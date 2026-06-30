@@ -1,0 +1,33 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Python caches and environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+.conda/
+
+# Local config and secrets
+.env
+.env.*
+!.env.example
+*.secret
+SECRET.md
+secrets/
+
+# Logs and generated output
+*.log
+logs/
+tmp/
+temp/
+outputs/
+dist/
+build/
