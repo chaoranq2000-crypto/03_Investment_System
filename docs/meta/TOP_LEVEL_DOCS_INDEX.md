@@ -16,6 +16,8 @@
 | `docs/plans/PLANS.md` | 计划模板 | 定义复杂任务的计划格式和验收方法 |
 | `docs/plans/P0_ACCEPTANCE_CHECKLIST.md` | 验收清单 | 用于判断 P0 是否完成并暂停 |
 | `docs/plans/P0_执行计划.md` | P0 执行计划 | 记录 P0 阶段的执行步骤和检查项 |
+| `docs/plans/P1_执行计划.md` | P1 执行计划 | 记录单细分最小研究闭环的步骤和验收标准 |
+| `docs/plans/2026-07-01_execution_plan_log.md` | 执行日志 | 汇总 P0 和 P1 两次执行计划的实际执行、验收、偏差和发布状态 |
 | `docs/p0/P0_前置规划确认稿.md` | P0 记录 | 确认 P0 范围、非目标、原则、验收和暂停点 |
 | `docs/p0/P0_smoke_test.md` | P0 记录 | 回答 P0 smoke test 的 13 个问题并记录阻塞项 |
 | `docs/p0/P0_closeout.md` | P0 记录 | 记录 P0 完成、未做、TODO、P1 前置和暂停确认 |
@@ -53,6 +55,10 @@ docs/plans/P0_执行计划.md
 docs/p0/P0_smoke_test.md
 ↓
 docs/p0/P0_closeout.md
+↓
+docs/plans/P1_执行计划.md
+↓
+docs/plans/2026-07-01_execution_plan_log.md
 ```
 
 ---
@@ -68,4 +74,4 @@ templates/*.md
 decisions/*.md
 ```
 
-P0 文档骨架完成后，不要马上做复杂自动化。先用 `docs/plans/P0_ACCEPTANCE_CHECKLIST.md` 验收，再进入 P1 最小闭环。
+P0 文档骨架完成后，不要马上做复杂自动化。先用 `docs/plans/P0_ACCEPTANCE_CHECKLIST.md` 验收，再进入 P1 最小闭环。P1 执行后用 `docs/plans/2026-07-01_execution_plan_log.md` 回看计划执行、偏差修复和 GitHub 发布状态。
