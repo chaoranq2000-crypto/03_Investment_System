@@ -1,0 +1,44 @@
+# Codex project configuration for A-share Research OS.
+# Review against your installed Codex version before use.
+
+project_root_markers = [".git", "AGENTS.md", "pyproject.toml"]
+
+[[skills.config]]
+path = ".agents/skills/evidence-ingest"
+enabled = true
+
+[[skills.config]]
+path = ".agents/skills/segment-research"
+enabled = true
+
+[[skills.config]]
+path = ".agents/skills/company-universe"
+enabled = true
+
+[[skills.config]]
+path = ".agents/skills/segment-company-mapping"
+enabled = true
+
+[[skills.config]]
+path = ".agents/skills/stock-deep-dive"
+enabled = true
+
+[[skills.config]]
+path = ".agents/skills/compare-segments"
+enabled = true
+
+[[skills.config]]
+path = ".agents/skills/compare-stocks"
+enabled = true
+
+[[skills.config]]
+path = ".agents/skills/refresh-research"
+enabled = true
+
+[[skills.config]]
+path = ".agents/skills/quality-review"
+enabled = true
+
+[[skills.config]]
+path = ".agents/skills/memo-writer"
+enabled = true

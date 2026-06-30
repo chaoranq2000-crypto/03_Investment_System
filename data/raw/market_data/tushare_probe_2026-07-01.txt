@@ -1,0 +1,8 @@
+P1 Tushare probe
+
+conda_env: C:\Projects\03_Investment_System\.conda\investment-system
+tushare_import: success
+tushare_version: 1.4.29
+service_query: failed
+service_message: token rejected by Tushare service
+note: no token value stored in this file; do not use this probe as research evidence.

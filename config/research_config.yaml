@@ -1,0 +1,173 @@
+project:
+  name: a-share-research-os
+  name_cn: A股投研工作区
+  stage: P1
+  language: zh-CN
+  timezone: Asia/Shanghai
+  date_format: YYYY-MM-DD
+  default_disclaimer: 本内容用于研究流程与证据管理，不构成任何买入、卖出、持有或其他交易建议。
+
+paths:
+  raw_evidence: data/raw
+  processed_text: data/processed/text
+  processed_tables: data/processed/tables
+  processed_normalized: data/processed/normalized
+  manifests: data/manifests
+  segment_reports: reports/segments
+  stock_reports: reports/stocks
+  comparisons: reports/comparisons
+  refresh_logs: reports/refresh
+  memos: reports/memos
+  decisions: decisions
+
+naming:
+  date_format: YYYY-MM-DD
+  segment_id_format: lower_snake_case
+  company_folder_format: <stock_code>_<company_slug>
+  evidence_id_format: <source_type>_<entity_or_publisher>_<date_or_period>_<short_hash>
+  claim_id_format: claim_<entity_type>_<entity_id>_<date>_<seq>
+  metric_id_format: metric_<entity_type>_<entity_id>_<period>_<short_hash>
+  report_file_format: <date>_<report_type>.md
+
+evidence:
+  id_pattern: <source_type>_<entity_or_publisher>_<date_or_period>_<short_hash>
+  confidence_labels:
+    - high
+    - medium
+    - low
+  status_labels:
+    - fresh
+    - stale
+    - superseded
+    - contradicted
+    - low_confidence
+  required_missing_markers:
+    - "TODO: 需要补充证据"
+    - "MISSING: 暂无直接披露"
+    - "LOW_CONFIDENCE: 当前证据质量不足"
+    - "UNVERIFIED: 尚未核验"
+
+claims:
+  id_pattern: claim_<entity_type>_<entity_id>_<date>_<seq>
+  claim_types:
+    - fact
+    - estimate
+    - inference
+    - management_comment
+    - analyst_view
+    - opinion
+    - unknown
+
+metrics:
+  id_pattern: metric_<entity_type>_<entity_id>_<period>_<short_hash>
+  required_fields:
+    - metric_name
+    - entity_type
+    - entity_id
+    - period
+    - value
+    - unit
+    - source_evidence_id
+    - calculation_method
+    - is_estimate
+
+reports:
+  status_labels:
+    - current
+    - needs_refresh
+    - outdated
+    - archived
+  required_sections:
+    - metadata
+    - evidence_snapshot
+    - facts
+    - estimates_and_inferences
+    - risks_and_counter_evidence
+    - todo_and_missing_data
+    - evidence_map
+
+object_schemas:
+  segment:
+    required_fields:
+      - segment_id
+      - name_cn
+      - name_en
+      - definition
+      - scope_in
+      - scope_out
+      - industry_chain_role
+      - status
+  company:
+    required_fields:
+      - company_id
+      - stock_code
+      - stock_name
+      - exchange
+      - business_summary
+      - status
+  security:
+    required_fields:
+      - security_id
+      - stock_code
+      - exchange
+      - stock_name
+      - listing_status
+      - currency
+  evidence:
+    required_fields:
+      - evidence_id
+      - source_type
+      - title
+      - publisher
+      - publish_date
+      - raw_file_path
+      - reliability_rank
+      - status
+  claim:
+    required_fields:
+      - claim_id
+      - evidence_id
+      - entity_type
+      - entity_id
+      - claim_text
+      - claim_type
+      - confidence
+      - status
+  report:
+    required_fields:
+      - report_id
+      - report_type
+      - title
+      - report_date
+      - evidence_snapshot
+      - confidence
+      - status
+
+segment_company_exposure:
+  required_fields:
+    - segment_id
+    - company_id
+    - stock_code
+    - stock_name
+    - exposure_type
+    - exposure_score
+    - evidence_ids
+    - confidence
+  exposure_types:
+    - revenue
+    - capacity
+    - product
+    - technology
+    - customer
+    - project
+    - narrative
+    - unknown
+  score_range: 0-5
+
+p0_non_goals:
+  - complex_database
+  - automatic_filing_download
+  - full_market_scan
+  - automatic_valuation_model
+  - realtime_market_monitoring
+  - trading_instruction

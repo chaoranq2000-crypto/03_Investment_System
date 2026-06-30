@@ -1,0 +1,15 @@
+segment_exposure:
+  - segment_id: ai_server_liquid_cooling
+    company_id: cn_300731_cotran
+    stock_code: "300731"
+    stock_name: 科创新源
+    exposure_type: technology
+    exposure_score: 2
+    revenue_pct: "MISSING: 暂无直接披露"
+    profit_pct: "MISSING: 暂无直接披露"
+    evidence_ids:
+      - annual_report_300731_cotran_2025_122523
+    confidence: medium
+    valid_from: 2026-07-01
+    valid_to:
+    notes: 科创新源披露液冷板和数据中心液冷需求相关内容，但更适合作为技术/概念暴露降权样本。

@@ -1,0 +1,47 @@
+metrics: []
+
+schema:
+  metric_id: string
+  entity_type: segment | company | security
+  entity_id: string
+  metric_name: string
+  period: string
+  value: number | string | null
+  unit: string
+  source_evidence_id: string
+  calculation_method: string
+  is_estimate: true | false
+  confidence: high | medium | low
+  created_at: YYYY-MM-DD
+  notes: string
+
+metric_groups:
+  segment:
+    - market_size
+    - growth_rate
+    - penetration_rate
+    - supply_demand_balance
+    - industry_margin_pool
+    - localization_rate
+    - policy_intensity
+  company:
+    - segment_revenue_pct
+    - segment_profit_pct
+    - gross_margin
+    - order_backlog
+    - capacity
+    - customer_concentration
+    - r_and_d_intensity
+    - leverage
+  valuation:
+    - pe
+    - pb
+    - ps
+    - ev_ebitda
+    - market_cap
+
+guardrails:
+  - Every metric must state period, unit, source_evidence_id, and calculation_method.
+  - Estimated metrics must set is_estimate to true and explain the method.
+  - Conflicting metric definitions must be shown side by side, not silently merged.
+  - Metrics are research inputs and must not be converted into direct trading instructions.

@@ -1,0 +1,79 @@
+segments:
+  - segment_id: ai_server_liquid_cooling
+    name_cn: AI服务器液冷
+    name_en: AI server liquid cooling
+    aliases:
+      - 数据中心液冷
+      - 服务器液冷
+      - 冷板液冷
+      - 浸没式液冷
+      - 算力中心液冷
+    definition: 面向AI服务器和智算/数据中心高功率密度场景的液冷设备、部件、系统集成与相关热管理解决方案。
+    scope_in:
+      - AI服务器、智算中心和数据中心液冷设备及部件
+      - 冷板、CDU、管路、接头、泵阀、换热和系统集成
+      - 与数据中心液冷部署直接相关的产品、项目、客户认证和技术储备
+    scope_out:
+      - 普通商用空调和传统机房精密空调
+      - 与服务器或数据中心无关的工业冷却
+      - 储能温控、汽车热管理等相邻但非本轮核心场景
+    parent_theme: ai_infrastructure
+    industry_chain_role: equipment
+    related_segments:
+      - data_center_power
+      - server_structure
+      - energy_storage_thermal_management
+      - electronic_thermal_materials
+    created_at: 2026-07-01
+    updated_at: 2026-07-01
+    status: active
+    evidence_ids:
+      - policy_miit_compute_infra_20231008_9f2a30
+      - industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91
+    notes: P1试点细分；用于验证证据、公司池、暴露映射和质量审查闭环。
+
+schema:
+  segment_id: string
+  name_cn: string
+  name_en: string
+  aliases: list
+  definition: string
+  scope_in: list
+  scope_out: list
+  parent_theme: string
+  industry_chain_role: upstream | midstream | downstream | equipment | material | service | application | unknown
+  related_segments: list
+  created_at: YYYY-MM-DD
+  updated_at: YYYY-MM-DD
+  status: active | watch | archived
+  evidence_ids: list
+  notes: string
+
+segment_company_exposure_schema:
+  segment_id: string
+  company_id: string
+  stock_code: string
+  stock_name: string
+  exposure_type: revenue | capacity | product | technology | customer | project | narrative | unknown
+  exposure_score: 0-5
+  revenue_pct: number | null
+  profit_pct: number | null
+  evidence_ids: list
+  confidence: high | medium | low
+  valid_from: YYYY-MM-DD | null
+  valid_to: YYYY-MM-DD | null
+  notes: string
+
+exposure_score_meaning:
+  0: 无证据或不相关
+  1: 仅概念或非常弱的间接关联
+  2: 有产品、技术或项目线索，但收入或利润影响不清
+  3: 有明确业务暴露，但占比或弹性不清
+  4: 有较强业务暴露，收入、订单或客户证据较清楚
+  5: 高纯度核心暴露，财务影响明确且证据强
+
+guardrails:
+  - segment_id must be lower_snake_case.
+  - scope_in and scope_out must be explicit before writing a segment report.
+  - company exposure is many-to-many and must not be forced into one segment.
+  - narrative exposure is low confidence until supported by primary evidence.

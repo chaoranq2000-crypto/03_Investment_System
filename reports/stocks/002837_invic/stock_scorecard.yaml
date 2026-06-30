@@ -1,0 +1,40 @@
+stock_scorecard:
+  company_id: cn_002837_invic
+  stock_code: "002837"
+  stock_name: 英维克
+  score_date: 2026-07-01
+  disclaimer: 本内容用于研究流程与证据管理，不构成任何买入、卖出、持有或其他交易建议。
+  linked_segments:
+    - ai_server_liquid_cooling
+  scores:
+    segment_exposure_quality:
+      score: 4
+      rationale: 暴露类型为product，仍需收入占比和客户订单核验。
+      evidence_ids:
+        - annual_report_002837_invic_2025_0f8fcf
+      confidence: medium
+    revenue_visibility:
+      score: 1
+      rationale: 液冷收入占比暂缺。
+      evidence_ids:
+        - TODO
+      confidence: low
+    financial_quality:
+      score: 1
+      rationale: Tushare stock_basic已导入，结构化财务字段未完成。
+      evidence_ids:
+        - market_data_tushare_stock_basic_20260701_a6d9f2
+      confidence: low
+    evidence_quality:
+      score: 3
+      rationale: 有官方披露证据，但字段抽取未完成。
+      evidence_ids:
+        - annual_report_002837_invic_2025_0f8fcf
+      confidence: medium
+  final_priority: deep_watch
+  key_reasons:
+    - reason: 进入P1个股样本用于验证暴露映射。
+      evidence_id: annual_report_002837_invic_2025_0f8fcf
+  kill_switches:
+    - condition: 连续两期无液冷收入、订单或客户验证披露。
+      evidence_needed: 年报/半年报/公告/投关记录

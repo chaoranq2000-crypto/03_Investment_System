@@ -1,0 +1,16 @@
+refresh_tasks:
+  - task_id: refresh_tushare_financial_and_announcement_data_20260701
+    object: data_source
+    evidence_needed: Tushare fina_indicator, anns_d
+    status: open
+    reason: stock_basic已成功，财务和公告深字段仍需补。
+  - task_id: extract_liquid_cooling_revenue_pct_20260701
+    object: company_universe
+    evidence_needed: 年报和半年报分产品表
+    status: open
+    reason: company_universe中revenue_pct仍为MISSING。
+  - task_id: verify_customer_orders_20260701
+    object: segment
+    evidence_needed: 客户侧采购、订单或招标公告
+    status: open
+    reason: 需求兑现需要客户侧证据。

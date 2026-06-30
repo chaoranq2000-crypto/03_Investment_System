@@ -1,0 +1,119 @@
+watchlist:
+  segments:
+    - watch_item_id: watch_seg_ai_server_liquid_cooling_20260701
+      segment_id: ai_server_liquid_cooling
+      watch_reason: AI算力基础设施扩张与高功率密度服务器散热需求相关，P1已建立证据闭环。
+      supporting_claim_ids:
+        - claim_segment_ai_server_liquid_cooling_20260701_001
+        - claim_segment_ai_server_liquid_cooling_20260701_002
+      evidence_ids:
+        - policy_miit_compute_infra_20231008_9f2a30
+        - industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91
+      key_metrics:
+        - liquid_cooling_revenue_pct
+        - data_center_liquid_cooling_orders
+        - customer_validation_progress
+      triggers:
+        - 年报/半年报披露液冷收入或订单
+        - 运营商或云厂商液冷集采/技术规范更新
+        - CAICT或行业协会更新渗透率和市场规模口径
+      risks:
+        - 风冷效率提升或风液混合方案延缓替代
+        - 价格竞争压缩利润池
+        - 公司披露停留在技术储备而非收入兑现
+      confidence: medium
+      status: active
+      next_review_date: 2026-10-01
+  companies:
+    - watch_item_id: watch_company_cn_002837_invic_20260701
+      company_id: cn_002837_invic
+      stock_code: "002837"
+      stock_name: 英维克
+      linked_segments:
+        - ai_server_liquid_cooling
+      watch_reason: 产品暴露清晰度较高，但液冷收入占比仍需核验。
+      supporting_claim_ids:
+        - claim_company_002837_invic_20260701_001
+        - claim_company_002837_invic_20260701_002
+      evidence_ids:
+        - annual_report_002837_invic_2025_0f8fcf
+      validation_metrics:
+        - liquid_cooling_revenue_pct
+        - data_center_customer_orders
+        - gross_margin_of_thermal_management
+      triggers:
+        - 年报/半年报披露分产品收入
+        - 数据中心液冷重大合同公告
+        - 投资者关系活动记录更新客户验证进展
+      risks:
+        - 收入暴露低于市场叙事
+        - 液冷产品价格竞争
+      confidence: medium
+      status: active
+      next_review_date: 2026-10-01
+    - watch_item_id: watch_company_cn_300731_cotran_20260701
+      company_id: cn_300731_cotran
+      stock_code: "300731"
+      stock_name: 科创新源
+      linked_segments:
+        - ai_server_liquid_cooling
+      watch_reason: 作为概念/技术暴露降权样本，重点验证收入兑现。
+      supporting_claim_ids:
+        - claim_company_300731_cotran_20260701_001
+        - claim_company_300731_cotran_20260701_002
+      evidence_ids:
+        - annual_report_300731_cotran_2025_122523
+      validation_metrics:
+        - liquid_cooling_plate_revenue
+        - customer_certification
+        - batch_delivery_progress
+      triggers:
+        - 液冷板收入或订单披露
+        - 子公司创源智热业务进展披露
+      risks:
+        - 仅有产品或技术储备，未形成显著业绩贡献
+      confidence: medium
+      status: active
+      next_review_date: 2026-10-01
+  metrics: []
+  catalysts: []
+  risks: []
+
+schemas:
+  segment_watch_item:
+    watch_item_id: string
+    segment_id: string
+    watch_reason: string
+    supporting_claim_ids: list
+    evidence_ids: list
+    key_metrics: list
+    triggers: list
+    risks: list
+    confidence: high | medium | low
+    status: active | paused | archived
+    next_review_date: YYYY-MM-DD
+  company_watch_item:
+    watch_item_id: string
+    company_id: string
+    stock_code: string
+    stock_name: string
+    linked_segments: list
+    watch_reason: string
+    supporting_claim_ids: list
+    evidence_ids: list
+    validation_metrics: list
+    triggers: list
+    risks: list
+    confidence: high | medium | low
+    status: active | paused | archived
+    next_review_date: YYYY-MM-DD
+
+decision_log_paths:
+  thesis_log: decisions/thesis_log.md
+  watchlist_changes: decisions/watchlist_changes.md
+  postmortems: decisions/postmortems
+
+guardrails:
+  - Watchlist inclusion must have evidence_ids or explicit TODO.
+  - Watchlist changes must be logged in decisions/watchlist_changes.md.
+  - A watch item is a research priority, not a buy/sell/hold instruction.

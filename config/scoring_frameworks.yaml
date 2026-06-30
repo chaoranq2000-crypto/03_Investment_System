@@ -1,0 +1,72 @@
+score_scale:
+  min: 0
+  max: 5
+  interpretation:
+    0: no_evidence_or_not_applicable
+    1: weak
+    2: early_or_uncertain
+    3: moderate
+    4: strong
+    5: very_strong_with_high_quality_evidence
+
+frameworks:
+  segment_scorecard:
+    description: 细分方向研究评分框架，用于比较研究优先级，不是交易信号。
+    dimensions:
+      - market_space
+      - growth_visibility
+      - industry_chain_position
+      - profit_pool_quality
+      - a_share_purity
+      - evidence_quality
+      - catalyst_visibility
+      - risk_pressure
+    required_fields:
+      - segment_id
+      - score_date
+      - dimension
+      - score
+      - rationale
+      - evidence_ids
+      - confidence
+      - reviewer
+  stock_scorecard:
+    description: 个股研究评分框架，用于结构化比较，不输出买卖建议。
+    dimensions:
+      - segment_exposure_quality
+      - revenue_visibility
+      - margin_quality
+      - customer_quality
+      - technology_or_product_edge
+      - financial_quality
+      - governance_quality
+      - valuation_scenario_risk
+      - evidence_quality
+    required_fields:
+      - company_id
+      - stock_code
+      - score_date
+      - dimension
+      - score
+      - rationale
+      - evidence_ids
+      - confidence
+      - reviewer
+  comparison_matrix:
+    description: 细分或个股横向比较矩阵，要求统一口径和证据来源。
+    required_fields:
+      - object_type
+      - object_id
+      - dimension
+      - score
+      - evidence_ids
+      - claim_ids
+      - confidence
+      - notes
+
+guardrails:
+  - score_is_not_trading_signal: true
+  - scoring_requires_evidence_or_todo: true
+  - high_score_requires_primary_or_high_quality_evidence: true
+  - narrative_only_exposure_cannot_receive_high_score: true
+  - changed_scores_require_refresh_log: true

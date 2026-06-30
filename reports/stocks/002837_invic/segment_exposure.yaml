@@ -1,0 +1,15 @@
+segment_exposure:
+  - segment_id: ai_server_liquid_cooling
+    company_id: cn_002837_invic
+    stock_code: "002837"
+    stock_name: 英维克
+    exposure_type: product
+    exposure_score: 4
+    revenue_pct: "MISSING: 暂无直接披露"
+    profit_pct: "MISSING: 暂无直接披露"
+    evidence_ids:
+      - annual_report_002837_invic_2025_0f8fcf
+    confidence: medium
+    valid_from: 2026-07-01
+    valid_to:
+    notes: 英维克披露数据中心热管理和液冷相关产品/解决方案，属于较清晰的产品暴露样本。

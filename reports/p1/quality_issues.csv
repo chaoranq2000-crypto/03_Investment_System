@@ -1,0 +1,6 @@
+issue_id,severity,status,object,issue,fix
+P1-QA-001,high,fixed,segment_report,初稿中所有关键结论必须有evidence_id或claim_id,已在segment_report、stock_report、evidence_map中补齐引用
+P1-QA-002,high,fixed,company_universe,不能把技术储备或热管理宽口径写成高暴露,科创新源、飞荣达降为exposure_score=2并标记验证项
+P1-QA-003,medium,fixed,data_source,Tushare初始调用未走代理URL，服务端返回token无效,已按PDF指南设置pro._DataApi__http_url并生成stock_basic快照；财务深字段另列TODO
+P1-QA-004,medium,todo,metrics,液冷收入占比、利润占比、订单金额仍缺失,在company_universe、stock_report和followup_questions中保留MISSING/TODO
+P1-QA-005,high,fixed,stock_deep_dive,个股报告相对优秀案例缺少财务概览、因果链、情景和反证密度,已用Tushare财务快照生成metrics_draft，并重写两份个股深度报告

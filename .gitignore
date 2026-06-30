@@ -1,33 +1,41 @@
-# OS and editor files
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
+# Environment
+.env
+.env.*
+!.env.example
+.conda/
 
-# Python caches and environments
+# Python
 __pycache__/
 *.py[cod]
+*.pyo
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .venv/
 venv/
-env/
-.conda/
 
-# Local config and secrets
-.env
-.env.*
-!.env.example
-*.secret
-SECRET.md
+# Jupyter
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Local databases and large generated artifacts
+*.duckdb
+*.duckdb.wal
+*.parquet.tmp
+data/db/*.duckdb
+data/db/*.duckdb.wal
+data/processed/embeddings/*
+!data/processed/embeddings/.gitkeep
+data/db/vector.index
+
+# Secrets / tokens
 secrets/
+*.pem
+*.key
 
-# Logs and generated output
-*.log
-logs/
-tmp/
-temp/
-outputs/
-dist/
-build/
+# Local/private third-party setup manuals
+docs/playbooks/tushare_configuration_guide.pdf

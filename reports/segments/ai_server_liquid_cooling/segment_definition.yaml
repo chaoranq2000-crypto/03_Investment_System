@@ -1,0 +1,39 @@
+segment_id: ai_server_liquid_cooling
+name_cn: AI服务器液冷
+name_en: AI server liquid cooling
+aliases:
+  - 数据中心液冷
+  - 服务器液冷
+  - 冷板液冷
+  - 浸没式液冷
+  - 算力中心液冷
+definition: 面向AI服务器和智算/数据中心高功率密度场景的液冷设备、部件、系统集成与相关热管理解决方案。
+scope_in:
+  - 冷板式液冷设备、部件和系统集成
+  - 浸没式液冷设备、部件和系统集成
+  - 数据中心液冷相关CDU、泵阀、管路、快接头、换热和控制系统
+  - 与AI服务器液冷部署直接相关的客户验证、订单、项目和技术储备
+scope_out:
+  - 普通商用空调
+  - 与服务器无关的工业冷却
+  - 储能温控、汽车热管理等非本轮核心场景
+  - 仅因热管理宽口径出现但无法证明数据中心液冷关联的业务
+related_segments:
+  - data_center_power
+  - server_structure
+  - electronic_thermal_materials
+  - energy_storage_thermal_management
+industry_chain_role:
+  - equipment
+  - components
+  - system_integration
+key_questions:
+  - 液冷渗透率是否提升？
+  - A股公司收入暴露是否真实？
+  - 产品、订单、客户和利润率能否兑现？
+evidence_ids:
+  - policy_miit_compute_infra_20231008_9f2a30
+  - industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91
+status: active
+created_at: 2026-07-01
+updated_at: 2026-07-01

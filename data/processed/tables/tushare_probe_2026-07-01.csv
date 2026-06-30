@@ -1,0 +1,2 @@
+probe_date,package,package_version,endpoint,status,research_use,notes
+2026-07-01,tushare,1.4.29,stock_basic / anns_d,superseded_by_proxy_config,not_used,按PDF指南设置代理URL后已成功补录stock_basic快照
