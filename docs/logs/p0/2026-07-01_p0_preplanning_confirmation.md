@@ -43,7 +43,7 @@
 
 ## 6. 验收标准
 
-P0 通过标准以 `docs/plans/P0_ACCEPTANCE_CHECKLIST.md` 为准，并由 `docs/p0/P0_smoke_test.md` 和 `tests/test_p0_acceptance.py` 提供本轮验收证据。
+P0 通过标准以 `docs/plans/p0_acceptance_checklist.md` 为准，并由 `docs/logs/p0/2026-07-01_p0_smoke_test.md` 和 `tests/test_p0_acceptance.py` 提供本轮验收证据。
 
 ## 7. 暂停点
 

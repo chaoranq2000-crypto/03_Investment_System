@@ -77,7 +77,7 @@ P1.5 不做：
 | [`docs/project/PROJECT_CHARTER.md`](docs/project/PROJECT_CHARTER.md) | 项目目标、范围、非目标、路线图和暂停点 |
 | [`docs/architecture/WORKSPACE_STRUCTURE.md`](docs/architecture/WORKSPACE_STRUCTURE.md) | 目录结构、文件归位、命名规则 |
 | [`docs/policies/QUALITY_GUARDRAILS.md`](docs/policies/QUALITY_GUARDRAILS.md) | 质量检查、反幻觉、反证、风险纪律 |
-| [`docs/plans/P0_ACCEPTANCE_CHECKLIST.md`](docs/plans/P0_ACCEPTANCE_CHECKLIST.md) | P0 验收清单 |
+| [`docs/plans/p0_acceptance_checklist.md`](docs/plans/p0_acceptance_checklist.md) | P0 验收清单 |
 
 ---
 
@@ -102,6 +102,7 @@ a-share-research-os/
 │   ├── policies/
 │   ├── playbooks/
 │   ├── plans/
+│   ├── logs/
 │   └── meta/
 ├── config/
 ├── data/

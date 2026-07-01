@@ -17,16 +17,19 @@
 - local-only: playbooks/tushare_configuration_guide.pdf (ignored; not published to public GitHub)
 
 ## Plans
-- plans/PLANS.md
-- plans/P0_ACCEPTANCE_CHECKLIST.md
-- plans/P0_执行计划.md
-- plans/P1_执行计划.md
-- plans/2026-07-01_execution_plan_log.md
+- plans/plan_template.md
+- plans/p0_acceptance_checklist.md
+- plans/p0_execution_plan.md
+- plans/p1_execution_plan.md
+- plans/p1_1_revision_plan.md
 
-## P0 Records
-- p0/P0_前置规划确认稿.md
-- p0/P0_smoke_test.md
-- p0/P0_closeout.md
+## Logs
+- logs/README.md
+- logs/2026-07-01_plan_completion_log.md
+- logs/2026-07-01_docs_structure_cleanup_log.md
+- logs/p0/2026-07-01_p0_preplanning_confirmation.md
+- logs/p0/2026-07-01_p0_smoke_test.md
+- logs/p0/2026-07-01_p0_closeout.md
 
 ## Meta
 - meta/TOP_LEVEL_DOCS_INDEX.md

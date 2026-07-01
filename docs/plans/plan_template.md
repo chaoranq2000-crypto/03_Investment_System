@@ -1,4 +1,4 @@
-# PLANS.md — 执行计划模板
+# plan_template.md — 执行计划模板
 
 ## 1. 什么时候写计划
 
@@ -18,7 +18,22 @@
 
 ---
 
-## 2. 执行计划格式
+## 2. 文件命名规则
+
+`docs/plans/` 下的计划文件统一使用英文小写 `snake_case`；计划完成情况放在与 `docs/plans/` 平行的 `docs/logs/`：
+
+- 通用模板：`plan_template.md`
+- 阶段计划：`p0_execution_plan.md`、`p1_execution_plan.md`
+- 阶段修正计划：`p1_1_revision_plan.md`
+- 验收清单：`p0_acceptance_checklist.md`
+- 完成情况日志：`docs/logs/YYYY-MM-DD_plan_completion_log.md`
+- 阶段记录：`docs/logs/<stage_id>/YYYY-MM-DD_<stage_id>_<record_type>.md`
+
+日志文件的完整规则以 `docs/logs/README.md` 为准。文件名应先写阶段或日期，再写文档类型；中文标题只放在正文标题中，不放在路径中。
+
+---
+
+## 3. 执行计划格式
 
 ```md
 # Plan: <任务名称>
@@ -75,7 +90,7 @@
 
 ---
 
-## 3. P0 计划模板
+## 4. P0 计划模板
 
 ```md
 # Plan: P0 顶层文件生成
@@ -99,8 +114,8 @@
 - EVIDENCE_AND_CITATION_POLICY.md
 - QUALITY_GUARDRAILS.md
 - OPERATING_PLAYBOOK.md
-- PLANS.md
-- P0_ACCEPTANCE_CHECKLIST.md
+- plan_template.md
+- p0_acceptance_checklist.md
 
 ## 验收
 - 顶层规则清楚。
@@ -112,7 +127,7 @@
 
 ---
 
-## 4. 细分研究计划模板
+## 5. 细分研究计划模板
 
 ```md
 # Plan: Segment Research — <segment_name>
@@ -148,7 +163,7 @@
 
 ---
 
-## 5. 个股研究计划模板
+## 6. 个股研究计划模板
 
 ```md
 # Plan: Stock Deep Dive — <stock_code> <company_name>
@@ -183,7 +198,7 @@
 
 ---
 
-## 6. Refresh 计划模板
+## 7. Refresh 计划模板
 
 ```md
 # Plan: Refresh Research — <scope>

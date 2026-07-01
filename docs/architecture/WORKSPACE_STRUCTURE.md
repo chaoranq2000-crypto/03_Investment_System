@@ -21,14 +21,13 @@
 ```text
 AGENTS.md
 README.md
-PROJECT_CHARTER.md
-WORKSPACE_STRUCTURE.md
-RESEARCH_OBJECT_MODEL.md
-EVIDENCE_AND_CITATION_POLICY.md
-QUALITY_GUARDRAILS.md
-OPERATING_PLAYBOOK.md
-PLANS.md
-P0_ACCEPTANCE_CHECKLIST.md
+docs/
+config/
+data/
+reports/
+templates/
+decisions/
+tests/
 pyproject.toml
 .env.example
 .gitignore
@@ -38,18 +37,62 @@ pyproject.toml
 |---|---|
 | `AGENTS.md` | Codex 长期规则 |
 | `README.md` | 项目说明入口 |
-| `PROJECT_CHARTER.md` | 项目边界和路线图 |
-| `WORKSPACE_STRUCTURE.md` | 目录结构和文件归位规则 |
-| `RESEARCH_OBJECT_MODEL.md` | 研究对象和关系模型 |
-| `EVIDENCE_AND_CITATION_POLICY.md` | 证据和引用纪律 |
-| `QUALITY_GUARDRAILS.md` | 质量检查规则 |
-| `OPERATING_PLAYBOOK.md` | 日常使用手册 |
-| `PLANS.md` | 复杂任务计划模板 |
-| `P0_ACCEPTANCE_CHECKLIST.md` | P0 验收清单 |
+| `docs/` | 项目文档、架构、政策、手册、计划和元索引 |
+| `config/` | 研究配置、分类、来源、指标和评分规则 |
+| `data/` | 原始证据、加工数据、数据库和 manifest |
+| `reports/` | 派生研究报告、比较、刷新和备忘录 |
+| `templates/` | 报告、证据卡、比较矩阵和 memo 模板 |
+| `decisions/` | thesis log、watchlist 变更和复盘 |
+| `tests/` | 工作区验收和回归检查 |
 
 ---
 
-## 3. 配置目录 `config/`
+## 3. 文档目录 `docs/`
+
+```text
+docs/
+├── index.md
+├── project/
+├── architecture/
+├── policies/
+├── playbooks/
+├── plans/
+├── logs/
+└── meta/
+```
+
+### 3.1 计划目录 `docs/plans/`
+
+计划、计划模板和验收清单统一放在 `docs/plans/`，文件名使用英文小写 `snake_case`。
+
+```text
+docs/plans/
+├── plan_template.md
+├── p0_acceptance_checklist.md
+├── p0_execution_plan.md
+├── p1_execution_plan.md
+└── p1_1_revision_plan.md
+```
+
+### 3.2 日志目录 `docs/logs/`
+
+计划完成情况、阶段验收记录、closeout 和复盘记录统一放在 `docs/logs/`，不要与计划文件混放。
+
+```text
+docs/logs/
+├── README.md
+├── YYYY-MM-DD_<scope>_<log_type>.md
+└── p0/
+    ├── YYYY-MM-DD_p0_preplanning_confirmation.md
+    ├── YYYY-MM-DD_p0_smoke_test.md
+    └── YYYY-MM-DD_p0_closeout.md
+```
+
+日志命名规则以 `docs/logs/README.md` 为准；新增日志统一使用 `YYYY-MM-DD_<scope>_<log_type>.md`。
+
+---
+
+## 4. 配置目录 `config/`
 
 ```text
 config/
@@ -78,7 +121,7 @@ config/
 
 ---
 
-## 4. 证据目录 `data/`
+## 5. 证据目录 `data/`
 
 ```text
 data/
@@ -97,7 +140,7 @@ data/
 └── manifests/
 ```
 
-### 4.1 `data/raw/`
+### 5.1 `data/raw/`
 
 原始证据，只新增不覆盖。
 
@@ -109,7 +152,7 @@ data/
 | `transcripts/` | 调研纪要、电话会、业绩说明会、访谈 |
 | `market_data/` | 结构化行情、财务、行业数据原始导出 |
 
-### 4.2 `data/processed/`
+### 5.2 `data/processed/`
 
 加工产物，可重建。
 
@@ -120,7 +163,7 @@ data/
 | `embeddings/` | 向量索引或嵌入文件 |
 | `normalized/` | 标准化后的 CSV/Parquet/YAML |
 
-### 4.3 `data/db/`
+### 5.3 `data/db/`
 
 本地数据库或索引。
 
@@ -131,7 +174,7 @@ data/db/vector.index
 
 P0 可以只保留目录，不必实现数据库。
 
-### 4.4 `data/manifests/`
+### 5.4 `data/manifests/`
 
 证据和刷新日志的 manifest。
 
@@ -142,7 +185,7 @@ data/manifests/refresh_log.*
 
 ---
 
-## 5. Skills 目录 `.agents/skills/`
+## 6. Skills 目录 `.agents/skills/`
 
 ```text
 .agents/skills/
@@ -172,7 +215,7 @@ P0 只要求有 `SKILL.md` 空壳和边界说明。
 
 ---
 
-## 6. 模板目录 `templates/`
+## 7. 模板目录 `templates/`
 
 ```text
 templates/
@@ -196,7 +239,7 @@ templates/
 
 ---
 
-## 7. 报告目录 `reports/`
+## 8. 报告目录 `reports/`
 
 ```text
 reports/
@@ -207,7 +250,7 @@ reports/
 └── memos/
 ```
 
-### 7.1 细分报告
+### 8.1 细分报告
 
 ```text
 reports/segments/<segment_id>/
@@ -218,7 +261,7 @@ reports/segments/<segment_id>/
 └── refresh_tasks.yaml
 ```
 
-### 7.2 个股报告
+### 8.2 个股报告
 
 ```text
 reports/stocks/<stock_code>_<company_slug>/
@@ -228,7 +271,7 @@ reports/stocks/<stock_code>_<company_slug>/
 └── evidence_map.md
 ```
 
-### 7.3 对比报告
+### 8.3 对比报告
 
 ```text
 reports/comparisons/
@@ -238,7 +281,7 @@ reports/comparisons/
 └── <date>_stock_score_matrix.csv
 ```
 
-### 7.4 刷新报告
+### 8.4 刷新报告
 
 ```text
 reports/refresh/
@@ -250,7 +293,7 @@ reports/refresh/
 
 ---
 
-## 8. 决策目录 `decisions/`
+## 9. 决策目录 `decisions/`
 
 ```text
 decisions/
@@ -267,7 +310,7 @@ decisions/
 
 ---
 
-## 9. 命名规范
+## 10. 命名规范
 
 | 对象 | 规则 | 示例 |
 |---|---|---|
@@ -279,7 +322,7 @@ decisions/
 
 ---
 
-## 10. 禁止事项
+## 11. 禁止事项
 
 - 不在根目录随意创建临时报告。
 - 不把 raw evidence 放进 reports。

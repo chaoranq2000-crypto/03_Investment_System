@@ -17,12 +17,14 @@ REQUIRED_FILES = [
     "docs/policies/EVIDENCE_AND_CITATION_POLICY.md",
     "docs/policies/QUALITY_GUARDRAILS.md",
     "docs/playbooks/OPERATING_PLAYBOOK.md",
-    "docs/plans/PLANS.md",
-    "docs/plans/P0_ACCEPTANCE_CHECKLIST.md",
-    "docs/plans/P0_执行计划.md",
-    "docs/p0/P0_前置规划确认稿.md",
-    "docs/p0/P0_smoke_test.md",
-    "docs/p0/P0_closeout.md",
+    "docs/plans/plan_template.md",
+    "docs/plans/p0_acceptance_checklist.md",
+    "docs/plans/p0_execution_plan.md",
+    "docs/logs/README.md",
+    "docs/logs/2026-07-01_docs_structure_cleanup_log.md",
+    "docs/logs/p0/2026-07-01_p0_preplanning_confirmation.md",
+    "docs/logs/p0/2026-07-01_p0_smoke_test.md",
+    "docs/logs/p0/2026-07-01_p0_closeout.md",
     "config/research_config.yaml",
     "config/segment_taxonomy.yaml",
     "config/source_registry.yaml",
@@ -42,6 +44,8 @@ REQUIRED_FILES = [
 
 REQUIRED_DIRS = [
     ".agents/skills",
+    "docs/logs",
+    "docs/logs/p0",
     "config",
     "data/raw/announcements",
     "data/raw/annual_reports",
@@ -177,11 +181,11 @@ def collect_errors() -> list[str]:
     if "evidence_id,source_type,source_name,title,publisher,publish_date" not in evidence_header:
         errors.append("evidence_manifest.csv header is incomplete")
 
-    smoke = read_text("docs/p0/P0_smoke_test.md")
+    smoke = read_text("docs/logs/p0/2026-07-01_p0_smoke_test.md")
     if "result: PASS" not in smoke or "P0 Blocking Issues" not in smoke:
         errors.append("P0 smoke test does not record PASS and blocking issues")
 
-    closeout = read_text("docs/p0/P0_closeout.md")
+    closeout = read_text("docs/logs/p0/2026-07-01_p0_closeout.md")
     if "status: PASS" not in closeout or "暂停确认" not in closeout:
         errors.append("P0 closeout does not record PASS and pause confirmation")
 

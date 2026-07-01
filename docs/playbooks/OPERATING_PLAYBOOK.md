@@ -50,7 +50,7 @@ P0 目标：让项目可被 Codex 和人稳定理解。
 4. 建立 `config/` YAML 空壳。
 5. 建立 `templates/` Markdown 模板。
 6. 建立 `data/`、`reports/`、`decisions/` 目录。
-7. 根据 `P0_ACCEPTANCE_CHECKLIST.md` 验收。
+7. 根据 `docs/plans/p0_acceptance_checklist.md` 验收。
 
 ### 3.2 暂停条件
 

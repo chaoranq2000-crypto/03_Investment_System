@@ -64,8 +64,8 @@ RESEARCH_OBJECT_MODEL.md
 EVIDENCE_AND_CITATION_POLICY.md
 QUALITY_GUARDRAILS.md
 OPERATING_PLAYBOOK.md
-PLANS.md
-P0_ACCEPTANCE_CHECKLIST.md
+docs/plans/plan_template.md
+docs/plans/p0_acceptance_checklist.md
 .codex/config.toml
 ```
 

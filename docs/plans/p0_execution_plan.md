@@ -5,7 +5,7 @@
 - 版本：v0.1
 - 日期：2026-06-30
 - 状态：Draft for Execution
-- 前置文档：`P0_前置规划确认稿.md`
+- 前置文档：`2026-07-01_p0_preplanning_confirmation.md`
 
 > 说明：本文档用于执行 P0。P0 只搭建项目骨架、规则、模板、配置和 skills 空壳，不实现复杂自动化，不输出投资建议。
 
@@ -135,7 +135,7 @@ decisions/watchlist_changes.md
 ### 产出文件
 
 ```text
-docs/p0/P0_前置规划确认稿.md
+docs/logs/p0/2026-07-01_p0_preplanning_confirmation.md
 ```
 
 如暂不建立 `docs/`，可先保留在项目根目录或工作区外部。
@@ -1155,7 +1155,7 @@ reports/refresh/2026-06-30_p0_smoke_test.md
 或：
 
 ```text
-docs/p0/P0_smoke_test.md
+docs/logs/p0/2026-07-01_p0_smoke_test.md
 ```
 
 ### 依赖
@@ -1196,7 +1196,7 @@ P1 首个细分候选
 ### 产出文件
 
 ```text
-docs/p0/P0_closeout.md
+docs/logs/p0/2026-07-01_p0_closeout.md
 ```
 
 如不建 `docs/`，可放入：

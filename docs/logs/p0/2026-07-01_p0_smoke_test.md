@@ -54,7 +54,7 @@
 
 ## 13. 是否明确 P0 不做复杂数据库、全市场扫描、自动估值？
 
-是。`README.md`、`docs/project/PROJECT_CHARTER.md`、`docs/playbooks/OPERATING_PLAYBOOK.md` 和 `docs/p0/P0_前置规划确认稿.md` 都明确 P0 不做复杂数据库、全市场扫描、自动抓取公告、自动估值模型、行情监控或交易策略。
+是。`README.md`、`docs/project/PROJECT_CHARTER.md`、`docs/playbooks/OPERATING_PLAYBOOK.md` 和 `docs/logs/p0/2026-07-01_p0_preplanning_confirmation.md` 都明确 P0 不做复杂数据库、全市场扫描、自动抓取公告、自动估值模型、行情监控或交易策略。
 
 ## TODO
 

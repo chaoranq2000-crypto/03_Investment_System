@@ -147,8 +147,9 @@ docs/architecture/RESEARCH_OBJECT_MODEL.md Segment/company/evidence/claim/metric
 docs/policies/EVIDENCE_AND_CITATION_POLICY.md Evidence source, ID, citation, and freshness rules
 docs/policies/QUALITY_GUARDRAILS.md Review gates and anti-hallucination rules
 docs/playbooks/OPERATING_PLAYBOOK.md Common workflows and skill-routing guide
-docs/plans/PLANS.md            Planning and execution-plan template
-docs/plans/P0_ACCEPTANCE_CHECKLIST.md P0 completion checklist
+docs/plans/plan_template.md     Planning and execution-plan template
+docs/plans/p0_acceptance_checklist.md P0 completion checklist
+docs/logs/                       Plan completion logs and stage records
 
 .codex/config.toml              Codex project configuration
 .agents/skills/                 Repo skills, one directory per repeatable research action
