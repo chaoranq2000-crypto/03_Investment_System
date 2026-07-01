@@ -1,0 +1,5 @@
+# Add this block to .codex/config.toml after the skill directory is added.
+
+[[skills.config]]
+path = ".agents/skills/research-orchestrator"
+enabled = true

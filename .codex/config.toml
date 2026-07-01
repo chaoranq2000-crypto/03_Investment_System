@@ -42,3 +42,7 @@ enabled = true
 [[skills.config]]
 path = ".agents/skills/memo-writer"
 enabled = true
+
+[[skills.config]]
+path = ".agents/skills/research-orchestrator"
+enabled = true

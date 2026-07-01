@@ -16,15 +16,22 @@
 - playbooks/stock_report_case_study_shengyi_tech.md
 - local-only: playbooks/tushare_configuration_guide.pdf (ignored; not published to public GitHub)
 
+## Workflows
+- workflows/README.md
+- workflows/RESEARCH_WORKFLOW.md
+- workflows/WORKFLOW_ORCHESTRATION_SPEC.md
+
 ## Plans
 - plans/plan_template.md
 - plans/p0_acceptance_checklist.md
 - plans/p0_execution_plan.md
 - plans/p1_execution_plan.md
 - plans/p1_1_revision_plan.md
+- plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md
 
 ## Logs
 - logs/README.md
+- logs/2026-07-02_p1_6_workflow_foundation_log.md
 - logs/2026-07-01_plan_completion_log.md
 - logs/2026-07-01_docs_structure_cleanup_log.md
 - logs/p0/2026-07-01_p0_preplanning_confirmation.md
