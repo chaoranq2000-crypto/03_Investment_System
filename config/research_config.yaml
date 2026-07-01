@@ -1,7 +1,14 @@
 project:
   name: a-share-research-os
   name_cn: A股投研工作区
-  stage: P1
+  stage: P1.5
+  previous_stage:
+    P0: conditional_pass
+    P1: conditional_pass_with_medium_todos
+  current_focus: pre_p2_hardening
+  report_date: 2026-07-01
+  as_of_date: 2026-07-01
+  generated_at: 2026-07-01
   language: zh-CN
   timezone: Asia/Shanghai
   date_format: YYYY-MM-DD
@@ -31,6 +38,31 @@ naming:
 
 evidence:
   id_pattern: <source_type>_<entity_or_publisher>_<date_or_period>_<short_hash>
+  manifest_path: data/manifests/evidence_manifest.csv
+  archive_policy:
+    source_url_only_evidence_card: 只保存证据卡和来源链接时，source_url 必填，raw_file_path 可为空。
+    local_snapshot_file: 本地结构化快照或原始文件，raw_file_path 必填，source_url 可为空。
+  required_manifest_fields:
+    - evidence_id
+    - source_type
+    - source_name
+    - title
+    - publisher
+    - publish_date
+    - retrieved_at
+    - ingested_at
+    - file_hash
+    - source_url
+    - raw_file_path
+    - processed_text_path
+    - processed_table_path
+    - page_count
+    - reliability_rank
+    - status
+    - license_note
+    - stale_after
+    - review_status
+    - archive_policy
   confidence_labels:
     - high
     - medium
@@ -49,6 +81,22 @@ evidence:
 
 claims:
   id_pattern: claim_<entity_type>_<entity_id>_<date>_<seq>
+  draft_path: data/manifests/claims_draft.csv
+  registry_path: data/manifests/claims_registry.csv
+  required_registry_fields:
+    - claim_id
+    - evidence_id
+    - entity_type
+    - entity_id
+    - claim_text
+    - claim_type
+    - quote_or_excerpt
+    - page_no_or_section
+    - confidence
+    - valid_until
+    - status
+    - review_status
+    - notes
   claim_types:
     - fact
     - estimate
@@ -60,6 +108,8 @@ claims:
 
 metrics:
   id_pattern: metric_<entity_type>_<entity_id>_<period>_<short_hash>
+  draft_path: data/manifests/metrics_draft.csv
+  registry_path: data/manifests/metrics_registry.csv
   required_fields:
     - metric_name
     - entity_type
@@ -70,6 +120,20 @@ metrics:
     - source_evidence_id
     - calculation_method
     - is_estimate
+  required_registry_fields:
+    - metric_id
+    - entity_type
+    - entity_id
+    - metric_name
+    - period
+    - value
+    - unit
+    - source_evidence_id
+    - calculation_method
+    - is_estimate
+    - confidence
+    - review_status
+    - notes
 
 reports:
   status_labels:
@@ -153,6 +217,10 @@ segment_company_exposure:
     - exposure_score
     - evidence_ids
     - confidence
+    - verification_status
+    - next_evidence_needed
+    - last_reviewed_at
+    - reviewer_note
   exposure_types:
     - revenue
     - capacity
@@ -163,6 +231,17 @@ segment_company_exposure:
     - narrative
     - unknown
   score_range: 0-5
+
+date_policy:
+  timezone: Asia/Shanghai
+  report_date: 研究快照日期。
+  as_of_date: 研究使用的信息截止日期。
+  generated_at: 文件生成日期，不能晚于 as_of_date。
+  future_allowed_fields:
+    - due_date
+    - next_review_date
+    - valid_until
+    - stale_after
 
 p0_non_goals:
   - complex_database

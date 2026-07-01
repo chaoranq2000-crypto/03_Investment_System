@@ -20,10 +20,41 @@ stock_scorecard:
         - TODO
       confidence: low
     financial_quality:
-      score: 1
-      rationale: Tushare stock_basic已导入，结构化财务字段未完成。
+      score: 3
+      rationale: Tushare结构化财务快照已导入，但属于公司整体指标，不能直接归因于AI服务器液冷业务。
       evidence_ids:
-        - market_data_tushare_stock_basic_20260701_a6d9f2
+        - market_data_tushare_income_selected_stocks_20260701_f1c8b2
+        - market_data_tushare_fina_indicator_selected_stocks_20260701_c3e4a9
+      confidence: medium
+    margin_quality:
+      score: 2
+      rationale: 公司整体毛利率可追踪，但液冷业务毛利率暂缺。
+      evidence_ids:
+        - market_data_tushare_fina_indicator_selected_stocks_20260701_c3e4a9
+      confidence: low
+    customer_quality:
+      score: 2
+      rationale: 产品线索较明确，客户侧订单和验证证据仍待补。
+      evidence_ids:
+        - TODO
+      confidence: low
+    technology_or_product_edge:
+      score: 3
+      rationale: 数据中心热管理和液冷产品线明确，但优势强度仍需订单、客户或技术参数证据。
+      evidence_ids:
+        - annual_report_002837_invic_2025_0f8fcf
+      confidence: medium
+    governance_quality:
+      score: 2
+      rationale: P1.5未做治理深挖，仅保留为后续个股深度核验项。
+      evidence_ids:
+        - TODO
+      confidence: low
+    valuation_scenario_risk:
+      score: 2
+      rationale: 估值场景只用于研究假设管理，液冷收入和利润缺口使情景风险偏高。
+      evidence_ids:
+        - TODO
       confidence: low
     evidence_quality:
       score: 3

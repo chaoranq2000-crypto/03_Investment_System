@@ -28,28 +28,31 @@ Codex Skills：标准化投研动作
 
 ## 2. 当前阶段
 
-当前处于 **P0：工作区骨架与研究纪律**。
+当前处于 **P1.5：pre-P2 hardening / 进入 P2 前加固**。
 
-P0 只做：
+阶段状态：
 
-- 顶层规则
-- 目录结构
-- 命名规范
-- 对象模型
-- 证据纪律
-- 模板入口
-- skills 边界
-- 最小质量检查
+- P0：CONDITIONAL_PASS，工作区骨架、规则、skills、配置、模板和最小质量纪律已经建立。
+- P1：CONDITIONAL_PASS_WITH_MEDIUM_TODOS，`ai_server_liquid_cooling` 已跑通证据、细分报告、公司池、个股样本、暴露映射和观察清单闭环。
+- 当前焦点：修复进入 P2 前的工程门禁、registry、exposure 口径、scorecard 一致性和 CI 验收。
 
-P0 不做：
+P1.5 只做：
 
-- 复杂数据库实现
-- 全市场扫描
-- 自动下载公告
-- 自动估值模型
-- 实时行情监控
-- 自动交易
-- 买卖建议生成
+- 保持 P0/P1 已有闭环可运行。
+- 把 draft claims/metrics 拆成 draft + registry 两层。
+- 强化 evidence manifest、segment-company exposure、quality issues 的字段。
+- 增加 P1.5 hardening tests 和 GitHub Actions CI。
+- 明确剩余 TODO，不把缺口伪装成已解决。
+
+P1.5 不做：
+
+- 扩展新细分。
+- 新增 P2 comparison 报告。
+- 批量扩大公司池。
+- 自动估值模型。
+- 实时行情监控。
+- 自动交易。
+- 买卖建议生成。
 
 ---
 

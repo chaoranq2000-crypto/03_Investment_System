@@ -42,6 +42,18 @@ segment_scorecard:
       evidence_ids:
         - market_data_tushare_stock_basic_20260701_a6d9f2
       confidence: medium
+    catalyst_visibility:
+      score: 2
+      rationale: 年报、半年报、液冷订单和客户验证是后续催化观察点，但本轮缺少明确时间表和订单金额。
+      evidence_ids:
+        - TODO
+      confidence: low
+    risk_pressure:
+      score: 3
+      rationale: 风冷效率提升、风液混合替代、价格竞争和公司收入纯度不足均需持续跟踪。
+      evidence_ids:
+        - TODO
+      confidence: low
   final_priority: watch_medium_high
   key_reasons:
     - reason: 细分边界清楚，产品链条可定义。

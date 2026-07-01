@@ -1,0 +1,46 @@
+exposure_score_rules:
+  5:
+    meaning: 已披露明确收入或利润占比，且与该细分直接相关。
+    required_evidence:
+      - revenue_pct_or_profit_pct
+      - official_report_or_announcement
+    p1_5_gate: 当前AI服务器液冷样本中无公司达到5分。
+  4:
+    meaning: 产品、客户或订单明确，但收入占比未披露。
+    required_evidence:
+      - product_or_customer_or_order
+      - official_report_or_ir_record
+    p1_5_examples:
+      - cn_002837_invic
+      - cn_301018_shenling
+  3:
+    meaning: 产品线索存在，但客户、订单或收入未核验。
+    required_evidence:
+      - product_line_evidence
+      - TODO: 需要补充客户、订单或收入证据
+    p1_5_examples:
+      - cn_300499_gaolan
+  2:
+    meaning: 技术储备、宽口径热管理、概念相关或财务兑现仍待验证。
+    required_evidence:
+      - technology_or_broad_theme_evidence
+      - explicit_low_confidence_or_validation_note
+    p1_5_examples:
+      - cn_300731_cotran
+      - cn_300602_frd
+  1:
+    meaning: 新闻、市场叙事或弱线索，未形成业务证据。
+    required_evidence:
+      - narrative_source
+      - TODO: 需要补充证据
+  0:
+    meaning: 排除或证据不足。
+    required_evidence:
+      - exclusion_reason_or_missing_evidence_note
+
+guardrails:
+  revenue_or_profit_exposure_requires_direct_disclosure: true
+  technology_exposure_cannot_receive_score_above_2_without_customer_order_or_revenue_evidence: true
+  narrative_only_exposure_cannot_receive_score_above_1: true
+  missing_revenue_pct_must_remain_visible: true
+  exposure_score_is_not_trading_signal: true

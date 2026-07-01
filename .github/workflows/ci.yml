@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          channels: conda-forge
+          activate-environment: investment-system-ci
+          python-version: "3.11"
+      - name: Install test dependencies
+        run: conda install -y pytest pyyaml
+      - name: Compile tests
+        run: python -m py_compile tests/test_p0_acceptance.py tests/test_p1_acceptance.py tests/test_p1_5_hardening.py
+      - name: Run pytest
+        run: python -m pytest -q

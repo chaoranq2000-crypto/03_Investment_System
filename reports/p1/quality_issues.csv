@@ -1,6 +1,6 @@
-issue_id,severity,status,object,issue,fix
-P1-QA-001,high,fixed,segment_report,初稿中所有关键结论必须有evidence_id或claim_id,已在segment_report、stock_report、evidence_map中补齐引用
-P1-QA-002,high,fixed,company_universe,不能把技术储备或热管理宽口径写成高暴露,科创新源、飞荣达降为exposure_score=2并标记验证项
-P1-QA-003,medium,fixed,data_source,Tushare初始调用未走代理URL，服务端返回token无效,已按PDF指南设置pro._DataApi__http_url并生成stock_basic快照；财务深字段另列TODO
-P1-QA-004,medium,todo,metrics,液冷收入占比、利润占比、订单金额仍缺失,在company_universe、stock_report和followup_questions中保留MISSING/TODO
-P1-QA-005,high,fixed,stock_deep_dive,个股报告相对优秀案例缺少财务概览、因果链、情景和反证密度,已用Tushare财务快照生成metrics_draft，并重写两份个股深度报告
+issue_id,severity,status,object,file_path,issue_type,issue,fix,owner,due_date,blocking_for_stage,closed_at
+P1-QA-001,high,fixed,segment_report,reports/segments/ai_server_liquid_cooling/2026-07-01_segment_report.md,citation_traceability,初稿中所有关键结论必须有evidence_id或claim_id,已在segment_report、stock_report、evidence_map中补齐引用,research_owner,,,2026-07-01
+P1-QA-002,high,fixed,company_universe,reports/segments/ai_server_liquid_cooling/company_universe.csv,exposure_scoring,不能把技术储备或热管理宽口径写成高暴露,科创新源、飞荣达降为exposure_score=2并标记验证项,research_owner,,,2026-07-01
+P1-QA-003,medium,fixed,data_source,src/utils/tushare_client.py,datasource_config,Tushare初始调用未走代理URL，服务端返回token无效,已按PDF指南设置pro._DataApi__http_url并生成stock_basic快照；财务深字段另列TODO,research_owner,,limited_p2_research_depth,2026-07-01
+P1-QA-004,medium,todo,metrics,data/manifests/metrics_registry.csv,missing_segment_financials,液冷收入占比、利润占比、订单金额仍缺失,在company_universe、stock_report和followup_questions中保留MISSING/TODO,research_owner,2026-10-01,limited_p2_research_depth,
+P1-QA-005,high,fixed,stock_deep_dive,reports/stocks,report_depth,个股报告相对优秀案例缺少财务概览、因果链、情景和反证密度,已用Tushare财务快照生成metrics_draft，并重写两份个股深度报告,research_owner,,,2026-07-01
