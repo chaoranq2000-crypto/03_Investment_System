@@ -1,73 +1,160 @@
 ---
 name: evidence-ingest
-description: Use when importing, registering, extracting, hashing, or deduplicating evidence into data/raw, data/processed, and data/manifests. Do not use for investment conclusions, scoring, watchlist decisions, or narrative reports.
+description: A股投研证据导入、归档、解析、登记与候选生成。当用户要求导入公告、年报、研报、网页、CSV/XLSX、行情/财务结构化数据或手动材料时使用。不得用于投资结论、评分、watchlist 决策或报告叙事写作。
 ---
 
-# Evidence Ingest
+# Evidence Ingest Skill
 
 ## Goal
 
-把公告、年报、行业报告、纪要、数据表等证据放入正确目录，并登记为可追溯的 `evidence_id` 记录。
+Turn raw materials and structured data snapshots into auditable evidence records, processed outputs, draft claim/metric candidates and ingest logs.
+
+The output of this skill is not a research conclusion. It is an evidence package that later skills may review.
 
 ## When to use
 
-- 用户提供 PDF、公告、CSV、网页截图、纪要或数据源，需要归档和登记。
-- 需要从原始证据抽取文本或表格。
-- 需要去重、生成 hash、更新 `data/manifests/evidence_manifest.csv`。
-
-## Inputs
-
-- 原始文件或来源路径。
-- source_type、publisher、publish_date、title 等元数据。
-- 关联的 segment_id、company_id、stock_code 或 research question。
+- importing or registering local files, URLs, PDFs, CSV/XLSX, Markdown/TXT or HTML snapshots;
+- pulling structured market/financial data snapshots from approved adapters such as Tushare or Baostock;
+- deduplicating evidence by hash;
+- validating `data/manifests/evidence_manifest.csv`;
+- generating draft `claim_candidates` or `metric_candidates` for later review.
 
 ## Responsibilities
 
-- 将原始证据放入 `data/raw/<category>/`。
-- 将加工文本放入 `data/processed/text/`，表格放入 `data/processed/tables/`。
-- 生成或校验 `evidence_id`。
-- 登记 manifest 字段：路径、hash、来源等级、状态、license_note。
-- 标记缺失字段为 `TODO`、`MISSING` 或 `UNVERIFIED`。
+- classify input materials into evidence, metric snapshots or clues;
+- compute hashes and enforce duplicate handling;
+- preserve raw files or snapshots according to archive policy;
+- write processed text, table, page-map or parse-log outputs when applicable;
+- register manifest rows and draft candidates;
+- validate manifest, path, candidate and no-advice gates;
+- report missing metadata, parse failures and follow-up TODOs explicitly.
 
 ## Out of scope
 
-- 不输出投资结论。
-- 不给 segment 或 company 打分。
-- 不纳入或移出 watchlist。
-- 不把证据摘要写成最终研报。
-- 不覆盖 `data/raw/` 中已有原始文件。
+Do not use when the requested task is:
 
-## Outputs
+- writing segment reports or stock reports;
+- scoring segments or companies;
+- deciding watchlist inclusion/exclusion;
+- making buy/sell/hold recommendations;
+- converting clues directly into material claims.
 
-- `data/raw/<category>/<file>`
-- `data/processed/text/<file>`
-- `data/processed/tables/<file>`
-- `data/manifests/evidence_manifest.csv`
-- 证据卡或 evidence map 草稿。
+## Required references
 
-## Workflow
+Read these before execution:
 
-1. 判断 source_type 和目标 raw 子目录。
-2. 检查同名文件和 hash，避免重复导入。
-3. 保存原始文件；如已存在，新增版本或停止请求人工确认。
-4. 抽取文本或表格到 processed 目录。
-5. 生成 `evidence_id` 并更新 manifest。
-6. 标记 reliability_rank、status、license_note。
-7. 输出本次新增、跳过和待补字段清单。
+- `references/source_types.md`
+- `references/source_registry_contract.md`
+- `references/ingest_modes.md`
+- `references/storage_manifest_contract.md`
+- `references/field_dictionary.md`
+- `references/parsing_outputs_contract.md`
+- `references/candidate_generation_contract.md`
+- `references/ingest_quality_gate.md`
+- `references/failure_handling.md`
+- `references/structured_data_sources.md`
+
+Read adapter notes only when relevant:
+
+- `references/adapter_notes/cninfo_sse_szse.md`
+- `references/adapter_notes/tushare.md`
+- `references/adapter_notes/baostock.md`
+
+## Supported ingest modes
+
+- `manual_file`
+- `local_dir_batch`
+- `url_file`
+- `official_disclosure_search`
+- `structured_api_pull`
+- `web_page_snapshot`
+- `clue_search`
+- `refresh_watchlist`
+
+B1 must implement contracts and validation for `manual_file`, `local_dir_batch`, `url_file` and `structured_api_pull`. Other modes may remain interface definitions.
+
+## Standard workflow
+
+Every ingest mode follows this chain:
+
+```text
+discover
+→ acquire
+→ hash_dedup
+→ archive_raw
+→ parse_or_snapshot
+→ classify_source
+→ assign_reliability_rank
+→ register_manifest
+→ generate_candidates
+→ validate_manifest
+→ output_ingest_log
+```
+
+## Output contract
+
+Write only evidence-layer outputs:
+
+- raw files or snapshots under `data/raw/`;
+- processed text/tables/page maps/logs under `data/processed/`;
+- manifest rows under `data/manifests/evidence_manifest.csv`;
+- draft candidates under `data/processed/candidates/` or `data/manifests/*_draft.csv`;
+- clue rows under `data/manifests/clue_log.csv`;
+- ingest run logs under `data/manifests/ingest_runs.csv` or `data/processed/logs/`.
+
+Do not write final reports, scorecards, watchlist decisions or investment memos.
+
+## Validation scripts
+
+Use these scripts from `scripts/`:
+
+```text
+compute_hash.py          Calculate file hash for raw files or snapshots.
+validate_manifest.py     Validate manifest fields, enums, dates, hashes and source/rank rules.
+check_paths.py           Validate raw/processed/table/page-map paths and URL/path separation.
+validate_candidates.py   Validate claim and metric candidate schemas and claim-type guardrails.
+write_ingest_log.py      Write standardized ingest run logs.
+run_debug_cases.py       Execute B1 debug fixtures and output PASS/FAIL/TODO readout.
+```
 
 ## Guardrails
 
-- `data/raw/` 原始证据只新增，不覆盖、不编辑。
-- 不编造来源、标题、发布日期、页码、路径或 hash。
-- D 级来源只能作为线索，不能单独支撑 material claim。
-- 证据登记不是结论生成；任何结论必须交给后续 research 或 review skill。
+- Raw files are immutable. Never overwrite raw evidence.
+- Every import must produce or update a manifest row.
+- Tushare and Baostock outputs are metric snapshots by default; they do not replace official filings for business-exposure claims.
+- D-level sources may only produce clues or TODOs.
+- Candidate rows are draft until promoted by quality review.
+- Missing data must be explicit. Do not invent page numbers, URLs, dates, revenue shares or evidence IDs.
+- No buy/sell/hold language, target-price calls or trading instructions.
 
 ## Quality checklist
 
-- [ ] raw 文件路径正确。
-- [ ] processed 文件没有写回 raw。
-- [ ] `evidence_id` 稳定且可读。
-- [ ] manifest 字段完整或显式标记 TODO/MISSING。
-- [ ] reliability_rank 和 status 已标注。
-- [ ] license_note 已记录。
-- [ ] 未输出买卖建议。
+- [ ] Raw archive policy is valid and raw evidence is not overwritten.
+- [ ] Manifest row has required fields, valid enums and stable hashes.
+- [ ] Source rank and material-claim permission are compatible.
+- [ ] URL fields and repository-relative local paths are separated.
+- [ ] Processed outputs exist when paths are filled.
+- [ ] Claim and metric candidates remain draft and respect source-rank limits.
+- [ ] D-level sources produce only clues or TODOs.
+- [ ] No buy/sell/hold recommendations or trading instructions are present.
+
+## Readout format
+
+After each run, report:
+
+```text
+run_id:
+ingest_mode:
+input_count:
+result: SUCCESS | PARTIAL_SUCCESS | SKIPPED_DUPLICATE | FAILED
+manifest_rows_created:
+manifest_rows_updated:
+duplicates_skipped:
+processed_outputs:
+claim_candidates:
+metric_candidates:
+clues:
+issues_by_severity:
+blocking_issues:
+next_todos:
+```

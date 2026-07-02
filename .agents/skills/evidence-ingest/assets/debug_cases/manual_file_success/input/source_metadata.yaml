@@ -1,0 +1,10 @@
+source_type: policy_document
+source_name: user_uploaded
+source_group: user_uploaded
+title: B1 debug policy fixture
+publisher: debug
+publish_date: 2026-01-15
+reliability_rank: C
+material_claim_allowed: false
+license_note: debug fixture only
+ingest_mode: manual_file

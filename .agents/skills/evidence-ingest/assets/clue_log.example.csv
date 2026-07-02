@@ -1,0 +1,2 @@
+clue_id,evidence_id,source_name,source_type,entity_type,entity_id,clue_text,reliability_rank,needs_verification_with,created_at,review_status,notes
+clue_example_001,ev_news_social_clue_market_20260201_deadbe,news,news_social_clue,segment,debug_segment,Example clue only.,D,official_disclosure,2026-07-02T00:00:00Z,draft,Do not use as material claim.

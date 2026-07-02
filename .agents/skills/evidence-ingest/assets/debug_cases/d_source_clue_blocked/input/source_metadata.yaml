@@ -1,0 +1,6 @@
+source_type: news_social_clue
+source_name: news
+source_group: clue
+reliability_rank: D
+material_claim_allowed: false
+allowed_claim_types: clue

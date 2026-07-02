@@ -1,0 +1,9 @@
+{
+  "source_name": "tushare",
+  "api_name": "income",
+  "params": {
+    "ts_code": "002837.SZ",
+    "period": "20251231"
+  },
+  "fields": ["ts_code", "ann_date", "end_date", "revenue", "n_income"]
+}
