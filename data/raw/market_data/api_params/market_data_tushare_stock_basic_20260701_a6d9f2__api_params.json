@@ -1,0 +1,28 @@
+{
+  "api_name": "stock_basic",
+  "api_params_hash": "9009b94cf39ee878e8457bee34406bb1f6354864818373f713cbc292aa5ef6db",
+  "as_of_date": "2026-07-01",
+  "backfill_basis": "src/ingest/fetch_tushare_stock_basic_snapshot.py",
+  "backfilled_at": "2026-07-02",
+  "fields": "ts_code,symbol,name,area,industry,market,list_date",
+  "hash_method": "sha256(canonical JSON of source_name/api_name/params/fields/as_of_date/retrieved_at/post_filter_when_present)",
+  "limitations": "Structured company-basic snapshot only; not business-exposure evidence.",
+  "params": {
+    "exchange": "",
+    "list_status": "L"
+  },
+  "permission_note": "points/frequency dependent",
+  "post_filter": {
+    "symbol": [
+      "002837",
+      "301018",
+      "300499",
+      "300731",
+      "300602"
+    ]
+  },
+  "raw_snapshot_path": "data/raw/market_data/tushare_stock_basic_ai_server_liquid_cooling_2026-07-01.csv",
+  "retrieved_at": "2026-07-01",
+  "source_name": "tushare",
+  "token_env": "TUSHARE_TOKEN"
+}

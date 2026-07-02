@@ -1,0 +1,23 @@
+{
+  "api_name": "income",
+  "api_params_hash": "e3bae17307aee19867296e16f15b1636be107a7043f7368e34e486f8dc46fcce",
+  "as_of_date": "2026-07-01",
+  "backfill_basis": "src/ingest/fetch_tushare_financial_snapshots.py",
+  "backfilled_at": "2026-07-02",
+  "fields": "ts_code,ann_date,f_ann_date,end_date,report_type,comp_type,total_revenue,revenue,operate_profit,total_profit,n_income,n_income_attr_p,basic_eps,diluted_eps",
+  "hash_method": "sha256(canonical JSON of source_name/api_name/params/fields/as_of_date/retrieved_at/post_filter_when_present)",
+  "limitations": "Company-level financial statement snapshot; cannot prove liquid-cooling segment exposure.",
+  "params": {
+    "end_date": "20260701",
+    "start_date": "20240101",
+    "ts_code_batch": [
+      "002837.SZ",
+      "300731.SZ"
+    ]
+  },
+  "permission_note": "points/frequency dependent",
+  "raw_snapshot_path": "data/raw/market_data/tushare_income_selected_stocks_2026-07-01.csv",
+  "retrieved_at": "2026-07-01",
+  "source_name": "tushare",
+  "token_env": "TUSHARE_TOKEN"
+}

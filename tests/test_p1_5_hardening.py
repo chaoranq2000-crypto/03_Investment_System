@@ -147,12 +147,15 @@ def test_evidence_manifest_separates_source_url_and_local_paths() -> None:
     evidence = read_csv("data/manifests/evidence_manifest.csv")
     for row in evidence:
         assert row["source_url"] or row["raw_file_path"], row["evidence_id"]
-        assert not (row["source_url"] and row["raw_file_path"]), row["evidence_id"]
+        if row["source_url"]:
+            assert row["source_url"].startswith(("http://", "https://")), row["evidence_id"]
         assert row["processed_text_path"] or row["processed_table_path"], row["evidence_id"]
         if row["raw_file_path"]:
+            assert not row["raw_file_path"].startswith(("http://", "https://")), row["evidence_id"]
             assert (ROOT / row["raw_file_path"]).exists(), row["raw_file_path"]
         for processed_field in ["processed_text_path", "processed_table_path"]:
             if row[processed_field]:
+                assert not row[processed_field].startswith(("http://", "https://")), row["evidence_id"]
                 assert (ROOT / row[processed_field]).exists(), row[processed_field]
         if row["reliability_rank"] == "D":
             assert row["material_claim_allowed"] == "false"

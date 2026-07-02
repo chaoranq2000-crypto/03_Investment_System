@@ -94,8 +94,8 @@ B1-only boundary observed:
 | resolved | Existing D-level Tushare probe claim used `fact`. | Converted to clue-only diagnostic lineage and added `data/manifests/clue_log.csv`. | none |
 | resolved | Existing Tushare structured data rows were fact-like claims. | Converted structured uses to `metric_statement` claim candidates and B1 metric candidates under `metric_only` boundaries. | none |
 | resolved | Existing claim/metric drafts used pre-B1 column names. | Migrated to `claim_candidate_id` and `metric_candidate_id` schemas. | none |
-| medium | Official disclosure and industry/policy rows are evidence-card-only in the current repo. | Archive original raw PDFs/pages before promoting those rows as material claim support. | future evidence hardening |
-| medium | Legacy Tushare rows lack original API params JSON/hash. | Capture `api_params_hash` in future structured API pulls; current snapshots are anchored by file/content hashes. | future evidence hardening |
+| resolved | Official disclosure and industry/policy rows were evidence-card-only in the current repo. | Archived original raw PDFs/pages/snapshots and updated manifest raw paths, file hashes, archive policies, and material-use flags according to source type. | none |
+| resolved | Legacy Tushare rows lacked original API params JSON/hash. | Backfilled API parameter JSON files from the live fetch/diagnostic scripts and stored `api_params_hash` in the manifest. | none |
 
 ## Files Changed In B1 Scope
 
@@ -118,14 +118,14 @@ B1-only boundary observed:
 
 ## Decision
 
-- B1 status: `accepted_with_todos`
+- B1 status: `accepted`
 - High severity issue count: 0
-- Medium TODO count: 2 future evidence-hardening items
+- Medium TODO count: 0
 - Ready for B2: yes, subject to explicit user approval
 
 Decision rationale:
 
-B1 debug runner, manifest validator, path validator, candidate validator, B1 pytest, and full pytest all pass after the approved migration. The live evidence manifest and draft candidates now follow the B1 evidence-ingest contract. Remaining TODOs are future evidence-hardening tasks, not blockers for the B1 contract.
+B1 debug runner, manifest validator, path validator, candidate validator, B1 pytest, and full pytest all pass after the approved migration and 2026-07-02 evidence-chain hardening. The live evidence manifest and draft candidates now follow the B1 evidence-ingest contract. The two former evidence-hardening TODOs have been closed.
 
 ## Remaining TODO
 
@@ -133,8 +133,22 @@ B1 debug runner, manifest validator, path validator, candidate validator, B1 pyt
 - DONE `candidate_schema_migration_needed`: `claims_draft.csv` and `metrics_draft.csv` now validate under B1 candidate schemas.
 - DONE `structured_data_claim_type_review_needed`: Tushare structured data rows are metric-only metric candidates / metric statements, not business-exposure facts.
 - DONE `d_source_probe_review_needed`: superseded Tushare probe is clue-only diagnostic lineage and is represented in `clue_log.csv`.
-- TODO `raw_archive_hardening_needed`: archive original official/industry raw PDFs/pages before material claim promotion.
-- TODO `api_params_hash_backfill_or_next_pull_needed`: future structured API pulls should store original params and `api_params_hash`.
+- DONE `raw_archive_hardening_needed`: original official/industry/policy raw PDFs/pages/snapshots are archived and manifest raw paths/file hashes are filled.
+- DONE `api_params_hash_backfill_or_next_pull_needed`: existing Tushare snapshots have API params JSON files and `api_params_hash`; future structured API pulls should continue this contract.
+
+## Post-B1 Evidence-Chain Hardening
+
+- hardening_date: 2026-07-02
+- `evidence_card_only` rows after hardening: 0
+- structured Tushare/Baostock rows missing `api_params_hash` after hardening: 0
+- raw archive files added:
+  - `data/raw/regulator_policy/policy_miit_compute_infra_20231008_9f2a30.html`
+  - `data/raw/industry_reports/industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91.pdf`
+  - `data/raw/annual_reports/*.pdf`
+- API parameter backfill files added:
+  - `data/raw/market_data/api_params/*__api_params.json`
+- metadata correction:
+  - `annual_report_002837_invic_2025_0f8fcf` source changed from `sse` to `szse` because the archived source URL is `disc.static.szse.cn`.
 
 ## Not Started
 

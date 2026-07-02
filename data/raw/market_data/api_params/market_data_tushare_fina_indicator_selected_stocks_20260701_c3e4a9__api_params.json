@@ -1,0 +1,23 @@
+{
+  "api_name": "fina_indicator",
+  "api_params_hash": "53d549abdf74cf465f423ba4f678af928ffdd1642f27d37073c5d9d311a4c9c8",
+  "as_of_date": "2026-07-01",
+  "backfill_basis": "src/ingest/fetch_tushare_financial_snapshots.py",
+  "backfilled_at": "2026-07-02",
+  "fields": "ts_code,ann_date,end_date,roe,roe_dt,grossprofit_margin,netprofit_margin,ocfps,debt_to_assets,invturn_days,arturn_days",
+  "hash_method": "sha256(canonical JSON of source_name/api_name/params/fields/as_of_date/retrieved_at/post_filter_when_present)",
+  "limitations": "Company-level financial indicator snapshot; cannot prove liquid-cooling segment exposure.",
+  "params": {
+    "end_date": "20260701",
+    "start_date": "20240101",
+    "ts_code_batch": [
+      "002837.SZ",
+      "300731.SZ"
+    ]
+  },
+  "permission_note": "points/frequency dependent",
+  "raw_snapshot_path": "data/raw/market_data/tushare_fina_indicator_selected_stocks_2026-07-01.csv",
+  "retrieved_at": "2026-07-01",
+  "source_name": "tushare",
+  "token_env": "TUSHARE_TOKEN"
+}

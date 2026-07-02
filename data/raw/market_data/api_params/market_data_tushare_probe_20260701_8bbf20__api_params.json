@@ -1,0 +1,29 @@
+{
+  "api_name": "diagnostics_probe",
+  "api_params_hash": "424b4e2adb431eabe0b92dd771d1c4c902b95881cf2dbd08540f9821618e0617",
+  "as_of_date": "2026-07-01",
+  "backfill_basis": "src/utils/tushare_diagnostics.py and data/raw/market_data/tushare_probe_2026-07-01.txt",
+  "backfilled_at": "2026-07-02",
+  "fields": {
+    "anns_d": "ann_date,ts_code,name,title,url",
+    "stock_basic": "ts_code,symbol,name,area,industry,list_date"
+  },
+  "hash_method": "sha256(canonical JSON of source_name/api_name/params/fields/as_of_date/retrieved_at/post_filter_when_present)",
+  "limitations": "Diagnostic probe only; superseded by later proxy-configured stock_basic snapshot; do not use as material claim.",
+  "params": {
+    "anns_d": {
+      "end_date": "20260701",
+      "start_date": "20260701",
+      "ts_code": "000001.SZ"
+    },
+    "stock_basic": {
+      "exchange": "",
+      "list_status": "L"
+    }
+  },
+  "permission_note": "points/frequency dependent",
+  "raw_snapshot_path": "data/raw/market_data/tushare_probe_2026-07-01.txt",
+  "retrieved_at": "2026-07-01",
+  "source_name": "tushare",
+  "token_env": "TUSHARE_TOKEN"
+}

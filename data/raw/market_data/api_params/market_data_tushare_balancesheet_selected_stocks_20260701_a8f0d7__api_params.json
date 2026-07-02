@@ -1,0 +1,23 @@
+{
+  "api_name": "balancesheet",
+  "api_params_hash": "76a8165dd7f9805b781e37943cd820781470bb7969608f60fbeed8e4e3cc8b38",
+  "as_of_date": "2026-07-01",
+  "backfill_basis": "src/ingest/fetch_tushare_financial_snapshots.py",
+  "backfilled_at": "2026-07-02",
+  "fields": "ts_code,ann_date,end_date,total_assets,total_liab,total_hldr_eqy_exc_min_int,inventories,accounts_receiv",
+  "hash_method": "sha256(canonical JSON of source_name/api_name/params/fields/as_of_date/retrieved_at/post_filter_when_present)",
+  "limitations": "Company-level balance-sheet snapshot; cannot prove liquid-cooling segment exposure.",
+  "params": {
+    "end_date": "20260701",
+    "start_date": "20240101",
+    "ts_code_batch": [
+      "002837.SZ",
+      "300731.SZ"
+    ]
+  },
+  "permission_note": "points/frequency dependent",
+  "raw_snapshot_path": "data/raw/market_data/tushare_balancesheet_selected_stocks_2026-07-01.csv",
+  "retrieved_at": "2026-07-01",
+  "source_name": "tushare",
+  "token_env": "TUSHARE_TOKEN"
+}
