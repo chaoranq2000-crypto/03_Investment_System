@@ -42,27 +42,41 @@ evidence:
   archive_policy:
     source_url_only_evidence_card: 只保存证据卡和来源链接时，source_url 必填，raw_file_path 可为空。
     local_snapshot_file: 本地结构化快照或原始文件，raw_file_path 必填，source_url 可为空。
+    evidence_card_only: B1 证据卡模式；需保留 source_url、license_note 与限制说明。
+    snapshot_archived: B1 本地快照模式；raw_file_path 必填。
   required_manifest_fields:
     - evidence_id
     - source_type
     - source_name
+    - source_group
     - title
     - publisher
     - publish_date
+    - as_of_date
     - retrieved_at
     - ingested_at
     - file_hash
+    - content_hash
+    - api_params_hash
     - source_url
     - raw_file_path
+    - raw_archive_policy
     - processed_text_path
     - processed_table_path
+    - page_map_path
     - page_count
+    - language
+    - file_format
+    - ingest_mode
     - reliability_rank
+    - material_claim_allowed
+    - allowed_claim_types
     - status
+    - parse_status
+    - candidate_status
     - license_note
     - stale_after
     - review_status
-    - archive_policy
   confidence_labels:
     - high
     - medium
@@ -99,10 +113,15 @@ claims:
     - notes
   claim_types:
     - fact
+    - metric_statement
+    - management_comment
+    - company_claim
+    - analyst_view
     - estimate
     - inference
-    - management_comment
-    - analyst_view
+    - clue
+    - risk
+    - counter_evidence
     - opinion
     - unknown
 

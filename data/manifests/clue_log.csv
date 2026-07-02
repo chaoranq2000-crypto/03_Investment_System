@@ -1,0 +1,2 @@
+clue_id,evidence_id,source_name,source_type,entity_type,entity_id,clue_text,reliability_rank,needs_verification_with,created_at,review_status,notes
+clue_data_tushare_20260701_001,market_data_tushare_probe_20260701_8bbf20,tushare,structured_market_data,other,p1_data_source,初始Tushare调用因未设置代理URL而被服务端返回token无效，该失败记录已被代理配置成功验证取代。,D,official_disclosure_or_successful_structured_snapshot,2026-07-01T00:00:00Z,draft,Diagnostic clue only; do not use as material claim.

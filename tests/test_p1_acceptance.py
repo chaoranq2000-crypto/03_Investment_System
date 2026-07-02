@@ -94,13 +94,17 @@ def test_evidence_manifest_and_claims_are_linked() -> None:
 
     allowed_claim_types = {
         "fact",
+        "metric_statement",
         "estimate",
         "inference",
         "management_comment",
+        "company_claim",
         "analyst_view",
         "opinion",
         "unknown",
+        "clue",
         "risk",
+        "counter_evidence",
     }
     invalid_types = [row for row in claims if row["claim_type"] not in allowed_claim_types]
     assert not invalid_types
@@ -115,7 +119,8 @@ def test_financial_metrics_are_traceable() -> None:
     assert {"cn_002837_invic", "cn_300731_cotran"}.issubset(companies)
 
     for row in metrics:
-        assert row["metric_id"].startswith("metric_company_")
+        metric_id = row.get("metric_candidate_id") or row.get("metric_id", "")
+        assert metric_id.startswith("metric_company_")
         assert row["entity_type"] == "company"
         assert row["period"] in {"20251231", "20260331"}
         assert row["source_evidence_id"] in evidence_ids

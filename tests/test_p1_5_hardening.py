@@ -155,7 +155,9 @@ def test_evidence_manifest_separates_source_url_and_local_paths() -> None:
             if row[processed_field]:
                 assert (ROOT / row[processed_field]).exists(), row[processed_field]
         if row["reliability_rank"] == "D":
-            assert row["review_status"] == "reviewed_p1_lineage_only"
+            assert row["material_claim_allowed"] == "false"
+            assert row["candidate_status"] in {"not_allowed", "blocked", "not_generated"}
+            assert row["review_status"] in {"blocked", "rejected", "reviewed"}
 
 
 def test_claims_and_metrics_registry_have_no_dangling_evidence() -> None:

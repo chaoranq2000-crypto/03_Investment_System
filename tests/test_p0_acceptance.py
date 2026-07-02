@@ -1,3 +1,4 @@
+import csv
 from pathlib import Path
 
 
@@ -177,9 +178,11 @@ def collect_errors() -> list[str]:
         if marker not in research_config:
             errors.append(f"research_config.yaml missing: {marker}")
 
-    evidence_header = read_text("data/manifests/evidence_manifest.csv").strip()
-    if "evidence_id,source_type,source_name,title,publisher,publish_date" not in evidence_header:
-        errors.append("evidence_manifest.csv header is incomplete")
+    with (ROOT / "data/manifests/evidence_manifest.csv").open(encoding="utf-8-sig", newline="") as handle:
+        evidence_header = next(csv.reader(handle))
+    for field in ["evidence_id", "source_type", "source_name", "title", "publisher", "publish_date"]:
+        if field not in evidence_header:
+            errors.append(f"evidence_manifest.csv missing field: {field}")
 
     smoke = read_text("docs/logs/p0/2026-07-01_p0_smoke_test.md")
     if "result: PASS" not in smoke or "P0 Blocking Issues" not in smoke:

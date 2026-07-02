@@ -143,6 +143,27 @@ sources:
     stale_after: 1y
     license_note_required: false
     notes: Exchange filing source.
+  policy_document:
+    display_name: 官方政策文件
+    source_group: regulator_policy
+    supported_source_types:
+      - policy_document
+      - regulator_statistics
+    default_reliability_rank: B
+    allowed_claim_types:
+      - fact
+      - metric_statement
+      - inference
+    material_claim_allowed: true
+    raw_archive_required: true
+    raw_archive_policy_default: snapshot_archived
+    requires_token: false
+    rate_limit_policy: manual_or_adapter_controlled
+    fallback_sources: []
+    manual_review_required: false
+    stale_after: source_dependent
+    license_note_required: false
+    notes: Policy and regulator context source; archive raw page or file before material use.
   tushare:
     display_name: Tushare Pro
     source_group: structured_database
@@ -182,6 +203,29 @@ sources:
     stale_after: 90d
     license_note_required: true
     notes: Historical quote/basic field fallback.
+  industry_report:
+    display_name: 行业研究报告
+    source_group: third_party_analysis
+    supported_source_types:
+      - third_party_research
+      - regulator_statistics
+    default_reliability_rank: B
+    allowed_claim_types:
+      - fact
+      - analyst_view
+      - estimate
+      - inference
+      - clue
+    material_claim_allowed: false
+    raw_archive_required: true
+    raw_archive_policy_default: evidence_card_only
+    requires_token: false
+    rate_limit_policy: manual
+    fallback_sources: []
+    manual_review_required: true
+    stale_after: 180d
+    license_note_required: true
+    notes: Use for industry context and estimates; do not treat as official company filing.
   brokerage_report:
     display_name: 券商研报
     source_group: third_party_analysis

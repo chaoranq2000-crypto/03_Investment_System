@@ -6,8 +6,9 @@
 - skill: evidence-ingest
 - run_date: 2026-07-02 15:38:31 +08:00
 - operator: Codex
-- repo_commit: 3359b758abdbb923ddec0d8f9d65964225757d30
+- repo_commit: 357ca4e7a41cc0b4ceb81bb2b730df8c4ae21a4c
 - branch: codex/p1-6-b1-evidence-ingest-verify
+- migration_update_run_date: 2026-07-02
 
 ## Scope
 
@@ -18,7 +19,7 @@ B1-only boundary observed:
 - Did not use `codex_prompts/P1_6_DETAILED_PLAN_FOR_CODEX.md`.
 - Did not start B2 or later phases.
 - Did not modify non-B1 skill directories.
-- Did not bulk-migrate existing `data/manifests/*` files.
+- Migrated existing `data/manifests/*` files only after explicit follow-up approval for the remaining B1 TODOs.
 
 ## Commands Run
 
@@ -35,6 +36,11 @@ B1-only boundary observed:
 | `conda run -p .\.conda\investment-system python .agents/skills/evidence-ingest/scripts/validate_manifest.py --repo . --manifest data/manifests/evidence_manifest.csv` | FAIL_EXPECTED | Existing manifest uses pre-B1 schema; see issues. |
 | `conda run -p .\.conda\investment-system python .agents/skills/evidence-ingest/scripts/validate_candidates.py --repo . --claims .agents/skills/evidence-ingest/assets/claim_candidates.example.csv --metrics .agents/skills/evidence-ingest/assets/metric_candidates.example.csv --manifest .agents/skills/evidence-ingest/assets/evidence_manifest.example.csv` | PASS | Candidate example validation succeeded. |
 | Existing draft candidate validation | FAIL_EXPECTED | Existing drafts have pre-B1 schema/content guardrail issues; see issues. |
+| `conda run -p .\.conda\investment-system python .agents/skills/evidence-ingest/scripts/migrate_legacy_manifests_to_b1.py --repo .` | PASS | Migrated 15 manifest rows, 22 claim candidates, 44 metric candidates, and 1 clue row. |
+| `conda run -p .\.conda\investment-system python .agents/skills/evidence-ingest/scripts/validate_manifest.py --repo . --manifest data/manifests/evidence_manifest.csv` | PASS | Existing manifest now passes B1 validator. |
+| `conda run -p .\.conda\investment-system python .agents/skills/evidence-ingest/scripts/check_paths.py data/manifests/evidence_manifest.csv --repo .` | PASS | Path separation and local path existence passed. |
+| `conda run -p .\.conda\investment-system python .agents/skills/evidence-ingest/scripts/validate_candidates.py --repo . --manifest data/manifests/evidence_manifest.csv --claims data/manifests/claims_draft.csv --metrics data/manifests/metrics_draft.csv` | PASS | Existing claim and metric drafts now pass B1 candidate gate. |
+| UTF-8 `conda run -p .\.conda\investment-system python -m pytest -q` | PASS | `28 passed in 2.14s` |
 
 ## Contract Files Checked
 
@@ -60,11 +66,11 @@ B1-only boundary observed:
 
 | Gate | Result | Issues |
 |---|---|---|
-| Manifest gate | PASS for B1 fixtures; BLOCKED for existing repo manifest | Existing `data/manifests/evidence_manifest.csv` lacks B1 columns: `candidate_status`, `ingest_mode`, `material_claim_allowed`, `parse_status`, `raw_archive_policy`. |
-| Path gate | PASS for B1 debug fixtures | Existing manifest path gate was not fully evaluated because schema validation stops at missing required columns. |
-| Candidate gate | PASS for B1 examples and debug fixtures; BLOCKED for existing drafts | Existing `claims_draft.csv` has a D-level Tushare probe evidence row generating a `fact` claim, and C-level structured data rows generating `fact` claims. |
+| Manifest gate | PASS | Existing `data/manifests/evidence_manifest.csv` now uses B1 columns and enums. |
+| Path gate | PASS | Existing manifest local paths and source URLs validate. |
+| Candidate gate | PASS | Existing `claims_draft.csv` and `metrics_draft.csv` now use B1 candidate schemas and guardrails. |
 | No-advice gate | PASS | No B1 output created buy/sell/hold language, target-price calls or trading instructions. |
-| Source registry gate | PASS_WITH_FIX | `config/source_registry.yaml` now preserves the old registry and adds the B1 `sources:` matrix. |
+| Source registry gate | PASS_WITH_FIX | `config/source_registry.yaml` now preserves the old registry, adds the B1 `sources:` matrix, and includes current `policy_document` / `industry_report` entries. |
 
 ## Source Registry Reconciliation
 
@@ -72,6 +78,7 @@ B1-only boundary observed:
 
 - Preserved the existing `source_types`, `rank_meaning`, `manifest_fields`, and `guardrails` sections.
 - Added B1 `sources:` matrix entries for `cninfo`, `sse`, `szse`, `bse`, `tushare`, `baostock`, `brokerage_report`, and `news`.
+- Added current-manifest source entries for `policy_document` and `industry_report`.
 - Enforced B1 defaults:
   - official disclosure sources can support material claims only with archived/locatable evidence;
   - `tushare` is `metric_only`;
@@ -83,10 +90,12 @@ B1-only boundary observed:
 
 | severity | issue | fix | blocking_for_stage |
 |---|---|---|---|
-| critical | Existing `data/manifests/evidence_manifest.csv` uses pre-B1 schema and is missing required B1 columns. | Create a separately approved manifest schema migration plan; do not bulk-migrate inside B1 verification. | B1 acceptance / B2 start |
-| high | Existing `claims_draft.csv` row 14 uses D-level `market_data_tushare_probe_20260701_8bbf20` evidence for a `fact` claim. | During migration, convert to clue/TODO or mark as failed/superseded diagnostic metadata; do not promote as material claim. | B1 acceptance / B2 start |
-| medium | Existing `claims_draft.csv` rows 15-23 use C-level structured data rows as `fact` claims. | During migration, convert structured data rows to metric candidates or metric statements under `metric_only` rules. | B1 acceptance / B2 start |
-| medium | Existing `claims_draft.csv` and `metrics_draft.csv` use pre-B1 column names (`claim_id`, `metric_id`) rather than B1 candidate schemas. | Add draft schema migration TODO and map old IDs to B1 `claim_candidate_id` / `metric_candidate_id` fields. | B1 acceptance / B2 start |
+| resolved | Existing `data/manifests/evidence_manifest.csv` used pre-B1 schema and was missing required B1 columns. | Migrated to B1 manifest schema with `raw_archive_policy`, `ingest_mode`, `material_claim_allowed`, `parse_status`, and `candidate_status`. | none |
+| resolved | Existing D-level Tushare probe claim used `fact`. | Converted to clue-only diagnostic lineage and added `data/manifests/clue_log.csv`. | none |
+| resolved | Existing Tushare structured data rows were fact-like claims. | Converted structured uses to `metric_statement` claim candidates and B1 metric candidates under `metric_only` boundaries. | none |
+| resolved | Existing claim/metric drafts used pre-B1 column names. | Migrated to `claim_candidate_id` and `metric_candidate_id` schemas. | none |
+| medium | Official disclosure and industry/policy rows are evidence-card-only in the current repo. | Archive original raw PDFs/pages before promoting those rows as material claim support. | future evidence hardening |
+| medium | Legacy Tushare rows lack original API params JSON/hash. | Capture `api_params_hash` in future structured API pulls; current snapshots are anchored by file/content hashes. | future evidence hardening |
 
 ## Files Changed In B1 Scope
 
@@ -97,24 +106,35 @@ B1-only boundary observed:
 | `tests/test_phase_b1_evidence_ingest_contract.py` | Added coverage for the plan-compatible CLI forms. |
 | `config/source_registry.yaml` | Added B1 `sources:` matrix without replacing legacy registry content. |
 | `reports/p1_6/B1_EVIDENCE_INGEST_DEBUG_READOUT.md` | Filled this readout. |
+| `.agents/skills/evidence-ingest/scripts/migrate_legacy_manifests_to_b1.py` | Added deterministic migration script for legacy manifest and draft candidate CSVs. |
+| `data/manifests/evidence_manifest.csv` | Migrated to B1 manifest schema. |
+| `data/manifests/claims_draft.csv` | Migrated to B1 claim candidate schema. |
+| `data/manifests/metrics_draft.csv` | Migrated to B1 metric candidate schema. |
+| `data/manifests/clue_log.csv` | Added D-source diagnostic clue row. |
+| `config/research_config.yaml` | Updated manifest required fields and claim type config for B1 schema. |
+| `tests/test_p0_acceptance.py` | Made evidence manifest header check order-independent. |
+| `tests/test_p1_acceptance.py` | Accepted B1 claim types and metric candidate IDs. |
+| `tests/test_p1_5_hardening.py` | Updated D-level evidence guardrail assertion for B1 enums. |
 
 ## Decision
 
-- B1 status: `blocked`
-- High severity issue count: 1 critical + 1 high existing-data issue
-- Medium TODO count: 2 migration workstreams, including 9 C-level structured-data claim rows
-- Ready for B2: no
+- B1 status: `accepted_with_todos`
+- High severity issue count: 0
+- Medium TODO count: 2 future evidence-hardening items
+- Ready for B2: yes, subject to explicit user approval
 
 Decision rationale:
 
-B1 debug runner and pytest pass, and B1-local script compatibility issues were repaired. However, the existing repo manifest/draft files require a broader schema and claim-type migration before the B1 evidence-ingest contract can be safely treated as accepted for the live evidence base. The B1 plan explicitly says not to perform a risky bulk migration without separate approval.
+B1 debug runner, manifest validator, path validator, candidate validator, B1 pytest, and full pytest all pass after the approved migration. The live evidence manifest and draft candidates now follow the B1 evidence-ingest contract. Remaining TODOs are future evidence-hardening tasks, not blockers for the B1 contract.
 
 ## Remaining TODO
 
-- `manifest_schema_migration_needed`: migrate `data/manifests/evidence_manifest.csv` to B1 columns and enums, including `raw_archive_policy`, `ingest_mode`, `material_claim_allowed`, `parse_status`, and `candidate_status`.
-- `candidate_schema_migration_needed`: migrate `claims_draft.csv` and `metrics_draft.csv` to B1 candidate schemas.
-- `structured_data_claim_type_review_needed`: convert Tushare/Baostock structured data uses to `metric_only` metric candidates or metric statements; do not use them for business-exposure facts.
-- `d_source_probe_review_needed`: convert the superseded Tushare probe failure row from fact-like claim usage into diagnostic metadata, clue/TODO, or failed/superseded evidence handling.
+- DONE `manifest_schema_migration_needed`: `data/manifests/evidence_manifest.csv` now validates under B1.
+- DONE `candidate_schema_migration_needed`: `claims_draft.csv` and `metrics_draft.csv` now validate under B1 candidate schemas.
+- DONE `structured_data_claim_type_review_needed`: Tushare structured data rows are metric-only metric candidates / metric statements, not business-exposure facts.
+- DONE `d_source_probe_review_needed`: superseded Tushare probe is clue-only diagnostic lineage and is represented in `clue_log.csv`.
+- TODO `raw_archive_hardening_needed`: archive original official/industry raw PDFs/pages before material claim promotion.
+- TODO `api_params_hash_backfill_or_next_pull_needed`: future structured API pulls should store original params and `api_params_hash`.
 
 ## Not Started
 
