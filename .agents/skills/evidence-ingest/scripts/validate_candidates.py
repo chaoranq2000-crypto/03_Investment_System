@@ -92,9 +92,10 @@ def validate_metrics(path: Path, manifest: dict[str, dict[str, str]]) -> list[st
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate draft claim/metric candidates.")
+    parser.add_argument("--repo", default=".", help="Repo root; accepted for command compatibility.")
     parser.add_argument("--manifest", default="data/manifests/evidence_manifest.csv")
-    parser.add_argument("--claim-candidates", default=None)
-    parser.add_argument("--metric-candidates", default=None)
+    parser.add_argument("--claim-candidates", "--claims", dest="claim_candidates", default=None)
+    parser.add_argument("--metric-candidates", "--metrics", dest="metric_candidates", default=None)
     args = parser.parse_args()
 
     manifest = read_manifest(Path(args.manifest)) if args.manifest else {}

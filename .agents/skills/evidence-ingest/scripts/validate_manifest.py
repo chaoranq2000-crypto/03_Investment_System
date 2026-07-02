@@ -174,13 +174,18 @@ def validate_rows(rows: list[dict[str, str]], fields: list[str], repo: Path, che
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate evidence manifest.")
-    parser.add_argument("manifest", help="Path to evidence_manifest.csv")
+    parser.add_argument("manifest_path", nargs="?", help="Path to evidence_manifest.csv")
+    parser.add_argument("--manifest", dest="manifest_option", help="Path to evidence_manifest.csv")
     parser.add_argument("--repo", default=".", help="Repo root for path validation")
     parser.add_argument("--no-path-check", action="store_true", help="Skip local path existence checks")
     parser.add_argument("--json", action="store_true", help="Output JSON issues")
     args = parser.parse_args()
 
-    manifest = Path(args.manifest)
+    manifest_arg = args.manifest_option or args.manifest_path
+    if not manifest_arg:
+        parser.error("manifest path is required as a positional argument or --manifest")
+
+    manifest = Path(manifest_arg)
     repo = Path(args.repo).resolve()
     rows, fields = read_csv(manifest)
     issues = validate_rows(rows, fields, repo=repo, check_paths=not args.no_path_check)

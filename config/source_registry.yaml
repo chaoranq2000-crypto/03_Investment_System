@@ -48,6 +48,180 @@ source_types:
     use_case: unknown_or_unclassified
     default_freshness: verification_required
 
+sources:
+  cninfo:
+    display_name: 巨潮资讯
+    source_group: official_disclosure
+    supported_source_types:
+      - official_disclosure
+      - annual_report
+      - announcement
+    default_reliability_rank: A
+    allowed_claim_types:
+      - fact
+      - metric_statement
+      - management_comment
+    material_claim_allowed: true
+    raw_archive_required: true
+    raw_archive_policy_default: full_file_archived
+    requires_token: false
+    rate_limit_policy: manual_or_adapter_controlled
+    fallback_sources:
+      - sse
+      - szse
+      - bse
+    manual_review_required: false
+    stale_after: 1y
+    license_note_required: false
+    notes: Official disclosure source; prefer original PDF when available.
+  sse:
+    display_name: 上海证券交易所
+    source_group: official_disclosure
+    supported_source_types:
+      - official_disclosure
+      - annual_report
+      - announcement
+    default_reliability_rank: A
+    allowed_claim_types:
+      - fact
+      - metric_statement
+      - management_comment
+    material_claim_allowed: true
+    raw_archive_required: true
+    raw_archive_policy_default: full_file_archived
+    requires_token: false
+    rate_limit_policy: manual_or_adapter_controlled
+    fallback_sources:
+      - cninfo
+    manual_review_required: false
+    stale_after: 1y
+    license_note_required: false
+    notes: Exchange filing source.
+  szse:
+    display_name: 深圳证券交易所
+    source_group: official_disclosure
+    supported_source_types:
+      - official_disclosure
+      - annual_report
+      - announcement
+    default_reliability_rank: A
+    allowed_claim_types:
+      - fact
+      - metric_statement
+      - management_comment
+    material_claim_allowed: true
+    raw_archive_required: true
+    raw_archive_policy_default: full_file_archived
+    requires_token: false
+    rate_limit_policy: manual_or_adapter_controlled
+    fallback_sources:
+      - cninfo
+    manual_review_required: false
+    stale_after: 1y
+    license_note_required: false
+    notes: Exchange filing source.
+  bse:
+    display_name: 北京证券交易所
+    source_group: official_disclosure
+    supported_source_types:
+      - official_disclosure
+      - annual_report
+      - announcement
+    default_reliability_rank: A
+    allowed_claim_types:
+      - fact
+      - metric_statement
+      - management_comment
+    material_claim_allowed: true
+    raw_archive_required: true
+    raw_archive_policy_default: full_file_archived
+    requires_token: false
+    rate_limit_policy: manual_or_adapter_controlled
+    fallback_sources:
+      - cninfo
+    manual_review_required: false
+    stale_after: 1y
+    license_note_required: false
+    notes: Exchange filing source.
+  tushare:
+    display_name: Tushare Pro
+    source_group: structured_database
+    supported_source_types:
+      - structured_market_data
+      - structured_financial_data
+    default_reliability_rank: B
+    allowed_claim_types:
+      - metric_statement
+      - estimate
+    material_claim_allowed: metric_only
+    raw_archive_required: true
+    raw_archive_policy_default: snapshot_archived
+    requires_token: true
+    rate_limit_policy: points_and_frequency_control
+    fallback_sources:
+      - baostock
+    manual_review_required: false
+    stale_after: 90d
+    license_note_required: true
+    notes: Structured metric snapshot source; not replacement for filings.
+  baostock:
+    display_name: Baostock
+    source_group: structured_database_fallback
+    supported_source_types:
+      - structured_market_data
+    default_reliability_rank: B
+    allowed_claim_types:
+      - metric_statement
+    material_claim_allowed: metric_only
+    raw_archive_required: true
+    raw_archive_policy_default: snapshot_archived
+    requires_token: false
+    rate_limit_policy: login_query_logout; public server courtesy limits
+    fallback_sources: []
+    manual_review_required: false
+    stale_after: 90d
+    license_note_required: true
+    notes: Historical quote/basic field fallback.
+  brokerage_report:
+    display_name: 券商研报
+    source_group: third_party_analysis
+    supported_source_types:
+      - third_party_research
+    default_reliability_rank: C
+    allowed_claim_types:
+      - analyst_view
+      - estimate
+      - inference
+      - clue
+    material_claim_allowed: false
+    raw_archive_required: false
+    raw_archive_policy_default: evidence_card_only
+    requires_token: false
+    rate_limit_policy: manual
+    fallback_sources: []
+    manual_review_required: true
+    stale_after: 180d
+    license_note_required: true
+    notes: Use for context and estimates; do not treat as official fact.
+  news:
+    display_name: 新闻/社媒/热榜
+    source_group: clue
+    supported_source_types:
+      - news_social_clue
+    default_reliability_rank: D
+    allowed_claim_types:
+      - clue
+    material_claim_allowed: false
+    raw_archive_required: false
+    raw_archive_policy_default: metadata_only
+    requires_token: false
+    rate_limit_policy: manual
+    fallback_sources: []
+    manual_review_required: true
+    stale_after: 30d
+    license_note_required: true
+    notes: Clue only; verify with official disclosure before material use.
+
 rank_meaning:
   A: 可作为核心事实依据，仍需记录日期、路径、页码或表格定位。
   B: 可作为重要背景或行业证据，需说明口径和适用范围。

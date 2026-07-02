@@ -46,3 +46,42 @@ def test_b1_debug_cases_pass() -> None:
     result = subprocess.run([sys.executable, str(script), "--repo", str(root)], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     assert result.returncode == 0, result.stdout
     assert "B1_DEBUG_READOUT=PASS" in result.stdout
+
+
+def test_validate_manifest_accepts_plan_manifest_option() -> None:
+    root = repo_root()
+    script = root / ".agents/skills/evidence-ingest/scripts/validate_manifest.py"
+    manifest = root / ".agents/skills/evidence-ingest/assets/evidence_manifest.example.csv"
+    result = subprocess.run(
+        [sys.executable, str(script), "--repo", str(root), "--manifest", str(manifest), "--no-path-check"],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    assert result.returncode == 0, result.stdout
+    assert "PASS: manifest validation succeeded" in result.stdout
+
+
+def test_validate_candidates_accepts_plan_aliases() -> None:
+    root = repo_root()
+    script = root / ".agents/skills/evidence-ingest/scripts/validate_candidates.py"
+    assets = root / ".agents/skills/evidence-ingest/assets"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script),
+            "--repo",
+            str(root),
+            "--claims",
+            str(assets / "claim_candidates.example.csv"),
+            "--metrics",
+            str(assets / "metric_candidates.example.csv"),
+            "--manifest",
+            str(assets / "evidence_manifest.example.csv"),
+        ],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+    )
+    assert result.returncode == 0, result.stdout
+    assert "PASS: candidate validation succeeded" in result.stdout
