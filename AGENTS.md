@@ -20,6 +20,7 @@ Build a maintainable A股投研工作区 where:
 4. Every material conclusion can be traced to `evidence_id`, `claim_id`, `metric_id`, or a clearly marked TODO.
 5. Updates produce change logs rather than silently rewriting old conclusions.
 6. Research outputs separate fact, estimate, inference, management comment, analyst view, and opinion.
+7. Workflow runs record orchestration state, handoffs, artifacts, TODOs, quality gates, and readouts.
 
 ---
 
@@ -146,7 +147,10 @@ docs/architecture/WORKSPACE_STRUCTURE.md Directory and file placement rules
 docs/architecture/RESEARCH_OBJECT_MODEL.md Segment/company/evidence/claim/metric model
 docs/policies/EVIDENCE_AND_CITATION_POLICY.md Evidence source, ID, citation, and freshness rules
 docs/policies/QUALITY_GUARDRAILS.md Review gates and anti-hallucination rules
-docs/playbooks/OPERATING_PLAYBOOK.md Common workflows and skill-routing guide
+docs/workflows/README.md          Permanent workflow documentation entry point
+docs/workflows/RESEARCH_WORKFLOW.md Permanent research workflow fact source
+docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md research-orchestrator routing and run rules
+docs/playbooks/OPERATING_PLAYBOOK.md Lightweight command index and quick entry
 docs/plans/plan_template.md     Planning and execution-plan template
 docs/plans/p0_acceptance_checklist.md P0 completion checklist
 docs/logs/                       Plan completion logs and stage records
@@ -162,9 +166,23 @@ src/                            Scripts and reusable code
 notebooks/                      Exploratory notebooks, not production source of truth
 templates/                      Report and memo templates
 reports/                        Generated research reports and matrices
+reports/workflow_runs/           Workflow run state, handoffs, manifests, gates, and readouts
 decisions/                      Thesis log, watchlist changes, postmortems
 tests/                          Quality checks and regression tests
 ```
+
+### 3.1 Documentation priority
+
+When documentation overlaps or conflicts, use this priority order:
+
+1. `AGENTS.md`: repo-level non-negotiable rules, safety boundaries, evidence discipline, and completion gates.
+2. `docs/workflows/README.md`, `docs/workflows/RESEARCH_WORKFLOW.md`, `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md`: permanent workflow fact source for workflow types, workflow runs, orchestration, handoffs, gates, and P2 readiness.
+3. `.agents/skills/research-orchestrator/SKILL.md`: execution entry for classifying user intent, creating or updating workflow runs, routing lower-level skills, and producing readouts according to `docs/workflows/`.
+4. `.agents/skills/<skill>/SKILL.md`: concrete lower-level skill contracts for evidence ingest, segment research, stock deep dives, mapping, review, refresh, comparisons, and memo writing.
+5. `docs/playbooks/OPERATING_PLAYBOOK.md`: lightweight command index and quick entry only; it is not a workflow fact source.
+6. `docs/plans/` and `docs/logs/`: stage plans, execution records, and historical readouts. They should not override permanent workflow documents.
+
+If a lower-priority file disagrees with a higher-priority file, follow the higher-priority file and record the stale document as a TODO or refresh task.
 
 ---
 
@@ -229,10 +247,13 @@ Use Chinese names for human-readable titles, but use English `snake_case` for ID
 
 Skills are repeatable research actions, not generic report writers.
 
+Use `research-orchestrator` as the top-level entry when the user asks to run, resume, diagnose, or close a workflow; asks which skill should be called next; asks whether the system can enter P2; or asks for a workflow readout. It should create or update `reports/workflow_runs/<workflow_id>/` when a full run, resume, debug pass, or readout is needed.
+
 Use these boundaries:
 
 | Skill | Use when | Do not use when |
 |---|---|---|
+| `research-orchestrator` | classifying workflow type, creating/updating workflow runs, routing skills, generating handoffs, checking gates, producing readouts | replacing lower-level research skills, inventing evidence, writing unreviewed investment conclusions |
 | `evidence-ingest` | importing, registering, extracting, or deduplicating evidence | writing investment conclusions |
 | `segment-research` | researching one segment or产业链环节 | doing a single-stock deep dive |
 | `company-universe` | building A股 company pool for a segment | valuing one stock |
@@ -281,6 +302,22 @@ reports/refresh/stale_claims.csv
 reports/refresh/updated_scorecards.yaml
 reports/refresh/reports_to_regenerate.yaml
 ```
+
+### 7.4 Workflow run package
+
+A workflow run should include:
+
+```text
+reports/workflow_runs/<workflow_id>/workflow_state.yaml
+reports/workflow_runs/<workflow_id>/run_log.md
+reports/workflow_runs/<workflow_id>/artifact_manifest.csv
+reports/workflow_runs/<workflow_id>/open_todos.csv
+reports/workflow_runs/<workflow_id>/quality_gate_report.md
+reports/workflow_runs/<workflow_id>/workflow_readout.md
+reports/workflow_runs/<workflow_id>/handoffs/
+```
+
+Use workflow runs for full closed loops, resumes, debugging passes, readouts, and P2 readiness gates. If a short diagnostic does not create a run directory, state that explicitly in the response.
 
 ---
 

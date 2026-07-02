@@ -28,23 +28,25 @@ Codex Skills：标准化投研动作
 
 ## 2. 当前阶段
 
-当前处于 **P1.5：pre-P2 hardening / 进入 P2 前加固**。
+当前处于 **P1.6：workflow buildout / 进入 P2 前的工作流制度化**。
 
 阶段状态：
 
 - P0：CONDITIONAL_PASS，工作区骨架、规则、skills、配置、模板和最小质量纪律已经建立。
 - P1：CONDITIONAL_PASS_WITH_MEDIUM_TODOS，`ai_server_liquid_cooling` 已跑通证据、细分报告、公司池、个股样本、暴露映射和观察清单闭环。
-- 当前焦点：修复进入 P2 前的工程门禁、registry、exposure 口径、scorecard 一致性和 CI 验收。
+- P1.5：pre-P2 hardening 已作为前序加固阶段，重点是 registry、exposure 口径、scorecard 一致性和 CI 验收。
+- 当前焦点：固化 `docs/workflows/` 永久工作流事实源，启用 `research-orchestrator` 总编排入口，补强下层 workflow / skill 契约，并通过 segment-led、stock-led、interlock 调试后执行 P2 readiness gate。
 
-P1.5 只做：
+P1.6 只做：
 
-- 保持 P0/P1 已有闭环可运行。
-- 把 draft claims/metrics 拆成 draft + registry 两层。
-- 强化 evidence manifest、segment-company exposure、quality issues 的字段。
-- 增加 P1.5 hardening tests 和 GitHub Actions CI。
+- 建立和维护 `docs/workflows/` 永久工作流事实源。
+- 让 `research-orchestrator` 能分类 workflow、创建或更新 workflow run、路由下层 skills、生成 handoff 和 readout。
+- 逐个补强 `evidence-ingest`、`segment-research`、`company-universe`、`segment-company-mapping`、`stock-deep-dive`、`quality-review` 等下层 workflow 契约。
+- 做 segment-led、stock-led、segment-stock interlock 三类调试。
+- 执行 P2 readiness gate，只判断是否进入 limited P2 pilot。
 - 明确剩余 TODO，不把缺口伪装成已解决。
 
-P1.5 不做：
+P1.6 不做：
 
 - 扩展新细分。
 - 新增 P2 comparison 报告。
@@ -77,7 +79,12 @@ P1.5 不做：
 | [`docs/project/PROJECT_CHARTER.md`](docs/project/PROJECT_CHARTER.md) | 项目目标、范围、非目标、路线图和暂停点 |
 | [`docs/architecture/WORKSPACE_STRUCTURE.md`](docs/architecture/WORKSPACE_STRUCTURE.md) | 目录结构、文件归位、命名规则 |
 | [`docs/policies/QUALITY_GUARDRAILS.md`](docs/policies/QUALITY_GUARDRAILS.md) | 质量检查、反幻觉、反证、风险纪律 |
+| [`docs/workflows/README.md`](docs/workflows/README.md) | 永久工作流文档入口 |
+| [`docs/workflows/RESEARCH_WORKFLOW.md`](docs/workflows/RESEARCH_WORKFLOW.md) | 细分/个股研究永久总工作流事实源 |
+| [`docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md`](docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md) | `research-orchestrator` 编排、workflow run、handoff 和门禁规范 |
+| [`docs/playbooks/OPERATING_PLAYBOOK.md`](docs/playbooks/OPERATING_PLAYBOOK.md) | 常用命令索引和快速入口；不是工作流事实源 |
 | [`docs/plans/p0_acceptance_checklist.md`](docs/plans/p0_acceptance_checklist.md) | P0 验收清单 |
+| [`docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md`](docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md) | P1.6 阶段建设计划 |
 
 ---
 
@@ -100,6 +107,7 @@ a-share-research-os/
 │   ├── project/
 │   ├── architecture/
 │   ├── policies/
+│   ├── workflows/
 │   ├── playbooks/
 │   ├── plans/
 │   ├── logs/
@@ -122,10 +130,11 @@ a-share-research-os/
 
 ## 6. Skills 规划
 
-P0 阶段先建立 skills 空壳，后续逐步实现。
+Skills 是可复用的投研动作。P1.6 以后，`research-orchestrator` 作为总编排入口，下层 skills 执行具体研究动作。
 
 | Skill | 投研动作 |
 |---|---|
+| `research-orchestrator` | 识别 workflow 类型、创建/更新 workflow run、路由下层 skills、生成 handoff、检查门禁、输出 readout |
 | `evidence-ingest` | 证据导入、归档、解析、登记 |
 | `segment-research` | 细分方向研究 |
 | `company-universe` | 从细分寻找 A 股公司池 |
