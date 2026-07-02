@@ -1,0 +1,7 @@
+run_id,ingest_mode,started_at,finished_at,result,stock_code,source_name,source_type,api_name,manifest_rows_created,manifest_rows_updated,metric_candidates,claim_candidates,issues,notes
+ingest_official_002837_ce7f64,official_disclosure_search,2026-07-02T16:41:15Z,2026-07-02T16:41:15Z,SUCCESS,002837,szse,annual_report,,1,0,0,0,,official disclosure registered; parse later before material claims
+ingest_structured_002837_stock_basic_f82181,structured_api_pull,2026-07-02T16:41:17Z,2026-07-02T16:41:17Z,SUCCESS,002837,local_tushare_fixture,structured_financial_data,stock_basic,1,0,1,0,,offline-capable structured snapshot ingest
+ingest_structured_002837_income_89213a,structured_api_pull,2026-07-02T16:41:18Z,2026-07-02T16:41:18Z,SUCCESS,002837,local_tushare_fixture,structured_financial_data,income,1,0,80,0,,offline-capable structured snapshot ingest
+ingest_structured_002837_balancesheet_bad80e,structured_api_pull,2026-07-02T16:41:19Z,2026-07-02T16:41:19Z,SUCCESS,002837,local_tushare_fixture,structured_financial_data,balancesheet,1,0,65,0,,offline-capable structured snapshot ingest
+ingest_structured_002837_cashflow_418339,structured_api_pull,2026-07-02T16:41:20Z,2026-07-02T16:41:20Z,SUCCESS,002837,local_tushare_fixture,structured_financial_data,cashflow,1,0,56,0,,offline-capable structured snapshot ingest
+ingest_structured_002837_fina_indicator_875a4c,structured_api_pull,2026-07-02T16:41:21Z,2026-07-02T16:41:21Z,SUCCESS,002837,local_tushare_fixture,structured_financial_data,fina_indicator,1,0,60,0,,offline-capable structured snapshot ingest

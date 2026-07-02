@@ -1,0 +1,132 @@
+{
+  "workflow_id": "wf_20260703_stock_first_002837_invic",
+  "scope": "workflow-local debug; no global manifest append",
+  "stock_code": "002837",
+  "company_id": "cn_002837_invic",
+  "company_name": "英维克",
+  "source_inputs": {
+    "annual_report": "data/raw/annual_reports/annual_report_002837_invic_2025_0f8fcf.pdf",
+    "structured_csv_fixtures": [
+      "fixtures/balancesheet_002837.csv",
+      "fixtures/cashflow_002837.csv",
+      "fixtures/fina_indicator_002837.csv",
+      "fixtures/income_002837.csv",
+      "fixtures/stock_basic_002837.csv"
+    ]
+  },
+  "created": {
+    "evidence_rows": 6,
+    "metric_candidates": 262,
+    "ingest_runs": 6
+  },
+  "ingest_runs": [
+    {
+      "run_id": "ingest_official_002837_ce7f64",
+      "ingest_mode": "official_disclosure_search",
+      "started_at": "2026-07-02T16:41:15Z",
+      "finished_at": "2026-07-02T16:41:15Z",
+      "result": "SUCCESS",
+      "stock_code": "002837",
+      "source_name": "szse",
+      "source_type": "annual_report",
+      "api_name": "",
+      "manifest_rows_created": "1",
+      "manifest_rows_updated": "0",
+      "metric_candidates": "0",
+      "claim_candidates": "0",
+      "issues": "",
+      "notes": "official disclosure registered; parse later before material claims"
+    },
+    {
+      "run_id": "ingest_structured_002837_stock_basic_f82181",
+      "ingest_mode": "structured_api_pull",
+      "started_at": "2026-07-02T16:41:17Z",
+      "finished_at": "2026-07-02T16:41:17Z",
+      "result": "SUCCESS",
+      "stock_code": "002837",
+      "source_name": "local_tushare_fixture",
+      "source_type": "structured_financial_data",
+      "api_name": "stock_basic",
+      "manifest_rows_created": "1",
+      "manifest_rows_updated": "0",
+      "metric_candidates": "1",
+      "claim_candidates": "0",
+      "issues": "",
+      "notes": "offline-capable structured snapshot ingest"
+    },
+    {
+      "run_id": "ingest_structured_002837_income_89213a",
+      "ingest_mode": "structured_api_pull",
+      "started_at": "2026-07-02T16:41:18Z",
+      "finished_at": "2026-07-02T16:41:18Z",
+      "result": "SUCCESS",
+      "stock_code": "002837",
+      "source_name": "local_tushare_fixture",
+      "source_type": "structured_financial_data",
+      "api_name": "income",
+      "manifest_rows_created": "1",
+      "manifest_rows_updated": "0",
+      "metric_candidates": "80",
+      "claim_candidates": "0",
+      "issues": "",
+      "notes": "offline-capable structured snapshot ingest"
+    },
+    {
+      "run_id": "ingest_structured_002837_balancesheet_bad80e",
+      "ingest_mode": "structured_api_pull",
+      "started_at": "2026-07-02T16:41:19Z",
+      "finished_at": "2026-07-02T16:41:19Z",
+      "result": "SUCCESS",
+      "stock_code": "002837",
+      "source_name": "local_tushare_fixture",
+      "source_type": "structured_financial_data",
+      "api_name": "balancesheet",
+      "manifest_rows_created": "1",
+      "manifest_rows_updated": "0",
+      "metric_candidates": "65",
+      "claim_candidates": "0",
+      "issues": "",
+      "notes": "offline-capable structured snapshot ingest"
+    },
+    {
+      "run_id": "ingest_structured_002837_cashflow_418339",
+      "ingest_mode": "structured_api_pull",
+      "started_at": "2026-07-02T16:41:20Z",
+      "finished_at": "2026-07-02T16:41:20Z",
+      "result": "SUCCESS",
+      "stock_code": "002837",
+      "source_name": "local_tushare_fixture",
+      "source_type": "structured_financial_data",
+      "api_name": "cashflow",
+      "manifest_rows_created": "1",
+      "manifest_rows_updated": "0",
+      "metric_candidates": "56",
+      "claim_candidates": "0",
+      "issues": "",
+      "notes": "offline-capable structured snapshot ingest"
+    },
+    {
+      "run_id": "ingest_structured_002837_fina_indicator_875a4c",
+      "ingest_mode": "structured_api_pull",
+      "started_at": "2026-07-02T16:41:21Z",
+      "finished_at": "2026-07-02T16:41:21Z",
+      "result": "SUCCESS",
+      "stock_code": "002837",
+      "source_name": "local_tushare_fixture",
+      "source_type": "structured_financial_data",
+      "api_name": "fina_indicator",
+      "manifest_rows_created": "1",
+      "manifest_rows_updated": "0",
+      "metric_candidates": "60",
+      "claim_candidates": "0",
+      "issues": "",
+      "notes": "offline-capable structured snapshot ingest"
+    }
+  ],
+  "global_append": false,
+  "notes": [
+    "All generated evidence and metrics are workflow-local delta artifacts.",
+    "Structured snapshots are metric-only and cannot support business exposure by themselves.",
+    "Annual report is registered but not parsed with page/table locators in this run."
+  ]
+}

@@ -1,0 +1,24 @@
+company_id: cn_002837_invic
+stock_code: "002837"
+stock_name: 英维克
+as_of_date: 2026-07-03
+source_workflow_id: wf_20260703_stock_first_002837_invic
+linked_segments:
+  - segment_id: ai_server_liquid_cooling
+    segment_name: AI服务器液冷
+    link_status: todo_insufficient_evidence
+    exposure_type: todo_insufficient_evidence
+    exposure_score: 1
+    revenue_pct: "MISSING: 暂无本轮重新抽取的直接披露"
+    profit_pct: "MISSING: 暂无本轮重新抽取的直接披露"
+    evidence_ids:
+      - ev_annual_report_002837_20260421_ce7f64
+    claim_ids:
+      - "TODO: extract claim from annual report with page/table locator"
+    metric_ids:
+      - "TODO: structured metrics are company-level and metric-only"
+    confidence: low
+    valid_from: 2026-07-03
+    valid_to: null
+    backflow_decision: blocked
+    notes: "Workflow-local debug can identify the likely segment context, but cannot update global exposure registry until annual report extraction supplies reviewed claim/page/table locator."

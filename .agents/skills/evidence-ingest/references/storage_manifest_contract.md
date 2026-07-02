@@ -5,14 +5,12 @@
 ```text
 data/
 ├── raw/
-│   ├── official_disclosure/
 │   ├── annual_reports/
 │   ├── announcements/
 │   ├── regulator_policy/
 │   ├── industry_reports/
 │   ├── company_ir_product/
 │   ├── market_data/
-│   ├── financial_data/
 │   ├── web_snapshots/
 │   └── user_uploaded/
 ├── processed/

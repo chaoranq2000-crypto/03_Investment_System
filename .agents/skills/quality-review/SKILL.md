@@ -1,69 +1,177 @@
 ---
 name: quality-review
-description: Use when checking evidence traceability, claim types, stale evidence, metric definitions, counter-evidence, missing data, update logs, and investment-safety boundaries. Do not use to generate new unreviewed claims or trade instructions.
+description: Use when checking evidence traceability, claim types, stale evidence, metric definitions, counter-evidence, missing data, update logs, exposure mapping, stock-led backflow, and investment-safety boundaries. Do not use to generate new unreviewed claims or trade instructions.
 ---
 
 # Quality Review
 
 ## Goal
 
-检查研究产物是否可追溯、口径清楚、不确定性可见、反证可见、更新有痕，并且不输出直接交易指令。
+Check that research artifacts are traceable, correctly typed, comparable, uncertainty-aware, counter-evidence-aware, updateable and free of direct trading instructions.
+
+In P1.6, prioritize **B6-lite stock gates** for the stock-led evidence-to-report MVP.
 
 ## When to use
 
-- 交付 segment report、stock report、comparison、memo 或 refresh log 前。
-- 修改 scorecard、watchlist、thesis 或 exposure 记录前后。
-- 发现证据冲突、缺失或口径不一致时。
+- Before delivering segment report, stock report, comparison, memo or refresh log.
+- Before/after modifying scorecard, watchlist, thesis or exposure records.
+- When evidence conflicts, data is missing, or source reliability is unclear.
+- At T9 of `stock_first_closed_loop`.
 
 ## Inputs
 
-- 待审查文件路径。
-- 关联 evidence_id、claim_id、metric_id。
-- 相关 config、templates、manifest 和 decisions。
+```text
+artifact paths
+evidence_manifest.csv
+claims_draft.csv / claims_registry.csv
+metrics_draft.csv / metrics_registry.csv
+segment_exposure.yaml
+segment_company_exposure.csv
+workflow_state.yaml
+run_log.md
+```
 
 ## Responsibilities
 
-- 检查 material claim 是否有证据。
-- 检查 claim_type 是否混淆。
-- 检查指标口径、单位、周期和来源。
-- 检查风险、反证、missing data。
-- 检查报告路径和输出边界。
-- 输出问题清单、严重程度和修复建议。
+- Check material claims have evidence / claim / metric / TODO support.
+- Check claim_type separation.
+- Check metric period, unit, source and calculation method.
+- Check risk, counter-evidence and missing data.
+- Check exposure mapping and backflow decisions.
+- Check report path and output boundary.
+- Output issue list, severity and fix owner.
 
 ## Out of scope
 
-- 不生成新的未经复核结论。
-- 不替代 evidence-ingest。
-- 不替代 segment 或 stock research。
-- 不输出买卖建议。
-- 不静默修改报告；需要修复时明确列出改动。
+- Do not generate new unreviewed conclusions.
+- Do not replace `evidence-ingest`.
+- Do not replace segment or stock research.
+- Do not output buy/sell/hold instructions.
+- Do not silently modify reports; list required fixes.
+
+## Issue schema
+
+Every issue must use:
+
+```csv
+issue_id,severity,gate_id,stage,target_artifact,description,fix_owner_skill,status,created_at,resolved_at,notes
+```
+
+Severity:
+
+| severity | Meaning |
+|---|---|
+| high | Blocks accepted status; affects evidence traceability, identity, exposure, material claims, or no-advice boundary |
+| medium | Does not block limited pilot if disclosed; affects completeness, comparability, confidence or important TODOs |
+| low | Formatting, naming, minor clarity or non-blocking improvements |
+
+Status:
+
+```text
+open
+fixed
+accepted_todo
+false_positive
+blocked
+```
+
+## Stock-led gates
+
+### G1 Evidence Gate
+
+Pass conditions:
+
+- Evidence manifest exists.
+- Required official filings are registered or explicit TODOs exist.
+- source_url and raw_file_path are separated.
+- structured API snapshots are marked metric-only.
+
+### G2 Claim Gate
+
+Pass conditions:
+
+- fact / estimate / inference / management_comment / analyst_view / opinion are separated.
+- D-level clues do not support material claims.
+- management comments are not written as facts.
+
+### G3 Metric Gate
+
+Pass conditions:
+
+- each metric has period, value, unit/currency, source_evidence_id and calculation_method.
+- metric candidates from structured API are draft unless promoted.
+
+### G6 Exposure Gate
+
+Pass conditions:
+
+- exposure_type, exposure_score, evidence_ids and confidence are present.
+- revenue_pct / profit_pct are disclosed or MISSING.
+- narrative exposure is not upgraded to revenue/product exposure without evidence.
+
+### G7 Stock Report Gate
+
+Pass conditions:
+
+- stock report has metadata, evidence snapshot, business skeleton, financial metrics, linked segments, risk/counter-evidence and TODO.
+- material statements cite evidence_id / claim_id / metric_id or TODO/MISSING.
+
+### G8 Backflow Gate
+
+Pass conditions:
+
+- backflow decision is explicit.
+- update/no-update/blocked reason is recorded.
+- stock findings are not isolated from segment-company state.
+
+### G9 No Advice Gate
+
+Pass conditions:
+
+- no buy/sell/hold language.
+- no target-price instruction.
+- score, memo or scenario is not framed as a trading signal.
+
+## Outcome rules
+
+| outcome | Conditions |
+|---|---|
+| accepted | no high/medium blocking issue |
+| accepted_with_todos | no high issue; medium/low TODOs documented |
+| needs_fix | at least one fixable high issue |
+| blocked | identity/evidence/path/source problem prevents review |
 
 ## Outputs
 
-- quality review note
-- evidence gap list
-- stale / contradicted claim list
-- required fixes
-- optional follow-up tasks
-
-## Workflow
-
-1. 读取待审查产物和关联 evidence map。
-2. 检查 material claim 引用。
-3. 检查 claim_type、metric、exposure 和 scorecard。
-4. 检查风险、反证和 TODO/MISSING。
-5. 检查 refresh/change log 要求。
-6. 检查是否存在直接交易指令。
-7. 输出通过、条件通过或不通过结论。
+```text
+quality_gate_report.md
+quality_issues.csv
+evidence_gap_list.csv
+stale_or_contradicted_claims.csv
+required_fixes.md
+```
 
 ## Guardrails
 
-- 质量审查优先报告问题，不粉饰缺口。
-- 无证据结论必须标为 TODO/MISSING/LOW_CONFIDENCE/UNVERIFIED。
-- 管理层表述、券商预测和媒体叙事必须明确标签。
-- 评分、memo 和 watchlist 都不是交易信号。
+- Quality review should surface problems, not hide gaps.
+- Unsupported conclusions must become TODO/MISSING/LOW_CONFIDENCE/UNVERIFIED.
+- Management comments, analyst predictions and media narratives must be labeled.
+- Scores, memos and watchlists are not trading signals.
 
 ## Quality checklist
+
+1. Do all key conclusions have `evidence_id`, `claim_id`, `metric_id` or TODO?
+2. Are facts, estimates, inferences and opinions separated?
+3. Are management comments tagged as management comments?
+4. Are analyst predictions tagged as analyst views?
+5. Is missing data explicitly marked?
+6. Are counter-evidence and uncertainty visible?
+7. Are metric period, unit and source clear?
+8. Is stale evidence marked?
+9. Is update/backflow logging required?
+10. Is direct trading advice avoided?
+
+Compatibility checklist:
 
 1. 是否所有关键结论都有 `evidence_id` 或 `claim_id`。
 2. 是否混淆事实、估计、推断、观点。

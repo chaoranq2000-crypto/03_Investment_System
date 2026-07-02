@@ -1,0 +1,179 @@
+workflow_id: wf_20260703_stock_first_002837_invic
+workflow_type: stock_first_closed_loop
+status: needs_fix
+created_at: 2026-07-03
+updated_at: 2026-07-03
+owner: mixed
+active_segment_id: ai_server_liquid_cooling
+active_company_id: cn_002837_invic
+current_stage: T10_close_readout
+completed_stages:
+  - T0_intake
+  - T1_company_evidence
+  - T2_business_financial_skeleton
+  - T3_linked_segment_discovery
+  - T6_exposure_mapping
+  - T7_stock_report_draft
+  - T8_backflow
+  - T9_quality_review
+  - T10_close_readout
+next_stage: T1_fix_annual_report_extraction
+active_skill: research-orchestrator
+required_next_skill: evidence-ingest
+
+evidence_snapshot:
+  manifest_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/evidence_manifest_delta.csv
+  evidence_count: 6
+  notes: workflow-local delta only; global manifest not appended
+
+claims_snapshot:
+  draft_path: null
+  registry_path: data/manifests/claims_registry.csv
+  claim_count: 0
+  notes: no new claim candidates generated; annual report extraction required
+
+metrics_snapshot:
+  draft_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/metrics_draft_delta.csv
+  registry_path: data/manifests/metrics_registry.csv
+  metric_count: 262
+  notes: workflow-local metric candidates from local CSV fixtures
+
+artifacts:
+  - artifact_type: workflow_state
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/workflow_state.yaml
+    created_by_skill: research-orchestrator
+    stage: T0
+    status: current
+    required: true
+  - artifact_type: stock_evidence_plan
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_evidence_plan.yaml
+    created_by_skill: research-orchestrator
+    stage: T1
+    status: current
+    required: true
+  - artifact_type: evidence_manifest_delta
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/evidence_manifest_delta.csv
+    created_by_skill: evidence-ingest
+    stage: T1
+    status: current
+    required: true
+  - artifact_type: metrics_draft_delta
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/metrics_draft_delta.csv
+    created_by_skill: evidence-ingest
+    stage: T1
+    status: current
+    required: true
+  - artifact_type: ingest_log
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/ingest_log.json
+    created_by_skill: evidence-ingest
+    stage: T1
+    status: current
+    required: true
+  - artifact_type: stock_report_draft
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_report_draft.md
+    created_by_skill: stock-deep-dive
+    stage: T7
+    status: needs_fix
+    required: true
+  - artifact_type: evidence_map
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/evidence_map.md
+    created_by_skill: stock-deep-dive
+    stage: T7
+    status: current
+    required: true
+  - artifact_type: segment_exposure
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/segment_exposure.yaml
+    created_by_skill: stock-deep-dive
+    stage: T6
+    status: needs_fix
+    required: true
+  - artifact_type: exposure_change_note
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/exposure_change_note.md
+    created_by_skill: segment-company-mapping
+    stage: T8
+    status: current
+    required: true
+  - artifact_type: quality_issue_list
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/quality_issue_list.md
+    created_by_skill: quality-review
+    stage: T9
+    status: current
+    required: true
+  - artifact_type: workflow_readout
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/workflow_readout.md
+    created_by_skill: research-orchestrator
+    stage: T10
+    status: current
+    required: true
+open_todos:
+  - issue_id: Q002837-001
+    severity: high
+    stage: T1 Company Evidence
+    target_artifact: evidence_manifest_delta.csv
+    fix_owner_skill: evidence-ingest
+    status: open
+  - issue_id: Q002837-002
+    severity: high
+    stage: T6 Exposure Mapping
+    target_artifact: segment_exposure.yaml
+    fix_owner_skill: segment-company-mapping
+    status: open
+  - issue_id: Q002837-003
+    severity: medium
+    stage: T2 Business & Financial Skeleton
+    target_artifact: metrics_draft_delta.csv
+    fix_owner_skill: evidence-ingest
+    status: open
+  - issue_id: Q002837-004
+    severity: medium
+    stage: T7 Stock Report Draft
+    target_artifact: stock_report_draft.md
+    fix_owner_skill: stock-deep-dive
+    status: accepted_todo
+  - issue_id: Q002837-005
+    severity: low
+    stage: T8 Backflow
+    target_artifact: exposure_change_note.md
+    fix_owner_skill: research-orchestrator
+    status: accepted_todo
+quality_gates:
+  - gate_id: G1
+    status: fail
+    checked_by: quality-review
+    notes: annual report locator missing
+  - gate_id: G2
+    status: not_checked
+    checked_by: quality-review
+    notes: no new claim candidates
+  - gate_id: G3
+    status: pass
+    checked_by: quality-review
+    notes: metric candidates generated
+  - gate_id: G6
+    status: fail
+    checked_by: quality-review
+    notes: exposure is TODO
+  - gate_id: G7
+    status: pass
+    checked_by: quality-review
+    notes: draft traceable with TODOs
+  - gate_id: G8
+    status: fail
+    checked_by: quality-review
+    notes: backflow blocked
+  - gate_id: G9
+    status: pass
+    checked_by: quality-review
+    notes: no trading instruction
+  - gate_id: G10
+    status: pass
+    checked_by: quality-review
+    notes: readout complete
+entry_criteria:
+  - stock_code provided
+  - local evidence available
+exit_criteria:
+  - workflow-local artifacts generated
+  - quality issues listed
+  - readout status explicit
+notes: "P2 out of scope; global evidence/metric/exposure registries were not appended."

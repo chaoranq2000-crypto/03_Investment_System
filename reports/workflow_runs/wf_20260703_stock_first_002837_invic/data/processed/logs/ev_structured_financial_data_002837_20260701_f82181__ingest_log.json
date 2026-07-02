@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_structured_002837_stock_basic_f82181",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-02T16:41:17Z",
+  "finished_at": "2026-07-02T16:41:17Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "local_tushare_fixture",
+  "source_type": "structured_financial_data",
+  "api_name": "stock_basic",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "1",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest"
+}

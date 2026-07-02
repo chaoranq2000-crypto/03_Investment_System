@@ -24,7 +24,7 @@ B1 should define the adapter contract and store snapshots. Full production adapt
 
 ## Output boundary
 
-- Save raw response under `data/raw/market_data/` or `data/raw/financial_data/`.
+- Save raw response under `data/raw/market_data/`.
 - Save normalized outputs under `data/processed/normalized/`.
 - Generate `metric_candidates` only.
 - Set `material_claim_allowed=metric_only`.

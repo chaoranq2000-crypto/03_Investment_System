@@ -1,0 +1,6 @@
+issue_id,severity,stage,target_artifact,description,fix_owner_skill,status,created_at,resolved_at,notes
+Q002837-001,high,T1 Company Evidence,evidence_manifest_delta.csv,Annual report is registered but not parsed; no page/table locator or extracted claim exists for material business exposure.,evidence-ingest,open,2026-07-03,,workflow-local debug
+Q002837-002,high,T6 Exposure Mapping,segment_exposure.yaml,Segment exposure remains todo_insufficient_evidence; global exposure registry must not be updated until reviewed claim support exists.,segment-company-mapping,open,2026-07-03,,workflow-local debug
+Q002837-003,medium,T2 Business & Financial Skeleton,metrics_draft_delta.csv,Metric candidates are generated from local fixtures and remain draft; period_type and units need normalization before promotion.,evidence-ingest,open,2026-07-03,,workflow-local debug
+Q002837-004,medium,T7 Stock Report Draft,stock_report_draft.md,"Draft report is traceable but intentionally skeletal; customer, order, capacity and segment revenue fields remain TODO/MISSING.",stock-deep-dive,accepted_todo,2026-07-03,,workflow-local debug
+Q002837-005,low,T8 Backflow,exposure_change_note.md,Backflow is blocked with clear next step; rerun mapping after extraction.,research-orchestrator,accepted_todo,2026-07-03,,workflow-local debug

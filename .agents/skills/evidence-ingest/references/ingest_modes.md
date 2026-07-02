@@ -61,7 +61,7 @@ discover
 
 ### structured_api_pull
 
-- Save raw API response as CSV/JSON/Parquet under `data/raw/market_data/` or `data/raw/financial_data/`.
+- Save raw API response as CSV/JSON/Parquet under `data/raw/market_data/`.
 - Save API parameters and field list; compute `api_params_hash`.
 - Generate `metric_candidates` only.
 - Set `material_claim_allowed=metric_only`.

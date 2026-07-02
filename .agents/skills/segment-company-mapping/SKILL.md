@@ -1,70 +1,134 @@
 ---
 name: segment-company-mapping
-description: Use when maintaining many-to-many exposure records between segments and companies. Do not use for writing full narrative reports, valuation, or direct trading instructions.
+description: "Use when maintaining many-to-many exposure records between segments and companies. In P1.6, prioritize B4-lite: consume stock segment_exposure.yaml and produce exposure state updates or change notes. Do not use for writing full narrative reports, valuation, or direct trading instructions."
 ---
 
 # Segment Company Mapping
 
 ## Goal
 
-维护 `segment_company_exposure`，让一个公司可以映射到多个细分，一个细分可以对应多家公司。
+Maintain `segment_company_exposure`, so one company can map to multiple segments and one segment can contain multiple companies.
+
+In P1.6, the immediate goal is **B4-lite**: accept `segment_exposure.yaml` from stock-led MVP and create/update exposure state or write a blocked/TODO change note.
 
 ## When to use
 
-- 需要新增、更新或审查 segment-company exposure。
-- 需要区分收入暴露、产品暴露、技术储备、客户、项目、市场叙事。
-- 需要修正单一归属造成的研究混乱。
+- Need to add, update or review segment-company exposure.
+- Need to consume `reports/stocks/<stock_code>_<company_name>/segment_exposure.yaml`.
+- Need to distinguish revenue, product, technology, customer, project and narrative exposure.
+- Need to produce a backflow decision after stock research.
 
 ## Inputs
 
-- segment_id、company_id、stock_code、stock_name。
-- exposure evidence：evidence_id、claim_id、source_path。
-- revenue_pct、profit_pct 或 MISSING 标记。
+```yaml
+segment_exposure_path:
+segment_id:
+company_id:
+stock_code:
+stock_name:
+evidence_ids:
+claim_ids:
+metric_ids:
+revenue_pct:
+profit_pct:
+```
 
 ## Responsibilities
 
-- 维护 exposure_type、exposure_score、confidence。
-- 记录 evidence_ids、valid_from、valid_to、notes。
-- 标记低置信度、叙事暴露和待补证据。
-- 输出映射变更摘要。
+- Validate segment and company identifiers.
+- Validate exposure_type, exposure_score and confidence.
+- Ensure revenue_pct and profit_pct are disclosed or explicitly MISSING.
+- Ensure exposure_score is backed by evidence/claim/TODO.
+- Maintain evidence_ids, valid_from, valid_to and notes.
+- Write exposure change notes and backflow decisions.
 
 ## Out of scope
 
-- 不写完整细分报告。
-- 不写完整个股深度。
-- 不做估值结论。
-- 不把映射分数等同交易信号。
-- 不静默改写历史映射；重要变化需记录刷新或变更说明。
+- Do not write full segment reports.
+- Do not write full stock deep dives.
+- Do not make valuation conclusions.
+- Do not treat exposure scores as trading signals.
+- Do not silently rewrite history; material changes need a change note or refresh log.
 
-## Outputs
+## Exposure type enum
 
-- `reports/stocks/<stock_code>_<company_slug>/segment_exposure.yaml`
-- `reports/segments/<segment_id>/company_universe.csv`
-- exposure change note
-- evidence gap list
+```text
+revenue
+product
+technology
+customer
+project
+capacity
+order
+narrative
+excluded
+todo_insufficient_evidence
+```
 
-## Workflow
+## Exposure score guide
 
-1. 确认 segment 和 company 标识。
-2. 检查已有 exposure 记录。
-3. 对新增证据进行来源等级和 claim_type 标注。
-4. 更新 exposure_type、score、confidence。
-5. 标记 valid_from / valid_to。
-6. 输出变化、反证和待复核项。
+| score | Meaning | Minimum support |
+|---:|---|---|
+| 0 | excluded / not material | evidence or exclusion reason |
+| 1 | narrative/clue only | clue or TODO, no material claim |
+| 2 | product/technology/customer clue | company evidence, low confidence |
+| 3 | confirmed product/project/customer exposure | official/company evidence, revenue share MISSING allowed |
+| 4 | meaningful business exposure | official evidence or multiple reviewed claims |
+| 5 | high-purity/revenue-confirmed exposure | disclosed revenue/profit share or very strong official evidence |
+
+Narrative-only exposure cannot score above 1. Technology-only exposure cannot score above 2 unless there is product/project/customer evidence.
+
+## B4-lite workflow
+
+1. Read `segment_exposure.yaml`.
+2. Validate identifiers.
+3. Validate each linked segment row.
+4. Compare with existing `data/processed/normalized/segment_company_exposure.csv` if present.
+5. Decide action:
+
+```text
+update_exposure
+create_segment_candidate
+update_company_universe
+no_backflow_needed
+blocked
+```
+
+6. Write either:
+
+```text
+data/processed/normalized/segment_company_exposure.csv
+```
+
+or:
+
+```text
+reports/stocks/<stock_code>_<company_name>/exposure_change_note.md
+```
+
+7. Handoff to `quality-review` for G6/G8 gates.
+
+## Output row contract
+
+```csv
+segment_id,company_id,stock_code,stock_name,exposure_type,exposure_score,revenue_pct,profit_pct,evidence_ids,claim_ids,metric_ids,confidence,valid_from,valid_to,status,backflow_decision,notes
+```
 
 ## Guardrails
 
-- revenue_pct 和 profit_pct 不能猜；无披露写 MISSING。
-- 只凭市场叙事不能给高 exposure_score。
-- 技术储备、产能、订单、收入必须分开。
-- 冲突证据必须并列呈现。
+- revenue_pct and profit_pct cannot be guessed; if absent, write `MISSING:<reason>`.
+- D-level clues cannot support high exposure_score.
+- Technology reserve, capacity, orders and revenue must remain separate.
+- Conflicting evidence must be shown side by side.
+- No accepted mapping without evidence_ids, claim_ids, or explicit TODO.
 
 ## Quality checklist
 
-- [ ] segment_id、company_id、stock_code、stock_name 已填写。
-- [ ] exposure_type 在允许枚举内。
-- [ ] exposure_score 有证据或 TODO。
-- [ ] evidence_ids 已填写或显式缺失。
-- [ ] confidence 已标注。
-- [ ] revenue_pct / profit_pct 缺失时标 MISSING。
-- [ ] 变更需要 refresh log 时已记录。
+- [ ] segment_id, company_id, stock_code and stock_name are present.
+- [ ] exposure_type is in the allowed enum.
+- [ ] exposure_score has evidence, claim, metric or TODO support.
+- [ ] evidence_ids are filled or explicitly missing.
+- [ ] confidence is high/medium/low.
+- [ ] revenue_pct / profit_pct are disclosed or MISSING.
+- [ ] backflow decision is explicit.
+- [ ] change note exists for material updates.

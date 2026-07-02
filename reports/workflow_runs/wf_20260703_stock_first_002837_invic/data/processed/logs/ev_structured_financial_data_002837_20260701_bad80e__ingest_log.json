@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_structured_002837_balancesheet_bad80e",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-02T16:41:19Z",
+  "finished_at": "2026-07-02T16:41:19Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "local_tushare_fixture",
+  "source_type": "structured_financial_data",
+  "api_name": "balancesheet",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "65",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest"
+}
