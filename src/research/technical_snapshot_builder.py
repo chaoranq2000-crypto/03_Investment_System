@@ -8,6 +8,9 @@ from typing import Sequence
 
 import yaml
 
+INSUFFICIENT_PRICE_WINDOW = "INSUFFICIENT_PRICE_WINDOW"
+TODO_MARKET_DATA = "TODO_MARKET_DATA"
+
 
 def _to_float(value: str) -> float | None:
     try:
@@ -18,25 +21,33 @@ def _to_float(value: str) -> float | None:
 
 def _ma(values: list[float], window: int) -> float | str:
     if len(values) < window:
-        return "MISSING_DISCLOSURE"
+        return INSUFFICIENT_PRICE_WINDOW
     return round(mean(values[-window:]), 4)
 
 
 def _pct_change(values: list[float], window: int) -> float | str:
-    if len(values) <= window or values[-window - 1] == 0:
-        return "MISSING_DISCLOSURE"
+    if len(values) <= window:
+        return INSUFFICIENT_PRICE_WINDOW
+    if values[-window - 1] == 0:
+        return TODO_MARKET_DATA
     return round((values[-1] / values[-window - 1] - 1) * 100, 4)
 
 
 def _volume_ratio(rows: list[dict[str, str]]) -> float | str:
+    if not any((row.get("volume", "") or row.get("vol", "")).strip() for row in rows):
+        return TODO_MARKET_DATA
     volumes = [_to_float(row.get("volume", "") or row.get("vol", "")) for row in rows]
     volumes = [value for value in volumes if value is not None]
     if len(volumes) < 5:
-        return "MISSING_DISCLOSURE"
+        return INSUFFICIENT_PRICE_WINDOW
     base = mean(volumes[-5:])
     if base == 0:
-        return "MISSING_DISCLOSURE"
+        return TODO_MARKET_DATA
     return round(volumes[-1] / base, 4)
+
+
+def _posix_path(path: Path) -> str:
+    return path.as_posix()
 
 
 def build_technical_snapshot(
@@ -55,14 +66,15 @@ def build_technical_snapshot(
     ma10_value = _ma(closes, 10)
     ma20_value = _ma(closes, 20)
     ma60_value = _ma(closes, 60)
-    trend = "MISSING_PRICE_HISTORY"
+    trend = INSUFFICIENT_PRICE_WINDOW
     if close is not None and isinstance(ma5_value, float):
         trend = "above_ma5" if close >= ma5_value else "below_ma5"
     as_of = latest.get("trade_date") or latest.get("as_of_date") or as_of_date
+    source_path = _posix_path(market_csv)
     snapshot = {
         "stock_code": stock_code,
         "as_of_date": as_of,
-        "price_series_source": str(market_csv),
+        "price_series_source": source_path,
         "adjustment_policy": "unknown",
         "windows": {
             "daily": {
@@ -74,24 +86,28 @@ def build_technical_snapshot(
                 "pct_chg_60d": _pct_change(closes, 60),
                 "volume_ratio": _volume_ratio(rows),
             },
-            "weekly": {"ma5": "MISSING_DISCLOSURE", "ma10": "MISSING_DISCLOSURE", "ma20": "MISSING_DISCLOSURE"},
+            "weekly": {
+                "ma5": INSUFFICIENT_PRICE_WINDOW,
+                "ma10": INSUFFICIENT_PRICE_WINDOW,
+                "ma20": INSUFFICIENT_PRICE_WINDOW,
+            },
         },
         "support_resistance": {
             "source_method": "computed" if closes else "unknown",
             "levels": [
-                {"type": "support", "value": min(closes[-20:]) if closes else "MISSING_DISCLOSURE"},
-                {"type": "resistance", "value": max(closes[-20:]) if closes else "MISSING_DISCLOSURE"},
+                {"type": "support", "value": min(closes[-20:]) if closes else TODO_MARKET_DATA},
+                {"type": "resistance", "value": max(closes[-20:]) if closes else TODO_MARKET_DATA},
             ],
         },
-        "close": close if close is not None else "MISSING_DISCLOSURE",
+        "close": close if close is not None else TODO_MARKET_DATA,
         "ma5": ma5_value,
         "ma10": ma10_value,
         "ma20": ma20_value,
         "ma60": ma60_value,
-        "support": min(closes[-20:]) if closes else "MISSING_DISCLOSURE",
-        "resistance": max(closes[-20:]) if closes else "MISSING_DISCLOSURE",
+        "support": min(closes[-20:]) if closes else TODO_MARKET_DATA,
+        "resistance": max(closes[-20:]) if closes else TODO_MARKET_DATA,
         "trend_status": trend,
-        "source": str(market_csv),
+        "source": source_path,
         "notes": "Technical snapshot is a market-state observation, not trading advice.",
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)

@@ -1,4 +1,4 @@
 issue_id,severity,stage,target_artifact,description,fix_owner_skill,status,created_at,resolved_at,notes
-DL-GAP-001,medium,DL5 Data Packs,peer_market_snapshot.csv,Peer market snapshot not generated in this data-layer-only pass,evidence-ingest,accepted_todo,2026-07-03,,Keep TODO_PEER_DATA before peer comparison
+DL-GAP-001,low,DL5 Data Packs,peer_market_snapshot.csv,Fixture-only peer_market_snapshot.csv generated; live peer market data hardening remains pending,evidence-ingest,lowered_to_low_todo,2026-07-03,,Peer valuation context remains metric-only and non-conclusive
 DL-GAP-002,medium,DL5 Data Packs,official_disclosure_reconciliation,Structured financial metrics still need official filing reconciliation,evidence-ingest,accepted_todo,2026-07-03,,Do not use structured snapshots as business exposure facts
 DL-GAP-003,low,DL5 Data Packs,valuation_snapshot.yaml,pe_forward missing from fixture,evidence-ingest,accepted_todo,2026-07-03,,Field remains TODO_MARKET_DATA

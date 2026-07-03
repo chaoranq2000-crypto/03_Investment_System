@@ -4,6 +4,7 @@ import csv
 import json
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,6 +40,125 @@ def test_tushare_no_token_dry_run_returns_blocked(tmp_path: Path, monkeypatch) -
     payload = json.loads(readout.read_text(encoding="utf-8"))
     assert payload["result"] == "BLOCKED"
     assert payload["params"]["token_env"] == "TUSHARE_TOKEN"
+
+
+def test_tushare_live_mode_requires_explicit_network_flag(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("TUSHARE_TOKEN", "x" * 56)
+    readout = tmp_path / "tushare_live_blocked.json"
+    tushare_main(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--api-name",
+            "income",
+            "--stock-code",
+            "002837",
+            "--mode",
+            "live",
+            "--as-of-date",
+            "2026-07-01",
+            "--readout-output",
+            str(readout),
+        ]
+    )
+    payload = json.loads(readout.read_text(encoding="utf-8"))
+    assert payload["result"] == "BLOCKED"
+    assert payload["mode"] == "live"
+    assert payload["allow_network"] is False
+    assert payload["permission_note"] == "live Tushare mode requires explicit --allow-network"
+    assert "x" * 56 not in readout.read_text(encoding="utf-8")
+
+
+def test_tushare_live_mode_with_network_requires_token_without_leaking(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv("TUSHARE_TOKEN", raising=False)
+    readout = tmp_path / "tushare_live_no_token.json"
+    tushare_main(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--api-name",
+            "income",
+            "--stock-code",
+            "002837",
+            "--mode",
+            "live",
+            "--allow-network",
+            "--as-of-date",
+            "2026-07-01",
+            "--readout-output",
+            str(readout),
+        ]
+    )
+    payload = json.loads(readout.read_text(encoding="utf-8"))
+    assert payload["result"] == "BLOCKED"
+    assert payload["permission_note"] == "missing TUSHARE_TOKEN"
+    assert "token_value" not in readout.read_text(encoding="utf-8")
+
+
+def test_tushare_live_mode_routes_mock_response_through_structured_ingest(
+    tmp_path: Path, monkeypatch
+) -> None:
+    token = "sensitive-live-token-should-not-be-written"
+    captured: dict[str, object] = {}
+
+    class FakeFrame:
+        def to_dict(self, orient: str) -> list[dict[str, str]]:
+            assert orient == "records"
+            return [{"ts_code": "002837.SZ", "end_date": "20251231", "total_revenue": "1000"}]
+
+    class FakePro:
+        def income(self, **params: str) -> FakeFrame:
+            captured["params"] = params
+            return FakeFrame()
+
+    fake_tushare = SimpleNamespace(
+        set_token=lambda value: captured.setdefault("token", value),
+        pro_api=lambda: FakePro(),
+    )
+    monkeypatch.setitem(sys.modules, "tushare", fake_tushare)
+    monkeypatch.setenv("TUSHARE_TOKEN", token)
+
+    readout = tmp_path / "tushare_live_readout.json"
+    tushare_main(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--api-name",
+            "income",
+            "--stock-code",
+            "002837",
+            "--company-id",
+            "cn_002837_invic",
+            "--mode",
+            "live",
+            "--allow-network",
+            "--as-of-date",
+            "2026-07-01",
+            "--publish-date",
+            "2026-07-01",
+            "--unit",
+            "CNY",
+            "--readout-output",
+            str(readout),
+        ]
+    )
+
+    assert captured["token"] == token
+    assert captured["params"]["ts_code"] == "002837.SZ"  # type: ignore[index]
+    payload = json.loads(readout.read_text(encoding="utf-8"))
+    assert payload["adapter_status"] == "live_completed"
+    assert payload["rows"] == 1
+    manifest = read_csv(tmp_path / "data/manifests/evidence_manifest.csv")
+    metrics = read_csv(tmp_path / "data/manifests/metrics_draft.csv")
+    assert manifest[0]["source_name"] == "tushare"
+    assert manifest[0]["material_claim_allowed"] == "metric_only"
+    assert manifest[0]["raw_file_path"]
+    assert manifest[0]["processed_table_path"]
+    assert manifest[0]["api_params_hash"]
+    assert {row["metric_name"] for row in metrics} == {"total_revenue"}
+    for path in tmp_path.rglob("*"):
+        if path.is_file():
+            assert token not in path.read_text(encoding="utf-8", errors="ignore")
 
 
 def test_tushare_income_fixture_generates_manifest_and_metrics(tmp_path: Path) -> None:

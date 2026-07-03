@@ -4,8 +4,19 @@ final_status: accepted_with_todos
 blocking_issues: 0
 accepted_todos: 3
 high_issues: 0
-medium_issues: 2
-low_issues: 1
+medium_issues: 1
+low_issues: 2
+
+## Summary
+
+| item | value |
+|---|---|
+| final_status | accepted_with_todos |
+| blocking_issues | 0 |
+| accepted_todos | 3 |
+| high_issues | 0 |
+| medium_issues | 1 |
+| low_issues | 2 |
 
 | gate | status |
 |---|---|
@@ -26,6 +37,6 @@ None.
 
 | issue_id | severity | target_artifact | description |
 |---|---|---|---|
-| DL-GAP-001 | medium | peer_market_snapshot.csv | Peer market snapshot not generated in this data-layer-only pass |
 | DL-GAP-002 | medium | official_disclosure_reconciliation | Structured financial metrics still need official filing reconciliation |
+| DL-GAP-001 | low | peer_market_snapshot.csv | Fixture-only peer_market_snapshot.csv generated; live peer market data hardening remains pending |
 | DL-GAP-003 | low | valuation_snapshot.yaml | pe_forward missing from fixture |

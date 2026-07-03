@@ -44,6 +44,32 @@ accepted_sample_quality
 | quality gate report | quality_gate_report.md | accepted_sample_quality |
 | acceptance checklist | stock_report_acceptance_checklist.yaml | accepted_sample_quality |
 | backflow decision | backflow_decision.yaml | explicit no global exposure update |
+| data-layer bridge draft | R4_stock_report_data_layer_bridge_draft.md | accepted_with_todos |
+| data-layer bridge issue list | data_layer_bridge_issue_list.csv | current |
+| data-layer bridge readout | data_layer_bridge_readout.md | current |
+| integrated data-layer readout | integrated_data_layer_readout.md | accepted_with_todos |
+| quality gate after data-layer bridge | quality_gate_report_after_data_layer_bridge.md | accepted_with_todos |
+| remaining source gaps after data-layer bridge | remaining_source_gaps_after_data_layer_bridge.md | current |
+
+## Data Layer Bridge
+
+| item | result |
+|---|---|
+| source_data_layer_run | wf_20260703_data_layer_002837_invic |
+| bridge_status | accepted_with_todos |
+| G10 Data Layer Pack Gate | pass with accepted TODOs |
+| formal stock report regenerated | no |
+| structured data promoted to business exposure fact | no |
+
+## Integrated Data Layer Debug
+
+| item | result |
+|---|---|
+| stock-first workflow consumed data-layer run | pass |
+| accepted TODOs retained | pass |
+| G10 after bridge | accepted_with_todos |
+| remaining source gaps generated | pass |
+| P2 entered | no |
 
 ## Closed Previous High Issues
 

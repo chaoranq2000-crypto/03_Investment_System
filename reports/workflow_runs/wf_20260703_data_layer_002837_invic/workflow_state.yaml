@@ -56,6 +56,18 @@ artifacts:
     stage: DL5
     status: current
     required: true
+  - artifact_type: peer_market_snapshot
+    path: reports/workflow_runs/wf_20260703_data_layer_002837_invic/peer_market_snapshot.csv
+    created_by_skill: evidence-ingest
+    stage: DL5
+    status: current
+    required: true
+  - artifact_type: official_disclosure_reconciliation_stub
+    path: reports/workflow_runs/wf_20260703_data_layer_002837_invic/official_disclosure_reconciliation_stub.md
+    created_by_skill: evidence-ingest
+    stage: DL5
+    status: current
+    required: true
   - artifact_type: data_layer_quality_report
     path: reports/workflow_runs/wf_20260703_data_layer_002837_invic/data_layer_quality_report.md
     created_by_skill: quality-review
@@ -71,11 +83,11 @@ artifacts:
 
 open_todos:
   - issue_id: DL-GAP-001
-    severity: medium
+    severity: low
     stage: DL5 Data Packs
     target_artifact: peer_market_snapshot.csv
     fix_owner_skill: evidence-ingest
-    status: accepted_todo
+    status: lowered_to_low_todo
   - issue_id: DL-GAP-002
     severity: medium
     stage: DL5 Data Packs
@@ -121,7 +133,7 @@ quality_gates:
   - gate_id: G-DL8
     status: accepted_todo
     checked_by: data_layer_quality_review
-    notes: required downstream packs present; accepted TODOs remain for peer snapshot, official disclosure reconciliation and pe_forward
+    notes: required downstream packs present; peer snapshot is fixture-only; accepted TODOs remain for live peer data hardening, official disclosure reconciliation and pe_forward
 
 entry_criteria:
   - stock_code provided

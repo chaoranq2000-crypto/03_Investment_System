@@ -23,3 +23,9 @@ art_021,quality_issue_list,quality_issue_list.md,quality-review,T9,True,True,cur
 art_022,quality_gate_report,quality_gate_report.md,quality-review,T9,True,True,current,accepted_sample_quality
 art_023,stock_report_acceptance_checklist,stock_report_acceptance_checklist.yaml,quality-review,T9,True,True,current,accepted_sample_quality
 art_024,workflow_readout,workflow_readout.md,research-orchestrator,T11,True,True,current,accepted_sample_quality
+art_025,data_layer_bridge_draft,R4_stock_report_data_layer_bridge_draft.md,stock-deep-dive,DL5,True,True,current,R4 data-layer bridge draft only
+art_026,data_layer_bridge_issue_list,data_layer_bridge_issue_list.csv,quality-review,DL5,True,True,current,accepted TODOs carried forward
+art_027,data_layer_bridge_readout,data_layer_bridge_readout.md,research-orchestrator,DL5,True,True,current,G10 data-layer pack gate accepted_with_todos
+art_028,integrated_data_layer_readout,integrated_data_layer_readout.md,research-orchestrator,DL7,True,True,current,stock-first workflow consumes data-layer packs
+art_029,quality_gate_report_after_data_layer_bridge,quality_gate_report_after_data_layer_bridge.md,quality-review,DL7,True,True,current,G10 accepted_with_todos
+art_030,remaining_source_gaps_after_data_layer_bridge,remaining_source_gaps_after_data_layer_bridge.md,quality-review,DL7,True,True,current,accepted TODOs retained for next disclosure work

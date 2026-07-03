@@ -1,20 +1,20 @@
 stock_code: 002837
 as_of_date: '2026-07-01'
-price_series_source: reports\workflow_runs\wf_20260703_data_layer_002837_invic\normalized\baostock_query_history_k_data_plus_002837_2026-07-01_eaca2035.csv
+price_series_source: reports/workflow_runs/wf_20260703_data_layer_002837_invic/normalized/baostock_query_history_k_data_plus_002837_2026-07-01_eaca2035.csv
 adjustment_policy: unknown
 windows:
   daily:
     ma5: 32.02
     ma10: 31.19
-    ma20: MISSING_DISCLOSURE
-    ma60: MISSING_DISCLOSURE
-    pct_chg_20d: MISSING_DISCLOSURE
-    pct_chg_60d: MISSING_DISCLOSURE
+    ma20: INSUFFICIENT_PRICE_WINDOW
+    ma60: INSUFFICIENT_PRICE_WINDOW
+    pct_chg_20d: INSUFFICIENT_PRICE_WINDOW
+    pct_chg_60d: INSUFFICIENT_PRICE_WINDOW
     volume_ratio: 1.1104
   weekly:
-    ma5: MISSING_DISCLOSURE
-    ma10: MISSING_DISCLOSURE
-    ma20: MISSING_DISCLOSURE
+    ma5: INSUFFICIENT_PRICE_WINDOW
+    ma10: INSUFFICIENT_PRICE_WINDOW
+    ma20: INSUFFICIENT_PRICE_WINDOW
 support_resistance:
   source_method: computed
   levels:
@@ -25,10 +25,10 @@ support_resistance:
 close: 32.5
 ma5: 32.02
 ma10: 31.19
-ma20: MISSING_DISCLOSURE
-ma60: MISSING_DISCLOSURE
+ma20: INSUFFICIENT_PRICE_WINDOW
+ma60: INSUFFICIENT_PRICE_WINDOW
 support: 29.5
 resistance: 32.5
 trend_status: above_ma5
-source: reports\workflow_runs\wf_20260703_data_layer_002837_invic\normalized\baostock_query_history_k_data_plus_002837_2026-07-01_eaca2035.csv
+source: reports/workflow_runs/wf_20260703_data_layer_002837_invic/normalized/baostock_query_history_k_data_plus_002837_2026-07-01_eaca2035.csv
 notes: Technical snapshot is a market-state observation, not trading advice.

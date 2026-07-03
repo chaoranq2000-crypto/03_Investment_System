@@ -12,3 +12,5 @@ art_010,data_layer_quality_report,data_layer_quality_report.md,quality-review,DL
 art_011,data_layer_issue_list,data_layer_issue_list.csv,quality-review,DL6,True,True,current,3 accepted_todos and no blocking issues
 art_012,quality_gate_report,quality_gate_report.md,quality-review,DL6,True,True,current,mirrors data-layer accepted_with_todos state
 art_013,workflow_readout,workflow_readout.md,research-orchestrator,DL7,True,True,current,accepted_with_todos data-layer run
+art_014,peer_market_snapshot,peer_market_snapshot.csv,evidence-ingest,DL5,True,True,current,fixture-only peer valuation context
+art_015,official_disclosure_reconciliation_stub,official_disclosure_reconciliation_stub.md,evidence-ingest,DL5,True,True,current,structured metrics remain metric-only pending official disclosure reconciliation

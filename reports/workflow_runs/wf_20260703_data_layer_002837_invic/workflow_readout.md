@@ -16,15 +16,15 @@ as_of_date: 2026-07-01
 | blocking_issues | 0 |
 | accepted_todos | 3 |
 | high_issues | 0 |
-| medium_issues | 2 |
-| low_issues | 1 |
+| medium_issues | 1 |
+| low_issues | 2 |
 
 ## Accepted Todos
 
 | issue_id | severity | target_artifact | handling |
 |---|---|---|---|
-| DL-GAP-001 | medium | `peer_market_snapshot.csv` | Keep peer comparison as `TODO_PEER_DATA`. |
 | DL-GAP-002 | medium | `official_disclosure_reconciliation` | Do not use structured financial metrics as business exposure facts until reconciled to official disclosure. |
+| DL-GAP-001 | low | `peer_market_snapshot.csv` | Fixture-only peer snapshot exists; live peer market data hardening remains pending. |
 | DL-GAP-003 | low | `valuation_snapshot.yaml` | Keep `pe_forward` as `TODO_MARKET_DATA` because the fixture does not contain it. |
 
 ## Artifacts
@@ -38,6 +38,8 @@ as_of_date: 2026-07-01
 | financial metric pack | `financial_metric_pack.csv` |
 | valuation snapshot | `valuation_snapshot.yaml` |
 | technical snapshot | `technical_snapshot.yaml` |
+| peer market snapshot | `peer_market_snapshot.csv` |
+| official disclosure reconciliation stub | `official_disclosure_reconciliation_stub.md` |
 | source gap report | `source_gap_report.md` |
 | quality gate | `data_layer_quality_report.md` |
 
@@ -46,8 +48,9 @@ as_of_date: 2026-07-01
 - All structured snapshots remain metric-only.
 - No business exposure fact is created from Tushare or Baostock fixtures.
 - Global registries were not appended.
-- Missing peer and disclosure reconciliation work remains visible in `open_todos.csv`.
+- Peer snapshot is fixture-only and remains metric-only.
+- Disclosure reconciliation work remains visible in `open_todos.csv`.
 
 ## Handoff
 
-The run is ready for the stock report readiness bridge with accepted TODOs. Downstream report logic may consume `valuation_snapshot.yaml`, `technical_snapshot.yaml` and `financial_metric_pack.csv`; missing peer, `pe_forward`, or official-disclosure reconciliation fields must remain TODO/MISSING.
+The run is ready for the stock report readiness bridge with accepted TODOs. Downstream report logic may consume `valuation_snapshot.yaml`, `technical_snapshot.yaml`, `peer_market_snapshot.csv` and `financial_metric_pack.csv`; missing `pe_forward` or official-disclosure reconciliation fields must remain TODO/MISSING.

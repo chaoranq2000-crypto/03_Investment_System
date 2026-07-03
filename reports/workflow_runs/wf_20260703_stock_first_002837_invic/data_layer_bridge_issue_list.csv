@@ -1,0 +1,4 @@
+issue_id,severity,source_artifact,description,status,handling
+DLBR-001,medium,official_disclosure_reconciliation_stub.md,Structured financial metrics need official disclosure reconciliation,accepted_todo,Keep company-level metrics as metric context only
+DLBR-002,low,valuation_snapshot.yaml,pe_forward remains TODO_MARKET_DATA,accepted_todo,Expose missing field in valuation context
+DLBR-003,low,peer_market_snapshot.csv,Peer market snapshot is fixture-only for non-target peers,accepted_todo,Keep peer context non-conclusive until live peer data hardening

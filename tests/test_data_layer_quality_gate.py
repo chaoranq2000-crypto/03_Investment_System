@@ -4,6 +4,8 @@ import csv
 import sys
 from pathlib import Path
 
+import yaml
+
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src" / "qa"))
@@ -65,6 +67,18 @@ OPEN_TODO_HEADER = [
     "created_at",
     "resolved_at",
     "notes",
+]
+
+DATA_LAYER_RUN_DIR = ROOT / "reports/workflow_runs/wf_20260703_data_layer_002837_invic"
+FORMATTED_ARTIFACTS = [
+    DATA_LAYER_RUN_DIR / "data_layer_quality_report.md",
+    DATA_LAYER_RUN_DIR / "data_layer_issue_list.csv",
+    DATA_LAYER_RUN_DIR / "open_todos.csv",
+    DATA_LAYER_RUN_DIR / "source_gap_report.md",
+    DATA_LAYER_RUN_DIR / "workflow_readout.md",
+    DATA_LAYER_RUN_DIR / "workflow_state.yaml",
+    DATA_LAYER_RUN_DIR / "valuation_snapshot.yaml",
+    DATA_LAYER_RUN_DIR / "technical_snapshot.yaml",
 ]
 
 
@@ -211,3 +225,24 @@ def test_data_layer_quality_gate_flags_token_value_field(tmp_path: Path) -> None
     issues = (run_dir / "data_layer_issue_list.csv").read_text(encoding="utf-8")
     assert "blocking_issue" in issues
     assert "token_value" in issues
+
+
+def test_current_data_layer_artifacts_are_readable_and_posix() -> None:
+    report = (DATA_LAYER_RUN_DIR / "data_layer_quality_report.md").read_text(encoding="utf-8")
+    assert report.startswith("# Data Layer Quality Report\n")
+    assert "## Summary" in report
+    assert "## Blocking Issues" in report
+    assert "## Accepted Todos" in report
+
+    issue_rows = (DATA_LAYER_RUN_DIR / "data_layer_issue_list.csv").read_text(encoding="utf-8").splitlines()
+    with (DATA_LAYER_RUN_DIR / "data_layer_issue_list.csv").open("r", encoding="utf-8-sig", newline="") as handle:
+        parsed_issue_rows = list(csv.DictReader(handle))
+    assert len(issue_rows) == 1 + len(parsed_issue_rows)
+    assert len(parsed_issue_rows) == 3
+
+    for file_name in ["workflow_state.yaml", "valuation_snapshot.yaml", "technical_snapshot.yaml"]:
+        parsed = yaml.safe_load((DATA_LAYER_RUN_DIR / file_name).read_text(encoding="utf-8"))
+        assert isinstance(parsed, dict)
+
+    for path in FORMATTED_ARTIFACTS:
+        assert "\\" not in path.read_text(encoding="utf-8"), path
