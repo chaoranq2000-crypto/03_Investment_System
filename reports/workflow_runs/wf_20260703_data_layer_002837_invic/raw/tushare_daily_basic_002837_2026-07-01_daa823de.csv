@@ -1,0 +1,2 @@
+ts_code,trade_date,close,total_mv,circ_mv,pe_ttm,pb,ps_ttm,turnover_rate,volume,amount,source_evidence_id
+002837.SZ,20260701,32.50,2418000,2106000,38.2,4.1,6.7,2.35,18500000,601250000,ev_structured_market_fixture_002837_20260701

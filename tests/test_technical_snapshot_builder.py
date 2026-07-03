@@ -29,4 +29,7 @@ def test_technical_and_sentiment_builders_write_yaml(tmp_path: Path) -> None:
     )
     assert tech["as_of_date"] == "20260705"
     assert tech["trend_status"] == "above_ma5"
+    assert tech["windows"]["daily"]["ma5"] == 12
+    assert tech["windows"]["daily"]["ma10"] == "MISSING_DISCLOSURE"
+    assert tech["windows"]["daily"]["volume_ratio"] == "MISSING_DISCLOSURE"
     assert sentiment["industry_sentiment"]["claim_type"] == "clue"

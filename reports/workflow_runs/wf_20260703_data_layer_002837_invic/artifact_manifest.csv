@@ -1,0 +1,14 @@
+artifact_id,artifact_type,path,created_by_skill,stage,required,exists,status,notes
+art_001,workflow_state,workflow_state.yaml,research-orchestrator,DL0,True,True,current,workflow-local state
+art_002,data_request_plan,data_request_plan.yaml,evidence-ingest,DL0,True,True,current,data-layer request plan
+art_003,adapter_run_queue,adapter_run_queue.yaml,evidence-ingest,DL1,True,True,current,fixture adapter queue
+art_004,evidence_manifest,evidence_manifest.csv,evidence-ingest,DL3,True,True,current,workflow-local manifest
+art_005,metrics_draft,metrics_draft.csv,evidence-ingest,DL4,True,True,current,metric candidates only
+art_006,financial_metric_pack,financial_metric_pack.csv,evidence-ingest,DL5,True,True,current,structured financial metrics
+art_007,valuation_snapshot,valuation_snapshot.yaml,evidence-ingest,DL5,True,True,current,market valuation context
+art_008,technical_snapshot,technical_snapshot.yaml,evidence-ingest,DL5,True,True,current,K-line technical context
+art_009,source_gap_report,source_gap_report.md,evidence-ingest,DL5,True,True,current,gaps visible
+art_010,data_layer_quality_report,data_layer_quality_report.md,quality-review,DL6,True,True,current,accepted with high_issues=0
+art_011,data_layer_issue_list,data_layer_issue_list.csv,quality-review,DL6,True,True,current,no open issues
+art_012,quality_gate_report,quality_gate_report.md,quality-review,DL6,True,True,current,mirrors data-layer quality gate
+art_013,workflow_readout,workflow_readout.md,research-orchestrator,DL7,True,True,current,accepted data-layer run

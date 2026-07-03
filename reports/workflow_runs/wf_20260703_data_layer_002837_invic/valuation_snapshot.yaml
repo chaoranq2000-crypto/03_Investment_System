@@ -1,0 +1,21 @@
+stock_code: 002837
+company_id: cn_002837_invic
+as_of_date: '20260701'
+sources:
+- source_name: tushare
+  evidence_id: ev_structured_market_data_002837_20260701_daa823
+  api_params_hash: daa823de68d9ebf49ad71d55601f5237d8cf3333c6c919b650b85ba0673405cd
+market_values:
+  price: '32.50'
+  market_cap: '2418000'
+  float_market_cap: '2106000'
+  pe_ttm: '38.2'
+  pe_forward: TODO_MARKET_DATA
+  pb: '4.1'
+  ps: '6.7'
+  turnover_rate: '2.35'
+  volume: '18500000'
+  amount: '601250000'
+missing_fields:
+- pe_forward
+notes: Valuation snapshot is metric-only market context and not a company fact.

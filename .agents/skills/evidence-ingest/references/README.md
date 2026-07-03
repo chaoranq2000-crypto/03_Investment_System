@@ -17,6 +17,10 @@ This directory contains stable contracts for the `evidence-ingest` skill.
 | `ingest_quality_gate.md` | Success/failure definitions and validation gates. |
 | `failure_handling.md` | Common failure modes and required handling. |
 | `structured_data_sources.md` | Tushare/Baostock positioning and metric snapshot boundary. |
+| `source_adapter_matrix.md` | Data-layer source routing matrix and adapter status labels. |
+| `structured_data_adapter_contract.md` | Structured API snapshot contract and metric-only boundary. |
+| `market_context_snapshot_contract.md` | Valuation, technical, sentiment and peer market snapshot contract. |
+| `data_layer_quality_gate.md` | Data-layer quality gates and acceptance states. |
 | `adapter_notes/` | Source-specific notes for later adapter implementation. |
 
 No reference file should contain transient run state. Run state belongs in `data/manifests/`, `data/processed/logs/` or reports/readouts.

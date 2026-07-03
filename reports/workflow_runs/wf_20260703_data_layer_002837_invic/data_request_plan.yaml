@@ -1,0 +1,54 @@
+workflow_id: wf_20260703_data_layer_002837_invic
+request_id: dl_req_002837_20260703
+request_type: stock_first
+status: in_progress
+created_at: 2026-07-03
+updated_at: 2026-07-03
+
+object:
+  entity_type: company
+  stock_code: "002837"
+  ts_code: 002837.SZ
+  company_id: cn_002837_invic
+  company_name: 英维克
+  segment_id: ai_server_liquid_cooling
+  segment_name: AI服务器液冷
+
+time_range:
+  start_date: 2024-01-01
+  end_date: 2026-07-01
+  as_of_date: 2026-07-01
+  periods: [2024FY, 2025FY]
+
+required_outputs:
+  evidence_manifest_rows: true
+  metric_candidates: true
+  claim_candidates: false
+  clue_log: false
+  normalized_tables: true
+  data_packs:
+    financial_metric_pack: true
+    valuation_snapshot: true
+    technical_snapshot: true
+    source_gap_report: true
+
+source_layers:
+  structured_database:
+    enabled: true
+    primary: tushare
+    fallback: baostock
+    token_env: TUSHARE_TOKEN
+    APIs:
+      tushare: [income, daily_basic]
+      baostock: [query_history_k_data_plus]
+
+guardrails:
+  no_api_token_in_repo: true
+  raw_files_immutable: true
+  structured_data_metric_only: true
+  no_buy_sell_hold_advice: true
+  official_disclosure_required_for_business_exposure: true
+
+open_todos:
+  - TODO_PEER_DATA: peer_market_snapshot not generated in this data-layer-only pass.
+  - TODO_DISCLOSURE_RECONCILIATION: structured financial metrics still require official filing reconciliation before material company facts.

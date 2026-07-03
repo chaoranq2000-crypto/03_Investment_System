@@ -1,0 +1,103 @@
+# Data Request Plan Template
+# Used by evidence-ingest data layer. Do not store API tokens here.
+
+workflow_id: ""
+request_id: ""
+request_type: "stock_first"   # stock_first | segment_first | refresh | comparison | ad_hoc
+status: "planned"             # planned | in_progress | accepted | accepted_with_todos | needs_fix | blocked
+created_at: ""
+updated_at: ""
+
+object:
+  entity_type: "company"       # company | segment | market | mixed
+  stock_code: ""
+  ts_code: ""
+  company_id: ""
+  company_name: ""
+  segment_id: ""
+  segment_name: ""
+
+time_range:
+  start_date: ""
+  end_date: ""
+  as_of_date: ""
+  periods: []
+
+required_outputs:
+  evidence_manifest_rows: true
+  metric_candidates: true
+  claim_candidates: false
+  clue_log: false
+  normalized_tables: true
+  data_packs:
+    company_identity_pack: true
+    financial_metric_pack: true
+    business_segment_metric_pack: true
+    valuation_snapshot: true
+    technical_snapshot: true
+    market_sentiment_pack: false
+    peer_market_snapshot: false
+    source_gap_report: true
+
+source_layers:
+  official_disclosure:
+    enabled: true
+    sources: [cninfo, sse, szse, bse]
+    needs:
+      - latest_annual_report
+      - latest_interim_or_quarterly_report
+      - material_announcements_last_12m
+    allow_metadata_only_on_failure: true
+  structured_database:
+    enabled: true
+    primary: tushare
+    fallback: baostock
+    token_env: TUSHARE_TOKEN
+    APIs:
+      tushare:
+        - stock_basic
+        - daily_basic
+        - income
+        - balancesheet
+        - cashflow
+        - fina_indicator
+        - fina_mainbz
+      baostock:
+        - query_stock_basic
+        - query_history_k_data_plus
+        - query_profit_data
+        - query_balance_data
+        - query_cash_flow_data
+  market_context:
+    enabled: true
+    sources: [tushare, baostock, tencent_finance, mootdx, eastmoney_push2]
+    needs:
+      - price_and_valuation
+      - kline_and_ma
+      - sector_membership
+      - capital_flow_optional
+  third_party_clues:
+    enabled: false
+    sources: [brokerage_report, news_social]
+    output_boundary: clue_only_or_analyst_view
+
+quality_gates:
+  - G-DL1 Source Permission Gate
+  - G-DL2 Raw Archive Gate
+  - G-DL3 Snapshot Reproducibility Gate
+  - G-DL4 Field Schema Gate
+  - G-DL5 Metric-only Boundary Gate
+  - G-DL6 Freshness Gate
+  - G-DL7 License / Terms Gate
+  - G-DL8 Downstream Pack Completeness Gate
+
+guardrails:
+  no_api_token_in_repo: true
+  raw_files_immutable: true
+  structured_data_metric_only: true
+  news_clue_only: true
+  no_buy_sell_hold_advice: true
+  official_disclosure_required_for_business_exposure: true
+
+open_todos: []
+notes: ""

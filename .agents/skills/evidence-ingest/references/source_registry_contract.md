@@ -8,7 +8,7 @@
 sources:
   <source_name>:
     display_name: <human-readable name>
-    source_group: official_disclosure | structured_database | structured_database_fallback | regulator_policy | company_source | third_party_analysis | clue | user_uploaded
+    source_group: official_disclosure | structured_database | structured_database_fallback | market_data_adapter | market_signal_adapter | regulator_policy | company_source | third_party_analysis | clue | user_uploaded
     default_reliability_rank: A | B | C | D | unknown
     supported_source_types: []
     allowed_claim_types: []
@@ -40,6 +40,8 @@ sources:
 - `sse`, `szse`, `bse`: exchange filings; A rank.
 - `tushare`: structured database; B rank; metric-only material support; token/points/frequency controlled.
 - `baostock`: structured market-data fallback; B/C rank depending on use; metric-only support.
+- `tencent_finance`, `mootdx`: market data adapters; B/C rank depending on endpoint; metric-only support.
+- `eastmoney_push2`, `ths`: market signal adapters; C/D rank; clue/analyst_view/estimate only unless a numeric market metric is explicitly mapped and reviewed.
 - `company_website`, `ir_record`, `interactive_qna`: C rank unless backed by official filing.
 - `brokerage_report`, `industry_report`: B/C rank; analyst_view/estimate/context only.
 - `news`, `social_media`, `market_hotlist`: D rank; clue only.

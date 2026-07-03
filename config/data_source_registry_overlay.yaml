@@ -1,0 +1,182 @@
+# Data source registry overlay for data layer workflow.
+# Merge into config/source_registry.yaml after review. This file is intentionally additive.
+
+source_groups:
+  official_disclosure:
+    material_claim_default: requires_extraction_and_review
+    raw_archive_policy_default: full_file_archived
+  structured_database:
+    material_claim_default: metric_only
+    raw_archive_policy_default: snapshot_archived
+  structured_database_fallback:
+    material_claim_default: metric_only
+    raw_archive_policy_default: snapshot_archived
+  market_data_adapter:
+    material_claim_default: metric_only
+    raw_archive_policy_default: snapshot_archived
+  market_signal_adapter:
+    material_claim_default: clue_only
+    raw_archive_policy_default: snapshot_archived
+  third_party_analysis:
+    material_claim_default: false
+    raw_archive_policy_default: evidence_card_only
+  clue:
+    material_claim_default: false
+    raw_archive_policy_default: metadata_only
+
+sources_overlay:
+  tushare:
+    extend_supported_source_types:
+      - structured_financial_data
+      - structured_market_data
+      - structured_security_master
+      - structured_valuation_data
+    preferred_apis:
+      stock_identity:
+        - stock_basic
+      financial_statements:
+        - income
+        - balancesheet
+        - cashflow
+      financial_indicators:
+        - fina_indicator
+      business_breakdown_candidates:
+        - fina_mainbz
+      valuation_and_market:
+        - daily_basic
+        - daily
+        - pro_bar
+      event_calendar:
+        - disclosure_date
+        - forecast
+        - express
+        - dividend
+    adapter_status: offline_fixture_supported
+    target_status: production_supported
+    extra_guardrails:
+      - token_env_only
+      - points_and_frequency_logged
+      - metric_only
+      - official_disclosure_required_for_business_exposure
+
+  baostock:
+    extend_supported_source_types:
+      - structured_market_data
+      - structured_financial_data
+      - structured_security_master
+    preferred_apis:
+      session:
+        - login
+        - logout
+      stock_identity:
+        - query_all_stock
+        - query_stock_basic
+      market_data:
+        - query_history_k_data_plus
+      financial_fallback:
+        - query_profit_data
+        - query_operation_data
+        - query_growth_data
+        - query_balance_data
+        - query_cash_flow_data
+        - query_dupont_data
+    adapter_status: planned
+    target_status: offline_fixture_supported_then_api_supported_unverified
+    extra_guardrails:
+      - login_query_logout_required
+      - metric_only
+      - no_business_exposure_claims
+
+  tencent_finance:
+    display_name: 腾讯财经
+    source_group: market_data_adapter
+    supported_source_types:
+      - structured_market_data
+      - structured_valuation_data
+    default_reliability_rank: C
+    allowed_claim_types:
+      - metric_statement
+    material_claim_allowed: metric_only
+    raw_archive_required: true
+    raw_archive_policy_default: snapshot_archived
+    requires_token: false
+    rate_limit_policy: polite_http_with_retry
+    fallback_sources:
+      - tushare
+      - baostock
+    manual_review_required: false
+    stale_after: 1d
+    license_note_required: true
+    notes: Price/valuation context only; verify field mapping before promotion.
+
+  mootdx:
+    display_name: 通达信/mootdx
+    source_group: market_data_adapter
+    supported_source_types:
+      - structured_market_data
+      - f10_context
+    default_reliability_rank: C
+    allowed_claim_types:
+      - metric_statement
+      - clue
+    material_claim_allowed: metric_only
+    raw_archive_required: true
+    raw_archive_policy_default: snapshot_archived
+    requires_token: false
+    rate_limit_policy: tcp_connection_and_network_env_dependent
+    fallback_sources:
+      - baostock
+      - tushare
+    manual_review_required: true
+    stale_after: 1d
+    license_note_required: true
+    notes: Market/F10 adapter; not official disclosure substitute.
+
+  eastmoney_push2:
+    display_name: 东方财富 push2/datacenter/reportapi
+    source_group: market_signal_adapter
+    supported_source_types:
+      - structured_market_data
+      - market_signal
+      - research_report_metadata
+      - news_social_clue
+    default_reliability_rank: C
+    allowed_claim_types:
+      - metric_statement
+      - analyst_view
+      - estimate
+      - clue
+    material_claim_allowed: clue_only
+    raw_archive_required: true
+    raw_archive_policy_default: snapshot_archived
+    requires_token: false
+    rate_limit_policy: serial_http_rate_limit_retry_jitter
+    fallback_sources: []
+    manual_review_required: true
+    stale_after: source_dependent
+    license_note_required: true
+    notes: Use for market context, report metadata, news clues; Eastmoney exclusive endpoints need strict throttling.
+
+  ths:
+    display_name: 同花顺
+    source_group: market_signal_adapter
+    supported_source_types:
+      - market_signal
+      - analyst_estimate
+      - news_social_clue
+    default_reliability_rank: C
+    allowed_claim_types:
+      - analyst_view
+      - estimate
+      - clue
+    material_claim_allowed: clue_only
+    raw_archive_required: true
+    raw_archive_policy_default: metadata_only
+    requires_token: false
+    rate_limit_policy: polite_http_manual_review
+    fallback_sources:
+      - eastmoney_push2
+    manual_review_required: true
+    stale_after: 1d
+    license_note_required: true
+    notes: Hotlist/consensus/context only; not company fact.

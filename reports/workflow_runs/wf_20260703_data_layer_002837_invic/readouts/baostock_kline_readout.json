@@ -1,0 +1,22 @@
+{
+  "run_id": "ingest_structured_002837_query_history_k_data_plus_eaca20",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-03T06:15:54Z",
+  "finished_at": "2026-07-03T06:15:54Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "baostock",
+  "source_type": "structured_market_data",
+  "api_name": "query_history_k_data_plus",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "70",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest",
+  "adapter_status": "offline_fixture_supported",
+  "api_params_hash": "eaca203575496e27053c01faecfb5abe15207aa97c2fe9be3d903d38c0c65356",
+  "evidence_id": "ev_structured_market_data_002837_20260701_eaca20",
+  "raw_file_path": "reports/workflow_runs/wf_20260703_data_layer_002837_invic/raw/baostock_query_history_k_data_plus_002837_2026-07-01_eaca2035.csv",
+  "processed_table_path": "reports/workflow_runs/wf_20260703_data_layer_002837_invic/normalized/baostock_query_history_k_data_plus_002837_2026-07-01_eaca2035.csv"
+}

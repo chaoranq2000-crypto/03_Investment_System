@@ -29,6 +29,11 @@ segment_exposure.yaml
 segment_company_exposure.csv
 workflow_state.yaml
 run_log.md
+data_layer_quality_report.md
+valuation_snapshot.yaml
+technical_snapshot.yaml
+financial_metric_pack.csv
+source_gap_report.md
 ```
 
 ## Responsibilities
@@ -115,6 +120,8 @@ Pass conditions:
 
 - stock report has metadata, evidence snapshot, business skeleton, financial metrics, linked segments, risk/counter-evidence and TODO.
 - material statements cite evidence_id / claim_id / metric_id or TODO/MISSING.
+- data-layer packs are used only when `data_layer_quality_report.md` has high_issues: 0.
+- missing valuation, technical, peer or structured financial packs remain TODO/MISSING.
 
 ### G8 Backflow Gate
 
@@ -131,6 +138,17 @@ Pass conditions:
 - no buy/sell/hold language.
 - no target-price instruction.
 - score, memo or scenario is not framed as a trading signal.
+
+### G10 Data Layer Pack Gate
+
+Pass conditions:
+
+- `valuation_snapshot.yaml` exists before valuation context is written; otherwise `TODO_MARKET_DATA` is visible.
+- `technical_snapshot.yaml` exists before technical context is written; otherwise `TODO_MARKET_DATA` is visible.
+- `financial_metric_pack.csv` exists before structured financial data is used; otherwise `TODO_STRUCTURED_FINANCIAL_DATA` is visible.
+- `peer_market_snapshot.csv` exists before peer valuation comparison is written; otherwise `TODO_PEER_DATA` is visible.
+- official disclosure evidence exists before business exposure is written as fact; otherwise `MISSING_DISCLOSURE` is visible.
+- Tushare/Baostock/market context snapshots do not support customer order, capacity or segment revenue facts by themselves.
 
 ## Outcome rules
 
@@ -170,6 +188,7 @@ required_fixes.md
 8. Is stale evidence marked?
 9. Is update/backflow logging required?
 10. Is direct trading advice avoided?
+11. Are missing data-layer packs represented as TODO/MISSING rather than unsupported conclusions?
 
 Compatibility checklist:
 

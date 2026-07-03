@@ -1,0 +1,25 @@
+workflow_id: wf_20260703_data_layer_002837_invic
+queue_status: in_progress
+as_of_date: 2026-07-01
+runs:
+  - run_id: dl_002837_tushare_income_fixture
+    source_name: tushare
+    api_name: income
+    mode: fixture
+    input_path: fixtures/tushare_income_002837.csv
+    output_boundary: metric_candidates_only
+  - run_id: dl_002837_tushare_daily_basic_fixture
+    source_name: tushare
+    api_name: daily_basic
+    mode: fixture
+    input_path: fixtures/tushare_daily_basic_002837.csv
+    output_boundary: valuation_snapshot
+  - run_id: dl_002837_baostock_kline_fixture
+    source_name: baostock
+    api_name: query_history_k_data_plus
+    mode: fixture
+    input_path: fixtures/baostock_kline_002837.csv
+    output_boundary: technical_snapshot
+quality_gate:
+  required: true
+  output: data_layer_quality_report.md

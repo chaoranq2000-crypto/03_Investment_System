@@ -1,0 +1,4 @@
+run_id,ingest_mode,started_at,finished_at,result,stock_code,source_name,source_type,api_name,manifest_rows_created,manifest_rows_updated,metric_candidates,claim_candidates,issues,notes
+ingest_structured_002837_income_1b506c,structured_api_pull,2026-07-03T06:15:32Z,2026-07-03T06:15:32Z,SUCCESS,002837,tushare,structured_financial_data,income,1,0,14,0,,offline-capable structured snapshot ingest
+ingest_structured_002837_daily_basic_daa823,structured_api_pull,2026-07-03T06:15:44Z,2026-07-03T06:15:44Z,SUCCESS,002837,tushare,structured_market_data,daily_basic,1,0,9,0,,offline-capable structured snapshot ingest
+ingest_structured_002837_query_history_k_data_plus_eaca20,structured_api_pull,2026-07-03T06:15:54Z,2026-07-03T06:15:54Z,SUCCESS,002837,baostock,structured_market_data,query_history_k_data_plus,1,0,70,0,,offline-capable structured snapshot ingest

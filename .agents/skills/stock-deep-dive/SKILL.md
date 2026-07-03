@@ -38,6 +38,13 @@ claim_ids:
 metric_ids:
 evidence_ids:
 stock_evidence_plan:
+data_layer_packs:
+  valuation_snapshot:
+  technical_snapshot:
+  financial_metric_pack:
+  business_segment_metric_pack:
+  peer_market_snapshot:
+  source_gap_report:
 existing_stock_report:
 existing_segment_exposure:
 ```
@@ -47,6 +54,7 @@ existing_segment_exposure:
 - Confirm company identity and security code.
 - Consume evidence registered by `evidence-ingest`; do not bypass manifest.
 - Build a business and financial skeleton.
+- Consume data-layer packs only after they pass the data-layer quality gate.
 - Separate facts, management comments, estimates, inferences and opinions.
 - Discover linked segments from products, customers, projects, orders, technology and business lines.
 - Output `segment_exposure.yaml` for `segment-company-mapping`.
@@ -105,7 +113,13 @@ data/manifests/evidence_manifest.csv
 data/manifests/claims_draft.csv or claims_registry.csv
 data/manifests/metrics_draft.csv or metrics_registry.csv
 reports/workflow_runs/<workflow_id>/stock_evidence_plan.yaml
+reports/workflow_runs/<workflow_id>/valuation_snapshot.yaml
+reports/workflow_runs/<workflow_id>/technical_snapshot.yaml
+reports/workflow_runs/<workflow_id>/financial_metric_pack.csv
+reports/workflow_runs/<workflow_id>/source_gap_report.md
 ```
+
+For data-layer pack rules, read `references/data_layer_pack_consumption.md`.
 
 ### 3. Business breakdown contract
 
@@ -146,6 +160,19 @@ metric_id_or_candidate_id:
 calculation_method:
 is_estimate:
 review_status:
+```
+
+### 4.1 Data-layer pack consumption gate
+
+Before using market or structured data packs:
+
+```text
+- `data_layer_quality_report.md` must exist and have high_issues: 0.
+- Missing `valuation_snapshot.yaml` means valuation context must stay `TODO_MARKET_DATA`.
+- Missing `technical_snapshot.yaml` means technical context must stay `TODO_MARKET_DATA`.
+- Missing `financial_metric_pack.csv` means structured financial data must stay `TODO_STRUCTURED_FINANCIAL_DATA`.
+- Missing `peer_market_snapshot.csv` means peer comparison must stay `TODO_PEER_DATA`.
+- Missing official disclosure means business exposure remains `MISSING_DISCLOSURE`.
 ```
 
 ### 5. Linked segments discovery
@@ -267,6 +294,7 @@ reports/workflow_runs/<workflow_id>/handoffs/*
 - Stock report must include evidence snapshot and evidence map.
 - Management outlook is `management_comment`, not fact.
 - Valuation scenarios express assumptions and sensitivity only.
+- Data-layer market context cannot prove business exposure, customer orders or segment revenue.
 - Scorecard/scenario cannot become trading advice.
 - Segment exposure must use many-to-many mapping.
 - Missing data must be marked TODO/MISSING rather than filled by guess.
@@ -277,6 +305,7 @@ reports/workflow_runs/<workflow_id>/handoffs/*
 - [ ] evidence_snapshot is present.
 - [ ] key business and financial claims have evidence_id / claim_id / metric_id / TODO.
 - [ ] metric period, unit, source and calculation method are explicit.
+- [ ] data-layer packs either exist with `high_issues: 0` or are represented as TODO/MISSING.
 - [ ] linked_segments use segment exposure mapping.
 - [ ] revenue_pct/profit_pct are disclosed or MISSING.
 - [ ] risk, counter-evidence and uncertainty are listed.

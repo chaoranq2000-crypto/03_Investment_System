@@ -7,6 +7,9 @@
 - architecture/WORKSPACE_STRUCTURE.md
 - architecture/RESEARCH_OBJECT_MODEL.md
 
+## ADR
+- adr/ADR_0002_data_layer_as_evidence_ingest_subsystem.md
+
 ## Policies
 - policies/EVIDENCE_AND_CITATION_POLICY.md
 - policies/QUALITY_GUARDRAILS.md
@@ -25,6 +28,7 @@
 - workflows/README.md
 - workflows/RESEARCH_WORKFLOW.md
 - workflows/WORKFLOW_ORCHESTRATION_SPEC.md
+- workflows/DATA_LAYER_WORKFLOW.md
 
 ## Plans
 - plans/plan_template.md
@@ -33,6 +37,9 @@
 - plans/p1_execution_plan.md
 - plans/p1_1_revision_plan.md
 - plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md
+- plans/DATA_LAYER_CODEX_EXECUTION_PLAN.md
+- plans/DATA_LAYER_ACCEPTANCE_CHECKLIST.md
+- plans/DATA_LAYER_DEV_TASK_BREAKDOWN.md
 
 ## Logs
 - logs/README.md

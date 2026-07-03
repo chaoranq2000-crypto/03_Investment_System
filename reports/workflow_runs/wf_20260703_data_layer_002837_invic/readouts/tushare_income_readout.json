@@ -1,0 +1,22 @@
+{
+  "run_id": "ingest_structured_002837_income_1b506c",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-03T06:15:32Z",
+  "finished_at": "2026-07-03T06:15:32Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "tushare",
+  "source_type": "structured_financial_data",
+  "api_name": "income",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "14",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest",
+  "adapter_status": "offline_fixture_supported",
+  "api_params_hash": "1b506c247e3aa357af31eafab227d5ae2ede305cb7ccfce031b46b914918b5be",
+  "evidence_id": "ev_structured_financial_data_002837_20260701_1b506c",
+  "raw_file_path": "reports/workflow_runs/wf_20260703_data_layer_002837_invic/raw/tushare_income_002837_2026-07-01_1b506c24.csv",
+  "processed_table_path": "reports/workflow_runs/wf_20260703_data_layer_002837_invic/normalized/tushare_income_002837_2026-07-01_1b506c24.csv"
+}

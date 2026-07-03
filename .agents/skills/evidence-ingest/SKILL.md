@@ -62,6 +62,13 @@ Read these before execution:
 - `references/failure_handling.md`
 - `references/structured_data_sources.md`
 
+Read these for data-layer and source-adapter routing tasks:
+
+- `references/source_adapter_matrix.md`
+- `references/structured_data_adapter_contract.md`
+- `references/market_context_snapshot_contract.md`
+- `references/data_layer_quality_gate.md`
+
 Read these for stock-led evidence download tasks:
 
 - `references/stock_evidence_plan.md`

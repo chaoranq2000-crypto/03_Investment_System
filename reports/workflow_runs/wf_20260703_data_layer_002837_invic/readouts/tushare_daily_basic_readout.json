@@ -1,0 +1,22 @@
+{
+  "run_id": "ingest_structured_002837_daily_basic_daa823",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-03T06:15:44Z",
+  "finished_at": "2026-07-03T06:15:44Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "tushare",
+  "source_type": "structured_market_data",
+  "api_name": "daily_basic",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "9",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest",
+  "adapter_status": "offline_fixture_supported",
+  "api_params_hash": "daa823de68d9ebf49ad71d55601f5237d8cf3333c6c919b650b85ba0673405cd",
+  "evidence_id": "ev_structured_market_data_002837_20260701_daa823",
+  "raw_file_path": "reports/workflow_runs/wf_20260703_data_layer_002837_invic/raw/tushare_daily_basic_002837_2026-07-01_daa823de.csv",
+  "processed_table_path": "reports/workflow_runs/wf_20260703_data_layer_002837_invic/normalized/tushare_daily_basic_002837_2026-07-01_daa823de.csv"
+}

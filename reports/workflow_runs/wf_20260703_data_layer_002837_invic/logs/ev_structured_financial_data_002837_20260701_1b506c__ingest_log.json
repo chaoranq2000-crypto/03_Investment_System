@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_structured_002837_income_1b506c",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-03T06:15:32Z",
+  "finished_at": "2026-07-03T06:15:32Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "tushare",
+  "source_type": "structured_financial_data",
+  "api_name": "income",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "14",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest"
+}
