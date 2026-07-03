@@ -20,7 +20,7 @@ jobs:
           python-version: "3.11"
       - name: Install test dependencies
         run: conda install -y pytest pyyaml
-      - name: Compile tests
-        run: python -m py_compile tests/test_p0_acceptance.py tests/test_p1_acceptance.py tests/test_p1_5_hardening.py
+      - name: Compile Python files
+        run: python -m py_compile $(git ls-files '*.py')
       - name: Run pytest
         run: python -m pytest -q
