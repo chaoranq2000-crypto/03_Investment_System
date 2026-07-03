@@ -1,0 +1,18 @@
+workflow_id: wf_20260703_stock_first_002837_invic
+status: update_exposure_product_only
+decision: update_exposure
+target_files:
+- data/processed/normalized/segment_company_exposure.csv
+- reports/segments/ai_server_liquid_cooling/company_universe.csv
+- reports/workflow_runs/wf_20260703_stock_first_002837_invic/segment_exposure.yaml
+allowed_updates:
+- append official product-line clue evidence_id
+- refresh notes and reviewer_note
+- refresh last_reviewed_at
+blocked_updates:
+- revenue_pct promotion
+- profit_pct promotion
+- order/customer exposure promotion
+- score increase from narrative heat
+p2_block_003: resolved_product_only_update
+next_action: segment-led replay should decide whether scorecard notes need refresh.

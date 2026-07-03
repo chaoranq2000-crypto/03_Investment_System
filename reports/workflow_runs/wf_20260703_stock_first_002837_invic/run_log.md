@@ -20,3 +20,4 @@ Global registry verification:
 | data/manifests/evidence_manifest.csv | 16 | 2398E8ACC2E4C870E9D709C10FE3FF05863CE432136C8E5212574F59C83C3B90 |
 | data/manifests/metrics_draft.csv | 45 | 8A84922442F63B6E64463A8475BDD0FC2CAE5CCCAECDF80CA0A8458EC609D09E |
 | data/processed/normalized/segment_company_exposure.csv | 6 | F580DA4915C46A7EBE368C5572A41E763A1CCDD379E20FB651FE4E5539732233 |
+| R4 Disclosure/Backflow Review | done | Formatted artifacts verified; official review decisions, liquid-cooling evidence review, product-only backflow review, R4 v0.2 and P2 readiness check generated. |

@@ -1,6 +1,6 @@
 # P1.6 Stock-led Evidence Download MVP Readout
 
-> 本 readout 记录本轮 `stock_led_evidence_download_patch.zip` 的应用、项目化调整和验收结果。本轮不进入 P2，不生成买入/卖出/持有建议。
+> 本 readout 记录本轮 `stock_led_evidence_download_patch.zip` 的应用、项目化调整和验收结果。本轮不进入 P2，不生成直接交易或配置指令。
 
 ## 1. 修改文件清单
 

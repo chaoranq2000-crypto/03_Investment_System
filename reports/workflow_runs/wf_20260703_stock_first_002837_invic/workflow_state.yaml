@@ -1,158 +1,198 @@
 workflow_id: wf_20260703_stock_first_002837_invic
-workflow_type: stock_report_production
-status: accepted_sample_quality
-quality_target: R3_sample_quality_draft
+workflow_type: stock_first_closed_loop
+status: accepted_with_todos
+quality_target: R4_publishable_ready_with_disclosure_todos
 created_at: 2026-07-03
-updated_at: 2026-07-03
+updated_at: '2026-07-03'
 owner: mixed
 active_segment_id: ai_server_liquid_cooling
 active_company_id: cn_002837_invic
-current_stage: R4_stock_deep_dive_v0_1
+current_stage: R4_disclosure_review_and_backflow
 completed_stages:
-  - T0_intake
-  - T1_evidence_plan
-  - T2_evidence_acquire_parse
-  - T3_candidate_generation
-  - T4_candidate_review_promotion
-  - T5_analysis_pack_build
-  - T6_forecast_valuation_model
-  - T7_technical_sentiment_event_pack
-  - T8_report_draft
-  - T9_quality_review
-  - T10_backflow_maintenance
-  - T11_close_readout
-next_stage: P2_readiness_precheck_not_gate
+- T0_intake
+- T1_evidence_plan
+- T2_evidence_acquire_parse
+- T3_candidate_generation
+- T4_candidate_review_promotion
+- T5_analysis_pack_build
+- T6_forecast_valuation_model
+- T7_technical_sentiment_event_pack
+- T8_report_draft
+- T9_quality_review
+- T10_backflow_maintenance
+- T11_close_readout
+- R4_artifact_formatting_cleanup
+- R4_official_reconciliation_review
+- R4_liquid_cooling_exposure_review
+- R4_segment_stock_backflow_review
+- R4_stock_deep_dive_v0_2_gate
+- R4_p2_readiness_check_not_p2
+next_stage: segment_led_replay_preparation
 active_skill: research-orchestrator
-required_next_skill: research-orchestrator
-
+required_next_skill: segment-research
 evidence_snapshot:
   manifest_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/evidence_manifest_delta.csv
   evidence_count: 6
   annual_report_parse_log: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/logs/ev_annual_report_002837_20260421_ce7f64_parse_log.json
   annual_report_page_map: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/page_maps/ev_annual_report_002837_20260421_ce7f64_page_map.yaml
-  notes: annual report locator extraction completed with pypdf fallback; MinerU CLI attempted and logged.
-
+  notes: annual report locator extraction completed with pypdf fallback; MinerU CLI
+    attempted and logged.
 claims_snapshot:
   candidates_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/candidates/claim_candidates_ev_annual_report_002837_20260421_ce7f64.csv
   registry_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/claims_registry.csv
   claim_count: 18
   notes: workflow-local reviewed claims; not appended to global registry.
-
 metrics_snapshot:
   draft_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/metrics_draft_delta.csv
   registry_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/metrics_registry.csv
   metric_count: 262
-  notes: workflow-local reviewed metrics from structured fixtures; metric-only boundary preserved.
-
+  notes: workflow-local reviewed metrics from structured fixtures; metric-only boundary
+    preserved.
 artifacts:
-  - artifact_type: stock_analysis_pack
-    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_analysis_pack.yaml
-    created_by_skill: stock-research-analyst
-    stage: T5
-    status: current
-    required: true
-  - artifact_type: stock_report_sample_quality_draft
-    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_report_sample_quality_draft.md
-    created_by_skill: stock-report-writer
-    stage: T8
-    status: current
-    required: true
-  - artifact_type: quality_gate_report
-    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/quality_gate_report.md
-    created_by_skill: quality-review
-    stage: T9
-    status: accepted_sample_quality
-    required: true
-  - artifact_type: backflow_decision
-    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/backflow_decision.yaml
-    created_by_skill: maintenance
-    stage: T10
-    status: current
-    required: true
-  - artifact_type: business_segment_metric_pack
-    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/business_segment_metric_pack.csv
-    created_by_skill: stock-deep-dive
-    stage: R4_Next_3
-    status: current
-    required: true
-  - artifact_type: R4_stock_deep_dive_v0_1
-    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_stock_deep_dive_v0_1.md
-    created_by_skill: stock-report-writer
-    stage: R4_Next_5
-    status: bridge_only
-    required: true
-  - artifact_type: R4_quality_gate_report
-    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_quality_gate_report.md
-    created_by_skill: quality-review
-    stage: R4_Next_5
-    status: bridge_only
-    required: true
-  - artifact_type: R4_source_gap_report
-    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_source_gap_report.md
-    created_by_skill: quality-review
-    stage: R4_Next_5
-    status: current
-    required: true
-
+- artifact_type: stock_analysis_pack
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_analysis_pack.yaml
+  created_by_skill: stock-research-analyst
+  stage: T5
+  status: current
+  required: true
+- artifact_type: stock_report_sample_quality_draft
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_report_sample_quality_draft.md
+  created_by_skill: stock-report-writer
+  stage: T8
+  status: current
+  required: true
+- artifact_type: quality_gate_report
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/quality_gate_report.md
+  created_by_skill: quality-review
+  stage: T9
+  status: accepted_sample_quality
+  required: true
+- artifact_type: backflow_decision
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/backflow_decision.yaml
+  created_by_skill: maintenance
+  stage: T10
+  status: current
+  required: true
+- artifact_type: business_segment_metric_pack
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/business_segment_metric_pack.csv
+  created_by_skill: stock-deep-dive
+  stage: R4_Next_3
+  status: current
+  required: true
+- artifact_type: R4_stock_deep_dive_v0_1
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_stock_deep_dive_v0_1.md
+  created_by_skill: stock-report-writer
+  stage: R4_Next_5
+  status: bridge_only
+  required: true
+- artifact_type: R4_quality_gate_report
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_quality_gate_report.md
+  created_by_skill: quality-review
+  stage: R4_Next_5
+  status: bridge_only
+  required: true
+- artifact_type: R4_source_gap_report
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_source_gap_report.md
+  created_by_skill: quality-review
+  stage: R4_Next_5
+  status: current
+  required: true
+- artifact_type: official_reconciliation_review_decision
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/official_reconciliation_review_decision.csv
+  created_by_skill: quality-review
+  stage: R4_Phase_2
+  status: current
+  required: true
+- artifact_type: liquid_cooling_exposure_evidence_review
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/liquid_cooling_exposure_evidence_review.csv
+  created_by_skill: evidence-ingest
+  stage: R4_Phase_3
+  status: current
+  required: true
+- artifact_type: exposure_backflow_review
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/exposure_backflow_review.yaml
+  created_by_skill: segment-company-mapping
+  stage: R4_Phase_4
+  status: current
+  required: true
+- artifact_type: R4_stock_deep_dive_v0_2
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_stock_deep_dive_v0_2.md
+  created_by_skill: stock-deep-dive
+  stage: R4_Phase_5
+  status: publishable_ready_with_disclosure_todos
+  required: true
+- artifact_type: R4_quality_gate_report_v0_2
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_quality_gate_report_v0_2.md
+  created_by_skill: quality-review
+  stage: R4_Phase_5
+  status: current
+  required: true
+- artifact_type: P2_readiness_check_after_R4_v0_2
+  path: reports/p1_6/P2_READINESS_CHECK_AFTER_R4_V0_2.md
+  created_by_skill: research-orchestrator
+  stage: R4_Phase_7
+  status: current
+  required: true
 open_todos:
-  - issue_id: GAP002837-001
-    severity: low
-    stage: T10 Maintenance
-    target_artifact: evidence_gap_requests.yaml
-    fix_owner_skill: evidence-ingest
-    status: accepted_todo
-  - issue_id: ENV002837-001
-    severity: low
-    stage: T2 Parser
-    target_artifact: data/processed/logs/ev_annual_report_002837_20260421_ce7f64_parse_log.json
-    fix_owner_skill: evidence-ingest
-    status: accepted_todo
-
+- issue_id: P2-BLOCK-002
+  severity: medium
+  stage: R4_liquid_cooling_exposure_review
+  target_artifact: liquid_cooling_exposure_evidence_review.csv
+  fix_owner_skill: evidence-ingest
+  status: accepted_disclosure_todo
+  notes: Liquid-cooling revenue_pct and profit_pct remain MISSING_DISCLOSURE.
+- issue_id: P2-BLOCK-004
+  severity: low
+  stage: manual_live_smoke
+  target_artifact: docs/playbooks/MANUAL_LIVE_DATA_SMOKE_PLAYBOOK.md
+  fix_owner_skill: evidence-ingest
+  status: accepted_todo
+  notes: Optional live smoke was not run.
 quality_gates:
-  - gate_id: G1
-    status: pass
-    checked_by: quality-review
-    notes: page_map and evidence map present
-  - gate_id: G2
-    status: pass
-    checked_by: quality-review
-    notes: reviewed claims have evidence_id, quote and locator
-  - gate_id: G3
-    status: pass
-    checked_by: quality-review
-    notes: reviewed metrics have period, unit and source_evidence_id
-  - gate_id: G4
-    status: pass
-    checked_by: quality-review
-    notes: missing business revenue remains MISSING_DISCLOSURE
-  - gate_id: G5
-    status: pass
-    checked_by: quality-review
-    notes: exposure score remains product-level and supported by claims
-  - gate_id: G6_G7
-    status: pass
-    checked_by: quality-review
-    notes: forecast assumptions, sensitivity, valuation date and peer table present
-  - gate_id: G8
-    status: pass
-    checked_by: quality-review
-    notes: technical/sentiment/event pack keeps missing data explicit
-  - gate_id: G10
-    status: pass
-    checked_by: quality-review
-    notes: no unsupported advice patterns in final draft
-  - gate_id: G11
-    status: pass
-    checked_by: quality-review
-    notes: backflow decision explicit
-
+- gate_id: G1
+  status: pass
+  checked_by: quality-review
+  notes: page_map and evidence map present
+- gate_id: G2
+  status: pass
+  checked_by: quality-review
+  notes: reviewed claims have evidence_id, quote and locator
+- gate_id: G3
+  status: pass
+  checked_by: quality-review
+  notes: reviewed metrics have period, unit and source_evidence_id
+- gate_id: G4
+  status: pass
+  checked_by: quality-review
+  notes: missing business revenue remains MISSING_DISCLOSURE
+- gate_id: G5
+  status: pass
+  checked_by: quality-review
+  notes: exposure score remains product-level and supported by claims
+- gate_id: G6_G7
+  status: pass
+  checked_by: quality-review
+  notes: forecast assumptions, sensitivity, valuation date and peer table present
+- gate_id: G8
+  status: pass
+  checked_by: quality-review
+  notes: technical/sentiment/event pack keeps missing data explicit
+- gate_id: G10
+  status: pass
+  checked_by: quality-review
+  notes: no unsupported advice patterns in final draft
+- gate_id: G11
+  status: pass
+  checked_by: quality-review
+  notes: backflow decision explicit
 entry_criteria:
-  - stock_code provided
-  - existing 002837 workflow run available
+- stock_code provided
+- existing 002837 workflow run available
 exit_criteria:
-  - page_map/table_inventory/parse_log generated
-  - reviewed claims and metrics generated
-  - stock_analysis_pack generated
-  - stock_report_sample_quality_draft generated
-  - quality_review_v2 accepted_sample_quality
-notes: "Global evidence/metric/exposure registries were not appended; workflow-local reviewed outputs preserve the no-trading and evidence-first boundaries."
+- page_map/table_inventory/parse_log generated
+- reviewed claims and metrics generated
+- stock_analysis_pack generated
+- stock_report_sample_quality_draft generated
+- quality_review_v2 accepted_sample_quality
+notes: R4 v0.2 is publishable_ready_with_disclosure_todos for internal research circulation;
+  P2 comparison was not started.

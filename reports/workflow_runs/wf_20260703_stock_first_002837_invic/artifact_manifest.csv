@@ -34,3 +34,9 @@ art_032,business_segment_extraction_readout,business_segment_extraction_readout.
 art_033,R4_stock_deep_dive_v0_1,R4_stock_deep_dive_v0_1.md,stock-report-writer,R4_Next_5,True,True,current,R4 v0.1 readiness draft
 art_034,R4_quality_gate_report,R4_quality_gate_report.md,quality-review,R4_Next_5,True,True,bridge_only,R4 publishable gate report
 art_035,R4_source_gap_report,R4_source_gap_report.md,quality-review,R4_Next_5,True,True,current,R4 source gaps visible
+art_036,official_reconciliation_review_decision,official_reconciliation_review_decision.csv,quality-review,R4_Phase_2,True,True,current,official reconciliation decisions with no structured promotion
+art_037,liquid_cooling_exposure_evidence_review,liquid_cooling_exposure_evidence_review.csv,evidence-ingest,R4_Phase_3,True,True,current,product clues reviewed; revenue/profit disclosure missing
+art_038,exposure_backflow_review,exposure_backflow_review.yaml,segment-company-mapping,R4_Phase_4,True,True,current,product-only update_exposure decision
+art_039,R4_stock_deep_dive_v0_2,R4_stock_deep_dive_v0_2.md,stock-deep-dive,R4_Phase_5,True,True,publishable_ready_with_disclosure_todos,R4 v0.2 readiness draft
+art_040,R4_quality_gate_report_v0_2,R4_quality_gate_report_v0_2.md,quality-review,R4_Phase_5,True,True,current,R4 v0.2 gate report
+art_041,segment_led_replay_preparation_note,segment_led_replay_preparation_note.md,research-orchestrator,R4_Phase_6,True,True,prepared,segment-led replay prepared but not executed

@@ -20,7 +20,6 @@ linked_segments:
   confidence: medium
   valid_from: 2026-07-03
   valid_to: null
-  backflow_decision: blocked
-  notes: Workflow-local R4 extraction found official product_line_clue rows for liquid-cooling
-    related products, but revenue_pct/profit_pct remain MISSING_DISCLOSURE and no
-    global exposure registry update is allowed yet.
+  backflow_decision: update_exposure
+  notes: R4 review allows product-only evidence/note update to global exposure state;
+    revenue_pct and profit_pct remain MISSING_DISCLOSURE.

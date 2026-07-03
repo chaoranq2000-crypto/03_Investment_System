@@ -11,9 +11,9 @@
     "command": [
       "C:\\Users\\Q\\anaconda3\\envs\\mineru\\Scripts\\mineru.EXE",
       "--path",
-      "C:\\Projects\\03_Investment_System\\reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\data\\raw\\annual_reports\\szse_annual_report_002837_2026-04-21.pdf",
+      "reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/raw/annual_reports/szse_annual_report_002837_2026-04-21.pdf",
       "--output",
-      "C:\\Projects\\03_Investment_System\\reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\.tmp_mineru_output\\job_20260703_002837_annual_report_parse",
+      "reports/workflow_runs/wf_20260703_stock_first_002837_invic/.tmp_mineru_output/job_20260703_002837_annual_report_parse",
       "--backend",
       "pipeline",
       "--method",
@@ -33,7 +33,7 @@
     ],
     "returncode": 1,
     "stdout": "2026-07-03 02:30:31.796 | INFO     | mineru.cli.client:run_orchestrated_cli:953 - Started local mineru-api at http://127.0.0.1:65430\n2026-07-03 02:30:34.799 | INFO     | __main__:create_app:236 - Request concurrency limited to 3\nINFO:     Started server process [9060]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://127.0.0.1:65430 (Press CTRL+C to quit)\n2026-07-03 02:30:35.362 | INFO     | mineru.cli.client:run_planned_task:832 - Submitting batch 1/1 | 1 document, 2 pages in this batch | 2 pages total | task#1 [szse_annual_report_002837_2026-04-21]\n2026-07-03 02:30:38.562 | INFO     | mineru.backend.pipeline.pipeline_analyze:doc_analyze_streaming:209 - Pipeline processing-window multi-file run. doc_count=1, total_pages=2, window_size=64, total_batches=1\n2026-07-03 02:30:41.688 | INFO     | mineru.backend.pipeline.pipeline_analyze:doc_analyze_streaming:264 - Pipeline processing window batch 1/1: 2/2 pages, batch_pages=2, doc_slices=doc0:1-2\n2026-07-03 02:30:41.707 | INFO     | mineru.backend.pipeline.pipeline_analyze:batch_image_analyze:364 - GPU Memory: 12 GB, Batch Ratio: 4. \n2026-07-03 02:30:41.707 | INFO     | mineru.backend.pipeline.model_init:__init__:239 - DocAnalysis init, this may take some times......\n2026-07-03 02:30:42.438 | INFO     | mineru.backend.pipeline.model_init:__init__:291 - DocAnalysis init done!\n2026-07-03 02:30:42.438 | INFO     | mineru.backend.pipeline.pipeline_analyze:custom_model_init:83 - model init cost: 0.7310807704925537\nStart MinerU FastAPI Service: http://127.0.0.1:65430\nAPI documentation: http://127.0.0.1:65430/docs\n\nLayout Predict:   0%|          | 0/2 [00:00<?, ?it/s]\nLayout Predict: 100%|██████████| 2/2 [00:00<00:00,  5.17it/s]\nLayout Predict: 100%|██████████| 2/2 [00:00<00:00,  5.17it/s]\n\nOCR-det ch:   0%|          | 0/33 [00:00<?, ?it/s]\nOCR-det ch:   6%|▌         | 2/33 [00:00<00:03, 10.15it/s]\nOCR-det ch:  21%|██        | 7/33 [00:00<00:01, 25.95it/s]\nOCR-det ch:  42%|████▏     | 14/33 [00:00<00:00, 37.12it/s]\nOCR-det ch:  58%|█████▊    | 19/33 [00:00<00:00, 39.49it/s]\nOCR-det ch:  73%|███████▎  | 24/33 [00:00<00:00, 41.87it/s]\nOCR-det ch:  91%|█████████ | 30/33 [00:00<00:00, 44.74it/s]\nOCR-det ch: 100%|██████████| 33/33 [00:00<00:00, 36.86it/s]\n\nSeal Predict: 0it [00:00, ?it/s]\nSeal Predict: 0it [00:00, ?it/s]\n\nProcessing pages:   0%|          | 0/2 [00:00<?, ?it/s]\nProcessing pages: 100%|██████████| 2/2 [00:00<00:00, 18.89it/s]\nError: 1 task(s) failed while processing documents:\n- task#1 (szse_annual_report_002837_2026-04-21): [Errno 2] No such file or directory: 'C:\\\\Projects\\\\03_Investment_System\\\\reports\\\\workflow_runs\\\\wf_20260703_stock_first_002837_invic\\\\.tmp_mineru_output\\\\job_20260703_002837_annual_report_parse\\\\szse_annual_report_002837_2026-04-21\\\\txt\\\\images\\\\afba60dec882f8562defd7a0aea6bd96cd3003e7cc40f4b2b1945a5b2a06ae48.jpg'\n",
-    "output_dir": "C:\\Projects\\03_Investment_System\\reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\.tmp_mineru_output\\job_20260703_002837_annual_report_parse"
+    "output_dir": "reports/workflow_runs/wf_20260703_stock_first_002837_invic/.tmp_mineru_output/job_20260703_002837_annual_report_parse"
   },
   "raw_pdf_path": "data/raw/annual_reports/szse_annual_report_002837_2026-04-21.pdf",
   "processed_text_path": "data/processed/text/ev_annual_report_002837_20260421_ce7f64.md",
@@ -42,8 +42,8 @@
   "page_count": 7,
   "table_inventory_count": 16,
   "candidate_info": {
-    "claim_candidates_path": "C:\\Projects\\03_Investment_System\\reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\data\\processed\\candidates\\claim_candidates_ev_annual_report_002837_20260421_ce7f64.csv",
-    "metric_candidates_path": "C:\\Projects\\03_Investment_System\\reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\data\\processed\\candidates\\metric_candidates_ev_annual_report_002837_20260421_ce7f64.csv",
+    "claim_candidates_path": "reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/candidates/claim_candidates_ev_annual_report_002837_20260421_ce7f64.csv",
+    "metric_candidates_path": "reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/candidates/metric_candidates_ev_annual_report_002837_20260421_ce7f64.csv",
     "claim_candidates": 18,
     "metric_candidates": 7
   },
