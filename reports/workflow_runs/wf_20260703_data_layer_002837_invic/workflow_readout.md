@@ -23,7 +23,7 @@ as_of_date: 2026-07-01
 
 | issue_id | severity | target_artifact | handling |
 |---|---|---|---|
-| DL-GAP-002 | medium | `official_disclosure_reconciliation` | Do not use structured financial metrics as business exposure facts until reconciled to official disclosure. |
+| DL-GAP-002 | medium | `official_financial_reconciliation.csv` | Partial official reconciliation exists; mismatch and official_missing rows require review before promotion. |
 | DL-GAP-001 | low | `peer_market_snapshot.csv` | Fixture-only peer snapshot exists; live peer market data hardening remains pending. |
 | DL-GAP-003 | low | `valuation_snapshot.yaml` | Keep `pe_forward` as `TODO_MARKET_DATA` because the fixture does not contain it. |
 
@@ -40,6 +40,8 @@ as_of_date: 2026-07-01
 | technical snapshot | `technical_snapshot.yaml` |
 | peer market snapshot | `peer_market_snapshot.csv` |
 | official disclosure reconciliation stub | `official_disclosure_reconciliation_stub.md` |
+| official financial reconciliation | `official_financial_reconciliation.csv` |
+| official financial reconciliation readout | `official_financial_reconciliation_readout.md` |
 | source gap report | `source_gap_report.md` |
 | quality gate | `data_layer_quality_report.md` |
 
@@ -49,8 +51,8 @@ as_of_date: 2026-07-01
 - No business exposure fact is created from Tushare or Baostock fixtures.
 - Global registries were not appended.
 - Peer snapshot is fixture-only and remains metric-only.
-- Disclosure reconciliation work remains visible in `open_todos.csv`.
+- Disclosure reconciliation work is now partial and remains visible in `open_todos.csv`.
 
 ## Handoff
 
-The run is ready for the stock report readiness bridge with accepted TODOs. Downstream report logic may consume `valuation_snapshot.yaml`, `technical_snapshot.yaml`, `peer_market_snapshot.csv` and `financial_metric_pack.csv`; missing `pe_forward` or official-disclosure reconciliation fields must remain TODO/MISSING.
+The run is ready for R4 bridge/report readiness work with accepted TODOs. Downstream report logic may consume `valuation_snapshot.yaml`, `technical_snapshot.yaml`, `peer_market_snapshot.csv`, `financial_metric_pack.csv` and `official_financial_reconciliation.csv`; missing `pe_forward`, official_missing fields, and reconciliation mismatch rows must remain TODO/MISSING until quality-review.

@@ -7,7 +7,7 @@ source_data_layer_run: wf_20260703_data_layer_002837_invic
 
 | gap_id | severity | source | next_action |
 |---|---|---|---|
-| DLBR-001 | medium | official_disclosure_reconciliation_stub.md | Extract and reconcile official annual/interim/quarterly tables before any reported fact promotion. |
+| DLBR-001 | medium | official_financial_reconciliation.csv | Partial company-level reconciliation exists; mismatch rows still require review before promotion. |
 | DLBR-002 | low | valuation_snapshot.yaml | Fill `pe_forward` through future market data source or keep `TODO_MARKET_DATA`. |
 | DLBR-003 | low | peer_market_snapshot.csv | Replace fixture-only peer TODO fields through live peer data hardening. |
 | DISCLOSURE-SEGMENT-001 | medium | stock report bridge boundary | Keep liquid-cooling revenue share as `MISSING_DISCLOSURE` until official disclosure table support exists. |

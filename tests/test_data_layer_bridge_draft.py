@@ -32,6 +32,7 @@ def test_data_layer_bridge_outputs_keep_boundaries() -> None:
     )
 
     assert issue_rows
+    assert len((STOCK_RUN / "data_layer_bridge_issue_list.csv").read_text(encoding="utf-8").splitlines()) >= 4
     assert {row["issue_id"] for row in issue_rows} == {"DLBR-001", "DLBR-002", "DLBR-003"}
     assert "G10 Data Layer Pack Gate" in readout
     assert "structured snapshots remain metric-only | pass" in readout
@@ -48,6 +49,7 @@ def test_integrated_data_layer_debug_outputs_keep_todos_visible() -> None:
     gaps = (STOCK_RUN / "remaining_source_gaps_after_data_layer_bridge.md").read_text(encoding="utf-8")
 
     assert "status: accepted_with_todos" in integrated
+    assert integrated.count("## ") >= 3
     assert "G10 Data Layer Pack Gate | accepted_with_todos" in integrated
     assert "DLBR-001" in integrated
     assert "final_status: accepted_with_todos" in gate

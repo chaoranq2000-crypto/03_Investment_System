@@ -14,11 +14,36 @@ current_status: `accepted_with_todos`
 | DL-1.5 artifact formatting | done | none | none | quality-review | `reports/p1_6/DATA_LAYER_DL1_5_ARTIFACT_FORMATTING_READOUT.md` |
 | DL-2 technical semantics | done | none | short fixture window labeled `INSUFFICIENT_PRICE_WINDOW` | evidence-ingest | `reports/p1_6/DATA_LAYER_DL2_TECHNICAL_MARKET_SEMANTICS_READOUT.md` |
 | DL-3 peer snapshot | done | none | live peer market data hardening remains low TODO | evidence-ingest | `peer_market_snapshot.csv` |
-| Official disclosure reconciliation | pending | official disclosure extraction/reconciliation not complete | DL-GAP-002 medium | evidence-ingest / quality-review | `official_disclosure_reconciliation_stub.md` |
-| DL-5 stock report bridge draft | pending | bridge draft not generated | source gaps must be exposed | stock-deep-dive | `R4_stock_report_data_layer_bridge_draft.md` |
-| DL-7 integrated debug | pending | DL-5 not complete | accepted TODOs must carry forward | research-orchestrator / quality-review | `integrated_data_layer_readout.md` |
+| DL-5 stock report bridge draft | done | none | source gaps carried forward | stock-deep-dive | `R4_stock_report_data_layer_bridge_draft.md` |
+| DL-7 integrated debug | done | none | accepted TODOs carried forward | research-orchestrator / quality-review | `integrated_data_layer_readout.md` |
+| DATA_LAYER_NEXT_TASKS_MASTER_READOUT produced | done | none | R4/disclosure work deferred to next task file | research-orchestrator | `reports/p1_6/DATA_LAYER_NEXT_TASKS_MASTER_READOUT.md` |
+| Official disclosure reconciliation MVP | partial_done | mismatch and official_missing rows require review | DL-GAP-002 medium | evidence-ingest / quality-review | `official_financial_reconciliation.csv` |
+| Business segment disclosure extraction MVP | done_with_missing_disclosure | liquid-cooling revenue_pct/profit_pct missing | DISCLOSURE-SEGMENT-002 medium | stock-deep-dive / quality-review | `business_segment_metric_pack.csv` |
+| R4 publishable stock report gate | bridge_only | publishable_ready not met | source gaps visible | stock-deep-dive / quality-review | `R4_quality_gate_report.md` |
+| R4 stock deep dive v0.1 | done_bridge_only | R4 gate remains bridge_only | source gaps visible | stock-report-writer / quality-review | `R4_stock_deep_dive_v0_1.md` |
 | DL-4 live adapter hardening | done_with_manual_live_smoke_pending | real-service live smoke skipped by default | live mode implemented, mocked, and gated by explicit `--allow-network` | evidence-ingest | `DATA_LAYER_DL4_ADAPTER_HARDENING_READOUT.md` |
-| P2 readiness gate | pending | stock bridge and integrated debug not complete | do not enter P2 yet | research-orchestrator | final master readout |
+| Manual real-service Tushare / Baostock smoke | pending_manual_only | explicit external prerequisites required | not needed for R4 bridge_only | evidence-ingest | `docs/playbooks/MANUAL_LIVE_DATA_SMOKE_PLAYBOOK.md` |
+| P2 readiness precheck | pending | R4 publishable gate not ready | do not enter P2 yet | research-orchestrator | `reports/p1_6/P2_READINESS_PRECHECK_AFTER_DATA_LAYER.md` |
+
+## Current True State
+
+| state_key | value |
+|---|---|
+| engineering_data_layer_bridge | done |
+| data_layer_status | accepted_with_todos |
+| stock_bridge_status | accepted_with_todos |
+| disclosure_reconciliation | partial_completed_with_review_todos |
+| business_segment_disclosure | completed_with_missing_disclosure |
+| publishable_r4 | bridge_only |
+| p2_readiness | blocked |
+
+Notes:
+
+- data-layer bridge completion is not the same as R4 publishable report completion.
+- fixture peer snapshot completion is not the same as real API peer data completion.
+- reconciliation stub completion is not the same as official reconciliation completion.
+- partial official reconciliation does not promote structured metrics to reported facts.
+- product_line_clue rows do not create liquid-cooling revenue_pct or profit_pct.
 
 ## 1. Documentation And Architecture
 
@@ -70,12 +95,14 @@ current_status: `accepted_with_todos`
 - [x] `valuation_snapshot.yaml` exists and preserves `TODO_MARKET_DATA` for missing `pe_forward`.
 - [x] `technical_snapshot.yaml` exists and preserves no-advice note.
 - [x] `financial_metric_pack.csv` exists.
-- [ ] `business_segment_metric_pack.csv` exists or business exposure remains `MISSING_DISCLOSURE`.
+- [x] `business_segment_metric_pack.csv` exists and business exposure gaps remain `MISSING_DISCLOSURE`.
 - [x] `peer_market_snapshot.csv` exists before peer valuation comparison.
 - [x] `official_disclosure_reconciliation_stub.md` exists.
-- [ ] Official disclosure reconciliation is complete.
-- [ ] R4 stock report data-layer bridge draft is generated.
-- [ ] Integrated stock-first data-layer debug is generated.
+- [x] Official disclosure reconciliation MVP exists, with mismatch/official_missing rows still visible.
+- [x] R4 stock report data-layer bridge draft is generated.
+- [x] Integrated stock-first data-layer debug is generated.
+- [x] R4 publishable gate exists and currently outputs `bridge_only`.
+- [x] R4 stock deep dive v0.1 exists as readiness draft, not publishable_ready.
 
 ## 7. Explicit Blockers To Keep Closed
 
@@ -91,9 +118,10 @@ These conditions must remain false:
 
 ## 8. Pending Work
 
-- [ ] Complete official disclosure reconciliation beyond the stub.
-- [ ] Generate DL-5 R4 stock report data-layer bridge draft.
-- [ ] Run DL-7 stock-first integrated data-layer debug.
+- [x] Complete official disclosure reconciliation MVP beyond the stub.
+- [x] Generate DL-5 R4 stock report data-layer bridge draft.
+- [x] Run DL-7 stock-first integrated data-layer debug.
+- [x] Generate R4 stock deep dive v0.1 with visible source gaps.
 - [x] Add CI-safe DL-4 live adapter guards, mocked live success tests and default-skipped manual live smoke tests.
 - [ ] Execute manual live smoke when external token/package prerequisites are intentionally enabled.
-- [ ] Produce `reports/p1_6/DATA_LAYER_NEXT_TASKS_MASTER_READOUT.md` after all master-plan tasks are complete.
+- [ ] Produce `reports/p1_6/R4_READINESS_NEXT_TASKS_MASTER_READOUT.md` after R4 readiness tasks are complete.

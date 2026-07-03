@@ -78,7 +78,10 @@ def build_valuation_snapshot(
         "notes": "Valuation snapshot is metric-only market context and not a company fact.",
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(yaml.safe_dump(snapshot, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    output_path.write_text(
+        yaml.safe_dump(snapshot, allow_unicode=True, sort_keys=False, default_flow_style=False),
+        encoding="utf-8",
+    )
     return snapshot
 
 

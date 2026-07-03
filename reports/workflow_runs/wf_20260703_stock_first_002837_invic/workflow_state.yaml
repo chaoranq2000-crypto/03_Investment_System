@@ -7,7 +7,7 @@ updated_at: 2026-07-03
 owner: mixed
 active_segment_id: ai_server_liquid_cooling
 active_company_id: cn_002837_invic
-current_stage: T11_close_readout
+current_stage: R4_stock_deep_dive_v0_1
 completed_stages:
   - T0_intake
   - T1_evidence_plan
@@ -21,9 +21,9 @@ completed_stages:
   - T9_quality_review
   - T10_backflow_maintenance
   - T11_close_readout
-next_stage: refresh_followup_when_new_evidence_arrives
+next_stage: P2_readiness_precheck_not_gate
 active_skill: research-orchestrator
-required_next_skill: refresh-research
+required_next_skill: research-orchestrator
 
 evidence_snapshot:
   manifest_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/evidence_manifest_delta.csv
@@ -67,6 +67,30 @@ artifacts:
     path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/backflow_decision.yaml
     created_by_skill: maintenance
     stage: T10
+    status: current
+    required: true
+  - artifact_type: business_segment_metric_pack
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/business_segment_metric_pack.csv
+    created_by_skill: stock-deep-dive
+    stage: R4_Next_3
+    status: current
+    required: true
+  - artifact_type: R4_stock_deep_dive_v0_1
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_stock_deep_dive_v0_1.md
+    created_by_skill: stock-report-writer
+    stage: R4_Next_5
+    status: bridge_only
+    required: true
+  - artifact_type: R4_quality_gate_report
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_quality_gate_report.md
+    created_by_skill: quality-review
+    stage: R4_Next_5
+    status: bridge_only
+    required: true
+  - artifact_type: R4_source_gap_report
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_source_gap_report.md
+    created_by_skill: quality-review
+    stage: R4_Next_5
     status: current
     required: true
 

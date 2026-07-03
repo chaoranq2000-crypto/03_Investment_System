@@ -121,6 +121,8 @@ reports/workflow_runs/<workflow_id>/source_gap_report.md
 
 For data-layer pack rules, read `references/data_layer_pack_consumption.md`.
 
+For R4 readiness and publishable report boundaries, read `references/publishable_stock_report_gate.md`.
+
 ### 3. Business breakdown contract
 
 For each business line, record:

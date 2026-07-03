@@ -14,3 +14,5 @@ art_012,quality_gate_report,quality_gate_report.md,quality-review,DL6,True,True,
 art_013,workflow_readout,workflow_readout.md,research-orchestrator,DL7,True,True,current,accepted_with_todos data-layer run
 art_014,peer_market_snapshot,peer_market_snapshot.csv,evidence-ingest,DL5,True,True,current,fixture-only peer valuation context
 art_015,official_disclosure_reconciliation_stub,official_disclosure_reconciliation_stub.md,evidence-ingest,DL5,True,True,current,structured metrics remain metric-only pending official disclosure reconciliation
+art_016,official_financial_reconciliation,official_financial_reconciliation.csv,evidence-ingest,R4_Next_2,True,True,current,partial official reconciliation with visible mismatch/official_missing rows
+art_017,official_financial_reconciliation_readout,official_financial_reconciliation_readout.md,evidence-ingest,R4_Next_2,True,True,current,R4 Next-2 readout

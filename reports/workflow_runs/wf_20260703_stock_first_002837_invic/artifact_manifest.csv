@@ -29,3 +29,8 @@ art_027,data_layer_bridge_readout,data_layer_bridge_readout.md,research-orchestr
 art_028,integrated_data_layer_readout,integrated_data_layer_readout.md,research-orchestrator,DL7,True,True,current,stock-first workflow consumes data-layer packs
 art_029,quality_gate_report_after_data_layer_bridge,quality_gate_report_after_data_layer_bridge.md,quality-review,DL7,True,True,current,G10 accepted_with_todos
 art_030,remaining_source_gaps_after_data_layer_bridge,remaining_source_gaps_after_data_layer_bridge.md,quality-review,DL7,True,True,current,accepted TODOs retained for next disclosure work
+art_031,business_segment_metric_pack,business_segment_metric_pack.csv,stock-deep-dive,R4_Next_3,True,True,current,official-disclosure business segment extraction with missing liquid-cooling revenue_pct
+art_032,business_segment_extraction_readout,business_segment_extraction_readout.md,stock-deep-dive,R4_Next_3,True,True,current,R4 Next-3 readout
+art_033,R4_stock_deep_dive_v0_1,R4_stock_deep_dive_v0_1.md,stock-report-writer,R4_Next_5,True,True,current,R4 v0.1 readiness draft
+art_034,R4_quality_gate_report,R4_quality_gate_report.md,quality-review,R4_Next_5,True,True,bridge_only,R4 publishable gate report
+art_035,R4_source_gap_report,R4_source_gap_report.md,quality-review,R4_Next_5,True,True,current,R4 source gaps visible

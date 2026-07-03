@@ -390,7 +390,7 @@ def check_token_leak(run_dir: Path, issues: list[dict[str, str]]) -> None:
 def write_issue_list(path: Path, issues: list[dict[str, str]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=ISSUE_FIELDNAMES)
+        writer = csv.DictWriter(handle, fieldnames=ISSUE_FIELDNAMES, lineterminator="\n")
         writer.writeheader()
         writer.writerows(issues)
 

@@ -239,10 +239,18 @@ def test_current_data_layer_artifacts_are_readable_and_posix() -> None:
         parsed_issue_rows = list(csv.DictReader(handle))
     assert len(issue_rows) == 1 + len(parsed_issue_rows)
     assert len(parsed_issue_rows) == 3
+    assert len(issue_rows) >= 4
+
+    open_todo_rows = (DATA_LAYER_RUN_DIR / "open_todos.csv").read_text(encoding="utf-8").splitlines()
+    assert len(open_todo_rows) >= 4
 
     for file_name in ["workflow_state.yaml", "valuation_snapshot.yaml", "technical_snapshot.yaml"]:
         parsed = yaml.safe_load((DATA_LAYER_RUN_DIR / file_name).read_text(encoding="utf-8"))
         assert isinstance(parsed, dict)
+
+    assert len((DATA_LAYER_RUN_DIR / "workflow_state.yaml").read_text(encoding="utf-8").splitlines()) >= 20
+    assert len((DATA_LAYER_RUN_DIR / "valuation_snapshot.yaml").read_text(encoding="utf-8").splitlines()) >= 10
+    assert len((DATA_LAYER_RUN_DIR / "technical_snapshot.yaml").read_text(encoding="utf-8").splitlines()) >= 15
 
     for path in FORMATTED_ARTIFACTS:
         assert "\\" not in path.read_text(encoding="utf-8"), path

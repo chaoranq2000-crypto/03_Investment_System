@@ -22,6 +22,6 @@ accepted_todos: 3
 
 | issue_id | severity | target_artifact | handling |
 |---|---|---|---|
-| DL-GAP-002 | medium | `official_disclosure_reconciliation` | Structured metrics need official disclosure reconciliation before business facts. |
+| DL-GAP-002 | medium | `official_financial_reconciliation.csv` | Partial official reconciliation exists; mismatch and official_missing rows require review before promotion. |
 | DL-GAP-001 | low | `peer_market_snapshot.csv` | Fixture-only peer snapshot exists; live peer market data hardening remains pending. |
 | DL-GAP-003 | low | `valuation_snapshot.yaml` | `pe_forward` remains `TODO_MARKET_DATA`. |

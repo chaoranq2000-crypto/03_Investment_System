@@ -150,6 +150,18 @@ Pass conditions:
 - official disclosure evidence exists before business exposure is written as fact; otherwise `MISSING_DISCLOSURE` is visible.
 - Tushare/Baostock/market context snapshots do not support customer order, capacity or segment revenue facts by themselves.
 
+### G11 R4 Publishable Stock Report Gate
+
+Pass conditions:
+
+- `official_financial_reconciliation.csv` exists before company-level financial metrics are treated as reported facts.
+- `business_segment_metric_pack.csv` exists before business-segment discussion is upgraded beyond explicit TODO/MISSING.
+- `MISSING_DISCLOSURE`, `official_missing` and `mismatch` rows stay visible.
+- `bridge_only` is distinct from `publishable_ready`.
+- No-advice gate still passes.
+
+Reference: `.agents/skills/stock-deep-dive/references/publishable_stock_report_gate.md`.
+
 ## Outcome rules
 
 | outcome | Conditions |

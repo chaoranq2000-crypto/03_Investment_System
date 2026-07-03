@@ -111,7 +111,10 @@ def build_technical_snapshot(
         "notes": "Technical snapshot is a market-state observation, not trading advice.",
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(yaml.safe_dump(snapshot, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    output_path.write_text(
+        yaml.safe_dump(snapshot, allow_unicode=True, sort_keys=False, default_flow_style=False),
+        encoding="utf-8",
+    )
     return snapshot
 
 
