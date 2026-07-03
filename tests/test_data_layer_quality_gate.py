@@ -54,6 +54,19 @@ HEADER = [
     "notes",
 ]
 
+OPEN_TODO_HEADER = [
+    "issue_id",
+    "severity",
+    "stage",
+    "target_artifact",
+    "description",
+    "fix_owner_skill",
+    "status",
+    "created_at",
+    "resolved_at",
+    "notes",
+]
+
 
 def write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -126,8 +139,61 @@ def test_data_layer_quality_gate_accepts_traceable_metric_only_run(tmp_path: Pat
         source_registry_path=ROOT / "config/source_registry.yaml",
     )
     assert result["final_status"] == "accepted"
+    assert result["blocking_issue_count"] == 0
+    assert result["accepted_todo_count"] == 0
     assert result["high_issues"] == 0
     assert (run_dir / "data_layer_quality_report.md").exists()
+
+
+def test_data_layer_quality_gate_accepts_with_visible_todos(tmp_path: Path) -> None:
+    run_dir = build_good_run(tmp_path)
+    write_csv(
+        run_dir / "open_todos.csv",
+        OPEN_TODO_HEADER,
+        [
+            {
+                "issue_id": "DL-GAP-001",
+                "severity": "medium",
+                "stage": "DL5 Data Packs",
+                "target_artifact": "peer_market_snapshot.csv",
+                "description": "peer_market_snapshot.csv not generated",
+                "fix_owner_skill": "evidence-ingest",
+                "status": "accepted_todo",
+                "created_at": "2026-07-03",
+                "notes": "Keep TODO_PEER_DATA before peer comparison",
+            },
+            {
+                "issue_id": "DL-GAP-003",
+                "severity": "low",
+                "stage": "DL5 Data Packs",
+                "target_artifact": "valuation_snapshot.yaml",
+                "description": "pe_forward missing from fixture",
+                "fix_owner_skill": "evidence-ingest",
+                "status": "accepted_todo",
+                "created_at": "2026-07-03",
+                "notes": "Field remains TODO_MARKET_DATA",
+            },
+        ],
+    )
+    result = review_data_layer_run(
+        run_dir=run_dir,
+        repo_root=tmp_path,
+        source_registry_path=ROOT / "config/source_registry.yaml",
+    )
+    assert result["final_status"] == "accepted_with_todos"
+    assert result["blocking_issue_count"] == 0
+    assert result["accepted_todo_count"] == 2
+    assert result["medium_issues"] == 1
+    assert result["low_issues"] == 1
+
+    report = (run_dir / "data_layer_quality_report.md").read_text(encoding="utf-8")
+    issue_list = (run_dir / "data_layer_issue_list.csv").read_text(encoding="utf-8")
+    assert "final_status: accepted_with_todos" in report
+    assert "## Blocking Issues\n\nNone." in report
+    assert "DL-GAP-001" in report
+    assert "DL-GAP-003" in report
+    assert "issue_class" in issue_list
+    assert "accepted_todo" in issue_list
 
 
 def test_data_layer_quality_gate_flags_token_value_field(tmp_path: Path) -> None:
@@ -138,7 +204,10 @@ def test_data_layer_quality_gate_flags_token_value_field(tmp_path: Path) -> None
         repo_root=tmp_path,
         source_registry_path=ROOT / "config/source_registry.yaml",
     )
-    assert result["final_status"] == "needs_fix"
+    assert result["final_status"] == "blocked"
+    assert result["blocking_issue_count"] == 1
+    assert result["accepted_todo_count"] == 0
     assert result["high_issues"] == 1
     issues = (run_dir / "data_layer_issue_list.csv").read_text(encoding="utf-8")
+    assert "blocking_issue" in issues
     assert "token_value" in issues

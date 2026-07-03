@@ -8,7 +8,7 @@ art_006,financial_metric_pack,financial_metric_pack.csv,evidence-ingest,DL5,True
 art_007,valuation_snapshot,valuation_snapshot.yaml,evidence-ingest,DL5,True,True,current,market valuation context
 art_008,technical_snapshot,technical_snapshot.yaml,evidence-ingest,DL5,True,True,current,K-line technical context
 art_009,source_gap_report,source_gap_report.md,evidence-ingest,DL5,True,True,current,gaps visible
-art_010,data_layer_quality_report,data_layer_quality_report.md,quality-review,DL6,True,True,current,accepted with high_issues=0
-art_011,data_layer_issue_list,data_layer_issue_list.csv,quality-review,DL6,True,True,current,no open issues
-art_012,quality_gate_report,quality_gate_report.md,quality-review,DL6,True,True,current,mirrors data-layer quality gate
-art_013,workflow_readout,workflow_readout.md,research-orchestrator,DL7,True,True,current,accepted data-layer run
+art_010,data_layer_quality_report,data_layer_quality_report.md,quality-review,DL6,True,True,current,accepted_with_todos with blocking_issues=0
+art_011,data_layer_issue_list,data_layer_issue_list.csv,quality-review,DL6,True,True,current,3 accepted_todos and no blocking issues
+art_012,quality_gate_report,quality_gate_report.md,quality-review,DL6,True,True,current,mirrors data-layer accepted_with_todos state
+art_013,workflow_readout,workflow_readout.md,research-orchestrator,DL7,True,True,current,accepted_with_todos data-layer run

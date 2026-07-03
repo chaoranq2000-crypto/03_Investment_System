@@ -14,6 +14,7 @@ from check_no_unsupported_advice import find_unsupported_advice
 ISSUE_FIELDNAMES = [
     "issue_id",
     "severity",
+    "issue_class",
     "gate_id",
     "stage",
     "target_artifact",
@@ -24,6 +25,7 @@ ISSUE_FIELDNAMES = [
 ]
 
 STRUCTURED_SOURCES = {"tushare", "baostock", "local_fixture", "tencent_finance", "mootdx"}
+SEVERITY_ORDER = {"high": 3, "medium": 2, "low": 1}
 REQUIRED_PACKS = [
     "financial_metric_pack.csv",
     "valuation_snapshot.yaml",
@@ -70,15 +72,20 @@ def add_issue(
     stage: str,
     target_artifact: str,
     description: str,
+    issue_id: str = "",
     fix_owner: str = "evidence-ingest",
-    status: str = "open",
+    status: str = "",
     notes: str = "",
 ) -> None:
-    issue_id = f"DLQ-{gate_id}-{len(issues) + 1:03d}"
+    severity = severity.lower()
+    issue_class = "blocking_issue" if severity == "high" else "accepted_todo"
+    issue_id = issue_id or f"DLQ-{gate_id}-{len(issues) + 1:03d}"
+    status = status or ("open" if issue_class == "blocking_issue" else "accepted_todo")
     issues.append(
         {
             "issue_id": issue_id,
             "severity": severity,
+            "issue_class": issue_class,
             "gate_id": gate_id,
             "stage": stage,
             "target_artifact": target_artifact,
@@ -88,6 +95,41 @@ def add_issue(
             "notes": notes,
         }
     )
+
+
+def add_open_todos(run_dir: Path, issues: list[dict[str, str]]) -> None:
+    for row in read_csv_dicts(run_dir / "open_todos.csv"):
+        severity = row.get("severity", "").lower()
+        if severity not in SEVERITY_ORDER:
+            severity = "medium"
+        status = row.get("status", "accepted_todo") or "accepted_todo"
+        add_issue(
+            issues,
+            issue_id=row.get("issue_id", ""),
+            severity=severity,
+            gate_id="G-DL8",
+            stage=row.get("stage", "open_todos"),
+            target_artifact=row.get("target_artifact", ""),
+            description=row.get("description", ""),
+            fix_owner=row.get("fix_owner_skill") or row.get("fix_owner") or "evidence-ingest",
+            status=status,
+            notes=row.get("notes", ""),
+        )
+
+
+def split_issue_state(issues: list[dict[str, str]]) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
+    blocking_issues = [issue for issue in issues if issue["issue_class"] == "blocking_issue"]
+    accepted_todos = [issue for issue in issues if issue["issue_class"] == "accepted_todo"]
+    return blocking_issues, accepted_todos
+
+
+def final_status_for(issues: list[dict[str, str]]) -> str:
+    blocking_issues, accepted_todos = split_issue_state(issues)
+    if blocking_issues:
+        return "blocked"
+    if accepted_todos:
+        return "accepted_with_todos"
+    return "accepted"
 
 
 def source_registry(path: Path) -> dict[str, Any]:
@@ -354,27 +396,49 @@ def write_issue_list(path: Path, issues: list[dict[str, str]]) -> None:
 
 
 def write_report(path: Path, *, final_status: str, issues: list[dict[str, str]]) -> None:
+    blocking_issues, accepted_todos = split_issue_state(issues)
     high = sum(1 for issue in issues if issue["severity"] == "high")
     medium = sum(1 for issue in issues if issue["severity"] == "medium")
+    low = sum(1 for issue in issues if issue["severity"] == "low")
     lines = [
         "# Data Layer Quality Report",
         "",
         f"final_status: {final_status}",
+        f"blocking_issues: {len(blocking_issues)}",
+        f"accepted_todos: {len(accepted_todos)}",
         f"high_issues: {high}",
         f"medium_issues: {medium}",
+        f"low_issues: {low}",
         "",
         "| gate | status |",
         "|---|---|",
     ]
     for gate in ["G-DL1", "G-DL2", "G-DL3", "G-DL4", "G-DL5", "G-DL6", "G-DL7", "G-DL8"]:
         gate_issues = [issue for issue in issues if issue["gate_id"] == gate]
-        lines.append(f"| {gate} | {'pass' if not gate_issues else 'needs_fix'} |")
-    if issues:
-        lines.extend(["", "## Issues", "", "| issue_id | severity | target_artifact | description |", "|---|---|---|---|"])
-        for issue in issues:
+        gate_blockers = [issue for issue in gate_issues if issue["issue_class"] == "blocking_issue"]
+        status = "blocked" if gate_blockers else "accepted_todo" if gate_issues else "pass"
+        lines.append(f"| {gate} | {status} |")
+    lines.extend(["", "## Blocking Issues", ""])
+    if blocking_issues:
+        lines.extend(["| issue_id | severity | target_artifact | description |", "|---|---|---|---|"])
+        for issue in blocking_issues:
             lines.append(
                 f"| {issue['issue_id']} | {issue['severity']} | {issue['target_artifact']} | {issue['description']} |"
             )
+    else:
+        lines.append("None.")
+    lines.extend(["", "## Accepted Todos", ""])
+    if accepted_todos:
+        lines.extend(["| issue_id | severity | target_artifact | description |", "|---|---|---|---|"])
+        for issue in sorted(
+            accepted_todos,
+            key=lambda item: (-SEVERITY_ORDER.get(item["severity"], 0), item["issue_id"]),
+        ):
+            lines.append(
+                f"| {issue['issue_id']} | {issue['severity']} | {issue['target_artifact']} | {issue['description']} |"
+            )
+    else:
+        lines.append("None.")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -404,13 +468,26 @@ def review_data_layer_run(
     check_metric_only_boundary(run_dir=run_dir, issues=issues)
     check_pack_completeness(run_dir, issues)
     check_token_leak(run_dir, issues)
+    add_open_todos(run_dir, issues)
 
+    blocking_issues, accepted_todos = split_issue_state(issues)
     high = sum(1 for issue in issues if issue["severity"] == "high")
     medium = sum(1 for issue in issues if issue["severity"] == "medium")
-    final_status = "accepted" if high == 0 and medium == 0 else "accepted_with_todos" if high == 0 else "needs_fix"
+    low = sum(1 for issue in issues if issue["severity"] == "low")
+    final_status = final_status_for(issues)
     write_issue_list(run_dir / "data_layer_issue_list.csv", issues)
     write_report(run_dir / "data_layer_quality_report.md", final_status=final_status, issues=issues)
-    return {"final_status": final_status, "high_issues": high, "medium_issues": medium, "issues": issues}
+    return {
+        "final_status": final_status,
+        "blocking_issue_count": len(blocking_issues),
+        "accepted_todo_count": len(accepted_todos),
+        "high_issues": high,
+        "medium_issues": medium,
+        "low_issues": low,
+        "blocking_issues": blocking_issues,
+        "accepted_todos": accepted_todos,
+        "issues": issues,
+    }
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -426,7 +503,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         source_registry_path=(repo_root / args.source_registry),
     )
     print(result)
-    return 1 if result["high_issues"] else 0
+    return 1 if result["blocking_issue_count"] else 0
 
 
 if __name__ == "__main__":

@@ -128,9 +128,10 @@ No pack should silently omit missing fields.
 | final_status | meaning |
 |---|---|
 | accepted | No high/medium issues; downstream can use packs. |
-| accepted_with_todos | No high issues; medium TODOs visible and non-blocking. |
-| needs_fix | One or more high issues fixable by rerun or metadata repair. |
-| blocked | Missing token/source/network/manual file prevents required data. |
+| accepted_with_todos | No blocking issues; medium/low accepted TODOs are visible and non-blocking. |
+| blocked | One or more blocking issues remain, including high issues, token leaks, source/network blockers or raw/archive failures. |
+
+The executable DL-1 gate emits only `accepted`, `accepted_with_todos`, or `blocked`.
 
 ## 5. Non-negotiable blockers
 

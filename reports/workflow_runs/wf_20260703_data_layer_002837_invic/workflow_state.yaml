@@ -1,6 +1,6 @@
 workflow_id: wf_20260703_data_layer_002837_invic
 workflow_type: stock_first_closed_loop
-status: accepted
+status: accepted_with_todos
 created_at: 2026-07-03
 updated_at: 2026-07-03
 owner: mixed
@@ -60,7 +60,7 @@ artifacts:
     path: reports/workflow_runs/wf_20260703_data_layer_002837_invic/data_layer_quality_report.md
     created_by_skill: quality-review
     stage: DL6
-    status: accepted
+    status: accepted_with_todos
     required: true
   - artifact_type: workflow_readout
     path: reports/workflow_runs/wf_20260703_data_layer_002837_invic/workflow_readout.md
@@ -80,6 +80,12 @@ open_todos:
     severity: medium
     stage: DL5 Data Packs
     target_artifact: official_disclosure_reconciliation
+    fix_owner_skill: evidence-ingest
+    status: accepted_todo
+  - issue_id: DL-GAP-003
+    severity: low
+    stage: DL5 Data Packs
+    target_artifact: valuation_snapshot.yaml
     fix_owner_skill: evidence-ingest
     status: accepted_todo
 
@@ -113,9 +119,9 @@ quality_gates:
     checked_by: data_layer_quality_review
     notes: no token value detected
   - gate_id: G-DL8
-    status: pass
+    status: accepted_todo
     checked_by: data_layer_quality_review
-    notes: required downstream packs present
+    notes: required downstream packs present; accepted TODOs remain for peer snapshot, official disclosure reconciliation and pe_forward
 
 entry_criteria:
   - stock_code provided
