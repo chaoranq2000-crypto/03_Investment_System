@@ -1,0 +1,71 @@
+metadata:
+  run_id:
+  stock_code:
+  stock_name:
+  company_id:
+  analysis_date:
+  quality_target: R3_sample_quality_draft
+  evidence_snapshot:
+  claim_ids: []
+  metric_ids: []
+
+core_thesis:
+  one_sentence:
+  facts: []
+  inferences: []
+  key_assumptions: []
+  largest_uncertainties: []
+
+financial_quality:
+  summary:
+  income_statement: {}
+  cashflow: {}
+  balance_sheet: {}
+  ratios: {}
+  non_recurring_adjustments: []
+  red_flags: []
+
+business_breakdown:
+  business_lines: []
+  segment_links: []
+  missing_disclosures: []
+
+industry_context:
+  linked_segments: []
+  demand_drivers: []
+  supply_competition: []
+  value_chain_position:
+  key_indicators: []
+  confidence:
+
+forecast_model:
+  periods: [2026E, 2027E, 2028E]
+  revenue_forecast: []
+  margin_forecast: []
+  net_profit_forecast: []
+  key_assumptions: []
+  sensitivity: []
+  scenarios: {}
+  confidence:
+
+valuation_model:
+  static_valuation: {}
+  dynamic_valuation: {}
+  peer_comparison: {}
+  scenarios: {}
+  conclusion:
+
+technical_sentiment_event:
+  technical_snapshot: {}
+  macro_sentiment: {}
+  industry_sentiment: {}
+  company_sentiment: {}
+  catalyst_calendar: []
+
+risks_and_counter_evidence:
+  risks: []
+  counter_evidence: []
+  falsification_conditions: []
+  tracking_items: []
+
+evidence_gaps: []

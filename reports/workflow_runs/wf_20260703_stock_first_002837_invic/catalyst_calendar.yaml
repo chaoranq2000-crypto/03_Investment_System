@@ -1,0 +1,12 @@
+as_of_date: '2026-07-03'
+events:
+- date_window: next_reporting_window
+  event: 下一期定期报告或经营更新
+  impact_variable: 收入增速、毛利率、现金流、分业务披露
+  upside_condition: 分业务或订单证据改善
+  downside_risk: 收入兑现或现金流质量弱于模型假设
+  evidence_ids_or_claim_ids:
+  - claim_cn_002837_invic_28149e07
+  - claim_cn_002837_invic_e9580358
+  - claim_cn_002837_invic_013e4cab
+  claim_type: estimate

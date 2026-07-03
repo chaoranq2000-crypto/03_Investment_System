@@ -1,0 +1,40 @@
+job_id:
+run_id:
+evidence_id:
+stock_code:
+company_id:
+source_type: annual_report
+raw_pdf_path:
+output_root: data/processed/
+mineru:
+  bin: ${MINERU_BIN:-mineru}
+  profile: default
+  device: auto
+  extra_args: []
+normalization:
+  processed_text_path: data/processed/text/{evidence_id}.md
+  content_json_path: data/processed/layout/{evidence_id}_content.json
+  middle_json_path: data/processed/layout/{evidence_id}_middle.json
+  tables_path: data/processed/tables/{evidence_id}_tables.json
+  page_map_path: data/processed/page_maps/{evidence_id}_page_map.yaml
+  parse_log_path: data/processed/logs/{evidence_id}_parse_log.json
+candidate_generation:
+  generate_claim_candidates: true
+  generate_metric_candidates: true
+  section_keywords:
+    - 主营业务
+    - 分行业
+    - 分产品
+    - 分地区
+    - 毛利率
+    - 产能
+    - 订单
+    - 客户
+    - 供应商
+    - 募投
+    - 研发
+    - 风险
+quality:
+  require_page_map: true
+  require_table_inventory: true
+  allow_partial_success: true

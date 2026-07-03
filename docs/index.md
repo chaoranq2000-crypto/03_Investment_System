@@ -14,6 +14,11 @@
 ## Playbooks
 - playbooks/OPERATING_PLAYBOOK.md
 - playbooks/stock_report_case_study_shengyi_tech.md
+- playbooks/stock_report_samples/README.md
+- playbooks/stock_report_samples/stock_report_sample_chifeng_gold.md
+- playbooks/stock_report_samples/stock_report_sample_dongyangguang.md
+- playbooks/stock_report_samples/stock_report_sample_wuxi_apptec.md
+- playbooks/stock_report_samples/stock_report_sample_tongguan_copper_foil.md
 - local-only: playbooks/tushare_configuration_guide.pdf (ignored; not published to public GitHub)
 
 ## Workflows

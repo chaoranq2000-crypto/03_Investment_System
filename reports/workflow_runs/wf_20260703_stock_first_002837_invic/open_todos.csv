@@ -1,6 +1,8 @@
 issue_id,severity,stage,target_artifact,description,fix_owner_skill,status,created_at,resolved_at,notes
-Q002837-001,high,T1 Company Evidence,evidence_manifest_delta.csv,Annual report is registered but not parsed; no page/table locator or extracted claim exists for material business exposure.,evidence-ingest,open,2026-07-03,,workflow-local debug
-Q002837-002,high,T6 Exposure Mapping,segment_exposure.yaml,Segment exposure remains todo_insufficient_evidence; global exposure registry must not be updated until reviewed claim support exists.,segment-company-mapping,open,2026-07-03,,workflow-local debug
-Q002837-003,medium,T2 Business & Financial Skeleton,metrics_draft_delta.csv,Metric candidates are generated from local fixtures and remain draft; period_type and units need normalization before promotion.,evidence-ingest,open,2026-07-03,,workflow-local debug
-Q002837-004,medium,T7 Stock Report Draft,stock_report_draft.md,"Draft report is traceable but intentionally skeletal; customer, order, capacity and segment revenue fields remain TODO/MISSING.",stock-deep-dive,accepted_todo,2026-07-03,,workflow-local debug
-Q002837-005,low,T8 Backflow,exposure_change_note.md,Backflow is blocked with clear next step; rerun mapping after extraction.,research-orchestrator,accepted_todo,2026-07-03,,workflow-local debug
+Q002837-001,high,T1 Company Evidence,evidence_manifest_delta.csv,Annual report locator missing,evidence-ingest,fixed,2026-07-03,2026-07-03,page_map/parse_log/claim locators generated
+Q002837-002,high,T6 Exposure Mapping,segment_exposure.yaml,Segment exposure unsupported,segment-company-mapping,fixed,2026-07-03,2026-07-03,product exposure supported by reviewed claims; revenue/profit exposure remains MISSING
+Q002837-003,medium,T2 Business & Financial Skeleton,metrics_draft_delta.csv,Metric candidates remained draft,evidence-ingest,fixed,2026-07-03,2026-07-03,262 workflow-local metrics promoted
+Q002837-004,medium,T7 Stock Report Draft,stock_report_draft.md,Skeletal report draft,stock-report-writer,fixed,2026-07-03,2026-07-03,stock_report_sample_quality_draft.md generated
+Q002837-005,low,T8 Backflow,exposure_change_note.md,Backflow decision incomplete,maintenance,fixed,2026-07-03,2026-07-03,backflow_decision.yaml explicit
+GAP002837-001,low,T10 Maintenance,evidence_gap_requests.yaml,Liquid cooling revenue pct and gross margin remain missing,evidence-ingest,accepted_todo,2026-07-03,,MISSING_DISCLOSURE kept visible
+ENV002837-001,low,T2 Parser,data/processed/logs/ev_annual_report_002837_20260421_ce7f64_parse_log.json,MinerU CLI returned non-zero during client-side output generation,evidence-ingest,accepted_todo,2026-07-03,,pypdf fallback produced complete locator outputs

@@ -1,0 +1,15 @@
+stock_code: 002837
+as_of_date: '2026-07-03'
+macro_sentiment:
+  status: TODO_SOURCE_REQUIRED
+  source: TODO_SOURCE_REQUIRED
+  claim_type: clue
+industry_sentiment:
+  status: LOW_CONFIDENCE_CLUE_ONLY
+  source: TODO_SOURCE_REQUIRED
+  claim_type: clue
+company_sentiment:
+  status: TODO_SOURCE_REQUIRED
+  source: TODO_SOURCE_REQUIRED
+  claim_type: clue
+notes: Sentiment clues must not be written as facts.

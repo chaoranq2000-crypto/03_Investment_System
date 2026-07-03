@@ -1,0 +1,36 @@
+business_lines:
+- name: 数据中心/机房温控及液冷相关解决方案
+  revenue: MISSING_DISCLOSURE
+  revenue_pct: MISSING_DISCLOSURE
+  gross_margin: MISSING_DISCLOSURE
+  growth_driver: AI算力与数据中心热管理需求，仍需订单/分产品收入证据确认兑现强度。
+  claim_ids: &id001
+  - claim_cn_002837_invic_28149e07
+  - claim_cn_002837_invic_e9580358
+  - claim_cn_002837_invic_013e4cab
+  - claim_cn_002837_invic_a430b6e8
+  - claim_cn_002837_invic_80ee216e
+  - claim_cn_002837_invic_33cd54f4
+  - claim_cn_002837_invic_cb36fb00
+  - claim_cn_002837_invic_0449cc90
+  - claim_cn_002837_invic_7f197d50
+  - claim_cn_002837_invic_9c6c3e3d
+  - claim_cn_002837_invic_5e6afcf0
+  - claim_cn_002837_invic_fcce4010
+  - claim_cn_002837_invic_0771f4eb
+  - claim_cn_002837_invic_9872a700
+  - claim_cn_002837_invic_07f57e51
+  - claim_cn_002837_invic_377c2029
+  - claim_cn_002837_invic_a560164f
+  confidence: medium
+  notes: 产品/业务线索可支持 product/narrative exposure，不支持收入占比。
+segment_links:
+- segment_id: ai_server_liquid_cooling
+  exposure_type: product
+  exposure_score: 3
+  claim_ids: *id001
+  confidence: medium
+missing_disclosures:
+- 'MISSING_DISCLOSURE: 液冷收入占比'
+- 'MISSING_DISCLOSURE: 液冷毛利率'
+- 'MISSING_DISCLOSURE: 客户/订单/产能表格化证据'

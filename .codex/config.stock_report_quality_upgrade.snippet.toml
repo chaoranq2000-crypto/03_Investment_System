@@ -1,0 +1,9 @@
+# Add after existing skills.config entries when ready.
+
+[[skills.config]]
+path = ".agents/skills/stock-research-analyst"
+enabled = true
+
+[[skills.config]]
+path = ".agents/skills/stock-report-writer"
+enabled = true

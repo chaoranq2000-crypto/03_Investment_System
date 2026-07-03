@@ -1,0 +1,44 @@
+report_quality_levels:
+  R0_debug_mvp:
+    description: workflow debug only
+    allowed_outputs:
+      - stock_report_draft.md
+      - segment_exposure.yaml
+      - quality_issue_list.md
+    cannot_be_used_as_research_report: true
+
+  R1_evidence_complete:
+    description: official filings parsed and candidate layer usable
+    requirements:
+      - annual_report_processed
+      - page_map_present
+      - claim_candidates_present
+      - metric_candidates_present
+      - evidence_gap_requests_present_if_needed
+
+  R2_analysis_complete:
+    description: structured analysis pack complete enough for report drafting
+    requirements:
+      - financial_quality_yaml
+      - business_breakdown_yaml
+      - segment_exposure_draft_yaml
+      - industry_context_card_yaml
+      - forecast_model_yaml
+      - valuation_model_yaml
+
+  R3_sample_quality_draft:
+    description: report matches sample structure and narrative quality with evidence map
+    requirements:
+      - stock_report_sample_quality_draft_md
+      - evidence_map
+      - open_questions
+      - quality_review_v2
+      - no_high_issues
+
+  R4_maintained_report:
+    description: accepted report with registry backflow and refresh hooks
+    requirements:
+      - accepted_sample_quality_or_better
+      - registry_backflow_done
+      - report_status_updated
+      - refresh_tasks_created

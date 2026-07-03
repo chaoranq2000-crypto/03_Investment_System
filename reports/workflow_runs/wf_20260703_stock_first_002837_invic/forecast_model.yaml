@@ -1,0 +1,69 @@
+periods:
+- 2026E
+- 2027E
+- 2028E
+revenue_forecast:
+- period: 2026E
+  value: 1269355658.7
+  unit: CNY
+  claim_type: estimate
+  supporting_metric_ids:
+  - metric_cn_002837_invic_revenue_20260331_4f7f22
+  assumption: base scenario revenue growth 8%; estimate, not fact
+- period: 2027E
+  value: 1396291224.57
+  unit: CNY
+  claim_type: estimate
+  supporting_metric_ids:
+  - metric_cn_002837_invic_revenue_20260331_4f7f22
+  assumption: base scenario revenue growth 10%; estimate, not fact
+- period: 2028E
+  value: 1535920347.03
+  unit: CNY
+  claim_type: estimate
+  supporting_metric_ids:
+  - metric_cn_002837_invic_revenue_20260331_4f7f22
+  assumption: base scenario revenue growth 10%; estimate, not fact
+margin_forecast:
+- period: 2026E
+  value: TODO_MODEL_INPUT
+  claim_type: estimate
+  supporting_metric_ids:
+  - metric_cn_002837_invic_revenue_20260331_4f7f22
+- period: 2027E
+  value: TODO_MODEL_INPUT
+  claim_type: estimate
+  supporting_metric_ids:
+  - metric_cn_002837_invic_revenue_20260331_4f7f22
+- period: 2028E
+  value: TODO_MODEL_INPUT
+  claim_type: estimate
+  supporting_metric_ids:
+  - metric_cn_002837_invic_revenue_20260331_4f7f22
+net_profit_forecast:
+- period: 2026E
+  value: TODO_MODEL_INPUT
+  claim_type: estimate
+  supporting_metric_ids:
+  - metric_cn_002837_invic_revenue_20260331_4f7f22
+- period: 2027E
+  value: TODO_MODEL_INPUT
+  claim_type: estimate
+  supporting_metric_ids:
+  - metric_cn_002837_invic_revenue_20260331_4f7f22
+- period: 2028E
+  value: TODO_MODEL_INPUT
+  claim_type: estimate
+  supporting_metric_ids:
+  - metric_cn_002837_invic_revenue_20260331_4f7f22
+key_assumptions:
+- assumption_id: assumption_revenue_growth_base
+  description: 收入预测以公司层面历史收入为基准，暂不把公司收入归因到液冷业务。
+  supporting_metric_ids:
+  - metric_cn_002837_invic_revenue_20260331_4f7f22
+  claim_type: estimate
+sensitivity:
+- variable: revenue_growth
+  bear: base - 5pct
+  base: see revenue_forecast
+  bull: base + 5pct

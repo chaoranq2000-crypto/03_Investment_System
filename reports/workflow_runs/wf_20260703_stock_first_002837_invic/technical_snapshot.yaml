@@ -1,0 +1,10 @@
+stock_code: 002837
+as_of_date: '2026-07-03'
+close: MISSING_DISCLOSURE
+ma5: MISSING_DISCLOSURE
+ma20: MISSING_DISCLOSURE
+support: MISSING_DISCLOSURE
+resistance: MISSING_DISCLOSURE
+trend_status: MISSING_PRICE_HISTORY
+source: reports\workflow_runs\wf_20260703_stock_first_002837_invic\market_snapshot.csv
+notes: Technical snapshot is a market-state observation, not trading advice.

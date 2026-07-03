@@ -83,6 +83,33 @@ METRIC_CANDIDATE_FIELDNAMES: list[str] = [
     "notes",
 ]
 
+CLAIM_CANDIDATE_FIELDNAMES: list[str] = [
+    "claim_candidate_id",
+    "evidence_id",
+    "source_type",
+    "source_name",
+    "reliability_rank",
+    "entity_type",
+    "entity_id",
+    "segment_id",
+    "company_id",
+    "stock_code",
+    "claim_text",
+    "claim_type",
+    "claim_scope",
+    "quote_or_excerpt",
+    "page_no_or_section",
+    "table_id",
+    "confidence",
+    "materiality",
+    "support_level",
+    "needs_review_reason",
+    "review_status",
+    "promote_to_claim_id",
+    "created_at",
+    "notes",
+]
+
 INGEST_RUN_FIELDNAMES: list[str] = [
     "run_id",
     "ingest_mode",

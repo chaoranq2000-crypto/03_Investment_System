@@ -1,0 +1,68 @@
+summary: 公司层面财务指标已结构化；这些指标不直接证明具体业务或液冷收入暴露。
+income_statement:
+- &id001
+  metric_name: total_revenue
+  period: '20260331'
+  value: '1175329313.61'
+  unit: CNY
+  metric_id: metric_cn_002837_invic_total_revenue_20260331_d1f448
+  source_evidence_id: ev_structured_financial_data_002837_20260701_89213a
+- &id002
+  metric_name: n_income_attr_p
+  period: '20260331'
+  value: '8657602.27'
+  unit: CNY
+  metric_id: metric_cn_002837_invic_n_income_attr_p_20260331_530e7b
+  source_evidence_id: ev_structured_financial_data_002837_20260701_89213a
+cashflow:
+- &id004
+  metric_name: n_cashflow_act
+  period: '20260331'
+  value: '-386363968.71'
+  unit: CNY
+  metric_id: metric_cn_002837_invic_n_cashflow_act_20260331_c16d8a
+  source_evidence_id: ev_structured_financial_data_002837_20260701_418339
+balance_sheet:
+- &id003
+  metric_name: debt_to_assets
+  period: '20260331'
+  value: '55.1085'
+  unit: CNY
+  metric_id: metric_cn_002837_invic_debt_to_assets_20260331_44170f
+  source_evidence_id: ev_structured_financial_data_002837_20260701_875a4c
+- &id005
+  metric_name: accounts_receiv
+  period: '20260331'
+  value: '3060887771.01'
+  unit: CNY
+  metric_id: metric_cn_002837_invic_accounts_receiv_20260331_153826
+  source_evidence_id: ev_structured_financial_data_002837_20260701_bad80e
+- &id006
+  metric_name: inventories
+  period: '20260331'
+  value: '1181981088.85'
+  unit: CNY
+  metric_id: metric_cn_002837_invic_inventories_20260331_a0cd42
+  source_evidence_id: ev_structured_financial_data_002837_20260701_bad80e
+ratios:
+- *id001
+- *id002
+- metric_name: grossprofit_margin
+  period: '20260331'
+  value: '24.2935'
+  unit: CNY
+  metric_id: metric_cn_002837_invic_grossprofit_margin_20260331_963af8
+  source_evidence_id: ev_structured_financial_data_002837_20260701_875a4c
+- metric_name: netprofit_margin
+  period: '20260331'
+  value: '1.2049'
+  unit: CNY
+  metric_id: metric_cn_002837_invic_netprofit_margin_20260331_6379be
+  source_evidence_id: ev_structured_financial_data_002837_20260701_875a4c
+- *id003
+- *id004
+- *id005
+- *id006
+non_recurring_adjustments: TODO_SOURCE_REQUIRED
+red_flags:
+- 'MISSING: 分业务收入和液冷收入占比仍需官方表格或公告支持'

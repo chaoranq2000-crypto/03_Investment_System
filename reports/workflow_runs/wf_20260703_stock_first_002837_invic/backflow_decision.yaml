@@ -1,0 +1,10 @@
+run_id: wf_20260703_stock_first_002837_invic
+backflow_decision: no_global_exposure_update_with_todos
+exposure_registry_update: not_updated
+claims_registry_update: workflow_local_reviewed
+metrics_registry_update: workflow_local_reviewed
+reason: Reviewed claims support product exposure, but revenue/profit exposure remains
+  missing.
+next_refresh_tasks:
+- 补充分业务收入/毛利率表格证据
+- 补充订单/客户/产能公告证据

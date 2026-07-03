@@ -1,0 +1,56 @@
+run_id:
+stock_code:
+report_path:
+quality_target: R3_sample_quality_draft
+
+checks:
+  G1_evidence_completeness:
+    status: pending
+    high_issues: []
+    medium_issues: []
+  G2_claim_locator:
+    status: pending
+    high_issues: []
+    medium_issues: []
+  G3_metric_normalization:
+    status: pending
+    high_issues: []
+    medium_issues: []
+  G4_business_breakdown:
+    status: pending
+    high_issues: []
+    medium_issues: []
+  G5_segment_exposure:
+    status: pending
+    high_issues: []
+    medium_issues: []
+  G6_forecast_model:
+    status: pending
+    high_issues: []
+    medium_issues: []
+  G7_valuation:
+    status: pending
+    high_issues: []
+    medium_issues: []
+  G8_technical_sentiment_event:
+    status: pending
+    high_issues: []
+    medium_issues: []
+  G9_report_expression:
+    status: pending
+    high_issues: []
+    medium_issues: []
+  G10_no_unsupported_advice:
+    status: pending
+    high_issues: []
+    medium_issues: []
+  G11_backflow_maintenance:
+    status: pending
+    high_issues: []
+    medium_issues: []
+
+final_decision:
+  status: pending
+  accepted_level:
+  blocking_issues: []
+  next_todos: []

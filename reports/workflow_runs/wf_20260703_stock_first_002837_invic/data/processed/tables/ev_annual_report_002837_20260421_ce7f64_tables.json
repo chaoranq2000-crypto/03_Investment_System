@@ -1,0 +1,130 @@
+[
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p2_t27",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 2,
+    "table_title": "报告期内公司的机房温控节能营业收入同比快速增长，下半年的增速较上半年有所放缓。2025 年下半年的机房温",
+    "parse_status": "line_inventory",
+    "text_excerpt": "报告期内公司的机房温控节能营业收入同比快速增长，下半年的增速较上半年有所放缓。2025 年下半年的机房温"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p2_t28",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 2,
+    "table_title": "控业务的海外收入显著提高，2025 年下半年以及报告期内的毛利率与上年度同期相比显著上升。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "控业务的海外收入显著提高，2025 年下半年以及报告期内的毛利率与上年度同期相比显著上升。"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p2_t47",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 2,
+    "table_title": "极拓展国内外客户。报告期内公司来自储能应用的营业收入约 17 亿元，较上年度同比增长约 14%。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "极拓展国内外客户。报告期内公司来自储能应用的营业收入约 17 亿元，较上年度同比增长约 14%。"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p3_t42",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 3,
+    "table_title": "总资产 7,747,255,663.66 6,014,413,898.70 28.81% 5,091,055,172.06",
+    "parse_status": "line_inventory",
+    "text_excerpt": "总资产 7,747,255,663.66 6,014,413,898.70 28.81% 5,091,055,172.06"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p3_t43",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 3,
+    "table_title": "归属于上市公司股东的净资产 3,445,641,008.79 2,915,892,117.15 18.17% 2,486,071,338.29",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净资产 3,445,641,008.79 2,915,892,117.15 18.17% 2,486,071,338.29"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p4_t4",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 4,
+    "table_title": "营业收入 6,067,759,091.55 4,588,819,487.27 32.23% 3,528,859,077.13",
+    "parse_status": "line_inventory",
+    "text_excerpt": "营业收入 6,067,759,091.55 4,588,819,487.27 32.23% 3,528,859,077.13"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p4_t5",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 4,
+    "table_title": "归属于上市公司股东的净利润 521,914,773.00 452,664,369.42 15.30% 344,006,335.07",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净利润 521,914,773.00 452,664,369.42 15.30% 344,006,335.07"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p4_t7",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 4,
+    "table_title": "经常性损益的净利润 503,698,695.52 429,719,858.69 17.22% 316,268,801.76",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经常性损益的净利润 503,698,695.52 429,719,858.69 17.22% 316,268,801.76"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p4_t8",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 4,
+    "table_title": "经营活动产生的现金流量净额 157,273,222.36 199,835,014.95 -21.30% 453,072,040.34",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 157,273,222.36 199,835,014.95 -21.30% 453,072,040.34"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p4_t11",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 4,
+    "table_title": "加权平均净资产收益率 16.58% 16.88% -0.30% 15.03%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "加权平均净资产收益率 16.58% 16.88% -0.30% 15.03%"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p4_t15",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 4,
+    "table_title": "营业收入 932,585,781.26 1,640,553,679.64 1,452,891,317.45 2,041,728,313.20",
+    "parse_status": "line_inventory",
+    "text_excerpt": "营业收入 932,585,781.26 1,640,553,679.64 1,452,891,317.45 2,041,728,313.20"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p4_t16",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 4,
+    "table_title": "归属于上市公司股东的净利润 48,010,475.41 167,629,951.15 183,429,234.55 122,845,111.89",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净利润 48,010,475.41 167,629,951.15 183,429,234.55 122,845,111.89"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p4_t18",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 4,
+    "table_title": "经常性损益的净利润 41,801,374.54 160,418,260.15 181,317,017.33 120,162,043.50",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经常性损益的净利润 41,801,374.54 160,418,260.15 181,317,017.33 120,162,043.50"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p4_t19",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 4,
+    "table_title": "经营活动产生的现金流量净额 -170,771,733.08 -63,142,115.10 -85,120,624.11 476,307,694.65",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 -170,771,733.08 -63,142,115.10 -85,120,624.11 476,307,694.65"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p5_t12",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 5,
+    "table_title": "233,565,528 股外，还通过招商证券股份有限公司客户信用交易担保证券",
+    "parse_status": "line_inventory",
+    "text_excerpt": "233,565,528 股外，还通过招商证券股份有限公司客户信用交易担保证券"
+  },
+  {
+    "table_id": "ev_annual_report_002837_20260421_ce7f64_p6_t41",
+    "evidence_id": "ev_annual_report_002837_20260421_ce7f64",
+    "page_no": 6,
+    "table_title": "2025 年 4月 22 日 《关于 2024年度计提资产减值准备的公告》 2025-014 《证券时报》《证券日报》和巨",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2025 年 4月 22 日 《关于 2024年度计提资产减值准备的公告》 2025-014 《证券时报》《证券日报》和巨"
+  }
+]

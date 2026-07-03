@@ -1,0 +1,6 @@
+- gap_id: gap_liquid_cooling_revenue_pct
+  target_section: business_breakdown
+  missing_claim_or_metric: 液冷收入占比和毛利率
+  required_source_type: annual_report_or_announcement_table
+  blocking_level: medium
+  owner_skill: evidence-ingest

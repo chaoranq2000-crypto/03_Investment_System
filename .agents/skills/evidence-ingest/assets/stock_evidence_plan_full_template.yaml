@@ -1,0 +1,93 @@
+run_id:
+stock_code:
+stock_name:
+company_id:
+exchange:
+date_range:
+quality_target: R1_evidence_complete | R2_analysis_complete | R3_sample_quality_draft
+
+required_evidence:
+  official_filings:
+    latest_annual_report:
+      required: true
+      source_priority: [cninfo, sse, szse, bse, manual_file]
+      parser: MinerU
+      output_required: [processed_text, page_map, table_map, parse_log, claim_candidates]
+    latest_interim_report:
+      required: true
+      parser: MinerU
+    latest_quarterly_report:
+      required: true
+      parser: MinerU_or_structured_snapshot
+    material_announcements_last_24m:
+      required: true
+      parser: MinerU_or_html_snapshot
+    exchange_inquiry_replies:
+      required: false
+      parser: MinerU_or_html_snapshot
+
+  structured_financial_data:
+    income_statement:
+      required: true
+      source_priority: [tushare, baostock]
+      output: metric_candidates
+    balance_sheet:
+      required: true
+      source_priority: [tushare, baostock]
+      output: metric_candidates
+    cashflow_statement:
+      required: true
+      source_priority: [tushare, baostock]
+      output: metric_candidates
+    financial_indicators:
+      required: true
+      source_priority: [tushare, baostock]
+      output: metric_candidates
+    valuation_snapshot:
+      required: true
+      source_priority: [tushare, tencent, eastmoney]
+      output: metric_candidates
+
+  market_and_sentiment:
+    daily_price_history:
+      required: true
+      lookback_days: 260
+      output: market_snapshot
+    moving_averages:
+      required: true
+      windows: [5, 10, 20, 60, 120]
+      output: technical_snapshot
+    financing_margin:
+      required: false
+      output: sentiment_snapshot
+    capital_flow:
+      required: false
+      output: sentiment_snapshot
+    hot_rank_or_theme:
+      required: false
+      output: clue_log
+
+  industry_context:
+    industry_reports:
+      required_for_R3: true
+      source_priority: [official_stats, industry_association, broker_report, manual_file]
+      output: estimate_candidates
+    peer_company_list:
+      required: true
+      output: peer_comparison_candidates
+
+rules:
+  annual_report_required_for_business_exposure: true
+  structured_data_metric_only: true
+  management_interaction_comment_only: true
+  news_clue_only: true
+  no_material_claim_from_d_level_source: true
+  missing_required_evidence_generates_gap_request: true
+
+expected_outputs:
+  - evidence_manifest_delta.csv
+  - claim_candidates_delta.csv
+  - metric_candidates_delta.csv
+  - clue_log_delta.csv
+  - evidence_gap_requests.yaml
+  - ingest_log.json

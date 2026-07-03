@@ -1,0 +1,42 @@
+job_id: job_20260703_002837_annual_report_parse
+run_id: wf_20260703_stock_first_002837_invic
+evidence_id: ev_annual_report_002837_20260421_ce7f64
+stock_code: "002837"
+company_id: cn_002837_invic
+source_type: annual_report
+raw_pdf_path: data/raw/annual_reports/szse_annual_report_002837_2026-04-21.pdf
+mineru:
+  bin: ${MINERU_BIN:-mineru}
+  profile: default
+  device: auto
+  extra_args:
+    - --backend
+    - pipeline
+    - --method
+    - txt
+    - --lang
+    - ch
+    - --table
+    - "false"
+    - --formula
+    - "false"
+    - --image-analysis
+    - "false"
+    - --start
+    - "0"
+    - --end
+    - "1"
+normalization:
+  processed_text_path: data/processed/text/ev_annual_report_002837_20260421_ce7f64.md
+  content_json_path: data/processed/layout/ev_annual_report_002837_20260421_ce7f64_content.json
+  middle_json_path: data/processed/layout/ev_annual_report_002837_20260421_ce7f64_middle.json
+  tables_path: data/processed/tables/ev_annual_report_002837_20260421_ce7f64_tables.json
+  page_map_path: data/processed/page_maps/ev_annual_report_002837_20260421_ce7f64_page_map.yaml
+  parse_log_path: data/processed/logs/ev_annual_report_002837_20260421_ce7f64_parse_log.json
+candidate_generation:
+  generate_claim_candidates: true
+  generate_metric_candidates: true
+quality:
+  require_page_map: true
+  require_table_inventory: true
+  allow_partial_success: true

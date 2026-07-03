@@ -31,6 +31,8 @@ data/db/*.duckdb.wal
 data/processed/embeddings/*
 !data/processed/embeddings/.gitkeep
 data/db/vector.index
+reports/workflow_runs/**/.tmp_mineru_output/
+*_patch.zip
 
 # Secrets / tokens
 secrets/

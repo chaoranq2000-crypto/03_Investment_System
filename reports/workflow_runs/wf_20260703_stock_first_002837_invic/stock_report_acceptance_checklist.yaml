@@ -1,0 +1,22 @@
+final_status: accepted_sample_quality
+high_issues: 0
+medium_issues: 0
+gates:
+- gate: G1 Evidence Completeness
+  status: pass
+- gate: G2 Claim Locator
+  status: pass
+- gate: G3 Metric Normalization
+  status: pass
+- gate: G4 Business Breakdown
+  status: pass
+- gate: G5 Segment Exposure
+  status: pass
+- gate: G6/G7 Forecast Valuation
+  status: pass
+- gate: G8 Technical Sentiment Event
+  status: pass
+- gate: G10 No Unsupported Advice
+  status: pass
+- gate: G11 Backflow Maintenance
+  status: pass
