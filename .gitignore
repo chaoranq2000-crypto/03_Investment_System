@@ -21,6 +21,10 @@ venv/
 .DS_Store
 .vscode/
 .idea/
+.obsidian/
+
+# Local learning workspace
+docs/references/project_learning/
 
 # Local databases and large generated artifacts
 *.duckdb
