@@ -1,315 +1,231 @@
 ---
 name: stock-deep-dive
-description: Use when analyzing one listed company across business lines, segment exposure, financial quality, customers, supply chain, governance, scenarios, risks, and evidence map. In P1.6, prioritize the B5-lite stock-led evidence-to-report MVP. Do not use for multi-segment ranking or direct buy/sell/hold advice.
+description: A股个股深度研究统一入口；当用户要求个股研究、个股深度、股票分析、业务/财务/估值/风险/催化剂/linked_segments/segment_exposure/报告草稿时使用。不要用于完整细分研究或 P2 横向比较。
 ---
 
-# Stock Deep Dive
+# Stock Deep Dive Skill
 
 ## Goal
 
-Produce an evidence-backed stock research package that can stand alone as a company analysis and also feed the segment-company exposure state layer.
+`stock-deep-dive` is the single active stock research entry point.
+It consolidates the former analysis-pack layer and report-writing layer into one
+workflow that turns reviewed evidence and data-layer outputs into:
 
-In P1.6, the immediate target is **B5-lite**: consume evidence-ingest outputs and run one stock-led MVP, not a final fully automated valuation system.
+- `stock_analysis_pack.yaml`
+- a stock deep dive report draft
+- `segment_exposure.yaml`
+- `backflow_decision`
+- a quality-review handoff package
 
-## When to use
+The skill is evidence-first. Reports are derived artifacts, not the source of
+truth. It must preserve evidence gaps instead of smoothing them away.
 
-- The user asks to research a single A-share company or stock code.
-- A stock-first workflow needs business, financial and linked segment skeletons.
-- A segment sample needs a stock deep dive.
-- `segment_exposure.yaml` and evidence map are required.
+## Use when
+
+Use this skill when the user asks for:
+
+- A-share stock deep dive or company research.
+- Business breakdown, financial quality, forecast assumptions, valuation context,
+  technical snapshot, sentiment, catalyst calendar, risks, or counter-evidence.
+- `linked_segments`, `segment_exposure`, or stock-to-segment backflow.
+- A stock report draft based on already registered evidence and metrics.
+
+## Do not use when
+
+Do not use this skill for:
+
+- Full segment research.
+- P2 segment or stock comparison.
+- Evidence acquisition, web download, live API execution, or source adapter work.
+- Claim promotion without quality-review.
+- Scorecard/watchlist output as a trading signal.
+- Any buy/sell/hold/rating instruction, position sizing, or direct trading action.
 
 ## Inputs
 
-Required:
+Expected inputs may include:
 
-```yaml
-stock_code:
-stock_name:
-company_id:
-exchange:
-evidence_snapshot:
-```
+- `stock_code`, `company_name`, `company_id`, `exchange`
+- `workflow_id`
+- `evidence_manifest` rows
+- `claim_candidates` or `claims_registry`
+- `metric_candidates` or `metrics_registry`
+- data-layer packs
+- optional `linked_segments`
+- optional prior `segment_exposure.yaml`
+- optional report depth: `bridge`, `internal_draft`, `publishable_candidate`
 
-Optional:
+## Integrated workflow
 
-```yaml
-linked_segments:
-claim_ids:
-metric_ids:
-evidence_ids:
-stock_evidence_plan:
-data_layer_packs:
-  valuation_snapshot:
-  technical_snapshot:
-  financial_metric_pack:
-  business_segment_metric_pack:
-  peer_market_snapshot:
-  source_gap_report:
-existing_stock_report:
-existing_segment_exposure:
-```
-
-## Responsibilities
-
-- Confirm company identity and security code.
-- Consume evidence registered by `evidence-ingest`; do not bypass manifest.
-- Build a business and financial skeleton.
-- Consume data-layer packs only after they pass the data-layer quality gate.
-- Separate facts, management comments, estimates, inferences and opinions.
-- Discover linked segments from products, customers, projects, orders, technology and business lines.
-- Output `segment_exposure.yaml` for `segment-company-mapping`.
-- Produce a stock report draft with evidence snapshot, risks, counter-evidence and TODOs.
-- Produce a backflow decision.
-
-## Out of scope
-
-- Do not perform multi-stock ranking.
-- Do not replace `evidence-ingest` for downloading or registering evidence.
-- Do not replace full `segment-research`.
-- Do not turn valuation scenarios into target-price instructions.
-- Do not output buy/sell/hold recommendations.
-- Do not support key financial or business claims with a single D-level clue.
-- Do not silently overwrite old reports.
-
-## B5-lite workflow
-
-### 0. Company identity gate
+### SDD-0 Company identity gate
 
 Confirm:
 
-```yaml
-stock_code:
-ts_code:
-stock_name:
-company_id:
-exchange:
-identity_confidence: high | medium | low
-identity_evidence_ids: []
-blocking_issues: []
-```
+- `stock_code`
+- `company_id`
+- `company_name`
+- `exchange`
+- report object and workflow object
 
-If identity is ambiguous, stop and return `blocked`.
+Block the run if identity is ambiguous, duplicated, or inconsistent across inputs.
 
-### 1. Stock evidence plan
+### SDD-1 Evidence and data-layer gate
 
-Check for:
+Consume evidence-ingest and data-layer outputs.
 
-```text
-- annual report / latest official filing;
-- interim or quarterly report if available;
-- material announcements in the selected date range;
-- structured financial data snapshots;
-- optional IR/company website/news clues.
-```
+Rules:
 
-If evidence is missing, create TODOs. Do not invent.
+- Use structured data only as metric/context unless an official disclosure source
+  also supports the business claim.
+- Do not use Tushare/Baostock/API snapshots as business exposure proof.
+- Do not infer customer, order, capacity, revenue exposure, or profit exposure
+  from company-level financial metrics alone.
+- Preserve `MISSING_DISCLOSURE`, `TODO_SOURCE_REQUIRED`, and source gaps.
+- Material claims must carry `evidence_id`, `claim_id`, `metric_id`, or explicit
+  TODO / missing reason.
 
-### 2. Evidence package consumption
+### SDD-2 Analysis pack build
 
-Read only registered evidence/candidates:
+Produce `stock_analysis_pack.yaml`.
 
-```text
-data/manifests/evidence_manifest.csv
-data/manifests/claims_draft.csv or claims_registry.csv
-data/manifests/metrics_draft.csv or metrics_registry.csv
-reports/workflow_runs/<workflow_id>/stock_evidence_plan.yaml
-reports/workflow_runs/<workflow_id>/valuation_snapshot.yaml
-reports/workflow_runs/<workflow_id>/technical_snapshot.yaml
-reports/workflow_runs/<workflow_id>/financial_metric_pack.csv
-reports/workflow_runs/<workflow_id>/source_gap_report.md
-```
+The pack should include:
 
-For data-layer pack rules, read `references/data_layer_pack_consumption.md`.
+- `metadata`
+- `company_identity`
+- `evidence_snapshot`
+- `financial_quality`
+- `business_breakdown`
+- `linked_segments`
+- `industry_context_card`
+- `forecast_assumptions`
+- `valuation_context`
+- `peer_context`
+- `technical_snapshot`
+- `sentiment_pack`
+- `catalyst_calendar`
+- `risk_counter_evidence`
+- `source_gap_requests`
 
-For R4 readiness and publishable report boundaries, read `references/publishable_stock_report_gate.md`.
+Rules:
 
-### 3. Business breakdown contract
+- Estimates, assumptions, and analyst views must be explicitly labeled.
+- Management comments must not be promoted to facts unless supported by official
+  disclosure or accepted claim review.
+- Business line revenue, gross margin, customer, product, capacity, and order
+  fields may be `MISSING`; never invent them.
 
-For each business line, record:
+### SDD-3 Report drafting
 
-```yaml
-business_line:
-description:
-revenue:
-gross_margin:
-growth:
-products:
-customers:
-capacity:
-orders:
-related_segments:
-evidence_ids:
-claim_ids:
-confidence:
-missing_fields:
-notes:
-```
+Use:
 
-Allowed missing value: `MISSING:<reason>`. Do not infer revenue_pct unless directly disclosed.
+- `assets/stock_deep_dive_report_template.md`
+- `references/report_style_guide.md`
 
-### 4. Financial metric contract
+Produce an R4 / stock deep dive draft from `stock_analysis_pack.yaml`.
 
-Each metric must include:
+Rules:
 
-```yaml
-metric_name:
-period:
-value:
-unit:
-currency:
-source_evidence_id:
-metric_id_or_candidate_id:
-calculation_method:
-is_estimate:
-review_status:
-```
+- Do not discover new facts during writing.
+- Do not hide evidence gaps.
+- Keep fact / estimate / inference / opinion separated.
+- Include risks, counter-evidence, open questions, evidence map, and source gaps.
+- no buy/sell/hold, no position sizing, no direct trading instruction.
 
-### 4.1 Data-layer pack consumption gate
+### SDD-4 Segment exposure and backflow
 
-Before using market or structured data packs:
+Produce or update `segment_exposure.yaml`.
 
-```text
-- `data_layer_quality_report.md` must exist and have high_issues: 0.
-- Missing `valuation_snapshot.yaml` means valuation context must stay `TODO_MARKET_DATA`.
-- Missing `technical_snapshot.yaml` means technical context must stay `TODO_MARKET_DATA`.
-- Missing `financial_metric_pack.csv` means structured financial data must stay `TODO_STRUCTURED_FINANCIAL_DATA`.
-- Missing `peer_market_snapshot.csv` means peer comparison must stay `TODO_PEER_DATA`.
-- Missing official disclosure means business exposure remains `MISSING_DISCLOSURE`.
-```
+Generate exactly one `backflow_decision` for each material segment issue:
 
-### 5. Linked segments discovery
+- `update_exposure`
+- `update_company_universe`
+- `update_segment_taxonomy`
+- `update_scorecard`
+- `no_backflow_needed`
+- `blocked`
 
-Each material business line must attempt segment mapping:
+Exposure rules:
 
-```yaml
-segment_id:
-segment_name:
-link_status: confirmed_existing | candidate | excluded | todo_insufficient_evidence
-exposure_type: revenue | product | technology | customer | project | narrative
-supporting_evidence_ids:
-confidence:
-notes:
-```
+- `product_line_clue` may update product exposure only.
+- `product_line_clue` must not be promoted into revenue exposure or profit
+  exposure.
+- `revenue_pct` and `profit_pct` must be `MISSING_DISCLOSURE` unless directly
+  disclosed or accepted by quality-review from an official source.
+- Customer, order, capacity, or project clues must remain clue-level unless the
+  source and review status allow a stronger claim.
 
-If a segment does not exist, create a mini segment context TODO instead of full industry research.
+### SDD-5 Quality-review handoff
 
-### 6. `segment_exposure.yaml` contract
+Hand off to `quality-review` for at least:
 
-Write:
+- G1 Evidence Gate
+- G2 Claim Gate
+- G3 Metric Gate
+- G6 Exposure Gate
+- G7 Stock Report Gate
+- G8 Backflow Gate
+- G9 No Advice Gate
 
-```text
-reports/stocks/<stock_code>_<company_name>/segment_exposure.yaml
-```
+The final gate status must be one of:
 
-Minimum fields:
+- `bridge_only`
+- `publishable_ready_with_disclosure_todos`
+- `publishable_ready`
+- `blocked`
 
-```yaml
-company_id:
-stock_code:
-stock_name:
-as_of_date:
-linked_segments:
-  - segment_id:
-    segment_name:
-    exposure_type:
-    exposure_score:
-    revenue_pct:
-    profit_pct:
-    evidence_ids:
-    claim_ids:
-    metric_ids:
-    confidence:
-    valid_from:
-    valid_to:
-    backflow_decision:
-    notes:
-```
+Any high severity issue blocks acceptance. Medium TODOs may be accepted only if
+they remain visible and do not alter the report's truthfulness.
 
-### 7. Stock report contract
+## Must-read references
 
-Write:
+Read these references before executing a stock run:
 
-```text
-reports/stocks/<stock_code>_<company_name>/<date>_stock_deep_dive.md
-reports/stocks/<stock_code>_<company_name>/evidence_map.md
-reports/stocks/<stock_code>_<company_name>/open_questions.md
-```
-
-Required sections:
-
-```text
-0. Metadata and evidence snapshot
-1. One-page conclusion split into fact / inference / assumption / uncertainty
-2. Company identity and business structure
-3. Business breakdown
-4. Financial quality and metric table
-5. Linked segments and exposure
-6. Customers, suppliers, capacity, orders, projects
-7. Governance and management comments
-8. Scenario assumptions, not trading instructions
-9. Risks and counter-evidence
-10. TODO / MISSING
-11. Evidence map
-```
-
-### 8. Backflow decision
-
-Every stock run must end with one of:
-
-```text
-update_exposure
-create_segment_candidate
-update_company_universe
-update_segment_taxonomy
-no_backflow_needed
-blocked
-```
-
-No backflow decision means the workflow cannot close.
-
-### 9. Quality review handoff
-
-Send stock package to `quality-review` with gates:
-
-```text
-G1 Evidence Gate
-G2 Claim Gate
-G3 Metric Gate
-G6 Exposure Gate
-G7 Stock Report Gate
-G8 Backflow Gate
-G9 No Advice Gate
-```
+- `references/data_layer_pack_consumption.md`
+- `references/publishable_stock_report_gate.md`
+- `references/analysis_pack_contract.md`
+- `references/business_breakdown_contract.md`
+- `references/forecast_valuation_contract.md`
+- `references/market_sentiment_event_contract.md`
+- `references/report_style_guide.md`
 
 ## Outputs
 
+Write workflow-run artifacts to:
+
+```text
+reports/workflow_runs/<workflow_id>/
+```
+
+Expected artifacts:
+
+- `stock_analysis_pack.yaml`
+- `stock_deep_dive_draft.md` or `R4_stock_deep_dive_v*.md`
+- `segment_exposure.yaml`
+- `evidence_map.md`
+- `source_gap_report.md`
+- `open_questions.md`
+- `quality_gate_report.md`
+- `workflow_readout.md`
+
+If the workflow allows canonical stock output, also write:
+
 ```text
 reports/stocks/<stock_code>_<company_name>/<date>_stock_deep_dive.md
 reports/stocks/<stock_code>_<company_name>/segment_exposure.yaml
 reports/stocks/<stock_code>_<company_name>/evidence_map.md
-reports/stocks/<stock_code>_<company_name>/open_questions.md
-reports/workflow_runs/<workflow_id>/handoffs/*
 ```
 
-## Guardrails
+## Acceptance checklist
 
-- Stock report must include evidence snapshot and evidence map.
-- Management outlook is `management_comment`, not fact.
-- Valuation scenarios express assumptions and sensitivity only.
-- Data-layer market context cannot prove business exposure, customer orders or segment revenue.
-- Scorecard/scenario cannot become trading advice.
-- Segment exposure must use many-to-many mapping.
-- Missing data must be marked TODO/MISSING rather than filled by guess.
+Before closing a run, confirm:
 
-## Quality checklist
-
-- [ ] company_id, stock_code, stock_name and exchange are correct.
-- [ ] evidence_snapshot is present.
-- [ ] key business and financial claims have evidence_id / claim_id / metric_id / TODO.
-- [ ] metric period, unit, source and calculation method are explicit.
-- [ ] data-layer packs either exist with `high_issues: 0` or are represented as TODO/MISSING.
-- [ ] linked_segments use segment exposure mapping.
-- [ ] revenue_pct/profit_pct are disclosed or MISSING.
-- [ ] risk, counter-evidence and uncertainty are listed.
-- [ ] backflow decision is explicit.
-- [ ] no buy/sell/hold recommendation appears.
+- Company identity is unambiguous.
+- Evidence and data-layer inputs are registered.
+- `stock_analysis_pack.yaml` exists.
+- Report draft does not introduce uncited material claims.
+- `segment_exposure.yaml` exists or a blocked/no_backflow explanation is written.
+- `backflow_decision` is explicit.
+- `MISSING_DISCLOSURE` and `TODO_SOURCE_REQUIRED` are visible.
+- There is no buy/sell/hold, rating instruction, position sizing, or direct
+  trading instruction.
+- Quality-review status is recorded.

@@ -54,7 +54,7 @@ def review_stock_report(run_dir: Path) -> dict[str, object]:
 
     evidence_map_issues = check_evidence_map(report_path, run_dir / "report_evidence_map.md")
     for index, item in enumerate(evidence_map_issues, start=1):
-        issues.append(_issue(f"SRQR-G1-{index}", "high", "G1", "T9", str(report_path), item, "stock-report-writer"))
+        issues.append(_issue(f"SRQR-G1-{index}", "high", "G1", "T9", str(report_path), item, "stock-deep-dive"))
 
     for index, claim in enumerate(claims, start=1):
         if not claim.get("evidence_id"):
@@ -75,7 +75,7 @@ def review_stock_report(run_dir: Path) -> dict[str, object]:
     for line in business.get("business_lines", []) if isinstance(business.get("business_lines"), list) else []:
         revenue = str(line.get("revenue", ""))
         if revenue not in {"MISSING_DISCLOSURE", "TODO_SOURCE_REQUIRED"} and not line.get("claim_ids"):
-            issues.append(_issue("SRQR-G4-1", "high", "G4", "T9", "business_breakdown.yaml", "business revenue lacks claim support", "stock-research-analyst"))
+            issues.append(_issue("SRQR-G4-1", "high", "G4", "T9", "business_breakdown.yaml", "business revenue lacks claim support", "stock-deep-dive"))
 
     for link in business.get("segment_links", []) if isinstance(business.get("segment_links"), list) else []:
         score = int(link.get("exposure_score", 0) or 0)
@@ -90,15 +90,15 @@ def review_stock_report(run_dir: Path) -> dict[str, object]:
         ),
         start=1,
     ):
-        issues.append(_issue(f"SRQR-G6G7-{index}", "high", "G6/G7", "T9", "forecast_or_valuation", item, "stock-research-analyst"))
+        issues.append(_issue(f"SRQR-G6G7-{index}", "high", "G6/G7", "T9", "forecast_or_valuation", item, "stock-deep-dive"))
 
     technical = pack.get("technical_sentiment_event", {}) if isinstance(pack, dict) else {}
     tech_snapshot = technical.get("technical_snapshot", {}) if isinstance(technical, dict) else {}
     if not tech_snapshot.get("as_of_date"):
-        issues.append(_issue("SRQR-G8-1", "high", "G8", "T9", "technical_snapshot.yaml", "technical section lacks data date", "stock-research-analyst"))
+        issues.append(_issue("SRQR-G8-1", "high", "G8", "T9", "technical_snapshot.yaml", "technical section lacks data date", "stock-deep-dive"))
 
     for index, pattern in enumerate(find_unsupported_advice(report_text), start=1):
-        issues.append(_issue(f"SRQR-G10-{index}", "high", "G10", "T9", str(report_path), f"unsupported advice pattern: {pattern}", "stock-report-writer"))
+        issues.append(_issue(f"SRQR-G10-{index}", "high", "G10", "T9", str(report_path), f"unsupported advice pattern: {pattern}", "stock-deep-dive"))
 
     if not (run_dir / "backflow_decision.yaml").exists():
         issues.append(_issue("SRQR-G11-1", "high", "G11", "T10", "backflow_decision.yaml", "backflow decision missing", "maintenance"))

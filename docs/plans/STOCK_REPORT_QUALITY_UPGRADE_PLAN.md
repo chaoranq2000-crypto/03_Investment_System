@@ -158,14 +158,11 @@ accepted_sample_quality
 
 ## 4. 工作流入口
 
-推荐新增两个下层 skills：
+当前已合并为一个下层 skill：
 
 ```text
-stock-research-analyst
-    负责研究分析与建模，输出 stock_analysis_pack.yaml。
-
-stock-report-writer
-    负责研报生成与表达，输出 sample-quality draft。
+stock-deep-dive
+    负责研究分析、建模和研报草稿生成，输出 stock_analysis_pack.yaml 与 sample-quality draft。
 ```
 
 保留：
@@ -182,8 +179,7 @@ research-orchestrator
 ```text
 research-orchestrator
   → evidence-ingest
-  → stock-research-analyst
-  → stock-report-writer
+  → stock-deep-dive
   → quality-review
   → segment-company-mapping / refresh-research
 ```
@@ -196,7 +192,7 @@ Step 2. 将 002837 年报 PDF 解析为 text / table / page_map / parse_log。
 Step 3. 生成 claim_candidates，并人工或质量门晋升关键 claims。
 Step 4. 标准化 Tushare / Baostock metric candidates。
 Step 5. 生成 stock_analysis_pack.yaml。
-Step 6. 使用 stock-report-writer 生成样例质量报告草案。
+Step 6. 使用 stock-deep-dive 生成样例质量报告草案。
 Step 7. 运行 quality-review v2。
 Step 8. 对 002837 做 regression run。
 Step 9. 再扩展到第二只样本股。

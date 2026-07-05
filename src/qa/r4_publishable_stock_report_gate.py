@@ -418,7 +418,7 @@ def _update_artifact_manifest(stock_run: Path) -> None:
         fieldnames = list(rows[0].keys()) if rows else []
     existing = {row.get("artifact_type") for row in rows}
     additions = [
-        ("art_033", "R4_stock_deep_dive_v0_1", R4_REPORT, "stock-report-writer", "R4_Next_5", "current", "R4 v0.1 readiness draft"),
+        ("art_033", "R4_stock_deep_dive_v0_1", R4_REPORT, "stock-deep-dive", "R4_Next_5", "current", "R4 v0.1 readiness draft"),
         ("art_034", "R4_quality_gate_report", R4_GATE_REPORT, "quality-review", "R4_Next_5", "bridge_only", "R4 publishable gate report"),
         ("art_035", "R4_source_gap_report", R4_SOURCE_GAP_REPORT, "quality-review", "R4_Next_5", "current", "R4 source gaps visible"),
     ]

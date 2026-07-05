@@ -24,6 +24,10 @@
 - playbooks/stock_report_samples/stock_report_sample_tongguan_copper_foil.md
 - local-only: playbooks/tushare_configuration_guide.pdf (ignored; not published to public GitHub)
 
+## References
+- references/project_learning/README.md
+- references/external_skill_review/a_stock_data_for_evidence_pipeline.md
+
 ## Workflows
 - workflows/README.md
 - workflows/RESEARCH_WORKFLOW.md

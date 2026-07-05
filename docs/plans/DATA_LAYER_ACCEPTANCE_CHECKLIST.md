@@ -20,7 +20,7 @@ current_status: `accepted_with_todos`
 | Official disclosure reconciliation MVP | partial_done | mismatch and official_missing rows require review | DL-GAP-002 medium | evidence-ingest / quality-review | `official_financial_reconciliation.csv` |
 | Business segment disclosure extraction MVP | done_with_missing_disclosure | liquid-cooling revenue_pct/profit_pct missing | DISCLOSURE-SEGMENT-002 medium | stock-deep-dive / quality-review | `business_segment_metric_pack.csv` |
 | R4 publishable stock report gate | bridge_only | publishable_ready not met | source gaps visible | stock-deep-dive / quality-review | `R4_quality_gate_report.md` |
-| R4 stock deep dive v0.1 | done_bridge_only | R4 gate remains bridge_only | source gaps visible | stock-report-writer / quality-review | `R4_stock_deep_dive_v0_1.md` |
+| R4 stock deep dive v0.1 | done_bridge_only | R4 gate remains bridge_only | source gaps visible | stock-deep-dive / quality-review | `R4_stock_deep_dive_v0_1.md` |
 | DL-4 live adapter hardening | done_with_manual_live_smoke_pending | real-service live smoke skipped by default | live mode implemented, mocked, and gated by explicit `--allow-network` | evidence-ingest | `DATA_LAYER_DL4_ADAPTER_HARDENING_READOUT.md` |
 | Manual real-service Tushare / Baostock smoke | pending_manual_only | explicit external prerequisites required | not needed for R4 bridge_only | evidence-ingest | `docs/playbooks/MANUAL_LIVE_DATA_SMOKE_PLAYBOOK.md` |
 | P2 readiness precheck | pending | R4 publishable gate not ready | do not enter P2 yet | research-orchestrator | `reports/p1_6/P2_READINESS_PRECHECK_AFTER_DATA_LAYER.md` |

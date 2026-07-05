@@ -88,13 +88,13 @@ adapter output
   → metric_candidates / clue_log / event_candidates
   → quality-review
   → market_sentiment_pack / technical_snapshot / catalyst_calendar
-  → stock-report-writer
+  → stock-deep-dive
 ```
 
 不得：
 
 ```text
-adapter output → stock-report-writer → final report
+adapter output → stock-deep-dive → final report
 ```
 
 ## 7. Codex 执行建议

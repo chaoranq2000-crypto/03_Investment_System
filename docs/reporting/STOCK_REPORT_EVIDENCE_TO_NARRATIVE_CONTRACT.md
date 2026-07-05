@@ -96,7 +96,7 @@ blocked_language:
 ```yaml
 evidence_gap_request:
   gap_id:
-  discovered_by: stock-report-writer
+  discovered_by: stock-deep-dive
   report_section:
   missing_input_type: claim | metric | estimate | market_snapshot
   blocking_level: high | medium | low

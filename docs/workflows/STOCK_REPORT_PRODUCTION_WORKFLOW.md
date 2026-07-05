@@ -179,7 +179,7 @@ metric_candidates.csv → reviewed_metrics.csv / metrics_registry.csv
 
 ## 8. T5 Analysis Pack Build
 
-由 `stock-research-analyst` 输出：
+由 `stock-deep-dive` 的 analysis-pack stage 输出：
 
 ```text
 reports/workflow_runs/<run_id>/stock_analysis_pack.yaml
@@ -236,7 +236,7 @@ catalyst_calendar.yaml
 
 ## 11. T8 Report Draft
 
-由 `stock-report-writer` 生成：
+由 `stock-deep-dive` 的 report-drafting stage 生成：
 
 ```text
 stock_report_sample_quality_draft.md
