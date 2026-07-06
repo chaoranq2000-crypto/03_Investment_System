@@ -46,6 +46,17 @@ source_gap_report.md
 - Check report path and output boundary.
 - Output issue list, severity and fix owner.
 
+## Canonical gate boundary
+
+Global `gate_id` values are defined only in:
+
+```text
+docs/workflows/RESEARCH_WORKFLOW.md
+```
+
+This skill may define quality checklists and stock-report-specific `subcheck_id`
+values, but must not add new global G-number gates.
+
 ## Out of scope
 
 - Do not generate new unreviewed conclusions.
@@ -59,8 +70,11 @@ source_gap_report.md
 Every issue must use:
 
 ```csv
-issue_id,severity,gate_id,stage,target_artifact,description,fix_owner_skill,status,created_at,resolved_at,notes
+issue_id,severity,gate_id,subcheck_id,stage,target_artifact,description,fix_owner_skill,status,created_at,resolved_at,notes
 ```
+
+`gate_id` must come from `docs/workflows/RESEARCH_WORKFLOW.md`. If a local
+check is needed, write it as `subcheck_id` or in `notes`.
 
 Severity:
 
@@ -139,7 +153,14 @@ Pass conditions:
 - no target-price instruction.
 - score, memo or scenario is not framed as a trading signal.
 
-### G10 Data Layer Pack Gate
+### G7-DL Data Layer Pack Check
+
+Parent gate:
+
+```yaml
+parent_gate_id: G7
+name: Data Layer Pack Check
+```
 
 Pass conditions:
 
@@ -150,7 +171,14 @@ Pass conditions:
 - official disclosure evidence exists before business exposure is written as fact; otherwise `MISSING_DISCLOSURE` is visible.
 - Tushare/Baostock/market context snapshots do not support customer order, capacity or segment revenue facts by themselves.
 
-### G11 R4 Publishable Stock Report Gate
+### G7-R4 R4 Publishable Stock Report Check
+
+Parent gate:
+
+```yaml
+parent_gate_id: G7
+name: R4 Publishable Stock Report Check
+```
 
 Pass conditions:
 

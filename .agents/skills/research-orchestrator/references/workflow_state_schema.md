@@ -6,7 +6,7 @@
 
 ```yaml
 workflow_id: wf_YYYYMMDD_<workflow_type>_<object_id>
-workflow_type: segment_to_stock_closed_loop | stock_first_closed_loop | segment_stock_interlock | refresh_existing_research | comparison_readiness_gate | workflow_diagnostic
+workflow_type: segment_to_stock_closed_loop | stock_first_closed_loop | segment_stock_interlock | refresh_existing_research | comparison_readiness_gate
 status: planned | in_progress | blocked | needs_fix | ready_for_review | accepted | accepted_with_todos | archived
 created_at: YYYY-MM-DD
 updated_at: YYYY-MM-DD
@@ -43,6 +43,10 @@ entry_criteria: []
 exit_criteria: []
 notes: null
 ```
+
+`workflow_diagnostic` is a non-run diagnostic mode, not a persisted
+`workflow_type`. If no workflow run is created, explain that in the user-facing
+readout instead of writing a diagnostic `workflow_state.yaml`.
 
 ## Status rules
 

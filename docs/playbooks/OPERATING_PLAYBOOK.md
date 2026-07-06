@@ -1,6 +1,6 @@
 # Operating Playbook — 快速入口与常用命令索引
 
-> 本文件不是工作流事实源，也不定义 P1/P2/P3 阶段细节。永久工作流事实源见 `docs/workflows/RESEARCH_WORKFLOW.md` 和 `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md`。
+> 本文件不是工作流事实源，也不定义 P1/P2/P3 阶段细节。永久 workflow kernel 见 `docs/workflows/RESEARCH_WORKFLOW.md`；orchestrator runtime contract 见 `.agents/skills/research-orchestrator/references/orchestration_contract.md`。
 
 ## 1. 文档入口
 
@@ -9,7 +9,7 @@
 | 查项目级纪律、证据规则、禁止事项 | `AGENTS.md` |
 | 查文档总目录 | `docs/index.md` |
 | 查永久工作流定义 | `docs/workflows/RESEARCH_WORKFLOW.md` |
-| 查 workflow run、handoff、门禁和编排规则 | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` |
+| 查 workflow run、handoff 和编排 runtime | `.agents/skills/research-orchestrator/references/orchestration_contract.md` |
 | 查当前 P1.6 建设计划 | `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md` |
 | 查 P1.6 已完成基础设施记录 | `docs/logs/2026-07-02_p1_6_workflow_foundation_log.md` |
 

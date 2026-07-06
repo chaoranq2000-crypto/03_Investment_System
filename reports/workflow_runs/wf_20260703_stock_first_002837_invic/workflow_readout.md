@@ -8,7 +8,8 @@ accepted_sample_quality
 
 | Field | Value |
 |---|---|
-| workflow_type | stock_report_production |
+| workflow_type | stock_first_closed_loop |
+| profile_id | stock_report_production |
 | object | 002837 英维克 |
 | date_range | 2025-01-01 to 2026-07-03 |
 | quality_target | R3_sample_quality_draft |

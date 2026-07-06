@@ -27,6 +27,7 @@ def _issue(
     issue_id: str,
     severity: str,
     gate_id: str,
+    subcheck_id: str,
     stage: str,
     target_artifact: str,
     description: str,
@@ -36,6 +37,7 @@ def _issue(
         "issue_id": issue_id,
         "severity": severity,
         "gate_id": gate_id,
+        "subcheck_id": subcheck_id,
         "stage": stage,
         "target_artifact": target_artifact,
         "description": description,
@@ -54,33 +56,33 @@ def review_stock_report(run_dir: Path) -> dict[str, object]:
 
     evidence_map_issues = check_evidence_map(report_path, run_dir / "report_evidence_map.md")
     for index, item in enumerate(evidence_map_issues, start=1):
-        issues.append(_issue(f"SRQR-G1-{index}", "high", "G1", "T9", str(report_path), item, "stock-deep-dive"))
+        issues.append(_issue(f"SRQR-G1-{index}", "high", "G1", "SRQ1", "T9", str(report_path), item, "stock-deep-dive"))
 
     for index, claim in enumerate(claims, start=1):
         if not claim.get("evidence_id"):
-            issues.append(_issue(f"SRQR-G2-{index}", "high", "G2", "T9", "claims_registry.csv", "claim missing evidence_id", "quality-review"))
+            issues.append(_issue(f"SRQR-G2-{index}", "high", "G2", "SRQ2", "T9", "claims_registry.csv", "claim missing evidence_id", "quality-review"))
         if not claim.get("quote_or_excerpt"):
-            issues.append(_issue(f"SRQR-G2Q-{index}", "high", "G2", "T9", "claims_registry.csv", "claim missing quote_or_excerpt", "quality-review"))
+            issues.append(_issue(f"SRQR-G2Q-{index}", "high", "G2", "SRQ2", "T9", "claims_registry.csv", "claim missing quote_or_excerpt", "quality-review"))
         if not claim.get("page_no_or_section"):
-            issues.append(_issue(f"SRQR-G2L-{index}", "high", "G2", "T9", "claims_registry.csv", "claim missing locator", "quality-review"))
+            issues.append(_issue(f"SRQR-G2L-{index}", "high", "G2", "SRQ2", "T9", "claims_registry.csv", "claim missing locator", "quality-review"))
     if not claims:
-        issues.append(_issue("SRQR-G2-EMPTY", "high", "G2", "T9", "claims_registry.csv", "no reviewed claims", "quality-review"))
+        issues.append(_issue("SRQR-G2-EMPTY", "high", "G2", "SRQ2", "T9", "claims_registry.csv", "no reviewed claims", "quality-review"))
 
     for index, metric in enumerate(metrics, start=1):
         missing = [field for field in ("period", "value", "unit", "source_evidence_id") if not metric.get(field)]
         if missing:
-            issues.append(_issue(f"SRQR-G3-{index}", "high", "G3", "T9", "metrics_registry.csv", f"metric missing {','.join(missing)}", "quality-review"))
+            issues.append(_issue(f"SRQR-G3-{index}", "high", "G3", "SRQ3", "T9", "metrics_registry.csv", f"metric missing {','.join(missing)}", "quality-review"))
 
     business = pack.get("business_breakdown", {}) if isinstance(pack, dict) else {}
     for line in business.get("business_lines", []) if isinstance(business.get("business_lines"), list) else []:
         revenue = str(line.get("revenue", ""))
         if revenue not in {"MISSING_DISCLOSURE", "TODO_SOURCE_REQUIRED"} and not line.get("claim_ids"):
-            issues.append(_issue("SRQR-G4-1", "high", "G4", "T9", "business_breakdown.yaml", "business revenue lacks claim support", "stock-deep-dive"))
+            issues.append(_issue("SRQR-G7-SRQ4-1", "high", "G7", "SRQ4", "T9", "business_breakdown.yaml", "business revenue lacks claim support", "stock-deep-dive"))
 
     for link in business.get("segment_links", []) if isinstance(business.get("segment_links"), list) else []:
         score = int(link.get("exposure_score", 0) or 0)
         if score >= 4 and not link.get("claim_ids"):
-            issues.append(_issue("SRQR-G5-1", "high", "G5", "T9", "segment_exposure_draft.yaml", "high exposure score lacks claim support", "segment-company-mapping"))
+            issues.append(_issue("SRQR-G6-SRQ5-1", "high", "G6", "SRQ5", "T9", "segment_exposure_draft.yaml", "high exposure score lacks claim support", "segment-company-mapping"))
 
     for index, item in enumerate(
         check_forecast_and_valuation(
@@ -90,43 +92,43 @@ def review_stock_report(run_dir: Path) -> dict[str, object]:
         ),
         start=1,
     ):
-        issues.append(_issue(f"SRQR-G6G7-{index}", "high", "G6/G7", "T9", "forecast_or_valuation", item, "stock-deep-dive"))
+        issues.append(_issue(f"SRQR-G7-SRQ6-SRQ7-{index}", "high", "G7", "SRQ6/SRQ7", "T9", "forecast_or_valuation", item, "stock-deep-dive"))
 
     technical = pack.get("technical_sentiment_event", {}) if isinstance(pack, dict) else {}
     tech_snapshot = technical.get("technical_snapshot", {}) if isinstance(technical, dict) else {}
     if not tech_snapshot.get("as_of_date"):
-        issues.append(_issue("SRQR-G8-1", "high", "G8", "T9", "technical_snapshot.yaml", "technical section lacks data date", "stock-deep-dive"))
+        issues.append(_issue("SRQR-G7-SRQ8-1", "high", "G7", "SRQ8", "T9", "technical_snapshot.yaml", "technical section lacks data date", "stock-deep-dive"))
 
     for index, pattern in enumerate(find_unsupported_advice(report_text), start=1):
-        issues.append(_issue(f"SRQR-G10-{index}", "high", "G10", "T9", str(report_path), f"unsupported advice pattern: {pattern}", "stock-deep-dive"))
+        issues.append(_issue(f"SRQR-G9-SRQ10-{index}", "high", "G9", "SRQ10", "T9", str(report_path), f"unsupported advice pattern: {pattern}", "stock-deep-dive"))
 
     if not (run_dir / "backflow_decision.yaml").exists():
-        issues.append(_issue("SRQR-G11-1", "high", "G11", "T10", "backflow_decision.yaml", "backflow decision missing", "maintenance"))
+        issues.append(_issue("SRQR-G8-SRQ11-1", "high", "G8", "SRQ11", "T10", "backflow_decision.yaml", "backflow decision missing", "maintenance"))
 
     high_count = sum(1 for issue in issues if issue["severity"] == "high")
     medium_count = sum(1 for issue in issues if issue["severity"] == "medium")
     status = "accepted_sample_quality" if high_count == 0 and medium_count == 0 else "needs_fix"
 
-    issue_md = ["# Quality Issue List", "", "| issue_id | severity | gate_id | target_artifact | description | status |", "|---|---|---|---|---|---|"]
+    issue_md = ["# Quality Issue List", "", "| issue_id | severity | gate_id | subcheck_id | target_artifact | description | status |", "|---|---|---|---|---|---|---|"]
     if issues:
         for issue in issues:
             issue_md.append(
-                f"| {issue['issue_id']} | {issue['severity']} | {issue['gate_id']} | {issue['target_artifact']} | {issue['description']} | {issue['status']} |"
+                f"| {issue['issue_id']} | {issue['severity']} | {issue['gate_id']} | {issue['subcheck_id']} | {issue['target_artifact']} | {issue['description']} | {issue['status']} |"
             )
     else:
-        issue_md.append("| none | none | all | stock_report_sample_quality_draft.md | no high or medium issues | closed |")
+        issue_md.append("| none | none | all | all | stock_report_sample_quality_draft.md | no high or medium issues | closed |")
     (run_dir / "quality_issue_list.md").write_text("\n".join(issue_md) + "\n", encoding="utf-8")
 
     gate_rows = [
-        ("G1 Evidence Completeness", "pass" if not any(i["gate_id"] == "G1" for i in issues) else "fail"),
-        ("G2 Claim Locator", "pass" if not any(i["gate_id"] == "G2" for i in issues) else "fail"),
-        ("G3 Metric Normalization", "pass" if not any(i["gate_id"] == "G3" for i in issues) else "fail"),
-        ("G4 Business Breakdown", "pass" if not any(i["gate_id"] == "G4" for i in issues) else "fail"),
-        ("G5 Segment Exposure", "pass" if not any(i["gate_id"] == "G5" for i in issues) else "fail"),
-        ("G6/G7 Forecast Valuation", "pass" if not any(i["gate_id"] == "G6/G7" for i in issues) else "fail"),
-        ("G8 Technical Sentiment Event", "pass" if not any(i["gate_id"] == "G8" for i in issues) else "fail"),
-        ("G10 No Unsupported Advice", "pass" if not any(i["gate_id"] == "G10" for i in issues) else "fail"),
-        ("G11 Backflow Maintenance", "pass" if not any(i["gate_id"] == "G11" for i in issues) else "fail"),
+        ("G1 Evidence Completeness / SRQ1", "pass" if not any(i["subcheck_id"] == "SRQ1" for i in issues) else "fail"),
+        ("G2 Claim Locator / SRQ2", "pass" if not any(i["subcheck_id"] == "SRQ2" for i in issues) else "fail"),
+        ("G3 Metric Normalization / SRQ3", "pass" if not any(i["subcheck_id"] == "SRQ3" for i in issues) else "fail"),
+        ("G7 Business Breakdown / SRQ4", "pass" if not any(i["subcheck_id"] == "SRQ4" for i in issues) else "fail"),
+        ("G6 Segment Exposure / SRQ5", "pass" if not any(i["subcheck_id"] == "SRQ5" for i in issues) else "fail"),
+        ("G7 Forecast Valuation / SRQ6-SRQ7", "pass" if not any(i["subcheck_id"] == "SRQ6/SRQ7" for i in issues) else "fail"),
+        ("G7 Technical Sentiment Event / SRQ8", "pass" if not any(i["subcheck_id"] == "SRQ8" for i in issues) else "fail"),
+        ("G9 No Unsupported Advice / SRQ10", "pass" if not any(i["subcheck_id"] == "SRQ10" for i in issues) else "fail"),
+        ("G8 Backflow Maintenance / SRQ11", "pass" if not any(i["subcheck_id"] == "SRQ11" for i in issues) else "fail"),
     ]
     report_md = ["# Quality Gate Report", "", f"final_status: {status}", f"high_issues: {high_count}", f"medium_issues: {medium_count}", "", "| gate | status |", "|---|---|"]
     report_md.extend(f"| {gate} | {gate_status} |" for gate, gate_status in gate_rows)

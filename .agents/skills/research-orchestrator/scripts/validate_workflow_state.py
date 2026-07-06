@@ -41,8 +41,6 @@ VALID_WORKFLOW_TYPES = {
     "segment_stock_interlock",
     "refresh_existing_research",
     "comparison_readiness_gate",
-    "workflow_diagnostic",
-    "stock_report_production",
 }
 
 VALID_STATUSES = {
@@ -53,7 +51,6 @@ VALID_STATUSES = {
     "ready_for_review",
     "accepted",
     "accepted_with_todos",
-    "accepted_sample_quality",
     "archived",
 }
 
@@ -104,7 +101,7 @@ def main(argv: list[str]) -> int:
         if isinstance(item, dict) and item.get("severity") == "high" and item.get("status") != "closed":
             high_open.append(item.get("issue_id", "<unknown>"))
 
-    if high_open and data["status"] in {"accepted", "accepted_with_todos", "accepted_sample_quality"}:
+    if high_open and data["status"] in {"accepted", "accepted_with_todos"}:
         fail("accepted status is not allowed while high severity issues remain open: " + ", ".join(high_open))
 
     print(f"OK: {path}")

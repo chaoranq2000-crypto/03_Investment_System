@@ -1,5 +1,5 @@
 artifact_id,artifact_type,path,created_by_skill,stage,required,exists,status,notes
-art_001,workflow_state,workflow_state.yaml,research-orchestrator,T0,True,True,current,workflow upgraded to stock_report_production
+art_001,workflow_state,workflow_state.yaml,research-orchestrator,T0,True,True,current,stock_report_production retained as profile_id under stock_first_closed_loop
 art_002,stock_evidence_plan,stock_evidence_plan.yaml,research-orchestrator,T1,True,True,current,existing plan reused
 art_003,mineru_parse_job,mineru_parse_job.yaml,evidence-ingest,T2,True,True,current,local PDF parse job
 art_004,parse_log,data/processed/logs/ev_annual_report_002837_20260421_ce7f64_parse_log.json,evidence-ingest,T2,True,True,current,pypdf fallback full locator; MinerU CLI attempted

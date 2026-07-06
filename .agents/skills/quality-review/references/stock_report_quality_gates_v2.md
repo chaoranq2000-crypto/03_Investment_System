@@ -7,18 +7,21 @@ Upgrade quality-review from debug gate to sample-quality stock report gate.
 ## 2. Gate summary
 
 ```text
-G1 Evidence Completeness Gate
-G2 Claim Locator Gate
-G3 Metric Normalization Gate
-G4 Business Breakdown Gate
-G5 Segment Exposure Gate
-G6 Forecast Model Gate
-G7 Valuation Gate
-G8 Technical / Sentiment / Event Gate
-G9 Report Expression Gate
-G10 No Unsupported Advice Gate
-G11 Backflow & Maintenance Gate
+SRQ1 Evidence Completeness Check
+SRQ2 Claim Locator Check
+SRQ3 Metric Normalization Check
+SRQ4 Business Breakdown Check
+SRQ5 Segment Exposure Check
+SRQ6 Forecast Model Check
+SRQ7 Valuation Check
+SRQ8 Technical / Sentiment / Event Check
+SRQ9 Report Expression Check
+SRQ10 No Unsupported Advice Check
+SRQ11 Backflow & Maintenance Check
 ```
+
+These are stock-report checklist IDs, not global `gate_id` values. Map them to
+the global gates in `docs/workflows/RESEARCH_WORKFLOW.md` when writing issues.
 
 ## 3. Severity rules
 
@@ -31,7 +34,7 @@ low:
   definition: Style, completeness or non-critical polish issue.
 ```
 
-## 4. G1 Evidence Completeness Gate
+## 4. SRQ1 Evidence Completeness Check
 
 High issue if:
 
@@ -42,7 +45,7 @@ High issue if:
 - report uses a source not in manifest.
 ```
 
-## 5. G2 Claim Locator Gate
+## 5. SRQ2 Claim Locator Check
 
 High issue if:
 
@@ -53,7 +56,7 @@ High issue if:
 - D-level clue supports material claim.
 ```
 
-## 6. G3 Metric Normalization Gate
+## 6. SRQ3 Metric Normalization Check
 
 High issue if:
 
@@ -63,7 +66,7 @@ High issue if:
 - Tushare/Baostock metric is used as business exposure fact.
 ```
 
-## 7. G4 Business Breakdown Gate
+## 7. SRQ4 Business Breakdown Check
 
 High issue if:
 
@@ -79,7 +82,7 @@ Medium issue if:
 - business breakdown is incomplete but gaps are explicit.
 ```
 
-## 8. G5 Segment Exposure Gate
+## 8. SRQ5 Segment Exposure Check
 
 High issue if:
 
@@ -89,7 +92,7 @@ High issue if:
 - exposure_score >=4 without claim/metric support.
 ```
 
-## 9. G6 Forecast Model Gate
+## 9. SRQ6 Forecast Model Check
 
 High issue if:
 
@@ -99,7 +102,7 @@ High issue if:
 - no sensitivity or scenario for R3.
 ```
 
-## 10. G7 Valuation Gate
+## 10. SRQ7 Valuation Check
 
 High issue if:
 
@@ -109,7 +112,7 @@ High issue if:
 - target price appears as trading instruction.
 ```
 
-## 11. G8 Technical / Sentiment / Event Gate
+## 11. SRQ8 Technical / Sentiment / Event Check
 
 High issue if:
 
@@ -119,7 +122,7 @@ High issue if:
 - event date lacks source or estimate label.
 ```
 
-## 12. G9 Report Expression Gate
+## 12. SRQ9 Report Expression Check
 
 Medium issue if:
 
@@ -129,7 +132,7 @@ Medium issue if:
 - evidence gaps are hidden in appendix only.
 ```
 
-## 13. G10 No Unsupported Advice Gate
+## 13. SRQ10 No Unsupported Advice Check
 
 High issue if:
 
@@ -146,7 +149,7 @@ research_status: high_conviction_watch / watch / neutral_watch / risk_watch
 scenario valuation range as model output
 ```
 
-## 14. G11 Backflow & Maintenance Gate
+## 14. SRQ11 Backflow & Maintenance Check
 
 High issue if:
 

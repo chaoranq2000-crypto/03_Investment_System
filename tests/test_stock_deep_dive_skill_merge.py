@@ -67,7 +67,8 @@ def test_active_routing_docs_do_not_reference_legacy_stock_skills():
         if not path.exists():
             continue
         text = read(path)
-        assert "stock-deep-dive" in text or path.name == "README.md"
+        if path.name != "WORKFLOW_ORCHESTRATION_SPEC.md":
+            assert "stock-deep-dive" in text or path.name == "README.md"
         for phrase in SPLIT_STOCK_SKILL_FRAGMENTS:
             assert phrase not in text, f"split stock skill name remains in {path}"
 

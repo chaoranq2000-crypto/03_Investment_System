@@ -1,84 +1,68 @@
 # Workflows — 永久工作流文档入口
 
-`docs/workflows/` 是 A-share Research OS 的永久工作流事实源目录。它说明系统在日常研究中如何运转，而不是记录某个建设阶段的临时计划。
+`docs/workflows/` 只承载系统级 workflow 事实。
 
-## 本目录负责回答
+它不承载单个 skill 的完整执行契约，也不维护历史计划、执行日志或样例报告正文。
 
-1. 用户说“研究一个细分 / 深挖一个股票 / 刷新已有研究”时，系统如何判断 workflow 类型。
-2. `research-orchestrator` 如何编排下层 skills。
-3. 每个 workflow 阶段的输入、输出、质量门和回写关系是什么。
-4. 细分研究和个股研究如何既独立运行，又通过 evidence、claims、metrics、`segment_company_exposure` 互相连接。
-5. 进入 P2 比较前，哪些基础闭环必须先通过。
+## Canonical workflow kernel
 
-## 本目录不负责
+| 文件 | 定位 | 是否定义 global workflow facts |
+|---|---|---:|
+| `RESEARCH_WORKFLOW.md` | 唯一全局 workflow kernel；定义 `workflow_type`、全局阶段、全局 `gate_id`、回写决策、P2 前置条件 | 是 |
+| `DATA_LAYER_WORKFLOW.md` | 数据层 workflow；定义 source adapter、archive、manifest、candidate、data pack 与 evidence-ingest 的边界 | 只定义 data-layer 事实 |
 
-- 项目路线图。
-- P0 / P1 / P1.5 / P2 / P3 阶段计划。
-- 单次执行 readout。
-- 某个细分或个股的研究报告。
-- 日常命令速查。
+## Compatibility pointers
 
-阶段计划放在 `docs/plans/`；日常提示放在 `docs/playbooks/`；执行日志放在 `docs/logs/`。
+以下文件为兼容旧链接或迁移说明，不再定义新的 workflow facts：
 
-## 文件列表
-
-| 文件 | 定位 | 是否事实源 | 上位文件 |
-|---|---|---:|---|
-| `RESEARCH_WORKFLOW.md` | 永久总工作流：workflow 类型、阶段、交接资产、细分/个股关系、P2 前置条件 | 是 | `AGENTS.md` |
-| `WORKFLOW_ORCHESTRATION_SPEC.md` | `research-orchestrator` 如何分类、建 run、路由 skill、生成 handoff、检查门禁 | 是 | `RESEARCH_WORKFLOW.md` |
-| `DATA_LAYER_WORKFLOW.md` | 数据层如何发现、拉取、归档、标准化、候选化和交接 | 是 | `RESEARCH_WORKFLOW.md` |
-| `STOCK_REPORT_PRODUCTION_WORKFLOW.md` | 样例级个股报告生产流程；服务 stock-first / R4 readiness，不替代 `stock-deep-dive` | 是 | `RESEARCH_WORKFLOW.md` |
-
-未来如果继续细化 workflow，可以新增：
-
-```text
-SEGMENT_RESEARCH_WORKFLOW.md
-STOCK_DEEP_DIVE_WORKFLOW.md
-SEGMENT_STOCK_INTERLOCK_WORKFLOW.md
-REFRESH_RESEARCH_WORKFLOW.md
-COMPARISON_READINESS_WORKFLOW.md
-```
-
-新增文件必须以 `RESEARCH_WORKFLOW.md` 为上位事实源，并同步更新本 README 与 `docs/index.md`。
+| 文件 | 新事实源 |
+|---|---|
+| `WORKFLOW_ORCHESTRATION_SPEC.md` | `.agents/skills/research-orchestrator/references/orchestration_contract.md` for runtime contract；`RESEARCH_WORKFLOW.md` for global IDs |
+| `STOCK_REPORT_PRODUCTION_WORKFLOW.md` | `.agents/skills/stock-deep-dive/references/report_production_profile.md` for stock report production profile；`RESEARCH_WORKFLOW.md` for `stock_first_closed_loop` |
 
 ## 与 skills 的关系
 
 ```text
 docs/workflows/RESEARCH_WORKFLOW.md
-    = 事实源：说明系统如何运转。
+    = 系统事实：workflow_type / stage / gate / backflow / P2 readiness
 
 .agents/skills/research-orchestrator/SKILL.md
-    = 执行入口：按事实源路由下层 skills。
+    = 执行入口：创建 run、更新状态、写 handoff、路由下层 skills、close readout
 
 .agents/skills/<lower-skill>/SKILL.md
-    = 下层执行契约：完成证据导入、细分研究、个股研究、质量检查等动作。
+    = 下层执行契约：说明本 skill 何时使用、输入、局部步骤、输出、blocked 条件
+
+.agents/skills/<skill>/references/
+    = 字段、模板、runtime contract、局部 profile
 ```
 
-`research-orchestrator` 不是万能研究员。它只负责编排、状态、路由、门禁和 readout；具体研究动作必须交给下层 skills。
+## 不负责
 
-## 个股 skill 合并状态
-
-个股分析包构建和报告写作已经统一合并到 `stock-deep-dive`。当前 workflow 文档、路由矩阵、config 和 handoff 都不应再引用拆分式个股技能名称。
-
-当前主路径应优先使用：
+本目录不负责：
 
 ```text
-research-orchestrator
-→ evidence-ingest
-→ stock-deep-dive
-→ segment-company-mapping
-→ quality-review
-→ research-orchestrator close readout
+项目路线图
+P0 / P1 / P1.5 / P2 / P3 阶段计划
+单次执行 readout
+某个细分或个股的研究报告
+日常命令速查
+单个 skill 的内部 schema 或模板
 ```
 
-如果发现新的拆分式个股技能名称，应先合并有效规则到 `stock-deep-dive/references/`，再更新对应 workflow 文档和验收检查。
+阶段计划放在 `docs/plans/`；日常提示放在 `docs/playbooks/`；执行日志放在 `docs/logs/`。
 
 ## 版本纪律
 
-当 workflow 发生结构性变化时，同步更新：
+如果要改全局 ID：
 
-1. `RESEARCH_WORKFLOW.md` 的 workflow 定义或阶段表。
-2. `WORKFLOW_ORCHESTRATION_SPEC.md` 的路由矩阵和质量门。
-3. `.agents/skills/research-orchestrator/SKILL.md` 的执行规则。
-4. 相关下层 skill 的 `SKILL.md`、`references/`、`scripts/` 和样例资产。
-5. `docs/index.md` 与 `docs/meta/DOC_OWNERSHIP_MATRIX.md`。
+```text
+workflow_type
+global stage_id
+global gate_id
+backflow_decision
+run status enum
+```
+
+只改 `RESEARCH_WORKFLOW.md`，再让其他文件引用。
+
+如果要改单个 skill 的执行细节，改该 skill 的 `SKILL.md` 或 `references/`，不要新增 workflow doc。

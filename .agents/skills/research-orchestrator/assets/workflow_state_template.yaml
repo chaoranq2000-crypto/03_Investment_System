@@ -1,5 +1,5 @@
-workflow_id: wf_YYYYMMDD_workflow_diagnostic_object_id
-workflow_type: workflow_diagnostic
+workflow_id: wf_YYYYMMDD_stock_first_closed_loop_object_id
+workflow_type: stock_first_closed_loop
 status: planned
 created_at: YYYY-MM-DD
 updated_at: YYYY-MM-DD

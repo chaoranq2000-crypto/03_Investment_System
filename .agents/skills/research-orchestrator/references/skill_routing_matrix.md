@@ -1,6 +1,6 @@
 # Skill Routing Matrix — research-orchestrator reference
 
-> 本文件是 `research-orchestrator` 的快速路由参考。事实源仍以 `docs/workflows/RESEARCH_WORKFLOW.md` 和 `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` 为准。
+> 本文件是 `research-orchestrator` 的快速路由参考。全局 workflow facts 以 `docs/workflows/RESEARCH_WORKFLOW.md` 为准；runtime / handoff contract 以 `.agents/skills/research-orchestrator/references/orchestration_contract.md` 为准。
 
 ## 1. Routine routing
 

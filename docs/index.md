@@ -2,6 +2,9 @@
 
 本页是文档导航入口，不是工作流事实源。具体规则以对应目录下的事实源文件为准。
 
+默认导航入口是仓库根目录 `README.md` 和本文件。`docs/plans/`、`docs/logs/` 和
+`docs/codex_tasks/` 是阶段计划、执行记录和一次性任务材料，不属于默认阅读路径。
+
 ## Project
 
 - `project/PROJECT_CHARTER.md` — 项目目标、边界、路线图、暂停点。
@@ -22,11 +25,11 @@
 
 ## Workflows
 
-- `workflows/README.md` — 永久工作流文档入口。
-- `workflows/RESEARCH_WORKFLOW.md` — 总研究工作流事实源。
-- `workflows/WORKFLOW_ORCHESTRATION_SPEC.md` — `research-orchestrator` 编排、状态、handoff 和门禁。
+- `workflows/README.md` — workflow docs entry and ownership notes.
+- `workflows/RESEARCH_WORKFLOW.md` — canonical global workflow kernel: `workflow_type`, global stages, global gates, backflow, P2 readiness.
 - `workflows/DATA_LAYER_WORKFLOW.md` — 数据层发现、拉取、归档、候选化和交接。
-- `workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` — 样例级个股报告生产流程。
+- `workflows/WORKFLOW_ORCHESTRATION_SPEC.md` — compatibility pointer；runtime contract now lives in `.agents/skills/research-orchestrator/references/orchestration_contract.md`.
+- `workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` — compatibility pointer；stock report production profile now lives in `.agents/skills/stock-deep-dive/references/report_production_profile.md`.
 
 ## Reporting
 
@@ -53,40 +56,19 @@
 
 计划文件是阶段建设计划，不应覆盖永久事实源。
 
-- `plans/plan_template.md`
-- `plans/p0_acceptance_checklist.md`
-- `plans/p0_execution_plan.md`
-- `plans/p1_execution_plan.md`
-- `plans/p1_1_revision_plan.md`
-- `plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md`
-- `plans/DATA_LAYER_CODEX_EXECUTION_PLAN.md`
-- `plans/DATA_LAYER_ACCEPTANCE_CHECKLIST.md`
-- `plans/DATA_LAYER_DEV_TASK_BREAKDOWN.md`
-- `plans/DOCS_AND_AGENTS_CLEANUP_PLAN.md`
+按需进入 `docs/plans/` 查阶段建设快照；不要把其中内容当作当前 workflow kernel。
 
 ## Codex Tasks
 
 `docs/codex_tasks/` 放给 Codex 执行的阶段性任务，不是长期事实源。
 
-- `codex_tasks/TASK_01_MINERU_PDF_PIPELINE.md`
-- `codex_tasks/TASK_02_STRUCTURED_MARKET_DATA_PIPELINE.md`
-- `codex_tasks/TASK_03_CLAIM_METRIC_PROMOTION.md`
-- `codex_tasks/TASK_04_STOCK_ANALYSIS_PACK.md`
-- `codex_tasks/TASK_05_REPORT_WRITER_AND_TEMPLATE.md`
-- `codex_tasks/TASK_06_QUALITY_REVIEW_AND_BACKFLOW.md`
-- `codex_tasks/TASK_07_002837_REGRESSION_RUN.md`
+按需进入 `docs/codex_tasks/` 查一次性执行说明；完成后的事实应回到正式 docs、skills 或 reports。
 
 ## Logs
 
 日志记录阶段执行结果和历史 readout，不应覆盖当前工作流事实源。
 
-- `logs/README.md`
-- `logs/2026-07-02_p1_6_workflow_foundation_log.md`
-- `logs/2026-07-01_plan_completion_log.md`
-- `logs/2026-07-01_docs_structure_cleanup_log.md`
-- `logs/p0/2026-07-01_p0_preplanning_confirmation.md`
-- `logs/p0/2026-07-01_p0_smoke_test.md`
-- `logs/p0/2026-07-01_p0_closeout.md`
+按需进入 `docs/logs/` 查历史 readout；日志不覆盖当前事实源。
 
 ## Meta
 

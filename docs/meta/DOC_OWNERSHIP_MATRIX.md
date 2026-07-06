@@ -12,6 +12,32 @@
 6. Skill 的 `SKILL.md` 是执行契约，不是项目路线图。
 7. reporting docs 只定义个股报告质量和表达，不重新定义整个工作流。
 
+## Workflow interface ownership addendum
+
+以下接口事实只能有一个 owner。
+
+| Interface fact | Owner | Allowed elsewhere |
+|---|---|---|
+| `workflow_type` enum | `docs/workflows/RESEARCH_WORKFLOW.md` | 只引用，不复制 enum 表 |
+| Global `stage_id` and stage sequence | `docs/workflows/RESEARCH_WORKFLOW.md` | 下层 skill 可定义本地 step ID，但不得定义全局 stage |
+| Global `gate_id` enum | `docs/workflows/RESEARCH_WORKFLOW.md` | `quality-review` 可定义 checklist 和 `subcheck_id` |
+| `backflow_decision` enum | `docs/workflows/RESEARCH_WORKFLOW.md` | skills 可产出 decision，但不得重定义 enum |
+| Run status enum | `docs/workflows/RESEARCH_WORKFLOW.md` | `workflow_state_schema.md` 可引用，不另列新枚举 |
+| Orchestrator runtime contract | `.agents/skills/research-orchestrator/references/orchestration_contract.md` | `research-orchestrator/SKILL.md` 只摘要动作 |
+| Handoff packet format | `.agents/skills/research-orchestrator/references/orchestration_contract.md` | handoff 文件实例化该格式 |
+| Stock report production profile | `.agents/skills/stock-deep-dive/references/report_production_profile.md` | 使用 `profile_id`，不得作为 `workflow_type` |
+| Stock report expression and style | `docs/reporting/` 或 `stock-deep-dive/references/` | workflow docs 不复制表达指南 |
+| Quality issue schema | `.agents/skills/quality-review/SKILL.md`，后续可抽到 reference | 其他文件只消费 issue 输出 |
+
+以下模式属于漂移，除非出现在历史目录或迁移任务说明中：
+
+```text
+stock_report_production used as workflow_type
+global gate IDs beyond the canonical close gate
+full global gate table outside RESEARCH_WORKFLOW.md
+Full workflow stage table inside any SKILL.md
+```
+
 ## 职责矩阵
 
 | 文件 / 目录 | 主职责 | 不应包含 | 上位文件 |
@@ -24,11 +50,11 @@
 | `docs/architecture/RESEARCH_OBJECT_MODEL.md` | Segment / Company / Evidence / Claim / Metric 等对象模型 | 具体报告模板、阶段计划 | `AGENTS.md` |
 | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | evidence / claim / citation / freshness / conflict rules | workflow 编排细节、样例报告语言风格 | `AGENTS.md` |
 | `docs/policies/QUALITY_GUARDRAILS.md` | 质量门、反幻觉、反证、no-advice | 具体工作流执行步骤 | `AGENTS.md` |
-| `docs/workflows/RESEARCH_WORKFLOW.md` | 永久总工作流事实源 | 阶段计划、执行日志 | `AGENTS.md` |
-| `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | orchestrator 状态、路由、handoff、门禁 | 下层 skill 的全部业务细节 | `RESEARCH_WORKFLOW.md` |
+| `docs/workflows/RESEARCH_WORKFLOW.md` | 唯一 global workflow kernel：workflow_type、global stage、global gate、backflow、run status、P2 readiness | 阶段计划、执行日志、单个 skill 的内部 schema | `AGENTS.md` |
+| `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | compatibility pointer，指向 orchestrator runtime contract | workflow_type / stage / gate enum、下层 skill 的全部业务细节 | `RESEARCH_WORKFLOW.md` |
 | `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层 source adapter、manifest、candidate、data pack、quality gate | 投研结论、报告写作风格 | `RESEARCH_WORKFLOW.md` |
-| `docs/workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` | 个股报告生产流程、analysis pack、narrative、quality gate | 细分研究总流程、买卖建议 | `RESEARCH_WORKFLOW.md` |
-| `docs/reporting/` | 个股报告质量标准、证据到叙事契约、表达指南 | 编排路由、run 状态、source adapter 规则 | `STOCK_REPORT_PRODUCTION_WORKFLOW.md` |
+| `docs/workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` | compatibility pointer，指向 stock report production profile | workflow_type、全局 stage、买卖建议 | `RESEARCH_WORKFLOW.md` |
+| `docs/reporting/` | 个股报告质量标准、证据到叙事契约、表达指南 | 编排路由、run 状态、source adapter 规则 | `stock-deep-dive/references/report_production_profile.md` |
 | `docs/playbooks/` | 日常操作提示和命令入口 | 永久事实定义、阶段验收标准 | workflow docs |
 | `docs/plans/` | 建设计划和验收清单 | 当前事实源定义 | project / workflow docs |
 | `docs/codex_tasks/` | 给 Codex 的一次性任务说明 | 永久规则、当前事实源 | plans / workflow docs |
@@ -44,9 +70,10 @@
 | 对象模型 | `RESEARCH_OBJECT_MODEL.md` | workflow docs 只引用对象名称和交接资产 |
 | evidence / claim 规则 | `EVIDENCE_AND_CITATION_POLICY.md` | AGENTS 只保留纪律，quality docs 只检查 |
 | workflow 类型和阶段 | `RESEARCH_WORKFLOW.md` | playbook 只给调用示例 |
-| orchestrator run / handoff | `WORKFLOW_ORCHESTRATION_SPEC.md` | skill docs 只写本 skill 交接点 |
+| orchestrator run / handoff | `.agents/skills/research-orchestrator/references/orchestration_contract.md` | skill docs 只写本 skill 交接点 |
 | 数据下载 / source adapter | `DATA_LAYER_WORKFLOW.md` + evidence-ingest references | stock-deep-dive 不直接定义下载器 |
-| 个股报告质量标准 | `docs/reporting/` | workflow 只定义生产流程，不复制表达样式 |
+| stock report production profile | `.agents/skills/stock-deep-dive/references/report_production_profile.md` | workflow docs 只保留 compatibility pointer |
+| 个股报告质量标准 | `docs/reporting/` | workflow docs 和 profile 不复制表达样式 |
 | 阶段计划 | `docs/plans/` | README 只写当前阶段一句话 |
 
 ## 个股 skill 合并状态

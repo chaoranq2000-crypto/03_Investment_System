@@ -20,6 +20,29 @@ workflow that turns reviewed evidence and data-layer outputs into:
 The skill is evidence-first. Reports are derived artifacts, not the source of
 truth. It must preserve evidence gaps instead of smoothing them away.
 
+## Canonical workflow boundary
+
+This skill must not redefine global `workflow_type`, global `stage_id`, global
+`gate_id`, or project ownership.
+
+Use:
+
+```text
+docs/workflows/RESEARCH_WORKFLOW.md
+```
+
+for global workflow facts.
+
+Use:
+
+```text
+references/report_production_profile.md
+```
+
+for the stock report production profile.
+
+`stock_report_production` is a `profile_id`, not a `workflow_type`.
+
 ## When to use
 
 Use this skill when the user asks for:
@@ -134,6 +157,7 @@ Rules:
 Use:
 
 - `assets/stock_deep_dive_report_template.md`
+- `references/report_production_profile.md`
 - `references/report_style_guide.md`
 - `references/legacy_stock_skill_rules.md`
 
@@ -196,6 +220,7 @@ they remain visible and do not alter the report's truthfulness.
 
 Read these references before executing a stock run:
 
+- `references/report_production_profile.md`
 - `references/data_layer_pack_consumption.md`
 - `references/publishable_stock_report_gate.md`
 - `references/analysis_pack_contract.md`

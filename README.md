@@ -52,10 +52,10 @@ P1.6 不做：扩展新细分、P2 横向比较、批量扩大公司池、自动
 | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | 证据、引用、来源等级和新鲜度规则 |
 | `docs/policies/QUALITY_GUARDRAILS.md` | 质量检查、反幻觉、反证和 no-advice 纪律 |
 | `docs/workflows/README.md` | 永久工作流文档入口 |
-| `docs/workflows/RESEARCH_WORKFLOW.md` | 细分 / 个股研究总工作流事实源 |
-| `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | `research-orchestrator` 编排、run、handoff 和门禁规范 |
+| `docs/workflows/RESEARCH_WORKFLOW.md` | 唯一 global workflow kernel |
+| `.agents/skills/research-orchestrator/references/orchestration_contract.md` | `research-orchestrator` runtime、handoff 和 readout contract |
 | `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层工作流和 source adapter 边界 |
-| `docs/workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` | 样例级个股报告生产流程 |
+| `.agents/skills/stock-deep-dive/references/report_production_profile.md` | 样例级个股报告生产 profile |
 | `docs/meta/DOC_OWNERSHIP_MATRIX.md` | 文档职责边界，防止重复和冲突 |
 
 ## Skills
