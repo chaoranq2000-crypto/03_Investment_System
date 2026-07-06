@@ -24,12 +24,12 @@ P2 readiness global criteria
 
 ## 文件列表
 
-| 文件 | 定位 | 是否定义全局接口 |
-|---|---|---:|
-| `RESEARCH_WORKFLOW.md` | 全局 workflow kernel。定义 workflow 类型、阶段、交接资产、细分/个股关系、gate、P2 前置条件。 | 是 |
-| `WORKFLOW_ORCHESTRATION_SPEC.md` | `research-orchestrator` 如何分类、建 run、路由 skill、生成 handoff、调度门禁。 | 否 |
-| `DATA_LAYER_WORKFLOW.md` | 数据层如何发现、拉取、归档、标准化、候选化和交接；可定义 `DL-*` 局部检查。 | 否 |
-| `STOCK_REPORT_PRODUCTION_WORKFLOW.md` | 兼容性指针。活跃 report production profile 已迁到 `stock-deep-dive/references/`。 | 否 |
+| 文件 | 定位 | 是否全局事实源 | 上位事实源 |
+|---|---|---:|---|
+| `RESEARCH_WORKFLOW.md` | 全局 workflow kernel。定义 workflow 类型、阶段、交接资产、细分/个股关系、gate、P2 前置条件。 | 是 | - |
+| `WORKFLOW_ORCHESTRATION_SPEC.md` | `research-orchestrator` 如何分类、建 run、路由 skill、生成 handoff、调度门禁。 | 否 | `RESEARCH_WORKFLOW.md` |
+| `DATA_LAYER_WORKFLOW.md` | 数据层如何发现、拉取、归档、标准化、候选化和交接；可定义 `DL-*` 局部检查。 | 否 | `RESEARCH_WORKFLOW.md` |
+| `STOCK_REPORT_PRODUCTION_WORKFLOW.md` | 兼容性指针；实际 profile 已迁移到 `.agents/skills/stock-deep-dive/references/report_production_profile.md`。 | 否 | `RESEARCH_WORKFLOW.md` |
 
 ## 与 skills 的关系
 

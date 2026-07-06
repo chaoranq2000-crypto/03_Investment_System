@@ -26,7 +26,7 @@
 - `workflows/RESEARCH_WORKFLOW.md` — 唯一全局 workflow kernel。
 - `workflows/WORKFLOW_ORCHESTRATION_SPEC.md` — orchestrator 运行时规范，消费全局接口。
 - `workflows/DATA_LAYER_WORKFLOW.md` — 数据层发现、拉取、归档、候选化和交接。
-- `workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` — 兼容性指针；活跃 profile 已迁至 `stock-deep-dive/references/`。
+- `workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` — 兼容性指针；实际 profile 已迁移到 `.agents/skills/stock-deep-dive/references/report_production_profile.md`。
 
 ## Reporting
 
