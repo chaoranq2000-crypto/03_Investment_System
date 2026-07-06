@@ -1,8 +1,8 @@
 # A-share Research OS / A股投研工作区
 
-> 这是一个证据驱动的 A 股投研工作区，不是自动交易系统，也不直接提供买卖建议。
+> 这是一个证据驱动的 A 股投研工作区，不是自动交易系统，也不直接提供买入、卖出或持有建议。
 
-## 1. 项目定位
+## 项目定位
 
 A-share Research OS 的目标是把 A 股投研过程拆成可维护、可复用、可审查的工作流：
 
@@ -16,183 +16,82 @@ Codex Skills：标准化投研动作
 产出层：细分报告、个股深度、对比矩阵、观察清单、投资备忘录
 ```
 
-核心思想：
+核心原则：
 
 - 证据库是核心。
 - 报告是某一时点的可再生产物。
 - 细分方向和上市公司是多对多关系。
-- 投研结论必须能追溯证据。
-- 更新研究时必须输出变化。
+- 投研结论必须能追溯到 evidence / claim / metric / TODO。
+- 更新研究时必须输出变化记录。
 
----
-
-## 2. 当前阶段
+## 当前阶段
 
 当前处于 **P1.6：workflow buildout / 进入 P2 前的工作流制度化**。
 
-阶段状态：
+P1.5：pre-P2 hardening 已作为前序加固阶段完成；当前 P1.6 在此基础上固化工作流事实源和执行入口。
 
-- P0：CONDITIONAL_PASS，工作区骨架、规则、skills、配置、模板和最小质量纪律已经建立。
-- P1：CONDITIONAL_PASS_WITH_MEDIUM_TODOS，`ai_server_liquid_cooling` 已跑通证据、细分报告、公司池、个股样本、暴露映射和观察清单闭环。
-- P1.5：pre-P2 hardening 已作为前序加固阶段，重点是 registry、exposure 口径、scorecard 一致性和 CI 验收。
-- 当前焦点：固化 `docs/workflows/` 永久工作流事实源，启用 `research-orchestrator` 总编排入口，补强下层 workflow / skill 契约，并通过 segment-led、stock-led、interlock 调试后执行 P2 readiness gate。
+P1.6 的重点是：
 
-P1.6 只做：
+1. 固化 `docs/workflows/` 永久工作流事实源。
+2. 启用 `research-orchestrator` 作为总编排入口。
+3. 补强 evidence ingest、stock deep dive、mapping、quality review 等下层契约。
+4. 通过 stock-led、segment-led、segment-stock interlock 调试。
+5. 执行 P2 readiness gate，只判断是否进入 limited P2 pilot。
 
-- 建立和维护 `docs/workflows/` 永久工作流事实源。
-- 让 `research-orchestrator` 能分类 workflow、创建或更新 workflow run、路由下层 skills、生成 handoff 和 readout。
-- 逐个补强 `evidence-ingest`、`segment-research`、`company-universe`、`segment-company-mapping`、`stock-deep-dive`、`quality-review` 等下层 workflow 契约。
-- 做 segment-led、stock-led、segment-stock interlock 三类调试。
-- 执行 P2 readiness gate，只判断是否进入 limited P2 pilot。
-- 明确剩余 TODO，不把缺口伪装成已解决。
+P1.6 不做：扩展新细分、P2 横向比较、批量扩大公司池、自动交易、实时行情监控或买卖建议生成。
 
-P1.6 不做：
-
-- 扩展新细分。
-- 新增 P2 comparison 报告。
-- 批量扩大公司池。
-- 自动估值模型。
-- 实时行情监控。
-- 自动交易。
-- 买卖建议生成。
-
----
-
-## 3. 阶段路线图
-
-| 阶段 | 目标 | 关键词 | 暂停点 |
-|---|---|---|---|
-| P0 | 搭骨架 | `AGENTS.md`、目录、模板、配置、skills 空壳 | Codex 能理解项目规则和文件位置 |
-| P1 | 跑通一个闭环 | 一个细分 → 公司池 → 1-2 个个股 → 评分 → 观察清单 | 关键结论可追溯证据 |
-| P2 | 做比较 | 多个细分、多个个股横向比较 | 形成 watchlist 和 research_queue |
-| P3 | 做维护 | 新证据驱动旧结论更新 | 输出 refresh log、stale claims、postmortem |
-
----
-
-## 4. Documentation
-
-文档总入口：[`docs/index.md`](docs/index.md)
+## 文档入口
 
 | 文件 | 用途 |
 |---|---|
 | `AGENTS.md` | Codex 项目级长期规则和投研纪律 |
-| [`docs/project/PROJECT_CHARTER.md`](docs/project/PROJECT_CHARTER.md) | 项目目标、范围、非目标、路线图和暂停点 |
-| [`docs/architecture/WORKSPACE_STRUCTURE.md`](docs/architecture/WORKSPACE_STRUCTURE.md) | 目录结构、文件归位、命名规则 |
-| [`docs/policies/QUALITY_GUARDRAILS.md`](docs/policies/QUALITY_GUARDRAILS.md) | 质量检查、反幻觉、反证、风险纪律 |
-| [`docs/workflows/README.md`](docs/workflows/README.md) | 永久工作流文档入口 |
-| [`docs/workflows/RESEARCH_WORKFLOW.md`](docs/workflows/RESEARCH_WORKFLOW.md) | 细分/个股研究永久总工作流事实源 |
-| [`docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md`](docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md) | `research-orchestrator` 编排、workflow run、handoff 和门禁规范 |
-| [`docs/playbooks/OPERATING_PLAYBOOK.md`](docs/playbooks/OPERATING_PLAYBOOK.md) | 常用命令索引和快速入口；不是工作流事实源 |
-| [`docs/plans/p0_acceptance_checklist.md`](docs/plans/p0_acceptance_checklist.md) | P0 验收清单 |
-| [`docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md`](docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md) | P1.6 阶段建设计划 |
+| `docs/index.md` | 文档总索引 |
+| `docs/project/PROJECT_CHARTER.md` | 项目目标、边界、路线图和暂停点 |
+| `docs/architecture/WORKSPACE_STRUCTURE.md` | 目录结构、文件归位和命名规则 |
+| `docs/architecture/RESEARCH_OBJECT_MODEL.md` | Segment、Company、Evidence、Claim、Metric 等对象模型 |
+| `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | 证据、引用、来源等级和新鲜度规则 |
+| `docs/policies/QUALITY_GUARDRAILS.md` | 质量检查、反幻觉、反证和 no-advice 纪律 |
+| `docs/workflows/README.md` | 永久工作流文档入口 |
+| `docs/workflows/RESEARCH_WORKFLOW.md` | 细分 / 个股研究总工作流事实源 |
+| `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | `research-orchestrator` 编排、run、handoff 和门禁规范 |
+| `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层工作流和 source adapter 边界 |
+| `docs/workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` | 样例级个股报告生产流程 |
+| `docs/meta/DOC_OWNERSHIP_MATRIX.md` | 文档职责边界，防止重复和冲突 |
 
----
+## Skills
 
-## 5. 推荐目录结构
-
-```text
-a-share-research-os/
-├── AGENTS.md
-├── README.md
-├── pyproject.toml
-├── .env.example
-├── .gitignore
-│
-├── .codex/
-│   └── config.toml
-├── .agents/
-│   └── skills/
-├── docs/
-│   ├── index.md
-│   ├── project/
-│   ├── architecture/
-│   ├── policies/
-│   ├── workflows/
-│   ├── playbooks/
-│   ├── plans/
-│   ├── logs/
-│   └── meta/
-├── config/
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   ├── db/
-│   └── manifests/
-├── src/
-├── notebooks/
-├── templates/
-├── reports/
-├── decisions/
-└── tests/
-```
-
----
-
-## 6. Skills 规划
-
-Skills 是可复用的投研动作。P1.6 以后，`research-orchestrator` 作为总编排入口，下层 skills 执行具体研究动作。
-
-| Skill | 投研动作 |
-|---|---|
-| `research-orchestrator` | 识别 workflow 类型、创建/更新 workflow run、路由下层 skills、生成 handoff、检查门禁、输出 readout |
-| `evidence-ingest` | 证据导入、归档、解析、登记 |
-| `segment-research` | 细分方向研究 |
-| `company-universe` | 从细分寻找 A 股公司池 |
-| `segment-company-mapping` | 维护细分和公司的多对多暴露关系 |
-| `stock-deep-dive` | 个股深度研究 |
-| `compare-segments` | 多个细分横向比较 |
-| `compare-stocks` | 多个个股横向比较 |
-| `refresh-research` | 更新已有研究，输出变化日志 |
-| `quality-review` | 证据、口径、反证、过期结论检查 |
-| `memo-writer` | 生成投资备忘录、观察清单或 thesis note |
-
----
-
-## 7. 最小使用方式
-
-### 7.1 细分研究
+P1.6 后，`research-orchestrator` 是总编排入口，下层 skills 执行具体研究动作：
 
 ```text
-$segment-research 调研“AI服务器液冷”，深度=standard。
-要求：明确细分边界、产业链位置、A股公司池、关键指标、风险与反证，关键结论引用 evidence_id。
+research-orchestrator
+evidence-ingest
+segment-research
+company-universe
+segment-company-mapping
+stock-deep-dive
+quality-review
+refresh-research
+compare-segments
+compare-stocks
+memo-writer
 ```
 
-### 7.2 个股深度
+如果存在未启用或待合并的旧 skill 目录，应先按 `.codex/config.toml` 和 `docs/meta/DOC_OWNERSHIP_MATRIX.md` 判断是否仍可路由；不要让历史 skill 覆盖当前主工作流。
+
+## 最小使用方式
 
 ```text
-$stock-deep-dive 调研 300xxx，关联细分包括 AI服务器液冷、数据中心电源。
-要求：输出业务拆分、细分暴露、财务质量、估值场景、反证清单和 evidence_map。
+$research-orchestrator 启动个股优先闭环：002837 英维克。
+目标：消费 evidence-ingest 产物，输出 stock package、segment_exposure、quality gate 和 close readout。
 ```
-
-### 7.3 横向比较
 
 ```text
-$compare-segments 对比 AI服务器液冷、CPO、先进封装、机器人丝杠。
-按市场空间、增速、A股纯度、业绩兑现度、估值拥挤度、催化剂和风险排序。
+$research-orchestrator 启动细分到个股闭环：AI服务器液冷。
+目标：输出 segment package、company_universe、exposure mapping、stock sample 和 quality readout。
 ```
 
-### 7.4 更新维护
+## 研究边界
 
-```text
-$refresh-research 更新 watchlist 中的细分和个股。
-只输出变化，不要重写所有报告；标记 stale、superseded、contradicted claims。
-```
+本项目可以输出研究框架、证据地图、风险清单、评分卡、观察清单、情景假设和 refresh log。
 
----
-
-## 8. P0 完成标准
-
-P0 完成后，应能回答：
-
-1. Codex 进入项目后是否知道这是 A 股投研工作区？
-2. 原始证据应该放在哪里？
-3. 处理后的文本和表格应该放在哪里？
-4. 细分报告、个股报告、对比报告应该放在哪里？
-5. 投资假设、观察清单、复盘应该放在哪里？
-6. 一个细分如何命名？
-7. 一个公司如何映射到多个细分？
-8. 每个 skill 什么时候该用，什么时候不该用？
-9. 报告模板是否要求 `evidence_id` 或 `claim_id`？
-10. 是否有最小质量检查规则？
-
-只要这些问题可以清楚回答，P0 就应该暂停，进入 P1，而不是继续加复杂功能。
+本项目不输出直接买卖建议、仓位建议、保证收益判断或自动交易指令。

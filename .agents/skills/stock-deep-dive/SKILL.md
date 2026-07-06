@@ -20,7 +20,7 @@ workflow that turns reviewed evidence and data-layer outputs into:
 The skill is evidence-first. Reports are derived artifacts, not the source of
 truth. It must preserve evidence gaps instead of smoothing them away.
 
-## Use when
+## When to use
 
 Use this skill when the user asks for:
 
@@ -30,7 +30,13 @@ Use this skill when the user asks for:
 - `linked_segments`, `segment_exposure`, or stock-to-segment backflow.
 - A stock report draft based on already registered evidence and metrics.
 
-## Do not use when
+## Responsibilities
+
+This skill is responsible for turning reviewed evidence, reviewed metrics, and
+data-layer context into a stock analysis pack, report draft, segment exposure
+update, backflow decision, and quality-review handoff.
+
+## Out of scope
 
 Do not use this skill for:
 
@@ -40,6 +46,15 @@ Do not use this skill for:
 - Claim promotion without quality-review.
 - Scorecard/watchlist output as a trading signal.
 - Any buy/sell/hold/rating instruction, position sizing, or direct trading action.
+
+## Guardrails
+
+- Preserve evidence gaps instead of converting them into assertions.
+- Keep facts, estimates, inferences, management comments, analyst views, and
+  opinions separate.
+- Do not promote structured API data into business exposure proof without
+  supporting official disclosure.
+- Do not create direct trading instructions.
 
 ## Inputs
 
@@ -120,6 +135,7 @@ Use:
 
 - `assets/stock_deep_dive_report_template.md`
 - `references/report_style_guide.md`
+- `references/legacy_stock_skill_rules.md`
 
 Produce an R4 / stock deep dive draft from `stock_analysis_pack.yaml`.
 
@@ -187,6 +203,7 @@ Read these references before executing a stock run:
 - `references/forecast_valuation_contract.md`
 - `references/market_sentiment_event_contract.md`
 - `references/report_style_guide.md`
+- `references/legacy_stock_skill_rules.md`
 
 ## Outputs
 
@@ -215,7 +232,7 @@ reports/stocks/<stock_code>_<company_name>/segment_exposure.yaml
 reports/stocks/<stock_code>_<company_name>/evidence_map.md
 ```
 
-## Acceptance checklist
+## Quality checklist
 
 Before closing a run, confirm:
 

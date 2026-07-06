@@ -28,6 +28,7 @@ def main() -> int:
         SDD / "references" / "forecast_valuation_contract.md",
         SDD / "references" / "market_sentiment_event_contract.md",
         SDD / "references" / "report_style_guide.md",
+        SDD / "references" / "legacy_stock_skill_rules.md",
         SDD / "assets" / "stock_analysis_pack_template.yaml",
         SDD / "assets" / "stock_deep_dive_report_template.md",
     ]
@@ -55,6 +56,7 @@ def main() -> int:
             "stock_analysis_pack",
             "segment_exposure",
             "backflow_decision",
+            "legacy_stock_skill_rules.md",
             "publishable_ready_with_disclosure_todos",
             "MISSING_DISCLOSURE",
             "no buy/sell/hold",
@@ -65,6 +67,26 @@ def main() -> int:
         for phrase in required_phrases:
             if phrase not in skill:
                 fail(f"required phrase missing from stock-deep-dive/SKILL.md: {phrase}", errors)
+
+    legacy_rules_path = SDD / "references" / "legacy_stock_skill_rules.md"
+    if legacy_rules_path.exists():
+        legacy_rules = legacy_rules_path.read_text(encoding="utf-8")
+        for phrase in [
+            "Report drafting translates",
+            "not_needed",
+            "Separate active routing",
+            "quality-review",
+        ]:
+            if phrase not in legacy_rules:
+                fail(f"required migrated-rule phrase missing: {phrase}", errors)
+
+    snippet_path = ROOT / ".codex" / "config.stock_report_quality_upgrade.snippet.toml"
+    if snippet_path.exists():
+        snippet = snippet_path.read_text(encoding="utf-8")
+        if "[[skills.config]]" in snippet:
+            fail("deprecated stock report quality snippet still contains skills.config blocks", errors)
+        if "Deprecated" not in snippet:
+            fail("stock report quality snippet is not marked deprecated", errors)
 
     active_docs = [
         ROOT / "README.md",

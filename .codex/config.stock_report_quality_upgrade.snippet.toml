@@ -1,9 +1,8 @@
-# Add after existing skills.config entries when ready.
-
-[[skills.config]]
-path = ".agents/skills/stock-research-analyst"
-enabled = true
-
-[[skills.config]]
-path = ".agents/skills/stock-report-writer"
-enabled = true
+# Deprecated by OLD_STOCK_SKILL_CLEANUP on 2026-07-06.
+#
+# Do not append this file to .codex/config.toml.
+# The former stock-research-analyst and stock-report-writer split workflow has
+# been merged into .agents/skills/stock-deep-dive.
+#
+# Kept as a compatibility note only. It intentionally contains no skill
+# configuration blocks.

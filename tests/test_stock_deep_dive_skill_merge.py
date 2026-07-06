@@ -22,6 +22,7 @@ def test_merged_references_and_assets_exist():
         SDD / "references" / "forecast_valuation_contract.md",
         SDD / "references" / "market_sentiment_event_contract.md",
         SDD / "references" / "report_style_guide.md",
+        SDD / "references" / "legacy_stock_skill_rules.md",
         SDD / "assets" / "stock_analysis_pack_template.yaml",
         SDD / "assets" / "stock_deep_dive_report_template.md",
     ]
@@ -34,6 +35,12 @@ def test_config_uses_only_stock_deep_dive_for_stock_skill():
     assert ".agents/skills/stock-deep-dive" in config
     for name in OLD_SKILL_NAMES:
         assert name not in config
+
+
+def test_stock_report_quality_upgrade_snippet_is_retired():
+    snippet = read(ROOT / ".codex" / "config.stock_report_quality_upgrade.snippet.toml")
+    assert "Deprecated" in snippet
+    assert "[[skills.config]]" not in snippet
 
 
 def test_active_routing_docs_do_not_reference_legacy_stock_skills():
@@ -57,6 +64,15 @@ def test_stock_deep_dive_keeps_no_advice_boundary():
     assert "no buy/sell/hold" in text
     assert "position sizing" in text
     assert "direct trading instruction" in text
+    assert "legacy_stock_skill_rules.md" in text
+
+
+def test_legacy_stock_skill_rules_are_migrated_not_routed():
+    text = read(SDD / "references" / "legacy_stock_skill_rules.md")
+    assert "Report drafting translates" in text
+    assert "not_needed" in text
+    assert "Separate active routing" in text
+    assert "quality-review" in text
 
 
 def test_revenue_and_profit_exposure_require_missing_disclosure_without_source():

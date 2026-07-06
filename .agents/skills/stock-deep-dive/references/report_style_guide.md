@@ -1,5 +1,23 @@
 # Sample Style Guide for Stock Report Writer
 
+## 0. Writer Boundary
+
+Use this guide inside SDD-3 Report drafting. The drafting stage translates
+`stock_analysis_pack.yaml` and approved component files into narrative.
+
+It must not:
+
+```text
+- Discover facts outside the analysis pack.
+- Fill missing business, financial, customer, order, forecast or valuation
+  fields with guesses.
+- Hide TODO, MISSING, LOW_CONFIDENCE or UNVERIFIED labels.
+- Turn valuation, technical or sentiment observations into trading actions.
+```
+
+When a needed input is absent, write a visible gap request instead of a smooth
+unsupported sentence.
+
 ## 1. What to emulate
 
 Emulate these qualities:
