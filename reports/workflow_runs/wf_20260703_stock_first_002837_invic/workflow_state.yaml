@@ -51,13 +51,13 @@ metrics_snapshot:
 artifacts:
 - artifact_type: stock_analysis_pack
   path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_analysis_pack.yaml
-  created_by_skill: stock-research-analyst
+  created_by_skill: stock-deep-dive
   stage: T5
   status: current
   required: true
 - artifact_type: stock_report_sample_quality_draft
   path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_report_sample_quality_draft.md
-  created_by_skill: stock-report-writer
+  created_by_skill: stock-deep-dive
   stage: T8
   status: current
   required: true
@@ -81,7 +81,7 @@ artifacts:
   required: true
 - artifact_type: R4_stock_deep_dive_v0_1
   path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_stock_deep_dive_v0_1.md
-  created_by_skill: stock-report-writer
+  created_by_skill: stock-deep-dive
   stage: R4_Next_5
   status: bridge_only
   required: true

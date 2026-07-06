@@ -76,7 +76,7 @@ compare-stocks
 memo-writer
 ```
 
-如果存在未启用或待合并的旧 skill 目录，应先按 `.codex/config.toml` 和 `docs/meta/DOC_OWNERSHIP_MATRIX.md` 判断是否仍可路由；不要让历史 skill 覆盖当前主工作流。
+个股深度研究统一使用 `stock-deep-dive`；如出现新的 `stock-*` 技能目录，应先按 `.codex/config.toml` 和 `docs/meta/DOC_OWNERSHIP_MATRIX.md` 判断是否属于当前主工作流。
 
 ## 最小使用方式
 

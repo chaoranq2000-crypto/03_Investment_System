@@ -49,23 +49,23 @@
 | 个股报告质量标准 | `docs/reporting/` | workflow 只定义生产流程，不复制表达样式 |
 | 阶段计划 | `docs/plans/` | README 只写当前阶段一句话 |
 
-## 旧 skill 名称处理
+## 个股 skill 合并状态
 
-`stock-research-analyst` 和 `stock-report-writer` 是历史拆分式个股工作流名称。如果目录仍存在但 `.codex/config.toml` 未启用，默认处理为：
+个股分析包构建和报告写作已经统一合并到 `stock-deep-dive`。如果发现拆分式个股 skill 目录或路由，默认处理为：
 
 ```text
-status: retired_after_merge_review
+status: merged_into_stock_deep_dive
 routing_allowed: false
 replacement: stock-deep-dive
 ```
 
-后续可由 Codex 单独执行 skill cleanup：
+后续可由 Codex 单独执行合并一致性检查：
 
 1. 搜索所有引用。
 2. 将有效内容并入 `stock-deep-dive/references/`。
 3. 更新 workflow 文档。
-4. 删除或归档旧目录。
-5. 确认 `.codex/config.toml` 不启用旧 skill。
+4. 逐一处理不再需要的目录或文件，禁止批量删除。
+5. 确认 `.codex/config.toml` 只启用 `stock-deep-dive` 作为个股深度入口。
 
 ## Markdown 格式纪律
 

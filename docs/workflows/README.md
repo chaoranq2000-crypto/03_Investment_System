@@ -56,9 +56,9 @@ docs/workflows/RESEARCH_WORKFLOW.md
 
 `research-orchestrator` 不是万能研究员。它只负责编排、状态、路由、门禁和 readout；具体研究动作必须交给下层 skills。
 
-## 旧 skill 名称处理
+## 个股 skill 合并状态
 
-如果历史文档或目录中出现 `stock-research-analyst`、`stock-report-writer` 等拆分式个股技能名称，默认视为已合并到 `stock-deep-dive` 的待归档参考。
+个股分析包构建和报告写作已经统一合并到 `stock-deep-dive`。当前 workflow 文档、路由矩阵、config 和 handoff 都不应再引用拆分式个股技能名称。
 
 当前主路径应优先使用：
 
@@ -71,7 +71,7 @@ research-orchestrator
 → research-orchestrator close readout
 ```
 
-只有当 `.codex/config.toml` 明确启用某个旧 skill，并且当前 workflow 文档仍引用它时，才允许路由到该 skill。
+如果发现新的拆分式个股技能名称，应先合并有效规则到 `stock-deep-dive/references/`，再更新对应 workflow 文档和验收检查。
 
 ## 版本纪律
 

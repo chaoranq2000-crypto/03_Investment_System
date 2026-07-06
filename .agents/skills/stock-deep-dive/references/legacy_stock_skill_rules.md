@@ -1,12 +1,12 @@
-# Legacy Stock Skill Rules Migrated Into Stock Deep Dive
+# Stock Deep Dive Migrated Rules
 
 ## Purpose
 
-This file carries forward the useful rules from the retired
-`stock-research-analyst` and `stock-report-writer` split workflow.
+This file carries forward the useful rules from the previously split stock
+analysis and report drafting workflow.
 
 It is a `stock-deep-dive` reference, not a routing entry. Do not call or revive
-the old skills as defaults. The active stock path remains:
+split stock skills as defaults. The active stock path remains:
 
 ```text
 research-orchestrator
@@ -74,12 +74,12 @@ The former writer layer is now SDD-3 Report drafting.
 Mark duplicated old rules as `not_needed_duplicate` in cleanup readouts rather
 than copying the same rule into multiple references.
 
-These old split-workflow ideas are intentionally not retained:
+These split-workflow ideas are intentionally not retained:
 
-- Separate active routing to `stock-research-analyst`.
-- Separate active routing to `stock-report-writer`.
+- Separate active routing for analysis-pack construction.
+- Separate active routing for report drafting.
 - A handoff that lets a writer consume raw evidence or unreviewed sources.
-- Any `.codex` snippet that enables old stock skills by default.
+- Any `.codex` snippet that enables split stock skills by default.
 - Any rule that lets report polish override evidence gaps, claim type labels,
   missing disclosure, risk, counter-evidence, or no-advice gates.
 

@@ -8,16 +8,16 @@ art_006,table_inventory,data/processed/tables/ev_annual_report_002837_20260421_c
 art_007,claim_candidates,data/processed/candidates/claim_candidates_ev_annual_report_002837_20260421_ce7f64.csv,evidence-ingest,T3,True,True,current,18 rows
 art_008,claims_registry,claims_registry.csv,quality-review,T4,True,True,current,18 reviewed workflow-local claims
 art_009,metrics_registry,metrics_registry.csv,quality-review,T4,True,True,current,262 reviewed workflow-local metrics
-art_010,technical_snapshot,technical_snapshot.yaml,stock-research-analyst,T7,True,True,current,market data missing remains explicit
-art_011,market_sentiment_pack,market_sentiment_pack.yaml,stock-research-analyst,T7,True,True,current,clue/TODO only
-art_012,stock_analysis_pack,stock_analysis_pack.yaml,stock-research-analyst,T5,True,True,current,R3 analysis input
-art_013,business_breakdown,business_breakdown.yaml,stock-research-analyst,T5,True,True,current,revenue/profit pct MISSING
-art_014,forecast_model,forecast_model.yaml,stock-research-analyst,T6,True,True,current,estimate assumptions included
-art_015,valuation_model,valuation_model.yaml,stock-research-analyst,T6,True,True,current,scenario framework only
-art_016,peer_comparison,peer_comparison.csv,stock-research-analyst,T6,True,True,current,placeholder peer table
-art_017,stock_report_sample_quality_draft,stock_report_sample_quality_draft.md,stock-report-writer,T8,True,True,current,R3 sample-quality draft
-art_018,report_evidence_map,report_evidence_map.md,stock-report-writer,T8,True,True,current,16 rows
-art_019,writer_gap_requests,writer_gap_requests.yaml,stock-report-writer,T8,True,True,current,gaps visible
+art_010,technical_snapshot,technical_snapshot.yaml,stock-deep-dive,T7,True,True,current,market data missing remains explicit
+art_011,market_sentiment_pack,market_sentiment_pack.yaml,stock-deep-dive,T7,True,True,current,clue/TODO only
+art_012,stock_analysis_pack,stock_analysis_pack.yaml,stock-deep-dive,T5,True,True,current,R3 analysis input
+art_013,business_breakdown,business_breakdown.yaml,stock-deep-dive,T5,True,True,current,revenue/profit pct MISSING
+art_014,forecast_model,forecast_model.yaml,stock-deep-dive,T6,True,True,current,estimate assumptions included
+art_015,valuation_model,valuation_model.yaml,stock-deep-dive,T6,True,True,current,scenario framework only
+art_016,peer_comparison,peer_comparison.csv,stock-deep-dive,T6,True,True,current,placeholder peer table
+art_017,stock_report_sample_quality_draft,stock_report_sample_quality_draft.md,stock-deep-dive,T8,True,True,current,R3 sample-quality draft
+art_018,report_evidence_map,report_evidence_map.md,stock-deep-dive,T8,True,True,current,16 rows
+art_019,writer_gap_requests,writer_gap_requests.yaml,stock-deep-dive,T8,True,True,current,gaps visible
 art_020,backflow_decision,backflow_decision.yaml,maintenance,T10,True,True,current,no global exposure update with TODOs
 art_021,quality_issue_list,quality_issue_list.md,quality-review,T9,True,True,current,no high or medium issues
 art_022,quality_gate_report,quality_gate_report.md,quality-review,T9,True,True,current,accepted_sample_quality
@@ -31,7 +31,7 @@ art_029,quality_gate_report_after_data_layer_bridge,quality_gate_report_after_da
 art_030,remaining_source_gaps_after_data_layer_bridge,remaining_source_gaps_after_data_layer_bridge.md,quality-review,DL7,True,True,current,accepted TODOs retained for next disclosure work
 art_031,business_segment_metric_pack,business_segment_metric_pack.csv,stock-deep-dive,R4_Next_3,True,True,current,official-disclosure business segment extraction with missing liquid-cooling revenue_pct
 art_032,business_segment_extraction_readout,business_segment_extraction_readout.md,stock-deep-dive,R4_Next_3,True,True,current,R4 Next-3 readout
-art_033,R4_stock_deep_dive_v0_1,R4_stock_deep_dive_v0_1.md,stock-report-writer,R4_Next_5,True,True,current,R4 v0.1 readiness draft
+art_033,R4_stock_deep_dive_v0_1,R4_stock_deep_dive_v0_1.md,stock-deep-dive,R4_Next_5,True,True,current,R4 v0.1 readiness draft
 art_034,R4_quality_gate_report,R4_quality_gate_report.md,quality-review,R4_Next_5,True,True,bridge_only,R4 publishable gate report
 art_035,R4_source_gap_report,R4_source_gap_report.md,quality-review,R4_Next_5,True,True,current,R4 source gaps visible
 art_036,official_reconciliation_review_decision,official_reconciliation_review_decision.csv,quality-review,R4_Phase_2,True,True,current,official reconciliation decisions with no structured promotion

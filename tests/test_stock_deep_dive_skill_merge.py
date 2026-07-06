@@ -3,16 +3,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS = ROOT / ".agents" / "skills"
 SDD = SKILLS / "stock-deep-dive"
-OLD_SKILL_NAMES = ["stock-" + "research-analyst", "stock-" + "report-writer", "stock-" + "report-write"]
+ACTIVE_STOCK_SKILL = "stock-deep-dive"
+SPLIT_STOCK_SKILL_FRAGMENTS = [
+    "research" + "-" + "analyst",
+    "report" + "-" + "writer",
+    "report" + "-" + "write",
+]
 
 
 def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def test_legacy_skill_directories_removed():
-    for name in OLD_SKILL_NAMES:
-        assert not (SKILLS / name).exists()
+def test_only_stock_deep_dive_stock_skill_directory_exists():
+    stock_skill_dirs = sorted(
+        path.name for path in SKILLS.glob("stock-*") if path.is_dir()
+    )
+    assert stock_skill_dirs == [ACTIVE_STOCK_SKILL]
 
 
 def test_merged_references_and_assets_exist():
@@ -33,8 +40,13 @@ def test_merged_references_and_assets_exist():
 def test_config_uses_only_stock_deep_dive_for_stock_skill():
     config = read(ROOT / ".codex" / "config.toml")
     assert ".agents/skills/stock-deep-dive" in config
-    for name in OLD_SKILL_NAMES:
-        assert name not in config
+    stock_skill_paths = [
+        line.split("=", 1)[1].strip().strip('"')
+        for line in config.splitlines()
+        if line.strip().startswith("path")
+        and ".agents/skills/stock-" in line
+    ]
+    assert stock_skill_paths == [".agents/skills/stock-deep-dive"]
 
 
 def test_stock_report_quality_upgrade_snippet_is_retired():
@@ -55,8 +67,9 @@ def test_active_routing_docs_do_not_reference_legacy_stock_skills():
         if not path.exists():
             continue
         text = read(path)
-        for name in OLD_SKILL_NAMES:
-            assert name not in text, f"{name} remains in {path}"
+        assert "stock-deep-dive" in text or path.name == "README.md"
+        for phrase in SPLIT_STOCK_SKILL_FRAGMENTS:
+            assert phrase not in text, f"split stock skill name remains in {path}"
 
 
 def test_stock_deep_dive_keeps_no_advice_boundary():

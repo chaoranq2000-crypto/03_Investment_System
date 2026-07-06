@@ -1,8 +1,8 @@
-# Deprecated by OLD_STOCK_SKILL_CLEANUP on 2026-07-06.
+# Deprecated by stock-deep-dive consolidation on 2026-07-06.
 #
 # Do not append this file to .codex/config.toml.
-# The former stock-research-analyst and stock-report-writer split workflow has
-# been merged into .agents/skills/stock-deep-dive.
+# The split stock analysis/reporting workflow has been merged into
+# .agents/skills/stock-deep-dive.
 #
 # Kept as a compatibility note only. It intentionally contains no skill
 # configuration blocks.

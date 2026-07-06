@@ -8,7 +8,12 @@ import sys
 ROOT = Path(__file__).resolve().parents[4]
 SKILLS = ROOT / ".agents" / "skills"
 SDD = SKILLS / "stock-deep-dive"
-OLD_SKILL_NAMES = ["stock-" + "research-analyst", "stock-" + "report-writer", "stock-" + "report-write"]
+ACTIVE_STOCK_SKILL = "stock-deep-dive"
+SPLIT_STOCK_SKILL_FRAGMENTS = [
+    "research" + "-" + "analyst",
+    "report" + "-" + "writer",
+    "report" + "-" + "write",
+]
 
 
 def fail(message: str, errors: list[str]) -> None:
@@ -18,9 +23,15 @@ def fail(message: str, errors: list[str]) -> None:
 def main() -> int:
     errors: list[str] = []
 
-    for name in OLD_SKILL_NAMES:
-        if (SKILLS / name).exists():
-            fail(f"legacy skill directory still exists: {SKILLS / name}", errors)
+    stock_skill_dirs = sorted(
+        path.name for path in SKILLS.glob("stock-*") if path.is_dir()
+    )
+    if stock_skill_dirs != [ACTIVE_STOCK_SKILL]:
+        fail(
+            "unexpected stock skill directories under .agents/skills: "
+            + ", ".join(stock_skill_dirs),
+            errors,
+        )
 
     required_paths = [
         SDD / "references" / "analysis_pack_contract.md",
@@ -39,9 +50,18 @@ def main() -> int:
     config_path = ROOT / ".codex" / "config.toml"
     if config_path.exists():
         config = config_path.read_text(encoding="utf-8")
-        for name in OLD_SKILL_NAMES:
-            if name in config:
-                fail(f"legacy skill name remains in .codex/config.toml: {name}", errors)
+        stock_skill_paths = [
+            line.split("=", 1)[1].strip().strip('"')
+            for line in config.splitlines()
+            if line.strip().startswith("path")
+            and ".agents/skills/stock-" in line
+        ]
+        if stock_skill_paths != [".agents/skills/stock-deep-dive"]:
+            fail(
+                "unexpected stock skill paths in .codex/config.toml: "
+                + ", ".join(stock_skill_paths),
+                errors,
+            )
         if ".agents/skills/stock-deep-dive" not in config:
             fail("stock-deep-dive path is not present in .codex/config.toml", errors)
     else:
@@ -99,9 +119,9 @@ def main() -> int:
         if not path.exists():
             continue
         text = path.read_text(encoding="utf-8")
-        for name in OLD_SKILL_NAMES:
-            if name in text:
-                fail(f"legacy skill name remains in active doc {path}: {name}", errors)
+        for phrase in SPLIT_STOCK_SKILL_FRAGMENTS:
+            if phrase in text:
+                fail(f"split stock skill name remains in active doc {path}: {phrase}", errors)
 
     if errors:
         print("stock-deep-dive merge validation FAILED")

@@ -17,7 +17,7 @@ research-orchestrator
 → research-orchestrator close readout
 ```
 
-历史拆分名称 `stock-research-analyst` 和 `stock-report-writer` 如仍存在，默认视为已合并到 `stock-deep-dive` 的待归档参考，不应作为默认路由入口。
+个股分析包构建和报告写作已合并到 `stock-deep-dive`，不再保留拆分式个股 skill 路由。
 
 ## Workflow metadata
 
