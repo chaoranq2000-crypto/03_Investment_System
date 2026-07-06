@@ -1,33 +1,35 @@
-# Stock Report Production Workflow — compatibility pointer
+# Stock Report Production Workflow — Compatibility Pointer
 
-This file is kept only for backward-compatible links.
+本文件仅为兼容性指针。个股报告生产细节已迁移到 `stock-deep-dive` 的 skill reference：
 
-`stock_report_production` is not a permanent `workflow_type`.
-
-It is a local stock-deep-dive profile:
-
-```yaml
-profile_id: stock_report_production
-parent_workflow_type: stock_first_closed_loop
+```text
+.agents/skills/stock-deep-dive/references/report_production_profile.md
 ```
 
-## Canonical sources
+当前定位：
 
-Use these sources instead:
+```yaml
+status: migrated_to_skill_profile
+profile_id: stock_report_production
+parent_workflow_type: stock_first_closed_loop
+active_owner: stock-deep-dive
+```
+
+不要把 `stock_report_production` 作为平级 workflow 使用。
+
+全局 workflow type、stage 和 gate 以以下文件为准：
 
 ```text
 docs/workflows/RESEARCH_WORKFLOW.md
-    Global `stock_first_closed_loop` workflow, stages, gates, and backflow decisions.
-
-.agents/skills/stock-deep-dive/references/report_production_profile.md
-    Stock report production profile, report quality target, local T0-T11 production steps.
-
-.agents/skills/stock-deep-dive/SKILL.md
-    Execution contract for stock deep dive.
 ```
 
-## Rule
+当前主路径仍是：
 
-This file must not define the old stock-report-production value as a `workflow_type`.
-
-If stock report production details change, update the stock-deep-dive reference profile rather than adding another workflow doc.
+```text
+research-orchestrator
+→ evidence-ingest
+→ stock-deep-dive
+→ segment-company-mapping
+→ quality-review
+→ research-orchestrator close readout
+```

@@ -1,68 +1,96 @@
-# Workflows — 永久工作流文档入口
+# Workflows — 工作流文档入口
 
-`docs/workflows/` 只承载系统级 workflow 事实。
+`docs/workflows/` 说明 A-share Research OS 在日常研究中如何运转。它不是阶段计划目录，也不是某次执行日志目录。
 
-它不承载单个 skill 的完整执行契约，也不维护历史计划、执行日志或样例报告正文。
+## Canonical boundary
 
-## Canonical workflow kernel
-
-| 文件 | 定位 | 是否定义 global workflow facts |
-|---|---|---:|
-| `RESEARCH_WORKFLOW.md` | 唯一全局 workflow kernel；定义 `workflow_type`、全局阶段、全局 `gate_id`、回写决策、P2 前置条件 | 是 |
-| `DATA_LAYER_WORKFLOW.md` | 数据层 workflow；定义 source adapter、archive、manifest、candidate、data pack 与 evidence-ingest 的边界 | 只定义 data-layer 事实 |
-
-## Compatibility pointers
-
-以下文件为兼容旧链接或迁移说明，不再定义新的 workflow facts：
-
-| 文件 | 新事实源 |
-|---|---|
-| `WORKFLOW_ORCHESTRATION_SPEC.md` | `.agents/skills/research-orchestrator/references/orchestration_contract.md` for runtime contract；`RESEARCH_WORKFLOW.md` for global IDs |
-| `STOCK_REPORT_PRODUCTION_WORKFLOW.md` | `.agents/skills/stock-deep-dive/references/report_production_profile.md` for stock report production profile；`RESEARCH_WORKFLOW.md` for `stock_first_closed_loop` |
-
-## 与 skills 的关系
+只有一个文件定义全局 workflow kernel：
 
 ```text
 docs/workflows/RESEARCH_WORKFLOW.md
-    = 系统事实：workflow_type / stage / gate / backflow / P2 readiness
-
-.agents/skills/research-orchestrator/SKILL.md
-    = 执行入口：创建 run、更新状态、写 handoff、路由下层 skills、close readout
-
-.agents/skills/<lower-skill>/SKILL.md
-    = 下层执行契约：说明本 skill 何时使用、输入、局部步骤、输出、blocked 条件
-
-.agents/skills/<skill>/references/
-    = 字段、模板、runtime contract、局部 profile
 ```
 
-## 不负责
-
-本目录不负责：
-
-```text
-项目路线图
-P0 / P1 / P1.5 / P2 / P3 阶段计划
-单次执行 readout
-某个细分或个股的研究报告
-日常命令速查
-单个 skill 的内部 schema 或模板
-```
-
-阶段计划放在 `docs/plans/`；日常提示放在 `docs/playbooks/`；执行日志放在 `docs/logs/`。
-
-## 版本纪律
-
-如果要改全局 ID：
+它唯一拥有：
 
 ```text
 workflow_type
 global stage_id
 global gate_id
 backflow_decision
-run status enum
+P2 readiness global criteria
 ```
 
-只改 `RESEARCH_WORKFLOW.md`，再让其他文件引用。
+其他 workflow 文件只能消费这些接口，不能重新定义。
 
-如果要改单个 skill 的执行细节，改该 skill 的 `SKILL.md` 或 `references/`，不要新增 workflow doc。
+## 文件列表
+
+| 文件 | 定位 | 是否定义全局接口 |
+|---|---|---:|
+| `RESEARCH_WORKFLOW.md` | 全局 workflow kernel。定义 workflow 类型、阶段、交接资产、细分/个股关系、gate、P2 前置条件。 | 是 |
+| `WORKFLOW_ORCHESTRATION_SPEC.md` | `research-orchestrator` 如何分类、建 run、路由 skill、生成 handoff、调度门禁。 | 否 |
+| `DATA_LAYER_WORKFLOW.md` | 数据层如何发现、拉取、归档、标准化、候选化和交接；可定义 `DL-*` 局部检查。 | 否 |
+| `STOCK_REPORT_PRODUCTION_WORKFLOW.md` | 兼容性指针。活跃 report production profile 已迁到 `stock-deep-dive/references/`。 | 否 |
+
+## 与 skills 的关系
+
+```text
+docs/workflows/RESEARCH_WORKFLOW.md
+  = 事实源：说明系统如何运转，并定义全局接口。
+
+.agents/skills/research-orchestrator/SKILL.md
+  = 执行入口：按事实源路由下层 skills。
+
+.agents/skills/<skill>/SKILL.md
+  = 下层执行契约：完成证据导入、细分研究、个股研究、质量检查等动作。
+
+.agents/skills/<skill>/references/*
+  = 字段、模板、局部 profile、局部子检查。
+```
+
+`research-orchestrator` 不是万能研究员。它只负责编排、状态、路由、门禁调度和 readout；具体研究动作必须交给下层 skills。
+
+## 局部步骤命名
+
+全局 gate 只能使用 `G0` 到 `G10`。
+
+局部步骤或子检查必须使用 skill-local 前缀：
+
+```text
+DL-*   data layer local checks
+SDD-*  stock-deep-dive local steps
+QR-*   quality-review local subchecks
+RP-*   report-production profile steps
+```
+
+## 个股报告生产 profile
+
+个股分析包构建和报告写作已经统一合并到 `stock-deep-dive`。
+
+当前主路径：
+
+```text
+research-orchestrator
+→ evidence-ingest
+→ stock-deep-dive
+→ segment-company-mapping
+→ quality-review
+→ research-orchestrator close readout
+```
+
+个股报告生产细节放在：
+
+```text
+.agents/skills/stock-deep-dive/references/report_production_profile.md
+```
+
+不要把它升级为平级 workflow。
+
+## 版本纪律
+
+当 workflow 发生结构性变化时，按顺序更新：
+
+1. `RESEARCH_WORKFLOW.md` 的 canonical interface。
+2. `WORKFLOW_ORCHESTRATION_SPEC.md` 的运行时消费逻辑。
+3. 相关 skill 的 `SKILL.md` 或 `references/`。
+4. `docs/index.md` 与 `docs/meta/DOC_OWNERSHIP_MATRIX.md`。
+5. `scripts/check_doc_drift.py` 的校验规则。

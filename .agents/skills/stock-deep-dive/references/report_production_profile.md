@@ -1,60 +1,40 @@
-# Report Production Profile — stock-deep-dive reference
+# Stock Report Production Profile — stock-deep-dive reference
 
-## Positioning
+本文件定义 `stock-deep-dive` 内部如何把 reviewed evidence、reviewed metrics、data-layer packs 和 analysis pack 转成接近样例质量的个股报告草稿。
 
-This profile defines how `stock-deep-dive` turns reviewed evidence and data-layer context into a sample-quality stock research report.
-
-It is not a global workflow.
+它是 skill-local profile，不是平级 workflow。
 
 ```yaml
 profile_id: stock_report_production
 parent_workflow_type: stock_first_closed_loop
-quality_target: R4_readiness_draft | R3_sample_quality_draft
-entry_skill: research-orchestrator
-primary_execution_skill: stock-deep-dive
+active_skill: stock-deep-dive
 quality_skill: quality-review
+quality_target: R4_readiness_draft | R3_sample_quality_draft
 primary_subject: single_stock
 ```
 
-Global workflow stages, workflow types, gate IDs, and backflow decisions are defined only in:
+全局 workflow type、global stage 和 global gate 以 `docs/workflows/RESEARCH_WORKFLOW.md` 为准。
 
-```text
-docs/workflows/RESEARCH_WORKFLOW.md
-```
+## Profile step map
 
-## Current production route
+| profile_step_id | 对应全局阶段 | 目标 | 主要 owner |
+|---|---|---|---|
+| RP0 Intake & Scope | T0 | 确认股票、公司主体、报告质量目标和已有 run。 | `research-orchestrator` |
+| RP1 Evidence Plan | T1 | 生成或检查 `stock_evidence_plan.yaml`。 | `evidence-ingest` |
+| RP2 Evidence Acquire & Parse | T1 | 获取 / 登记 / 解析官方披露和结构化数据。 | `evidence-ingest` |
+| RP3 Candidate Generation | T1-T2 | 生成 claim / metric / business-line / exposure candidates。 | `evidence-ingest` |
+| RP4 Candidate Review | T2 | 晋升 reviewed claims / metrics。 | `quality-review` |
+| RP5 Analysis Pack Build | T2-T7 | 生成 `stock_analysis_pack.yaml`。 | `stock-deep-dive` |
+| RP6 Forecast & Valuation Context | T7 | 生成 forecast / valuation context，全部标记 estimate / inference。 | `stock-deep-dive` |
+| RP7 Technical / Sentiment / Event Pack | T7 | 消费 data-layer packs，不足则保留 TODO。 | `stock-deep-dive` |
+| RP8 Report Draft | T7 | 从 analysis pack 生成 report draft，不新增事实。 | `stock-deep-dive` |
+| RP9 Quality Review | T9 | 执行 G1/G2/G3/G6/G7/G8/G9，必要时附加 QR-* 子检查。 | `quality-review` |
+| RP10 Backflow & Maintenance | T8 | 回写 exposure / claims / metrics / refresh todo。 | `segment-company-mapping` |
+| RP11 Close Readout | T10 | 输出 final readout 和状态。 | `research-orchestrator` |
 
-```text
-research-orchestrator
-→ evidence-ingest
-→ stock-deep-dive
-→ segment-company-mapping
-→ quality-review
-→ research-orchestrator close readout
-```
+## RP0 Intake & Scope
 
-## Local production steps
-
-These local step IDs are profile steps, not global stage IDs.
-
-```text
-RPP-0 Intake & Scope
-RPP-1 Evidence Plan
-RPP-2 Evidence Acquire & Parse
-RPP-3 Candidate Generation
-RPP-4 Candidate Review / Promotion
-RPP-5 Analysis Pack Build
-RPP-6 Forecast & Valuation Model
-RPP-7 Technical / Sentiment / Event Pack
-RPP-8 Report Draft
-RPP-9 Quality Review Handoff
-RPP-10 Backflow & Maintenance
-RPP-11 Close Readout Inputs
-```
-
-## RPP-0 Intake & Scope
-
-Expected input:
+输入：
 
 ```yaml
 stock_code:
@@ -67,7 +47,7 @@ date_range:
 existing_workflow_run:
 ```
 
-Expected output:
+输出：
 
 ```text
 workflow_state.yaml
@@ -75,28 +55,28 @@ company_identity.yaml
 scope_card.yaml
 ```
 
-Must confirm:
+必须确认：
 
-- security code and company entity are unique;
-- evidence snapshot exists or explicit TODO exists;
-- segment exposure exists or linked segment discovery is required;
-- target quality is R1/R2/R3/R4.
+- 证券代码和公司主体是否唯一。
+- 是否已有 evidence snapshot。
+- 是否已有 segment exposure。
+- 报告目标是 R1、R2、R3 还是 R4 readiness。
 
-## RPP-1 Evidence Plan
+## RP1 Evidence Plan
 
-`evidence-ingest` prepares `stock_evidence_plan.yaml`.
+由 `evidence-ingest` 生成 `stock_evidence_plan.yaml`。
 
-Minimum evidence package:
+最低证据包：
 
-1. latest annual report PDF or explicit TODO;
-2. latest interim / quarterly report or explicit TODO;
-3. material announcements in the target date range;
-4. financial statements and structured metrics;
-5. market, valuation, and technical snapshots when available;
-6. investor relations, company website, and news clues when needed;
-7. industry source or mini industry context card, or explicit TODO.
+1. 最近年度报告 PDF 或 explicit TODO。
+2. 最近半年报 / 季报或 explicit TODO。
+3. 近 12-24 个月重大公告。
+4. 财务报表与财务指标结构化数据。
+5. 行情、估值、技术指标快照。
+6. 互动问答、投资者关系、公司官网、新闻线索。
+7. 行业报告或权威数据，至少形成简版行业卡或 TODO。
 
-Missing evidence must become `evidence_gap_request`:
+缺失任何项都必须生成 evidence gap request：
 
 ```yaml
 evidence_gap_request:
@@ -110,13 +90,35 @@ evidence_gap_request:
   owner_skill: evidence-ingest
 ```
 
-## RPP-2 Evidence Acquire & Parse
+## RP2 Evidence Acquire & Parse
 
-Official filings should flow through the repository's evidence-ingest and data-layer contracts.
+### 官方 PDF
 
-Structured API data is metric/context only by default. It must not support business exposure claims without official disclosure evidence.
+```text
+data/raw/official_filings/<stock_code>/<file>.pdf
+→ MinerU
+→ data/processed/text/<doc_id>.md
+→ data/processed/layout/<doc_id>_content.json
+→ data/processed/tables/<doc_id>_tables.json
+→ data/processed/page_maps/<doc_id>_page_map.yaml
+→ data/processed/logs/<doc_id>_parse_log.json
+```
 
-Market, sentiment, and event clues may enter:
+### 结构化数据
+
+Tushare / Baostock 输出：
+
+```text
+data/raw/structured_api/<stock_code>/*.csv|json
+data/processed/normalized/<stock_code>/*.csv
+data/processed/candidates/metric_candidates_<stock_code>.csv
+```
+
+结构化数据默认只生成 metric candidates，不生成业务暴露 claim。
+
+### 市场、情绪、事件线索
+
+可进入：
 
 ```text
 clue_log.csv
@@ -125,11 +127,11 @@ sentiment_snapshot.csv
 event_candidates.csv
 ```
 
-They must not directly become report facts.
+不得直接进入报告正文。
 
-## RPP-3 Candidate Generation
+## RP3 Candidate Generation
 
-Generate candidates such as:
+从官方披露解析结果与结构化数据中生成：
 
 ```text
 claim_candidates.csv
@@ -140,37 +142,37 @@ segment_exposure_candidates.yaml
 evidence_gap_requests.yaml
 ```
 
-Priority extraction areas:
+重点抽取区域：
 
-- MD&A / operating discussion;
-- revenue by product / industry / region;
-- production, sales, capacity, projects, fundraising projects;
-- top customers / suppliers;
-- major contracts and framework agreements;
-- R&D projects, patents, technology routes;
-- risk factors;
-- management comments on industry and outlook.
+- 经营情况讨论与分析。
+- 主营业务分产品 / 分行业 / 分地区。
+- 产销量、产能、在建项目、募投项目。
+- 前五大客户 / 供应商。
+- 重大合同 / 订单 / 框架协议。
+- 研发项目 / 专利 / 技术路线。
+- 风险因素。
+- 管理层对行业和未来的表述。
 
-## RPP-4 Candidate Review / Promotion
+## RP4 Candidate Review
 
-Candidate promotion rules:
+候选晋升规则：
 
 ```text
-claim_candidates.csv -> reviewed_claims.csv / claims_registry.csv
-metric_candidates.csv -> reviewed_metrics.csv / metrics_registry.csv
+claim_candidates.csv → reviewed_claims.csv / claims_registry.csv
+metric_candidates.csv → reviewed_metrics.csv / metrics_registry.csv
 ```
 
-Promotion requires:
+晋升条件：
 
-- existing `evidence_id`;
-- traceable quote, excerpt, page number, or table cell locator;
-- matching `source_rank` and `claim_type`;
-- no material claim supported only by D-level clues;
-- explicit `estimate` / `inference` labels.
+- `evidence_id` 存在。
+- `quote_or_excerpt`、`page_no` 或 `table_cell_locator` 可回溯。
+- `source_rank` 与 `claim_type` 匹配。
+- material claim 不来自 D 级来源。
+- `estimate` / `inference` 显式标注。
 
-## RPP-5 Analysis Pack Build
+## RP5 Analysis Pack Build
 
-`stock-deep-dive` uses reviewed claims, reviewed metrics, accepted estimates, and data-layer context to produce:
+由 `stock-deep-dive` 基于 reviewed claims / reviewed metrics / accepted estimates 输出分析包：
 
 ```text
 reports/workflow_runs/<workflow_id>/stock_analysis_pack.yaml
@@ -180,13 +182,11 @@ reports/workflow_runs/<workflow_id>/financial_quality.yaml
 reports/workflow_runs/<workflow_id>/risk_counter_evidence.yaml
 ```
 
-`stock_analysis_pack.yaml` is the only upstream source for report drafting.
+`stock_analysis_pack.yaml` 是报告写作的唯一上游。不允许报告正文从未审查证据自由发挥。
 
-Do not let report writing discover new material facts.
+## RP6 Forecast & Valuation Context
 
-## RPP-6 Forecast & Valuation Model
-
-Expected outputs:
+由 `stock-deep-dive` 输出：
 
 ```text
 forecast_model.yaml
@@ -195,18 +195,18 @@ peer_comparison.csv
 sensitivity_table.csv
 ```
 
-Minimum requirements:
+最低要求：
 
-- 2026E / 2027E / 2028E assumptions or explicit TODO;
-- revenue, gross margin, expense ratio, net profit, EPS assumptions;
-- base / bull / bear scenario or explicit gap;
-- most sensitive variable;
-- peer valuation table;
-- every forecast labeled `estimate` or `inference`.
+- 2026E / 2027E / 2028E 三年预测或 explicit TODO。
+- 收入、毛利率、费用率、归母净利、EPS 的主假设。
+- 至少一个 base / bull / bear 场景或保留缺口。
+- 至少一个最敏感变量。
+- 可比公司估值表。
+- 所有预测必须标记为 `estimate` / `inference`。
 
-## RPP-7 Technical / Sentiment / Event Pack
+## RP7 Technical / Sentiment / Event Pack
 
-Expected outputs:
+由 `stock-deep-dive` 消费 data-layer packs 后输出：
 
 ```text
 technical_snapshot.yaml
@@ -214,89 +214,83 @@ market_sentiment_pack.yaml
 catalyst_calendar.yaml
 ```
 
-Required fields when data exists:
+最低要求：
 
-- data date;
-- current price and valuation snapshot;
-- moving average or trend indicator;
-- support / resistance methodology;
-- turnover, value traded, or flow data when available;
-- industry / theme sentiment clues;
-- next 1-3 month catalyst calendar.
+- 数据日期。
+- 当前价格和估值快照。
+- 均线或趋势指标。
+- 关键支撑 / 阻力口径。
+- 成交额、换手率、资金流等可得市场指标。
+- 行业 / 主题热度线索。
+- 未来 1-3 个月事件日历。
 
-If market data is missing, keep TODO. Do not write unsupported technical or sentiment conclusions.
+缺 market data 时保留 TODO，不编写具体技术或情绪结论。
 
-## RPP-8 Report Draft
+## RP8 Report Draft
 
-Use:
-
-```text
-stock_analysis_pack.yaml
-assets/stock_deep_dive_report_template.md
-references/report_style_guide.md
-references/report_production_profile.md
-```
-
-Expected outputs:
+由 `stock-deep-dive` 将 analysis pack 转为报告草稿：
 
 ```text
-stock_deep_dive_draft.md
+stock_report_sample_quality_draft.md
 report_evidence_map.md
 report_open_questions.md
 writer_gap_requests.yaml
 ```
 
-The draft should include:
+报告草稿必须包含：
 
-1. metadata;
-2. intro / core research line;
-3. financial overview;
-4. business breakdown;
-5. industry context;
-6. forecast assumptions;
-7. valuation context;
-8. technical context if supported;
-9. sentiment context if supported;
-10. catalyst calendar;
-11. conclusion, risks, counter-evidence, tracking list;
-12. evidence map;
-13. open questions / evidence gaps.
+1. Metadata。
+2. 前言 / 核心主线。
+3. 财务概览。
+4. 业务拆分。
+5. 行业分析。
+6. 盈利预测。
+7. 估值分析。
+8. 技术分析。
+9. 情绪分析。
+10. 事件驱动。
+11. 研究结论、风险、反证、跟踪清单。
+12. Evidence Map。
+13. Open Questions / Evidence Gaps。
 
-No buy/sell/hold wording, no position sizing, no direct trading instruction.
+## RP9 Quality Review
 
-## RPP-9 Quality Review Handoff
+由 `quality-review` 执行全局 gate 和局部 subchecks。
 
-Hand off to `quality-review` using the global gates in `RESEARCH_WORKFLOW.md`.
-
-Stock-report-specific checks should be represented as subchecks under the global stock report gate.
-
-Suggested subchecks:
-
-```yaml
-- subcheck_id: G7-DL
-  parent_gate_id: G7
-  name: Data Layer Pack Check
-- subcheck_id: G7-R4
-  parent_gate_id: G7
-  name: R4 Publishable Stock Report Check
-```
-
-Final quality outcomes:
+全局 gate 来自 `RESEARCH_WORKFLOW.md`：
 
 ```text
-bridge_only
-publishable_ready_with_disclosure_todos
-publishable_ready
+G1 Evidence Gate
+G2 Claim Gate
+G3 Metric Gate
+G6 Exposure Gate
+G7 Stock Report Gate
+G8 Backflow Gate
+G9 No Advice Gate
+```
+
+如为 R4 readiness，可追加 `QR-R4-*` 局部子检查；不得创建新的全局 G 编号。
+
+输出：
+
+```text
+quality_issue_list.md
+quality_gate_report.md
+stock_report_acceptance_checklist.yaml
+```
+
+判定：
+
+```text
+accepted_sample_quality
+accepted_with_todos
+needs_fix
 blocked
 ```
 
-Any high severity issue blocks acceptance.
+## RP10 Backflow & Maintenance
 
-## RPP-10 Backflow & Maintenance
-
-Backflow or no-backflow reason must be explicit.
-
-Possible target files:
+必须回写或明确不回写：
 
 ```text
 segment_company_exposure.csv
@@ -307,16 +301,16 @@ reports_to_refresh.yaml
 refresh_log.md
 ```
 
-Rules:
+回写规则：
 
-- exposure update requires reviewed claim, reviewed metric, or accepted TODO;
-- forecast / valuation does not become a fact;
-- clue-level data does not become a claim;
-- report status and evidence status must be updated.
+- Exposure update 必须有 reviewed claim、reviewed metric 或 accepted TODO。
+- Forecast / valuation 不回写为事实，只回写为 model snapshot。
+- Clue 不回写为 claim。
+- 报告状态和证据状态必须更新。
 
-## RPP-11 Close Readout Inputs
+## RP11 Close Readout
 
-The orchestrator close readout should be able to report:
+最终 readout 必须说明：
 
 ```yaml
 run_id:

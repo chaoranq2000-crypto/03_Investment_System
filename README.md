@@ -28,11 +28,9 @@ Codex Skills：标准化投研动作
 
 当前处于 **P1.6：workflow buildout / 进入 P2 前的工作流制度化**。
 
-P1.5：pre-P2 hardening 已作为前序加固阶段完成；当前 P1.6 在此基础上固化工作流事实源和执行入口。
-
 P1.6 的重点是：
 
-1. 固化 `docs/workflows/` 永久工作流事实源。
+1. 固化 `docs/workflows/RESEARCH_WORKFLOW.md` 作为唯一全局 workflow kernel。
 2. 启用 `research-orchestrator` 作为总编排入口。
 3. 补强 evidence ingest、stock deep dive、mapping、quality review 等下层契约。
 4. 通过 stock-led、segment-led、segment-stock interlock 调试。
@@ -44,19 +42,21 @@ P1.6 不做：扩展新细分、P2 横向比较、批量扩大公司池、自动
 
 | 文件 | 用途 |
 |---|---|
-| `AGENTS.md` | Codex 项目级长期规则和投研纪律 |
-| `docs/index.md` | 文档总索引 |
-| `docs/project/PROJECT_CHARTER.md` | 项目目标、边界、路线图和暂停点 |
-| `docs/architecture/WORKSPACE_STRUCTURE.md` | 目录结构、文件归位和命名规则 |
-| `docs/architecture/RESEARCH_OBJECT_MODEL.md` | Segment、Company、Evidence、Claim、Metric 等对象模型 |
-| `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | 证据、引用、来源等级和新鲜度规则 |
-| `docs/policies/QUALITY_GUARDRAILS.md` | 质量检查、反幻觉、反证和 no-advice 纪律 |
-| `docs/workflows/README.md` | 永久工作流文档入口 |
-| `docs/workflows/RESEARCH_WORKFLOW.md` | 唯一 global workflow kernel |
-| `.agents/skills/research-orchestrator/references/orchestration_contract.md` | `research-orchestrator` runtime、handoff 和 readout contract |
-| `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层工作流和 source adapter 边界 |
-| `.agents/skills/stock-deep-dive/references/report_production_profile.md` | 样例级个股报告生产 profile |
-| `docs/meta/DOC_OWNERSHIP_MATRIX.md` | 文档职责边界，防止重复和冲突 |
+| `AGENTS.md` | Codex 项目级长期规则和投研纪律。 |
+| `docs/index.md` | 文档总索引；只导航，不承载事实源正文。 |
+| `docs/project/PROJECT_CHARTER.md` | 项目目标、边界、路线图和暂停点。 |
+| `docs/architecture/WORKSPACE_STRUCTURE.md` | 目录结构、文件归位和命名规则。 |
+| `docs/architecture/RESEARCH_OBJECT_MODEL.md` | Segment、Company、Evidence、Claim、Metric 等对象模型。 |
+| `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | 证据、引用、来源等级和新鲜度规则。 |
+| `docs/policies/QUALITY_GUARDRAILS.md` | 质量检查、反幻觉、反证和 no-advice 纪律。 |
+| `docs/workflows/README.md` | workflow 文档入口。 |
+| `docs/workflows/RESEARCH_WORKFLOW.md` | 唯一全局 workflow kernel；定义 `workflow_type`、global stage、global gate、backflow decision。 |
+| `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | `research-orchestrator` 运行时规范；消费全局接口，不重新定义全局接口。 |
+| `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层 source adapter、manifest、candidate、data pack 边界。 |
+| `.agents/skills/stock-deep-dive/references/report_production_profile.md` | 个股报告生产 profile；属于 `stock-deep-dive` 执行细节。 |
+| `docs/meta/DOC_OWNERSHIP_MATRIX.md` | 文档职责边界和去重矩阵。 |
+
+`docs/plans/`、`docs/logs/`、`docs/codex_tasks/` 是阶段性材料，不作为当前事实源阅读路径。
 
 ## Skills
 
@@ -76,7 +76,7 @@ compare-stocks
 memo-writer
 ```
 
-个股深度研究统一使用 `stock-deep-dive`；如出现新的 `stock-*` 技能目录，应先按 `.codex/config.toml` 和 `docs/meta/DOC_OWNERSHIP_MATRIX.md` 判断是否属于当前主工作流。
+个股深度研究统一使用 `stock-deep-dive`。如果存在未启用或待合并的旧 skill 目录，应先按 `.codex/config.toml` 和 `docs/meta/DOC_OWNERSHIP_MATRIX.md` 判断是否仍可路由；不要让历史 skill 覆盖当前主工作流。
 
 ## 最小使用方式
 

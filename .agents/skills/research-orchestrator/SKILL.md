@@ -1,245 +1,226 @@
 ---
 name: research-orchestrator
-description: A股投研总工作流编排入口。当用户要求启动、续跑、诊断、关闭、复盘一个 workflow，或询问下一步应调用哪个 skill 时使用。该 skill 只负责编排、状态、handoff、路由和 readout；不替代 evidence-ingest、segment-research、stock-deep-dive、quality-review 等下层技能。
+description: A股投研总工作流编排。当用户要求研究一个细分、深挖一个股票、刷新已有研究、检查是否能进入 P2、续跑/复盘一个 workflow，或询问下一步应调用哪个 skill 时使用。该 skill 负责按 docs/workflows/RESEARCH_WORKFLOW.md 的事实源路由下层 skills，不替代 evidence-ingest、segment-research、stock-deep-dive、quality-review 等具体研究技能。
 ---
 
 # Research Orchestrator Skill
 
 ## Purpose
 
-`research-orchestrator` turns a user request into an auditable workflow run.
+把用户请求转化为可审计的研究工作流运行：识别 canonical `workflow_type`，创建或更新 workflow state，路由下层 skills，生成 handoff，调度门禁，推动 fix loop，并输出 workflow readout。
 
-It is an execution entry point, not a workflow fact source.
+本 skill 是执行入口，不是全局事实源。
 
-This skill must not redefine global `workflow_type`, global `stage_id`, global `gate_id`, run status enums, or project-level ownership.
+## Canonical boundary
 
-## Canonical sources
-
-### Always read
-
-Before creating, resuming, closing, or diagnosing a workflow run, read:
+本 skill 不重新定义以下全局接口：
 
 ```text
-AGENTS.md
+workflow_type
+global stage_id
+global gate_id
+backflow_decision
+P2 readiness criteria
+```
+
+这些接口只以以下文件为准：
+
+```text
 docs/workflows/RESEARCH_WORKFLOW.md
 ```
 
-If the run already exists, also read:
+运行时 handoff 和状态规则见：
 
 ```text
-reports/workflow_runs/<workflow_id>/workflow_state.yaml
-reports/workflow_runs/<workflow_id>/open_todos.csv
-reports/workflow_runs/<workflow_id>/artifact_manifest.csv
-```
-
-Before routing to a lower skill, read that lower skill's `SKILL.md`.
-
-### Read when needed
-
-Read these only when the task requires them:
-
-```text
-.agents/skills/research-orchestrator/references/orchestration_contract.md
+docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
 .agents/skills/research-orchestrator/references/workflow_state_schema.md
 .agents/skills/research-orchestrator/references/skill_routing_matrix.md
-docs/policies/EVIDENCE_AND_CITATION_POLICY.md
-docs/policies/QUALITY_GUARDRAILS.md
-docs/architecture/RESEARCH_OBJECT_MODEL.md
-docs/reporting/
 ```
-
-If a referenced file is missing, record `blocked_by` or an explicit TODO. Do not pretend it was read.
 
 ## When to use
 
-Use this skill when the user asks to:
+使用本 skill 当用户要求：
 
-- start a segment-led research workflow;
-- start a stock-led research workflow;
-- handle segment-stock interlock or backflow;
-- refresh existing research;
-- check P2 readiness;
-- resume, diagnose, close, or review a workflow run;
-- decide which lower skill should run next.
+- 研究一个细分，并希望跑完整细分到个股闭环。
+- 深挖一个股票，并希望独立个股研究后映射 / 回写细分。
+- 刷新已有研究。
+- 检查是否可以进入 P2。
+- 判断当前下一步该做什么 / 应该调用哪个 skill。
+- 续跑、复盘、诊断某个 workflow。
+- 搭建或调试细分 / 个股研究总工作流。
 
-## Do not use as the main executor when
+## Do not use as main executor when
 
-If the user asks for one concrete research action, route to the lower skill after creating a handoff if needed.
+如果用户只要求完成单一具体动作，应直接路由到下层 skill：
 
-| User need | Main skill |
+| 用户只要求 | 主 skill |
 |---|---|
-| acquire, parse, register, or deduplicate evidence | `evidence-ingest` |
-| define or research one segment | `segment-research` |
-| build an A-share company universe | `company-universe` |
-| maintain segment-company exposure | `segment-company-mapping` |
-| write or update one stock deep dive | `stock-deep-dive` |
-| review evidence, claims, metrics, exposure, or no-advice boundary | `quality-review` |
-| write a memo or watchlist note from accepted research | `memo-writer` |
-| refresh existing research with new evidence | `refresh-research` |
+| 导入一个公告、PDF、CSV、网页、数据源 | `evidence-ingest` |
+| 写一个细分报告 | `segment-research` |
+| 找某细分 A 股公司池 | `company-universe` |
+| 维护 exposure 映射 | `segment-company-mapping` |
+| 写一个个股深度 | `stock-deep-dive` |
+| 检查报告证据、幻觉、反证、口径 | `quality-review` |
+| 写 memo / watchlist note | `memo-writer` |
+
+本 skill 可以先生成 handoff 或更新 workflow state，但不应替代下层 skill 的专业流程。
+
+## Read discipline
+
+Always read or inspect before creating / updating a workflow run:
+
+1. `AGENTS.md`
+2. `docs/workflows/RESEARCH_WORKFLOW.md`
+3. Current `workflow_state.yaml` if resuming a run
+4. The target lower-level skill's `SKILL.md`
+
+Read when needed:
+
+- `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` for handoff / state / close rules.
+- `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` for evidence / citation / source rank questions.
+- `docs/policies/QUALITY_GUARDRAILS.md` for quality boundary questions.
+- `docs/architecture/RESEARCH_OBJECT_MODEL.md` when changing object model or schema.
+- Skill `references/` when entering that skill's specific execution contract.
+
+Do not require normal execution to read `docs/plans/`, `docs/logs/`, or historical Codex tasks.
 
 ## Inputs
 
-Expected input may include:
+Possible input fields:
 
 ```yaml
 workflow_type:
+run_mode: normal | diagnostic
 segment_name:
 segment_id:
 stock_code:
 company_name:
 company_id:
 depth: quick | standard | deep
+date_range:
 target: build_workflow | run_workflow | resume | diagnose | readout | p2_readiness
 workflow_id:
 constraints:
 out_of_scope:
 ```
 
-If optional details are missing but the workflow can proceed safely, continue with conservative assumptions and record them in `workflow_state.yaml` or the user-facing readout.
-
-Do not block only because a non-critical field is missing.
+If optional information is missing but the task can still progress, use conservative assumptions and record them in `workflow_state.yaml` or the response. Do not block on non-critical fields.
 
 ## Local procedure
 
-### 1. Classify request
+### ORCH-1 Classify request
 
-Classify the request using the canonical workflow types and rules in `docs/workflows/RESEARCH_WORKFLOW.md`.
+Classify the request against canonical workflow types in `RESEARCH_WORKFLOW.md`.
 
-If the user only wants a status check or routing advice, use non-run diagnostic mode and explain that no workflow run was created.
+If the user only asks for status / next step / gap check, use `run_mode: diagnostic` rather than inventing a new workflow type.
 
-### 2. Create or locate workflow run
+### ORCH-2 Create or locate workflow run
 
-For a full run, resume, debug, or closeout, create or update:
+For complete runs, resumes, debug runs, or readout tasks, create or update:
 
 ```text
 reports/workflow_runs/<workflow_id>/
 ```
 
-Use the workflow run structure defined by the canonical workflow docs and orchestrator references.
+For brief diagnostics, a run directory may be skipped, but the response must say that no run directory was created.
 
-### 3. Update workflow state
+### ORCH-3 Update workflow state
 
-Update `workflow_state.yaml` rather than relying on chat memory.
-
-At minimum, record:
+Use the schema in:
 
 ```text
-workflow_id
-workflow_type
-status
-current_stage
-next_stage
-active_skill
-required_next_skill
-artifacts
-open_todos
-quality_gates
-notes
+.agents/skills/research-orchestrator/references/workflow_state_schema.md
 ```
 
-Schema details live in `references/workflow_state_schema.md`.
+Do not add new `workflow_type` values from this skill.
 
-### 4. Prepare handoff
+### ORCH-4 Route to lower-level skill
 
-Before routing to a lower skill, write a handoff packet under:
+Use `RESEARCH_WORKFLOW.md` stages and `skill_routing_matrix.md` as a quick reference.
+
+If they conflict, follow `RESEARCH_WORKFLOW.md` and create a TODO to update the stale reference.
+
+### ORCH-5 Write handoff packet
+
+Write handoff packets in:
 
 ```text
-reports/workflow_runs/<workflow_id>/handoffs/
+reports/workflow_runs/<workflow_id>/handoffs/<nn>_to_<skill>.md
 ```
 
-The packet should state:
+Each handoff must include objective, inputs, expected outputs, guardrails, completion criteria and next gate.
+
+### ORCH-6 Enforce backflow
+
+For stock-first and segment-to-stock runs, close only after there is an explicit backflow decision:
 
 ```text
-workflow_id
-current_stage
-requested_skill
-objective
-inputs
-expected_outputs
-guardrails
-completion_criteria
-next_gate_or_review
+update_exposure
+update_company_universe
+update_segment_taxonomy
+update_scorecard
+no_backflow_needed
+blocked
 ```
 
-Handoff format details live in `references/orchestration_contract.md`.
+No backflow decision means the workflow cannot close as accepted.
 
-### 5. Route to lower skill
+### ORCH-7 Dispatch quality gates
 
-Choose the lower skill according to:
+Global gate definitions live in `RESEARCH_WORKFLOW.md`.
 
-```text
-docs/workflows/RESEARCH_WORKFLOW.md
-.agents/skills/research-orchestrator/references/skill_routing_matrix.md
-```
+The orchestrator may dispatch gates and update status, but `quality-review` owns issue finding and severity assignment.
 
-The orchestrator may summarize what the lower skill must do, but must not perform the lower skill's full research work.
+High severity issues block `accepted`.
 
-### 6. Enforce backflow and quality review
+### ORCH-8 Produce readout
 
-A full segment-led or stock-led workflow cannot close unless segment-stock backflow has either been executed or explicitly marked `no_backflow_needed` / `blocked` with a reason.
-
-Do not mark a workflow `accepted` while any high severity issue remains open.
-
-### 7. Produce close readout
-
-At closeout, write or update:
+For complete runs, write:
 
 ```text
 reports/workflow_runs/<workflow_id>/workflow_readout.md
 ```
 
-The readout must include:
+The readout must include status, scope, skills used, artifacts produced, quality gates, backflow decisions, unresolved TODOs and P2 readiness if relevant.
+
+## Output style
+
+When answering the user, stay operational:
 
 ```text
-status
-scope
-skills used
-artifacts produced
+current workflow_type
+current stage
+next skill
+files to read
+files to write
 quality gates
-backflow decisions
-remaining TODOs
-P2 readiness, if relevant
+blocking items / TODOs
 ```
 
-## Outputs
-
-This skill may create or update:
-
-```text
-reports/workflow_runs/<workflow_id>/workflow_state.yaml
-reports/workflow_runs/<workflow_id>/run_log.md
-reports/workflow_runs/<workflow_id>/artifact_manifest.csv
-reports/workflow_runs/<workflow_id>/open_todos.csv
-reports/workflow_runs/<workflow_id>/quality_gate_report.md
-reports/workflow_runs/<workflow_id>/workflow_readout.md
-reports/workflow_runs/<workflow_id>/handoffs/*.md
-```
-
-It should not directly create final research claims, stock conclusions, or segment conclusions without the relevant lower skill.
+Do not write long investment opinions from this skill.
 
 ## Guardrails
 
-- Do not invent `evidence_id`, `claim_id`, `metric_id`, stock data, financial figures, customer names, orders, revenue shares, or valuation numbers.
-- Do not bypass `quality-review` to mark a run accepted.
-- Do not run formal P2 comparison before the comparison readiness gate.
-- Do not use `memo-writer`, scorecards, or watchlists as sources of new research conclusions.
+- Do not define new canonical workflow types, global stage IDs or global gate IDs.
+- Do not invent evidence_id、claim_id、metric_id、stock data、收入占比、订单、客户、估值数字。
+- Do not bypass `quality-review` to mark workflow accepted.
+- Do not enter formal P2 comparison before `comparison_readiness_gate`.
+- Do not treat `memo-writer` or scorecard as a new conclusion source.
 - Do not silently overwrite raw evidence or old reports.
-- Preserve missing data and uncertainty through TODO / MISSING / LOW_CONFIDENCE / UNVERIFIED labels.
-- Keep fact, estimate, inference, management comment, analyst view, and opinion separated.
-- Do not output direct buy/sell/hold instructions, position sizing, or guaranteed-return language.
+- Separate fact、estimate、inference、management_comment、analyst_view、opinion。
+- Record uncertainty、missing data and TODO。
+- Do not output buy/sell/hold advice.
 
 ## Minimal close checklist
 
-Before closing a full workflow run, confirm:
-
 ```text
 [ ] workflow_state.yaml exists and is current
-[ ] run_log.md records major steps or skipped steps
+[ ] run_log.md records major steps or skipped-run reason is explicit
 [ ] artifact_manifest.csv lists required artifacts
 [ ] open_todos.csv lists unresolved gaps
-[ ] quality_gate_report.md exists or blocked reason is explicit
-[ ] required lower-skill handoffs are recorded or explicitly skipped
+[ ] quality_gate_report.md exists for complete runs
+[ ] lower-level skill handoffs are recorded or explicitly skipped
 [ ] segment-company exposure is updated or no-update reason is recorded
-[ ] no high severity quality issue remains open
+[ ] no high-severity quality issues remain
 [ ] workflow_readout.md states accepted / accepted_with_todos / needs_fix / blocked
 ```

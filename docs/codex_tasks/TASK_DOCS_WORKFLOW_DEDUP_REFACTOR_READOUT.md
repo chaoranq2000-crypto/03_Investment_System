@@ -86,7 +86,7 @@ Baseline before patch：
 After patch：
 
 ```text
-git grep -n "workflow_type: stock_report_production" -- . ':!docs/plans' ':!docs/logs'
+git grep -n "legacy stock_report_production workflow_type" -- . ':!docs/plans' ':!docs/logs' ':!docs/codex_tasks' ':!docs/references/project_learning'
 => no results
 ```
 

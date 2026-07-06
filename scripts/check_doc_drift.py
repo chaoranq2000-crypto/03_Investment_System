@@ -1,196 +1,151 @@
 #!/usr/bin/env python3
-"""Check active docs and skill contracts for workflow-definition drift."""
+"""Check active docs/skills for workflow interface drift.
+
+This is intentionally lightweight. It is not a Markdown linter and does not
+inspect historical plans/logs/tasks.
+"""
 
 from __future__ import annotations
 
-import json
 import re
 import sys
 from pathlib import Path
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
-ROOT = Path(__file__).resolve().parents[1]
+CANONICAL_WORKFLOW = Path("docs/workflows/RESEARCH_WORKFLOW.md")
+TARGET_PATHS = [
+    Path("README.md"),
+    Path("AGENTS.md"),
+    Path("docs/index.md"),
+    Path("docs/workflows"),
+    Path("docs/meta"),
+    Path("docs/policies"),
+    Path("docs/architecture"),
+    Path(".agents/skills"),
+]
+EXCLUDED_PARTS = {
+    "docs/plans",
+    "docs/logs",
+    "docs/codex_tasks",
+    "reports",
+    "data",
+    "notebooks",
+    ".git",
+    ".venv",
+    "venv",
+}
+TEXT_SUFFIXES = {".md", ".txt", ".yaml", ".yml", ".toml", ".py", ".csv"}
 
-ALLOWED_WORKFLOW_TYPES = {
+CANONICAL_WORKFLOW_TYPES = {
     "segment_to_stock_closed_loop",
     "stock_first_closed_loop",
     "segment_stock_interlock",
     "refresh_existing_research",
     "comparison_readiness_gate",
 }
-
-ACTIVE_ROOTS = [
-    ROOT / "AGENTS.md",
-    ROOT / "README.md",
-    ROOT / "docs",
-    ROOT / ".agents",
-    ROOT / "src",
-    ROOT / "tests",
-]
-
-EXCLUDED_PARTS = {
-    ".git",
-    ".conda",
-    ".pytest_cache",
-    "__pycache__",
-    "data",
-}
-
-EXCLUDED_PREFIXES = {
-    Path("docs/plans"),
-    Path("docs/logs"),
-    Path("docs/codex_tasks"),
-    Path("docs/references/project_learning"),
-    Path("reports/workflow_runs"),
-}
-
-TEXT_SUFFIXES = {
-    ".md",
-    ".py",
-    ".yaml",
-    ".yml",
-    ".toml",
-    ".txt",
-    ".csv",
-    ".json",
-}
-
-WORKFLOW_TYPE_RE = re.compile(r"^\s*workflow_type\s*:\s*([A-Za-z0-9_-]+)?\s*$")
-GATE_TABLE_RE = re.compile(r"^\|\s*(G(?:[0-9]|10))\s*\|")
-HIGH_GATE_RE = re.compile(r"\bG1[1-9]\b")
-FORBIDDEN_SKILL_HEADINGS = [
-    "## 永久工作流类型",
-    "## Workflow state 最小字段",
-    "## 质量门禁列表",
-]
+CANONICAL_GATES = {f"G{i}" for i in range(11)}
 
 
 def rel(path: Path) -> Path:
-    return path.relative_to(ROOT)
+    return path.relative_to(REPO_ROOT)
 
 
 def is_excluded(path: Path) -> bool:
-    relative = rel(path)
-    if any(part in EXCLUDED_PARTS for part in relative.parts):
-        return True
-    return any(relative == prefix or prefix in relative.parents for prefix in EXCLUDED_PREFIXES)
+    as_posix = str(rel(path)).replace("\\", "/")
+    return any(as_posix == part or as_posix.startswith(part + "/") for part in EXCLUDED_PARTS)
 
 
-def iter_files() -> list[Path]:
+def iter_target_files() -> list[Path]:
     files: list[Path] = []
-    for root in ACTIVE_ROOTS:
+    for target in TARGET_PATHS:
+        root = REPO_ROOT / target
         if not root.exists():
             continue
         if root.is_file():
-            candidates = [root]
-        else:
-            candidates = [path for path in root.rglob("*") if path.is_file()]
-        for path in candidates:
-            if path.suffix.lower() not in TEXT_SUFFIXES:
-                continue
-            if is_excluded(path):
-                continue
-            files.append(path)
-    return sorted(files)
+            if root.suffix in TEXT_SUFFIXES and not is_excluded(root):
+                files.append(root)
+            continue
+        for path in root.rglob("*"):
+            if path.is_file() and path.suffix in TEXT_SUFFIXES and not is_excluded(path):
+                files.append(path)
+    script = REPO_ROOT / "scripts" / "check_doc_drift.py"
+    if script.exists():
+        files.append(script)
+    return sorted(set(files))
 
 
-def add_item(
-    items: list[dict[str, object]],
-    severity: str,
-    path: Path,
-    line: int,
-    rule: str,
-    message: str,
-) -> None:
-    items.append(
-        {
-            "severity": severity,
-            "path": str(rel(path)).replace("\\", "/"),
-            "line": line,
-            "rule": rule,
-            "message": message,
-        }
-    )
+def read(path: Path) -> str:
+    return path.read_text(encoding="utf-8", errors="replace")
 
 
-def check_file(path: Path, items: list[dict[str, object]]) -> None:
-    try:
-        lines = path.read_text(encoding="utf-8").splitlines()
-    except UnicodeDecodeError:
+def fail(errors: list[str], path: Path, message: str) -> None:
+    errors.append(f"{rel(path)}: {message}")
+
+
+def check_canonical_workflow(errors: list[str]) -> None:
+    path = REPO_ROOT / CANONICAL_WORKFLOW
+    if not path.exists():
+        errors.append(f"{CANONICAL_WORKFLOW}: missing canonical workflow file")
         return
+    text = read(path)
 
-    relative = rel(path).as_posix()
-    is_research_kernel = relative == "docs/workflows/RESEARCH_WORKFLOW.md"
-    is_skill = len(path.parts) >= 3 and path.name == "SKILL.md" and ".agents" in path.parts
+    for workflow_type in sorted(CANONICAL_WORKFLOW_TYPES):
+        if workflow_type not in text:
+            fail(errors, path, f"missing canonical workflow_type {workflow_type!r}")
 
-    for line_no, line in enumerate(lines, start=1):
-        match = WORKFLOW_TYPE_RE.match(line)
-        if match:
-            value = match.group(1)
-            if value and value not in ALLOWED_WORKFLOW_TYPES:
-                add_item(
-                    items,
-                    "error",
-                    path,
-                    line_no,
-                    "workflow_type_enum",
-                    f"non-canonical workflow_type: {value}",
-                )
+    gate_ids = set(re.findall(r"\bG\d+\b", text))
+    missing = CANONICAL_GATES - gate_ids
+    if missing:
+        fail(errors, path, f"missing canonical gate ids: {', '.join(sorted(missing))}")
 
-        if HIGH_GATE_RE.search(line):
-            add_item(
-                items,
-                "error",
-                path,
-                line_no,
-                "global_gate_above_g10",
-                "global gate ids above G10 are not allowed on active contract surfaces",
-            )
+    unexpected = {gate for gate in gate_ids if re.fullmatch(r"G\d+", gate) and gate not in CANONICAL_GATES}
+    if unexpected:
+        fail(errors, path, f"unexpected global gate ids: {', '.join(sorted(unexpected))}")
 
-        if GATE_TABLE_RE.match(line) and not is_research_kernel:
-            add_item(
-                items,
-                "error",
-                path,
-                line_no,
-                "global_gate_table_outside_kernel",
-                "global gate table rows must live only in docs/workflows/RESEARCH_WORKFLOW.md",
-            )
+    if re.search(r"workflow_type\s*:\s*stock_report_production", text):
+        fail(errors, path, "must not define stock_report_production as workflow_type")
 
-        if len(line) > 500:
-            add_item(
-                items,
-                "warning",
-                path,
-                line_no,
-                "markdown_long_line",
-                "line exceeds 500 characters",
-            )
 
-    if is_skill:
-        text = "\n".join(lines)
-        for heading in FORBIDDEN_SKILL_HEADINGS:
-            if heading in text:
-                add_item(
-                    items,
-                    "warning",
-                    path,
-                    1,
-                    "skill_redefines_global_workflow_facts",
-                    f"SKILL.md contains forbidden heading: {heading}",
-                )
+def check_active_files(errors: list[str]) -> None:
+    gate_table_line = re.compile(r"^\s*\|\s*G\d+\b", re.MULTILINE)
+    stock_report_workflow_type = re.compile(r"workflow_type\s*:\s*stock_report_production")
+    high_gate_ids = re.compile(r"\bG(?:1[1-9]|[2-9]\d)\b")
+
+    for path in iter_target_files():
+        text = read(path)
+        relative = rel(path)
+        is_canonical = relative == CANONICAL_WORKFLOW
+
+        if stock_report_workflow_type.search(text):
+            fail(errors, path, "active docs must not write stock_report_production as workflow_type")
+
+        if not is_canonical and gate_table_line.search(text):
+            fail(errors, path, "global gate table appears outside RESEARCH_WORKFLOW.md")
+
+        high_gates = sorted(set(high_gate_ids.findall(text)))
+        if high_gates:
+            fail(errors, path, f"unexpected global gate ids outside G0-G10: {', '.join(high_gates)}")
+
+        if relative.match(".agents/skills/*/SKILL.md"):
+            if "workflow_type:" in text and "does not redefine" not in text and "不重新定义" not in text:
+                fail(errors, path, "SKILL.md mentions workflow_type without anti-redefinition guardrail")
 
 
 def main() -> int:
-    items: list[dict[str, object]] = []
-    for path in iter_files():
-        check_file(path, items)
+    errors: list[str] = []
+    check_canonical_workflow(errors)
+    check_active_files(errors)
 
-    errors = sum(1 for item in items if item["severity"] == "error")
-    warnings = sum(1 for item in items if item["severity"] == "warning")
-    print(json.dumps({"errors": errors, "warnings": warnings, "items": items}, ensure_ascii=False, indent=2))
-    return 1 if errors else 0
+    if errors:
+        print("Doc drift check failed:\n")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+
+    print("Doc drift check passed.")
+    return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())

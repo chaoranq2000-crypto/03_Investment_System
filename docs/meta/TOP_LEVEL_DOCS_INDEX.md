@@ -1,31 +1,26 @@
-# Documentation Meta Index — compatibility pointer
+# Documentation Meta Index — Compatibility Pointer
 
-This file is no longer the active reading-order source.
+本文件仅为历史兼容性指针，不再维护第二份顶层文档清单。
 
-Use these navigation sources instead:
+当前主索引：
 
 ```text
-README.md
 docs/index.md
+```
+
+当前文档职责边界：
+
+```text
 docs/meta/DOC_OWNERSHIP_MATRIX.md
 ```
 
-## Default reading path
-
-For normal work, read only what the task needs:
+当前 workflow 事实源：
 
 ```text
-AGENTS.md
 docs/workflows/RESEARCH_WORKFLOW.md
-relevant .agents/skills/<skill>/SKILL.md
-current reports/workflow_runs/<workflow_id>/workflow_state.yaml, if any
 ```
 
-Read policies, architecture docs, reporting docs, and skill references only when the task needs them.
-
-## Historical materials
-
-These directories are historical or task-specific and are not default fact sources:
+历史计划、日志和 Codex 任务保留在以下目录，但不作为当前事实源：
 
 ```text
 docs/plans/
@@ -33,4 +28,4 @@ docs/logs/
 docs/codex_tasks/
 ```
 
-Do not use this file to override `DOC_OWNERSHIP_MATRIX.md` or `RESEARCH_WORKFLOW.md`.
+如需要新增或调整主阅读路径，只更新 `docs/index.md`，不要在本文件复制第二份索引。
