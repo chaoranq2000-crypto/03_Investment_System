@@ -19,8 +19,10 @@ def test_stock_deep_dive_references_data_layer_pack_consumption() -> None:
 
 def test_quality_review_has_data_layer_pack_gate() -> None:
     quality = (ROOT / ".agents/skills/quality-review/SKILL.md").read_text(encoding="utf-8")
-    assert "### G7-DL Data Layer Pack Check" in quality
-    assert "parent_gate_id: G7" in quality
+    assert "### QR-DL Data Layer Pack Subchecks" in quality
+    assert "local_check_id" in quality
+    assert "`QR-DL-1`" in quality
+    assert "`QR-DL-6`" in quality
     assert "valuation_snapshot.yaml" in quality
     assert "TODO_STRUCTURED_FINANCIAL_DATA" in quality
     assert "MISSING_DISCLOSURE" in quality

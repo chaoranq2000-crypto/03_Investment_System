@@ -125,14 +125,21 @@ def collect_errors() -> list[str]:
             f"name: {skill}",
             "description:",
             "## When to use",
-            "## Responsibilities",
             "## Out of scope",
-            "## Guardrails",
             "## Quality checklist",
         ]
         for marker in required_markers:
             if marker not in content:
                 errors.append(f"{skill_path} missing marker: {marker}")
+        marker_groups = {
+            "responsibility section": ["## Responsibilities", "## Local procedure"],
+            "guardrail section": ["## Guardrails", "## Canonical boundary"],
+        }
+        for label, alternatives in marker_groups.items():
+            if not any(marker in content for marker in alternatives):
+                errors.append(
+                    f"{skill_path} missing {label}: one of {', '.join(alternatives)}"
+                )
         if f'path = ".agents/skills/{skill}"' not in config:
             errors.append(f".codex/config.toml missing skill path: {skill}")
 
@@ -154,16 +161,16 @@ def collect_errors() -> list[str]:
 
     quality = read_text(".agents/skills/quality-review/SKILL.md")
     for marker in [
-        "是否所有关键结论都有 `evidence_id` 或 `claim_id`",
-        "是否混淆事实、估计、推断、观点",
-        "是否把管理层表述当成事实",
-        "是否把券商预测当成事实",
-        "是否标记缺失数据",
-        "是否列出反证和不确定性",
-        "是否说明指标口径、单位和周期",
-        "是否存在过期证据",
-        "是否有更新日志要求",
-        "是否避免买卖建议",
+        "Do all key conclusions have `evidence_id`, `claim_id`, `metric_id` or TODO?",
+        "Are facts, estimates, inferences and opinions separated?",
+        "Are management comments tagged as management comments?",
+        "Are analyst predictions tagged as analyst views?",
+        "Is missing data explicitly marked?",
+        "Are counter-evidence and uncertainty visible?",
+        "Are metric period, unit and source clear?",
+        "Is stale evidence marked?",
+        "Is update / backflow logging required?",
+        "Is direct trading advice avoided?",
     ]:
         if marker not in quality:
             errors.append(f"quality-review checklist missing: {marker}")

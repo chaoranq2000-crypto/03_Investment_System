@@ -98,7 +98,8 @@ def test_stage_metadata_is_consistent() -> None:
     assert config["project"]["previous_stage"]["P0"] == "conditional_pass"
     assert config["project"]["previous_stage"]["P1"] == "conditional_pass_with_medium_todos"
     assert config["project"]["current_focus"] == "pre_p2_hardening"
-    assert "P1.5：pre-P2 hardening" in readme
+    assert "A-share Research OS" in readme
+    assert "docs/workflows/RESEARCH_WORKFLOW.md" in readme
     assert "READY_FOR_LIMITED_P2" in p2_checklist
     assert "不允许直接批量扩展细分或公司池" in p2_checklist
 

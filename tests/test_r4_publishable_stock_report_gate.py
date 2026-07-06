@@ -25,8 +25,9 @@ def test_r4_publishable_gate_documents_bridge_only_boundary() -> None:
     assert "publishable_ready" in text
     assert "No-advice gate" in text
     assert "references/publishable_stock_report_gate.md" in stock_skill
-    assert "G7-R4 R4 Publishable Stock Report Check" in quality_skill
-    assert "parent_gate_id: G7" in quality_skill
+    assert "### QR-R4 Publishable Stock Report Subchecks" in quality_skill
+    assert "`QR-R4-1`" in quality_skill
+    assert "`QR-R4-5`" in quality_skill
 
 
 def test_r4_gate_status_is_bridge_only_with_visible_todos() -> None:
