@@ -67,3 +67,33 @@ sensitivity:
   bear: base - 5pct
   base: see revenue_forecast
   bull: base + 5pct
+historical_metric_anchors:
+- metric_name: revenue
+  period: '20260331'
+  metric_id: metric_cn_002837_invic_revenue_20260331_4f7f22
+  use_in_model: revenue_forecast_base
+  claim_type: metric_snapshot
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
+  limitations: Company-level metric-only input; not segment exposure proof.
+- metric_name: n_income_attr_p
+  period: '20260331'
+  metric_id: metric_cn_002837_invic_n_income_attr_p_20260331_530e7b
+  use_in_model: historical_profit_anchor_reference_only
+  claim_type: metric_snapshot
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
+  limitations: Historical value only; does not create net profit forecast.
+- metric_name: basic_eps
+  period: '20260331'
+  metric_id: metric_cn_002837_invic_basic_eps_20260331_16e329
+  use_in_model: historical_eps_anchor_reference_only
+  claim_type: metric_snapshot
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
+  limitations: Historical value only; does not create EPS forecast.
+model_input_status:
+  revenue_forecast: partial_estimate_from_existing_metric_anchor
+  margin_forecast: TODO_MODEL_INPUT
+  net_profit_forecast: TODO_MODEL_INPUT
+  eps_forecast: TODO_MODEL_INPUT
+  market_valuation_inputs: TODO_MARKET_DATA
+  peer_inputs: TODO_PEER_DATA
+no_advice_boundary: true

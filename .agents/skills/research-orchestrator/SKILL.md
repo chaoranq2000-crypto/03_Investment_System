@@ -1,6 +1,10 @@
 ---
 name: research-orchestrator
-description: A股投研总工作流编排。当用户要求研究一个细分、深挖一个股票、刷新已有研究、检查是否能进入 P2、续跑/复盘一个 workflow，或询问下一步应调用哪个 skill 时使用。该 skill 负责按 docs/workflows/RESEARCH_WORKFLOW.md 的事实源路由下层 skills，不替代 evidence-ingest、segment-research、stock-deep-dive、quality-review 等具体研究技能。
+description: >
+  A股投研总工作流编排。当用户要求研究一个细分、深挖一个股票、刷新已有研究、
+  检查是否能进入 P2、续跑/复盘一个 workflow，或询问下一步应调用哪个 skill 时使用。
+  该 skill 负责按 docs/workflows/RESEARCH_WORKFLOW.md 的事实源路由下层 skills，
+  不替代 evidence-ingest、segment-research、stock-deep-dive、quality-review 等具体研究技能。
 ---
 
 # Research Orchestrator Skill
@@ -35,6 +39,7 @@ docs/workflows/RESEARCH_WORKFLOW.md
 docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
 .agents/skills/research-orchestrator/references/workflow_state_schema.md
 .agents/skills/research-orchestrator/references/skill_routing_matrix.md
+.agents/skills/research-orchestrator/assets/handoff_template.md
 ```
 
 ## When to use
@@ -104,84 +109,58 @@ constraints:
 out_of_scope:
 ```
 
-If optional information is missing but the task can still progress, use conservative assumptions and record them in `workflow_state.yaml` or the response. Do not block on non-critical fields.
+If optional information is missing but the task can still progress, use
+conservative assumptions and record them in `workflow_state.yaml` or the
+response. Do not block on non-critical fields.
 
 ## Local procedure
 
-### ORCH-1 Classify request
+### ORCH-1 Read canonical docs
 
-Classify the request against canonical workflow types in `RESEARCH_WORKFLOW.md`.
+Read `AGENTS.md`, `RESEARCH_WORKFLOW.md`, and when needed
+`WORKFLOW_ORCHESTRATION_SPEC.md`. Use the spec for runtime rules.
 
-If the user only asks for status / next step / gap check, use `run_mode: diagnostic` rather than inventing a new workflow type.
+### ORCH-2 Classify workflow_type
 
-### ORCH-2 Create or locate workflow run
+Classify against canonical workflow types in `RESEARCH_WORKFLOW.md`.
+For status / gap / next-step checks, use `run_mode: diagnostic`.
+See `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
-For complete runs, resumes, debug runs, or readout tasks, create or update:
+### ORCH-3 Create or update workflow_state
 
-```text
-reports/workflow_runs/<workflow_id>/
-```
+Create or update `reports/workflow_runs/<workflow_id>/workflow_state.yaml`
+when the run requires persisted state. Use `workflow_state_schema.md`
+and the runtime rules in `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
-For brief diagnostics, a run directory may be skipped, but the response must say that no run directory was created.
+### ORCH-4 Select next stage and target skill
 
-### ORCH-3 Update workflow state
+Use canonical stages from `RESEARCH_WORKFLOW.md`; use
+`skill_routing_matrix.md` only as a quick reference. Runtime dispatch follows
+`WORKFLOW_ORCHESTRATION_SPEC.md`.
 
-Use the schema in:
+### ORCH-5 Emit handoff packet
 
-```text
-.agents/skills/research-orchestrator/references/workflow_state_schema.md
-```
+Write handoff packets from `assets/handoff_template.md` under
+`reports/workflow_runs/<workflow_id>/handoffs/`. Required fields are governed
+by `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
-Do not add new `workflow_type` values from this skill.
+### ORCH-6 Dispatch quality gate
 
-### ORCH-4 Route to lower-level skill
+Dispatch the next canonical gate from `RESEARCH_WORKFLOW.md`.
+`quality-review` owns issue finding and severity; dispatch rules live in
+`WORKFLOW_ORCHESTRATION_SPEC.md`.
 
-Use `RESEARCH_WORKFLOW.md` stages and `skill_routing_matrix.md` as a quick reference.
+### ORCH-7 Route fix loop if needed
 
-If they conflict, follow `RESEARCH_WORKFLOW.md` and create a TODO to update the stale reference.
+If review finds blocking issues, update state to `needs_fix` or `blocked`
+and route to the owner skill. Fix loop rules live in
+`WORKFLOW_ORCHESTRATION_SPEC.md`.
 
-### ORCH-5 Write handoff packet
+### ORCH-8 Close with workflow_readout
 
-Write handoff packets in:
-
-```text
-reports/workflow_runs/<workflow_id>/handoffs/<nn>_to_<skill>.md
-```
-
-Each handoff must include objective, inputs, expected outputs, guardrails, completion criteria and next gate.
-
-### ORCH-6 Enforce backflow
-
-For stock-first and segment-to-stock runs, close only after there is an explicit backflow decision:
-
-```text
-update_exposure
-update_company_universe
-update_segment_taxonomy
-update_scorecard
-no_backflow_needed
-blocked
-```
-
-No backflow decision means the workflow cannot close as accepted.
-
-### ORCH-7 Dispatch quality gates
-
-Global gate definitions live in `RESEARCH_WORKFLOW.md`.
-
-The orchestrator may dispatch gates and update status, but `quality-review` owns issue finding and severity assignment.
-
-High severity issues block `accepted`.
-
-### ORCH-8 Produce readout
-
-For complete runs, write:
-
-```text
-reports/workflow_runs/<workflow_id>/workflow_readout.md
-```
-
-The readout must include status, scope, skills used, artifacts produced, quality gates, backflow decisions, unresolved TODOs and P2 readiness if relevant.
+For complete runs, write `workflow_readout.md` with final status, artifacts,
+quality results, backflow decision, TODOs, and P2 readiness only if relevant.
+Close rules live in `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
 ## Output style
 
@@ -212,6 +191,8 @@ Do not write long investment opinions from this skill.
 - Do not output buy/sell/hold advice.
 
 ## Minimal close checklist
+
+This checklist is an operational close check, not a second global gate table.
 
 ```text
 [ ] workflow_state.yaml exists and is current

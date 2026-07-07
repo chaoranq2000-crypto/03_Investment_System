@@ -14,12 +14,13 @@ valuation_request:
   input_paths:
     stock_analysis_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_analysis_pack.yaml
     forecast_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
-    financial_metric_pack: TODO_FINANCIAL_METRIC_PACK
+    financial_metric_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
     reviewed_claims: reports/workflow_runs/wf_20260703_stock_first_002837_invic/claims_registry.csv
     reviewed_metrics: reports/workflow_runs/wf_20260703_stock_first_002837_invic/metrics_registry.csv
-    market_snapshot: TODO_MARKET_DATA
-    peer_market_snapshot: TODO_PEER_DATA
-    source_gap_report: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_source_gap_report_v0_2.md
+    market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_snapshot.csv
+    peer_market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv
+    valuation_input_readiness: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation_input_readiness.yaml
+    source_gap_report: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_source_gap_report_v0_3.md
 
   allowed_methods:
     static_multiples: true
@@ -41,6 +42,6 @@ valuation_request:
   known_gaps:
     - TODO_MARKET_DATA
     - TODO_PEER_DATA
-    - TODO_FINANCIAL_METRIC_PACK
     - TODO_FORECAST_MODEL_NET_PROFIT
-  notes: "Dry-run request for P1.6 company-valuation sub-skill integration; gaps are intentionally visible and no live data was acquired."
+    - MISSING_DISCLOSURE
+  notes: "P1.6 enrichment request uses parseable input files. Market and peer rows remain TODO; financial_metric_pack is partial metric-only support."

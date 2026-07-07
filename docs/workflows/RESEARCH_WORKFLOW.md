@@ -32,6 +32,9 @@ P2 readiness criteria
 
 其他文件可以引用这些接口，但不得重新定义或扩展。
 
+Detailed workflow_state schema is owned by
+`.agents/skills/research-orchestrator/references/workflow_state_schema.md`.
+
 Skill-local 步骤和检查必须使用局部前缀：
 
 ```text
@@ -133,48 +136,17 @@ wf_20260701_segment_to_stock_ai_server_liquid_cooling
 wf_20260701_stock_first_cn_002837_invic
 ```
 
-## 6. Workflow state 最小字段
+## 6. Workflow state ownership
 
-`workflow_state.yaml` 至少包含：
+`workflow_state.yaml` 记录一次 workflow run 的当前状态。
 
-```yaml
-workflow_id:
-workflow_type: segment_to_stock_closed_loop | stock_first_closed_loop | segment_stock_interlock | refresh_existing_research | comparison_readiness_gate
-run_mode: normal | diagnostic
-status: planned | in_progress | blocked | needs_fix | ready_for_review | accepted | accepted_with_todos | archived
-created_at:
-updated_at:
-owner:
-active_segment_id:
-active_company_id:
-current_stage:
-completed_stages: []
-next_stage:
-active_skill:
-required_next_skill:
-evidence_snapshot:
-claims_snapshot:
-metrics_snapshot:
-artifacts: []
-open_todos: []
-quality_gates: []
-entry_criteria:
-exit_criteria:
-notes:
-```
+本 kernel 只要求完整运行在 `reports/workflow_runs/<workflow_id>/`
+维护一个当前 `workflow_state.yaml`，并消费本文件定义的
+canonical `workflow_type`、global `stage_id`、global `gate_id`
+和 `backflow_decision`。
 
-状态含义：
-
-| status | 含义 |
-|---|---|
-| `planned` | 工作流已定义，尚未开始。 |
-| `in_progress` | 正在执行某一步。 |
-| `blocked` | 缺关键输入、证据、配置或路径，无法继续。 |
-| `needs_fix` | 产物存在质量问题，需要回到具体 stage 修复。 |
-| `ready_for_review` | 主要产物完成，等待质量审查或人工复核。 |
-| `accepted` | 关键门禁通过，无 high severity 问题。 |
-| `accepted_with_todos` | 无 high severity 问题，但保留 medium/low TODO。 |
-| `archived` | 历史运行，保留但不作为当前状态。 |
+Detailed workflow_state schema is owned by
+`.agents/skills/research-orchestrator/references/workflow_state_schema.md`.
 
 ## 7. Skill 角色分工
 
@@ -366,18 +338,5 @@ config/segment_taxonomy.yaml 更新或新增 candidate 说明
 7. 至少一次 workflow run 的 readout 能说明：使用了哪些 skill、读取了哪些输入、产出了哪些文件、哪些 TODO 未解决。
 8. quality-review 无 high severity issue；medium TODO 已明确不会阻塞 limited P2 pilot。
 
-## 14. 现在到 P2 前的建设顺序
-
-建议顺序：
-
-```text
-A. 固化 RESEARCH_WORKFLOW.md 作为全局 kernel
-B. 瘦身 research-orchestrator skill
-C. 补齐 segment_to_stock_closed_loop 的下层步骤和 skill 契约
-D. 补齐 stock_first_closed_loop 的下层步骤和 skill 契约
-E. 补齐 segment_stock_interlock 的回写和冲突处理契约
-F. 做一次 segment-led 调试
-G. 做一次 stock-led 调试
-H. 做一次 interlock 调试
-I. 执行 comparison_readiness_gate，只判断是否进入 P2，不直接做 P2
-```
+阶段性建设顺序属于 `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md`，
+不在本 kernel 中维护。

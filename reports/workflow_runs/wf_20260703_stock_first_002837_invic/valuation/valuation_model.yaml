@@ -13,16 +13,25 @@ valuation_model:
 
   input_status:
     forecast_model: partial
+    financial_metric_pack: partial
     market_data: todo_market_data
     peer_data: todo_peer_data
     official_metric_support: partial
     business_segment_support: missing_disclosure
 
+  input_artifact_paths:
+    valuation_request: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation_request.yaml
+    valuation_input_readiness: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation_input_readiness.yaml
+    market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_snapshot.csv
+    peer_market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv
+    financial_metric_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
+    forecast_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
+
   selected_methods:
     - method_id: static_multiples
       method_name: Static market multiples
       status: todo
-      reason: TODO_MARKET_DATA; current price, market cap and current multiples are missing.
+      reason: market_snapshot.csv exists only as TODO_MARKET_DATA placeholder; current price, market cap and current multiples are missing.
       required_inputs:
         - market_snapshot.csv
       missing_inputs:
@@ -31,9 +40,10 @@ valuation_model:
     - method_id: dynamic_multiples
       method_name: Dynamic multiples from forecast model
       status: todo
-      reason: Forecast revenue exists, but margin and net profit remain TODO_MODEL_INPUT.
+      reason: Forecast revenue exists and financial_metric_pack provides historical anchors, but net profit, EPS, margin and market valuation inputs remain TODO.
       required_inputs:
         - forecast_model.yaml
+        - financial_metric_pack.csv
         - market_snapshot.csv
       missing_inputs:
         - TODO_FORECAST_MODEL_NET_PROFIT
@@ -42,7 +52,7 @@ valuation_model:
     - method_id: peer_comparison
       method_name: Peer comparison
       status: todo
-      reason: TODO_PEER_DATA; no peer_market_snapshot.csv is available under the new handoff contract.
+      reason: peer_market_snapshot.csv exists only as TODO_PEER_DATA placeholder; no dated peer multiples or peer selection evidence are available.
       required_inputs:
         - peer_market_snapshot.csv
       missing_inputs:
@@ -60,7 +70,7 @@ valuation_model:
     - method_id: dcf
       method_name: Discounted cash flow
       status: skipped
-      reason: Free-cash-flow, WACC and terminal growth assumptions are not supportable from reviewed inputs in this dry-run.
+      reason: Free-cash-flow forecast, WACC and terminal growth assumptions are not supportable from reviewed inputs in this run.
       required_inputs:
         - forecast cash flow assumptions
         - discount rate assumptions
@@ -78,7 +88,7 @@ valuation_model:
       dividend_yield: TODO_MARKET_DATA
     source_metric_ids: []
     source_paths:
-      - TODO_MARKET_DATA
+      - reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_snapshot.csv
     notes: Static valuation is blocked until a reviewed market snapshot is provided.
     confidence: low
 
@@ -95,13 +105,20 @@ valuation_model:
       ps_2026E: TODO_MARKET_DATA
     forecast_metric_ids:
       - metric_cn_002837_invic_revenue_20260331_4f7f22
+    historical_anchor_metric_ids:
+      - metric_cn_002837_invic_n_income_attr_p_20260331_530e7b
+      - metric_cn_002837_invic_basic_eps_20260331_16e329
+      - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+      - metric_cn_002837_invic_basic_eps_20251231_03d56b
     assumptions_ids:
       - assumption_revenue_growth_base
-    notes: Revenue forecasts are estimates; margin and net profit inputs remain TODO_MODEL_INPUT in forecast_model.yaml.
+    financial_metric_pack_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
+    notes: Revenue forecasts are estimates. Historical profit and EPS anchors are available but do not create net profit or EPS forecasts.
     confidence: low
 
   peer_comparison:
     peer_table_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/peer_comparison.csv
+    peer_market_snapshot_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv
     peer_set_quality: todo
     median_metrics:
       pe_ttm: TODO_PEER_DATA
@@ -111,9 +128,9 @@ valuation_model:
       ev_ebitda: TODO_PEER_DATA
     target_position:
       relative_to_peer_median: not_assessable
-      explanation: Peer comparison is not assessable without a dated peer_market_snapshot.csv and peer selection reasons.
+      explanation: Peer comparison is not assessable without a dated reviewed peer market snapshot and peer selection reasons.
     limitations:
-      - No reviewed peer set is available under the new company-valuation handoff.
+      - No reviewed peer set is available under the company-valuation handoff.
       - Existing product exposure does not prove segment revenue exposure.
 
   scenario_valuation:
@@ -147,11 +164,11 @@ valuation_model:
           - TODO_MARKET_DATA
     sensitivity_table_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
     most_sensitive_variable: revenue_growth
-    interpretation_boundary: Scenario context only; no trading action, position sizing or target-price instruction.
+    interpretation_boundary: Scenario context only; no trading action or allocation instruction.
 
   dcf_or_other_intrinsic_method:
     method_used: skipped
-    reason: Insufficient reviewed free-cash-flow, discount-rate and segment economics assumptions.
+    reason: Insufficient reviewed free-cash-flow forecast, discount-rate and segment economics assumptions.
     assumptions:
       discount_rate: TODO_MODEL_INPUT
       terminal_growth: TODO_MODEL_INPUT
@@ -173,5 +190,5 @@ valuation_model:
   quality_handoff:
     path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_quality_handoff.yaml
     no_advice_boundary: pass
-    open_gap_count: 4
+    open_gap_count: 3
     blocking_gap_count: 0

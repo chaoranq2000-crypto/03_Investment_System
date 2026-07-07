@@ -136,6 +136,7 @@ valuation_request:
     financial_metric_pack:
     market_snapshot:
     peer_market_snapshot:
+    valuation_input_readiness:
   requested_sections:
     - static_valuation
     - dynamic_valuation
@@ -198,7 +199,26 @@ TODO_SEGMENT_DISCLOSURE when SOTP is requested but segment disclosure is missing
 LOW_CONFIDENCE_PEER_SET when peer comparability is weak
 ```
 
-### 6.5 Additional prohibited outputs
+### 6.5 Input enrichment
+
+Before `company-valuation` runs, `stock-deep-dive` should normalize valuation inputs according to:
+
+```text
+.agents/skills/stock-deep-dive/references/valuation_input_enrichment_contract.md
+```
+
+The normalized handoff should prefer parseable file paths:
+
+```text
+reports/workflow_runs/<workflow_id>/market_snapshot.csv
+reports/workflow_runs/<workflow_id>/peer_market_snapshot.csv
+reports/workflow_runs/<workflow_id>/financial_metric_pack.csv
+reports/workflow_runs/<workflow_id>/valuation_input_readiness.yaml
+```
+
+Visible TODO rows are allowed when reviewed data is missing. Valuation conclusions remain `estimate`, `inference`, or `analyst_view`, never `fact`.
+
+### 6.6 Additional prohibited outputs
 
 ```text
 Do not output buy/sell/hold language.

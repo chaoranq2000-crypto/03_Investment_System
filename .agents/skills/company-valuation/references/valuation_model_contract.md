@@ -6,6 +6,8 @@ This contract defines the structured output of `company-valuation` when it is ca
 
 `valuation_model.yaml` and `valuation_section_draft.md` are model artifacts. They are not evidence, not promoted claims, and not trading advice.
 
+`company-valuation` expects `stock-deep-dive` to normalize valuation inputs with `.agents/skills/stock-deep-dive/references/valuation_input_enrichment_contract.md` before the sub-skill handoff. Parseable TODO rows are valid inputs when reviewed market, peer, or forecast data is unavailable.
+
 ## 2. Input contract
 
 The caller should provide `valuation_request.yaml`:
@@ -30,6 +32,7 @@ valuation_request:
     reviewed_metrics:
     market_snapshot:
     peer_market_snapshot:
+    valuation_input_readiness:
     source_gap_report:
   allowed_methods:
     static_multiples: true

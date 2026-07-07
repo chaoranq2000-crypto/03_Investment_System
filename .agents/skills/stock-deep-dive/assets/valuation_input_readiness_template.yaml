@@ -1,0 +1,48 @@
+---
+valuation_input_readiness:
+  workflow_id: ""
+  stock_code: ""
+  company_id: ""
+  as_of_date: "YYYY-MM-DD"
+  generated_by: stock-deep-dive
+  no_advice_boundary: true
+  input_paths:
+    market_snapshot: "reports/workflow_runs/<workflow_id>/market_snapshot.csv"
+    peer_market_snapshot: "reports/workflow_runs/<workflow_id>/peer_market_snapshot.csv"
+    financial_metric_pack: "reports/workflow_runs/<workflow_id>/financial_metric_pack.csv"
+    forecast_model: "reports/workflow_runs/<workflow_id>/forecast_model.yaml"
+    valuation_request: "reports/workflow_runs/<workflow_id>/valuation_request.yaml"
+  statuses:
+    market_snapshot:
+      status: TODO_MARKET_DATA
+      source_paths: []
+      source_metric_ids: []
+      open_gaps:
+        - TODO_MARKET_DATA
+      limitations: []
+    peer_market_snapshot:
+      status: TODO_PEER_DATA
+      source_paths: []
+      source_metric_ids: []
+      open_gaps:
+        - TODO_PEER_DATA
+      limitations: []
+    financial_metric_pack:
+      status: TODO_FINANCIAL_METRIC_PACK
+      source_paths: []
+      source_metric_ids: []
+      open_gaps:
+        - TODO_FINANCIAL_METRIC_PACK
+      limitations: []
+    forecast_model:
+      status: TODO_FORECAST_MODEL_NET_PROFIT
+      source_paths: []
+      source_metric_ids: []
+      open_gaps:
+        - TODO_FORECAST_MODEL_NET_PROFIT
+      limitations: []
+  open_gaps:
+    - TODO_MARKET_DATA
+    - TODO_PEER_DATA
+    - TODO_FINANCIAL_METRIC_PACK
+    - TODO_FORECAST_MODEL_NET_PROFIT

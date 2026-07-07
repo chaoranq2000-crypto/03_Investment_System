@@ -45,3 +45,13 @@ art_043,valuation_section_draft,valuation/valuation_section_draft.md,company-val
 art_044,valuation_gap_requests,valuation/valuation_gap_requests.yaml,company-valuation,RP6,True,True,current,company-valuation gap requests
 art_045,valuation_quality_handoff,valuation/valuation_quality_handoff.yaml,company-valuation,RP6,True,True,current,company-valuation quality handoff for QR-VAL checks
 art_046,sensitivity_table,valuation/sensitivity_table.csv,company-valuation,RP6,True,True,current,company-valuation sensitivity table with TODO valuation context
+art_047,market_snapshot,market_snapshot.csv,stock-deep-dive,RP6,True,True,current,parseable market input placeholder with TODO_MARKET_DATA
+art_048,peer_market_snapshot,peer_market_snapshot.csv,stock-deep-dive,RP6,True,True,current,parseable peer input placeholder with TODO_PEER_DATA
+art_049,financial_metric_pack,financial_metric_pack.csv,stock-deep-dive,RP6,True,True,partial,company-level metric-only financial input pack
+art_050,valuation_input_readiness,valuation_input_readiness.yaml,stock-deep-dive,RP6,True,True,accepted_with_todos,input readiness handoff for company-valuation
+art_051,valuation_input_validation_json,valuation_input_validation.json,stock-deep-dive,RP6,True,True,accepted_with_todos,validator JSON output
+art_052,valuation_input_validation_md,valuation_input_validation.md,stock-deep-dive,RP6,True,True,accepted_with_todos,validator Markdown output
+art_053,R4_stock_deep_dive_v0_3,R4_stock_deep_dive_v0_3.md,stock-deep-dive,R4_Phase_5,True,True,publishable_ready_with_disclosure_todos,R4 v0.3 valuation input enrichment draft
+art_054,R4_quality_gate_report_v0_3,R4_quality_gate_report_v0_3.md,quality-review,R4_Phase_5,True,True,current,R4 v0.3 quality gate report
+art_055,R4_source_gap_report_v0_3,R4_source_gap_report_v0_3.md,quality-review,R4_Phase_5,True,True,current,R4 v0.3 source gap report
+art_056,R4_open_questions_v0_3,R4_open_questions_v0_3.md,quality-review,R4_Phase_5,True,True,current,R4 v0.3 open questions

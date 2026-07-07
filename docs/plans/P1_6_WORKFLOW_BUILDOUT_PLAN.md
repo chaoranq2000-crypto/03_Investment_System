@@ -4,6 +4,28 @@
 >
 > 2026-07-02 update：当前实施顺序调整为 **先跑通 stock-led evidence-to-report MVP，同时完善 `evidence-ingest` 下载执行层**；完整 `segment-research` 和 `company-universe` 契约在 stock-led MVP 之后补齐。
 
+## 0. 从 workflow kernel 迁入的建设顺序
+
+以下内容原位于 `docs/workflows/RESEARCH_WORKFLOW.md` 的
+“现在到 P2 前的建设顺序”。它是阶段性建设计划，不定义
+canonical `workflow_type`、`stage_id`、`gate_id` 或
+`backflow_decision`。
+
+| 原顺序 | 建设事项 | 当前计划归属 |
+|---|---|---|
+| A | 固化 `RESEARCH_WORKFLOW.md` 作为全局 kernel | Phase A |
+| B | 瘦身 `research-orchestrator` skill | Phase A |
+| C | 补齐 `segment_to_stock_closed_loop` 的下层步骤和 skill 契约 | Phase C / B2 / B3 |
+| D | 补齐 `stock_first_closed_loop` 的下层步骤和 skill 契约 | Phase B / B5-lite |
+| E | 补齐 `segment_stock_interlock` 的回写和冲突处理契约 | Phase D / B4-lite |
+| F | 做一次 segment-led 调试 | Phase C |
+| G | 做一次 stock-led 调试 | Phase B5-debug |
+| H | 做一次 interlock 调试 | Phase D |
+| I | 执行 `comparison_readiness_gate`，只判断是否进入 P2，不直接做 P2 | Phase E |
+
+若本迁入表与 2026-07-02 update 后的执行顺序存在差异，以本计划
+Phase B-E 和第 8 节的当前顺序为准。
+
 ## 1. 总目标
 
 进入 P2 前，先完成：

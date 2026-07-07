@@ -14,9 +14,10 @@ valuation_snapshot:
     market_cap: MISSING
     shares_outstanding: MISSING
     currency: CNY
-    source_path: TODO_MARKET_DATA
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_snapshot.csv
     source_metric_ids: []
     freshness_status: unknown
+    input_status: TODO_MARKET_DATA
 
   multiples:
     pe_ttm: MISSING
@@ -26,14 +27,16 @@ valuation_snapshot:
     pe_forward: MISSING
 
   peer_context:
-    peer_market_snapshot_path: TODO_PEER_DATA
+    peer_market_snapshot_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv
     peer_set_quality: todo
     peer_median_multiples: {}
     limitations:
-      - No peer_market_snapshot.csv is available in the dry-run.
+      - peer_market_snapshot.csv is present only as TODO_PEER_DATA placeholder.
 
   model_context:
     forecast_model_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
+    financial_metric_pack_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
+    valuation_input_readiness_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation_input_readiness.yaml
     sensitivity_table_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
     scenario_summary:
       bear: TODO_VALUATION_CONTEXT

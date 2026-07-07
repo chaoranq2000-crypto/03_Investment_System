@@ -98,6 +98,23 @@ Use template:
 .agents/skills/stock-deep-dive/assets/valuation_request_template.yaml
 ```
 
+Before writing the request, normalize valuation inputs under:
+
+```text
+reports/workflow_runs/<workflow_id>/market_snapshot.csv
+reports/workflow_runs/<workflow_id>/peer_market_snapshot.csv
+reports/workflow_runs/<workflow_id>/financial_metric_pack.csv
+reports/workflow_runs/<workflow_id>/valuation_input_readiness.yaml
+```
+
+Use:
+
+```text
+.agents/skills/stock-deep-dive/references/valuation_input_enrichment_contract.md
+```
+
+The normalized files may contain parseable TODO rows. Do not replace the path fields in `valuation_request.yaml` with bare TODO strings when the file can be created with explicit gaps.
+
 ## 5. Expected subagent outputs
 
 `company-valuation` should write:

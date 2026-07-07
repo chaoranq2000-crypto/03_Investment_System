@@ -1,0 +1,72 @@
+---
+valuation_input_readiness:
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: "002837"
+  company_id: cn_002837_invic
+  as_of_date: "2026-07-03"
+  generated_by: stock-deep-dive
+  no_advice_boundary: true
+  input_paths:
+    market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_snapshot.csv
+    peer_market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv
+    financial_metric_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
+    forecast_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
+    valuation_request: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation_request.yaml
+  statuses:
+    market_snapshot:
+      status: TODO_MARKET_DATA
+      source_paths: []
+      source_metric_ids: []
+      open_gaps:
+        - TODO_MARKET_DATA
+      limitations:
+        - No reviewed market valuation snapshot is available; live APIs were not executed.
+    peer_market_snapshot:
+      status: TODO_PEER_DATA
+      source_paths: []
+      source_metric_ids: []
+      open_gaps:
+        - TODO_PEER_DATA
+      limitations:
+        - No reviewed peer set or dated peer multiples are available; live APIs were not executed.
+    financial_metric_pack:
+      status: partial
+      source_paths:
+        - data/raw/market_data/local_tushare_fixture_income_002837_2026-07-01_89213a96.csv
+        - data/raw/market_data/local_tushare_fixture_cashflow_002837_2026-07-01_41833915.csv
+        - data/raw/market_data/local_tushare_fixture_balancesheet_002837_2026-07-01_bad80e49.csv
+      source_metric_ids:
+        - metric_cn_002837_invic_revenue_20260331_4f7f22
+        - metric_cn_002837_invic_operate_profit_20260331_04da98
+        - metric_cn_002837_invic_n_income_attr_p_20260331_530e7b
+        - metric_cn_002837_invic_basic_eps_20260331_16e329
+        - metric_cn_002837_invic_diluted_eps_20260331_e2e70f
+        - metric_cn_002837_invic_n_cashflow_act_20260331_c16d8a
+        - metric_cn_002837_invic_total_assets_20260331_1349a0
+        - metric_cn_002837_invic_total_liab_20260331_40bc89
+        - metric_cn_002837_invic_revenue_20251231_9c5aaf
+        - metric_cn_002837_invic_net_profit_20251231_c253e4
+        - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+        - metric_cn_002837_invic_basic_eps_20251231_03d56b
+        - metric_cn_002837_invic_n_cashflow_act_20251231_890163
+      open_gaps:
+        - MISSING_ROE_CAPEX_DIRECT_METRICS
+      limitations:
+        - Company-level metric-only structured fixture; not segment exposure proof and not a valuation conclusion.
+    forecast_model:
+      status: partial
+      source_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
+      source_metric_ids:
+        - metric_cn_002837_invic_revenue_20260331_4f7f22
+        - metric_cn_002837_invic_n_income_attr_p_20260331_530e7b
+        - metric_cn_002837_invic_basic_eps_20260331_16e329
+      open_gaps:
+        - TODO_FORECAST_MODEL_NET_PROFIT
+      limitations:
+        - Revenue forecast exists; net profit EPS and margin forecasts remain TODO_MODEL_INPUT.
+  open_gaps:
+    - TODO_MARKET_DATA
+    - TODO_PEER_DATA
+    - TODO_FORECAST_MODEL_NET_PROFIT
+    - MISSING_DISCLOSURE
