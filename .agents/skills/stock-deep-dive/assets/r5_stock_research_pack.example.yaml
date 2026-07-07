@@ -1,0 +1,310 @@
+schema_version: r5_mvp_v0.2
+artifact_type: R5_stock_research_pack
+status: draft
+as_of_date: '2026-07-07'
+workflow_id: wf_example_r5_b5_lite
+stock:
+  company_name: 示例公司
+  stock_code: '000000'
+  exchange: SZSE
+  currency: CNY
+  fiscal_year_latest: 2025A
+  report_authoring_date: '2026-07-07'
+quality_status:
+  r5_gate_status: not_reviewed
+  allowed_report_level: research_draft
+  high_issue_count: 0
+  medium_issue_count: 3
+  source_gap_visible: true
+  no_advice_gate_passed: null
+company_identity_pack:
+  status: ready
+  company_id: company_example_000000_sz
+  legal_name: 示例股份有限公司
+  short_name: 示例公司
+  securities:
+  - stock_code: '000000'
+    exchange: SZSE
+    security_type: A_share
+  headquarters: null
+  primary_industry: null
+  business_summary: 示例占位，不代表真实公司。
+  identity_evidence_ids:
+  - ev_example_identity_001
+  open_questions: []
+source_gap_policy:
+  missing_value_tokens:
+  - MISSING_DISCLOSURE
+  - TODO_SOURCE_REQUIRED
+  - TODO_MODEL_INPUT
+  - NOT_APPLICABLE
+  - TODO_MARKET_DATA
+  - TODO_PEER_DATA
+  - LOW_CONFIDENCE_CLUE_ONLY
+  rule: Do not convert missing values into factual claims.
+evidence_snapshot_pack:
+  status: partial
+  as_of_date: '2026-07-07'
+  evidence_manifest_path: data/manifests/example_evidence_manifest.csv
+  evidence_counts:
+    official_filings: 1
+    announcements: 0
+    investor_relations: 0
+    market_data: 0
+    peer_data: 0
+    industry_data: 0
+    news_or_event_clues: 0
+  critical_missing_sources:
+  - market_snapshot.csv
+  - peer_market_snapshot.csv
+  evidence_ids:
+  - ev_example_identity_001
+  - ev_example_annual_report_2025
+financial_history_pack:
+  status: TODO
+  currency: CNY
+  periods: []
+  income_statement: []
+  balance_sheet: []
+  cashflow_statement: []
+  key_metrics: []
+  financial_quality:
+    revenue_growth_driver: null
+    gross_margin_driver: null
+    adjusted_profit_bridge: null
+    cashflow_quality: null
+    working_capital_flags: []
+    roe_roic_commentary: null
+  evidence_ids: []
+  missing_items: []
+business_breakdown_pack:
+  status: partial
+  business_lines:
+  - business_name: 核心业务示例
+    role: unknown
+    revenue:
+      value: null
+      unit: CNY_mn
+      evidence_id: null
+      missing_reason: TODO_SOURCE_REQUIRED
+    revenue_pct:
+      value: null
+      evidence_id: null
+      missing_reason: TODO_SOURCE_REQUIRED
+    gross_margin:
+      value: null
+      evidence_id: null
+      missing_reason: TODO_SOURCE_REQUIRED
+    gross_profit:
+      value: null
+      unit: CNY_mn
+      evidence_id: null
+      missing_reason: TODO_SOURCE_REQUIRED
+    gross_profit_pct:
+      value: null
+      evidence_id: null
+      missing_reason: TODO_SOURCE_REQUIRED
+    products:
+    - name: 产品线索示例
+      claim_type: LOW_CONFIDENCE_CLUE_ONLY
+      evidence_id: ev_example_annual_report_2025
+    customers: []
+    capacity: []
+    orders: []
+    pricing_driver: null
+    cost_driver: null
+    linked_segments:
+    - segment_example
+    confidence: low
+  profit_pool_summary: 业务收入、毛利率和利润贡献尚未取得官方披露，不能写强判断。
+  structural_contradictions:
+  - product exposure exists, but revenue_pct and profit_pct remain missing.
+  missing_items:
+  - segment revenue
+  - segment gross margin
+segment_exposure_pack:
+  status: partial
+  linked_segments:
+  - segment_id: segment_example
+    segment_name: 示例细分
+  exposures:
+  - segment_id: segment_example
+    segment_name: 示例细分
+    exposure_type: product_line_clue
+    exposure_score: 1
+    confidence: low
+    evidence_ids:
+    - ev_example_annual_report_2025
+    missing_reason: null
+    backflow_decision: no_backflow_needed
+industry_context_pack:
+  status: TODO
+  industry_cards:
+  - segment_name: null
+    demand_drivers: []
+    supply_constraints: []
+    price_or_margin_mechanism: []
+    competition_structure: []
+    technology_roadmap: []
+    policy_or_cycle_sensitivity: []
+    company_position: null
+    evidence_ids: []
+    missing_items: []
+  industry_beta_summary: null
+peer_comparison_pack:
+  status: TODO
+  peer_set:
+    selection_method: null
+    peers: []
+  peer_financial_snapshot_path: null
+  peer_valuation_snapshot_path: null
+  peer_comparison_summary: null
+  missing_items: []
+forecast_model_pack:
+  status: TODO
+  model_type: bottom_up_or_explicit_assumption_required
+  forecast_years:
+  - 2026E
+  - 2027E
+  - 2028E
+  scenarios:
+    base_case:
+      status: TODO_MODEL_INPUT
+      assumptions: []
+      forecast_table: []
+    bull_case:
+      status: TODO_MODEL_INPUT
+      assumptions: []
+      forecast_table: []
+    bear_case:
+      status: TODO_MODEL_INPUT
+      assumptions: []
+      forecast_table: []
+  required_metrics:
+  - revenue
+  - gross_margin
+  - gross_profit
+  - net_profit_attributable
+  - eps
+  sensitivity_tests: []
+  consensus_comparison: null
+  missing_items:
+  - bottom_up_forecast_assumptions
+valuation_pack:
+  status: TODO
+  market_snapshot:
+    as_of_date: null
+    current_price: null
+    market_cap: null
+    share_count: null
+    net_cash_or_net_debt: null
+    enterprise_value: null
+    pe_ttm: null
+    forward_pe: null
+    pb: null
+    ps: null
+    ev_ebitda: null
+    missing_reason: TODO_MARKET_DATA
+  peer_valuation_context: []
+  valuation_methods:
+  - method: relative_pe
+    status: TODO_MODEL_INPUT
+    output: null
+  - method: sotp
+    status: TODO_IF_APPLICABLE
+    output: null
+  - method: dcf
+    status: TODO_IF_APPLICABLE
+    output: null
+  valuation_scenarios: []
+  valuation_sensitivity: []
+  missing_items:
+  - market_snapshot.csv
+  - peer_market_snapshot.csv
+technical_market_pack:
+  status: TODO
+  as_of_date: null
+  price_history_path: null
+  current_price: null
+  returns:
+    one_month: null
+    three_month: null
+    six_month: null
+    twelve_month: null
+    ytd: null
+  moving_averages:
+    ma5: null
+    ma10: null
+    ma20: null
+    ma60: null
+    ma120: null
+    ma250: null
+  volume_turnover: null
+  support_levels: []
+  resistance_levels: []
+  trend_judgement: null
+  missing_items:
+  - price_history.csv
+sentiment_event_pack:
+  status: TODO
+  as_of_date: null
+  macro_sentiment:
+    status: TODO_SOURCE_REQUIRED
+    summary: null
+    evidence_ids: []
+  industry_sentiment:
+    status: TODO_SOURCE_REQUIRED
+    summary: null
+    evidence_ids: []
+  company_sentiment:
+    status: TODO_SOURCE_REQUIRED
+    summary: null
+    evidence_ids: []
+  fund_flow_pack_path: null
+  analyst_view_pack_path: null
+  catalyst_calendar:
+  - event_date: null
+    event_name: null
+    event_type: null
+    probability: null
+    expected_market_interpretation: null
+    verification_metric: null
+    counterevidence_condition: null
+    evidence_ids: []
+  missing_items:
+  - sentiment sources
+  - event calendar
+risk_counterevidence_pack:
+  status: partial
+  key_risks:
+  - risk_name: source gap risk
+    description: 核心业务拆分和市场快照尚缺。
+    evidence_ids: []
+  counterevidence: []
+  falsification_conditions:
+  - 官方披露显示产品线索不构成实质业务收入。
+  monitoring_checklist:
+  - 补充 official filings
+  - 补充 financial_metric_pack
+  - 补充 market_snapshot
+  evidence_ids: []
+report_composition_pack:
+  status: partial
+  thesis_statement: null
+  core_contradiction: 存在产品暴露线索，但缺收入与利润贡献披露。
+  market_disagreement: null
+  section_claim_plan_path: null
+  allowed_report_level: research_draft
+  sections_ready:
+    preface: false
+    financial_overview: false
+    business_breakdown: true
+    industry_analysis: false
+    forecast: false
+    valuation: false
+    technical_analysis: false
+    sentiment_analysis: false
+    catalyst_events: false
+    research_conclusion: false
+  source_gap_report_path: reports/workflow_runs/wf_example_r5_b5_lite/R5_source_gap_report.md
+  open_questions_path: reports/workflow_runs/wf_example_r5_b5_lite/R5_open_questions.md
