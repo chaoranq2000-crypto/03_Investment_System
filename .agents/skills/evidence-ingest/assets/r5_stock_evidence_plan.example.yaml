@@ -1,0 +1,83 @@
+schema_version: r5_stock_evidence_plan_v0.1
+artifact_type: R5_stock_evidence_plan
+metadata:
+  workflow_id: wf_r5_fixture
+  company_id: company_fixture
+  stock_code: '000000'
+  company_name: Fixture Company
+  as_of_date: '2026-07-07'
+implementation_boundary:
+  no_downloader_added: true
+  no_live_api: true
+  no_raw_or_processed_modification: true
+source_gap_policy:
+  missing_disclosure_token: MISSING_DISCLOSURE
+  preserve_missing_data: true
+  no_guessing: true
+evidence_plan:
+  official_filings:
+    source_priority: 1
+    requests:
+      - request_id: annual_reports_3y
+        source_type: official_disclosure
+        required_for_pack: [evidence_snapshot_pack, financial_history_pack, business_breakdown_pack]
+        freshness_requirement: latest_three_fiscal_years
+        fallback_if_missing: MISSING_DISCLOSURE
+      - request_id: latest_periodic_report
+        source_type: official_disclosure
+        required_for_pack: [financial_history_pack]
+        freshness_requirement: latest_interim_or_quarterly
+        fallback_if_missing: MISSING_DISCLOSURE
+  structured_financial_data:
+    source_priority: 2
+    requests:
+      - request_id: structured_financials
+        source_type: structured_financial_data
+        required_for_pack: [financial_history_pack, forecast_model_pack]
+        freshness_requirement: align_to_official_filing_period
+        fallback_if_missing: TODO_SOURCE_REQUIRED
+  market_snapshot:
+    source_priority: 3
+    requests:
+      - request_id: market_snapshot
+        source_type: market_data_snapshot
+        required_for_pack: [valuation_pack, technical_market_pack]
+        freshness_requirement: explicit_as_of_date_required
+        fallback_if_missing: TODO_MARKET_DATA
+  peer_snapshot:
+    source_priority: 4
+    requests:
+      - request_id: peer_snapshot
+        source_type: peer_snapshot
+        required_for_pack: [peer_comparison_pack, valuation_pack]
+        freshness_requirement: explicit_peer_set_and_as_of_date
+        fallback_if_missing: TODO_PEER_DATA
+  industry_context:
+    source_priority: 5
+    requests:
+      - request_id: industry_context
+        source_type: industry_context
+        required_for_pack: [industry_context_pack]
+        freshness_requirement: source_date_required
+        fallback_if_missing: TODO_SOURCE_REQUIRED
+  news_event_clues:
+    source_priority: 6
+    requests:
+      - request_id: news_event_clues
+        source_type: news_social_clue
+        required_for_pack: [sentiment_event_pack, risk_counterevidence_pack]
+        freshness_requirement: last_12_to_18_months_or_visible_gap
+        fallback_if_missing: TODO_SOURCE_REQUIRED
+  investor_relations:
+    source_priority: 5
+    requests:
+      - request_id: investor_relations
+        source_type: investor_relations
+        required_for_pack: [business_breakdown_pack, sentiment_event_pack]
+        freshness_requirement: management_comment_date_required
+        fallback_if_missing: TODO_SOURCE_REQUIRED
+expected_artifacts:
+  manifest_rows: true
+  claim_candidates: true
+  metric_candidates: true
+  ingest_log: true

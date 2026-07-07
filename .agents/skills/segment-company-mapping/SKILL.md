@@ -55,15 +55,14 @@ profit_pct:
 
 ```text
 revenue
-product
-technology
-customer
-project
-capacity
-order
-narrative
-excluded
-todo_insufficient_evidence
+profit
+product_line_clue
+customer_clue
+order_clue
+capacity_clue
+technology_reserve
+project_clue
+narrative_only
 ```
 
 ## Exposure score guide
@@ -90,10 +89,8 @@ Narrative-only exposure cannot score above 1. Technology-only exposure cannot sc
 ```text
 update_exposure
 create_segment_candidate
-update_company_universe
-update_segment_taxonomy
-update_scorecard
 no_backflow_needed
+needs_review
 blocked
 ```
 
@@ -114,7 +111,7 @@ reports/stocks/<stock_code>_<company_name>/exposure_change_note.md
 ## Output row contract
 
 ```csv
-segment_id,company_id,stock_code,stock_name,exposure_type,exposure_score,revenue_pct,profit_pct,evidence_ids,claim_ids,metric_ids,confidence,valid_from,valid_to,status,backflow_decision,notes
+segment_id,company_id,stock_code,company_name,exposure_type,exposure_score,revenue_pct,profit_pct,evidence_ids,claim_ids,metric_ids,confidence,valid_from,valid_to,status,backflow_decision,notes
 ```
 
 ## References and validators
@@ -129,7 +126,7 @@ scripts/validate_segment_exposure.py
 
 ## Guardrails
 
-- revenue_pct and profit_pct cannot be guessed; if absent, write `MISSING:<reason>`.
+- revenue_pct and profit_pct cannot be guessed; if absent, write `MISSING_DISCLOSURE` or `NOT_DISCLOSED`.
 - D-level clues cannot support high exposure_score.
 - Technology reserve, capacity, orders and revenue must remain separate.
 - Conflicting evidence must be shown side by side.

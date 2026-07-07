@@ -1,0 +1,146 @@
+schema_version: r5_mvp_v0.3
+artifact_type: R5_stock_research_pack
+status: draft
+pack_status: research_draft
+metadata:
+  workflow_id: wf_fixture_r5_valid
+  generated_at: '2026-07-07'
+  source_pack: stock_analysis_pack.yaml
+stock:
+  company_id: company_fixture
+  company_name: Fixture Company
+  stock_code: '000000'
+  exchange: SZSE
+quality_status:
+  r5_gate_status: not_reviewed
+  allowed_report_level: research_draft
+  high_issue_count: 0
+  medium_issue_count: 2
+  source_gap_visible: true
+  no_advice_gate_passed: null
+source_gap_policy:
+  missing_value_tokens:
+    - MISSING_DISCLOSURE
+    - TODO_SOURCE_REQUIRED
+    - TODO_MODEL_INPUT
+    - TODO_MARKET_DATA
+    - TODO_PEER_DATA
+    - LOW_CONFIDENCE_CLUE_ONLY
+  rule: Keep every gap visible.
+company_identity_pack:
+  status: ready
+  company_id: company_fixture
+  legal_name: Fixture Company Ltd.
+  stock_code: '000000'
+  exchange: SZSE
+  identity_evidence_ids: [ev_identity_fixture]
+evidence_snapshot_pack:
+  status: partial
+  as_of_date: '2026-07-07'
+  evidence_manifest_path: data/manifests/fixture.csv
+  evidence_ids: [ev_identity_fixture, ev_annual_fixture]
+financial_history_pack:
+  status: partial
+  periods: [2023A, 2024A, 2025A]
+  metrics:
+    - metric_name: revenue
+      period: 2025A
+      value: null
+      unit: CNY_mn
+      missing_reason: TODO_SOURCE_REQUIRED
+business_breakdown_pack:
+  status: partial
+  business_lines:
+    - business_name: Fixture business
+      revenue:
+        value: null
+        unit: CNY_mn
+        missing_reason: TODO_SOURCE_REQUIRED
+      revenue_pct:
+        value: null
+        missing_reason: MISSING_DISCLOSURE
+      gross_margin:
+        value: null
+        missing_reason: TODO_SOURCE_REQUIRED
+      gross_profit:
+        value: null
+        unit: CNY_mn
+        missing_reason: TODO_SOURCE_REQUIRED
+      gross_profit_pct:
+        value: null
+        missing_reason: MISSING_DISCLOSURE
+      confidence: low
+segment_exposure_pack:
+  status: partial
+  exposures:
+    - segment_id: segment_fixture
+      exposure_type: product_line_clue
+      exposure_score: 1
+      confidence: low
+      evidence_ids: [ev_annual_fixture]
+industry_context_pack:
+  status: TODO
+  industry_cards: []
+peer_comparison_pack:
+  status: TODO
+  missing_reason: TODO_PEER_DATA
+forecast_model_pack:
+  status: TODO
+  forecast_years: [2026E, 2027E, 2028E]
+  required_metrics: [revenue, gross_margin, net_profit_attributable, eps]
+  missing_reason: TODO_MODEL_INPUT
+valuation_pack:
+  status: TODO
+  market_snapshot:
+    as_of_date: null
+    current_price: null
+    missing_reason: TODO_MARKET_DATA
+technical_market_pack:
+  status: TODO
+  as_of_date: null
+  missing_reason: TODO_MARKET_DATA
+sentiment_event_pack:
+  status: TODO
+  as_of_date: null
+  missing_reason: TODO_SOURCE_REQUIRED
+risk_counterevidence_pack:
+  status: partial
+  key_risks:
+    - risk_name: source gap risk
+      missing_reason: TODO_SOURCE_REQUIRED
+  counterevidence: []
+source_gap_register:
+  - gap_id: R5_GAP_FIXTURE_001
+    section: evidence
+    missing_data: TODO_SOURCE_REQUIRED
+    impact_on_conclusion: source-gapped draft only
+    fix_owner_skill: evidence-ingest
+    next_action: register official disclosure
+  - gap_id: R5_GAP_FIXTURE_002
+    section: business
+    missing_data: MISSING_DISCLOSURE
+    impact_on_conclusion: business contribution cannot be asserted
+    fix_owner_skill: evidence-ingest
+    next_action: keep missing field visible
+  - gap_id: R5_GAP_FIXTURE_003
+    section: forecast
+    missing_data: TODO_MODEL_INPUT
+    impact_on_conclusion: no sample-quality forecast
+    fix_owner_skill: stock-deep-dive
+    next_action: add reviewed assumptions
+  - gap_id: R5_GAP_FIXTURE_004
+    section: valuation
+    missing_data: TODO_MARKET_DATA and TODO_PEER_DATA
+    impact_on_conclusion: no sample-quality valuation
+    fix_owner_skill: company-valuation
+    next_action: add reviewed market snapshot
+  - gap_id: R5_GAP_FIXTURE_005
+    section: exposure
+    missing_data: LOW_CONFIDENCE_CLUE_ONLY
+    impact_on_conclusion: clue cannot prove revenue exposure
+    fix_owner_skill: quality-review
+    next_action: review before promotion
+report_composition_pack:
+  status: partial
+  allowed_report_level: research_draft
+  source_gap_report_path: reports/workflow_runs/wf_fixture_r5_valid/R5_source_gap_report.md

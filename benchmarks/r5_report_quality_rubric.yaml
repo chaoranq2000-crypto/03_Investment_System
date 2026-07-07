@@ -15,12 +15,24 @@ rating_levels:
 required_sections:
   preface:
     required: true
+    required_conditions:
+      - "clear_company_identity"
+    optional_conditions:
+      - "market_disagreement"
+    blocked_conditions:
+      - "missing_company_identity"
     minimum_requirements:
       - "clear_company_identity"
       - "core_contradiction"
       - "market_disagreement"
   financial_overview:
     required: true
+    required_conditions:
+      - "period_unit_source_for_metrics"
+    optional_conditions:
+      - "roe_roic_bridge"
+    blocked_conditions:
+      - "unsupported_number"
     minimum_requirements:
       - "income_statement_summary"
       - "cashflow_quality"
@@ -28,6 +40,12 @@ required_sections:
       - "key_metrics"
   business_breakdown:
     required: true
+    required_conditions:
+      - "business_line_revenue_or_missing_reason"
+    optional_conditions:
+      - "customer_capacity_order_context"
+    blocked_conditions:
+      - "company_total_used_as_business_line_revenue"
     minimum_requirements:
       - "business_lines"
       - "revenue_or_missing_reason"
@@ -35,36 +53,75 @@ required_sections:
       - "profit_pool_commentary"
   industry_analysis:
     required: true
+    required_conditions:
+      - "demand_supply_competition_context"
+    optional_conditions:
+      - "policy_or_cycle_sensitivity"
+    blocked_conditions:
+      - "industry_context_used_as_company_fact"
     minimum_requirements:
       - "demand_drivers"
       - "supply_constraints_or_competition"
       - "company_position"
   forecast:
     required_for_sample_quality: true
+    required_conditions:
+      - "2026E_2028E_base_case"
+    optional_conditions:
+      - "consensus_comparison"
+    blocked_conditions:
+      - "forecast_missing"
     minimum_requirements:
       - "2026E_2028E_base_case"
       - "assumptions"
       - "sensitivity_or_scenario"
   valuation:
     required_for_sample_quality: true
+    required_conditions:
+      - "market_snapshot"
+      - "peer_or_scenario_context"
+    optional_conditions:
+      - "SOTP_or_DCF_if_applicable"
+    blocked_conditions:
+      - "valuation_market_snapshot_missing"
+      - "peer_context_missing"
     minimum_requirements:
       - "market_snapshot"
       - "peer_or_scenario_context"
       - "valuation_method_explanation"
   technical_analysis:
     required_for_sample_quality: true
+    required_conditions:
+      - "as_of_date"
+    optional_conditions:
+      - "volume_percentile"
+    blocked_conditions:
+      - "technical_as_of_date_missing"
     minimum_requirements:
       - "as_of_date"
       - "moving_averages"
       - "support_resistance_or_trend_state"
   sentiment_analysis:
     required_for_sample_quality: true
+    required_conditions:
+      - "macro_industry_company_layers"
+    optional_conditions:
+      - "fund_flow_or_analyst_view"
+    blocked_conditions:
+      - "sentiment_source_missing"
     minimum_requirements:
       - "macro_or_market_sentiment"
       - "industry_theme_sentiment"
       - "company_specific_sentiment"
   catalyst_events:
     required_for_sample_quality: true
+    required_conditions:
+      - "dated_events"
+      - "impact_path"
+    optional_conditions:
+      - "event_scenario_matrix"
+    blocked_conditions:
+      - "event_source_missing"
     minimum_requirements:
       - "dated_events"
       - "impact_path"
@@ -72,6 +129,12 @@ required_sections:
       - "counterevidence_condition"
   research_conclusion:
     required: true
+    required_conditions:
+      - "research_conclusion_not_trading_instruction"
+    optional_conditions:
+      - "monitoring_checklist"
+    blocked_conditions:
+      - "direct_trading_instruction"
     minimum_requirements:
       - "core_judgement"
       - "key_assumptions"
@@ -95,6 +158,9 @@ blocking_rules:
     severity: "medium"
     decision: "research_draft_only"
   valuation_market_snapshot_missing:
+    severity: "medium"
+    decision: "research_draft_only"
+  peer_context_missing:
     severity: "medium"
     decision: "research_draft_only"
   business_breakdown_missing:
@@ -170,5 +236,6 @@ sample_quality_thresholds:
   source_gap_must_be_visible: true
   forecast_base_case_required: true
   valuation_market_snapshot_required: true
+  valuation_peer_context_required: true
   no_advice_gate_required: true
   hidden_todo_allowed: false

@@ -9,18 +9,19 @@ For R5-MVP, the same structure is used by `r5_quality_issues.example.csv`.
 ## Required fields
 
 ```csv
-issue_id,severity,gate_id,section,artifact,description,fix_owner_skill,blocking_decision,next_action,status
+issue_id,severity,gate_id,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
 ```
 
 ## severity enum
 
 ```text
+critical
 high
 medium
 low
 ```
 
-`high` means the artifact cannot be accepted while the issue is active.
+`critical` and `high` mean the artifact cannot be accepted while the issue is active.
 
 ## gate_id values
 
@@ -76,13 +77,12 @@ blocked
 
 ```text
 open
+resolved
 accepted_todo
-fixed
-false_positive
-blocked
+waived_with_reason
 ```
 
-`open` and `blocked` are active. `accepted_todo` remains visible but does not block accepted-with-TODOs when severity is not high.
+`open` is active. `accepted_todo` remains visible but does not block accepted-with-TODOs when severity is medium or low. `waived_with_reason` requires a visible reason in `next_action` or notes.
 
 ## Mandatory high severity patterns
 

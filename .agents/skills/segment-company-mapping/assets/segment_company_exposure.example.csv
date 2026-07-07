@@ -1,4 +1,4 @@
 segment_id,company_id,stock_code,company_name,exposure_type,exposure_score,revenue_pct,profit_pct,evidence_ids,claim_ids,metric_ids,confidence,valid_from,valid_to,status,backflow_decision,notes
-segment_example,company_example_000000_sz,000000,示例公司,product,2,MISSING_DISCLOSURE,MISSING_DISCLOSURE,ev_example_annual_report_2025,,,low,2026-07-07,,draft,no_backflow_needed,source gap remains visible
-segment_technology_example,company_example_000000_sz,000000,示例公司,technology,2,TODO_SOURCE_REQUIRED,TODO_SOURCE_REQUIRED,ev_example_annual_report_2025,,,low,2026-07-07,,draft,create_segment_candidate,technology clue requires taxonomy review
-segment_narrative_example,company_example_000000_sz,000000,示例公司,narrative,1,MISSING_DISCLOSURE,MISSING_DISCLOSURE,,,,low,2026-07-07,,blocked,blocked,TODO_SOURCE_REQUIRED before promotion
+segment_example,company_example_000000_sz,000000,示例公司,product_line_clue,2,MISSING_DISCLOSURE,MISSING_DISCLOSURE,ev_example_annual_report_2025,,,low,2026-07-07,,draft,no_backflow_needed,source gap remains visible
+segment_technology_example,company_example_000000_sz,000000,示例公司,technology_reserve,2,MISSING_DISCLOSURE,MISSING_DISCLOSURE,ev_example_annual_report_2025,,,low,2026-07-07,,draft,create_segment_candidate,technology clue requires taxonomy review
+segment_narrative_example,company_example_000000_sz,000000,示例公司,narrative_only,1,MISSING_DISCLOSURE,MISSING_DISCLOSURE,,,,low,2026-07-07,,blocked,needs_review,TODO_SOURCE_REQUIRED before promotion

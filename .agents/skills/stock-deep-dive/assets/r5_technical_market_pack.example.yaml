@@ -1,0 +1,28 @@
+artifact_type: R5_technical_market_pack
+schema_version: r5_technical_market_v0.1
+status: TODO
+as_of_date: '2026-07-07'
+current_price: {value: null, missing_reason: TODO_MARKET_DATA}
+return_1m: {value: null, missing_reason: TODO_MARKET_DATA}
+return_3m: {value: null, missing_reason: TODO_MARKET_DATA}
+return_6m: {value: null, missing_reason: TODO_MARKET_DATA}
+return_12m: {value: null, missing_reason: TODO_MARKET_DATA}
+ytd_return: {value: null, missing_reason: TODO_MARKET_DATA}
+52w_high: {value: null, missing_reason: TODO_MARKET_DATA}
+52w_low: {value: null, missing_reason: TODO_MARKET_DATA}
+MA5: {value: null, missing_reason: TODO_MARKET_DATA}
+MA10: {value: null, missing_reason: TODO_MARKET_DATA}
+MA20: {value: null, missing_reason: TODO_MARKET_DATA}
+MA60: {value: null, missing_reason: TODO_MARKET_DATA}
+turnover: {value: null, missing_reason: TODO_MARKET_DATA}
+volume_percentile: {value: null, missing_reason: TODO_MARKET_DATA}
+support_levels:
+  - level: null
+    basis: TODO_MARKET_DATA
+    source_id_or_missing_reason: TODO_MARKET_DATA
+resistance_levels:
+  - level: null
+    basis: TODO_MARKET_DATA
+    source_id_or_missing_reason: TODO_MARKET_DATA
+market_state_judgement: null
+no_advice_boundary: true

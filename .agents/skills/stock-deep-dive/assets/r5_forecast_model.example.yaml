@@ -1,0 +1,43 @@
+artifact_type: R5_forecast_model_pack
+schema_version: r5_forecast_model_v0.1
+status: TODO
+sample_quality_allowed: false
+forecast_years: [2026E, 2027E, 2028E]
+scenarios:
+  base_case:
+    status: TODO_MODEL_INPUT
+    forecast_table:
+      2026E:
+        revenue: {value: null, unit: CNY_mn, missing_reason: TODO_MODEL_INPUT}
+        gross_margin: {value: null, unit: pct, missing_reason: TODO_MODEL_INPUT}
+        net_profit_attributable: {value: null, unit: CNY_mn, missing_reason: TODO_MODEL_INPUT}
+        eps: {value: null, unit: CNY_per_share, missing_reason: TODO_MODEL_INPUT}
+      2027E:
+        revenue: {value: null, unit: CNY_mn, missing_reason: TODO_MODEL_INPUT}
+        gross_margin: {value: null, unit: pct, missing_reason: TODO_MODEL_INPUT}
+        net_profit_attributable: {value: null, unit: CNY_mn, missing_reason: TODO_MODEL_INPUT}
+        eps: {value: null, unit: CNY_per_share, missing_reason: TODO_MODEL_INPUT}
+      2028E:
+        revenue: {value: null, unit: CNY_mn, missing_reason: TODO_MODEL_INPUT}
+        gross_margin: {value: null, unit: pct, missing_reason: TODO_MODEL_INPUT}
+        net_profit_attributable: {value: null, unit: CNY_mn, missing_reason: TODO_MODEL_INPUT}
+        eps: {value: null, unit: CNY_per_share, missing_reason: TODO_MODEL_INPUT}
+  bull_case:
+    status: TODO_MODEL_INPUT
+    missing_reason: TODO_MODEL_INPUT
+    forecast_table: {}
+  bear_case:
+    status: TODO_MODEL_INPUT
+    missing_reason: TODO_MODEL_INPUT
+    forecast_table: {}
+sensitivity_table:
+  - driver: gross_margin
+    change: null
+    impact_metric: net_profit_attributable
+    impact_value: null
+    assumption_id_or_missing_reason: TODO_MODEL_INPUT
+source_gap_register:
+  - gap_id: R5_FCST_GAP_001
+    missing_data: bottom_up_forecast_assumptions
+    impact_on_conclusion: forecast cannot reach sample-quality
+    next_action: add reviewed assumptions or keep TODO_MODEL_INPUT

@@ -1,6 +1,11 @@
 schema_version: "r5_mvp_v0.1"
 artifact_type: "R5_stock_research_pack"
 status: "draft"
+pack_status: "needs_fix"
+metadata:
+  workflow_id: null
+  generated_at: null
+  source_pack: "stock_analysis_pack.yaml"
 as_of_date: null
 workflow_id: null
 stock:
@@ -268,6 +273,32 @@ risk_counterevidence_pack:
   falsification_conditions: []
   monitoring_checklist: []
   evidence_ids: []
+
+source_gap_register:
+  - gap_id: "R5_GAP_TEMPLATE_001"
+    section: "evidence"
+    missing_data: "TODO_SOURCE_REQUIRED"
+    impact_on_conclusion: "Cannot make material claims without reviewed evidence."
+    fix_owner_skill: "evidence-ingest"
+    next_action: "Register reviewed evidence or keep TODO_SOURCE_REQUIRED visible."
+  - gap_id: "R5_GAP_TEMPLATE_002"
+    section: "forecast"
+    missing_data: "TODO_MODEL_INPUT"
+    impact_on_conclusion: "Forecast section cannot reach sample-quality."
+    fix_owner_skill: "stock-deep-dive"
+    next_action: "Provide reviewed assumptions or keep TODO_MODEL_INPUT visible."
+  - gap_id: "R5_GAP_TEMPLATE_003"
+    section: "valuation"
+    missing_data: "TODO_MARKET_DATA / TODO_PEER_DATA"
+    impact_on_conclusion: "Valuation section cannot reach sample-quality."
+    fix_owner_skill: "company-valuation"
+    next_action: "Provide reviewed market and peer snapshots or keep TODOs visible."
+  - gap_id: "R5_GAP_TEMPLATE_004"
+    section: "exposure"
+    missing_data: "LOW_CONFIDENCE_CLUE_ONLY"
+    impact_on_conclusion: "Clue-level exposure cannot prove revenue or profit contribution."
+    fix_owner_skill: "quality-review"
+    next_action: "Review source quality before promoting the clue."
 
 report_composition_pack:
   status: "TODO"

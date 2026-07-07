@@ -136,6 +136,30 @@ Rules:
 - Management comments must not be promoted to facts unless supported by official disclosure or accepted claim review.
 - Business line revenue, gross margin, customer, product, capacity and order fields may be `MISSING`; never invent them.
 
+### SDD-R5-0 R5 mode entry
+
+Use the R5 path only when the run explicitly asks for an R5 research pack or sample-quality preparation. R5 supplements the R4 `stock_analysis_pack.yaml` path; it does not redefine the global workflow kernel.
+
+### SDD-R5-1 R4 to R5 mapping
+
+Map reviewed `stock_analysis_pack.yaml` fields into `R5_stock_research_pack.yaml` according to `references/r5_stock_research_pack_contract.md`. If a source R4 field is absent or unreviewed, keep the R5 field present with `missing_reason`, `source_gap_register`, or a visible TODO.
+
+### SDD-R5-2 Twelve subpack build
+
+Build the 12 R5 subpacks: company identity, evidence snapshot, financial history, business breakdown, segment exposure, industry context, peer comparison, forecast model, valuation, technical market, sentiment/event, and risk/counterevidence. Every material field must retain `fact`, `estimate`, `assumption`, `inference`, `analyst_view`, `management_comment`, `opinion`, or `unknown` typing.
+
+### SDD-R5-3 Source-gap and downgrade handling
+
+Allowed R5 states are `R5_sample_quality_ready`, `R5_research_draft`, `R5_source_gapped_draft`, and `blocked`. Missing business, forecast, valuation, market, technical, sentiment, or event inputs must downgrade the state rather than being filled from memory or prose.
+
+### SDD-R5-4 Upstream and sub-skill boundary
+
+Do not acquire evidence, call live APIs, calculate real forecast values, or calculate real valuation outputs inside `stock-deep-dive`. Evidence comes from `evidence-ingest`; valuation context comes from `company-valuation` or reviewed valuation assets.
+
+### SDD-R5-5 Quality-review handoff
+
+Before any R5 report composition, hand off the pack, `source_gap_register`, open questions, no-advice scan status, and downgrade reason to `quality-review`. Composer/writer layers may translate only reviewed pack content and must not create new facts.
+
 ### SDD-2.5 Valuation subagent handoff
 
 When the stock report requires a valuation section, create `valuation_request.yaml` from `assets/valuation_request_template.yaml` and call `company-valuation` as a sub-skill.
@@ -257,6 +281,7 @@ Read these references before executing a stock run:
 - `references/report_style_guide.md`
 - `references/report_production_profile.md`
 - `references/r5_stock_research_pack_contract.md`
+- `references/r5_report_contract.md`
 - `references/valuation_subagent_handoff.md`
 - `references/legacy_stock_skill_rules.md`
 

@@ -1,0 +1,25 @@
+schema_version: r5_section_expectation_mapping_v0.1
+artifact_type: R5_section_expectation_mapping
+mapping:
+  company_summary: preface
+  investment_highlights: preface
+  financial_review: financial_overview
+  financial_forecast_table: forecast
+  business_segments: business_breakdown
+  revenue_breakdown: business_breakdown
+  industry_chain: industry_analysis
+  competition_analysis: industry_analysis
+  earnings_forecast: forecast
+  valuation_comparison: valuation
+  peer_valuation: valuation
+  technical_analysis: technical_analysis
+  market_snapshot: technical_analysis
+  sentiment_tracking: sentiment_analysis
+  event_calendar: catalyst_events
+  catalyst_analysis: catalyst_events
+  risks: research_conclusion
+  conclusion: research_conclusion
+rules:
+  facts_from_sample_are_not_evidence: true
+  ratings_are_not_output_requirements: true
+  source_gap_visibility_required: true

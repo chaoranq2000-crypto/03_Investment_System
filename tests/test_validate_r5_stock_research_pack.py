@@ -29,6 +29,13 @@ def test_example_pack_is_valid():
     assert validator.validate_pack(load_example()) == []
 
 
+def test_pack_status_enum_is_validated():
+    validator = load_validator()
+    data = load_example()
+    data["pack_status"] = "sample_quality_ready"
+    assert any("pack_status must be one of" in error for error in validator.validate_pack(data))
+
+
 def test_missing_top_level_key_is_reported():
     validator = load_validator()
     data = load_example()
@@ -59,11 +66,22 @@ def test_business_metric_value_requires_evidence_or_metric_id():
 def test_sample_quality_requires_no_advice_gate_and_market_snapshot():
     validator = load_validator()
     data = copy.deepcopy(load_example())
+    data["pack_status"] = "sample_quality_candidate"
     data["quality_status"]["allowed_report_level"] = "sample_quality_ready"
     data["quality_status"]["no_advice_gate_passed"] = False
     errors = validator.validate_pack(data)
     assert any("no_advice_gate_passed" in error for error in errors)
     assert any("market_snapshot.current_price" in error for error in errors)
+
+
+def test_sample_quality_candidate_requires_forecast_and_business_ready():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    data["pack_status"] = "sample_quality_candidate"
+    data["quality_status"]["allowed_report_level"] = "research_draft"
+    errors = validator.validate_pack(data)
+    assert any("forecast_model_pack.status" in error for error in errors)
+    assert any("business_breakdown_pack.status" in error for error in errors)
 
 
 def test_forbidden_direct_trading_phrase_is_reported():

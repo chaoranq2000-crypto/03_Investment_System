@@ -23,8 +23,8 @@ R5-G11 Sample Benchmark Gate
 ## Outcome rules
 
 ```text
-accepted: no active high, medium or low issue.
-accepted_with_todos: no active high issue; medium or low TODO remains visible.
+accepted: no active critical, high, medium or low issue.
+accepted_with_todos: no active critical/high issue; medium or low TODO remains visible.
 needs_fix: at least one active high issue that can be fixed.
 blocked: identity, evidence, parse, path, or source problem prevents review.
 ```
@@ -44,12 +44,15 @@ technical as_of_date missing for market-state language
 no-advice gate missing or failed
 ```
 
+Critical/high issues block `accepted`. Medium/low issues may lead to
+`accepted_with_todos` only when TODO/source gaps remain visible.
+
 ## Validation
 
 Run:
 
 ```bash
-python .agents/skills/quality-review/scripts/validate_quality_issues.py --issues .agents/skills/quality-review/assets/r5_quality_issues.example.csv
+python .agents/skills/quality-review/scripts/validate_quality_issues.py .agents/skills/quality-review/assets/r5_quality_issues.example.csv --expected-decision accepted_with_todos
 ```
 
 The validator reports one of:

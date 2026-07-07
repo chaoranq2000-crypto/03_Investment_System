@@ -261,3 +261,26 @@ guaranteed_return
 ```
 
 If legacy inputs include them, move them to `ignored_legacy_fields` and record a no-advice note.
+
+## 7. R5 mini validator output fields
+
+For R5 handoff validation, `valuation_output.yaml` must include:
+
+```yaml
+valuation_as_of_date:
+input_status: complete | partial_with_todos | blocked
+market_snapshot:
+peer_set:
+method_selection:
+scenario_outputs:
+  base:
+  bull:
+  bear:
+sensitivity:
+source_gap:
+no_advice_disclaimer:
+```
+
+If market snapshot is missing, `input_status` must not be `complete`.
+
+Each valuation output number must carry `assumption_id` or `missing_reason`.

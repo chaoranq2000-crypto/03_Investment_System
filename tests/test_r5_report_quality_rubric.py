@@ -34,6 +34,14 @@ def test_required_sections_cover_r5_report_shape():
     }.issubset(required_sections)
 
 
+def test_each_r5_section_has_required_optional_and_blocked_conditions():
+    sections = load_rubric()["required_sections"]
+    for name, config in sections.items():
+        assert config.get("required_conditions"), name
+        assert "optional_conditions" in config, name
+        assert config.get("blocked_conditions"), name
+
+
 def test_blocking_rules_include_core_risks():
     blocking_rules = set(load_rubric()["blocking_rules"])
     assert {

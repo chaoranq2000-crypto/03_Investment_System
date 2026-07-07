@@ -1,0 +1,49 @@
+schema_version: r5_section_density_targets_v0.1
+artifact_type: R5_section_density_targets
+status: draft
+sections:
+  financial_overview:
+    required: [period_metrics, cashflow_quality, abnormal_items]
+    optional: [roe_roic_bridge, working_capital_flags]
+    blocked: [unsupported_number, hidden_source_gap]
+    minimum_pack_refs: 3
+  business_breakdown:
+    required: [business_lines, revenue_or_missing_reason, gross_margin_or_missing_reason]
+    optional: [customers, capacity, orders]
+    blocked: [company_total_substitutes_segment_revenue]
+    minimum_pack_refs: 3
+  industry_analysis:
+    required: [demand, supply, competition, company_position]
+    optional: [policy, technology_roadmap]
+    blocked: [industry_context_used_as_company_fact]
+    minimum_pack_refs: 2
+  forecast:
+    required: [base_case_2026E_2028E, assumptions, sensitivity]
+    optional: [consensus_comparison]
+    blocked: [forecast_missing]
+    minimum_pack_refs: 3
+  valuation:
+    required: [market_snapshot, peer_context, method_explanation]
+    optional: [SOTP, DCF]
+    blocked: [market_snapshot_missing, peer_context_missing, trading_instruction]
+    minimum_pack_refs: 3
+  technical:
+    required: [as_of_date, moving_averages, support_resistance]
+    optional: [volume_percentile]
+    blocked: [as_of_date_missing, trading_action]
+    minimum_pack_refs: 2
+  sentiment:
+    required: [macro_sentiment, industry_sentiment, company_sentiment]
+    optional: [fund_flow, analyst_view]
+    blocked: [source_missing, financial_fact_from_news]
+    minimum_pack_refs: 2
+  catalyst:
+    required: [event_date, impact_path, verification_metric, counterevidence_condition]
+    optional: [scenario_matrix]
+    blocked: [event_source_missing, trading_action]
+    minimum_pack_refs: 2
+  conclusion:
+    required: [research_judgement, assumptions, falsification_conditions]
+    optional: [monitoring_checklist]
+    blocked: [buy_sell_hold_language, position_sizing]
+    minimum_pack_refs: 2

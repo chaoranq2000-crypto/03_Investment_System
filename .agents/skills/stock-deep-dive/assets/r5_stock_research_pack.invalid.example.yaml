@@ -1,0 +1,59 @@
+schema_version: r5_mvp_v0.3
+artifact_type: R5_stock_research_pack
+status: draft
+pack_status: sample_quality_candidate
+metadata:
+  workflow_id: wf_fixture_r5_invalid
+quality_status:
+  allowed_report_level: sample_quality_ready
+  high_issue_count: 1
+  source_gap_visible: false
+  no_advice_gate_passed: false
+source_gap_policy:
+  missing_value_tokens: []
+source_gap_register: []
+financial_history_pack:
+  status: partial
+business_breakdown_pack:
+  status: ready
+  business_lines:
+    - business_name: Invalid business
+      revenue:
+        value: 100
+      revenue_pct:
+        value: null
+      gross_margin:
+        value: null
+      gross_profit:
+        value: null
+      gross_profit_pct:
+        value: null
+segment_exposure_pack:
+  status: partial
+  exposures:
+    - segment_id: invalid
+      exposure_score: 1
+industry_context_pack:
+  status: TODO
+peer_comparison_pack:
+  status: TODO
+forecast_model_pack:
+  status: TODO
+  forecast_years: [2026E]
+  required_metrics: [revenue]
+valuation_pack:
+  status: TODO
+  market_snapshot:
+    current_price: null
+technical_market_pack:
+  status: ready
+  trend_judgement: strong uptrend
+sentiment_event_pack:
+  status: ready
+  company_sentiment:
+    summary: strong positive
+risk_counterevidence_pack:
+  status: TODO
+report_composition_pack:
+  status: partial
+  thesis_statement: 建议买入

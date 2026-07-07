@@ -37,7 +37,7 @@ def test_narrative_exposure_score_is_capped():
     data = copy.deepcopy(load_example())
     data["exposures"][2]["exposure_score"] = 2
     errors = validator.validate_segment_exposure(data)
-    assert any("narrative exposure cannot score above 1" in error for error in errors)
+    assert any("narrative_only exposure cannot score above 1" in error for error in errors)
 
 
 def test_missing_revenue_pct_requires_explicit_token():
@@ -53,11 +53,47 @@ def test_technology_score_above_two_requires_business_support():
     data = copy.deepcopy(load_example())
     data["exposures"][1]["exposure_score"] = 3
     errors = validator.validate_segment_exposure(data)
-    assert any("technology exposure above 2" in error for error in errors)
+    assert any("technology_reserve exposure above 2" in error for error in errors)
+
+
+def test_exposure_type_enum_matches_r5_contract():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    data["exposures"][0]["exposure_type"] = "product"
+    errors = validator.validate_segment_exposure(data)
+    assert any("exposure_type is invalid" in error for error in errors)
+
+
+def test_score_must_be_integer_zero_to_five():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    data["exposures"][0]["exposure_score"] = 2.5
+    errors = validator.validate_segment_exposure(data)
+    assert any("integer between 0 and 5" in error for error in errors)
+
+
+def test_score_above_zero_requires_support():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    row = data["exposures"][0]
+    row["evidence_ids"] = []
+    row["claim_ids"] = []
+    row["metric_ids"] = []
+    row["missing_reason"] = ""
+    errors = validator.validate_segment_exposure(data)
+    assert any("requires evidence_ids" in error for error in errors)
+
+
+def test_product_line_clue_does_not_update_revenue_exposure():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    data["exposures"][0]["backflow_decision"] = "update_revenue_exposure"
+    errors = validator.validate_segment_exposure(data)
+    assert any("backflow_decision is invalid" in error for error in errors)
 
 
 def test_cli_validates_example(capsys):
     validator = load_validator()
-    assert validator.main(["--input", str(EXAMPLE_PATH)]) == 0
+    assert validator.main([str(EXAMPLE_PATH)]) == 0
     captured = capsys.readouterr()
     assert "outcome: accepted_with_todos" in captured.out

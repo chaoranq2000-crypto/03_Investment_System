@@ -1,0 +1,45 @@
+artifact_type: company_valuation_output
+schema_version: r5_company_valuation_output_v0.1
+valuation_as_of_date: '2026-07-07'
+input_status: partial_with_todos
+market_snapshot:
+  as_of_date: null
+  current_price: {value: null, missing_reason: TODO_MARKET_DATA}
+  market_cap: {value: null, missing_reason: TODO_MARKET_DATA}
+  share_count: {value: null, missing_reason: TODO_MARKET_DATA}
+peer_set:
+  peers: []
+  missing_reason: TODO_PEER_DATA
+method_selection:
+  selected_methods:
+    - method: relative_PE
+      status: TODO_FORECAST_MODEL
+      reason: missing reviewed forecast and market snapshot
+scenario_outputs:
+  base:
+    implied_market_cap:
+      value: null
+      missing_reason: TODO_MARKET_DATA
+    implied_multiple:
+      value: null
+      missing_reason: TODO_FORECAST_MODEL
+  bull:
+    status: TODO_MODEL_INPUT
+    missing_reason: TODO_MODEL_INPUT
+  bear:
+    status: TODO_MODEL_INPUT
+    missing_reason: TODO_MODEL_INPUT
+sensitivity:
+  - driver: revenue_growth
+    impact_metric: implied_market_cap
+    impact_value:
+      value: null
+      missing_reason: TODO_MODEL_INPUT
+source_gap:
+  - gap_id: CV_GAP_001
+    missing_data: market_snapshot
+    next_action: provide reviewed market snapshot or keep TODO_MARKET_DATA
+  - gap_id: CV_GAP_002
+    missing_data: peer_set
+    next_action: provide reviewed peer context or keep TODO_PEER_DATA
+no_advice_disclaimer: This valuation output is research context only and does not provide rating, trading action, sizing guidance, target-price instruction, or return assurance.

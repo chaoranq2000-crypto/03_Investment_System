@@ -1,0 +1,37 @@
+schema_version: r5_sample_report_metadata_schema_v0.1
+artifact_type: R5_sample_report_metadata_schema
+required_fields:
+  sample_id:
+    type: string
+  company_name:
+    type: string
+  sections_present:
+    type: list
+  forecast_present:
+    type: boolean
+  valuation_present:
+    type: boolean
+  technical_present:
+    type: boolean
+  sentiment_present:
+    type: boolean
+  catalyst_present:
+    type: boolean
+  copyright_status:
+    type: enum
+    allowed: [user_provided_local_reference, public_metadata_only, permission_required, unknown]
+  local_user_provided:
+    type: boolean
+optional_fields:
+  source_category:
+    type: string
+  report_date:
+    type: string
+  density_notes:
+    type: list
+  no_advice_notes:
+    type: list
+rules:
+  no_full_text_storage: true
+  no_external_copyright_body: true
+  no_rating_or_position_guidance_copy: true

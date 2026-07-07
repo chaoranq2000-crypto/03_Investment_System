@@ -1,0 +1,31 @@
+artifact_type: R5_sentiment_event_pack
+schema_version: r5_sentiment_event_v0.1
+status: TODO
+as_of_date: '2026-07-07'
+macro_sentiment:
+  - summary: null
+    missing_reason: TODO_SOURCE_REQUIRED
+industry_sentiment:
+  - summary: null
+    missing_reason: TODO_SOURCE_REQUIRED
+company_sentiment:
+  - summary: null
+    missing_reason: TODO_SOURCE_REQUIRED
+catalyst_calendar:
+  - event_date: null
+    event_name: TODO_SOURCE_REQUIRED
+    impact_path: TODO_SOURCE_REQUIRED
+    verification_metric: TODO_SOURCE_REQUIRED
+    counterevidence_condition: TODO_SOURCE_REQUIRED
+    source_id_or_missing_reason: TODO_SOURCE_REQUIRED
+event_scenario_matrix:
+  base:
+    status: TODO_SOURCE_REQUIRED
+    source_id_or_missing_reason: TODO_SOURCE_REQUIRED
+  upside:
+    status: TODO_SOURCE_REQUIRED
+    source_id_or_missing_reason: TODO_SOURCE_REQUIRED
+  downside:
+    status: TODO_SOURCE_REQUIRED
+    source_id_or_missing_reason: TODO_SOURCE_REQUIRED
+no_advice_boundary: true

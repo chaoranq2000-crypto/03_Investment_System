@@ -81,13 +81,14 @@ For R5 issue-list validation, use the compact CSV schema in
 `references/issue_schema.md`:
 
 ```csv
-issue_id,severity,gate_id,section,artifact,description,fix_owner_skill,blocking_decision,next_action,status
+issue_id,severity,gate_id,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
 ```
 
 Severity:
 
 | severity | Meaning |
 |---|---|
+| critical | Blocks accepted status; indicates no-advice failure, identity failure, or impossible review state. |
 | high | Blocks accepted status; affects evidence traceability, identity, exposure, material claims, or no-advice boundary. |
 | medium | Does not block limited pilot if disclosed; affects completeness, comparability, confidence or important TODOs. |
 | low | Formatting, naming, minor clarity or non-blocking improvements. |
@@ -96,10 +97,9 @@ Status:
 
 ```text
 open
-fixed
+resolved
 accepted_todo
-false_positive
-blocked
+waived_with_reason
 ```
 
 ## Global gate checks consumed by this skill

@@ -22,7 +22,7 @@ Equivalent identity may be carried under `company_identity`, but validators shou
 exposures:
   - segment_id: segment_example
     segment_name: 示例细分
-    exposure_type: product
+    exposure_type: product_line_clue
     exposure_score: 2
     confidence: low
     revenue_pct: MISSING_DISCLOSURE
@@ -40,15 +40,14 @@ exposures:
 
 ```text
 revenue
-product
-technology
-customer
-project
-capacity
-order
-narrative
-excluded
-todo_insufficient_evidence
+profit
+product_line_clue
+customer_clue
+order_clue
+capacity_clue
+technology_reserve
+project_clue
+narrative_only
 ```
 
 ## exposure_score guide
@@ -62,9 +61,9 @@ todo_insufficient_evidence
 | 4 | Meaningful business exposure supported by official evidence or reviewed claims. |
 | 5 | High-purity or revenue-confirmed exposure with disclosed revenue/profit share. |
 
-Narrative-only exposure cannot score above 1.
+`narrative_only` exposure cannot score above 1.
 
-Technology exposure cannot score above 2 unless product, project, or customer support is explicit in `supporting_exposure_types`.
+`technology_reserve` exposure cannot score above 2 unless product, project, or customer support is explicit in `supporting_exposure_types`.
 
 ## Missing disclosure rules
 
@@ -72,8 +71,7 @@ Technology exposure cannot score above 2 unless product, project, or customer su
 
 ```text
 MISSING_DISCLOSURE
-MISSING
-TODO_SOURCE_REQUIRED
+NOT_DISCLOSED
 ```
 
 Blank strings and null values are invalid unless wrapped in an object with an explicit `missing_reason`.

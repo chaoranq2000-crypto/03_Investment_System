@@ -14,26 +14,23 @@ except ImportError as exc:  # pragma: no cover
 
 EXPOSURE_TYPES = {
     "revenue",
-    "product",
-    "technology",
-    "customer",
-    "project",
-    "capacity",
-    "order",
-    "narrative",
-    "excluded",
-    "todo_insufficient_evidence",
+    "profit",
+    "product_line_clue",
+    "customer_clue",
+    "order_clue",
+    "capacity_clue",
+    "technology_reserve",
+    "project_clue",
+    "narrative_only",
 }
 BACKFLOW_DECISIONS = {
     "update_exposure",
     "create_segment_candidate",
-    "update_company_universe",
-    "update_segment_taxonomy",
-    "update_scorecard",
     "no_backflow_needed",
+    "needs_review",
     "blocked",
 }
-MISSING_TOKENS = {"MISSING_DISCLOSURE", "MISSING", "TODO_SOURCE_REQUIRED", "LOW_CONFIDENCE_CLUE_ONLY"}
+MISSING_TOKENS = {"MISSING_DISCLOSURE", "NOT_DISCLOSED"}
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -83,10 +80,12 @@ def _has_support(exposure: dict[str, Any]) -> bool:
 
 
 def _as_score(value: Any) -> float | None:
-    if isinstance(value, (int, float)):
+    if isinstance(value, int) and not isinstance(value, bool):
         return float(value)
     try:
-        return float(value)
+        if isinstance(value, str) and value.strip().isdigit():
+            return float(value)
+        return None
     except (TypeError, ValueError):
         return None
 
@@ -112,16 +111,16 @@ def validate_segment_exposure(data: dict[str, Any]) -> list[str]:
             errors.append(f"exposures[{idx}].exposure_type is invalid: {exposure_type}")
 
         score = _as_score(exposure.get("exposure_score"))
-        if score is None or score < 0 or score > 5:
-            errors.append(f"exposures[{idx}].exposure_score must be between 0 and 5")
+        if score is None or score < 0 or score > 5 or int(score) != score:
+            errors.append(f"exposures[{idx}].exposure_score must be an integer between 0 and 5")
 
-        if exposure_type == "narrative" and score is not None and score > 1:
-            errors.append(f"exposures[{idx}]: narrative exposure cannot score above 1")
+        if exposure_type == "narrative_only" and score is not None and score > 1:
+            errors.append(f"exposures[{idx}]: narrative_only exposure cannot score above 1")
 
-        if exposure_type == "technology" and score is not None and score > 2:
+        if exposure_type == "technology_reserve" and score is not None and score > 2:
             support_types = set(exposure.get("supporting_exposure_types") or [])
-            if not support_types.intersection({"product", "project", "customer"}):
-                errors.append("exposures[{idx}]: technology exposure above 2 requires product/project/customer support".format(idx=idx))
+            if not support_types.intersection({"product_line_clue", "project_clue", "customer_clue"}):
+                errors.append("exposures[{idx}]: technology_reserve exposure above 2 requires product/project/customer support".format(idx=idx))
 
         for pct_field in ("revenue_pct", "profit_pct"):
             if not _is_pct_value_valid(exposure.get(pct_field)):
@@ -133,6 +132,8 @@ def validate_segment_exposure(data: dict[str, Any]) -> list[str]:
         decision = exposure.get("backflow_decision")
         if decision not in BACKFLOW_DECISIONS:
             errors.append(f"exposures[{idx}].backflow_decision is invalid: {decision}")
+        if exposure_type == "product_line_clue" and decision == "update_revenue_exposure":
+            errors.append(f"exposures[{idx}]: product_line_clue cannot trigger update_revenue_exposure")
 
     return errors
 
@@ -149,10 +150,14 @@ def derive_outcome(data: dict[str, Any], errors: list[str]) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate a B4-lite segment_exposure YAML file.")
-    parser.add_argument("--input", required=True, type=Path, help="segment_exposure YAML path")
+    parser.add_argument("path", nargs="?", type=Path, help="segment_exposure YAML path")
+    parser.add_argument("--input", dest="input_path", type=Path, help="segment_exposure YAML path")
     args = parser.parse_args(argv)
+    input_path = args.input_path or args.path
+    if input_path is None:
+        parser.error("provide a path or --input")
     try:
-        data = load_yaml(args.input)
+        data = load_yaml(input_path)
         errors = validate_segment_exposure(data)
     except Exception as exc:  # noqa: BLE001
         print(f"outcome: blocked")
@@ -165,7 +170,7 @@ def main(argv: list[str] | None = None) -> int:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
-    print(f"OK: {args.input}")
+    print(f"OK: {input_path}")
     return 0
 
 
