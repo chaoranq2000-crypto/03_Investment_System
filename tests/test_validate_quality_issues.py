@@ -44,6 +44,33 @@ def test_trading_instruction_issue_must_be_high():
     assert any("direct trading instruction" in error for error in errors)
 
 
+def test_missing_required_value_is_reported():
+    validator = load_validator()
+    rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
+    rows[0]["next_action"] = ""
+    assert any("next_action is required" in error for error in validator.validate_quality_issues(rows))
+
+
+def test_invalid_severity_is_reported():
+    validator = load_validator()
+    rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
+    rows[0]["severity"] = "critical"
+    assert any("severity is invalid" in error for error in validator.validate_quality_issues(rows))
+
+
+def test_invalid_gate_id_is_reported():
+    validator = load_validator()
+    rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
+    rows[0]["gate_id"] = "R5-G99"
+    assert any("gate_id is invalid" in error for error in validator.validate_quality_issues(rows))
+
+
+def test_missing_r5_no_advice_gate_is_reported():
+    validator = load_validator()
+    rows = [row for row in validator.load_issues(EXAMPLE_PATH) if row["gate_id"] != "R5-G10"]
+    assert any("R5-G10 No-Advice Gate" in error for error in validator.validate_quality_issues(rows))
+
+
 def test_gate_id_supports_global_qr_and_r5_ids():
     validator = load_validator()
     rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))

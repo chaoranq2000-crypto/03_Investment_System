@@ -45,6 +45,17 @@ def test_business_metric_null_requires_missing_reason():
     assert any("business_lines[0].revenue" in error for error in validator.validate_pack(data))
 
 
+def test_business_metric_value_requires_evidence_or_metric_id():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    revenue = data["business_breakdown_pack"]["business_lines"][0]["revenue"]
+    revenue.pop("missing_reason")
+    revenue["value"] = 123
+    revenue["evidence_id"] = None
+    revenue["metric_id"] = None
+    assert any("non-null value requires evidence_id or metric_id" in error for error in validator.validate_pack(data))
+
+
 def test_sample_quality_requires_no_advice_gate_and_market_snapshot():
     validator = load_validator()
     data = copy.deepcopy(load_example())
@@ -53,6 +64,13 @@ def test_sample_quality_requires_no_advice_gate_and_market_snapshot():
     errors = validator.validate_pack(data)
     assert any("no_advice_gate_passed" in error for error in errors)
     assert any("market_snapshot.current_price" in error for error in errors)
+
+
+def test_forbidden_direct_trading_phrase_is_reported():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    data["report_composition_pack"]["thesis_statement"] = "建议买入"
+    assert any("forbidden direct trading phrase" in error for error in validator.validate_pack(data))
 
 
 def test_cli_accepts_pack_argument(capsys):
