@@ -1,0 +1,174 @@
+schema_version: "r5_quality_rubric_v0.1"
+artifact_type: "R5_report_quality_rubric"
+status: "draft"
+
+rating_levels:
+  sample_quality_ready:
+    description: "Report has sufficient structured research assets and passes all blocking gates."
+  research_draft:
+    description: "Report has useful research content but lacks at least one core sample-quality asset."
+  source_gapped_draft:
+    description: "Report is mainly a gap-visible internal draft."
+  blocked:
+    description: "Report should not be generated or circulated as R5."
+
+required_sections:
+  preface:
+    required: true
+    minimum_requirements:
+      - "clear_company_identity"
+      - "core_contradiction"
+      - "market_disagreement"
+  financial_overview:
+    required: true
+    minimum_requirements:
+      - "income_statement_summary"
+      - "cashflow_quality"
+      - "profit_quality_or_adjustment"
+      - "key_metrics"
+  business_breakdown:
+    required: true
+    minimum_requirements:
+      - "business_lines"
+      - "revenue_or_missing_reason"
+      - "margin_or_missing_reason"
+      - "profit_pool_commentary"
+  industry_analysis:
+    required: true
+    minimum_requirements:
+      - "demand_drivers"
+      - "supply_constraints_or_competition"
+      - "company_position"
+  forecast:
+    required_for_sample_quality: true
+    minimum_requirements:
+      - "2026E_2028E_base_case"
+      - "assumptions"
+      - "sensitivity_or_scenario"
+  valuation:
+    required_for_sample_quality: true
+    minimum_requirements:
+      - "market_snapshot"
+      - "peer_or_scenario_context"
+      - "valuation_method_explanation"
+  technical_analysis:
+    required_for_sample_quality: true
+    minimum_requirements:
+      - "as_of_date"
+      - "moving_averages"
+      - "support_resistance_or_trend_state"
+  sentiment_analysis:
+    required_for_sample_quality: true
+    minimum_requirements:
+      - "macro_or_market_sentiment"
+      - "industry_theme_sentiment"
+      - "company_specific_sentiment"
+  catalyst_events:
+    required_for_sample_quality: true
+    minimum_requirements:
+      - "dated_events"
+      - "impact_path"
+      - "verification_metric"
+      - "counterevidence_condition"
+  research_conclusion:
+    required: true
+    minimum_requirements:
+      - "core_judgement"
+      - "key_assumptions"
+      - "falsification_conditions"
+      - "monitoring_checklist"
+
+blocking_rules:
+  company_identity_missing:
+    severity: "high"
+    decision: "blocked"
+  evidence_snapshot_missing:
+    severity: "high"
+    decision: "blocked"
+  unsupported_number:
+    severity: "high"
+    decision: "blocked"
+  hidden_todo_or_missing_disclosure:
+    severity: "high"
+    decision: "blocked"
+  forecast_missing:
+    severity: "medium"
+    decision: "research_draft_only"
+  valuation_market_snapshot_missing:
+    severity: "medium"
+    decision: "research_draft_only"
+  business_breakdown_missing:
+    severity: "medium"
+    decision: "research_draft_only"
+  technical_as_of_date_missing:
+    severity: "medium"
+    decision: "no_trading_state_language"
+  direct_trading_instruction:
+    severity: "high"
+    decision: "blocked"
+
+quality_gates:
+  - gate_id: "R5-G1"
+    name: "Evidence Completeness Gate"
+    owner_skill: "evidence-ingest"
+    required_for_sample_quality: true
+  - gate_id: "R5-G2"
+    name: "Financial Model Gate"
+    owner_skill: "stock-deep-dive"
+    required_for_sample_quality: true
+  - gate_id: "R5-G3"
+    name: "Business Breakdown Gate"
+    owner_skill: "stock-deep-dive"
+    required_for_sample_quality: true
+  - gate_id: "R5-G4"
+    name: "Industry Context Gate"
+    owner_skill: "segment-research"
+    required_for_sample_quality: true
+  - gate_id: "R5-G5"
+    name: "Forecast Model Gate"
+    owner_skill: "stock-deep-dive"
+    required_for_sample_quality: true
+  - gate_id: "R5-G6"
+    name: "Valuation Gate"
+    owner_skill: "stock-deep-dive"
+    required_for_sample_quality: true
+  - gate_id: "R5-G7"
+    name: "Market / Technical Gate"
+    owner_skill: "stock-deep-dive"
+    required_for_sample_quality: true
+  - gate_id: "R5-G8"
+    name: "Sentiment / Event Gate"
+    owner_skill: "stock-deep-dive"
+    required_for_sample_quality: true
+  - gate_id: "R5-G9"
+    name: "Narrative Coherence Gate"
+    owner_skill: "memo-writer"
+    required_for_sample_quality: true
+  - gate_id: "R5-G10"
+    name: "No-Advice Gate"
+    owner_skill: "quality-review"
+    required_for_sample_quality: true
+  - gate_id: "R5-G11"
+    name: "Sample Benchmark Gate"
+    owner_skill: "quality-review"
+    required_for_sample_quality: true
+
+issue_schema:
+  required_fields:
+    - "issue_id"
+    - "severity"
+    - "gate_id"
+    - "section"
+    - "artifact"
+    - "description"
+    - "fix_owner_skill"
+    - "blocking_decision"
+    - "next_action"
+
+sample_quality_thresholds:
+  high_issue_count_must_equal: 0
+  source_gap_must_be_visible: true
+  forecast_base_case_required: true
+  valuation_market_snapshot_required: true
+  no_advice_gate_required: true
+  hidden_todo_allowed: false
