@@ -1,0 +1,28 @@
+valuation_quality_handoff:
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: "002837"
+  source_skill: company-valuation
+  caller_skill: stock-deep-dive
+  artifact_paths:
+    valuation_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_model.yaml
+    valuation_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_snapshot.yaml
+    peer_comparison: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/peer_comparison.csv
+    sensitivity_table: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
+    valuation_section_draft: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_section_draft.md
+    valuation_gap_requests: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_gap_requests.yaml
+  local_checks:
+    - QR-VAL-1
+    - QR-VAL-2
+    - QR-VAL-3
+    - QR-VAL-4
+    - QR-VAL-5
+    - QR-VAL-6
+  no_advice_boundary: pass
+  open_gaps:
+    - TODO_MARKET_DATA
+    - TODO_PEER_DATA
+    - TODO_FINANCIAL_METRIC_PACK
+    - TODO_FORECAST_MODEL_NET_PROFIT
+  high_issues: 0
+  medium_todos: 4
+  notes: "Dry-run produced visible TODO valuation context instead of deterministic valuation conclusions."

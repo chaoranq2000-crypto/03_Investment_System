@@ -1,0 +1,41 @@
+valuation_request:
+  workflow_id: ""
+  stock_code: ""
+  company_id: ""
+  stock_name: ""
+  exchange: ""
+  as_of_date: "YYYY-MM-DD"
+  caller_skill: stock-deep-dive
+  parent_stage: RP6
+  quality_target: bridge
+  no_advice_boundary: true
+
+  input_paths:
+    stock_analysis_pack: "reports/workflow_runs/<workflow_id>/stock_analysis_pack.yaml"
+    forecast_model: "reports/workflow_runs/<workflow_id>/forecast_model.yaml"
+    financial_metric_pack: "reports/workflow_runs/<workflow_id>/financial_metric_pack.csv"
+    reviewed_claims: ""
+    reviewed_metrics: ""
+    market_snapshot: ""
+    peer_market_snapshot: ""
+    source_gap_report: ""
+
+  allowed_methods:
+    static_multiples: true
+    dynamic_multiples: true
+    peer_comparison: true
+    scenario_valuation: true
+    dcf: conditional
+    sotp: conditional
+    ddm_or_pb: conditional
+    nav_or_resource: conditional
+
+  requested_sections:
+    - static_valuation
+    - dynamic_valuation
+    - peer_comparison
+    - scenario_sensitivity
+    - valuation_risks
+
+  known_gaps: []
+  notes: ""

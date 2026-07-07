@@ -1,0 +1,176 @@
+valuation_model:
+  metadata:
+    workflow_id: wf_20260703_stock_first_002837_invic
+    stock_code: "002837"
+    company_id: cn_002837_invic
+    stock_name: 英维克
+    as_of_date: "2026-07-03"
+    source_skill: company-valuation
+    caller_skill: stock-deep-dive
+    quality_target: publishable_candidate
+    no_advice_boundary: true
+
+  input_status:
+    forecast_model: partial
+    market_data: todo_market_data
+    peer_data: todo_peer_data
+    official_metric_support: partial
+    business_segment_support: missing_disclosure
+
+  selected_methods:
+    - method_id: static_multiples
+      method_name: Static market multiples
+      status: todo
+      reason: TODO_MARKET_DATA; current price, market cap and current multiples are missing.
+      required_inputs:
+        - market_snapshot.csv
+      missing_inputs:
+        - TODO_MARKET_DATA
+      confidence: low
+    - method_id: dynamic_multiples
+      method_name: Dynamic multiples from forecast model
+      status: todo
+      reason: Forecast revenue exists, but margin and net profit remain TODO_MODEL_INPUT.
+      required_inputs:
+        - forecast_model.yaml
+        - market_snapshot.csv
+      missing_inputs:
+        - TODO_FORECAST_MODEL_NET_PROFIT
+        - TODO_MARKET_DATA
+      confidence: low
+    - method_id: peer_comparison
+      method_name: Peer comparison
+      status: todo
+      reason: TODO_PEER_DATA; no peer_market_snapshot.csv is available under the new handoff contract.
+      required_inputs:
+        - peer_market_snapshot.csv
+      missing_inputs:
+        - TODO_PEER_DATA
+      confidence: low
+    - method_id: sotp
+      method_name: Sum-of-the-parts
+      status: skipped
+      reason: MISSING_DISCLOSURE; liquid-cooling revenue and margin are not disclosed.
+      required_inputs:
+        - business segment revenue and margin disclosure
+      missing_inputs:
+        - MISSING_DISCLOSURE
+      confidence: low
+    - method_id: dcf
+      method_name: Discounted cash flow
+      status: skipped
+      reason: Free-cash-flow, WACC and terminal growth assumptions are not supportable from reviewed inputs in this dry-run.
+      required_inputs:
+        - forecast cash flow assumptions
+        - discount rate assumptions
+      missing_inputs:
+        - TODO_FORECAST_MODEL_CASH_FLOW
+      confidence: low
+
+  static_valuation:
+    as_of_date: "2026-07-03"
+    metrics:
+      pe_ttm: TODO_MARKET_DATA
+      pb: TODO_MARKET_DATA
+      ps: TODO_MARKET_DATA
+      ev_ebitda: TODO_MARKET_DATA
+      dividend_yield: TODO_MARKET_DATA
+    source_metric_ids: []
+    source_paths:
+      - TODO_MARKET_DATA
+    notes: Static valuation is blocked until a reviewed market snapshot is provided.
+    confidence: low
+
+  dynamic_valuation:
+    forecast_periods:
+      - 2026E
+      - 2027E
+      - 2028E
+    metrics:
+      pe_2026E: TODO_FORECAST_MODEL_NET_PROFIT
+      pe_2027E: TODO_FORECAST_MODEL_NET_PROFIT
+      pe_2028E: TODO_FORECAST_MODEL_NET_PROFIT
+      ev_ebitda_2026E: TODO_FORECAST_MODEL_NET_PROFIT
+      ps_2026E: TODO_MARKET_DATA
+    forecast_metric_ids:
+      - metric_cn_002837_invic_revenue_20260331_4f7f22
+    assumptions_ids:
+      - assumption_revenue_growth_base
+    notes: Revenue forecasts are estimates; margin and net profit inputs remain TODO_MODEL_INPUT in forecast_model.yaml.
+    confidence: low
+
+  peer_comparison:
+    peer_table_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/peer_comparison.csv
+    peer_set_quality: todo
+    median_metrics:
+      pe_ttm: TODO_PEER_DATA
+      pe_2026E: TODO_PEER_DATA
+      pb: TODO_PEER_DATA
+      ps: TODO_PEER_DATA
+      ev_ebitda: TODO_PEER_DATA
+    target_position:
+      relative_to_peer_median: not_assessable
+      explanation: Peer comparison is not assessable without a dated peer_market_snapshot.csv and peer selection reasons.
+    limitations:
+      - No reviewed peer set is available under the new company-valuation handoff.
+      - Existing product exposure does not prove segment revenue exposure.
+
+  scenario_valuation:
+    scenarios:
+      bear:
+        assumptions:
+          revenue_growth: base - 5pct
+        output_range: TODO_VALUATION_CONTEXT
+        support_ids:
+          - metric_cn_002837_invic_revenue_20260331_4f7f22
+        uncertainties:
+          - TODO_FORECAST_MODEL_NET_PROFIT
+          - TODO_MARKET_DATA
+      base:
+        assumptions:
+          revenue_growth: see forecast_model.yaml
+        output_range: TODO_VALUATION_CONTEXT
+        support_ids:
+          - metric_cn_002837_invic_revenue_20260331_4f7f22
+        uncertainties:
+          - TODO_FORECAST_MODEL_NET_PROFIT
+          - TODO_MARKET_DATA
+      bull:
+        assumptions:
+          revenue_growth: base + 5pct
+        output_range: TODO_VALUATION_CONTEXT
+        support_ids:
+          - metric_cn_002837_invic_revenue_20260331_4f7f22
+        uncertainties:
+          - TODO_FORECAST_MODEL_NET_PROFIT
+          - TODO_MARKET_DATA
+    sensitivity_table_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
+    most_sensitive_variable: revenue_growth
+    interpretation_boundary: Scenario context only; no trading action, position sizing or target-price instruction.
+
+  dcf_or_other_intrinsic_method:
+    method_used: skipped
+    reason: Insufficient reviewed free-cash-flow, discount-rate and segment economics assumptions.
+    assumptions:
+      discount_rate: TODO_MODEL_INPUT
+      terminal_growth: TODO_MODEL_INPUT
+      forecast_horizon: TODO_MODEL_INPUT
+      margin_path: TODO_MODEL_INPUT
+      reinvestment_or_capex: TODO_MODEL_INPUT
+    sensitivity_table_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
+    sanity_checks:
+      wacc_gt_terminal_growth: TODO_MODEL_INPUT
+      terminal_value_share: TODO_MODEL_INPUT
+      cyclicality_adjustment: TODO_MODEL_INPUT
+    confidence: low
+
+  valuation_section:
+    draft_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_section_draft.md
+    evidence_map_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/report_evidence_map.md
+    open_gaps_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_gap_requests.yaml
+
+  quality_handoff:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_quality_handoff.yaml
+    no_advice_boundary: pass
+    open_gap_count: 4
+    blocking_gap_count: 0

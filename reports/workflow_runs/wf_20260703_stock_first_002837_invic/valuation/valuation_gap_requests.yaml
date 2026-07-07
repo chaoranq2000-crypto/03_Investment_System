@@ -1,0 +1,33 @@
+valuation_gap_requests:
+  - gap_id: TODO_MARKET_DATA
+    target_section: static_valuation
+    missing_claim_or_metric: Current price, market capitalization, shares outstanding, PE TTM, PB, PS and EV/EBITDA as of the valuation date.
+    required_source_type: market_snapshot_csv
+    preferred_source_name: reviewed market data snapshot under the workflow run
+    blocking_level: medium
+    owner_skill: evidence-ingest
+    notes: No live data was acquired for this dry-run; static valuation remains not_assessable.
+  - gap_id: TODO_PEER_DATA
+    target_section: peer_comparison
+    missing_claim_or_metric: Dated peer multiples with peer selection reasons and limitations.
+    required_source_type: peer_market_snapshot_csv
+    preferred_source_name: reviewed peer market snapshot
+    blocking_level: medium
+    owner_skill: evidence-ingest
+    notes: Existing root peer_comparison.csv has only TODO fields and is insufficient under the new contract.
+  - gap_id: TODO_FINANCIAL_METRIC_PACK
+    target_section: handoff_input
+    missing_claim_or_metric: financial_metric_pack.csv expected by company-valuation handoff.
+    required_source_type: reviewed_metric_pack
+    preferred_source_name: financial_metric_pack.csv or explicit mapping to metrics_registry.csv
+    blocking_level: medium
+    owner_skill: stock-deep-dive
+    notes: metrics_registry.csv exists, but the new handoff path is not yet materialized as financial_metric_pack.csv.
+  - gap_id: TODO_FORECAST_MODEL_NET_PROFIT
+    target_section: dynamic_valuation
+    missing_claim_or_metric: Net profit, EPS, margin and multiple assumptions for 2026E-2028E.
+    required_source_type: forecast_model_yaml
+    preferred_source_name: forecast_model.yaml
+    blocking_level: medium
+    owner_skill: stock-deep-dive
+    notes: Revenue forecast exists; profit and margin fields remain TODO_MODEL_INPUT, so dynamic valuation cannot be determined.

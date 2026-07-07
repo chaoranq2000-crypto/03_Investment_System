@@ -1,0 +1,2 @@
+peer_company,peer_stock_code,exchange,selection_reason,business_similarity,segment_overlap,market_cap,pe_ttm,pe_2026E,pb,ps,ev_ebitda,as_of_date,metric_source,limitations,confidence
+英维克,002837,SZSE,subject_company_only,NOT_APPLICABLE,ai_server_liquid_cooling_product_clue_only,TODO_MARKET_DATA,TODO_MARKET_DATA,TODO_FORECAST_MODEL_NET_PROFIT,TODO_MARKET_DATA,TODO_MARKET_DATA,TODO_MARKET_DATA,2026-07-03,TODO_PEER_DATA,No reviewed peer set or dated peer multiples are available under the new handoff contract.,low

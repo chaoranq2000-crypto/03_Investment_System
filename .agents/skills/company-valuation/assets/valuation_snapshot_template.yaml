@@ -1,0 +1,48 @@
+valuation_snapshot:
+  metadata:
+    workflow_id: ""
+    stock_code: ""
+    company_id: ""
+    as_of_date: "YYYY-MM-DD"
+    generated_by: company-valuation
+    caller_skill: stock-deep-dive
+    no_advice_boundary: true
+
+  market_data:
+    current_price: MISSING
+    market_cap: MISSING
+    shares_outstanding: MISSING
+    currency: CNY
+    source_path: TODO_MARKET_DATA
+    source_metric_ids: []
+    freshness_status: unknown
+
+  multiples:
+    pe_ttm: MISSING
+    pb: MISSING
+    ps: MISSING
+    ev_ebitda: MISSING
+    pe_forward: MISSING
+
+  peer_context:
+    peer_market_snapshot_path: TODO_PEER_DATA
+    peer_set_quality: todo
+    peer_median_multiples: {}
+    limitations: []
+
+  model_context:
+    forecast_model_path: TODO_FORECAST_MODEL
+    sensitivity_table_path: ""
+    scenario_summary:
+      bear: MISSING
+      base: MISSING
+      bull: MISSING
+
+  labels:
+    valuation_context_label: not_assessable
+    confidence: low
+
+  gaps:
+    - gap_id: TODO_MARKET_DATA
+      blocking_level: medium
+      owner_skill: evidence-ingest

@@ -99,3 +99,75 @@ valuation_model:
 - Do not call buy/sell/hold.
 - Do not use peer PE without noting period and source.
 ```
+
+## 6. Company-valuation sub-skill mode
+
+When a valuation section is required, `stock-deep-dive` should create `valuation_request.yaml` and call `company-valuation` as a sub-skill.
+
+### 6.1 Handoff input
+
+```yaml
+valuation_request:
+  workflow_id:
+  stock_code:
+  company_id:
+  as_of_date:
+  caller_skill: stock-deep-dive
+  parent_stage: RP6
+  no_advice_boundary: true
+  input_paths:
+    stock_analysis_pack:
+    forecast_model:
+    financial_metric_pack:
+    market_snapshot:
+    peer_market_snapshot:
+  requested_sections:
+    - static_valuation
+    - dynamic_valuation
+    - peer_comparison
+    - scenario_sensitivity
+```
+
+### 6.2 Sub-skill outputs
+
+```text
+valuation/valuation_model.yaml
+valuation/valuation_snapshot.yaml
+valuation/peer_comparison.csv
+valuation/sensitivity_table.csv
+valuation/valuation_section_draft.md
+valuation/valuation_gap_requests.yaml
+valuation/valuation_quality_handoff.yaml
+```
+
+### 6.3 Valuation status labels
+
+Use context labels, not trading labels:
+
+```text
+below_peer_median
+inline_with_peers
+above_peer_median
+not_assessable
+```
+
+Do not use these labels as direct trading advice.
+
+### 6.4 Missing data rules
+
+```text
+TODO_MARKET_DATA     when current market valuation snapshot is unavailable
+TODO_PEER_DATA       when peer multiples are unavailable
+TODO_FORECAST_MODEL  when dynamic valuation has no forecast model
+TODO_SEGMENT_DISCLOSURE when SOTP is requested but segment disclosure is missing
+LOW_CONFIDENCE_PEER_SET when peer comparability is weak
+```
+
+### 6.5 Additional prohibited outputs
+
+```text
+Do not output buy/sell/hold language.
+Do not output target-price instruction.
+Do not convert scenario ranges into a recommended trading range.
+Do not use market valuation context as business exposure proof.
+```

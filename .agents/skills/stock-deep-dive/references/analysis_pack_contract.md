@@ -57,11 +57,29 @@ forecast_model:
   sensitivity: []
 
 valuation_model:
-  static_valuation:
-  dynamic_valuation:
-  peer_comparison:
-  scenarios:
-  conclusion:
+  source_skill: company-valuation
+  valuation_request_path:
+  valuation_model_path:
+  valuation_snapshot_path:
+  valuation_section_draft_path:
+  peer_comparison_path:
+  sensitivity_table_path:
+  valuation_gap_requests_path:
+  input_status:
+    forecast_model:
+    market_data:
+    peer_data:
+    official_metric_support:
+  static_valuation: {}
+  dynamic_valuation: {}
+  peer_comparison: {}
+  scenarios: {}
+  sensitivity: []
+  conclusion_boundary:
+    claim_type: inference
+    no_advice_boundary: true
+    valuation_context_label: below_peer_median | inline_with_peers | above_peer_median | not_assessable
+  gaps: []
 
 technical_sentiment_event:
   technical_snapshot:
@@ -90,7 +108,7 @@ required_id_fields:
   business_lines: claim_ids and metric_ids
   segment_links: claim_ids or evidence_gap_id
   forecast_assumptions: supporting_claim_ids / supporting_metric_ids
-  valuation: supporting_metric_ids / peer_source_ids
+  valuation: supporting_metric_ids / peer_source_ids / valuation_model_path / explicit TODO
   catalyst_calendar: evidence_id or clue_id
 ```
 

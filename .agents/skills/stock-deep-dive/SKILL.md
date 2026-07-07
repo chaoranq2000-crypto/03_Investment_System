@@ -12,6 +12,8 @@ description: A股个股深度研究统一入口；当用户要求个股研究、
 It turns reviewed evidence, reviewed metrics and data-layer outputs into:
 
 - `stock_analysis_pack.yaml`
+- a valuation subagent handoff package when valuation context is required
+- `valuation_model.yaml` / `valuation_section_draft.md` from `company-valuation` when valuation context is required
 - a stock deep dive report draft
 - `segment_exposure.yaml`
 - `backflow_decision`
@@ -68,6 +70,11 @@ Expected inputs may include:
 - optional `linked_segments`
 - optional prior `segment_exposure.yaml`
 - optional report depth: `bridge`, `internal_draft`, `publishable_candidate`
+- optional `valuation_request.yaml`
+- optional `valuation_model.yaml`
+- optional `valuation_snapshot.yaml`
+- optional `peer_market_snapshot.csv`
+- optional `sensitivity_table.csv`
 
 ## Local procedure
 
@@ -123,6 +130,41 @@ Rules:
 - Management comments must not be promoted to facts unless supported by official disclosure or accepted claim review.
 - Business line revenue, gross margin, customer, product, capacity and order fields may be `MISSING`; never invent them.
 
+### SDD-2.5 Valuation subagent handoff
+
+When the stock report requires a valuation section, create `valuation_request.yaml` from `assets/valuation_request_template.yaml` and call `company-valuation` as a sub-skill.
+
+Rules:
+
+- `company-valuation` may only consume reviewed evidence, reviewed claims, reviewed metrics, forecast_model and data-layer market / peer snapshots.
+- It must not acquire new evidence, fetch live data, promote claims or write direct trading advice.
+- Missing market, peer, forecast or official metric inputs must become `TODO_MARKET_DATA`, `TODO_PEER_DATA`, `TODO_FORECAST_MODEL` or `official_missing`.
+- `stock-deep-dive` may use `valuation_section_draft.md` to assemble the report, but must not introduce new valuation facts during report writing.
+- Valuation outputs do not prove business exposure and must not update `segment_exposure.yaml` by themselves.
+
+Expected inputs:
+
+```text
+reports/workflow_runs/<workflow_id>/valuation_request.yaml
+reports/workflow_runs/<workflow_id>/stock_analysis_pack.yaml
+reports/workflow_runs/<workflow_id>/forecast_model.yaml
+reports/workflow_runs/<workflow_id>/financial_metric_pack.csv
+reports/workflow_runs/<workflow_id>/peer_market_snapshot.csv or TODO_PEER_DATA
+reports/workflow_runs/<workflow_id>/market_snapshot.csv or TODO_MARKET_DATA
+```
+
+Expected outputs:
+
+```text
+reports/workflow_runs/<workflow_id>/valuation/valuation_model.yaml
+reports/workflow_runs/<workflow_id>/valuation/valuation_snapshot.yaml
+reports/workflow_runs/<workflow_id>/valuation/peer_comparison.csv
+reports/workflow_runs/<workflow_id>/valuation/sensitivity_table.csv
+reports/workflow_runs/<workflow_id>/valuation/valuation_section_draft.md
+reports/workflow_runs/<workflow_id>/valuation/valuation_gap_requests.yaml
+reports/workflow_runs/<workflow_id>/valuation/valuation_quality_handoff.yaml
+```
+
 ### SDD-3 Report drafting
 
 Use:
@@ -140,6 +182,7 @@ Rules:
 - Do not hide evidence gaps.
 - Keep fact / estimate / inference / opinion separated.
 - Include risks, counter-evidence, open questions, evidence map and source gaps.
+- For valuation writing, consume `valuation_section_draft.md` and `valuation_model.yaml` produced by `company-valuation`; do not create new valuation facts in the prose layer.
 - No buy/sell/hold, no position sizing, no direct trading instruction.
 
 ### SDD-4 Segment exposure and backflow
@@ -195,6 +238,7 @@ Read these references before executing a stock run:
 - `references/market_sentiment_event_contract.md`
 - `references/report_style_guide.md`
 - `references/report_production_profile.md`
+- `references/valuation_subagent_handoff.md`
 - `references/legacy_stock_skill_rules.md`
 
 If a reference is missing, record a TODO rather than inventing its content.
@@ -217,6 +261,11 @@ Expected artifacts:
 - `open_questions.md`
 - `quality_gate_report.md`
 - `workflow_readout.md`
+- `valuation/valuation_model.yaml`
+- `valuation/valuation_snapshot.yaml`
+- `valuation/valuation_section_draft.md`
+- `valuation/valuation_gap_requests.yaml`
+- `valuation/valuation_quality_handoff.yaml`
 
 If the workflow allows canonical stock output, also write:
 
@@ -237,5 +286,7 @@ Before closing a run, confirm:
 - `segment_exposure.yaml` exists or a blocked / no_backflow explanation is written.
 - `backflow_decision` is explicit.
 - `MISSING_DISCLOSURE` and `TODO_SOURCE_REQUIRED` are visible.
+- Valuation section either consumes `company-valuation` outputs or shows visible valuation TODOs.
+- No valuation output contains direct buy/sell/hold, target-price instruction, position sizing or guaranteed return.
 - There is no buy/sell/hold, rating instruction, position sizing, or direct trading instruction.
 - Quality-review status is recorded.

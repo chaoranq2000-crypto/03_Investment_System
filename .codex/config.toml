@@ -24,6 +24,10 @@ path = ".agents/skills/stock-deep-dive"
 enabled = true
 
 [[skills.config]]
+path = ".agents/skills/company-valuation"
+enabled = true
+
+[[skills.config]]
 path = ".agents/skills/compare-segments"
 enabled = true
 

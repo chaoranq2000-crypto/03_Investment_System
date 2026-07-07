@@ -1,0 +1,45 @@
+valuation_request:
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: "002837"
+  company_id: cn_002837_invic
+  stock_name: 英维克
+  exchange: SZSE
+  as_of_date: "2026-07-03"
+  caller_skill: stock-deep-dive
+  parent_stage: RP6
+  quality_target: publishable_candidate
+  no_advice_boundary: true
+
+  input_paths:
+    stock_analysis_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_analysis_pack.yaml
+    forecast_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
+    financial_metric_pack: TODO_FINANCIAL_METRIC_PACK
+    reviewed_claims: reports/workflow_runs/wf_20260703_stock_first_002837_invic/claims_registry.csv
+    reviewed_metrics: reports/workflow_runs/wf_20260703_stock_first_002837_invic/metrics_registry.csv
+    market_snapshot: TODO_MARKET_DATA
+    peer_market_snapshot: TODO_PEER_DATA
+    source_gap_report: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_source_gap_report_v0_2.md
+
+  allowed_methods:
+    static_multiples: true
+    dynamic_multiples: true
+    peer_comparison: true
+    scenario_valuation: true
+    dcf: conditional
+    sotp: conditional
+    ddm_or_pb: conditional
+    nav_or_resource: conditional
+
+  requested_sections:
+    - static_valuation
+    - dynamic_valuation
+    - peer_comparison
+    - scenario_sensitivity
+    - valuation_risks
+
+  known_gaps:
+    - TODO_MARKET_DATA
+    - TODO_PEER_DATA
+    - TODO_FINANCIAL_METRIC_PACK
+    - TODO_FORECAST_MODEL_NET_PROFIT
+  notes: "Dry-run request for P1.6 company-valuation sub-skill integration; gaps are intentionally visible and no live data was acquired."

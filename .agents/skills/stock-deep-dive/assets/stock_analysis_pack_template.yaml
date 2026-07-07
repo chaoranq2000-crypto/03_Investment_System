@@ -49,11 +49,29 @@ forecast_model:
   confidence:
 
 valuation_model:
+  source_skill: company-valuation
+  valuation_request_path: ""
+  valuation_model_path: ""
+  valuation_snapshot_path: ""
+  valuation_section_draft_path: ""
+  peer_comparison_path: ""
+  sensitivity_table_path: ""
+  valuation_gap_requests_path: ""
+  input_status:
+    forecast_model: TODO_FORECAST_MODEL
+    market_data: TODO_MARKET_DATA
+    peer_data: TODO_PEER_DATA
+    official_metric_support: official_missing
   static_valuation: {}
   dynamic_valuation: {}
   peer_comparison: {}
   scenarios: {}
-  conclusion:
+  sensitivity: []
+  conclusion_boundary:
+    claim_type: inference
+    no_advice_boundary: true
+    valuation_context_label: not_assessable
+  gaps: []
 
 technical_sentiment_event:
   technical_snapshot: {}

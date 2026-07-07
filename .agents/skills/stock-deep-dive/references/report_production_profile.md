@@ -25,7 +25,7 @@ primary_subject: single_stock
 | RP3 Candidate Generation | T1-T2 | 生成 claim / metric / business-line / exposure candidates。 | `evidence-ingest` |
 | RP4 Candidate Review | T2 | 晋升 reviewed claims / metrics。 | `quality-review` |
 | RP5 Analysis Pack Build | T2-T7 | 生成 `stock_analysis_pack.yaml`。 | `stock-deep-dive` |
-| RP6 Forecast & Valuation Context | T7 | 生成 forecast / valuation context，全部标记 estimate / inference。 | `stock-deep-dive` |
+| RP6 Forecast & Valuation Context | T7 | Generate forecast context in `stock-deep-dive`; call `company-valuation` for valuation_model / peer comparison / sensitivity / valuation section draft. | `stock-deep-dive` + `company-valuation` |
 | RP7 Technical / Sentiment / Event Pack | T7 | 消费 data-layer packs，不足则保留 TODO。 | `stock-deep-dive` |
 | RP8 Report Draft | T7 | 从 analysis pack 生成 report draft，不新增事实。 | `stock-deep-dive` |
 | RP9 Quality Review | T9 | 执行 G1/G2/G3/G6/G7/G8/G9，必要时附加 QR-* 子检查。 | `quality-review` |
@@ -186,23 +186,42 @@ reports/workflow_runs/<workflow_id>/risk_counter_evidence.yaml
 
 ## RP6 Forecast & Valuation Context
 
-由 `stock-deep-dive` 输出：
+`stock-deep-dive` owns the forecast model and creates `valuation_request.yaml`. `company-valuation` owns valuation context generation.
+
+Inputs:
 
 ```text
+stock_analysis_pack.yaml
 forecast_model.yaml
-valuation_model.yaml
-peer_comparison.csv
-sensitivity_table.csv
+financial_metric_pack.csv
+market_snapshot.csv or TODO_MARKET_DATA
+peer_market_snapshot.csv or TODO_PEER_DATA
+valuation_request.yaml
 ```
 
-最低要求：
+Outputs:
 
-- 2026E / 2027E / 2028E 三年预测或 explicit TODO。
-- 收入、毛利率、费用率、归母净利、EPS 的主假设。
-- 至少一个 base / bull / bear 场景或保留缺口。
-- 至少一个最敏感变量。
-- 可比公司估值表。
-- 所有预测必须标记为 `estimate` / `inference`。
+```text
+reports/workflow_runs/<workflow_id>/forecast_model.yaml
+reports/workflow_runs/<workflow_id>/valuation_request.yaml
+reports/workflow_runs/<workflow_id>/valuation/valuation_model.yaml
+reports/workflow_runs/<workflow_id>/valuation/valuation_snapshot.yaml
+reports/workflow_runs/<workflow_id>/valuation/peer_comparison.csv
+reports/workflow_runs/<workflow_id>/valuation/sensitivity_table.csv
+reports/workflow_runs/<workflow_id>/valuation/valuation_section_draft.md
+reports/workflow_runs/<workflow_id>/valuation/valuation_gap_requests.yaml
+reports/workflow_runs/<workflow_id>/valuation/valuation_quality_handoff.yaml
+```
+
+Minimum requirements:
+
+- 2026E / 2027E / 2028E forecast model or explicit `TODO_FORECAST_MODEL`.
+- Static and dynamic valuation context or explicit `TODO_MARKET_DATA`.
+- Peer comparison or explicit `TODO_PEER_DATA`.
+- Bear / base / bull scenario or explicit gap.
+- At least one sensitive variable.
+- All estimates labeled `estimate` / `inference` / `analyst_view`.
+- No buy/sell/hold, no target-price instruction, no position sizing.
 
 ## RP7 Technical / Sentiment / Event Pack
 
@@ -252,6 +271,8 @@ writer_gap_requests.yaml
 11. 研究结论、风险、反证、跟踪清单。
 12. Evidence Map。
 13. Open Questions / Evidence Gaps。
+
+Valuation section must be assembled from `valuation/valuation_section_draft.md` or show visible valuation TODOs. The prose layer must not create new valuation facts.
 
 ## RP9 Quality Review
 

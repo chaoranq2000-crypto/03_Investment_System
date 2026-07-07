@@ -166,6 +166,19 @@ Use these subchecks when a report uses data-layer packs:
 | `QR-DL-5` | Official disclosure evidence exists before business exposure is written as fact; otherwise `MISSING_DISCLOSURE` is visible. |
 | `QR-DL-6` | Tushare / Baostock / market context snapshots do not support customer order, capacity or segment revenue facts by themselves. |
 
+### QR-VAL Valuation Sub-skill Subchecks
+
+Use these checks when a stock report consumes `company-valuation` outputs.
+
+| local_check_id | Pass condition |
+|---|---|
+| `QR-VAL-1` | `valuation_model.yaml` and `valuation_section_draft.md` exist, or visible `TODO_VALUATION_CONTEXT` is present. |
+| `QR-VAL-2` | Every valuation metric has period, unit / currency, source path or metric id, calculation method and `as_of_date`. |
+| `QR-VAL-3` | Peer comparison includes peer selection reasons, same-period multiple dates, and limitations. |
+| `QR-VAL-4` | Bear/base/bull scenarios are labeled `estimate` / `inference` / `analyst_view` and include sensitivity or explicit TODO. |
+| `QR-VAL-5` | No buy/sell/hold language, target-price instruction, position sizing or guaranteed return appears in valuation outputs. |
+| `QR-VAL-6` | Market valuation, technical or peer context is not used as business exposure proof. |
+
 ### QR-R4 Publishable Stock Report Subchecks
 
 Use these subchecks for R4 readiness or publishable-candidate stock reports:
