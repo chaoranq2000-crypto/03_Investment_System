@@ -1,7 +1,11 @@
 # Codex project configuration for A-share Research OS.
 # Review against your installed Codex version before use.
 
-project_root_markers = [".git", "AGENTS.md", "pyproject.toml"]
+project_root_markers = [
+  ".git",
+  "AGENTS.md",
+  "pyproject.toml",
+]
 
 [[skills.config]]
 path = ".agents/skills/evidence-ingest"
