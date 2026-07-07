@@ -11,7 +11,9 @@ description: >
 
 ## Purpose
 
-把用户请求转化为可审计的研究工作流运行：识别 canonical `workflow_type`，创建或更新 workflow state，路由下层 skills，生成 handoff，调度门禁，推动 fix loop，并输出 workflow readout。
+把用户请求转化为可审计的研究工作流运行：识别 canonical
+`workflow_type`，创建或更新 workflow state，路由下层 skills，
+生成 handoff，调度门禁，推动 fix loop，并输出 workflow readout。
 
 本 skill 是执行入口，不是全局事实源。
 

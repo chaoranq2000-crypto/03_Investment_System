@@ -4,16 +4,27 @@ Date: 2026-07-07
 
 ## 1. 修改文件
 
-| file | change |
+| id | file |
 |---|---|
-| `docs/workflows/RESEARCH_WORKFLOW.md` | 保留唯一 global workflow kernel；移出 workflow_state 字段级 schema 和 P2 前建设顺序。 |
-| `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | 保留 runtime orchestration spec；删除内嵌 routing matrix、handoff 模板和 CSV 字段级 schema。 |
-| `.agents/skills/research-orchestrator/SKILL.md` | 保留执行入口定位；将 ORCH-1 到 ORCH-8 瘦身为短流程并链接 runtime spec。 |
-| `.agents/skills/research-orchestrator/references/skill_routing_matrix.md` | 改为唯一 quick routing matrix；删除 P1.6 建设计划式矩阵。 |
-| `.agents/skills/research-orchestrator/assets/handoff_template.md` | 改为唯一 handoff packet 模板，补齐必填字段。 |
-| `.agents/skills/research-orchestrator/references/workflow_state_schema.md` | 改为 workflow_state、artifact_manifest、open_todos 的字段级 schema owner。 |
-| `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md` | 接收从 workflow kernel 迁出的 P2 前建设顺序。 |
-| `reports/p1_6/WORKFLOW_DOC_DEDUP_READOUT.md` | 新增本 readout。 |
+| F1 | `docs/workflows/RESEARCH_WORKFLOW.md` |
+| F2 | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` |
+| F3 | `.agents/skills/research-orchestrator/SKILL.md` |
+| F4 | `.agents/skills/research-orchestrator/references/skill_routing_matrix.md` |
+| F5 | `.agents/skills/research-orchestrator/assets/handoff_template.md` |
+| F6 | `.agents/skills/research-orchestrator/references/workflow_state_schema.md` |
+| F7 | `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md` |
+| F8 | `reports/p1_6/WORKFLOW_DOC_DEDUP_READOUT.md` |
+
+| id | change |
+|---|---|
+| F1 | 保留唯一 global workflow kernel；移出 workflow_state 字段级 schema 和 P2 前建设顺序。 |
+| F2 | 保留 runtime orchestration spec；删除内嵌 routing matrix、handoff 模板和 CSV 字段级 schema。 |
+| F3 | 保留执行入口定位；将 ORCH-1 到 ORCH-8 瘦身为短流程并链接 runtime spec。 |
+| F4 | 改为唯一 quick routing matrix；删除 P1.6 建设计划式矩阵。 |
+| F5 | 改为唯一 handoff packet 模板，补齐必填字段。 |
+| F6 | 改为 workflow_state、artifact_manifest、open_todos 的字段级 schema owner。 |
+| F7 | 接收从 workflow kernel 迁出的 P2 前建设顺序。 |
+| F8 | 新增本 readout。 |
 
 ## 2. 迁移内容
 
@@ -28,19 +39,29 @@ Date: 2026-07-07
 
 ## 3. 当前事实 owner
 
-| fact type | unique owner |
+| owner_id | fact type |
 |---|---|
-| canonical `workflow_type` | `docs/workflows/RESEARCH_WORKFLOW.md` |
-| canonical `stage_id` | `docs/workflows/RESEARCH_WORKFLOW.md` |
-| canonical `gate_id` / G0-G10 gate definition | `docs/workflows/RESEARCH_WORKFLOW.md` |
-| canonical `backflow_decision` | `docs/workflows/RESEARCH_WORKFLOW.md` |
-| P2 readiness 条件 | `docs/workflows/RESEARCH_WORKFLOW.md` |
-| runtime gate dispatch / fix loop / close readout rules | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` |
-| workflow_state / artifact_manifest / open_todos field schema | `.agents/skills/research-orchestrator/references/workflow_state_schema.md` |
-| quick routing matrix | `.agents/skills/research-orchestrator/references/skill_routing_matrix.md` |
-| handoff packet template | `.agents/skills/research-orchestrator/assets/handoff_template.md` |
-| orchestrator execution entry and read discipline | `.agents/skills/research-orchestrator/SKILL.md` |
-| P1.6 build sequence | `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md` |
+| O1 | canonical `workflow_type` |
+| O1 | canonical `stage_id` |
+| O1 | canonical `gate_id` / G0-G10 gate definition |
+| O1 | canonical `backflow_decision` |
+| O1 | P2 readiness 条件 |
+| O2 | runtime gate dispatch / fix loop / close readout rules |
+| O3 | workflow_state / artifact_manifest / open_todos field schema |
+| O4 | quick routing matrix |
+| O5 | handoff packet template |
+| O6 | orchestrator execution entry and read discipline |
+| O7 | P1.6 build sequence |
+
+| owner_id | unique owner |
+|---|---|
+| O1 | `docs/workflows/RESEARCH_WORKFLOW.md` |
+| O2 | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` |
+| O3 | `.agents/skills/research-orchestrator/references/workflow_state_schema.md` |
+| O4 | `.agents/skills/research-orchestrator/references/skill_routing_matrix.md` |
+| O5 | `.agents/skills/research-orchestrator/assets/handoff_template.md` |
+| O6 | `.agents/skills/research-orchestrator/SKILL.md` |
+| O7 | `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md` |
 
 ## 4. 语义不变确认
 
@@ -68,7 +89,42 @@ conda run -p .\.conda\investment-system python scripts/check_doc_drift.py
 
 ## 6. 剩余 TODO
 
-| issue_id | severity | owner | next_action |
-|---|---|---|---|
-| workflow_state_validator_alignment | low | research-orchestrator | 可选：后续扩展 validator，使其也校验 `run_mode` 和 `quality_gates[].status`。 |
-| workflow_state_template_alignment | low | research-orchestrator | 可选：后续将 `run_mode` 加入 `workflow_state_template.yaml`，与 orchestration runtime 字段保持更强一致。 |
+| issue_id | severity | owner |
+|---|---|---|
+| workflow_state_validator_alignment | low | research-orchestrator |
+| workflow_state_template_alignment | low | research-orchestrator |
+
+| issue_id | next_action_ref |
+|---|---|
+| workflow_state_validator_alignment | A1 |
+| workflow_state_template_alignment | A2 |
+
+- A1: 可选：后续扩展 validator，使其也校验 `run_mode`
+  和 `quality_gates[].status`。
+- A2: 可选：后续将 `run_mode` 加入 `workflow_state_template.yaml`，
+  与 orchestration runtime 字段保持更强一致。
+
+## 7. Markdown formatting cleanup
+
+Date: 2026-07-07
+
+| cleanup area | files |
+|---|---|
+| wide Markdown tables | `RESEARCH_WORKFLOW.md`、`skill_routing_matrix.md` |
+| wide Markdown tables | `WORKFLOW_DOC_DEDUP_READOUT.md` |
+| long table notes | `workflow_state_schema.md` |
+| long paragraphs / list items | `RESEARCH_WORKFLOW.md`、`SKILL.md` |
+| checked, no edit needed | `WORKFLOW_ORCHESTRATION_SPEC.md`、`handoff_template.md` |
+
+| semantic guardrail | result |
+|---|---|
+| workflow_type / stage_id / gate_id / backflow_decision | unchanged |
+| P2 readiness semantics | unchanged |
+| investment conclusions | none added |
+| P2 execution | not entered |
+
+| validation | result |
+|---|---|
+| `git diff --check` | pass; Git reported LF/CRLF conversion warnings only |
+| `scripts/check_doc_drift.py` | pass |
+| `validate_workflow_state.py` | pass |

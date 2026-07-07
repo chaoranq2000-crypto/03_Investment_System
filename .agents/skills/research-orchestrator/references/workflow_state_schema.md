@@ -25,9 +25,9 @@ The current validator is:
 |---|---|---|
 | canonical workflow type | `workflow_type` | Owned by `RESEARCH_WORKFLOW.md`; validator checks the same five values. |
 | workflow_status | `status` | This schema and validator use the values listed below. |
-| gate_status | `quality_gates[].status` | This schema uses the values listed below; validator currently checks only that `quality_gates` is a list. |
-| todo_severity | `open_todos[].severity` | This schema uses `high`, `medium`, `low`; validator treats open `high` TODOs as blockers. |
-| review_status | artifact-specific fields | Not a top-level workflow_state enum; lower-level scripts and manifests own their local values. |
+| gate_status | `quality_gates[].status` | Listed below; validator currently checks only list type. |
+| todo_severity | `open_todos[].severity` | Uses `high`, `medium`, `low`; open `high` TODOs block acceptance. |
+| review_status | artifact-specific fields | Local scripts and manifests own artifact-specific values. |
 
 `workflow_status` values:
 
