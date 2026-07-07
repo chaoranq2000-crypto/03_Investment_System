@@ -165,6 +165,18 @@ reports/workflow_runs/<workflow_id>/valuation/valuation_gap_requests.yaml
 reports/workflow_runs/<workflow_id>/valuation/valuation_quality_handoff.yaml
 ```
 
+After the sub-skill returns, `stock-deep-dive` must collect and reconcile:
+
+- `valuation_model.yaml`
+- `valuation_snapshot.yaml`
+- `peer_comparison.csv`
+- `sensitivity_table.csv`
+- `valuation_section_draft.md`
+- `valuation_gap_requests.yaml`
+- `valuation_quality_handoff.yaml`
+
+These files are consumed as derived valuation artifacts for report assembly and quality-review handoff. They do not create new facts, stock recommendations, exposure proof, target-price instructions, or position-sizing language.
+
 ### SDD-3 Report drafting
 
 Use:

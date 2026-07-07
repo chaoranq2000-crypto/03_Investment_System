@@ -65,6 +65,19 @@ valuation_model:
   peer_comparison_path:
   sensitivity_table_path:
   valuation_gap_requests_path:
+  valuation_quality_handoff_path:
+  artifact_paths:
+    valuation_model:
+    valuation_snapshot:
+    peer_comparison:
+    sensitivity_table:
+    valuation_section_draft:
+    valuation_gap_requests:
+    valuation_quality_handoff:
+  quality_handoff:
+    local_checks: []
+    no_advice_boundary:
+    open_gaps: []
   input_status:
     forecast_model:
     market_data:
@@ -77,6 +90,7 @@ valuation_model:
   sensitivity: []
   conclusion_boundary:
     claim_type: inference
+    allowed_claim_types: [estimate, inference, analyst_view]
     no_advice_boundary: true
     valuation_context_label: below_peer_median | inline_with_peers | above_peer_median | not_assessable
   gaps: []
@@ -111,6 +125,8 @@ required_id_fields:
   valuation: supporting_metric_ids / peer_source_ids / valuation_model_path / explicit TODO
   catalyst_calendar: evidence_id or clue_id
 ```
+
+Valuation conclusions may only be `estimate`, `inference`, or `analyst_view`. They must never be represented as `fact`, and they must not be used as business exposure proof.
 
 ## 4. Missing data representation
 

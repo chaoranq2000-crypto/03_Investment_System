@@ -25,7 +25,7 @@ primary_subject: single_stock
 | RP3 Candidate Generation | T1-T2 | 生成 claim / metric / business-line / exposure candidates。 | `evidence-ingest` |
 | RP4 Candidate Review | T2 | 晋升 reviewed claims / metrics。 | `quality-review` |
 | RP5 Analysis Pack Build | T2-T7 | 生成 `stock_analysis_pack.yaml`。 | `stock-deep-dive` |
-| RP6 Forecast & Valuation Context | T7 | Generate forecast context in `stock-deep-dive`; call `company-valuation` for valuation_model / peer comparison / sensitivity / valuation section draft. | `stock-deep-dive` + `company-valuation` |
+| RP6 Forecast & Valuation Context | T7 | `stock-deep-dive` prepares `forecast_model.yaml` + `valuation_request.yaml`; `company-valuation` produces valuation artifacts; `stock-deep-dive` consumes them during RP8 report draft. | `stock-deep-dive` + `company-valuation` |
 | RP7 Technical / Sentiment / Event Pack | T7 | 消费 data-layer packs，不足则保留 TODO。 | `stock-deep-dive` |
 | RP8 Report Draft | T7 | 从 analysis pack 生成 report draft，不新增事实。 | `stock-deep-dive` |
 | RP9 Quality Review | T9 | 执行 G1/G2/G3/G6/G7/G8/G9，必要时附加 QR-* 子检查。 | `quality-review` |
@@ -186,7 +186,15 @@ reports/workflow_runs/<workflow_id>/risk_counter_evidence.yaml
 
 ## RP6 Forecast & Valuation Context
 
-`stock-deep-dive` owns the forecast model and creates `valuation_request.yaml`. `company-valuation` owns valuation context generation.
+`stock-deep-dive` owns the forecast model and creates `valuation_request.yaml`. `company-valuation` owns valuation context generation. This profile does not change global workflow stages or global gate definitions.
+
+Responsibility split:
+
+```text
+stock-deep-dive prepares forecast_model.yaml and valuation_request.yaml
+company-valuation produces valuation_model / valuation_snapshot / peer_comparison / sensitivity / section draft / gaps / quality handoff
+stock-deep-dive consumes valuation artifacts during RP8 report draft without adding new valuation facts
+```
 
 Inputs:
 

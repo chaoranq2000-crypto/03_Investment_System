@@ -57,6 +57,20 @@ valuation_model:
   peer_comparison_path: ""
   sensitivity_table_path: ""
   valuation_gap_requests_path: ""
+  valuation_quality_handoff_path: ""
+  artifact_paths:
+    valuation_model: ""
+    valuation_snapshot: ""
+    peer_comparison: ""
+    sensitivity_table: ""
+    valuation_section_draft: ""
+    valuation_gap_requests: ""
+    valuation_quality_handoff: ""
+  quality_handoff:
+    local_checks: []
+    no_advice_boundary: needs_review
+    open_gaps: []
+  no_advice_boundary: true
   input_status:
     forecast_model: TODO_FORECAST_MODEL
     market_data: TODO_MARKET_DATA
@@ -69,8 +83,10 @@ valuation_model:
   sensitivity: []
   conclusion_boundary:
     claim_type: inference
+    allowed_claim_types: [estimate, inference, analyst_view]
     no_advice_boundary: true
     valuation_context_label: not_assessable
+  open_gaps: []
   gaps: []
 
 technical_sentiment_event:

@@ -65,7 +65,22 @@ R3 minimum:
 
 ```yaml
 valuation_model:
+  source_skill: company-valuation
+  caller_skill: stock-deep-dive
   as_of_date:
+  input_status:
+    forecast_model:
+    market_data:
+    peer_data:
+    official_metric_support:
+    business_segment_support:
+  selected_methods: []
+  valuation_snapshot_path:
+  peer_comparison_path:
+  sensitivity_table_path:
+  valuation_section_draft_path:
+  valuation_quality_handoff_path:
+  valuation_gap_requests_path:
   market_data:
     price:
     market_cap:
@@ -138,6 +153,26 @@ valuation/sensitivity_table.csv
 valuation/valuation_section_draft.md
 valuation/valuation_gap_requests.yaml
 valuation/valuation_quality_handoff.yaml
+```
+
+`valuation_model.yaml` must expose these handoff fields for `stock-deep-dive` and `quality-review`:
+
+```yaml
+source_skill: company-valuation
+caller_skill: stock-deep-dive
+input_status:
+  forecast_model:
+  market_data:
+  peer_data:
+  official_metric_support:
+  business_segment_support:
+selected_methods: []
+valuation_snapshot_path:
+peer_comparison_path:
+sensitivity_table_path:
+valuation_section_draft_path:
+valuation_quality_handoff_path:
+valuation_gap_requests_path:
 ```
 
 ### 6.3 Valuation status labels
