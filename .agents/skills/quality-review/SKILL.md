@@ -22,6 +22,9 @@ docs/workflows/RESEARCH_WORKFLOW.md
 This skill may refer to G0-G10 but must not create new global G numbers.
 
 Skill-local checks must use `QR-*` IDs.
+R5 sample-quality checks use local `R5-G1` to `R5-G11` IDs from
+`references/r5_quality_gate.md`; they do not extend the global workflow gate
+table.
 
 ## When to use
 
@@ -72,6 +75,13 @@ Every issue must use:
 
 ```csv
 issue_id,severity,gate_id,local_check_id,stage,target_artifact,description,fix_owner_skill,status,created_at,resolved_at,notes
+```
+
+For R5 issue-list validation, use the compact CSV schema in
+`references/issue_schema.md`:
+
+```csv
+issue_id,severity,gate_id,section,artifact,description,fix_owner_skill,blocking_decision,next_action,status
 ```
 
 Severity:
@@ -195,6 +205,31 @@ Reference:
 
 ```text
 .agents/skills/stock-deep-dive/references/publishable_stock_report_gate.md
+```
+
+### QR-R5 Sample-Quality Gate Subchecks
+
+Use `references/r5_quality_gate.md` when reviewing R5 research packs or R5
+report notes. The R5 local gates are:
+
+```text
+R5-G1 Evidence Completeness Gate
+R5-G2 Financial Model Gate
+R5-G3 Business Breakdown Gate
+R5-G4 Industry Context Gate
+R5-G5 Forecast Model Gate
+R5-G6 Valuation Gate
+R5-G7 Market / Technical Gate
+R5-G8 Sentiment / Event Gate
+R5-G9 Narrative Coherence Gate
+R5-G10 No-Advice Gate
+R5-G11 Sample Benchmark Gate
+```
+
+Validate issue lists with:
+
+```bash
+python .agents/skills/quality-review/scripts/validate_quality_issues.py --issues .agents/skills/quality-review/assets/r5_quality_issues.example.csv
 ```
 
 ## Outcome rules

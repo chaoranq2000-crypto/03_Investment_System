@@ -12,6 +12,7 @@ description: A股个股深度研究统一入口；当用户要求个股研究、
 It turns reviewed evidence, reviewed metrics and data-layer outputs into:
 
 - `stock_analysis_pack.yaml`
+- `R5_stock_research_pack.yaml` when running the R5-MVP research-pack path
 - a valuation subagent handoff package when valuation context is required
 - `valuation_model.yaml` / `valuation_section_draft.md` from `company-valuation` when valuation context is required
 - a stock deep dive report draft
@@ -123,6 +124,11 @@ The pack should include:
 - `catalyst_calendar`
 - `risk_counter_evidence`
 - `source_gap_requests`
+
+For R5-MVP work, produce `R5_stock_research_pack.yaml` using
+`references/r5_stock_research_pack_contract.md`. The pack is the R5 fact
+source and must preserve all `TODO_*`, `MISSING_DISCLOSURE`, forecast,
+valuation, market, and business-breakdown gaps.
 
 Rules:
 
@@ -250,6 +256,7 @@ Read these references before executing a stock run:
 - `references/market_sentiment_event_contract.md`
 - `references/report_style_guide.md`
 - `references/report_production_profile.md`
+- `references/r5_stock_research_pack_contract.md`
 - `references/valuation_subagent_handoff.md`
 - `references/legacy_stock_skill_rules.md`
 
@@ -266,6 +273,7 @@ reports/workflow_runs/<workflow_id>/
 Expected artifacts:
 
 - `stock_analysis_pack.yaml`
+- `R5_stock_research_pack.yaml` for R5-MVP runs
 - `stock_deep_dive_draft.md` or `R4_stock_deep_dive_v*.md`
 - `segment_exposure.yaml`
 - `evidence_map.md`
@@ -294,6 +302,7 @@ Before closing a run, confirm:
 - Company identity is unambiguous.
 - Evidence and data-layer inputs are registered.
 - `stock_analysis_pack.yaml` exists.
+- R5-MVP runs validate `R5_stock_research_pack.yaml` before report composition.
 - Report draft does not introduce uncited material claims.
 - `segment_exposure.yaml` exists or a blocked / no_backflow explanation is written.
 - `backflow_decision` is explicit.

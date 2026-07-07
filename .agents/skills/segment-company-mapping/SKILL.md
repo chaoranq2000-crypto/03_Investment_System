@@ -41,6 +41,7 @@ profit_pct:
 - Ensure exposure_score is backed by evidence/claim/TODO.
 - Maintain evidence_ids, valid_from, valid_to and notes.
 - Write exposure change notes and backflow decisions.
+- Validate B4-lite `segment_exposure.yaml` with `scripts/validate_segment_exposure.py` before promoting updates.
 
 ## Out of scope
 
@@ -90,6 +91,8 @@ Narrative-only exposure cannot score above 1. Technology-only exposure cannot sc
 update_exposure
 create_segment_candidate
 update_company_universe
+update_segment_taxonomy
+update_scorecard
 no_backflow_needed
 blocked
 ```
@@ -112,6 +115,16 @@ reports/stocks/<stock_code>_<company_name>/exposure_change_note.md
 
 ```csv
 segment_id,company_id,stock_code,stock_name,exposure_type,exposure_score,revenue_pct,profit_pct,evidence_ids,claim_ids,metric_ids,confidence,valid_from,valid_to,status,backflow_decision,notes
+```
+
+## References and validators
+
+```text
+references/exposure_schema.md
+references/backflow_decision_rules.md
+assets/segment_exposure.example.yaml
+assets/segment_company_exposure.example.csv
+scripts/validate_segment_exposure.py
 ```
 
 ## Guardrails

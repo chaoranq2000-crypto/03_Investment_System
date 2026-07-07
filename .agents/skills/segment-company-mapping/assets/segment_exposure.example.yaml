@@ -1,0 +1,49 @@
+schema_version: "segment_exposure_v0.1"
+artifact_type: "segment_exposure"
+status: "draft"
+as_of_date: "2026-07-07"
+company_id: "company_example_000000_sz"
+stock_code: "000000"
+company_name: "示例公司"
+exposures:
+  - segment_id: "segment_example"
+    segment_name: "示例细分"
+    exposure_type: "product"
+    exposure_score: 2
+    confidence: "low"
+    revenue_pct: "MISSING_DISCLOSURE"
+    profit_pct: "MISSING_DISCLOSURE"
+    evidence_ids:
+      - "ev_example_annual_report_2025"
+    claim_ids: []
+    metric_ids: []
+    missing_reason: "MISSING_DISCLOSURE"
+    backflow_decision: "no_backflow_needed"
+    next_action: "Keep source gap visible until official business-line disclosure is found."
+  - segment_id: "segment_technology_example"
+    segment_name: "示例技术细分"
+    exposure_type: "technology"
+    exposure_score: 2
+    confidence: "low"
+    revenue_pct: "TODO_SOURCE_REQUIRED"
+    profit_pct: "TODO_SOURCE_REQUIRED"
+    evidence_ids:
+      - "ev_example_annual_report_2025"
+    claim_ids: []
+    metric_ids: []
+    missing_reason: "TODO_SOURCE_REQUIRED"
+    backflow_decision: "create_segment_candidate"
+    next_action: "Review whether the technology clue belongs in segment taxonomy."
+  - segment_id: "segment_narrative_example"
+    segment_name: "示例叙事细分"
+    exposure_type: "narrative"
+    exposure_score: 1
+    confidence: "low"
+    revenue_pct: "MISSING_DISCLOSURE"
+    profit_pct: "MISSING_DISCLOSURE"
+    evidence_ids: []
+    claim_ids: []
+    metric_ids: []
+    missing_reason: "LOW_CONFIDENCE_CLUE_ONLY"
+    backflow_decision: "blocked"
+    next_action: "TODO_SOURCE_REQUIRED: find official disclosure before promotion."

@@ -53,3 +53,10 @@ def test_sample_quality_requires_no_advice_gate_and_market_snapshot():
     errors = validator.validate_pack(data)
     assert any("no_advice_gate_passed" in error for error in errors)
     assert any("market_snapshot.current_price" in error for error in errors)
+
+
+def test_cli_accepts_pack_argument(capsys):
+    validator = load_validator()
+    assert validator.main(["--pack", str(EXAMPLE_PATH)]) == 0
+    captured = capsys.readouterr()
+    assert "outcome: accepted_with_todos" in captured.out

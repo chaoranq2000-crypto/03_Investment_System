@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate an R5_stock_research_pack YAML artifact for R5-MVP B5-lite."""
+"""Validate an R5_stock_research_pack YAML artifact for R5-MVP."""
 from __future__ import annotations
 
 import argparse
@@ -12,14 +12,31 @@ try:
 except ImportError as exc:  # pragma: no cover
     raise SystemExit("PyYAML is required: pip install pyyaml") from exc
 
-REQUIRED_TOP_LEVEL = [
-    "schema_version", "artifact_type", "status", "stock", "quality_status", "source_gap_policy",
-    "company_identity_pack", "evidence_snapshot_pack", "financial_history_pack",
-    "business_breakdown_pack", "segment_exposure_pack", "industry_context_pack",
-    "peer_comparison_pack", "forecast_model_pack", "valuation_pack", "technical_market_pack",
-    "sentiment_event_pack", "risk_counterevidence_pack", "report_composition_pack",
+CORE_PACKS = [
+    "company_identity_pack",
+    "evidence_snapshot_pack",
+    "financial_history_pack",
+    "business_breakdown_pack",
+    "segment_exposure_pack",
+    "industry_context_pack",
+    "peer_comparison_pack",
+    "forecast_model_pack",
+    "valuation_pack",
+    "technical_market_pack",
+    "sentiment_event_pack",
+    "risk_counterevidence_pack",
 ]
-REQUIRED_PACKS = [k for k in REQUIRED_TOP_LEVEL if k.endswith("_pack")]
+REQUIRED_TOP_LEVEL = [
+    "schema_version",
+    "artifact_type",
+    "status",
+    "stock",
+    "quality_status",
+    "source_gap_policy",
+    *CORE_PACKS,
+    "report_composition_pack",
+]
+REQUIRED_PACKS = [*CORE_PACKS, "report_composition_pack"]
 MISSING_TOKENS = {"MISSING_DISCLOSURE", "TODO_SOURCE_REQUIRED", "TODO_MODEL_INPUT"}
 FORECAST_YEARS = {"2026E", "2027E", "2028E"}
 REQUIRED_FORECAST_METRICS = {"revenue", "gross_margin", "gross_profit", "net_profit_attributable", "eps"}
@@ -53,6 +70,24 @@ def _walk_text(value: Any) -> str:
     return value if isinstance(value, str) else ""
 
 
+def _pack_status(data: dict[str, Any], pack_name: str) -> str | None:
+    pack = data.get(pack_name)
+    return pack.get("status") if isinstance(pack, dict) else None
+
+
+def derive_outcome(data: dict[str, Any], errors: list[str]) -> str:
+    if errors:
+        return "blocked" if any("artifact_type" in error or "missing top-level" in error for error in errors) else "needs_fix"
+    quality = data.get("quality_status") or {}
+    if quality.get("high_issue_count") not in (None, 0, "0"):
+        return "needs_fix"
+    if any(_pack_status(data, pack_name) in {"TODO", "partial"} for pack_name in REQUIRED_PACKS):
+        return "accepted_with_todos"
+    if quality.get("medium_issue_count") not in (None, 0, "0"):
+        return "accepted_with_todos"
+    return "accepted"
+
+
 def validate_pack(data: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     for key in REQUIRED_TOP_LEVEL:
@@ -82,6 +117,11 @@ def validate_pack(data: dict[str, Any]) -> list[str]:
             errors.append(f"{pack_name} must be a mapping")
         elif "status" not in pack:
             errors.append(f"{pack_name}.status is required")
+
+    if level == "sample_quality_ready":
+        for pack_name in ["forecast_model_pack", "valuation_pack", "business_breakdown_pack"]:
+            if _pack_status(data, pack_name) != "ready":
+                errors.append(f"sample_quality_ready requires {pack_name}.status == ready")
 
     business_pack = data.get("business_breakdown_pack") or {}
     lines = business_pack.get("business_lines")
@@ -140,18 +180,25 @@ def validate_pack(data: dict[str, Any]) -> list[str]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate an R5_stock_research_pack YAML file.")
-    parser.add_argument("path", type=Path)
+    parser.add_argument("path", nargs="?", type=Path, help="Pack path. Retained for backward compatibility.")
+    parser.add_argument("--pack", dest="pack_path", type=Path, help="Pack path.")
     args = parser.parse_args(argv)
+    path = args.pack_path or args.path
+    if path is None:
+        parser.error("provide a pack path or --pack")
     try:
-        errors = validate_pack(load_yaml(args.path))
+        data = load_yaml(path)
+        errors = validate_pack(data)
     except Exception as exc:  # noqa: BLE001
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
+    outcome = derive_outcome(data, errors)
+    print(f"outcome: {outcome}")
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
-    print(f"OK: {args.path}")
+    print(f"OK: {path}")
     return 0
 
 
