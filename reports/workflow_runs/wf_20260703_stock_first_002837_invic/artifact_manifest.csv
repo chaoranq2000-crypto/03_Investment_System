@@ -13,8 +13,8 @@ art_011,market_sentiment_pack,market_sentiment_pack.yaml,stock-deep-dive,T7,True
 art_012,stock_analysis_pack,stock_analysis_pack.yaml,stock-deep-dive,T5,True,True,current,R3 analysis input
 art_013,business_breakdown,business_breakdown.yaml,stock-deep-dive,T5,True,True,current,revenue/profit pct MISSING
 art_014,forecast_model,forecast_model.yaml,stock-deep-dive,T6,True,True,current,estimate assumptions included
-art_015,valuation_model,valuation_model.yaml,stock-deep-dive,T6,True,True,current,scenario framework only
-art_016,peer_comparison,peer_comparison.csv,stock-deep-dive,T6,True,True,current,placeholder peer table
+art_015,valuation_model,valuation/valuation_model.yaml,company-valuation,RP6,True,True,current,company-valuation output with TODO market and peer gaps
+art_016,peer_comparison,valuation/peer_comparison.csv,company-valuation,RP6,True,True,current,company-valuation peer table with TODO_PEER_DATA
 art_017,stock_report_sample_quality_draft,stock_report_sample_quality_draft.md,stock-deep-dive,T8,True,True,current,R3 sample-quality draft
 art_018,report_evidence_map,report_evidence_map.md,stock-deep-dive,T8,True,True,current,16 rows
 art_019,writer_gap_requests,writer_gap_requests.yaml,stock-deep-dive,T8,True,True,current,gaps visible
@@ -40,3 +40,8 @@ art_038,exposure_backflow_review,exposure_backflow_review.yaml,segment-company-m
 art_039,R4_stock_deep_dive_v0_2,R4_stock_deep_dive_v0_2.md,stock-deep-dive,R4_Phase_5,True,True,publishable_ready_with_disclosure_todos,R4 v0.2 readiness draft
 art_040,R4_quality_gate_report_v0_2,R4_quality_gate_report_v0_2.md,quality-review,R4_Phase_5,True,True,current,R4 v0.2 gate report
 art_041,segment_led_replay_preparation_note,segment_led_replay_preparation_note.md,research-orchestrator,R4_Phase_6,True,True,prepared,segment-led replay prepared but not executed
+art_042,valuation_snapshot,valuation/valuation_snapshot.yaml,company-valuation,RP6,True,True,current,company-valuation valuation snapshot with TODO_MARKET_DATA
+art_043,valuation_section_draft,valuation/valuation_section_draft.md,company-valuation,RP6,True,True,current,company-valuation section draft with visible valuation TODOs
+art_044,valuation_gap_requests,valuation/valuation_gap_requests.yaml,company-valuation,RP6,True,True,current,company-valuation gap requests
+art_045,valuation_quality_handoff,valuation/valuation_quality_handoff.yaml,company-valuation,RP6,True,True,current,company-valuation quality handoff for QR-VAL checks
+art_046,sensitivity_table,valuation/sensitivity_table.csv,company-valuation,RP6,True,True,current,company-valuation sensitivity table with TODO valuation context

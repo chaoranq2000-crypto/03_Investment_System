@@ -252,24 +252,66 @@ forecast_model:
     base: see revenue_forecast
     bull: base + 5pct
 valuation_model:
+  source_skill: company-valuation
+  caller_skill: stock-deep-dive
   as_of_date: '2026-07-03'
+  valuation_request_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation_request.yaml
+  valuation_model_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_model.yaml
+  valuation_snapshot_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_snapshot.yaml
+  valuation_section_draft_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_section_draft.md
+  peer_comparison_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/peer_comparison.csv
+  sensitivity_table_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
+  valuation_gap_requests_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_gap_requests.yaml
+  valuation_quality_handoff_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_quality_handoff.yaml
+  artifact_paths:
+    valuation_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_model.yaml
+    valuation_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_snapshot.yaml
+    peer_comparison: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/peer_comparison.csv
+    sensitivity_table: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
+    valuation_section_draft: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_section_draft.md
+    valuation_gap_requests: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_gap_requests.yaml
+    valuation_quality_handoff: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_quality_handoff.yaml
+  input_status:
+    forecast_model: partial
+    market_data: todo_market_data
+    peer_data: todo_peer_data
+    official_metric_support: partial
+    business_segment_support: missing_disclosure
   static_valuation:
     status: TODO_MARKET_DATA
-    supporting_metric_ids:
-    - metric_cn_002837_invic_basic_eps_20260331_16e329
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_snapshot.yaml
   dynamic_valuation:
-    status: scenario_model_only
-    claim_type: inference
-    no_target_price_instruction: true
-  peer_comparison: reports\workflow_runs\wf_20260703_stock_first_002837_invic\peer_comparison.csv
+    status: TODO_FORECAST_MODEL_NET_PROFIT
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_model.yaml
+  peer_comparison:
+    status: TODO_PEER_DATA
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/peer_comparison.csv
   scenarios:
-  - scenario: bear
-    description: 收入增速低于 base，估值只保留场景区间口径。
-  - scenario: base
-    description: 基于历史收入的温和增长估计。
-  - scenario: bull
-    description: 收入增速高于 base，需订单和分业务证据验证。
-  conclusion: 当前仅形成场景估值框架，不形成交易动作或价格指令。
+    status: TODO_VALUATION_CONTEXT
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
+  conclusion_boundary:
+    claim_type: inference
+    allowed_claim_types:
+    - estimate
+    - inference
+    - analyst_view
+    valuation_context_label: not_assessable
+    no_advice_boundary: true
+  quality_handoff:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_quality_handoff.yaml
+    local_checks:
+    - QR-VAL-1
+    - QR-VAL-2
+    - QR-VAL-3
+    - QR-VAL-4
+    - QR-VAL-5
+    no_advice_boundary: pass
+  open_gaps:
+  - TODO_MARKET_DATA
+  - TODO_PEER_DATA
+  - TODO_FINANCIAL_METRIC_PACK
+  - TODO_FORECAST_MODEL_NET_PROFIT
+  notes: Valuation content is referenced from company-valuation outputs under valuation/; missing market and peer data remain TODO.
 technical_sentiment_event:
   technical_snapshot:
     stock_code: 002837

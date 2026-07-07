@@ -1,2 +1,2 @@
 variable,case_label,delta,output_metric,output_value,impact_vs_base,assumption_type,supporting_metric_ids,supporting_claim_ids,notes
-revenue_growth,TODO_VALUATION_CONTEXT,base +/- 5pct,valuation_context,TODO_VALUATION_CONTEXT,TODO,estimate,metric_cn_002837_invic_revenue_20260331_4f7f22,,Forecast revenue sensitivity exists, but market snapshot and net profit forecast inputs are missing.
+revenue_growth,TODO_VALUATION_CONTEXT,base +/- 5pct,valuation_context,TODO_VALUATION_CONTEXT,TODO,estimate,metric_cn_002837_invic_revenue_20260331_4f7f22,,"Forecast revenue sensitivity exists, but market snapshot and net profit forecast inputs are missing."

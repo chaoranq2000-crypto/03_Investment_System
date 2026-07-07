@@ -78,24 +78,24 @@ Mismatch、official_missing 与 structured_missing 均已逐条给出 review_dec
 
 ## 6. Valuation And Peer Context
 
-估值和 peer 表只提供市场上下文，不形成排名或交易动作。
+估值和 peer 表只提供市场上下文，不形成排名、交易动作、价格指令或 exposure proof。当前 `company-valuation` 输出仍显示 `TODO_MARKET_DATA` / `TODO_PEER_DATA`，因此本节不写入未被 `valuation/valuation_snapshot.yaml` 支撑的 PE、PB、PS、市值或价格数字。
 
-| field | value |
-| --- | --- |
-| price | 32.50 |
-| market_cap | 2418000 |
-| pe_ttm | 38.2 |
-| pe_forward | TODO_MARKET_DATA |
-| pb | 4.1 |
-| ps | 6.7 |
+| field | value | source |
+| --- | --- | --- |
+| current_price | TODO_MARKET_DATA | valuation/valuation_snapshot.yaml#market_data.current_price |
+| market_cap | TODO_MARKET_DATA | valuation/valuation_snapshot.yaml#market_data.market_cap |
+| pe_ttm | TODO_MARKET_DATA | valuation/valuation_model.yaml#static_valuation.metrics.pe_ttm |
+| pe_forward | TODO_FORECAST_MODEL_NET_PROFIT | valuation/valuation_model.yaml#dynamic_valuation.metrics |
+| pb | TODO_MARKET_DATA | valuation/valuation_model.yaml#static_valuation.metrics.pb |
+| ps | TODO_MARKET_DATA | valuation/valuation_model.yaml#static_valuation.metrics.ps |
+| valuation_context_label | not_assessable | valuation/valuation_snapshot.yaml#labels.valuation_context_label |
 
-| stock_code | company_name | pe_ttm | pb | ps | status |
-| --- | --- | --- | --- | --- | --- |
-| 002837 | 英维克 | 38.2 | 4.1 | 6.7 | context_only |
-| 301018 | 申菱环境 | TODO_MARKET_DATA | TODO_MARKET_DATA | TODO_MARKET_DATA | context_only |
-| 300499 | 高澜股份 | TODO_MARKET_DATA | TODO_MARKET_DATA | TODO_MARKET_DATA | context_only |
-| 300731 | 科创新源 | TODO_MARKET_DATA | TODO_MARKET_DATA | TODO_MARKET_DATA | context_only |
-| 300602 | 飞荣达 | TODO_MARKET_DATA | TODO_MARKET_DATA | TODO_MARKET_DATA | context_only |
+| source_artifact | status | boundary |
+| --- | --- | --- |
+| valuation/valuation_model.yaml | TODO_MARKET_DATA / TODO_PEER_DATA / TODO_FORECAST_MODEL_NET_PROFIT | estimate / inference only |
+| valuation/valuation_snapshot.yaml | market_data: MISSING; multiples: MISSING | market context only |
+| valuation/peer_comparison.csv | TODO_PEER_DATA | no peer ranking |
+| valuation/sensitivity_table.csv | TODO_VALUATION_CONTEXT | no trading action |
 
 ## 7. Technical And Market State
 
