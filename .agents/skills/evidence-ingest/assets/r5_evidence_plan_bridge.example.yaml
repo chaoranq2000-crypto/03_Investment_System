@@ -1,0 +1,137 @@
+schema_version: r5_evidence_plan_bridge_v0.1
+artifact_type: R5_stock_evidence_snapshot_plan
+stock_code: "000000"
+workflow_id: wf_r5_example
+official_filings_needed:
+  - annual report business breakdown table
+structured_financial_data_needed:
+  - reviewed financial metrics
+market_snapshot_needed:
+  - dated market snapshot
+peer_snapshot_needed:
+  - reviewed peer valuation snapshot
+industry_data_needed:
+  - industry context source
+analyst_consensus_needed: []
+news_and_event_sources_needed:
+  - dated event source
+priority: high
+blocking_for_r5: true
+metadata:
+  workflow_id: wf_r5_example
+  stock_code: "000000"
+  as_of_date: "2026-07-08"
+implementation_boundary:
+  no_live_api: true
+  no_downloader_added: true
+  plan_only: true
+source_gap_policy:
+  missing_tokens:
+    - MISSING_DISCLOSURE
+    - TODO_SOURCE_REQUIRED
+    - TODO_MODEL_INPUT
+    - TODO_MARKET_DATA
+    - TODO_PEER_DATA
+  preserve_missing_data: true
+evidence_requests:
+  official_filings:
+    - request_id: r5_official_annual_report
+      evidence_need: annual_report_business_breakdown
+      source_type: annual_report
+      source_rank: A
+      as_of_date: "2026-07-08"
+      freshness_policy: latest_available_or_visible_gap
+      allowed_usage: [fact_support, business_exposure_after_review, financial_metrics]
+      required_for_pack: [business_breakdown_pack, financial_history_pack]
+      status: planned
+      missing_reason: MISSING_DISCLOSURE
+      next_action: register annual report business breakdown table
+  structured_financial_metrics:
+    - request_id: r5_structured_financial_metrics
+      evidence_need: reviewed_financial_metrics
+      source_type: structured_financial_data
+      source_rank: B
+      as_of_date: "2026-07-08"
+      freshness_policy: align_to_official_filing
+      allowed_usage: [metric_candidate, forecast_input_after_review]
+      required_for_pack: [financial_history_pack, forecast_model_pack]
+      status: planned
+      missing_reason: TODO_MODEL_INPUT
+      next_action: register reviewed structured financial metrics
+  market_snapshot:
+    - request_id: r5_market_snapshot
+      evidence_need: dated_market_snapshot
+      source_type: market_data_snapshot
+      source_rank: B
+      as_of_date: "2026-07-08"
+      freshness_policy: explicit_as_of_date_required
+      allowed_usage: [valuation_context, technical_context]
+      required_for_pack: [valuation_pack, technical_market_pack]
+      status: planned
+      missing_reason: TODO_MARKET_DATA
+      next_action: register dated market snapshot
+  peer_snapshot:
+    - request_id: r5_peer_snapshot
+      evidence_need: reviewed_peer_snapshot
+      source_type: peer_snapshot
+      source_rank: B
+      as_of_date: "2026-07-08"
+      freshness_policy: explicit_peer_set_and_as_of_date_required
+      allowed_usage: [peer_context, valuation_context]
+      required_for_pack: [peer_comparison_pack, valuation_pack]
+      status: planned
+      missing_reason: TODO_PEER_DATA
+      next_action: register peer snapshot
+  industry_context_clues:
+    - request_id: r5_industry_context
+      evidence_need: industry_context_source
+      source_type: industry_context
+      source_rank: C
+      as_of_date: "2026-07-08"
+      freshness_policy: dated_source_required
+      allowed_usage: [context_only, TODO_generation]
+      required_for_pack: [industry_context_pack]
+      status: planned
+      missing_reason: TODO_SOURCE_REQUIRED
+      next_action: register industry context source
+  news_event_clues:
+    - request_id: r5_news_event_sources
+      evidence_need: dated_event_source
+      source_type: news_or_event_source
+      source_rank: D
+      as_of_date: "2026-07-08"
+      freshness_policy: clue_only_with_verification_required
+      allowed_usage: [clue_only, TODO_generation]
+      required_for_pack: [sentiment_event_pack]
+      status: planned
+      missing_reason: TODO_SOURCE_REQUIRED
+      next_action: verify with official disclosure before material use
+  investor_relations:
+    - request_id: r5_investor_relations
+      evidence_need: investor_relations_or_company_context
+      source_type: investor_relations
+      source_rank: C
+      as_of_date: "2026-07-08"
+      freshness_policy: management_comment_with_date_required
+      allowed_usage: [management_comment, company_context]
+      required_for_pack: [business_breakdown_pack, sentiment_event_pack]
+      status: planned
+      missing_reason: TODO_SOURCE_REQUIRED
+      next_action: tag as management_comment
+handoff_to_stock_deep_dive:
+  evidence_manifest_path: data/manifests/evidence_manifest.csv
+  claim_candidates_path: data/manifests/claims_draft.csv
+  metric_candidates_path: data/manifests/metrics_draft.csv
+  source_gap_register_path: reports/workflow_runs/wf_r5_example/R5_source_gap_report.md
+  evidence_counts:
+    official_filings: TODO
+    structured_financial_metrics: TODO
+    market_snapshot: TODO
+    peer_snapshot: TODO
+    context_clues: TODO
+  official_filing_requests: [r5_official_annual_report]
+  structured_metric_requests: [r5_structured_financial_metrics]
+  market_snapshot_requests: [r5_market_snapshot]
+  peer_snapshot_requests: [r5_peer_snapshot]
+  context_clue_requests: [r5_industry_context, r5_news_event_sources, r5_investor_relations]
+  missing_inputs: [MISSING_DISCLOSURE, TODO_MODEL_INPUT, TODO_MARKET_DATA, TODO_PEER_DATA, TODO_SOURCE_REQUIRED]

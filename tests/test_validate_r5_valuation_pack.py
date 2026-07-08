@@ -64,6 +64,20 @@ def test_sample_quality_requires_market_and_peer_context():
     assert any("peer context" in error for error in errors)
 
 
+def test_sample_quality_requires_dated_market_snapshot():
+    validator = load_validator()
+    data = load_example()
+    data["sample_quality_allowed"] = True
+    data["market_snapshot"] = {
+        "as_of_date": None,
+        "current_price": 10.0,
+        "market_cap": 100.0,
+        "share_count": 10.0,
+    }
+    errors = validator.validate_valuation_pack(data)
+    assert any("complete market_snapshot" in error for error in errors)
+
+
 def test_valuation_scenario_requires_method_assumptions_and_sources():
     validator = load_validator()
     data = load_example()

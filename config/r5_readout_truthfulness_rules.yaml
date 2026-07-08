@@ -1,0 +1,31 @@
+required_tokens:
+  status:
+    - status
+  files_added:
+    - files_added
+    - files added
+  files_modified:
+    - files_modified
+    - files modified
+  commands_run:
+    - commands_run
+    - commands run
+  exit_codes:
+    - exit_code
+    - exit codes
+  stdout_or_stderr_summary:
+    - stdout_or_stderr_summary
+    - stdout or stderr
+    - stdout/stderr
+  known_todos:
+    - known_todos
+    - known todos
+  next_recommended_patch:
+    - next_recommended_patch
+    - next recommended patch
+pytest_summary_regex: "\\b\\d+\\s+(passed|failed|error|errors|skipped)\\b"
+critical_evidence_regex: "(sha256|line[_ -]?count|before_lines|after_lines|checked=\\d+|inventory_status)"
+summary_only_phrases:
+  - pytest passed
+  - all tests passed
+  - validation ok

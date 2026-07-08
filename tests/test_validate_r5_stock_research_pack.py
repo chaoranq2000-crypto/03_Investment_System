@@ -84,6 +84,24 @@ def test_sample_quality_candidate_requires_forecast_and_business_ready():
     assert any("business_breakdown_pack.status" in error for error in errors)
 
 
+def test_technical_judgement_requires_as_of_date():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    data["technical_market_pack"]["as_of_date"] = None
+    data["technical_market_pack"]["trend_judgement"] = "short-term market-state language"
+    errors = validator.validate_pack(data)
+    assert any("technical_market_pack requires as_of_date" in error for error in errors)
+
+
+def test_sentiment_judgement_requires_as_of_date():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    data["sentiment_event_pack"]["as_of_date"] = None
+    data["sentiment_event_pack"]["event_judgement"] = "short-term event judgement"
+    errors = validator.validate_pack(data)
+    assert any("sentiment_event_pack requires as_of_date" in error for error in errors)
+
+
 def test_forbidden_direct_trading_phrase_is_reported():
     validator = load_validator()
     data = copy.deepcopy(load_example())

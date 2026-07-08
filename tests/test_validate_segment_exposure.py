@@ -84,6 +84,14 @@ def test_score_above_zero_requires_support():
     assert any("requires evidence_ids" in error for error in errors)
 
 
+def test_company_total_revenue_cannot_be_used_as_segment_revenue():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    data["exposures"][0]["revenue_basis"] = "company_total_revenue"
+    errors = validator.validate_segment_exposure(data)
+    assert any("company total revenue" in error for error in errors)
+
+
 def test_product_line_clue_does_not_update_revenue_exposure():
     validator = load_validator()
     data = copy.deepcopy(load_example())

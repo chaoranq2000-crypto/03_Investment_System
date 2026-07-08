@@ -1,0 +1,143 @@
+{
+  "status": "pass",
+  "summary": {
+    "checked": 19,
+    "failed": 0,
+    "passed": 19
+  },
+  "artifacts": [
+    {
+      "path": "templates/r5_stock_research_pack.yaml",
+      "artifact_type": "yaml",
+      "status": "pass",
+      "line_count": 322,
+      "issues": []
+    },
+    {
+      "path": "benchmarks/r5_report_quality_rubric.yaml",
+      "artifact_type": "yaml",
+      "status": "pass",
+      "line_count": 241,
+      "issues": []
+    },
+    {
+      "path": ".agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml",
+      "artifact_type": "yaml",
+      "status": "pass",
+      "line_count": 146,
+      "issues": []
+    },
+    {
+      "path": ".agents/skills/stock-deep-dive/assets/r5_stock_research_pack.example.yaml",
+      "artifact_type": "yaml",
+      "status": "pass",
+      "line_count": 340,
+      "issues": []
+    },
+    {
+      "path": "templates/r5_stock_research_note.md",
+      "artifact_type": "markdown",
+      "status": "pass",
+      "line_count": 191,
+      "issues": []
+    },
+    {
+      "path": "docs/workflows/R5_SAMPLE_QUALITY_STOCK_REPORT_SPEC.md",
+      "artifact_type": "markdown",
+      "status": "pass",
+      "line_count": 239,
+      "issues": []
+    },
+    {
+      "path": "docs/workflows/R5_MVP_RESTRUCTURE_PLAN.md",
+      "artifact_type": "markdown",
+      "status": "pass",
+      "line_count": 191,
+      "issues": []
+    },
+    {
+      "path": ".agents/skills/stock-deep-dive/scripts/validate_r5_stock_research_pack.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 529,
+      "issues": []
+    },
+    {
+      "path": ".agents/skills/segment-company-mapping/scripts/validate_segment_exposure.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 178,
+      "issues": []
+    },
+    {
+      "path": ".agents/skills/quality-review/scripts/validate_quality_issues.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 160,
+      "issues": []
+    },
+    {
+      "path": "src/research/forecast_model_builder.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 74,
+      "issues": []
+    },
+    {
+      "path": "src/research/technical_snapshot_builder.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 140,
+      "issues": []
+    },
+    {
+      "path": "src/report/stock_report_writer.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 219,
+      "issues": []
+    },
+    {
+      "path": "src/qa/stock_report_quality_review.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 158,
+      "issues": []
+    },
+    {
+      "path": "tests/test_r5_patch0_artifacts_parse.py",
+      "artifact_type": "pytest",
+      "status": "pass",
+      "line_count": 80,
+      "issues": []
+    },
+    {
+      "path": "tests/test_validate_r5_stock_research_pack.py",
+      "artifact_type": "pytest",
+      "status": "pass",
+      "line_count": 98,
+      "issues": []
+    },
+    {
+      "path": "tests/test_validate_segment_exposure.py",
+      "artifact_type": "pytest",
+      "status": "pass",
+      "line_count": 99,
+      "issues": []
+    },
+    {
+      "path": "tests/test_stock_report_writer.py",
+      "artifact_type": "pytest",
+      "status": "pass",
+      "line_count": 52,
+      "issues": []
+    },
+    {
+      "path": "tests/test_stock_report_quality_review.py",
+      "artifact_type": "pytest",
+      "status": "pass",
+      "line_count": 68,
+      "issues": []
+    }
+  ]
+}

@@ -3,6 +3,8 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / ".agents/skills/stock-deep-dive/scripts/compose_r5_report_from_pack.py"
 PACK_PATH = REPO_ROOT / ".agents/skills/stock-deep-dive/assets/r5_stock_research_pack.example.yaml"
@@ -46,7 +48,33 @@ def test_composer_does_not_introduce_new_numbers():
     composer = load_composer()
     pack_text = PACK_PATH.read_text(encoding="utf-8")
     note = composer.compose_note(composer.load_pack(PACK_PATH))
-    assert composer.numeric_tokens(note) - composer.numeric_tokens(pack_text) == set()
+    composer.assert_no_new_numbers(pack_text, note)
+
+
+def test_new_number_guard_raises_on_pack_external_number():
+    composer = load_composer()
+    with pytest.raises(ValueError, match="introduced numbers"):
+        composer.assert_no_new_numbers("known value 10", "known value 10\nnew unsupported value 999")
+
+
+def test_missing_forecast_downgrades_sample_quality_candidate():
+    composer = load_composer()
+    pack = composer.load_pack(PACK_PATH)
+    pack["pack_status"] = "sample_quality_candidate"
+    pack["quality_status"]["allowed_report_level"] = "sample_quality_ready"
+    pack["quality_status"]["no_advice_gate_passed"] = True
+    text = composer.compose_note(pack)
+    assert "pack_status: research_draft" in text
+    assert "downgrade_reason:" in text
+    assert "forecast_model_pack" in text
+
+
+def test_pack_input_trading_action_language_is_blocked():
+    composer = load_composer()
+    pack = composer.load_pack(PACK_PATH)
+    pack["report_composition_pack"]["thesis_statement"] = "建议买入"
+    with pytest.raises(ValueError, match="forbidden trading phrase"):
+        composer.compose_note(pack)
 
 
 def test_no_trading_action_language():

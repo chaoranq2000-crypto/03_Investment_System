@@ -1,0 +1,55 @@
+artifact_type: R5_valuation_handoff
+schema_version: r5_valuation_handoff_v0.1
+workflow_id: wf_r5_fixture
+stock_code: "000000"
+company_id: company_fixture
+valuation_as_of_date: "2026-07-08"
+market_snapshot:
+  status: reviewed
+  current_price:
+    value: 10.0
+    unit: CNY_per_share
+    source_evidence_id: ev_fixture_market_snapshot
+  market_cap:
+    value: 1000.0
+    unit: CNY_mn
+    source_evidence_id: ev_fixture_market_snapshot
+  share_count:
+    value: 100.0
+    unit: mn_shares
+    source_evidence_id: ev_fixture_market_snapshot
+peer_context:
+  status: reviewed
+  peers:
+    - peer_company: Fixture Peer
+      peer_stock_code: "000001"
+      similarity_reason: same_fixture_segment
+      source_evidence_id: ev_fixture_peer_snapshot
+method_used:
+  - relative_pe
+  - scenario_analysis
+scenario_values:
+  - scenario_id: base_case
+    method: relative_pe
+    target_price_scenario:
+      value: 12.0
+      unit: CNY_per_share
+      source_evidence_id: ev_fixture_peer_snapshot
+      assumption_id: assump_fixture_base
+    interpretation_boundary: scenario_value_not_action_recommendation
+assumptions:
+  - assumption_id: assump_fixture_base
+    description: Fixture-only relative multiple assumption.
+    source_evidence_id: ev_fixture_peer_snapshot
+sensitivity:
+  - driver: forward_pe
+    change: plus_one_turn
+    impact_value:
+      value: 1.0
+      unit: CNY_per_share
+      assumption_id: assump_fixture_base
+source_evidence_ids:
+  - ev_fixture_market_snapshot
+  - ev_fixture_peer_snapshot
+missing_items: []
+no_advice_statement: Scenario values are valuation context only and not action recommendations.

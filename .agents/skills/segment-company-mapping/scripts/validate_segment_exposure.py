@@ -31,6 +31,14 @@ BACKFLOW_DECISIONS = {
     "blocked",
 }
 MISSING_TOKENS = {"MISSING_DISCLOSURE", "NOT_DISCLOSED"}
+COMPANY_TOTAL_SCOPE_MARKERS = {
+    "company_total",
+    "company_total_revenue",
+    "company_total_profit",
+    "total_company",
+    "total_revenue",
+    "total_profit",
+}
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -90,6 +98,16 @@ def _as_score(value: Any) -> float | None:
         return None
 
 
+def _uses_company_total_as_segment_metric(exposure: dict[str, Any]) -> bool:
+    if exposure.get("uses_company_total_revenue_as_segment_revenue") is True:
+        return True
+    for key in ("revenue_basis", "profit_basis", "metric_basis", "source_metric_scope"):
+        value = exposure.get(key)
+        if isinstance(value, str) and value.strip().lower() in COMPANY_TOTAL_SCOPE_MARKERS:
+            return True
+    return False
+
+
 def validate_segment_exposure(data: dict[str, Any]) -> list[str]:
     errors: list[str] = []
 
@@ -128,6 +146,11 @@ def validate_segment_exposure(data: dict[str, Any]) -> list[str]:
 
         if not _has_support(exposure):
             errors.append(f"exposures[{idx}] requires evidence_ids, claim_ids, metric_ids, missing_reason, or TODO")
+
+        if _uses_company_total_as_segment_metric(exposure):
+            errors.append(
+                f"exposures[{idx}]: company total revenue/profit cannot be used as segment revenue/profit exposure"
+            )
 
         decision = exposure.get("backflow_decision")
         if decision not in BACKFLOW_DECISIONS:

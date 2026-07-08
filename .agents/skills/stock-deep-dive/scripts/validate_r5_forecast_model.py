@@ -29,6 +29,15 @@ def _has_assumption_or_missing(value: Any) -> bool:
     return isinstance(value, dict) and bool(value.get("assumption_id") or value.get("missing_reason"))
 
 
+def _has_reviewed_forecast_value(value: Any) -> bool:
+    return (
+        isinstance(value, dict)
+        and value.get("value") is not None
+        and bool(value.get("assumption_id"))
+        and not value.get("missing_reason")
+    )
+
+
 def validate_forecast_model(data: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     if data.get("artifact_type") != "R5_forecast_model_pack":
@@ -82,8 +91,20 @@ def validate_forecast_model(data: dict[str, Any]) -> list[str]:
             if missing:
                 errors.append(f"sensitivity_table[{idx}] missing: {', '.join(missing)}")
 
-    if data.get("sample_quality_allowed") is True and data.get("status") != "ready":
-        errors.append("sample_quality_allowed requires status ready and reviewed assumptions")
+    if data.get("sample_quality_allowed") is True:
+        if data.get("status") != "ready":
+            errors.append("sample_quality_allowed requires status ready and reviewed assumptions")
+        if isinstance(base_case, dict) and isinstance(base_case.get("forecast_table"), dict):
+            for year in sorted(YEARS):
+                year_row = base_case["forecast_table"].get(year)
+                if not isinstance(year_row, dict):
+                    continue
+                for metric in sorted(METRICS):
+                    metric_obj = year_row.get(metric)
+                    if not _has_reviewed_forecast_value(metric_obj):
+                        errors.append(
+                            f"sample_quality_allowed requires reviewed non-missing forecast value for {year}.{metric}"
+                        )
     return errors
 
 

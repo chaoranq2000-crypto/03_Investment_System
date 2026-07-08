@@ -1,0 +1,335 @@
+schema_version: r5_mvp_v0.2
+artifact_type: R5_stock_research_pack
+status: source_gapped_draft
+pack_status: research_draft
+metadata:
+  workflow_id: wf_20260703_stock_first_002837_invic
+  generated_at: "2026-07-08"
+  source_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_analysis_pack.yaml
+  evidence_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/evidence_manifest_delta.csv
+as_of_date: "2026-07-03"
+workflow_id: wf_20260703_stock_first_002837_invic
+stock:
+  company_name: 英维克
+  stock_code: "002837"
+  exchange: SZSE
+  currency: CNY
+  fiscal_year_latest: 2025A
+  report_authoring_date: "2026-07-08"
+quality_status:
+  r5_gate_status: not_reviewed
+  allowed_report_level: research_draft
+  high_issue_count: 0
+  medium_issue_count: 4
+  source_gap_visible: true
+  no_advice_gate_passed: null
+company_identity_pack:
+  status: ready
+  company_id: cn_002837_invic
+  legal_name: 深圳市英维克科技股份有限公司
+  short_name: 英维克
+  securities:
+    - stock_code: "002837"
+      exchange: SZSE
+      security_type: A_share
+  headquarters: null
+  primary_industry: null
+  business_summary: 数据中心/机房温控及液冷相关产品暴露来自既有工作流资产；本 R5 pack 不新增外部证据。
+  identity_evidence_ids:
+    - ev_annual_report_002837_20260421_ce7f64
+  open_questions: []
+source_gap_policy:
+  missing_value_tokens:
+    - MISSING_DISCLOSURE
+    - TODO_SOURCE_REQUIRED
+    - TODO_MODEL_INPUT
+    - TODO_MARKET_DATA
+    - TODO_PEER_DATA
+    - LOW_CONFIDENCE_CLUE_ONLY
+  rule: Do not convert missing values into factual claims or investment conclusions.
+evidence_snapshot_pack:
+  status: partial
+  as_of_date: "2026-07-03"
+  evidence_manifest_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/evidence_manifest_delta.csv
+  evidence_counts:
+    official_filings: 1
+    announcements: 0
+    investor_relations: 0
+    market_data: 5
+    peer_data: 1
+    industry_data: 0
+    news_or_event_clues: 0
+  critical_missing_sources:
+    - reviewed_forecast_assumptions
+    - reviewed_market_snapshot
+    - reviewed_peer_snapshot
+    - dated_sentiment_sources
+  evidence_ids:
+    - ev_annual_report_002837_20260421_ce7f64
+    - ev_structured_financial_data_002837_20260701_89213a
+financial_history_pack:
+  status: partial
+  currency: CNY
+  periods:
+    - "20260331"
+    - "20251231"
+  income_statement:
+    - metric_name: total_revenue
+      period: "20260331"
+      value: "1175329313.61"
+      unit: CNY
+      metric_id: metric_cn_002837_invic_total_revenue_20260331_d1f448
+      source_evidence_id: ev_structured_financial_data_002837_20260701_89213a
+  balance_sheet: []
+  cashflow_statement: []
+  key_metrics:
+    - metric_name: grossprofit_margin
+      period: "20260331"
+      value: "24.2935"
+      unit: pct
+      metric_id: metric_cn_002837_invic_grossprofit_margin_20260331_963af8
+      source_evidence_id: ev_structured_financial_data_002837_20260701_875a4c
+  financial_quality:
+    revenue_growth_driver: null
+    gross_margin_driver: null
+    adjusted_profit_bridge: null
+    cashflow_quality: null
+    working_capital_flags: []
+    roe_roic_commentary: null
+  evidence_ids:
+    - ev_structured_financial_data_002837_20260701_89213a
+  missing_items:
+    - segment revenue and margin remain MISSING_DISCLOSURE
+business_breakdown_pack:
+  status: partial
+  business_lines:
+    - business_name: 数据中心/机房温控及液冷相关解决方案
+      role: product_exposure_candidate
+      revenue:
+        value: null
+        unit: CNY
+        evidence_id: null
+        missing_reason: MISSING_DISCLOSURE
+      revenue_pct:
+        value: null
+        evidence_id: null
+        missing_reason: MISSING_DISCLOSURE
+      gross_margin:
+        value: null
+        evidence_id: null
+        missing_reason: MISSING_DISCLOSURE
+      gross_profit:
+        value: null
+        unit: CNY
+        evidence_id: null
+        missing_reason: MISSING_DISCLOSURE
+      gross_profit_pct:
+        value: null
+        evidence_id: null
+        missing_reason: MISSING_DISCLOSURE
+      products:
+        - name: 温控及液冷相关产品线索
+          claim_type: LOW_CONFIDENCE_CLUE_ONLY
+          evidence_id: claim_cn_002837_invic_28149e07
+      customers: []
+      capacity: []
+      orders: []
+      pricing_driver: null
+      cost_driver: null
+      linked_segments:
+        - ai_server_liquid_cooling
+      confidence: medium
+  profit_pool_summary: 分业务收入、毛利率和利润贡献仍为 MISSING_DISCLOSURE，不能升级为事实。
+  structural_contradictions:
+    - 产品暴露线索存在，但收入占比、利润占比、订单和客户证据仍缺。
+  missing_items:
+    - MISSING_DISCLOSURE: 液冷收入占比
+    - MISSING_DISCLOSURE: 液冷毛利率
+segment_exposure_pack:
+  status: partial
+  linked_segments:
+    - segment_id: ai_server_liquid_cooling
+      segment_name: AI服务器液冷
+  exposures:
+    - segment_id: ai_server_liquid_cooling
+      segment_name: AI服务器液冷
+      exposure_type: product_line_clue
+      exposure_score: 3
+      confidence: medium
+      evidence_ids:
+        - claim_cn_002837_invic_28149e07
+      missing_reason: MISSING_DISCLOSURE
+      backflow_decision: needs_review
+industry_context_pack:
+  status: TODO
+  industry_cards:
+    - segment_name: AI服务器液冷
+      demand_drivers:
+        - "TODO_SOURCE_REQUIRED: 需要经过审查的行业需求证据。"
+      supply_constraints: []
+      price_or_margin_mechanism: []
+      competition_structure: []
+      technology_roadmap: []
+      policy_or_cycle_sensitivity: []
+      company_position: null
+      evidence_ids: []
+      missing_items:
+        - "TODO_SOURCE_REQUIRED: 同业和行业报告证据"
+  industry_beta_summary: null
+peer_comparison_pack:
+  status: TODO
+  peer_set:
+    selection_method: TODO_PEER_DATA
+    peers: []
+  peer_financial_snapshot_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv
+  peer_valuation_snapshot_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_comparison.csv
+  peer_comparison_summary: null
+  missing_items:
+    - "TODO_PEER_DATA: reviewed peer valuation context"
+forecast_model_pack:
+  status: TODO
+  model_type: bottom_up_or_explicit_assumption_required
+  forecast_years:
+    - 2026E
+    - 2027E
+    - 2028E
+  scenarios:
+    base_case:
+      status: TODO_MODEL_INPUT
+      assumptions: []
+      forecast_table: []
+    bull_case:
+      status: TODO_MODEL_INPUT
+      assumptions: []
+      forecast_table: []
+    bear_case:
+      status: TODO_MODEL_INPUT
+      assumptions: []
+      forecast_table: []
+  required_metrics:
+    - revenue
+    - gross_margin
+    - net_profit_attributable
+    - eps
+  sensitivity_tests: []
+  consensus_comparison: null
+  missing_items:
+    - "TODO_MODEL_INPUT: reviewed forecast assumptions"
+valuation_pack:
+  status: TODO
+  market_snapshot:
+    as_of_date: null
+    current_price: null
+    market_cap: null
+    share_count: null
+    missing_reason: TODO_MARKET_DATA
+  peer_valuation_context: []
+  valuation_methods:
+    - method: relative_pe
+      status: TODO_MODEL_INPUT
+      output: null
+    - method: sotp
+      status: TODO_IF_APPLICABLE
+      output: null
+  valuation_scenarios: []
+  valuation_sensitivity: []
+  missing_items:
+    - "TODO_MARKET_DATA: reviewed market snapshot"
+    - "TODO_PEER_DATA: reviewed peer valuation context"
+technical_market_pack:
+  status: TODO
+  as_of_date: null
+  price_history_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_snapshot.csv
+  current_price: null
+  returns: {}
+  moving_averages: {}
+  volume_turnover: null
+  support_levels: []
+  resistance_levels: []
+  trend_judgement: null
+  missing_items:
+    - "TODO_MARKET_DATA: dated price history and market state"
+sentiment_event_pack:
+  status: TODO
+  as_of_date: null
+  macro_sentiment:
+    status: TODO_SOURCE_REQUIRED
+    summary: null
+    evidence_ids: []
+  industry_sentiment:
+    status: TODO_SOURCE_REQUIRED
+    summary: null
+    evidence_ids: []
+  company_sentiment:
+    status: TODO_SOURCE_REQUIRED
+    summary: null
+    evidence_ids: []
+  fund_flow_pack_path: null
+  analyst_view_pack_path: null
+  catalyst_calendar: []
+  missing_items:
+    - TODO_SOURCE_REQUIRED: dated sentiment and catalyst sources
+risk_counterevidence_pack:
+  status: partial
+  key_risks:
+    - risk_name: source_gap_risk
+      description: 核心业务拆分、forecast、valuation、market 和 sentiment 仍有证据缺口。
+      evidence_ids: []
+  counterevidence: []
+  falsification_conditions:
+    - 官方披露不能支持液冷收入或利润贡献时，segment exposure 不得升级。
+  monitoring_checklist:
+    - 补充分业务收入和毛利率披露
+    - 补充 reviewed forecast assumptions
+    - 补充 reviewed market and peer snapshots
+source_gap_register:
+  - gap_id: R5_002837_GAP_BUSINESS_001
+    section: business_breakdown
+    missing_data: "MISSING_DISCLOSURE: liquid cooling revenue_pct, gross_margin, gross_profit_pct"
+    impact_on_conclusion: product clue cannot prove revenue or profit exposure
+    fix_owner_skill: evidence-ingest
+    next_action: register official segment revenue and margin disclosure or keep MISSING_DISCLOSURE
+  - gap_id: R5_002837_GAP_FORECAST_001
+    section: forecast
+    missing_data: "TODO_MODEL_INPUT: reviewed forecast assumptions"
+    impact_on_conclusion: forecast_model_pack cannot reach sample-quality
+    fix_owner_skill: stock-deep-dive
+    next_action: build reviewed assumptions from accepted metrics or keep TODO_MODEL_INPUT
+  - gap_id: R5_002837_GAP_VALUATION_001
+    section: valuation
+    missing_data: "TODO_MARKET_DATA and TODO_PEER_DATA: reviewed market and peer valuation snapshots"
+    impact_on_conclusion: valuation_pack cannot reach sample-quality
+    fix_owner_skill: company-valuation
+    next_action: provide reviewed market and peer context or keep TODOs
+  - gap_id: R5_002837_GAP_SENTIMENT_001
+    section: sentiment_event
+    missing_data: "TODO_SOURCE_REQUIRED: dated sentiment, catalyst, and event sources"
+    impact_on_conclusion: sentiment_event_pack cannot support short-term judgement
+    fix_owner_skill: evidence-ingest
+    next_action: collect dated sources or keep TODO_SOURCE_REQUIRED
+  - gap_id: R5_002837_GAP_EXPOSURE_001
+    section: segment_exposure
+    missing_data: "LOW_CONFIDENCE_CLUE_ONLY: product clue needs reviewed revenue/profit exposure evidence"
+    impact_on_conclusion: exposure remains needs_review
+    fix_owner_skill: quality-review
+    next_action: review exposure before any promotion
+report_composition_pack:
+  status: partial
+  thesis_statement: null
+  core_contradiction: 产品暴露线索存在，但收入、利润、forecast、valuation、market 和 sentiment 缺口仍显式存在。
+  market_disagreement: null
+  section_claim_plan_path: null
+  allowed_report_level: research_draft
+  sections_ready:
+    preface: true
+    financial_overview: true
+    business_breakdown: false
+    industry_analysis: false
+    forecast: false
+    valuation: false
+    technical_analysis: false
+    sentiment_analysis: false
+    catalyst_events: false
+    research_conclusion: false
+  source_gap_report_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_source_gap_report.md
+  open_questions_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_open_questions.md

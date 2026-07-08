@@ -1,0 +1,107 @@
+{
+  "status": "fail",
+  "failed": 2,
+  "checked": 6,
+  "results": [
+    {
+      "name": "r5_artifact_format_guard",
+      "command": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "scripts/check_r5_artifact_format.py",
+        "--strict"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.151,
+      "summary": "status=pass checked=19 passed=19 failed=0",
+      "stdout": "status=pass checked=19 passed=19 failed=0\n",
+      "stderr": ""
+    },
+    {
+      "name": "r5_patch_inventory_check",
+      "command": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "scripts/r5_patch_inventory_check.py",
+        "--config",
+        "config/r5_patch_1_12_expected_artifacts.yaml",
+        "--out",
+        "reports/p1_6/r5_patch_1_12_inventory_status.yaml",
+        "--strict"
+      ],
+      "exit_code": 1,
+      "duration_seconds": 0.17,
+      "summary": "inventory_status=claimed_complete_but_validation_failed accepted=false patches_checked=12 artifact_failures=34",
+      "stdout": "inventory_status=claimed_complete_but_validation_failed accepted=false patches_checked=12 artifact_failures=34\n",
+      "stderr": ""
+    },
+    {
+      "name": "r5_pack_validators",
+      "command": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_validate_r5_stock_research_pack.py",
+        "tests/test_validate_segment_exposure.py",
+        "tests/test_validate_quality_issues.py",
+        "tests/test_validate_r5_forecast_model.py",
+        "tests/test_validate_r5_valuation_pack.py",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.636,
+      "summary": "..............................................                           [100%]\n46 passed in 0.31s",
+      "stdout": "..............................................                           [100%]\n46 passed in 0.31s\n",
+      "stderr": ""
+    },
+    {
+      "name": "r5_composer_fixture_smoke",
+      "command": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_compose_r5_report_from_pack.py",
+        "tests/test_r5_mvp_fixture_smoke.py",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.533,
+      "summary": "............                                                             [100%]\n12 passed in 0.22s",
+      "stdout": "............                                                             [100%]\n12 passed in 0.22s\n",
+      "stderr": ""
+    },
+    {
+      "name": "r5_quality_fixture_smoke",
+      "command": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_r5_stock_led_smoke_dry_run.py",
+        "--tb=short"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.399,
+      "summary": ".....                                                                    [100%]\n5 passed in 0.08s",
+      "stdout": ".....                                                                    [100%]\n5 passed in 0.08s\n",
+      "stderr": ""
+    },
+    {
+      "name": "r5_readout_truthfulness_gate",
+      "command": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "scripts/check_r5_readout_truthfulness.py",
+        "--rules",
+        "config/r5_readout_truthfulness_rules.yaml",
+        "--glob",
+        "reports/p1_6/R5_PATCH_*_READOUT.md",
+        "--strict"
+      ],
+      "exit_code": 1,
+      "duration_seconds": 0.084,
+      "summary": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_2_SEGMENT_MAPPING_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; pytest mentioned without pytest result summary; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_3_QUALITY_REVIEW_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_4_FORECAST_VALUATION_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_5_TECH_SENTIMENT_CATALYST_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_6_COMPOSER_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_7_BENCHMARK_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_8_STOCK_LED_SMOKE_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_9_EVIDENCE_PLAN_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence",
+      "stdout": "truthfulness_status=fail checked=27 failed=16\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_0A_REPAIR_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_10_CLOSE_READOUT_TEMPLATE_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_11_SAMPLE_BENCHMARK_POLICY_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_12_COMPANY_VALUATION_VALIDATOR_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_1_PACK_VALIDATOR_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_1_STOCK_DEEP_DIVE_R5_PACK_CONTRACT_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_2_SEGMENT_MAPPING_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; pytest mentioned without pytest result summary; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_3_QUALITY_REVIEW_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_4_FORECAST_VALUATION_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_5_TECH_SENTIMENT_CATALYST_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_6_COMPOSER_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_7_BENCHMARK_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_8_STOCK_LED_SMOKE_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\nC:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_9_EVIDENCE_PLAN_READOUT.md: missing files_added; missing files_modified; missing commands_run; missing exit_codes; missing stdout_or_stderr_summary; missing known_todos; missing next_recommended_patch; missing explicit exit_code evidence; missing artifact hash, line count, checked count, or inventory status evidence\n",
+      "stderr": ""
+    }
+  ]
+}

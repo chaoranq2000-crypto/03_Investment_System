@@ -1,0 +1,41 @@
+{
+  "decision": "R5_BLOCKED",
+  "can_enter_source_gapped_real_sample_pilot": false,
+  "sample_quality_report_allowed": false,
+  "p2_allowed": false,
+  "blockers": [
+    {
+      "id": "patch_13_20_strict_smoke",
+      "severity": "high",
+      "reason": "Patch 13-20 strict smoke is not all green.",
+      "detail": "r5_patch_inventory_check, r5_readout_truthfulness_gate"
+    },
+    {
+      "id": "patch_inventory",
+      "severity": "high",
+      "reason": "Patch 1-12 inventory is not validated_complete.",
+      "detail": "claimed_complete_but_validation_failed"
+    }
+  ],
+  "non_blockers": [
+    {
+      "id": "forecast_todo",
+      "severity": "todo",
+      "reason": "Forecast remains TODO_MODEL_INPUT for sample-quality.",
+      "detail": "TODO"
+    },
+    {
+      "id": "valuation_todo",
+      "severity": "todo",
+      "reason": "Valuation remains TODO_MARKET_DATA / TODO_PEER_DATA for sample-quality.",
+      "detail": "TODO"
+    }
+  ],
+  "input_summary": {
+    "smoke_status": "fail",
+    "inventory_status": "claimed_complete_but_validation_failed",
+    "format_guard_status": "pass",
+    "source_gap_report_exists": true,
+    "no_advice_passed": true
+  }
+}

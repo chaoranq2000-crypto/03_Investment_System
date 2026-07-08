@@ -87,6 +87,8 @@ def validate_quality_issues(rows: list[dict[str, str]], expected_outcome: str | 
 
         if row.get("blocking_decision") not in OUTCOMES:
             errors.append(f"row {idx}: blocking_decision is invalid: {row.get('blocking_decision')}")
+        elif severity in {"critical", "high"} and row.get("blocking_decision") == "accepted":
+            errors.append(f"row {idx}: high or critical severity cannot have accepted blocking_decision")
 
         if status == "waived_with_reason" and len(row.get("next_action", "")) < 8:
             errors.append(f"row {idx}: waived_with_reason requires visible reason in next_action")

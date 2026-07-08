@@ -54,6 +54,15 @@ def test_each_forecast_value_requires_assumption_or_missing_reason():
     assert any("requires assumption_id or missing_reason" in error for error in errors)
 
 
+def test_sample_quality_cannot_use_missing_forecast_values():
+    validator = load_validator()
+    data = copy.deepcopy(load_example())
+    data["status"] = "ready"
+    data["sample_quality_allowed"] = True
+    errors = validator.validate_forecast_model(data)
+    assert any("reviewed non-missing forecast value" in error for error in errors)
+
+
 def test_scenarios_and_sensitivity_fields_are_required():
     validator = load_validator()
     data = load_example()

@@ -1,0 +1,111 @@
+schema_version: r5_mvp_v0.3
+artifact_type: R5_stock_research_pack
+status: draft
+pack_status: needs_fix
+metadata:
+  workflow_id: null
+  generated_at: null
+  source_pack: stock_analysis_pack.yaml
+stock:
+  company_id: null
+  company_name: null
+  stock_code: null
+  exchange: null
+  currency: CNY
+quality_status:
+  r5_gate_status: not_reviewed
+  allowed_report_level: not_assessed
+  r5_external_state: R5_source_gapped_draft
+  high_issue_count: null
+  medium_issue_count: null
+  source_gap_visible: true
+  no_advice_gate_passed: null
+source_gap_policy:
+  missing_value_tokens:
+    - MISSING_DISCLOSURE
+    - TODO_SOURCE_REQUIRED
+    - TODO_MODEL_INPUT
+    - TODO_MARKET_DATA
+    - TODO_PEER_DATA
+    - NOT_APPLICABLE
+    - LOW_CONFIDENCE_CLUE_ONLY
+  rule: Do not convert missing values into factual claims.
+company_identity_pack:
+  status: TODO
+  required_fields:
+    company_id: null
+    legal_name: null
+    stock_code: null
+    exchange: null
+  optional_fields: {}
+  blocked_fields: []
+  identity_evidence_ids: []
+evidence_snapshot_pack:
+  status: TODO
+  as_of_date: null
+  evidence_manifest_path: null
+  official_filings_status: TODO_SOURCE_REQUIRED
+  critical_missing_sources: []
+financial_history_pack:
+  status: TODO
+  periods: []
+  metrics: []
+  non_recurring_items: []
+  adjusted_profit_bridge: []
+  cashflow_quality:
+    claim_type: unknown
+    summary: null
+    missing_reason: TODO_SOURCE_REQUIRED
+business_breakdown_pack:
+  status: TODO
+  business_lines: []
+  profit_pool_summary: null
+  missing_items: []
+segment_exposure_pack:
+  status: TODO
+  exposures: []
+industry_context_pack:
+  status: TODO
+  industry_cards: []
+peer_comparison_pack:
+  status: TODO
+  peer_set: []
+  missing_reason: TODO_PEER_DATA
+forecast_model_pack:
+  status: TODO
+  forecast_years: [2026E, 2027E, 2028E]
+  scenarios: {}
+  missing_reason: TODO_MODEL_INPUT
+valuation_pack:
+  status: TODO
+  market_snapshot:
+    as_of_date: null
+    current_price: null
+    missing_reason: TODO_MARKET_DATA
+  peer_context:
+    missing_reason: TODO_PEER_DATA
+technical_market_pack:
+  status: TODO
+  as_of_date: null
+  missing_reason: TODO_MARKET_DATA
+sentiment_event_pack:
+  status: TODO
+  as_of_date: null
+  missing_reason: TODO_SOURCE_REQUIRED
+risk_counterevidence_pack:
+  status: TODO
+  risks: []
+  counterevidence: []
+source_gap_register:
+  - gap_id: R5_GAP_TEMPLATE_001
+    section: evidence
+    missing_data: official filing / market / peer / model input
+    impact_on_conclusion: R5_sample_quality_ready_not_allowed
+    fix_owner_skill: evidence-ingest
+    next_action: register reviewed source or keep TODO visible
+report_composition_pack:
+  status: TODO
+  allowed_report_level: not_assessed
+  source_gap_report_path: null
+  open_questions_path: null
+  composer_may_create_new_facts: false

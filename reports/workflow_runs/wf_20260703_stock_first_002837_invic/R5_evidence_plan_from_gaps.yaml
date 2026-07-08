@@ -1,0 +1,249 @@
+schema_version: r5_evidence_plan_bridge_v0.1
+artifact_type: R5_stock_evidence_snapshot_plan
+stock_code: 002837
+workflow_id: wf_20260703_stock_first_002837_invic
+official_filings_needed:
+- 'annual report / official disclosure for MISSING_DISCLOSURE`: 液冷收入占比、毛利率、利润贡献'
+- 'annual report / official disclosure for LOW_CONFIDENCE_CLUE_ONLY`: 产品线索仍需收入/利润证据审查'
+structured_financial_data_needed:
+- 'reviewed structured metrics for MISSING_DISCLOSURE`: 液冷收入占比、毛利率、利润贡献'
+- 'reviewed structured metrics for TODO_MODEL_INPUT`: reviewed forecast assumptions'
+market_snapshot_needed:
+- 'dated market snapshot for TODO_MARKET_DATA` / `TODO_PEER_DATA`: reviewed market
+  and peer snapshots'
+- 'dated market snapshot for TODO_MARKET_DATA`: dated price history and market state'
+peer_snapshot_needed:
+- 'reviewed peer snapshot for TODO_MARKET_DATA` / `TODO_PEER_DATA`: reviewed market
+  and peer snapshots'
+industry_data_needed:
+- industry_context_clues placeholder from R5 gap bridge
+analyst_consensus_needed: []
+news_and_event_sources_needed:
+- 'dated news/event source for TODO_SOURCE_REQUIRED`: dated sentiment, catalyst, event
+  sources'
+priority: high
+blocking_for_r5: true
+metadata:
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  company_name: 英维克
+  as_of_date: '2026-07-03'
+  source_gap_report: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_source_gap_report.md
+implementation_boundary:
+  no_live_api: true
+  no_downloader_added: true
+  plan_only: true
+source_gap_policy:
+  missing_tokens:
+  - MISSING_DISCLOSURE
+  - TODO_SOURCE_REQUIRED
+  - TODO_MODEL_INPUT
+  - TODO_MARKET_DATA
+  - TODO_PEER_DATA
+  preserve_missing_data: true
+evidence_requests:
+  official_filings:
+  - request_id: r5_official_filings_r5_002837_gap_business_001
+    evidence_need: 'annual report / official disclosure for MISSING_DISCLOSURE`: 液冷收入占比、毛利率、利润贡献'
+    source_type: annual_report
+    source_rank: A
+    as_of_date: '2026-07-03'
+    freshness_policy: explicit_as_of_date_or_visible_gap
+    allowed_usage:
+    - fact_support
+    - business_exposure_after_review
+    - financial_metrics
+    required_for_pack:
+    - business_breakdown_pack
+    - segment_exposure_pack
+    status: planned
+    evidence_id: null
+    missing_reason: MISSING_DISCLOSURE
+    next_action: 继续查找官方分业务披露、公告或表格证据
+  - request_id: r5_official_filings_r5_002837_gap_exposure_001
+    evidence_need: 'annual report / official disclosure for LOW_CONFIDENCE_CLUE_ONLY`:
+      产品线索仍需收入/利润证据审查'
+    source_type: annual_report
+    source_rank: A
+    as_of_date: '2026-07-03'
+    freshness_policy: explicit_as_of_date_or_visible_gap
+    allowed_usage:
+    - fact_support
+    - business_exposure_after_review
+    - financial_metrics
+    required_for_pack:
+    - business_breakdown_pack
+    - segment_exposure_pack
+    status: planned
+    evidence_id: null
+    missing_reason: MISSING_DISCLOSURE
+    next_action: 审查 exposure before promotion
+  structured_financial_metrics:
+  - request_id: r5_structured_financial_metrics_r5_002837_gap_business_001
+    evidence_need: 'reviewed structured metrics for MISSING_DISCLOSURE`: 液冷收入占比、毛利率、利润贡献'
+    source_type: structured_financial_data
+    source_rank: B
+    as_of_date: '2026-07-03'
+    freshness_policy: explicit_as_of_date_or_visible_gap
+    allowed_usage:
+    - metric_candidate
+    - forecast_input_after_review
+    required_for_pack:
+    - financial_history_pack
+    - forecast_model_pack
+    status: planned
+    evidence_id: null
+    missing_reason: TODO_MODEL_INPUT
+    next_action: 继续查找官方分业务披露、公告或表格证据
+  - request_id: r5_structured_financial_metrics_r5_002837_gap_forecast_001
+    evidence_need: 'reviewed structured metrics for TODO_MODEL_INPUT`: reviewed forecast
+      assumptions'
+    source_type: structured_financial_data
+    source_rank: B
+    as_of_date: '2026-07-03'
+    freshness_policy: explicit_as_of_date_or_visible_gap
+    allowed_usage:
+    - metric_candidate
+    - forecast_input_after_review
+    required_for_pack:
+    - financial_history_pack
+    - forecast_model_pack
+    status: planned
+    evidence_id: null
+    missing_reason: TODO_MODEL_INPUT
+    next_action: 用已审查 metrics 构建假设，或保持 TODO
+  market_snapshot:
+  - request_id: r5_market_snapshot_r5_002837_gap_valuation_001
+    evidence_need: 'dated market snapshot for TODO_MARKET_DATA` / `TODO_PEER_DATA`:
+      reviewed market and peer snapshots'
+    source_type: market_data_snapshot
+    source_rank: B
+    as_of_date: '2026-07-03'
+    freshness_policy: explicit_as_of_date_or_visible_gap
+    allowed_usage:
+    - valuation_context
+    - technical_context
+    required_for_pack:
+    - valuation_pack
+    - technical_market_pack
+    status: planned
+    evidence_id: null
+    missing_reason: TODO_MARKET_DATA
+    next_action: 提供已审查 market / peer context，或保持 TODO
+  - request_id: r5_market_snapshot_r5_002837_gap_market_001
+    evidence_need: 'dated market snapshot for TODO_MARKET_DATA`: dated price history
+      and market state'
+    source_type: market_data_snapshot
+    source_rank: B
+    as_of_date: '2026-07-03'
+    freshness_policy: explicit_as_of_date_or_visible_gap
+    allowed_usage:
+    - valuation_context
+    - technical_context
+    required_for_pack:
+    - valuation_pack
+    - technical_market_pack
+    status: planned
+    evidence_id: null
+    missing_reason: TODO_MARKET_DATA
+    next_action: 补 dated market snapshot；未补前不写趋势判断
+  peer_snapshot:
+  - request_id: r5_peer_snapshot_r5_002837_gap_valuation_001
+    evidence_need: 'reviewed peer snapshot for TODO_MARKET_DATA` / `TODO_PEER_DATA`:
+      reviewed market and peer snapshots'
+    source_type: peer_snapshot
+    source_rank: B
+    as_of_date: '2026-07-03'
+    freshness_policy: explicit_as_of_date_or_visible_gap
+    allowed_usage:
+    - peer_context
+    - valuation_context
+    required_for_pack:
+    - peer_comparison_pack
+    - valuation_pack
+    status: planned
+    evidence_id: null
+    missing_reason: TODO_PEER_DATA
+    next_action: 提供已审查 market / peer context，或保持 TODO
+  industry_context_clues:
+  - request_id: r5_industry_context_clues_placeholder
+    evidence_need: industry_context_clues placeholder from R5 gap bridge
+    source_type: industry_context_clues
+    source_rank: C
+    as_of_date: '2026-07-03'
+    freshness_policy: explicit_as_of_date_or_visible_gap
+    allowed_usage:
+    - context_only
+    required_for_pack:
+    - evidence_snapshot_pack
+    status: planned
+    evidence_id: null
+    missing_reason: TODO_SOURCE_REQUIRED
+    next_action: keep visible source gap until a concrete request is registered
+  news_event_clues:
+  - request_id: r5_news_event_clues_r5_002837_gap_sentiment_001
+    evidence_need: 'dated news/event source for TODO_SOURCE_REQUIRED`: dated sentiment,
+      catalyst, event sources'
+    source_type: news_or_event_source
+    source_rank: D
+    as_of_date: '2026-07-03'
+    freshness_policy: explicit_as_of_date_or_visible_gap
+    allowed_usage:
+    - clue_only
+    - TODO_generation
+    required_for_pack:
+    - sentiment_event_pack
+    status: planned
+    evidence_id: null
+    missing_reason: TODO_SOURCE_REQUIRED
+    next_action: 收集 dated sources；未补前保持 TODO
+  investor_relations:
+  - request_id: r5_investor_relations_r5_002837_gap_sentiment_001
+    evidence_need: 'investor relations or company context for TODO_SOURCE_REQUIRED`:
+      dated sentiment, catalyst, event sources'
+    source_type: investor_relations
+    source_rank: C
+    as_of_date: '2026-07-03'
+    freshness_policy: explicit_as_of_date_or_visible_gap
+    allowed_usage:
+    - management_comment
+    - company_context
+    required_for_pack:
+    - business_breakdown_pack
+    - sentiment_event_pack
+    status: planned
+    evidence_id: null
+    missing_reason: TODO_SOURCE_REQUIRED
+    next_action: 收集 dated sources；未补前保持 TODO
+handoff_to_stock_deep_dive:
+  evidence_manifest_path: data/manifests/evidence_manifest.csv
+  claim_candidates_path: data/manifests/claims_draft.csv
+  metric_candidates_path: data/manifests/metrics_draft.csv
+  source_gap_register_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_source_gap_report.md
+  evidence_counts:
+    official_filings: TODO
+    structured_financial_metrics: TODO
+    market_snapshot: TODO
+    peer_snapshot: TODO
+    context_clues: TODO
+  official_filing_requests:
+  - r5_official_filings_r5_002837_gap_business_001
+  - r5_official_filings_r5_002837_gap_exposure_001
+  structured_metric_requests:
+  - r5_structured_financial_metrics_r5_002837_gap_business_001
+  - r5_structured_financial_metrics_r5_002837_gap_forecast_001
+  market_snapshot_requests:
+  - r5_market_snapshot_r5_002837_gap_valuation_001
+  - r5_market_snapshot_r5_002837_gap_market_001
+  peer_snapshot_requests:
+  - r5_peer_snapshot_r5_002837_gap_valuation_001
+  context_clue_requests:
+  - r5_industry_context_clues_placeholder
+  - r5_news_event_clues_r5_002837_gap_sentiment_001
+  - r5_investor_relations_r5_002837_gap_sentiment_001
+  missing_inputs:
+  - MISSING_DISCLOSURE
+  - TODO_SOURCE_REQUIRED
+  - TODO_MODEL_INPUT
+  - TODO_MARKET_DATA
+  - TODO_PEER_DATA

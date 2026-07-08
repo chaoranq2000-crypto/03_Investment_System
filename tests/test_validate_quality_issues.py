@@ -35,6 +35,15 @@ def test_active_high_issue_blocks_accepted_outcome():
     assert validator.derive_outcome(rows, []) == "needs_fix"
 
 
+def test_high_issue_row_cannot_have_accepted_blocking_decision():
+    validator = load_validator()
+    rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
+    rows[0]["severity"] = "high"
+    rows[0]["blocking_decision"] = "accepted"
+    errors = validator.validate_quality_issues(rows)
+    assert any("high or critical severity cannot have accepted" in error for error in errors)
+
+
 def test_trading_instruction_issue_must_be_high():
     validator = load_validator()
     rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))

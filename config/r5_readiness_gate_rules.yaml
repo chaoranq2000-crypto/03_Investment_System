@@ -1,0 +1,19 @@
+decision_labels:
+  ready_for_source_gapped_real_sample_pilot: R5_READY_FOR_SOURCE_GAPPED_REAL_SAMPLE_PILOT
+  contracts_executable_with_todos_only: R5_CONTRACTS_EXECUTABLE_WITH_TODOS_ONLY
+  needs_more_repair: R5_NEEDS_MORE_REPAIR
+  blocked: R5_BLOCKED
+blocking_rules:
+  patch_13_20_smoke_must_pass: true
+  no_advice_must_pass: true
+  source_gaps_must_be_visible: true
+  sample_quality_forbidden_when_todos_exist: true
+  p2_forbidden: true
+default_paths:
+  smoke_result: reports/p1_6/r5_mvp_smoke_result.json
+  inventory_status: reports/p1_6/r5_patch_1_12_inventory_status.yaml
+  format_guard: reports/p1_6/r5_format_guard.json
+  source_gapped_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_pack_source_gapped.yaml
+  source_gap_report: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_source_gap_report.md
+  evidence_plan: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_plan_from_gaps.yaml
+  valuation_handoff_example: .agents/skills/company-valuation/assets/r5_valuation_handoff.example.yaml
