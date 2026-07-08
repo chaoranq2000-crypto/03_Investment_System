@@ -31,8 +31,13 @@ def test_run_steps_records_success(tmp_path: Path):
     )
 
     assert report["status"] == "pass"
+    assert report["repo_root"] == str(tmp_path)
+    assert report["python_executable"]
+    assert report["platform"]
+    assert report["steps"] == report["results"]
     assert report["results"][0]["exit_code"] == 0
     assert "ok summary" in report["results"][0]["summary"]
+    assert "ok summary" in report["results"][0]["stdout_tail"]
     assert "duration_seconds" in report["results"][0]
 
 
@@ -71,6 +76,7 @@ def test_default_steps_adds_strict_to_advisory_gates():
 
     assert "--strict" in inventory["command"]
     assert "--strict" in truthfulness["command"]
+    assert "--json" in truthfulness["command"]
 
 
 def test_emit_report_writes_stderr(capsys):

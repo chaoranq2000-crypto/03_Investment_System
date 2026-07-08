@@ -1,22 +1,9 @@
 {
-  "decision": "R5_BLOCKED",
+  "decision": "R5_CONTRACTS_EXECUTABLE_WITH_TODOS_ONLY",
   "can_enter_source_gapped_real_sample_pilot": false,
   "sample_quality_report_allowed": false,
   "p2_allowed": false,
-  "blockers": [
-    {
-      "id": "patch_13_20_strict_smoke",
-      "severity": "high",
-      "reason": "Patch 13-20 strict smoke is not all green.",
-      "detail": "r5_patch_inventory_check, r5_readout_truthfulness_gate"
-    },
-    {
-      "id": "patch_inventory",
-      "severity": "high",
-      "reason": "Patch 1-12 inventory is not validated_complete.",
-      "detail": "claimed_complete_but_validation_failed"
-    }
-  ],
+  "blockers": [],
   "non_blockers": [
     {
       "id": "forecast_todo",
@@ -32,8 +19,8 @@
     }
   ],
   "input_summary": {
-    "smoke_status": "fail",
-    "inventory_status": "claimed_complete_but_validation_failed",
+    "smoke_status": "pass",
+    "inventory_status": "validated_complete",
     "format_guard_status": "pass",
     "source_gap_report_exists": true,
     "no_advice_passed": true

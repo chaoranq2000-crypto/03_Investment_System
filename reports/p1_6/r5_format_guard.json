@@ -1,11 +1,49 @@
 {
   "status": "pass",
+  "checked": 24,
+  "failed": 0,
+  "passed": 24,
   "summary": {
-    "checked": 19,
+    "checked": 24,
     "failed": 0,
-    "passed": 19
+    "passed": 24
   },
   "artifacts": [
+    {
+      "path": "scripts/check_r5_artifact_format.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 262,
+      "issues": []
+    },
+    {
+      "path": "scripts/r5_patch_inventory_check.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 253,
+      "issues": []
+    },
+    {
+      "path": "scripts/check_r5_readout_truthfulness.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 182,
+      "issues": []
+    },
+    {
+      "path": "scripts/run_r5_mvp_smoke.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 196,
+      "issues": []
+    },
+    {
+      "path": "scripts/r5_readiness_gate.py",
+      "artifact_type": "python",
+      "status": "pass",
+      "line_count": 191,
+      "issues": []
+    },
     {
       "path": "templates/r5_stock_research_pack.yaml",
       "artifact_type": "yaml",
@@ -66,21 +104,21 @@
       "path": ".agents/skills/segment-company-mapping/scripts/validate_segment_exposure.py",
       "artifact_type": "python",
       "status": "pass",
-      "line_count": 178,
+      "line_count": 201,
       "issues": []
     },
     {
       "path": ".agents/skills/quality-review/scripts/validate_quality_issues.py",
       "artifact_type": "python",
       "status": "pass",
-      "line_count": 160,
+      "line_count": 162,
       "issues": []
     },
     {
       "path": "src/research/forecast_model_builder.py",
       "artifact_type": "python",
       "status": "pass",
-      "line_count": 74,
+      "line_count": 116,
       "issues": []
     },
     {
@@ -94,7 +132,7 @@
       "path": "src/report/stock_report_writer.py",
       "artifact_type": "python",
       "status": "pass",
-      "line_count": 219,
+      "line_count": 298,
       "issues": []
     },
     {
@@ -115,14 +153,14 @@
       "path": "tests/test_validate_r5_stock_research_pack.py",
       "artifact_type": "pytest",
       "status": "pass",
-      "line_count": 98,
+      "line_count": 116,
       "issues": []
     },
     {
       "path": "tests/test_validate_segment_exposure.py",
       "artifact_type": "pytest",
       "status": "pass",
-      "line_count": 99,
+      "line_count": 107,
       "issues": []
     },
     {

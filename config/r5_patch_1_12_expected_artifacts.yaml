@@ -1,279 +1,298 @@
 patches:
-  - patch_id: R5_PATCH_1
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_1_STOCK_DEEP_DIVE_R5_PACK_CONTRACT_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/stock-deep-dive/SKILL.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/references/r5_stock_research_pack_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/references/r5_report_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack_template.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_source_gap_report_template.md
-        artifact_type: markdown
-        required: true
-      - path: reports/p1_6/R5_PATCH_1_STOCK_DEEP_DIVE_R5_PACK_CONTRACT_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_2
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/stock-deep-dive/scripts/validate_r5_stock_research_pack.py
-        artifact_type: python
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.invalid.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: tests/test_r5_stock_research_pack_schema.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_3
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/evidence-ingest/references/r5_stock_evidence_snapshot_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/evidence-ingest/assets/r5_stock_evidence_plan_template.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/evidence-ingest/scripts/validate_r5_evidence_plan.py
-        artifact_type: python
-        required: true
-      - path: tests/test_r5_evidence_snapshot_plan.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_4
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_4_FINANCIAL_BUSINESS_PACK_CONTRACTS_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/stock-deep-dive/references/r5_financial_history_pack_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/references/r5_business_breakdown_pack_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_financial_history_pack.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_business_breakdown_pack.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/scripts/validate_r5_financial_business_packs.py
-        artifact_type: python
-        required: true
-      - path: tests/test_r5_financial_business_packs.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_4_FINANCIAL_BUSINESS_PACK_CONTRACTS_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_5
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_5_FORECAST_MODEL_CONTRACT_AND_VALIDATOR_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/stock-deep-dive/references/r5_forecast_model_pack_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_forecast_model_pack.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/scripts/validate_r5_forecast_model_pack.py
-        artifact_type: python
-        required: true
-      - path: tests/test_r5_forecast_model_pack.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_5_FORECAST_MODEL_CONTRACT_AND_VALIDATOR_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_6
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_6_VALUATION_PACK_CONTRACT_AND_HANDOFF_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/stock-deep-dive/references/r5_valuation_pack_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/company-valuation/references/r5_valuation_handoff_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_valuation_pack.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/scripts/validate_r5_valuation_pack.py
-        artifact_type: python
-        required: true
-      - path: tests/test_r5_valuation_pack.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_6_VALUATION_PACK_CONTRACT_AND_HANDOFF_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_7
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_7_TECHNICAL_MARKET_PACK_CONTRACT_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/stock-deep-dive/references/r5_technical_market_pack_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_technical_market_pack.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/scripts/validate_r5_technical_market_pack.py
-        artifact_type: python
-        required: true
-      - path: tests/test_r5_technical_market_pack.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_7_TECHNICAL_MARKET_PACK_CONTRACT_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_8
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_8_SENTIMENT_EVENT_PACK_CONTRACT_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/stock-deep-dive/references/r5_sentiment_event_pack_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_sentiment_event_pack.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/scripts/validate_r5_sentiment_event_pack.py
-        artifact_type: python
-        required: true
-      - path: tests/test_r5_sentiment_event_pack.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_8_SENTIMENT_EVENT_PACK_CONTRACT_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_9
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_9_RISK_COUNTEREVIDENCE_SOURCE_GAP_PACK_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/stock-deep-dive/references/r5_risk_counterevidence_pack_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_risk_counterevidence_pack.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_source_gap_report_template.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/scripts/validate_r5_risk_counterevidence_pack.py
-        artifact_type: python
-        required: true
-      - path: tests/test_r5_risk_counterevidence_pack.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_9_RISK_COUNTEREVIDENCE_SOURCE_GAP_PACK_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_10
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_10_R5_QUALITY_GATE_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/quality-review/SKILL.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/quality-review/references/r5_quality_gate.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/quality-review/references/r5_issue_schema.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/quality-review/assets/r5_quality_issues.example.csv
-        artifact_type: csv
-        required: true
-      - path: .agents/skills/quality-review/scripts/validate_r5_quality_gate.py
-        artifact_type: python
-        required: true
-      - path: tests/test_r5_quality_gate.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_10_R5_QUALITY_GATE_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_11
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_11_REPORT_PLANNER_COMPOSER_SKELETON_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: .agents/skills/stock-deep-dive/references/r5_report_planner_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/references/r5_report_composer_contract.md
-        artifact_type: markdown
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_report_outline.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/assets/r5_thesis_stack.example.yaml
-        artifact_type: yaml
-        required: true
-      - path: .agents/skills/stock-deep-dive/scripts/validate_r5_report_plan.py
-        artifact_type: python
-        required: true
-      - path: tests/test_r5_report_planner_composer.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_11_REPORT_PLANNER_COMPOSER_SKELETON_READOUT.md
-        artifact_type: readout
-        required: true
-
-  - patch_id: R5_PATCH_12
-    claimed_status: claimed_complete
-    related_readout: reports/p1_6/R5_PATCH_12_SAMPLE_BENCHMARK_REGRESSION_READOUT.md
-    blocking_if_missing: true
-    expected_artifacts:
-      - path: benchmarks/r5_report_quality_rubric.yaml
-        artifact_type: yaml
-        required: true
-      - path: benchmarks/r5_section_density_targets.yaml
-        artifact_type: yaml
-        required: true
-      - path: benchmarks/sample_reports/README.md
-        artifact_type: markdown
-        required: true
-      - path: tests/test_r5_report_quality_rubric.py
-        artifact_type: pytest
-        required: true
-      - path: reports/p1_6/R5_PATCH_12_SAMPLE_BENCHMARK_REGRESSION_READOUT.md
-        artifact_type: readout
-        required: true
+- patch_id: R5_PATCH_1
+  claimed_status: claimed_complete
+  related_readout: reports/p1_6/R5_PATCH_1_STOCK_DEEP_DIVE_R5_PACK_CONTRACT_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: .agents/skills/stock-deep-dive/SKILL.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/stock-deep-dive/references/r5_stock_research_pack_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/stock-deep-dive/references/r5_report_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack_template.yaml
+    artifact_type: yaml
+    required: true
+  - path: .agents/skills/stock-deep-dive/assets/r5_source_gap_report_template.md
+    artifact_type: markdown
+    required: true
+  - path: reports/p1_6/R5_PATCH_1_STOCK_DEEP_DIVE_R5_PACK_CONTRACT_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_2
+  claimed_status: claimed_complete
+  related_readout: reports/p1_6/R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_stock_research_pack.py
+    artifact_type: python
+    required: true
+  - path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml
+    artifact_type: yaml
+    required: true
+  - path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.invalid.example.yaml
+    artifact_type: yaml
+    required: true
+  - path: tests/test_r5_stock_research_pack_schema.py
+    artifact_type: pytest
+    required: true
+  - path: reports/p1_6/R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_3
+  claimed_status: claimed_complete
+  related_readout: reports/p1_6/R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: .agents/skills/evidence-ingest/references/r5_stock_evidence_snapshot_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/evidence-ingest/assets/r5_stock_evidence_plan_template.yaml
+    artifact_type: yaml
+    required: true
+  - path: .agents/skills/evidence-ingest/scripts/validate_r5_evidence_plan.py
+    artifact_type: python
+    required: true
+  - path: tests/test_r5_evidence_snapshot_plan.py
+    artifact_type: pytest
+    required: true
+  - path: reports/p1_6/R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_4
+  claimed_status: claimed_complete
+  superseded_by: R5_PATCH_4_FORECAST_VALUATION_READOUT.md and unified R5 stock research
+    pack contracts
+  related_readout: reports/p1_6/R5_PATCH_4_FORECAST_VALUATION_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: .agents/skills/stock-deep-dive/references/r5_financial_history_pack_contract.md
+    superseded_by: .agents/skills/stock-deep-dive/references/r5_financial_history_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/stock-deep-dive/references/r5_business_breakdown_pack_contract.md
+    superseded_by: .agents/skills/stock-deep-dive/references/r5_business_breakdown_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/stock-deep-dive/assets/r5_financial_history_pack.example.yaml
+    superseded_by: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml
+    artifact_type: yaml
+    required: true
+  - path: .agents/skills/stock-deep-dive/assets/r5_business_breakdown_pack.example.yaml
+    superseded_by: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml
+    artifact_type: yaml
+    required: true
+  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_financial_business_packs.py
+    superseded_by: .agents/skills/stock-deep-dive/scripts/validate_r5_stock_research_pack.py
+    artifact_type: python
+    required: true
+  - path: tests/test_r5_financial_business_packs.py
+    superseded_by: tests/test_validate_r5_stock_research_pack.py
+    artifact_type: pytest
+    required: true
+  - path: reports/p1_6/R5_PATCH_4_FINANCIAL_BUSINESS_PACK_CONTRACTS_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_4_FORECAST_VALUATION_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_5
+  claimed_status: claimed_complete
+  superseded_by: Current split uses forecast, technical market, and sentiment validators
+  related_readout: reports/p1_6/R5_PATCH_5_TECH_SENTIMENT_CATALYST_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: .agents/skills/stock-deep-dive/references/r5_forecast_model_pack_contract.md
+    superseded_by: .agents/skills/stock-deep-dive/references/r5_forecast_model_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/stock-deep-dive/assets/r5_forecast_model_pack.example.yaml
+    superseded_by: .agents/skills/stock-deep-dive/assets/r5_forecast_model.example.yaml
+    artifact_type: yaml
+    required: true
+  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_forecast_model_pack.py
+    superseded_by: .agents/skills/stock-deep-dive/scripts/validate_r5_forecast_model.py
+    artifact_type: python
+    required: true
+  - path: tests/test_r5_forecast_model_pack.py
+    superseded_by: tests/test_validate_r5_forecast_model.py
+    artifact_type: pytest
+    required: true
+  - path: .agents/skills/stock-deep-dive/references/r5_technical_market_pack_contract.md
+    superseded_by: .agents/skills/stock-deep-dive/references/r5_technical_market_pack_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/stock-deep-dive/assets/r5_technical_market_pack.example.yaml
+    artifact_type: yaml
+    required: true
+  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_technical_market_pack.py
+    artifact_type: python
+    required: true
+  - path: tests/test_validate_r5_technical_market_pack.py
+    artifact_type: pytest
+    required: true
+  - path: .agents/skills/stock-deep-dive/references/r5_sentiment_event_pack_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/stock-deep-dive/assets/r5_sentiment_event_pack.example.yaml
+    artifact_type: yaml
+    required: true
+  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_sentiment_event_pack.py
+    artifact_type: python
+    required: true
+  - path: tests/test_validate_r5_sentiment_event_pack.py
+    artifact_type: pytest
+    required: true
+  - path: reports/p1_6/R5_PATCH_5_FORECAST_MODEL_CONTRACT_AND_VALIDATOR_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_5_TECH_SENTIMENT_CATALYST_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_6
+  claimed_status: claimed_complete
+  superseded_by: R5 report composer executable fixture
+  related_readout: reports/p1_6/R5_PATCH_6_COMPOSER_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: .agents/skills/stock-deep-dive/references/r5_report_composer_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/stock-deep-dive/scripts/compose_r5_report_from_pack.py
+    artifact_type: python
+    required: true
+  - path: tests/test_compose_r5_report_from_pack.py
+    artifact_type: pytest
+    required: true
+  - path: tests/test_r5_mvp_fixture_smoke.py
+    artifact_type: pytest
+    required: true
+  - path: reports/p1_6/R5_PATCH_6_VALUATION_PACK_CONTRACT_AND_HANDOFF_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_6_COMPOSER_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_7
+  claimed_status: claimed_complete
+  superseded_by: R5 benchmark and quality rubric gate
+  related_readout: reports/p1_6/R5_PATCH_7_BENCHMARK_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: benchmarks/r5_report_quality_rubric.yaml
+    artifact_type: yaml
+    required: true
+  - path: tests/test_r5_report_quality_rubric.py
+    artifact_type: pytest
+    required: true
+  - path: tests/test_r5_report_no_advice_and_todos.py
+    artifact_type: pytest
+    required: true
+  - path: reports/p1_6/R5_PATCH_7_TECHNICAL_MARKET_PACK_CONTRACT_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_7_BENCHMARK_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_8
+  claimed_status: claimed_complete
+  superseded_by: R5 stock-led smoke dry run
+  related_readout: reports/p1_6/R5_PATCH_8_STOCK_LED_SMOKE_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: tests/test_r5_stock_led_smoke_dry_run.py
+    artifact_type: pytest
+    required: true
+  - path: tests/fixtures/r5_minimal_stock_run/R5_stock_research_pack.yaml
+    artifact_type: yaml
+    required: true
+  - path: tests/fixtures/r5_minimal_stock_run/expected_R5_stock_research_note.md
+    artifact_type: markdown
+    required: true
+  - path: reports/p1_6/R5_PATCH_8_SENTIMENT_EVENT_PACK_CONTRACT_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_8_STOCK_LED_SMOKE_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_9
+  claimed_status: claimed_complete
+  superseded_by: R5 evidence plan bridge
+  related_readout: reports/p1_6/R5_PATCH_9_EVIDENCE_PLAN_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: .agents/skills/evidence-ingest/references/r5_stock_evidence_plan_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/evidence-ingest/assets/r5_evidence_plan_bridge.example.yaml
+    artifact_type: yaml
+    required: true
+  - path: .agents/skills/evidence-ingest/scripts/validate_r5_stock_evidence_plan.py
+    artifact_type: python
+    required: true
+  - path: scripts/build_r5_evidence_plan_from_gaps.py
+    artifact_type: python
+    required: true
+  - path: tests/test_build_r5_evidence_plan_from_gaps.py
+    artifact_type: pytest
+    required: true
+  - path: reports/p1_6/R5_PATCH_9_RISK_COUNTEREVIDENCE_SOURCE_GAP_PACK_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_9_EVIDENCE_PLAN_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_10
+  claimed_status: claimed_complete
+  superseded_by: R5 close readout template gate
+  related_readout: reports/p1_6/R5_PATCH_10_CLOSE_READOUT_TEMPLATE_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: templates/r5_workflow_close_readout.md
+    artifact_type: markdown
+    required: true
+  - path: templates/r5_task_queue.md
+    artifact_type: markdown
+    required: true
+  - path: tests/test_r5_close_readout_templates.py
+    artifact_type: pytest
+    required: true
+  - path: reports/p1_6/R5_PATCH_10_R5_QUALITY_GATE_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_10_CLOSE_READOUT_TEMPLATE_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_11
+  claimed_status: claimed_complete
+  superseded_by: R5 sample benchmark policy gate
+  related_readout: reports/p1_6/R5_PATCH_11_SAMPLE_BENCHMARK_POLICY_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: templates/stock_report_sample_quality.md
+    artifact_type: markdown
+    required: true
+  - path: benchmarks/r5_report_quality_rubric.yaml
+    artifact_type: yaml
+    required: true
+  - path: tests/test_sample_report_benchmark_policy.py
+    artifact_type: pytest
+    required: true
+  - path: reports/p1_6/R5_PATCH_11_REPORT_PLANNER_COMPOSER_SKELETON_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_11_SAMPLE_BENCHMARK_POLICY_READOUT.md
+    artifact_type: readout
+    required: true
+- patch_id: R5_PATCH_12
+  claimed_status: claimed_complete
+  superseded_by: company-valuation validator contract
+  related_readout: reports/p1_6/R5_PATCH_12_COMPANY_VALUATION_VALIDATOR_READOUT.md
+  blocking_if_missing: true
+  expected_artifacts:
+  - path: .agents/skills/company-valuation/SKILL.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/company-valuation/references/r5_valuation_handoff_contract.md
+    artifact_type: markdown
+    required: true
+  - path: .agents/skills/company-valuation/assets/r5_valuation_handoff.example.yaml
+    artifact_type: yaml
+    required: true
+  - path: .agents/skills/company-valuation/scripts/validate_valuation_output.py
+    artifact_type: python
+    required: true
+  - path: tests/test_validate_company_valuation_output.py
+    artifact_type: pytest
+    required: true
+  - path: reports/p1_6/R5_PATCH_12_SAMPLE_BENCHMARK_REGRESSION_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_12_COMPANY_VALUATION_VALIDATOR_READOUT.md
+    artifact_type: readout
+    required: true

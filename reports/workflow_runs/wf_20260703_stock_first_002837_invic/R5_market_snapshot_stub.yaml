@@ -1,0 +1,18 @@
+artifact_type: R5_market_snapshot
+schema_version: r5_market_snapshot_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+company_name: 英维克
+status: TODO_MARKET_DATA
+as_of_date: null
+missing_reason: TODO_MARKET_DATA
+no_live_api: true
+market_fields:
+  current_price: null
+  market_cap: null
+  pe_ttm: null
+  pb: null
+  ps: null
+allowed_usage:
+  - source_gapped_research_draft
+next_action: provide reviewed dated market snapshot or keep TODO_MARKET_DATA

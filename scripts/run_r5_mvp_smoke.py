@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import json
+import platform
 import subprocess
 import sys
 import time
@@ -35,11 +37,21 @@ def default_steps(python: str, strict: bool) -> list[dict[str, Any]]:
     return [
         {
             "name": "r5_artifact_format_guard",
-            "command": [python, "scripts/check_r5_artifact_format.py", "--strict"],
+            "command": [
+                python,
+                "scripts/check_r5_artifact_format.py",
+                "--strict",
+                "--json",
+                "reports/p1_6/r5_format_guard.json",
+            ],
+            "artifact_outputs": ["reports/p1_6/r5_format_guard.json"],
+            "trust_boundary_note": "format guard runs first and checks gate-of-gates including smoke wrapper itself",
         },
         {
             "name": "r5_patch_inventory_check",
             "command": inventory_command,
+            "artifact_outputs": ["reports/p1_6/r5_patch_1_12_inventory_status.yaml"],
+            "trust_boundary_note": "inventory is blocking in strict mode",
         },
         {
             "name": "r5_pack_validators",
@@ -55,6 +67,8 @@ def default_steps(python: str, strict: bool) -> list[dict[str, Any]]:
                 "tests/test_validate_r5_valuation_pack.py",
                 "--tb=short",
             ],
+            "artifact_outputs": [],
+            "trust_boundary_note": "pytest exit_code is treated as authoritative",
         },
         {
             "name": "r5_composer_fixture_smoke",
@@ -67,6 +81,8 @@ def default_steps(python: str, strict: bool) -> list[dict[str, Any]]:
                 "tests/test_r5_mvp_fixture_smoke.py",
                 "--tb=short",
             ],
+            "artifact_outputs": [],
+            "trust_boundary_note": "pytest exit_code is treated as authoritative",
         },
         {
             "name": "r5_quality_fixture_smoke",
@@ -78,12 +94,24 @@ def default_steps(python: str, strict: bool) -> list[dict[str, Any]]:
                 "tests/test_r5_stock_led_smoke_dry_run.py",
                 "--tb=short",
             ],
+            "artifact_outputs": [],
+            "trust_boundary_note": "pytest exit_code is treated as authoritative",
         },
         {
             "name": "r5_readout_truthfulness_gate",
-            "command": truthfulness_command,
+            "command": [
+                *truthfulness_command,
+                "--json",
+                "reports/p1_6/r5_readout_truthfulness_result.json",
+            ],
+            "artifact_outputs": ["reports/p1_6/r5_readout_truthfulness_result.json"],
+            "trust_boundary_note": "canonical readouts are blocking; legacy readouts are archived as noncanonical",
         },
     ]
+
+
+def _tail(text: str, limit: int = 20) -> str:
+    return "\n".join(text.splitlines()[-limit:])
 
 
 def summarize_output(stdout: str, stderr: str, limit: int = 10) -> str:
@@ -107,8 +135,12 @@ def run_step(step: dict[str, Any], cwd: Path) -> dict[str, Any]:
         "exit_code": completed.returncode,
         "duration_seconds": round(duration, 3),
         "summary": summarize_output(completed.stdout, completed.stderr),
+        "stdout_tail": _tail(completed.stdout),
+        "stderr_tail": _tail(completed.stderr),
         "stdout": completed.stdout,
         "stderr": completed.stderr,
+        "artifact_outputs": step.get("artifact_outputs", []),
+        "trust_boundary_note": step.get("trust_boundary_note", ""),
     }
 
 
@@ -119,6 +151,12 @@ def run_steps(steps: list[dict[str, Any]], cwd: Path) -> dict[str, Any]:
         "status": "fail" if failures else "pass",
         "failed": len(failures),
         "checked": len(results),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "repo_root": str(cwd),
+        "python_executable": sys.executable,
+        "python_version": sys.version,
+        "platform": platform.platform(),
+        "steps": results,
         "results": results,
     }
 

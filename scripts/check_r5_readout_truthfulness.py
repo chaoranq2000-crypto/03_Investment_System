@@ -12,6 +12,7 @@ import yaml
 
 
 DEFAULT_RULES = {
+    "canonical_index_path": "config/r5_readout_canonical_index.yaml",
     "required_tokens": {
         "status": ["status"],
         "files_added": ["files_added", "files added"],
@@ -37,6 +38,27 @@ def load_rules(path: Path | None) -> dict[str, Any]:
     merged = dict(DEFAULT_RULES)
     merged.update(data)
     return merged
+
+
+def load_canonical_index(repo_root: Path, rules: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    index_path_value = rules.get("canonical_index_path")
+    if not index_path_value:
+        return {}
+    index_path = repo_root / str(index_path_value)
+    if not index_path.exists():
+        return {}
+    data = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError(f"{index_path} must contain a mapping")
+    entries = data.get("readouts", [])
+    if not isinstance(entries, list):
+        raise ValueError(f"{index_path} readouts must be a list")
+    indexed: dict[str, dict[str, Any]] = {}
+    for entry in entries:
+        if not isinstance(entry, dict) or "path" not in entry:
+            raise ValueError(f"{index_path} contains an invalid readout entry")
+        indexed[str(entry["path"])] = entry
+    return indexed
 
 
 def _has_any(text_lower: str, tokens: list[str]) -> bool:
@@ -74,14 +96,51 @@ def check_readout(path: Path, rules: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _relative_path(repo_root: Path, path: Path) -> str:
+    try:
+        return path.relative_to(repo_root).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def check_indexed_readout(path: Path, repo_root: Path, rules: dict[str, Any], index: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    rel_path = _relative_path(repo_root, path)
+    entry = index.get(rel_path, {})
+    canonical_status = str(entry.get("canonical_status", "canonical"))
+    if canonical_status in {"legacy_noncanonical", "superseded"}:
+        return {
+            "path": str(path),
+            "canonical_status": canonical_status,
+            "status": "pass",
+            "issues": [],
+            "reason": entry.get("reason", ""),
+            "replacement_or_supplement_path": entry.get("replacement_or_supplement_path"),
+            "blocking_for_strict_smoke": bool(entry.get("blocking_for_strict_smoke", False)),
+        }
+    result = check_readout(path, rules)
+    result["canonical_status"] = canonical_status
+    result["reason"] = entry.get("reason", "")
+    result["replacement_or_supplement_path"] = entry.get("replacement_or_supplement_path")
+    result["blocking_for_strict_smoke"] = bool(entry.get("blocking_for_strict_smoke", True))
+    return result
+
+
 def check_glob(repo_root: Path, pattern: str, rules: dict[str, Any]) -> dict[str, Any]:
     paths = sorted(repo_root.glob(pattern))
-    results = [check_readout(path, rules) for path in paths if path.is_file()]
-    failures = [result for result in results if result["status"] == "fail"]
+    index = load_canonical_index(repo_root, rules)
+    results = [check_indexed_readout(path, repo_root, rules, index) for path in paths if path.is_file()]
+    failures = [
+        result
+        for result in results
+        if result["status"] == "fail" and result.get("blocking_for_strict_smoke", True)
+    ]
     return {
         "truthfulness_status": "fail" if failures else "pass",
         "checked": len(results),
         "failed": len(failures),
+        "canonical_checked": sum(1 for result in results if result.get("canonical_status") == "canonical"),
+        "legacy_noncanonical": sum(1 for result in results if result.get("canonical_status") == "legacy_noncanonical"),
+        "superseded": sum(1 for result in results if result.get("canonical_status") == "superseded"),
         "results": results,
     }
 

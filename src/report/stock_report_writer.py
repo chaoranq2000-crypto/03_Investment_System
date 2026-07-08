@@ -24,6 +24,85 @@ def _table(rows: list[list[object]]) -> str:
     return "\n".join(lines)
 
 
+def _source_gap_rows(pack: Mapping[str, object]) -> list[Mapping[str, object]]:
+    rows = pack.get("source_gap_register")
+    return rows if isinstance(rows, list) else []
+
+
+def render_source_gapped_research_draft(*, pack_path: Path, output_path: Path) -> dict[str, object]:
+    pack = _load_yaml(pack_path)
+    if not isinstance(pack, dict):
+        raise ValueError("R5 pack must be a mapping")
+    stock = pack.get("stock") if isinstance(pack.get("stock"), dict) else {}
+    company_name = stock.get("company_name", "")
+    stock_code = stock.get("stock_code", "")
+    quality = pack.get("quality_status") if isinstance(pack.get("quality_status"), dict) else {}
+    gaps = _source_gap_rows(pack)
+
+    lines = [
+        f"# source_gapped_research_draft: {stock_code} {company_name}".strip(),
+        "",
+        "metadata:",
+        f"- output_type: source_gapped_research_draft",
+        f"- pack_status: {pack.get('pack_status', 'research_draft')}",
+        f"- allowed_report_level: {quality.get('allowed_report_level', 'research_draft')}",
+        f"- no_advice_boundary: {quality.get('no_advice_gate_passed', True)}",
+        "",
+        "## Forecast",
+        "",
+        f"- status: {(pack.get('forecast_model_pack') or {}).get('status', 'TODO')}",
+        "- next_action: keep TODO_MODEL_INPUT until reviewed assumptions exist.",
+        "",
+        "## Valuation",
+        "",
+        f"- status: {(pack.get('valuation_pack') or {}).get('status', 'TODO')}",
+        "- next_action: keep TODO_MARKET_DATA and TODO_PEER_DATA until reviewed inputs exist.",
+        "",
+        "## Technical Market",
+        "",
+        f"- status: {(pack.get('technical_market_pack') or {}).get('status', 'TODO')}",
+        "- next_action: keep TODO_MARKET_DATA until a dated market snapshot exists.",
+        "",
+        "## Sentiment Event",
+        "",
+        f"- status: {(pack.get('sentiment_event_pack') or {}).get('status', 'TODO')}",
+        "- next_action: keep TODO_SOURCE_REQUIRED until dated sources exist.",
+        "",
+        "## Source Gap Appendix",
+        "",
+    ]
+    for row in gaps:
+        if not isinstance(row, dict):
+            continue
+        lines.append(
+            "- {gap_id} | {section} | {missing} | {next_action}".format(
+                gap_id=row.get("gap_id", "gap"),
+                section=row.get("section", "unknown"),
+                missing=row.get("missing_data", row.get("missing_reason", "TODO_SOURCE_REQUIRED")),
+                next_action=row.get("next_action", "keep visible TODO"),
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "## Open Questions",
+            "",
+            "- See R5_open_questions.md and R5_evidence_request_queue.yaml.",
+            "",
+        ]
+    )
+    text = "\n".join(lines)
+    forbidden = ["买入", "卖出", "持有", "仓位", "target price", "buy rating", "sell rating", "hold rating"]
+    for phrase in forbidden:
+        if phrase.lower() in text.lower():
+            raise ValueError(f"forbidden trading phrase generated: {phrase}")
+    if "sample-quality" in text.lower() or "sample_quality" in text.lower():
+        raise ValueError("source-gapped draft must not carry sample-quality marker")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(text + "\n", encoding="utf-8")
+    return {"output_path": str(output_path), "source_gap_count": len(gaps), "output_type": "source_gapped_research_draft"}
+
+
 def _metric_rows(financial_quality: Mapping[str, object]) -> list[list[object]]:
     rows = [["指标", "期间", "数值", "单位", "metric_id / evidence"]]
     for item in financial_quality.get("ratios", []) if isinstance(financial_quality.get("ratios"), list) else []:

@@ -86,6 +86,25 @@ def test_one_line_yaml_is_a_failure(tmp_path: Path):
     assert any("line_count" in note for note in result["notes"])
 
 
+def test_superseded_artifact_validates_replacement(tmp_path: Path):
+    inventory = load_inventory()
+    (tmp_path / "replacement.yaml").write_text("schema_version: test\nartifact_type: replacement\n", encoding="utf-8")
+
+    result = inventory.validate_artifact(
+        tmp_path,
+        {
+            "path": "old_name.yaml",
+            "superseded_by": "replacement.yaml",
+            "artifact_type": "yaml",
+            "required": True,
+        },
+    )
+
+    assert result["status"] == "pass"
+    assert result["path"] == "old_name.yaml"
+    assert result["resolved_path"] == "replacement.yaml"
+
+
 def test_cli_writes_inventory_report(tmp_path: Path):
     inventory = load_inventory()
     (tmp_path / "ok.yaml").write_text("schema_version: test\nartifact_type: ok\n", encoding="utf-8")

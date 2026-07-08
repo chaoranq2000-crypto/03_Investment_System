@@ -87,10 +87,12 @@ def _readout_status(repo_root: Path, readout_path: str | None, blocking: bool) -
 
 def validate_artifact(repo_root: Path, artifact: dict[str, Any]) -> dict[str, Any]:
     rel_path = str(artifact["path"])
+    superseded_by = artifact.get("superseded_by")
+    resolved_path = str(superseded_by or rel_path)
     artifact_type = str(artifact.get("artifact_type", "markdown"))
     required = bool(artifact.get("required", True))
     validations = list(artifact.get("validation") or DEFAULT_VALIDATIONS.get(artifact_type, ["exists"]))
-    path = repo_root / rel_path
+    path = repo_root / resolved_path
     exists = path.exists()
     line_count = _line_count(path)
     notes: list[str] = []
@@ -135,6 +137,8 @@ def validate_artifact(repo_root: Path, artifact: dict[str, Any]) -> dict[str, An
 
     return {
         "path": rel_path,
+        "resolved_path": resolved_path,
+        "superseded_by": superseded_by,
         "artifact_type": artifact_type,
         "required": required,
         "exists": exists,
@@ -186,6 +190,7 @@ def reconcile_inventory(repo_root: Path, config: dict[str, Any]) -> dict[str, An
             {
                 "patch_id": patch.get("patch_id"),
                 "claimed_status": patch.get("claimed_status", "claimed_complete"),
+                "superseded_by": patch.get("superseded_by"),
                 "validated_status": patch_status,
                 "blocking_if_missing": bool(patch.get("blocking_if_missing", True)),
                 "related_readout": readout,

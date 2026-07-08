@@ -1,0 +1,352 @@
+{
+  "truthfulness_status": "pass",
+  "checked": 38,
+  "failed": 0,
+  "canonical_checked": 10,
+  "legacy_noncanonical": 28,
+  "superseded": 0,
+  "results": [
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_0A_REPAIR_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_10_CLOSE_READOUT_TEMPLATE_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_11_SAMPLE_BENCHMARK_POLICY_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_12_COMPANY_VALUATION_VALIDATOR_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_13_FORMAT_SYNTAX_RECOVERY_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_14_FORMAT_GUARD_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_15_INVENTORY_RECONCILIATION_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_16_VALIDATOR_SEMANTIC_HARDENING_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_17_COMPOSER_REPAIR_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_18_REPRODUCIBLE_FIXTURE_SMOKE_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_19_READOUT_TRUTHFULNESS_GATE_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_1_PACK_VALIDATOR_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_1_STOCK_DEEP_DIVE_R5_PACK_CONTRACT_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_20_SINGLE_SMOKE_COMMAND_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_21_SOURCE_GAPPED_002837_PACK_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_22_EVIDENCE_PLAN_BRIDGE_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_23_VALUATION_HANDOFF_INTERLOCK_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_24_READINESS_GATE_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_25_RAW_FORMAT_RECOVERY_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "Patch 25 generated from rerun commands in this task",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_26_EXECUTABLE_GUARD_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "Patch 26 generated from rerun commands in this task",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_27_INVENTORY_V2_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "Patch 27 generated from rerun commands in this task",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_29_SMOKE_TRUST_BOUNDARY_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "Patch 29 generated from rerun smoke command in this task",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_2_SEGMENT_MAPPING_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_30_READINESS_REBASE_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "Patch 30 generated from rerun readiness command in this task",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_31_SOURCE_GAPPED_002837_NORMALIZATION_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "Patch 31 generated from source-gapped pack validation commands",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_32_EVIDENCE_REQUEST_QUEUE_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "Patch 32 generated from queue builder commands",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_33_MARKET_PEER_INPUTS_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "Patch 33 generated from market/peer validator commands",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_34_FORECAST_VALUATION_INTERLOCK_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "Patch 34 generated from forecast interlock validation commands",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_35_REPORT_COMPOSER_DEGRADATION_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "Patch 35 generated from composer degradation validation commands",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_3_QUALITY_REVIEW_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_4_FORECAST_VALUATION_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_5_TECH_SENTIMENT_CATALYST_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_6_COMPOSER_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_7_BENCHMARK_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_8_STOCK_LED_SMOKE_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_9_EVIDENCE_PLAN_READOUT.md",
+      "canonical_status": "legacy_noncanonical",
+      "status": "pass",
+      "issues": [],
+      "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
+      "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
+      "blocking_for_strict_smoke": false
+    }
+  ]
+}

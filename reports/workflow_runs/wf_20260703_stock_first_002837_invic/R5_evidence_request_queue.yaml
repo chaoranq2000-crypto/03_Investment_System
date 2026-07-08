@@ -1,0 +1,227 @@
+schema_version: r5_evidence_request_queue_v0.1
+artifact_type: R5_evidence_request_queue
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+source_plan_path: reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_evidence_plan_from_gaps.yaml
+no_live_api: true
+status: planned
+requests:
+- request_id: r5_industry_context_clues_placeholder
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  source_gap_id: R5_002837_GAP_UNMAPPED_001
+  pack_section: evidence_snapshot_pack
+  evidence_need: industry_context_clues placeholder from R5 gap bridge
+  source_type: industry_context_clues
+  source_rank: C
+  freshness_policy: explicit_as_of_date_or_visible_gap
+  required_for_pack:
+  - evidence_snapshot_pack
+  allowed_usage:
+  - context_only
+  owner_skill: evidence-ingest
+  status: planned
+  evidence_id: null
+  missing_reason: TODO_SOURCE_REQUIRED
+  next_action: keep visible source gap until a concrete request is registered
+  no_live_api: true
+- request_id: r5_investor_relations_r5_002837_gap_sentiment_001
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  source_gap_id: R5_002837_GAP_SENTIMENT_001
+  pack_section: business_breakdown_pack
+  evidence_need: 'investor relations or company context for TODO_SOURCE_REQUIRED`:
+    dated sentiment, catalyst, event sources'
+  source_type: investor_relations
+  source_rank: C
+  freshness_policy: explicit_as_of_date_or_visible_gap
+  required_for_pack:
+  - business_breakdown_pack
+  - sentiment_event_pack
+  allowed_usage:
+  - management_comment
+  - company_context
+  owner_skill: evidence-ingest
+  status: planned
+  evidence_id: null
+  missing_reason: TODO_SOURCE_REQUIRED
+  next_action: 收集 dated sources；未补前保持 TODO
+  no_live_api: true
+- request_id: r5_market_snapshot_r5_002837_gap_market_001
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  source_gap_id: R5_002837_GAP_MARKET_001
+  pack_section: valuation_pack
+  evidence_need: 'dated market snapshot for TODO_MARKET_DATA`: dated price history
+    and market state'
+  source_type: market_data_snapshot
+  source_rank: B
+  freshness_policy: explicit_as_of_date_or_visible_gap
+  required_for_pack:
+  - valuation_pack
+  - technical_market_pack
+  allowed_usage:
+  - valuation_context
+  - technical_context
+  owner_skill: evidence-ingest
+  status: planned
+  evidence_id: null
+  missing_reason: TODO_MARKET_DATA
+  next_action: 补 dated market snapshot；未补前不写趋势判断
+  no_live_api: true
+- request_id: r5_market_snapshot_r5_002837_gap_valuation_001
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  source_gap_id: R5_002837_GAP_VALUATION_001
+  pack_section: valuation_pack
+  evidence_need: 'dated market snapshot for TODO_MARKET_DATA` / `TODO_PEER_DATA`:
+    reviewed market and peer snapshots'
+  source_type: market_data_snapshot
+  source_rank: B
+  freshness_policy: explicit_as_of_date_or_visible_gap
+  required_for_pack:
+  - valuation_pack
+  - technical_market_pack
+  allowed_usage:
+  - valuation_context
+  - technical_context
+  owner_skill: evidence-ingest
+  status: planned
+  evidence_id: null
+  missing_reason: TODO_MARKET_DATA
+  next_action: 提供已审查 market / peer context，或保持 TODO
+  no_live_api: true
+- request_id: r5_news_event_clues_r5_002837_gap_sentiment_001
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  source_gap_id: R5_002837_GAP_SENTIMENT_001
+  pack_section: sentiment_event_pack
+  evidence_need: 'dated news/event source for TODO_SOURCE_REQUIRED`: dated sentiment,
+    catalyst, event sources'
+  source_type: news_or_event_source
+  source_rank: D
+  freshness_policy: explicit_as_of_date_or_visible_gap
+  required_for_pack:
+  - sentiment_event_pack
+  allowed_usage:
+  - clue_only
+  - TODO_generation
+  owner_skill: evidence-ingest
+  status: planned
+  evidence_id: null
+  missing_reason: TODO_SOURCE_REQUIRED
+  next_action: 收集 dated sources；未补前保持 TODO
+  no_live_api: true
+- request_id: r5_official_filings_r5_002837_gap_business_001
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  source_gap_id: R5_002837_GAP_BUSINESS_001
+  pack_section: business_breakdown_pack
+  evidence_need: 'annual report / official disclosure for MISSING_DISCLOSURE`: 液冷收入占比、毛利率、利润贡献'
+  source_type: annual_report
+  source_rank: A
+  freshness_policy: explicit_as_of_date_or_visible_gap
+  required_for_pack:
+  - business_breakdown_pack
+  - segment_exposure_pack
+  allowed_usage:
+  - fact_support
+  - business_exposure_after_review
+  - financial_metrics
+  owner_skill: evidence-ingest
+  status: planned
+  evidence_id: null
+  missing_reason: MISSING_DISCLOSURE
+  next_action: 继续查找官方分业务披露、公告或表格证据
+  no_live_api: true
+- request_id: r5_official_filings_r5_002837_gap_exposure_001
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  source_gap_id: R5_002837_GAP_EXPOSURE_001
+  pack_section: business_breakdown_pack
+  evidence_need: 'annual report / official disclosure for LOW_CONFIDENCE_CLUE_ONLY`:
+    产品线索仍需收入/利润证据审查'
+  source_type: annual_report
+  source_rank: A
+  freshness_policy: explicit_as_of_date_or_visible_gap
+  required_for_pack:
+  - business_breakdown_pack
+  - segment_exposure_pack
+  allowed_usage:
+  - fact_support
+  - business_exposure_after_review
+  - financial_metrics
+  owner_skill: evidence-ingest
+  status: planned
+  evidence_id: null
+  missing_reason: MISSING_DISCLOSURE
+  next_action: 审查 exposure before promotion
+  no_live_api: true
+- request_id: r5_peer_snapshot_r5_002837_gap_valuation_001
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  source_gap_id: R5_002837_GAP_VALUATION_001
+  pack_section: peer_comparison_pack
+  evidence_need: 'reviewed peer snapshot for TODO_MARKET_DATA` / `TODO_PEER_DATA`:
+    reviewed market and peer snapshots'
+  source_type: peer_snapshot
+  source_rank: B
+  freshness_policy: explicit_as_of_date_or_visible_gap
+  required_for_pack:
+  - peer_comparison_pack
+  - valuation_pack
+  allowed_usage:
+  - peer_context
+  - valuation_context
+  owner_skill: evidence-ingest
+  status: planned
+  evidence_id: null
+  missing_reason: TODO_PEER_DATA
+  next_action: 提供已审查 market / peer context，或保持 TODO
+  no_live_api: true
+- request_id: r5_structured_financial_metrics_r5_002837_gap_business_001
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  source_gap_id: R5_002837_GAP_BUSINESS_001
+  pack_section: financial_history_pack
+  evidence_need: 'reviewed structured metrics for MISSING_DISCLOSURE`: 液冷收入占比、毛利率、利润贡献'
+  source_type: structured_financial_data
+  source_rank: B
+  freshness_policy: explicit_as_of_date_or_visible_gap
+  required_for_pack:
+  - financial_history_pack
+  - forecast_model_pack
+  allowed_usage:
+  - metric_candidate
+  - forecast_input_after_review
+  owner_skill: evidence-ingest
+  status: planned
+  evidence_id: null
+  missing_reason: TODO_MODEL_INPUT
+  next_action: 继续查找官方分业务披露、公告或表格证据
+  no_live_api: true
+- request_id: r5_structured_financial_metrics_r5_002837_gap_forecast_001
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  source_gap_id: R5_002837_GAP_FORECAST_001
+  pack_section: financial_history_pack
+  evidence_need: 'reviewed structured metrics for TODO_MODEL_INPUT`: reviewed forecast
+    assumptions'
+  source_type: structured_financial_data
+  source_rank: B
+  freshness_policy: explicit_as_of_date_or_visible_gap
+  required_for_pack:
+  - financial_history_pack
+  - forecast_model_pack
+  allowed_usage:
+  - metric_candidate
+  - forecast_input_after_review
+  owner_skill: evidence-ingest
+  status: planned
+  evidence_id: null
+  missing_reason: TODO_MODEL_INPUT
+  next_action: 用已审查 metrics 构建假设，或保持 TODO
+  no_live_api: true
+summary:
+  request_count: 10
+  source_gap_count: 7

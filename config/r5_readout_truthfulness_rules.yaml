@@ -1,3 +1,4 @@
+canonical_index_path: config/r5_readout_canonical_index.yaml
 required_tokens:
   status:
     - status

@@ -86,3 +86,26 @@ def test_cli_checks_glob(tmp_path: Path, capsys):
 
     assert exit_code == 0
     assert "truthfulness_status=pass" in capsys.readouterr().out
+
+
+def test_legacy_noncanonical_readout_is_visible_but_nonblocking(tmp_path: Path):
+    checker = load_checker()
+    readout = tmp_path / "R5_PATCH_LEGACY_READOUT.md"
+    readout.write_text("# Legacy\n\nstatus: PASS\n", encoding="utf-8")
+    config_dir = tmp_path / "config"
+    config_dir.mkdir()
+    (config_dir / "r5_readout_canonical_index.yaml").write_text(
+        "readouts:\n"
+        "  - path: R5_PATCH_LEGACY_READOUT.md\n"
+        "    canonical_status: legacy_noncanonical\n"
+        "    reason: historical readout lacks command evidence\n"
+        "    replacement_or_supplement_path: reports/p1_6/R5_READOUT_CANONICAL_INDEX.md\n"
+        "    blocking_for_strict_smoke: false\n",
+        encoding="utf-8",
+    )
+
+    report = checker.check_glob(tmp_path, "R5_PATCH_*_READOUT.md", checker.DEFAULT_RULES)
+
+    assert report["truthfulness_status"] == "pass"
+    assert report["legacy_noncanonical"] == 1
+    assert report["results"][0]["canonical_status"] == "legacy_noncanonical"

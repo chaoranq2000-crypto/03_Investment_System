@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import py_compile
 import re
+import subprocess
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -20,6 +22,7 @@ class ArtifactRule:
     artifact_type: str
     min_lines: int = 2
     min_headings: int = 0
+    requires_cli_help: bool = False
 
 
 @dataclass
@@ -67,6 +70,14 @@ R5_PYTHON_RULES = [
     ArtifactRule("src/qa/stock_report_quality_review.py", "python"),
 ]
 
+R5_GATE_OF_GATES_RULES = [
+    ArtifactRule("scripts/check_r5_artifact_format.py", "python", min_lines=8, requires_cli_help=True),
+    ArtifactRule("scripts/r5_patch_inventory_check.py", "python", min_lines=8, requires_cli_help=True),
+    ArtifactRule("scripts/check_r5_readout_truthfulness.py", "python", min_lines=8, requires_cli_help=True),
+    ArtifactRule("scripts/run_r5_mvp_smoke.py", "python", min_lines=8, requires_cli_help=True),
+    ArtifactRule("scripts/r5_readiness_gate.py", "python", min_lines=8, requires_cli_help=True),
+]
+
 R5_TEST_RULES = [
     ArtifactRule("tests/test_r5_patch0_artifacts_parse.py", "pytest"),
     ArtifactRule("tests/test_validate_r5_stock_research_pack.py", "pytest"),
@@ -75,7 +86,7 @@ R5_TEST_RULES = [
     ArtifactRule("tests/test_stock_report_quality_review.py", "pytest"),
 ]
 
-DEFAULT_RULES = [*R5_YAML_RULES, *R5_MARKDOWN_RULES, *R5_PYTHON_RULES, *R5_TEST_RULES]
+DEFAULT_RULES = [*R5_GATE_OF_GATES_RULES, *R5_YAML_RULES, *R5_MARKDOWN_RULES, *R5_PYTHON_RULES, *R5_TEST_RULES]
 
 
 def _line_count(text: str) -> int:
@@ -93,10 +104,15 @@ def _check_common(path: Path, text: str, rule: ArtifactRule, issues: list[str]) 
         issues.append(f"line_count {line_count} is below minimum {rule.min_lines}")
     if text.startswith("#!") and line_count < 2:
         issues.append("shebang is not followed by a real newline")
+    first_line = text.splitlines()[0] if text.splitlines() else ""
+    if first_line.startswith("#!") and re.search(r"\b(from|import|def|class)\b", first_line):
+        issues.append("shebang line appears to swallow Python code")
     if _has_literal_newline_blob(text, line_count):
         issues.append("large-scale literal \\\\n sequence detected instead of real line breaks")
     if path.suffix == ".py" and line_count <= 1:
         issues.append("python artifact is a one-line blob")
+    if path.suffix == ".py" and line_count <= 2 and re.search(r"\b(import|def|class)\b.+\b(import|def|class)\b", text):
+        issues.append("python artifact appears to contain a one-line import/def/class blob")
     if path.suffix in {".yaml", ".yml"} and line_count <= 1:
         issues.append("yaml artifact is a one-line blob")
 
@@ -113,10 +129,43 @@ def _check_yaml(path: Path, issues: list[str]) -> None:
 
 
 def _check_python(path: Path, issues: list[str]) -> None:
+    source = path.read_text(encoding="utf-8")
     try:
         py_compile.compile(str(path), doraise=True)
     except py_compile.PyCompileError as exc:
         issues.append(f"py_compile failed: {exc.msg}")
+        return
+    try:
+        module = ast.parse(source, filename=str(path))
+    except SyntaxError as exc:
+        issues.append(f"ast_parse failed: {exc}")
+        return
+    if not module.body:
+        issues.append("python module AST is empty")
+    elif all(
+        isinstance(node, ast.Expr) and isinstance(getattr(node, "value", None), ast.Constant)
+        for node in module.body
+    ):
+        issues.append("python module contains only comments/docstrings/constants")
+
+
+def _check_cli_help(repo_root: Path, path: Path, issues: list[str]) -> None:
+    rel_path = path.relative_to(repo_root)
+    try:
+        completed = subprocess.run(
+            [sys.executable, str(rel_path), "--help"],
+            cwd=str(repo_root),
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=20,
+        )
+    except Exception as exc:  # noqa: BLE001
+        issues.append(f"--help execution failed: {exc}")
+        return
+    if completed.returncode != 0:
+        tail = "\n".join([*completed.stdout.splitlines(), *completed.stderr.splitlines()][-5:])
+        issues.append(f"--help exit_code {completed.returncode}; tail={tail}")
 
 
 def _check_markdown(text: str, rule: ArtifactRule, issues: list[str]) -> None:
@@ -144,6 +193,8 @@ def check_artifact(repo_root: Path, rule: ArtifactRule) -> ArtifactResult:
         _check_yaml(path, issues)
     elif rule.artifact_type == "python":
         _check_python(path, issues)
+        if rule.requires_cli_help:
+            _check_cli_help(repo_root, path, issues)
     elif rule.artifact_type == "markdown":
         _check_markdown(text, rule, issues)
     elif rule.artifact_type == "pytest":
@@ -166,6 +217,9 @@ def run_checks(repo_root: Path, rules: Iterable[ArtifactRule] = DEFAULT_RULES) -
     failed = [result for result in results if result.status == "fail"]
     return {
         "status": "fail" if failed else "pass",
+        "checked": len(results),
+        "failed": len(failed),
+        "passed": len(results) - len(failed),
         "summary": {
             "checked": len(results),
             "failed": len(failed),

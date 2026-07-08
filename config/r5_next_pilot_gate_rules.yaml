@@ -1,0 +1,8 @@
+schema_version: r5_next_pilot_gate_rules_v0.1
+sample_quality_report_allowed: false
+p2_allowed: false
+max_next_candidate_tasks: 3
+candidate_tasks:
+  - collect reviewed market and peer inputs from R5_evidence_request_queue.yaml without live API
+  - register reviewed forecast assumptions before numeric forecast or valuation outputs
+  - rerun source-gapped pilot gate after TODO inputs are reviewed

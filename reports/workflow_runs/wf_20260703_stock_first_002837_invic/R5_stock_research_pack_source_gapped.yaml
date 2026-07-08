@@ -22,7 +22,7 @@ quality_status:
   high_issue_count: 0
   medium_issue_count: 4
   source_gap_visible: true
-  no_advice_gate_passed: null
+  no_advice_gate_passed: true
 company_identity_pack:
   status: ready
   company_id: cn_002837_invic
@@ -301,6 +301,12 @@ source_gap_register:
     impact_on_conclusion: valuation_pack cannot reach sample-quality
     fix_owner_skill: company-valuation
     next_action: provide reviewed market and peer context or keep TODOs
+  - gap_id: R5_002837_GAP_MARKET_001
+    section: technical_market
+    missing_data: "TODO_MARKET_DATA: dated price history and market state"
+    impact_on_conclusion: technical_market_pack cannot support sample-quality market-state judgement
+    fix_owner_skill: stock-deep-dive
+    next_action: provide reviewed dated market snapshot or keep TODO_MARKET_DATA
   - gap_id: R5_002837_GAP_SENTIMENT_001
     section: sentiment_event
     missing_data: "TODO_SOURCE_REQUIRED: dated sentiment, catalyst, and event sources"

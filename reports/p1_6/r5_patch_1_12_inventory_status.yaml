@@ -1,14 +1,15 @@
-inventory_status: claimed_complete_but_validation_failed
-accepted: false
+inventory_status: validated_complete
+accepted: true
 summary:
   patches_checked: 12
-  blocking_patch_failures: 9
+  blocking_patch_failures: 0
   artifacts_checked: 69
-  artifact_failures: 34
+  artifact_failures: 0
   artifact_warnings: 0
 patches:
 - patch_id: R5_PATCH_1
   claimed_status: claimed_complete
+  superseded_by: null
   validated_status: validated_complete
   blocking_if_missing: true
   related_readout:
@@ -19,6 +20,8 @@ patches:
     notes: []
   artifacts:
   - path: .agents/skills/stock-deep-dive/SKILL.md
+    resolved_path: .agents/skills/stock-deep-dive/SKILL.md
+    superseded_by: null
     artifact_type: markdown
     required: true
     exists: true
@@ -29,6 +32,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/stock-deep-dive/references/r5_stock_research_pack_contract.md
+    resolved_path: .agents/skills/stock-deep-dive/references/r5_stock_research_pack_contract.md
+    superseded_by: null
     artifact_type: markdown
     required: true
     exists: true
@@ -39,6 +44,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/stock-deep-dive/references/r5_report_contract.md
+    resolved_path: .agents/skills/stock-deep-dive/references/r5_report_contract.md
+    superseded_by: null
     artifact_type: markdown
     required: true
     exists: true
@@ -49,6 +56,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack_template.yaml
+    resolved_path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack_template.yaml
+    superseded_by: null
     artifact_type: yaml
     required: true
     exists: true
@@ -59,6 +68,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/stock-deep-dive/assets/r5_source_gap_report_template.md
+    resolved_path: .agents/skills/stock-deep-dive/assets/r5_source_gap_report_template.md
+    superseded_by: null
     artifact_type: markdown
     required: true
     exists: true
@@ -69,6 +80,8 @@ patches:
     status: pass
     notes: []
   - path: reports/p1_6/R5_PATCH_1_STOCK_DEEP_DIVE_R5_PACK_CONTRACT_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_1_STOCK_DEEP_DIVE_R5_PACK_CONTRACT_READOUT.md
+    superseded_by: null
     artifact_type: readout
     required: true
     exists: true
@@ -80,6 +93,7 @@ patches:
     notes: []
 - patch_id: R5_PATCH_2
   claimed_status: claimed_complete
+  superseded_by: null
   validated_status: validated_complete
   blocking_if_missing: true
   related_readout:
@@ -90,6 +104,8 @@ patches:
     notes: []
   artifacts:
   - path: .agents/skills/stock-deep-dive/scripts/validate_r5_stock_research_pack.py
+    resolved_path: .agents/skills/stock-deep-dive/scripts/validate_r5_stock_research_pack.py
+    superseded_by: null
     artifact_type: python
     required: true
     exists: true
@@ -100,6 +116,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml
+    resolved_path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml
+    superseded_by: null
     artifact_type: yaml
     required: true
     exists: true
@@ -110,6 +128,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.invalid.example.yaml
+    resolved_path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.invalid.example.yaml
+    superseded_by: null
     artifact_type: yaml
     required: true
     exists: true
@@ -120,6 +140,8 @@ patches:
     status: pass
     notes: []
   - path: tests/test_r5_stock_research_pack_schema.py
+    resolved_path: tests/test_r5_stock_research_pack_schema.py
+    superseded_by: null
     artifact_type: pytest
     required: true
     exists: true
@@ -130,6 +152,8 @@ patches:
     status: pass
     notes: []
   - path: reports/p1_6/R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR_READOUT.md
+    superseded_by: null
     artifact_type: readout
     required: true
     exists: true
@@ -141,6 +165,7 @@ patches:
     notes: []
 - patch_id: R5_PATCH_3
   claimed_status: claimed_complete
+  superseded_by: null
   validated_status: validated_complete
   blocking_if_missing: true
   related_readout:
@@ -151,6 +176,8 @@ patches:
     notes: []
   artifacts:
   - path: .agents/skills/evidence-ingest/references/r5_stock_evidence_snapshot_contract.md
+    resolved_path: .agents/skills/evidence-ingest/references/r5_stock_evidence_snapshot_contract.md
+    superseded_by: null
     artifact_type: markdown
     required: true
     exists: true
@@ -161,6 +188,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/evidence-ingest/assets/r5_stock_evidence_plan_template.yaml
+    resolved_path: .agents/skills/evidence-ingest/assets/r5_stock_evidence_plan_template.yaml
+    superseded_by: null
     artifact_type: yaml
     required: true
     exists: true
@@ -171,6 +200,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/evidence-ingest/scripts/validate_r5_evidence_plan.py
+    resolved_path: .agents/skills/evidence-ingest/scripts/validate_r5_evidence_plan.py
+    superseded_by: null
     artifact_type: python
     required: true
     exists: true
@@ -181,6 +212,8 @@ patches:
     status: pass
     notes: []
   - path: tests/test_r5_evidence_snapshot_plan.py
+    resolved_path: tests/test_r5_evidence_snapshot_plan.py
+    superseded_by: null
     artifact_type: pytest
     required: true
     exists: true
@@ -191,6 +224,8 @@ patches:
     status: pass
     notes: []
   - path: reports/p1_6/R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN_READOUT.md
+    superseded_by: null
     artifact_type: readout
     required: true
     exists: true
@@ -202,247 +237,164 @@ patches:
     notes: []
 - patch_id: R5_PATCH_4
   claimed_status: claimed_complete
-  validated_status: validation_failed
+  superseded_by: R5_PATCH_4_FORECAST_VALUATION_READOUT.md and unified R5 stock research
+    pack contracts
+  validated_status: validated_complete
   blocking_if_missing: true
   related_readout:
-    path: reports/p1_6/R5_PATCH_4_FINANCIAL_BUSINESS_PACK_CONTRACTS_READOUT.md
-    exists: false
-    line_count: null
-    status: fail
-    notes:
-    - related_readout does not exist
+    path: reports/p1_6/R5_PATCH_4_FORECAST_VALUATION_READOUT.md
+    exists: true
+    line_count: 46
+    status: pass
+    notes: []
   artifacts:
   - path: .agents/skills/stock-deep-dive/references/r5_financial_history_pack_contract.md
+    resolved_path: .agents/skills/stock-deep-dive/references/r5_financial_history_contract.md
+    superseded_by: .agents/skills/stock-deep-dive/references/r5_financial_history_contract.md
     artifact_type: markdown
     required: true
-    exists: false
-    line_count: null
+    exists: true
+    line_count: 54
     parse_status: not_applicable
     compile_status: not_applicable
     test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
+    status: pass
+    notes: []
   - path: .agents/skills/stock-deep-dive/references/r5_business_breakdown_pack_contract.md
+    resolved_path: .agents/skills/stock-deep-dive/references/r5_business_breakdown_contract.md
+    superseded_by: .agents/skills/stock-deep-dive/references/r5_business_breakdown_contract.md
     artifact_type: markdown
     required: true
-    exists: false
-    line_count: null
+    exists: true
+    line_count: 78
     parse_status: not_applicable
     compile_status: not_applicable
     test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
+    status: pass
+    notes: []
   - path: .agents/skills/stock-deep-dive/assets/r5_financial_history_pack.example.yaml
-    artifact_type: yaml
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: .agents/skills/stock-deep-dive/assets/r5_business_breakdown_pack.example.yaml
-    artifact_type: yaml
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_financial_business_packs.py
-    artifact_type: python
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: tests/test_r5_financial_business_packs.py
-    artifact_type: pytest
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: reports/p1_6/R5_PATCH_4_FINANCIAL_BUSINESS_PACK_CONTRACTS_READOUT.md
-    artifact_type: readout
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-- patch_id: R5_PATCH_5
-  claimed_status: claimed_complete
-  validated_status: validation_failed
-  blocking_if_missing: true
-  related_readout:
-    path: reports/p1_6/R5_PATCH_5_FORECAST_MODEL_CONTRACT_AND_VALIDATOR_READOUT.md
-    exists: false
-    line_count: null
-    status: fail
-    notes:
-    - related_readout does not exist
-  artifacts:
-  - path: .agents/skills/stock-deep-dive/references/r5_forecast_model_pack_contract.md
-    artifact_type: markdown
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: .agents/skills/stock-deep-dive/assets/r5_forecast_model_pack.example.yaml
-    artifact_type: yaml
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_forecast_model_pack.py
-    artifact_type: python
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: tests/test_r5_forecast_model_pack.py
-    artifact_type: pytest
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: reports/p1_6/R5_PATCH_5_FORECAST_MODEL_CONTRACT_AND_VALIDATOR_READOUT.md
-    artifact_type: readout
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-- patch_id: R5_PATCH_6
-  claimed_status: claimed_complete
-  validated_status: validation_failed
-  blocking_if_missing: true
-  related_readout:
-    path: reports/p1_6/R5_PATCH_6_VALUATION_PACK_CONTRACT_AND_HANDOFF_READOUT.md
-    exists: false
-    line_count: null
-    status: fail
-    notes:
-    - related_readout does not exist
-  artifacts:
-  - path: .agents/skills/stock-deep-dive/references/r5_valuation_pack_contract.md
-    artifact_type: markdown
-    required: true
-    exists: true
-    line_count: 47
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: pass
-    notes: []
-  - path: .agents/skills/company-valuation/references/r5_valuation_handoff_contract.md
-    artifact_type: markdown
-    required: true
-    exists: true
-    line_count: 33
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: pass
-    notes: []
-  - path: .agents/skills/stock-deep-dive/assets/r5_valuation_pack.example.yaml
+    resolved_path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml
+    superseded_by: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml
     artifact_type: yaml
     required: true
     exists: true
-    line_count: 32
+    line_count: 146
     parse_status: pass
     compile_status: not_applicable
     test_collectable: not_applicable
     status: pass
     notes: []
-  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_valuation_pack.py
+  - path: .agents/skills/stock-deep-dive/assets/r5_business_breakdown_pack.example.yaml
+    resolved_path: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml
+    superseded_by: .agents/skills/stock-deep-dive/assets/r5_stock_research_pack.valid.example.yaml
+    artifact_type: yaml
+    required: true
+    exists: true
+    line_count: 146
+    parse_status: pass
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_financial_business_packs.py
+    resolved_path: .agents/skills/stock-deep-dive/scripts/validate_r5_stock_research_pack.py
+    superseded_by: .agents/skills/stock-deep-dive/scripts/validate_r5_stock_research_pack.py
     artifact_type: python
     required: true
     exists: true
-    line_count: 129
+    line_count: 529
     parse_status: not_applicable
     compile_status: pass
     test_collectable: not_applicable
     status: pass
     notes: []
-  - path: tests/test_r5_valuation_pack.py
+  - path: tests/test_r5_financial_business_packs.py
+    resolved_path: tests/test_validate_r5_stock_research_pack.py
+    superseded_by: tests/test_validate_r5_stock_research_pack.py
     artifact_type: pytest
     required: true
-    exists: false
-    line_count: null
+    exists: true
+    line_count: 116
     parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: reports/p1_6/R5_PATCH_6_VALUATION_PACK_CONTRACT_AND_HANDOFF_READOUT.md
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
+  - path: reports/p1_6/R5_PATCH_4_FINANCIAL_BUSINESS_PACK_CONTRACTS_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_4_FORECAST_VALUATION_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_4_FORECAST_VALUATION_READOUT.md
     artifact_type: readout
     required: true
-    exists: false
-    line_count: null
+    exists: true
+    line_count: 46
     parse_status: not_applicable
     compile_status: not_applicable
     test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-- patch_id: R5_PATCH_7
+    status: pass
+    notes: []
+- patch_id: R5_PATCH_5
   claimed_status: claimed_complete
-  validated_status: validation_failed
+  superseded_by: Current split uses forecast, technical market, and sentiment validators
+  validated_status: validated_complete
   blocking_if_missing: true
   related_readout:
-    path: reports/p1_6/R5_PATCH_7_TECHNICAL_MARKET_PACK_CONTRACT_READOUT.md
-    exists: false
-    line_count: null
-    status: fail
-    notes:
-    - related_readout does not exist
+    path: reports/p1_6/R5_PATCH_5_TECH_SENTIMENT_CATALYST_READOUT.md
+    exists: true
+    line_count: 40
+    status: pass
+    notes: []
   artifacts:
+  - path: .agents/skills/stock-deep-dive/references/r5_forecast_model_pack_contract.md
+    resolved_path: .agents/skills/stock-deep-dive/references/r5_forecast_model_contract.md
+    superseded_by: .agents/skills/stock-deep-dive/references/r5_forecast_model_contract.md
+    artifact_type: markdown
+    required: true
+    exists: true
+    line_count: 53
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: .agents/skills/stock-deep-dive/assets/r5_forecast_model_pack.example.yaml
+    resolved_path: .agents/skills/stock-deep-dive/assets/r5_forecast_model.example.yaml
+    superseded_by: .agents/skills/stock-deep-dive/assets/r5_forecast_model.example.yaml
+    artifact_type: yaml
+    required: true
+    exists: true
+    line_count: 43
+    parse_status: pass
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_forecast_model_pack.py
+    resolved_path: .agents/skills/stock-deep-dive/scripts/validate_r5_forecast_model.py
+    superseded_by: .agents/skills/stock-deep-dive/scripts/validate_r5_forecast_model.py
+    artifact_type: python
+    required: true
+    exists: true
+    line_count: 141
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: tests/test_r5_forecast_model_pack.py
+    resolved_path: tests/test_validate_r5_forecast_model.py
+    superseded_by: tests/test_validate_r5_forecast_model.py
+    artifact_type: pytest
+    required: true
+    exists: true
+    line_count: 73
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
   - path: .agents/skills/stock-deep-dive/references/r5_technical_market_pack_contract.md
+    resolved_path: .agents/skills/stock-deep-dive/references/r5_technical_market_pack_contract.md
+    superseded_by: .agents/skills/stock-deep-dive/references/r5_technical_market_pack_contract.md
     artifact_type: markdown
     required: true
     exists: true
@@ -453,6 +405,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/stock-deep-dive/assets/r5_technical_market_pack.example.yaml
+    resolved_path: .agents/skills/stock-deep-dive/assets/r5_technical_market_pack.example.yaml
+    superseded_by: null
     artifact_type: yaml
     required: true
     exists: true
@@ -463,6 +417,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/stock-deep-dive/scripts/validate_r5_technical_market_pack.py
+    resolved_path: .agents/skills/stock-deep-dive/scripts/validate_r5_technical_market_pack.py
+    superseded_by: null
     artifact_type: python
     required: true
     exists: true
@@ -472,41 +428,21 @@ patches:
     test_collectable: not_applicable
     status: pass
     notes: []
-  - path: tests/test_r5_technical_market_pack.py
+  - path: tests/test_validate_r5_technical_market_pack.py
+    resolved_path: tests/test_validate_r5_technical_market_pack.py
+    superseded_by: null
     artifact_type: pytest
     required: true
-    exists: false
-    line_count: null
+    exists: true
+    line_count: 65
     parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: reports/p1_6/R5_PATCH_7_TECHNICAL_MARKET_PACK_CONTRACT_READOUT.md
-    artifact_type: readout
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-- patch_id: R5_PATCH_8
-  claimed_status: claimed_complete
-  validated_status: validation_failed
-  blocking_if_missing: true
-  related_readout:
-    path: reports/p1_6/R5_PATCH_8_SENTIMENT_EVENT_PACK_CONTRACT_READOUT.md
-    exists: false
-    line_count: null
-    status: fail
-    notes:
-    - related_readout does not exist
-  artifacts:
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
   - path: .agents/skills/stock-deep-dive/references/r5_sentiment_event_pack_contract.md
+    resolved_path: .agents/skills/stock-deep-dive/references/r5_sentiment_event_pack_contract.md
+    superseded_by: null
     artifact_type: markdown
     required: true
     exists: true
@@ -517,6 +453,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/stock-deep-dive/assets/r5_sentiment_event_pack.example.yaml
+    resolved_path: .agents/skills/stock-deep-dive/assets/r5_sentiment_event_pack.example.yaml
+    superseded_by: null
     artifact_type: yaml
     required: true
     exists: true
@@ -527,6 +465,8 @@ patches:
     status: pass
     notes: []
   - path: .agents/skills/stock-deep-dive/scripts/validate_r5_sentiment_event_pack.py
+    resolved_path: .agents/skills/stock-deep-dive/scripts/validate_r5_sentiment_event_pack.py
+    superseded_by: null
     artifact_type: python
     required: true
     exists: true
@@ -536,215 +476,45 @@ patches:
     test_collectable: not_applicable
     status: pass
     notes: []
-  - path: tests/test_r5_sentiment_event_pack.py
+  - path: tests/test_validate_r5_sentiment_event_pack.py
+    resolved_path: tests/test_validate_r5_sentiment_event_pack.py
+    superseded_by: null
     artifact_type: pytest
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: reports/p1_6/R5_PATCH_8_SENTIMENT_EVENT_PACK_CONTRACT_READOUT.md
-    artifact_type: readout
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-- patch_id: R5_PATCH_9
-  claimed_status: claimed_complete
-  validated_status: validation_failed
-  blocking_if_missing: true
-  related_readout:
-    path: reports/p1_6/R5_PATCH_9_RISK_COUNTEREVIDENCE_SOURCE_GAP_PACK_READOUT.md
-    exists: false
-    line_count: null
-    status: fail
-    notes:
-    - related_readout does not exist
-  artifacts:
-  - path: .agents/skills/stock-deep-dive/references/r5_risk_counterevidence_pack_contract.md
-    artifact_type: markdown
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: .agents/skills/stock-deep-dive/assets/r5_risk_counterevidence_pack.example.yaml
-    artifact_type: yaml
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: .agents/skills/stock-deep-dive/assets/r5_source_gap_report_template.md
-    artifact_type: markdown
-    required: true
-    exists: true
-    line_count: 32
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: pass
-    notes: []
-  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_risk_counterevidence_pack.py
-    artifact_type: python
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: tests/test_r5_risk_counterevidence_pack.py
-    artifact_type: pytest
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: reports/p1_6/R5_PATCH_9_RISK_COUNTEREVIDENCE_SOURCE_GAP_PACK_READOUT.md
-    artifact_type: readout
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-- patch_id: R5_PATCH_10
-  claimed_status: claimed_complete
-  validated_status: validation_failed
-  blocking_if_missing: true
-  related_readout:
-    path: reports/p1_6/R5_PATCH_10_R5_QUALITY_GATE_READOUT.md
-    exists: false
-    line_count: null
-    status: fail
-    notes:
-    - related_readout does not exist
-  artifacts:
-  - path: .agents/skills/quality-review/SKILL.md
-    artifact_type: markdown
-    required: true
-    exists: true
-    line_count: 273
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: pass
-    notes: []
-  - path: .agents/skills/quality-review/references/r5_quality_gate.md
-    artifact_type: markdown
     required: true
     exists: true
     line_count: 65
     parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
+    compile_status: pass
+    test_collectable: pass
     status: pass
     notes: []
-  - path: .agents/skills/quality-review/references/r5_issue_schema.md
-    artifact_type: markdown
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: .agents/skills/quality-review/assets/r5_quality_issues.example.csv
-    artifact_type: csv
-    required: true
-    exists: true
-    line_count: 12
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: pass
-    notes: []
-  - path: .agents/skills/quality-review/scripts/validate_r5_quality_gate.py
-    artifact_type: python
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: tests/test_r5_quality_gate.py
-    artifact_type: pytest
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: reports/p1_6/R5_PATCH_10_R5_QUALITY_GATE_READOUT.md
+  - path: reports/p1_6/R5_PATCH_5_FORECAST_MODEL_CONTRACT_AND_VALIDATOR_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_5_TECH_SENTIMENT_CATALYST_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_5_TECH_SENTIMENT_CATALYST_READOUT.md
     artifact_type: readout
     required: true
-    exists: false
-    line_count: null
+    exists: true
+    line_count: 40
     parse_status: not_applicable
     compile_status: not_applicable
     test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-- patch_id: R5_PATCH_11
+    status: pass
+    notes: []
+- patch_id: R5_PATCH_6
   claimed_status: claimed_complete
-  validated_status: validation_failed
+  superseded_by: R5 report composer executable fixture
+  validated_status: validated_complete
   blocking_if_missing: true
   related_readout:
-    path: reports/p1_6/R5_PATCH_11_REPORT_PLANNER_COMPOSER_SKELETON_READOUT.md
-    exists: false
-    line_count: null
-    status: fail
-    notes:
-    - related_readout does not exist
+    path: reports/p1_6/R5_PATCH_6_COMPOSER_READOUT.md
+    exists: true
+    line_count: 33
+    status: pass
+    notes: []
   artifacts:
-  - path: .agents/skills/stock-deep-dive/references/r5_report_planner_contract.md
-    artifact_type: markdown
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
   - path: .agents/skills/stock-deep-dive/references/r5_report_composer_contract.md
+    resolved_path: .agents/skills/stock-deep-dive/references/r5_report_composer_contract.md
+    superseded_by: null
     artifact_type: markdown
     required: true
     exists: true
@@ -754,74 +524,69 @@ patches:
     test_collectable: not_applicable
     status: pass
     notes: []
-  - path: .agents/skills/stock-deep-dive/assets/r5_report_outline.example.yaml
-    artifact_type: yaml
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: .agents/skills/stock-deep-dive/assets/r5_thesis_stack.example.yaml
-    artifact_type: yaml
-    required: true
-    exists: false
-    line_count: null
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: .agents/skills/stock-deep-dive/scripts/validate_r5_report_plan.py
+  - path: .agents/skills/stock-deep-dive/scripts/compose_r5_report_from_pack.py
+    resolved_path: .agents/skills/stock-deep-dive/scripts/compose_r5_report_from_pack.py
+    superseded_by: null
     artifact_type: python
     required: true
-    exists: false
-    line_count: null
+    exists: true
+    line_count: 177
     parse_status: not_applicable
-    compile_status: not_applicable
+    compile_status: pass
     test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: tests/test_r5_report_planner_composer.py
+    status: pass
+    notes: []
+  - path: tests/test_compose_r5_report_from_pack.py
+    resolved_path: tests/test_compose_r5_report_from_pack.py
+    superseded_by: null
     artifact_type: pytest
     required: true
-    exists: false
-    line_count: null
+    exists: true
+    line_count: 84
     parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-  - path: reports/p1_6/R5_PATCH_11_REPORT_PLANNER_COMPOSER_SKELETON_READOUT.md
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
+  - path: tests/test_r5_mvp_fixture_smoke.py
+    resolved_path: tests/test_r5_mvp_fixture_smoke.py
+    superseded_by: null
+    artifact_type: pytest
+    required: true
+    exists: true
+    line_count: 102
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
+  - path: reports/p1_6/R5_PATCH_6_VALUATION_PACK_CONTRACT_AND_HANDOFF_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_6_COMPOSER_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_6_COMPOSER_READOUT.md
     artifact_type: readout
     required: true
-    exists: false
-    line_count: null
+    exists: true
+    line_count: 33
     parse_status: not_applicable
     compile_status: not_applicable
     test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
-- patch_id: R5_PATCH_12
+    status: pass
+    notes: []
+- patch_id: R5_PATCH_7
   claimed_status: claimed_complete
-  validated_status: validation_failed
+  superseded_by: R5 benchmark and quality rubric gate
+  validated_status: validated_complete
   blocking_if_missing: true
   related_readout:
-    path: reports/p1_6/R5_PATCH_12_SAMPLE_BENCHMARK_REGRESSION_READOUT.md
-    exists: false
-    line_count: null
-    status: fail
-    notes:
-    - related_readout does not exist
+    path: reports/p1_6/R5_PATCH_7_BENCHMARK_READOUT.md
+    exists: true
+    line_count: 33
+    status: pass
+    notes: []
   artifacts:
   - path: benchmarks/r5_report_quality_rubric.yaml
+    resolved_path: benchmarks/r5_report_quality_rubric.yaml
+    superseded_by: null
     artifact_type: yaml
     required: true
     exists: true
@@ -831,27 +596,9 @@ patches:
     test_collectable: not_applicable
     status: pass
     notes: []
-  - path: benchmarks/r5_section_density_targets.yaml
-    artifact_type: yaml
-    required: true
-    exists: true
-    line_count: 49
-    parse_status: pass
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: pass
-    notes: []
-  - path: benchmarks/sample_reports/README.md
-    artifact_type: markdown
-    required: true
-    exists: true
-    line_count: 23
-    parse_status: not_applicable
-    compile_status: not_applicable
-    test_collectable: not_applicable
-    status: pass
-    notes: []
   - path: tests/test_r5_report_quality_rubric.py
+    resolved_path: tests/test_r5_report_quality_rubric.py
+    superseded_by: null
     artifact_type: pytest
     required: true
     exists: true
@@ -861,14 +608,375 @@ patches:
     test_collectable: pass
     status: pass
     notes: []
-  - path: reports/p1_6/R5_PATCH_12_SAMPLE_BENCHMARK_REGRESSION_READOUT.md
+  - path: tests/test_r5_report_no_advice_and_todos.py
+    resolved_path: tests/test_r5_report_no_advice_and_todos.py
+    superseded_by: null
+    artifact_type: pytest
+    required: true
+    exists: true
+    line_count: 60
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
+  - path: reports/p1_6/R5_PATCH_7_TECHNICAL_MARKET_PACK_CONTRACT_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_7_BENCHMARK_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_7_BENCHMARK_READOUT.md
     artifact_type: readout
     required: true
-    exists: false
-    line_count: null
+    exists: true
+    line_count: 33
     parse_status: not_applicable
     compile_status: not_applicable
     test_collectable: not_applicable
-    status: fail
-    notes:
-    - missing file
+    status: pass
+    notes: []
+- patch_id: R5_PATCH_8
+  claimed_status: claimed_complete
+  superseded_by: R5 stock-led smoke dry run
+  validated_status: validated_complete
+  blocking_if_missing: true
+  related_readout:
+    path: reports/p1_6/R5_PATCH_8_STOCK_LED_SMOKE_READOUT.md
+    exists: true
+    line_count: 41
+    status: pass
+    notes: []
+  artifacts:
+  - path: tests/test_r5_stock_led_smoke_dry_run.py
+    resolved_path: tests/test_r5_stock_led_smoke_dry_run.py
+    superseded_by: null
+    artifact_type: pytest
+    required: true
+    exists: true
+    line_count: 74
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
+  - path: tests/fixtures/r5_minimal_stock_run/R5_stock_research_pack.yaml
+    resolved_path: tests/fixtures/r5_minimal_stock_run/R5_stock_research_pack.yaml
+    superseded_by: null
+    artifact_type: yaml
+    required: true
+    exists: true
+    line_count: 340
+    parse_status: pass
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: tests/fixtures/r5_minimal_stock_run/expected_R5_stock_research_note.md
+    resolved_path: tests/fixtures/r5_minimal_stock_run/expected_R5_stock_research_note.md
+    superseded_by: null
+    artifact_type: markdown
+    required: true
+    exists: true
+    line_count: 58
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: reports/p1_6/R5_PATCH_8_SENTIMENT_EVENT_PACK_CONTRACT_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_8_STOCK_LED_SMOKE_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_8_STOCK_LED_SMOKE_READOUT.md
+    artifact_type: readout
+    required: true
+    exists: true
+    line_count: 41
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+- patch_id: R5_PATCH_9
+  claimed_status: claimed_complete
+  superseded_by: R5 evidence plan bridge
+  validated_status: validated_complete
+  blocking_if_missing: true
+  related_readout:
+    path: reports/p1_6/R5_PATCH_9_EVIDENCE_PLAN_READOUT.md
+    exists: true
+    line_count: 33
+    status: pass
+    notes: []
+  artifacts:
+  - path: .agents/skills/evidence-ingest/references/r5_stock_evidence_plan_contract.md
+    resolved_path: .agents/skills/evidence-ingest/references/r5_stock_evidence_plan_contract.md
+    superseded_by: null
+    artifact_type: markdown
+    required: true
+    exists: true
+    line_count: 44
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: .agents/skills/evidence-ingest/assets/r5_evidence_plan_bridge.example.yaml
+    resolved_path: .agents/skills/evidence-ingest/assets/r5_evidence_plan_bridge.example.yaml
+    superseded_by: null
+    artifact_type: yaml
+    required: true
+    exists: true
+    line_count: 137
+    parse_status: pass
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: .agents/skills/evidence-ingest/scripts/validate_r5_stock_evidence_plan.py
+    resolved_path: .agents/skills/evidence-ingest/scripts/validate_r5_stock_evidence_plan.py
+    superseded_by: null
+    artifact_type: python
+    required: true
+    exists: true
+    line_count: 113
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: scripts/build_r5_evidence_plan_from_gaps.py
+    resolved_path: scripts/build_r5_evidence_plan_from_gaps.py
+    superseded_by: null
+    artifact_type: python
+    required: true
+    exists: true
+    line_count: 318
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: tests/test_build_r5_evidence_plan_from_gaps.py
+    resolved_path: tests/test_build_r5_evidence_plan_from_gaps.py
+    superseded_by: null
+    artifact_type: pytest
+    required: true
+    exists: true
+    line_count: 64
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
+  - path: reports/p1_6/R5_PATCH_9_RISK_COUNTEREVIDENCE_SOURCE_GAP_PACK_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_9_EVIDENCE_PLAN_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_9_EVIDENCE_PLAN_READOUT.md
+    artifact_type: readout
+    required: true
+    exists: true
+    line_count: 33
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+- patch_id: R5_PATCH_10
+  claimed_status: claimed_complete
+  superseded_by: R5 close readout template gate
+  validated_status: validated_complete
+  blocking_if_missing: true
+  related_readout:
+    path: reports/p1_6/R5_PATCH_10_CLOSE_READOUT_TEMPLATE_READOUT.md
+    exists: true
+    line_count: 28
+    status: pass
+    notes: []
+  artifacts:
+  - path: templates/r5_workflow_close_readout.md
+    resolved_path: templates/r5_workflow_close_readout.md
+    superseded_by: null
+    artifact_type: markdown
+    required: true
+    exists: true
+    line_count: 53
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: templates/r5_task_queue.md
+    resolved_path: templates/r5_task_queue.md
+    superseded_by: null
+    artifact_type: markdown
+    required: true
+    exists: true
+    line_count: 11
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: tests/test_r5_close_readout_templates.py
+    resolved_path: tests/test_r5_close_readout_templates.py
+    superseded_by: null
+    artifact_type: pytest
+    required: true
+    exists: true
+    line_count: 39
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
+  - path: reports/p1_6/R5_PATCH_10_R5_QUALITY_GATE_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_10_CLOSE_READOUT_TEMPLATE_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_10_CLOSE_READOUT_TEMPLATE_READOUT.md
+    artifact_type: readout
+    required: true
+    exists: true
+    line_count: 28
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+- patch_id: R5_PATCH_11
+  claimed_status: claimed_complete
+  superseded_by: R5 sample benchmark policy gate
+  validated_status: validated_complete
+  blocking_if_missing: true
+  related_readout:
+    path: reports/p1_6/R5_PATCH_11_SAMPLE_BENCHMARK_POLICY_READOUT.md
+    exists: true
+    line_count: 27
+    status: pass
+    notes: []
+  artifacts:
+  - path: templates/stock_report_sample_quality.md
+    resolved_path: templates/stock_report_sample_quality.md
+    superseded_by: null
+    artifact_type: markdown
+    required: true
+    exists: true
+    line_count: 136
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: benchmarks/r5_report_quality_rubric.yaml
+    resolved_path: benchmarks/r5_report_quality_rubric.yaml
+    superseded_by: null
+    artifact_type: yaml
+    required: true
+    exists: true
+    line_count: 241
+    parse_status: pass
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: tests/test_sample_report_benchmark_policy.py
+    resolved_path: tests/test_sample_report_benchmark_policy.py
+    superseded_by: null
+    artifact_type: pytest
+    required: true
+    exists: true
+    line_count: 56
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
+  - path: reports/p1_6/R5_PATCH_11_REPORT_PLANNER_COMPOSER_SKELETON_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_11_SAMPLE_BENCHMARK_POLICY_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_11_SAMPLE_BENCHMARK_POLICY_READOUT.md
+    artifact_type: readout
+    required: true
+    exists: true
+    line_count: 27
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+- patch_id: R5_PATCH_12
+  claimed_status: claimed_complete
+  superseded_by: company-valuation validator contract
+  validated_status: validated_complete
+  blocking_if_missing: true
+  related_readout:
+    path: reports/p1_6/R5_PATCH_12_COMPANY_VALUATION_VALIDATOR_READOUT.md
+    exists: true
+    line_count: 29
+    status: pass
+    notes: []
+  artifacts:
+  - path: .agents/skills/company-valuation/SKILL.md
+    resolved_path: .agents/skills/company-valuation/SKILL.md
+    superseded_by: null
+    artifact_type: markdown
+    required: true
+    exists: true
+    line_count: 380
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: .agents/skills/company-valuation/references/r5_valuation_handoff_contract.md
+    resolved_path: .agents/skills/company-valuation/references/r5_valuation_handoff_contract.md
+    superseded_by: null
+    artifact_type: markdown
+    required: true
+    exists: true
+    line_count: 33
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: .agents/skills/company-valuation/assets/r5_valuation_handoff.example.yaml
+    resolved_path: .agents/skills/company-valuation/assets/r5_valuation_handoff.example.yaml
+    superseded_by: null
+    artifact_type: yaml
+    required: true
+    exists: true
+    line_count: 55
+    parse_status: pass
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: .agents/skills/company-valuation/scripts/validate_valuation_output.py
+    resolved_path: .agents/skills/company-valuation/scripts/validate_valuation_output.py
+    superseded_by: null
+    artifact_type: python
+    required: true
+    exists: true
+    line_count: 137
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: not_applicable
+    status: pass
+    notes: []
+  - path: tests/test_validate_company_valuation_output.py
+    resolved_path: tests/test_validate_company_valuation_output.py
+    superseded_by: null
+    artifact_type: pytest
+    required: true
+    exists: true
+    line_count: 74
+    parse_status: not_applicable
+    compile_status: pass
+    test_collectable: pass
+    status: pass
+    notes: []
+  - path: reports/p1_6/R5_PATCH_12_SAMPLE_BENCHMARK_REGRESSION_READOUT.md
+    resolved_path: reports/p1_6/R5_PATCH_12_COMPANY_VALUATION_VALIDATOR_READOUT.md
+    superseded_by: reports/p1_6/R5_PATCH_12_COMPANY_VALUATION_VALIDATOR_READOUT.md
+    artifact_type: readout
+    required: true
+    exists: true
+    line_count: 29
+    parse_status: not_applicable
+    compile_status: not_applicable
+    test_collectable: not_applicable
+    status: pass
+    notes: []
