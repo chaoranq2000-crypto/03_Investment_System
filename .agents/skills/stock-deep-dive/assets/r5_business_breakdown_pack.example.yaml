@@ -1,0 +1,66 @@
+artifact_type: R5_business_breakdown_pack
+schema_version: r5_business_breakdown_pack_v0.1
+status: partial
+as_of_date: "2026-07-09"
+stock_code: "002837"
+business_lines:
+  - business_name: data_center_thermal_management
+    role: product_line_clue
+    revenue:
+      value: null
+      unit: CNY
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    revenue_pct:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_margin:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit:
+      value: null
+      unit: CNY
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit_pct:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    products:
+      - liquid_cooling_clue
+    customers: []
+    capacity: []
+    orders: []
+    pricing_driver: TODO_SOURCE_REQUIRED
+    cost_driver: TODO_SOURCE_REQUIRED
+    linked_segments:
+      - ai_server_liquid_cooling
+    confidence: medium
+    evidence_ids: []
+    missing_items:
+      - MISSING_DISCLOSURE
+profit_pool_summary:
+  status: TODO
+  missing_reason: MISSING_DISCLOSURE
+structural_contradictions:
+  - Product clue exists, but revenue and profit split remain MISSING_DISCLOSURE.
+linked_segments:
+  - ai_server_liquid_cooling
+missing_items:
+  - item: business-line revenue and margin
+    reason: MISSING_DISCLOSURE
+source_gap_register:
+  - gap_id: R5_BUNDLE3_BUSINESS_DISCLOSURE_GAP
+    token: MISSING_DISCLOSURE
+sample_quality_allowed: false
+p2_allowed: false

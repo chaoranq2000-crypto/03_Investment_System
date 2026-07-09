@@ -1,47 +1,46 @@
 # R5 Valuation Pack Contract
 
-## Purpose
+`R5_valuation_pack` records valuation context, source gaps and method readiness.
+It must distinguish valuation analysis scaffolding from direct trading
+instructions.
 
-`r5_valuation_pack` carries valuation context for R5 stock research. It can describe source status, scenario structure, peer context, and missing market inputs. It must not output trading instructions.
+Required root fields:
 
-## Required shape
+- `artifact_type`
+- `schema_version`
+- `status`
+- `as_of_date`
+- `market_snapshot`
+- `peer_valuation_context`
+- `valuation_methods`
+- `valuation_scenarios`
+- `valuation_sensitivity`
+- `limitations`
+- `missing_items`
+- `source_gap_register`
 
-```yaml
-artifact_type: R5_valuation_pack
-status: TODO | partial | ready | blocked
-sample_quality_allowed: false
-market_snapshot:
-  as_of_date:
-  current_price:
-  market_cap:
-  share_count:
-  missing_reason:
-multiples:
-  PE_TTM:
-  forward_PE:
-  PB:
-  PS:
-peer_context:
-  peer_set:
-  peer_multiples:
-  missing_reason:
-valuation_scenarios: []
-```
+Market snapshot fields:
 
-Missing `market_snapshot` or missing peer context prevents sample-quality status. Null values are allowed only when the nearby object carries `missing_reason`.
+- `current_price`
+- `market_cap`
+- `share_count`
+- `net_cash_or_net_debt`
+- `enterprise_value`
+- `pe_ttm`
+- `forward_pe`
+- `pb`
+- `ps`
+- `ev_ebitda`
+- `as_of_date`
+- `evidence_id` or `metric_id`
+- `missing_reason`
 
-## Scenario fields
+Rules:
 
-Each scenario must include:
-
-```text
-method
-key_assumptions
-source_ids_or_missing_reason
-```
-
-## Boundaries
-
-- Do not fetch live market data.
-- Do not calculate real valuation.
-- Do not produce buy/sell/hold language, target-price instructions, position sizing, or guaranteed-return statements.
+- Non-null market snapshot values require `evidence_id` or `metric_id`.
+- Null market snapshot values require `TODO_MARKET_DATA` or explicit missing reason.
+- Peer context rows with non-null multiples require evidence or metric support.
+- `status: ready` requires a dated market snapshot, at least one peer context row,
+  and at least one valuation method with supported output.
+- Forecast-dependent ready methods must reference forecast assumptions or metrics.
+- Direct trading instruction language is forbidden.

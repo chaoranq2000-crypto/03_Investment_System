@@ -64,3 +64,10 @@ Historical readouts are not rewritten. Legacy entries are retained as history an
 | `reports/p1_6/R5_PATCH_53_REGISTRY_PROMOTION_FROM_ACCEPTED_STAGING_READOUT.md` | `canonical` | `true` | Patch 53 generated from accepted-only registry promotion tests and CLI result |
 | `reports/p1_6/R5_PATCH_54_PILOT_GATE_RECHECK_AND_DRAFT_PLUS_RENDER_READOUT.md` | `canonical` | `true` | Patch 54 generated from gate recheck and reviewed-input render commands |
 | `reports/p1_6/R5_AFTER_PATCH55_REVIEWED_INPUT_ACTIVATION_CLOSE_READOUT.md` | `canonical` | `true` | Patch 55 close readout freezes reviewed-input activation state and next decision |
+| `reports/p1_6/R5_AFTER_BUNDLE2_STATUS_BASELINE_READOUT.md` | `canonical` | `true` | Bundle 3.0 status baseline readout records post-Bundle2 source-gapped state |
+| `reports/p1_6/R5_BUNDLE_3_1_FINANCIAL_HISTORY_SUBPACK_READOUT.md` | `canonical` | `true` | Bundle 3.1 financial history subpack validator readout |
+| `reports/p1_6/R5_BUNDLE_3_2_BUSINESS_BREAKDOWN_SUBPACK_READOUT.md` | `canonical` | `true` | Bundle 3.2 business breakdown subpack validator readout |
+| `reports/p1_6/R5_BUNDLE_3_3_FORECAST_MODEL_SUBPACK_READOUT.md` | `canonical` | `true` | Bundle 3.3 forecast model subpack validator readout |
+| `reports/p1_6/R5_BUNDLE_3_4_VALUATION_SUBPACK_READOUT.md` | `canonical` | `true` | Bundle 3.4 valuation subpack validator readout |
+| `reports/p1_6/R5_BUNDLE_3_5_CORE_ASSET_PREFLIGHT_GATE_READOUT.md` | `canonical` | `true` | Bundle 3.5 core asset preflight gate readout |
+| `reports/p1_6/R5_BUNDLE_3_CORE_RESEARCH_ASSET_SUBPACKS_CLOSE_READOUT.md` | `canonical` | `true` | Bundle 3.6 close readout freezes executable-with-TODOs core asset state |

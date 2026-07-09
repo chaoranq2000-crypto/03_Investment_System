@@ -25,7 +25,7 @@ patches:
     artifact_type: markdown
     required: true
     exists: true
-    line_count: 338
+    line_count: 345
     parse_status: not_applicable
     compile_status: not_applicable
     test_collectable: not_applicable

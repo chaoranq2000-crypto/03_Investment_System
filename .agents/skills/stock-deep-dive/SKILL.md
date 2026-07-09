@@ -130,6 +130,13 @@ For R5-MVP work, produce `R5_stock_research_pack.yaml` using
 source and must preserve all `TODO_*`, `MISSING_DISCLOSURE`, forecast,
 valuation, market, and business-breakdown gaps.
 
+Bundle 3 core subpack contracts live in:
+
+- `references/r5_financial_history_pack_contract.md`
+- `references/r5_business_breakdown_pack_contract.md`
+- `references/r5_forecast_model_pack_contract.md`
+- `references/r5_valuation_pack_contract.md`
+
 Rules:
 
 - Estimates, assumptions and analyst views must be explicitly labeled.

@@ -1,0 +1,64 @@
+{
+  "truthfulness_status": "pass",
+  "checked": 6,
+  "failed": 0,
+  "canonical_checked": 6,
+  "legacy_noncanonical": 0,
+  "superseded": 0,
+  "results": [
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_3_1_FINANCIAL_HISTORY_SUBPACK_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_3_2_BUSINESS_BREAKDOWN_SUBPACK_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_3_3_FORECAST_MODEL_SUBPACK_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_3_4_VALUATION_SUBPACK_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_3_5_CORE_ASSET_PREFLIGHT_GATE_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_3_CORE_RESEARCH_ASSET_SUBPACKS_CLOSE_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    }
+  ]
+}

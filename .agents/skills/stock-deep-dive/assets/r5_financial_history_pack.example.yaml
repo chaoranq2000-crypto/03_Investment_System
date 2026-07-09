@@ -1,0 +1,75 @@
+artifact_type: R5_financial_history_pack
+schema_version: r5_financial_history_pack_v0.1
+status: partial
+as_of_date: "2026-07-09"
+currency: CNY
+periods:
+  - 2023A
+  - 2024A
+  - 2025A
+income_statement:
+  - metric_name: revenue
+    period: 2025A
+    value: null
+    unit: CNY
+    currency: CNY
+    evidence_id: null
+    metric_id: null
+    missing_reason: TODO_MODEL_INPUT
+  - metric_name: net_profit_attributable
+    period: 2025A
+    value: null
+    unit: CNY
+    currency: CNY
+    evidence_id: null
+    metric_id: null
+    missing_reason: TODO_MODEL_INPUT
+balance_sheet:
+  - metric_name: total_assets
+    period: 2025A
+    value: null
+    unit: CNY
+    currency: CNY
+    evidence_id: null
+    metric_id: null
+    missing_reason: TODO_MODEL_INPUT
+cashflow_statement:
+  - metric_name: operating_cashflow
+    period: 2025A
+    value: null
+    unit: CNY
+    currency: CNY
+    evidence_id: null
+    metric_id: null
+    missing_reason: TODO_MODEL_INPUT
+key_metrics:
+  - metric_name: gross_margin
+    period: 2025A
+    value: null
+    unit: pct
+    currency: null
+    evidence_id: null
+    metric_id: null
+    missing_reason: TODO_MODEL_INPUT
+financial_quality:
+  revenue_quality: TODO_MODEL_INPUT
+  profit_quality: TODO_MODEL_INPUT
+adjusted_profit_bridge:
+  status: TODO
+  rows: []
+cashflow_quality:
+  status: TODO
+  notes:
+    - TODO_MODEL_INPUT
+working_capital_flags:
+  status: TODO
+  flags: []
+roe_roic_commentary:
+  status: TODO
+  commentary: TODO_MODEL_INPUT
+evidence_ids: []
+missing_items:
+  - item: reviewed financial history metrics
+    reason: TODO_MODEL_INPUT
+sample_quality_allowed: false
+p2_allowed: false

@@ -1,0 +1,66 @@
+artifact_type: R5_forecast_model_pack
+schema_version: r5_forecast_model_pack_v0.1
+status: partial
+as_of_date: "2026-07-09"
+model_type: source_gapped_three_statement_stub
+forecast_years:
+  - 2026E
+  - 2027E
+  - 2028E
+required_metrics:
+  - revenue
+  - gross_margin
+  - gross_profit
+  - net_profit_attributable
+  - eps
+assumptions:
+  - assumption_id: TODO_REVIEWED_FORECAST_ASSUMPTION
+    status: TODO
+    missing_reason: TODO_MODEL_INPUT
+forecast_table:
+  base_case: &base_case_table
+    2026E:
+      revenue: {value: null, unit: CNY, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      gross_margin: {value: null, unit: pct, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      gross_profit: {value: null, unit: CNY, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      net_profit_attributable: {value: null, unit: CNY, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      eps: {value: null, unit: CNY_per_share, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+    2027E:
+      revenue: {value: null, unit: CNY, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      gross_margin: {value: null, unit: pct, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      gross_profit: {value: null, unit: CNY, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      net_profit_attributable: {value: null, unit: CNY, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      eps: {value: null, unit: CNY_per_share, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+    2028E:
+      revenue: {value: null, unit: CNY, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      gross_margin: {value: null, unit: pct, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      gross_profit: {value: null, unit: CNY, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      net_profit_attributable: {value: null, unit: CNY, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+      eps: {value: null, unit: CNY_per_share, assumption_id: null, evidence_id: null, metric_id: null, missing_reason: TODO_MODEL_INPUT}
+scenarios:
+  base_case:
+    status: TODO_MODEL_INPUT
+    forecast_table: *base_case_table
+  bull_case:
+    status: TODO_MODEL_INPUT
+    forecast_table: {}
+  bear_case:
+    status: TODO_MODEL_INPUT
+    forecast_table: {}
+sensitivity_tests:
+  - driver: revenue_growth
+    status: TODO
+    missing_reason: TODO_MODEL_INPUT
+consensus_comparison:
+  status: not_supplied
+  as_of_date: null
+  source_evidence_id: null
+  missing_reason: TODO_MODEL_INPUT
+missing_items:
+  - item: reviewed forecast assumptions
+    reason: TODO_MODEL_INPUT
+source_gap_register:
+  - gap_id: R5_BUNDLE3_FORECAST_MODEL_GAP
+    token: TODO_MODEL_INPUT
+sample_quality_allowed: false
+p2_allowed: false

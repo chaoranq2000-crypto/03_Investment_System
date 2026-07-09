@@ -1,0 +1,43 @@
+bundle: R5_BUNDLE_3_CORE_RESEARCH_ASSET_SUBPACKS
+schema_version: r5_bundle3_expected_artifacts_v0.1
+expected_close_state: R5_CORE_ASSET_SCHEMAS_EXECUTABLE_WITH_TODOS
+sample_quality_report_allowed: false
+p2_allowed: false
+artifacts:
+  financial_history:
+    contract: .agents/skills/stock-deep-dive/references/r5_financial_history_pack_contract.md
+    example: .agents/skills/stock-deep-dive/assets/r5_financial_history_pack.example.yaml
+    validator: .agents/skills/stock-deep-dive/scripts/validate_r5_financial_history_pack.py
+    test: tests/test_validate_r5_financial_history_pack.py
+    readout: reports/p1_6/R5_BUNDLE_3_1_FINANCIAL_HISTORY_SUBPACK_READOUT.md
+  business_breakdown:
+    contract: .agents/skills/stock-deep-dive/references/r5_business_breakdown_pack_contract.md
+    example: .agents/skills/stock-deep-dive/assets/r5_business_breakdown_pack.example.yaml
+    validator: .agents/skills/stock-deep-dive/scripts/validate_r5_business_breakdown_pack.py
+    test: tests/test_validate_r5_business_breakdown_pack.py
+    readout: reports/p1_6/R5_BUNDLE_3_2_BUSINESS_BREAKDOWN_SUBPACK_READOUT.md
+  forecast_model:
+    contract: .agents/skills/stock-deep-dive/references/r5_forecast_model_pack_contract.md
+    example: .agents/skills/stock-deep-dive/assets/r5_forecast_model_pack.example.yaml
+    validator: .agents/skills/stock-deep-dive/scripts/validate_r5_forecast_model_pack.py
+    test: tests/test_validate_r5_forecast_model_pack.py
+    readout: reports/p1_6/R5_BUNDLE_3_3_FORECAST_MODEL_SUBPACK_READOUT.md
+  valuation:
+    contract: .agents/skills/stock-deep-dive/references/r5_valuation_pack_contract.md
+    example: .agents/skills/stock-deep-dive/assets/r5_valuation_pack.example.yaml
+    validator: .agents/skills/stock-deep-dive/scripts/validate_r5_valuation_pack.py
+    test: tests/test_validate_r5_valuation_pack.py
+    readout: reports/p1_6/R5_BUNDLE_3_4_VALUATION_SUBPACK_READOUT.md
+  core_asset_preflight:
+    script: .agents/skills/stock-deep-dive/scripts/run_r5_core_asset_preflight.py
+    test: tests/test_r5_core_asset_preflight.py
+    result: reports/p1_6/r5_core_asset_preflight_result.json
+    readout: reports/p1_6/R5_BUNDLE_3_5_CORE_ASSET_PREFLIGHT_GATE_READOUT.md
+  close:
+    test: tests/test_r5_bundle3_close.py
+    readout: reports/p1_6/R5_BUNDLE_3_CORE_RESEARCH_ASSET_SUBPACKS_CLOSE_READOUT.md
+remaining_boundaries:
+  - no_live_api
+  - no_real_stock_report
+  - no_p2
+  - preserve_todo_and_missing_disclosure

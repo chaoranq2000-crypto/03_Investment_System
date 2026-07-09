@@ -1,0 +1,72 @@
+{
+  "artifact_type": "R5_core_asset_preflight_result",
+  "schema_version": "r5_core_asset_preflight_result_v0.1",
+  "core_asset_state": "R5_CORE_ASSET_SCHEMAS_EXECUTABLE_WITH_TODOS",
+  "financial_history_status": "accepted_with_todos",
+  "business_breakdown_status": "accepted_with_todos",
+  "forecast_model_status": "accepted_with_todos",
+  "valuation_status": "accepted_with_todos",
+  "sample_quality_report_allowed": false,
+  "p2_allowed": false,
+  "blockers": [],
+  "non_blocking_todos": [
+    {
+      "token": "TODO_MODEL_INPUT",
+      "reason": "visible core subpack TODO or missing marker"
+    },
+    {
+      "token": "TODO_MARKET_DATA",
+      "reason": "visible core subpack TODO or missing marker"
+    },
+    {
+      "token": "TODO_PEER_DATA",
+      "reason": "visible core subpack TODO or missing marker"
+    },
+    {
+      "token": "TODO_SOURCE_REQUIRED",
+      "reason": "visible core subpack TODO or missing marker"
+    },
+    {
+      "token": "MISSING_DISCLOSURE",
+      "reason": "visible core subpack TODO or missing marker"
+    }
+  ],
+  "known_todos": [
+    "TODO_MODEL_INPUT",
+    "TODO_MARKET_DATA",
+    "TODO_PEER_DATA",
+    "TODO_SOURCE_REQUIRED",
+    "MISSING_DISCLOSURE"
+  ],
+  "next_candidate_tasks": [
+    "supply accepted reviewed financial history inputs",
+    "supply accepted reviewed business disclosure",
+    "supply accepted reviewed forecast and valuation inputs"
+  ],
+  "checks": {
+    "financial_history": {
+      "label": "financial_history",
+      "path": "C:\\Projects\\03_Investment_System\\.agents\\skills\\stock-deep-dive\\assets\\r5_financial_history_pack.example.yaml",
+      "validator_status": "accepted_with_todos",
+      "errors": []
+    },
+    "business_breakdown": {
+      "label": "business_breakdown",
+      "path": "C:\\Projects\\03_Investment_System\\.agents\\skills\\stock-deep-dive\\assets\\r5_business_breakdown_pack.example.yaml",
+      "validator_status": "accepted_with_todos",
+      "errors": []
+    },
+    "forecast_model": {
+      "label": "forecast_model",
+      "path": "C:\\Projects\\03_Investment_System\\.agents\\skills\\stock-deep-dive\\assets\\r5_forecast_model_pack.example.yaml",
+      "validator_status": "accepted_with_todos",
+      "errors": []
+    },
+    "valuation": {
+      "label": "valuation",
+      "path": "C:\\Projects\\03_Investment_System\\.agents\\skills\\stock-deep-dive\\assets\\r5_valuation_pack.example.yaml",
+      "validator_status": "accepted_with_todos",
+      "errors": []
+    }
+  }
+}
