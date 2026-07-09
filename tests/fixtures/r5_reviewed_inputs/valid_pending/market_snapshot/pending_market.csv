@@ -1,0 +1,2 @@
+input_id,workflow_id,stock_code,input_type,as_of_date,source_evidence_id,source_rank,review_status,reviewer,reviewed_at,capture_method,no_live_api,limitations,notes,sample_quality_allowed
+pending_market_001,wf_20260703_stock_first_002837_invic,002837,market_snapshot,,null,B,pending,,,,true,TODO_MARKET_DATA remains pending,does not unblock gate,false

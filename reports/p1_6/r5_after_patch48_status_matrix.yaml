@@ -1,0 +1,93 @@
+artifact_type: r5_after_patch48_status_matrix
+schema_version: r5_after_patch48_status_matrix_v0.1
+generated_from: scripts/check_r5_task_readout_sync.py
+status: pass
+blocking_missing: []
+rows:
+- patch_id: R5_PATCH_43
+  task_card_path: codex_tasks/r5_after_patch36/R5_PATCH_43_VALUATION_INPUT_REGISTRY_AND_INTERLOCK.md
+  readout_path: reports/p1_6/R5_PATCH_43_VALUATION_INPUT_REGISTRY_AND_INTERLOCK_READOUT.md
+  blocking_for_next: true
+  notes: valuation registry/interlock readout with command evidence
+  companion_paths: []
+  task_card_exists: true
+  readout_exists: true
+  readout_status: accepted_with_todos
+  command_evidence: true
+  status: completed_with_command_evidence
+  close_readout_relation: standard_patch_readout_path
+  canonical_status: canonical
+  companion_artifacts: {}
+- patch_id: R5_PATCH_44
+  task_card_path: codex_tasks/r5_after_patch36/R5_PATCH_44_002837_REVIEWED_INPUT_DRY_RUN.md
+  readout_path: reports/p1_6/R5_PATCH_44_002837_REVIEWED_INPUT_DRY_RUN_READOUT.md
+  blocking_for_next: true
+  notes: 002837 reviewed-input dry run readout with command evidence
+  companion_paths: []
+  task_card_exists: true
+  readout_exists: true
+  readout_status: accepted_with_todos
+  command_evidence: true
+  status: completed_with_command_evidence
+  close_readout_relation: standard_patch_readout_path
+  canonical_status: canonical
+  companion_artifacts: {}
+- patch_id: R5_PATCH_45
+  task_card_path: codex_tasks/r5_after_patch36/R5_PATCH_45_R5_PACK_PROMOTION_GATE.md
+  readout_path: reports/p1_6/R5_PATCH_45_R5_PACK_PROMOTION_GATE_READOUT.md
+  blocking_for_next: true
+  notes: pack promotion gate readout with command evidence
+  companion_paths: []
+  task_card_exists: true
+  readout_exists: true
+  readout_status: accepted_with_todos
+  command_evidence: true
+  status: completed_with_command_evidence
+  close_readout_relation: standard_patch_readout_path
+  canonical_status: canonical
+  companion_artifacts: {}
+- patch_id: R5_PATCH_46
+  task_card_path: codex_tasks/r5_after_patch36/R5_PATCH_46_QUALITY_GATE_SCORECARD_V2.md
+  readout_path: reports/p1_6/R5_PATCH_46_QUALITY_GATE_SCORECARD_V2_READOUT.md
+  blocking_for_next: true
+  notes: quality scorecard v2 readout with command evidence
+  companion_paths: []
+  task_card_exists: true
+  readout_exists: true
+  readout_status: accepted_with_todos
+  command_evidence: true
+  status: completed_with_command_evidence
+  close_readout_relation: standard_patch_readout_path
+  canonical_status: canonical
+  companion_artifacts: {}
+- patch_id: R5_PATCH_47
+  task_card_path: codex_tasks/r5_after_patch36/R5_PATCH_47_COMPOSER_RESEARCH_DRAFT_PLUS_MODE.md
+  readout_path: reports/p1_6/R5_PATCH_47_COMPOSER_RESEARCH_DRAFT_PLUS_MODE_READOUT.md
+  blocking_for_next: true
+  notes: composer draft-plus readout with command evidence
+  companion_paths: []
+  task_card_exists: true
+  readout_exists: true
+  readout_status: accepted_with_todos
+  command_evidence: true
+  status: completed_with_command_evidence
+  close_readout_relation: standard_patch_readout_path
+  canonical_status: canonical
+  companion_artifacts: {}
+- patch_id: R5_PATCH_48
+  task_card_path: codex_tasks/r5_after_patch36/R5_PATCH_48_PILOT_READINESS_DECISION.md
+  readout_path: reports/p1_6/R5_AFTER_PATCH36_REVIEWED_INPUT_CLOSE_READOUT.md
+  blocking_for_next: true
+  notes: Patch 48 is represented by the after-Patch36 close readout, not a patch-numbered
+    readout
+  companion_paths:
+  - reports/p1_6/r5_reviewed_input_pilot_gate_result.json
+  task_card_exists: true
+  readout_exists: true
+  readout_status: R5_REVIEWED_INPUT_PILOT_BLOCKED_SOURCE_GAPPED
+  command_evidence: true
+  status: completed_with_command_evidence
+  close_readout_relation: close_readout_exists_under_non_patch_filename
+  canonical_status: canonical
+  companion_artifacts:
+    reports/p1_6/r5_reviewed_input_pilot_gate_result.json: true

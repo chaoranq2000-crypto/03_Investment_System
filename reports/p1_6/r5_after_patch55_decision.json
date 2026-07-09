@@ -1,0 +1,61 @@
+{
+  "artifact_type": "r5_after_patch55_decision",
+  "schema_version": "r5_after_patch55_decision_v0.1",
+  "current_r5_state": "R5_REVIEWED_INPUT_PILOT_BLOCKED_SOURCE_GAPPED",
+  "reviewed_input_pilot_allowed": false,
+  "sample_quality_report_allowed": false,
+  "p2_allowed": false,
+  "strict_smoke_status": "pass",
+  "pack_promotion_level": "source_gapped_research_draft",
+  "promotion_status": "no_accepted_inputs",
+  "registries_changed": false,
+  "rendered_output_type": "source_gapped_research_draft",
+  "blockers": [
+    {
+      "id": "reviewed_input_requirements",
+      "severity": "high",
+      "reason": "Reviewed-input pilot requires market, peer, forecast and valuation reviewed inputs.",
+      "detail": "reviewed_market_inputs_available, reviewed_peer_inputs_available, reviewed_forecast_assumptions_available, reviewed_valuation_inputs_available"
+    }
+  ],
+  "non_blocking_todos": [
+    {
+      "id": "todo_todo_market_data",
+      "severity": "todo",
+      "reason": "TODO remains visible after reviewed-input dry run.",
+      "detail": "TODO_MARKET_DATA"
+    },
+    {
+      "id": "todo_todo_peer_data",
+      "severity": "todo",
+      "reason": "TODO remains visible after reviewed-input dry run.",
+      "detail": "TODO_PEER_DATA"
+    },
+    {
+      "id": "todo_todo_model_input",
+      "severity": "todo",
+      "reason": "TODO remains visible after reviewed-input dry run.",
+      "detail": "TODO_MODEL_INPUT"
+    },
+    {
+      "id": "todo_missing_disclosure",
+      "severity": "todo",
+      "reason": "TODO remains visible after reviewed-input dry run.",
+      "detail": "MISSING_DISCLOSURE"
+    },
+    {
+      "id": "todo_todo_source_required",
+      "severity": "todo",
+      "reason": "TODO remains visible after reviewed-input dry run.",
+      "detail": "TODO_SOURCE_REQUIRED"
+    }
+  ],
+  "known_todos": [
+    "TODO_MARKET_DATA",
+    "TODO_PEER_DATA",
+    "TODO_MODEL_INPUT",
+    "MISSING_DISCLOSURE",
+    "TODO_SOURCE_REQUIRED"
+  ],
+  "next_recommended_patch": "supply accepted local reviewed inputs, then rerun dropzone validation, staging, promotion, pilot gate, and render checks"
+}

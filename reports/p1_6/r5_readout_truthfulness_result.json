@@ -1,8 +1,8 @@
 {
   "truthfulness_status": "pass",
-  "checked": 54,
+  "checked": 59,
   "failed": 0,
-  "canonical_checked": 26,
+  "canonical_checked": 31,
   "legacy_noncanonical": 28,
   "superseded": 0,
   "results": [
@@ -446,6 +446,51 @@
       "reason": "historical readout lacks the full command/exit_code/stdout-stderr evidence required by Patch 28; it is preserved as history only",
       "replacement_or_supplement_path": "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md",
       "blocking_for_strict_smoke": false
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_50_REVIEWED_INPUT_DROPZONE_CONTRACT_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_51_REVIEWED_INPUT_DROPZONE_VALIDATORS_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_52_002837_REVIEWED_INPUT_STAGING_DRY_RUN_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_53_REGISTRY_PROMOTION_FROM_ACCEPTED_STAGING_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_54_PILOT_GATE_RECHECK_AND_DRAFT_PLUS_RENDER_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
     },
     {
       "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_PATCH_5_TECH_SENTIMENT_CATALYST_READOUT.md",

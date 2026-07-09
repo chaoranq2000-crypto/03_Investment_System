@@ -51,3 +51,16 @@ Historical readouts are not rewritten. Legacy entries are retained as history an
 | `reports/p1_6/R5_PATCH_40_REAL_SAMPLE_PILOT_GATE_RECHECK_READOUT.md` | `canonical` | `true` | Patch 40 generated from next pilot gate recheck commands |
 | `reports/p1_6/R5_PATCH_41_COMPOSER_DEGRADATION_READOUT.md` | `canonical` | `true` | Patch 41 generated from composer degradation validation commands |
 | `reports/p1_6/R5_AFTER_PATCH42_CLOSE_READOUT.md` | `canonical` | `true` | Patch 42 close readout freezes reviewed-input registration state |
+| `reports/p1_6/R5_PATCH_43_VALUATION_INPUT_REGISTRY_AND_INTERLOCK_READOUT.md` | `canonical` | `true` | Patch 43 generated from valuation input registry/interlock validation commands |
+| `reports/p1_6/R5_PATCH_44_002837_REVIEWED_INPUT_DRY_RUN_READOUT.md` | `canonical` | `true` | Patch 44 generated from reviewed-input dry-run validation commands |
+| `reports/p1_6/R5_PATCH_45_R5_PACK_PROMOTION_GATE_READOUT.md` | `canonical` | `true` | Patch 45 generated from pack promotion gate commands |
+| `reports/p1_6/R5_PATCH_46_QUALITY_GATE_SCORECARD_V2_READOUT.md` | `canonical` | `true` | Patch 46 generated from quality scorecard v2 validation commands |
+| `reports/p1_6/R5_PATCH_47_COMPOSER_RESEARCH_DRAFT_PLUS_MODE_READOUT.md` | `canonical` | `true` | Patch 47 generated from composer draft-plus validation commands |
+| `reports/p1_6/R5_AFTER_PATCH36_REVIEWED_INPUT_CLOSE_READOUT.md` | `canonical` | `true` | Patch 48 close readout is represented under the after-Patch36 filename and paired with r5_reviewed_input_pilot_gate_result.json |
+| `reports/p1_6/R5_AFTER_PATCH48_STATUS_INDEX_READOUT.md` | `canonical` | `true` | Patch 49 status/index hygiene readout validates Patch 43-48 task/readout sync |
+| `reports/p1_6/R5_PATCH_50_REVIEWED_INPUT_DROPZONE_CONTRACT_READOUT.md` | `canonical` | `true` | Patch 50 generated from dropzone contract existence and template parse checks |
+| `reports/p1_6/R5_PATCH_51_REVIEWED_INPUT_DROPZONE_VALIDATORS_READOUT.md` | `canonical` | `true` | Patch 51 generated from reviewed-input dropzone validator tests and CLI check |
+| `reports/p1_6/R5_PATCH_52_002837_REVIEWED_INPUT_STAGING_DRY_RUN_READOUT.md` | `canonical` | `true` | Patch 52 generated from 002837 staging dry-run tests and CLI result |
+| `reports/p1_6/R5_PATCH_53_REGISTRY_PROMOTION_FROM_ACCEPTED_STAGING_READOUT.md` | `canonical` | `true` | Patch 53 generated from accepted-only registry promotion tests and CLI result |
+| `reports/p1_6/R5_PATCH_54_PILOT_GATE_RECHECK_AND_DRAFT_PLUS_RENDER_READOUT.md` | `canonical` | `true` | Patch 54 generated from gate recheck and reviewed-input render commands |
+| `reports/p1_6/R5_AFTER_PATCH55_REVIEWED_INPUT_ACTIVATION_CLOSE_READOUT.md` | `canonical` | `true` | Patch 55 close readout freezes reviewed-input activation state and next decision |

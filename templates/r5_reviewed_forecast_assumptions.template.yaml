@@ -1,0 +1,6 @@
+artifact_type: R5_reviewed_forecast_assumptions_template
+template_only: true
+not_evidence: true
+no_live_api: true
+path_pattern: data/reviewed_inputs/<workflow_id>/forecast_assumptions/
+records: []

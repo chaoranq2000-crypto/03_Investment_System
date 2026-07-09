@@ -1,0 +1,33 @@
+artifact_type: R5_reviewed_input_render_result
+schema_version: r5_reviewed_input_render_result_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+input_gate_state: R5_REVIEWED_INPUT_PILOT_BLOCKED_SOURCE_GAPPED
+promotion_level: source_gapped_research_draft
+promotion_status: no_accepted_inputs
+rendered_output_type: source_gapped_research_draft
+rendered_output_path: reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_note_reviewed_input_draft.md
+sample_quality_report_allowed: false
+p2_allowed: false
+source_gap_count: 6
+forbidden_language_check:
+  status: pass
+  forbidden_found: []
+required_markers:
+  source_gap_appendix: true
+  open_questions: true
+  no_advice_boundary: true
+  remaining_todos: true
+writer_result:
+  output_path: reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_note_reviewed_input_draft.md
+  source_gap_count: 6
+  output_type: source_gapped_research_draft
+remaining_todos:
+- TODO_MARKET_DATA
+- TODO_PEER_DATA
+- TODO_MODEL_INPUT
+- MISSING_DISCLOSURE
+- TODO_SOURCE_REQUIRED
+notes:
+- Blocked gate renders source_gapped_research_draft only.
+- Source Gap Appendix, Open Questions, no-advice boundary, and remaining TODOs are
+  preserved.

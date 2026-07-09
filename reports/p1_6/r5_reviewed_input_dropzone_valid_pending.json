@@ -1,0 +1,14 @@
+{
+  "artifact_type": "R5_reviewed_input_dropzone_validation",
+  "schema_version": "r5_reviewed_input_dropzone_validation_v0.1",
+  "status": "pass",
+  "checked_files": [
+    "tests/fixtures/r5_reviewed_inputs/valid_pending/market_snapshot/pending_market.csv"
+  ],
+  "accepted_count": 0,
+  "accepted_degraded_count": 0,
+  "pending_count": 1,
+  "rejected_count": 0,
+  "failed_count": 0,
+  "issues": []
+}

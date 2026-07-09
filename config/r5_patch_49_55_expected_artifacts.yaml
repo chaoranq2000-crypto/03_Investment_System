@@ -1,0 +1,33 @@
+artifact_type: r5_patch_49_55_expected_artifacts
+schema_version: r5_patch_49_55_expected_artifacts_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+required_artifacts:
+  - path: reports/p1_6/R5_AFTER_PATCH48_STATUS_INDEX_READOUT.md
+    role: patch49_status_index_readout
+  - path: reports/p1_6/R5_PATCH_50_REVIEWED_INPUT_DROPZONE_CONTRACT_READOUT.md
+    role: patch50_dropzone_contract_readout
+  - path: reports/p1_6/R5_PATCH_51_REVIEWED_INPUT_DROPZONE_VALIDATORS_READOUT.md
+    role: patch51_dropzone_validator_readout
+  - path: reports/p1_6/R5_PATCH_52_002837_REVIEWED_INPUT_STAGING_DRY_RUN_READOUT.md
+    role: patch52_staging_readout
+  - path: reports/p1_6/R5_PATCH_53_REGISTRY_PROMOTION_FROM_ACCEPTED_STAGING_READOUT.md
+    role: patch53_promotion_readout
+  - path: reports/p1_6/R5_PATCH_54_PILOT_GATE_RECHECK_AND_DRAFT_PLUS_RENDER_READOUT.md
+    role: patch54_render_readout
+  - path: reports/p1_6/R5_AFTER_PATCH55_REVIEWED_INPUT_ACTIVATION_CLOSE_READOUT.md
+    role: patch55_close_readout
+  - path: reports/p1_6/r5_after_patch55_decision.json
+    role: patch55_decision
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_reviewed_input_staging_result.yaml
+    role: staging_result
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_reviewed_input_registry_promotion_result.yaml
+    role: promotion_result
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_reviewed_input_render_result.yaml
+    role: render_result
+expected_decision:
+  current_r5_state: R5_REVIEWED_INPUT_PILOT_BLOCKED_SOURCE_GAPPED
+  reviewed_input_pilot_allowed: false
+  sample_quality_report_allowed: false
+  p2_allowed: false
+  pack_promotion_level: source_gapped_research_draft
+  rendered_output_type: source_gapped_research_draft

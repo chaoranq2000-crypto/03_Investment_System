@@ -1,0 +1,17 @@
+records:
+  - input_id: bad_business_001
+    workflow_id: wf_20260703_stock_first_002837_invic
+    stock_code: "002837"
+    input_type: business_disclosure
+    as_of_date: "2026-07-09"
+    source_evidence_id: null
+    source_rank: A
+    review_status: accepted
+    reviewer: local_reviewer
+    reviewed_at: "2026-07-09T18:00:00+08:00"
+    capture_method: manual_reviewed_fixture
+    no_live_api: true
+    limitations:
+      - official disclosure is required
+    evidence_id: null
+    sample_quality_allowed: false

@@ -1,0 +1,6 @@
+artifact_type: R5_reviewed_business_disclosure_template
+template_only: true
+not_evidence: true
+no_live_api: true
+path_pattern: data/reviewed_inputs/<workflow_id>/business_disclosure/
+records: []

@@ -1,0 +1,38 @@
+artifact_type: R5_reviewed_input_registry_promotion_result
+schema_version: r5_reviewed_input_registry_promotion_result_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+no_live_api: true
+dropzone_root: C:\Projects\03_Investment_System\data\reviewed_inputs\wf_20260703_stock_first_002837_invic
+staging_result_path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_reviewed_input_staging_result.yaml
+validation_status: pass
+validation_issues: []
+promotion_status: no_accepted_inputs
+registries_changed: false
+allowed_report_level: source_gapped_research_draft
+sample_quality_report_allowed: false
+p2_allowed: false
+accepted_count: 0
+accepted_degraded_count: 0
+accepted_input_ids: []
+accepted_degraded_input_ids: []
+reviewed_flags_from_accepted_rows:
+  reviewed_market_inputs_available: false
+  reviewed_peer_inputs_available: false
+  reviewed_forecast_assumptions_available: false
+  reviewed_business_disclosure_available: false
+  reviewed_valuation_inputs_available: false
+remaining_todos:
+- TODO_MARKET_DATA
+- TODO_PEER_DATA
+- TODO_MODEL_INPUT
+- MISSING_DISCLOSURE
+- TODO_SOURCE_REQUIRED
+registry_paths:
+  market_peer: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_market_peer_input_registry.yaml
+  forecast_assumptions: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_forecast_assumption_registry.yaml
+  evidence_ledger: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_evidence_request_review_ledger.yaml
+notes:
+- Only review_status=accepted rows can unblock reviewed flags.
+- accepted_degraded rows are carried as limitations and do not allow sample-quality.
+- Pending and rejected rows keep source-gap visibility.

@@ -1,0 +1,19 @@
+records:
+  - input_id: degraded_forecast_001
+    workflow_id: wf_20260703_stock_first_002837_invic
+    stock_code: "002837"
+    input_type: forecast_assumptions
+    as_of_date: "2026-07-09"
+    source_evidence_id: ev_reviewed_local_forecast_001
+    source_rank: B
+    review_status: accepted_degraded
+    reviewer: local_reviewer
+    reviewed_at: "2026-07-09T18:00:00+08:00"
+    capture_method: manual_reviewed_fixture
+    no_live_api: true
+    limitations:
+      - company-level context only
+      - not enough for sample-quality
+    sample_quality_allowed: false
+    assumption_name: company_revenue_context
+    value: reviewed_degraded_context

@@ -1,0 +1,36 @@
+artifact_type: R5_reviewed_input_staging_result
+schema_version: r5_reviewed_input_staging_result_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+no_live_api: true
+dropzone_root: data\reviewed_inputs\wf_20260703_stock_first_002837_invic
+validation_status: pass
+validation_issues: []
+reviewed_market_inputs_available: false
+reviewed_peer_inputs_available: false
+reviewed_forecast_assumptions_available: false
+reviewed_business_disclosure_available: false
+reviewed_valuation_inputs_available: false
+accepted_count: 0
+accepted_degraded_count: 0
+pending_count: 0
+rejected_count: 0
+accepted_input_ids: []
+accepted_degraded_input_ids: []
+remaining_todos:
+- TODO_MARKET_DATA
+- TODO_PEER_DATA
+- TODO_MODEL_INPUT
+- MISSING_DISCLOSURE
+- TODO_SOURCE_REQUIRED
+allowed_report_level: source_gapped_research_draft
+sample_quality_report_allowed: false
+p2_allowed: false
+inputs:
+  dropzone_root: C:\Projects\03_Investment_System\data\reviewed_inputs\wf_20260703_stock_first_002837_invic
+  evidence_request_review_ledger: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_evidence_request_review_ledger.yaml
+  previous_reviewed_input_dry_run: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_reviewed_input_dry_run_result.yaml
+notes:
+- Accepted-only flags are derived only from review_status=accepted rows.
+- accepted_degraded rows may preserve limitations but do not allow sample-quality.
+- Templates are not evidence and are not counted as accepted inputs.
