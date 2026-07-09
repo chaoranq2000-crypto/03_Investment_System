@@ -1,0 +1,18 @@
+schema_version: r5_evidence_request_review_ledger_v0.1
+artifact_type: R5_evidence_request_review_ledger
+workflow_id: wf_20260703_stock_first_002837_invic
+source_queue_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_queue.yaml
+review_status: pending
+no_live_api: true
+items:
+  - request_id: r5_market_snapshot_r5_002837_gap_market_001
+    source_gap_id: R5_002837_GAP_MARKET_001
+    pack_section: valuation_pack
+    review_decision: pending
+    evidence_id: null
+    source_rank: B
+    reason: TODO_MARKET_DATA
+    next_action: manual source collection required before promotion
+promotion_rules:
+  - accepted requires evidence_id and source_rank
+  - pending cannot unblock source-gapped pilot

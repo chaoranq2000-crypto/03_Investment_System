@@ -1,6 +1,6 @@
 # 价值发现：<公司名>
 
-> 本模板只用于 R5 report composer 转译已审查的 `R5_stock_research_pack.yaml`。不得在本模板中创造无证据数字、隐藏 source gap 或输出直接交易指令。
+> 本模板只用于 R5 report composer 转译已审查的 `R5_stock_research_pack.yaml`。不得在本模板中创造无证据数字、隐藏 source gap 或输出直接交易指令；输出级别必须服从 gate result 与 reviewed input registries。
 
 ## 前言
 

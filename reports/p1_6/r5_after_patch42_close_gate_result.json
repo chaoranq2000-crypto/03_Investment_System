@@ -1,0 +1,54 @@
+{
+  "status": "closed_with_todos",
+  "current_r5_state": "R5_CONTRACTS_EXECUTABLE_WITH_TODOS_ONLY",
+  "source_gapped_real_sample_pilot_allowed": false,
+  "sample_quality_report_allowed": false,
+  "p2_allowed": false,
+  "blockers": [],
+  "non_blockers": [
+    {
+      "id": "forecast_todo",
+      "severity": "todo",
+      "reason": "Forecast remains TODO_MODEL_INPUT for sample-quality.",
+      "detail": "TODO"
+    },
+    {
+      "id": "valuation_todo",
+      "severity": "todo",
+      "reason": "Valuation remains TODO_MARKET_DATA / TODO_PEER_DATA for sample-quality.",
+      "detail": "TODO"
+    }
+  ],
+  "registry_blockers": [
+    {
+      "id": "market_peer_registry_pending",
+      "severity": "todo",
+      "reason": "market/peer input registry is not reviewed or reviewed-degraded.",
+      "detail": "pending"
+    },
+    {
+      "id": "forecast_assumption_registry_pending",
+      "severity": "todo",
+      "reason": "forecast assumption registry is not reviewed or reviewed-degraded.",
+      "detail": "pending"
+    }
+  ],
+  "registry_summary": {
+    "market_peer_registry_ready": false,
+    "forecast_assumption_registry_ready": false,
+    "evidence_request_review_ledger_ok": true,
+    "market_peer_review_status": "pending",
+    "forecast_review_status": "pending",
+    "ledger_review_status": "pending",
+    "ledger_pending_count": 10
+  },
+  "next_candidate_tasks": [
+    "collect reviewed market and peer inputs from R5_evidence_request_queue.yaml without live API",
+    "register reviewed forecast assumptions before numeric forecast or valuation outputs",
+    "rerun source-gapped pilot gate after TODO inputs are reviewed"
+  ],
+  "boundary": {
+    "no_live_api": true,
+    "do_not_execute_next_tasks_in_this_patch": true
+  }
+}

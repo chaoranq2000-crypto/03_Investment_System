@@ -1,0 +1,55 @@
+artifact_type: R5_quality_scorecard_v2
+schema_version: r5_quality_scorecard_v2_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+allowed_report_level: source_gapped_research_draft
+no_advice_gate_passed: true
+reviewed_input_flags:
+  reviewed_market_inputs_available: false
+  reviewed_peer_inputs_available: false
+  reviewed_forecast_assumptions_available: false
+  reviewed_valuation_inputs_available: false
+sections:
+  - section_id: financial
+    readiness: ready_with_limitations
+    evidence_ids:
+      - ev_structured_financial_data_002837_20260701_89213a
+    issues: []
+    limitations:
+      - company-level financial metrics only
+    fix_owner_skill: stock-deep-dive
+  - section_id: business
+    readiness: source_gapped
+    evidence_ids:
+      - ev_annual_report_002837_20260421_ce7f64
+    issues:
+      - MISSING_DISCLOSURE for liquid-cooling revenue and margin
+    limitations:
+      - business exposure remains clue-only
+    fix_owner_skill: evidence-ingest
+  - section_id: forecast
+    readiness: source_gapped
+    evidence_ids: []
+    issues:
+      - TODO_MODEL_INPUT
+    limitations:
+      - reviewed forecast assumptions are absent
+    fix_owner_skill: stock-deep-dive
+  - section_id: valuation
+    readiness: source_gapped
+    evidence_ids: []
+    issues:
+      - TODO_MARKET_DATA
+      - TODO_PEER_DATA
+    limitations:
+      - reviewed market and peer snapshots are absent
+    fix_owner_skill: stock-deep-dive
+sample_quality_blockers:
+  - reviewed market snapshot absent
+  - reviewed peer snapshot absent
+  - reviewed forecast assumptions absent
+  - business disclosure gap remains MISSING_DISCLOSURE
+next_actions:
+  - register reviewed market and peer snapshots
+  - register reviewed forecast assumptions
+  - review official disclosure business gaps

@@ -1,0 +1,36 @@
+schema_version: r5_market_peer_input_registry_v0.1
+artifact_type: R5_market_peer_input_registry
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+as_of_date: null
+review_status: pending
+reviewer: null
+no_live_api: true
+market_inputs:
+  current_price:
+    value: TODO_MARKET_DATA
+    unit: CNY_per_share
+    evidence_id: null
+    source_type: market_snapshot
+    missing_reason: TODO_MARKET_DATA
+  market_cap:
+    value: TODO_MARKET_DATA
+    unit: CNY
+    evidence_id: null
+    source_type: market_snapshot
+    missing_reason: TODO_MARKET_DATA
+peer_inputs:
+  peer_set:
+    value: TODO_PEER_DATA
+    evidence_id: null
+    source_type: peer_snapshot
+    missing_reason: TODO_PEER_DATA
+  peer_valuation_multiples:
+    value: TODO_PEER_DATA
+    evidence_id: null
+    source_type: peer_snapshot
+    missing_reason: TODO_PEER_DATA
+allowed_usage:
+  - valuation_context_only_when_reviewed
+blocking_rules:
+  - if review_status != reviewed, valuation pack must remain degraded

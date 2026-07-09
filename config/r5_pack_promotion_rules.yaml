@@ -1,0 +1,26 @@
+schema_version: r5_pack_promotion_rules_v0.1
+promotion_levels:
+  - blocked
+  - source_gapped_research_draft
+  - reviewed_input_research_draft
+  - sample_quality_candidate
+required_for_reviewed_input_research_draft:
+  - reviewed_market_inputs_available
+  - reviewed_peer_inputs_available
+  - reviewed_forecast_assumptions_available
+  - reviewed_valuation_inputs_available
+required_for_sample_quality_candidate:
+  - reviewed_market_inputs_available
+  - reviewed_peer_inputs_available
+  - reviewed_forecast_assumptions_available
+  - reviewed_valuation_inputs_available
+  - reviewed_business_disclosure_available
+blocking_todo_tokens:
+  - TODO_MARKET_DATA
+  - TODO_PEER_DATA
+  - TODO_MODEL_INPUT
+  - MISSING_DISCLOSURE
+  - TODO_SOURCE_REQUIRED
+default_paths:
+  source_gapped_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_pack_source_gapped.yaml
+  reviewed_input_dry_run: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_reviewed_input_dry_run_result.yaml

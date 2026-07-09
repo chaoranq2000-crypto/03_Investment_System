@@ -1,0 +1,64 @@
+{
+  "artifact_type": "R5_reviewed_input_pilot_gate_result",
+  "current_r5_state": "R5_REVIEWED_INPUT_PILOT_BLOCKED_SOURCE_GAPPED",
+  "reviewed_input_pilot_allowed": false,
+  "sample_quality_report_allowed": false,
+  "p2_allowed": false,
+  "blockers": [
+    {
+      "id": "reviewed_input_requirements",
+      "severity": "high",
+      "reason": "Reviewed-input pilot requires market, peer, forecast and valuation reviewed inputs.",
+      "detail": "reviewed_market_inputs_available, reviewed_peer_inputs_available, reviewed_forecast_assumptions_available, reviewed_valuation_inputs_available"
+    }
+  ],
+  "non_blocking_todos": [
+    {
+      "id": "todo_todo_market_data",
+      "severity": "todo",
+      "reason": "TODO remains visible after reviewed-input dry run.",
+      "detail": "TODO_MARKET_DATA"
+    },
+    {
+      "id": "todo_todo_peer_data",
+      "severity": "todo",
+      "reason": "TODO remains visible after reviewed-input dry run.",
+      "detail": "TODO_PEER_DATA"
+    },
+    {
+      "id": "todo_todo_model_input",
+      "severity": "todo",
+      "reason": "TODO remains visible after reviewed-input dry run.",
+      "detail": "TODO_MODEL_INPUT"
+    },
+    {
+      "id": "todo_missing_disclosure",
+      "severity": "todo",
+      "reason": "TODO remains visible after reviewed-input dry run.",
+      "detail": "MISSING_DISCLOSURE"
+    },
+    {
+      "id": "todo_todo_source_required",
+      "severity": "todo",
+      "reason": "TODO remains visible after reviewed-input dry run.",
+      "detail": "TODO_SOURCE_REQUIRED"
+    }
+  ],
+  "input_summary": {
+    "strict_smoke_status": "pass",
+    "pack_promotion_level": "source_gapped_research_draft",
+    "quality_allowed_report_level": "source_gapped_research_draft",
+    "no_advice_gate_passed": true,
+    "critical_todos": [
+      "TODO_MARKET_DATA",
+      "TODO_PEER_DATA",
+      "TODO_MODEL_INPUT",
+      "MISSING_DISCLOSURE"
+    ]
+  },
+  "next_candidate_tasks": [
+    "register reviewed market snapshot from local reviewed evidence",
+    "register reviewed peer set and peer metrics",
+    "register reviewed forecast assumptions and valuation inputs"
+  ]
+}

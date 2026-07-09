@@ -1,0 +1,13 @@
+artifact_type: R5_peer_snapshot
+schema_version: r5_peer_snapshot_v0.2
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+company_name: 英维克
+status: TODO_PEER_DATA
+no_live_api: true
+peer_set: []
+peer_metrics: []
+allowed_usage:
+  - source_gapped_research_draft
+limitations:
+  - TODO_PEER_DATA: reviewed peer set and dated peer metrics are not registered.

@@ -1,0 +1,29 @@
+artifact_type: R5_reviewed_input_dry_run_result
+schema_version: r5_reviewed_input_dry_run_result_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+no_live_api: true
+inputs:
+  evidence_request_queue: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_queue.yaml
+  market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_market_snapshot_stub.yaml
+  peer_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_peer_snapshot_stub.yaml
+  forecast_assumption_registry: .agents/skills/stock-deep-dive/assets/r5_forecast_assumption_registry.example.yaml
+  valuation_input_registry: .agents/skills/stock-deep-dive/assets/r5_valuation_input_registry.example.yaml
+reviewed_market_inputs_available: false
+reviewed_peer_inputs_available: false
+reviewed_forecast_assumptions_available: false
+reviewed_valuation_inputs_available: false
+reviewed_business_disclosure_available: false
+allowed_report_level: source_gapped_research_draft
+remaining_todos:
+  - TODO_MARKET_DATA
+  - TODO_PEER_DATA
+  - TODO_MODEL_INPUT
+  - MISSING_DISCLOSURE
+  - TODO_SOURCE_REQUIRED
+source_gap_visibility: true
+sample_quality_report_allowed: false
+p2_allowed: false
+notes:
+  - No reviewed fixtures were supplied in this dry run.
+  - The 002837 pilot remains source-gapped and must not promote TODO rows into facts.

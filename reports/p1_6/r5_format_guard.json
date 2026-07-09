@@ -118,7 +118,7 @@
       "path": "src/research/forecast_model_builder.py",
       "artifact_type": "python",
       "status": "pass",
-      "line_count": 116,
+      "line_count": 191,
       "issues": []
     },
     {
@@ -132,7 +132,7 @@
       "path": "src/report/stock_report_writer.py",
       "artifact_type": "python",
       "status": "pass",
-      "line_count": 298,
+      "line_count": 392,
       "issues": []
     },
     {

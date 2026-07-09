@@ -1,0 +1,34 @@
+artifact_type: R5_valuation_input_registry
+schema_version: r5_valuation_input_registry_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+no_live_api: true
+market_snapshot:
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_market_snapshot_stub.yaml
+  review_status: TODO_MARKET_DATA
+  source_evidence_ids: []
+peer_snapshot:
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_peer_snapshot_stub.yaml
+  review_status: TODO_PEER_DATA
+  source_evidence_ids: []
+forecast_model:
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
+  review_status: TODO_MODEL_INPUT
+  assumption_ids: []
+business_line_split:
+  review_status: MISSING_DISCLOSURE
+valuation_methods:
+  - method: relative_pe
+    eligibility: blocked_for_sample_quality
+    required_inputs:
+      - reviewed_market_snapshot
+      - reviewed_peer_snapshot
+  - method: dcf
+    eligibility: blocked_for_sample_quality
+    required_inputs:
+      - reviewed_cashflow_assumptions
+limitations:
+  - TODO_MARKET_DATA
+  - TODO_PEER_DATA
+  - TODO_MODEL_INPUT
+  - MISSING_DISCLOSURE

@@ -1,0 +1,17 @@
+artifact_type: R5_official_disclosure_gap_review
+schema_version: r5_official_disclosure_gap_review_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+no_live_api: true
+reviews:
+  - gap_id: R5_002837_GAP_BUSINESS_001
+    requested_disclosure: liquid-cooling revenue, gross margin, and profit contribution
+    official_source_candidates:
+      - annual_report_002837_2025
+    reviewed_source_ids: []
+    finding_status: not_found
+    extracted_metric_candidates: []
+    limitations:
+      - MISSING_DISCLOSURE: official business-line split has not been located.
+    allowed_usage:
+      - source_gap_visibility

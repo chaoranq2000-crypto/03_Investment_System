@@ -2,7 +2,7 @@
   "status": "pass",
   "failed": 0,
   "checked": 6,
-  "generated_at": "2026-07-08T14:47:00.571456+00:00",
+  "generated_at": "2026-07-09T06:13:40.297932+00:00",
   "repo_root": "C:\\Projects\\03_Investment_System",
   "python_executable": "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
   "python_version": "3.12.13 | packaged by Anaconda, Inc. | (main, Mar 19 2026, 20:16:45) [MSC v.1942 64 bit (AMD64)]",
@@ -18,7 +18,7 @@
         "reports/p1_6/r5_format_guard.json"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.629,
+      "duration_seconds": 0.617,
       "summary": "status=pass checked=24 passed=24 failed=0",
       "stdout_tail": "status=pass checked=24 passed=24 failed=0",
       "stderr_tail": "",
@@ -41,7 +41,7 @@
         "--strict"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.268,
+      "duration_seconds": 0.249,
       "summary": "inventory_status=validated_complete accepted=true patches_checked=12 artifact_failures=0",
       "stdout_tail": "inventory_status=validated_complete accepted=true patches_checked=12 artifact_failures=0",
       "stderr_tail": "",
@@ -67,11 +67,11 @@
         "--tb=short"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.726,
-      "summary": "..............................................                           [100%]\n46 passed in 0.35s",
-      "stdout_tail": "..............................................                           [100%]\n46 passed in 0.35s",
+      "duration_seconds": 0.685,
+      "summary": "..............................................                           [100%]\n46 passed in 0.33s",
+      "stdout_tail": "..............................................                           [100%]\n46 passed in 0.33s",
       "stderr_tail": "",
-      "stdout": "..............................................                           [100%]\n46 passed in 0.35s\n",
+      "stdout": "..............................................                           [100%]\n46 passed in 0.33s\n",
       "stderr": "",
       "artifact_outputs": [],
       "trust_boundary_note": "pytest exit_code is treated as authoritative"
@@ -88,11 +88,11 @@
         "--tb=short"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.628,
-      "summary": "............                                                             [100%]\n12 passed in 0.25s",
-      "stdout_tail": "............                                                             [100%]\n12 passed in 0.25s",
+      "duration_seconds": 0.598,
+      "summary": "............                                                             [100%]\n12 passed in 0.24s",
+      "stdout_tail": "............                                                             [100%]\n12 passed in 0.24s",
       "stderr_tail": "",
-      "stdout": "............                                                             [100%]\n12 passed in 0.25s\n",
+      "stdout": "............                                                             [100%]\n12 passed in 0.24s\n",
       "stderr": "",
       "artifact_outputs": [],
       "trust_boundary_note": "pytest exit_code is treated as authoritative"
@@ -108,11 +108,11 @@
         "--tb=short"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.425,
-      "summary": ".....                                                                    [100%]\n5 passed in 0.08s",
-      "stdout_tail": ".....                                                                    [100%]\n5 passed in 0.08s",
+      "duration_seconds": 0.422,
+      "summary": ".....                                                                    [100%]\n5 passed in 0.09s",
+      "stdout_tail": ".....                                                                    [100%]\n5 passed in 0.09s",
       "stderr_tail": "",
-      "stdout": ".....                                                                    [100%]\n5 passed in 0.08s\n",
+      "stdout": ".....                                                                    [100%]\n5 passed in 0.09s\n",
       "stderr": "",
       "artifact_outputs": [],
       "trust_boundary_note": "pytest exit_code is treated as authoritative"
@@ -131,11 +131,11 @@
         "reports/p1_6/r5_readout_truthfulness_result.json"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.09,
-      "summary": "truthfulness_status=pass checked=38 failed=0",
-      "stdout_tail": "truthfulness_status=pass checked=38 failed=0",
+      "duration_seconds": 0.113,
+      "summary": "truthfulness_status=pass checked=54 failed=0",
+      "stdout_tail": "truthfulness_status=pass checked=54 failed=0",
       "stderr_tail": "",
-      "stdout": "truthfulness_status=pass checked=38 failed=0\n",
+      "stdout": "truthfulness_status=pass checked=54 failed=0\n",
       "stderr": "",
       "artifact_outputs": [
         "reports/p1_6/r5_readout_truthfulness_result.json"
@@ -154,7 +154,7 @@
         "reports/p1_6/r5_format_guard.json"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.629,
+      "duration_seconds": 0.617,
       "summary": "status=pass checked=24 passed=24 failed=0",
       "stdout_tail": "status=pass checked=24 passed=24 failed=0",
       "stderr_tail": "",
@@ -177,7 +177,7 @@
         "--strict"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.268,
+      "duration_seconds": 0.249,
       "summary": "inventory_status=validated_complete accepted=true patches_checked=12 artifact_failures=0",
       "stdout_tail": "inventory_status=validated_complete accepted=true patches_checked=12 artifact_failures=0",
       "stderr_tail": "",
@@ -203,11 +203,11 @@
         "--tb=short"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.726,
-      "summary": "..............................................                           [100%]\n46 passed in 0.35s",
-      "stdout_tail": "..............................................                           [100%]\n46 passed in 0.35s",
+      "duration_seconds": 0.685,
+      "summary": "..............................................                           [100%]\n46 passed in 0.33s",
+      "stdout_tail": "..............................................                           [100%]\n46 passed in 0.33s",
       "stderr_tail": "",
-      "stdout": "..............................................                           [100%]\n46 passed in 0.35s\n",
+      "stdout": "..............................................                           [100%]\n46 passed in 0.33s\n",
       "stderr": "",
       "artifact_outputs": [],
       "trust_boundary_note": "pytest exit_code is treated as authoritative"
@@ -224,11 +224,11 @@
         "--tb=short"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.628,
-      "summary": "............                                                             [100%]\n12 passed in 0.25s",
-      "stdout_tail": "............                                                             [100%]\n12 passed in 0.25s",
+      "duration_seconds": 0.598,
+      "summary": "............                                                             [100%]\n12 passed in 0.24s",
+      "stdout_tail": "............                                                             [100%]\n12 passed in 0.24s",
       "stderr_tail": "",
-      "stdout": "............                                                             [100%]\n12 passed in 0.25s\n",
+      "stdout": "............                                                             [100%]\n12 passed in 0.24s\n",
       "stderr": "",
       "artifact_outputs": [],
       "trust_boundary_note": "pytest exit_code is treated as authoritative"
@@ -244,11 +244,11 @@
         "--tb=short"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.425,
-      "summary": ".....                                                                    [100%]\n5 passed in 0.08s",
-      "stdout_tail": ".....                                                                    [100%]\n5 passed in 0.08s",
+      "duration_seconds": 0.422,
+      "summary": ".....                                                                    [100%]\n5 passed in 0.09s",
+      "stdout_tail": ".....                                                                    [100%]\n5 passed in 0.09s",
       "stderr_tail": "",
-      "stdout": ".....                                                                    [100%]\n5 passed in 0.08s\n",
+      "stdout": ".....                                                                    [100%]\n5 passed in 0.09s\n",
       "stderr": "",
       "artifact_outputs": [],
       "trust_boundary_note": "pytest exit_code is treated as authoritative"
@@ -267,11 +267,11 @@
         "reports/p1_6/r5_readout_truthfulness_result.json"
       ],
       "exit_code": 0,
-      "duration_seconds": 0.09,
-      "summary": "truthfulness_status=pass checked=38 failed=0",
-      "stdout_tail": "truthfulness_status=pass checked=38 failed=0",
+      "duration_seconds": 0.113,
+      "summary": "truthfulness_status=pass checked=54 failed=0",
+      "stdout_tail": "truthfulness_status=pass checked=54 failed=0",
       "stderr_tail": "",
-      "stdout": "truthfulness_status=pass checked=38 failed=0\n",
+      "stdout": "truthfulness_status=pass checked=54 failed=0\n",
       "stderr": "",
       "artifact_outputs": [
         "reports/p1_6/r5_readout_truthfulness_result.json"

@@ -1,0 +1,96 @@
+schema_version: r5_evidence_request_review_ledger_v0.1
+artifact_type: R5_evidence_request_review_ledger
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+source_queue_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_queue.yaml
+review_status: pending
+no_live_api: true
+items:
+- request_id: r5_industry_context_clues_placeholder
+  source_gap_id: R5_002837_GAP_UNMAPPED_001
+  pack_section: evidence_snapshot_pack
+  review_decision: pending
+  evidence_id: null
+  source_rank: C
+  reason: TODO_SOURCE_REQUIRED
+  next_action: keep visible source gap until a concrete request is registered
+- request_id: r5_investor_relations_r5_002837_gap_sentiment_001
+  source_gap_id: R5_002837_GAP_SENTIMENT_001
+  pack_section: business_breakdown_pack
+  review_decision: pending
+  evidence_id: null
+  source_rank: C
+  reason: TODO_SOURCE_REQUIRED
+  next_action: 收集 dated sources；未补前保持 TODO
+- request_id: r5_market_snapshot_r5_002837_gap_market_001
+  source_gap_id: R5_002837_GAP_MARKET_001
+  pack_section: valuation_pack
+  review_decision: pending
+  evidence_id: null
+  source_rank: B
+  reason: TODO_MARKET_DATA
+  next_action: 补 dated market snapshot；未补前不写趋势判断
+- request_id: r5_market_snapshot_r5_002837_gap_valuation_001
+  source_gap_id: R5_002837_GAP_VALUATION_001
+  pack_section: valuation_pack
+  review_decision: pending
+  evidence_id: null
+  source_rank: B
+  reason: TODO_MARKET_DATA
+  next_action: 提供已审查 market / peer context，或保持 TODO
+- request_id: r5_news_event_clues_r5_002837_gap_sentiment_001
+  source_gap_id: R5_002837_GAP_SENTIMENT_001
+  pack_section: sentiment_event_pack
+  review_decision: pending
+  evidence_id: null
+  source_rank: D
+  reason: TODO_SOURCE_REQUIRED
+  next_action: 收集 dated sources；未补前保持 TODO
+- request_id: r5_official_filings_r5_002837_gap_business_001
+  source_gap_id: R5_002837_GAP_BUSINESS_001
+  pack_section: business_breakdown_pack
+  review_decision: pending
+  evidence_id: null
+  source_rank: A
+  reason: MISSING_DISCLOSURE
+  next_action: 继续查找官方分业务披露、公告或表格证据
+- request_id: r5_official_filings_r5_002837_gap_exposure_001
+  source_gap_id: R5_002837_GAP_EXPOSURE_001
+  pack_section: business_breakdown_pack
+  review_decision: pending
+  evidence_id: null
+  source_rank: A
+  reason: MISSING_DISCLOSURE
+  next_action: 审查 exposure before promotion
+- request_id: r5_peer_snapshot_r5_002837_gap_valuation_001
+  source_gap_id: R5_002837_GAP_VALUATION_001
+  pack_section: peer_comparison_pack
+  review_decision: pending
+  evidence_id: null
+  source_rank: B
+  reason: TODO_PEER_DATA
+  next_action: 提供已审查 market / peer context，或保持 TODO
+- request_id: r5_structured_financial_metrics_r5_002837_gap_business_001
+  source_gap_id: R5_002837_GAP_BUSINESS_001
+  pack_section: financial_history_pack
+  review_decision: pending
+  evidence_id: null
+  source_rank: B
+  reason: TODO_MODEL_INPUT
+  next_action: 继续查找官方分业务披露、公告或表格证据
+- request_id: r5_structured_financial_metrics_r5_002837_gap_forecast_001
+  source_gap_id: R5_002837_GAP_FORECAST_001
+  pack_section: financial_history_pack
+  review_decision: pending
+  evidence_id: null
+  source_rank: B
+  reason: TODO_MODEL_INPUT
+  next_action: 用已审查 metrics 构建假设，或保持 TODO
+summary:
+  request_count: 10
+  pending_count: 10
+  accepted_count: 0
+  accepted_null_evidence_count: 0
+promotion_rules:
+- accepted requires evidence_id and source_rank
+- pending cannot unblock source-gapped pilot

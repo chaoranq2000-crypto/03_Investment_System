@@ -2,6 +2,10 @@ schema_version: r5_next_pilot_gate_rules_v0.1
 sample_quality_report_allowed: false
 p2_allowed: false
 max_next_candidate_tasks: 3
+default_paths:
+  market_peer_input_registry: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_market_peer_input_registry.yaml
+  forecast_assumption_registry: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_forecast_assumption_registry.yaml
+  evidence_request_review_ledger: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_review_ledger.yaml
 candidate_tasks:
   - collect reviewed market and peer inputs from R5_evidence_request_queue.yaml without live API
   - register reviewed forecast assumptions before numeric forecast or valuation outputs

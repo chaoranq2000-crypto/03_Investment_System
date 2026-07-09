@@ -103,6 +103,100 @@ def render_source_gapped_research_draft(*, pack_path: Path, output_path: Path) -
     return {"output_path": str(output_path), "source_gap_count": len(gaps), "output_type": "source_gapped_research_draft"}
 
 
+def _load_optional_yaml(path: Path | None) -> object:
+    return _load_yaml(path) if path is not None else {}
+
+
+def _scorecard_sections(scorecard: Mapping[str, object]) -> list[Mapping[str, object]]:
+    sections = scorecard.get("sections")
+    return [section for section in sections if isinstance(section, Mapping)] if isinstance(sections, list) else []
+
+
+def render_reviewed_input_research_draft(
+    *,
+    pack_path: Path,
+    scorecard_path: Path,
+    promotion_path: Path | None = None,
+    output_path: Path,
+) -> dict[str, object]:
+    pack = _load_yaml(pack_path)
+    scorecard_raw = _load_yaml(scorecard_path)
+    promotion_raw = _load_optional_yaml(promotion_path)
+    if not isinstance(pack, dict):
+        raise ValueError("R5 pack must be a mapping")
+    if not isinstance(scorecard_raw, dict):
+        raise ValueError("R5 quality scorecard must be a mapping")
+    promotion = promotion_raw if isinstance(promotion_raw, dict) else {}
+    if promotion.get("promotion_level") == "sample_quality_candidate":
+        output_type = "sample_quality_candidate"
+    else:
+        output_type = "reviewed_input_research_draft"
+
+    stock = pack.get("stock") if isinstance(pack.get("stock"), dict) else {}
+    quality = pack.get("quality_status") if isinstance(pack.get("quality_status"), dict) else {}
+    gaps = _source_gap_rows(pack)
+    rendered_sections = 0
+    lines = [
+        f"# reviewed_input_research_draft: {stock.get('stock_code', '')} {stock.get('company_name', '')}".strip(),
+        "",
+        "metadata:",
+        f"- output_type: {output_type}",
+        f"- pack_status: {pack.get('pack_status', 'research_draft')}",
+        f"- allowed_report_level: {scorecard_raw.get('allowed_report_level', quality.get('allowed_report_level', 'research_draft'))}",
+        f"- no_advice_boundary: {quality.get('no_advice_gate_passed', True)}",
+        "",
+    ]
+
+    for section in _scorecard_sections(scorecard_raw):
+        section_id = section.get("section_id", "section")
+        readiness = section.get("readiness", "source_gapped")
+        lines.extend([f"## {section_id}", ""])
+        if readiness in {"ready", "ready_with_limitations"}:
+            rendered_sections += 1
+            lines.append(f"- readiness: {readiness}")
+            lines.append(f"- evidence_ids: {', '.join(section.get('evidence_ids', []) or ['TODO'])}")
+            for limitation in section.get("limitations", []) or []:
+                lines.append(f"- limitation: {limitation}")
+        else:
+            lines.append(f"- readiness: {readiness}")
+            lines.append("- next_action: keep source gaps visible until reviewed inputs exist.")
+            for issue in section.get("issues", []) or []:
+                lines.append(f"- issue: {issue}")
+        lines.append("")
+
+    lines.extend(["## Source Gap Appendix", ""])
+    for row in gaps:
+        if not isinstance(row, dict):
+            continue
+        lines.append(
+            "- {gap_id} | {section} | {missing} | {next_action}".format(
+                gap_id=row.get("gap_id", "gap"),
+                section=row.get("section", "unknown"),
+                missing=row.get("missing_data", row.get("missing_reason", "TODO_SOURCE_REQUIRED")),
+                next_action=row.get("next_action", "keep visible TODO"),
+            )
+        )
+    blockers = scorecard_raw.get("sample_quality_blockers") or []
+    lines.extend(["", "## Open Questions", ""])
+    if blockers:
+        for blocker in blockers:
+            lines.append(f"- {blocker}")
+    else:
+        lines.append("- TODO: continue reviewed input checks before any readiness upgrade.")
+    lines.append("")
+
+    text = "\n".join(lines)
+    forbidden = ["买入", "卖出", "持有", "仓位", "target price", "buy rating", "sell rating", "hold rating"]
+    for phrase in forbidden:
+        if phrase.lower() in text.lower():
+            raise ValueError(f"forbidden trading phrase generated: {phrase}")
+    if output_type != "sample_quality_candidate" and "sample_quality_candidate" in text:
+        raise ValueError("reviewed-input draft must not claim sample_quality_candidate")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(text + "\n", encoding="utf-8")
+    return {"output_path": str(output_path), "reviewed_sections": rendered_sections, "output_type": output_type}
+
+
 def _metric_rows(financial_quality: Mapping[str, object]) -> list[list[object]]:
     rows = [["指标", "期间", "数值", "单位", "metric_id / evidence"]]
     for item in financial_quality.get("ratios", []) if isinstance(financial_quality.get("ratios"), list) else []:

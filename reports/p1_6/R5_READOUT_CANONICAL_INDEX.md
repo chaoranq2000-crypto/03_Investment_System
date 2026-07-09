@@ -45,3 +45,9 @@ Historical readouts are not rewritten. Legacy entries are retained as history an
 | `reports/p1_6/R5_PATCH_33_MARKET_PEER_INPUTS_READOUT.md` | `canonical` | `true` | Patch 33 generated from market/peer validator commands |
 | `reports/p1_6/R5_PATCH_34_FORECAST_VALUATION_INTERLOCK_READOUT.md` | `canonical` | `true` | Patch 34 generated from forecast interlock validation commands |
 | `reports/p1_6/R5_PATCH_35_REPORT_COMPOSER_DEGRADATION_READOUT.md` | `canonical` | `true` | Patch 35 generated from composer degradation validation commands |
+| `reports/p1_6/R5_PATCH_37_MARKET_PEER_INPUT_REGISTRY_READOUT.md` | `canonical` | `true` | Patch 37 generated from market/peer input registry validation commands |
+| `reports/p1_6/R5_PATCH_38_FORECAST_ASSUMPTION_REGISTRY_READOUT.md` | `canonical` | `true` | Patch 38 generated from forecast assumption registry validation commands |
+| `reports/p1_6/R5_PATCH_39_EVIDENCE_REQUEST_REVIEW_LEDGER_READOUT.md` | `canonical` | `true` | Patch 39 generated from evidence request review ledger builder and validator commands |
+| `reports/p1_6/R5_PATCH_40_REAL_SAMPLE_PILOT_GATE_RECHECK_READOUT.md` | `canonical` | `true` | Patch 40 generated from next pilot gate recheck commands |
+| `reports/p1_6/R5_PATCH_41_COMPOSER_DEGRADATION_READOUT.md` | `canonical` | `true` | Patch 41 generated from composer degradation validation commands |
+| `reports/p1_6/R5_AFTER_PATCH42_CLOSE_READOUT.md` | `canonical` | `true` | Patch 42 close readout freezes reviewed-input registration state |

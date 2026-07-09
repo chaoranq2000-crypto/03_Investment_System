@@ -1,0 +1,24 @@
+artifact_type: R5_reviewed_evidence_registry
+schema_version: r5_reviewed_evidence_registry_v0.1
+registry_id: r5_reviewed_evidence_registry_002837_example
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+no_live_api: true
+records:
+  - source_gap_id: R5_002837_GAP_MARKET_001
+    request_id: r5_market_snapshot_r5_002837_gap_market_001
+    evidence_id: null
+    source_type: market_data_snapshot
+    source_rank: B
+    as_of_date: null
+    review_status: planned
+    reviewer: TODO_REVIEWER
+    allowed_usage:
+      - source_gapped_research_draft
+    claim_scope:
+      - TODO_SOURCE_REQUIRED
+    metric_scope:
+      - TODO_MARKET_DATA
+    limitations:
+      - TODO_SOURCE_REQUIRED: reviewed dated market snapshot has not been supplied.
+    no_live_api: true
