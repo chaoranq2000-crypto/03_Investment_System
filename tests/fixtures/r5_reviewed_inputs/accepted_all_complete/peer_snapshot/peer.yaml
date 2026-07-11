@@ -1,0 +1,21 @@
+records:
+  - input_id: fixture_all_peer_001
+    workflow_id: wf_fixture_r5_bundle4
+    stock_code: "000000"
+    input_type: peer_snapshot
+    as_of_date: "2026-06-30"
+    source_evidence_id: ev_fixture_all_peer_001
+    source_rank: B
+    review_status: accepted
+    reviewer: fixture_reviewer
+    reviewed_at: "2026-07-10T10:05:00+08:00"
+    capture_method: synthetic_fixture
+    no_live_api: true
+    limitations: [synthetic test data, not research evidence]
+    peer_set_id: fixture_peer_set_all
+    peer_stock_code: fixture_peer_02
+    peer_company_name: Synthetic Peer B
+    peer_metric_name: pe_ttm
+    peer_metric_value: 18.0
+    peer_metric_unit: multiple
+    sample_quality_allowed: false

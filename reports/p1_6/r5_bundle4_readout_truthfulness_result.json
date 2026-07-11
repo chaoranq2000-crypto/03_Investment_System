@@ -1,0 +1,64 @@
+{
+  "truthfulness_status": "pass",
+  "checked": 6,
+  "failed": 0,
+  "canonical_checked": 6,
+  "legacy_noncanonical": 0,
+  "superseded": 0,
+  "results": [
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_4_1_ACCEPTED_FIXTURE_SET_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_4_2_DROPZONE_VALIDATION_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_4_3_REGISTRY_PROMOTION_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_4_4_POST_PROMOTION_DRY_RUN_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_4_5_END_TO_END_FIXTURE_SMOKE_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_4_REVIEWED_INPUT_FIXTURE_PROMOTION_CLOSE_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+records:
+  - input_id: fixture_all_valuation_001
+    workflow_id: wf_fixture_r5_bundle4
+    stock_code: "000000"
+    input_type: valuation_inputs
+    as_of_date: "2026-06-30"
+    source_evidence_id: ev_fixture_all_valuation_001
+    source_rank: B
+    review_status: accepted
+    reviewer: fixture_reviewer
+    reviewed_at: "2026-07-10T10:15:00+08:00"
+    capture_method: synthetic_fixture
+    no_live_api: true
+    limitations: [synthetic test data, not research evidence]
+    valuation_input_id: fixture_valuation_context_all
+    requested_methods: [relative_pe, dcf]
+    market_input_ids: [fixture_all_market_001]
+    peer_input_ids: [fixture_all_peer_001]
+    forecast_assumption_ids: [fixture_all_forecast_001]
+    business_disclosure_input_ids: [fixture_all_business_001]
+    sample_quality_allowed: false

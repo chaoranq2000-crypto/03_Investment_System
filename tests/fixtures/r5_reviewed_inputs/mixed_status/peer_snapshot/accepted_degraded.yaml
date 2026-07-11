@@ -1,0 +1,24 @@
+records:
+  - input_id: fixture_mixed_peer_degraded
+    workflow_id: wf_fixture_r5_bundle4
+    stock_code: "000000"
+    input_type: peer_snapshot
+    as_of_date: "2026-06-30"
+    source_evidence_id: ev_fixture_mixed_peer_degraded
+    source_rank: C
+    review_status: accepted_degraded
+    reviewer: fixture_reviewer
+    reviewed_at: "2026-07-10T11:05:00+08:00"
+    capture_method: synthetic_fixture
+    no_live_api: true
+    limitations:
+      - synthetic test data
+      - not research evidence
+      - incomplete synthetic peer coverage
+    peer_set_id: fixture_peer_set_degraded
+    peer_stock_code: fixture_peer_03
+    peer_company_name: Synthetic Peer C
+    peer_metric_name: pe_ttm
+    peer_metric_value: 14.0
+    peer_metric_unit: multiple
+    sample_quality_allowed: false

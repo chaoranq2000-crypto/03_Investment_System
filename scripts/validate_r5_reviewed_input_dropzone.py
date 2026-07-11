@@ -6,6 +6,8 @@ import argparse
 import csv
 import json
 import re
+from collections import Counter
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +23,7 @@ ALLOWED_INPUT_TYPES = {
 }
 ALLOWED_REVIEW_STATUSES = {"pending", "accepted", "rejected", "accepted_degraded"}
 ACCEPTED_STATUSES = {"accepted", "accepted_degraded"}
+ALLOWED_SOURCE_RANKS = {"A", "B", "C", "D", "unknown"}
 FORBIDDEN_ACCEPTED_TOKENS = {
     "TODO_MARKET_DATA",
     "TODO_PEER_DATA",
@@ -41,6 +44,10 @@ ACCEPTED_REQUIRED_FIELDS = [
 ]
 FALSE_VALUES = {"false", "0", "no", "n"}
 NULL_VALUES = {"", "null", "none", "nan", "na", "n/a", "~"}
+PLACEHOLDER_EVIDENCE = re.compile(
+    r"(?:^|[_:\-])(todo|missing|placeholder|unknown|unverified|low_confidence)(?:$|[_:\-])",
+    re.IGNORECASE,
+)
 
 
 def _issue(issue_id: str, severity: str, path: str, description: str) -> dict[str, str]:
@@ -77,6 +84,43 @@ def _is_true(value: Any) -> bool:
     if isinstance(value, str):
         return value.strip().lower() in {"true", "1", "yes", "y"}
     return False
+
+
+def _is_placeholder_evidence(value: Any) -> bool:
+    if _is_missing(value):
+        return False
+    return bool(PLACEHOLDER_EVIDENCE.search(str(value).strip()))
+
+
+def _is_valid_date(value: Any) -> bool:
+    if isinstance(value, datetime):
+        return False
+    if isinstance(value, date):
+        return True
+    if not isinstance(value, str) or not value.strip():
+        return False
+    try:
+        date.fromisoformat(value.strip())
+    except ValueError:
+        return False
+    return True
+
+
+def _is_valid_datetime(value: Any) -> bool:
+    if isinstance(value, datetime):
+        return True
+    if not isinstance(value, str) or not value.strip():
+        return False
+    try:
+        datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return True
+
+
+def _parent_input_type(path: Path) -> str | None:
+    candidates = [part for part in path.parts[:-1] if part in ALLOWED_INPUT_TYPES]
+    return candidates[-1] if candidates else None
 
 
 def _rows_from_yaml(path: Path) -> list[dict[str, Any]]:
@@ -131,6 +175,16 @@ def validate_record(record: dict[str, Any], path: Path, row_index: int) -> list[
     input_type = record.get("input_type")
     if input_type not in ALLOWED_INPUT_TYPES:
         issues.append(_issue("R5DROP-TYPE-001", "high", f"{location}.input_type", "input_type is not allowed"))
+    parent_input_type = _parent_input_type(path)
+    if parent_input_type and input_type in ALLOWED_INPUT_TYPES and input_type != parent_input_type:
+        issues.append(
+            _issue(
+                "R5DROP-FOLDER-001",
+                "high",
+                f"{location}.input_type",
+                f"input_type {input_type} does not match parent directory {parent_input_type}",
+            )
+        )
 
     review_status = str(record.get("review_status") or "")
     if review_status not in ALLOWED_REVIEW_STATUSES:
@@ -142,8 +196,62 @@ def validate_record(record: dict[str, Any], path: Path, row_index: int) -> list[
                 issues.append(_issue("R5DROP-ACCEPTED-REQ-001", "high", f"{location}.{field}", f"{field} is required for accepted rows"))
         if _is_missing(record.get("source_evidence_id")):
             issues.append(_issue("R5DROP-EVIDENCE-001", "high", f"{location}.source_evidence_id", "accepted rows require source_evidence_id"))
+        elif _is_placeholder_evidence(record.get("source_evidence_id")):
+            issues.append(
+                _issue(
+                    "R5DROP-EVIDENCE-003",
+                    "high",
+                    f"{location}.source_evidence_id",
+                    "accepted rows cannot use placeholder source_evidence_id",
+                )
+            )
         if "evidence_id" in record and _is_missing(record.get("evidence_id")):
             issues.append(_issue("R5DROP-EVIDENCE-002", "high", f"{location}.evidence_id", "accepted rows cannot carry evidence_id null"))
+        if _is_true(record.get("template_only")):
+            issues.append(
+                _issue(
+                    "R5DROP-TEMPLATE-001",
+                    "high",
+                    f"{location}.template_only",
+                    "accepted rows cannot be template_only",
+                )
+            )
+        if _is_true(record.get("not_evidence")):
+            issues.append(
+                _issue(
+                    "R5DROP-NOTEVID-001",
+                    "high",
+                    f"{location}.not_evidence",
+                    "accepted rows cannot be marked not_evidence",
+                )
+            )
+        if not _is_valid_date(record.get("as_of_date")):
+            issues.append(
+                _issue(
+                    "R5DROP-DATE-001",
+                    "high",
+                    f"{location}.as_of_date",
+                    "accepted rows require a valid ISO as_of_date",
+                )
+            )
+        if not _is_valid_datetime(record.get("reviewed_at")):
+            issues.append(
+                _issue(
+                    "R5DROP-DATETIME-001",
+                    "high",
+                    f"{location}.reviewed_at",
+                    "accepted rows require a valid ISO reviewed_at timestamp",
+                )
+            )
+        if str(record.get("source_rank")) not in ALLOWED_SOURCE_RANKS:
+            issues.append(
+                _issue(
+                    "R5DROP-RANK-001",
+                    "high",
+                    f"{location}.source_rank",
+                    "accepted row source_rank is unsupported",
+                )
+            )
         if not _is_true(record.get("no_live_api")):
             issues.append(_issue("R5DROP-NOLIVE-001", "high", f"{location}.no_live_api", "accepted rows require no_live_api true"))
         text = _text(record)
@@ -171,14 +279,24 @@ def validate_root(root: Path) -> dict[str, Any]:
         "pending_count": 0,
         "rejected_count": 0,
     }
+    input_ids: list[str] = []
+    workflow_ids: set[str] = set()
+    stock_codes: set[str] = set()
+    counts_by_input_type: Counter[str] = Counter()
+    record_count = 0
     for path in iter_input_files(root):
-        checked_files.append(path.as_posix())
+        try:
+            relative_path = path.relative_to(root)
+        except ValueError:
+            relative_path = Path(path.name)
+        checked_files.append(relative_path.as_posix())
         try:
             rows = read_dropzone_file(path)
         except Exception as exc:  # noqa: BLE001
-            issues.append(_issue("R5DROP-LOAD-001", "high", path.as_posix(), f"ERROR: {exc}"))
+            issues.append(_issue("R5DROP-LOAD-001", "high", relative_path.as_posix(), f"ERROR: {exc}"))
             continue
         for idx, record in enumerate(rows):
+            record_count += 1
             status = str(record.get("review_status") or "")
             if status == "accepted":
                 counts["accepted_count"] += 1
@@ -188,7 +306,49 @@ def validate_root(root: Path) -> dict[str, Any]:
                 counts["pending_count"] += 1
             elif status == "rejected":
                 counts["rejected_count"] += 1
-            issues.extend(validate_record(record, path, idx))
+            input_type = str(record.get("input_type") or "")
+            counts_by_input_type[input_type] += 1
+            input_id = record.get("input_id")
+            if not _is_missing(input_id):
+                input_ids.append(str(input_id))
+            workflow_id = record.get("workflow_id")
+            if not _is_missing(workflow_id):
+                workflow_ids.add(str(workflow_id))
+            stock_code = record.get("stock_code")
+            if not _is_missing(stock_code):
+                stock_codes.add(str(stock_code))
+            issues.extend(validate_record(record, relative_path, idx))
+
+    duplicate_input_ids = sorted(input_id for input_id, count in Counter(input_ids).items() if count > 1)
+    unique_workflow_ids = sorted(workflow_ids)
+    unique_stock_codes = sorted(stock_codes)
+    if duplicate_input_ids:
+        issues.append(
+            _issue(
+                "R5DROP-ID-001",
+                "high",
+                "input_id",
+                "duplicate non-empty input_id values: " + ", ".join(duplicate_input_ids),
+            )
+        )
+    if len(unique_workflow_ids) > 1:
+        issues.append(
+            _issue(
+                "R5DROP-WORKFLOW-001",
+                "high",
+                "workflow_id",
+                "validated root contains multiple workflow_id values: " + ", ".join(unique_workflow_ids),
+            )
+        )
+    if len(unique_stock_codes) > 1:
+        issues.append(
+            _issue(
+                "R5DROP-STOCK-001",
+                "high",
+                "stock_code",
+                "validated root contains multiple stock_code values: " + ", ".join(unique_stock_codes),
+            )
+        )
 
     failed_count = sum(1 for issue in issues if issue["severity"] == "high")
     return {
@@ -196,6 +356,11 @@ def validate_root(root: Path) -> dict[str, Any]:
         "schema_version": "r5_reviewed_input_dropzone_validation_v0.1",
         "status": "pass" if failed_count == 0 else "fail",
         "checked_files": checked_files,
+        "record_count": record_count,
+        "unique_workflow_ids": unique_workflow_ids,
+        "unique_stock_codes": unique_stock_codes,
+        "duplicate_input_ids": duplicate_input_ids,
+        "counts_by_input_type": dict(sorted(counts_by_input_type.items())),
         **counts,
         "failed_count": failed_count,
         "issues": issues,

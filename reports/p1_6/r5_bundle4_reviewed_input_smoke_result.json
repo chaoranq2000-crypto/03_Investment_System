@@ -1,0 +1,531 @@
+{
+  "artifact_type": "r5_bundle4_reviewed_input_smoke_result",
+  "schema_version": "r5_bundle4_reviewed_input_smoke_result.v1",
+  "fixture_mode": true,
+  "base_workflow_id": "wf_20260703_stock_first_002837_invic",
+  "temporary_workflow_id": "wf_fixture_r5_bundle4",
+  "no_live_api": true,
+  "scenarios": {
+    "empty_or_pending": {
+      "status": "pass",
+      "expectation_met": true,
+      "steps": [
+        {
+          "name": "dropzone_validation",
+          "status": "pass"
+        },
+        {
+          "name": "registry_promotion",
+          "status": "no_accepted_inputs"
+        },
+        {
+          "name": "registry_validation_and_dry_run",
+          "status": "fail"
+        },
+        {
+          "name": "fixture_gate_decision",
+          "status": "pass"
+        },
+        {
+          "name": "expectation_check",
+          "status": "pass"
+        }
+      ],
+      "reviewed_flags": {
+        "reviewed_market_inputs_available": false,
+        "reviewed_peer_inputs_available": false,
+        "reviewed_forecast_assumptions_available": false,
+        "reviewed_valuation_inputs_available": false,
+        "reviewed_business_disclosure_available": false
+      },
+      "remaining_todos": [
+        "TODO_MARKET_DATA",
+        "TODO_PEER_DATA",
+        "TODO_MODEL_INPUT",
+        "MISSING_DISCLOSURE",
+        "TODO_SOURCE_REQUIRED"
+      ],
+      "allowed_report_level": "source_gapped_research_draft",
+      "sample_quality_report_allowed": false,
+      "p2_allowed": false,
+      "accepted_count": 0,
+      "accepted_degraded_count": 0,
+      "accepted_input_ids": [],
+      "accepted_degraded_input_ids": [],
+      "registries_changed": false,
+      "registry_actions": {
+        "market_peer": {
+          "action": "unchanged",
+          "before_hash": null,
+          "after_hash": null
+        },
+        "forecast_assumptions": {
+          "action": "unchanged",
+          "before_hash": null,
+          "after_hash": null
+        },
+        "valuation_inputs": {
+          "action": "unchanged",
+          "before_hash": null,
+          "after_hash": null
+        },
+        "evidence_ledger": {
+          "action": "unchanged",
+          "before_hash": null,
+          "after_hash": null
+        }
+      },
+      "blockers": [
+        {
+          "id": "evidence_ledger",
+          "reason": "missing physical registry: R5_evidence_request_review_ledger.yaml"
+        },
+        {
+          "id": "forecast_assumptions",
+          "reason": "missing physical registry: R5_forecast_assumption_registry.yaml"
+        },
+        {
+          "id": "identity",
+          "reason": "stock_code mismatch across registries: []"
+        },
+        {
+          "id": "identity",
+          "reason": "workflow_id mismatch across registries: []"
+        },
+        {
+          "id": "market_peer",
+          "reason": "missing physical registry: R5_market_peer_input_registry.yaml"
+        },
+        {
+          "id": "valuation_inputs",
+          "reason": "missing physical registry: R5_valuation_input_registry.yaml"
+        }
+      ]
+    },
+    "accepted_core_complete": {
+      "status": "pass",
+      "expectation_met": true,
+      "steps": [
+        {
+          "name": "dropzone_validation",
+          "status": "pass"
+        },
+        {
+          "name": "registry_promotion",
+          "status": "accepted_inputs_promoted"
+        },
+        {
+          "name": "registry_validation_and_dry_run",
+          "status": "pass"
+        },
+        {
+          "name": "fixture_gate_decision",
+          "status": "pass"
+        },
+        {
+          "name": "expectation_check",
+          "status": "pass"
+        }
+      ],
+      "reviewed_flags": {
+        "reviewed_market_inputs_available": true,
+        "reviewed_peer_inputs_available": true,
+        "reviewed_forecast_assumptions_available": true,
+        "reviewed_valuation_inputs_available": true,
+        "reviewed_business_disclosure_available": false
+      },
+      "remaining_todos": [
+        "MISSING_DISCLOSURE"
+      ],
+      "allowed_report_level": "reviewed_input_research_draft",
+      "sample_quality_report_allowed": false,
+      "p2_allowed": false,
+      "accepted_count": 8,
+      "accepted_degraded_count": 0,
+      "accepted_input_ids": [
+        "fixture_core_forecast_001",
+        "fixture_core_forecast_002",
+        "fixture_core_forecast_003",
+        "fixture_core_forecast_004",
+        "fixture_core_forecast_005",
+        "fixture_core_market_001",
+        "fixture_core_peer_001",
+        "fixture_core_valuation_001"
+      ],
+      "accepted_degraded_input_ids": [],
+      "registries_changed": true,
+      "registry_actions": {
+        "market_peer": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "c67c30a831b5e3cd5f5dac5969066968925aa2fb520f1221bd953198d25e5c1a"
+        },
+        "forecast_assumptions": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "8c613d259c98c17dc3193d35cdd96cf27e736b8a642ccacb61f1d6ddfbe04534"
+        },
+        "valuation_inputs": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "ed44008ecfe4d62d53023b375fd8ec0af586317eb1d95ce875d4101f6a13b330"
+        },
+        "evidence_ledger": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "38a5ba8c026ee5855aa0c7bfa7a634845cf508752534843de6821d4fb61b5fe5"
+        }
+      },
+      "blockers": []
+    },
+    "accepted_all_complete": {
+      "status": "pass",
+      "expectation_met": true,
+      "steps": [
+        {
+          "name": "dropzone_validation",
+          "status": "pass"
+        },
+        {
+          "name": "registry_promotion",
+          "status": "accepted_inputs_promoted"
+        },
+        {
+          "name": "registry_validation_and_dry_run",
+          "status": "pass"
+        },
+        {
+          "name": "fixture_gate_decision",
+          "status": "pass"
+        },
+        {
+          "name": "expectation_check",
+          "status": "pass"
+        }
+      ],
+      "reviewed_flags": {
+        "reviewed_market_inputs_available": true,
+        "reviewed_peer_inputs_available": true,
+        "reviewed_forecast_assumptions_available": true,
+        "reviewed_valuation_inputs_available": true,
+        "reviewed_business_disclosure_available": true
+      },
+      "remaining_todos": [],
+      "allowed_report_level": "reviewed_input_research_draft",
+      "sample_quality_report_allowed": false,
+      "p2_allowed": false,
+      "accepted_count": 9,
+      "accepted_degraded_count": 0,
+      "accepted_input_ids": [
+        "fixture_all_business_001",
+        "fixture_all_forecast_001",
+        "fixture_all_forecast_002",
+        "fixture_all_forecast_003",
+        "fixture_all_forecast_004",
+        "fixture_all_forecast_005",
+        "fixture_all_market_001",
+        "fixture_all_peer_001",
+        "fixture_all_valuation_001"
+      ],
+      "accepted_degraded_input_ids": [],
+      "registries_changed": true,
+      "registry_actions": {
+        "market_peer": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "1056116e3042fb1237770c8afd755b0d30df36eda1067c68e37cda5c4e41ab52"
+        },
+        "forecast_assumptions": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "0e611e22f7cfd897df6ffa7abf0a50e2dbd3d1b1c10cfd5625a0fd94c8c548fe"
+        },
+        "valuation_inputs": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "d996960dbda20ab0a934f298a738bbc44be5e5886384ae81ce0782217665ef8b"
+        },
+        "evidence_ledger": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "e75d467321afc054e0223b52df87622831887ddb11a3ab078ac65c1ac552919a"
+        }
+      },
+      "blockers": []
+    },
+    "mixed_status": {
+      "status": "pass",
+      "expectation_met": true,
+      "steps": [
+        {
+          "name": "dropzone_validation",
+          "status": "pass"
+        },
+        {
+          "name": "registry_promotion",
+          "status": "accepted_inputs_promoted"
+        },
+        {
+          "name": "registry_validation_and_dry_run",
+          "status": "fail"
+        },
+        {
+          "name": "fixture_gate_decision",
+          "status": "pass"
+        },
+        {
+          "name": "expectation_check",
+          "status": "pass"
+        }
+      ],
+      "reviewed_flags": {
+        "reviewed_market_inputs_available": true,
+        "reviewed_peer_inputs_available": false,
+        "reviewed_forecast_assumptions_available": false,
+        "reviewed_valuation_inputs_available": false,
+        "reviewed_business_disclosure_available": false
+      },
+      "remaining_todos": [
+        "TODO_PEER_DATA",
+        "TODO_MODEL_INPUT",
+        "MISSING_DISCLOSURE",
+        "TODO_SOURCE_REQUIRED"
+      ],
+      "allowed_report_level": "source_gapped_research_draft",
+      "sample_quality_report_allowed": false,
+      "p2_allowed": false,
+      "accepted_count": 1,
+      "accepted_degraded_count": 1,
+      "accepted_input_ids": [
+        "fixture_mixed_market_accepted"
+      ],
+      "accepted_degraded_input_ids": [
+        "fixture_mixed_peer_degraded"
+      ],
+      "registries_changed": true,
+      "registry_actions": {
+        "market_peer": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "0d8b770c190c958c3fea75ab63e5377fd6f3bd7f6eb09ea83815429e0251bce2"
+        },
+        "forecast_assumptions": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "aea08dc64881aea64551f14dcb54b4c2550178f5fa48ebc219456b98e8263863"
+        },
+        "valuation_inputs": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "a02a14206799a67491d06d406b5e8a75e5db9b8f93e9bcf4e99a3ad6b7a3dbf8"
+        },
+        "evidence_ledger": {
+          "action": "created",
+          "before_hash": null,
+          "after_hash": "6b7faccaa49fe81c3ef4c8eeac0096578df1b7363dd31fdde2434315b25365fd"
+        }
+      },
+      "blockers": [
+        {
+          "id": "valuation_inputs",
+          "reason": "valuation_input_refs are missing or empty"
+        }
+      ]
+    },
+    "invalid_input": {
+      "status": "pass",
+      "expectation_met": true,
+      "steps": [
+        {
+          "name": "dropzone_validation",
+          "status": "fail"
+        },
+        {
+          "name": "registry_promotion",
+          "status": "blocked_invalid_dropzone"
+        },
+        {
+          "name": "registry_validation_and_dry_run",
+          "status": "fail"
+        },
+        {
+          "name": "fixture_gate_decision",
+          "status": "pass"
+        },
+        {
+          "name": "expectation_check",
+          "status": "pass"
+        }
+      ],
+      "reviewed_flags": {
+        "reviewed_market_inputs_available": false,
+        "reviewed_peer_inputs_available": false,
+        "reviewed_forecast_assumptions_available": false,
+        "reviewed_valuation_inputs_available": false,
+        "reviewed_business_disclosure_available": false
+      },
+      "remaining_todos": [
+        "TODO_MARKET_DATA",
+        "TODO_PEER_DATA",
+        "TODO_MODEL_INPUT",
+        "MISSING_DISCLOSURE",
+        "TODO_SOURCE_REQUIRED"
+      ],
+      "allowed_report_level": "source_gapped_research_draft",
+      "sample_quality_report_allowed": false,
+      "p2_allowed": false,
+      "accepted_count": 2,
+      "accepted_degraded_count": 0,
+      "accepted_input_ids": [
+        "fixture_cross_stock_market",
+        "fixture_cross_stock_peer"
+      ],
+      "accepted_degraded_input_ids": [],
+      "registries_changed": false,
+      "registry_actions": {
+        "market_peer": {
+          "action": "blocked",
+          "before_hash": null,
+          "after_hash": null
+        },
+        "forecast_assumptions": {
+          "action": "blocked",
+          "before_hash": null,
+          "after_hash": null
+        },
+        "valuation_inputs": {
+          "action": "blocked",
+          "before_hash": null,
+          "after_hash": null
+        },
+        "evidence_ledger": {
+          "action": "blocked",
+          "before_hash": null,
+          "after_hash": null
+        }
+      },
+      "blockers": [
+        {
+          "id": "R5DROP-STOCK-001",
+          "reason": "validated root contains multiple stock_code values: 000000, fixture_other_stock"
+        },
+        {
+          "id": "R5PROMOTE-BOUNDARY-001",
+          "reason": "dropzone validation failed"
+        },
+        {
+          "id": "evidence_ledger",
+          "reason": "missing physical registry: R5_evidence_request_review_ledger.yaml"
+        },
+        {
+          "id": "forecast_assumptions",
+          "reason": "missing physical registry: R5_forecast_assumption_registry.yaml"
+        },
+        {
+          "id": "identity",
+          "reason": "stock_code mismatch across registries: []"
+        },
+        {
+          "id": "identity",
+          "reason": "workflow_id mismatch across registries: []"
+        },
+        {
+          "id": "market_peer",
+          "reason": "missing physical registry: R5_market_peer_input_registry.yaml"
+        },
+        {
+          "id": "promotion_result",
+          "reason": "promotion result validation_status is not pass"
+        },
+        {
+          "id": "valuation_inputs",
+          "reason": "missing physical registry: R5_valuation_input_registry.yaml"
+        }
+      ]
+    },
+    "idempotent_rerun": {
+      "status": "pass",
+      "expectation_met": true,
+      "steps": [
+        {
+          "name": "dropzone_validation",
+          "status": "pass"
+        },
+        {
+          "name": "registry_promotion",
+          "status": "accepted_inputs_unchanged"
+        },
+        {
+          "name": "first_materialization",
+          "status": "accepted_inputs_promoted"
+        },
+        {
+          "name": "registry_validation_and_dry_run",
+          "status": "pass"
+        },
+        {
+          "name": "fixture_gate_decision",
+          "status": "pass"
+        },
+        {
+          "name": "expectation_check",
+          "status": "pass"
+        }
+      ],
+      "reviewed_flags": {
+        "reviewed_market_inputs_available": true,
+        "reviewed_peer_inputs_available": true,
+        "reviewed_forecast_assumptions_available": true,
+        "reviewed_valuation_inputs_available": true,
+        "reviewed_business_disclosure_available": false
+      },
+      "remaining_todos": [
+        "MISSING_DISCLOSURE"
+      ],
+      "allowed_report_level": "reviewed_input_research_draft",
+      "sample_quality_report_allowed": false,
+      "p2_allowed": false,
+      "accepted_count": 8,
+      "accepted_degraded_count": 0,
+      "accepted_input_ids": [
+        "fixture_core_forecast_001",
+        "fixture_core_forecast_002",
+        "fixture_core_forecast_003",
+        "fixture_core_forecast_004",
+        "fixture_core_forecast_005",
+        "fixture_core_market_001",
+        "fixture_core_peer_001",
+        "fixture_core_valuation_001"
+      ],
+      "accepted_degraded_input_ids": [],
+      "registries_changed": false,
+      "registry_actions": {
+        "market_peer": {
+          "action": "unchanged",
+          "before_hash": "c67c30a831b5e3cd5f5dac5969066968925aa2fb520f1221bd953198d25e5c1a",
+          "after_hash": "c67c30a831b5e3cd5f5dac5969066968925aa2fb520f1221bd953198d25e5c1a"
+        },
+        "forecast_assumptions": {
+          "action": "unchanged",
+          "before_hash": "8c613d259c98c17dc3193d35cdd96cf27e736b8a642ccacb61f1d6ddfbe04534",
+          "after_hash": "8c613d259c98c17dc3193d35cdd96cf27e736b8a642ccacb61f1d6ddfbe04534"
+        },
+        "valuation_inputs": {
+          "action": "unchanged",
+          "before_hash": "ed44008ecfe4d62d53023b375fd8ec0af586317eb1d95ce875d4101f6a13b330",
+          "after_hash": "ed44008ecfe4d62d53023b375fd8ec0af586317eb1d95ce875d4101f6a13b330"
+        },
+        "evidence_ledger": {
+          "action": "unchanged",
+          "before_hash": "38a5ba8c026ee5855aa0c7bfa7a634845cf508752534843de6821d4fb61b5fe5",
+          "after_hash": "38a5ba8c026ee5855aa0c7bfa7a634845cf508752534843de6821d4fb61b5fe5"
+        }
+      },
+      "blockers": []
+    }
+  },
+  "real_workflow_unchanged": true,
+  "sample_quality_report_allowed": false,
+  "p2_allowed": false,
+  "overall_status": "pass"
+}

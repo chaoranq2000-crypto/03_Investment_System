@@ -1,0 +1,17 @@
+records:
+  - input_id: fixture_cross_workflow_market
+    workflow_id: wf_fixture_r5_bundle4
+    stock_code: "000000"
+    input_type: market_snapshot
+    as_of_date: "2026-06-30"
+    source_evidence_id: ev_fixture_cross_workflow_market
+    source_rank: B
+    review_status: accepted
+    reviewer: fixture_reviewer
+    reviewed_at: "2026-07-10T12:10:00+08:00"
+    capture_method: synthetic_fixture
+    no_live_api: true
+    limitations: [synthetic test data, not research evidence]
+    market_date: "2026-06-30"
+    close_price: 11.0
+    sample_quality_allowed: false

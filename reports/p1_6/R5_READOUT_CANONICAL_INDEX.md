@@ -71,3 +71,11 @@ Historical readouts are not rewritten. Legacy entries are retained as history an
 | `reports/p1_6/R5_BUNDLE_3_4_VALUATION_SUBPACK_READOUT.md` | `canonical` | `true` | Bundle 3.4 valuation subpack validator readout |
 | `reports/p1_6/R5_BUNDLE_3_5_CORE_ASSET_PREFLIGHT_GATE_READOUT.md` | `canonical` | `true` | Bundle 3.5 core asset preflight gate readout |
 | `reports/p1_6/R5_BUNDLE_3_CORE_RESEARCH_ASSET_SUBPACKS_CLOSE_READOUT.md` | `canonical` | `true` | Bundle 3.6 close readout freezes executable-with-TODOs core asset state |
+| `reports/p1_6/R5_AFTER_BUNDLE3_COMPLETION_REVIEW.md` | `canonical` | `true` | Bundle 4 preflight review revalidates the physical Bundle 3 close state without changing its source-gapped decision |
+| `reports/p1_6/R5_AFTER_BUNDLE3_STATUS_BASELINE_READOUT.md` | `canonical` | `true` | Bundle 4.0 baseline separates fixture-pipeline readiness from the still-closed real reviewed-input pilot |
+| `reports/p1_6/R5_BUNDLE_4_1_ACCEPTED_FIXTURE_SET_READOUT.md` | `canonical` | `true` | Bundle 4.1 records the isolated synthetic fixture matrix and preserves the no-real-evidence boundary |
+| `reports/p1_6/R5_BUNDLE_4_2_DROPZONE_VALIDATION_READOUT.md` | `canonical` | `true` | Bundle 4.2 records deterministic fail-closed reviewed-input boundary validation |
+| `reports/p1_6/R5_BUNDLE_4_3_REGISTRY_PROMOTION_READOUT.md` | `canonical` | `true` | Bundle 4.3 records validated physical registry writes, rollback and idempotency |
+| `reports/p1_6/R5_BUNDLE_4_4_POST_PROMOTION_DRY_RUN_READOUT.md` | `canonical` | `true` | Bundle 4.4 records registry-derived readiness, provenance and independent TODO reconciliation |
+| `reports/p1_6/R5_BUNDLE_4_5_END_TO_END_FIXTURE_SMOKE_READOUT.md` | `canonical` | `true` | Bundle 4.5 records six deterministic offline fixture activation scenarios |
+| `reports/p1_6/R5_BUNDLE_4_REVIEWED_INPUT_FIXTURE_PROMOTION_CLOSE_READOUT.md` | `canonical` | `true` | Bundle 4.6 closes the fixture activation capability while the real 002837 pilot remains source-gapped |

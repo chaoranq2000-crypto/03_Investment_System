@@ -1,0 +1,75 @@
+bundle: R5_BUNDLE_4_REVIEWED_INPUT_FIXTURE_PROMOTION_SMOKE
+schema_version: r5_bundle4_expected_artifacts_v0.1
+base_state: R5_CORE_ASSET_SCHEMAS_EXECUTABLE_WITH_TODOS
+expected_close_state: R5_REVIEWED_INPUT_FIXTURE_PROMOTION_SMOKE_PASSED
+real_workflow: wf_20260703_stock_first_002837_invic
+fixture_workflow: wf_fixture_r5_bundle4
+fixture_stock_code: "000000"
+no_live_api: true
+external_downloads_allowed: false
+fixtures_are_evidence: false
+real_workflow_write_allowed: false
+fixture_mode_sample_quality_allowed: false
+sample_quality_report_allowed: false
+p2_allowed: false
+artifacts:
+  completion_review:
+    readout: reports/p1_6/R5_AFTER_BUNDLE3_COMPLETION_REVIEW.md
+  status_baseline:
+    manifest: config/r5_bundle4_expected_artifacts.yaml
+    readout: reports/p1_6/R5_AFTER_BUNDLE3_STATUS_BASELINE_READOUT.md
+  accepted_fixture_set:
+    root: tests/fixtures/r5_reviewed_inputs
+    scenario_directories:
+      - tests/fixtures/r5_reviewed_inputs/accepted_core_complete
+      - tests/fixtures/r5_reviewed_inputs/accepted_all_complete
+      - tests/fixtures/r5_reviewed_inputs/mixed_status
+      - tests/fixtures/r5_reviewed_inputs/invalid_duplicate_input_id
+      - tests/fixtures/r5_reviewed_inputs/invalid_cross_workflow
+      - tests/fixtures/r5_reviewed_inputs/invalid_cross_stock
+      - tests/fixtures/r5_reviewed_inputs/invalid_template_as_evidence
+      - tests/fixtures/r5_reviewed_inputs/invalid_folder_type_mismatch
+      - tests/fixtures/r5_reviewed_inputs/invalid_missing_evidence
+      - tests/fixtures/r5_reviewed_inputs/invalid_accepted_todo
+    boundary_readme: tests/fixtures/r5_reviewed_inputs/README.md
+    test: tests/test_r5_bundle4_fixture_contract.py
+    readout: reports/p1_6/R5_BUNDLE_4_1_ACCEPTED_FIXTURE_SET_READOUT.md
+  dropzone_validation:
+    validator: scripts/validate_r5_reviewed_input_dropzone.py
+    tests:
+      - tests/test_validate_r5_reviewed_input_dropzone.py
+      - tests/test_r5_bundle4_fixture_contract.py
+    readout: reports/p1_6/R5_BUNDLE_4_2_DROPZONE_VALIDATION_READOUT.md
+  registry_promotion:
+    promoter: scripts/promote_r5_reviewed_inputs_to_registries.py
+    io_helper: scripts/r5_reviewed_input_registry_io.py
+    tests:
+      - tests/test_r5_reviewed_input_registry_promotion.py
+      - tests/test_r5_bundle4_registry_promotion.py
+      - tests/test_r5_bundle4_registry_idempotency.py
+    readout: reports/p1_6/R5_BUNDLE_4_3_REGISTRY_PROMOTION_READOUT.md
+  post_promotion_dry_run:
+    builder: scripts/build_r5_reviewed_input_dry_run_from_registries.py
+    tests:
+      - tests/test_r5_bundle4_post_promotion_dry_run.py
+      - tests/test_r5_002837_reviewed_input_staging.py
+    readout: reports/p1_6/R5_BUNDLE_4_4_POST_PROMOTION_DRY_RUN_READOUT.md
+  fixture_smoke:
+    runner: scripts/run_r5_bundle4_reviewed_input_smoke.py
+    result: reports/p1_6/r5_bundle4_reviewed_input_smoke_result.json
+    test: tests/test_r5_bundle4_reviewed_input_smoke.py
+    readout: reports/p1_6/R5_BUNDLE_4_5_END_TO_END_FIXTURE_SMOKE_READOUT.md
+  close:
+    test: tests/test_r5_bundle4_close.py
+    readout: reports/p1_6/R5_BUNDLE_4_REVIEWED_INPUT_FIXTURE_PROMOTION_CLOSE_READOUT.md
+    truthfulness_result: reports/p1_6/r5_bundle4_readout_truthfulness_result.json
+    canonical_index: reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+remaining_boundaries:
+  - no_live_api
+  - no_external_downloads
+  - fixture_not_evidence
+  - no_real_002837_workflow_mutation
+  - no_real_stock_report
+  - no_sample_quality
+  - no_p2
+  - preserve_todo_missing_pending_rejected_states

@@ -1,0 +1,20 @@
+records:
+  - input_id: fixture_all_business_001
+    workflow_id: wf_fixture_r5_bundle4
+    stock_code: "000000"
+    input_type: business_disclosure
+    as_of_date: "2026-06-30"
+    source_evidence_id: ev_fixture_all_business_001
+    source_rank: A
+    review_status: accepted
+    reviewer: fixture_reviewer
+    reviewed_at: "2026-07-10T10:20:00+08:00"
+    capture_method: synthetic_fixture
+    no_live_api: true
+    limitations: [synthetic test data, not research evidence]
+    disclosure_id: fixture_business_disclosure_001
+    disclosure_type: synthetic_business_mix
+    business_line: Synthetic Segment A
+    disclosed_value: 40.0
+    unit: pct
+    sample_quality_allowed: false

@@ -1,0 +1,141 @@
+records:
+  - input_id: fixture_all_forecast_001
+    workflow_id: wf_fixture_r5_bundle4
+    stock_code: "000000"
+    input_type: forecast_assumptions
+    as_of_date: "2026-06-30"
+    source_evidence_id: ev_fixture_all_forecast_001
+    source_rank: B
+    review_status: accepted
+    reviewer: fixture_reviewer
+    reviewed_at: "2026-07-10T10:10:00+08:00"
+    capture_method: synthetic_fixture
+    no_live_api: true
+    limitations: [synthetic test data, not research evidence]
+    assumption_id: fixture_assumption_margin
+    driver: gross_margin
+    periods: [2026E]
+    value: 25.0
+    unit: pct
+    evidence_ids: [ev_fixture_all_forecast_001]
+    metric_ids: [metric_fixture_gross_margin]
+    scope: company
+    scenario: base
+    metric_name: gross_margin
+    supporting_evidence_ids: [ev_fixture_all_forecast_001]
+    supporting_metric_ids: [metric_fixture_gross_margin]
+    rationale: deterministic synthetic base assumption
+    reviewer_note: synthetic fixture assumption
+    sample_quality_allowed: false
+  - input_id: fixture_all_forecast_002
+    workflow_id: wf_fixture_r5_bundle4
+    stock_code: "000000"
+    input_type: forecast_assumptions
+    as_of_date: "2026-06-30"
+    source_evidence_id: ev_fixture_all_forecast_002
+    source_rank: B
+    review_status: accepted
+    reviewer: fixture_reviewer
+    reviewed_at: "2026-07-10T10:11:00+08:00"
+    capture_method: synthetic_fixture
+    no_live_api: true
+    limitations: [synthetic test data, not research evidence]
+    assumption_id: fixture_all_assumption_revenue_growth
+    driver: revenue_growth
+    periods: [2026E]
+    value: 6.0
+    unit: pct
+    evidence_ids: [ev_fixture_all_forecast_002]
+    metric_ids: [metric_fixture_all_revenue_growth]
+    scope: company
+    scenario: base
+    metric_name: revenue_growth
+    supporting_evidence_ids: [ev_fixture_all_forecast_002]
+    supporting_metric_ids: [metric_fixture_all_revenue_growth]
+    rationale: deterministic synthetic base assumption
+    reviewer_note: synthetic fixture assumption
+    sample_quality_allowed: false
+  - input_id: fixture_all_forecast_003
+    workflow_id: wf_fixture_r5_bundle4
+    stock_code: "000000"
+    input_type: forecast_assumptions
+    as_of_date: "2026-06-30"
+    source_evidence_id: ev_fixture_all_forecast_003
+    source_rank: B
+    review_status: accepted
+    reviewer: fixture_reviewer
+    reviewed_at: "2026-07-10T10:12:00+08:00"
+    capture_method: synthetic_fixture
+    no_live_api: true
+    limitations: [synthetic test data, not research evidence]
+    assumption_id: fixture_all_assumption_opex
+    driver: opex
+    periods: [2026E]
+    value: 9.0
+    unit: pct
+    evidence_ids: [ev_fixture_all_forecast_003]
+    metric_ids: [metric_fixture_all_opex]
+    scope: opex
+    scenario: base
+    metric_name: opex
+    supporting_evidence_ids: [ev_fixture_all_forecast_003]
+    supporting_metric_ids: [metric_fixture_all_opex]
+    rationale: deterministic synthetic base assumption
+    reviewer_note: synthetic fixture assumption
+    sample_quality_allowed: false
+  - input_id: fixture_all_forecast_004
+    workflow_id: wf_fixture_r5_bundle4
+    stock_code: "000000"
+    input_type: forecast_assumptions
+    as_of_date: "2026-06-30"
+    source_evidence_id: ev_fixture_all_forecast_004
+    source_rank: B
+    review_status: accepted
+    reviewer: fixture_reviewer
+    reviewed_at: "2026-07-10T10:13:00+08:00"
+    capture_method: synthetic_fixture
+    no_live_api: true
+    limitations: [synthetic test data, not research evidence]
+    assumption_id: fixture_all_assumption_net_profit
+    driver: net_profit
+    periods: [2026E]
+    value: 120.0
+    unit: CNY
+    evidence_ids: [ev_fixture_all_forecast_004]
+    metric_ids: [metric_fixture_all_net_profit]
+    scope: company
+    scenario: base
+    metric_name: net_profit
+    supporting_evidence_ids: [ev_fixture_all_forecast_004]
+    supporting_metric_ids: [metric_fixture_all_net_profit]
+    rationale: deterministic synthetic base assumption
+    reviewer_note: synthetic fixture assumption
+    sample_quality_allowed: false
+  - input_id: fixture_all_forecast_005
+    workflow_id: wf_fixture_r5_bundle4
+    stock_code: "000000"
+    input_type: forecast_assumptions
+    as_of_date: "2026-06-30"
+    source_evidence_id: ev_fixture_all_forecast_005
+    source_rank: B
+    review_status: accepted
+    reviewer: fixture_reviewer
+    reviewed_at: "2026-07-10T10:14:00+08:00"
+    capture_method: synthetic_fixture
+    no_live_api: true
+    limitations: [synthetic test data, not research evidence]
+    assumption_id: fixture_all_assumption_eps
+    driver: eps
+    periods: [2026E]
+    value: 1.2
+    unit: CNY_per_share
+    evidence_ids: [ev_fixture_all_forecast_005]
+    metric_ids: [metric_fixture_all_eps]
+    scope: company
+    scenario: base
+    metric_name: eps
+    supporting_evidence_ids: [ev_fixture_all_forecast_005]
+    supporting_metric_ids: [metric_fixture_all_eps]
+    rationale: deterministic synthetic base assumption
+    reviewer_note: synthetic fixture assumption
+    sample_quality_allowed: false
