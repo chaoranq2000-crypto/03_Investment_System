@@ -28,6 +28,8 @@ Codex Skills：标准化投研动作
 
 当前处于 **P1.6：workflow buildout / 进入 P2 前的工作流制度化**。
 
+P1.6 是项目总阶段标签；具体 R5 Bundle、当前 gate 与允许的产出级别，以 `reports/p1_6/R5_READOUT_CANONICAL_INDEX.md` 中最新 canonical close readout 为准，README 不作为运行时状态事实源。
+
 P1.6 的重点是：
 
 1. 固化 `docs/workflows/RESEARCH_WORKFLOW.md` 作为唯一全局 workflow kernel。

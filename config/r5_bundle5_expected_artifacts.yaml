@@ -1,0 +1,330 @@
+schema_version: r5_bundle5_expected_artifacts_v0.1
+bundle: R5_BUNDLE_5_REAL_002837_REVIEWED_INPUT_ONBOARDING
+base_commit: aeb846b1f5eb39d1f29cd5a1fc88a35fbb06f017
+base_state: R5_REVIEWED_INPUT_FIXTURE_PROMOTION_SMOKE_PASSED
+allowed_target_states:
+  - R5_REAL_002837_REVIEWED_INPUT_RESEARCH_DRAFT_READY
+  - R5_REAL_002837_REVIEWED_INPUT_ONBOARDING_PARTIAL
+  - R5_REVIEWED_INPUT_FIXTURE_PROMOTION_SMOKE_PASSED
+real_workflow: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+required_core_input_types:
+  - business_disclosure
+  - market_snapshot
+  - peer_snapshot
+  - forecast_assumptions
+  - valuation_inputs
+optional_input_types:
+  - sentiment_event_sources
+fixed_boundaries:
+  sample_quality_report_allowed: false
+  p2_allowed: false
+  sample_reports_are_research_evidence: false
+  fixtures_are_research_evidence: false
+  fabricate_reviewer_or_evidence_allowed: false
+  overwrite_raw_evidence_allowed: false
+real_workflow_write_boundary:
+  canonical_registry_write_allowed_before_card_5_5: false
+  first_card_allowed_to_write_canonical_registries: card_5_5
+  pre_card_5_5_allowed_outputs:
+    - inventory
+    - source_request
+    - validation
+    - candidate
+    - staging
+  promotion_preconditions:
+    - all_core_inputs_reviewed_and_evidence_anchored
+    - validators_pass
+    - dry_run_pass
+    - pre_hash_inventory_exists
+    - backup_exists
+    - rollback_plan_tested
+ci_warning_todos:
+  - warning_id: node20_action_runtime_migration
+    severity: low
+    status: open_non_blocking
+    owner: repository_maintainer
+    next_action: verify supported action upgrades without reducing compile or full-pytest semantics
+  - warning_id: conda_defaults_channel_implicit
+    severity: low
+    status: open_non_blocking
+    owner: repository_maintainer
+    next_action: decide explicit defaults or conda-remove-defaults after environment compatibility review
+baseline_required_paths:
+  - README.md
+  - codex_tasks/r5_after_bundle4/README.md
+  - codex_tasks/r5_after_bundle4/APPLY_ORDER.md
+  - codex_tasks/r5_after_bundle4/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
+  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_0_STATUS_TRUTH_SYNC_AND_EXPECTED_ARTIFACTS.md
+  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_AND_PROVENANCE_MATRIX.md
+  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_AND_FINANCIAL_HISTORY_ONBOARDING.md
+  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_3_MARKET_AND_PEER_INPUT_ONBOARDING.md
+  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_4_FORECAST_AND_VALUATION_INPUT_ONBOARDING.md
+  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_AND_CORE_ASSET_REBUILD.md
+  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_AND_QUALITY_GATE.md
+  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_NO_ADVICE.md
+  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_8_CLOSE_READOUT_AND_NEXT_DECISION.md
+  - codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml
+  - codex_tasks/r5_after_bundle4/R5_BUNDLE5_TASK_PACKAGE_MANIFEST.yaml
+  - config/r5_bundle5_expected_artifacts.yaml
+  - reports/p1_6/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
+  - reports/p1_6/R5_AFTER_BUNDLE4_STATUS_BASELINE_READOUT.md
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - tests/test_r5_bundle5_status_baseline.py
+shared_updates:
+  - path: README.md
+    writers:
+      - card_5_0
+  - path: config/r5_bundle5_expected_artifacts.yaml
+    writers:
+      - card_5_0
+      - card_5_8
+  - path: reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+    writers:
+      - card_5_0
+      - card_5_8
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_queue.yaml
+    writers:
+      - card_5_1
+cards:
+  completion_review:
+    order: 0
+    task_card: codex_tasks/r5_after_bundle4/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
+    canonical_registry_write_allowed: false
+    declared_write_scopes:
+      - completion_review_readout
+    owned_artifacts:
+      - path: reports/p1_6/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
+        artifact_type: readout
+        required_by_card: completion_review
+  card_5_0:
+    order: 1
+    task_card: codex_tasks/r5_after_bundle4/R5_BUNDLE_5_0_STATUS_TRUTH_SYNC_AND_EXPECTED_ARTIFACTS.md
+    canonical_registry_write_allowed: false
+    declared_write_scopes:
+      - status_baseline
+      - expected_artifact_manifest
+      - documentation_pointer
+      - focused_test
+    owned_artifacts:
+      - path: config/r5_bundle5_expected_artifacts.yaml
+        artifact_type: manifest
+        required_by_card: card_5_0
+      - path: reports/p1_6/R5_AFTER_BUNDLE4_STATUS_BASELINE_READOUT.md
+        artifact_type: readout
+        required_by_card: card_5_0
+      - path: tests/test_r5_bundle5_status_baseline.py
+        artifact_type: test
+        required_by_card: card_5_0
+  card_5_1:
+    order: 2
+    task_card: codex_tasks/r5_after_bundle4/R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_AND_PROVENANCE_MATRIX.md
+    canonical_registry_write_allowed: false
+    declared_write_scopes:
+      - inventory
+      - source_request
+      - validation
+      - orchestration_handoff
+    owned_artifacts:
+      - path: scripts/build_r5_bundle5_real_input_inventory.py
+        artifact_type: script
+        required_by_card: card_5_1
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_real_input_inventory.yaml
+        artifact_type: inventory
+        required_by_card: card_5_1
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_dropzone_validation_initial.json
+        artifact_type: validation
+        required_by_card: card_5_1
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/handoffs/06_to_evidence-ingest_bundle5_real_input_inventory.md
+        artifact_type: handoff
+        required_by_card: card_5_1
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/handoffs/07_to_quality-review_bundle5_real_input_inventory.md
+        artifact_type: handoff
+        required_by_card: card_5_1
+      - path: tests/test_r5_bundle5_real_input_inventory.py
+        artifact_type: test
+        required_by_card: card_5_1
+      - path: reports/p1_6/R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_READOUT.md
+        artifact_type: readout
+        required_by_card: card_5_1
+  card_5_2:
+    order: 3
+    task_card: codex_tasks/r5_after_bundle4/R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_AND_FINANCIAL_HISTORY_ONBOARDING.md
+    canonical_registry_write_allowed: false
+    declared_write_scopes:
+      - reviewed_input_candidate
+      - processed_official_evidence
+      - staging_validation
+    owned_artifacts:
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_business_disclosure_validation.json
+        artifact_type: validation
+        required_by_card: card_5_2
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_core_preflight_after_disclosure.yaml
+        artifact_type: validation
+        required_by_card: card_5_2
+      - path: tests/test_r5_bundle5_official_disclosure_onboarding.py
+        artifact_type: test
+        required_by_card: card_5_2
+      - path: reports/p1_6/R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_FINANCIAL_READOUT.md
+        artifact_type: readout
+        required_by_card: card_5_2
+  card_5_3:
+    order: 4
+    task_card: codex_tasks/r5_after_bundle4/R5_BUNDLE_5_3_MARKET_AND_PEER_INPUT_ONBOARDING.md
+    canonical_registry_write_allowed: false
+    declared_write_scopes:
+      - reviewed_input_candidate
+      - immutable_market_snapshot
+      - staging_validation
+    owned_artifacts:
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_market_snapshot_validation.json
+        artifact_type: validation
+        required_by_card: card_5_3
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_peer_snapshot_validation.json
+        artifact_type: validation
+        required_by_card: card_5_3
+      - path: tests/test_r5_bundle5_market_peer_onboarding.py
+        artifact_type: test
+        required_by_card: card_5_3
+      - path: reports/p1_6/R5_BUNDLE_5_3_MARKET_PEER_INPUT_READOUT.md
+        artifact_type: readout
+        required_by_card: card_5_3
+  card_5_4:
+    order: 5
+    task_card: codex_tasks/r5_after_bundle4/R5_BUNDLE_5_4_FORECAST_AND_VALUATION_INPUT_ONBOARDING.md
+    canonical_registry_write_allowed: false
+    declared_write_scopes:
+      - reviewed_input_candidate
+      - forecast_valuation_staging
+      - staging_validation
+    owned_artifacts:
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_forecast_assumption_validation.json
+        artifact_type: validation
+        required_by_card: card_5_4
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_valuation_input_validation.json
+        artifact_type: validation
+        required_by_card: card_5_4
+      - path: tests/test_r5_bundle5_forecast_valuation_onboarding.py
+        artifact_type: test
+        required_by_card: card_5_4
+      - path: reports/p1_6/R5_BUNDLE_5_4_FORECAST_VALUATION_INPUT_READOUT.md
+        artifact_type: readout
+        required_by_card: card_5_4
+  card_5_5:
+    order: 6
+    task_card: codex_tasks/r5_after_bundle4/R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_AND_CORE_ASSET_REBUILD.md
+    canonical_registry_write_allowed: true
+    declared_write_scopes:
+      - canonical_registries
+      - backup
+      - promotion
+      - readiness_rebuild
+      - core_subpack_rebuild
+    owned_artifacts:
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_dropzone_validation_final.json
+        artifact_type: validation
+        required_by_card: card_5_5
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_reviewed_input_staging.yaml
+        artifact_type: staging
+        required_by_card: card_5_5
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_prepromotion_inventory.yaml
+        artifact_type: inventory
+        required_by_card: card_5_5
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_registry_backup_manifest.yaml
+        artifact_type: backup_manifest
+        required_by_card: card_5_5
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_registry_promotion_result.yaml
+        artifact_type: promotion
+        required_by_card: card_5_5
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_registry_idempotency_result.json
+        artifact_type: validation
+        required_by_card: card_5_5
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_core_asset_preflight.yaml
+        artifact_type: validation
+        required_by_card: card_5_5
+      - path: tests/test_r5_bundle5_real_registry_promotion.py
+        artifact_type: test
+        required_by_card: card_5_5
+      - path: reports/p1_6/R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_READOUT.md
+        artifact_type: readout
+        required_by_card: card_5_5
+  card_5_6:
+    order: 7
+    task_card: codex_tasks/r5_after_bundle4/R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_AND_QUALITY_GATE.md
+    canonical_registry_write_allowed: false
+    declared_write_scopes:
+      - gate
+      - render
+      - quality
+    owned_artifacts:
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_real_pilot_gate_result.json
+        artifact_type: validation
+        required_by_card: card_5_6
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_reviewed_input_render_result.yaml
+        artifact_type: render_result
+        required_by_card: card_5_6
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_note_reviewed_input_draft.md
+        artifact_type: report
+        required_by_card: card_5_6
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_quality_gate_result.yaml
+        artifact_type: quality_result
+        required_by_card: card_5_6
+      - path: tests/test_r5_bundle5_real_pilot_gate.py
+        artifact_type: test
+        required_by_card: card_5_6
+      - path: reports/p1_6/R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_QUALITY_READOUT.md
+        artifact_type: readout
+        required_by_card: card_5_6
+  card_5_7:
+    order: 8
+    task_card: codex_tasks/r5_after_bundle4/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_NO_ADVICE.md
+    canonical_registry_write_allowed: false
+    declared_write_scopes:
+      - benchmark_precheck
+      - no_advice_validation
+    owned_artifacts:
+      - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_benchmark_coverage_precheck.yaml
+        artifact_type: validation
+        required_by_card: card_5_7
+      - path: tests/test_r5_bundle5_benchmark_coverage_precheck.py
+        artifact_type: test
+        required_by_card: card_5_7
+      - path: reports/p1_6/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_READOUT.md
+        artifact_type: readout
+        required_by_card: card_5_7
+  card_5_8:
+    order: 9
+    task_card: codex_tasks/r5_after_bundle4/R5_BUNDLE_5_8_CLOSE_READOUT_AND_NEXT_DECISION.md
+    canonical_registry_write_allowed: false
+    declared_write_scopes:
+      - close_validation
+      - truthfulness
+      - canonical_index_update
+    owned_artifacts:
+      - path: tests/test_r5_bundle5_close.py
+        artifact_type: test
+        required_by_card: card_5_8
+      - path: reports/p1_6/r5_bundle5_readout_truthfulness_result.json
+        artifact_type: validation
+        required_by_card: card_5_8
+      - path: reports/p1_6/R5_BUNDLE_5_REAL_REVIEWED_INPUT_ONBOARDING_CLOSE_READOUT.md
+        artifact_type: readout
+        required_by_card: card_5_8
+reused_checks:
+  - tests/test_validate_r5_reviewed_input_dropzone.py
+  - tests/test_validate_r5_financial_history_pack.py
+  - tests/test_validate_r5_business_breakdown_pack.py
+  - tests/test_validate_r5_market_peer_input_registry.py
+  - tests/test_validate_r5_forecast_assumption_registry.py
+  - tests/test_validate_r5_valuation_inputs.py
+  - tests/test_r5_forecast_valuation_interlock.py
+  - tests/test_r5_reviewed_input_registry_promotion.py
+  - tests/test_r5_bundle4_registry_idempotency.py
+  - tests/test_r5_bundle4_post_promotion_dry_run.py
+  - tests/test_r5_pilot_gate_recheck_and_render.py
+  - tests/test_validate_r5_quality_scorecard.py
+  - tests/test_r5_composer_research_draft_plus.py
+  - tests/test_sample_report_benchmark_policy.py
+  - tests/test_r5_bundle4_close.py
+  - tests/test_r5_bundle3_close.py
+  - tests/test_r5_after_patch55_close.py

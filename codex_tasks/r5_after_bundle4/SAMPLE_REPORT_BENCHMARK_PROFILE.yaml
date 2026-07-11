@@ -1,0 +1,62 @@
+schema_version: r5_user_sample_report_benchmark_profile_v0.1
+profile_id: user_supplied_high_density_stock_reports_20260711
+source_origin: user_supplied_outside_repository
+source_files:
+  - 个股研究报告样例1.txt
+  - 个股研究案例样例2.txt
+  - 个股研究报告样例3.txt
+  - 个股研究报告样例4.txt
+use_as_research_evidence: false
+use_as_workflow_fact_source: false
+use_as_gate_definition: false
+allowed_uses:
+  - section_coverage_reference
+  - information_density_reference
+  - narrative_flow_reference
+  - table_and_metric_presentation_reference
+prohibited_uses:
+  - importing_factual_claims
+  - importing_forecasts_or_prices
+  - importing_citations_or_source_assertions
+  - importing_investment_ratings
+  - importing_position_sizing
+  - importing_trade_timing
+  - importing_target_price_as_action_instruction
+coverage_dimensions:
+  - company_context
+  - financial_history_and_cash_flow_quality
+  - business_breakdown_and_segment_economics
+  - industry_structure_and_competition
+  - forecast_assumptions_and_sensitivity
+  - valuation_methods_and_comparability
+  - dated_market_or_technical_state_when_supported
+  - dated_sentiment_and_events_when_supported
+  - risks_counterevidence_and_open_questions
+  - research_conclusion_and_watch_conditions
+safe_section_mapping:
+  前言: company_context
+  财务概览: financial_history_and_cash_flow_quality
+  业务拆分: business_breakdown_and_segment_economics
+  行业分析: industry_structure_and_competition
+  盈利预测: forecast_assumptions_and_sensitivity
+  估值分析: valuation_methods_and_comparability
+  技术分析: dated_market_or_technical_state_when_supported
+  情绪分析: dated_sentiment_and_events_when_supported
+  事件驱动: dated_sentiment_and_events_when_supported
+  投资建议: research_conclusion_and_watch_conditions_without_action_instruction
+forbidden_output_patterns:
+  - 给予买入评级
+  - 强烈推荐
+  - 推荐评级
+  - 观望为主
+  - 加仓至
+  - 降仓至
+  - 仓位
+  - 操作策略
+  - 买入
+  - 卖出
+  - 持有建议
+  - 保证收益
+quality_flags_fixed:
+  sample_quality_report_allowed: false
+  p2_allowed: false

@@ -1,0 +1,208 @@
+schema_version: r5_bundle5_real_input_inventory_v0.1
+artifact_type: R5_bundle5_real_input_inventory
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+dropzone_root: data/reviewed_inputs/wf_20260703_stock_first_002837_invic
+status: blocked_source_gapped
+generated_from_local_files_only: true
+dropzone_validation:
+  status: pass
+  checked_file_count: 0
+  record_count: 0
+  accepted_count: 0
+  accepted_degraded_count: 0
+  failed_count: 0
+  interpretation: empty_valid_but_source_gapped
+summary:
+  required_core_input_type_count: 5
+  valid_accepted_core_input_type_count: 0
+  missing_or_invalid_core_input_type_count: 5
+  source_request_count: 10
+  source_gap_count: 7
+  review_ledger:
+    request_count: 10
+    pending_count: 10
+    accepted_count: 0
+items:
+- input_type: business_disclosure
+  required: true
+  record_count: 0
+  valid_accepted_count: 0
+  status: missing
+  records: []
+  evidence_candidates:
+  - evidence_id: annual_report_002837_invic_2025_0f8fcf
+    title: 002837 英维克 2025年年度报告摘要
+    source_rank: A
+    review_status: reviewed
+    publish_date: '2026-04-21'
+    file_hash: ce7f64a9337742b1cecef56fb4a9ea7e558715f7bd1dca8b5e64003f71daafa1
+    source_path: data/raw/annual_reports/annual_report_002837_invic_2025_0f8fcf.pdf
+    source_path_status: resolved
+    manifest_scope: global
+    candidate_only: true
+  - evidence_id: ev_annual_report_002837_20260421_ce7f64
+    title: 002837 英维克 2025年年度报告摘要
+    source_rank: A
+    review_status: draft
+    publish_date: '2026-04-21'
+    file_hash: ce7f64a9337742b1cecef56fb4a9ea7e558715f7bd1dca8b5e64003f71daafa1
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/raw/annual_reports/szse_annual_report_002837_2026-04-21.pdf
+    source_path_status: resolved
+    manifest_scope: workflow_local
+    candidate_only: true
+  request_ids:
+  - r5_official_filings_r5_002837_gap_business_001
+  - r5_official_filings_r5_002837_gap_exposure_001
+  - r5_structured_financial_metrics_r5_002837_gap_business_001
+  candidate_registry_target: R5_valuation_input_registry.yaml::business_line_split
+  missing_fields:
+  - input_id
+  - physical_input_path
+  - review_status
+  - source_evidence_id
+  - source_rank
+  - as_of_or_publication_date
+  - reviewer
+  - reviewed_at
+  - limitations
+  blocking: true
+  blocking_reason: missing_valid_accepted_reviewed_input
+- input_type: market_snapshot
+  required: true
+  record_count: 0
+  valid_accepted_count: 0
+  status: missing
+  records: []
+  evidence_candidates: []
+  request_ids:
+  - r5_market_snapshot_r5_002837_gap_market_001
+  - r5_market_snapshot_r5_002837_gap_valuation_001
+  candidate_registry_target: R5_market_peer_input_registry.yaml::market_inputs
+  missing_fields:
+  - input_id
+  - physical_input_path
+  - review_status
+  - source_evidence_id
+  - source_rank
+  - as_of_or_publication_date
+  - reviewer
+  - reviewed_at
+  - limitations
+  blocking: true
+  blocking_reason: missing_valid_accepted_reviewed_input
+- input_type: peer_snapshot
+  required: true
+  record_count: 0
+  valid_accepted_count: 0
+  status: missing
+  records: []
+  evidence_candidates: []
+  request_ids:
+  - r5_peer_snapshot_r5_002837_gap_valuation_001
+  candidate_registry_target: R5_market_peer_input_registry.yaml::peer_inputs
+  missing_fields:
+  - input_id
+  - physical_input_path
+  - review_status
+  - source_evidence_id
+  - source_rank
+  - as_of_or_publication_date
+  - reviewer
+  - reviewed_at
+  - limitations
+  blocking: true
+  blocking_reason: missing_valid_accepted_reviewed_input
+- input_type: forecast_assumptions
+  required: true
+  record_count: 0
+  valid_accepted_count: 0
+  status: missing
+  records: []
+  evidence_candidates: []
+  request_ids:
+  - r5_structured_financial_metrics_r5_002837_gap_business_001
+  - r5_structured_financial_metrics_r5_002837_gap_forecast_001
+  candidate_registry_target: R5_forecast_assumption_registry.yaml
+  missing_fields:
+  - input_id
+  - physical_input_path
+  - review_status
+  - source_evidence_id
+  - source_rank
+  - as_of_or_publication_date
+  - reviewer
+  - reviewed_at
+  - limitations
+  blocking: true
+  blocking_reason: missing_valid_accepted_reviewed_input
+- input_type: valuation_inputs
+  required: true
+  record_count: 0
+  valid_accepted_count: 0
+  status: missing
+  records: []
+  evidence_candidates: []
+  request_ids:
+  - r5_market_snapshot_r5_002837_gap_market_001
+  - r5_market_snapshot_r5_002837_gap_valuation_001
+  - r5_peer_snapshot_r5_002837_gap_valuation_001
+  candidate_registry_target: R5_valuation_input_registry.yaml
+  missing_fields:
+  - input_id
+  - physical_input_path
+  - review_status
+  - source_evidence_id
+  - source_rank
+  - as_of_or_publication_date
+  - reviewer
+  - reviewed_at
+  - limitations
+  blocking: true
+  blocking_reason: missing_valid_accepted_reviewed_input
+- input_type: sentiment_event_sources
+  required: false
+  record_count: 0
+  valid_accepted_count: 0
+  status: missing
+  records: []
+  evidence_candidates: []
+  request_ids:
+  - r5_industry_context_clues_placeholder
+  - r5_investor_relations_r5_002837_gap_sentiment_001
+  - r5_news_event_clues_r5_002837_gap_sentiment_001
+  candidate_registry_target: sentiment_event_pack_candidate
+  missing_fields:
+  - input_id
+  - physical_input_path
+  - review_status
+  - source_evidence_id
+  - source_rank
+  - as_of_or_publication_date
+  - reviewer
+  - reviewed_at
+  - limitations
+  blocking: false
+  blocking_reason: null
+provenance_aliases:
+- file_hash: ce7f64a9337742b1cecef56fb4a9ea7e558715f7bd1dca8b5e64003f71daafa1
+  evidence_ids:
+  - annual_report_002837_invic_2025_0f8fcf
+  - ev_annual_report_002837_20260421_ce7f64
+  physical_sources:
+  - data/raw/annual_reports/annual_report_002837_invic_2025_0f8fcf.pdf
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/raw/annual_reports/szse_annual_report_002837_2026-04-21.pdf
+  decision: provenance_alias_not_independent_evidence
+quality_decision:
+  g1_evidence_gate: fail
+  card_5_1_stop_condition_triggered: true
+  card_5_2_allowed: false
+  promotion_allowed: false
+  sample_quality_report_allowed: false
+  p2_allowed: false
+limitations:
+- Parsing or validator pass is not review acceptance.
+- Evidence candidates are not reviewed-input records.
+- Templates, fixtures, sample reports and TODO placeholders are excluded from accepted
+  coverage.
+- Card 5.1 never authorizes canonical registry promotion.

@@ -1,0 +1,17 @@
+{
+  "artifact_type": "R5_reviewed_input_dropzone_validation",
+  "schema_version": "r5_reviewed_input_dropzone_validation_v0.1",
+  "status": "pass",
+  "checked_files": [],
+  "record_count": 0,
+  "unique_workflow_ids": [],
+  "unique_stock_codes": [],
+  "duplicate_input_ids": [],
+  "counts_by_input_type": {},
+  "accepted_count": 0,
+  "accepted_degraded_count": 0,
+  "pending_count": 0,
+  "rejected_count": 0,
+  "failed_count": 0,
+  "issues": []
+}

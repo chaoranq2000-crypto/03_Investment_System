@@ -79,3 +79,5 @@ Historical readouts are not rewritten. Legacy entries are retained as history an
 | `reports/p1_6/R5_BUNDLE_4_4_POST_PROMOTION_DRY_RUN_READOUT.md` | `canonical` | `true` | Bundle 4.4 records registry-derived readiness, provenance and independent TODO reconciliation |
 | `reports/p1_6/R5_BUNDLE_4_5_END_TO_END_FIXTURE_SMOKE_READOUT.md` | `canonical` | `true` | Bundle 4.5 records six deterministic offline fixture activation scenarios |
 | `reports/p1_6/R5_BUNDLE_4_REVIEWED_INPUT_FIXTURE_PROMOTION_CLOSE_READOUT.md` | `canonical` | `true` | Bundle 4.6 closes the fixture activation capability while the real 002837 pilot remains source-gapped |
+| `reports/p1_6/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md` | `canonical` | `true` | Bundle 5 entry review freshly revalidates the physical Bundle 4 close state and preserves the real-input boundary |
+| `reports/p1_6/R5_AFTER_BUNDLE4_STATUS_BASELINE_READOUT.md` | `canonical` | `true` | Bundle 5.0 defines producer ownership, expected artifacts and the pre-Card-5.5 canonical-registry write boundary |

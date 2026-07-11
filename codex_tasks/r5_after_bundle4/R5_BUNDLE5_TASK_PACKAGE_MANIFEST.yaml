@@ -1,0 +1,38 @@
+schema_version: r5_bundle5_task_package_manifest_v0.1
+package_id: r5_after_bundle4_real_reviewed_input_onboarding
+prepared_date: 2026-07-11
+base_commit: aeb846b
+base_state: R5_REVIEWED_INPUT_FIXTURE_PROMOTION_SMOKE_PASSED
+real_workflow: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+objective: real_reviewed_input_research_draft
+sample_quality_report_allowed: false
+p2_allowed: false
+cards:
+  - R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
+  - R5_BUNDLE_5_0_STATUS_TRUTH_SYNC_AND_EXPECTED_ARTIFACTS.md
+  - R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_AND_PROVENANCE_MATRIX.md
+  - R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_AND_FINANCIAL_HISTORY_ONBOARDING.md
+  - R5_BUNDLE_5_3_MARKET_AND_PEER_INPUT_ONBOARDING.md
+  - R5_BUNDLE_5_4_FORECAST_AND_VALUATION_INPUT_ONBOARDING.md
+  - R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_AND_CORE_ASSET_REBUILD.md
+  - R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_AND_QUALITY_GATE.md
+  - R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_NO_ADVICE.md
+  - R5_BUNDLE_5_8_CLOSE_READOUT_AND_NEXT_DECISION.md
+required_core_input_types:
+  - business_disclosure
+  - market_snapshot
+  - peer_snapshot
+  - forecast_assumptions
+  - valuation_inputs
+optional_input_types:
+  - sentiment_event_sources
+hard_boundaries:
+  - no_fabricated_reviewer_or_evidence
+  - no_fixture_or_template_as_evidence
+  - no_real_registry_write_before_card_5_5
+  - atomic_rollback_idempotent_promotion
+  - preserve_todo_missing_pending_rejected
+  - no_direct_trading_instruction
+  - no_sample_quality
+  - no_p2
