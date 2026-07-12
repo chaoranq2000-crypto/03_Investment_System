@@ -1,6 +1,7 @@
 # Workflow Readout: wf_20260703_stock_first_002837_invic
 
-## Status
+## Status historical_snapshot_superseded_by_bundle7_quality_rebaseline
+> **Current-state notice:** this historical readout is superseded by the Bundle 7 positive reader-quality rebaseline. Current status is `needs_fix`; see `reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle7_quality_backflow_readout.md`.
 
 accepted_sample_quality
 
