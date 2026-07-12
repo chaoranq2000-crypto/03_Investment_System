@@ -1,5 +1,7 @@
 # Quality Gate Report
 
+> **Current-state notice:** this is a historical pre-Bundle 7 quality snapshot and is `historical_snapshot_superseded_by_bundle7_quality_rebaseline`. The current quality decision is recorded in `R5_bundle7_quality_gate_report.md`.
+
 final_status: accepted_sample_quality
 high_issues: 0
 medium_issues: 0
