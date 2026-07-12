@@ -79,7 +79,7 @@ status: R5_002837_READER_FACING_REPORT_V2_CANDIDATE_READY
 
 ## artifact hashes
 
-- reader_report_sha256: `096e28c7a3ed686dbdcade76c3e200d2f7130144fd668660463c3c5b83a7aaa3`
+- reader_report_sha256: `54ec29f5e1bb6302cc63bd3cfc2ae91dcf60ac2a4754918a15c308b1aae96309`
 - traceability_appendix_sha256: `05c8be5cd80a2438bd4e13815e4e121bfe462cf906422a1478d135cee53e57bd`
 - reader_quality_scorecard_sha256: `bd667cf5ac00448fede9d8561b42d19d4dcc58a4e1ba8a27ab358d469b57df09`
 - human_review_form_sha256: `06dc4bd922fb5dba4c2161d23f6a9b59e88d4dfd9a720cd000b16395fe3cf796`
@@ -115,7 +115,7 @@ status: R5_002837_READER_FACING_REPORT_V2_CANDIDATE_READY
 - `reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle6_valuation_reasoning_pack.yaml` — owner_card=6.5; sha256=`b10f0754992bbbd63413fcc3e4eca36a9ac6e9940dcf8e06ca0e38f482935aaa`
 - `scripts/run_r5_reader_quality_gate.py` — owner_card=6.6; sha256=`aed4557bf1a64f567da9c59539bf9d240d945f6f4c18c03ffa95f7cd1d27196f`
 - `tests/test_r5_reader_quality_gate.py` — owner_card=6.6; sha256=`30d6334e672e9fdac436f8aaadca13a1288b454730d7d33bdc48dd3a90580153`
-- `reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2.md` — owner_card=6.7; sha256=`096e28c7a3ed686dbdcade76c3e200d2f7130144fd668660463c3c5b83a7aaa3`
+- `reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2.md` — owner_card=6.7; sha256=`54ec29f5e1bb6302cc63bd3cfc2ae91dcf60ac2a4754918a15c308b1aae96309`
 - `reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_traceability_v2.yaml` — owner_card=6.7; sha256=`05c8be5cd80a2438bd4e13815e4e121bfe462cf906422a1478d135cee53e57bd`
 - `reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2_quality_scorecard.yaml` — owner_card=6.7; sha256=`bd667cf5ac00448fede9d8561b42d19d4dcc58a4e1ba8a27ab358d469b57df09`
 - `reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2_human_review.yaml` — owner_card=6.7; sha256=`06dc4bd922fb5dba4c2161d23f6a9b59e88d4dfd9a720cd000b16395fe3cf796`
@@ -132,7 +132,7 @@ status: R5_002837_READER_FACING_REPORT_V2_CANDIDATE_READY
 ## human review handoff
 
 - report path: `reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2.md`
-- report hash: `096e28c7a3ed686dbdcade76c3e200d2f7130144fd668660463c3c5b83a7aaa3`
+- report hash: `54ec29f5e1bb6302cc63bd3cfc2ae91dcf60ac2a4754918a15c308b1aae96309`
 - status: `pending`
 - reviewer: `null`
 - reviewed_at: `null`

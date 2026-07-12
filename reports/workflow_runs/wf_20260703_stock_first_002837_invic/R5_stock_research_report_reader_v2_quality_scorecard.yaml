@@ -1,12 +1,143 @@
-artifact_type: R5_stock_research_report_reader_v2_quality_scorecard
-schema_version: v0.1
-decision: candidate_ready_for_human_review
-score: 100
+artifact_type: R5_reader_quality_scorecard
+schema_version: v0.2
+rubric_id: r5_bundle7_positive_reader_quality_gate
+scoring_method: positive_from_zero
+decision: rejected
+quality_band: research_draft
+score: 59
 threshold: 82
-critical_blocker_count: 0
-critical_blockers: []
+research_draft_threshold: 45
+critical_blocker_count: 12
+critical_blockers:
+- &id005
+  code: reader_report_below_research_density_floor
+  severity: medium
+  evidence: han_chars=2334; required=3200
+  fix_owner_skill: memo-writer
+  fix_stage: T8_report_draft
+  target_artifacts:
+  - reader_report.md
+  - section_payloads.yaml
+- &id006
+  code: insufficient_analytical_unit_coverage
+  severity: medium
+  evidence: complete=0; required=7; complete_sections=
+  fix_owner_skill: stock-deep-dive
+  fix_stage: T5_analysis_pack_build
+  target_artifacts:
+  - thesis_tree.yaml
+  - business_driver_tree.yaml
+  - segment_economics.yaml
+  - risk_counterevidence_pack.yaml
+- &id007
+  code: independent_research_evidence_below_minimum
+  severity: medium
+  evidence: independent_sources=1; required=2
+  fix_owner_skill: evidence-ingest
+  fix_stage: T2_evidence_acquire_parse
+  target_artifacts: &id001
+  - evidence_coverage_matrix.yaml
+  - industry_evidence_pack.yaml
+  - peer_operating_pack.yaml
+- &id008
+  code: independent_industry_evidence_missing
+  severity: medium
+  evidence: no independent industry underlying source
+  fix_owner_skill: segment-research
+  fix_stage: T5_analysis_pack_build
+  target_artifacts:
+  - industry_evidence_pack.yaml
+  - competitive_position_matrix.yaml
+- &id009
+  code: peer_operating_evidence_missing
+  severity: medium
+  evidence: no peer evidence source and fewer than three credible peers
+  fix_owner_skill: evidence-ingest
+  fix_stage: T2_evidence_acquire_parse
+  target_artifacts: *id001
+- &id010
+  code: forecast_not_bottom_up_or_segment_driven
+  severity: medium
+  evidence: forecast drivers remain company-total/mechanical
+  fix_owner_skill: stock-deep-dive
+  fix_stage: T6_forecast_valuation_model
+  target_artifacts: &id002
+  - segment_forecast_model.yaml
+  - forecast_bridge.yaml
+  - forecast_sensitivity.csv
+- &id011
+  code: forecast_bridge_uses_aggregate_residual
+  severity: medium
+  evidence: tax/finance/other/minority are not separately modeled
+  fix_owner_skill: stock-deep-dive
+  fix_stage: T6_forecast_valuation_model
+  target_artifacts: *id002
+- &id012
+  code: valuation_lacks_reverse_or_scenario_value_range
+  severity: medium
+  evidence: no reverse valuation or bull/base/bear value range
+  fix_owner_skill: company-valuation
+  fix_stage: RP6_valuation
+  target_artifacts: &id003
+  - reverse_valuation.yaml
+  - scenario_valuation.yaml
+  - peer_operating_pack.yaml
+- &id013
+  code: credible_peer_context_below_minimum
+  severity: medium
+  evidence: credible_peers=0
+  fix_owner_skill: company-valuation
+  fix_stage: RP6_valuation
+  target_artifacts: *id003
+- &id014
+  code: technical_analysis_inputs_missing
+  severity: medium
+  evidence: no reviewed technical-series analysis in reader report
+  fix_owner_skill: stock-deep-dive
+  fix_stage: T7_technical_sentiment_event_pack
+  target_artifacts: &id004
+  - technical_snapshot.yaml
+  - market_sentiment_pack.yaml
+  - catalyst_calendar.yaml
+- &id015
+  code: sentiment_analysis_inputs_missing
+  severity: medium
+  evidence: no macro/industry/company sentiment layers
+  fix_owner_skill: stock-deep-dive
+  fix_stage: T7_technical_sentiment_event_pack
+  target_artifacts: *id004
+- &id016
+  code: catalyst_event_chain_incomplete
+  severity: medium
+  evidence: future date, impact path, verification metric and counterevidence condition
+    are not all present
+  fix_owner_skill: stock-deep-dive
+  fix_stage: T7_technical_sentiment_event_pack
+  target_artifacts: *id004
+truthfulness_blockers: []
+candidate_blockers:
+- *id005
+- *id006
+- *id007
+- *id008
+- *id009
+- *id010
+- *id011
+- *id012
+- *id013
+- *id014
+- *id015
+- *id016
 warnings: []
 dimension_scores:
+  evidence_integrity: 16
+  coverage_completeness: 6
+  analytical_synthesis: 8
+  forecast_and_valuation: 7
+  narrative_and_readability: 8
+  presentation_hygiene: 10
+  risks_and_watch_conditions: 4
+dimension_max_scores:
   evidence_integrity: 20
   coverage_completeness: 15
   analytical_synthesis: 20
@@ -15,10 +146,483 @@ dimension_scores:
   presentation_hygiene: 10
   risks_and_watch_conditions: 5
 required_section_coverage:
-  covered: 9
-  required: 9
+  covered: 10
+  required: 10
   missing: []
   duplicated: []
+section_diagnostics:
+  executive_summary:
+    han_chars: 148
+    numeric_fact_count: 3
+    paragraph_count: 2
+    unique_references:
+    - E1
+    - E2
+    - E3
+    - E8
+    signals:
+      judgment: true
+      trend: true
+      causal: false
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - judgment
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - judgment
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: false
+    analysis_unit_pass: false
+  company_context_and_scope:
+    han_chars: 182
+    numeric_fact_count: 0
+    paragraph_count: 2
+    unique_references:
+    - E1
+    - E4
+    signals:
+      judgment: false
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: false
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - judgment
+    - counterevidence
+    present_required_signals:
+    - counterevidence
+    signal_ratio: 0.5
+    density_pass: true
+    analysis_unit_pass: false
+  financial_history_and_cashflow_quality:
+    han_chars: 248
+    numeric_fact_count: 35
+    paragraph_count: 4
+    unique_references:
+    - E2
+    - E3
+    signals:
+      judgment: false
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: false
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - trend
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - trend
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: false
+    analysis_unit_pass: false
+  business_breakdown_and_economics:
+    han_chars: 166
+    numeric_fact_count: 8
+    paragraph_count: 3
+    unique_references:
+    - E4
+    signals:
+      judgment: true
+      trend: false
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: false
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: false
+      verification_metric: true
+    required_signals:
+    - judgment
+    - trend
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - judgment
+    - causal
+    - economic_impact
+    - counterevidence
+    signal_ratio: 0.667
+    density_pass: false
+    analysis_unit_pass: false
+  industry_structure_and_competition:
+    han_chars: 292
+    numeric_fact_count: 1
+    paragraph_count: 3
+    unique_references:
+    - E5
+    - E6
+    signals:
+      judgment: true
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: true
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - judgment
+    - trend
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - judgment
+    - trend
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: false
+    analysis_unit_pass: false
+  forecast_and_scenarios:
+    han_chars: 292
+    numeric_fact_count: 24
+    paragraph_count: 4
+    unique_references:
+    - E7
+    signals:
+      judgment: true
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: false
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: false
+      verification_metric: true
+    required_signals:
+    - assumption
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - assumption
+    - causal
+    - economic_impact
+    - counterevidence
+    signal_ratio: 0.8
+    density_pass: false
+    analysis_unit_pass: false
+  valuation_and_market_expectations:
+    han_chars: 281
+    numeric_fact_count: 26
+    paragraph_count: 4
+    unique_references:
+    - E8
+    - E9
+    signals:
+      judgment: true
+      trend: true
+      causal: false
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: true
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - judgment
+    - economic_impact
+    - peer
+    - reverse_valuation
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - judgment
+    - economic_impact
+    - peer
+    - counterevidence
+    - watchpoint
+    signal_ratio: 0.833
+    density_pass: false
+    analysis_unit_pass: false
+  dated_events:
+    han_chars: 106
+    numeric_fact_count: 9
+    paragraph_count: 1
+    unique_references:
+    - E1
+    - E3
+    - E6
+    signals:
+      judgment: true
+      trend: false
+      causal: false
+      economic_impact: true
+      counterevidence: false
+      watchpoint: true
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - future_event
+    - causal
+    - verification_metric
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - future_event
+    - verification_metric
+    - watchpoint
+    signal_ratio: 0.6
+    density_pass: false
+    analysis_unit_pass: false
+  risks_counterevidence_and_watchpoints:
+    han_chars: 227
+    numeric_fact_count: 0
+    paragraph_count: 3
+    unique_references:
+    - E1
+    - E2
+    - E3
+    - E4
+    - E5
+    - E6
+    - E8
+    - E9
+    signals:
+      judgment: true
+      trend: true
+      causal: false
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: false
+      verification_metric: true
+    required_signals:
+    - counterevidence
+    - economic_impact
+    - watchpoint
+    present_required_signals:
+    - counterevidence
+    - economic_impact
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: false
+    analysis_unit_pass: false
+  research_conclusion:
+    han_chars: 217
+    numeric_fact_count: 0
+    paragraph_count: 4
+    unique_references:
+    - E1
+    - E3
+    - E4
+    - E7
+    - E8
+    signals:
+      judgment: true
+      trend: true
+      causal: false
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: false
+      verification_metric: true
+    required_signals:
+    - judgment
+    - assumption
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - judgment
+    - assumption
+    - counterevidence
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: false
+    analysis_unit_pass: false
+analysis_unit_coverage:
+  complete: 0
+  required_for_candidate: 7
+  complete_sections: []
+source_diagnostics:
+  underlying_source_count: 4
+  underlying_source_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_interim_report_002837_20250819_47054e
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  category_counts:
+    issuer: 3
+    market: 1
+  issuer_source_count: 3
+  independent_source_count: 1
+  independent_source_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  metadata_complete_ratio: 1.0
+forecast_capabilities:
+  has_base_case_2026E_2028E: true
+  has_driver_assumptions: true
+  has_three_scenarios: true
+  arithmetic_reconciles: true
+  segment_driven: false
+  disaggregated_cost_tax_minority_bridge: false
+  uses_aggregate_residual_bridge: true
+  report_has_assumption_language: true
+  report_has_watch_or_counterevidence: false
+  consensus_comparison: false
+valuation_capabilities:
+  dated_snapshot: true
+  denominator_control: true
+  peer_count: 2
+  credible_peer_count: 0
+  method_explanation: true
+  forward_context: true
+  reverse_valuation: false
+  scenario_value_ranges: false
+  report_has_peer_context: true
+market_event_capabilities:
+  technical: false
+  sentiment: false
+  dated_event_count: 2
+  future_dated_event: true
+  event_impact_path: true
+  event_verification_metric: true
+  event_counterevidence_condition: false
+  market_snapshot: true
+fix_routes:
+- owner_skill: company-valuation
+  stage: RP6_valuation
+  reason_codes:
+  - credible_peer_context_below_minimum
+  - valuation_lacks_reverse_or_scenario_value_range
+  target_artifacts:
+  - peer_operating_pack.yaml
+  - reverse_valuation.yaml
+  - scenario_valuation.yaml
+  priority: medium
+- owner_skill: evidence-ingest
+  stage: T2_evidence_acquire_parse
+  reason_codes:
+  - independent_research_evidence_below_minimum
+  - peer_operating_evidence_missing
+  target_artifacts:
+  - evidence_coverage_matrix.yaml
+  - industry_evidence_pack.yaml
+  - peer_operating_pack.yaml
+  priority: medium
+- owner_skill: segment-research
+  stage: T5_analysis_pack_build
+  reason_codes:
+  - independent_industry_evidence_missing
+  target_artifacts:
+  - competitive_position_matrix.yaml
+  - industry_evidence_pack.yaml
+  priority: medium
+- owner_skill: stock-deep-dive
+  stage: T5_analysis_pack_build
+  reason_codes:
+  - insufficient_analytical_unit_coverage
+  target_artifacts:
+  - business_driver_tree.yaml
+  - risk_counterevidence_pack.yaml
+  - segment_economics.yaml
+  - thesis_tree.yaml
+  priority: medium
+- owner_skill: stock-deep-dive
+  stage: T6_forecast_valuation_model
+  reason_codes:
+  - forecast_bridge_uses_aggregate_residual
+  - forecast_not_bottom_up_or_segment_driven
+  target_artifacts:
+  - forecast_bridge.yaml
+  - forecast_sensitivity.csv
+  - segment_forecast_model.yaml
+  priority: medium
+- owner_skill: stock-deep-dive
+  stage: T7_technical_sentiment_event_pack
+  reason_codes:
+  - catalyst_event_chain_incomplete
+  - sentiment_analysis_inputs_missing
+  - technical_analysis_inputs_missing
+  target_artifacts:
+  - catalyst_calendar.yaml
+  - market_sentiment_pack.yaml
+  - technical_snapshot.yaml
+  priority: medium
+- owner_skill: memo-writer
+  stage: T8_report_draft
+  reason_codes:
+  - reader_report_below_research_density_floor
+  target_artifacts:
+  - reader_report.md
+  - section_payloads.yaml
+  priority: medium
 display_citations:
   used:
   - E1
@@ -36,14 +640,17 @@ display_citations:
 unresolved_citation_count: 0
 machine_token_leakage_count: 0
 numeric_format_violation_count: 0
-conclusion_state: candidate_ready_for_human_review
+conclusion_state: research_draft
 truthfulness_status: pass
 human_review_required: true
-human_review_status: pending
+human_review_status: not_ready
 sample_quality_report_allowed: false
 p2_allowed: false
 input_hashes:
-  report_sha256: 096e28c7a3ed686dbdcade76c3e200d2f7130144fd668660463c3c5b83a7aaa3
+  report_sha256: 54ec29f5e1bb6302cc63bd3cfc2ae91dcf60ac2a4754918a15c308b1aae96309
   appendix_sha256: 05c8be5cd80a2438bd4e13815e4e121bfe462cf906422a1478d135cee53e57bd
   forecast_bridge_sha256: 59ce89a2d8f763051eaff0dd098f243d0856092015faaeb31dc394b4a7195fb3
   valuation_reasoning_sha256: b10f0754992bbbd63413fcc3e4eca36a9ac6e9940dcf8e06ca0e38f482935aaa
+  live_rubric_sha256: 34c42febae86ee235b66f305c33d1a82a7798c2f74c6e3bc188254f2389b958d
+  density_targets_sha256: 97d21081a7995584fcf2aeac38702dc4ca7fb9c172842a17e1cc6f7ca2d578a1
+  benchmark_rubric_sha256: 06a268fbddc8e79547d6785d90fdda66fb04a45d7b3f4e523a64c176bb95b3b1

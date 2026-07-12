@@ -29,6 +29,9 @@ def test_close_state_keeps_human_review_and_promotion_boundaries():
     score = yaml.safe_load((RUN / "R5_stock_research_report_reader_v2_quality_scorecard.yaml").read_text(encoding="utf-8"))
     review = yaml.safe_load((RUN / "R5_stock_research_report_reader_v2_human_review.yaml").read_text(encoding="utf-8"))
     assert "R5_002837_READER_FACING_REPORT_V2_CANDIDATE_READY" in close
-    assert score["decision"] == "candidate_ready_for_human_review" and score["critical_blocker_count"] == 0
+    assert score["schema_version"] == "v0.2"
+    assert score["decision"] == "rejected" and score["quality_band"] == "research_draft"
+    assert score["truthfulness_status"] == "pass" and score["critical_blocker_count"] == 12
+    assert score["human_review_status"] == "not_ready"
     assert review["status"] == "pending" and review["reviewer"] is None
     assert not review["sample_quality_report_allowed"] and not review["p2_allowed"]
