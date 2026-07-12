@@ -1,0 +1,40 @@
+schema_version: r5_bundle6_task_package_manifest_v0.1
+package_id: r5_bundle6_reader_facing_report_quality_remediation
+prepared_date: 2026-07-12
+observed_repository_head: aeb846b
+base_state_contract:
+  bundle5_status: accepted_with_todos
+  current_r5_state: R5_REAL_002837_REVIEWED_INPUT_RESEARCH_DRAFT_READY
+  real_reviewed_inputs_supplied: true
+  reviewed_input_research_draft_rendered: true
+  sample_quality_report_allowed: false
+  p2_allowed: false
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+stock_name: 英维克
+objective: >-
+  Produce a reader-facing v2 research report candidate and a separate traceability appendix,
+  while preserving evidence discipline and keeping sample-quality and P2 closed pending human review.
+cards:
+  - R5_BUNDLE_6_0_STATUS_AND_READER_QUALITY_BASELINE.md
+  - R5_BUNDLE_6_1_READER_FACING_REPORT_CONTRACT.md
+  - R5_BUNDLE_6_2_SECTION_PAYLOAD_AND_METRIC_NORMALIZATION.md
+  - R5_BUNDLE_6_3_NARRATIVE_COMPOSER_AND_TRACEABILITY_SPLIT.md
+  - R5_BUNDLE_6_4_RESEARCH_COVERAGE_REMEDIATION.md
+  - R5_BUNDLE_6_5_FORECAST_AND_VALUATION_REMEDIATION.md
+  - R5_BUNDLE_6_6_READER_QUALITY_GATE_AND_NEGATIVE_TESTS.md
+  - R5_BUNDLE_6_7_002837_V2_RENDER_AND_HUMAN_REVIEW.md
+  - R5_BUNDLE_6_8_CLOSE_READOUT_AND_NEXT_DECISION.md
+hard_flags:
+  human_review_required: true
+  sample_quality_report_allowed: false
+  p2_allowed: false
+prohibited_actions:
+  - import_user_sample_facts_as_evidence
+  - fabricate_liquid_cooling_segment_financials
+  - hide_material_gaps
+  - expose_internal_ids_or_paths_in_reader_report
+  - generate_direct_investment_advice
+  - self_accept_human_review
+  - open_sample_quality
+  - open_p2

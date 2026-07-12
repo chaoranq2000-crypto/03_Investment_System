@@ -1,0 +1,102 @@
+schema_version: r5_reader_quality_rubric_v0.1
+rubric_id: r5_bundle6_reader_report_candidate
+score_total: 100
+candidate_threshold: 82
+critical_blockers_must_equal: 0
+human_review_required_for_quality_promotion: true
+sample_quality_report_allowed_in_bundle6: false
+p2_allowed_in_bundle6: false
+
+dimensions:
+  evidence_integrity:
+    weight: 20
+    requirements:
+      - every material factual statement resolves to a traceability reference
+      - fact_estimate_inference_separation_is_preserved
+      - material_limitations_are_not_hidden
+      - no_sample_fact_is_registered_or_reused
+  coverage_completeness:
+    weight: 15
+    required_sections:
+      - executive_summary
+      - company_context_and_scope
+      - financial_history_and_cashflow_quality
+      - business_breakdown_and_economics
+      - industry_structure_and_competition
+      - forecast_and_scenarios
+      - valuation_and_market_expectations
+      - risks_counterevidence_and_watchpoints
+      - research_conclusion
+    optional_when_unsupported:
+      - technical_market_state
+      - sentiment_state
+  analytical_synthesis:
+    weight: 20
+    requirements_per_major_section:
+      - one_sentence_judgment
+      - material_facts
+      - causal_explanation
+      - economic_implication
+      - counterpoint_or_uncertainty
+      - observable_watchpoint
+  forecast_and_valuation:
+    weight: 15
+    requirements:
+      - historical_to_forecast_bridge
+      - explicit_model_drivers
+      - scenario_or_sensitivity_output
+      - arithmetic_reconciliation
+      - peer_selection_rationale
+      - denominator_and_date_consistency
+      - market_implied_expectation_discussion
+      - ineligible_methods_explained_without_fake_outputs
+  narrative_and_readability:
+    weight: 15
+    requirements:
+      - coherent_report_thesis
+      - reader_first_chinese_prose
+      - no_machine_schema_voice_in_main_body
+      - no_repeated_audit_blocks
+      - section_transitions_are_present
+  presentation_hygiene:
+    weight: 10
+    requirements:
+      - currency_presented_in_yuan_or_yi_yuan_with_consistent_rounding
+      - percentages_have_at_most_two_decimals
+      - multiples_have_at_most_one_decimal_unless_exception_documented
+      - eps_has_at_most_three_decimals
+      - tables_have_units_in_headers
+      - main_body_has_no_internal_ids_or_paths
+      - main_body_has_no_todo_or_missing_tokens
+  risks_and_watch_conditions:
+    weight: 5
+    requirements:
+      - risks_are_linked_to_thesis
+      - counterevidence_is_visible
+      - watchpoints_have_source_and_trigger_logic
+
+critical_blockers:
+  - unsupported_material_fact
+  - unresolved_traceability_reference
+  - raw_internal_evidence_id_in_main_report
+  - raw_registry_or_workflow_path_in_main_report
+  - readiness_or_visible_gap_token_in_main_report
+  - raw_todo_missing_or_unreviewed_token_in_main_report
+  - duplicate_machine_readiness_sections
+  - unrounded_raw_cny_dump
+  - forecast_without_driver_bridge
+  - forecast_arithmetic_mismatch
+  - valuation_without_date_or_denominator_control
+  - direct_buy_sell_hold_or_position_instruction
+  - sample_fact_used_as_evidence
+  - fabricated_human_review_acceptance
+
+candidate_output_contract:
+  report_file: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2.md
+  traceability_file: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_traceability_v2.yaml
+  scorecard_file: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2_quality_scorecard.yaml
+  human_review_file: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2_human_review.yaml
+  success_state: R5_002837_READER_FACING_REPORT_V2_CANDIDATE_READY
+  human_review_status: pending
+  sample_quality_report_allowed: false
+  p2_allowed: false

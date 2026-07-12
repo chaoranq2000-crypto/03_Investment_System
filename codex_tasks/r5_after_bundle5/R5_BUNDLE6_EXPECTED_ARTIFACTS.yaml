@@ -1,0 +1,50 @@
+schema_version: r5_bundle6_expected_artifacts_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+required_artifacts:
+  - path: reports/p1_6/R5_BUNDLE_6_0_STATUS_READER_QUALITY_BASELINE_READOUT.md
+    owner_card: 6.0
+  - path: .agents/skills/stock-deep-dive/references/r5_reader_facing_report_contract.md
+    owner_card: 6.1
+  - path: config/r5_reader_quality_rubric.yaml
+    owner_card: 6.1
+  - path: .agents/skills/quality-review/references/r5_reader_quality_gate_contract.md
+    owner_card: 6.1
+  - path: src/report/r5_section_payload_builder.py
+    owner_card: 6.2
+  - path: src/report/r5_metric_formatter.py
+    owner_card: 6.2
+  - path: scripts/build_r5_reader_section_payloads.py
+    owner_card: 6.2
+  - path: src/report/r5_reader_report_writer.py
+    owner_card: 6.3
+  - path: scripts/render_r5_reader_report_v2.py
+    owner_card: 6.3
+  - path: scripts/render_r5_traceability_appendix_v2.py
+    owner_card: 6.3
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle6_coverage_inventory.yaml
+    owner_card: 6.4
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle6_industry_event_market_input_plan.yaml
+    owner_card: 6.4
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle6_forecast_bridge.yaml
+    owner_card: 6.5
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle6_valuation_reasoning_pack.yaml
+    owner_card: 6.5
+  - path: scripts/run_r5_reader_quality_gate.py
+    owner_card: 6.6
+  - path: tests/test_r5_reader_quality_gate.py
+    owner_card: 6.6
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2.md
+    owner_card: 6.7
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_traceability_v2.yaml
+    owner_card: 6.7
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2_quality_scorecard.yaml
+    owner_card: 6.7
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2_human_review.yaml
+    owner_card: 6.7
+  - path: reports/p1_6/R5_BUNDLE_6_READER_REPORT_QUALITY_REMEDIATION_CLOSE_READOUT.md
+    owner_card: 6.8
+fixed_close_flags:
+  human_review_required: true
+  human_review_status: pending
+  sample_quality_report_allowed: false
+  p2_allowed: false
