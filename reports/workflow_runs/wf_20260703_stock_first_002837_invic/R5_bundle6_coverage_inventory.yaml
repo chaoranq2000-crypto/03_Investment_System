@@ -1,0 +1,101 @@
+artifact_type: R5_bundle6_coverage_inventory
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-12'
+dimensions:
+- dimension: company_context
+  mandatory: true
+  review_status: accepted
+  reviewed_evidence:
+  - 2025 annual report, pages 11-14
+  missing_evidence: []
+  preferred_source_type: official_disclosure
+  date_requirement: cutoff_or_earlier
+  expected_output: company boundary
+  owner: stock-deep-dive
+- dimension: financial_history
+  mandatory: true
+  review_status: accepted
+  reviewed_evidence:
+  - 2025 annual report, page 7
+  - 2026Q1 report, pages 2 and 9
+  missing_evidence: []
+  preferred_source_type: official_disclosure
+  date_requirement: 2023A-2026Q1
+  expected_output: history and cash conversion
+  owner: stock-deep-dive
+- dimension: business_economics
+  mandatory: true
+  review_status: accepted_with_boundary
+  reviewed_evidence:
+  - 2025 annual report, pages 15-16
+  missing_evidence:
+  - liquid-cooling-specific revenue and margin are not separately disclosed
+  preferred_source_type: official_disclosure
+  date_requirement: latest annual
+  expected_output: broad product-line economics
+  owner: stock-deep-dive
+- dimension: industry_and_competition
+  mandatory: true
+  review_status: accepted_issuer_evidence_limited
+  reviewed_evidence:
+  - 2025 annual report, pages 11-14
+  - 2025 interim report, pages 10-12
+  missing_evidence:
+  - independent market-size series
+  - same-definition market shares
+  preferred_source_type: official_disclosure_or_industry_association
+  date_requirement: 2025_or_later
+  expected_output: demand drivers, value chain, advantages and constraints
+  owner: evidence-ingest
+- dimension: peer_comparability
+  mandatory: true
+  review_status: accepted_low_confidence
+  reviewed_evidence:
+  - 2026-07-10 structured market snapshot for 301018 and 300499
+  missing_evidence:
+  - fully comparable revenue-mix and margin series
+  preferred_source_type: official_disclosure_and_reviewed_market_data
+  date_requirement: same_valuation_date
+  expected_output: transparent small peer matrix
+  owner: company-valuation
+- dimension: dated_company_events
+  mandatory: true
+  review_status: accepted
+  reviewed_evidence:
+  - 2025 interim report published 2025-08-19
+  - 2025 annual report and 2026Q1 report published 2026-04-21
+  missing_evidence: []
+  preferred_source_type: official_disclosure
+  date_requirement: explicit_publication_date
+  expected_output: completed events and future verification points
+  owner: evidence-ingest
+- dimension: historical_market_series
+  mandatory: false
+  review_status: deferred_method_not_activated
+  reviewed_evidence:
+  - 2026-07-10 point-in-time snapshot
+  missing_evidence:
+  - reviewed OHLCV series with adjustment and missing-date policy
+  preferred_source_type: structured_market_data
+  date_requirement: at_least_250_trading_days
+  expected_output: objective returns, volatility and drawdown only
+  owner: evidence-ingest
+- dimension: sentiment
+  mandatory: false
+  review_status: omitted_unsupported
+  reviewed_evidence: []
+  missing_evidence:
+  - definitionally clear dated ownership, flow or consensus input
+  preferred_source_type: reviewed_structured_data
+  date_requirement: dated
+  expected_output: optional
+  owner: evidence-ingest
+industry_reader_boundary: 发行人披露可支持需求驱动、产品链定位和竞争压力；独立市场规模与份额仍不作事实结论。
+liquid_cooling_boundary:
+  confirmed: 产品暴露和端到端产品覆盖
+  broad_economics: 机房与机柜温控宽口径
+  unverified: 液冷独立收入、毛利率与利润贡献
+  future_measurement: 后续官方分产品披露、订单与毛利率
+sample_quality_report_allowed: false
+p2_allowed: false

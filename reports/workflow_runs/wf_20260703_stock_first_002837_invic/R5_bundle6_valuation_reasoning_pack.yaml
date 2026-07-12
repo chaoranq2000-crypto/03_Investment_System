@@ -1,0 +1,67 @@
+artifact_type: R5_bundle6_valuation_reasoning_pack
+schema_version: v0.1
+as_of_date: '2026-07-10'
+dated_snapshot:
+  price_cny: 73.54
+  market_cap_cny: 93715669584
+  pe_ttm: 194.2045
+  pb: 27.0715
+  ps_ttm: 14.8507
+  denominator_control: PE/PS use TTM denominators; forward PE uses Bundle6 scenario
+    EPS; all market fields share 2026-07-10
+method_eligibility:
+- method: forward_pe
+  status: context_only
+  reason: earnings scenarios exist but 2026 profitability is unstable
+- method: ps_ttm
+  status: active_context
+  reason: revenue denominator is more stable; margin differences limit comparability
+- method: dcf
+  status: inactive
+  reason: FCFF, discount rate and terminal assumptions are not reviewed
+- method: sotp
+  status: inactive
+  reason: liquid-cooling and other segment economics are not sufficiently separated
+peer_matrix:
+- stock_code: '301018'
+  name: 申菱环境
+  pe_ttm: 234.3524
+  valuation_date: '2026-07-10'
+  denominator: TTM
+  inclusion_reason: thermal-management exposure
+  comparability_limitation: business mix and earnings quality differ
+  confidence: low
+- stock_code: '300499'
+  name: 高澜股份
+  pe_ttm: 385.8974
+  valuation_date: '2026-07-10'
+  denominator: TTM
+  inclusion_reason: thermal-management exposure
+  comparability_limitation: business mix and earnings quality differ
+  confidence: low
+market_implied_expectations:
+- statement: TTM市盈率接近194.2倍，价格已要求利润较当前水平显著扩张
+  claim_type: inference
+  limitation: 不等于目标价或交易建议
+- statement: 按基准模型，2026E/2027E/2028E远期市盈率约995.8/291.8/161.5倍
+  claim_type: estimate
+  limitation: 对利润率恢复高度敏感
+- statement: 14.9倍TTM市销率意味着收入增长必须最终转化为可持续利润和现金
+  claim_type: inference
+  limitation: 未建立市场一致预期反推模型
+scenario_context:
+- period: 2026E
+  eps: 0.073854
+  forward_pe: 995.748368402524
+- period: 2027E
+  eps: 0.252034
+  forward_pe: 291.78602886912086
+- period: 2028E
+  eps: 0.455462
+  forward_pe: 161.46242716187083
+target_price: null
+rating: null
+position_instruction: null
+human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false

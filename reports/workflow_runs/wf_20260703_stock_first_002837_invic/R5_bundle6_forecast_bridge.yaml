@@ -1,0 +1,151 @@
+artifact_type: R5_bundle6_forecast_bridge
+schema_version: v0.1
+as_of_date: '2026-07-10'
+historical_anchor:
+  period: 2025A
+  revenue: 6067759091.55
+  net_profit_attributable: 521914773.0
+  gross_margin_pct: 27.86
+  eps: 0.54
+latest_quarter_treatment:
+  period: 2026Q1
+  observed: 收入同比增长26.03%，归母净利润同比下降81.97%，经营现金流为负
+  model_choice: 不直接年化一季度利润；基准情景采用较低毛利率和费用率起点，熊牛情景扩大区间
+  cause_status: observable_divergence_driver_not_verified
+broad_product_line_boundary: 预测保持公司整体口径，不建立未披露的液冷独立收入线。
+driver_assumptions:
+- driver: revenue_growth
+  values:
+    2026E: 26.0291
+    2027E: 20.0
+    2028E: 15.0
+  unit: pct
+  rationale: 2026 uses the reported Q1 year-on-year rate as a mechanical carry-forward;
+    later years are explicit slowing-growth model assumptions.
+- driver: gross_margin
+  values:
+    2026E: 24.2935
+    2027E: 25.5
+    2028E: 26.5
+  unit: pct
+  rationale: The base path starts from the reported Q1 cost/revenue ratio and only
+    partially normalizes toward the 2025 annual level.
+- driver: opex
+  values:
+    2026E: 18.5321
+    2027E: 17.5
+    2028E: 16.5
+  unit: pct_of_revenue
+  rationale: The expense ratio is a model input, not a reported full-year outcome;
+    it begins at the Q1 ratio and gradually normalizes.
+- driver: net_profit
+  values:
+    2026E: 94115513.02
+    2027E: 321179929.4
+    2028E: 580418015.27
+  unit: CNY
+  rationale: The 2026 base is a mechanical prior-year seasonality run-rate; 2027-2028
+    margins are explicit model assumptions with wide ranges.
+- driver: eps
+  values:
+    2026E: 0.073854
+    2027E: 0.252034
+    2028E: 0.455462
+  unit: CNY_per_share
+  rationale: EPS uses the reviewed same-date total-share count and the model net-profit
+    path; dilution after the snapshot is not assumed.
+base_case_bridge:
+- period: 2026E
+  revenue: 7647141176.21
+  gross_margin_pct: 24.2935
+  gross_profit: 1857758241.64
+  opex_assumption_pct: 18.5321
+  opex: 1417175849.9164133
+  implied_tax_finance_other_and_minority: 346466878.7035868
+  net_profit_attributable: 94115513.02
+  diluted_share_count: 1274349692
+  eps: 0.073854
+  reconciliation_difference: -2.4258095712714756e-07
+- period: 2027E
+  revenue: 9176569411.45
+  gross_margin_pct: 25.5
+  gross_profit: 2340025199.92
+  opex_assumption_pct: 17.5
+  opex: 1605899647.00375
+  implied_tax_finance_other_and_minority: 412945623.51625
+  net_profit_attributable: 321179929.4
+  diluted_share_count: 1274349692
+  eps: 0.252034
+  reconciliation_difference: 3.759772337352807e-07
+- period: 2028E
+  revenue: 10553054823.17
+  gross_margin_pct: 26.5
+  gross_profit: 2796559528.14
+  opex_assumption_pct: 16.5
+  opex: 1741254045.82305
+  implied_tax_finance_other_and_minority: 474887467.04694986
+  net_profit_attributable: 580418015.27
+  diluted_share_count: 1274349692
+  eps: 0.455462
+  reconciliation_difference: 1.2229947321529266e-07
+scenarios:
+  base_case:
+    status: ready
+    drivers:
+      2026E:
+        revenue: 7647141176.21
+        gross_margin_pct: 24.2935
+        net_profit: 94115513.02
+        eps: 0.073854
+      2027E:
+        revenue: 9176569411.45
+        gross_margin_pct: 25.5
+        net_profit: 321179929.4
+        eps: 0.252034
+      2028E:
+        revenue: 10553054823.17
+        gross_margin_pct: 26.5
+        net_profit: 580418015.27
+        eps: 0.455462
+  bull_case:
+    status: sensitivity_estimate
+    drivers:
+      2026E:
+        revenue: 8023397846.76
+        gross_margin_pct: 27.86
+        net_profit: 240701935.4
+        eps: 0.188882
+      2027E:
+        revenue: 10029247308.45
+        gross_margin_pct: 27.5
+        net_profit: 601754838.51
+        eps: 0.472205
+      2028E:
+        revenue: 12035096770.13
+        gross_margin_pct: 27.0
+        net_profit: 962807741.61
+        eps: 0.755529
+  bear_case:
+    status: sensitivity_estimate
+    drivers:
+      2026E:
+        revenue: 7281310909.86
+        gross_margin_pct: 23.0
+        net_profit: 36406554.55
+        eps: 0.028569
+      2027E:
+        revenue: 8373507546.34
+        gross_margin_pct: 24.0
+        net_profit: 167470150.93
+        eps: 0.131416
+      2028E:
+        revenue: 9210858300.97
+        gross_margin_pct: 25.0
+        net_profit: 368434332.04
+        eps: 0.289116
+sensitivity_variables:
+- revenue_growth
+- gross_margin
+consensus_used: false
+sample_quality_report_allowed: false
+p2_allowed: false

@@ -1,0 +1,60 @@
+artifact_type: R5_bundle6_industry_event_market_input_plan
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+accepted_inputs:
+- input: industry_and_value_chain
+  source: 2025 annual report
+  source_date: '2026-04-21'
+  locator: PDF pages 11-14
+  claim_type: management_comment_and_fact
+  review_status: accepted_with_issuer_boundary
+- input: competition_pressure
+  source: 2025 interim report
+  source_date: '2025-08-19'
+  locator: PDF pages 10-12
+  claim_type: management_comment
+  review_status: accepted_with_issuer_boundary
+- input: material_completed_events
+  source: official periodic reports
+  source_date: 2025-08-19 and 2026-04-21
+  locator: publication metadata
+  claim_type: fact
+  review_status: accepted
+- input: peer_valuation_snapshot
+  source: reviewed structured market data
+  source_date: '2026-07-10'
+  locator: same-date daily_basic snapshot
+  claim_type: fact
+  review_status: accepted_low_confidence
+peer_rationale:
+- stock_code: '301018'
+  name: 申菱环境
+  included_because: 精密温控与数据中心热管理产品暴露
+  not_fully_comparable_because: 业务组合和利润结构不同
+  valuation_date: '2026-07-10'
+  denominator_period: TTM
+  confidence: low
+- stock_code: '300499'
+  name: 高澜股份
+  included_because: 热管理与液冷相关产品暴露
+  not_fully_comparable_because: 业务组合和盈利波动不同
+  valuation_date: '2026-07-10'
+  denominator_period: TTM
+  confidence: low
+completed_events:
+- date: '2025-08-19'
+  event: 2025年半年度报告披露
+  classification: completed_fact
+- date: '2026-04-21'
+  event: 2025年年度报告与2026年一季度报告披露
+  classification: completed_fact
+scheduled_verification_points:
+- 下一份官方定期报告：验证毛利率、经营现金流和液冷披露口径；具体日期以交易所公告为准
+deferred_inputs:
+- input: historical_ohlcv
+  reason: technical market section is not activated in this candidate
+- input: sentiment
+  reason: no reviewed definitionally clear input
+sample_evidence_used: false
+sample_quality_report_allowed: false
+p2_allowed: false

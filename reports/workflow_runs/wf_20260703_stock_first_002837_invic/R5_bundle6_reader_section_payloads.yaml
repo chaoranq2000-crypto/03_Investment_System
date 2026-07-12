@@ -1,0 +1,301 @@
+artifact_type: R5_reader_section_payloads
+schema_version: r5_reader_section_payloads_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+stock_name: 英维克
+calculation_ledger: &id001
+  revenue_cagr_2023_2025_pct: 31.128473986044355
+  revenue_growth_2024_pct: 30.03691524576435
+  revenue_growth_2025_pct: 32.22919551276262
+  net_profit_growth_2024_pct: 31.586056206752634
+  net_profit_growth_2025_pct: 15.298399489390047
+  net_margin_pct:
+    2023A: 9.74837270491907
+    2024A: 9.864505907799415
+    2025A: 8.601441901785813
+    2026Q1: 0.7366107668503861
+  ocf_to_profit_pct:
+    2023A: 131.70456301271508
+    2024A: 44.146398181515615
+    2025A: 30.133889764411787
+    2026Q1: -4462.713308612178
+  ocf_to_revenue_pct:
+    2023A: 12.839051671864457
+    2024A: 4.354824056696261
+    2025A: 2.591949020834062
+    2026Q1: -32.872826724902396
+  q1_revenue_yoy_pct: 26.03
+  q1_profit_yoy_pct: -81.97
+sections:
+- section_id: executive_summary
+  title: 核心研究观点
+  one_sentence_judgment: 公司宽口径温控业务已实现较快扩张，但盈利与现金流在最新季度明显承压，当前估值反映了较强的后续修复预期。
+  material_facts:
+  - 2023—2025年收入连续增长
+  - 2026年一季度收入增长而利润显著下滑
+  - 当前市盈率与市销率均处高位
+  trend_calculations: []
+  causal_chain:
+  - 算力密度提升扩大热管理需求；公司披露端到端产品覆盖；但最新季度成本费用与现金流压力尚未解释清楚
+  economic_implications:
+  - 研究重点应从收入增长转向利润率、现金转换和产品结构的共同验证
+  counterpoints:
+  - 液冷单独盈利口径尚未披露
+  uncertainties:
+  - 一季度利润异常的持续性和原因仍待后续定期报告验证
+  watchpoints:
+  - 后续季度毛利率、经营现金流和宽口径产品线收入增速
+  display_references:
+  - E1
+  - E2
+  - E3
+  - E8
+  readiness_for_reader_report: ready
+- section_id: company_context_and_scope
+  title: 公司背景与研究边界
+  one_sentence_judgment: 英维克覆盖数据中心、算力设备和储能等精密温控场景，但本文只把液冷视为已确认的产品暴露，不把公司整体业绩等同于液冷业绩。
+  material_facts:
+  - 公司披露风冷与液冷产品以及端到端交付能力
+  trend_calculations: []
+  causal_chain:
+  - 产品覆盖扩大可服务价值链，但披露口径仍停留在宽产品线
+  economic_implications:
+  - 商业兑现需由分产品收入、毛利率和订单继续验证
+  counterpoints:
+  - 公司对竞争优势的描述属于管理层陈述
+  uncertainties:
+  - 液冷独立收入和利润贡献未单列
+  watchpoints:
+  - 未来官方披露是否增加液冷收入、毛利率或订单口径
+  display_references:
+  - E1
+  - E4
+  readiness_for_reader_report: ready
+- section_id: financial_history_and_cashflow_quality
+  title: 财务历史与现金流质量
+  one_sentence_judgment: 2023—2025年收入与利润增长，但现金流转化持续走弱；2026年一季度出现收入与利润、现金流的显著背离。
+  material_facts:
+  - 2023A: 3528859077.13
+    2024A: 4588819487.27
+    2025A: 6067759091.55
+    2026Q1: 1175329313.61
+  - 2023A: 344006335.07
+    2024A: 452664369.42
+    2025A: 521914773.0
+    2026Q1: 8657602.27
+  - 2023A: 453072040.34
+    2024A: 199835014.95
+    2025A: 157273222.36
+    2026Q1: -386363968.71
+  trend_calculations:
+  - *id001
+  causal_chain:
+  - 背离是可观察事实；当前已审阅材料不足以确认具体驱动
+  economic_implications:
+  - 若利润率和现金转化不能恢复，收入增长的含金量将下降
+  counterpoints:
+  - 单季度现金流可能受季节性和营运资金扰动
+  uncertainties:
+  - 尚无已审阅的一次性项目或季度季节性序列用于归因
+  watchpoints:
+  - 应收、存货、合同负债、毛利率及经营现金流的季度变化
+  display_references:
+  - E2
+  - E3
+  readiness_for_reader_report: ready
+- section_id: business_breakdown_and_economics
+  title: 业务拆分与细分经济性
+  one_sentence_judgment: 2025年机房与机柜温控合计贡献近九成收入，毛利率接近；这证明宽口径温控主业集中度高，但不能推导液冷独立经济性。
+  material_facts: &id002
+  - name: 机房温控节能产品
+    revenue_share_pct: 56.83
+    gross_margin_pct: 28.36
+  - name: 机柜温控节能产品
+    revenue_share_pct: 32.59
+    gross_margin_pct: 27.24
+  - name: 客车空调
+    revenue_share_pct: 1.49
+    gross_margin_pct: null
+  - name: 轨道交通列车空调及服务
+    revenue_share_pct: 0.74
+    gross_margin_pct: null
+  - name: 其他
+    revenue_share_pct: 8.35
+    gross_margin_pct: null
+  trend_calculations: *id002
+  causal_chain:
+  - 宽口径主业集中使数据中心与算力需求对公司更重要，但产品结构变化仍需单独披露
+  economic_implications:
+  - 机房与机柜温控的增长和毛利率决定短期盈利基础
+  counterpoints:
+  - 低占比业务未完整披露毛利率
+  uncertainties:
+  - 液冷收入、毛利率与利润贡献没有独立口径
+  watchpoints:
+  - 两大产品线收入占比、毛利率差异和新增订单
+  display_references:
+  - E4
+  readiness_for_reader_report: ready
+- section_id: industry_structure_and_competition
+  title: 行业结构与竞争
+  one_sentence_judgment: 高热密度与能效要求推动液冷导入，公司覆盖冷板、连接件、分配单元、机柜、工质和冷源等环节；优势在于链条完整，约束在于竞争加剧及独立盈利数据不足。
+  material_facts:
+  - 发行人2025年年报披露高热密度和高能效要求推动液冷导入
+  - 公司披露端到端液冷产品覆盖
+  - 2025年中报披露竞争加剧使机房温控毛利率同比下降
+  trend_calculations: []
+  causal_chain:
+  - 芯片功率密度提升→散热与能效约束增强→液冷导入；同时供应竞争加剧→价格与毛利率承压
+  economic_implications:
+  - 需求增长能否转化为利润取决于产品结构、交付质量和定价能力
+  counterpoints:
+  - 需求驱动与竞争优势主要来自发行人披露，缺少独立行业统计交叉验证
+  uncertainties:
+  - 市场规模和同业份额未采用口径不一致的第三方估计
+  watchpoints:
+  - 机房温控毛利率、液冷产品披露、同业同口径收入和利润率
+  display_references:
+  - E5
+  - E6
+  readiness_for_reader_report: ready
+- section_id: forecast_and_scenarios
+  title: 预测与情景
+  one_sentence_judgment: 模型以2026年一季度弱盈利为约束，不假设液冷独立收入，并通过收入增速、毛利率和净利率形成三种显式情景。
+  material_facts: &id003
+  - period: 2026E
+    revenue: 7647141176.21
+    revenue_growth_pct: 26.029083568255995
+    gross_margin_pct: 24.2935
+    net_profit: 94115513.02
+    eps: 0.073854
+    eps_change_pct: -86.32333333333332
+  - period: 2027E
+    revenue: 9176569411.45
+    revenue_growth_pct: 19.99999999997386
+    gross_margin_pct: 25.5
+    net_profit: 321179929.4
+    eps: 0.252034
+    eps_change_pct: 241.25978281474255
+  - period: 2028E
+    revenue: 10553054823.17
+    revenue_growth_pct: 15.000000000027235
+    gross_margin_pct: 26.5
+    net_profit: 580418015.27
+    eps: 0.455462
+    eps_change_pct: 80.71450677289573
+  trend_calculations: *id003
+  causal_chain:
+  - 收入增速与毛利率决定毛利额，费用和税负假设形成归母净利润，再由固定股本桥接至每股收益
+  economic_implications:
+  - 盈利修复对毛利率和费用纪律高度敏感
+  counterpoints:
+  - 基准情景不是管理层指引或市场一致预期
+  uncertainties:
+  - 一季度弱利润原因未验证，因此情景区间保持较宽
+  watchpoints:
+  - 实际收入增速、毛利率、费用率、税率与股本变化
+  display_references:
+  - E7
+  readiness_for_reader_report: ready
+- section_id: valuation_and_market_expectations
+  title: 估值与市场预期
+  one_sentence_judgment: 截至2026年7月10日，市场定价要求未来利润显著修复；在盈利不稳定阶段，市销率与远期市盈率应结合使用，不能给出单一确定价值结论。
+  material_facts:
+  - price_cny: 73.54
+    market_cap_cny: 93715669584
+    pe_ttm: 194.2045
+    pb: 27.0715
+    ps_ttm: 14.8507
+    denominator_control: PE/PS use TTM denominators; forward PE uses Bundle6 scenario
+      EPS; all market fields share 2026-07-10
+  - - stock_code: '301018'
+      name: 申菱环境
+      pe_ttm: 234.3524
+      valuation_date: '2026-07-10'
+      denominator: TTM
+      inclusion_reason: thermal-management exposure
+      comparability_limitation: business mix and earnings quality differ
+      confidence: low
+    - stock_code: '300499'
+      name: 高澜股份
+      pe_ttm: 385.8974
+      valuation_date: '2026-07-10'
+      denominator: TTM
+      inclusion_reason: thermal-management exposure
+      comparability_limitation: business mix and earnings quality differ
+      confidence: low
+  trend_calculations:
+  - statement: TTM市盈率接近194.2倍，价格已要求利润较当前水平显著扩张
+    claim_type: inference
+    limitation: 不等于目标价或交易建议
+  - statement: 按基准模型，2026E/2027E/2028E远期市盈率约995.8/291.8/161.5倍
+    claim_type: estimate
+    limitation: 对利润率恢复高度敏感
+  - statement: 14.9倍TTM市销率意味着收入增长必须最终转化为可持续利润和现金
+    claim_type: inference
+    limitation: 未建立市场一致预期反推模型
+  causal_chain:
+  - 较高市销率和远期市盈率→价格对增长与利润率修复敏感→任何修复不及预期都会放大估值风险
+  economic_implications:
+  - 估值判断的核心不是点目标价，而是检验收入增长和利润率恢复能否兑现
+  counterpoints:
+  - 两家可比公司业务结构差异较大，横向倍数仅作低置信度背景
+  uncertainties:
+  - 现金流折现和分部估值的必要输入尚未满足
+  watchpoints:
+  - 收入增速、净利率、盈利预测修订与同口径估值变化
+  display_references:
+  - E8
+  - E9
+  readiness_for_reader_report: ready
+- section_id: risks_counterevidence_and_watchpoints
+  title: 风险、反证与观察条件
+  one_sentence_judgment: 核心风险是增长未能转化为利润与现金、竞争压低毛利率，以及市场预期领先于基本面兑现。
+  material_facts:
+  - 2026年一季度利润与经营现金流承压
+  - 发行人披露竞争加剧影响毛利率
+  trend_calculations: []
+  causal_chain:
+  - 竞争或成本压力→毛利率下降→利润修复落后于收入→高估值消化困难
+  economic_implications:
+  - 需要以连续季度数据而非单次叙事验证经营改善
+  counterpoints:
+  - 公司产品链条完整且收入仍在增长
+  uncertainties:
+  - 液冷单独经济性和一季度异常原因未得到独立验证
+  watchpoints:
+  - 毛利率恢复、经营现金流转正、液冷独立披露、同业竞争强度
+  display_references:
+  - E2
+  - E3
+  - E5
+  - E8
+  readiness_for_reader_report: ready
+- section_id: research_conclusion
+  title: 研究结论与跟踪清单
+  one_sentence_judgment: 现有证据支持公司具备算力热管理与液冷产品暴露，但尚不足以证明液冷独立盈利贡献；报告候选应保持观察型结论，等待利润率、现金流和披露质量共同改善。
+  material_facts:
+  - 宽口径主业增长
+  - 最新季度利润和现金流承压
+  - 液冷独立经济性未披露
+  trend_calculations: []
+  causal_chain:
+  - 产品暴露提供增长选择权；财务兑现与估值吸收决定研究结论能否增强
+  economic_implications:
+  - 后续更新应优先处理可验证经营指标，而非扩大未经核验的行业叙事
+  counterpoints:
+  - 若后续利润率与现金流恢复，当前谨慎判断需要上调
+  uncertainties:
+  - 模型和估值均依赖未来披露验证
+  watchpoints:
+  - 季度毛利率、经营现金流、液冷口径、预测偏差和估值日期
+  display_references:
+  - E1
+  - E3
+  - E4
+  - E7
+  - E8
+  readiness_for_reader_report: ready
+human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false
