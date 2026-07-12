@@ -1,0 +1,117 @@
+artifact_type: R5_bundle6_reader_surface_baseline
+schema_version: r5_bundle6_reader_surface_baseline_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+classification: audit_oriented_research_draft_not_reader_candidate
+before_state_preserved: true
+input_artifacts:
+  bundle5_draft:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_note_reviewed_input_draft.md
+    sha256: 5a3b041d87cebd1dbf7f433ef5cd5f5032bc4fd5c1000733d9ae2ceebe95f64c
+  bundle5_quality_gate:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_quality_gate_result.yaml
+    sha256: 1930d40da623aee924e6fbaed8a003455709c887171e5d7adf3ed920de78c320
+  bundle5_benchmark_precheck:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_benchmark_coverage_precheck.yaml
+    sha256: 6234e7cedc4b4db7a4d95a35ca180552bba5347a96874ae143c0348f0536cb7d
+  bundle5_truthfulness:
+    path: reports/p1_6/r5_bundle5_readout_truthfulness_result.json
+    sha256: fadea7d0e9f210ad25055ca705033360193762b532831bd0638fdad5008b6059
+verification:
+  bundle5_truthfulness: pass_checked_8_failed_0
+  bundle5_close_pytest: 9 passed in 0.17s
+  full_repository_pytest: 510 passed, 2 skipped in 20.98s
+  bundle5_quality_decision: accepted_with_todos
+  critical_quality_blockers: 0
+reader_surface:
+  line_count: 251
+  nonblank_line_count: 183
+  character_count: 14102
+  heading_count: 25
+  headings:
+  - 'reviewed_input_research_draft: 002837 英维克'
+  - 重要结论与可追溯锚点
+  - 公司背景与研究边界
+  - 财务历史与现金流质量
+  - 业务拆分与细分经济性
+  - 行业结构与竞争
+  - 预测假设与敏感性
+  - 估值方法与可比性
+  - 有日期的市场状态
+  - 有日期的情绪与事件
+  - 风险、反证与开放问题
+  - 研究结论与后续观察条件
+  - 数据时点与口径冲突处理
+  - company_context
+  - financial_history_and_cash_flow_quality
+  - business_breakdown_and_segment_economics
+  - industry_structure_and_competition
+  - forecast
+  - valuation
+  - dated_market_or_technical_state_when_supported
+  - dated_sentiment_and_events_when_supported
+  - risks_counterevidence_and_open_questions
+  - research_conclusion_and_watch_conditions
+  - Source Gap Appendix
+  - Open Questions
+  raw_internal_id_count: 5
+  raw_internal_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  - r5_b5_forecast_eps_base
+  - r5_b5_valuation_context_002837_20260710
+  internal_path_count: 4
+  internal_paths:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_financial_history_candidate.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_business_breakdown_candidate.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_forecast_model_candidate.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_valuation_pack_candidate.yaml
+  machine_label_count: 34
+  gap_token_count: 5
+  gap_tokens:
+  - MISSING_DISCLOSURE
+  - TODO_SOURCE_REQUIRED
+  - LOW_CONFIDENCE_CLUE_ONLY
+  - UNREVIEWED_FCFF_INPUTS
+  - MISSING_PRICE_HISTORY
+  duplicate_machine_readiness_section_count: 10
+  duplicate_machine_readiness_sections:
+  - company_context
+  - financial_history_and_cash_flow_quality
+  - business_breakdown_and_segment_economics
+  - industry_structure_and_competition
+  - forecast
+  - valuation
+  - dated_market_or_technical_state_when_supported
+  - dated_sentiment_and_events_when_supported
+  - risks_counterevidence_and_open_questions
+  - research_conclusion_and_watch_conditions
+  source_gap_appendix_in_main_body: true
+  over_precise_numeric_count: 3
+  over_precise_numeric_examples:
+  - '0.073854'
+  - '0.252034'
+  - '0.455462'
+coverage_baseline:
+  total: 10
+  covered: 4
+  partial: 4
+  missing: 2
+  partial_dimensions:
+  - business_breakdown_and_segment_economics
+  - valuation_methods_and_comparability
+  - dated_market_or_technical_state_when_supported
+  - research_conclusion_and_watch_conditions
+  missing_dimensions:
+  - industry_structure_and_competition
+  - dated_sentiment_and_events_when_supported
+reader_quality_diagnostic:
+  manual_planning_score: 46
+  canonical_gate_score: null
+  reader_candidate_accepted: false
+  reason: Bundle 5 proves truthfulness and renderability but the main body leaks audit
+    metadata and lacks reader-oriented synthesis.
+canonical_state_changed: false
+sample_quality_report_allowed: false
+p2_allowed: false
