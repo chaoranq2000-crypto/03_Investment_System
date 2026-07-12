@@ -1,0 +1,137 @@
+artifact_type: R5_stock_research_report_traceability_v2
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+cutoff_date: '2026-07-10'
+records:
+- display_reference_id: E1
+  claim_type: fact_and_management_comment
+  claim_text_digest: fd821e18424ddc8cebf1c53518f4cb8da1252427f1111c826bef925c90671801
+  claim_summary: 公司业务范围、液冷产品链与披露边界
+  period: 2025A
+  unit: null
+  raw_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  method: direct_review
+  confidence: high
+  limitation: 竞争优势表述来自管理层，液冷独立经济性未单列
+  reviewer_state: accepted
+  conflict_or_staleness_status: current
+- display_reference_id: E2
+  claim_type: fact_and_inference
+  claim_text_digest: a693d45b811e60321f4800b6fa18da3187872a8be767a9618160f13e053dd8ba
+  claim_summary: 2023—2025年财务历史、现金转换与趋势计算
+  period: 2023A-2025A
+  unit: CNY/pct
+  raw_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_financial_history_candidate.yaml
+  method: reported_values_and_arithmetic
+  confidence: high
+  limitation: 公司整体口径，不归因于液冷
+  reviewer_state: accepted
+  conflict_or_staleness_status: current
+- display_reference_id: E3
+  claim_type: fact_and_inference
+  claim_text_digest: d08de74b3d344cb7bcde6646d5f9f2cdea16ce6683cbe43c6a95c8de6a83e35e
+  claim_summary: 2026年一季度收入利润背离及现金流
+  period: 2026Q1
+  unit: CNY/pct
+  raw_evidence_ids:
+  - ev_quarterly_report_002837_20260421_2f00c7
+  source_path: data/processed/text/002837/szse_2026_q1_report_002837_2026-04-21.txt
+  method: reported_values_and_arithmetic
+  confidence: high
+  limitation: 背离原因尚未验证
+  reviewer_state: accepted
+  conflict_or_staleness_status: current
+- display_reference_id: E4
+  claim_type: fact_and_inference
+  claim_text_digest: dd80ebf96da41c04942a3b7abcd307f19ab0f5df00a5e8eb84e6023fb9282a91
+  claim_summary: 2025年宽产品线收入占比、毛利率与液冷边界
+  period: 2025A
+  unit: CNY/pct
+  raw_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_business_breakdown_candidate.yaml
+  method: reported_values_and_arithmetic
+  confidence: high
+  limitation: 低占比产品毛利率及液冷独立口径未披露
+  reviewer_state: accepted
+  conflict_or_staleness_status: current
+- display_reference_id: E5
+  claim_type: management_comment_and_fact
+  claim_text_digest: 00a4be396d099ddd2ac4b1b6acdd97b58693eb3a3dd1eb56cb1be1777430fc67
+  claim_summary: 热密度与能效驱动、端到端价值链定位
+  period: 2025A
+  unit: null
+  raw_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  method: issuer_disclosure_review
+  confidence: medium
+  limitation: 缺少独立市场规模和份额交叉验证
+  reviewer_state: accepted_with_issuer_boundary
+  conflict_or_staleness_status: current
+- display_reference_id: E6
+  claim_type: management_comment
+  claim_text_digest: 741fd76afc5c79046281d03acc20bb3de6d9a7e9622bc7ac99b8eef915d91c23
+  claim_summary: 竞争加剧与机房温控毛利率压力
+  period: 2025H1
+  unit: pct
+  raw_evidence_ids:
+  - ev_interim_report_002837_20250819_47054e
+  source_path: data/processed/text/002837/cninfo_2025_interim_report_full_002837_2025-08-19.txt
+  method: issuer_disclosure_review
+  confidence: medium
+  limitation: 具体竞争强度和同业份额未独立验证
+  reviewer_state: accepted_with_issuer_boundary
+  conflict_or_staleness_status: current
+- display_reference_id: E7
+  claim_type: estimate
+  claim_text_digest: aba4f29930e2d29d665e8734a36c940bed85b046ca7bf0bc3e31f23dc61f48a2
+  claim_summary: 2026—2028年公司整体预测桥、情景与敏感性
+  period: 2026E-2028E
+  unit: CNY/pct
+  raw_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle6_forecast_bridge.yaml
+  method: scenario_model_with_reconciliation
+  confidence: medium
+  limitation: 不是管理层指引或一致预期；一季度异常原因未验证
+  reviewer_state: accepted_model_input
+  conflict_or_staleness_status: current
+- display_reference_id: E8
+  claim_type: fact_and_estimate
+  claim_text_digest: eef484725c9533bdd046580dc37bdd3ca733929c3928dda1f8f3efebccfe526b
+  claim_summary: 2026年7月10日市场快照与远期倍数
+  period: '2026-07-10'
+  unit: CNY/multiple
+  raw_evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle6_valuation_reasoning_pack.yaml
+  method: same_date_denominator_control
+  confidence: high_for_snapshot_medium_for_forward
+  limitation: 远期倍数依赖本文情景
+  reviewer_state: accepted
+  conflict_or_staleness_status: current
+- display_reference_id: E9
+  claim_type: inference
+  claim_text_digest: 0b16b07bb5afa71522503503b7fb9c318c0b0513401e17f4804146ae9f48e9dd
+  claim_summary: 市场隐含预期、同业比较限制与方法适用性
+  period: '2026-07-10'
+  unit: multiple
+  raw_evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle6_valuation_reasoning_pack.yaml
+  method: method_eligibility_and_peer_context
+  confidence: low_to_medium
+  limitation: 同业仅两家且业务结构不同；无目标价
+  reviewer_state: accepted_with_limitations
+  conflict_or_staleness_status: current
+human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false

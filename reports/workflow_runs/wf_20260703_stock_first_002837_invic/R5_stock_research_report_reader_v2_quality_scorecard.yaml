@@ -1,0 +1,49 @@
+artifact_type: R5_stock_research_report_reader_v2_quality_scorecard
+schema_version: v0.1
+decision: candidate_ready_for_human_review
+score: 100
+threshold: 82
+critical_blocker_count: 0
+critical_blockers: []
+warnings: []
+dimension_scores:
+  evidence_integrity: 20
+  coverage_completeness: 15
+  analytical_synthesis: 20
+  forecast_and_valuation: 15
+  narrative_and_readability: 15
+  presentation_hygiene: 10
+  risks_and_watch_conditions: 5
+required_section_coverage:
+  covered: 9
+  required: 9
+  missing: []
+  duplicated: []
+display_citations:
+  used:
+  - E1
+  - E2
+  - E3
+  - E4
+  - E5
+  - E6
+  - E7
+  - E8
+  - E9
+  appendix_records: 9
+  unresolved: []
+  duplicate_appendix_references: []
+unresolved_citation_count: 0
+machine_token_leakage_count: 0
+numeric_format_violation_count: 0
+conclusion_state: candidate_ready_for_human_review
+truthfulness_status: pass
+human_review_required: true
+human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false
+input_hashes:
+  report_sha256: 096e28c7a3ed686dbdcade76c3e200d2f7130144fd668660463c3c5b83a7aaa3
+  appendix_sha256: 05c8be5cd80a2438bd4e13815e4e121bfe462cf906422a1478d135cee53e57bd
+  forecast_bridge_sha256: 59ce89a2d8f763051eaff0dd098f243d0856092015faaeb31dc394b4a7195fb3
+  valuation_reasoning_sha256: b10f0754992bbbd63413fcc3e4eca36a9ac6e9940dcf8e06ca0e38f482935aaa

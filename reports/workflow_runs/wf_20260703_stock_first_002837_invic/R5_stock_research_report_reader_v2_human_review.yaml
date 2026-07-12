@@ -1,0 +1,10 @@
+schema_version: r5_reader_report_human_review_v0.1
+report_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2.md
+report_sha256: 096e28c7a3ed686dbdcade76c3e200d2f7130144fd668660463c3c5b83a7aaa3
+reviewer: null
+reviewed_at: null
+status: pending
+blocking_comments: []
+nonblocking_comments: []
+sample_quality_report_allowed: false
+p2_allowed: false

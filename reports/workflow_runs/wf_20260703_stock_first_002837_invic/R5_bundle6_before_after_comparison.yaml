@@ -1,0 +1,31 @@
+artifact_type: R5_bundle6_before_after_comparison
+schema_version: v0.1
+comparison_scope: structure_density_and_presentation_only
+bundle5_draft:
+  raw_internal_ids: 5
+  internal_paths: 4
+  raw_gap_tokens: 5
+  numeric_format_violations: 3
+  covered_dimensions: 4
+  partial_dimensions: 4
+  missing_dimensions: 2
+  reader_quality_score: 46
+bundle6_candidate:
+  raw_internal_ids: 0
+  internal_paths: 0
+  raw_gap_tokens: 0
+  numeric_format_violations: 0
+  covered_dimensions: 9
+  partial_dimensions: 0
+  missing_dimensions: 0
+  reader_quality_score: 100
+analytical_payload_complete_sections: 9
+remaining_limitations:
+- 行业证据主要来自发行人披露，独立市场规模和份额未纳入。
+- 液冷独立收入、毛利率和利润贡献未披露。
+- 2026年一季度弱盈利的具体驱动尚未验证。
+- 同业估值样本仅两家且可比性低。
+- 历史行情和情绪方法未启用。
+human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false
