@@ -1,0 +1,57 @@
+artifact_type: R5_risk_counterevidence_pack
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+company_id: cn_002837_invic
+analysis_date: '2026-07-12'
+analysis_units:
+- analysis_id: AN-RISK-001
+  section: risk_counterevidence
+  claim_type: inference
+  judgment: 核心反证集中在三点：液冷产品证据尚未转化为可量化分部收入，2026年一季度利润率和经营现金流承压，以及政策与行业资料明确存在多种替代制冷路线；这些因素共同限制论点置信度。
+  trend: 产品平台和客户验证披露在增加，但液冷收入、毛利和订单转化率仍未披露；同时2026年一季度公司整体经营现金流为负、存货较2025年底上升，行业端冷板主流之外仍存在浸没式、蒸发冷却、热管和氟泵路线。
+  causal_mechanism: 如果客户验证不能形成批量交付，或替代路线和价格竞争压低项目价值，产品覆盖不会自动转化为利润；若交付与回款周期拉长，存货和应收占用会进一步放大现金流压力。
+  financial_impact: 反证兑现时可能表现为收入增速低于预期、毛利率下行、经营现金流持续为负和营运资金增加；相反，端到端产品通过批量交付并改善回款，可缓解这些风险但仍需分项披露确认。
+  supporting_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  supporting_metric_ids:
+  - metric_company_cn_002837_invic_accounts_receivable_20260331_688db8
+  - metric_company_cn_002837_invic_inventories_20251231_a33680
+  - metric_company_cn_002837_invic_inventories_20260331_b2311b
+  - metric_company_cn_002837_invic_net_operating_cash_flow_20260331_2feaa9
+  counter_evidence_source_ids:
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  confidence: medium
+  falsification_condition: 若后续定期报告披露液冷分项收入与毛利持续增长、经营现金流转正、存货和应收增速受控，并有独立客户或行业证据确认批量采用，则当前风险约束应下调。
+  watch_metrics:
+  - metric_name: 经营现金流净额
+    metric_id: metric_company_cn_002837_invic_net_operating_cash_flow_20260331_2feaa9
+    expected_direction: 转正并改善
+    threshold: 连续两个报告期为正且滚动十二个月现金利润转换率高于50%
+    review_frequency: quarterly
+    source_id: SRC-METRIC-CASHFLOW-SELECTED-20260701
+  - metric_name: 存货规模
+    metric_id: metric_company_cn_002837_invic_inventories_20260331_b2311b
+    expected_direction: 增速低于收入增速
+    threshold: 连续两个报告期库存增速低于营业收入增速
+    review_frequency: quarterly
+    source_id: SRC-METRIC-BALANCE-SELECTED-20260701
+  dependencies:
+  - AN-BUSINESS-DRIVER-001
+  - AN-COMPETITION-001
+  - AN-CORE-001
+  - AN-FINANCIAL-001
+  - AN-INDUSTRY-001
+  - AN-SEGMENT-ECONOMICS-001
+  missing_data:
+  - MISSING_DISCLOSURE: 液冷收入、毛利、订单转化率和独立客户采用证据
+  blockers: []
+  warnings: []
+  status: complete
+unit_count: 1
+source_analysis_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8_analysis_inputs_v2.yaml
+notes:
+- Derived only from complete R5_analysis_pack_v2 units.
+- No additional facts or conclusions are introduced here.

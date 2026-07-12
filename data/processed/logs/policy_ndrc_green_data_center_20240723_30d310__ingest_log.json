@@ -1,0 +1,15 @@
+{
+  "run_id": "ingest_bundle8_industry_sources_20260712",
+  "evidence_id": "policy_ndrc_green_data_center_20240723_30d310",
+  "ingest_mode": "url_file",
+  "result": "SUCCESS",
+  "raw_file_path": "data/raw/regulator_policy/policy_ndrc_green_data_center_20240723_30d310.pdf",
+  "processed_text_path": "data/processed/text/ai_server_liquid_cooling/policy_ndrc_green_data_center_20240723_30d310.md",
+  "page_map_path": "data/processed/page_maps/policy_ndrc_green_data_center_20240723_30d310_page_map.yaml",
+  "file_hash": "30d310ed765d51abce62ecdaea1dc79d26fc3e1e3966432ce2c50e541480f39e",
+  "page_count": 7,
+  "empty_text_pages": [],
+  "parser": "pypdf",
+  "generated_at": "2026-07-12T15:59:20.710478+00:00",
+  "notes": "Full physical-page text extraction; key chart and policy pages visually checked with Poppler rendering."
+}

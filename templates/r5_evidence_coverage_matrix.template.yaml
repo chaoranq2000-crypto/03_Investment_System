@@ -1,0 +1,14 @@
+artifact_type: R5_evidence_coverage_matrix
+schema_version: v0.1
+workflow_id: wf_example
+as_of_date: '2026-07-12'
+requirements: []
+summary:
+  decision: evidence_inputs_blocked
+  covered_requirements: 0
+  total_requirements: 0
+  blocking_requirements_open: 0
+  total_underlying_sources: 0
+  independent_underlying_sources: 0
+notes:
+  - 此文件应由 scripts/build_r5_evidence_coverage_matrix.py 生成。

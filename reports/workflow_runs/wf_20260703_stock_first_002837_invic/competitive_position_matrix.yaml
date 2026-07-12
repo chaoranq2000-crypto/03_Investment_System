@@ -1,0 +1,89 @@
+artifact_type: R5_competitive_position_matrix
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+company_id: cn_002837_invic
+analysis_date: '2026-07-12'
+analysis_units:
+- analysis_id: AN-INDUSTRY-001
+  section: industry_context
+  claim_type: inference
+  judgment: 独立来源同时支持数据中心规模扩张、机柜功率密度上升和PUE约束趋严，液冷需求具备明确技术与政策基础；但政策并列支持多种高效制冷路线，液冷并非唯一受益方案。
+  trend: 截至2024年底全国在用数据中心标准机架超过900万，研究报告称单机柜功率密度已突破30kW；政策要求到2025年底全国平均PUE不高于1.5，新建大型数据中心不高于1.25、国家枢纽项目不高于1.2。
+  causal_mechanism: AI服务器提高单机柜热流密度，传统风冷的换热和能效边界收紧，同时PUE硬约束要求数据中心降低非IT能耗，因而推动冷板液冷、浸没式液冷以及蒸发冷却、热管和氟泵等路线加速采用。
+  financial_impact: 行业约束扩大高效散热设备、液体分配、换热和系统集成的需求池，但路线选择、改造成本、可靠性和客户标准决定订单落点，不能把行业需求直接映射为英维克收入或市场份额。
+  supporting_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  supporting_metric_ids:
+  - metric_segment_ai_server_liquid_cooling_rack_power_density_2025_59947f
+  - metric_segment_ai_server_liquid_cooling_standard_racks_2024_59947f
+  - metric_segment_data_center_average_pue_target_2025_30d310
+  - metric_segment_data_center_hub_pue_cap_2025_30d310
+  - metric_segment_data_center_new_large_pue_target_2025_30d310
+  counter_evidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  confidence: medium
+  falsification_condition: 若后续独立数据表明高密度机柜增速放缓、PUE目标普遍延后，或非液冷技术在成本和可靠性上占据主要新增部署，则液冷需求强度判断应下调。
+  watch_metrics:
+  - metric_name: 单机柜功率密度
+    metric_id: metric_segment_ai_server_liquid_cooling_rack_power_density_2025_59947f
+    expected_direction: 上升
+    threshold: 新的独立行业来源继续确认30kW以上机柜占比扩大
+    review_frequency: annual
+    source_id: SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - metric_name: 国家枢纽数据中心PUE上限
+    metric_id: metric_segment_data_center_hub_pue_cap_2025_30d310
+    expected_direction: 不高于政策目标
+    threshold: 国家枢纽项目PUE持续不高于1.2
+    review_frequency: annual
+    source_id: SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  dependencies: []
+  blockers: []
+  warnings: []
+  status: complete
+- analysis_id: AN-COMPETITION-001
+  section: competitive_position
+  claim_type: inference
+  judgment: 英维克披露的端到端液冷部件覆盖和平台验证构成差异化证据，但高澜股份、科创新源、申菱环境和飞荣达也存在液冷或热管理经营线索；由于各公司液冷收入纯度和分部口径均不完整，本阶段只能比较证据层级，不能形成份额或优劣排名。
+  trend: 2025年及最新披露显示同业从冷板、温控设备到宽口径热管理均在增加液冷相关表述，竞争参与者数量和技术路线同时扩展；英维克则披露了冷板、CDU、快接头、微模块和客户平台验证等更宽的链条证据。
+  causal_mechanism: 平台部件广度和客户验证可能缩短集成认证并提高单项目覆盖价值，但专业化同业可通过单品成本、细分客户和不同技术路线竞争；最终竞争结果取决于批量出货、交付可靠性、价格和服务成本，而非产品名称数量。
+  financial_impact: 若平台优势转化为规模与组合改善，可能体现为收入、毛利率和现金回款优于可比样本；若竞争报价或项目成本上升，则平台广度也可能增加费用和营运资金占用，现有公司整体指标不足以分离液冷贡献。
+  supporting_source_ids:
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  - SRC-PEER-COTRAN-ANNUAL-2025
+  - SRC-PEER-FRD-SEMI-2025
+  - SRC-PEER-GAOLAN-ANNUAL-2025
+  - SRC-PEER-SHENLING-SEMI-2025
+  supporting_metric_ids:
+  - metric_company_cn_002837_invic_gross_margin_20251231_d6a50d
+  - metric_company_cn_002837_invic_net_profit_margin_20251231_f0977c
+  - metric_company_cn_300731_cotran_gross_margin_20251231_8793dd
+  - metric_company_cn_300731_cotran_net_profit_margin_20251231_e13ae1
+  counter_evidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  - SRC-PEER-FRD-SEMI-2025
+  confidence: low
+  falsification_condition: 若可比公司后续披露可复算的液冷收入、毛利和批量客户数据，显示其规模、盈利或回款持续优于英维克，则“平台覆盖构成相对差异化”的判断应被否定或降级。
+  watch_metrics:
+  - metric_name: 英维克与可比样本公司整体毛利率差
+    metric_id: metric_company_cn_002837_invic_gross_margin_20251231_d6a50d
+    expected_direction: 在统一口径下保持非负且由分部数据解释
+    threshold: 仅在同期间、同口径并补齐液冷分部披露后进行比较
+    review_frequency: semiannual
+    source_id: SRC-METRIC-INDICATOR-SELECTED-20260701
+  dependencies:
+  - AN-BUSINESS-DRIVER-001
+  - AN-INDUSTRY-001
+  missing_data:
+  - MISSING_DISCLOSURE: 各同业液冷收入、毛利和客户口径
+  blockers: []
+  warnings: []
+  status: complete
+unit_count: 2
+source_analysis_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8_analysis_inputs_v2.yaml
+notes:
+- Derived only from complete R5_analysis_pack_v2 units.
+- No additional facts or conclusions are introduced here.

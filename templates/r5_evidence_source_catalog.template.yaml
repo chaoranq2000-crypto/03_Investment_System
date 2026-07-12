@@ -1,0 +1,25 @@
+schema_version: v0.1
+workflow_id: wf_example
+as_of_date: '2026-07-12'
+sources:
+  - source_id: SRC-ISSUER-ANNUAL-2025
+    underlying_source_id: DOC-ISSUER-ANNUAL-2025
+    title: 2025年年度报告
+    owner_type: issuer
+    source_type: annual_report
+    review_status: reviewed
+    as_of_date: '2026-04-21'
+    evidence_classes:
+      - issuer_financial
+      - issuer_business_disclosure
+      - company_operating
+    sections:
+      - financial_quality
+      - business_breakdown
+      - business_driver
+    peer_ids: []
+    counterevidence_for: []
+    claim_ids: []
+    metric_ids: []
+    source_path: data/raw/annual_reports/example.pdf
+    notes: 仅示例字段；不得把模板当成真实证据。

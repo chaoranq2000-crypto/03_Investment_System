@@ -1,0 +1,245 @@
+schema_version: v0.1
+bundle_id: R5_BUNDLE_8_RESEARCH_DEPTH
+baseline_commit: 6513350ab371cd2e5612fe2fb4a3f4c1f2f5f9d0
+quality_target: R5_research_depth_inputs_ready
+scope:
+  modules:
+    - M3_evidence_coverage_and_research_inputs
+    - M4_research_analysis_engine
+  included:
+    - evidence_coverage_matrix
+    - industry_evidence_pack
+    - peer_operating_pack
+    - company_operating_evidence_pack
+    - thesis_tree
+    - business_driver_tree
+    - segment_economics
+    - competitive_position_matrix
+    - risk_counterevidence_pack
+    - analysis_pack_v2
+  explicitly_deferred:
+    R5_BUNDLE_9:
+      - segment_forecast_model
+      - forecast_bridge
+      - reverse_valuation
+      - scenario_valuation
+    R5_BUNDLE_10:
+      - technical_snapshot
+      - market_sentiment_pack
+      - catalyst_calendar
+      - reader_report
+      - writer_refactor
+      - end_to_end_sample_benchmark
+source_policy:
+  accepted_review_statuses:
+    - reviewed
+    - promoted
+    - accepted
+  independent_owner_types:
+    - regulator
+    - industry_association
+    - government
+    - exchange
+    - peer_company
+    - customer
+    - supplier
+    - research_institution
+    - market_data_provider
+  issuer_owner_types:
+    - issuer
+    - issuer_ir
+  missing_markers:
+    - TODO
+    - MISSING
+    - MISSING_DISCLOSURE
+    - TODO_SOURCE_REQUIRED
+    - TODO_PARSE_REQUIRED
+    - LOW_CONFIDENCE
+    - LOW_CONFIDENCE_CLUE_ONLY
+  generic_analysis_phrases:
+    - 需要继续观察
+    - 有待进一步验证
+    - 行业前景广阔
+    - 公司具备竞争优势
+    - 风险与机遇并存
+    - 基本面总体向好
+    - 本节有一个结论
+coverage_gate:
+  decision_pass: evidence_inputs_ready
+  decision_fail: evidence_inputs_blocked
+  require_all_blocking_requirements_covered: true
+  min_covered_requirements: 7
+  min_total_independent_underlying_sources: 4
+  min_total_underlying_sources: 7
+  requirements:
+    - coverage_id: B8-COV-FINANCIAL
+      section: financial_quality
+      research_question: 最近三个报告期的收入、利润、现金流和资产负债变化是否由可追溯官方数据支持？
+      required_evidence_classes:
+        - issuer_financial
+      match_mode: any
+      min_underlying_sources: 2
+      min_independent_sources: 0
+      min_peer_count: 0
+      freshness_max_days: 550
+      requires_counterevidence: false
+      blocking: true
+      owner_skill: evidence-ingest
+      target_artifacts:
+        - company_operating_evidence_pack.yaml
+        - evidence_coverage_matrix.yaml
+    - coverage_id: B8-COV-BUSINESS
+      section: business_breakdown
+      research_question: 主要业务线的收入、毛利率、客户、订单、产能、价格或单位经济性是否有披露或明确缺口？
+      required_evidence_classes:
+        - issuer_business_disclosure
+        - company_operating
+      match_mode: all
+      min_underlying_sources: 2
+      min_independent_sources: 0
+      min_peer_count: 0
+      freshness_max_days: 550
+      requires_counterevidence: false
+      blocking: true
+      owner_skill: evidence-ingest
+      target_artifacts:
+        - company_operating_evidence_pack.yaml
+        - segment_economics.yaml
+    - coverage_id: B8-COV-COMPANY-OPERATING
+      section: business_driver
+      research_question: 增长来自销量、价格、产品结构、客户、订单还是产能，且各驱动是否有直接证据？
+      required_evidence_classes:
+        - company_operating
+      match_mode: any
+      min_underlying_sources: 2
+      min_independent_sources: 1
+      min_peer_count: 0
+      freshness_max_days: 365
+      requires_counterevidence: true
+      blocking: true
+      owner_skill: evidence-ingest
+      target_artifacts:
+        - company_operating_evidence_pack.yaml
+        - business_driver_tree.yaml
+    - coverage_id: B8-COV-INDUSTRY-DEMAND
+      section: industry_context
+      research_question: 行业需求、渗透率或市场规模是否至少由两个独立底层来源支持，而不是只引用发行人？
+      required_evidence_classes:
+        - industry_demand
+      match_mode: any
+      min_underlying_sources: 2
+      min_independent_sources: 2
+      min_peer_count: 0
+      freshness_max_days: 730
+      requires_counterevidence: true
+      blocking: true
+      owner_skill: segment-research
+      target_artifacts:
+        - industry_evidence_pack.yaml
+        - evidence_coverage_matrix.yaml
+    - coverage_id: B8-COV-INDUSTRY-SUPPLY
+      section: industry_context
+      research_question: 供给、竞争格局、技术路线或价格压力是否有独立来源和反向证据？
+      required_evidence_classes:
+        - industry_supply_competition
+      match_mode: any
+      min_underlying_sources: 2
+      min_independent_sources: 2
+      min_peer_count: 0
+      freshness_max_days: 730
+      requires_counterevidence: true
+      blocking: true
+      owner_skill: segment-research
+      target_artifacts:
+        - industry_evidence_pack.yaml
+        - competitive_position_matrix.yaml
+    - coverage_id: B8-COV-PEERS
+      section: competitive_position
+      research_question: 是否至少有三家可信同业的经营数据，并解释可比性和不可比性？
+      required_evidence_classes:
+        - peer_operating
+      match_mode: any
+      min_underlying_sources: 3
+      min_independent_sources: 3
+      min_peer_count: 3
+      freshness_max_days: 550
+      requires_counterevidence: false
+      blocking: true
+      owner_skill: evidence-ingest
+      target_artifacts:
+        - peer_operating_pack.yaml
+        - competitive_position_matrix.yaml
+    - coverage_id: B8-COV-RISK
+      section: risk_counterevidence
+      research_question: 核心论点是否至少有一项独立反向证据、失效条件和后续验证指标？
+      required_evidence_classes:
+        - risk_counterevidence
+      match_mode: any
+      min_underlying_sources: 1
+      min_independent_sources: 1
+      min_peer_count: 0
+      freshness_max_days: 730
+      requires_counterevidence: true
+      blocking: true
+      owner_skill: stock-deep-dive
+      target_artifacts:
+        - risk_counterevidence_pack.yaml
+        - thesis_tree.yaml
+analysis_gate:
+  decision_pass: analysis_inputs_ready
+  decision_fail: analysis_inputs_blocked
+  min_complete_units: 7
+  required_sections:
+    - core_thesis
+    - financial_quality
+    - business_driver
+    - segment_economics
+    - industry_context
+    - competitive_position
+    - risk_counterevidence
+  optional_sections:
+    - catalyst_watchpoints
+  allowed_confidence:
+    - low
+    - medium
+    - high
+  required_fields:
+    - judgment
+    - trend
+    - causal_mechanism
+    - financial_impact
+    - supporting_source_ids
+    - counter_evidence_source_ids
+    - falsification_condition
+    - watch_metrics
+  text_min_chars:
+    judgment: 18
+    trend: 18
+    causal_mechanism: 35
+    financial_impact: 25
+    falsification_condition: 18
+  min_supporting_sources_per_unit: 1
+  min_counterevidence_sources_per_unit: 1
+  min_watch_metrics_per_unit: 1
+  metric_required_sections:
+    - financial_quality
+    - business_driver
+    - segment_economics
+    - industry_context
+    - competitive_position
+  independent_source_required_sections:
+    - industry_context
+    - competitive_position
+    - risk_counterevidence
+  issuer_source_required_sections:
+    - financial_quality
+    - business_driver
+    - segment_economics
+  reject_duplicate_core_text: true
+  reject_missing_markers_in_complete_units: true
+bundle_gate:
+  require_evidence_gate_pass: true
+  require_analysis_gate_pass: true
+  workflow_state_mutation_allowed: false
+  reader_regeneration_allowed: false
+  bundle9_handoff_allowed_when_passed: true

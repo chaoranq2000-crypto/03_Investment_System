@@ -1,0 +1,311 @@
+artifact_type: R5_analysis_pack_v2
+schema_version: v0.1
+bundle_id: R5_BUNDLE_8_RESEARCH_DEPTH
+workflow_id: wf_20260703_stock_first_002837_invic
+company_id: cn_002837_invic
+analysis_date: '2026-07-12'
+source_catalog_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8_evidence_source_catalog.yaml
+coverage_matrix_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/evidence_coverage_matrix.yaml
+analysis_inputs_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8_analysis_inputs_v2.yaml
+analysis_units:
+- analysis_id: AN-CORE-001
+  section: core_thesis
+  claim_type: inference
+  judgment: 现有证据支持英维克具备数据中心温控和端到端液冷产品平台，但尚不足以把公司整体增长解释为液冷收入增长，核心判断应限定为“产品与技术平台暴露已验证、财务贡献仍待分项披露”。
+  trend: 2025年年报摘要把业务证据从机房温控延伸到冷板、CDU、快接头和微模块液冷，并披露英特尔测试验证与客户定制案例；与此同时，定期报告仍未给出液冷收入和毛利占比。
+  causal_mechanism: 高功率密度服务器提高热流密度和系统复杂度，促使客户从单一制冷设备转向冷板、CDU、连接件、控制和交付服务的组合方案；平台覆盖越完整，进入客户验证和项目配套的机会越多，但只有订单转化、验收和回款完成后才会形成可确认的财务贡献。
+  financial_impact: 若产品验证持续转化，影响路径应先体现在数据中心相关收入结构和毛利组合，再传导至经营现金流；若分项披露长期缺失或回款落后，则公司整体收入增长不能作为液冷论点的财务证据。
+  supporting_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  supporting_metric_ids: []
+  counter_evidence_source_ids:
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  confidence: medium
+  falsification_condition: 后续两期定期报告若不再披露液冷核心产品或客户验证，或披露的分项收入显示相关贡献很低且持续下降，应下调产品平台暴露判断。
+  watch_metrics:
+  - metric_name: 液冷分项收入与毛利披露状态
+    metric_id: ''
+    expected_direction: 从未披露转为可核验分项披露
+    threshold: 定期报告首次披露液冷收入、毛利或可复算的分业务口径
+    review_frequency: semiannual
+    source_id: SRC-ISSUER-ANNUAL-SUMMARY-2025
+  dependencies: []
+  missing_data:
+  - MISSING_DISCLOSURE: 液冷收入占比
+  - MISSING_DISCLOSURE: 液冷毛利率
+  - MISSING_DISCLOSURE: 客户、订单和产能的可复核分项表
+  blockers: []
+  warnings: []
+  status: complete
+- analysis_id: AN-FINANCIAL-001
+  section: financial_quality
+  claim_type: inference
+  judgment: 英维克2025年收入与归母净利润均增长，但利润增速低于收入增速，2026年一季度毛利率、净利率和经营现金流进一步承压，当前财务质量应评价为“规模扩张已确认、利润和现金转化需要继续验证”。
+  trend: 2025年公司整体营业收入约60.68亿元、归母净利润约5.22亿元，同比分别约增长32.23%和15.30%；2026年一季度毛利率降至24.29%、净利率降至1.20%，经营现金流净额约为负3.86亿元。
+  causal_mechanism: 收入扩张快于利润增长意味着产品结构、区域组合、价格或费用投入正在稀释增量收入的利润转化；同时应收账款约30.61亿元、存货约11.82亿元和负经营现金流表明资金占用上升，增长兑现需要跨期回款和库存消化配合。
+  financial_impact: 若毛利率和现金转化不能修复，收入增长对净利润、自由现金流和资本回报的贡献会被削弱，并增加营运资金需求；该影响属于公司整体财务质量，不能直接归因于液冷业务。
+  supporting_source_ids:
+  - SRC-ISSUER-ANNUAL-2025-FULL
+  - SRC-ISSUER-Q1-2026
+  - SRC-METRIC-INCOME-SELECTED-20260701
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  supporting_metric_ids:
+  - metric_company_cn_002837_invic_gross_margin_20251231_d6a50d
+  - metric_company_cn_002837_invic_gross_margin_20260331_273f9a
+  - metric_company_cn_002837_invic_net_operating_cash_flow_20260331_2feaa9
+  - metric_company_cn_002837_invic_net_profit_attributable_20251231_73d111
+  - metric_company_cn_002837_invic_net_profit_margin_20260331_b5c7bd
+  - metric_company_cn_002837_invic_total_revenue_20251231_0880d1
+  counter_evidence_source_ids:
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  confidence: medium
+  falsification_condition: 若后续季度毛利率恢复至2025年水平附近、经营现金流由负转正且应收与存货增速低于收入增速，则当前关于增长质量承压的判断应明显缓和。
+  watch_metrics:
+  - metric_name: 公司整体毛利率
+    metric_id: metric_company_cn_002837_invic_gross_margin_20260331_273f9a
+    expected_direction: 回升
+    threshold: 连续两个报告期不低于27%
+    review_frequency: quarterly
+    source_id: SRC-METRIC-INDICATOR-SELECTED-20260701
+  - metric_name: 经营现金流净额
+    metric_id: metric_company_cn_002837_invic_net_operating_cash_flow_20260331_2feaa9
+    expected_direction: 由负转正
+    threshold: 单季转正且滚动十二个月不低于同期归母净利润的50%
+    review_frequency: quarterly
+    source_id: SRC-METRIC-CASHFLOW-SELECTED-20260701
+  dependencies: []
+  blockers: []
+  warnings: []
+  status: complete
+- analysis_id: AN-BUSINESS-DRIVER-001
+  section: business_driver
+  claim_type: inference
+  judgment: 英维克在液冷链条上的主要可验证驱动不是已披露的收入份额，而是从冷板、CDU、快接头到微模块和交付服务的产品覆盖，以及英特尔测试验证和客户定制开发所体现的准入能力。
+  trend: 2025年披露显示产品覆盖从传统机房温控延伸到XSpace微模块液冷、冷板、机架式CDU和快接头，并出现英特尔平台验证与客户定制CDU案例；同期公司整体收入增长，但分项收入仍不能与这些产品逐一对应。
+  causal_mechanism: 机柜功率密度突破30kW后，冷却方案需要处理芯片级换热、流体分配、连接可靠性、控制和现场服务，客户验证会提高供应商切换成本；若英维克的多部件平台通过验证并进入批量交付，单项目可覆盖的价值量和服务环节可能增加。
+  financial_impact: 驱动兑现应表现为相关产品出货、数据中心业务组合改善和收入增长，并可能伴随研发、库存和应收增加；在分项收入缺失时，只能观察公司整体收入与营运资金变化，不能计算液冷收入贡献。
+  supporting_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-ISSUER-ANNUAL-2025-FULL
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  - SRC-METRIC-INCOME-SELECTED-20260701
+  supporting_metric_ids:
+  - metric_company_cn_002837_invic_inventories_20260331_b2311b
+  - metric_company_cn_002837_invic_total_revenue_20251231_0880d1
+  - metric_segment_ai_server_liquid_cooling_rack_power_density_2025_59947f
+  counter_evidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  confidence: medium
+  falsification_condition: 若后续披露显示液冷产品验证未转化为批量出货，或库存和应收持续增加而收入、毛利与回款未同步改善，则“平台覆盖带来经营驱动”的判断不成立。
+  watch_metrics:
+  - metric_name: 存货规模
+    metric_id: metric_company_cn_002837_invic_inventories_20260331_b2311b
+    expected_direction: 增速不高于收入增速
+    threshold: 连续两个报告期存货同比增速低于公司收入同比增速
+    review_frequency: quarterly
+    source_id: SRC-METRIC-BALANCE-SELECTED-20260701
+  - metric_name: 单机柜功率密度约束阈值
+    metric_id: metric_segment_ai_server_liquid_cooling_rack_power_density_2025_59947f
+    expected_direction: 维持在高于传统风冷约束的区间
+    threshold: 独立行业来源继续确认30kW以上高密度机柜扩张
+    review_frequency: annual
+    source_id: SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  dependencies:
+  - AN-FINANCIAL-001
+  missing_data:
+  - MISSING_DISCLOSURE: 液冷产品出货量与订单转化率
+  blockers: []
+  warnings: []
+  status: complete
+- analysis_id: AN-SEGMENT-ECONOMICS-001
+  section: segment_economics
+  claim_type: inference
+  judgment: 现有披露可确认英维克覆盖液冷系统多个部件和交付环节，但无法确认各环节收入、毛利率和价值量；因此分业务经济性应围绕“验证—出货—验收—回款”链条评估，而不能用公司整体毛利率替代液冷分部利润率。
+  trend: 公司披露的液冷产品从冷板、快接头和CDU延伸到微模块及全链条交付，同时2025年公司整体毛利率为27.86%，2026年一季度降至24.29%，表明产品平台扩展尚不能直接推出分部利润率改善。
+  causal_mechanism: 多部件平台可能提高单项目覆盖价值，但定制开发、项目交付、区域组合和竞争报价也可能增加成本；当验收周期拉长时，应收账款和库存会先于现金回收上升，使账面收入与现金利润出现时差。
+  financial_impact: 正向情形是产品组合和系统集成提高收入及毛利额，负向情形是项目复杂度、价格竞争和营运资金占用压低毛利率与现金转化；由于分项口径未披露，本阶段不估算液冷收入或毛利。
+  supporting_source_ids:
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  - SRC-ISSUER-INTERIM-2025-FULL
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  supporting_metric_ids:
+  - metric_company_cn_002837_invic_accounts_receivable_20260331_688db8
+  - metric_company_cn_002837_invic_gross_margin_20251231_d6a50d
+  - metric_company_cn_002837_invic_gross_margin_20260331_273f9a
+  - metric_company_cn_002837_invic_inventories_20260331_b2311b
+  counter_evidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  confidence: low
+  falsification_condition: 若公司后续提供可复算的液冷分项收入、毛利率和现金回款数据，且显示平台扩展未改善单位经济性或现金转化，则需要重写本阶段的价值量传导假设。
+  watch_metrics:
+  - metric_name: 公司整体毛利率与液冷分项毛利披露
+    metric_id: metric_company_cn_002837_invic_gross_margin_20260331_273f9a
+    expected_direction: 公司毛利率企稳且出现可复核分项口径
+    threshold: 公司整体毛利率连续两个报告期企稳，同时首次披露液冷分项毛利
+    review_frequency: quarterly
+    source_id: SRC-METRIC-INDICATOR-SELECTED-20260701
+  - metric_name: 应收账款规模
+    metric_id: metric_company_cn_002837_invic_accounts_receivable_20260331_688db8
+    expected_direction: 增速低于收入增速
+    threshold: 连续两个报告期应收账款同比增速低于营业收入同比增速
+    review_frequency: quarterly
+    source_id: SRC-METRIC-BALANCE-SELECTED-20260701
+  dependencies:
+  - AN-BUSINESS-DRIVER-001
+  missing_data:
+  - MISSING_DISCLOSURE: 液冷分项收入、毛利和项目现金回款
+  blockers: []
+  warnings: []
+  status: complete
+- analysis_id: AN-INDUSTRY-001
+  section: industry_context
+  claim_type: inference
+  judgment: 独立来源同时支持数据中心规模扩张、机柜功率密度上升和PUE约束趋严，液冷需求具备明确技术与政策基础；但政策并列支持多种高效制冷路线，液冷并非唯一受益方案。
+  trend: 截至2024年底全国在用数据中心标准机架超过900万，研究报告称单机柜功率密度已突破30kW；政策要求到2025年底全国平均PUE不高于1.5，新建大型数据中心不高于1.25、国家枢纽项目不高于1.2。
+  causal_mechanism: AI服务器提高单机柜热流密度，传统风冷的换热和能效边界收紧，同时PUE硬约束要求数据中心降低非IT能耗，因而推动冷板液冷、浸没式液冷以及蒸发冷却、热管和氟泵等路线加速采用。
+  financial_impact: 行业约束扩大高效散热设备、液体分配、换热和系统集成的需求池，但路线选择、改造成本、可靠性和客户标准决定订单落点，不能把行业需求直接映射为英维克收入或市场份额。
+  supporting_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  supporting_metric_ids:
+  - metric_segment_ai_server_liquid_cooling_rack_power_density_2025_59947f
+  - metric_segment_ai_server_liquid_cooling_standard_racks_2024_59947f
+  - metric_segment_data_center_average_pue_target_2025_30d310
+  - metric_segment_data_center_hub_pue_cap_2025_30d310
+  - metric_segment_data_center_new_large_pue_target_2025_30d310
+  counter_evidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  confidence: medium
+  falsification_condition: 若后续独立数据表明高密度机柜增速放缓、PUE目标普遍延后，或非液冷技术在成本和可靠性上占据主要新增部署，则液冷需求强度判断应下调。
+  watch_metrics:
+  - metric_name: 单机柜功率密度
+    metric_id: metric_segment_ai_server_liquid_cooling_rack_power_density_2025_59947f
+    expected_direction: 上升
+    threshold: 新的独立行业来源继续确认30kW以上机柜占比扩大
+    review_frequency: annual
+    source_id: SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - metric_name: 国家枢纽数据中心PUE上限
+    metric_id: metric_segment_data_center_hub_pue_cap_2025_30d310
+    expected_direction: 不高于政策目标
+    threshold: 国家枢纽项目PUE持续不高于1.2
+    review_frequency: annual
+    source_id: SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  dependencies: []
+  blockers: []
+  warnings: []
+  status: complete
+- analysis_id: AN-COMPETITION-001
+  section: competitive_position
+  claim_type: inference
+  judgment: 英维克披露的端到端液冷部件覆盖和平台验证构成差异化证据，但高澜股份、科创新源、申菱环境和飞荣达也存在液冷或热管理经营线索；由于各公司液冷收入纯度和分部口径均不完整，本阶段只能比较证据层级，不能形成份额或优劣排名。
+  trend: 2025年及最新披露显示同业从冷板、温控设备到宽口径热管理均在增加液冷相关表述，竞争参与者数量和技术路线同时扩展；英维克则披露了冷板、CDU、快接头、微模块和客户平台验证等更宽的链条证据。
+  causal_mechanism: 平台部件广度和客户验证可能缩短集成认证并提高单项目覆盖价值，但专业化同业可通过单品成本、细分客户和不同技术路线竞争；最终竞争结果取决于批量出货、交付可靠性、价格和服务成本，而非产品名称数量。
+  financial_impact: 若平台优势转化为规模与组合改善，可能体现为收入、毛利率和现金回款优于可比样本；若竞争报价或项目成本上升，则平台广度也可能增加费用和营运资金占用，现有公司整体指标不足以分离液冷贡献。
+  supporting_source_ids:
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  - SRC-PEER-COTRAN-ANNUAL-2025
+  - SRC-PEER-FRD-SEMI-2025
+  - SRC-PEER-GAOLAN-ANNUAL-2025
+  - SRC-PEER-SHENLING-SEMI-2025
+  supporting_metric_ids:
+  - metric_company_cn_002837_invic_gross_margin_20251231_d6a50d
+  - metric_company_cn_002837_invic_net_profit_margin_20251231_f0977c
+  - metric_company_cn_300731_cotran_gross_margin_20251231_8793dd
+  - metric_company_cn_300731_cotran_net_profit_margin_20251231_e13ae1
+  counter_evidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  - SRC-PEER-FRD-SEMI-2025
+  confidence: low
+  falsification_condition: 若可比公司后续披露可复算的液冷收入、毛利和批量客户数据，显示其规模、盈利或回款持续优于英维克，则“平台覆盖构成相对差异化”的判断应被否定或降级。
+  watch_metrics:
+  - metric_name: 英维克与可比样本公司整体毛利率差
+    metric_id: metric_company_cn_002837_invic_gross_margin_20251231_d6a50d
+    expected_direction: 在统一口径下保持非负且由分部数据解释
+    threshold: 仅在同期间、同口径并补齐液冷分部披露后进行比较
+    review_frequency: semiannual
+    source_id: SRC-METRIC-INDICATOR-SELECTED-20260701
+  dependencies:
+  - AN-BUSINESS-DRIVER-001
+  - AN-INDUSTRY-001
+  missing_data:
+  - MISSING_DISCLOSURE: 各同业液冷收入、毛利和客户口径
+  blockers: []
+  warnings: []
+  status: complete
+- analysis_id: AN-RISK-001
+  section: risk_counterevidence
+  claim_type: inference
+  judgment: 核心反证集中在三点：液冷产品证据尚未转化为可量化分部收入，2026年一季度利润率和经营现金流承压，以及政策与行业资料明确存在多种替代制冷路线；这些因素共同限制论点置信度。
+  trend: 产品平台和客户验证披露在增加，但液冷收入、毛利和订单转化率仍未披露；同时2026年一季度公司整体经营现金流为负、存货较2025年底上升，行业端冷板主流之外仍存在浸没式、蒸发冷却、热管和氟泵路线。
+  causal_mechanism: 如果客户验证不能形成批量交付，或替代路线和价格竞争压低项目价值，产品覆盖不会自动转化为利润；若交付与回款周期拉长，存货和应收占用会进一步放大现金流压力。
+  financial_impact: 反证兑现时可能表现为收入增速低于预期、毛利率下行、经营现金流持续为负和营运资金增加；相反，端到端产品通过批量交付并改善回款，可缓解这些风险但仍需分项披露确认。
+  supporting_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  supporting_metric_ids:
+  - metric_company_cn_002837_invic_accounts_receivable_20260331_688db8
+  - metric_company_cn_002837_invic_inventories_20251231_a33680
+  - metric_company_cn_002837_invic_inventories_20260331_b2311b
+  - metric_company_cn_002837_invic_net_operating_cash_flow_20260331_2feaa9
+  counter_evidence_source_ids:
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  confidence: medium
+  falsification_condition: 若后续定期报告披露液冷分项收入与毛利持续增长、经营现金流转正、存货和应收增速受控，并有独立客户或行业证据确认批量采用，则当前风险约束应下调。
+  watch_metrics:
+  - metric_name: 经营现金流净额
+    metric_id: metric_company_cn_002837_invic_net_operating_cash_flow_20260331_2feaa9
+    expected_direction: 转正并改善
+    threshold: 连续两个报告期为正且滚动十二个月现金利润转换率高于50%
+    review_frequency: quarterly
+    source_id: SRC-METRIC-CASHFLOW-SELECTED-20260701
+  - metric_name: 存货规模
+    metric_id: metric_company_cn_002837_invic_inventories_20260331_b2311b
+    expected_direction: 增速低于收入增速
+    threshold: 连续两个报告期库存增速低于营业收入增速
+    review_frequency: quarterly
+    source_id: SRC-METRIC-BALANCE-SELECTED-20260701
+  dependencies:
+  - AN-BUSINESS-DRIVER-001
+  - AN-COMPETITION-001
+  - AN-CORE-001
+  - AN-FINANCIAL-001
+  - AN-INDUSTRY-001
+  - AN-SEGMENT-ECONOMICS-001
+  missing_data:
+  - MISSING_DISCLOSURE: 液冷收入、毛利、订单转化率和独立客户采用证据
+  blockers: []
+  warnings: []
+  status: complete
+summary:
+  decision: analysis_inputs_ready
+  complete_units: 7
+  total_units: 7
+  required_complete_units: 7
+  complete_sections:
+  - business_driver
+  - competitive_position
+  - core_thesis
+  - financial_quality
+  - industry_context
+  - risk_counterevidence
+  - segment_economics
+  missing_required_sections: []
+  blocker_count: 0
+  pack_blockers: []
+notes:
+- The engine validates analyst-authored reasoning; it does not invent facts.
+- A complete unit needs evidence, mechanism, counter-evidence, falsification, and
+  watch metrics.
+- Incomplete evidence coverage blocks dependent analysis sections.

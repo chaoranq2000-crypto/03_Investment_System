@@ -1,0 +1,380 @@
+artifact_type: R5_evidence_coverage_matrix
+schema_version: v0.1
+bundle_id: R5_BUNDLE_8_RESEARCH_DEPTH
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-12'
+source_catalog_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8_evidence_source_catalog.yaml
+requirements:
+- coverage_id: B8-COV-FINANCIAL
+  section: financial_quality
+  research_question: 最近三个报告期的收入、利润、现金流和资产负债变化是否由可追溯官方数据支持？
+  blocking: true
+  owner_skill: evidence-ingest
+  target_artifacts:
+  - company_operating_evidence_pack.yaml
+  - evidence_coverage_matrix.yaml
+  required_evidence_classes:
+  - issuer_financial
+  requirements:
+    min_underlying_sources: 2
+    min_independent_sources: 0
+    min_peer_count: 0
+    freshness_max_days: 550
+    requires_counterevidence: false
+  source_ids:
+  - SRC-ISSUER-ANNUAL-2025-FULL
+  - SRC-ISSUER-INTERIM-2025-FULL
+  - SRC-ISSUER-Q1-2026
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  - SRC-METRIC-INCOME-SELECTED-20260701
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  underlying_source_ids:
+  - DOC-ISSUER-ANNUAL-2025-FULL
+  - DOC-ISSUER-INTERIM-2025-FULL
+  - DOC-ISSUER-Q1-2026
+  - SNAPSHOT-TUSHARE-BALANCE-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-CASHFLOW-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INCOME-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INDICATOR-SELECTED-20260701
+  independent_underlying_source_ids:
+  - SNAPSHOT-TUSHARE-BALANCE-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-CASHFLOW-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INCOME-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INDICATOR-SELECTED-20260701
+  issuer_underlying_source_ids:
+  - DOC-ISSUER-ANNUAL-2025-FULL
+  - DOC-ISSUER-INTERIM-2025-FULL
+  - DOC-ISSUER-Q1-2026
+  peer_ids:
+  - cn_300731_cotran
+  counterevidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  - SRC-METRIC-INCOME-SELECTED-20260701
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  checks:
+    underlying_source_minimum: true
+    independent_source_minimum: true
+    peer_minimum: true
+    counterevidence_present: true
+  status: covered
+  evidence_state: complete
+  reason_codes: []
+  excluded_sources: []
+- coverage_id: B8-COV-BUSINESS
+  section: business_breakdown
+  research_question: 主要业务线的收入、毛利率、客户、订单、产能、价格或单位经济性是否有披露或明确缺口？
+  blocking: true
+  owner_skill: evidence-ingest
+  target_artifacts:
+  - company_operating_evidence_pack.yaml
+  - segment_economics.yaml
+  required_evidence_classes:
+  - issuer_business_disclosure
+  - company_operating
+  requirements:
+    min_underlying_sources: 2
+    min_independent_sources: 0
+    min_peer_count: 0
+    freshness_max_days: 550
+    requires_counterevidence: false
+  source_ids:
+  - SRC-ISSUER-ANNUAL-2025-FULL
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  - SRC-ISSUER-INTERIM-2025-FULL
+  underlying_source_ids:
+  - DOC-ISSUER-ANNUAL-2025-FULL
+  - DOC-ISSUER-ANNUAL-SUMMARY-2025
+  - DOC-ISSUER-INTERIM-2025-FULL
+  independent_underlying_source_ids: []
+  issuer_underlying_source_ids:
+  - DOC-ISSUER-ANNUAL-2025-FULL
+  - DOC-ISSUER-ANNUAL-SUMMARY-2025
+  - DOC-ISSUER-INTERIM-2025-FULL
+  peer_ids: []
+  counterevidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  checks:
+    underlying_source_minimum: true
+    independent_source_minimum: true
+    peer_minimum: true
+    counterevidence_present: true
+  status: covered
+  evidence_state: complete
+  reason_codes: []
+  excluded_sources: []
+- coverage_id: B8-COV-COMPANY-OPERATING
+  section: business_driver
+  research_question: 增长来自销量、价格、产品结构、客户、订单还是产能，且各驱动是否有直接证据？
+  blocking: true
+  owner_skill: evidence-ingest
+  target_artifacts:
+  - company_operating_evidence_pack.yaml
+  - business_driver_tree.yaml
+  required_evidence_classes:
+  - company_operating
+  requirements:
+    min_underlying_sources: 2
+    min_independent_sources: 1
+    min_peer_count: 0
+    freshness_max_days: 365
+    requires_counterevidence: true
+  source_ids:
+  - SRC-ISSUER-ANNUAL-2025-FULL
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  - SRC-ISSUER-INTERIM-2025-FULL
+  - SRC-ISSUER-Q1-2026
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  - SRC-METRIC-INCOME-SELECTED-20260701
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  underlying_source_ids:
+  - DOC-ISSUER-ANNUAL-2025-FULL
+  - DOC-ISSUER-ANNUAL-SUMMARY-2025
+  - DOC-ISSUER-INTERIM-2025-FULL
+  - DOC-ISSUER-Q1-2026
+  - SNAPSHOT-TUSHARE-BALANCE-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-CASHFLOW-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INCOME-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INDICATOR-SELECTED-20260701
+  independent_underlying_source_ids:
+  - SNAPSHOT-TUSHARE-BALANCE-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-CASHFLOW-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INCOME-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INDICATOR-SELECTED-20260701
+  issuer_underlying_source_ids:
+  - DOC-ISSUER-ANNUAL-2025-FULL
+  - DOC-ISSUER-ANNUAL-SUMMARY-2025
+  - DOC-ISSUER-INTERIM-2025-FULL
+  - DOC-ISSUER-Q1-2026
+  peer_ids:
+  - cn_300731_cotran
+  counterevidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  - SRC-METRIC-INCOME-SELECTED-20260701
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  checks:
+    underlying_source_minimum: true
+    independent_source_minimum: true
+    peer_minimum: true
+    counterevidence_present: true
+  status: covered
+  evidence_state: complete
+  reason_codes: []
+  excluded_sources: []
+- coverage_id: B8-COV-INDUSTRY-DEMAND
+  section: industry_context
+  research_question: 行业需求、渗透率或市场规模是否至少由两个独立底层来源支持，而不是只引用发行人？
+  blocking: true
+  owner_skill: segment-research
+  target_artifacts:
+  - industry_evidence_pack.yaml
+  - evidence_coverage_matrix.yaml
+  required_evidence_classes:
+  - industry_demand
+  requirements:
+    min_underlying_sources: 2
+    min_independent_sources: 2
+    min_peer_count: 0
+    freshness_max_days: 730
+    requires_counterevidence: true
+  source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  underlying_source_ids:
+  - DOC-CAICT-GREEN-COMPUTING-2025
+  - DOC-NDRC-GREEN-DATACENTER-2024
+  independent_underlying_source_ids:
+  - DOC-CAICT-GREEN-COMPUTING-2025
+  - DOC-NDRC-GREEN-DATACENTER-2024
+  issuer_underlying_source_ids: []
+  peer_ids: []
+  counterevidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  checks:
+    underlying_source_minimum: true
+    independent_source_minimum: true
+    peer_minimum: true
+    counterevidence_present: true
+  status: covered
+  evidence_state: complete
+  reason_codes: []
+  excluded_sources: []
+- coverage_id: B8-COV-INDUSTRY-SUPPLY
+  section: industry_context
+  research_question: 供给、竞争格局、技术路线或价格压力是否有独立来源和反向证据？
+  blocking: true
+  owner_skill: segment-research
+  target_artifacts:
+  - industry_evidence_pack.yaml
+  - competitive_position_matrix.yaml
+  required_evidence_classes:
+  - industry_supply_competition
+  requirements:
+    min_underlying_sources: 2
+    min_independent_sources: 2
+    min_peer_count: 0
+    freshness_max_days: 730
+    requires_counterevidence: true
+  source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  underlying_source_ids:
+  - DOC-CAICT-GREEN-COMPUTING-2025
+  - DOC-NDRC-GREEN-DATACENTER-2024
+  independent_underlying_source_ids:
+  - DOC-CAICT-GREEN-COMPUTING-2025
+  - DOC-NDRC-GREEN-DATACENTER-2024
+  issuer_underlying_source_ids: []
+  peer_ids: []
+  counterevidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  checks:
+    underlying_source_minimum: true
+    independent_source_minimum: true
+    peer_minimum: true
+    counterevidence_present: true
+  status: covered
+  evidence_state: complete
+  reason_codes: []
+  excluded_sources: []
+- coverage_id: B8-COV-PEERS
+  section: competitive_position
+  research_question: 是否至少有三家可信同业的经营数据，并解释可比性和不可比性？
+  blocking: true
+  owner_skill: evidence-ingest
+  target_artifacts:
+  - peer_operating_pack.yaml
+  - competitive_position_matrix.yaml
+  required_evidence_classes:
+  - peer_operating
+  requirements:
+    min_underlying_sources: 3
+    min_independent_sources: 3
+    min_peer_count: 3
+    freshness_max_days: 550
+    requires_counterevidence: false
+  source_ids:
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  - SRC-METRIC-INCOME-SELECTED-20260701
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  - SRC-PEER-COTRAN-ANNUAL-2025
+  - SRC-PEER-FRD-SEMI-2025
+  - SRC-PEER-GAOLAN-ANNUAL-2025
+  - SRC-PEER-SHENLING-SEMI-2025
+  underlying_source_ids:
+  - DOC-PEER-COTRAN-ANNUAL-2025
+  - DOC-PEER-FRD-SEMI-2025
+  - DOC-PEER-GAOLAN-ANNUAL-2025
+  - DOC-PEER-SHENLING-SEMI-2025
+  - SNAPSHOT-TUSHARE-BALANCE-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-CASHFLOW-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INCOME-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INDICATOR-SELECTED-20260701
+  independent_underlying_source_ids:
+  - DOC-PEER-COTRAN-ANNUAL-2025
+  - DOC-PEER-FRD-SEMI-2025
+  - DOC-PEER-GAOLAN-ANNUAL-2025
+  - DOC-PEER-SHENLING-SEMI-2025
+  - SNAPSHOT-TUSHARE-BALANCE-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-CASHFLOW-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INCOME-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-INDICATOR-SELECTED-20260701
+  issuer_underlying_source_ids: []
+  peer_ids:
+  - cn_300499_gaolan
+  - cn_300602_frd
+  - cn_300731_cotran
+  - cn_301018_shenling
+  counterevidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  - SRC-METRIC-INCOME-SELECTED-20260701
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  checks:
+    underlying_source_minimum: true
+    independent_source_minimum: true
+    peer_minimum: true
+    counterevidence_present: true
+  status: covered
+  evidence_state: complete
+  reason_codes: []
+  excluded_sources: []
+- coverage_id: B8-COV-RISK
+  section: risk_counterevidence
+  research_question: 核心论点是否至少有一项独立反向证据、失效条件和后续验证指标？
+  blocking: true
+  owner_skill: stock-deep-dive
+  target_artifacts:
+  - risk_counterevidence_pack.yaml
+  - thesis_tree.yaml
+  required_evidence_classes:
+  - risk_counterevidence
+  requirements:
+    min_underlying_sources: 1
+    min_independent_sources: 1
+    min_peer_count: 0
+    freshness_max_days: 730
+    requires_counterevidence: true
+  source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  underlying_source_ids:
+  - DOC-CAICT-GREEN-COMPUTING-2025
+  - DOC-NDRC-GREEN-DATACENTER-2024
+  - SNAPSHOT-TUSHARE-BALANCE-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-CASHFLOW-SELECTED-20260701
+  independent_underlying_source_ids:
+  - DOC-CAICT-GREEN-COMPUTING-2025
+  - DOC-NDRC-GREEN-DATACENTER-2024
+  - SNAPSHOT-TUSHARE-BALANCE-SELECTED-20260701
+  - SNAPSHOT-TUSHARE-CASHFLOW-SELECTED-20260701
+  issuer_underlying_source_ids: []
+  peer_ids:
+  - cn_300731_cotran
+  counterevidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  checks:
+    underlying_source_minimum: true
+    independent_source_minimum: true
+    peer_minimum: true
+    counterevidence_present: true
+  status: covered
+  evidence_state: complete
+  reason_codes: []
+  excluded_sources: []
+summary:
+  decision: evidence_inputs_ready
+  covered_requirements: 7
+  total_requirements: 7
+  blocking_requirements_open: 0
+  blocking_coverage_ids: []
+  total_underlying_sources: 14
+  independent_underlying_sources: 10
+  min_covered_requirements: 7
+  min_total_underlying_sources: 7
+  min_total_independent_underlying_sources: 4
+notes:
+- Counts use underlying_source_id, so multiple extracts from one document count once.
+- Only accepted review statuses and fresh sources contribute to a requirement.
+- Issuer-only industry material cannot satisfy independent-source thresholds.

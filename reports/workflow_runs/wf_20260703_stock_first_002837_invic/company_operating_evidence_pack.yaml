@@ -1,0 +1,289 @@
+artifact_type: R5_company_operating_evidence_pack
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-12'
+sources:
+- source_id: SRC-ISSUER-ANNUAL-2025-FULL
+  underlying_source_id: DOC-ISSUER-ANNUAL-2025-FULL
+  title: 深圳市英维克科技股份有限公司2025年年度报告全文
+  owner_type: issuer
+  source_type: annual_report
+  review_status: reviewed
+  as_of_date: '2026-04-21'
+  evidence_classes:
+  - company_operating
+  - issuer_business_disclosure
+  - issuer_financial
+  sections:
+  - business_breakdown
+  - business_driver
+  - core_thesis
+  - financial_quality
+  - segment_economics
+  peer_ids: []
+  counterevidence_for: []
+  claim_ids: []
+  metric_ids: []
+  source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  notes: 发行人年度报告全文；业务线收入、液冷收入占比、客户和订单缺口仍按原披露边界处理。
+  independence: issuer
+  coverage_ids:
+  - B8-COV-BUSINESS
+  - B8-COV-COMPANY-OPERATING
+  - B8-COV-FINANCIAL
+- source_id: SRC-ISSUER-INTERIM-2025-FULL
+  underlying_source_id: DOC-ISSUER-INTERIM-2025-FULL
+  title: 深圳市英维克科技股份有限公司2025年半年度报告全文
+  owner_type: issuer
+  source_type: interim_report
+  review_status: reviewed
+  as_of_date: '2025-08-19'
+  evidence_classes:
+  - company_operating
+  - issuer_business_disclosure
+  - issuer_financial
+  sections:
+  - business_breakdown
+  - business_driver
+  - financial_quality
+  - segment_economics
+  peer_ids: []
+  counterevidence_for: []
+  claim_ids: []
+  metric_ids: []
+  source_path: data/raw/announcements/cninfo_2025_interim_report_full_002837_2025-08-19.pdf
+  evidence_id: ev_interim_report_002837_20250819_47054e
+  notes: 发行人半年度报告全文；与年度报告形成跨期核对，不单独证明液冷收入占比。
+  independence: issuer
+  coverage_ids:
+  - B8-COV-BUSINESS
+  - B8-COV-COMPANY-OPERATING
+  - B8-COV-FINANCIAL
+- source_id: SRC-ISSUER-ANNUAL-SUMMARY-2025
+  underlying_source_id: DOC-ISSUER-ANNUAL-SUMMARY-2025
+  title: 深圳市英维克科技股份有限公司2025年年度报告摘要
+  owner_type: issuer
+  source_type: annual_report
+  review_status: reviewed
+  as_of_date: '2026-04-21'
+  evidence_classes:
+  - company_operating
+  - issuer_business_disclosure
+  sections:
+  - business_breakdown
+  - business_driver
+  - core_thesis
+  - segment_economics
+  peer_ids: []
+  counterevidence_for:
+  - risk_counterevidence
+  claim_ids:
+  - claim_cn_002837_invic_0449cc90
+  - claim_cn_002837_invic_0771f4eb
+  - claim_cn_002837_invic_28149e07
+  - claim_cn_002837_invic_33cd54f4
+  - claim_cn_002837_invic_377c2029
+  - claim_cn_002837_invic_47c1467e
+  - claim_cn_002837_invic_9872a700
+  - claim_cn_002837_invic_fcce4010
+  metric_ids: []
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/raw/annual_reports/szse_annual_report_002837_2026-04-21.pdf
+  evidence_id: ev_annual_report_002837_20260421_ce7f64
+  notes: 业务/产品摘要提供端到端液冷、冷板、CDU、快接头、机柜温控与毛利率方向性表述；不披露液冷收入和利润占比。
+  independence: issuer
+  coverage_ids:
+  - B8-COV-BUSINESS
+  - B8-COV-COMPANY-OPERATING
+- source_id: SRC-ISSUER-Q1-2026
+  underlying_source_id: DOC-ISSUER-Q1-2026
+  title: 深圳市英维克科技股份有限公司2026年第一季度报告
+  owner_type: issuer
+  source_type: quarterly_report
+  review_status: reviewed
+  as_of_date: '2026-04-21'
+  evidence_classes:
+  - company_operating
+  - issuer_financial
+  sections:
+  - business_driver
+  - financial_quality
+  peer_ids: []
+  counterevidence_for: []
+  claim_ids: []
+  metric_ids: []
+  source_path: data/raw/announcements/szse_2026_q1_report_002837_2026-04-21.pdf
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  notes: 发行人季度财务快照；不提供足以确认液冷业务单季贡献的分项披露。
+  independence: issuer
+  coverage_ids:
+  - B8-COV-COMPANY-OPERATING
+  - B8-COV-FINANCIAL
+- source_id: SRC-METRIC-INCOME-SELECTED-20260701
+  underlying_source_id: SNAPSHOT-TUSHARE-INCOME-SELECTED-20260701
+  title: Tushare income snapshot for P1 selected stocks
+  owner_type: market_data_provider
+  source_type: structured_financial_data
+  review_status: reviewed
+  as_of_date: '2026-07-01'
+  evidence_classes:
+  - company_operating
+  - issuer_financial
+  - peer_operating
+  sections:
+  - business_driver
+  - competitive_position
+  - financial_quality
+  peer_ids:
+  - cn_300731_cotran
+  counterevidence_for:
+  - business_driver
+  - competitive_position
+  - financial_quality
+  claim_ids:
+  - claim_financial_cn_002837_invic_2025_001
+  - claim_financial_cn_002837_invic_2025_002
+  - claim_financial_cn_002837_invic_2026Q1_001
+  - claim_financial_cn_300731_cotran_2025_001
+  - claim_financial_cn_300731_cotran_2025_002
+  - claim_financial_cn_300731_cotran_2026Q1_001
+  metric_ids:
+  - metric_company_cn_002837_invic_net_profit_attributable_20251231_73d111
+  - metric_company_cn_002837_invic_net_profit_attributable_20260331_dba127
+  - metric_company_cn_002837_invic_total_revenue_20251231_0880d1
+  - metric_company_cn_002837_invic_total_revenue_20260331_a4342d
+  - metric_company_cn_300731_cotran_net_profit_attributable_20251231_4e622c
+  - metric_company_cn_300731_cotran_net_profit_attributable_20260331_107cde
+  - metric_company_cn_300731_cotran_total_revenue_20251231_d79602
+  - metric_company_cn_300731_cotran_total_revenue_20260331_4b0d33
+  source_path: data/raw/market_data/tushare_income_selected_stocks_2026-07-01.csv
+  evidence_id: market_data_tushare_income_selected_stocks_20260701_f1c8b2
+  notes: metric-only；公司整体指标不能直接证明液冷收入、订单或客户暴露。
+  independence: independent
+  coverage_ids:
+  - B8-COV-COMPANY-OPERATING
+  - B8-COV-FINANCIAL
+  - B8-COV-PEERS
+- source_id: SRC-METRIC-INDICATOR-SELECTED-20260701
+  underlying_source_id: SNAPSHOT-TUSHARE-INDICATOR-SELECTED-20260701
+  title: Tushare fina_indicator snapshot for P1 selected stocks
+  owner_type: market_data_provider
+  source_type: structured_financial_data
+  review_status: reviewed
+  as_of_date: '2026-07-01'
+  evidence_classes:
+  - company_operating
+  - issuer_financial
+  - peer_operating
+  sections:
+  - business_driver
+  - competitive_position
+  - financial_quality
+  peer_ids:
+  - cn_300731_cotran
+  counterevidence_for:
+  - business_driver
+  - competitive_position
+  - financial_quality
+  claim_ids:
+  - claim_financial_cn_002837_invic_2025_003
+  - claim_financial_cn_300731_cotran_2025_003
+  metric_ids:
+  - metric_company_cn_002837_invic_debt_to_assets_20251231_ff6ca6
+  - metric_company_cn_002837_invic_gross_margin_20251231_d6a50d
+  - metric_company_cn_002837_invic_gross_margin_20260331_273f9a
+  - metric_company_cn_002837_invic_net_profit_margin_20251231_f0977c
+  - metric_company_cn_002837_invic_net_profit_margin_20260331_b5c7bd
+  - metric_company_cn_002837_invic_roe_dt_20251231_556ccc
+  - metric_company_cn_300731_cotran_debt_to_assets_20251231_d9d0da
+  - metric_company_cn_300731_cotran_gross_margin_20251231_8793dd
+  - metric_company_cn_300731_cotran_net_profit_margin_20251231_e13ae1
+  source_path: data/raw/market_data/tushare_fina_indicator_selected_stocks_2026-07-01.csv
+  evidence_id: market_data_tushare_fina_indicator_selected_stocks_20260701_c3e4a9
+  notes: metric-only；指标口径沿用 Tushare 快照并保留未重述限制。
+  independence: independent
+  coverage_ids:
+  - B8-COV-COMPANY-OPERATING
+  - B8-COV-FINANCIAL
+  - B8-COV-PEERS
+- source_id: SRC-METRIC-CASHFLOW-SELECTED-20260701
+  underlying_source_id: SNAPSHOT-TUSHARE-CASHFLOW-SELECTED-20260701
+  title: Tushare cashflow snapshot for P1 selected stocks
+  owner_type: market_data_provider
+  source_type: structured_financial_data
+  review_status: reviewed
+  as_of_date: '2026-07-01'
+  evidence_classes:
+  - company_operating
+  - issuer_financial
+  - peer_operating
+  - risk_counterevidence
+  sections:
+  - business_driver
+  - competitive_position
+  - financial_quality
+  - risk_counterevidence
+  peer_ids:
+  - cn_300731_cotran
+  counterevidence_for:
+  - all
+  claim_ids: []
+  metric_ids:
+  - metric_company_cn_002837_invic_net_operating_cash_flow_20251231_4e6c0a
+  - metric_company_cn_002837_invic_net_operating_cash_flow_20260331_2feaa9
+  - metric_company_cn_300731_cotran_net_operating_cash_flow_20251231_4979ed
+  - metric_company_cn_300731_cotran_net_operating_cash_flow_20260331_512da8
+  source_path: data/raw/market_data/tushare_cashflow_selected_stocks_2026-07-01.csv
+  evidence_id: market_data_tushare_cashflow_selected_stocks_20260701_d5b6c1
+  notes: metric-only；现金流只约束财务质量判断，不证明业务归因。
+  independence: independent
+  coverage_ids:
+  - B8-COV-COMPANY-OPERATING
+  - B8-COV-FINANCIAL
+  - B8-COV-PEERS
+  - B8-COV-RISK
+- source_id: SRC-METRIC-BALANCE-SELECTED-20260701
+  underlying_source_id: SNAPSHOT-TUSHARE-BALANCE-SELECTED-20260701
+  title: Tushare balancesheet snapshot for P1 selected stocks
+  owner_type: market_data_provider
+  source_type: structured_financial_data
+  review_status: reviewed
+  as_of_date: '2026-07-01'
+  evidence_classes:
+  - company_operating
+  - issuer_financial
+  - peer_operating
+  - risk_counterevidence
+  sections:
+  - business_driver
+  - competitive_position
+  - financial_quality
+  - risk_counterevidence
+  peer_ids:
+  - cn_300731_cotran
+  counterevidence_for:
+  - all
+  claim_ids: []
+  metric_ids:
+  - metric_company_cn_002837_invic_accounts_receivable_20251231_a1c324
+  - metric_company_cn_002837_invic_accounts_receivable_20260331_688db8
+  - metric_company_cn_002837_invic_inventories_20251231_a33680
+  - metric_company_cn_002837_invic_inventories_20260331_b2311b
+  - metric_company_cn_300731_cotran_accounts_receivable_20251231_df73b6
+  - metric_company_cn_300731_cotran_accounts_receivable_20260331_01be5f
+  - metric_company_cn_300731_cotran_inventories_20251231_1dfe67
+  - metric_company_cn_300731_cotran_inventories_20260331_fed997
+  source_path: data/raw/market_data/tushare_balancesheet_selected_stocks_2026-07-01.csv
+  evidence_id: market_data_tushare_balancesheet_selected_stocks_20260701_a8f0d7
+  notes: metric-only；存货和应收用于反证/观察，不直接等同需求兑现。
+  independence: independent
+  coverage_ids:
+  - B8-COV-COMPANY-OPERATING
+  - B8-COV-FINANCIAL
+  - B8-COV-PEERS
+  - B8-COV-RISK
+source_count: 8
+underlying_source_count: 8
+notes:
+- This pack is a reviewed-source handoff, not a narrative conclusion.
+- Missing fields remain explicit and must not be inferred from absence.

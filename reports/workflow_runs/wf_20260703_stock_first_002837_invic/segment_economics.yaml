@@ -1,0 +1,53 @@
+artifact_type: R5_segment_economics
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+company_id: cn_002837_invic
+analysis_date: '2026-07-12'
+analysis_units:
+- analysis_id: AN-SEGMENT-ECONOMICS-001
+  section: segment_economics
+  claim_type: inference
+  judgment: 现有披露可确认英维克覆盖液冷系统多个部件和交付环节，但无法确认各环节收入、毛利率和价值量；因此分业务经济性应围绕“验证—出货—验收—回款”链条评估，而不能用公司整体毛利率替代液冷分部利润率。
+  trend: 公司披露的液冷产品从冷板、快接头和CDU延伸到微模块及全链条交付，同时2025年公司整体毛利率为27.86%，2026年一季度降至24.29%，表明产品平台扩展尚不能直接推出分部利润率改善。
+  causal_mechanism: 多部件平台可能提高单项目覆盖价值，但定制开发、项目交付、区域组合和竞争报价也可能增加成本；当验收周期拉长时，应收账款和库存会先于现金回收上升，使账面收入与现金利润出现时差。
+  financial_impact: 正向情形是产品组合和系统集成提高收入及毛利额，负向情形是项目复杂度、价格竞争和营运资金占用压低毛利率与现金转化；由于分项口径未披露，本阶段不估算液冷收入或毛利。
+  supporting_source_ids:
+  - SRC-ISSUER-ANNUAL-SUMMARY-2025
+  - SRC-ISSUER-INTERIM-2025-FULL
+  - SRC-METRIC-INDICATOR-SELECTED-20260701
+  supporting_metric_ids:
+  - metric_company_cn_002837_invic_accounts_receivable_20260331_688db8
+  - metric_company_cn_002837_invic_gross_margin_20251231_d6a50d
+  - metric_company_cn_002837_invic_gross_margin_20260331_273f9a
+  - metric_company_cn_002837_invic_inventories_20260331_b2311b
+  counter_evidence_source_ids:
+  - SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  - SRC-METRIC-BALANCE-SELECTED-20260701
+  - SRC-METRIC-CASHFLOW-SELECTED-20260701
+  confidence: low
+  falsification_condition: 若公司后续提供可复算的液冷分项收入、毛利率和现金回款数据，且显示平台扩展未改善单位经济性或现金转化，则需要重写本阶段的价值量传导假设。
+  watch_metrics:
+  - metric_name: 公司整体毛利率与液冷分项毛利披露
+    metric_id: metric_company_cn_002837_invic_gross_margin_20260331_273f9a
+    expected_direction: 公司毛利率企稳且出现可复核分项口径
+    threshold: 公司整体毛利率连续两个报告期企稳，同时首次披露液冷分项毛利
+    review_frequency: quarterly
+    source_id: SRC-METRIC-INDICATOR-SELECTED-20260701
+  - metric_name: 应收账款规模
+    metric_id: metric_company_cn_002837_invic_accounts_receivable_20260331_688db8
+    expected_direction: 增速低于收入增速
+    threshold: 连续两个报告期应收账款同比增速低于营业收入同比增速
+    review_frequency: quarterly
+    source_id: SRC-METRIC-BALANCE-SELECTED-20260701
+  dependencies:
+  - AN-BUSINESS-DRIVER-001
+  missing_data:
+  - MISSING_DISCLOSURE: 液冷分项收入、毛利和项目现金回款
+  blockers: []
+  warnings: []
+  status: complete
+unit_count: 1
+source_analysis_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8_analysis_inputs_v2.yaml
+notes:
+- Derived only from complete R5_analysis_pack_v2 units.
+- No additional facts or conclusions are introduced here.

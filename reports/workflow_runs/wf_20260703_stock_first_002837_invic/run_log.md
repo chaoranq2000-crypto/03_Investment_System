@@ -33,3 +33,18 @@ Global registry verification:
 | Bundle 7 close | done | Current quality report and canonical close readout added; Bundle 6 candidate readout marked superseded; sample-quality and P2 remain closed. |
 
 Bundle 8 handoff was explicitly not dispatched in this close task. The recorded next owner is `evidence-ingest`; segment-company exposure was not updated because Bundle 7 produced no new exposure evidence.
+
+## Bundle 8 research-depth execution
+
+| Step | Status | Notes |
+|---|---|---|
+| B8-M3 Evidence Coverage | done | Registered 14 reviewed underlying sources with 10 independent sources; coverage matrix is 7/7 with zero blockers. |
+| B8-M3 Industry Research | done | Official CAICT and NDRC materials were archived, extracted, page-mapped and visually checked; industry validator passed with demand=2 and supply=2. |
+| B8-M4 Analysis Engine | done | Seven analyst-authored units passed; analysis pack and five deterministic subpacks were generated with counterevidence, falsification and watch metrics. |
+| B8 Integration Gate | done_local | Gate result is `bundle8_research_depth_inputs_ready`; deterministic rebuild changed 0 of 12 artifacts. |
+| Quality Review | accepted_with_todos | R5-G1 to R5-G11 are explicitly represented; liquid-cooling segment disclosure remains missing and uncommitted changes have no GitHub Actions result. |
+| Regression | done_local | Focused pytest: 22 passed. Full pytest: 575 passed, 2 skipped. No-advice scan: 0 hits. |
+| State boundary | preserved | `workflow_state.yaml` and `R5_stock_research_report_reader_v2.md` hashes remained unchanged; Reader was not regenerated and Bundle 8 was not closed. |
+| Next dispatch | pending | Handoff 16 records a close-only patch followed by Bundle 9; neither is started until explicit publish/CI and close review. |
+
+Bundle 8 local M3/M4 execution is complete. Remote CI, close-only state synchronization, Bundle 9, Bundle 10 and P2 remain outside this execution boundary.

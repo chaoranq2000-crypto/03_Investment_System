@@ -1,0 +1,77 @@
+artifact_type: R5_industry_evidence_pack
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-12'
+sources:
+- source_id: SRC-INDUSTRY-CAICT-GREEN-COMPUTING-2025
+  underlying_source_id: DOC-CAICT-GREEN-COMPUTING-2025
+  title: 绿色算力发展研究报告（2025年）
+  owner_type: research_institution
+  source_type: third_party_research
+  review_status: reviewed
+  as_of_date: '2025-07-24'
+  evidence_classes:
+  - industry_demand
+  - industry_supply_competition
+  - risk_counterevidence
+  sections:
+  - competitive_position
+  - industry_context
+  - risk_counterevidence
+  peer_ids: []
+  counterevidence_for:
+  - all
+  claim_ids:
+  - claim_segment_ai_server_liquid_cooling_20260712_004
+  - claim_segment_ai_server_liquid_cooling_20260712_005
+  metric_ids:
+  - metric_segment_ai_server_liquid_cooling_coldplate_pue_case_2025_59947f
+  - metric_segment_ai_server_liquid_cooling_rack_power_density_2025_59947f
+  - metric_segment_ai_server_liquid_cooling_standard_racks_2024_59947f
+  source_path: data/raw/industry_reports/industry_report_caict_green_computing_2025_59947f.pdf
+  evidence_id: industry_report_caict_green_computing_2025_59947f
+  notes: 研究机构观点；物理页32同时保留冷板主流、喷淋成熟度和浸没替代方向，不外推单一公司份额。
+  independence: independent
+  coverage_ids:
+  - B8-COV-INDUSTRY-DEMAND
+  - B8-COV-INDUSTRY-SUPPLY
+  - B8-COV-RISK
+- source_id: SRC-INDUSTRY-NDRC-GREEN-DATACENTER-2024
+  underlying_source_id: DOC-NDRC-GREEN-DATACENTER-2024
+  title: 数据中心绿色低碳发展专项行动计划
+  owner_type: government
+  source_type: policy_document
+  review_status: reviewed
+  as_of_date: '2024-07-23'
+  evidence_classes:
+  - industry_demand
+  - industry_supply_competition
+  - risk_counterevidence
+  sections:
+  - competitive_position
+  - industry_context
+  - risk_counterevidence
+  peer_ids: []
+  counterevidence_for:
+  - all
+  claim_ids:
+  - claim_segment_ai_server_liquid_cooling_20260712_006
+  - claim_segment_ai_server_liquid_cooling_20260712_007
+  metric_ids:
+  - metric_segment_data_center_average_pue_target_2025_30d310
+  - metric_segment_data_center_hub_pue_cap_2025_30d310
+  - metric_segment_data_center_new_large_pue_target_2025_30d310
+  - metric_segment_data_center_utilization_target_2025_30d310
+  source_path: data/raw/regulator_policy/policy_ndrc_green_data_center_20240723_30d310.pdf
+  evidence_id: policy_ndrc_green_data_center_20240723_30d310
+  notes: 政策把液冷与蒸发冷却、热管、氟泵并列；支持需求与约束，但不证明液冷唯一性或公司收入。
+  independence: independent
+  coverage_ids:
+  - B8-COV-INDUSTRY-DEMAND
+  - B8-COV-INDUSTRY-SUPPLY
+  - B8-COV-RISK
+source_count: 2
+underlying_source_count: 2
+notes:
+- This pack is a reviewed-source handoff, not a narrative conclusion.
+- Missing fields remain explicit and must not be inferred from absence.

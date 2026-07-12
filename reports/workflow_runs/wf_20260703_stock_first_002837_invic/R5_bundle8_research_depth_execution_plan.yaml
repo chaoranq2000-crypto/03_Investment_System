@@ -1,0 +1,236 @@
+artifact_type: R5_bundle8_research_depth_execution_plan
+schema_version: v0.1
+bundle_id: R5_BUNDLE_8_RESEARCH_DEPTH
+baseline_commit: 6513350ab371cd2e5612fe2fb4a3f4c1f2f5f9d0
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-12'
+source_backflow_plan: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle7_quality_backflow_plan.yaml
+entry_state:
+  source_decision: rejected
+  quality_band: research_draft
+  reader_score: 59
+  reader_threshold: 82
+  workflow_status: needs_fix
+  required_next_skill: evidence-ingest
+  entry_gate_passed: true
+scope:
+  included_modules:
+  - M3_evidence_coverage_and_research_inputs
+  - M4_research_analysis_engine
+  excluded_modules:
+  - M5_forecast_engine
+  - M6_valuation_and_implied_expectations
+  - M7_report_narrative_and_traceability
+  - M8_end_to_end_and_sample_benchmark
+plan_decision: bundle8_plan_ready
+accepted_bundle8_issues:
+- task_id: R5B8-0BF5FA3E
+  source_issue_id: R5Q-B7-0BF5FA3E
+  code: insufficient_analytical_unit_coverage
+  description: complete=0; required=7; complete_sections=
+  source_owner_skill: stock-deep-dive
+  source_stage: T5_analysis_pack_build
+  source_target_artifact: thesis_tree.yaml
+  status: open
+  workstream_id: B8-M4-ANALYSIS-ENGINE
+- task_id: R5B8-44F6297D
+  source_issue_id: R5Q-B7-44F6297D
+  code: independent_research_evidence_below_minimum
+  description: independent_sources=1; required=2
+  source_owner_skill: evidence-ingest
+  source_stage: T2_evidence_acquire_parse
+  source_target_artifact: evidence_coverage_matrix.yaml
+  status: open
+  workstream_id: B8-M3-EVIDENCE-COVERAGE
+- task_id: R5B8-8E0E9760
+  source_issue_id: R5Q-B7-8E0E9760
+  code: independent_industry_evidence_missing
+  description: no independent industry underlying source
+  source_owner_skill: segment-research
+  source_stage: T5_analysis_pack_build
+  source_target_artifact: industry_evidence_pack.yaml
+  status: open
+  workstream_id: B8-M3-INDUSTRY-RESEARCH
+- task_id: R5B8-E54AC257
+  source_issue_id: R5Q-B7-E54AC257
+  code: peer_operating_evidence_missing
+  description: no peer evidence source and fewer than three credible peers
+  source_owner_skill: evidence-ingest
+  source_stage: T2_evidence_acquire_parse
+  source_target_artifact: evidence_coverage_matrix.yaml
+  status: open
+  workstream_id: B8-M3-EVIDENCE-COVERAGE
+deferred_issues:
+- task_id: R5B8-A823A644
+  source_issue_id: R5Q-B7-A823A644
+  code: reader_report_below_research_density_floor
+  description: han_chars=2334; required=3200
+  source_owner_skill: memo-writer
+  source_stage: T8_report_draft
+  source_target_artifact: reader_report.md
+  status: open
+  deferred_to_bundle: R5_BUNDLE_10
+- task_id: R5B8-EDEA2DF6
+  source_issue_id: R5Q-B7-EDEA2DF6
+  code: forecast_not_bottom_up_or_segment_driven
+  description: forecast drivers remain company-total/mechanical
+  source_owner_skill: stock-deep-dive
+  source_stage: T6_forecast_valuation_model
+  source_target_artifact: segment_forecast_model.yaml
+  status: open
+  deferred_to_bundle: R5_BUNDLE_9
+- task_id: R5B8-FC4A9CE0
+  source_issue_id: R5Q-B7-FC4A9CE0
+  code: forecast_bridge_uses_aggregate_residual
+  description: tax/finance/other/minority are not separately modeled
+  source_owner_skill: stock-deep-dive
+  source_stage: T6_forecast_valuation_model
+  source_target_artifact: segment_forecast_model.yaml
+  status: open
+  deferred_to_bundle: R5_BUNDLE_9
+- task_id: R5B8-5F606C21
+  source_issue_id: R5Q-B7-5F606C21
+  code: valuation_lacks_reverse_or_scenario_value_range
+  description: no reverse valuation or bull/base/bear value range
+  source_owner_skill: company-valuation
+  source_stage: RP6_valuation
+  source_target_artifact: reverse_valuation.yaml
+  status: open
+  deferred_to_bundle: R5_BUNDLE_9
+- task_id: R5B8-47122D56
+  source_issue_id: R5Q-B7-47122D56
+  code: credible_peer_context_below_minimum
+  description: credible_peers=0
+  source_owner_skill: company-valuation
+  source_stage: RP6_valuation
+  source_target_artifact: reverse_valuation.yaml
+  status: open
+  deferred_to_bundle: R5_BUNDLE_9
+- task_id: R5B8-0B636DD2
+  source_issue_id: R5Q-B7-0B636DD2
+  code: technical_analysis_inputs_missing
+  description: no reviewed technical-series analysis in reader report
+  source_owner_skill: stock-deep-dive
+  source_stage: T7_technical_sentiment_event_pack
+  source_target_artifact: technical_snapshot.yaml
+  status: open
+  deferred_to_bundle: R5_BUNDLE_10
+- task_id: R5B8-E0B818E7
+  source_issue_id: R5Q-B7-E0B818E7
+  code: sentiment_analysis_inputs_missing
+  description: no macro/industry/company sentiment layers
+  source_owner_skill: stock-deep-dive
+  source_stage: T7_technical_sentiment_event_pack
+  source_target_artifact: technical_snapshot.yaml
+  status: open
+  deferred_to_bundle: R5_BUNDLE_10
+- task_id: R5B8-9A50BA49
+  source_issue_id: R5Q-B7-9A50BA49
+  code: catalyst_event_chain_incomplete
+  description: future date, impact path, verification metric and counterevidence condition
+    are not all present
+  source_owner_skill: stock-deep-dive
+  source_stage: T7_technical_sentiment_event_pack
+  source_target_artifact: technical_snapshot.yaml
+  status: open
+  deferred_to_bundle: R5_BUNDLE_10
+unmapped_issues: []
+missing_required_codes: []
+workstreams:
+- workstream_id: B8-M3-EVIDENCE-COVERAGE
+  module: M3_evidence_coverage_and_research_inputs
+  owner_skill: evidence-ingest
+  stage: T2_evidence_acquire_parse
+  depends_on: []
+  target_artifacts:
+  - R5_bundle8_evidence_source_catalog.yaml
+  - evidence_coverage_matrix.yaml
+  - company_operating_evidence_pack.yaml
+  - peer_operating_pack.yaml
+  exit_criteria:
+  - all blocking coverage rows are covered
+  - underlying-source deduplication is applied
+  - at least four independent underlying sources are reviewed
+  - at least three unique peers have operating evidence
+  - issuer-only material does not satisfy independent-industry thresholds
+  source_issue_ids:
+  - R5Q-B7-44F6297D
+  - R5Q-B7-E54AC257
+- workstream_id: B8-M3-INDUSTRY-RESEARCH
+  module: M3_evidence_coverage_and_research_inputs
+  owner_skill: segment-research
+  stage: T5_analysis_pack_build
+  depends_on:
+  - B8-M3-EVIDENCE-COVERAGE
+  target_artifacts:
+  - industry_evidence_pack.yaml
+  - competitive_position_matrix.yaml
+  exit_criteria:
+  - industry demand has at least two independent underlying sources
+  - industry supply/competition has at least two independent underlying sources
+  - counterevidence and uncertainty remain visible
+  - peer comparability and non-comparability are explicit
+  source_issue_ids:
+  - R5Q-B7-8E0E9760
+- workstream_id: B8-M4-ANALYSIS-ENGINE
+  module: M4_research_analysis_engine
+  owner_skill: stock-deep-dive
+  stage: T5_analysis_pack_build
+  depends_on:
+  - B8-M3-EVIDENCE-COVERAGE
+  - B8-M3-INDUSTRY-RESEARCH
+  target_artifacts:
+  - R5_bundle8_analysis_inputs_v2.yaml
+  - analysis_pack_v2.yaml
+  - thesis_tree.yaml
+  - business_driver_tree.yaml
+  - segment_economics.yaml
+  - competitive_position_matrix.yaml
+  - risk_counterevidence_pack.yaml
+  exit_criteria:
+  - at least seven complete analysis units pass
+  - each required unit contains judgment, trend, mechanism and financial impact
+  - each required unit contains counterevidence, falsification and watch metrics
+  - all source and metric references resolve to reviewed inputs
+  - generic or duplicated template analysis is rejected
+  source_issue_ids:
+  - R5Q-B7-0BF5FA3E
+- workstream_id: B8-INTEGRATION-GATE
+  module: M3_M4_integration
+  owner_skill: quality-review
+  stage: T9_quality_review
+  depends_on:
+  - B8-M4-ANALYSIS-ENGINE
+  target_artifacts:
+  - R5_bundle8_research_depth_gate.yaml
+  - R5_bundle8_research_depth_gate.md
+  exit_criteria:
+  - evidence coverage gate passes
+  - analysis pack gate passes
+  - workflow state is not mutated by the gate
+  - reader report is not regenerated in Bundle 8
+  - Bundle 9 handoff is explicit and Bundle 8 is not auto-closed
+  source_issue_ids: []
+execution_order:
+- B8-M3-EVIDENCE-COVERAGE
+- B8-M3-INDUSTRY-RESEARCH
+- B8-M4-ANALYSIS-ENGINE
+- B8-INTEGRATION-GATE
+research_input_minimums:
+  independent_underlying_sources: 4
+  credible_peers_with_operating_data: 3
+  complete_analysis_units: 7
+  industry_demand_independent_sources: 2
+  industry_supply_independent_sources: 2
+state_policy:
+  mutate_workflow_state_on_plan: false
+  resolve_open_todos_on_plan: false
+  update_canonical_index_on_plan: false
+  reader_regeneration_allowed: false
+  automatic_bundle_close_allowed: false
+  bundle9_handoff_allowed_after_gate_pass: true
+close_conditions:
+- Bundle 8 evidence and analysis gates pass on real reviewed inputs
+- full repository tests and CI pass
+- truthfulness/no-advice boundaries remain green
+- a separate close patch updates canonical state and TODOs

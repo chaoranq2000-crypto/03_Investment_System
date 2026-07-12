@@ -1,0 +1,13 @@
+issue_id,severity,gate_id,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
+R5B8-G1-001,low,R5-G1,T9_quality_review,evidence_coverage_matrix.yaml,evidence_completeness,证据覆盖矩阵为7/7且底层来源完成去重和reviewed校验,quality-review,accepted,后续来源刷新时重新运行coverage builder与validator,resolved
+R5B8-G2-001,low,R5-G2,T9_quality_review,analysis_pack_v2.yaml,financial_model,Bundle 8仅审查历史财务质量和传导机制；完整财务模型不在本补丁范围,stock-deep-dive,accepted,Bundle 9按M5契约构建财务与预测模型；当前不得写成已通过完整财务模型门,waived_with_reason
+R5B8-G3-001,medium,R5-G3,T5_analysis_pack_build,R5_bundle8_analysis_inputs_v2.yaml,segment_economics,液冷分项收入、毛利率、客户订单和项目现金回款仍未披露；分析单元已降级为不可量化的传导路径，不影响M3/M4输入门但继续阻止以公司整体指标替代分部事实,evidence-ingest,accepted_with_todos,在后续官方披露中取得可复算分项口径；Bundle 8不猜测填充,accepted_todo
+R5B8-G4-001,low,R5-G4,T9_quality_review,industry_evidence_pack.yaml,industry_context,行业需求与供给竞争各有两份独立底层来源且反证和多技术路线约束可见,quality-review,accepted,来源刷新或行业结论变更时重新运行industry validator,resolved
+R5B8-G5-001,low,R5-G5,T9_quality_review,R5_bundle8_research_depth_gate.yaml,forecast_model,预测模型明确延期至Bundle 9且未被Bundle 8 gate冒充完成,stock-deep-dive,accepted,仅在Bundle 8 close-only patch和显式Bundle 9调度后构建预测模型,waived_with_reason
+R5B8-G6-001,low,R5-G6,T9_quality_review,R5_bundle8_research_depth_gate.yaml,valuation,估值工作明确延期至Bundle 9且本轮没有生成目标价或交易结论,company-valuation,accepted,仅作为stock-deep-dive子流程在Bundle 9使用reviewed输入开展估值上下文,waived_with_reason
+R5B8-G7-001,low,R5-G7,T9_quality_review,R5_bundle8_research_depth_gate.yaml,market_technical,技术和市场状态模块明确延期至Bundle 10且不属于M3/M4输入门,stock-deep-dive,accepted,Bundle 10按as_of_date和证据契约另行审查；当前不得操作化为交易信号,waived_with_reason
+R5B8-G8-001,low,R5-G8,T9_quality_review,R5_bundle8_research_depth_gate.yaml,sentiment_event,情绪与事件模块明确延期至Bundle 10且本轮未生成相关结论,stock-deep-dive,accepted,Bundle 10取得带日期来源后再构建并审查,waived_with_reason
+R5B8-G9-001,low,R5-G9,T9_quality_review,analysis_pack_v2.yaml,narrative_coherence,七个分析单元的判断、趋势、机制、财务影响、反证、证伪条件和观察指标已形成闭环,quality-review,accepted,Reader重写时重新检查跨章节叙事一致性；本轮不重新生成Reader,resolved
+R5B8-G10-001,low,R5-G10,T9_quality_review,analysis_pack_v2.yaml,no_advice,对Bundle 8结论承载文件的直接交易语言扫描为零命中，未发现买卖、目标价、仓位或保证收益表述,quality-review,accepted,任何后续报告或close-only patch生成后重新执行no-advice扫描,resolved
+R5B8-G11-001,low,R5-G11,T9_quality_review,R5_stock_research_report_reader_v2_quality_scorecard.yaml,sample_benchmark,Bundle 8不重新生成Reader；现有Reader仍为59分research_draft且rejected，因此样例基准门未在本地M3/M4输入门中宣称通过,quality-review,accepted,Bundle 10完成Reader和端到端基准后再审查；当前结果不得表述为sample quality通过,waived_with_reason
+R5B8-QR-CI-001,low,QR-CI,T9_quality_review,R5_bundle8_research_depth_gate.yaml,ci_verification,本地focused与全仓库测试已通过，但当前变更尚未提交或推送，因此没有对应的GitHub Actions运行可供核验,research-orchestrator,accepted_with_todos,仅在用户明确要求发布后提交推送并要求GitHub Actions全绿；此项不允许被写成已通过,accepted_todo

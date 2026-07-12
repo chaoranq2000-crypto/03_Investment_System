@@ -1,0 +1,15 @@
+{
+  "run_id": "ingest_bundle8_industry_sources_20260712",
+  "evidence_id": "industry_report_caict_green_computing_2025_59947f",
+  "ingest_mode": "url_file",
+  "result": "SUCCESS",
+  "raw_file_path": "data/raw/industry_reports/industry_report_caict_green_computing_2025_59947f.pdf",
+  "processed_text_path": "data/processed/text/ai_server_liquid_cooling/industry_report_caict_green_computing_2025_59947f.md",
+  "page_map_path": "data/processed/page_maps/industry_report_caict_green_computing_2025_59947f_page_map.yaml",
+  "file_hash": "59947f86430a799f8fd7aaab79387bc96aad825fa7a7c9e480bc7954feb20e88",
+  "page_count": 69,
+  "empty_text_pages": [],
+  "parser": "pypdf",
+  "generated_at": "2026-07-12T15:59:20.627191+00:00",
+  "notes": "Full physical-page text extraction; key chart and policy pages visually checked with Poppler rendering."
+}

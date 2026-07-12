@@ -1,0 +1,28 @@
+schema_version: v0.1
+workflow_id: wf_example
+company_id: cn_example
+analysis_date: '2026-07-12'
+units:
+  - analysis_id: AN-CORE-001
+    section: core_thesis
+    judgment: 在此写入公司特异、可证伪的核心判断，不得使用模板结论。
+    trend: 在此写入至少两个报告期或可比较时点的变化趋势。
+    causal_mechanism: 在此说明驱动变量如何经过业务或财务链条影响结果。
+    financial_impact: 在此说明对收入、毛利、费用、现金流或资本回报的影响路径。
+    supporting_source_ids:
+      - SRC-EXAMPLE-SUPPORT
+    supporting_metric_ids:
+      - METRIC-EXAMPLE
+    counter_evidence_source_ids:
+      - SRC-EXAMPLE-COUNTER
+    confidence: medium
+    falsification_condition: 在此写入何种可观察结果会推翻本判断。
+    watch_metrics:
+      - metric_name: 示例观察指标
+        metric_id: METRIC-EXAMPLE
+        expected_direction: up
+        threshold: 明确阈值或区间
+        review_frequency: quarterly
+        source_id: SRC-EXAMPLE-SUPPORT
+    dependencies: []
+    notes: 模板本身不能通过 gate。

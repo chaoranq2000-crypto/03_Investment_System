@@ -1,0 +1,38 @@
+artifact_type: R5_bundle8_research_depth_gate
+schema_version: v0.1
+bundle_id: R5_BUNDLE_8_RESEARCH_DEPTH
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-12'
+decision: bundle8_research_depth_inputs_ready
+subgates:
+  evidence_coverage:
+    gate_id: R5_BUNDLE8_EVIDENCE_COVERAGE_GATE
+    decision: pass
+    errors: []
+    warnings: []
+    stats:
+      covered_requirements: 7
+      total_requirements: 7
+      open_blockers: 0
+  analysis_pack:
+    gate_id: R5_BUNDLE8_ANALYSIS_PACK_GATE
+    decision: pass
+    errors: []
+    warnings: []
+    stats:
+      complete_units: 7
+      total_units: 7
+      missing_required_sections: []
+scope_boundaries:
+  workflow_state_mutated: false
+  reader_regenerated: false
+  bundle_closed: false
+  deferred:
+  - segment_forecast_model
+  - reverse_valuation
+  - scenario_valuation
+  - technical_snapshot
+  - market_sentiment_pack
+  - catalyst_calendar
+  - reader_report_writer
+  - end_to_end_sample_benchmark

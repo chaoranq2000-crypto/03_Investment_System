@@ -1,0 +1,16 @@
+artifact_type: R5_analysis_pack_v2
+schema_version: v0.1
+workflow_id: wf_example
+company_id: cn_example
+analysis_date: '2026-07-12'
+source_catalog_path: TODO_SOURCE_REQUIRED
+coverage_matrix_path: TODO_SOURCE_REQUIRED
+analysis_units: []
+summary:
+  decision: analysis_inputs_blocked
+  complete_units: 0
+  required_complete_units: 7
+  missing_required_sections: []
+  blocker_count: 0
+notes:
+  - 此文件应由 scripts/build_r5_analysis_pack_v2.py 生成。
