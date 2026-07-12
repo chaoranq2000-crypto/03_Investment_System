@@ -1,0 +1,57 @@
+{
+  "artifact_type": "R5_core_asset_preflight_result",
+  "schema_version": "r5_core_asset_preflight_result_v0.1",
+  "core_asset_state": "partial",
+  "financial_history_status": "accepted",
+  "business_breakdown_status": "accepted_with_todos",
+  "forecast_model_status": "accepted",
+  "valuation_status": "accepted",
+  "sample_quality_report_allowed": false,
+  "p2_allowed": false,
+  "blockers": [],
+  "non_blocking_todos": [
+    {
+      "token": "TODO_SOURCE_REQUIRED",
+      "reason": "visible core subpack TODO or missing marker"
+    },
+    {
+      "token": "MISSING_DISCLOSURE",
+      "reason": "visible core subpack TODO or missing marker"
+    }
+  ],
+  "known_todos": [
+    "TODO_SOURCE_REQUIRED",
+    "MISSING_DISCLOSURE"
+  ],
+  "next_candidate_tasks": [
+    "supply accepted reviewed financial history inputs",
+    "supply accepted reviewed business disclosure",
+    "supply accepted reviewed forecast and valuation inputs"
+  ],
+  "checks": {
+    "financial_history": {
+      "label": "financial_history",
+      "path": "reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle5_financial_history_candidate.yaml",
+      "validator_status": "accepted",
+      "errors": []
+    },
+    "business_breakdown": {
+      "label": "business_breakdown",
+      "path": "reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle5_business_breakdown_candidate.yaml",
+      "validator_status": "accepted_with_todos",
+      "errors": []
+    },
+    "forecast_model": {
+      "label": "forecast_model",
+      "path": "reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle5_forecast_model_candidate.yaml",
+      "validator_status": "accepted",
+      "errors": []
+    },
+    "valuation": {
+      "label": "valuation",
+      "path": "reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle5_valuation_pack_candidate.yaml",
+      "validator_status": "accepted",
+      "errors": []
+    }
+  }
+}

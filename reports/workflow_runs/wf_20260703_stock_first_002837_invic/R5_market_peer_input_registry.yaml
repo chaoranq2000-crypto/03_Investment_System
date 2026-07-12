@@ -1,44 +1,395 @@
 schema_version: r5_market_peer_input_registry_v0.1
 artifact_type: R5_market_peer_input_registry
 workflow_id: wf_20260703_stock_first_002837_invic
-stock_code: "002837"
-as_of_date: null
-review_status: pending
-reviewer: null
+stock_code: 002837
+as_of_date: '2026-07-10'
+review_status: reviewed
+reviewer: codex
 no_live_api: true
 market_inputs:
   current_price:
-    value: TODO_MARKET_DATA
+    value: 73.54
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_type: market_snapshot
+    input_id: r5_b5_market_002837_20260710
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Trailing multiples reflect historical reported metrics and are not forward estimates.
+    - Source-reported market capitalization is retained instead of recomputing from
+      rounded close and shares.
+    provenance:
+    - input_id: r5_b5_market_002837_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Trailing multiples reflect historical reported metrics and are not forward
+        estimates.
+      - Source-reported market capitalization is retained instead of recomputing from
+        rounded close and shares.
     unit: CNY_per_share
-    evidence_id: null
-    source_type: market_snapshot
-    missing_reason: TODO_MARKET_DATA
   market_cap:
-    value: TODO_MARKET_DATA
+    value: 93715669584
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_type: market_snapshot
+    input_id: r5_b5_market_002837_20260710
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Trailing multiples reflect historical reported metrics and are not forward estimates.
+    - Source-reported market capitalization is retained instead of recomputing from
+      rounded close and shares.
+    provenance:
+    - input_id: r5_b5_market_002837_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Trailing multiples reflect historical reported metrics and are not forward
+        estimates.
+      - Source-reported market capitalization is retained instead of recomputing from
+        rounded close and shares.
     unit: CNY
-    evidence_id: null
-    source_type: market_snapshot
-    missing_reason: TODO_MARKET_DATA
   pe_ttm:
-    value: TODO_MARKET_DATA
-    unit: multiple
-    evidence_id: null
+    value: 194.2045
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
     source_type: market_snapshot
-    missing_reason: TODO_MARKET_DATA
+    input_id: r5_b5_market_002837_20260710
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Trailing multiples reflect historical reported metrics and are not forward estimates.
+    - Source-reported market capitalization is retained instead of recomputing from
+      rounded close and shares.
+    provenance:
+    - input_id: r5_b5_market_002837_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Trailing multiples reflect historical reported metrics and are not forward
+        estimates.
+      - Source-reported market capitalization is retained instead of recomputing from
+        rounded close and shares.
+    unit: multiple
+  pb:
+    value: 27.0715
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_type: market_snapshot
+    input_id: r5_b5_market_002837_20260710
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Trailing multiples reflect historical reported metrics and are not forward estimates.
+    - Source-reported market capitalization is retained instead of recomputing from
+      rounded close and shares.
+    provenance:
+    - input_id: r5_b5_market_002837_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Trailing multiples reflect historical reported metrics and are not forward
+        estimates.
+      - Source-reported market capitalization is retained instead of recomputing from
+        rounded close and shares.
+    unit: multiple
+  ps:
+    value: 15.4449
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_type: market_snapshot
+    input_id: r5_b5_market_002837_20260710
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Trailing multiples reflect historical reported metrics and are not forward estimates.
+    - Source-reported market capitalization is retained instead of recomputing from
+      rounded close and shares.
+    provenance:
+    - input_id: r5_b5_market_002837_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Trailing multiples reflect historical reported metrics and are not forward
+        estimates.
+      - Source-reported market capitalization is retained instead of recomputing from
+        rounded close and shares.
+    unit: multiple
 peer_inputs:
   peer_set:
-    value: TODO_PEER_DATA
-    evidence_id: null
+    value:
+    - '300499'
+    - '301018'
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
     source_type: peer_snapshot
-    missing_reason: TODO_PEER_DATA
+    input_id: r5_b5_peer_300499_pb_20260710
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    provenance:
+    - input_id: r5_b5_peer_300499_pb_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    - input_id: r5_b5_peer_300499_pe_ttm_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    - input_id: r5_b5_peer_300499_ps_ttm_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    - input_id: r5_b5_peer_301018_pb_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    - input_id: r5_b5_peer_301018_pe_ttm_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    - input_id: r5_b5_peer_301018_ps_ttm_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
   peer_valuation_multiples:
-    value: TODO_PEER_DATA
-    evidence_id: null
+    value:
+    - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+      peer_stock_code: '300499'
+      peer_company_name: 高澜股份
+      metric_name: pb
+      metric_value: 8.4621
+      metric_unit: multiple
+      input_id: r5_b5_peer_300499_pb_20260710
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+      peer_stock_code: '300499'
+      peer_company_name: 高澜股份
+      metric_name: pe_ttm
+      metric_value: 385.8974
+      metric_unit: multiple
+      input_id: r5_b5_peer_300499_pe_ttm_20260710
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+      peer_stock_code: '300499'
+      peer_company_name: 高澜股份
+      metric_name: ps_ttm
+      metric_value: 11.9854
+      metric_unit: multiple
+      input_id: r5_b5_peer_300499_ps_ttm_20260710
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+      peer_stock_code: '301018'
+      peer_company_name: 申菱环境
+      metric_name: pb
+      metric_value: 16.2152
+      metric_unit: multiple
+      input_id: r5_b5_peer_301018_pb_20260710
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+      peer_stock_code: '301018'
+      peer_company_name: 申菱环境
+      metric_name: pe_ttm
+      metric_value: 234.3524
+      metric_unit: multiple
+      input_id: r5_b5_peer_301018_pe_ttm_20260710
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+      peer_stock_code: '301018'
+      peer_company_name: 申菱环境
+      metric_name: ps_ttm
+      metric_value: 10.6599
+      metric_unit: multiple
+      input_id: r5_b5_peer_301018_ps_ttm_20260710
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
     source_type: peer_snapshot
-    missing_reason: TODO_PEER_DATA
+    input_id: r5_b5_peer_300499_pb_20260710
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    provenance:
+    - input_id: r5_b5_peer_300499_pb_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    - input_id: r5_b5_peer_300499_pe_ttm_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    - input_id: r5_b5_peer_300499_ps_ttm_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    - input_id: r5_b5_peer_301018_pb_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    - input_id: r5_b5_peer_301018_pe_ttm_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    - input_id: r5_b5_peer_301018_ps_ttm_20260710
+      source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Peer set has only two product-exposure candidates and is low confidence.
+      - Business mixes and liquid-cooling financial disclosure remain non-identical.
 allowed_usage:
-  - valuation_context_only_when_reviewed
+- reviewed_input_research_draft_only
 blocking_rules:
-  - if review_status != reviewed, valuation pack must remain degraded
+- fixture inputs never open sample-quality or P2
+promotion_provenance:
+- input_id: r5_b5_market_002837_20260710
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Trailing multiples reflect historical reported metrics and are not forward estimates.
+  - Source-reported market capitalization is retained instead of recomputing from
+    rounded close and shares.
+- input_id: r5_b5_peer_300499_pb_20260710
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- input_id: r5_b5_peer_300499_pe_ttm_20260710
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- input_id: r5_b5_peer_300499_ps_ttm_20260710
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- input_id: r5_b5_peer_301018_pb_20260710
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- input_id: r5_b5_peer_301018_pe_ttm_20260710
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- input_id: r5_b5_peer_301018_ps_ttm_20260710
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
 sample_quality_report_allowed: false
 p2_allowed: false

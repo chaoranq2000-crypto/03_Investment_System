@@ -1,0 +1,25 @@
+schema_version: r5_bundle5_reviewed_input_pilot_gate_rules_v0.1
+default_paths:
+  strict_smoke_result: reports/p1_6/r5_mvp_smoke_result.json
+  source_gapped_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_stock_research_pack.yaml
+  reviewed_input_dry_run_result: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_reviewed_input_dry_run_result.yaml
+  quality_scorecard_v2: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_quality_scorecard.yaml
+  promotion_rules: config/r5_pack_promotion_rules.yaml
+required_for_reviewed_input_pilot:
+  - reviewed_market_inputs_available
+  - reviewed_peer_inputs_available
+  - reviewed_forecast_assumptions_available
+  - reviewed_valuation_inputs_available
+critical_todo_tokens:
+  - TODO_MARKET_DATA
+  - TODO_PEER_DATA
+  - TODO_MODEL_INPUT
+fixed_boundaries:
+  max_allowed_report_level: reviewed_input_research_draft
+  sample_quality_report_allowed: false
+  p2_allowed: false
+next_candidate_tasks:
+  - run benchmark coverage precheck without promotion
+  - retain liquid-cooling-specific disclosure gaps
+  - retain low-confidence peer and valuation limitations
+max_next_candidate_tasks: 3

@@ -1,0 +1,37 @@
+artifact_type: R5_bundle5_registry_backup_manifest
+schema_version: r5_bundle5_registry_backup_manifest_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+inventory_signature: c7e2146bff39443503a9ead7c6afad84624eb4732f1960a0ef8e9bc72bbb9e5d
+backup_dir: reports/workflow_runs/wf_20260703_stock_first_002837_invic/backups/r5_bundle5_pre_promotion_c7e2146bff39
+backup_verified: true
+items:
+- registry_key: market_peer
+  target_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_market_peer_input_registry.yaml
+  pre_exists: true
+  pre_hash: 3363dae35cfbb063baa77ce796144aaa297570fb28adcb54871ff3361aa3d03a
+  backup_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/backups/r5_bundle5_pre_promotion_c7e2146bff39/R5_market_peer_input_registry.yaml.pre_promotion.bak
+  backup_hash: 3363dae35cfbb063baa77ce796144aaa297570fb28adcb54871ff3361aa3d03a
+  action: created
+- registry_key: forecast_assumptions
+  target_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_forecast_assumption_registry.yaml
+  pre_exists: true
+  pre_hash: 3474d20d5ebc8f1d006088d01d657e565715b6995e5a56071d93a3cd6853ffcc
+  backup_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/backups/r5_bundle5_pre_promotion_c7e2146bff39/R5_forecast_assumption_registry.yaml.pre_promotion.bak
+  backup_hash: 3474d20d5ebc8f1d006088d01d657e565715b6995e5a56071d93a3cd6853ffcc
+  action: created
+- registry_key: valuation_inputs
+  target_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_valuation_input_registry.yaml
+  pre_exists: false
+  pre_hash: null
+  backup_path: null
+  backup_hash: null
+  action: recorded_missing_target
+- registry_key: evidence_ledger
+  target_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_review_ledger.yaml
+  pre_exists: true
+  pre_hash: c3225cee58bc236f994acb8d24c0515c6c5311e8b2f169a10a95484f4b6afc37
+  backup_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/backups/r5_bundle5_pre_promotion_c7e2146bff39/R5_evidence_request_review_ledger.yaml.pre_promotion.bak
+  backup_hash: c3225cee58bc236f994acb8d24c0515c6c5311e8b2f169a10a95484f4b6afc37
+  action: created
+restore_strategy: restore verified pre-existing bytes atomically; remove only targets
+  recorded as absent before promotion

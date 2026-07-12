@@ -1,0 +1,15 @@
+artifact_type: R5_bundle5_market_peer_acquisition_log
+evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+retrieved_at: '2026-07-11T17:31:01Z'
+reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+raw_path: data/raw/market_data/tushare_daily_basic_peer_set_2026-07-10_eb0c080a.json
+normalized_path: data/processed/normalized/market_peer_002837_2026-07-10_eb0c080a.csv
+raw_status: created
+processed_status: created
+registration:
+  manifest_status: created
+  ingest_log_status: created
+  run_id: ingest_tushare_daily_basic_002837_eb0c080a
+token_persisted: false
+sample_quality_report_allowed: false
+p2_allowed: false

@@ -81,3 +81,11 @@ Historical readouts are not rewritten. Legacy entries are retained as history an
 | `reports/p1_6/R5_BUNDLE_4_REVIEWED_INPUT_FIXTURE_PROMOTION_CLOSE_READOUT.md` | `canonical` | `true` | Bundle 4.6 closes the fixture activation capability while the real 002837 pilot remains source-gapped |
 | `reports/p1_6/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md` | `canonical` | `true` | Bundle 5 entry review freshly revalidates the physical Bundle 4 close state and preserves the real-input boundary |
 | `reports/p1_6/R5_AFTER_BUNDLE4_STATUS_BASELINE_READOUT.md` | `canonical` | `true` | Bundle 5.0 defines producer ownership, expected artifacts and the pre-Card-5.5 canonical-registry write boundary |
+| `reports/p1_6/R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_READOUT.md` | `canonical` | `true` | Bundle 5.1 inventories real official-source candidates and reconciles the final 5/5 reviewed core-input state |
+| `reports/p1_6/R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_FINANCIAL_READOUT.md` | `canonical` | `true` | Bundle 5.2 records official disclosure parsing, financial history and visible liquid-cooling-specific gaps |
+| `reports/p1_6/R5_BUNDLE_5_3_MARKET_PEER_INPUT_READOUT.md` | `canonical` | `true` | Bundle 5.3 records the immutable dated market snapshot and low-confidence evidence-grounded peer set |
+| `reports/p1_6/R5_BUNDLE_5_4_FORECAST_VALUATION_INPUT_READOUT.md` | `canonical` | `true` | Bundle 5.4 records reviewed research estimates, method eligibility and valuation limitations |
+| `reports/p1_6/R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_READOUT.md` | `canonical` | `true` | Bundle 5.5 records authorized real registry promotion, verified backups and two-run idempotency |
+| `reports/p1_6/R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_QUALITY_READOUT.md` | `canonical` | `true` | Bundle 5.6 records physical-registry pilot gating, reviewed-input draft rendering and independent quality review |
+| `reports/p1_6/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_READOUT.md` | `canonical` | `true` | Bundle 5.7 records the non-promoting ten-dimension coverage and no-advice precheck |
+| `reports/p1_6/R5_BUNDLE_5_REAL_REVIEWED_INPUT_ONBOARDING_CLOSE_READOUT.md` | `canonical` | `true` | Bundle 5.8 closes real 002837 reviewed-input onboarding at research-draft level while sample-quality and P2 remain closed |

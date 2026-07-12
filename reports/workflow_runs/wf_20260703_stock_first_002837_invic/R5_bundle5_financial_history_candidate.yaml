@@ -1,0 +1,399 @@
+artifact_type: R5_financial_history_pack
+schema_version: r5_financial_history_pack_v0.1
+status: ready
+as_of_date: '2026-04-21'
+currency: CNY
+periods:
+- 2023A
+- 2024A
+- 2025A
+- 2026Q1
+income_statement:
+- metric_name: revenue
+  period: 2023A
+  value: 3528859077.13
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: net_profit_attributable
+  period: 2023A
+  value: 344006335.07
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: net_profit_ex_items
+  period: 2023A
+  value: 316268801.76
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: revenue
+  period: 2024A
+  value: 4588819487.27
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: net_profit_attributable
+  period: 2024A
+  value: 452664369.42
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: net_profit_ex_items
+  period: 2024A
+  value: 429719858.69
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: revenue
+  period: 2025A
+  value: 6067759091.55
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: net_profit_attributable
+  period: 2025A
+  value: 521914773.0
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: net_profit_ex_items
+  period: 2025A
+  value: 503698695.52
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: revenue
+  period: 2026Q1
+  value: 1175329313.61
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 2; 一、主要财务数据
+  claim_type: fact
+- metric_name: net_profit_attributable
+  period: 2026Q1
+  value: 8657602.27
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 2; 一、主要财务数据
+  claim_type: fact
+- metric_name: net_profit_ex_items
+  period: 2026Q1
+  value: 5392856.48
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 2; 一、主要财务数据
+  claim_type: fact
+balance_sheet:
+- metric_name: total_assets
+  period: 2023A
+  value: 5091055172.06
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: equity_attributable
+  period: 2023A
+  value: 2486071338.29
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: total_assets
+  period: 2024A
+  value: 6014413898.7
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: equity_attributable
+  period: 2024A
+  value: 2915892117.15
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: total_assets
+  period: 2025A
+  value: 7747255663.66
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: equity_attributable
+  period: 2025A
+  value: 3445641008.79
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: total_assets
+  period: 2026Q1
+  value: 7761763222.65
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 2; 一、主要财务数据
+  claim_type: fact
+- metric_name: equity_attributable
+  period: 2026Q1
+  value: 3461780265.25
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 2; 一、主要财务数据
+  claim_type: fact
+cashflow_statement:
+- metric_name: operating_cashflow
+  period: 2023A
+  value: 453072040.34
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: operating_cashflow
+  period: 2024A
+  value: 199835014.95
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: operating_cashflow
+  period: 2025A
+  value: 157273222.36
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: operating_cashflow
+  period: 2026Q1
+  value: -386363968.71
+  unit: CNY
+  currency: CNY
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 2; 一、主要财务数据
+  claim_type: fact
+key_metrics:
+- metric_name: basic_eps
+  period: 2023A
+  value: 0.47
+  unit: CNY_per_share
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: weighted_roe
+  period: 2023A
+  value: 15.03
+  unit: pct
+  currency: null
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: basic_eps
+  period: 2024A
+  value: 0.47
+  unit: CNY_per_share
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: weighted_roe
+  period: 2024A
+  value: 16.88
+  unit: pct
+  currency: null
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: basic_eps
+  period: 2025A
+  value: 0.54
+  unit: CNY_per_share
+  currency: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: weighted_roe
+  period: 2025A
+  value: 16.58
+  unit: pct
+  currency: null
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+  claim_type: fact
+- metric_name: basic_eps
+  period: 2026Q1
+  value: 0.01
+  unit: CNY_per_share
+  currency: CNY
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 2; 一、主要财务数据
+  claim_type: fact
+- metric_name: weighted_roe
+  period: 2026Q1
+  value: 0.25
+  unit: pct
+  currency: null
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 2; 一、主要财务数据
+  claim_type: fact
+- metric_name: gross_margin
+  period: 2025A
+  value: 27.86
+  unit: pct
+  currency: null
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: null
+  calculation_method: direct_reported_value
+  page_or_table_locator: PDF page 16; 第三节四、2（2）
+  claim_type: fact
+- metric_name: gross_margin
+  period: 2026Q1
+  value: 24.2935
+  unit: pct
+  currency: null
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  metric_id: null
+  calculation_method: (revenue - operating_cost) / revenue * 100; revenue=1175329313.61;
+    operating_cost=889801134.41
+  page_or_table_locator: PDF page 9; 合并利润表
+  claim_type: inference
+financial_quality:
+  revenue_quality: 2023-2025 audited annual figures; 2026Q1 unaudited quarterly figure
+  profit_quality: 2026Q1 attributable profit fell 81.97% year on year while revenue
+    grew 26.03%; do not extrapolate without explicit assumptions
+adjusted_profit_bridge:
+  status: reviewed
+  period: 2025A
+  rows:
+  - item: net_profit_attributable
+    value: 521914773.0
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  - item: net_profit_ex_items
+    value: 503698695.52
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  - item: non_recurring_gap
+    value: 18216077.48
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    calculation_method: attributable_profit_minus_ex_items_profit
+    claim_type: inference
+cashflow_quality:
+  status: reviewed
+  notes:
+  - 2025 operating cashflow was below 2024 and 2023 reported levels.
+  - 2026Q1 operating cashflow was negative; a single quarter does not establish a
+    full-year pattern.
+working_capital_flags:
+  status: reviewed_limited
+  flags:
+  - 2026Q1 operating cashflow requires later working-capital note analysis
+roe_roic_commentary:
+  status: reviewed
+  commentary: Annual report supplies weighted ROE; ROIC is not calculated in this
+    card because a reviewed invested-capital bridge is outside the disclosed summary
+    table.
+evidence_ids:
+- ev_annual_report_002837_20260421_2cbfc5
+- ev_interim_report_002837_20250819_47054e
+- ev_quarterly_report_002837_20260421_2f00c7
+missing_items: []
+sample_quality_allowed: false
+p2_allowed: false

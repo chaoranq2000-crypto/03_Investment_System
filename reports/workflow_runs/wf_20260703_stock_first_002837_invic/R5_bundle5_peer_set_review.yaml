@@ -1,0 +1,36 @@
+peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+selection_source_path: data/processed/normalized/segment_company_exposure.csv
+selection_sequence: exposure comparability first, market multiples second
+included:
+- stock_code: '301018'
+  stock_name: 申菱环境
+  exposure_type: product
+  exposure_score: 4
+  confidence: medium
+  reason: current local segment universe records product-level exposure; selected
+    before reviewing valuation multiples
+- stock_code: '300499'
+  stock_name: 高澜股份
+  exposure_type: product
+  exposure_score: 3
+  confidence: low
+  reason: current local segment universe records product-level exposure; selected
+    before reviewing valuation multiples
+excluded:
+- stock_code: '300731'
+  stock_name: 科创新源
+  exposure_type: technology
+  exposure_score: 2
+  confidence: medium
+  reason: current local universe records lower-scored technology-level rather than
+    product-level exposure
+- stock_code: '300602'
+  stock_name: 飞荣达
+  exposure_type: technology
+  exposure_score: 2
+  confidence: low
+  reason: current local universe records lower-scored technology-level rather than
+    product-level exposure
+peer_set_quality: low
+quality_reason: only two product-level candidates; 300499 exposure confidence is low
+  and broad business mixes differ

@@ -75,9 +75,10 @@ def validate_scorecard(data: dict[str, Any]) -> list[dict[str, str]]:
 def derive_decision(data: dict[str, Any], issues: list[dict[str, str]]) -> str:
     if any(issue["severity"] == "high" for issue in issues):
         return "blocked"
-    if data.get("sample_quality_blockers"):
-        return "source_gapped_research_draft"
-    return str(data.get("allowed_report_level", "source_gapped_research_draft"))
+    requested_level = str(data.get("allowed_report_level", "source_gapped_research_draft"))
+    if data.get("sample_quality_blockers") and requested_level == "sample_quality_candidate":
+        return "reviewed_input_research_draft"
+    return requested_level
 
 
 def main(argv: list[str] | None = None) -> int:

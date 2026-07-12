@@ -9,7 +9,7 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / ".agents/skills/stock-deep-dive/scripts/validate_r5_forecast_assumption_registry.py"
 RUN_REGISTRY = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_forecast_assumption_registry.yaml"
-FORECAST_MODEL = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml"
+FORECAST_MODEL = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_forecast_model_candidate.yaml"
 
 
 def load_validator():
@@ -54,14 +54,23 @@ def test_pending_registry_passes_but_keeps_todos():
     assert validator.derive_decision(data, issues) == "accepted_with_todos"
 
 
-def test_run_registry_does_not_unlock_numeric_forecast():
+def test_run_registry_and_rebuilt_pack_use_reviewed_numeric_forecast():
     validator = load_validator()
     data = validator.load_yaml(RUN_REGISTRY)
     forecast = yaml.safe_load(FORECAST_MODEL.read_text(encoding="utf-8"))
 
-    assert validator.derive_decision(data, validator.validate_registry(data)) == "accepted_with_todos"
-    assert forecast["model_input_status"]["revenue_forecast"] == "TODO_MODEL_INPUT"
-    assert "TODO_MODEL_INPUT" in RUN_REGISTRY.read_text(encoding="utf-8")
+    assert validator.derive_decision(data, validator.validate_registry(data)) == "accepted"
+    assert data["review_status"] == "reviewed"
+    assert {row["driver"] for row in data["assumptions"]} == {
+        "revenue_growth",
+        "gross_margin",
+        "opex",
+        "net_profit",
+        "eps",
+    }
+    assert forecast["status"] == "ready"
+    assert forecast["scenarios"]["base_case"]["forecast_table"]["2026E"]["revenue"]["value"] > 0
+    assert "TODO_MODEL_INPUT" not in RUN_REGISTRY.read_text(encoding="utf-8")
 
 
 def test_reviewed_assumption_requires_anchor_and_reviewer_note():

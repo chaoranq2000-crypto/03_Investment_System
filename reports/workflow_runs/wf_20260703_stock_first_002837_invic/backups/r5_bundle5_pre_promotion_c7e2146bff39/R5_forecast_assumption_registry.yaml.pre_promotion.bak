@@ -1,0 +1,80 @@
+schema_version: r5_forecast_assumption_registry_v0.1
+artifact_type: R5_forecast_assumption_registry
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: "002837"
+review_status: pending
+no_live_api: true
+assumptions:
+  - assumption_id: TODO_REVIEWED_REVENUE_GROWTH
+    driver: revenue_growth
+    periods:
+      - 2026E
+      - 2027E
+      - 2028E
+    value: TODO_MODEL_INPUT
+    unit: pct
+    evidence_ids: []
+    metric_ids:
+      - metric_cn_002837_invic_revenue_20260331_4f7f22
+    missing_reason: TODO_MODEL_INPUT
+    allowed_usage: degraded_forecast_only
+    review_status: pending
+  - assumption_id: TODO_REVIEWED_GROSS_MARGIN
+    driver: gross_margin
+    periods:
+      - 2026E
+      - 2027E
+      - 2028E
+    value: TODO_MODEL_INPUT
+    unit: pct
+    evidence_ids: []
+    metric_ids: []
+    missing_reason: TODO_MODEL_INPUT
+    allowed_usage: degraded_forecast_only
+    review_status: pending
+  - assumption_id: TODO_REVIEWED_OPEX
+    driver: opex
+    periods:
+      - 2026E
+      - 2027E
+      - 2028E
+    value: TODO_MODEL_INPUT
+    unit: pct
+    evidence_ids: []
+    metric_ids: []
+    missing_reason: TODO_MODEL_INPUT
+    allowed_usage: degraded_forecast_only
+    review_status: pending
+  - assumption_id: TODO_REVIEWED_NET_PROFIT
+    driver: net_profit
+    periods:
+      - 2026E
+      - 2027E
+      - 2028E
+    value: TODO_MODEL_INPUT
+    unit: CNY
+    evidence_ids: []
+    metric_ids: []
+    missing_reason: TODO_MODEL_INPUT
+    allowed_usage: degraded_forecast_only
+    review_status: pending
+  - assumption_id: TODO_REVIEWED_EPS
+    driver: eps
+    periods:
+      - 2026E
+      - 2027E
+      - 2028E
+    value: TODO_MODEL_INPUT
+    unit: CNY_per_share
+    evidence_ids: []
+    metric_ids: []
+    missing_reason: TODO_MODEL_INPUT
+    allowed_usage: degraded_forecast_only
+    review_status: pending
+blocking_rules:
+  - if any core forecast driver is pending, sample-quality must remain false
+forecast_model_interlock:
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
+  expected_status: TODO_MODEL_INPUT
+sample_quality_report_allowed: false
+p2_allowed: false

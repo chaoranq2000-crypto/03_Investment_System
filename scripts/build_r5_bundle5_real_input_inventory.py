@@ -22,6 +22,13 @@ CORE_INPUT_TYPES = (
 )
 OPTIONAL_INPUT_TYPES = ("sentiment_event_sources",)
 ACCEPTED_STATUSES = {"accepted", "accepted_degraded"}
+OFFICIAL_DISCLOSURE_SOURCE_TYPES = {
+    "annual_report",
+    "interim_report",
+    "quarterly_report",
+    "announcement",
+    "official_disclosure",
+}
 FORBIDDEN_ACCEPTED_TOKENS = {
     "TODO_MARKET_DATA",
     "TODO_PEER_DATA",
@@ -291,7 +298,7 @@ def _evidence_candidates(evidence_rows: list[dict[str, Any]], input_type: str) -
         return []
     candidates: list[dict[str, Any]] = []
     for row in evidence_rows:
-        if row.get("source_type") not in {"annual_report", "announcement", "official_disclosure"}:
+        if row.get("source_type") not in OFFICIAL_DISCLOSURE_SOURCE_TYPES:
             continue
         if row.get("fixture_or_template_origin"):
             continue
@@ -348,6 +355,13 @@ def build_inventory(
     workflow_dir = repo_root / "reports/workflow_runs" / workflow_id
     records, validation = _dropzone_records(repo_root, dropzone_root)
     evidence_rows = _evidence_rows(repo_root, workflow_id, stock_code)
+    official_disclosure_candidates = _evidence_candidates(evidence_rows, "business_disclosure")
+    card_5_2_allowed = any(
+        str(candidate.get("source_rank") or "").strip().upper() == "A"
+        and candidate.get("source_path_status") == "resolved"
+        and bool(candidate.get("source_path"))
+        for candidate in official_disclosure_candidates
+    )
     evidence_by_id: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in evidence_rows:
         evidence_id = str(row.get("evidence_id") or "")
@@ -394,7 +408,9 @@ def build_inventory(
                 "valid_accepted_count": valid_count,
                 "status": "accepted" if valid_count else ("missing" if not type_records else "pending_or_invalid"),
                 "records": reviewed_records,
-                "evidence_candidates": _evidence_candidates(evidence_rows, input_type),
+                "evidence_candidates": (
+                    official_disclosure_candidates if input_type == "business_disclosure" else []
+                ),
                 "request_ids": request_ids,
                 "candidate_registry_target": REGISTRY_TARGETS[input_type],
                 "missing_fields": missing_fields,
@@ -403,7 +419,7 @@ def build_inventory(
             }
         )
 
-    stop_condition = validation.get("record_count", 0) == 0
+    stop_condition = validation.get("record_count", 0) == 0 and not card_5_2_allowed
     core_complete = valid_core_types == len(CORE_INPUT_TYPES)
     status = "ready_for_later_promotion_card" if core_complete else "blocked_source_gapped"
     return {
@@ -440,7 +456,7 @@ def build_inventory(
         "quality_decision": {
             "g1_evidence_gate": "pass" if core_complete else "fail",
             "card_5_1_stop_condition_triggered": stop_condition,
-            "card_5_2_allowed": core_complete and not stop_condition,
+            "card_5_2_allowed": card_5_2_allowed,
             "promotion_allowed": False,
             "sample_quality_report_allowed": False,
             "p2_allowed": False,

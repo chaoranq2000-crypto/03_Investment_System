@@ -1,0 +1,60 @@
+artifact_type: R5_reviewed_input_staging_result
+schema_version: r5_reviewed_input_staging_result_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+no_live_api: true
+dropzone_root: data\reviewed_inputs\wf_20260703_stock_first_002837_invic
+validation_status: pass
+validation_issues: []
+reviewed_market_inputs_available: true
+reviewed_peer_inputs_available: true
+reviewed_forecast_assumptions_available: true
+reviewed_business_disclosure_available: true
+reviewed_valuation_inputs_available: true
+accepted_count: 22
+accepted_degraded_count: 0
+pending_count: 0
+rejected_count: 0
+accepted_input_ids:
+- r5_b5_business_2025_room_cooling_revenue
+- r5_b5_business_2025_room_cooling_gross_margin
+- r5_b5_business_2025_cabinet_cooling_revenue
+- r5_b5_business_2025_cabinet_cooling_gross_margin
+- r5_b5_business_2025_bus_air_conditioning_revenue
+- r5_b5_business_2025_rail_air_conditioning_service_revenue
+- r5_b5_business_2025_other_revenue
+- r5_b5_business_2025_company_revenue
+- r5_b5_business_2025_company_gross_margin
+- r5_b5_forecast_revenue_growth_base
+- r5_b5_forecast_gross_margin_base
+- r5_b5_forecast_opex_base
+- r5_b5_forecast_net_profit_base
+- r5_b5_forecast_eps_base
+- r5_b5_market_002837_20260710
+- r5_b5_peer_301018_pe_ttm_20260710
+- r5_b5_peer_301018_pb_20260710
+- r5_b5_peer_301018_ps_ttm_20260710
+- r5_b5_peer_300499_pe_ttm_20260710
+- r5_b5_peer_300499_pb_20260710
+- r5_b5_peer_300499_ps_ttm_20260710
+- r5_b5_valuation_context_002837_20260710
+accepted_degraded_input_ids: []
+remaining_todos:
+- TODO_MARKET_DATA
+- TODO_PEER_DATA
+- TODO_MODEL_INPUT
+- MISSING_DISCLOSURE
+- TODO_SOURCE_REQUIRED
+allowed_report_level: reviewed_input_research_draft
+sample_quality_report_allowed: false
+p2_allowed: false
+inputs:
+  dropzone_root: data\reviewed_inputs\wf_20260703_stock_first_002837_invic
+  evidence_request_review_ledger: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_evidence_request_review_ledger.yaml
+  previous_reviewed_input_dry_run: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_reviewed_input_dry_run_result.yaml
+notes:
+- Accepted-only flags are derived only from review_status=accepted rows.
+- accepted_degraded rows may preserve limitations but do not allow sample-quality.
+- Templates are not evidence and are not counted as accepted inputs.
+- Reviewed-input staging is capped at research-draft level; a later independent quality
+  gate is required for any higher level.

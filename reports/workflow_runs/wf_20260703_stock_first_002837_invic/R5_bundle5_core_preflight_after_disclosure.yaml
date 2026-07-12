@@ -1,0 +1,21 @@
+artifact_type: R5_bundle5_core_preflight_after_disclosure
+schema_version: r5_bundle5_core_preflight_after_disclosure_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+status: pass_for_card_5_2_partial_core
+financial_history_status: accepted
+business_breakdown_status: accepted_with_todos
+forecast_model_status: not_run_until_card_5_4
+valuation_status: not_run_until_card_5_4
+blocking_for_card_5_2: []
+blocking_for_card_5_5:
+- reviewed market snapshot not yet onboarded
+- reviewed peer snapshot not yet onboarded
+- forecast and valuation inputs not yet reviewed
+known_todos:
+- MISSING_DISCLOSURE
+- TODO_SOURCE_REQUIRED
+canonical_registry_write_allowed: false
+sample_quality_report_allowed: false
+p2_allowed: false
+interpretation: Financial and broad business candidate packs validate at the level
+  allowed by Card 5.2; full core preflight waits for Cards 5.3-5.4.

@@ -2,7 +2,7 @@ schema_version: r5_evidence_request_review_ledger_v0.1
 artifact_type: R5_evidence_request_review_ledger
 workflow_id: wf_20260703_stock_first_002837_invic
 stock_code: 002837
-source_queue_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_queue.yaml
+source_queue_path: null
 review_status: pending
 no_live_api: true
 items:
@@ -86,11 +86,636 @@ items:
   source_rank: B
   reason: TODO_MODEL_INPUT
   next_action: 用已审查 metrics 构建假设，或保持 TODO
-summary:
-  request_count: 10
-  pending_count: 10
-  accepted_count: 0
-  accepted_null_evidence_count: 0
+- request_id: reviewed_input::r5_b5_business_2025_bus_air_conditioning_revenue
+  source_gap_id: R5_FIXTURE_BUSINESS_DISCLOSURE_INPUT
+  pack_section: business_breakdown_pack
+  review_decision: accepted
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_rank: A
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_business_2025_bus_air_conditioning_revenue
+  input_type: business_disclosure
+  input_review_status: accepted
+  as_of_date: '2025-12-31'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+  limitations:
+  - 发行人宽口径产品分类，不代表液冷单独口径。
+  - 只用于已披露产品线收入与公司总收入的对账。
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_business_2025_bus_air_conditioning_revenue
+    source_evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_date: '2025-12-31'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 只用于已披露产品线收入与公司总收入的对账。
+- request_id: reviewed_input::r5_b5_business_2025_cabinet_cooling_gross_margin
+  source_gap_id: R5_FIXTURE_BUSINESS_DISCLOSURE_INPUT
+  pack_section: business_breakdown_pack
+  review_decision: accepted
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_rank: A
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_business_2025_cabinet_cooling_gross_margin
+  input_type: business_disclosure
+  input_review_status: accepted
+  as_of_date: '2025-12-31'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+  limitations:
+  - 发行人宽口径产品分类，不代表液冷单独口径。
+  - 毛利率仅适用于该披露产品大类。
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_business_2025_cabinet_cooling_gross_margin
+    source_evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_date: '2025-12-31'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 毛利率仅适用于该披露产品大类。
+- request_id: reviewed_input::r5_b5_business_2025_cabinet_cooling_revenue
+  source_gap_id: R5_FIXTURE_BUSINESS_DISCLOSURE_INPUT
+  pack_section: business_breakdown_pack
+  review_decision: accepted
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_rank: A
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_business_2025_cabinet_cooling_revenue
+  input_type: business_disclosure
+  input_review_status: accepted
+  as_of_date: '2025-12-31'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+  limitations:
+  - 发行人宽口径产品分类，不代表液冷单独口径。
+  - 只用于已披露产品线收入与公司总收入的对账。
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_business_2025_cabinet_cooling_revenue
+    source_evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_date: '2025-12-31'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 只用于已披露产品线收入与公司总收入的对账。
+- request_id: reviewed_input::r5_b5_business_2025_company_gross_margin
+  source_gap_id: R5_FIXTURE_BUSINESS_DISCLOSURE_INPUT
+  pack_section: business_breakdown_pack
+  review_decision: accepted
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_rank: A
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_business_2025_company_gross_margin
+  input_type: business_disclosure
+  input_review_status: accepted
+  as_of_date: '2025-12-31'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+  limitations:
+  - 合并口径综合毛利率，不代表任一细分技术路线。
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_business_2025_company_gross_margin
+    source_evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_date: '2025-12-31'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 合并口径综合毛利率，不代表任一细分技术路线。
+- request_id: reviewed_input::r5_b5_business_2025_company_revenue
+  source_gap_id: R5_FIXTURE_BUSINESS_DISCLOSURE_INPUT
+  pack_section: business_breakdown_pack
+  review_decision: accepted
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_rank: A
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_business_2025_company_revenue
+  input_type: business_disclosure
+  input_review_status: accepted
+  as_of_date: '2025-12-31'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+  limitations:
+  - 合并口径公司总收入。
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_business_2025_company_revenue
+    source_evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_date: '2025-12-31'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 合并口径公司总收入。
+- request_id: reviewed_input::r5_b5_business_2025_other_revenue
+  source_gap_id: R5_FIXTURE_BUSINESS_DISCLOSURE_INPUT
+  pack_section: business_breakdown_pack
+  review_decision: accepted
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_rank: A
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_business_2025_other_revenue
+  input_type: business_disclosure
+  input_review_status: accepted
+  as_of_date: '2025-12-31'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+  limitations:
+  - 发行人宽口径产品分类，不代表液冷单独口径。
+  - 只用于已披露产品线收入与公司总收入的对账。
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_business_2025_other_revenue
+    source_evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_date: '2025-12-31'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 只用于已披露产品线收入与公司总收入的对账。
+- request_id: reviewed_input::r5_b5_business_2025_rail_air_conditioning_service_revenue
+  source_gap_id: R5_FIXTURE_BUSINESS_DISCLOSURE_INPUT
+  pack_section: business_breakdown_pack
+  review_decision: accepted
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_rank: A
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_business_2025_rail_air_conditioning_service_revenue
+  input_type: business_disclosure
+  input_review_status: accepted
+  as_of_date: '2025-12-31'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+  limitations:
+  - 发行人宽口径产品分类，不代表液冷单独口径。
+  - 只用于已披露产品线收入与公司总收入的对账。
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_business_2025_rail_air_conditioning_service_revenue
+    source_evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_date: '2025-12-31'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 只用于已披露产品线收入与公司总收入的对账。
+- request_id: reviewed_input::r5_b5_business_2025_room_cooling_gross_margin
+  source_gap_id: R5_FIXTURE_BUSINESS_DISCLOSURE_INPUT
+  pack_section: business_breakdown_pack
+  review_decision: accepted
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_rank: A
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_business_2025_room_cooling_gross_margin
+  input_type: business_disclosure
+  input_review_status: accepted
+  as_of_date: '2025-12-31'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+  limitations:
+  - 发行人宽口径产品分类，不代表液冷单独口径。
+  - 毛利率仅适用于该披露产品大类。
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_business_2025_room_cooling_gross_margin
+    source_evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_date: '2025-12-31'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 毛利率仅适用于该披露产品大类。
+- request_id: reviewed_input::r5_b5_business_2025_room_cooling_revenue
+  source_gap_id: R5_FIXTURE_BUSINESS_DISCLOSURE_INPUT
+  pack_section: business_breakdown_pack
+  review_decision: accepted
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_rank: A
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_business_2025_room_cooling_revenue
+  input_type: business_disclosure
+  input_review_status: accepted
+  as_of_date: '2025-12-31'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+  limitations:
+  - 发行人宽口径产品分类，不代表液冷单独口径。
+  - 只用于已披露产品线收入与公司总收入的对账。
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_business_2025_room_cooling_revenue
+    source_evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_date: '2025-12-31'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 只用于已披露产品线收入与公司总收入的对账。
+- request_id: reviewed_input::r5_b5_forecast_eps_base
+  source_gap_id: R5_FIXTURE_FORECAST_ASSUMPTIONS_INPUT
+  pack_section: forecast_model_pack
+  review_decision: accepted
+  evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_forecast_eps_base
+  input_type: forecast_assumptions
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_forecast_eps_base
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+- request_id: reviewed_input::r5_b5_forecast_gross_margin_base
+  source_gap_id: R5_FIXTURE_FORECAST_ASSUMPTIONS_INPUT
+  pack_section: forecast_model_pack
+  review_decision: accepted
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_forecast_gross_margin_base
+  input_type: forecast_assumptions
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_forecast_gross_margin_base
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+- request_id: reviewed_input::r5_b5_forecast_net_profit_base
+  source_gap_id: R5_FIXTURE_FORECAST_ASSUMPTIONS_INPUT
+  pack_section: forecast_model_pack
+  review_decision: accepted
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_forecast_net_profit_base
+  input_type: forecast_assumptions
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_forecast_net_profit_base
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+- request_id: reviewed_input::r5_b5_forecast_opex_base
+  source_gap_id: R5_FIXTURE_FORECAST_ASSUMPTIONS_INPUT
+  pack_section: forecast_model_pack
+  review_decision: accepted
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_forecast_opex_base
+  input_type: forecast_assumptions
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_forecast_opex_base
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+- request_id: reviewed_input::r5_b5_forecast_revenue_growth_base
+  source_gap_id: R5_FIXTURE_FORECAST_ASSUMPTIONS_INPUT
+  pack_section: forecast_model_pack
+  review_decision: accepted
+  evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_forecast_revenue_growth_base
+  input_type: forecast_assumptions
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_forecast_revenue_growth_base
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+- request_id: reviewed_input::r5_b5_market_002837_20260710
+  source_gap_id: R5_FIXTURE_MARKET_SNAPSHOT_INPUT
+  pack_section: valuation_pack
+  review_decision: accepted
+  evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_market_002837_20260710
+  input_type: market_snapshot
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Trailing multiples reflect historical reported metrics and are not forward estimates.
+  - Source-reported market capitalization is retained instead of recomputing from
+    rounded close and shares.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_market_002837_20260710
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Trailing multiples reflect historical reported metrics and are not forward estimates.
+    - Source-reported market capitalization is retained instead of recomputing from
+      rounded close and shares.
+- request_id: reviewed_input::r5_b5_peer_300499_pb_20260710
+  source_gap_id: R5_FIXTURE_PEER_SNAPSHOT_INPUT
+  pack_section: peer_comparison_pack
+  review_decision: accepted
+  evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_peer_300499_pb_20260710
+  input_type: peer_snapshot
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_peer_300499_pb_20260710
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- request_id: reviewed_input::r5_b5_peer_300499_pe_ttm_20260710
+  source_gap_id: R5_FIXTURE_PEER_SNAPSHOT_INPUT
+  pack_section: peer_comparison_pack
+  review_decision: accepted
+  evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_peer_300499_pe_ttm_20260710
+  input_type: peer_snapshot
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_peer_300499_pe_ttm_20260710
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- request_id: reviewed_input::r5_b5_peer_300499_ps_ttm_20260710
+  source_gap_id: R5_FIXTURE_PEER_SNAPSHOT_INPUT
+  pack_section: peer_comparison_pack
+  review_decision: accepted
+  evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_peer_300499_ps_ttm_20260710
+  input_type: peer_snapshot
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_peer_300499_ps_ttm_20260710
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- request_id: reviewed_input::r5_b5_peer_301018_pb_20260710
+  source_gap_id: R5_FIXTURE_PEER_SNAPSHOT_INPUT
+  pack_section: peer_comparison_pack
+  review_decision: accepted
+  evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_peer_301018_pb_20260710
+  input_type: peer_snapshot
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_peer_301018_pb_20260710
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- request_id: reviewed_input::r5_b5_peer_301018_pe_ttm_20260710
+  source_gap_id: R5_FIXTURE_PEER_SNAPSHOT_INPUT
+  pack_section: peer_comparison_pack
+  review_decision: accepted
+  evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_peer_301018_pe_ttm_20260710
+  input_type: peer_snapshot
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_peer_301018_pe_ttm_20260710
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- request_id: reviewed_input::r5_b5_peer_301018_ps_ttm_20260710
+  source_gap_id: R5_FIXTURE_PEER_SNAPSHOT_INPUT
+  pack_section: peer_comparison_pack
+  review_decision: accepted
+  evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_peer_301018_ps_ttm_20260710
+  input_type: peer_snapshot
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_peer_301018_ps_ttm_20260710
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+- request_id: reviewed_input::r5_b5_valuation_context_002837_20260710
+  source_gap_id: R5_FIXTURE_VALUATION_INPUTS_INPUT
+  pack_section: valuation_pack
+  review_decision: accepted
+  evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  reason: reviewed input accepted
+  next_action: retain in the validated registry provenance chain
+  input_id: r5_b5_valuation_context_002837_20260710
+  input_type: valuation_inputs
+  input_review_status: accepted
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  limitations:
+  - The peer set has two companies and remains low confidence.
+  - Trailing PE is affected by the subject's weak 2026Q1 attributable profit.
+  - Forecast values are model estimates rather than reported facts or management guidance.
+  no_live_api: true
+  provenance:
+    input_id: r5_b5_valuation_context_002837_20260710
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The peer set has two companies and remains low confidence.
+    - Trailing PE is affected by the subject's weak 2026Q1 attributable profit.
+    - Forecast values are model estimates rather than reported facts or management
+      guidance.
 promotion_rules:
 - accepted requires evidence_id and source_rank
-- pending cannot unblock source-gapped pilot
+- non-accepted decisions never become reviewed facts
+- fixture rows never open sample-quality or P2
+summary:
+  request_count: 32
+  pending_count: 10
+  accepted_count: 22
+  rejected_count: 0
+  needs_manual_collection_count: 0
+  accepted_null_evidence_count: 0

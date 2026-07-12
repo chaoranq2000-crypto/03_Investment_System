@@ -6,6 +6,7 @@ import shutil
 import sys
 from pathlib import Path
 
+import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -30,7 +31,7 @@ def item_by_type(inventory: dict, input_type: str) -> dict:
     return next(item for item in inventory["items"] if item["input_type"] == input_type)
 
 
-def test_current_real_workflow_is_truthfully_source_gapped() -> None:
+def test_current_real_workflow_has_all_reviewed_core_input_types_after_promotion() -> None:
     inventory = BUILDER.build_inventory(
         REPO_ROOT,
         WORKFLOW_ID,
@@ -38,30 +39,32 @@ def test_current_real_workflow_is_truthfully_source_gapped() -> None:
         Path("data/reviewed_inputs") / WORKFLOW_ID,
     )
 
-    assert inventory["status"] == "blocked_source_gapped"
+    assert inventory["status"] == "ready_for_later_promotion_card"
     assert inventory["dropzone_validation"]["status"] == "pass"
-    assert inventory["dropzone_validation"]["record_count"] == 0
-    assert inventory["dropzone_validation"]["interpretation"] == "empty_valid_but_source_gapped"
-    assert inventory["summary"]["valid_accepted_core_input_type_count"] == 0
-    assert inventory["summary"]["missing_or_invalid_core_input_type_count"] == 5
-    assert inventory["summary"]["review_ledger"]["accepted_count"] == 0
+    assert inventory["dropzone_validation"]["record_count"] == 22
+    assert inventory["dropzone_validation"]["accepted_count"] == 22
+    assert inventory["dropzone_validation"]["interpretation"] == "records_present_review_inventory_required"
+    assert inventory["summary"]["valid_accepted_core_input_type_count"] == 5
+    assert inventory["summary"]["missing_or_invalid_core_input_type_count"] == 0
+    assert inventory["summary"]["review_ledger"]["accepted_count"] == 22
     assert {item["input_type"] for item in inventory["items"]} == {
         *BUILDER.CORE_INPUT_TYPES,
         *BUILDER.OPTIONAL_INPUT_TYPES,
     }
-    for input_type in BUILDER.CORE_INPUT_TYPES:
+    expected_counts = {
+        "business_disclosure": 9,
+        "market_snapshot": 1,
+        "peer_snapshot": 6,
+        "forecast_assumptions": 5,
+        "valuation_inputs": 1,
+    }
+    for input_type, expected_count in expected_counts.items():
         item = item_by_type(inventory, input_type)
-        assert item["blocking"] is True
-        assert item["valid_accepted_count"] == 0
+        assert item["blocking"] is False
+        assert item["valid_accepted_count"] == expected_count
+        assert all(record["accepted_valid"] is True for record in item["records"])
         assert item["request_ids"]
-        assert {
-            "input_id",
-            "source_evidence_id",
-            "source_rank",
-            "reviewer",
-            "reviewed_at",
-            "limitations",
-        }.issubset(item["missing_fields"])
+        assert item["missing_fields"] == []
     business = item_by_type(inventory, "business_disclosure")
     assert business["evidence_candidates"]
     assert all(candidate["candidate_only"] is True for candidate in business["evidence_candidates"])
@@ -71,16 +74,23 @@ def test_current_real_workflow_is_truthfully_source_gapped() -> None:
         for alias in inventory["provenance_aliases"]
     )
     assert inventory["quality_decision"] == {
-        "g1_evidence_gate": "fail",
-        "card_5_1_stop_condition_triggered": True,
-        "card_5_2_allowed": False,
+        "g1_evidence_gate": "pass",
+        "card_5_1_stop_condition_triggered": False,
+        "card_5_2_allowed": True,
         "promotion_allowed": False,
         "sample_quality_report_allowed": False,
         "p2_allowed": False,
     }
 
 
-def write_synthetic_repo(tmp_path: Path, *, invalid_fixture: bool = False) -> Path:
+def write_synthetic_repo(
+    tmp_path: Path,
+    *,
+    invalid_fixture: bool = False,
+    include_evidence: bool = True,
+    include_dropzone_record: bool = True,
+    source_type: str = "annual_report",
+) -> Path:
     repo = tmp_path / "repo"
     (repo / "scripts").mkdir(parents=True)
     shutil.copy2(
@@ -135,51 +145,57 @@ def write_synthetic_repo(tmp_path: Path, *, invalid_fixture: bool = False) -> Pa
         encoding="utf-8",
     )
 
-    raw_path = repo / "data/raw/annual_reports/002837_real.pdf"
-    raw_path.parent.mkdir(parents=True)
-    raw_path.write_bytes(b"real official filing bytes")
-    manifest_path = repo / "data/manifests/evidence_manifest.csv"
-    manifest_path.parent.mkdir(parents=True)
-    fields = [
-        "evidence_id",
-        "stock_code",
-        "company_id",
-        "entity_id",
-        "title",
-        "source_name",
-        "source_type",
-        "raw_file_path",
-        "file_hash",
-        "reliability_rank",
-        "review_status",
-        "parse_status",
-        "publish_date",
-        "notes",
-    ]
-    with manifest_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
-        writer.writeheader()
-        writer.writerow(
-            {
-                "evidence_id": "ev_real_002837_annual",
-                "stock_code": STOCK_CODE,
-                "company_id": "cn_002837_invic",
-                "entity_id": "cn_002837_invic",
-                "title": "002837 official annual report",
-                "source_name": "local_fixture" if invalid_fixture else "szse",
-                "source_type": "annual_report",
-                "raw_file_path": "data/raw/annual_reports/002837_real.pdf",
-                "file_hash": "a" * 64,
-                "reliability_rank": "A",
-                "review_status": "reviewed",
-                "parse_status": "parsed",
-                "publish_date": "2026-04-21",
-                "notes": "synthetic unit-test evidence metadata",
-            }
-        )
+    if include_evidence:
+        raw_path = repo / "data/raw/annual_reports/002837_real.pdf"
+        raw_path.parent.mkdir(parents=True)
+        raw_path.write_bytes(b"real official filing bytes")
+        manifest_path = repo / "data/manifests/evidence_manifest.csv"
+        manifest_path.parent.mkdir(parents=True)
+        fields = [
+            "evidence_id",
+            "stock_code",
+            "company_id",
+            "entity_id",
+            "title",
+            "source_name",
+            "source_type",
+            "raw_file_path",
+            "file_hash",
+            "reliability_rank",
+            "review_status",
+            "parse_status",
+            "publish_date",
+            "notes",
+        ]
+        with manifest_path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=fields)
+            writer.writeheader()
+            writer.writerow(
+                {
+                    "evidence_id": "ev_real_002837_annual",
+                    "stock_code": STOCK_CODE,
+                    "company_id": "cn_002837_invic",
+                    "entity_id": "cn_002837_invic",
+                    "title": "002837 official disclosure",
+                    "source_name": "local_fixture" if invalid_fixture else "szse",
+                    "source_type": source_type,
+                    "raw_file_path": "data/raw/annual_reports/002837_real.pdf",
+                    "file_hash": "a" * 64,
+                    "reliability_rank": "A",
+                    "review_status": "reviewed",
+                    "parse_status": "parsed",
+                    "publish_date": "2026-04-21",
+                    "notes": "synthetic unit-test evidence metadata",
+                }
+            )
 
-    dropzone = repo / "data/reviewed_inputs" / WORKFLOW_ID / "business_disclosure"
-    dropzone.mkdir(parents=True)
+    dropzone_root = repo / "data/reviewed_inputs" / WORKFLOW_ID
+    dropzone_root.mkdir(parents=True)
+    if not include_dropzone_record:
+        return repo
+
+    dropzone = dropzone_root / "business_disclosure"
+    dropzone.mkdir()
     record = {
         "input_id": "input_real_business_001",
         "workflow_id": WORKFLOW_ID,
@@ -200,6 +216,71 @@ def write_synthetic_repo(tmp_path: Path, *, invalid_fixture: bool = False) -> Pa
         yaml.safe_dump({"records": [record]}, sort_keys=False), encoding="utf-8"
     )
     return repo
+
+
+@pytest.mark.parametrize("source_type", ["annual_report", "interim_report", "quarterly_report"])
+def test_card_5_2_allowed_with_empty_dropzone_and_real_official_anchor(
+    tmp_path: Path,
+    source_type: str,
+) -> None:
+    repo = write_synthetic_repo(
+        tmp_path,
+        include_dropzone_record=False,
+        source_type=source_type,
+    )
+
+    inventory = BUILDER.build_inventory(
+        repo,
+        WORKFLOW_ID,
+        STOCK_CODE,
+        Path("data/reviewed_inputs") / WORKFLOW_ID,
+    )
+
+    assert inventory["dropzone_validation"]["record_count"] == 0
+    assert inventory["quality_decision"]["card_5_1_stop_condition_triggered"] is False
+    assert inventory["quality_decision"]["card_5_2_allowed"] is True
+    assert inventory["quality_decision"]["g1_evidence_gate"] == "fail"
+    assert inventory["quality_decision"]["promotion_allowed"] is False
+    assert inventory["quality_decision"]["sample_quality_report_allowed"] is False
+    assert inventory["quality_decision"]["p2_allowed"] is False
+
+
+def test_card_5_2_not_allowed_without_real_official_anchor(tmp_path: Path) -> None:
+    repo = write_synthetic_repo(
+        tmp_path,
+        include_evidence=False,
+        include_dropzone_record=False,
+    )
+
+    inventory = BUILDER.build_inventory(
+        repo,
+        WORKFLOW_ID,
+        STOCK_CODE,
+        Path("data/reviewed_inputs") / WORKFLOW_ID,
+    )
+
+    assert item_by_type(inventory, "business_disclosure")["evidence_candidates"] == []
+    assert inventory["quality_decision"]["card_5_1_stop_condition_triggered"] is True
+    assert inventory["quality_decision"]["card_5_2_allowed"] is False
+
+
+def test_card_5_2_not_allowed_for_fixture_official_anchor(tmp_path: Path) -> None:
+    repo = write_synthetic_repo(
+        tmp_path,
+        invalid_fixture=True,
+        include_dropzone_record=False,
+    )
+
+    inventory = BUILDER.build_inventory(
+        repo,
+        WORKFLOW_ID,
+        STOCK_CODE,
+        Path("data/reviewed_inputs") / WORKFLOW_ID,
+    )
+
+    assert item_by_type(inventory, "business_disclosure")["evidence_candidates"] == []
+    assert inventory["quality_decision"]["card_5_1_stop_condition_triggered"] is True
+    assert inventory["quality_decision"]["card_5_2_allowed"] is False
 
 
 def test_valid_accepted_record_requires_resolvable_physical_evidence(tmp_path: Path) -> None:

@@ -1,0 +1,29 @@
+{
+  "artifact_type": "R5_bundle5_registry_idempotency_result",
+  "schema_version": "r5_bundle5_registry_idempotency_result_v0.1",
+  "status": "pass",
+  "first_promotion_status": "accepted_inputs_promoted",
+  "second_promotion_status": "accepted_inputs_unchanged",
+  "first_hashes": {
+    "market_peer": "79bca54df269daadd0c956bf0c146ef751fe82f06b5ca6a955461e552b77e100",
+    "forecast_assumptions": "040353bacb5fd07c223828d894ce764c328cade166173c4166531be9f36d9776",
+    "valuation_inputs": "091a2c97a3dbf826e28eff9153432d03c016b7aa8c7a8076c52a175fca5928e4",
+    "evidence_ledger": "020f72dfa35d99d4c74a966b9509cbbbf979311b64847bb3c799f439fb9959f6"
+  },
+  "second_hashes": {
+    "market_peer": "79bca54df269daadd0c956bf0c146ef751fe82f06b5ca6a955461e552b77e100",
+    "forecast_assumptions": "040353bacb5fd07c223828d894ce764c328cade166173c4166531be9f36d9776",
+    "valuation_inputs": "091a2c97a3dbf826e28eff9153432d03c016b7aa8c7a8076c52a175fca5928e4",
+    "evidence_ledger": "020f72dfa35d99d4c74a966b9509cbbbf979311b64847bb3c799f439fb9959f6"
+  },
+  "second_actions": {
+    "market_peer": "unchanged",
+    "forecast_assumptions": "unchanged",
+    "valuation_inputs": "unchanged",
+    "evidence_ledger": "unchanged"
+  },
+  "byte_level_idempotent": true,
+  "semantic_idempotent": true,
+  "sample_quality_report_allowed": false,
+  "p2_allowed": false
+}

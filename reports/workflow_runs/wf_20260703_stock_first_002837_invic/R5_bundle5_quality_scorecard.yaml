@@ -1,0 +1,138 @@
+artifact_type: R5_quality_scorecard_v2
+schema_version: r5_bundle5_quality_scorecard_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+allowed_report_level: reviewed_input_research_draft
+no_advice_gate_passed: true
+reviewed_input_flags:
+  reviewed_market_inputs_available: true
+  reviewed_peer_inputs_available: true
+  reviewed_forecast_assumptions_available: true
+  reviewed_business_disclosure_available: true
+  reviewed_valuation_inputs_available: true
+sections:
+- section_id: company_context
+  benchmark_dimension: company_context
+  readiness: ready
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  issues:
+  - MISSING_DISCLOSURE
+  limitations:
+  - liquid-cooling-specific financial contribution is not separately disclosed
+  fix_owner_skill: stock-deep-dive
+- section_id: financial_history_and_cash_flow_quality
+  benchmark_dimension: financial_history_and_cash_flow_quality
+  readiness: ready
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  issues: []
+  limitations:
+  - 2026Q1 is unaudited and should not be treated as a full-year pattern
+  fix_owner_skill: stock-deep-dive
+- section_id: business_breakdown_and_segment_economics
+  benchmark_dimension: business_breakdown_and_segment_economics
+  readiness: ready_with_limitations
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  issues:
+  - MISSING_DISCLOSURE
+  limitations:
+  - The issuer discloses liquid-cooling products but reports revenue and margin in
+    broader room/cabinet cooling categories.
+  - Broad product-line totals therefore cannot be relabeled as liquid-cooling-specific
+    financials.
+  fix_owner_skill: evidence-ingest
+- section_id: industry_structure_and_competition
+  benchmark_dimension: industry_structure_and_competition
+  readiness: source_gapped
+  evidence_ids: []
+  issues:
+  - TODO_SOURCE_REQUIRED
+  limitations:
+  - industry evidence is outside the current reviewed-input set
+  fix_owner_skill: segment-research
+- section_id: forecast
+  benchmark_dimension: forecast_assumptions_and_sensitivity
+  readiness: ready
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  issues: []
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  fix_owner_skill: stock-deep-dive
+- section_id: valuation
+  benchmark_dimension: valuation_methods_and_comparability
+  readiness: ready_with_limitations
+  evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  - ev_quarterly_report_002837_20260421_2f00c7
+  issues:
+  - LOW_CONFIDENCE_CLUE_ONLY
+  - UNREVIEWED_FCFF_INPUTS
+  - UNDISCLOSED_SEGMENT_SPLIT
+  limitations:
+  - Relative PE is low confidence because only two exposure-grounded peers are available.
+  - PE is below the peer median while PB and PS TTM are above their peer medians;
+    no single valuation label is supportable.
+  - No intrinsic or segment-sum method is active.
+  - Scenario multiples are research context, not price outputs.
+  fix_owner_skill: company-valuation
+- section_id: dated_market_or_technical_state_when_supported
+  benchmark_dimension: dated_market_or_technical_state_when_supported
+  readiness: ready_with_limitations
+  evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  issues:
+  - MISSING_PRICE_HISTORY
+  limitations:
+  - single-date snapshot only
+  fix_owner_skill: stock-deep-dive
+- section_id: dated_sentiment_and_events_when_supported
+  benchmark_dimension: dated_sentiment_and_events_when_supported
+  readiness: source_gapped
+  evidence_ids: []
+  issues:
+  - TODO_SOURCE_REQUIRED
+  limitations:
+  - dated sources are absent
+  fix_owner_skill: evidence-ingest
+- section_id: risks_counterevidence_and_open_questions
+  benchmark_dimension: risks_counterevidence_and_open_questions
+  readiness: ready
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  issues:
+  - MISSING_DISCLOSURE
+  - LOW_CONFIDENCE_CLUE_ONLY
+  limitations: []
+  fix_owner_skill: quality-review
+- section_id: research_conclusion_and_watch_conditions
+  benchmark_dimension: research_conclusion_and_watch_conditions
+  readiness: ready_with_limitations
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  issues:
+  - MISSING_DISCLOSURE
+  - LOW_CONFIDENCE_CLUE_ONLY
+  limitations:
+  - research-draft level only
+  fix_owner_skill: quality-review
+sample_quality_blockers:
+- liquid-cooling-specific financial split remains undisclosed
+- industry and dated event evidence remain source-gapped
+- peer set and relative valuation context remain low confidence
+- intrinsic and segment-sum methods remain ineligible
+next_actions:
+- run the non-promoting benchmark coverage precheck
+- retain all visible disclosure and method gaps
+sample_quality_report_allowed: false
+p2_allowed: false

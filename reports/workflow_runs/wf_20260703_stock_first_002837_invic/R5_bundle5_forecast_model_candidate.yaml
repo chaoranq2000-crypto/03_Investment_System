@@ -1,0 +1,663 @@
+artifact_type: R5_forecast_model_pack
+schema_version: r5_forecast_model_pack_v0.1
+status: ready
+as_of_date: '2026-07-10'
+model_type: reviewed_mechanical_base_with_sensitivity_scenarios
+forecast_years:
+- 2026E
+- 2027E
+- 2028E
+required_metrics:
+- revenue
+- gross_margin
+- gross_profit
+- net_profit_attributable
+- eps
+assumptions:
+- workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: forecast_assumptions
+  as_of_date: '2026-07-10'
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  capture_method: codex_model_assumption_review_user_authorized
+  no_live_api: true
+  periods: &id002
+  - 2026E
+  - 2027E
+  - 2028E
+  scenario: base
+  claim_type: estimate
+  management_guidance_used: false
+  metric_ids: &id003 []
+  supporting_metric_ids: &id004 []
+  sample_quality_allowed: false
+  input_id: r5_b5_forecast_revenue_growth_base
+  assumption_id: r5_b5_forecast_revenue_growth_base
+  driver: revenue_growth
+  metric_name: revenue_growth
+  source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  value:
+    2026E: 26.0291
+    2027E: 20.0
+    2028E: 15.0
+  unit: pct
+  scope: company
+  evidence_ids: &id001
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  supporting_evidence_ids: *id001
+  dependency_input_ids:
+  - r5_b5_business_2025_room_cooling_revenue
+  - r5_b5_business_2025_room_cooling_gross_margin
+  - r5_b5_business_2025_cabinet_cooling_revenue
+  - r5_b5_business_2025_cabinet_cooling_gross_margin
+  - r5_b5_business_2025_bus_air_conditioning_revenue
+  - r5_b5_business_2025_rail_air_conditioning_service_revenue
+  - r5_b5_business_2025_other_revenue
+  - r5_b5_business_2025_company_revenue
+  - r5_b5_business_2025_company_gross_margin
+  formula_by_period:
+    2026E: 2026Q1 revenue / 2025Q1 revenue - 1
+    2027E: 'model assumption: growth slows to 20%'
+    2028E: 'model assumption: growth slows to 15%'
+  sensitivity_range_by_period: &id010
+    2026E:
+      low: 20.0
+      high: 32.23
+    2027E:
+      low: 12.0
+      high: 25.0
+    2028E:
+      low: 8.0
+      high: 20.0
+  rationale: 2026 uses the reported Q1 year-on-year rate as a mechanical carry-forward;
+    later years are explicit slowing-growth model assumptions.
+  reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+    in the financial-history pack.
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+- workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: forecast_assumptions
+  as_of_date: '2026-07-10'
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  capture_method: codex_model_assumption_review_user_authorized
+  no_live_api: true
+  periods: *id002
+  scenario: base
+  claim_type: estimate
+  management_guidance_used: false
+  metric_ids: *id003
+  supporting_metric_ids: *id004
+  sample_quality_allowed: false
+  input_id: r5_b5_forecast_gross_margin_base
+  assumption_id: r5_b5_forecast_gross_margin_base
+  driver: gross_margin
+  metric_name: gross_margin
+  source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  value:
+    2026E: 24.2935
+    2027E: 25.5
+    2028E: 26.5
+  unit: pct
+  scope: margin
+  evidence_ids: &id005
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  supporting_evidence_ids: *id005
+  dependency_input_ids:
+  - r5_b5_business_2025_company_gross_margin
+  formula_by_period:
+    2026E: carry forward 2026Q1 derived gross margin
+    2027E: 'model assumption: partial recovery to 25.5%'
+    2028E: 'model assumption: partial recovery to 26.5%, below 2025A 27.86%'
+  sensitivity_range_by_period: &id011
+    2026E:
+      low: 23.0
+      high: 27.86
+    2027E:
+      low: 23.5
+      high: 27.86
+    2028E:
+      low: 24.0
+      high: 27.86
+  rationale: The base path starts from the reported Q1 cost/revenue ratio and only
+    partially normalizes toward the 2025 annual level.
+  reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+    in the financial-history pack.
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+- workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: forecast_assumptions
+  as_of_date: '2026-07-10'
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  capture_method: codex_model_assumption_review_user_authorized
+  no_live_api: true
+  periods: *id002
+  scenario: base
+  claim_type: estimate
+  management_guidance_used: false
+  metric_ids: *id003
+  supporting_metric_ids: *id004
+  sample_quality_allowed: false
+  input_id: r5_b5_forecast_opex_base
+  assumption_id: r5_b5_forecast_opex_base
+  driver: opex
+  metric_name: opex
+  source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  value:
+    2026E: 18.5321
+    2027E: 17.5
+    2028E: 16.5
+  unit: pct_of_revenue
+  scope: opex
+  evidence_ids: &id006
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  supporting_evidence_ids: *id006
+  dependency_input_ids: []
+  formula_by_period:
+    2026E: (2026Q1 selling + administrative + R&D expenses) / 2026Q1 revenue
+    2027E: 'model assumption: normalize to 17.5%'
+    2028E: 'model assumption: normalize to 16.5%, still above 2025A 15.5581%'
+  sensitivity_range_by_period:
+    2026E:
+      low: 15.5581
+      high: 19.5
+    2027E:
+      low: 15.5581
+      high: 18.5
+    2028E:
+      low: 15.0
+      high: 18.0
+  rationale: The expense ratio is a model input, not a reported full-year outcome;
+    it begins at the Q1 ratio and gradually normalizes.
+  reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+    in the financial-history pack.
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+- workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: forecast_assumptions
+  as_of_date: '2026-07-10'
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  capture_method: codex_model_assumption_review_user_authorized
+  no_live_api: true
+  periods: *id002
+  scenario: base
+  claim_type: estimate
+  management_guidance_used: false
+  metric_ids: *id003
+  supporting_metric_ids: *id004
+  sample_quality_allowed: false
+  input_id: r5_b5_forecast_net_profit_base
+  assumption_id: r5_b5_forecast_net_profit_base
+  driver: net_profit
+  metric_name: net_profit
+  source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+  value:
+    2026E: 94115513.02
+    2027E: 321179929.4
+    2028E: 580418015.27
+  unit: CNY
+  scope: company
+  evidence_ids: &id007
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  supporting_evidence_ids: *id007
+  dependency_input_ids: []
+  formula_by_period:
+    2026E: 2026Q1 attributable profit / (2025Q1 attributable profit / 2025A attributable
+      profit)
+    2027E: 2027E revenue * 3.5% model net margin
+    2028E: 2028E revenue * 5.5% model net margin
+  sensitivity_range_by_period: &id012
+    2026E:
+      low: 34630409.08
+      high: 521914773.0
+    2027E:
+      low: 183531388.23
+      high: 550594164.69
+    2028E:
+      low: 316591644.7
+      high: 738713837.62
+  rationale: The 2026 base is a mechanical prior-year seasonality run-rate; 2027-2028
+    margins are explicit model assumptions with wide ranges.
+  reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+    in the financial-history pack.
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+- workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: forecast_assumptions
+  as_of_date: '2026-07-10'
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  capture_method: codex_model_assumption_review_user_authorized
+  no_live_api: true
+  periods: *id002
+  scenario: base
+  claim_type: estimate
+  management_guidance_used: false
+  metric_ids: *id003
+  supporting_metric_ids: *id004
+  sample_quality_allowed: false
+  input_id: r5_b5_forecast_eps_base
+  assumption_id: r5_b5_forecast_eps_base
+  driver: eps
+  metric_name: eps
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  value:
+    2026E: 0.073854
+    2027E: 0.252034
+    2028E: 0.455462
+  unit: CNY_per_share
+  scope: company
+  evidence_ids: &id008
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  supporting_evidence_ids: *id008
+  dependency_input_ids:
+  - r5_b5_market_002837_20260710
+  - r5_b5_forecast_net_profit_base
+  formula_by_period:
+    2026E: 2026E attributable profit / 1,274,349,692 reviewed shares
+    2027E: 2027E attributable profit / 1,274,349,692 reviewed shares
+    2028E: 2028E attributable profit / 1,274,349,692 reviewed shares
+  sensitivity_range_by_period:
+    2026E:
+      low: 0.027175
+      high: 0.409559
+    2027E:
+      low: 0.14402
+      high: 0.432055
+    2028E:
+      low: 0.248424
+      high: 0.579677
+  rationale: EPS uses the reviewed same-date total-share count and the model net-profit
+    path; dilution after the snapshot is not assumed.
+  reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+    in the financial-history pack.
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+forecast_table:
+  base_case: &id009
+    2026E:
+      revenue:
+        value: 7647141176.21
+        unit: CNY
+        assumption_id: r5_b5_forecast_revenue_growth_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      gross_margin:
+        value: 24.2935
+        unit: pct
+        assumption_id: r5_b5_forecast_gross_margin_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      gross_profit:
+        value: 1857758241.64
+        unit: CNY
+        assumption_id: r5_b5_forecast_gross_margin_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      net_profit_attributable:
+        value: 94115513.02
+        unit: CNY
+        assumption_id: r5_b5_forecast_net_profit_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      eps:
+        value: 0.073854
+        unit: CNY_per_share
+        assumption_id: r5_b5_forecast_eps_base
+        evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+        metric_id: null
+        claim_type: estimate
+    2027E:
+      revenue:
+        value: 9176569411.45
+        unit: CNY
+        assumption_id: r5_b5_forecast_revenue_growth_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      gross_margin:
+        value: 25.5
+        unit: pct
+        assumption_id: r5_b5_forecast_gross_margin_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      gross_profit:
+        value: 2340025199.92
+        unit: CNY
+        assumption_id: r5_b5_forecast_gross_margin_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      net_profit_attributable:
+        value: 321179929.4
+        unit: CNY
+        assumption_id: r5_b5_forecast_net_profit_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      eps:
+        value: 0.252034
+        unit: CNY_per_share
+        assumption_id: r5_b5_forecast_eps_base
+        evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+        metric_id: null
+        claim_type: estimate
+    2028E:
+      revenue:
+        value: 10553054823.17
+        unit: CNY
+        assumption_id: r5_b5_forecast_revenue_growth_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      gross_margin:
+        value: 26.5
+        unit: pct
+        assumption_id: r5_b5_forecast_gross_margin_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      gross_profit:
+        value: 2796559528.14
+        unit: CNY
+        assumption_id: r5_b5_forecast_gross_margin_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      net_profit_attributable:
+        value: 580418015.27
+        unit: CNY
+        assumption_id: r5_b5_forecast_net_profit_base
+        evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+        metric_id: null
+        claim_type: estimate
+      eps:
+        value: 0.455462
+        unit: CNY_per_share
+        assumption_id: r5_b5_forecast_eps_base
+        evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+        metric_id: null
+        claim_type: estimate
+scenarios:
+  base_case:
+    status: ready
+    claim_type: estimate
+    forecast_table: *id009
+  bull_case:
+    status: sensitivity_estimate
+    claim_type: estimate
+    forecast_table:
+      2026E:
+        revenue:
+          value: 8023397846.76
+          unit: CNY
+          assumption_id: scenario_revenue_growth
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 27.86
+          unit: pct
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 2235318640.11
+          unit: CNY
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 240701935.4
+          unit: CNY
+          assumption_id: scenario_net_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.188882
+          unit: CNY_per_share
+          assumption_id: scenario_net_margin
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2027E:
+        revenue:
+          value: 10029247308.45
+          unit: CNY
+          assumption_id: scenario_revenue_growth
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 27.5
+          unit: pct
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 2758043009.82
+          unit: CNY
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 601754838.51
+          unit: CNY
+          assumption_id: scenario_net_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.472205
+          unit: CNY_per_share
+          assumption_id: scenario_net_margin
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2028E:
+        revenue:
+          value: 12035096770.13
+          unit: CNY
+          assumption_id: scenario_revenue_growth
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 27.0
+          unit: pct
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 3249476127.94
+          unit: CNY
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 962807741.61
+          unit: CNY
+          assumption_id: scenario_net_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.755529
+          unit: CNY_per_share
+          assumption_id: scenario_net_margin
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+    limitations:
+    - Upper sensitivity path is not management guidance.
+  bear_case:
+    status: sensitivity_estimate
+    claim_type: estimate
+    forecast_table:
+      2026E:
+        revenue:
+          value: 7281310909.86
+          unit: CNY
+          assumption_id: scenario_revenue_growth
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 23.0
+          unit: pct
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 1674701509.27
+          unit: CNY
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 36406554.55
+          unit: CNY
+          assumption_id: scenario_net_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.028569
+          unit: CNY_per_share
+          assumption_id: scenario_net_margin
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2027E:
+        revenue:
+          value: 8373507546.34
+          unit: CNY
+          assumption_id: scenario_revenue_growth
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 24.0
+          unit: pct
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 2009641811.12
+          unit: CNY
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 167470150.93
+          unit: CNY
+          assumption_id: scenario_net_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.131416
+          unit: CNY_per_share
+          assumption_id: scenario_net_margin
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2028E:
+        revenue:
+          value: 9210858300.97
+          unit: CNY
+          assumption_id: scenario_revenue_growth
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 25.0
+          unit: pct
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 2302714575.24
+          unit: CNY
+          assumption_id: scenario_gross_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 368434332.04
+          unit: CNY
+          assumption_id: scenario_net_margin
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.289116
+          unit: CNY_per_share
+          assumption_id: scenario_net_margin
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+    limitations:
+    - Lower sensitivity path is a model stress case.
+sensitivity_tests:
+- driver: revenue_growth
+  range_by_period: *id010
+  claim_type: estimate
+- driver: gross_margin
+  range_by_period: *id011
+  claim_type: estimate
+- driver: net_profit
+  range_by_period: *id012
+  claim_type: estimate
+consensus_comparison:
+  status: not_supplied
+  note: No consensus or third-party forecast was used.
+missing_items: []
+source_gap_register: []
+sample_quality_allowed: false
+p2_allowed: false

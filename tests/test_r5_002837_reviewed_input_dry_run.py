@@ -60,15 +60,18 @@ def test_current_002837_stubs_do_not_exceed_source_gapped_level():
     assert has_reviewed_valuation_inputs(valuation) is False
 
 
-def test_dry_run_result_preserves_all_reviewed_input_todos():
+def test_dry_run_result_reflects_promoted_physical_registries():
     result = load_yaml(RESULT_PATH)
 
-    assert result["allowed_report_level"] == "source_gapped_research_draft"
-    assert result["reviewed_market_inputs_available"] is False
-    assert result["reviewed_peer_inputs_available"] is False
-    assert result["reviewed_forecast_assumptions_available"] is False
-    assert result["reviewed_valuation_inputs_available"] is False
+    assert result["derivation_source"] == "validated_physical_registries"
+    assert result["allowed_report_level"] == "reviewed_input_research_draft"
+    assert result["reviewed_market_inputs_available"] is True
+    assert result["reviewed_peer_inputs_available"] is True
+    assert result["reviewed_forecast_assumptions_available"] is True
+    assert result["reviewed_business_disclosure_available"] is True
+    assert result["reviewed_valuation_inputs_available"] is True
     assert result["sample_quality_report_allowed"] is False
     assert result["p2_allowed"] is False
-    for token in ["TODO_MARKET_DATA", "TODO_PEER_DATA", "TODO_MODEL_INPUT", "MISSING_DISCLOSURE"]:
-        assert token in result["remaining_todos"]
+    assert result["remaining_todos"] == []
+    resolved = {row["token"] for row in result["todo_trace"] if row["status"] == "resolved"}
+    assert {"TODO_MARKET_DATA", "TODO_PEER_DATA", "TODO_MODEL_INPUT"} <= resolved

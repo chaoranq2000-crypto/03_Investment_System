@@ -1,0 +1,25 @@
+{
+  "artifact_type": "R5_reviewed_input_dropzone_validation",
+  "schema_version": "r5_reviewed_input_dropzone_validation_v0.1",
+  "status": "pass",
+  "checked_files": [
+    "reviewed_valuation_context.yaml"
+  ],
+  "record_count": 1,
+  "unique_workflow_ids": [
+    "wf_20260703_stock_first_002837_invic"
+  ],
+  "unique_stock_codes": [
+    "002837"
+  ],
+  "duplicate_input_ids": [],
+  "counts_by_input_type": {
+    "valuation_inputs": 1
+  },
+  "accepted_count": 1,
+  "accepted_degraded_count": 0,
+  "pending_count": 0,
+  "rejected_count": 0,
+  "failed_count": 0,
+  "issues": []
+}

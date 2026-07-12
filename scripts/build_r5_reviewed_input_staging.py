@@ -93,17 +93,14 @@ def build_staging_result(
             "reviewed_valuation_inputs_available",
         ]
     )
-    has_all_accepted = has_core_accepted and flags["reviewed_business_disclosure_available"]
     if validation["status"] != "pass":
         allowed_report_level = "blocked"
-    elif has_all_accepted and not remaining_todos:
-        allowed_report_level = "sample_quality_candidate"
     elif has_core_accepted:
         allowed_report_level = "reviewed_input_research_draft"
     else:
         allowed_report_level = "source_gapped_research_draft"
 
-    sample_quality_allowed = allowed_report_level == "sample_quality_candidate"
+    sample_quality_allowed = False
     return {
         "artifact_type": "R5_reviewed_input_staging_result",
         "schema_version": "r5_reviewed_input_staging_result_v0.1",
@@ -133,6 +130,7 @@ def build_staging_result(
             "Accepted-only flags are derived only from review_status=accepted rows.",
             "accepted_degraded rows may preserve limitations but do not allow sample-quality.",
             "Templates are not evidence and are not counted as accepted inputs.",
+            "Reviewed-input staging is capped at research-draft level; a later independent quality gate is required for any higher level.",
         ],
     }
 

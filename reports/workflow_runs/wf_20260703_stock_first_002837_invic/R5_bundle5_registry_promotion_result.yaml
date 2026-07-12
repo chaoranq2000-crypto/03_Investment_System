@@ -1,0 +1,205 @@
+artifact_type: R5_reviewed_input_registry_promotion_result
+schema_version: r5_reviewed_input_registry_promotion_result_v0.2
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+fixture_mode: false
+dry_run: false
+no_live_api: true
+dropzone_root: C:\Projects\03_Investment_System\data\reviewed_inputs\wf_20260703_stock_first_002837_invic
+output_run_dir: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic
+validation_status: pass
+validation_issues: []
+promotion_status: accepted_inputs_promoted
+registries_changed: true
+allowed_report_level: reviewed_input_research_draft
+sample_quality_report_allowed: false
+p2_allowed: false
+accepted_count: 22
+accepted_degraded_count: 0
+accepted_input_ids:
+- r5_b5_business_2025_bus_air_conditioning_revenue
+- r5_b5_business_2025_cabinet_cooling_gross_margin
+- r5_b5_business_2025_cabinet_cooling_revenue
+- r5_b5_business_2025_company_gross_margin
+- r5_b5_business_2025_company_revenue
+- r5_b5_business_2025_other_revenue
+- r5_b5_business_2025_rail_air_conditioning_service_revenue
+- r5_b5_business_2025_room_cooling_gross_margin
+- r5_b5_business_2025_room_cooling_revenue
+- r5_b5_forecast_eps_base
+- r5_b5_forecast_gross_margin_base
+- r5_b5_forecast_net_profit_base
+- r5_b5_forecast_opex_base
+- r5_b5_forecast_revenue_growth_base
+- r5_b5_market_002837_20260710
+- r5_b5_peer_300499_pb_20260710
+- r5_b5_peer_300499_pe_ttm_20260710
+- r5_b5_peer_300499_ps_ttm_20260710
+- r5_b5_peer_301018_pb_20260710
+- r5_b5_peer_301018_pe_ttm_20260710
+- r5_b5_peer_301018_ps_ttm_20260710
+- r5_b5_valuation_context_002837_20260710
+accepted_degraded_input_ids: []
+reviewed_flags_from_accepted_rows:
+  reviewed_market_inputs_available: true
+  reviewed_peer_inputs_available: true
+  reviewed_forecast_assumptions_available: true
+  reviewed_business_disclosure_available: true
+  reviewed_valuation_inputs_available: true
+remaining_todos: []
+registry_paths:
+  market_peer: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_market_peer_input_registry.yaml
+  forecast_assumptions: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_forecast_assumption_registry.yaml
+  valuation_inputs: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_valuation_input_registry.yaml
+  evidence_ledger: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_evidence_request_review_ledger.yaml
+registry_results:
+  market_peer:
+    target_path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_market_peer_input_registry.yaml
+    action: unchanged
+    planned_action: unchanged
+    before_hash: 79bca54df269daadd0c956bf0c146ef751fe82f06b5ca6a955461e552b77e100
+    after_hash: 79bca54df269daadd0c956bf0c146ef751fe82f06b5ca6a955461e552b77e100
+    promoted_input_ids:
+    - r5_b5_market_002837_20260710
+    - r5_b5_peer_300499_pb_20260710
+    - r5_b5_peer_300499_pe_ttm_20260710
+    - r5_b5_peer_300499_ps_ttm_20260710
+    - r5_b5_peer_301018_pb_20260710
+    - r5_b5_peer_301018_pe_ttm_20260710
+    - r5_b5_peer_301018_ps_ttm_20260710
+    validation:
+      decision: accepted
+      validators:
+      - name: market_peer_registry
+        decision: accepted
+        issues: []
+      issues: []
+  forecast_assumptions:
+    target_path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_forecast_assumption_registry.yaml
+    action: updated
+    planned_action: updated
+    before_hash: 94ffbfebaf7eb96bd831dcb36091aeebb337fa74f51893308c1fb5f4a4185f83
+    after_hash: 040353bacb5fd07c223828d894ce764c328cade166173c4166531be9f36d9776
+    promoted_input_ids:
+    - r5_b5_forecast_eps_base
+    - r5_b5_forecast_gross_margin_base
+    - r5_b5_forecast_net_profit_base
+    - r5_b5_forecast_opex_base
+    - r5_b5_forecast_revenue_growth_base
+    validation:
+      decision: accepted
+      validators:
+      - name: forecast_registry
+        decision: accepted
+        issues: []
+      - name: forecast_downstream
+        decision: accepted
+        issues:
+        - &id001
+          issue_id: R5ASM-ROW-002
+          severity: medium
+          path: assumptions[0].supporting_metric_ids
+          description: supporting_metric_ids is required
+        - &id002
+          issue_id: R5ASM-ROW-002
+          severity: medium
+          path: assumptions[1].supporting_metric_ids
+          description: supporting_metric_ids is required
+        - &id003
+          issue_id: R5ASM-ROW-002
+          severity: medium
+          path: assumptions[2].supporting_metric_ids
+          description: supporting_metric_ids is required
+        - &id004
+          issue_id: R5ASM-ROW-002
+          severity: medium
+          path: assumptions[3].supporting_metric_ids
+          description: supporting_metric_ids is required
+        - &id005
+          issue_id: R5ASM-ROW-002
+          severity: medium
+          path: assumptions[4].supporting_metric_ids
+          description: supporting_metric_ids is required
+      issues:
+      - *id001
+      - *id002
+      - *id003
+      - *id004
+      - *id005
+  valuation_inputs:
+    target_path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_valuation_input_registry.yaml
+    action: unchanged
+    planned_action: unchanged
+    before_hash: 091a2c97a3dbf826e28eff9153432d03c016b7aa8c7a8076c52a175fca5928e4
+    after_hash: 091a2c97a3dbf826e28eff9153432d03c016b7aa8c7a8076c52a175fca5928e4
+    promoted_input_ids:
+    - r5_b5_business_2025_bus_air_conditioning_revenue
+    - r5_b5_business_2025_cabinet_cooling_gross_margin
+    - r5_b5_business_2025_cabinet_cooling_revenue
+    - r5_b5_business_2025_company_gross_margin
+    - r5_b5_business_2025_company_revenue
+    - r5_b5_business_2025_other_revenue
+    - r5_b5_business_2025_rail_air_conditioning_service_revenue
+    - r5_b5_business_2025_room_cooling_gross_margin
+    - r5_b5_business_2025_room_cooling_revenue
+    - r5_b5_forecast_eps_base
+    - r5_b5_forecast_gross_margin_base
+    - r5_b5_forecast_net_profit_base
+    - r5_b5_forecast_opex_base
+    - r5_b5_forecast_revenue_growth_base
+    - r5_b5_market_002837_20260710
+    - r5_b5_peer_300499_pb_20260710
+    - r5_b5_peer_300499_pe_ttm_20260710
+    - r5_b5_peer_300499_ps_ttm_20260710
+    - r5_b5_peer_301018_pb_20260710
+    - r5_b5_peer_301018_pe_ttm_20260710
+    - r5_b5_peer_301018_ps_ttm_20260710
+    - r5_b5_valuation_context_002837_20260710
+    validation:
+      decision: sample_quality_candidate
+      validators:
+      - name: valuation_inputs
+        decision: sample_quality_candidate
+        issues: []
+      issues: []
+  evidence_ledger:
+    target_path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_evidence_request_review_ledger.yaml
+    action: unchanged
+    planned_action: unchanged
+    before_hash: 020f72dfa35d99d4c74a966b9509cbbbf979311b64847bb3c799f439fb9959f6
+    after_hash: 020f72dfa35d99d4c74a966b9509cbbbf979311b64847bb3c799f439fb9959f6
+    promoted_input_ids:
+    - r5_b5_business_2025_bus_air_conditioning_revenue
+    - r5_b5_business_2025_cabinet_cooling_gross_margin
+    - r5_b5_business_2025_cabinet_cooling_revenue
+    - r5_b5_business_2025_company_gross_margin
+    - r5_b5_business_2025_company_revenue
+    - r5_b5_business_2025_other_revenue
+    - r5_b5_business_2025_rail_air_conditioning_service_revenue
+    - r5_b5_business_2025_room_cooling_gross_margin
+    - r5_b5_business_2025_room_cooling_revenue
+    - r5_b5_forecast_eps_base
+    - r5_b5_forecast_gross_margin_base
+    - r5_b5_forecast_net_profit_base
+    - r5_b5_forecast_opex_base
+    - r5_b5_forecast_revenue_growth_base
+    - r5_b5_market_002837_20260710
+    - r5_b5_peer_300499_pb_20260710
+    - r5_b5_peer_300499_pe_ttm_20260710
+    - r5_b5_peer_300499_ps_ttm_20260710
+    - r5_b5_peer_301018_pb_20260710
+    - r5_b5_peer_301018_pe_ttm_20260710
+    - r5_b5_peer_301018_ps_ttm_20260710
+    - r5_b5_valuation_context_002837_20260710
+    validation:
+      decision: accepted_with_todos
+      validators:
+      - name: evidence_ledger
+        decision: accepted_with_todos
+        issues: []
+      issues: []
+notes:
+- Only review_status=accepted rows become registry facts.
+- All intake decisions remain traceable in the evidence review ledger.
+- Registry promotion is capped at reviewed-input research-draft level; it never opens
+  sample-quality or P2.

@@ -99,7 +99,7 @@ def render_source_gapped_research_draft(*, pack_path: Path, output_path: Path) -
     if "sample-quality" in text.lower() or "sample_quality" in text.lower():
         raise ValueError("source-gapped draft must not carry sample-quality marker")
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(text + "\n", encoding="utf-8")
+    output_path.write_text(text.rstrip() + "\n", encoding="utf-8")
     return {"output_path": str(output_path), "source_gap_count": len(gaps), "output_type": "source_gapped_research_draft"}
 
 
@@ -110,6 +110,96 @@ def _load_optional_yaml(path: Path | None) -> object:
 def _scorecard_sections(scorecard: Mapping[str, object]) -> list[Mapping[str, object]]:
     sections = scorecard.get("sections")
     return [section for section in sections if isinstance(section, Mapping)] if isinstance(sections, list) else []
+
+
+def _mapping_list(value: object) -> list[Mapping[str, object]]:
+    return [row for row in value if isinstance(row, Mapping)] if isinstance(value, list) else []
+
+
+def _joined_ids(row: Mapping[str, object]) -> str:
+    values: list[str] = []
+    for key in ("evidence_ids", "claim_ids", "metric_ids", "assumption_ids", "input_ids"):
+        raw = row.get(key)
+        if isinstance(raw, list):
+            values.extend(str(item) for item in raw if item)
+    return ", ".join(dict.fromkeys(values)) or "TODO_SOURCE_REQUIRED"
+
+
+def _material_claim_rows(pack: Mapping[str, object]) -> list[list[object]]:
+    rows: list[list[object]] = [["claim_id", "类型", "期间", "结论", "证据/输入锚点", "来源与方法"]]
+    for claim in _mapping_list(pack.get("material_claims")):
+        source_method = " / ".join(
+            str(value)
+            for value in (claim.get("source_path"), claim.get("calculation_method"))
+            if value
+        )
+        rows.append(
+            [
+                claim.get("claim_id", ""),
+                claim.get("claim_type", "unknown"),
+                claim.get("period", ""),
+                claim.get("statement", ""),
+                _joined_ids(claim),
+                source_method,
+            ]
+        )
+    return rows
+
+
+def _report_section_rows(section: Mapping[str, object]) -> list[list[object]]:
+    columns = _mapping_list(section.get("columns"))
+    data_rows = _mapping_list(section.get("rows"))
+    if not columns or not data_rows:
+        return []
+    rows: list[list[object]] = [[column.get("label", column.get("key", "")) for column in columns]]
+    for data_row in data_rows:
+        rows.append([data_row.get(str(column.get("key", "")), "") for column in columns])
+    return rows
+
+
+def _append_grounded_sections(lines: list[str], pack: Mapping[str, object]) -> None:
+    material_claims = _mapping_list(pack.get("material_claims"))
+    if material_claims:
+        lines.extend(
+            [
+                "## 重要结论与可追溯锚点",
+                "",
+                "下表区分 fact、estimate 与 inference；每条重要结论均保留证据或审查输入锚点。",
+                "",
+                _table(_material_claim_rows(pack)),
+                "",
+            ]
+        )
+
+    for section in _mapping_list(pack.get("report_sections")):
+        title = section.get("title", section.get("section_id", "section"))
+        lines.extend([f"## {title}", "", f"- readiness: {section.get('readiness', 'source_gapped')}"])
+        evidence_ids = section.get("evidence_ids")
+        if isinstance(evidence_ids, list) and evidence_ids:
+            lines.append(f"- evidence_ids: {', '.join(str(item) for item in evidence_ids)}")
+        for paragraph in section.get("narrative", []) if isinstance(section.get("narrative"), list) else []:
+            lines.extend(["", str(paragraph)])
+        table_rows = _report_section_rows(section)
+        if table_rows:
+            lines.extend(["", _table(table_rows)])
+        for limitation in section.get("limitations", []) if isinstance(section.get("limitations"), list) else []:
+            lines.append(f"- limitation: {limitation}")
+        for gap in section.get("visible_gaps", []) if isinstance(section.get("visible_gaps"), list) else []:
+            lines.append(f"- visible_gap: {gap}")
+        lines.append("")
+
+    conflicts = _mapping_list(pack.get("data_definition_conflicts"))
+    if conflicts:
+        lines.extend(["## 数据时点与口径冲突处理", ""])
+        for row in conflicts:
+            lines.append(
+                "- {conflict_id} | {status} | {handling}".format(
+                    conflict_id=row.get("conflict_id", "conflict"),
+                    status=row.get("status", "visible"),
+                    handling=row.get("handling", "keep definitions separate"),
+                )
+            )
+        lines.append("")
 
 
 def render_reviewed_input_research_draft(
@@ -146,6 +236,8 @@ def render_reviewed_input_research_draft(
         f"- no_advice_boundary: {quality.get('no_advice_gate_passed', True)}",
         "",
     ]
+
+    _append_grounded_sections(lines, pack)
 
     for section in _scorecard_sections(scorecard_raw):
         section_id = section.get("section_id", "section")
@@ -193,7 +285,7 @@ def render_reviewed_input_research_draft(
     if output_type != "sample_quality_candidate" and "sample_quality_candidate" in text:
         raise ValueError("reviewed-input draft must not claim sample_quality_candidate")
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(text + "\n", encoding="utf-8")
+    output_path.write_text(text.rstrip() + "\n", encoding="utf-8")
     return {"output_path": str(output_path), "reviewed_sections": rendered_sections, "output_type": output_type}
 
 

@@ -1,0 +1,41 @@
+records:
+- input_id: r5_b5_market_002837_20260710
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: market_snapshot
+  as_of_date: '2026-07-10'
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  capture_method: archived_tushare_snapshot_then_codex_offline_review_user_authorized
+  no_live_api: true
+  limitations:
+  - Trailing multiples reflect historical reported metrics and are not forward estimates.
+  - Source-reported market capitalization is retained instead of recomputing from
+    rounded close and shares.
+  market_date: '2026-07-10'
+  as_of_timestamp: '2026-07-10T15:00:00+08:00'
+  timezone: Asia/Shanghai
+  exchange: SZSE
+  price_adjustment_convention: unadjusted_cash_close_from_daily_basic
+  close_price: 73.54
+  close_price_unit: CNY_per_share
+  share_count_basis: daily_basic_total_share_end_of_day
+  shares_outstanding: 1274349692
+  shares_outstanding_unit: shares
+  market_cap: 93715669584
+  market_cap_unit: CNY
+  market_cap_method: source_reported_total_mv_native_10k_CNY_x10000
+  rounded_close_times_shares: 93715676349.68
+  rounded_close_times_shares_difference_cny: -6765.68
+  currency: CNY
+  pe: 179.5613
+  pe_ttm: 194.2045
+  pb: 27.0715
+  ps: 15.4449
+  ps_ttm: 14.8507
+  freshness_status: latest_completed_trading_day_at_review
+  source_path: data/raw/market_data/tushare_daily_basic_peer_set_2026-07-10_eb0c080a.json
+  sample_quality_allowed: false

@@ -1,0 +1,203 @@
+artifact_type: R5_valuation_pack
+schema_version: r5_valuation_pack_v0.2
+status: partial
+as_of_date: '2026-07-10'
+market_snapshot:
+  as_of_date: '2026-07-10'
+  current_price:
+    value: 73.54
+    unit: CNY_per_share
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    metric_id: null
+    calculation_method: direct
+  market_cap:
+    value: 93715669584
+    unit: CNY
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    metric_id: null
+    calculation_method: daily_basic total_mv x 10000
+  share_count:
+    value: 1274349692
+    unit: shares
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    metric_id: null
+    calculation_method: daily_basic total_share x 10000
+  net_cash_or_net_debt:
+    value: 698135329.67
+    unit: CNY_net_debt_proxy
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    metric_id: null
+    calculation_method: short-term borrowings + current non-current liabilities +
+      long-term borrowings + lease liabilities - cash
+  enterprise_value:
+    value: 94413804913.67
+    unit: CNY
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    metric_id: null
+    calculation_method: market_cap + reviewed_Q1_net_debt_bridge
+  pe_ttm:
+    value: 194.2045
+    unit: multiple
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    metric_id: null
+    calculation_method: direct
+  forward_pe:
+    value:
+      2026E: 995.75
+      2027E: 291.79
+      2028E: 161.46
+    unit: multiple
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    metric_id: null
+    calculation_method: current_price / reviewed model EPS
+  pb:
+    value: 27.0715
+    unit: multiple
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    metric_id: null
+    calculation_method: direct
+  ps:
+    value: 14.8507
+    unit: multiple_TTM
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    metric_id: null
+    calculation_method: direct
+  ev_ebitda:
+    value: null
+    unit: multiple
+    evidence_id: null
+    metric_id: null
+    calculation_method: direct
+    missing_reason: METHOD_NOT_ELIGIBLE_WITHOUT_REVIEWED_EBITDA
+peer_valuation_context:
+  status: reviewed_low_confidence
+  rows:
+  - peer_stock_code: '301018'
+    peer_company_name: 申菱环境
+    metric_name: pe_ttm
+    multiple_value: 234.3524
+    unit: multiple
+    as_of_date: '2026-07-10'
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    input_id: r5_b5_peer_301018_pe_ttm_20260710
+  - peer_stock_code: '300499'
+    peer_company_name: 高澜股份
+    metric_name: pe_ttm
+    multiple_value: 385.8974
+    unit: multiple
+    as_of_date: '2026-07-10'
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    input_id: r5_b5_peer_300499_pe_ttm_20260710
+  peer_set_quality: low
+  peer_median_pe_ttm: 310.1249
+  limitations:
+  - Only two product-exposure peers; business mixes and disclosure quality differ.
+valuation_methods:
+- method_id: relative_pe
+  method_type: relative
+  status: ready
+  supported_output:
+    metric: cross_multiple_relative_context
+    subject:
+      pe_ttm: 194.2045
+      pb: 27.0715
+      ps_ttm: 14.8507
+    peer_median:
+      pe_ttm: 310.1249
+      pb: 12.33865
+      ps_ttm: 11.32265
+    label: mixed_multiple_signal_not_assessable
+  source_ids_or_missing_reason:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  - r5_b5_peer_301018_pe_ttm_20260710
+  - r5_b5_peer_301018_pb_20260710
+  - r5_b5_peer_301018_ps_ttm_20260710
+  - r5_b5_peer_300499_pe_ttm_20260710
+  - r5_b5_peer_300499_pb_20260710
+  - r5_b5_peer_300499_ps_ttm_20260710
+  confidence: low
+- method_id: dcf
+  method_type: forecast_dependent
+  status: skipped
+  supported_output: null
+  forecast_assumption_ids:
+  - r5_b5_forecast_revenue_growth_base
+  - r5_b5_forecast_gross_margin_base
+  - r5_b5_forecast_opex_base
+  - r5_b5_forecast_net_profit_base
+  - r5_b5_forecast_eps_base
+  forecast_metric_ids: []
+  source_ids_or_missing_reason: METHOD_EXCLUDED_UNREVIEWED_FCFF_AND_DISCOUNT_INPUTS
+- method_id: sotp
+  method_type: segment_dependent
+  status: skipped
+  supported_output: null
+  source_ids_or_missing_reason: METHOD_EXCLUDED_UNDISCLOSED_LIQUID_COOLING_SPLIT
+valuation_scenarios:
+- scenario_id: bear
+  status: research_estimate
+  method_id: relative_pe
+  output_metric: reference_pe_multiple
+  output_value: 234.3524
+  unit: multiple
+  source_ids_or_missing_reason: ev_structured_market_data_002837_20260710_eb0c08
+- scenario_id: base
+  status: research_estimate
+  method_id: relative_pe
+  output_metric: reference_pe_multiple
+  output_value: 310.1249
+  unit: multiple
+  source_ids_or_missing_reason: ev_structured_market_data_002837_20260710_eb0c08
+- scenario_id: bull
+  status: research_estimate
+  method_id: relative_pe
+  output_metric: reference_pe_multiple
+  output_value: 385.8974
+  unit: multiple
+  source_ids_or_missing_reason: ev_structured_market_data_002837_20260710_eb0c08
+valuation_sensitivity:
+  status: reviewed_estimate
+  rows:
+  - period: 2026E
+    model_eps: 0.073854
+    current_price: 73.54
+    forward_pe: 995.75
+    unit: multiple
+    assumption_id: r5_b5_forecast_eps_base
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  - period: 2027E
+    model_eps: 0.252034
+    current_price: 73.54
+    forward_pe: 291.79
+    unit: multiple
+    assumption_id: r5_b5_forecast_eps_base
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  - period: 2028E
+    model_eps: 0.455462
+    current_price: 73.54
+    forward_pe: 161.46
+    unit: multiple
+    assumption_id: r5_b5_forecast_eps_base
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  interpretation_boundary: Sensitivity holds the dated market price constant and varies
+    only the reviewed model EPS path.
+limitations:
+- Relative PE is low confidence because only two exposure-grounded peers are available.
+- PE is below the peer median while PB and PS TTM are above their peer medians; no
+  single valuation label is supportable.
+- No intrinsic or segment-sum method is active.
+- Scenario multiples are research context, not price outputs.
+missing_items:
+- item: ev_ebitda
+  reason: METHOD_NOT_ELIGIBLE_WITHOUT_REVIEWED_EBITDA
+- item: dcf
+  reason: METHOD_EXCLUDED_UNREVIEWED_FCFF_AND_DISCOUNT_INPUTS
+- item: sotp
+  reason: METHOD_EXCLUDED_UNDISCLOSED_LIQUID_COOLING_SPLIT
+source_gap_register:
+- gap_id: R5_B5_DCF_METHOD_GAP
+  token: UNREVIEWED_FCFF_INPUTS
+- gap_id: R5_B5_SOTP_METHOD_GAP
+  token: UNDISCLOSED_SEGMENT_SPLIT
+sample_quality_allowed: false
+p2_allowed: false

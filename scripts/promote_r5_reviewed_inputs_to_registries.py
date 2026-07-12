@@ -411,6 +411,8 @@ def _build_forecast_registry(
         "no_live_api": True,
         "assumptions": assumptions,
         "blocking_rules": ["fixture assumptions never open sample-quality or P2"],
+        "sample_quality_report_allowed": False,
+        "p2_allowed": False,
     }
 
 
@@ -451,8 +453,11 @@ def _merge_forecast(
         if driver not in seen:
             merged_rows.append(copy.deepcopy(old_row))
     merged = copy.deepcopy(candidate)
+    stale_when_fully_reviewed = {"forecast_model_interlock"}
     for key, value in existing.items():
-        if key != "assumptions":
+        if key != "assumptions" and not (
+            candidate.get("review_status") == "reviewed" and key in stale_when_fully_reviewed
+        ):
             merged.setdefault(key, copy.deepcopy(value))
     merged["assumptions"] = sorted(merged_rows, key=lambda row: (CORE_FORECAST_DRIVERS.index(str(row.get("driver"))) if str(row.get("driver")) in CORE_FORECAST_DRIVERS else 99, str(row.get("driver")), str(row.get("assumption_id"))))
     reviewed_drivers = {str(row.get("driver")) for row in merged_rows if row.get("review_status") == "reviewed"}
@@ -841,11 +846,6 @@ def _promotion_level(flags: dict[str, bool], fixture_mode: bool) -> str:
             "reviewed_valuation_inputs_available",
         ]
     )
-    all_ready = core_ready and flags["reviewed_business_disclosure_available"]
-    if fixture_mode and core_ready:
-        return "reviewed_input_research_draft"
-    if all_ready:
-        return "sample_quality_candidate"
     if core_ready:
         return "reviewed_input_research_draft"
     return "source_gapped_research_draft"
@@ -886,7 +886,7 @@ def _result(
         "promotion_status": promotion_status,
         "registries_changed": registries_changed,
         "allowed_report_level": allowed_level,
-        "sample_quality_report_allowed": False if fixture_mode else allowed_level == "sample_quality_candidate",
+        "sample_quality_report_allowed": False,
         "p2_allowed": False,
         "accepted_count": len(accepted),
         "accepted_degraded_count": len(degraded),
@@ -899,7 +899,7 @@ def _result(
         "notes": [
             "Only review_status=accepted rows become registry facts.",
             "All intake decisions remain traceable in the evidence review ledger.",
-            "Fixture mode never opens sample-quality or P2.",
+            "Registry promotion is capped at reviewed-input research-draft level; it never opens sample-quality or P2.",
         ],
     }
 

@@ -1,0 +1,2463 @@
+schema_version: r5_bundle5_stock_research_pack_v0.1
+artifact_type: R5_stock_research_pack
+status: accepted_with_todos
+pack_status: research_draft
+metadata:
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  company_id: cn_002837_invic
+  as_of_date: '2026-07-10'
+  registry_derivation: validated_physical_registries
+as_of_date: '2026-07-10'
+workflow_id: wf_20260703_stock_first_002837_invic
+stock:
+  company_name: 英维克
+  stock_code: 002837
+  exchange: SZSE
+  currency: CNY
+  fiscal_year_latest: 2025A
+  report_authoring_date: '2026-07-12'
+quality_status:
+  r5_gate_status: R5_REVIEWED_INPUT_PILOT_ALLOWED
+  allowed_report_level: reviewed_input_research_draft
+  high_issue_count: 0
+  medium_issue_count: 6
+  source_gap_visible: true
+  no_advice_gate_passed: true
+  sample_quality_report_allowed: false
+  p2_allowed: false
+company_identity_pack:
+  status: ready
+  company_id: cn_002837_invic
+  stock_code: 002837
+  company_name: 英维克
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+source_gap_policy:
+  source_gap_visible: true
+  missing_value_tokens:
+  - MISSING_DISCLOSURE
+  - TODO_SOURCE_REQUIRED
+  - TODO_MODEL_INPUT
+  - TODO_MARKET_DATA
+  - TODO_PEER_DATA
+  - LOW_CONFIDENCE_CLUE_ONLY
+  note: Policy tokens are an enum; only source_gap_register rows are active gaps.
+evidence_snapshot_pack:
+  status: ready
+  as_of_date: '2026-07-10'
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_interim_report_002837_20250819_47054e
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  source_paths:
+  - data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  - data/raw/announcements/cninfo_2025_interim_report_full_002837_2025-08-19.pdf
+  - data/raw/announcements/szse_2026_q1_report_002837_2026-04-21.pdf
+  - data/raw/market_data/tushare_daily_basic_peer_set_2026-07-10_eb0c080a.json
+financial_history_pack:
+  artifact_type: R5_financial_history_pack
+  schema_version: r5_financial_history_pack_v0.1
+  status: ready
+  as_of_date: '2026-04-21'
+  currency: CNY
+  periods:
+  - 2023A
+  - 2024A
+  - 2025A
+  - 2026Q1
+  income_statement:
+  - metric_name: revenue
+    period: 2023A
+    value: 3528859077.13
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: net_profit_attributable
+    period: 2023A
+    value: 344006335.07
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: net_profit_ex_items
+    period: 2023A
+    value: 316268801.76
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: revenue
+    period: 2024A
+    value: 4588819487.27
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: net_profit_attributable
+    period: 2024A
+    value: 452664369.42
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: net_profit_ex_items
+    period: 2024A
+    value: 429719858.69
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: revenue
+    period: 2025A
+    value: 6067759091.55
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: net_profit_attributable
+    period: 2025A
+    value: 521914773.0
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: net_profit_ex_items
+    period: 2025A
+    value: 503698695.52
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: revenue
+    period: 2026Q1
+    value: 1175329313.61
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 2; 一、主要财务数据
+    claim_type: fact
+  - metric_name: net_profit_attributable
+    period: 2026Q1
+    value: 8657602.27
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 2; 一、主要财务数据
+    claim_type: fact
+  - metric_name: net_profit_ex_items
+    period: 2026Q1
+    value: 5392856.48
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 2; 一、主要财务数据
+    claim_type: fact
+  balance_sheet:
+  - metric_name: total_assets
+    period: 2023A
+    value: 5091055172.06
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: equity_attributable
+    period: 2023A
+    value: 2486071338.29
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: total_assets
+    period: 2024A
+    value: 6014413898.7
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: equity_attributable
+    period: 2024A
+    value: 2915892117.15
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: total_assets
+    period: 2025A
+    value: 7747255663.66
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: equity_attributable
+    period: 2025A
+    value: 3445641008.79
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: total_assets
+    period: 2026Q1
+    value: 7761763222.65
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 2; 一、主要财务数据
+    claim_type: fact
+  - metric_name: equity_attributable
+    period: 2026Q1
+    value: 3461780265.25
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 2; 一、主要财务数据
+    claim_type: fact
+  cashflow_statement:
+  - metric_name: operating_cashflow
+    period: 2023A
+    value: 453072040.34
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: operating_cashflow
+    period: 2024A
+    value: 199835014.95
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: operating_cashflow
+    period: 2025A
+    value: 157273222.36
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: operating_cashflow
+    period: 2026Q1
+    value: -386363968.71
+    unit: CNY
+    currency: CNY
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 2; 一、主要财务数据
+    claim_type: fact
+  key_metrics:
+  - metric_name: basic_eps
+    period: 2023A
+    value: 0.47
+    unit: CNY_per_share
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: weighted_roe
+    period: 2023A
+    value: 15.03
+    unit: pct
+    currency: null
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: basic_eps
+    period: 2024A
+    value: 0.47
+    unit: CNY_per_share
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: weighted_roe
+    period: 2024A
+    value: 16.88
+    unit: pct
+    currency: null
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: basic_eps
+    period: 2025A
+    value: 0.54
+    unit: CNY_per_share
+    currency: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: weighted_roe
+    period: 2025A
+    value: 16.58
+    unit: pct
+    currency: null
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 7; 第二节六、主要会计数据和财务指标
+    claim_type: fact
+  - metric_name: basic_eps
+    period: 2026Q1
+    value: 0.01
+    unit: CNY_per_share
+    currency: CNY
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 2; 一、主要财务数据
+    claim_type: fact
+  - metric_name: weighted_roe
+    period: 2026Q1
+    value: 0.25
+    unit: pct
+    currency: null
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 2; 一、主要财务数据
+    claim_type: fact
+  - metric_name: gross_margin
+    period: 2025A
+    value: 27.86
+    unit: pct
+    currency: null
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+    page_or_table_locator: PDF page 16; 第三节四、2（2）
+    claim_type: fact
+  - metric_name: gross_margin
+    period: 2026Q1
+    value: 24.2935
+    unit: pct
+    currency: null
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    metric_id: null
+    calculation_method: (revenue - operating_cost) / revenue * 100; revenue=1175329313.61;
+      operating_cost=889801134.41
+    page_or_table_locator: PDF page 9; 合并利润表
+    claim_type: inference
+  financial_quality:
+    revenue_quality: 2023-2025 audited annual figures; 2026Q1 unaudited quarterly
+      figure
+    profit_quality: 2026Q1 attributable profit fell 81.97% year on year while revenue
+      grew 26.03%; do not extrapolate without explicit assumptions
+  adjusted_profit_bridge:
+    status: reviewed
+    period: 2025A
+    rows:
+    - item: net_profit_attributable
+      value: 521914773.0
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    - item: net_profit_ex_items
+      value: 503698695.52
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    - item: non_recurring_gap
+      value: 18216077.48
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      calculation_method: attributable_profit_minus_ex_items_profit
+      claim_type: inference
+  cashflow_quality:
+    status: reviewed
+    notes:
+    - 2025 operating cashflow was below 2024 and 2023 reported levels.
+    - 2026Q1 operating cashflow was negative; a single quarter does not establish
+      a full-year pattern.
+  working_capital_flags:
+    status: reviewed_limited
+    flags:
+    - 2026Q1 operating cashflow requires later working-capital note analysis
+  roe_roic_commentary:
+    status: reviewed
+    commentary: Annual report supplies weighted ROE; ROIC is not calculated in this
+      card because a reviewed invested-capital bridge is outside the disclosed summary
+      table.
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_interim_report_002837_20250819_47054e
+  - ev_quarterly_report_002837_20260421_2f00c7
+  missing_items: []
+  sample_quality_allowed: false
+  p2_allowed: false
+business_breakdown_pack:
+  artifact_type: R5_business_breakdown_pack
+  schema_version: r5_business_breakdown_pack_v0.1
+  status: partial
+  as_of_date: '2026-04-21'
+  stock_code: 002837
+  business_lines:
+  - business_name: room_cooling
+    reported_name: 机房温控节能产品
+    role: reported_broad_product_line
+    revenue:
+      value: 3448477492.62
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    revenue_pct:
+      value: 56.83
+      unit: pct
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    gross_margin:
+      value: 28.36
+      unit: pct
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    gross_profit:
+      value: 977827266.53
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: reported_revenue_minus_reported_cost
+    gross_profit_pct:
+      value: 57.84
+      unit: pct
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: derived_line_gross_profit_divided_by_reported_company_gross_profit
+    products:
+    - 机房温控节能产品
+    customers: []
+    capacity: []
+    orders: []
+    pricing_driver: not_assessed_in_card_5_2
+    cost_driver: reported cost available only for product lines above the disclosure
+      threshold
+    linked_segments: []
+    confidence: high
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    missing_items: []
+    page_or_table_locator: PDF pages 15-16; 第三节四、2
+    claim_type: fact_with_arithmetic_derivations
+  - business_name: cabinet_cooling
+    reported_name: 机柜温控节能产品
+    role: reported_broad_product_line
+    revenue:
+      value: 1977423139.19
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    revenue_pct:
+      value: 32.59
+      unit: pct
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    gross_margin:
+      value: 27.24
+      unit: pct
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    gross_profit:
+      value: 538639525.94
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: reported_revenue_minus_reported_cost
+    gross_profit_pct:
+      value: 31.86
+      unit: pct
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: derived_line_gross_profit_divided_by_reported_company_gross_profit
+    products:
+    - 机柜温控节能产品
+    customers: []
+    capacity: []
+    orders: []
+    pricing_driver: not_assessed_in_card_5_2
+    cost_driver: reported cost available only for product lines above the disclosure
+      threshold
+    linked_segments: []
+    confidence: high
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    missing_items: []
+    page_or_table_locator: PDF pages 15-16; 第三节四、2
+    claim_type: fact_with_arithmetic_derivations
+  - business_name: bus_air_conditioning
+    reported_name: 客车空调
+    role: reported_broad_product_line
+    revenue:
+      value: 90266641.17
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    revenue_pct:
+      value: 1.49
+      unit: pct
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    gross_margin:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit:
+      value: null
+      unit: CNY
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit_pct:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    products:
+    - 客车空调
+    customers: []
+    capacity: []
+    orders: []
+    pricing_driver: not_assessed_in_card_5_2
+    cost_driver: not_separately_disclosed
+    linked_segments: []
+    confidence: medium
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    missing_items:
+    - 该低占比产品未在年报10%以上产品表中单列营业成本和毛利率。
+    page_or_table_locator: PDF pages 15-16; 第三节四、2
+    claim_type: fact_with_visible_gaps
+  - business_name: rail_air_conditioning_service
+    reported_name: 轨道交通列车空调及服务
+    role: reported_broad_product_line
+    revenue:
+      value: 44912639.85
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    revenue_pct:
+      value: 0.74
+      unit: pct
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    gross_margin:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit:
+      value: null
+      unit: CNY
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit_pct:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    products:
+    - 轨道交通列车空调及服务
+    customers: []
+    capacity: []
+    orders: []
+    pricing_driver: not_assessed_in_card_5_2
+    cost_driver: not_separately_disclosed
+    linked_segments: []
+    confidence: medium
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    missing_items:
+    - 该低占比产品未在年报10%以上产品表中单列营业成本和毛利率。
+    page_or_table_locator: PDF pages 15-16; 第三节四、2
+    claim_type: fact_with_visible_gaps
+  - business_name: other
+    reported_name: 其他
+    role: reported_broad_product_line
+    revenue:
+      value: 506679178.72
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    revenue_pct:
+      value: 8.35
+      unit: pct
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      metric_id: null
+      calculation_method: direct_reported_value
+    gross_margin:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit:
+      value: null
+      unit: CNY
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit_pct:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    products:
+    - 其他
+    customers: []
+    capacity: []
+    orders: []
+    pricing_driver: not_assessed_in_card_5_2
+    cost_driver: not_separately_disclosed
+    linked_segments: []
+    confidence: medium
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    missing_items:
+    - 该低占比产品未在年报10%以上产品表中单列营业成本和毛利率。
+    page_or_table_locator: PDF pages 15-16; 第三节四、2
+    claim_type: fact_with_visible_gaps
+  - business_name: liquid_cooling_specific
+    reported_name: 液冷单独口径
+    role: product_line_clue_only
+    revenue:
+      value: null
+      unit: CNY
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    revenue_pct:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_margin:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit:
+      value: null
+      unit: CNY
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit_pct:
+      value: null
+      unit: pct
+      evidence_id: null
+      metric_id: null
+      missing_reason: MISSING_DISCLOSURE
+    products:
+    - Coolinside cold plates
+    - CDU
+    - manifold
+    - quick connectors
+    customers: []
+    capacity: []
+    orders: []
+    pricing_driver: TODO_SOURCE_REQUIRED
+    cost_driver: TODO_SOURCE_REQUIRED
+    linked_segments:
+    - ai_server_liquid_cooling
+    confidence: medium
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    missing_items:
+    - 液冷收入占比未单列披露。
+    - 液冷毛利率未单列披露。
+    - 液冷利润贡献未单列披露。
+    page_or_table_locator: PDF pages 9-10 product narrative; financial tables use
+      broader room/cabinet categories
+    claim_type: product_clue_and_unknown_metrics
+  profit_pool_summary:
+    status: partial
+    company_revenue: 6067759091.55
+    company_operating_cost: 4377125780.98
+    company_gross_profit: 1690633310.57
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    product_revenue_sum: 6067759091.55
+    reconciliation_residual: 0.0
+    calculation_method: sum_reported_product_revenue_and_compare_with_reported_company_revenue
+    limitation: Only the two product lines above the disclosure threshold have separate
+      cost and margin rows.
+  structural_contradictions:
+  - The issuer discloses liquid-cooling products but reports revenue and margin in
+    broader room/cabinet cooling categories.
+  - Broad product-line totals therefore cannot be relabeled as liquid-cooling-specific
+    financials.
+  linked_segments:
+  - ai_server_liquid_cooling
+  missing_items:
+  - item: liquid_cooling_revenue_share
+    reason: MISSING_DISCLOSURE
+  - item: liquid_cooling_gross_margin
+    reason: MISSING_DISCLOSURE
+  - item: liquid_cooling_profit_contribution
+    reason: MISSING_DISCLOSURE
+  source_gap_register:
+  - gap_id: R5_002837_GAP_BUSINESS_001
+    token: MISSING_DISCLOSURE
+    owner: evidence-ingest
+    next_action: retain visible gap until an official split is published
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_interim_report_002837_20250819_47054e
+  sample_quality_allowed: false
+  p2_allowed: false
+segment_exposure_pack:
+  status: partial
+  exposures:
+  - segment_id: ai_server_liquid_cooling
+    exposure_type: product
+    exposure_score: 2
+    revenue_pct: MISSING_DISCLOSURE
+    profit_pct: MISSING_DISCLOSURE
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    confidence: medium
+    link_status: needs_review
+    missing_reason: liquid-cooling-specific financial split is not disclosed
+industry_context_pack:
+  status: partial
+  linked_segments:
+  - ai_server_liquid_cooling
+  supply_competition: TODO_SOURCE_REQUIRED
+  evidence_ids: []
+peer_comparison_pack:
+  status: partial
+  as_of_date: '2026-07-10'
+  peer_set:
+  - '300499'
+  - '301018'
+  peer_metrics:
+  - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+    peer_stock_code: '300499'
+    peer_company_name: 高澜股份
+    metric_name: pb
+    metric_value: 8.4621
+    metric_unit: multiple
+    input_id: r5_b5_peer_300499_pb_20260710
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+    peer_stock_code: '300499'
+    peer_company_name: 高澜股份
+    metric_name: pe_ttm
+    metric_value: 385.8974
+    metric_unit: multiple
+    input_id: r5_b5_peer_300499_pe_ttm_20260710
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+    peer_stock_code: '300499'
+    peer_company_name: 高澜股份
+    metric_name: ps_ttm
+    metric_value: 11.9854
+    metric_unit: multiple
+    input_id: r5_b5_peer_300499_ps_ttm_20260710
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+    peer_stock_code: '301018'
+    peer_company_name: 申菱环境
+    metric_name: pb
+    metric_value: 16.2152
+    metric_unit: multiple
+    input_id: r5_b5_peer_301018_pb_20260710
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+    peer_stock_code: '301018'
+    peer_company_name: 申菱环境
+    metric_name: pe_ttm
+    metric_value: 234.3524
+    metric_unit: multiple
+    input_id: r5_b5_peer_301018_pe_ttm_20260710
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  - peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+    peer_stock_code: '301018'
+    peer_company_name: 申菱环境
+    metric_name: ps_ttm
+    metric_value: 10.6599
+    metric_unit: multiple
+    input_id: r5_b5_peer_301018_ps_ttm_20260710
+    evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  confidence: low
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+forecast_model_pack:
+  artifact_type: R5_forecast_model_pack
+  schema_version: r5_forecast_model_pack_v0.1
+  status: ready
+  as_of_date: '2026-07-10'
+  model_type: reviewed_mechanical_base_with_sensitivity_scenarios
+  forecast_years:
+  - 2026E
+  - 2027E
+  - 2028E
+  required_metrics:
+  - revenue
+  - gross_margin
+  - gross_profit
+  - net_profit_attributable
+  - eps
+  assumptions:
+  - workflow_id: wf_20260703_stock_first_002837_invic
+    stock_code: 002837
+    input_type: forecast_assumptions
+    as_of_date: '2026-07-10'
+    source_rank: B
+    review_status: accepted
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    capture_method: codex_model_assumption_review_user_authorized
+    no_live_api: true
+    periods: &id002
+    - 2026E
+    - 2027E
+    - 2028E
+    scenario: base
+    claim_type: estimate
+    management_guidance_used: false
+    metric_ids: &id003 []
+    supporting_metric_ids: &id004 []
+    sample_quality_allowed: false
+    input_id: r5_b5_forecast_revenue_growth_base
+    assumption_id: r5_b5_forecast_revenue_growth_base
+    driver: revenue_growth
+    metric_name: revenue_growth
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    value:
+      2026E: 26.0291
+      2027E: 20.0
+      2028E: 15.0
+    unit: pct
+    scope: company
+    evidence_ids: &id001
+    - ev_annual_report_002837_20260421_2cbfc5
+    - ev_quarterly_report_002837_20260421_2f00c7
+    supporting_evidence_ids: *id001
+    dependency_input_ids:
+    - r5_b5_business_2025_room_cooling_revenue
+    - r5_b5_business_2025_room_cooling_gross_margin
+    - r5_b5_business_2025_cabinet_cooling_revenue
+    - r5_b5_business_2025_cabinet_cooling_gross_margin
+    - r5_b5_business_2025_bus_air_conditioning_revenue
+    - r5_b5_business_2025_rail_air_conditioning_service_revenue
+    - r5_b5_business_2025_other_revenue
+    - r5_b5_business_2025_company_revenue
+    - r5_b5_business_2025_company_gross_margin
+    formula_by_period:
+      2026E: 2026Q1 revenue / 2025Q1 revenue - 1
+      2027E: 'model assumption: growth slows to 20%'
+      2028E: 'model assumption: growth slows to 15%'
+    sensitivity_range_by_period: &id010
+      2026E:
+        low: 20.0
+        high: 32.23
+      2027E:
+        low: 12.0
+        high: 25.0
+      2028E:
+        low: 8.0
+        high: 20.0
+    rationale: 2026 uses the reported Q1 year-on-year rate as a mechanical carry-forward;
+      later years are explicit slowing-growth model assumptions.
+    reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+      in the financial-history pack.
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+  - workflow_id: wf_20260703_stock_first_002837_invic
+    stock_code: 002837
+    input_type: forecast_assumptions
+    as_of_date: '2026-07-10'
+    source_rank: B
+    review_status: accepted
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    capture_method: codex_model_assumption_review_user_authorized
+    no_live_api: true
+    periods: *id002
+    scenario: base
+    claim_type: estimate
+    management_guidance_used: false
+    metric_ids: *id003
+    supporting_metric_ids: *id004
+    sample_quality_allowed: false
+    input_id: r5_b5_forecast_gross_margin_base
+    assumption_id: r5_b5_forecast_gross_margin_base
+    driver: gross_margin
+    metric_name: gross_margin
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    value:
+      2026E: 24.2935
+      2027E: 25.5
+      2028E: 26.5
+    unit: pct
+    scope: margin
+    evidence_ids: &id005
+    - ev_annual_report_002837_20260421_2cbfc5
+    - ev_quarterly_report_002837_20260421_2f00c7
+    supporting_evidence_ids: *id005
+    dependency_input_ids:
+    - r5_b5_business_2025_company_gross_margin
+    formula_by_period:
+      2026E: carry forward 2026Q1 derived gross margin
+      2027E: 'model assumption: partial recovery to 25.5%'
+      2028E: 'model assumption: partial recovery to 26.5%, below 2025A 27.86%'
+    sensitivity_range_by_period: &id011
+      2026E:
+        low: 23.0
+        high: 27.86
+      2027E:
+        low: 23.5
+        high: 27.86
+      2028E:
+        low: 24.0
+        high: 27.86
+    rationale: The base path starts from the reported Q1 cost/revenue ratio and only
+      partially normalizes toward the 2025 annual level.
+    reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+      in the financial-history pack.
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+  - workflow_id: wf_20260703_stock_first_002837_invic
+    stock_code: 002837
+    input_type: forecast_assumptions
+    as_of_date: '2026-07-10'
+    source_rank: B
+    review_status: accepted
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    capture_method: codex_model_assumption_review_user_authorized
+    no_live_api: true
+    periods: *id002
+    scenario: base
+    claim_type: estimate
+    management_guidance_used: false
+    metric_ids: *id003
+    supporting_metric_ids: *id004
+    sample_quality_allowed: false
+    input_id: r5_b5_forecast_opex_base
+    assumption_id: r5_b5_forecast_opex_base
+    driver: opex
+    metric_name: opex
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    value:
+      2026E: 18.5321
+      2027E: 17.5
+      2028E: 16.5
+    unit: pct_of_revenue
+    scope: opex
+    evidence_ids: &id006
+    - ev_annual_report_002837_20260421_2cbfc5
+    - ev_quarterly_report_002837_20260421_2f00c7
+    supporting_evidence_ids: *id006
+    dependency_input_ids: []
+    formula_by_period:
+      2026E: (2026Q1 selling + administrative + R&D expenses) / 2026Q1 revenue
+      2027E: 'model assumption: normalize to 17.5%'
+      2028E: 'model assumption: normalize to 16.5%, still above 2025A 15.5581%'
+    sensitivity_range_by_period:
+      2026E:
+        low: 15.5581
+        high: 19.5
+      2027E:
+        low: 15.5581
+        high: 18.5
+      2028E:
+        low: 15.0
+        high: 18.0
+    rationale: The expense ratio is a model input, not a reported full-year outcome;
+      it begins at the Q1 ratio and gradually normalizes.
+    reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+      in the financial-history pack.
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+  - workflow_id: wf_20260703_stock_first_002837_invic
+    stock_code: 002837
+    input_type: forecast_assumptions
+    as_of_date: '2026-07-10'
+    source_rank: B
+    review_status: accepted
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    capture_method: codex_model_assumption_review_user_authorized
+    no_live_api: true
+    periods: *id002
+    scenario: base
+    claim_type: estimate
+    management_guidance_used: false
+    metric_ids: *id003
+    supporting_metric_ids: *id004
+    sample_quality_allowed: false
+    input_id: r5_b5_forecast_net_profit_base
+    assumption_id: r5_b5_forecast_net_profit_base
+    driver: net_profit
+    metric_name: net_profit
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    value:
+      2026E: 94115513.02
+      2027E: 321179929.4
+      2028E: 580418015.27
+    unit: CNY
+    scope: company
+    evidence_ids: &id007
+    - ev_annual_report_002837_20260421_2cbfc5
+    - ev_quarterly_report_002837_20260421_2f00c7
+    supporting_evidence_ids: *id007
+    dependency_input_ids: []
+    formula_by_period:
+      2026E: 2026Q1 attributable profit / (2025Q1 attributable profit / 2025A attributable
+        profit)
+      2027E: 2027E revenue * 3.5% model net margin
+      2028E: 2028E revenue * 5.5% model net margin
+    sensitivity_range_by_period: &id012
+      2026E:
+        low: 34630409.08
+        high: 521914773.0
+      2027E:
+        low: 183531388.23
+        high: 550594164.69
+      2028E:
+        low: 316591644.7
+        high: 738713837.62
+    rationale: The 2026 base is a mechanical prior-year seasonality run-rate; 2027-2028
+      margins are explicit model assumptions with wide ranges.
+    reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+      in the financial-history pack.
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+  - workflow_id: wf_20260703_stock_first_002837_invic
+    stock_code: 002837
+    input_type: forecast_assumptions
+    as_of_date: '2026-07-10'
+    source_rank: B
+    review_status: accepted
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    capture_method: codex_model_assumption_review_user_authorized
+    no_live_api: true
+    periods: *id002
+    scenario: base
+    claim_type: estimate
+    management_guidance_used: false
+    metric_ids: *id003
+    supporting_metric_ids: *id004
+    sample_quality_allowed: false
+    input_id: r5_b5_forecast_eps_base
+    assumption_id: r5_b5_forecast_eps_base
+    driver: eps
+    metric_name: eps
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    value:
+      2026E: 0.073854
+      2027E: 0.252034
+      2028E: 0.455462
+    unit: CNY_per_share
+    scope: company
+    evidence_ids: &id008
+    - ev_annual_report_002837_20260421_2cbfc5
+    - ev_quarterly_report_002837_20260421_2f00c7
+    - ev_structured_market_data_002837_20260710_eb0c08
+    supporting_evidence_ids: *id008
+    dependency_input_ids:
+    - r5_b5_market_002837_20260710
+    - r5_b5_forecast_net_profit_base
+    formula_by_period:
+      2026E: 2026E attributable profit / 1,274,349,692 reviewed shares
+      2027E: 2027E attributable profit / 1,274,349,692 reviewed shares
+      2028E: 2028E attributable profit / 1,274,349,692 reviewed shares
+    sensitivity_range_by_period:
+      2026E:
+        low: 0.027175
+        high: 0.409559
+      2027E:
+        low: 0.14402
+        high: 0.432055
+      2028E:
+        low: 0.248424
+        high: 0.579677
+    rationale: EPS uses the reviewed same-date total-share count and the model net-profit
+      path; dilution after the snapshot is not assumed.
+    reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+      in the financial-history pack.
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+  forecast_table:
+    base_case: &id009
+      2026E:
+        revenue:
+          value: 7647141176.21
+          unit: CNY
+          assumption_id: r5_b5_forecast_revenue_growth_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 24.2935
+          unit: pct
+          assumption_id: r5_b5_forecast_gross_margin_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 1857758241.64
+          unit: CNY
+          assumption_id: r5_b5_forecast_gross_margin_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 94115513.02
+          unit: CNY
+          assumption_id: r5_b5_forecast_net_profit_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.073854
+          unit: CNY_per_share
+          assumption_id: r5_b5_forecast_eps_base
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2027E:
+        revenue:
+          value: 9176569411.45
+          unit: CNY
+          assumption_id: r5_b5_forecast_revenue_growth_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 25.5
+          unit: pct
+          assumption_id: r5_b5_forecast_gross_margin_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 2340025199.92
+          unit: CNY
+          assumption_id: r5_b5_forecast_gross_margin_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 321179929.4
+          unit: CNY
+          assumption_id: r5_b5_forecast_net_profit_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.252034
+          unit: CNY_per_share
+          assumption_id: r5_b5_forecast_eps_base
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2028E:
+        revenue:
+          value: 10553054823.17
+          unit: CNY
+          assumption_id: r5_b5_forecast_revenue_growth_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 26.5
+          unit: pct
+          assumption_id: r5_b5_forecast_gross_margin_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 2796559528.14
+          unit: CNY
+          assumption_id: r5_b5_forecast_gross_margin_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 580418015.27
+          unit: CNY
+          assumption_id: r5_b5_forecast_net_profit_base
+          evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.455462
+          unit: CNY_per_share
+          assumption_id: r5_b5_forecast_eps_base
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+  scenarios:
+    base_case:
+      status: ready
+      claim_type: estimate
+      forecast_table: *id009
+    bull_case:
+      status: sensitivity_estimate
+      claim_type: estimate
+      forecast_table:
+        2026E:
+          revenue:
+            value: 8023397846.76
+            unit: CNY
+            assumption_id: scenario_revenue_growth
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_margin:
+            value: 27.86
+            unit: pct
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_profit:
+            value: 2235318640.11
+            unit: CNY
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          net_profit_attributable:
+            value: 240701935.4
+            unit: CNY
+            assumption_id: scenario_net_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          eps:
+            value: 0.188882
+            unit: CNY_per_share
+            assumption_id: scenario_net_margin
+            evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+            metric_id: null
+            claim_type: estimate
+        2027E:
+          revenue:
+            value: 10029247308.45
+            unit: CNY
+            assumption_id: scenario_revenue_growth
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_margin:
+            value: 27.5
+            unit: pct
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_profit:
+            value: 2758043009.82
+            unit: CNY
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          net_profit_attributable:
+            value: 601754838.51
+            unit: CNY
+            assumption_id: scenario_net_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          eps:
+            value: 0.472205
+            unit: CNY_per_share
+            assumption_id: scenario_net_margin
+            evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+            metric_id: null
+            claim_type: estimate
+        2028E:
+          revenue:
+            value: 12035096770.13
+            unit: CNY
+            assumption_id: scenario_revenue_growth
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_margin:
+            value: 27.0
+            unit: pct
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_profit:
+            value: 3249476127.94
+            unit: CNY
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          net_profit_attributable:
+            value: 962807741.61
+            unit: CNY
+            assumption_id: scenario_net_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          eps:
+            value: 0.755529
+            unit: CNY_per_share
+            assumption_id: scenario_net_margin
+            evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+            metric_id: null
+            claim_type: estimate
+      limitations:
+      - Upper sensitivity path is not management guidance.
+    bear_case:
+      status: sensitivity_estimate
+      claim_type: estimate
+      forecast_table:
+        2026E:
+          revenue:
+            value: 7281310909.86
+            unit: CNY
+            assumption_id: scenario_revenue_growth
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_margin:
+            value: 23.0
+            unit: pct
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_profit:
+            value: 1674701509.27
+            unit: CNY
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          net_profit_attributable:
+            value: 36406554.55
+            unit: CNY
+            assumption_id: scenario_net_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          eps:
+            value: 0.028569
+            unit: CNY_per_share
+            assumption_id: scenario_net_margin
+            evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+            metric_id: null
+            claim_type: estimate
+        2027E:
+          revenue:
+            value: 8373507546.34
+            unit: CNY
+            assumption_id: scenario_revenue_growth
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_margin:
+            value: 24.0
+            unit: pct
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_profit:
+            value: 2009641811.12
+            unit: CNY
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          net_profit_attributable:
+            value: 167470150.93
+            unit: CNY
+            assumption_id: scenario_net_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          eps:
+            value: 0.131416
+            unit: CNY_per_share
+            assumption_id: scenario_net_margin
+            evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+            metric_id: null
+            claim_type: estimate
+        2028E:
+          revenue:
+            value: 9210858300.97
+            unit: CNY
+            assumption_id: scenario_revenue_growth
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_margin:
+            value: 25.0
+            unit: pct
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          gross_profit:
+            value: 2302714575.24
+            unit: CNY
+            assumption_id: scenario_gross_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          net_profit_attributable:
+            value: 368434332.04
+            unit: CNY
+            assumption_id: scenario_net_margin
+            evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+            metric_id: null
+            claim_type: estimate
+          eps:
+            value: 0.289116
+            unit: CNY_per_share
+            assumption_id: scenario_net_margin
+            evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+            metric_id: null
+            claim_type: estimate
+      limitations:
+      - Lower sensitivity path is a model stress case.
+  sensitivity_tests:
+  - driver: revenue_growth
+    range_by_period: *id010
+    claim_type: estimate
+  - driver: gross_margin
+    range_by_period: *id011
+    claim_type: estimate
+  - driver: net_profit
+    range_by_period: *id012
+    claim_type: estimate
+  consensus_comparison:
+    status: not_supplied
+    note: No consensus or third-party forecast was used.
+  missing_items: []
+  source_gap_register: []
+  sample_quality_allowed: false
+  p2_allowed: false
+valuation_pack:
+  artifact_type: R5_valuation_pack
+  schema_version: r5_valuation_pack_v0.2
+  status: partial
+  as_of_date: '2026-07-10'
+  market_snapshot:
+    as_of_date: '2026-07-10'
+    current_price:
+      value: 73.54
+      unit: CNY_per_share
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      metric_id: null
+      calculation_method: direct
+    market_cap:
+      value: 93715669584
+      unit: CNY
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      metric_id: null
+      calculation_method: daily_basic total_mv x 10000
+    share_count:
+      value: 1274349692
+      unit: shares
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      metric_id: null
+      calculation_method: daily_basic total_share x 10000
+    net_cash_or_net_debt:
+      value: 698135329.67
+      unit: CNY_net_debt_proxy
+      evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+      metric_id: null
+      calculation_method: short-term borrowings + current non-current liabilities
+        + long-term borrowings + lease liabilities - cash
+    enterprise_value:
+      value: 94413804913.67
+      unit: CNY
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      metric_id: null
+      calculation_method: market_cap + reviewed_Q1_net_debt_bridge
+    pe_ttm:
+      value: 194.2045
+      unit: multiple
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      metric_id: null
+      calculation_method: direct
+    forward_pe:
+      value:
+        2026E: 995.75
+        2027E: 291.79
+        2028E: 161.46
+      unit: multiple
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      metric_id: null
+      calculation_method: current_price / reviewed model EPS
+    pb:
+      value: 27.0715
+      unit: multiple
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      metric_id: null
+      calculation_method: direct
+    ps:
+      value: 14.8507
+      unit: multiple_TTM
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      metric_id: null
+      calculation_method: direct
+    ev_ebitda:
+      value: null
+      unit: multiple
+      evidence_id: null
+      metric_id: null
+      calculation_method: direct
+      missing_reason: METHOD_NOT_ELIGIBLE_WITHOUT_REVIEWED_EBITDA
+  peer_valuation_context:
+    status: reviewed_low_confidence
+    rows:
+    - peer_stock_code: '301018'
+      peer_company_name: 申菱环境
+      metric_name: pe_ttm
+      multiple_value: 234.3524
+      unit: multiple
+      as_of_date: '2026-07-10'
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      input_id: r5_b5_peer_301018_pe_ttm_20260710
+    - peer_stock_code: '300499'
+      peer_company_name: 高澜股份
+      metric_name: pe_ttm
+      multiple_value: 385.8974
+      unit: multiple
+      as_of_date: '2026-07-10'
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      input_id: r5_b5_peer_300499_pe_ttm_20260710
+    peer_set_quality: low
+    peer_median_pe_ttm: 310.1249
+    limitations:
+    - Only two product-exposure peers; business mixes and disclosure quality differ.
+  valuation_methods:
+  - method_id: relative_pe
+    method_type: relative
+    status: ready
+    supported_output:
+      metric: cross_multiple_relative_context
+      subject:
+        pe_ttm: 194.2045
+        pb: 27.0715
+        ps_ttm: 14.8507
+      peer_median:
+        pe_ttm: 310.1249
+        pb: 12.33865
+        ps_ttm: 11.32265
+      label: mixed_multiple_signal_not_assessable
+    source_ids_or_missing_reason:
+    - ev_structured_market_data_002837_20260710_eb0c08
+    - r5_b5_peer_301018_pe_ttm_20260710
+    - r5_b5_peer_301018_pb_20260710
+    - r5_b5_peer_301018_ps_ttm_20260710
+    - r5_b5_peer_300499_pe_ttm_20260710
+    - r5_b5_peer_300499_pb_20260710
+    - r5_b5_peer_300499_ps_ttm_20260710
+    confidence: low
+  - method_id: dcf
+    method_type: forecast_dependent
+    status: skipped
+    supported_output: null
+    forecast_assumption_ids:
+    - r5_b5_forecast_revenue_growth_base
+    - r5_b5_forecast_gross_margin_base
+    - r5_b5_forecast_opex_base
+    - r5_b5_forecast_net_profit_base
+    - r5_b5_forecast_eps_base
+    forecast_metric_ids: []
+    source_ids_or_missing_reason: METHOD_EXCLUDED_UNREVIEWED_FCFF_AND_DISCOUNT_INPUTS
+  - method_id: sotp
+    method_type: segment_dependent
+    status: skipped
+    supported_output: null
+    source_ids_or_missing_reason: METHOD_EXCLUDED_UNDISCLOSED_LIQUID_COOLING_SPLIT
+  valuation_scenarios:
+  - scenario_id: bear
+    status: research_estimate
+    method_id: relative_pe
+    output_metric: reference_pe_multiple
+    output_value: 234.3524
+    unit: multiple
+    source_ids_or_missing_reason: ev_structured_market_data_002837_20260710_eb0c08
+  - scenario_id: base
+    status: research_estimate
+    method_id: relative_pe
+    output_metric: reference_pe_multiple
+    output_value: 310.1249
+    unit: multiple
+    source_ids_or_missing_reason: ev_structured_market_data_002837_20260710_eb0c08
+  - scenario_id: bull
+    status: research_estimate
+    method_id: relative_pe
+    output_metric: reference_pe_multiple
+    output_value: 385.8974
+    unit: multiple
+    source_ids_or_missing_reason: ev_structured_market_data_002837_20260710_eb0c08
+  valuation_sensitivity:
+    status: reviewed_estimate
+    rows:
+    - period: 2026E
+      model_eps: 0.073854
+      current_price: 73.54
+      forward_pe: 995.75
+      unit: multiple
+      assumption_id: r5_b5_forecast_eps_base
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    - period: 2027E
+      model_eps: 0.252034
+      current_price: 73.54
+      forward_pe: 291.79
+      unit: multiple
+      assumption_id: r5_b5_forecast_eps_base
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    - period: 2028E
+      model_eps: 0.455462
+      current_price: 73.54
+      forward_pe: 161.46
+      unit: multiple
+      assumption_id: r5_b5_forecast_eps_base
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    interpretation_boundary: Sensitivity holds the dated market price constant and
+      varies only the reviewed model EPS path.
+  limitations:
+  - Relative PE is low confidence because only two exposure-grounded peers are available.
+  - PE is below the peer median while PB and PS TTM are above their peer medians;
+    no single valuation label is supportable.
+  - No intrinsic or segment-sum method is active.
+  - Scenario multiples are research context, not price outputs.
+  missing_items:
+  - item: ev_ebitda
+    reason: METHOD_NOT_ELIGIBLE_WITHOUT_REVIEWED_EBITDA
+  - item: dcf
+    reason: METHOD_EXCLUDED_UNREVIEWED_FCFF_AND_DISCOUNT_INPUTS
+  - item: sotp
+    reason: METHOD_EXCLUDED_UNDISCLOSED_LIQUID_COOLING_SPLIT
+  source_gap_register:
+  - gap_id: R5_B5_DCF_METHOD_GAP
+    token: UNREVIEWED_FCFF_INPUTS
+  - gap_id: R5_B5_SOTP_METHOD_GAP
+    token: UNDISCLOSED_SEGMENT_SPLIT
+  sample_quality_allowed: false
+  p2_allowed: false
+technical_market_pack:
+  status: partial
+  as_of_date: '2026-07-10'
+  market_snapshot:
+    current_price:
+      value: 73.54
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_type: market_snapshot
+      input_id: r5_b5_market_002837_20260710
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Trailing multiples reflect historical reported metrics and are not forward
+        estimates.
+      - Source-reported market capitalization is retained instead of recomputing from
+        rounded close and shares.
+      provenance:
+      - input_id: r5_b5_market_002837_20260710
+        source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+        source_rank: B
+        as_of_date: '2026-07-10'
+        reviewer: codex
+        reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+        limitations:
+        - Trailing multiples reflect historical reported metrics and are not forward
+          estimates.
+        - Source-reported market capitalization is retained instead of recomputing
+          from rounded close and shares.
+      unit: CNY_per_share
+    market_cap:
+      value: 93715669584
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_type: market_snapshot
+      input_id: r5_b5_market_002837_20260710
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Trailing multiples reflect historical reported metrics and are not forward
+        estimates.
+      - Source-reported market capitalization is retained instead of recomputing from
+        rounded close and shares.
+      provenance:
+      - input_id: r5_b5_market_002837_20260710
+        source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+        source_rank: B
+        as_of_date: '2026-07-10'
+        reviewer: codex
+        reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+        limitations:
+        - Trailing multiples reflect historical reported metrics and are not forward
+          estimates.
+        - Source-reported market capitalization is retained instead of recomputing
+          from rounded close and shares.
+      unit: CNY
+    pe_ttm:
+      value: 194.2045
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_type: market_snapshot
+      input_id: r5_b5_market_002837_20260710
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Trailing multiples reflect historical reported metrics and are not forward
+        estimates.
+      - Source-reported market capitalization is retained instead of recomputing from
+        rounded close and shares.
+      provenance:
+      - input_id: r5_b5_market_002837_20260710
+        source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+        source_rank: B
+        as_of_date: '2026-07-10'
+        reviewer: codex
+        reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+        limitations:
+        - Trailing multiples reflect historical reported metrics and are not forward
+          estimates.
+        - Source-reported market capitalization is retained instead of recomputing
+          from rounded close and shares.
+      unit: multiple
+    pb:
+      value: 27.0715
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_type: market_snapshot
+      input_id: r5_b5_market_002837_20260710
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Trailing multiples reflect historical reported metrics and are not forward
+        estimates.
+      - Source-reported market capitalization is retained instead of recomputing from
+        rounded close and shares.
+      provenance:
+      - input_id: r5_b5_market_002837_20260710
+        source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+        source_rank: B
+        as_of_date: '2026-07-10'
+        reviewer: codex
+        reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+        limitations:
+        - Trailing multiples reflect historical reported metrics and are not forward
+          estimates.
+        - Source-reported market capitalization is retained instead of recomputing
+          from rounded close and shares.
+      unit: multiple
+    ps:
+      value: 15.4449
+      evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+      source_type: market_snapshot
+      input_id: r5_b5_market_002837_20260710
+      source_rank: B
+      as_of_date: '2026-07-10'
+      reviewer: codex
+      reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+      limitations:
+      - Trailing multiples reflect historical reported metrics and are not forward
+        estimates.
+      - Source-reported market capitalization is retained instead of recomputing from
+        rounded close and shares.
+      provenance:
+      - input_id: r5_b5_market_002837_20260710
+        source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+        source_rank: B
+        as_of_date: '2026-07-10'
+        reviewer: codex
+        reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+        limitations:
+        - Trailing multiples reflect historical reported metrics and are not forward
+          estimates.
+        - Source-reported market capitalization is retained instead of recomputing
+          from rounded close and shares.
+      unit: multiple
+  trend_judgement: null
+  missing_reason: MISSING_PRICE_HISTORY
+  evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+sentiment_event_pack:
+  status: TODO
+  as_of_date: null
+  missing_reason: TODO_SOURCE_REQUIRED
+  evidence_ids: []
+risk_counterevidence_pack:
+  status: ready
+  risks:
+  - 2026Q1 profit and operating cashflow were weak relative to revenue growth.
+  - 2025A operating cashflow was below 2023A and 2024A.
+  - Peer comparability remains low confidence.
+  counter_evidence:
+  - Broad room/cabinet categories do not prove liquid-cooling-specific financial contribution.
+  - PE and PB/PS TTM peer signals point in different directions.
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+source_gap_register:
+- gap_id: R5_B5_GAP_LIQUID_COOLING_SPLIT
+  section: business_breakdown_and_segment_economics
+  missing_data: 'MISSING_DISCLOSURE: liquid-cooling-specific revenue share, margin
+    and profit contribution'
+  impact_on_conclusion: product exposure cannot be converted into a financial contribution
+    estimate
+  fix_owner_skill: evidence-ingest
+  next_action: retain the gap until an official split is published
+- gap_id: R5_B5_GAP_INDUSTRY_STRUCTURE
+  section: industry_structure_and_competition
+  missing_data: 'TODO_SOURCE_REQUIRED: reviewed industry supply and competition evidence'
+  impact_on_conclusion: industry structure remains outside the factual conclusion
+    set
+  fix_owner_skill: segment-research
+  next_action: onboard reviewed industry evidence in a later scoped task
+- gap_id: R5_B5_GAP_PRICE_HISTORY
+  section: dated_market_or_technical_state_when_supported
+  missing_data: 'MISSING_PRICE_HISTORY: one dated snapshot does not support a trend
+    statement'
+  impact_on_conclusion: market section is limited to a dated snapshot
+  fix_owner_skill: stock-deep-dive
+  next_action: keep trend assessment absent until reviewed history exists
+- gap_id: R5_B5_GAP_SENTIMENT_EVENTS
+  section: dated_sentiment_and_events_when_supported
+  missing_data: 'TODO_SOURCE_REQUIRED: dated sentiment and event evidence'
+  impact_on_conclusion: no event or sentiment judgement is rendered
+  fix_owner_skill: evidence-ingest
+  next_action: collect dated official event sources if the section is later activated
+- gap_id: R5_B5_GAP_PEER_CONFIDENCE
+  section: valuation_methods_and_comparability
+  missing_data: 'LOW_CONFIDENCE_CLUE_ONLY: peer set contains two non-identical business
+    mixes'
+  impact_on_conclusion: relative multiples remain contextual only
+  fix_owner_skill: company-valuation
+  next_action: retain low confidence until a broader evidence-grounded peer set is
+    reviewed
+- gap_id: R5_B5_GAP_INTRINSIC_METHODS
+  section: valuation_methods_and_comparability
+  missing_data: UNREVIEWED_FCFF_INPUTS and UNDISCLOSED_SEGMENT_SPLIT
+  impact_on_conclusion: intrinsic and segment-sum methods remain inactive
+  fix_owner_skill: company-valuation
+  next_action: keep methods excluded until required inputs are reviewed
+report_composition_pack:
+  status: ready
+  output_type: reviewed_input_research_draft
+  section_ids:
+  - company_context
+  - financial_history_and_cash_flow_quality
+  - business_breakdown_and_segment_economics
+  - industry_structure_and_competition
+  - forecast_assumptions_and_sensitivity
+  - valuation_methods_and_comparability
+  - dated_market_or_technical_state_when_supported
+  - dated_sentiment_and_events_when_supported
+  - risks_counterevidence_and_open_questions
+  - research_conclusion_and_watch_conditions
+  sample_quality_report_allowed: false
+  p2_allowed: false
+material_claims:
+- claim_id: financial_history_revenue_2025
+  section_id: financial_history_revenue
+  claim_type: fact
+  period: 2025A
+  statement: 公司营业收入为 6,067,759,091.55 CNY，归母净利润为 521,914,773.00 CNY。
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  assumption_ids: []
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_financial_history_candidate.yaml
+  calculation_method: direct_reported_value
+  unit: CNY
+  confidence: high
+  review_status: reviewed
+- claim_id: financial_q1_profit_divergence
+  section_id: financial_q1_profit
+  claim_type: fact
+  period: 2026Q1
+  statement: 营业收入同比增长 26.03%，归母净利润同比下降 81.97%，收入与利润表现发生背离。
+  evidence_ids:
+  - ev_quarterly_report_002837_20260421_2f00c7
+  assumption_ids: []
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_financial_history_candidate.yaml
+  calculation_method: direct_reported_yoy_values
+  unit: pct
+  confidence: high
+  review_status: reviewed
+- claim_id: financial_q1_operating_cashflow
+  section_id: financial_q1_operating
+  claim_type: fact
+  period: 2026Q1
+  statement: 经营现金流为 -386,363,968.71 CNY，且 2025A 低于 2023A 与 2024A。
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  assumption_ids: []
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_financial_history_candidate.yaml
+  calculation_method: direct_reported_value_and_period_comparison
+  unit: CNY
+  confidence: high
+  review_status: reviewed
+- claim_id: business_broad_product_split
+  section_id: business_broad_product
+  claim_type: fact
+  period: 2025A
+  statement: 机房温控与机柜温控是年报披露的宽口径产品线，收入分别为 3,448,477,492.62 与 1,977,423,139.19 CNY。
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  assumption_ids: []
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_business_breakdown_candidate.yaml
+  calculation_method: direct_reported_product_line_values
+  unit: CNY
+  confidence: high
+  review_status: reviewed
+- claim_id: business_liquid_cooling_exposure
+  section_id: business_liquid_cooling
+  claim_type: fact
+  period: 2025A
+  statement: 官方材料披露液冷相关产品线索，但没有单列相应收入占比、毛利率和利润贡献。
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  assumption_ids: []
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_business_breakdown_candidate.yaml
+  calculation_method: product_narrative_review_with_visible_missing_metrics
+  unit: not_applicable
+  confidence: medium
+  review_status: reviewed
+- claim_id: forecast_base_path
+  section_id: forecast_base
+  claim_type: estimate
+  period: 2026E-2028E
+  statement: 基准情景采用机械外推与显式模型假设，2026E-2028E EPS 分别为 0.073854、0.252034、0.455462 CNY/share。
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  assumption_ids:
+  - r5_b5_forecast_eps_base
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_forecast_model_candidate.yaml
+  calculation_method: reviewed_assumption_model
+  unit: CNY_per_share
+  confidence: low
+  review_status: reviewed
+- claim_id: valuation_cross_multiple_context
+  section_id: valuation_cross_multiple
+  claim_type: inference
+  period: '2026-07-10'
+  statement: PE TTM 低于两家同业中位数，而 PB 与 PS TTM 高于对应中位数，方向不一致，不能形成单一估值标签。
+  evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  assumption_ids:
+  - r5_b5_valuation_context_002837_20260710
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_valuation_pack_candidate.yaml
+  calculation_method: same_date_cross_multiple_comparison
+  unit: multiple
+  confidence: low
+  review_status: reviewed
+- claim_id: valuation_net_debt_proxy
+  section_id: valuation_net_debt
+  claim_type: inference
+  period: 2026Q1
+  statement: 净债务代理值为 698,135,329.67 CNY；受受限资金和金融资产重分类未复核影响，置信度为 low。
+  evidence_ids:
+  - ev_quarterly_report_002837_20260421_2f00c7
+  assumption_ids: []
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_valuation_pack_candidate.yaml
+  calculation_method: reviewed_debt_components_minus_cash
+  unit: CNY_net_debt_proxy
+  confidence: low
+  review_status: reviewed
+report_sections:
+- section_id: company_context
+  title: 公司背景与研究边界
+  readiness: covered
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  narrative:
+  - 当前证据支持公司存在数据中心温控和液冷相关产品线索；研究边界停留在产品暴露，不能把公司整体财务数据归因到液冷业务。
+  columns:
+  - key: item
+    label: 项目
+  - key: state
+    label: 状态
+  - key: confidence
+    label: 置信度
+  - key: anchor
+    label: 锚点
+  rows:
+  - item: ai_server_liquid_cooling
+    state: product_exposure_needs_review
+    confidence: medium
+    anchor: ev_annual_report_002837_20260421_2cbfc5
+  limitations:
+  - liquid-cooling-specific financial contribution is not separately disclosed
+  visible_gaps:
+  - MISSING_DISCLOSURE
+- section_id: financial_history_and_cash_flow_quality
+  title: 财务历史与现金流质量
+  readiness: covered
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  narrative:
+  - 2026Q1 收入增长与利润下降并存，经营现金流为负；单季结果不直接外推为全年事实。
+  columns:
+  - key: period
+    label: 期间
+  - key: revenue
+    label: 收入
+  - key: profit
+    label: 归母净利润
+  - key: ocf
+    label: 经营现金流
+  - key: unit
+    label: 单位
+  - key: type
+    label: 类型
+  - key: anchor
+    label: 证据
+  - key: method
+    label: 方法
+  rows:
+  - period: 2023A
+    revenue: 3,528,859,077.13
+    profit: 344,006,335.07
+    ocf: 453,072,040.34
+    unit: CNY
+    type: fact
+    anchor: ev_annual_report_002837_20260421_2cbfc5
+    method: direct_reported_value
+  - period: 2024A
+    revenue: 4,588,819,487.27
+    profit: 452,664,369.42
+    ocf: 199,835,014.95
+    unit: CNY
+    type: fact
+    anchor: ev_annual_report_002837_20260421_2cbfc5
+    method: direct_reported_value
+  - period: 2025A
+    revenue: 6,067,759,091.55
+    profit: 521,914,773.00
+    ocf: 157,273,222.36
+    unit: CNY
+    type: fact
+    anchor: ev_annual_report_002837_20260421_2cbfc5
+    method: direct_reported_value
+  - period: 2026Q1
+    revenue: 1,175,329,313.61
+    profit: 8,657,602.27
+    ocf: -386,363,968.71
+    unit: CNY
+    type: fact
+    anchor: ev_quarterly_report_002837_20260421_2f00c7
+    method: direct_reported_value
+  limitations:
+  - 2026Q1 is unaudited and should not be treated as a full-year pattern
+  visible_gaps: []
+- section_id: business_breakdown_and_segment_economics
+  title: 业务拆分与细分经济性
+  readiness: partial
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  narrative:
+  - 宽口径机房与机柜温控数据可核验，但这些数据不等同于液冷单独口径。
+  columns:
+  - key: line
+    label: 披露口径
+  - key: revenue
+    label: 收入 CNY
+  - key: share
+    label: 收入占比 %
+  - key: margin
+    label: 毛利率 %
+  - key: confidence
+    label: 置信度
+  - key: anchor
+    label: 证据
+  rows:
+  - line: 机房温控节能产品
+    revenue: 3,448,477,492.62
+    share: '56.83'
+    margin: '28.36'
+    confidence: high
+    anchor: ev_annual_report_002837_20260421_2cbfc5
+  - line: 机柜温控节能产品
+    revenue: 1,977,423,139.19
+    share: '32.59'
+    margin: '27.24'
+    confidence: high
+    anchor: ev_annual_report_002837_20260421_2cbfc5
+  - line: 液冷单独口径
+    revenue: MISSING_DISCLOSURE
+    share: MISSING_DISCLOSURE
+    margin: MISSING_DISCLOSURE
+    confidence: medium
+    anchor: ev_annual_report_002837_20260421_2cbfc5
+  limitations:
+  - The issuer discloses liquid-cooling products but reports revenue and margin in
+    broader room/cabinet cooling categories.
+  - Broad product-line totals therefore cannot be relabeled as liquid-cooling-specific
+    financials.
+  visible_gaps:
+  - MISSING_DISCLOSURE
+- section_id: industry_structure_and_competition
+  title: 行业结构与竞争
+  readiness: missing
+  evidence_ids: []
+  narrative:
+  - 当前没有审查后的行业供需与竞争证据，本节不生成事实性行业判断。
+  columns: []
+  rows: []
+  limitations:
+  - industry evidence is outside the current reviewed-input set
+  visible_gaps:
+  - TODO_SOURCE_REQUIRED
+- section_id: forecast_assumptions_and_sensitivity
+  title: 预测假设与敏感性
+  readiness: covered
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  narrative:
+  - 以下均为 estimate：2026E 使用机械外推，2027E-2028E 使用显式放缓与利润率假设，并保留宽范围敏感性。
+  columns:
+  - key: period
+    label: 期间
+  - key: revenue
+    label: 收入 CNY
+  - key: gross_margin
+    label: 毛利率 %
+  - key: profit
+    label: 归母净利润 CNY
+  - key: eps
+    label: EPS CNY/share
+  - key: type
+    label: 类型
+  - key: anchor
+    label: 假设锚点
+  rows:
+  - period: 2026E
+    revenue: 7,647,141,176.21
+    gross_margin: '24.2935'
+    profit: 94,115,513.02
+    eps: '0.073854'
+    type: estimate
+    anchor: r5_b5_forecast_eps_base
+  - period: 2027E
+    revenue: 9,176,569,411.45
+    gross_margin: '25.5000'
+    profit: 321,179,929.40
+    eps: '0.252034'
+    type: estimate
+    anchor: r5_b5_forecast_eps_base
+  - period: 2028E
+    revenue: 10,553,054,823.17
+    gross_margin: '26.5000'
+    profit: 580,418,015.27
+    eps: '0.455462'
+    type: estimate
+    anchor: r5_b5_forecast_eps_base
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  visible_gaps: []
+- section_id: valuation_methods_and_comparability
+  title: 估值方法与可比性
+  readiness: partial
+  evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  - ev_quarterly_report_002837_20260421_2f00c7
+  narrative:
+  - 同日比较中，公司 PE TTM 为 194.2045，同业中位数为 310.1249；PB 与 PS TTM 的方向相反，因此保持 mixed_multiple_signal_not_assessable。
+  columns:
+  - key: metric
+    label: 指标
+  - key: value
+    label: 数值
+  - key: unit
+    label: 单位
+  - key: definition
+    label: 口径
+  - key: anchor
+    label: 证据
+  rows:
+  - &id013
+    metric: close
+    value: '73.54'
+    unit: CNY_per_share
+    definition: 2026-07-10 unadjusted close
+    anchor: ev_structured_market_data_002837_20260710_eb0c08
+  - &id014
+    metric: PE TTM
+    value: '194.2045'
+    unit: multiple
+    definition: trailing earnings multiple
+    anchor: ev_structured_market_data_002837_20260710_eb0c08
+  - &id015
+    metric: PB
+    value: '27.0715'
+    unit: multiple
+    definition: price-to-book
+    anchor: ev_structured_market_data_002837_20260710_eb0c08
+  - metric: PS
+    value: '15.4449'
+    unit: multiple
+    definition: non-TTM PS field from physical registry
+    anchor: ev_structured_market_data_002837_20260710_eb0c08
+  - metric: PS TTM
+    value: '14.8507'
+    unit: multiple_TTM
+    definition: TTM sales multiple; kept separate from PS
+    anchor: ev_structured_market_data_002837_20260710_eb0c08
+  limitations:
+  - Relative PE is low confidence because only two exposure-grounded peers are available.
+  - PE is below the peer median while PB and PS TTM are above their peer medians;
+    no single valuation label is supportable.
+  - No intrinsic or segment-sum method is active.
+  - Scenario multiples are research context, not price outputs.
+  visible_gaps:
+  - LOW_CONFIDENCE_CLUE_ONLY
+  - UNREVIEWED_FCFF_INPUTS
+  - UNDISCLOSED_SEGMENT_SPLIT
+- section_id: dated_market_or_technical_state_when_supported
+  title: 有日期的市场状态
+  readiness: partial
+  evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  narrative:
+  - 仅呈现 2026-07-10 的收盘与估值快照；缺少审查后的历史序列，因此不生成趋势判断。
+  columns:
+  - key: metric
+    label: 指标
+  - key: value
+    label: 数值
+  - key: unit
+    label: 单位
+  - key: definition
+    label: 口径
+  - key: anchor
+    label: 证据
+  rows:
+  - *id013
+  - *id014
+  - *id015
+  limitations:
+  - single-date snapshot only
+  visible_gaps:
+  - MISSING_PRICE_HISTORY
+- section_id: dated_sentiment_and_events_when_supported
+  title: 有日期的情绪与事件
+  readiness: missing
+  evidence_ids: []
+  narrative:
+  - 当前没有进入审查输入集的有日期事件或情绪证据，本节保持空缺。
+  columns: []
+  rows: []
+  limitations:
+  - dated sources are absent
+  visible_gaps:
+  - TODO_SOURCE_REQUIRED
+- section_id: risks_counterevidence_and_open_questions
+  title: 风险、反证与开放问题
+  readiness: covered
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  narrative:
+  - 风险与反证保留在正文，不因报告可渲染而弱化。
+  columns:
+  - key: type
+    label: 类别
+  - key: item
+    label: 内容
+  - key: anchor
+    label: 锚点
+  rows:
+  - type: risk
+    item: 2026Q1 利润与经营现金流显著弱于收入表现
+    anchor: ev_quarterly_report_002837_20260421_2f00c7
+  - type: risk
+    item: 2025A 经营现金流低于 2023A 与 2024A
+    anchor: ev_annual_report_002837_20260421_2cbfc5
+  - type: counter_evidence
+    item: 宽口径产品线不能证明液冷单独财务贡献
+    anchor: ev_annual_report_002837_20260421_2cbfc5
+  - type: counter_evidence
+    item: PE、PB 与 PS TTM 的同业信号方向不一致
+    anchor: ev_structured_market_data_002837_20260710_eb0c08
+  limitations: []
+  visible_gaps:
+  - MISSING_DISCLOSURE
+  - LOW_CONFIDENCE_CLUE_ONLY
+- section_id: research_conclusion_and_watch_conditions
+  title: 研究结论与后续观察条件
+  readiness: partial
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  narrative:
+  - 研究状态为 evidence_watch：产品暴露可继续验证，但收入与利润暴露仍为 unknown；预测和估值仅作低置信研究情景。
+  columns:
+  - key: condition
+    label: 观察条件
+  - key: reason
+    label: 原因
+  - key: source
+    label: 后续来源
+  rows:
+  - condition: 液冷单独收入与毛利率
+    reason: 验证产品暴露能否转化为财务贡献
+    source: future official disclosure
+  - condition: 利润与经营现金流
+    reason: 验证盈利质量是否改善
+    source: future periodic report
+  - condition: 可比口径与方法输入
+    reason: 改善估值可比性与方法资格
+    source: reviewed structured inputs
+  limitations:
+  - research-draft level only
+  visible_gaps:
+  - MISSING_DISCLOSURE
+  - LOW_CONFIDENCE_CLUE_ONLY
+data_definition_conflicts:
+- conflict_id: market_ps_vs_ps_ttm_definition
+  status: resolved_by_separate_labels
+  definitions:
+  - PS=15.4449
+  - PS TTM=14.8507
+  source_paths:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_market_peer_input_registry.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_valuation_pack_candidate.yaml
+  handling: PS and PS TTM are rendered as distinct metrics; neither value is relabeled.
+- conflict_id: broad_product_line_vs_liquid_specific
+  status: unresolved_disclosure_gap
+  definitions:
+  - room/cabinet broad product lines
+  - liquid-cooling-specific financial split
+  source_paths:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_business_breakdown_candidate.yaml
+  handling: Broad product-line values remain separate from the missing liquid-cooling-specific
+    metrics.
+open_questions:
+- When will liquid-cooling-specific revenue, margin or profit contribution be separately
+  disclosed?
+- Does profit and operating cashflow recover after the weak 2026Q1 pattern?
+- Can a broader evidence-grounded peer set improve comparability?
+- When do reviewed price history and dated event sources become available?
+- Which inputs would make intrinsic or segment-sum methods eligible?
+sample_quality_report_allowed: false
+p2_allowed: false

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import re
@@ -38,6 +39,10 @@ def load_writer(repo_root: Path):
     return module
 
 
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def _source_gap_count(pack: dict[str, Any]) -> int:
     gaps = pack.get("source_gap_register")
     return len(gaps) if isinstance(gaps, list) else 0
@@ -57,13 +62,18 @@ def render_output(
     workflow_id: str,
     result_path: Path,
     output_path: Path,
+    pack_path: Path | None = None,
+    gate_path: Path | None = None,
+    staging_path: Path | None = None,
+    promotion_path: Path | None = None,
+    scorecard_path: Path | None = None,
 ) -> dict[str, Any]:
     run_dir = repo_root / "reports/workflow_runs" / workflow_id
-    pack_path = run_dir / "R5_stock_research_pack_source_gapped.yaml"
-    gate_path = repo_root / "reports/p1_6/r5_reviewed_input_pilot_gate_result.json"
-    staging_path = run_dir / "R5_reviewed_input_staging_result.yaml"
-    promotion_path = run_dir / "R5_reviewed_input_registry_promotion_result.yaml"
-    scorecard_path = repo_root / ".agents/skills/quality-review/assets/r5_quality_scorecard.example.yaml"
+    pack_path = pack_path or run_dir / "R5_stock_research_pack_source_gapped.yaml"
+    gate_path = gate_path or repo_root / "reports/p1_6/r5_reviewed_input_pilot_gate_result.json"
+    staging_path = staging_path or run_dir / "R5_reviewed_input_staging_result.yaml"
+    promotion_path = promotion_path or run_dir / "R5_reviewed_input_registry_promotion_result.yaml"
+    scorecard_path = scorecard_path or repo_root / ".agents/skills/quality-review/assets/r5_quality_scorecard.example.yaml"
 
     pack = load_yaml(pack_path)
     gate = load_json(gate_path)
@@ -90,11 +100,12 @@ def render_output(
     if gate.get("sample_quality_report_allowed") is not True and "sample_quality_candidate" in text:
         raise ValueError("sample-quality marker generated while sample-quality is not allowed")
 
+    remaining_todos = list(promotion.get("remaining_todos", staging.get("remaining_todos") or []))
     required_markers = {
         "source_gap_appendix": "Source Gap Appendix" in text,
         "open_questions": "Open Questions" in text,
         "no_advice_boundary": "no_advice_boundary" in text,
-        "remaining_todos": any(token in text for token in staging.get("remaining_todos") or []),
+        "remaining_todos": all(str(token) in text for token in remaining_todos),
     }
     result = {
         "artifact_type": "R5_reviewed_input_render_result",
@@ -105,6 +116,13 @@ def render_output(
         "promotion_status": promotion.get("promotion_status"),
         "rendered_output_type": desired_type,
         "rendered_output_path": str(output_path),
+        "input_artifacts": {
+            "pack": {"path": str(pack_path), "sha256": _sha256(pack_path)},
+            "gate": {"path": str(gate_path), "sha256": _sha256(gate_path)},
+            "staging": {"path": str(staging_path), "sha256": _sha256(staging_path)},
+            "promotion": {"path": str(promotion_path), "sha256": _sha256(promotion_path)},
+            "scorecard": {"path": str(scorecard_path), "sha256": _sha256(scorecard_path)},
+        },
         "sample_quality_report_allowed": bool(gate.get("sample_quality_report_allowed") and promotion.get("sample_quality_report_allowed")),
         "p2_allowed": bool(gate.get("p2_allowed") and promotion.get("p2_allowed")),
         "source_gap_count": _source_gap_count(pack),
@@ -114,7 +132,7 @@ def render_output(
         },
         "required_markers": required_markers,
         "writer_result": render_result,
-        "remaining_todos": list(staging.get("remaining_todos") or []),
+        "remaining_todos": remaining_todos,
         "notes": [
             "Blocked gate renders source_gapped_research_draft only.",
             "Source Gap Appendix, Open Questions, no-advice boundary, and remaining TODOs are preserved.",
@@ -139,6 +157,11 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         default=Path("reports/workflow_runs") / WORKFLOW_ID / "R5_reviewed_input_render_result.yaml",
     )
+    parser.add_argument("--pack", type=Path, help="Explicit research-pack path.")
+    parser.add_argument("--gate", type=Path, help="Explicit pilot-gate result path.")
+    parser.add_argument("--staging", type=Path, help="Explicit reviewed-input staging path.")
+    parser.add_argument("--promotion", type=Path, help="Explicit registry-promotion result path.")
+    parser.add_argument("--scorecard", type=Path, help="Explicit quality-scorecard path.")
     args = parser.parse_args(argv)
 
     result = render_output(
@@ -146,6 +169,11 @@ def main(argv: list[str] | None = None) -> int:
         workflow_id=args.workflow_id,
         result_path=args.json,
         output_path=args.output,
+        pack_path=args.pack,
+        gate_path=args.gate,
+        staging_path=args.staging,
+        promotion_path=args.promotion,
+        scorecard_path=args.scorecard,
     )
     print(
         "r5_reviewed_input_render_type={rendered} sample_quality_allowed={sample} p2_allowed={p2} source_gap_count={gaps} forbidden_language_check={forbidden}".format(

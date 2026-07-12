@@ -1,0 +1,27 @@
+{
+  "artifact_type": "R5_reviewed_input_pilot_gate_result",
+  "current_r5_state": "R5_REVIEWED_INPUT_PILOT_ALLOWED",
+  "reviewed_input_pilot_allowed": true,
+  "sample_quality_report_allowed": false,
+  "p2_allowed": false,
+  "blockers": [],
+  "non_blocking_todos": [],
+  "input_summary": {
+    "strict_smoke_status": "pass",
+    "raw_pack_promotion_level": "sample_quality_candidate",
+    "pack_promotion_level": "reviewed_input_research_draft",
+    "quality_allowed_report_level": "reviewed_input_research_draft",
+    "no_advice_gate_passed": true,
+    "critical_todos": [],
+    "fixed_boundaries": {
+      "max_allowed_report_level": "reviewed_input_research_draft",
+      "sample_quality_report_allowed": false,
+      "p2_allowed": false
+    }
+  },
+  "next_candidate_tasks": [
+    "run benchmark coverage precheck without promotion",
+    "retain liquid-cooling-specific disclosure gaps",
+    "retain low-confidence peer and valuation limitations"
+  ]
+}

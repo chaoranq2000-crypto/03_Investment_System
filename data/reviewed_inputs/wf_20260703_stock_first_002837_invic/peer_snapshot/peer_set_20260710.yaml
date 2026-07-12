@@ -1,0 +1,181 @@
+records:
+- input_id: r5_b5_peer_301018_pe_ttm_20260710
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: peer_snapshot
+  as_of_date: '2026-07-10'
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  capture_method: archived_tushare_snapshot_then_codex_offline_review_user_authorized
+  no_live_api: true
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+  peer_stock_code: '301018'
+  peer_company_name: 申菱环境
+  peer_metric_name: pe_ttm
+  peer_metric_value: 234.3524
+  peer_metric_unit: multiple
+  metric_period: TTM earnings as of 2026-07-10
+  accounting_basis: TTM earnings as of 2026-07-10
+  normalization_method: same-date Tushare daily_basic multiple; no cross-date interpolation
+  business_exposure_comparability: product exposure score 4; confidence medium
+  inclusion_reason: current local segment universe records product-level exposure;
+    selected before reviewing valuation multiples
+  selection_source_path: data/processed/normalized/segment_company_exposure.csv
+  source_path: data/raw/market_data/tushare_daily_basic_peer_set_2026-07-10_eb0c080a.json
+  sample_quality_allowed: false
+- input_id: r5_b5_peer_301018_pb_20260710
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: peer_snapshot
+  as_of_date: '2026-07-10'
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  capture_method: archived_tushare_snapshot_then_codex_offline_review_user_authorized
+  no_live_api: true
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+  peer_stock_code: '301018'
+  peer_company_name: 申菱环境
+  peer_metric_name: pb
+  peer_metric_value: 16.2152
+  peer_metric_unit: multiple
+  metric_period: most recently reported equity as reflected by Tushare on 2026-07-10
+  accounting_basis: most recently reported equity as reflected by Tushare on 2026-07-10
+  normalization_method: same-date Tushare daily_basic multiple; no cross-date interpolation
+  business_exposure_comparability: product exposure score 4; confidence medium
+  inclusion_reason: current local segment universe records product-level exposure;
+    selected before reviewing valuation multiples
+  selection_source_path: data/processed/normalized/segment_company_exposure.csv
+  source_path: data/raw/market_data/tushare_daily_basic_peer_set_2026-07-10_eb0c080a.json
+  sample_quality_allowed: false
+- input_id: r5_b5_peer_301018_ps_ttm_20260710
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: peer_snapshot
+  as_of_date: '2026-07-10'
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  capture_method: archived_tushare_snapshot_then_codex_offline_review_user_authorized
+  no_live_api: true
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+  peer_stock_code: '301018'
+  peer_company_name: 申菱环境
+  peer_metric_name: ps_ttm
+  peer_metric_value: 10.6599
+  peer_metric_unit: multiple
+  metric_period: TTM revenue as of 2026-07-10
+  accounting_basis: TTM revenue as of 2026-07-10
+  normalization_method: same-date Tushare daily_basic multiple; no cross-date interpolation
+  business_exposure_comparability: product exposure score 4; confidence medium
+  inclusion_reason: current local segment universe records product-level exposure;
+    selected before reviewing valuation multiples
+  selection_source_path: data/processed/normalized/segment_company_exposure.csv
+  source_path: data/raw/market_data/tushare_daily_basic_peer_set_2026-07-10_eb0c080a.json
+  sample_quality_allowed: false
+- input_id: r5_b5_peer_300499_pe_ttm_20260710
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: peer_snapshot
+  as_of_date: '2026-07-10'
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  capture_method: archived_tushare_snapshot_then_codex_offline_review_user_authorized
+  no_live_api: true
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+  peer_stock_code: '300499'
+  peer_company_name: 高澜股份
+  peer_metric_name: pe_ttm
+  peer_metric_value: 385.8974
+  peer_metric_unit: multiple
+  metric_period: TTM earnings as of 2026-07-10
+  accounting_basis: TTM earnings as of 2026-07-10
+  normalization_method: same-date Tushare daily_basic multiple; no cross-date interpolation
+  business_exposure_comparability: product exposure score 3; confidence low
+  inclusion_reason: current local segment universe records product-level exposure;
+    selected before reviewing valuation multiples
+  selection_source_path: data/processed/normalized/segment_company_exposure.csv
+  source_path: data/raw/market_data/tushare_daily_basic_peer_set_2026-07-10_eb0c080a.json
+  sample_quality_allowed: false
+- input_id: r5_b5_peer_300499_pb_20260710
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: peer_snapshot
+  as_of_date: '2026-07-10'
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  capture_method: archived_tushare_snapshot_then_codex_offline_review_user_authorized
+  no_live_api: true
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+  peer_stock_code: '300499'
+  peer_company_name: 高澜股份
+  peer_metric_name: pb
+  peer_metric_value: 8.4621
+  peer_metric_unit: multiple
+  metric_period: most recently reported equity as reflected by Tushare on 2026-07-10
+  accounting_basis: most recently reported equity as reflected by Tushare on 2026-07-10
+  normalization_method: same-date Tushare daily_basic multiple; no cross-date interpolation
+  business_exposure_comparability: product exposure score 3; confidence low
+  inclusion_reason: current local segment universe records product-level exposure;
+    selected before reviewing valuation multiples
+  selection_source_path: data/processed/normalized/segment_company_exposure.csv
+  source_path: data/raw/market_data/tushare_daily_basic_peer_set_2026-07-10_eb0c080a.json
+  sample_quality_allowed: false
+- input_id: r5_b5_peer_300499_ps_ttm_20260710
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: peer_snapshot
+  as_of_date: '2026-07-10'
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+  capture_method: archived_tushare_snapshot_then_codex_offline_review_user_authorized
+  no_live_api: true
+  limitations:
+  - Peer set has only two product-exposure candidates and is low confidence.
+  - Business mixes and liquid-cooling financial disclosure remain non-identical.
+  peer_set_id: r5_b5_liquid_cooling_peer_set_20260710
+  peer_stock_code: '300499'
+  peer_company_name: 高澜股份
+  peer_metric_name: ps_ttm
+  peer_metric_value: 11.9854
+  peer_metric_unit: multiple
+  metric_period: TTM revenue as of 2026-07-10
+  accounting_basis: TTM revenue as of 2026-07-10
+  normalization_method: same-date Tushare daily_basic multiple; no cross-date interpolation
+  business_exposure_comparability: product exposure score 3; confidence low
+  inclusion_reason: current local segment universe records product-level exposure;
+    selected before reviewing valuation multiples
+  selection_source_path: data/processed/normalized/segment_company_exposure.csv
+  source_path: data/raw/market_data/tushare_daily_basic_peer_set_2026-07-10_eb0c080a.json
+  sample_quality_allowed: false

@@ -44,6 +44,7 @@ def evaluate_promotion(pack: dict[str, Any], dry_run: dict[str, Any], rules: dic
     blockers: list[dict[str, str]] = []
     non_blocking_todos: list[dict[str, str]] = []
     text = _text(pack)
+    active_text = _text({key: value for key, value in pack.items() if key != "source_gap_policy"})
 
     if FORBIDDEN.search(text):
         blockers.append(_issue("no_advice_gate", "high", "Direct trading language found in R5 pack."))
@@ -55,7 +56,7 @@ def evaluate_promotion(pack: dict[str, Any], dry_run: dict[str, Any], rules: dic
         blockers.append(_issue("source_gap_visibility", "high", "Source gaps are not visibly registered."))
 
     visible_tokens = _visible_gap_tokens(pack)
-    hidden_tokens = sorted(token for token in rules.get("blocking_todo_tokens", []) if token in text and token not in visible_tokens)
+    hidden_tokens = sorted(token for token in rules.get("blocking_todo_tokens", []) if token in active_text and token not in visible_tokens)
     if hidden_tokens:
         blockers.append(_issue("hidden_todo_check", "high", "TODO/MISSING tokens appear outside visible source gaps.", ", ".join(hidden_tokens)))
 

@@ -1,0 +1,86 @@
+artifact_type: R5_bundle5_prepromotion_inventory
+schema_version: r5_bundle5_prepromotion_inventory_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+inventory_signature: c7e2146bff39443503a9ead7c6afad84624eb4732f1960a0ef8e9bc72bbb9e5d
+dropzone_validation_status: pass
+accepted_count: 22
+accepted_degraded_count: 0
+input_files:
+- path: data/reviewed_inputs/wf_20260703_stock_first_002837_invic/business_disclosure/official_2025_annual_report.yaml
+  sha256: c41c3aa518b1f769342548ed1885528c8e8b26a2ad9116ef4562aa859b361caa
+  size_bytes: 11256
+  record_count: 9
+- path: data/reviewed_inputs/wf_20260703_stock_first_002837_invic/forecast_assumptions/reviewed_model_assumptions.yaml
+  sha256: 98c6c65225ba17b0a4c97e2bc529eb482c7d2bec47056c1db8a7514c65ec0dba
+  size_bytes: 10015
+  record_count: 5
+- path: data/reviewed_inputs/wf_20260703_stock_first_002837_invic/market_snapshot/market_002837_20260710.yaml
+  sha256: 124ba49fea1c32e34fbcfdca3dd3c26a871f2547d5e3de86cf780462e3e70e37
+  size_bytes: 1586
+  record_count: 1
+- path: data/reviewed_inputs/wf_20260703_stock_first_002837_invic/peer_snapshot/peer_set_20260710.yaml
+  sha256: 8f4462de939a14dd29900a98970f5cfab5a29045ebb6e8fe964c1556c2906517
+  size_bytes: 8954
+  record_count: 6
+- path: data/reviewed_inputs/wf_20260703_stock_first_002837_invic/valuation_inputs/reviewed_valuation_context.yaml
+  sha256: 0ec84ae708a5fde0fdccc4342c1118363a228b5631486507e3da8087998abe7b
+  size_bytes: 4213
+  record_count: 1
+registry_targets:
+  market_peer:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_market_peer_input_registry.yaml
+    exists: true
+    sha256: 3363dae35cfbb063baa77ce796144aaa297570fb28adcb54871ff3361aa3d03a
+    size_bytes: 1191
+    semantic_summary:
+      artifact_type: R5_market_peer_input_registry
+      schema_version: r5_market_peer_input_registry_v0.1
+      review_status: pending
+      status: null
+      row_count_hint: 0
+  forecast_assumptions:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_forecast_assumption_registry.yaml
+    exists: true
+    sha256: 3474d20d5ebc8f1d006088d01d657e565715b6995e5a56071d93a3cd6853ffcc
+    size_bytes: 2120
+    semantic_summary:
+      artifact_type: R5_forecast_assumption_registry
+      schema_version: r5_forecast_assumption_registry_v0.1
+      review_status: pending
+      status: null
+      row_count_hint: 5
+  valuation_inputs:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_valuation_input_registry.yaml
+    exists: false
+    sha256: null
+    size_bytes: 0
+    semantic_summary:
+      artifact_type: null
+      status: missing
+  evidence_ledger:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_review_ledger.yaml
+    exists: true
+    sha256: c3225cee58bc236f994acb8d24c0515c6c5311e8b2f169a10a95484f4b6afc37
+    size_bytes: 3669
+    semantic_summary:
+      artifact_type: R5_evidence_request_review_ledger
+      schema_version: r5_evidence_request_review_ledger_v0.1
+      review_status: pending
+      status: null
+      row_count_hint: 10
+dry_run:
+  promotion_status: dry_run_ready
+  validation_status: pass
+  allowed_report_level: reviewed_input_research_draft
+  sample_quality_report_allowed: false
+  p2_allowed: false
+  planned_actions:
+    market_peer: updated
+    forecast_assumptions: updated
+    valuation_inputs: created
+    evidence_ledger: updated
+hard_boundaries:
+  sample_quality_report_allowed: false
+  p2_allowed: false
+  canonical_write_authorized_by_card: card_5_5

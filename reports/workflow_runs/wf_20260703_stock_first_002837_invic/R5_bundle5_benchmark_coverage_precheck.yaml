@@ -1,0 +1,224 @@
+artifact_type: R5_bundle5_benchmark_coverage_precheck
+schema_version: r5_bundle5_benchmark_coverage_precheck_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+profile_id: user_supplied_high_density_stock_reports_20260711
+precheck_status: pass
+precheck_only: true
+promotion_decision: false
+canonical_registry_write_performed: false
+sample_quality_report_allowed: false
+p2_allowed: false
+input_artifacts:
+  profile:
+    path: codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml
+    sha256: 81fc9334a0b9fe4816ab3750aa66ba4ca33313de038c87da7ddbb64d51ba0ae9
+  real_draft:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_note_reviewed_input_draft.md
+    sha256: d4164bbb6e98f5334b022a1f72a46eb8009720d375fc96a683a28c7dd6b70723
+  research_pack:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_stock_research_pack.yaml
+    sha256: 45f73cf0e0fe858f85ffaf43105e1f967d4ed8fc91a66e6445870f0326f9fbde
+  quality_gate:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_quality_gate_result.yaml
+    sha256: 1930d40da623aee924e6fbaed8a003455709c887171e5d7adf3ed920de78c320
+coverage_dimensions_expected:
+- company_context
+- financial_history_and_cash_flow_quality
+- business_breakdown_and_segment_economics
+- industry_structure_and_competition
+- forecast_assumptions_and_sensitivity
+- valuation_methods_and_comparability
+- dated_market_or_technical_state_when_supported
+- dated_sentiment_and_events_when_supported
+- risks_counterevidence_and_open_questions
+- research_conclusion_and_watch_conditions
+coverage:
+- dimension: company_context
+  status: covered
+  section_title: 公司背景与研究边界
+  rendered: true
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  evidence_anchors_in_report:
+  - ev_annual_report_002837_20260421_2cbfc5
+  explicit_todo_or_missing:
+  - MISSING_DISCLOSURE
+  visible_gaps_in_report:
+  - MISSING_DISCLOSURE
+  support_check: pass
+  issues: []
+- dimension: financial_history_and_cash_flow_quality
+  status: covered
+  section_title: 财务历史与现金流质量
+  rendered: true
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  evidence_anchors_in_report:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  explicit_todo_or_missing: []
+  visible_gaps_in_report: []
+  support_check: pass
+  issues: []
+- dimension: business_breakdown_and_segment_economics
+  status: partial
+  section_title: 业务拆分与细分经济性
+  rendered: true
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  evidence_anchors_in_report:
+  - ev_annual_report_002837_20260421_2cbfc5
+  explicit_todo_or_missing:
+  - MISSING_DISCLOSURE
+  visible_gaps_in_report:
+  - MISSING_DISCLOSURE
+  support_check: pass
+  issues: []
+- dimension: industry_structure_and_competition
+  status: missing
+  section_title: 行业结构与竞争
+  rendered: true
+  evidence_ids: []
+  evidence_anchors_in_report: []
+  explicit_todo_or_missing:
+  - TODO_SOURCE_REQUIRED
+  visible_gaps_in_report:
+  - TODO_SOURCE_REQUIRED
+  support_check: pass
+  issues: []
+- dimension: forecast_assumptions_and_sensitivity
+  status: covered
+  section_title: 预测假设与敏感性
+  rendered: true
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  evidence_anchors_in_report:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  explicit_todo_or_missing: []
+  visible_gaps_in_report: []
+  support_check: pass
+  issues: []
+- dimension: valuation_methods_and_comparability
+  status: partial
+  section_title: 估值方法与可比性
+  rendered: true
+  evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  - ev_quarterly_report_002837_20260421_2f00c7
+  evidence_anchors_in_report:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  - ev_quarterly_report_002837_20260421_2f00c7
+  explicit_todo_or_missing:
+  - LOW_CONFIDENCE_CLUE_ONLY
+  - UNREVIEWED_FCFF_INPUTS
+  - UNDISCLOSED_SEGMENT_SPLIT
+  visible_gaps_in_report:
+  - LOW_CONFIDENCE_CLUE_ONLY
+  - UNREVIEWED_FCFF_INPUTS
+  - UNDISCLOSED_SEGMENT_SPLIT
+  support_check: pass
+  issues: []
+- dimension: dated_market_or_technical_state_when_supported
+  status: partial
+  section_title: 有日期的市场状态
+  rendered: true
+  evidence_ids:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  evidence_anchors_in_report:
+  - ev_structured_market_data_002837_20260710_eb0c08
+  explicit_todo_or_missing:
+  - MISSING_PRICE_HISTORY
+  visible_gaps_in_report:
+  - MISSING_PRICE_HISTORY
+  support_check: pass
+  issues: []
+- dimension: dated_sentiment_and_events_when_supported
+  status: missing
+  section_title: 有日期的情绪与事件
+  rendered: true
+  evidence_ids: []
+  evidence_anchors_in_report: []
+  explicit_todo_or_missing:
+  - TODO_SOURCE_REQUIRED
+  visible_gaps_in_report:
+  - TODO_SOURCE_REQUIRED
+  support_check: pass
+  issues: []
+- dimension: risks_counterevidence_and_open_questions
+  status: covered
+  section_title: 风险、反证与开放问题
+  rendered: true
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  evidence_anchors_in_report:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  explicit_todo_or_missing:
+  - MISSING_DISCLOSURE
+  - LOW_CONFIDENCE_CLUE_ONLY
+  visible_gaps_in_report:
+  - MISSING_DISCLOSURE
+  - LOW_CONFIDENCE_CLUE_ONLY
+  support_check: pass
+  issues: []
+- dimension: research_conclusion_and_watch_conditions
+  status: partial
+  section_title: 研究结论与后续观察条件
+  rendered: true
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  evidence_anchors_in_report:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  explicit_todo_or_missing:
+  - MISSING_DISCLOSURE
+  - LOW_CONFIDENCE_CLUE_ONLY
+  visible_gaps_in_report:
+  - MISSING_DISCLOSURE
+  - LOW_CONFIDENCE_CLUE_ONLY
+  support_check: pass
+  issues: []
+coverage_summary:
+  total: 10
+  covered: 4
+  missing: 2
+  not_applicable: 0
+  partial: 4
+unsupported_populated_sections: []
+sample_registration_scan:
+  checked: 18
+  sample_evidence_registered_count: 0
+  matches: []
+  scan_scope:
+  - data/manifests/**
+  - data/reviewed_inputs/**
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_*registry.*
+sample_evidence_registered_count: 0
+forbidden_language_check:
+  status: pass
+  match_count: 0
+  matches: []
+coverage_gaps_preserved:
+- business_breakdown_and_segment_economics
+- industry_structure_and_competition
+- valuation_methods_and_comparability
+- dated_market_or_technical_state_when_supported
+- dated_sentiment_and_events_when_supported
+- research_conclusion_and_watch_conditions
+blockers: []
+notes:
+- The benchmark profile is used only for section coverage and presentation density.
+- No sample fact, forecast, price, event, citation or action instruction is evidence.
+- Coverage status does not change the report gate or open P2.

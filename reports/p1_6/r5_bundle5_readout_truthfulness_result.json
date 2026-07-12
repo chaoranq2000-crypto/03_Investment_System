@@ -1,0 +1,82 @@
+{
+  "truthfulness_status": "pass",
+  "checked": 8,
+  "failed": 0,
+  "canonical_checked": 8,
+  "legacy_noncanonical": 0,
+  "superseded": 0,
+  "results": [
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_FINANCIAL_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_5_3_MARKET_PEER_INPUT_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_5_4_FORECAST_VALUATION_INPUT_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_QUALITY_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    },
+    {
+      "path": "C:\\Projects\\03_Investment_System\\reports\\p1_6\\R5_BUNDLE_5_REAL_REVIEWED_INPUT_ONBOARDING_CLOSE_READOUT.md",
+      "status": "pass",
+      "issues": [],
+      "canonical_status": "canonical",
+      "reason": "",
+      "replacement_or_supplement_path": null,
+      "blocking_for_strict_smoke": true
+    }
+  ]
+}

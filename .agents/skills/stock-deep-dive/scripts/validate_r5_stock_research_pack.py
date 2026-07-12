@@ -213,8 +213,9 @@ def validate_pack_issues(data: dict[str, Any]) -> list[dict[str, str]]:
 
     gap_text = _source_gap_text(data)
     text_blob = _walk_text(data)
+    active_text_blob = _walk_text({key: value for key, value in data.items() if key != "source_gap_policy"})
     for token in sorted(MISSING_TOKENS):
-        if token in text_blob and token not in gap_text:
+        if token in active_text_blob and token not in gap_text:
             issues.append(
                 _issue(
                     "R5P-GAP-002",

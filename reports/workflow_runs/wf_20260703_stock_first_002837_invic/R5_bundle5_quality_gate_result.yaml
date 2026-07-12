@@ -1,0 +1,113 @@
+artifact_type: R5_bundle5_quality_gate_result
+schema_version: r5_bundle5_quality_gate_result_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+quality_decision: accepted_with_todos
+allowed_report_level: reviewed_input_research_draft
+rendered_output_type: reviewed_input_research_draft
+critical_quality_blockers: 0
+high_quality_blockers: 0
+blocker_details: []
+sample_quality_report_allowed: false
+p2_allowed: false
+checks:
+  material_claim_traceability:
+    status: pass
+    checked: 8
+    missing: []
+  claim_type_separation:
+    status: pass
+    types:
+    - estimate
+    - fact
+    - inference
+  metric_completeness:
+    status: pass
+    required_fields:
+    - period
+    - unit
+    - source
+    - method
+  exposure_integrity:
+    status: pass
+    confidence: medium
+    missing_state_visible: true
+  risk_counterevidence:
+    status: pass
+    risks: 3
+    counterevidence: 2
+  staleness_conflict:
+    status: pass
+    conflicts_checked: 2
+  forbidden_language:
+    status: pass
+    matches: []
+  resolved_registry_todo_leak:
+    status: pass
+    matches: []
+  pack_validator:
+    status: pass
+    decision: accepted_with_todos
+    issues: []
+  scorecard_validator:
+    status: pass
+    decision: reviewed_input_research_draft
+    issues: []
+issues:
+- issue_id: R5_B5_QA_DISCLOSURE
+  severity: medium
+  gate_id: R5_BUNDLE_5_6_QUALITY_GATE
+  stage: research_draft_render
+  target_artifact: R5_stock_research_note_reviewed_input_draft.md
+  section: business_breakdown_and_segment_economics
+  description: Liquid-cooling-specific financial contribution remains undisclosed.
+  fix_owner_skill: evidence-ingest
+  blocking_decision: false
+  next_action: Retain the visible gap until an official split is published.
+  status: open_visible
+- issue_id: R5_B5_QA_PEER
+  severity: medium
+  gate_id: R5_BUNDLE_5_6_QUALITY_GATE
+  stage: research_draft_render
+  target_artifact: R5_stock_research_note_reviewed_input_draft.md
+  section: valuation_methods_and_comparability
+  description: The two-company peer set remains low confidence.
+  fix_owner_skill: company-valuation
+  blocking_decision: false
+  next_action: Retain low confidence and the mixed-signal interpretation.
+  status: open_visible
+- issue_id: R5_B5_QA_EVENT
+  severity: medium
+  gate_id: R5_BUNDLE_5_6_QUALITY_GATE
+  stage: research_draft_render
+  target_artifact: R5_stock_research_note_reviewed_input_draft.md
+  section: dated_sentiment_and_events_when_supported
+  description: Dated sentiment and event evidence is absent.
+  fix_owner_skill: evidence-ingest
+  blocking_decision: false
+  next_action: Keep the section source-gapped until dated evidence is reviewed.
+  status: open_visible
+input_artifact_paths:
+  pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_stock_research_pack.yaml
+  scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_quality_scorecard.yaml
+  gate: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_real_pilot_gate_result.json
+  render_result: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_reviewed_input_render_result.yaml
+  report: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_note_reviewed_input_draft.md
+input_artifact_hashes:
+  pack: 45f73cf0e0fe858f85ffaf43105e1f967d4ed8fc91a66e6445870f0326f9fbde
+  scorecard: 6c0b110e272ac7007f2967b1e1cc65db9930ccf91e19cce4bc3ca27d6187a86e
+  gate: f2046a1b57edd4892902e0cffda9229e8a84bbe911cfad56f79f70ae2b89f165
+  render_result: e0c7b20c3c516e510313e09f9188b28cfff7d7061963835705ab7b1c83a1a6f3
+  report: d4164bbb6e98f5334b022a1f72a46eb8009720d375fc96a683a28c7dd6b70723
+visible_source_gaps:
+- R5_B5_GAP_LIQUID_COOLING_SPLIT
+- R5_B5_GAP_INDUSTRY_STRUCTURE
+- R5_B5_GAP_PRICE_HISTORY
+- R5_B5_GAP_SENTIMENT_EVENTS
+- R5_B5_GAP_PEER_CONFIDENCE
+- R5_B5_GAP_INTRINSIC_METHODS
+remaining_registry_todos: []
+resolved_registry_todos:
+- TODO_MARKET_DATA
+- TODO_MODEL_INPUT
+- TODO_PEER_DATA

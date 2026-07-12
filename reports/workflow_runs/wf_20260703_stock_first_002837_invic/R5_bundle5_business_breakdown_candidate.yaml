@@ -1,0 +1,337 @@
+artifact_type: R5_business_breakdown_pack
+schema_version: r5_business_breakdown_pack_v0.1
+status: partial
+as_of_date: '2026-04-21'
+stock_code: 002837
+business_lines:
+- business_name: room_cooling
+  reported_name: 机房温控节能产品
+  role: reported_broad_product_line
+  revenue:
+    value: 3448477492.62
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  revenue_pct:
+    value: 56.83
+    unit: pct
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  gross_margin:
+    value: 28.36
+    unit: pct
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  gross_profit:
+    value: 977827266.53
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: reported_revenue_minus_reported_cost
+  gross_profit_pct:
+    value: 57.84
+    unit: pct
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: derived_line_gross_profit_divided_by_reported_company_gross_profit
+  products:
+  - 机房温控节能产品
+  customers: []
+  capacity: []
+  orders: []
+  pricing_driver: not_assessed_in_card_5_2
+  cost_driver: reported cost available only for product lines above the disclosure
+    threshold
+  linked_segments: []
+  confidence: high
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  missing_items: []
+  page_or_table_locator: PDF pages 15-16; 第三节四、2
+  claim_type: fact_with_arithmetic_derivations
+- business_name: cabinet_cooling
+  reported_name: 机柜温控节能产品
+  role: reported_broad_product_line
+  revenue:
+    value: 1977423139.19
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  revenue_pct:
+    value: 32.59
+    unit: pct
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  gross_margin:
+    value: 27.24
+    unit: pct
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  gross_profit:
+    value: 538639525.94
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: reported_revenue_minus_reported_cost
+  gross_profit_pct:
+    value: 31.86
+    unit: pct
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: derived_line_gross_profit_divided_by_reported_company_gross_profit
+  products:
+  - 机柜温控节能产品
+  customers: []
+  capacity: []
+  orders: []
+  pricing_driver: not_assessed_in_card_5_2
+  cost_driver: reported cost available only for product lines above the disclosure
+    threshold
+  linked_segments: []
+  confidence: high
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  missing_items: []
+  page_or_table_locator: PDF pages 15-16; 第三节四、2
+  claim_type: fact_with_arithmetic_derivations
+- business_name: bus_air_conditioning
+  reported_name: 客车空调
+  role: reported_broad_product_line
+  revenue:
+    value: 90266641.17
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  revenue_pct:
+    value: 1.49
+    unit: pct
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  gross_margin:
+    value: null
+    unit: pct
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  gross_profit:
+    value: null
+    unit: CNY
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  gross_profit_pct:
+    value: null
+    unit: pct
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  products:
+  - 客车空调
+  customers: []
+  capacity: []
+  orders: []
+  pricing_driver: not_assessed_in_card_5_2
+  cost_driver: not_separately_disclosed
+  linked_segments: []
+  confidence: medium
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  missing_items:
+  - 该低占比产品未在年报10%以上产品表中单列营业成本和毛利率。
+  page_or_table_locator: PDF pages 15-16; 第三节四、2
+  claim_type: fact_with_visible_gaps
+- business_name: rail_air_conditioning_service
+  reported_name: 轨道交通列车空调及服务
+  role: reported_broad_product_line
+  revenue:
+    value: 44912639.85
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  revenue_pct:
+    value: 0.74
+    unit: pct
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  gross_margin:
+    value: null
+    unit: pct
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  gross_profit:
+    value: null
+    unit: CNY
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  gross_profit_pct:
+    value: null
+    unit: pct
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  products:
+  - 轨道交通列车空调及服务
+  customers: []
+  capacity: []
+  orders: []
+  pricing_driver: not_assessed_in_card_5_2
+  cost_driver: not_separately_disclosed
+  linked_segments: []
+  confidence: medium
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  missing_items:
+  - 该低占比产品未在年报10%以上产品表中单列营业成本和毛利率。
+  page_or_table_locator: PDF pages 15-16; 第三节四、2
+  claim_type: fact_with_visible_gaps
+- business_name: other
+  reported_name: 其他
+  role: reported_broad_product_line
+  revenue:
+    value: 506679178.72
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  revenue_pct:
+    value: 8.35
+    unit: pct
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: null
+    calculation_method: direct_reported_value
+  gross_margin:
+    value: null
+    unit: pct
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  gross_profit:
+    value: null
+    unit: CNY
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  gross_profit_pct:
+    value: null
+    unit: pct
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  products:
+  - 其他
+  customers: []
+  capacity: []
+  orders: []
+  pricing_driver: not_assessed_in_card_5_2
+  cost_driver: not_separately_disclosed
+  linked_segments: []
+  confidence: medium
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  missing_items:
+  - 该低占比产品未在年报10%以上产品表中单列营业成本和毛利率。
+  page_or_table_locator: PDF pages 15-16; 第三节四、2
+  claim_type: fact_with_visible_gaps
+- business_name: liquid_cooling_specific
+  reported_name: 液冷单独口径
+  role: product_line_clue_only
+  revenue:
+    value: null
+    unit: CNY
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  revenue_pct:
+    value: null
+    unit: pct
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  gross_margin:
+    value: null
+    unit: pct
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  gross_profit:
+    value: null
+    unit: CNY
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  gross_profit_pct:
+    value: null
+    unit: pct
+    evidence_id: null
+    metric_id: null
+    missing_reason: MISSING_DISCLOSURE
+  products:
+  - Coolinside cold plates
+  - CDU
+  - manifold
+  - quick connectors
+  customers: []
+  capacity: []
+  orders: []
+  pricing_driver: TODO_SOURCE_REQUIRED
+  cost_driver: TODO_SOURCE_REQUIRED
+  linked_segments:
+  - ai_server_liquid_cooling
+  confidence: medium
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  missing_items:
+  - 液冷收入占比未单列披露。
+  - 液冷毛利率未单列披露。
+  - 液冷利润贡献未单列披露。
+  page_or_table_locator: PDF pages 9-10 product narrative; financial tables use broader
+    room/cabinet categories
+  claim_type: product_clue_and_unknown_metrics
+profit_pool_summary:
+  status: partial
+  company_revenue: 6067759091.55
+  company_operating_cost: 4377125780.98
+  company_gross_profit: 1690633310.57
+  unit: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  product_revenue_sum: 6067759091.55
+  reconciliation_residual: 0.0
+  calculation_method: sum_reported_product_revenue_and_compare_with_reported_company_revenue
+  limitation: Only the two product lines above the disclosure threshold have separate
+    cost and margin rows.
+structural_contradictions:
+- The issuer discloses liquid-cooling products but reports revenue and margin in broader
+  room/cabinet cooling categories.
+- Broad product-line totals therefore cannot be relabeled as liquid-cooling-specific
+  financials.
+linked_segments:
+- ai_server_liquid_cooling
+missing_items:
+- item: liquid_cooling_revenue_share
+  reason: MISSING_DISCLOSURE
+- item: liquid_cooling_gross_margin
+  reason: MISSING_DISCLOSURE
+- item: liquid_cooling_profit_contribution
+  reason: MISSING_DISCLOSURE
+source_gap_register:
+- gap_id: R5_002837_GAP_BUSINESS_001
+  token: MISSING_DISCLOSURE
+  owner: evidence-ingest
+  next_action: retain visible gap until an official split is published
+evidence_ids:
+- ev_annual_report_002837_20260421_2cbfc5
+- ev_interim_report_002837_20250819_47054e
+sample_quality_allowed: false
+p2_allowed: false

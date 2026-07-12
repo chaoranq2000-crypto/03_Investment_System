@@ -1,11 +1,27 @@
 artifact_type: R5_reviewed_input_render_result
 schema_version: r5_reviewed_input_render_result_v0.1
 workflow_id: wf_20260703_stock_first_002837_invic
-input_gate_state: R5_REVIEWED_INPUT_PILOT_BLOCKED_SOURCE_GAPPED
-promotion_level: source_gapped_research_draft
-promotion_status: no_accepted_inputs
-rendered_output_type: source_gapped_research_draft
-rendered_output_path: reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_note_reviewed_input_draft.md
+input_gate_state: R5_REVIEWED_INPUT_PILOT_ALLOWED
+promotion_level: reviewed_input_research_draft
+promotion_status: accepted_inputs_promoted
+rendered_output_type: reviewed_input_research_draft
+rendered_output_path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_note_reviewed_input_draft.md
+input_artifacts:
+  pack:
+    path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_stock_research_pack.yaml
+    sha256: 45f73cf0e0fe858f85ffaf43105e1f967d4ed8fc91a66e6445870f0326f9fbde
+  gate:
+    path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_real_pilot_gate_result.json
+    sha256: f2046a1b57edd4892902e0cffda9229e8a84bbe911cfad56f79f70ae2b89f165
+  staging:
+    path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_reviewed_input_staging.yaml
+    sha256: 28da50a9ee7245985e1a90aadfae1e24d669567c05ea6c5e67e88582e87efb8b
+  promotion:
+    path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_registry_promotion_result.yaml
+    sha256: 487e6f96d0b599d765af0fedc6aed5b95830718b526188cd98b3fcade52f6243
+  scorecard:
+    path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_quality_scorecard.yaml
+    sha256: 6c0b110e272ac7007f2967b1e1cc65db9930ccf91e19cce4bc3ca27d6187a86e
 sample_quality_report_allowed: false
 p2_allowed: false
 source_gap_count: 6
@@ -18,15 +34,10 @@ required_markers:
   no_advice_boundary: true
   remaining_todos: true
 writer_result:
-  output_path: reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_note_reviewed_input_draft.md
-  source_gap_count: 6
-  output_type: source_gapped_research_draft
-remaining_todos:
-- TODO_MARKET_DATA
-- TODO_PEER_DATA
-- TODO_MODEL_INPUT
-- MISSING_DISCLOSURE
-- TODO_SOURCE_REQUIRED
+  output_path: C:\Projects\03_Investment_System\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_note_reviewed_input_draft.md
+  reviewed_sections: 8
+  output_type: reviewed_input_research_draft
+remaining_todos: []
 notes:
 - Blocked gate renders source_gapped_research_draft only.
 - Source Gap Appendix, Open Questions, no-advice boundary, and remaining TODOs are

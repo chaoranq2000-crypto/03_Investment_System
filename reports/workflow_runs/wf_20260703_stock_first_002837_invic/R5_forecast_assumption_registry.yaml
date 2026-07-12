@@ -1,80 +1,250 @@
 schema_version: r5_forecast_assumption_registry_v0.1
 artifact_type: R5_forecast_assumption_registry
 workflow_id: wf_20260703_stock_first_002837_invic
-stock_code: "002837"
-review_status: pending
+stock_code: 002837
+review_status: reviewed
+as_of_date: '2026-07-10'
+reviewer: codex
 no_live_api: true
 assumptions:
-  - assumption_id: TODO_REVIEWED_REVENUE_GROWTH
-    driver: revenue_growth
-    periods:
-      - 2026E
-      - 2027E
-      - 2028E
-    value: TODO_MODEL_INPUT
-    unit: pct
-    evidence_ids: []
-    metric_ids:
-      - metric_cn_002837_invic_revenue_20260331_4f7f22
-    missing_reason: TODO_MODEL_INPUT
-    allowed_usage: degraded_forecast_only
-    review_status: pending
-  - assumption_id: TODO_REVIEWED_GROSS_MARGIN
-    driver: gross_margin
-    periods:
-      - 2026E
-      - 2027E
-      - 2028E
-    value: TODO_MODEL_INPUT
-    unit: pct
-    evidence_ids: []
-    metric_ids: []
-    missing_reason: TODO_MODEL_INPUT
-    allowed_usage: degraded_forecast_only
-    review_status: pending
-  - assumption_id: TODO_REVIEWED_OPEX
-    driver: opex
-    periods:
-      - 2026E
-      - 2027E
-      - 2028E
-    value: TODO_MODEL_INPUT
-    unit: pct
-    evidence_ids: []
-    metric_ids: []
-    missing_reason: TODO_MODEL_INPUT
-    allowed_usage: degraded_forecast_only
-    review_status: pending
-  - assumption_id: TODO_REVIEWED_NET_PROFIT
-    driver: net_profit
-    periods:
-      - 2026E
-      - 2027E
-      - 2028E
-    value: TODO_MODEL_INPUT
-    unit: CNY
-    evidence_ids: []
-    metric_ids: []
-    missing_reason: TODO_MODEL_INPUT
-    allowed_usage: degraded_forecast_only
-    review_status: pending
-  - assumption_id: TODO_REVIEWED_EPS
-    driver: eps
-    periods:
-      - 2026E
-      - 2027E
-      - 2028E
-    value: TODO_MODEL_INPUT
-    unit: CNY_per_share
-    evidence_ids: []
-    metric_ids: []
-    missing_reason: TODO_MODEL_INPUT
-    allowed_usage: degraded_forecast_only
-    review_status: pending
+- assumption_id: r5_b5_forecast_revenue_growth_base
+  driver: revenue_growth
+  periods:
+  - 2026E
+  - 2027E
+  - 2028E
+  value:
+    2026E: 26.0291
+    2027E: 20.0
+    2028E: 15.0
+  unit: pct
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: []
+  allowed_usage: reviewed_input_research_draft
+  review_status: reviewed
+  reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+    in the financial-history pack.
+  scope: company
+  scenario: base
+  metric_name: revenue_growth
+  supporting_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  supporting_metric_ids: []
+  rationale: 2026 uses the reported Q1 year-on-year rate as a mechanical carry-forward;
+    later years are explicit slowing-growth model assumptions.
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  input_id: r5_b5_forecast_revenue_growth_base
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  provenance:
+    input_id: r5_b5_forecast_revenue_growth_base
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+- assumption_id: r5_b5_forecast_gross_margin_base
+  driver: gross_margin
+  periods:
+  - 2026E
+  - 2027E
+  - 2028E
+  value:
+    2026E: 24.2935
+    2027E: 25.5
+    2028E: 26.5
+  unit: pct
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: []
+  allowed_usage: reviewed_input_research_draft
+  review_status: reviewed
+  reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+    in the financial-history pack.
+  scope: margin
+  scenario: base
+  metric_name: gross_margin
+  supporting_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  supporting_metric_ids: []
+  rationale: The base path starts from the reported Q1 cost/revenue ratio and only
+    partially normalizes toward the 2025 annual level.
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  input_id: r5_b5_forecast_gross_margin_base
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  provenance:
+    input_id: r5_b5_forecast_gross_margin_base
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+- assumption_id: r5_b5_forecast_opex_base
+  driver: opex
+  periods:
+  - 2026E
+  - 2027E
+  - 2028E
+  value:
+    2026E: 18.5321
+    2027E: 17.5
+    2028E: 16.5
+  unit: pct_of_revenue
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: []
+  allowed_usage: reviewed_input_research_draft
+  review_status: reviewed
+  reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+    in the financial-history pack.
+  scope: opex
+  scenario: base
+  metric_name: opex
+  supporting_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  supporting_metric_ids: []
+  rationale: The expense ratio is a model input, not a reported full-year outcome;
+    it begins at the Q1 ratio and gradually normalizes.
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  input_id: r5_b5_forecast_opex_base
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  provenance:
+    input_id: r5_b5_forecast_opex_base
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+- assumption_id: r5_b5_forecast_net_profit_base
+  driver: net_profit
+  periods:
+  - 2026E
+  - 2027E
+  - 2028E
+  value:
+    2026E: 94115513.02
+    2027E: 321179929.4
+    2028E: 580418015.27
+  unit: CNY
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: []
+  allowed_usage: reviewed_input_research_draft
+  review_status: reviewed
+  reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+    in the financial-history pack.
+  scope: company
+  scenario: base
+  metric_name: net_profit
+  supporting_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  supporting_metric_ids: []
+  rationale: The 2026 base is a mechanical prior-year seasonality run-rate; 2027-2028
+    margins are explicit model assumptions with wide ranges.
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  input_id: r5_b5_forecast_net_profit_base
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  provenance:
+    input_id: r5_b5_forecast_net_profit_base
+    source_evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+- assumption_id: r5_b5_forecast_eps_base
+  driver: eps
+  periods:
+  - 2026E
+  - 2027E
+  - 2028E
+  value:
+    2026E: 0.073854
+    2027E: 0.252034
+    2028E: 0.455462
+  unit: CNY_per_share
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  metric_ids: []
+  allowed_usage: reviewed_input_research_draft
+  review_status: reviewed
+  reviewer_note: Reviewed as a transparent research estimate; reported facts remain
+    in the financial-history pack.
+  scope: company
+  scenario: base
+  metric_name: eps
+  supporting_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  supporting_metric_ids: []
+  rationale: EPS uses the reviewed same-date total-share count and the model net-profit
+    path; dilution after the snapshot is not assumed.
+  limitations:
+  - The path is a mechanical research scenario, not management guidance or consensus.
+  - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is wide.
+  input_id: r5_b5_forecast_eps_base
+  source_rank: B
+  as_of_date: '2026-07-10'
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  provenance:
+    input_id: r5_b5_forecast_eps_base
+    source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_date: '2026-07-10'
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
 blocking_rules:
-  - if any core forecast driver is pending, sample-quality must remain false
-forecast_model_interlock:
-  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
-  expected_status: TODO_MODEL_INPUT
+- fixture assumptions never open sample-quality or P2
 sample_quality_report_allowed: false
 p2_allowed: false

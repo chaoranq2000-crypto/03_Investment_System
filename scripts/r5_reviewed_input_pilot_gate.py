@@ -93,13 +93,23 @@ def evaluate_gate(inputs: dict[str, Any], rules: dict[str, Any]) -> dict[str, An
         non_blocking_todos.append({"id": f"todo_{str(token).lower()}", "severity": "todo", "reason": "TODO remains visible after reviewed-input dry run.", "detail": str(token)})
 
     reviewed_input_pilot_allowed = not blockers
+    fixed_boundaries = rules.get("fixed_boundaries") if isinstance(rules.get("fixed_boundaries"), dict) else {}
     sample_quality_allowed = (
         reviewed_input_pilot_allowed
         and promotion.get("promotion_level") == "sample_quality_candidate"
         and not critical_todos
         and not scorecard.get("sample_quality_blockers")
     )
+    if fixed_boundaries.get("sample_quality_report_allowed") is False:
+        sample_quality_allowed = False
     p2_allowed = sample_quality_allowed and bool(scorecard.get("p2_allowed", False))
+    if fixed_boundaries.get("p2_allowed") is False:
+        p2_allowed = False
+
+    raw_promotion_level = promotion.get("promotion_level")
+    effective_promotion_level = raw_promotion_level
+    if fixed_boundaries.get("sample_quality_report_allowed") is False and raw_promotion_level == "sample_quality_candidate":
+        effective_promotion_level = "reviewed_input_research_draft"
 
     if blockers:
         current_state = "R5_REVIEWED_INPUT_PILOT_BLOCKED_SOURCE_GAPPED"
@@ -118,10 +128,12 @@ def evaluate_gate(inputs: dict[str, Any], rules: dict[str, Any]) -> dict[str, An
         "non_blocking_todos": non_blocking_todos,
         "input_summary": {
             "strict_smoke_status": smoke.get("status"),
-            "pack_promotion_level": promotion.get("promotion_level"),
+            "raw_pack_promotion_level": raw_promotion_level,
+            "pack_promotion_level": effective_promotion_level,
             "quality_allowed_report_level": scorecard.get("allowed_report_level"),
             "no_advice_gate_passed": inputs.get("no_advice_gate_passed"),
             "critical_todos": critical_todos,
+            "fixed_boundaries": fixed_boundaries,
         },
         "next_candidate_tasks": list(rules.get("next_candidate_tasks") or [])[: int(rules.get("max_next_candidate_tasks", 3))],
     }

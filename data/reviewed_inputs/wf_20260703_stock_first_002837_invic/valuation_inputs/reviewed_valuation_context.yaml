@@ -1,0 +1,104 @@
+records:
+- input_id: r5_b5_valuation_context_002837_20260710
+  valuation_input_id: r5_b5_valuation_context_002837_20260710
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: 002837
+  input_type: valuation_inputs
+  as_of_date: '2026-07-10'
+  valuation_date: '2026-07-10'
+  source_evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+  source_rank: B
+  review_status: accepted
+  reviewer: codex
+  reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+  capture_method: company_valuation_subskill_method_review_user_authorized
+  no_live_api: true
+  currency: CNY
+  share_count_basis: reviewed daily_basic total_share on valuation date
+  shares_outstanding: 1274349692
+  net_debt_cash_bridge:
+    as_of_date: '2026-03-31'
+    currency: CNY
+    components:
+      cash: 917139183.43
+      short_term_borrowings: 939000000.0
+      current_noncurrent_liabilities: 246338651.34
+      long_term_borrowings: 351026719.14
+      lease_liabilities: 78909142.62
+    gross_debt: 1615274513.1
+    net_debt_proxy: 698135329.67
+    evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    page_or_table_locator: 2026Q1 report PDF pages 6-8; consolidated balance sheet
+    calculation_method: short-term borrowings + current non-current liabilities +
+      long-term borrowings + lease liabilities - cash
+    claim_type: inference
+    confidence: low
+    limitations:
+    - Current non-current liabilities are used as one disclosed aggregate; detailed
+      debt/lease composition is not reallocated.
+    - Restricted cash and the cash-equivalent treatment of trading financial assets
+      were not reviewed, so this is a proxy rather than a precise net-debt fact.
+  requested_methods:
+  - relative_pe
+  method_eligibility:
+    relative_pe:
+      status: eligible_low_confidence_context_only
+      reason: same-date PE TTM exists for two exposure-grounded peers; business mixes
+        differ and PB/PS comparisons point in the opposite direction
+    dcf:
+      status: excluded
+      reason: tax, capex, working-capital, discount-rate and terminal assumptions
+        are not sufficiently reviewed
+    sotp:
+      status: excluded
+      reason: liquid-cooling-specific revenue and profit splits are not separately
+        disclosed
+  market_input_ids:
+  - r5_b5_market_002837_20260710
+  peer_input_ids:
+  - r5_b5_peer_301018_pe_ttm_20260710
+  - r5_b5_peer_301018_pb_20260710
+  - r5_b5_peer_301018_ps_ttm_20260710
+  - r5_b5_peer_300499_pe_ttm_20260710
+  - r5_b5_peer_300499_pb_20260710
+  - r5_b5_peer_300499_ps_ttm_20260710
+  forecast_assumption_ids:
+  - r5_b5_forecast_revenue_growth_base
+  - r5_b5_forecast_gross_margin_base
+  - r5_b5_forecast_opex_base
+  - r5_b5_forecast_net_profit_base
+  - r5_b5_forecast_eps_base
+  business_disclosure_input_ids:
+  - r5_b5_business_2025_room_cooling_revenue
+  - r5_b5_business_2025_room_cooling_gross_margin
+  - r5_b5_business_2025_cabinet_cooling_revenue
+  - r5_b5_business_2025_cabinet_cooling_gross_margin
+  - r5_b5_business_2025_bus_air_conditioning_revenue
+  - r5_b5_business_2025_rail_air_conditioning_service_revenue
+  - r5_b5_business_2025_other_revenue
+  - r5_b5_business_2025_company_revenue
+  - r5_b5_business_2025_company_gross_margin
+  supporting_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_market_data_002837_20260710_eb0c08
+  accounting_basis: PE TTM on 2026-07-10; model EPS for 2026E-2028E; CNY consolidated
+    company basis
+  scenario_output_boundary: relative multiple context and forward-PE sensitivity only;
+    no price output
+  cross_multiple_context:
+    subject:
+      pe_ttm: 194.2045
+      pb: 27.0715
+      ps_ttm: 14.8507
+    peer_median:
+      pe_ttm: 310.1249
+      pb: 12.33865
+      ps_ttm: 11.32265
+    label: mixed_multiple_signal_not_assessable
+  limitations:
+  - The peer set has two companies and remains low confidence.
+  - Trailing PE is affected by the subject's weak 2026Q1 attributable profit.
+  - Forecast values are model estimates rather than reported facts or management guidance.
+  no_advice_boundary: true
+  sample_quality_allowed: false

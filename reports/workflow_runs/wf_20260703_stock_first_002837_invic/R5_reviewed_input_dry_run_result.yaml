@@ -1,29 +1,189 @@
 artifact_type: R5_reviewed_input_dry_run_result
-schema_version: r5_reviewed_input_dry_run_result_v0.1
+schema_version: r5_reviewed_input_dry_run_result_v0.2
+derivation_source: validated_physical_registries
 workflow_id: wf_20260703_stock_first_002837_invic
-stock_code: "002837"
+stock_code: 002837
+fixture_mode: false
 no_live_api: true
-inputs:
-  evidence_request_queue: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_queue.yaml
-  market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_market_snapshot_stub.yaml
-  peer_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_peer_snapshot_stub.yaml
-  forecast_assumption_registry: .agents/skills/stock-deep-dive/assets/r5_forecast_assumption_registry.example.yaml
-  valuation_input_registry: .agents/skills/stock-deep-dive/assets/r5_valuation_input_registry.example.yaml
-reviewed_market_inputs_available: false
-reviewed_peer_inputs_available: false
-reviewed_forecast_assumptions_available: false
-reviewed_valuation_inputs_available: false
-reviewed_business_disclosure_available: false
-allowed_report_level: source_gapped_research_draft
-remaining_todos:
-  - TODO_MARKET_DATA
-  - TODO_PEER_DATA
-  - TODO_MODEL_INPUT
-  - MISSING_DISCLOSURE
-  - TODO_SOURCE_REQUIRED
-source_gap_visibility: true
+validation_status: pass
+registry_sources:
+  market_peer:
+    path: R5_market_peer_input_registry.yaml
+    sha256: 79bca54df269daadd0c956bf0c146ef751fe82f06b5ca6a955461e552b77e100
+    validation:
+      decision: accepted
+      validators:
+      - name: market_peer_registry
+        decision: accepted
+        issues: []
+      issues: []
+  forecast_assumptions:
+    path: R5_forecast_assumption_registry.yaml
+    sha256: 040353bacb5fd07c223828d894ce764c328cade166173c4166531be9f36d9776
+    validation:
+      decision: accepted
+      validators:
+      - name: forecast_registry
+        decision: accepted
+        issues: []
+      - name: forecast_downstream
+        decision: accepted
+        issues:
+        - &id001
+          issue_id: R5ASM-ROW-002
+          severity: medium
+          path: assumptions[0].supporting_metric_ids
+          description: supporting_metric_ids is required
+        - &id002
+          issue_id: R5ASM-ROW-002
+          severity: medium
+          path: assumptions[1].supporting_metric_ids
+          description: supporting_metric_ids is required
+        - &id003
+          issue_id: R5ASM-ROW-002
+          severity: medium
+          path: assumptions[2].supporting_metric_ids
+          description: supporting_metric_ids is required
+        - &id004
+          issue_id: R5ASM-ROW-002
+          severity: medium
+          path: assumptions[3].supporting_metric_ids
+          description: supporting_metric_ids is required
+        - &id005
+          issue_id: R5ASM-ROW-002
+          severity: medium
+          path: assumptions[4].supporting_metric_ids
+          description: supporting_metric_ids is required
+      issues:
+      - *id001
+      - *id002
+      - *id003
+      - *id004
+      - *id005
+  valuation_inputs:
+    path: R5_valuation_input_registry.yaml
+    sha256: 091a2c97a3dbf826e28eff9153432d03c016b7aa8c7a8076c52a175fca5928e4
+    validation:
+      decision: sample_quality_candidate
+      validators:
+      - name: valuation_inputs
+        decision: sample_quality_candidate
+        issues: []
+      issues: []
+  evidence_ledger:
+    path: R5_evidence_request_review_ledger.yaml
+    sha256: 020f72dfa35d99d4c74a966b9509cbbbf979311b64847bb3c799f439fb9959f6
+    validation:
+      decision: accepted_with_todos
+      validators:
+      - name: evidence_ledger
+        decision: accepted_with_todos
+        issues: []
+      issues: []
+promotion_result:
+  path: R5_bundle5_registry_promotion_result.yaml
+  provided: true
+  validated: true
+identity:
+  valid: true
+  workflow_ids:
+  - wf_20260703_stock_first_002837_invic
+  stock_codes:
+  - 002837
+reviewed_market_inputs_available: true
+reviewed_peer_inputs_available: true
+reviewed_forecast_assumptions_available: true
+reviewed_valuation_inputs_available: true
+reviewed_business_disclosure_available: true
+flag_evidence:
+  reviewed_market_inputs_available:
+    input_ids: &id006
+    - r5_b5_market_002837_20260710
+    evidence_ids: &id007
+    - ev_structured_market_data_002837_20260710_eb0c08
+  reviewed_peer_inputs_available:
+    input_ids: &id008
+    - r5_b5_peer_300499_pb_20260710
+    - r5_b5_peer_300499_pe_ttm_20260710
+    - r5_b5_peer_300499_ps_ttm_20260710
+    - r5_b5_peer_301018_pb_20260710
+    - r5_b5_peer_301018_pe_ttm_20260710
+    - r5_b5_peer_301018_ps_ttm_20260710
+    evidence_ids: &id009
+    - ev_structured_market_data_002837_20260710_eb0c08
+  reviewed_forecast_assumptions_available:
+    input_ids: &id010
+    - r5_b5_forecast_eps_base
+    - r5_b5_forecast_gross_margin_base
+    - r5_b5_forecast_net_profit_base
+    - r5_b5_forecast_opex_base
+    - r5_b5_forecast_revenue_growth_base
+    evidence_ids: &id011
+    - ev_annual_report_002837_20260421_2cbfc5
+    - ev_quarterly_report_002837_20260421_2f00c7
+    - ev_structured_market_data_002837_20260710_eb0c08
+  reviewed_valuation_inputs_available:
+    input_ids: &id014
+    - r5_b5_valuation_context_002837_20260710
+    evidence_ids: &id015
+    - ev_structured_market_data_002837_20260710_eb0c08
+  reviewed_business_disclosure_available:
+    input_ids: &id012
+    - r5_b5_business_2025_bus_air_conditioning_revenue
+    - r5_b5_business_2025_cabinet_cooling_gross_margin
+    - r5_b5_business_2025_cabinet_cooling_revenue
+    - r5_b5_business_2025_company_gross_margin
+    - r5_b5_business_2025_company_revenue
+    - r5_b5_business_2025_other_revenue
+    - r5_b5_business_2025_rail_air_conditioning_service_revenue
+    - r5_b5_business_2025_room_cooling_gross_margin
+    - r5_b5_business_2025_room_cooling_revenue
+    evidence_ids: &id013
+    - ev_annual_report_002837_20260421_2cbfc5
+todo_trace:
+- token: TODO_MARKET_DATA
+  status: resolved
+  resolving_input_ids: *id006
+  registry_path: R5_market_peer_input_registry.yaml
+  field: market_inputs
+  evidence_ids: *id007
+  reason: resolved by validator-accepted physical registry provenance
+- token: TODO_PEER_DATA
+  status: resolved
+  resolving_input_ids: *id008
+  registry_path: R5_market_peer_input_registry.yaml
+  field: peer_inputs
+  evidence_ids: *id009
+  reason: resolved by validator-accepted physical registry provenance
+- token: TODO_MODEL_INPUT
+  status: resolved
+  resolving_input_ids: *id010
+  registry_path: R5_forecast_assumption_registry.yaml
+  field: assumptions
+  evidence_ids: *id011
+  reason: resolved by validator-accepted physical registry provenance
+- token: MISSING_DISCLOSURE
+  status: resolved
+  resolving_input_ids: *id012
+  registry_path: R5_valuation_input_registry.yaml
+  field: business_line_split
+  evidence_ids: *id013
+  reason: resolved by validator-accepted physical registry provenance
+- token: TODO_SOURCE_REQUIRED
+  status: resolved
+  resolving_input_ids: *id014
+  registry_path: R5_valuation_input_registry.yaml
+  field: valuation_input_refs
+  evidence_ids: *id015
+  reason: resolved by validator-accepted physical registry provenance
+remaining_todos: []
+source_gap_visibility: false
+allowed_report_level: reviewed_input_research_draft
+internal_fixture_completeness: all_complete
 sample_quality_report_allowed: false
 p2_allowed: false
+blockers: []
 notes:
-  - No reviewed fixtures were supplied in this dry run.
-  - The 002837 pilot remains source-gapped and must not promote TODO rows into facts.
+- Reviewed flags are derived only from validated physical registries.
+- Accepted dropzone row presence is not a readiness source.
+- Fixture mode is capped below sample-quality and P2.

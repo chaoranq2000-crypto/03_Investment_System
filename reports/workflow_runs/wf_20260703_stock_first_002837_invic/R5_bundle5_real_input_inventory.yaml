@@ -3,20 +3,20 @@ artifact_type: R5_bundle5_real_input_inventory
 workflow_id: wf_20260703_stock_first_002837_invic
 stock_code: 002837
 dropzone_root: data/reviewed_inputs/wf_20260703_stock_first_002837_invic
-status: blocked_source_gapped
+status: ready_for_later_promotion_card
 generated_from_local_files_only: true
 dropzone_validation:
   status: pass
-  checked_file_count: 0
-  record_count: 0
-  accepted_count: 0
+  checked_file_count: 5
+  record_count: 22
+  accepted_count: 22
   accepted_degraded_count: 0
   failed_count: 0
-  interpretation: empty_valid_but_source_gapped
+  interpretation: records_present_review_inventory_required
 summary:
   required_core_input_type_count: 5
-  valid_accepted_core_input_type_count: 0
-  missing_or_invalid_core_input_type_count: 5
+  valid_accepted_core_input_type_count: 5
+  missing_or_invalid_core_input_type_count: 0
   source_request_count: 10
   source_gap_count: 7
   review_ledger:
@@ -26,10 +26,152 @@ summary:
 items:
 - input_type: business_disclosure
   required: true
-  record_count: 0
-  valid_accepted_count: 0
-  status: missing
-  records: []
+  record_count: 9
+  valid_accepted_count: 9
+  status: accepted
+  records:
+  - input_id: r5_b5_business_2025_room_cooling_revenue
+    source_path: business_disclosure/official_2025_annual_report.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_or_publication_date: '2025-12-31'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 只用于已披露产品线收入与公司总收入的对账。
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_business_2025_room_cooling_gross_margin
+    source_path: business_disclosure/official_2025_annual_report.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_or_publication_date: '2025-12-31'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 毛利率仅适用于该披露产品大类。
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_business_2025_cabinet_cooling_revenue
+    source_path: business_disclosure/official_2025_annual_report.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_or_publication_date: '2025-12-31'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 只用于已披露产品线收入与公司总收入的对账。
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_business_2025_cabinet_cooling_gross_margin
+    source_path: business_disclosure/official_2025_annual_report.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_or_publication_date: '2025-12-31'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 毛利率仅适用于该披露产品大类。
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_business_2025_bus_air_conditioning_revenue
+    source_path: business_disclosure/official_2025_annual_report.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_or_publication_date: '2025-12-31'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 只用于已披露产品线收入与公司总收入的对账。
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_business_2025_rail_air_conditioning_service_revenue
+    source_path: business_disclosure/official_2025_annual_report.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_or_publication_date: '2025-12-31'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 只用于已披露产品线收入与公司总收入的对账。
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_business_2025_other_revenue
+    source_path: business_disclosure/official_2025_annual_report.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_or_publication_date: '2025-12-31'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 发行人宽口径产品分类，不代表液冷单独口径。
+    - 只用于已披露产品线收入与公司总收入的对账。
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_business_2025_company_revenue
+    source_path: business_disclosure/official_2025_annual_report.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_or_publication_date: '2025-12-31'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 合并口径公司总收入。
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_business_2025_company_gross_margin
+    source_path: business_disclosure/official_2025_annual_report.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    source_rank: A
+    as_of_or_publication_date: '2025-12-31'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:17:59.6225085+08:00'
+    limitations:
+    - 合并口径综合毛利率，不代表任一细分技术路线。
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
   evidence_candidates:
   - evidence_id: annual_report_002837_invic_2025_0f8fcf
     title: 002837 英维克 2025年年度报告摘要
@@ -38,6 +180,36 @@ items:
     publish_date: '2026-04-21'
     file_hash: ce7f64a9337742b1cecef56fb4a9ea7e558715f7bd1dca8b5e64003f71daafa1
     source_path: data/raw/annual_reports/annual_report_002837_invic_2025_0f8fcf.pdf
+    source_path_status: resolved
+    manifest_scope: global
+    candidate_only: true
+  - evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    title: 深圳市英维克科技股份有限公司2025年年度报告全文
+    source_rank: A
+    review_status: reviewed
+    publish_date: '2026-04-21'
+    file_hash: 2cbfc5dc8a60b01212b68d930fb06d0a25bd74563cd1942bd87161246c3a1472
+    source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+    source_path_status: resolved
+    manifest_scope: global
+    candidate_only: true
+  - evidence_id: ev_interim_report_002837_20250819_47054e
+    title: 深圳市英维克科技股份有限公司2025年半年度报告全文
+    source_rank: A
+    review_status: reviewed
+    publish_date: '2025-08-19'
+    file_hash: 47054e736c74130385e4cab67f04708599c4bae0df5599b4446614039b3f0ffb
+    source_path: data/raw/announcements/cninfo_2025_interim_report_full_002837_2025-08-19.pdf
+    source_path_status: resolved
+    manifest_scope: global
+    candidate_only: true
+  - evidence_id: ev_quarterly_report_002837_20260421_2f00c7
+    title: 深圳市英维克科技股份有限公司2026年第一季度报告
+    source_rank: A
+    review_status: reviewed
+    publish_date: '2026-04-21'
+    file_hash: 2f00c78f33e04ee476f633e57ca74de635f090a91e7c238b2251e5f1b19abd5c
+    source_path: data/raw/announcements/szse_2026_q1_report_002837_2026-04-21.pdf
     source_path_status: resolved
     manifest_scope: global
     candidate_only: true
@@ -56,110 +228,281 @@ items:
   - r5_official_filings_r5_002837_gap_exposure_001
   - r5_structured_financial_metrics_r5_002837_gap_business_001
   candidate_registry_target: R5_valuation_input_registry.yaml::business_line_split
-  missing_fields:
-  - input_id
-  - physical_input_path
-  - review_status
-  - source_evidence_id
-  - source_rank
-  - as_of_or_publication_date
-  - reviewer
-  - reviewed_at
-  - limitations
-  blocking: true
-  blocking_reason: missing_valid_accepted_reviewed_input
+  missing_fields: []
+  blocking: false
+  blocking_reason: null
 - input_type: market_snapshot
   required: true
-  record_count: 0
-  valid_accepted_count: 0
-  status: missing
-  records: []
+  record_count: 1
+  valid_accepted_count: 1
+  status: accepted
+  records:
+  - input_id: r5_b5_market_002837_20260710
+    source_path: market_snapshot/market_002837_20260710.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: latest_completed_trading_day_at_review
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Trailing multiples reflect historical reported metrics and are not forward estimates.
+    - Source-reported market capitalization is retained instead of recomputing from
+      rounded close and shares.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
   evidence_candidates: []
   request_ids:
   - r5_market_snapshot_r5_002837_gap_market_001
   - r5_market_snapshot_r5_002837_gap_valuation_001
   candidate_registry_target: R5_market_peer_input_registry.yaml::market_inputs
-  missing_fields:
-  - input_id
-  - physical_input_path
-  - review_status
-  - source_evidence_id
-  - source_rank
-  - as_of_or_publication_date
-  - reviewer
-  - reviewed_at
-  - limitations
-  blocking: true
-  blocking_reason: missing_valid_accepted_reviewed_input
+  missing_fields: []
+  blocking: false
+  blocking_reason: null
 - input_type: peer_snapshot
   required: true
-  record_count: 0
-  valid_accepted_count: 0
-  status: missing
-  records: []
+  record_count: 6
+  valid_accepted_count: 6
+  status: accepted
+  records:
+  - input_id: r5_b5_peer_301018_pe_ttm_20260710
+    source_path: peer_snapshot/peer_set_20260710.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_peer_301018_pb_20260710
+    source_path: peer_snapshot/peer_set_20260710.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_peer_301018_ps_ttm_20260710
+    source_path: peer_snapshot/peer_set_20260710.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_peer_300499_pe_ttm_20260710
+    source_path: peer_snapshot/peer_set_20260710.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_peer_300499_pb_20260710
+    source_path: peer_snapshot/peer_set_20260710.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_peer_300499_ps_ttm_20260710
+    source_path: peer_snapshot/peer_set_20260710.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:30:52.1451973+08:00'
+    limitations:
+    - Peer set has only two product-exposure candidates and is low confidence.
+    - Business mixes and liquid-cooling financial disclosure remain non-identical.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
   evidence_candidates: []
   request_ids:
   - r5_peer_snapshot_r5_002837_gap_valuation_001
   candidate_registry_target: R5_market_peer_input_registry.yaml::peer_inputs
-  missing_fields:
-  - input_id
-  - physical_input_path
-  - review_status
-  - source_evidence_id
-  - source_rank
-  - as_of_or_publication_date
-  - reviewer
-  - reviewed_at
-  - limitations
-  blocking: true
-  blocking_reason: missing_valid_accepted_reviewed_input
+  missing_fields: []
+  blocking: false
+  blocking_reason: null
 - input_type: forecast_assumptions
   required: true
-  record_count: 0
-  valid_accepted_count: 0
-  status: missing
-  records: []
+  record_count: 5
+  valid_accepted_count: 5
+  status: accepted
+  records:
+  - input_id: r5_b5_forecast_revenue_growth_base
+    source_path: forecast_assumptions/reviewed_model_assumptions.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_forecast_gross_margin_base
+    source_path: forecast_assumptions/reviewed_model_assumptions.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_forecast_opex_base
+    source_path: forecast_assumptions/reviewed_model_assumptions.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_forecast_net_profit_base
+    source_path: forecast_assumptions/reviewed_model_assumptions.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_quarterly_report_002837_20260421_2f00c7
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
+  - input_id: r5_b5_forecast_eps_base
+    source_path: forecast_assumptions/reviewed_model_assumptions.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The path is a mechanical research scenario, not management guidance or consensus.
+    - 2026Q1 profitability was unusually weak relative to 2025, so uncertainty is
+      wide.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
   evidence_candidates: []
   request_ids:
   - r5_structured_financial_metrics_r5_002837_gap_business_001
   - r5_structured_financial_metrics_r5_002837_gap_forecast_001
   candidate_registry_target: R5_forecast_assumption_registry.yaml
-  missing_fields:
-  - input_id
-  - physical_input_path
-  - review_status
-  - source_evidence_id
-  - source_rank
-  - as_of_or_publication_date
-  - reviewer
-  - reviewed_at
-  - limitations
-  blocking: true
-  blocking_reason: missing_valid_accepted_reviewed_input
+  missing_fields: []
+  blocking: false
+  blocking_reason: null
 - input_type: valuation_inputs
   required: true
-  record_count: 0
-  valid_accepted_count: 0
-  status: missing
-  records: []
+  record_count: 1
+  valid_accepted_count: 1
+  status: accepted
+  records:
+  - input_id: r5_b5_valuation_context_002837_20260710
+    source_path: valuation_inputs/reviewed_valuation_context.yaml
+    review_status: accepted
+    source_evidence_ids:
+    - ev_structured_market_data_002837_20260710_eb0c08
+    source_rank: B
+    as_of_or_publication_date: '2026-07-10'
+    freshness_status: unknown
+    reviewer: codex
+    reviewed_at: '2026-07-12T01:40:06.1796355+08:00'
+    limitations:
+    - The peer set has two companies and remains low confidence.
+    - Trailing PE is affected by the subject's weak 2026Q1 attributable profit.
+    - Forecast values are model estimates rather than reported facts or management
+      guidance.
+    missing_fields: []
+    conflicts: []
+    accepted_valid: true
   evidence_candidates: []
   request_ids:
   - r5_market_snapshot_r5_002837_gap_market_001
   - r5_market_snapshot_r5_002837_gap_valuation_001
   - r5_peer_snapshot_r5_002837_gap_valuation_001
   candidate_registry_target: R5_valuation_input_registry.yaml
-  missing_fields:
-  - input_id
-  - physical_input_path
-  - review_status
-  - source_evidence_id
-  - source_rank
-  - as_of_or_publication_date
-  - reviewer
-  - reviewed_at
-  - limitations
-  blocking: true
-  blocking_reason: missing_valid_accepted_reviewed_input
+  missing_fields: []
+  blocking: false
+  blocking_reason: null
 - input_type: sentiment_event_sources
   required: false
   record_count: 0
@@ -194,9 +537,9 @@ provenance_aliases:
   - reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/raw/annual_reports/szse_annual_report_002837_2026-04-21.pdf
   decision: provenance_alias_not_independent_evidence
 quality_decision:
-  g1_evidence_gate: fail
-  card_5_1_stop_condition_triggered: true
-  card_5_2_allowed: false
+  g1_evidence_gate: pass
+  card_5_1_stop_condition_triggered: false
+  card_5_2_allowed: true
   promotion_allowed: false
   sample_quality_report_allowed: false
   p2_allowed: false

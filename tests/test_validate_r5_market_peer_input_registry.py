@@ -51,12 +51,15 @@ def test_pending_registry_passes_with_visible_todos():
     assert validator.derive_decision(data, issues) == "accepted_with_todos"
 
 
-def test_run_registry_is_source_gapped_not_sample_quality():
+def test_run_registry_is_reviewed_but_capped_below_sample_quality():
     validator = load_validator()
     data = validator.load_yaml(RUN_REGISTRY)
     issues = validator.validate_registry(data)
 
-    assert validator.derive_decision(data, issues) == "accepted_with_todos"
+    assert validator.derive_decision(data, issues) == "accepted"
+    assert data["review_status"] == "reviewed"
+    assert data["as_of_date"] == "2026-07-10"
+    assert data["market_inputs"]["current_price"]["value"] == 73.54
     assert data["sample_quality_report_allowed"] is False
     assert data["p2_allowed"] is False
 

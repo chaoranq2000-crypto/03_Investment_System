@@ -1,0 +1,33 @@
+{
+  "artifact_type": "R5_reviewed_input_dropzone_validation",
+  "schema_version": "r5_reviewed_input_dropzone_validation_v0.1",
+  "status": "pass",
+  "checked_files": [
+    "business_disclosure/official_2025_annual_report.yaml",
+    "forecast_assumptions/reviewed_model_assumptions.yaml",
+    "market_snapshot/market_002837_20260710.yaml",
+    "peer_snapshot/peer_set_20260710.yaml",
+    "valuation_inputs/reviewed_valuation_context.yaml"
+  ],
+  "record_count": 22,
+  "unique_workflow_ids": [
+    "wf_20260703_stock_first_002837_invic"
+  ],
+  "unique_stock_codes": [
+    "002837"
+  ],
+  "duplicate_input_ids": [],
+  "counts_by_input_type": {
+    "business_disclosure": 9,
+    "forecast_assumptions": 5,
+    "market_snapshot": 1,
+    "peer_snapshot": 6,
+    "valuation_inputs": 1
+  },
+  "accepted_count": 22,
+  "accepted_degraded_count": 0,
+  "pending_count": 0,
+  "rejected_count": 0,
+  "failed_count": 0,
+  "issues": []
+}

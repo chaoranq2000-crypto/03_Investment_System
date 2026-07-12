@@ -1,0 +1,5 @@
+run_id,ingest_mode,started_at,finished_at,result,stock_code,source_name,source_type,api_name,manifest_rows_created,manifest_rows_updated,metric_candidates,claim_candidates,issues,notes
+ingest_official_002837_2cbfc5,official_disclosure_search,2026-07-11T16:47:45Z,2026-07-11T16:47:45Z,SUCCESS,002837,cninfo,annual_report,,1,0,0,0,,official disclosure registered; parse later before material claims
+ingest_official_002837_47054e,official_disclosure_search,2026-07-11T16:47:52Z,2026-07-11T16:47:53Z,SUCCESS,002837,cninfo,interim_report,,1,0,0,0,,official disclosure registered; parse later before material claims
+ingest_official_002837_2f00c7,official_disclosure_search,2026-07-11T16:48:00Z,2026-07-11T16:48:00Z,SUCCESS,002837,szse,quarterly_report,,1,0,0,0,,official disclosure registered; parse later before material claims
+ingest_tushare_daily_basic_002837_eb0c080a,tushare_live_reviewed_snapshot,2026-07-11T17:31:01Z,2026-07-11T17:31:01Z,SUCCESS,002837,tushare,structured_market_data,daily_basic,1,0,25,0,,same-date unit-safe market/peer snapshot; token not stored
