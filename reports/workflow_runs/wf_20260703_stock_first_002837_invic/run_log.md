@@ -21,3 +21,15 @@ Global registry verification:
 | data/manifests/metrics_draft.csv | 45 | 8A84922442F63B6E64463A8475BDD0FC2CAE5CCCAECDF80CA0A8458EC609D09E |
 | data/processed/normalized/segment_company_exposure.csv | 6 | F580DA4915C46A7EBE368C5572A41E763A1CCDD379E20FB651FE4E5539732233 |
 | R4 Disclosure/Backflow Review | done | Formatted artifacts verified; official review decisions, liquid-cooling evidence review, product-only backflow review, R4 v0.2 and P2 readiness check generated. |
+
+## Bundle 7 close update
+
+| Step | Status | Notes |
+|---|---|---|
+| M1 Reader Quality Gate v0.2 | done | Positive-from-zero gate reclassified the current Reader as 59/100 research_draft while truthfulness remained pass. |
+| M2 Workflow Quality Backflow | done | State moved to needs_fix; 12 unique issues and 7 deterministic routes were synchronized; evidence-ingest is first. |
+| Rollback rehearsal | done | Isolated full checkout applied and rolled back the overlay; baseline hashes and tracked-clean state were restored. |
+| Implementation publish | done | PR #1 passed both GitHub Actions checks and merged as 1530e7e291efe9176aca0e93b54d3dc482d3d2f9. |
+| Bundle 7 close | done | Current quality report and canonical close readout added; Bundle 6 candidate readout marked superseded; sample-quality and P2 remain closed. |
+
+Bundle 8 handoff was explicitly not dispatched in this close task. The recorded next owner is `evidence-ingest`; segment-company exposure was not updated because Bundle 7 produced no new exposure evidence.

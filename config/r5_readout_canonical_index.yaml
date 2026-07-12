@@ -224,3 +224,15 @@ readouts:
   reason: Patch 35 generated from composer degradation validation commands
   replacement_or_supplement_path: null
   blocking_for_strict_smoke: true
+- path: reports/p1_6/R5_BUNDLE_6_READER_REPORT_QUALITY_REMEDIATION_CLOSE_READOUT.md
+  canonical_status: superseded
+  reason: Bundle 7 positive-from-zero quality rebaseline supersedes the historical
+    100-point candidate decision; the Bundle 6 readout is retained for audit only
+  replacement_or_supplement_path: reports/p1_6/R5_BUNDLE_7_QUALITY_REBASE_AND_BACKFLOW_CLOSE_READOUT.md
+  blocking_for_strict_smoke: false
+- path: reports/p1_6/R5_BUNDLE_7_QUALITY_REBASE_AND_BACKFLOW_CLOSE_READOUT.md
+  canonical_status: canonical
+  reason: Bundle 7 close freezes the 59-point research-draft decision deterministic
+    backflow rollback evidence and closed sample-quality/P2 boundaries
+  replacement_or_supplement_path: null
+  blocking_for_strict_smoke: true

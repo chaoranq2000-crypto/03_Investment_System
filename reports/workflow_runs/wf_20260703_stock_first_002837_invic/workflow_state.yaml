@@ -152,6 +152,18 @@ artifacts:
   stage: R5_bundle7_quality_backflow
   status: current
   required: true
+- artifact_type: R5_bundle7_quality_gate_report
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle7_quality_gate_report.md
+  created_by_skill: quality-review
+  stage: R5_bundle7_close
+  status: current
+  required: true
+- artifact_type: R5_bundle7_close_readout
+  path: reports/p1_6/R5_BUNDLE_7_QUALITY_REBASE_AND_BACKFLOW_CLOSE_READOUT.md
+  created_by_skill: research-orchestrator
+  stage: R5_bundle7_close
+  status: current
+  required: true
 open_todos:
 - issue_id: P2-BLOCK-002
   severity: medium
