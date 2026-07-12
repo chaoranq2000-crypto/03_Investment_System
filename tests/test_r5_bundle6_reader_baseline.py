@@ -18,6 +18,11 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def canonical_text_sha256(path: Path) -> str:
+    normalized = path.read_text(encoding="utf-8").encode("utf-8")
+    return hashlib.sha256(normalized).hexdigest()
+
+
 def test_bundle6_baseline_freezes_current_bundle5_artifacts() -> None:
     baseline = load_yaml(BASELINE_PATH)
     report = REPO_ROOT / baseline["input_artifacts"]["bundle5_draft"]["path"]
@@ -26,9 +31,18 @@ def test_bundle6_baseline_freezes_current_bundle5_artifacts() -> None:
     assert baseline["classification"] == "audit_oriented_research_draft_not_reader_candidate"
     assert baseline["before_state_preserved"] is True
     assert baseline["input_artifacts"]["bundle5_draft"]["sha256"] == sha256(report)
-    assert baseline["input_artifacts"]["bundle5_quality_gate"]["sha256"] == sha256(quality)
+    assert baseline["input_artifacts"]["bundle5_quality_gate"]["sha256_mode"] == "canonical_lf_utf8"
+    assert baseline["input_artifacts"]["bundle5_quality_gate"]["sha256"] == canonical_text_sha256(quality)
     assert baseline["verification"]["bundle5_truthfulness"] == "pass_checked_8_failed_0"
     assert baseline["verification"]["critical_quality_blockers"] == 0
+
+
+def test_canonical_text_hash_is_line_ending_independent(tmp_path: Path) -> None:
+    crlf = tmp_path / "quality.yaml"
+    crlf.write_bytes(b"status: pass\r\ncount: 1\r\n")
+    expected = hashlib.sha256(b"status: pass\ncount: 1\n").hexdigest()
+
+    assert canonical_text_sha256(crlf) == expected
 
 
 def test_reader_surface_inventory_records_known_failures() -> None:

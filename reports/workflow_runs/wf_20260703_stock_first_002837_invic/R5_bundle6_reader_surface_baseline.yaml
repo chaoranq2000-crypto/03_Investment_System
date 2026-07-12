@@ -10,7 +10,8 @@ input_artifacts:
     sha256: 5a3b041d87cebd1dbf7f433ef5cd5f5032bc4fd5c1000733d9ae2ceebe95f64c
   bundle5_quality_gate:
     path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_quality_gate_result.yaml
-    sha256: 1930d40da623aee924e6fbaed8a003455709c887171e5d7adf3ed920de78c320
+    sha256: f8d7fbcda0dc5cc5a783e7994935e2434c872da60119af9b41e921ddac54d3bf
+    sha256_mode: canonical_lf_utf8
   bundle5_benchmark_precheck:
     path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_benchmark_coverage_precheck.yaml
     sha256: 6234e7cedc4b4db7a4d95a35ca180552bba5347a96874ae143c0348f0536cb7d

@@ -146,3 +146,4 @@ Bundle 8 的输入应直接使用本补丁生成的 `fix_routes` 与 `R5Q-B7-*` 
 - 全仓验证发现 Bundle 6 close 工件记录的 Reader v2 报告 SHA256 与同一基线提交中的实际 Git blob 不一致；已将人审 handoff 与 close readout 中的绑定值从 `096e28c7a3ed686dbdcade76c3e200d2f7130144fd668660463c3c5b83a7aaa3` 校正为 `54ec29f5e1bb6302cc63bd3cfc2ae91dcf60ac2a4754918a15c308b1aae96309`。报告正文未修改。
 - Bundle 6 close token 继续作为历史快照保留；当前决策面改由 Bundle 7 v0.2 scorecard 提供，其状态为 `rejected / research_draft / 59`。
 - 旧合同测试已同步到 v0.2 的 10 节结构与 `human_review_required` 字段；未放宽 truthfulness、no-advice、人审或 P2 边界。
+- GitHub Actions 暴露出 Bundle 6 baseline 对 YAML 工作区行尾字节的跨平台绑定；已将该文本哈希校正为 Git blob 对应的 canonical LF UTF-8 SHA256 `f8d7fbcda0dc5cc5a783e7994935e2434c872da60119af9b41e921ddac54d3bf`，并增加 CRLF/LF 等价测试。工件语义内容未修改。
