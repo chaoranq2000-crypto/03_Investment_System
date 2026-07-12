@@ -19,7 +19,8 @@ def test_rubric_is_executable_and_totals_100():
     rubric = yaml.safe_load((ROOT / "config/r5_reader_quality_rubric.yaml").read_text(encoding="utf-8"))
     assert sum(rubric["dimensions"].values()) == 100
     assert rubric["candidate_threshold"] == 82
-    assert rubric["human_review_status"] == "pending"
+    assert rubric["human_review_required"] is True
     assert not rubric["sample_quality_report_allowed"]
     assert not rubric["p2_allowed"]
-    assert len(rubric["required_sections"]) == 9
+    assert len(rubric["required_sections"]) == 10
+    assert "dated_events" in rubric["required_sections"]
