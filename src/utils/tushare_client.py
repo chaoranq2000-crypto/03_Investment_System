@@ -1,13 +1,22 @@
 from __future__ import annotations
 
+import importlib
 import os
 from pathlib import Path
 from typing import Any
 
-import tushare as ts
-
 
 DEFAULT_TUSHARE_API_URL = "https://fast.xiaodefa.cn"
+
+
+def _load_tushare() -> Any:
+    try:
+        return importlib.import_module("tushare")
+    except ModuleNotFoundError as exc:
+        raise RuntimeError(
+            "The optional 'tushare' package is required only for live Tushare access; "
+            "install it before calling get_tushare_pro()."
+        ) from exc
 
 
 def load_env_file(path: str | Path = ".env.local") -> dict[str, str]:
@@ -59,6 +68,7 @@ def get_tushare_pro(path: str | Path = ".env.local", api_url: str | None = None)
 
     # The local guide requires setting the token through the SDK and then
     # overriding the private HTTP endpoint so requests go through the proxy.
+    ts = _load_tushare()
     ts.set_token(token)
     pro = ts.pro_api()
     pro._DataApi__http_url = endpoint
