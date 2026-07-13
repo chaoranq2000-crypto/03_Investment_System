@@ -491,6 +491,126 @@ sources:
     license_note_required: true
     notes: Clue only; verify with official disclosure before material use.
 
+
+  sina_finance:
+    display_name: 新浪财经
+    source_group: market_signal_adapter
+    supported_source_types:
+      - structured_market_data
+      - market_signal
+      - news_social_clue
+    default_reliability_rank: C
+    allowed_claim_types:
+      - metric_statement
+      - clue
+    material_claim_allowed: false
+    raw_archive_required: true
+    raw_archive_policy_default: snapshot_archived
+    requires_token: false
+    rate_limit_policy: serial_http_no_concurrency_with_retry_jitter
+    fallback_sources:
+      - eastmoney_push2
+      - tencent_finance
+    manual_review_required: true
+    stale_after: 1d
+    license_note_required: true
+    adapter_status: planned
+    target_status: offline_fixture_supported_then_live_unverified
+    notes: Fund-flow and market context candidate; metric/clue only and never company fact.
+  baidu_finance:
+    display_name: 百度财经/K线
+    source_group: market_data_adapter
+    supported_source_types:
+      - structured_market_data
+    default_reliability_rank: C
+    allowed_claim_types:
+      - metric_statement
+    material_claim_allowed: metric_only
+    raw_archive_required: true
+    raw_archive_policy_default: snapshot_archived
+    requires_token: false
+    rate_limit_policy: polite_http_serial_with_schema_check
+    fallback_sources:
+      - tencent_finance
+      - tushare
+      - baostock
+    manual_review_required: true
+    stale_after: 1d
+    license_note_required: true
+    adapter_status: planned
+    target_status: offline_fixture_supported_then_live_unverified
+    notes: Planned independent K-line fallback; field mapping must pass schema fingerprint gate.
+  cls_market:
+    display_name: 财联社
+    source_group: clue
+    supported_source_types:
+      - news_social_clue
+    default_reliability_rank: D
+    allowed_claim_types:
+      - clue
+    material_claim_allowed: false
+    raw_archive_required: false
+    raw_archive_policy_default: metadata_only
+    requires_token: false
+    rate_limit_policy: polite_http_manual_review
+    fallback_sources:
+      - news
+      - eastmoney_push2
+    manual_review_required: true
+    stale_after: 7d
+    license_note_required: true
+    adapter_status: planned
+    target_status: metadata_snapshot_only
+    notes: News clue source only; verify every material event with an official source.
+  hkex:
+    display_name: 香港交易所披露易
+    source_group: official_disclosure
+    supported_source_types:
+      - official_disclosure
+      - annual_report
+      - announcement
+    default_reliability_rank: A
+    allowed_claim_types:
+      - fact
+      - metric_statement
+      - management_comment
+    material_claim_allowed: true
+    raw_archive_required: true
+    raw_archive_policy_default: full_file_archived
+    requires_token: false
+    rate_limit_policy: manual_or_adapter_controlled
+    fallback_sources: []
+    manual_review_required: false
+    stale_after: 1y
+    license_note_required: false
+    adapter_status: planned
+    target_status: official_disclosure_supported
+    notes: Planned official source for H-share filings and cross-listed issuer evidence.
+  cninfo_ir:
+    display_name: 巨潮资讯互动易/投资者关系
+    source_group: official_disclosure
+    supported_source_types:
+      - transcript
+      - company_website
+      - news_social_clue
+    default_reliability_rank: C
+    allowed_claim_types:
+      - management_comment
+      - clue
+    material_claim_allowed: false
+    raw_archive_required: true
+    raw_archive_policy_default: snapshot_archived
+    requires_token: false
+    rate_limit_policy: serial_http_dynamic_org_id_with_retry
+    fallback_sources:
+      - cninfo
+    manual_review_required: true
+    stale_after: 90d
+    license_note_required: false
+    adapter_status: planned
+    target_status: offline_fixture_supported_then_live_unverified
+    notes: Management comment or clue only; dynamic orgId mapping is required and answers are not audited facts.
+
 rank_meaning:
   A: 可作为核心事实依据，仍需记录日期、路径、页码或表格定位。
   B: 可作为重要背景或行业证据，需说明口径和适用范围。

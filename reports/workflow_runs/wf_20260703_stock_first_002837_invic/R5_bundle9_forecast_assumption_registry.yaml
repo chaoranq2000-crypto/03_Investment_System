@@ -1,0 +1,1191 @@
+artifact_type: R5_forecast_assumption_registry
+schema_version: r5_forecast_assumption_registry_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+review_status: reviewed
+no_live_api: true
+assumptions:
+- assumption_id: b9_base_case_room_cooling_revenue_growth
+  driver: revenue_growth
+  scope: segment
+  periods: &id003
+  - 2026E
+  - 2027E
+  - 2028E
+  value:
+    2026E: 28.0
+    2027E: 22.0
+    2028E: 18.0
+  formula: ''
+  unit: pct
+  scenario: base
+  evidence_ids: &id001
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_official_disclosure_002837_20250423_e78396
+  - ev_official_disclosure_002837_20250428_108da3
+  - ev_official_disclosure_002837_20250521_1b4421
+  metric_ids: &id002
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id001
+  supporting_metric_ids: *id002
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Business-line growth path is anchored to disclosed 2025 broad lines and
+    explicit demand/acceptance mechanisms.
+  limitations:
+  - liquid cooling is not modeled as a standalone disclosed segment
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_base_case_room_cooling_gross_margin
+  driver: gross_margin
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 26.0
+    2027E: 26.8
+    2028E: 27.4
+  formula: ''
+  unit: pct
+  scenario: base
+  evidence_ids: *id001
+  metric_ids: &id004
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id001
+  supporting_metric_ids: *id004
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Margin path starts from audited 2025 broad-line margins or the audited
+    residual calculation.
+  limitations:
+  - no standalone liquid-cooling gross margin is disclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_base_case_cabinet_cooling_revenue_growth
+  driver: revenue_growth
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 18.0
+    2027E: 15.0
+    2028E: 12.0
+  formula: ''
+  unit: pct
+  scenario: base
+  evidence_ids: &id005
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id006
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id005
+  supporting_metric_ids: *id006
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Business-line growth path is anchored to disclosed 2025 broad lines and
+    explicit demand/acceptance mechanisms.
+  limitations:
+  - liquid cooling is not modeled as a standalone disclosed segment
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_base_case_cabinet_cooling_gross_margin
+  driver: gross_margin
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 26.0
+    2027E: 26.7
+    2028E: 27.0
+  formula: ''
+  unit: pct
+  scenario: base
+  evidence_ids: *id005
+  metric_ids: &id007
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id005
+  supporting_metric_ids: *id007
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Margin path starts from audited 2025 broad-line margins or the audited
+    residual calculation.
+  limitations:
+  - no standalone liquid-cooling gross margin is disclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_base_case_other_businesses_revenue_growth
+  driver: revenue_growth
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 8.0
+    2027E: 6.0
+    2028E: 5.0
+  formula: ''
+  unit: pct
+  scenario: base
+  evidence_ids: &id008
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id009
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id008
+  supporting_metric_ids: *id009
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Business-line growth path is anchored to disclosed 2025 broad lines and
+    explicit demand/acceptance mechanisms.
+  limitations:
+  - liquid cooling is not modeled as a standalone disclosed segment
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_base_case_other_businesses_gross_margin
+  driver: gross_margin
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 24.5
+    2027E: 25.2
+    2028E: 25.8
+  formula: ''
+  unit: pct
+  scenario: base
+  evidence_ids: *id008
+  metric_ids: &id010
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id008
+  supporting_metric_ids: *id010
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Margin path starts from audited 2025 broad-line margins or the audited
+    residual calculation.
+  limitations:
+  - no standalone liquid-cooling gross margin is disclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_base_case_revenue_growth_consolidated
+  driver: revenue_growth
+  scope: company
+  periods: *id003
+  value:
+    2026E: 22.6255
+    2027E: 18.3142
+    2028E: 15.086
+  formula: sum business-line revenue forecasts / prior-year consolidated revenue -
+    1
+  unit: pct
+  scenario: base
+  evidence_ids: &id011
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: &id012
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id011
+  supporting_metric_ids: *id012
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Consolidated growth is a calculated output of the three disclosed broad-line
+    paths.
+  limitations:
+  - not management guidance
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_base_case_gross_margin_consolidated
+  driver: gross_margin
+  scope: margin
+  periods: *id003
+  value:
+    2026E: 25.8603
+    2027E: 26.636
+    2028E: 27.1595
+  formula: sum business-line gross profit / sum business-line revenue
+  unit: pct
+  scenario: base
+  evidence_ids: &id013
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_official_disclosure_002837_20250428_108da3
+  metric_ids: &id014
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id013
+  supporting_metric_ids: *id014
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Consolidated margin is weighted from business-line assumptions.
+  limitations:
+  - liquid-cooling margin remains undisclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_base_case_opex_bridge
+  driver: opex
+  scope: opex
+  periods: *id003
+  value:
+    2026E:
+      selling_expense: 4.2
+      administrative_expense: 4.1
+      rd_expense: 7.7
+    2027E:
+      selling_expense: 4.1
+      administrative_expense: 4.0
+      rd_expense: 7.5
+    2028E:
+      selling_expense: 4.0
+      administrative_expense: 3.9
+      rd_expense: 7.3
+  formula: ''
+  unit: pct_of_revenue
+  scenario: base
+  evidence_ids: &id015
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: &id016
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id015
+  supporting_metric_ids: *id016
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Selling, administrative and R&D expenses are modeled separately from
+    the audited 2025 ratios.
+  limitations:
+  - future expense ratios are estimates
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_base_case_net_profit_bridge
+  driver: net_profit
+  scope: company
+  periods: *id003
+  value:
+    2026E: 484033304.32
+    2027E: 683214747.18
+    2028E: 886905026.53
+  formula: operating profit + non-operating net - tax - minority profit
+  unit: CNY
+  scenario: base
+  evidence_ids: &id017
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: &id018
+  - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+  supporting_evidence_ids: *id017
+  supporting_metric_ids: *id018
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Attributable profit is derived from explicit expense, tax and minority
+    bridges.
+  limitations:
+  - model estimate; 2026Q1 profit weakness makes uncertainty wide
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_base_case_eps_bridge
+  driver: eps
+  scope: company
+  periods: *id003
+  value:
+    2026E: 0.379828
+    2027E: 0.536128
+    2028E: 0.695967
+  formula: net profit attributable / 1274349692 shares
+  unit: CNY_per_share
+  scenario: base
+  evidence_ids: &id019
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_structured_market_data_002837_20260710_eb0c08
+  metric_ids: &id020
+  - metric_cn_002837_invic_basic_eps_20251231_03d56b
+  - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+  supporting_evidence_ids: *id019
+  supporting_metric_ids: *id020
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: EPS uses a reviewed share-count anchor without assumed dilution.
+  limitations:
+  - future dilution is not modeled
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_base_case_tax_bridge
+  driver: effective_tax_rate
+  scope: tax
+  periods: *id003
+  value:
+    2026E: 10.0
+    2027E: 10.0
+    2028E: 10.0
+  formula: ''
+  unit: pct_of_pretax_profit
+  scenario: base
+  evidence_ids: &id021
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id022
+  - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+  supporting_evidence_ids: *id021
+  supporting_metric_ids: *id022
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Tax assumptions are anchored to the audited 2025 effective rate and R&D
+    deductions.
+  limitations:
+  - tax credits and subsidiary mix may change
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_base_case_cashflow_bridge
+  driver: operating_cashflow
+  scope: cashflow
+  periods: *id003
+  value:
+    2026E: 178770596.26
+    2027E: 535189849.67
+    2028E: 815145085.02
+  formula: net income + noncash addback - change in modeled net working capital
+  unit: CNY
+  scenario: base
+  evidence_ids: &id023
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_official_disclosure_002837_20250428_108da3
+  metric_ids: &id024
+  - metric_cn_002837_invic_n_cashflow_act_20251231_890163
+  supporting_evidence_ids: *id023
+  supporting_metric_ids: *id024
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Cash conversion reflects acceptance and collection timing rather than
+    revenue alone.
+  limitations:
+  - noncash addback and working-capital ratios are explicit assumptions
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_base_case_capex_bridge
+  driver: capex
+  scope: capex
+  periods: *id003
+  value:
+    2026E: 372030881.57
+    2027E: 396148734.77
+    2028E: 405254976.83
+  formula: forecast revenue * capex-to-revenue assumption
+  unit: CNY
+  scenario: base
+  evidence_ids: &id025
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id026
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  - metric_cn_002837_invic_n_cashflow_act_20251231_890163
+  supporting_evidence_ids: *id025
+  supporting_metric_ids: *id026
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Capex path starts from audited 2025 capital expenditure.
+  limitations:
+  - project timing may shift between years
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bull_case_room_cooling_revenue_growth
+  driver: revenue_growth
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 35.0
+    2027E: 28.0
+    2028E: 22.0
+  formula: ''
+  unit: pct
+  scenario: bull
+  evidence_ids: &id027
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_official_disclosure_002837_20250423_e78396
+  - ev_official_disclosure_002837_20250428_108da3
+  - ev_official_disclosure_002837_20250521_1b4421
+  metric_ids: &id028
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id027
+  supporting_metric_ids: *id028
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Business-line growth path is anchored to disclosed 2025 broad lines and
+    explicit demand/acceptance mechanisms.
+  limitations:
+  - liquid cooling is not modeled as a standalone disclosed segment
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bull_case_room_cooling_gross_margin
+  driver: gross_margin
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 28.0
+    2027E: 28.5
+    2028E: 29.0
+  formula: ''
+  unit: pct
+  scenario: bull
+  evidence_ids: *id027
+  metric_ids: &id029
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id027
+  supporting_metric_ids: *id029
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Margin path starts from audited 2025 broad-line margins or the audited
+    residual calculation.
+  limitations:
+  - no standalone liquid-cooling gross margin is disclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bull_case_cabinet_cooling_revenue_growth
+  driver: revenue_growth
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 25.0
+    2027E: 20.0
+    2028E: 16.0
+  formula: ''
+  unit: pct
+  scenario: bull
+  evidence_ids: &id030
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id031
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id030
+  supporting_metric_ids: *id031
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Business-line growth path is anchored to disclosed 2025 broad lines and
+    explicit demand/acceptance mechanisms.
+  limitations:
+  - liquid cooling is not modeled as a standalone disclosed segment
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bull_case_cabinet_cooling_gross_margin
+  driver: gross_margin
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 27.5
+    2027E: 28.0
+    2028E: 28.3
+  formula: ''
+  unit: pct
+  scenario: bull
+  evidence_ids: *id030
+  metric_ids: &id032
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id030
+  supporting_metric_ids: *id032
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Margin path starts from audited 2025 broad-line margins or the audited
+    residual calculation.
+  limitations:
+  - no standalone liquid-cooling gross margin is disclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bull_case_other_businesses_revenue_growth
+  driver: revenue_growth
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 12.0
+    2027E: 10.0
+    2028E: 8.0
+  formula: ''
+  unit: pct
+  scenario: bull
+  evidence_ids: &id033
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id034
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id033
+  supporting_metric_ids: *id034
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Business-line growth path is anchored to disclosed 2025 broad lines and
+    explicit demand/acceptance mechanisms.
+  limitations:
+  - liquid cooling is not modeled as a standalone disclosed segment
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bull_case_other_businesses_gross_margin
+  driver: gross_margin
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 26.0
+    2027E: 26.5
+    2028E: 27.0
+  formula: ''
+  unit: pct
+  scenario: bull
+  evidence_ids: *id033
+  metric_ids: &id035
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id033
+  supporting_metric_ids: *id035
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Margin path starts from audited 2025 broad-line margins or the audited
+    residual calculation.
+  limitations:
+  - no standalone liquid-cooling gross margin is disclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bull_case_revenue_growth_consolidated
+  driver: revenue_growth
+  scope: company
+  periods: *id003
+  value:
+    2026E: 29.3081
+    2027E: 23.8305
+    2028E: 19.0288
+  formula: sum business-line revenue forecasts / prior-year consolidated revenue -
+    1
+  unit: pct
+  scenario: bull
+  evidence_ids: &id036
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: &id037
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id036
+  supporting_metric_ids: *id037
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Consolidated growth is a calculated output of the three disclosed broad-line
+    paths.
+  limitations:
+  - not management guidance
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bull_case_gross_margin_consolidated
+  driver: gross_margin
+  scope: margin
+  periods: *id003
+  value:
+    2026E: 27.6592
+    2027E: 28.1846
+    2028E: 28.644
+  formula: sum business-line gross profit / sum business-line revenue
+  unit: pct
+  scenario: bull
+  evidence_ids: &id038
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_official_disclosure_002837_20250428_108da3
+  metric_ids: &id039
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id038
+  supporting_metric_ids: *id039
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Consolidated margin is weighted from business-line assumptions.
+  limitations:
+  - liquid-cooling margin remains undisclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bull_case_opex_bridge
+  driver: opex
+  scope: opex
+  periods: *id003
+  value:
+    2026E:
+      selling_expense: 4.0
+      administrative_expense: 3.9
+      rd_expense: 7.4
+    2027E:
+      selling_expense: 3.8
+      administrative_expense: 3.7
+      rd_expense: 7.1
+    2028E:
+      selling_expense: 3.7
+      administrative_expense: 3.6
+      rd_expense: 6.9
+  formula: ''
+  unit: pct_of_revenue
+  scenario: bull
+  evidence_ids: &id040
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: &id041
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id040
+  supporting_metric_ids: *id041
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Selling, administrative and R&D expenses are modeled separately from
+    the audited 2025 ratios.
+  limitations:
+  - future expense ratios are estimates
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bull_case_net_profit_bridge
+  driver: net_profit
+  scope: company
+  periods: *id003
+  value:
+    2026E: 727844293.36
+    2027E: 1023533399.36
+    2028E: 1328492967.99
+  formula: operating profit + non-operating net - tax - minority profit
+  unit: CNY
+  scenario: bull
+  evidence_ids: &id042
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: &id043
+  - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+  supporting_evidence_ids: *id042
+  supporting_metric_ids: *id043
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Attributable profit is derived from explicit expense, tax and minority
+    bridges.
+  limitations:
+  - model estimate; 2026Q1 profit weakness makes uncertainty wide
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bull_case_eps_bridge
+  driver: eps
+  scope: company
+  periods: *id003
+  value:
+    2026E: 0.57115
+    2027E: 0.803181
+    2028E: 1.042487
+  formula: net profit attributable / 1274349692 shares
+  unit: CNY_per_share
+  scenario: bull
+  evidence_ids: &id044
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_structured_market_data_002837_20260710_eb0c08
+  metric_ids: &id045
+  - metric_cn_002837_invic_basic_eps_20251231_03d56b
+  - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+  supporting_evidence_ids: *id044
+  supporting_metric_ids: *id045
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: EPS uses a reviewed share-count anchor without assumed dilution.
+  limitations:
+  - future dilution is not modeled
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bull_case_tax_bridge
+  driver: effective_tax_rate
+  scope: tax
+  periods: *id003
+  value:
+    2026E: 9.0
+    2027E: 9.0
+    2028E: 9.0
+  formula: ''
+  unit: pct_of_pretax_profit
+  scenario: bull
+  evidence_ids: &id046
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id047
+  - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+  supporting_evidence_ids: *id046
+  supporting_metric_ids: *id047
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Tax assumptions are anchored to the audited 2025 effective rate and R&D
+    deductions.
+  limitations:
+  - tax credits and subsidiary mix may change
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bull_case_cashflow_bridge
+  driver: operating_cashflow
+  scope: cashflow
+  periods: *id003
+  value:
+    2026E: 416688696.39
+    2027E: 768138157.01
+    2028E: 1168837998.69
+  formula: net income + noncash addback - change in modeled net working capital
+  unit: CNY
+  scenario: bull
+  evidence_ids: &id048
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_official_disclosure_002837_20250428_108da3
+  metric_ids: &id049
+  - metric_cn_002837_invic_n_cashflow_act_20251231_890163
+  supporting_evidence_ids: *id048
+  supporting_metric_ids: *id049
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Cash conversion reflects acceptance and collection timing rather than
+    revenue alone.
+  limitations:
+  - noncash addback and working-capital ratios are explicit assumptions
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bull_case_capex_bridge
+  driver: capex
+  scope: capex
+  periods: *id003
+  value:
+    2026E: 431535775.77
+    2027E: 485793671.92
+    2028E: 520411039.43
+  formula: forecast revenue * capex-to-revenue assumption
+  unit: CNY
+  scenario: bull
+  evidence_ids: &id050
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id051
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  - metric_cn_002837_invic_n_cashflow_act_20251231_890163
+  supporting_evidence_ids: *id050
+  supporting_metric_ids: *id051
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Capex path starts from audited 2025 capital expenditure.
+  limitations:
+  - project timing may shift between years
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bear_case_room_cooling_revenue_growth
+  driver: revenue_growth
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 15.0
+    2027E: 10.0
+    2028E: 8.0
+  formula: ''
+  unit: pct
+  scenario: bear
+  evidence_ids: &id052
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_official_disclosure_002837_20250423_e78396
+  - ev_official_disclosure_002837_20250428_108da3
+  - ev_official_disclosure_002837_20250521_1b4421
+  metric_ids: &id053
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id052
+  supporting_metric_ids: *id053
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Business-line growth path is anchored to disclosed 2025 broad lines and
+    explicit demand/acceptance mechanisms.
+  limitations:
+  - liquid cooling is not modeled as a standalone disclosed segment
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bear_case_room_cooling_gross_margin
+  driver: gross_margin
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 23.5
+    2027E: 24.0
+    2028E: 24.5
+  formula: ''
+  unit: pct
+  scenario: bear
+  evidence_ids: *id052
+  metric_ids: &id054
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id052
+  supporting_metric_ids: *id054
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Margin path starts from audited 2025 broad-line margins or the audited
+    residual calculation.
+  limitations:
+  - no standalone liquid-cooling gross margin is disclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bear_case_cabinet_cooling_revenue_growth
+  driver: revenue_growth
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 8.0
+    2027E: 6.0
+    2028E: 5.0
+  formula: ''
+  unit: pct
+  scenario: bear
+  evidence_ids: &id055
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id056
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id055
+  supporting_metric_ids: *id056
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Business-line growth path is anchored to disclosed 2025 broad lines and
+    explicit demand/acceptance mechanisms.
+  limitations:
+  - liquid cooling is not modeled as a standalone disclosed segment
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bear_case_cabinet_cooling_gross_margin
+  driver: gross_margin
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 23.5
+    2027E: 24.0
+    2028E: 24.5
+  formula: ''
+  unit: pct
+  scenario: bear
+  evidence_ids: *id055
+  metric_ids: &id057
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id055
+  supporting_metric_ids: *id057
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Margin path starts from audited 2025 broad-line margins or the audited
+    residual calculation.
+  limitations:
+  - no standalone liquid-cooling gross margin is disclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bear_case_other_businesses_revenue_growth
+  driver: revenue_growth
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 0.0
+    2027E: 2.0
+    2028E: 3.0
+  formula: ''
+  unit: pct
+  scenario: bear
+  evidence_ids: &id058
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id059
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id058
+  supporting_metric_ids: *id059
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Business-line growth path is anchored to disclosed 2025 broad lines and
+    explicit demand/acceptance mechanisms.
+  limitations:
+  - liquid cooling is not modeled as a standalone disclosed segment
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bear_case_other_businesses_gross_margin
+  driver: gross_margin
+  scope: segment
+  periods: *id003
+  value:
+    2026E: 21.5
+    2027E: 22.5
+    2028E: 23.5
+  formula: ''
+  unit: pct
+  scenario: bear
+  evidence_ids: *id058
+  metric_ids: &id060
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id058
+  supporting_metric_ids: *id060
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Margin path starts from audited 2025 broad-line margins or the audited
+    residual calculation.
+  limitations:
+  - no standalone liquid-cooling gross margin is disclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+  business_disclosure_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+- assumption_id: b9_bear_case_revenue_growth_consolidated
+  driver: revenue_growth
+  scope: company
+  periods: *id003
+  value:
+    2026E: 11.132
+    2027E: 7.9717
+    2028E: 6.6176
+  formula: sum business-line revenue forecasts / prior-year consolidated revenue -
+    1
+  unit: pct
+  scenario: bear
+  evidence_ids: &id061
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: &id062
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id061
+  supporting_metric_ids: *id062
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Consolidated growth is a calculated output of the three disclosed broad-line
+    paths.
+  limitations:
+  - not management guidance
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bear_case_gross_margin_consolidated
+  driver: gross_margin
+  scope: margin
+  periods: *id003
+  value:
+    2026E: 23.3096
+    2027E: 23.8651
+    2028E: 24.4131
+  formula: sum business-line gross profit / sum business-line revenue
+  unit: pct
+  scenario: bear
+  evidence_ids: &id063
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_official_disclosure_002837_20250428_108da3
+  metric_ids: &id064
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id063
+  supporting_metric_ids: *id064
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Consolidated margin is weighted from business-line assumptions.
+  limitations:
+  - liquid-cooling margin remains undisclosed
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bear_case_opex_bridge
+  driver: opex
+  scope: opex
+  periods: *id003
+  value:
+    2026E:
+      selling_expense: 4.5
+      administrative_expense: 4.4
+      rd_expense: 8.0
+    2027E:
+      selling_expense: 4.4
+      administrative_expense: 4.3
+      rd_expense: 7.8
+    2028E:
+      selling_expense: 4.3
+      administrative_expense: 4.2
+      rd_expense: 7.6
+  formula: ''
+  unit: pct_of_revenue
+  scenario: bear
+  evidence_ids: &id065
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: &id066
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  supporting_evidence_ids: *id065
+  supporting_metric_ids: *id066
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Selling, administrative and R&D expenses are modeled separately from
+    the audited 2025 ratios.
+  limitations:
+  - future expense ratios are estimates
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bear_case_net_profit_bridge
+  driver: net_profit
+  scope: company
+  periods: *id003
+  value:
+    2026E: 196442721.15
+    2027E: 271540606.77
+    2028E: 368966544.69
+  formula: operating profit + non-operating net - tax - minority profit
+  unit: CNY
+  scenario: bear
+  evidence_ids: &id067
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  metric_ids: &id068
+  - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+  supporting_evidence_ids: *id067
+  supporting_metric_ids: *id068
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Attributable profit is derived from explicit expense, tax and minority
+    bridges.
+  limitations:
+  - model estimate; 2026Q1 profit weakness makes uncertainty wide
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bear_case_eps_bridge
+  driver: eps
+  scope: company
+  periods: *id003
+  value:
+    2026E: 0.154151
+    2027E: 0.213082
+    2028E: 0.289533
+  formula: net profit attributable / 1274349692 shares
+  unit: CNY_per_share
+  scenario: bear
+  evidence_ids: &id069
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_structured_market_data_002837_20260710_eb0c08
+  metric_ids: &id070
+  - metric_cn_002837_invic_basic_eps_20251231_03d56b
+  - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+  supporting_evidence_ids: *id069
+  supporting_metric_ids: *id070
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: EPS uses a reviewed share-count anchor without assumed dilution.
+  limitations:
+  - future dilution is not modeled
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bear_case_tax_bridge
+  driver: effective_tax_rate
+  scope: tax
+  periods: *id003
+  value:
+    2026E: 11.0
+    2027E: 11.0
+    2028E: 11.0
+  formula: ''
+  unit: pct_of_pretax_profit
+  scenario: bear
+  evidence_ids: &id071
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id072
+  - metric_cn_002837_invic_n_income_attr_p_20251231_002a58
+  supporting_evidence_ids: *id071
+  supporting_metric_ids: *id072
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Tax assumptions are anchored to the audited 2025 effective rate and R&D
+    deductions.
+  limitations:
+  - tax credits and subsidiary mix may change
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bear_case_cashflow_bridge
+  driver: operating_cashflow
+  scope: cashflow
+  periods: *id003
+  value:
+    2026E: -31981375.42
+    2027E: 256794916.96
+    2028E: 428239402.17
+  formula: net income + noncash addback - change in modeled net working capital
+  unit: CNY
+  scenario: bear
+  evidence_ids: &id073
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_official_disclosure_002837_20250428_108da3
+  metric_ids: &id074
+  - metric_cn_002837_invic_n_cashflow_act_20251231_890163
+  supporting_evidence_ids: *id073
+  supporting_metric_ids: *id074
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Cash conversion reflects acceptance and collection timing rather than
+    revenue alone.
+  limitations:
+  - noncash addback and working-capital ratios are explicit assumptions
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+- assumption_id: b9_bear_case_capex_bridge
+  driver: capex
+  scope: capex
+  periods: *id003
+  value:
+    2026E: 303445105.5
+    2027E: 291230946.67
+    2028E: 271690585.55
+  formula: forecast revenue * capex-to-revenue assumption
+  unit: CNY
+  scenario: bear
+  evidence_ids: &id075
+  - ev_annual_report_002837_20260421_2cbfc5
+  metric_ids: &id076
+  - metric_cn_002837_invic_revenue_20251231_9c5aaf
+  - metric_cn_002837_invic_n_cashflow_act_20251231_890163
+  supporting_evidence_ids: *id075
+  supporting_metric_ids: *id076
+  missing_reason: null
+  allowed_usage: forecast_model
+  rationale: Capex path starts from audited 2025 capital expenditure.
+  limitations:
+  - project timing may shift between years
+  review_status: reviewed
+  reviewer_note: Reviewed as an explicit research model assumption; not issuer guidance
+    or fact.
+blocking_rules:
+- liquid-cooling revenue and margin cannot be modeled as standalone reported segments
+- forecast values remain estimates and cannot become facts or trading instructions
+- share-basis and issuer-event dates must be refreshed when changed

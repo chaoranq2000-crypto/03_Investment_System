@@ -1,5 +1,5 @@
 {
-  "status": "accepted_with_todos",
+  "status": "accepted",
   "workflow_run": "reports/workflow_runs/wf_20260703_stock_first_002837_invic",
   "issue_counts": {
     "high": 0,
@@ -7,8 +7,5 @@
     "low": 0
   },
   "issues": [],
-  "notes": [
-    "market_snapshot.csv keeps explicit market-data TODO rows.",
-    "peer_market_snapshot.csv keeps explicit peer-data TODO rows."
-  ]
+  "notes": []
 }

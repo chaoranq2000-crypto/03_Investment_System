@@ -1,0 +1,129 @@
+artifact_type: peer_operating_evidence_pack
+schema_version: v0.2
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-13'
+period: '2025-12-31'
+review_status: draft_pending_quality_review
+claim_boundary: metric_only
+comparison_scope: listed_company_total_operating_and_financial_metrics
+companies:
+  - company_id: cn_002837_invic
+    stock_code: '002837'
+    company_name: 英维克
+    role: subject_company
+    announcement_date: '2026-04-21'
+    metrics:
+      total_revenue: {value: 6067759091.55, unit: CNY}
+      net_profit_attributable: {value: 521914773.0, unit: CNY}
+      gross_margin: {value: 27.8626, unit: percent}
+      net_profit_margin: {value: 8.9437, unit: percent}
+      roe_diluted: {value: 15.8358, unit: percent}
+      debt_to_assets: {value: 55.3038, unit: percent}
+      net_operating_cash_flow: {value: 157273222.36, unit: CNY}
+      accounts_receivable: {value: 3053959547.65, unit: CNY}
+      inventories: {value: 983397026.13, unit: CNY}
+    source_evidence_ids:
+      income: ev_structured_financial_data_002837_20260713_38e6e4
+      indicator: ev_structured_financial_data_002837_20260713_45c65f
+      cashflow: ev_structured_financial_data_002837_20260713_f83c33
+      balance: ev_structured_financial_data_002837_20260713_88750f
+  - company_id: cn_300499_gaolan
+    stock_code: '300499'
+    company_name: 高澜股份
+    role: peer
+    announcement_date: '2026-04-24'
+    metrics:
+      total_revenue: {value: 989123831.32, unit: CNY}
+      net_profit_attributable: {value: 28383086.38, unit: CNY}
+      gross_margin: {value: 28.9396, unit: percent}
+      net_profit_margin: {value: 2.796, unit: percent}
+      roe_diluted: {value: 4.0884, unit: percent}
+      debt_to_assets: {value: 36.8528, unit: percent}
+      net_operating_cash_flow: {value: 110855883.75, unit: CNY}
+      accounts_receivable: {value: 404435977.73, unit: CNY}
+      inventories: {value: 546037779.22, unit: CNY}
+    source_evidence_ids:
+      income: ev_structured_financial_data_300499_20260713_d68c27
+      indicator: ev_structured_financial_data_300499_20260713_275338
+      cashflow: ev_structured_financial_data_300499_20260713_fb30a9
+      balance: ev_structured_financial_data_300499_20260713_75d3a7
+    official_scope_anchor: annual_report_300499_gaolan_2025_122516
+  - company_id: cn_300731_cotran
+    stock_code: '300731'
+    company_name: 科创新源
+    role: peer
+    announcement_date: '2026-04-29'
+    metrics:
+      total_revenue: {value: 1156901217.87, unit: CNY}
+      net_profit_attributable: {value: 35609646.01, unit: CNY}
+      gross_margin: {value: 19.2416, unit: percent}
+      net_profit_margin: {value: 4.2821, unit: percent}
+      roe_diluted: {value: 4.8039, unit: percent}
+      debt_to_assets: {value: 48.7692, unit: percent}
+      net_operating_cash_flow: {value: 42753313.69, unit: CNY}
+      accounts_receivable: {value: 427098519.57, unit: CNY}
+      inventories: {value: 135574593.21, unit: CNY}
+    source_evidence_ids:
+      income: ev_structured_financial_data_300731_20260713_7fa521
+      indicator: ev_structured_financial_data_300731_20260713_8065c2
+      cashflow: ev_structured_financial_data_300731_20260713_cc62b3
+      balance: ev_structured_financial_data_300731_20260713_c94439
+    official_scope_anchor: annual_report_300731_cotran_2025_122523
+  - company_id: cn_301018_shenling
+    stock_code: '301018'
+    company_name: 申菱环境
+    role: peer
+    announcement_date: '2026-04-27'
+    metrics:
+      total_revenue: {value: 4209198844.25, unit: CNY}
+      net_profit_attributable: {value: 216777173.18, unit: CNY}
+      gross_margin: {value: 23.9885, unit: percent}
+      net_profit_margin: {value: 5.3494, unit: percent}
+      roe_diluted: {value: 7.8785, unit: percent}
+      debt_to_assets: {value: 56.6619, unit: percent}
+      net_operating_cash_flow: {value: 324937326.72, unit: CNY}
+      accounts_receivable: {value: 2229815221.42, unit: CNY}
+      inventories: {value: 869046583.42, unit: CNY}
+    source_evidence_ids:
+      income: ev_structured_financial_data_301018_20260713_32deab
+      indicator: ev_structured_financial_data_301018_20260713_837ba6
+      cashflow: ev_structured_financial_data_301018_20260713_8e33bd
+      balance: ev_structured_financial_data_301018_20260713_c4e106
+    official_scope_anchor: semiannual_report_301018_shenling_2025_122461
+  - company_id: cn_300602_frd
+    stock_code: '300602'
+    company_name: 飞荣达
+    role: peer
+    announcement_date: '2026-04-28'
+    metrics:
+      total_revenue: {value: 6526685748.76, unit: CNY}
+      net_profit_attributable: {value: 364560225.57, unit: CNY}
+      gross_margin: {value: 19.472, unit: percent}
+      net_profit_margin: {value: 5.5076, unit: percent}
+      roe_diluted: {value: 7.9561, unit: percent}
+      debt_to_assets: {value: 55.4473, unit: percent}
+      net_operating_cash_flow: {value: 437005614.59, unit: CNY}
+      accounts_receivable: {value: 2801037384.24, unit: CNY}
+      inventories: {value: 1113689067.76, unit: CNY}
+    source_evidence_ids:
+      income: ev_structured_financial_data_300602_20260713_22e974
+      indicator: ev_structured_financial_data_300602_20260713_6bc035
+      cashflow: ev_structured_financial_data_300602_20260713_d99539
+      balance: ev_structured_financial_data_300602_20260713_ffee9a
+    official_scope_anchor: semiannual_report_300602_frd_2025_122450
+comparability:
+  same_period: true
+  same_metric_provider: true
+  same_field_mapping: true
+  business_scope_comparability: limited
+  liquid_cooling_revenue_purity_comparable: false
+  ranking_allowed: false
+  limitations:
+    - Company-level revenue and profit do not isolate liquid-cooling exposure.
+    - Product mixes, customer mixes, project acceptance timing and accounting presentation differ.
+    - New Tushare snapshots are draft metric-only inputs; official peer filings are scope anchors, not automatic numeric reconciliation.
+    - 申菱环境 and 飞荣达 official scope anchors currently use reviewed interim reports, while the numeric table uses 2025 annual structured data.
+quality_actions:
+  - reconcile selected metrics to each 2025 annual report before registry promotion
+  - retain peer comparison as operating context rather than a deterministic ranking
+  - disclose all valuation and business-scope limitations in Bundle 9

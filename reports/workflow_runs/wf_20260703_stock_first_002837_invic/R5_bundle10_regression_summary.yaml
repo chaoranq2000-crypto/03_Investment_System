@@ -1,0 +1,44 @@
+artifact_type: R5_bundle10_regression_summary
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+run_date: '2026-07-13'
+environment: C:/Projects/03_Investment_System/.conda/investment-system
+focused:
+  reader_pack_contract: {status: pass, summary: 'accepted; 10 sections; 18 traceability records; zero issues'}
+  technical_contract: {status: pass, summary: accepted_with_todos}
+  sentiment_event_contract: {status: pass, summary: accepted_with_todos}
+  reader_quality_gate: {status: pass, summary: 'candidate_ready_for_human_review; 98/100; zero blockers; truthfulness pass'}
+  dynamic_writer_tests: {status: pass, summary: '4 passed; real-pack duplicate and exact-value-source checks added'}
+  independent_subagent_review: {status: pass, summary: '3 AI domains; HR-1 through HR-6 recommend pass; not human signoff'}
+  human_review_handoff_tests: {status: pass, summary: '3 passed; finalized handoff plus fail-closed builder covered'}
+  human_review_submission_and_finalize_tests: {status: pass, summary: '4 passed; finalized workflow and isolated pending-to-close transition covered'}
+  bundle10_close_test: {status: pass, summary: '1 passed'}
+  lifecycle_state_sync_tests: {status: pass, summary: 'historical Bundle 7/8/9 boundaries and finalized Bundle 10 state covered'}
+  cross_industry_regression: {status: pass, summary: '2 synthetic cases; 2 industries; no identity leakage; narrative quality pass'}
+  deterministic_close: {status: pass, summary: '16 automated artifacts plus 4 final-close artifacts; zero errors'}
+  quality_issue_contract: {status: pass, summary: accepted_with_todos}
+full_repository:
+  status: pass
+  command: C:/Projects/03_Investment_System/.conda/investment-system/python.exe -m pytest -q
+  summary: '642 passed, 2 skipped'
+  exit_code: 0
+  duration_seconds: 27.14
+stale_test_repairs:
+  - path: tests/test_r5_bundle7_close.py
+    reason: historical next_stage assertion blocked legitimate Bundle 8 and Bundle 9 progress
+    change: verify fail-closed semantics and controlled route mapping
+  - path: tests/test_r5_bundle8b_local_close.py
+    reason: historical test treated Bundle 8 as permanently current and counted all later artifact IDs as Bundle 8
+    change: verify immutable Bundle 8 completion and exact art_091 through art_111 range
+external_human_review:
+  status: passed
+  reviewer: Q
+  reviewed_at: '2026-07-13T14:07:11+08:00'
+  report_sha256: eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83
+  checklist_pass_count: 6
+  blocking_comment_count: 0
+  handoff_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_human_review.yaml
+  submission_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_human_review_submission.yaml
+sample_quality_allowed: true
+p2_allowed: false
+remote_ci: TODO_AFTER_EXPLICIT_PUBLISH

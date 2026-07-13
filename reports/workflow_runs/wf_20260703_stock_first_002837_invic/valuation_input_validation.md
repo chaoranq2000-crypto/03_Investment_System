@@ -1,6 +1,6 @@
 # Valuation Input Validation
 
-status: accepted_with_todos
+status: accepted
 
 ## Issue Counts
 
@@ -16,5 +16,4 @@ No blocking issues found.
 
 ## Notes
 
-- market_snapshot.csv keeps explicit market-data TODO rows.
-- peer_market_snapshot.csv keeps explicit peer-data TODO rows.
+- No TODO notes.

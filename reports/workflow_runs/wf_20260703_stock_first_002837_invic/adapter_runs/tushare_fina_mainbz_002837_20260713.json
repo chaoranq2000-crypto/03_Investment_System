@@ -1,0 +1,10 @@
+{
+  "source_name": "tushare",
+  "api_name": "fina_mainbz",
+  "mode": "live",
+  "adapter_status": "live_completed",
+  "result": "SUCCESS",
+  "rows": 39,
+  "token_env": "TUSHARE_TOKEN",
+  "notes": "live Tushare response was routed through structured_api_pull; token value was not stored"
+}

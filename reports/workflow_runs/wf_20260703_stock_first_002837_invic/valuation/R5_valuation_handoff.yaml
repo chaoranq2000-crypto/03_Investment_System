@@ -1,0 +1,188 @@
+artifact_type: R5_valuation_handoff
+schema_version: r5_valuation_handoff_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+company_id: cn_002837_invic
+valuation_as_of_date: '2026-07-10'
+market_snapshot:
+  status: reviewed
+  current_price:
+    value: 73.54
+    unit: CNY_per_share
+    claim_type: fact
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+  market_cap:
+    value: 93715669584.0
+    unit: CNY
+    claim_type: fact
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+  share_count:
+    value: 1274349692
+    unit: shares
+    claim_type: fact
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+peer_context:
+  status: reviewed
+  quality: LOW_CONFIDENCE_PEER_SET
+  peers:
+  - peer_company: 高澜股份
+    peer_stock_code: '300499'
+    similarity_reason: 液冷设备与热管理业务邻近样本
+    pe_ttm:
+      value: 385.8974
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_300499_20260713_57cd0b
+    pb:
+      value: 8.4621
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_300499_20260713_57cd0b
+    ps:
+      value: 11.9122
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_300499_20260713_57cd0b
+    source_evidence_id: ev_structured_market_data_300499_20260713_57cd0b
+  - peer_company: 科创新源
+    peer_stock_code: '300731'
+    similarity_reason: 热管理材料与液冷产业链邻近样本
+    pe_ttm:
+      value: 409.8812
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_300731_20260713_f4f0c0
+    pb:
+      value: 14.9378
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_300731_20260713_f4f0c0
+    ps:
+      value: 7.9839
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_300731_20260713_f4f0c0
+    source_evidence_id: ev_structured_market_data_300731_20260713_f4f0c0
+  - peer_company: 申菱环境
+    peer_stock_code: '301018'
+    similarity_reason: 数据中心环境控制与液冷解决方案邻近样本
+    pe_ttm:
+      value: 234.3524
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_301018_20260713_cc0ee3
+    pb:
+      value: 16.2152
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_301018_20260713_cc0ee3
+    ps:
+      value: 10.6313
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_301018_20260713_cc0ee3
+    source_evidence_id: ev_structured_market_data_301018_20260713_cc0ee3
+  - peer_company: 飞荣达
+    peer_stock_code: '300602'
+    similarity_reason: 热管理材料及液冷相关产品邻近样本
+    pe_ttm:
+      value: 69.9482
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_300602_20260713_e6104c
+    pb:
+      value: 6.4751
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_300602_20260713_e6104c
+    ps:
+      value: 4.1171
+      unit: multiple
+      claim_type: fact
+      evidence_id: ev_structured_market_data_300602_20260713_e6104c
+    source_evidence_id: ev_structured_market_data_300602_20260713_e6104c
+method_used:
+- static_multiples
+- dynamic_pe
+- peer_context
+- scenario_valuation
+- reverse_valuation
+scenario_values:
+- scenario_id: bear_case
+  method: scenario_PE_on_2027E_profit
+  market_cap_range:
+    low:
+      value: 13577030338.5
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_bear_valuation_multiple_low
+    high:
+      value: 20365545507.75
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_bear_valuation_multiple_high
+  interpretation_boundary: scenario_value_not_action_recommendation
+- scenario_id: base_case
+  method: scenario_PE_on_2027E_profit
+  market_cap_range:
+    low:
+      value: 51241106038.5
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_base_valuation_multiple_low
+    high:
+      value: 68321474718.0
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_base_valuation_multiple_high
+  interpretation_boundary: scenario_value_not_action_recommendation
+- scenario_id: bull_case
+  method: scenario_PE_on_2027E_profit
+  market_cap_range:
+    low:
+      value: 102353339936.0
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_bull_valuation_multiple_low
+    high:
+      value: 153530009904.0
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_bull_valuation_multiple_high
+  interpretation_boundary: scenario_value_not_action_recommendation
+assumptions:
+- assumption_id: b9_bear_valuation_multiple_range
+  description: bear 2027E PE range 50x-75x
+  source_evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+  forecast_assumption_id: b9_bear_case_net_profit_bridge
+- assumption_id: b9_base_valuation_multiple_range
+  description: base 2027E PE range 75x-100x
+  source_evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+  forecast_assumption_id: b9_base_case_net_profit_bridge
+- assumption_id: b9_bull_valuation_multiple_range
+  description: bull 2027E PE range 100x-150x
+  source_evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+  forecast_assumption_id: b9_bull_case_net_profit_bridge
+sensitivity:
+- driver: 2027E_PE_multiple
+  change: plus_25x
+  impact_value:
+    value: 17080368679.499998
+    unit: CNY_market_cap
+    claim_type: inference
+    assumption_id: b9_base_valuation_multiple_sensitivity
+source_evidence_ids:
+- ev_structured_market_data_002837_20260713_f8cc52
+- ev_annual_report_002837_20260421_2cbfc5
+- ev_third_party_research_002837_20260713_20f610
+- ev_structured_market_data_300499_20260713_57cd0b
+- ev_structured_market_data_300731_20260713_f4f0c0
+- ev_structured_market_data_301018_20260713_cc0ee3
+- ev_structured_market_data_300602_20260713_e6104c
+missing_items:
+- MISSING_PEER_FORWARD_MULTIPLES
+- MISSING_NET_DEBT_AND_ENTERPRISE_VALUE
+- TODO_SEGMENT_DISCLOSURE
+- TODO_DCF_DISCOUNT_AND_TERMINAL_INPUTS
+no_advice_statement: Scenario values are research context only and not action recommendations.
+sample_quality_allowed: false

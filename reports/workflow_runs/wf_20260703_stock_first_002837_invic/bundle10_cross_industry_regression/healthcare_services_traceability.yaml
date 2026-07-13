@@ -1,0 +1,39 @@
+artifact_type: R5_stock_research_report_traceability_v2
+schema_version: v0.2
+workflow_id: fixture_healthcare_services
+stock_code: FIX002
+cutoff_date: '2026-07-13'
+records:
+- display_reference_id: E1
+  claim_type: fixture_fact
+  claim_summary: 医疗服务样例事实输入
+  period: fixture
+  unit: null
+  raw_evidence_ids:
+  - fixture_healthcare_services_source_1
+  source_category: other
+  source_path: tests/fixtures/r5_reader_writer/cross_industry_cases.yaml
+  method: synthetic_writer_regression
+  confidence: fixture_only
+  limitation: 只验证动态渲染，不进入研究结论
+  reviewer_state: fixture
+  conflict_or_staleness_status: not_applicable
+  claim_text_digest: 655184135a212ab7513f8b64dd47d6a89b1fb188cf0435420f8b9cbd1cbff100
+- display_reference_id: E2
+  claim_type: fixture_counterevidence
+  claim_summary: 医疗服务样例反证输入
+  period: fixture
+  unit: null
+  raw_evidence_ids:
+  - fixture_healthcare_services_source_2
+  source_category: other
+  source_path: tests/fixtures/r5_reader_writer/cross_industry_cases.yaml
+  method: synthetic_writer_regression
+  confidence: fixture_only
+  limitation: 只验证动态渲染，不进入研究结论
+  reviewer_state: fixture
+  conflict_or_staleness_status: not_applicable
+  claim_text_digest: 53752e8f0df6c0ed03feb8613799c0d64a7fded5d0782e95a62b4e746d608400
+human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false

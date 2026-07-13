@@ -1,0 +1,21 @@
+artifact_type: R5_bundle9_forecast_build_readout
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+decision: built_pending_quality_review
+business_lines: 3
+scenarios: 3
+forecast_years:
+- 2026E
+- 2027E
+- 2028E
+sensitivity_rows: 12
+profit_bridge_max_abs_difference: 0.0
+outputs:
+- R5_bundle9_forecast_assumption_registry.yaml
+- segment_forecast_model.yaml
+- forecast_bridge.yaml
+- forecast_sensitivity.csv
+supersedes_for_bundle9:
+- forecast_model.yaml
+- R5_bundle6_forecast_bridge.yaml
+sample_quality_allowed: false

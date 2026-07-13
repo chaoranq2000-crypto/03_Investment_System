@@ -1,0 +1,36 @@
+artifact_type: R5_reader_external_human_review_submission
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+external_reviewer: null
+reviewer_type: human
+reviewed_at: null
+decision: null
+report_sha256_confirmed: eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83
+traceability_appendix_sha256_confirmed: 7b883ffb664247ec323498db7ff995e9c7e6e0b61a0271650240fafbec385170
+required_checklist:
+- check_id: HR-1
+  status: pending
+  comment: null
+- check_id: HR-2
+  status: pending
+  comment: null
+- check_id: HR-3
+  status: pending
+  comment: null
+- check_id: HR-4
+  status: pending
+  comment: null
+- check_id: HR-5
+  status: pending
+  comment: null
+- check_id: HR-6
+  status: pending
+  comment: null
+blocking_comments: []
+nonblocking_comments: []
+attestation:
+  external_human_review_confirmed: false
+  report_read_in_full: false
+  traceability_consulted_as_needed: false
+  automated_agent_generated: null
+instructions: 复制本模板为 submission.yaml 后由真实评审人填写；模板原件保持 pending。

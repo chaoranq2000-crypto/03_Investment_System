@@ -1,31 +1,41 @@
----
 valuation_gap_requests:
-  - gap_id: TODO_MARKET_DATA
-    target_section: static_valuation
-    missing_claim_or_metric: Current price, market capitalization, shares outstanding, PE TTM, PB, PS and EV/EBITDA as of the valuation date.
-    required_source_type: market_snapshot_csv
-    preferred_source_name: reviewed market data snapshot under the workflow run
-    blocking_level: medium
-    owner_skill: evidence-ingest
-    notes: market_snapshot.csv is parseable but contains a TODO placeholder because no live data was acquired.
-  - gap_id: TODO_PEER_DATA
-    target_section: peer_comparison
-    missing_claim_or_metric: Dated peer multiples with peer selection reasons and limitations.
-    required_source_type: peer_market_snapshot_csv
-    preferred_source_name: reviewed peer market snapshot
-    blocking_level: medium
-    owner_skill: evidence-ingest
-    notes: peer_market_snapshot.csv is parseable but contains a TODO placeholder because no reviewed peer market data was acquired.
-  - gap_id: TODO_FORECAST_MODEL_NET_PROFIT
-    target_section: dynamic_valuation
-    missing_claim_or_metric: Net profit, EPS, margin and multiple assumptions for 2026E-2028E.
-    required_source_type: forecast_model_yaml
-    preferred_source_name: forecast_model.yaml plus financial_metric_pack.csv
-    blocking_level: medium
-    owner_skill: stock-deep-dive
-    notes: Financial metric anchors exist but forward net profit, EPS and margin remain TODO_MODEL_INPUT.
-resolved_inputs:
-  - gap_id: TODO_FINANCIAL_METRIC_PACK
-    status: resolved_to_partial_input
-    artifact_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
-    limitations: Metric pack exists with company-level structured fixture rows and still lacks direct ROE, capex and segment economics inputs.
+- gap_id: CV_B9_001
+  target_section: peer_comparison
+  missing_claim_or_metric: peer forward PE
+  required_source_type: reviewed same-basis forecasts
+  preferred_source_name: official or traceable analyst forecast
+  blocking_level: medium
+  owner_skill: evidence-ingest
+  notes: Keep peer set low confidence until refreshed.
+- gap_id: CV_B9_002
+  target_section: EV_and_DCF
+  missing_claim_or_metric: net debt and enterprise value
+  required_source_type: reviewed balance sheet
+  preferred_source_name: issuer filing
+  blocking_level: medium
+  owner_skill: stock-deep-dive
+  notes: EV-based methods remain unavailable.
+- gap_id: CV_B9_003
+  target_section: SOTP
+  missing_claim_or_metric: standalone liquid-cooling revenue and profit
+  required_source_type: issuer disclosure
+  preferred_source_name: annual report or official response
+  blocking_level: medium
+  owner_skill: evidence-ingest
+  notes: SOTP remains skipped.
+- gap_id: CV_B9_004
+  target_section: DCF
+  missing_claim_or_metric: discount rate and terminal-growth assumptions
+  required_source_type: reviewed model assumption
+  preferred_source_name: valuation assumption registry
+  blocking_level: medium
+  owner_skill: stock-deep-dive
+  notes: DCF remains skipped.
+- gap_id: CV_B9_005
+  target_section: peer_operating_context
+  missing_claim_or_metric: official 2025 line-item reconciliation for all peers
+  required_source_type: peer annual reports
+  preferred_source_name: official annual report
+  blocking_level: medium
+  owner_skill: quality-review
+  notes: Company-level operating comparison remains draft context.

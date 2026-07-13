@@ -1,0 +1,13 @@
+year,driver,change,impact_metric,impact_value,unit,assumption_id_or_missing_reason,calculation_method
+2026E,room_cooling_revenue_growth,+5pct_points,net_profit_attributable,38935035.13,CNY,b9_base_case_room_cooling_revenue_growth,prior room revenue * 5pp * modeled room margin * after-tax-minority factor
+2026E,consolidated_gross_margin,+1pct_point,net_profit_attributable,64621764.13,CNY,b9_base_case_gross_margin_consolidated,revenue * 1pp * after-tax-minority factor
+2026E,opex_ratio,+1pct_point,net_profit_attributable,-64621764.13,CNY,b9_base_case_opex_bridge,-revenue * 1pp * after-tax-minority factor
+2026E,nwc_to_revenue,+1pct_point,operating_cashflow,-74406176.31,CNY,b9_base_case_cashflow_bridge,-revenue * 1pp increase in ending net working capital
+2027E,room_cooling_revenue_growth,+5pct_points,net_profit_attributable,51370286.35,CNY,b9_base_case_room_cooling_revenue_growth,prior room revenue * 5pp * modeled room margin * after-tax-minority factor
+2027E,consolidated_gross_margin,+1pct_point,net_profit_attributable,76456705.81,CNY,b9_base_case_gross_margin_consolidated,revenue * 1pp * after-tax-minority factor
+2027E,opex_ratio,+1pct_point,net_profit_attributable,-76456705.81,CNY,b9_base_case_opex_bridge,-revenue * 1pp * after-tax-minority factor
+2027E,nwc_to_revenue,+1pct_point,operating_cashflow,-88033052.17,CNY,b9_base_case_cashflow_bridge,-revenue * 1pp increase in ending net working capital
+2028E,room_cooling_revenue_growth,+5pct_points,net_profit_attributable,64074848.21,CNY,b9_base_case_room_cooling_revenue_growth,prior room revenue * 5pp * modeled room margin * after-tax-minority factor
+2028E,consolidated_gross_margin,+1pct_point,net_profit_attributable,87990986.84,CNY,b9_base_case_gross_margin_consolidated,revenue * 1pp * after-tax-minority factor
+2028E,opex_ratio,+1pct_point,net_profit_attributable,-87990986.84,CNY,b9_base_case_opex_bridge,-revenue * 1pp * after-tax-minority factor
+2028E,nwc_to_revenue,+1pct_point,operating_cashflow,-101313744.21,CNY,b9_base_case_cashflow_bridge,-revenue * 1pp increase in ending net working capital

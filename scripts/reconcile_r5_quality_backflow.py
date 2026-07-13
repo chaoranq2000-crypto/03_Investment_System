@@ -374,7 +374,8 @@ def supersede_historical_readout(path: Path, plan: dict[str, Any], current_reado
             lines.insert(idx + 1, insertion)
             break
     else:
-        lines.insert(1, insertion)
+        lines.insert(1, "## Status historical_snapshot_superseded_by_bundle7_quality_rebaseline")
+        lines.insert(2, insertion)
     path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 

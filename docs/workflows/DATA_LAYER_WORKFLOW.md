@@ -23,9 +23,11 @@ research-orchestrator 识别 workflow stage
         ↓
 evidence-ingest 创建 data_request_plan
         ↓
-source adapter runners 拉取或登记原始文件/快照
+capability route + source health ledger 生成 adapter_run_queue
         ↓
-raw archive + normalized tables + manifests
+source adapter runners 串行拉取并按独立来源回退
+        ↓
+schema fingerprint + raw archive + normalized tables + manifests
         ↓
 claim_candidates / metric_candidates / clue_log
         ↓
@@ -225,9 +227,54 @@ config/source_registry.yaml
 
 ```text
 adapter_run_queue.yaml
+source_route_quality_report.yaml
 ```
 
-门禁：每个 endpoint 有 source_name、source_group、allowed_claim_types、fallback、license_note。
+门禁：
+
+- 每个 capability 有 source_name、source_group、allowed_claim_types、fallback、license_note；
+- material fact route 至少包含一个官方来源；
+- fallback 必须标注 `independence_domain`，不能把同一厂商的多个 endpoint 当作独立回退；
+- route catalog 不得引用 source registry 之外的来源；
+- planned/disabled adapter 不得进入 live queue。
+
+新增 canonical 配置：
+
+```text
+config/evidence_source_routes.yaml
+```
+
+新增运行命令：
+
+```bash
+python scripts/run_source_route_quality_gate.py
+python scripts/build_evidence_acquisition_plan.py --request <data_request_plan.yaml>
+```
+
+### DL1.5 Source Health / Circuit Breaker
+
+读取：
+
+```text
+data/manifests/source_health_ledger.yaml
+```
+
+规则：
+
+- `healthy` 与 `unknown` 来源可进入队列；
+- `degraded` 来源可以尝试，但必须保留独立 fallback；
+- `circuit_open` 与 `quarantined` 来源不得进入当前队列；
+- `401/403/404` 不做即时重试；`429/5xx/timeout` 使用有上限的退避与 jitter；
+- 公共 HTTP 源默认串行、复用 session/opener、遵守最小间隔与 `Retry-After`；
+- observed fields 缺少 expected fields 时标记 `schema_drift`，并切换独立 fallback；
+- source health 是运行元数据，不替代 raw archive、manifest 或证据 review。
+
+输出：
+
+```text
+source_health_ledger.yaml
+adapter_run_queue.yaml
+```
 
 ### DL2 Acquire / Register
 
@@ -328,6 +375,8 @@ G-DL5 Metric-only Boundary Gate
 G-DL6 Freshness Gate
 G-DL7 License / Terms Gate
 G-DL8 Downstream Pack Completeness Gate
+G-DL9 Source Health / Independent Fallback Gate
+G-DL10 Schema Drift Gate
 ```
 
 输出：

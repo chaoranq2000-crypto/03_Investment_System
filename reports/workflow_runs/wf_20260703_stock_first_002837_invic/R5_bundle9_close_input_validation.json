@@ -1,0 +1,46 @@
+{
+  "artifact_type": "R5_bundle9_close_input_validation",
+  "schema_version": "v0.1",
+  "workflow_id": "wf_20260703_stock_first_002837_invic",
+  "decision": "pass",
+  "checks": {
+    "required_artifacts": {
+      "count": 23,
+      "missing": []
+    },
+    "forecast_assumptions": {
+      "rows": 42,
+      "missing_dual_trace": 0
+    },
+    "forecast_model": {
+      "scenarios": 3,
+      "years_per_scenario": 3,
+      "profit_bridge_max_abs_difference": 0.0
+    },
+    "normalized_inputs": {
+      "market_rows": 1,
+      "peer_rows": 4,
+      "peer_forward_values": 0
+    },
+    "valuation_math": {
+      "scenario_checks": 6,
+      "reverse_checks": 5
+    },
+    "valuation_boundary": {
+      "pack_status": "partial",
+      "company_output_status": "partial_with_todos",
+      "dcf": "TODO",
+      "sotp": "TODO",
+      "sample_quality_allowed": false
+    },
+    "analyst_comparison": {
+      "rows": 3,
+      "claim_type": "analyst_view"
+    },
+    "no_advice_scan": {
+      "files": 9,
+      "violations": []
+    }
+  },
+  "errors": []
+}

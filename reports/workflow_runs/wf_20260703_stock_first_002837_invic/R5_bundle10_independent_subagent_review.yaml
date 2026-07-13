@@ -1,0 +1,132 @@
+artifact_type: R5_bundle10_independent_subagent_review
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+review_date: '2026-07-13'
+review_mode: independent_ai_subagent_panel
+user_authorized: true
+panel_status: recommend_pass_pending_external_human_confirmation
+reviewed_inputs:
+  reader_report:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3.md
+    sha256: eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83
+  traceability_appendix:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_traceability_v3.yaml
+    sha256: 7b883ffb664247ec323498db7ff995e9c7e6e0b61a0271650240fafbec385170
+    display_reference_count: 18
+  quality_scorecard:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_quality_scorecard.yaml
+    sha256: 23852649595386e3cc8ac5d7d8b38c1c3557713027bbbe24d91e35a3e5d0514b
+    decision: candidate_ready_for_human_review
+    score: 98
+    threshold: 82
+    truthfulness_status: pass
+    critical_blocker_count: 0
+  human_review_handoff:
+    path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_human_review.yaml
+    sha256: c58d9481210d5bbdf08de9f10e2fe383cb2f1191be686220272777208621b770
+    status: pending_external_human_review
+reviewers:
+  - reviewer_id: review_traceability
+    reviewer_type: independent_ai_subagent
+    domain: evidence_traceability_and_claim_typing
+    initial_recommendation: needs_fix
+    final_recommendation: recommend_pass
+    final_blockers: []
+    evidence:
+      - E1-E18全部解析且无缺失、未使用或重复记录
+      - E9仅承载经营可比性，E15绑定四家同日PE/PB/PS
+      - E16为行业metric_statement，E17为敏感性，E18为本公司估值快照
+      - 正文无内部ID、路径或机器字段泄露
+  - reviewer_id: review_forecast_valuation
+    reviewer_type: independent_ai_subagent
+    domain: forecast_and_valuation
+    initial_recommendation: needs_fix_mechanical_hash_binding_then_recommend_pass
+    final_recommendation: recommend_pass
+    final_blockers: []
+    evidence:
+      - 独立复算14组关键关系，并对三情景三年度执行243项关系检查
+      - 最大绝对算术误差0.02元，属于逐项四舍五入
+      - 动态PE、六个情景估值端点、反向估值和同业中位数均勾稽
+      - 无买卖、目标价、仓位或收益保证语言
+  - reviewer_id: review_narrative_risk
+    reviewer_type: independent_ai_subagent
+    domain: narrative_risk_market_context
+    initial_recommendation: needs_fix
+    final_recommendation: recommend_pass
+    final_blockers: []
+    evidence:
+      - 原两组逐字重复段落已消失
+      - 事实、估计、推断、管理层表述和分析师观点可区分
+      - information_cutoff与retrieved/generated日期已分离
+      - 风险、反证、观察条件和模型重估触发完整
+initial_findings_and_remediation:
+  - issue_id: PANEL-001
+    severity: high
+    finding: LF与CRLF造成精确报告哈希漂移
+    remediation: 从生成器重新渲染并重建scorecard及hash-bound handoff
+    status: resolved
+  - issue_id: PANEL-002
+    severity: high
+    finding: 同业PE/PB/PS表原先绑定经营资料而非同日市场估值证据
+    remediation: 新增E15并绑定四家结构化市场证据和R5_bundle9_valuation_pack.yaml
+    status: resolved
+  - issue_id: PANEL-003
+    severity: medium
+    finding: 摘要与正文存在两组逐字重复段落
+    remediation: 在pack生成器中改写公司边界和财务趋势段，并增加真实pack去重测试
+    status: resolved
+  - issue_id: PANEL-004
+    severity: medium
+    finding: 情绪事件pack混用信息截止日和获取生成日
+    remediation: as_of_date与information_cutoff_date固定为2026-07-10，retrieved_at与generated_at记录2026-07-13
+    status: resolved
+  - issue_id: PANEL-005
+    severity: medium
+    finding: 少量未验证因果使用偏确定措辞，行业指标claim type过宽
+    remediation: 改为可能性或条件性推断，并以E16 metric_statement单独承载行业数字
+    status: resolved
+  - issue_id: PANEL-006
+    severity: medium
+    finding: 预测敏感性和本公司静态估值原先与聚合引用共用路径
+    remediation: E10绑定预测桥，E17绑定敏感性，E18绑定本公司同日市场快照
+    status: resolved
+final_hr_recommendations:
+  HR-1:
+    status: pass
+    basis: 核心观点与证据及披露边界一致，所有重大数值均有准确显示引用
+  HR-2:
+    status: pass
+    basis: 事实、估计、推断、管理层表述与分析师观点清楚分离
+  HR-3:
+    status: pass
+    basis: 预测估值假设、日期、分母、情景、敏感性和停用方法均清楚且可复算
+  HR-4:
+    status: pass
+    basis: 风险反证与连续两个可比报告期等观察条件足以触发判断或模型重估
+  HR-5:
+    status: pass
+    basis: 技术、情绪和计划事件仅作为有日期的市场上下文，不能覆盖经营证据
+  HR-6:
+    status: pass
+    basis: 正文清晰、无逐字重复、无内部机器字段，精确哈希与评审包一致
+remaining_blockers: []
+remaining_nonblockers:
+  - severity: low
+    item: 第八节标题窄于其技术、情绪和事件内容
+    disposition: accepted_optional_style_improvement
+  - severity: low
+    item: 情景表仍使用bear/base/bull英文标签
+    disposition: accepted_optional_style_improvement
+  - severity: low
+    item: 正文未直接展示基准2026E自由现金流约负1.93亿元
+    disposition: accepted_optional_density_improvement
+validation:
+  focused_tests: 10_passed
+  full_repository_pytest: 637_passed_2_skipped
+  bundle10_close_input_validation: pass
+  no_advice_scan: pass
+panel_decision: recommend_pass
+external_human_review_satisfied: false
+sample_quality_allowed: false
+p2_allowed: false
+boundary: 三名评审者均为独立AI子agent；本面板不能生成或替代真实外部评审者身份、阅读全文证明、时间戳或人工签署。

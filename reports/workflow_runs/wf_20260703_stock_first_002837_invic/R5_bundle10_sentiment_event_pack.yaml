@@ -1,0 +1,47 @@
+artifact_type: R5_sentiment_event_pack
+schema_version: r5_sentiment_event_v0.3
+status: ready_with_todos
+as_of_date: '2026-07-10'
+information_cutoff_date: '2026-07-10'
+retrieved_at: '2026-07-13'
+generated_at: '2026-07-13'
+macro_sentiment:
+- summary: 宏观情绪缺少同日、可审阅且与公司传导路径一致的结构化指标，因此不作方向判断。
+  missing_reason: TODO_SOURCE_REQUIRED
+  claim_type: unknown
+industry_sentiment:
+- summary: 行业需求基础有独立技术与政策证据，但这些材料不是市场情绪指标；行业情绪保持未定。
+  source_id: industry_report_caict_green_computing_2025_59947f
+  claim_type: inference
+company_sentiment:
+- summary: 公司情绪只能以低置信预期差描述：两家近期机构的每股收益中点显著高于内部基准模型，同时近20日与近60日收益方向相反，说明短期交易热度和中期基本面预期并不一致。
+  source_id: ev_third_party_research_002837_20260713_20f610
+  claim_type: analyst_view_and_inference
+  technical_source_id: ev_structured_market_data_002837_20260713_3145e0
+  two_broker_eps_midpoint:
+    '2026': 1.1715
+    '2027': 1.8355
+    '2028': 2.6395
+catalyst_calendar:
+- event_date: '2026-08-25'
+  event_name: 2026年半年度报告计划披露窗口
+  impact_path: 分业务收入和产品组合披露将影响增长归因，毛利率与费用率影响盈利桥，应收、存货和经营现金流影响现金转化判断。
+  verification_metric: 宽口径业务收入、任何同定义液冷收入更新、毛利率、应收、存货与经营现金流
+  counterevidence_condition: 若正式公告日期变化，或收入增长未伴随毛利率与现金流改善，则当前基准情景需要下修并重新估值。
+  source_id_or_missing_reason: ev_structured_financial_data_002837_20260713_a177f1
+  date_status: scheduled_unverified_by_issuer_announcement
+  claim_type: estimate
+event_scenario_matrix:
+  base:
+    status: 宽口径收入按模型增长，毛利率和现金流逐步改善，液冷独立口径仍未披露。
+    source_id_or_missing_reason: b9_base_case_net_profit_bridge
+  upside:
+    status: 分业务披露增强且毛利率、回款同时改善，需要上修业务线假设。
+    source_id_or_missing_reason: b9_bull_case_net_profit_bridge
+  downside:
+    status: 竞争、项目验收或回款压力使利润与现金流低于基准，需要转入下行情景。
+    source_id_or_missing_reason: b9_bear_case_net_profit_bridge
+technical_context:
+  as_of_date: '2026-07-10'
+  market_state_judgement: 截至2026-07-10，收盘价略高于MA5，但低于MA10、MA20和MA60；近20个交易日上涨9.5%，近60个交易日下降28.5%，短期反弹与中期压力并存。该结论只描述市场状态。
+no_advice_boundary: true

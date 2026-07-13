@@ -1,0 +1,26 @@
+artifact_type: R5_bundle9_regression_summary
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+run_date: '2026-07-13'
+environment: C:/Projects/03_Investment_System/.conda/investment-system
+focused:
+  forecast_tests: {status: pass, summary: '3 passed'}
+  valuation_tests: {status: pass, summary: '3 passed'}
+  close_test: {status: pass, summary: '1 passed'}
+  forecast_contracts: {status: pass, summary: 'four validators accepted; model keeps explicit disclosure TODOs'}
+  valuation_contracts: {status: pass, summary: 'normalized inputs accepted; pack and handoff accepted; company output accepted_with_todos'}
+  quality_issue_contract: {status: pass, summary: 'accepted_with_todos'}
+  deterministic_close: {status: pass, summary: '23 artifacts; 42 assumptions; 6 scenario checks; 5 reverse checks; zero errors'}
+full_repository:
+  status: pass
+  command: C:/Projects/03_Investment_System/.conda/investment-system/python.exe -m pytest -q
+  summary: '617 passed, 2 skipped'
+  exit_code: 0
+  duration_seconds: 25.31
+stale_test_repair:
+  path: tests/test_r5_bundle7_close.py
+  reason: Bundle 7 test hard-coded a historical next_stage after Bundle 8 had already closed
+  change: assert fail-closed state and controlled route mapping across legitimate later bundles
+sample_quality_allowed: false
+p2_allowed: false
+remote_ci: TODO_AFTER_EXPLICIT_PUBLISH

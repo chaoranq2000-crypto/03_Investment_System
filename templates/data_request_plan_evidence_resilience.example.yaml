@@ -1,0 +1,41 @@
+workflow_id: wf_example_stock_first
+request_id: REQ_EXAMPLE_EVIDENCE_REFRESH
+request_type: stock_first
+object:
+  stock_code: 002837.SZ
+  company_id: company_002837
+  segment_id: ai_server_liquid_cooling
+time_range:
+  start_date: '2024-01-01'
+  end_date: '2026-07-12'
+required_capabilities:
+  - official_disclosures
+  - financial_statements
+  - financial_indicators
+  - security_master
+  - valuation_snapshot
+  - technical_history
+  - fund_flow_context
+  - investor_relations
+  - industry_policy
+  - research_metadata
+  - news_clues
+required_outputs:
+  - evidence_manifest_rows
+  - metric_candidates
+  - company_identity_pack
+  - financial_metric_pack
+  - valuation_snapshot
+  - technical_snapshot
+  - market_sentiment_pack
+  - source_gap_report
+quality_gates:
+  - source_permission
+  - independent_fallback
+  - source_health
+  - raw_archive
+  - schema_drift
+  - api_params_hash
+  - metric_only_boundary
+  - freshness
+  - license

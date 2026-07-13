@@ -1,0 +1,9 @@
+{
+  "artifact_type": "R5_bundle10_final_close_validation",
+  "schema_version": "v0.1",
+  "workflow_id": "wf_20260703_stock_first_002837_invic",
+  "decision": "pass",
+  "sample_quality_allowed": true,
+  "p2_allowed": false,
+  "errors": []
+}

@@ -1,0 +1,7 @@
+schema_version: 1
+decision: pass
+capability_count: 12
+source_count: 20
+issue_counts: {}
+blocking_issue_count: 0
+issues: []

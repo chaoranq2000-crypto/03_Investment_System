@@ -1,0 +1,778 @@
+artifact_type: R5_bundle9_forecast_bridge
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-13'
+historical_anchor:
+  period: 2025A
+  revenue: 6067759091.55
+  gross_profit: 1690633310.57
+  gross_margin: 27.8626
+  tax_surcharge: 31503818.55
+  selling_expense: 254101820.15
+  administrative_expense: 243986893.17
+  rd_expense: 445940662.45
+  financial_expense: 16182225.88
+  operating_profit: 590359558.6
+  total_profit: 597408857.0
+  income_tax: 54728876.14
+  net_income: 542679980.86
+  minority_profit: 20765207.86
+  net_profit_attributable: 521914773.0
+  operating_cashflow: 157273222.36
+  capex: 303000207.71
+  nwc_2024: 1507949639.5199997
+  nwc_2025: 2035857468.9900002
+  nwc_change: 527907829.4700005
+  accounts_receivable: 3053959547.65
+  inventories: 983397026.13
+  accounts_payable: 2001499104.79
+  shares: 1274349692
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+business_line_anchors:
+  room_cooling:
+    reported_name: 机房温控节能产品
+    revenue: 3448477492.62
+    gross_margin: 28.36
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    calculation_method: direct_reported_value
+  cabinet_cooling:
+    reported_name: 机柜温控节能产品
+    revenue: 1977423139.19
+    gross_margin: 27.24
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    calculation_method: direct_reported_value
+  other_businesses:
+    reported_name: 客车空调+轨道交通列车空调及服务+其他
+    revenue: 641858459.7400002
+    gross_margin: 27.134723467000825
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    calculation_method: audited_company_total_minus_two_reported_major_lines
+scenarios:
+  base_case:
+    2026E:
+      business_lines:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          revenue: 4414051190.55
+          revenue_growth: 28.0
+          gross_margin: 26.0
+          gross_profit: 1147653309.54
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_base_case_room_cooling_revenue_growth
+          margin_assumption_id: b9_base_case_room_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          revenue: 2333359304.24
+          revenue_growth: 18.0
+          gross_margin: 26.0
+          gross_profit: 606673419.1
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_base_case_cabinet_cooling_revenue_growth
+          margin_assumption_id: b9_base_case_cabinet_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          revenue: 693207136.52
+          revenue_growth: 8.0
+          gross_margin: 24.5
+          gross_profit: 169835748.45
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_base_case_other_businesses_revenue_growth
+          margin_assumption_id: b9_base_case_other_businesses_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+      bridge:
+        revenue: 7440617631.31
+        gross_profit: 1924162477.09
+        gross_margin: 25.8603
+        tax_surcharge: 38691211.68
+        selling_expense: 312505940.52
+        administrative_expense: 305065322.88
+        rd_expense: 572927557.61
+        financial_expense: 26042161.71
+        other_operating_drag: 119049882.1
+        operating_profit: 549880400.59
+        non_operating_net: 7440617.63
+        total_profit: 557321018.22
+        income_tax: 55732101.82
+        net_income: 501588916.4
+        minority_profit: 17555612.07
+        net_profit_attributable: 484033304.32
+        eps: 0.379828
+        shares: 1274349692
+        nwc: 2529809994.65
+        nwc_change: 493952525.66
+        noncash_addback: 171134205.52
+        operating_cashflow: 178770596.26
+        capex: 372030881.57
+        free_cashflow: -193260285.3
+        ratio_assumptions:
+          tax_surcharge: 0.52
+          selling_expense: 4.2
+          administrative_expense: 4.1
+          rd_expense: 7.7
+          financial_expense: 0.35
+          other_operating_drag: 1.6
+          non_operating_net: 0.1
+          effective_tax_rate: 10.0
+          minority_share_of_net_income: 3.5
+          nwc_to_revenue: 34.0
+          noncash_addback_to_revenue: 2.3
+          capex_to_revenue: 5.0
+        reconciliation_difference: 0.0
+    2027E:
+      business_lines:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          revenue: 5385142452.48
+          revenue_growth: 22.0
+          gross_margin: 26.8
+          gross_profit: 1443218177.26
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_base_case_room_cooling_revenue_growth
+          margin_assumption_id: b9_base_case_room_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          revenue: 2683363199.88
+          revenue_growth: 15.0
+          gross_margin: 26.7
+          gross_profit: 716457974.37
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_base_case_cabinet_cooling_revenue_growth
+          margin_assumption_id: b9_base_case_cabinet_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          revenue: 734799564.71
+          revenue_growth: 6.0
+          gross_margin: 25.2
+          gross_profit: 185169490.31
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_base_case_other_businesses_revenue_growth
+          margin_assumption_id: b9_base_case_other_businesses_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+      bridge:
+        revenue: 8803305217.07
+        gross_profit: 2344845641.94
+        gross_margin: 26.636
+        tax_surcharge: 44016526.09
+        selling_expense: 360935513.9
+        administrative_expense: 352132208.68
+        rd_expense: 660247891.28
+        financial_expense: 26409915.65
+        other_operating_drag: 123246273.04
+        operating_profit: 777857313.3
+        non_operating_net: 8803305.22
+        total_profit: 786660618.52
+        income_tax: 78666061.85
+        net_income: 707994556.67
+        minority_profit: 24779809.48
+        net_profit_attributable: 683214747.18
+        eps: 0.536128
+        shares: 1274349692
+        nwc: 2905090721.63
+        nwc_change: 375280726.99
+        noncash_addback: 202476019.99
+        operating_cashflow: 535189849.67
+        capex: 396148734.77
+        free_cashflow: 139041114.9
+        ratio_assumptions:
+          tax_surcharge: 0.5
+          selling_expense: 4.1
+          administrative_expense: 4.0
+          rd_expense: 7.5
+          financial_expense: 0.3
+          other_operating_drag: 1.4
+          non_operating_net: 0.1
+          effective_tax_rate: 10.0
+          minority_share_of_net_income: 3.5
+          nwc_to_revenue: 33.0
+          noncash_addback_to_revenue: 2.3
+          capex_to_revenue: 4.5
+        reconciliation_difference: 0.0
+    2028E:
+      business_lines:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          revenue: 6354468093.92
+          revenue_growth: 18.0
+          gross_margin: 27.4
+          gross_profit: 1741124257.73
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_base_case_room_cooling_revenue_growth
+          margin_assumption_id: b9_base_case_room_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          revenue: 3005366783.87
+          revenue_growth: 12.0
+          gross_margin: 27.0
+          gross_profit: 811449031.64
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_base_case_cabinet_cooling_revenue_growth
+          margin_assumption_id: b9_base_case_cabinet_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          revenue: 771539542.95
+          revenue_growth: 5.0
+          gross_margin: 25.8
+          gross_profit: 199057202.08
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_base_case_other_businesses_revenue_growth
+          margin_assumption_id: b9_base_case_other_businesses_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+      bridge:
+        revenue: 10131374420.74
+        gross_profit: 2751630491.45
+        gross_margin: 27.1595
+        tax_surcharge: 50656872.1
+        selling_expense: 405254976.83
+        administrative_expense: 395123602.41
+        rd_expense: 739590332.71
+        financial_expense: 28367848.38
+        other_operating_drag: 121576493.05
+        operating_profit: 1011060365.97
+        non_operating_net: 10131374.42
+        total_profit: 1021191740.39
+        income_tax: 102119174.04
+        net_income: 919072566.35
+        minority_profit: 32167539.82
+        net_profit_attributable: 886905026.53
+        eps: 0.695967
+        shares: 1274349692
+        nwc: 3242039814.64
+        nwc_change: 336949093.0
+        noncash_addback: 233021611.68
+        operating_cashflow: 815145085.02
+        capex: 405254976.83
+        free_cashflow: 409890108.19
+        ratio_assumptions:
+          tax_surcharge: 0.5
+          selling_expense: 4.0
+          administrative_expense: 3.9
+          rd_expense: 7.3
+          financial_expense: 0.28
+          other_operating_drag: 1.2
+          non_operating_net: 0.1
+          effective_tax_rate: 10.0
+          minority_share_of_net_income: 3.5
+          nwc_to_revenue: 32.0
+          noncash_addback_to_revenue: 2.3
+          capex_to_revenue: 4.0
+        reconciliation_difference: 0.0
+  bull_case:
+    2026E:
+      business_lines:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          revenue: 4655444615.04
+          revenue_growth: 35.0
+          gross_margin: 28.0
+          gross_profit: 1303524492.21
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bull_case_room_cooling_revenue_growth
+          margin_assumption_id: b9_bull_case_room_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          revenue: 2471778923.99
+          revenue_growth: 25.0
+          gross_margin: 27.5
+          gross_profit: 679739204.1
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bull_case_cabinet_cooling_revenue_growth
+          margin_assumption_id: b9_bull_case_cabinet_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          revenue: 718881474.91
+          revenue_growth: 12.0
+          gross_margin: 26.0
+          gross_profit: 186909183.48
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bull_case_other_businesses_revenue_growth
+          margin_assumption_id: b9_bull_case_other_businesses_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+      bridge:
+        revenue: 7846105013.94
+        gross_profit: 2170172879.79
+        gross_margin: 27.6592
+        tax_surcharge: 39230525.07
+        selling_expense: 313844200.56
+        administrative_expense: 305998095.54
+        rd_expense: 580611771.03
+        financial_expense: 19615262.53
+        other_operating_drag: 94153260.17
+        operating_profit: 816719764.89
+        non_operating_net: 7846105.01
+        total_profit: 824565869.9
+        income_tax: 74210928.29
+        net_income: 750354941.61
+        minority_profit: 22510648.25
+        net_profit_attributable: 727844293.36
+        eps: 0.57115
+        shares: 1274349692
+        nwc: 2549984129.53
+        nwc_change: 514126660.54
+        noncash_addback: 180460415.32
+        operating_cashflow: 416688696.39
+        capex: 431535775.77
+        free_cashflow: -14847079.38
+        ratio_assumptions:
+          tax_surcharge: 0.5
+          selling_expense: 4.0
+          administrative_expense: 3.9
+          rd_expense: 7.4
+          financial_expense: 0.25
+          other_operating_drag: 1.2
+          non_operating_net: 0.1
+          effective_tax_rate: 9.0
+          minority_share_of_net_income: 3.0
+          nwc_to_revenue: 32.5
+          noncash_addback_to_revenue: 2.3
+          capex_to_revenue: 5.5
+        reconciliation_difference: 0.0
+    2027E:
+      business_lines:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          revenue: 5958969107.25
+          revenue_growth: 28.0
+          gross_margin: 28.5
+          gross_profit: 1698306195.57
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bull_case_room_cooling_revenue_growth
+          margin_assumption_id: b9_bull_case_room_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          revenue: 2966134708.79
+          revenue_growth: 20.0
+          gross_margin: 28.0
+          gross_profit: 830517718.46
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bull_case_cabinet_cooling_revenue_growth
+          margin_assumption_id: b9_bull_case_cabinet_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          revenue: 790769622.4
+          revenue_growth: 10.0
+          gross_margin: 26.5
+          gross_profit: 209553949.94
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bull_case_other_businesses_revenue_growth
+          margin_assumption_id: b9_bull_case_other_businesses_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+      bridge:
+        revenue: 9715873438.44
+        gross_profit: 2738377863.97
+        gross_margin: 28.1846
+        tax_surcharge: 48579367.19
+        selling_expense: 369203190.66
+        administrative_expense: 359487317.22
+        rd_expense: 689827014.13
+        financial_expense: 24289683.6
+        other_operating_drag: 97158734.38
+        operating_profit: 1149832556.79
+        non_operating_net: 9715873.44
+        total_profit: 1159548430.22
+        income_tax: 104359358.72
+        net_income: 1055189071.5
+        minority_profit: 31655672.15
+        net_profit_attributable: 1023533399.36
+        eps: 0.803181
+        shares: 1274349692
+        nwc: 3060500133.11
+        nwc_change: 510516003.58
+        noncash_addback: 223465089.08
+        operating_cashflow: 768138157.01
+        capex: 485793671.92
+        free_cashflow: 282344485.09
+        ratio_assumptions:
+          tax_surcharge: 0.5
+          selling_expense: 3.8
+          administrative_expense: 3.7
+          rd_expense: 7.1
+          financial_expense: 0.25
+          other_operating_drag: 1.0
+          non_operating_net: 0.1
+          effective_tax_rate: 9.0
+          minority_share_of_net_income: 3.0
+          nwc_to_revenue: 31.5
+          noncash_addback_to_revenue: 2.3
+          capex_to_revenue: 5.0
+        reconciliation_difference: 0.0
+    2028E:
+      business_lines:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          revenue: 7269942310.84
+          revenue_growth: 22.0
+          gross_margin: 29.0
+          gross_profit: 2108283270.14
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bull_case_room_cooling_revenue_growth
+          margin_assumption_id: b9_bull_case_room_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          revenue: 3440716262.19
+          revenue_growth: 16.0
+          gross_margin: 28.3
+          gross_profit: 973722702.2
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bull_case_cabinet_cooling_revenue_growth
+          margin_assumption_id: b9_bull_case_cabinet_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          revenue: 854031192.19
+          revenue_growth: 8.0
+          gross_margin: 27.0
+          gross_profit: 230588421.89
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bull_case_other_businesses_revenue_growth
+          margin_assumption_id: b9_bull_case_other_businesses_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+      bridge:
+        revenue: 11564689765.22
+        gross_profit: 3312594394.23
+        gross_margin: 28.644
+        tax_surcharge: 55510510.87
+        selling_expense: 427893521.31
+        administrative_expense: 416328831.55
+        rd_expense: 797963593.8
+        financial_expense: 28911724.41
+        other_operating_drag: 92517518.12
+        operating_profit: 1493468694.16
+        non_operating_net: 11564689.77
+        total_profit: 1505033383.93
+        income_tax: 135453004.55
+        net_income: 1369580379.37
+        minority_profit: 41087411.38
+        net_profit_attributable: 1328492967.99
+        eps: 1.042487
+        shares: 1274349692
+        nwc: 3527230378.39
+        nwc_change: 466730245.28
+        noncash_addback: 265987864.6
+        operating_cashflow: 1168837998.69
+        capex: 520411039.43
+        free_cashflow: 648426959.25
+        ratio_assumptions:
+          tax_surcharge: 0.48
+          selling_expense: 3.7
+          administrative_expense: 3.6
+          rd_expense: 6.9
+          financial_expense: 0.25
+          other_operating_drag: 0.8
+          non_operating_net: 0.1
+          effective_tax_rate: 9.0
+          minority_share_of_net_income: 3.0
+          nwc_to_revenue: 30.5
+          noncash_addback_to_revenue: 2.3
+          capex_to_revenue: 4.5
+        reconciliation_difference: 0.0
+  bear_case:
+    2026E:
+      business_lines:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          revenue: 3965749116.51
+          revenue_growth: 15.0
+          gross_margin: 23.5
+          gross_profit: 931951042.38
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bear_case_room_cooling_revenue_growth
+          margin_assumption_id: b9_bear_case_room_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          revenue: 2135616990.33
+          revenue_growth: 8.0
+          gross_margin: 23.5
+          gross_profit: 501869992.73
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bear_case_cabinet_cooling_revenue_growth
+          margin_assumption_id: b9_bear_case_cabinet_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          revenue: 641858459.74
+          revenue_growth: 0.0
+          gross_margin: 21.5
+          gross_profit: 137999568.84
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bear_case_other_businesses_revenue_growth
+          margin_assumption_id: b9_bear_case_other_businesses_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+      bridge:
+        revenue: 6743224566.58
+        gross_profit: 1571820603.95
+        gross_margin: 23.3096
+        tax_surcharge: 37087735.12
+        selling_expense: 303445105.5
+        administrative_expense: 296701880.93
+        rd_expense: 539457965.33
+        financial_expense: 33716122.83
+        other_operating_drag: 134864491.33
+        operating_profit: 226547302.92
+        non_operating_net: 3371612.28
+        total_profit: 229918915.2
+        income_tax: 25291080.67
+        net_income: 204627834.53
+        minority_profit: 8185113.38
+        net_profit_attributable: 196442721.15
+        eps: 0.154151
+        shares: 1274349692
+        nwc: 2427560843.97
+        nwc_change: 391703374.98
+        noncash_addback: 155094165.03
+        operating_cashflow: -31981375.42
+        capex: 303445105.5
+        free_cashflow: -335426480.92
+        ratio_assumptions:
+          tax_surcharge: 0.55
+          selling_expense: 4.5
+          administrative_expense: 4.4
+          rd_expense: 8.0
+          financial_expense: 0.5
+          other_operating_drag: 2.0
+          non_operating_net: 0.05
+          effective_tax_rate: 11.0
+          minority_share_of_net_income: 4.0
+          nwc_to_revenue: 36.0
+          noncash_addback_to_revenue: 2.3
+          capex_to_revenue: 4.5
+        reconciliation_difference: 0.0
+    2027E:
+      business_lines:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          revenue: 4362324028.16
+          revenue_growth: 10.0
+          gross_margin: 24.0
+          gross_profit: 1046957766.76
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bear_case_room_cooling_revenue_growth
+          margin_assumption_id: b9_bear_case_room_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          revenue: 2263754009.74
+          revenue_growth: 6.0
+          gross_margin: 24.0
+          gross_profit: 543300962.34
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bear_case_cabinet_cooling_revenue_growth
+          margin_assumption_id: b9_bear_case_cabinet_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          revenue: 654695628.93
+          revenue_growth: 2.0
+          gross_margin: 22.5
+          gross_profit: 147306516.51
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bear_case_other_businesses_revenue_growth
+          margin_assumption_id: b9_bear_case_other_businesses_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+      bridge:
+        revenue: 7280773666.83
+        gross_profit: 1737565245.61
+        gross_margin: 23.8651
+        tax_surcharge: 40044255.17
+        selling_expense: 320354041.34
+        administrative_expense: 313073267.67
+        rd_expense: 567900346.01
+        financial_expense: 36403868.33
+        other_operating_drag: 145615473.34
+        operating_profit: 314173993.74
+        non_operating_net: 3640386.83
+        total_profit: 317814380.58
+        income_tax: 34959581.86
+        net_income: 282854798.71
+        minority_profit: 11314191.95
+        net_profit_attributable: 271540606.77
+        eps: 0.213082
+        shares: 1274349692
+        nwc: 2621078520.06
+        nwc_change: 193517676.09
+        noncash_addback: 167457794.34
+        operating_cashflow: 256794916.96
+        capex: 291230946.67
+        free_cashflow: -34436029.71
+        ratio_assumptions:
+          tax_surcharge: 0.55
+          selling_expense: 4.4
+          administrative_expense: 4.3
+          rd_expense: 7.8
+          financial_expense: 0.5
+          other_operating_drag: 2.0
+          non_operating_net: 0.05
+          effective_tax_rate: 11.0
+          minority_share_of_net_income: 4.0
+          nwc_to_revenue: 36.0
+          noncash_addback_to_revenue: 2.3
+          capex_to_revenue: 4.0
+        reconciliation_difference: 0.0
+    2028E:
+      business_lines:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          revenue: 4711309950.42
+          revenue_growth: 8.0
+          gross_margin: 24.5
+          gross_profit: 1154270937.85
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bear_case_room_cooling_revenue_growth
+          margin_assumption_id: b9_bear_case_room_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          revenue: 2376941710.23
+          revenue_growth: 5.0
+          gross_margin: 24.5
+          gross_profit: 582350719.01
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bear_case_cabinet_cooling_revenue_growth
+          margin_assumption_id: b9_bear_case_cabinet_cooling_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          revenue: 674336497.8
+          revenue_growth: 3.0
+          gross_margin: 23.5
+          gross_profit: 158469076.98
+          unit: CNY
+          claim_type: estimate
+          growth_assumption_id: b9_bear_case_other_businesses_revenue_growth
+          margin_assumption_id: b9_bear_case_other_businesses_gross_margin
+          evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+      bridge:
+        revenue: 7762588158.45
+        gross_profit: 1895090733.84
+        gross_margin: 24.4131
+        tax_surcharge: 42694234.87
+        selling_expense: 333791290.81
+        administrative_expense: 326028702.65
+        rd_expense: 589956700.04
+        financial_expense: 34931646.71
+        other_operating_drag: 139726586.85
+        operating_profit: 427961571.89
+        non_operating_net: 3881294.08
+        total_profit: 431842865.97
+        income_tax: 47502715.26
+        net_income: 384340150.72
+        minority_profit: 15373606.03
+        net_profit_attributable: 368966544.69
+        eps: 0.289533
+        shares: 1274349692
+        nwc: 2755718796.25
+        nwc_change: 134640276.19
+        noncash_addback: 178539527.64
+        operating_cashflow: 428239402.17
+        capex: 271690585.55
+        free_cashflow: 156548816.62
+        ratio_assumptions:
+          tax_surcharge: 0.55
+          selling_expense: 4.3
+          administrative_expense: 4.2
+          rd_expense: 7.6
+          financial_expense: 0.45
+          other_operating_drag: 1.8
+          non_operating_net: 0.05
+          effective_tax_rate: 11.0
+          minority_share_of_net_income: 4.0
+          nwc_to_revenue: 35.5
+          noncash_addback_to_revenue: 2.3
+          capex_to_revenue: 3.5
+        reconciliation_difference: 0.0
+reconciliation:
+  max_abs_profit_bridge_difference: 0.0
+  business_line_revenue_reconciled: true
+  business_line_gross_profit_reconciled: true
+  expense_tax_minority_separated: true
+  cashflow_and_capex_bridge_present: true
+limitations:
+- Forecasts are estimates based on reviewed assumptions, not issuer guidance.
+- Liquid cooling remains embedded in broad room/cabinet lines because 2025 standalone
+  disclosure is missing.
+- Cashflow uses explicit working-capital and noncash ratios rather than a full balance-sheet
+  forecast.
+no_advice_boundary: true

@@ -1,0 +1,155 @@
+artifact_type: live_acquisition_run_log
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+request_id: R5B8A_002837_EVIDENCE_GAP_CLOSURE_20260713
+as_of_date: '2026-07-13'
+execution_window_utc:
+  started_at: '2026-07-12T17:38:34Z'
+  finished_at: '2026-07-12T18:19:00Z'
+result: success_with_explicit_gaps
+boundaries:
+  evidence_review_status: mixed_4_official_IR_reviewed_42_structured_or_metadata_draft
+  automatic_promotion: false
+  direct_trading_advice: false
+  raw_archive_overwrite: false
+summary:
+  evidence_manifest_rows_created: 46
+  evidence_ids_unique: 46
+  metric_candidates_initially_created: 26654
+  metric_candidates_retained_after_unit_and_code_normalization: 25586
+  nonmetric_code_candidates_removed: 1068
+  claim_candidates_created: 0
+  raw_files_missing: 0
+  live_calls_recorded: 46
+source_runs:
+  - source_name: tushare
+    result: success
+    live_calls: 36
+    evidence_rows: 36
+    metric_candidates_initially_created: 23566
+    metric_candidates_retained: 23248
+    nonmetric_code_candidates_removed: 318
+    stock_codes: ['002837', '300499', '300731', '301018', '300602']
+    capabilities:
+      - financial_statements
+      - financial_indicators
+      - business_breakdown
+      - daily_price
+      - valuation_snapshot
+      - event_calendar
+    endpoint_resolution: project_env_TUSHARE_HTTP_URL_or_TUSHARE_API_URL
+    token_storage: environment_only
+    notes:
+      - 002837 acquired 8 snapshots, including 250-day daily data and the 2026H1 disclosure plan.
+      - Each of four peers acquired income, balance sheet, cash flow, indicators, business breakdown, daily_basic and daily.
+      - All Tushare outputs remain metric-only and draft.
+  - source_name: baostock
+    result: success
+    live_calls: 5
+    evidence_rows: 5
+    metric_candidates_initially_created: 3028
+    metric_candidates_retained: 2278
+    nonmetric_code_candidates_removed: 750
+    stock_codes: ['002837']
+    capabilities: [daily_price, financial_statements]
+    session_contract: login_query_logout
+    notes:
+      - 250-day history and four financial fallback tables were archived.
+      - Date and financial-field aliases remain draft until explicit mapping review.
+  - source_name: cninfo
+    result: success
+    live_calls: 4
+    evidence_rows: 4
+    metric_candidates: 0
+    stock_codes: ['002837']
+    capabilities: [official_disclosures, investor_relations]
+    evidence_ids:
+      - ev_official_disclosure_002837_20250423_e78396
+      - ev_official_disclosure_002837_20250428_108da3
+      - ev_official_disclosure_002837_20250521_1b4421
+      - ev_official_disclosure_002837_20251120_797533
+    parse_result: 4_of_4_success_pypdf
+    notes:
+      - Generic candidate generation was disabled because investor-relations answers require management_comment review.
+      - A confirmed CNINFO direct URL for record 2025-004 was not located; third-party reposts were not treated as the official original.
+  - source_name: eastmoney_push2
+    capability: research_metadata
+    result: success
+    live_calls: 1
+    evidence_rows: 1
+    rows: 14
+    metric_candidates: 60
+    evidence_id: ev_third_party_research_002837_20260713_20f610
+    proxy_route: inherited_proxy
+    http_status: 200
+    boundary: analyst_view_and_estimate_only
+    notes:
+      - Per-broker estimates are not issuer guidance and are not a verified consensus.
+      - Rating fields were not copied into the normalized table.
+connectivity_and_proxy_matrix:
+  global_env_observed:
+    HTTP_PROXY: http://127.0.0.1:6382
+    HTTPS_PROXY: http://127.0.0.1:6382
+    port_reachable: true
+    global_env_modified: false
+  checks:
+    - interface: tushare_project_endpoint
+      proxy_effect: no_block_observed
+      result: live_acquisition_success
+    - interface: baostock
+      proxy_effect: no_block_observed
+      result: live_acquisition_success
+    - interface: cninfo_static_pdf
+      proxy_effect: no_block_observed
+      result: http_200_and_archive_success
+    - interface: szse
+      proxy_effect: no_block_observed
+      result: http_200_probe
+    - interface: tencent_finance
+      proxy_effect: no_block_observed
+      result: http_200_probe
+    - interface: eastmoney_reportapi
+      proxy_effect: no_block_observed
+      result: http_200_live_acquisition
+    - interface: eastmoney_push2
+      proxy_effect: blocked_on_inherited_proxy_path
+      result: tls_eof_or_http_502_via_proxy_but_http_200_direct_probe
+      mitigation: source_specific_direct_route_only_after_transport_failure
+      live_adapter_status: unimplemented
+failed_or_blocked_attempts:
+  - issue_id: B8B-RUN-001
+    source_name: tushare
+    stage: bootstrap
+    result: no_artifact_written
+    cause: default Tushare endpoint ignored project-specific API URL
+    resolution: adapter now injects TUSHARE_HTTP_URL or TUSHARE_API_URL and passes the same API client to pro_bar
+  - issue_id: B8B-RUN-002
+    source_name: local_cli
+    stage: bootstrap
+    result: no_network_call_and_no_artifact_written
+    cause: PYTHONPATH omitted src/ingest on the first direct adapter invocation
+    resolution: execution environment now includes src/ingest and src
+  - issue_id: B8B-RUN-003
+    source_name: eastmoney_push2
+    stage: connectivity_probe
+    result: degraded
+    cause: inherited proxy transport failure specific to push2
+    resolution: direct probe succeeded; no live push2 artifact was claimed
+disabled_or_deferred_sources:
+  - source_name: sina_finance
+    reason: planned adapter remains disabled pending fixture and live-smoke tests
+  - source_name: baidu_finance
+    reason: planned adapter remains disabled pending fixture and live-smoke tests
+  - source_name: cls_market
+    reason: planned adapter remains disabled pending fixture and live-smoke tests
+  - source_name: hkex
+    reason: planned adapter remains disabled pending fixture and live-smoke tests
+  - source_name: cninfo_ir
+    reason: planned dedicated adapter remains disabled; official files were acquired through official_disclosure_pull
+  - source_name: mootdx
+    reason: package unavailable and independent Baostock fallback succeeded
+outputs:
+  evidence_delta: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8b_evidence_manifest_delta.csv
+  source_health_ledger: data/manifests/source_health_ledger.yaml
+  schema_issues: reports/workflow_runs/wf_20260703_stock_first_002837_invic/schema_drift_issue_list.csv
+  acquisition_readout: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle8_close_readout.md

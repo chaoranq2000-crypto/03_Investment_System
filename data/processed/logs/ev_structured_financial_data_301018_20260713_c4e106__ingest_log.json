@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_structured_301018_balancesheet_c4e106",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-12T18:08:41Z",
+  "finished_at": "2026-07-12T18:08:41Z",
+  "result": "SUCCESS",
+  "stock_code": "301018",
+  "source_name": "tushare",
+  "source_type": "structured_financial_data",
+  "api_name": "balancesheet",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "645",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest"
+}

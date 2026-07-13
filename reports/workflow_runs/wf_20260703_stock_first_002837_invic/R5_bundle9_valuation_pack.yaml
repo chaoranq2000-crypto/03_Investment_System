@@ -1,0 +1,226 @@
+artifact_type: R5_valuation_pack
+schema_version: r5_valuation_pack_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+status: partial
+market_snapshot:
+  as_of_date: '2026-07-10'
+  current_price:
+    value: 73.54
+    unit: CNY_per_share
+    claim_type: fact
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    metric_id: metric_company_cn_002837_invic_close_20260710_8b4e6cdd
+  market_cap:
+    value: 93715669584.0
+    unit: CNY
+    claim_type: fact
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    metric_id: metric_company_cn_002837_invic_total_mv_20260710_94c6ec36
+  share_count:
+    value: 1274349692
+    unit: shares
+    claim_type: fact
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    metric_id: metric_cn_002837_invic_shares_20251231_reviewed_anchor
+  net_cash_or_net_debt:
+    value: null
+    unit: CNY
+    claim_type: unknown
+    missing_reason: MISSING_NET_DEBT_AND_ENTERPRISE_VALUE
+  enterprise_value:
+    value: null
+    unit: CNY
+    claim_type: unknown
+    missing_reason: MISSING_NET_DEBT_AND_ENTERPRISE_VALUE
+  pe_ttm:
+    value: 194.2045
+    unit: multiple
+    claim_type: fact
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    metric_id: metric_company_cn_002837_invic_pe_ttm_20260710_f133fc07
+  forward_pe:
+    value: 193.6141
+    unit: multiple
+    claim_type: inference
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    assumption_id: b9_base_case_net_profit_bridge
+  pb:
+    value: 27.0715
+    unit: multiple
+    claim_type: fact
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    metric_id: metric_company_cn_002837_invic_pb_20260710_e0bb0510
+  ps:
+    value: 14.8507
+    unit: multiple
+    claim_type: fact
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    metric_id: metric_company_cn_002837_invic_ps_ttm_20260710_eb40d051
+  ev_ebitda:
+    value: null
+    unit: multiple
+    claim_type: unknown
+    missing_reason: MISSING_NET_DEBT_AND_ENTERPRISE_VALUE
+peer_valuation_context:
+  status: partial
+  rows:
+  - peer_company: 高澜股份
+    peer_stock_code: '300499'
+    multiple_name: pe_ttm
+    multiple_value: 385.8974
+    evidence_id: ev_structured_market_data_300499_20260713_57cd0b
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 高澜股份
+    peer_stock_code: '300499'
+    multiple_name: pb
+    multiple_value: 8.4621
+    evidence_id: ev_structured_market_data_300499_20260713_57cd0b
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 高澜股份
+    peer_stock_code: '300499'
+    multiple_name: ps
+    multiple_value: 11.9122
+    evidence_id: ev_structured_market_data_300499_20260713_57cd0b
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 科创新源
+    peer_stock_code: '300731'
+    multiple_name: pe_ttm
+    multiple_value: 409.8812
+    evidence_id: ev_structured_market_data_300731_20260713_f4f0c0
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 科创新源
+    peer_stock_code: '300731'
+    multiple_name: pb
+    multiple_value: 14.9378
+    evidence_id: ev_structured_market_data_300731_20260713_f4f0c0
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 科创新源
+    peer_stock_code: '300731'
+    multiple_name: ps
+    multiple_value: 7.9839
+    evidence_id: ev_structured_market_data_300731_20260713_f4f0c0
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 申菱环境
+    peer_stock_code: '301018'
+    multiple_name: pe_ttm
+    multiple_value: 234.3524
+    evidence_id: ev_structured_market_data_301018_20260713_cc0ee3
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 申菱环境
+    peer_stock_code: '301018'
+    multiple_name: pb
+    multiple_value: 16.2152
+    evidence_id: ev_structured_market_data_301018_20260713_cc0ee3
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 申菱环境
+    peer_stock_code: '301018'
+    multiple_name: ps
+    multiple_value: 10.6313
+    evidence_id: ev_structured_market_data_301018_20260713_cc0ee3
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 飞荣达
+    peer_stock_code: '300602'
+    multiple_name: pe_ttm
+    multiple_value: 69.9482
+    evidence_id: ev_structured_market_data_300602_20260713_e6104c
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 飞荣达
+    peer_stock_code: '300602'
+    multiple_name: pb
+    multiple_value: 6.4751
+    evidence_id: ev_structured_market_data_300602_20260713_e6104c
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  - peer_company: 飞荣达
+    peer_stock_code: '300602'
+    multiple_name: ps
+    multiple_value: 4.1171
+    evidence_id: ev_structured_market_data_300602_20260713_e6104c
+    as_of_date: '2026-07-10'
+    limitation: LOW_CONFIDENCE_PEER_SET
+  peer_set_quality: low
+valuation_methods:
+- method_id: static_multiples
+  method_type: market_dependent
+  status: ready
+  supported_output:
+    pe_ttm: 194.2045
+    pb: 27.0715
+    ps: 14.8507
+- method_id: dynamic_pe
+  method_type: forecast_dependent
+  status: ready
+  supported_output:
+    2026E: 193.6141
+    2027E: 137.1687
+    2028E: 105.666
+  forecast_assumption_ids:
+  - b9_base_case_net_profit_bridge
+- method_id: scenario_valuation
+  method_type: forecast_dependent
+  status: ready
+  supported_output:
+    bear:
+    - 13577030338.5
+    - 20365545507.75
+    base:
+    - 51241106038.5
+    - 68321474718.0
+    bull:
+    - 102353339936.0
+    - 153530009904.0
+  forecast_assumption_ids:
+  - b9_bear_case_net_profit_bridge
+  - b9_base_case_net_profit_bridge
+  - b9_bull_case_net_profit_bridge
+- method_id: reverse_valuation
+  method_type: forecast_dependent
+  status: ready
+  supported_output: reverse_valuation.yaml
+  forecast_assumption_ids:
+  - b9_base_case_net_profit_bridge
+- method_id: dcf
+  method_type: intrinsic
+  status: TODO
+  supported_output: null
+  missing_reason: TODO_DCF_DISCOUNT_AND_TERMINAL_INPUTS
+- method_id: sotp
+  method_type: segment_dependent
+  status: TODO
+  supported_output: null
+  missing_reason: TODO_SEGMENT_DISCLOSURE
+scenario_valuation:
+  bear:
+    market_cap_range_CNY:
+    - 13577030338.5
+    - 20365545507.75
+    assumption_id: b9_bear_case_net_profit_bridge
+  base:
+    market_cap_range_CNY:
+    - 51241106038.5
+    - 68321474718.0
+    assumption_id: b9_base_case_net_profit_bridge
+  bull:
+    market_cap_range_CNY:
+    - 102353339936.0
+    - 153530009904.0
+    assumption_id: b9_bull_case_net_profit_bridge
+reverse_valuation_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/reverse_valuation.yaml
+analyst_comparison_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/analyst_forecast_comparison.csv
+limitations:
+- LOW_CONFIDENCE_PEER_SET
+- MISSING_PEER_FORWARD_MULTIPLES
+- MISSING_NET_DEBT_AND_ENTERPRISE_VALUE
+sample_quality_allowed: false
+no_advice_boundary: true

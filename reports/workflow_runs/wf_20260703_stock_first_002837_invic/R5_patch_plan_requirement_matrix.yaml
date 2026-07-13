@@ -1,0 +1,241 @@
+artifact_type: R5_patch_plan_requirement_matrix
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+source_plan: R5_BUNDLE_8A_EVIDENCE_ACQUISITION_RESILIENCE_PATCH_2026-07-12.zip/工作区检查与下一步计划_2026-07-12.md
+audited_at: '2026-07-13'
+overall_status: complete_with_documented_todos
+completion_rule: 所有自动化要求均须有直接证据；人工审核必须由真实外部评审者对精确报告哈希签署
+
+requirements:
+  - requirement_id: A-1
+    requirement: 创建并使用r5/bundle8a-evidence-acquisition-resilience分支
+    status: pass
+    evidence:
+      - git_branch:r5/bundle8a-evidence-acquisition-resilience
+  - requirement_id: A-2
+    requirement: 在git apply check后应用Bundle 8A补丁并校验包完整性
+    status: pass
+    evidence:
+      - R5_bundle8a_integration_readout.md
+      - package_sha256:BF2ADD026C981235D563F5D2C909391116AEB0856A95B752F2A435D164A232D7
+      - checksum_validation:25_of_25
+      - overlay_validation:19_of_19
+  - requirement_id: A-3
+    requirement: 运行route gate、focused tests、dry-run queue、compile与完整仓库测试
+    status: pass
+    evidence:
+      - R5_bundle8a_source_route_quality_report.yaml
+      - R5_bundle8a_adapter_run_queue_dry_run.yaml
+      - R5_bundle10_regression_summary.yaml
+  - requirement_id: A-4
+    requirement: Bundle 8A集成时不得提前修改Reader或宣称Bundle 8关闭
+    status: pass
+    evidence:
+      - R5_bundle8a_integration_readout.md
+      - bundle8_close_readout.md
+    notes: Reader在Bundle 8A与Bundle 8关闭时保持59分拒绝稿，直到Bundle 10才重生成
+  - requirement_id: A-5
+    requirement: planned adapters保持disabled且当前workflow dry-run queue无阻断capability
+    status: pass
+    evidence:
+      - R5_bundle8a_adapter_run_queue_dry_run.yaml
+      - config/evidence_source_routes.yaml
+    notes: Sina、Baidu、CLS、HKEX、CNINFO IR planned route未被冒充为live adapter
+  - requirement_id: A-6
+    requirement: 将Bundle 8A质量结果登记到artifact manifest与run log
+    status: pass
+    evidence:
+      - artifact_manifest.csv
+      - run_log.md
+
+  - requirement_id: B-1
+    requirement: 增量检索发行人年报、中报、季报与重大公告
+    status: pass
+    evidence:
+      - live_acquisition_run_log.yaml
+      - R5_bundle8b_evidence_manifest_delta.csv
+  - requirement_id: B-2
+    requirement: 采集并审阅IR与互动问答，同时保留management_comment/clue边界
+    status: pass
+    evidence:
+      - R5_bundle8b_management_comment_review.yaml
+      - liquid_cooling_disclosure_gap_register.yaml
+  - requirement_id: B-3
+    requirement: 核验液冷产品、项目、产能、客户认证与回款并区分正式披露、代理与MISSING
+    status: pass_with_disclosure_gaps
+    evidence:
+      - liquid_cooling_disclosure_gap_register.yaml
+      - bundle8_close_quality_report.md
+    notes: 2024年约3亿元仅为B类管理层口径；2025年收入、毛利率、订单、客户与项目回款保持MISSING
+  - requirement_id: B-4
+    requirement: 补齐四家同业相同期间经营数据
+    status: pass_with_limitations
+    evidence:
+      - peer_operating_evidence_pack.yaml
+      - peer_market_snapshot.csv
+    notes: 四家同日公司层指标可比，但液冷纯度、远期倍数与官方数值勾稽不足，维持LOW_CONFIDENCE_PEER_SET
+  - requirement_id: B-5
+    requirement: 对行业需求、供给、渗透、能效政策与技术路径做独立来源交叉验证
+    status: pass_with_todos
+    evidence:
+      - industry_evidence_pack.yaml
+      - R5_bundle8_analysis_inputs_v2.yaml
+  - requirement_id: B-6
+    requirement: 获取250个交易日行情、估值与技术序列
+    status: pass
+    evidence:
+      - R5_bundle10_technical_market_pack.yaml
+  - requirement_id: B-7
+    requirement: 获取公开一致预期或研报元数据并保持estimate/analyst_view边界
+    status: pass
+    evidence:
+      - R5_bundle8b_eastmoney_research_metadata_readout.json
+      - R5_bundle9_valuation_pack.yaml
+  - requirement_id: B-8
+    requirement: 建立未来事件日历
+    status: pass_with_todos
+    evidence:
+      - market_event_pack.yaml
+      - R5_bundle10_sentiment_event_pack.yaml
+    notes: 事件计划日仍需后续官方确认，正文未将其写成确定催化
+  - requirement_id: B-9
+    requirement: 分开登记抓取失败、字段漂移与发行人未披露
+    status: pass
+    evidence:
+      - live_acquisition_run_log.yaml
+      - data/manifests/source_health_ledger.yaml
+      - schema_drift_issue_list.csv
+      - liquid_cooling_disclosure_gap_register.yaml
+  - requirement_id: B-10
+    requirement: Bundle 8 close-only同步canonical state、manifest、TODO与readout
+    status: pass
+    evidence:
+      - R5_bundle8b_close_input_validation.json
+      - bundle8_close_readout.md
+      - workflow_state.yaml
+
+  - requirement_id: C-1
+    requirement: 从披露口径分业务收入和驱动因子建立2026E至2028E模型
+    status: pass_with_disclosure_todos
+    evidence:
+      - R5_bundle9_forecast_assumption_registry.yaml
+      - segment_forecast_model.yaml
+    notes: 42项有证据或指标支持的假设；未虚构液冷独立收入
+  - requirement_id: C-2
+    requirement: 显式建模分业务毛利、费用、税、少数股东、非经常项与现金流桥
+    status: pass
+    evidence:
+      - forecast_bridge.yaml
+      - forecast_sensitivity.csv
+    notes: 利润桥最大绝对差为0
+  - requirement_id: C-3
+    requirement: 提供Base/Bull/Bear、敏感性与一致预期差异
+    status: pass
+    evidence:
+      - segment_forecast_model.yaml
+      - forecast_sensitivity.csv
+      - R5_bundle9_valuation_pack.yaml
+  - requirement_id: C-4
+    requirement: 提供peer operating comparison、reverse valuation与scenario value range
+    status: pass_with_low_confidence_peer_set
+    evidence:
+      - R5_bundle9_valuation_pack.yaml
+      - reverse_valuation.yaml
+      - scenario_valuation.yaml
+  - requirement_id: C-5
+    requirement: 输入不足的方法必须跳过或显式TODO，不得虚构精确值
+    status: pass
+    evidence:
+      - valuation/valuation_gap_requests.yaml
+      - bundle9_quality_report.md
+    notes: DCF与SOTP因必要输入不足而跳过
+  - requirement_id: C-6
+    requirement: 完成Bundle 9质量门与canonical关闭
+    status: pass_with_todos
+    evidence:
+      - R5_bundle9_close_input_validation.json
+      - bundle9_close_readout.md
+      - workflow_state.yaml
+
+  - requirement_id: D-1
+    requirement: 删除Writer中的公司专属硬编码
+    status: pass
+    evidence:
+      - src/report/r5_reader_report_writer.py
+      - R5_bundle10_close_input_validation.json
+    notes: 当前公司名、股票代码与workflow id命中均为零
+  - requirement_id: D-2
+    requirement: Writer消费judgment、facts、causal mechanism、counter-evidence与watch metrics
+    status: pass
+    evidence:
+      - R5_bundle10_reader_pack.yaml
+      - R5_stock_research_report_reader_v3.md
+      - R5_stock_research_report_traceability_v3.yaml
+  - requirement_id: D-3
+    requirement: 技术、情绪和未来事件只消费通过边界检查的数据
+    status: pass_with_todos
+    evidence:
+      - R5_bundle10_technical_market_pack.yaml
+      - R5_bundle10_sentiment_event_pack.yaml
+      - R5_stock_research_report_reader_v3_quality_scorecard.yaml
+  - requirement_id: D-4
+    requirement: 英维克Reader端到端回归
+    status: pass_final
+    evidence:
+      - R5_stock_research_report_reader_v3.md
+      - R5_stock_research_report_reader_v3_quality_scorecard.yaml
+    notes: 98/82、truthfulness pass、0 blocker；三域子agent复审建议通过，外部评审人Q已对精确哈希确认通过
+  - requirement_id: D-5
+    requirement: 至少两家跨行业Writer样本
+    status: pass_for_synthetic_writer_generalization
+    evidence:
+      - R5_bundle10_cross_industry_writer_regression.yaml
+      - bundle10_cross_industry_regression/industrial_equipment_reader.md
+      - bundle10_cross_industry_regression/healthcare_services_reader.md
+    notes: 合成样本只证明版式、schema、引用、身份隔离与叙事质量，不冒充真实公司研究证据
+  - requirement_id: D-6
+    requirement: truthfulness gate通过
+    status: pass
+    evidence:
+      - R5_stock_research_report_reader_v3_quality_scorecard.yaml
+  - requirement_id: D-7
+    requirement: reader-quality gate通过
+    status: pass_candidate_threshold
+    evidence:
+      - R5_stock_research_report_reader_v3_quality_scorecard.yaml
+    notes: 自动门只能输出candidate_ready_for_human_review
+  - requirement_id: D-8
+    requirement: 真实外部人工审核通过并绑定精确Reader哈希
+    status: pass
+    evidence:
+      - R5_stock_research_report_reader_v3_human_review.yaml
+      - R5_stock_research_report_reader_v3_human_review_submission.yaml
+      - R5_bundle10_human_review_submission_validation.json
+      - R5_bundle10_final_close_validation.json
+      - bundle10_final_close_readout.md
+    notes: external_reviewer=Q；reviewed_at=2026-07-13T14:07:11+08:00；HR-1至HR-6全部pass；blocking_comments=0
+  - requirement_id: D-9
+    requirement: truthfulness、reader-quality与人工审核同时通过后才允许样例级状态
+    status: pass
+    evidence:
+      - workflow_state.yaml
+      - R5_bundle10_close_input_validation.json
+      - R5_bundle10_final_close_validation.json
+    notes: 三道门均已通过；sample_quality_allowed=true；p2_allowed=false，未进入P2
+
+validation_snapshot:
+  full_repository_pytest: 642_passed_2_skipped
+  bundle10_required_artifacts: 20_including_4_final_close_artifacts
+  bundle10_close_validator: pass
+  human_review_submission_validator: pass
+  final_close_validator: pass
+  quality_issue_validator: accepted_with_todos
+  evidence_paths_checked: 67
+  git_diff_check: pass
+  publish_boundary: no_stage_no_commit_no_push
+
+remaining_required_action:
+  owner: none
+  action: none_for_patch_plan_close
+  patch_plan_complete: true
+  p2_next_step: separate_comparison_readiness_decision_not_started

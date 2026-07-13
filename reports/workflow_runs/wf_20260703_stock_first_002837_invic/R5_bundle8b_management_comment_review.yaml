@@ -1,0 +1,79 @@
+artifact_type: R5_bundle8b_management_comment_review
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+reviewed_at: '2026-07-13'
+reviewer_skill: quality-review
+decision: accepted_for_workflow_local_use_with_boundaries
+global_claim_registry_updated: false
+reviewed_items:
+  - review_id: B8B-MC-001
+    evidence_id: ev_official_disclosure_002837_20250423_e78396
+    source_path: data/processed/text/ev_official_disclosure_002837_20250423_e78396.md
+    locator: page_3_lines_84_88
+    claim_type: management_comment
+    review_status: reviewed
+    accepted_statement: 2024年数据中心机房及算力设备的液冷技术相关营业收入约3亿元
+    limitations:
+      - approximate
+      - not_an_audited_standalone_segment
+      - broader_than_server_liquid_cooling
+  - review_id: B8B-MC-002
+    evidence_id: ev_official_disclosure_002837_20250423_e78396
+    source_path: data/processed/text/ev_official_disclosure_002837_20250423_e78396.md
+    locator: page_3_lines_84_88
+    claim_type: management_comment
+    review_status: reviewed
+    accepted_statement: 截至2025年3月液冷链条累计交付1.2GW
+    limitations:
+      - cumulative_operating_indicator
+      - not_revenue_backlog_or_capacity
+  - review_id: B8B-MC-003
+    evidence_id: ev_official_disclosure_002837_20250428_108da3
+    source_path: data/processed/text/ev_official_disclosure_002837_20250428_108da3.md
+    locator: page_2_lines_42_48
+    claim_type: management_comment
+    review_status: reviewed
+    accepted_statement: 适用的机房项目通常在安装后取得客户验收文件时确认收入及应收账款
+    limitations: [contract_specific_timing]
+  - review_id: B8B-MC-004
+    evidence_id: ev_official_disclosure_002837_20250428_108da3
+    source_path: data/processed/text/ev_official_disclosure_002837_20250428_108da3.md
+    locator: page_6_lines_151_159
+    claim_type: management_comment
+    review_status: reviewed
+    accepted_statement: 液冷产品毛利率并不显著高于传统风冷且随应用场景变化
+    limitations: [no_numeric_liquid_cooling_gross_margin]
+  - review_id: B8B-MC-005
+    evidence_id: ev_official_disclosure_002837_20250428_108da3
+    source_path: data/processed/text/ev_official_disclosure_002837_20250428_108da3.md
+    locator: page_6_lines_172_174
+    claim_type: management_comment
+    review_status: reviewed
+    accepted_statement: 赊销方式下从验收确认到回款的平均账期约六个月
+    limitations: [company_wide_not_liquid_cooling_specific, not_contract_weighted]
+  - review_id: B8B-MC-006
+    evidence_id: ev_official_disclosure_002837_20250521_1b4421
+    source_path: data/processed/text/ev_official_disclosure_002837_20250521_1b4421.md
+    locator: pages_2_to_3_lines_46_72
+    claim_type: management_comment
+    review_status: reviewed
+    accepted_statement: 项目验收周期、热密度与能效要求、采购决策链和可靠性共同约束液冷兑现
+    limitations: [qualitative_mechanism_not_market_share_proof]
+  - review_id: B8B-MC-007
+    evidence_id: ev_official_disclosure_002837_20251120_797533
+    source_path: data/processed/text/ev_official_disclosure_002837_20251120_797533.md
+    locator: pages_4_to_6_lines_100_157
+    claim_type: management_comment
+    review_status: reviewed
+    accepted_statement: 公司未计划披露具体订单与客户业务进展且未披露2026年业绩指引
+    limitations: [absence_of_disclosure_is_not_evidence_of_absence]
+rejected_upgrades:
+  - attempted_type: fact
+    item: 2024_approximate_liquid_cooling_related_revenue
+    reason: approximate management statement is not an audited standalone segment metric
+  - attempted_type: fact
+    item: named_customer_order_or_revenue
+    reason: issuer explicitly withholds customer and order details
+  - attempted_type: metric_statement
+    item: liquid_cooling_gross_margin
+    reason: no numeric segment margin is disclosed

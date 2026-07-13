@@ -1,0 +1,34 @@
+stock_code: '300731'
+company_id: cn_300731_cotran
+as_of_date: '2026-07-10'
+sources:
+- source_name: tushare
+  evidence_id: ev_structured_market_data_300731_20260713_f4f0c0
+  api_params_hash: f4f0c072dee6aa3efac1d11318801ac5a6e3e10084c4d3ab3eeb8a162aa9cc6e
+market_values:
+  price: '52.1'
+  market_cap: '923652.766'
+  float_market_cap: '876587.189'
+  pe_ttm: '409.8812'
+  pe_forward: TODO_MARKET_DATA
+  pb: '14.9378'
+  ps: '7.9839'
+  turnover_rate: '3.7753'
+  volume: TODO_MARKET_DATA
+  amount: TODO_MARKET_DATA
+market_value_units:
+  price: CNY_per_share
+  market_cap: 10k_CNY
+  float_market_cap: 10k_CNY
+  pe_ttm: multiple
+  pe_forward: multiple
+  pb: multiple
+  ps: multiple
+  turnover_rate: percent
+  volume: source_unit_unverified
+  amount: source_unit_unverified
+missing_fields:
+- amount
+- pe_forward
+- volume
+notes: Valuation snapshot is metric-only market context and not a company fact.

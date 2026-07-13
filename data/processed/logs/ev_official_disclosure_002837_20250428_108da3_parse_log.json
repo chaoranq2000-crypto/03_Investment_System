@@ -1,0 +1,21 @@
+{
+  "job_id": "r5_bundle8b_ir_2025_002_parse",
+  "run_id": "wf_20260703_stock_first_002837_invic",
+  "evidence_id": "ev_official_disclosure_002837_20250428_108da3",
+  "status": "SUCCESS",
+  "normalization_status": "SUCCESS",
+  "parser": "pypdf_text_extraction",
+  "mineru_status": "not_attempted",
+  "mineru": {
+    "attempted": false,
+    "reason": "external mineru call not requested"
+  },
+  "raw_pdf_path": "data/raw/announcements/cninfo_investor_relations_record_002837_2025-04-28.pdf",
+  "processed_text_path": "data/processed/text/ev_official_disclosure_002837_20250428_108da3.md",
+  "tables_path": "data/processed/tables/ev_official_disclosure_002837_20250428_108da3_tables.json",
+  "page_map_path": "data/processed/page_maps/ev_official_disclosure_002837_20250428_108da3_page_map.yaml",
+  "page_count": 12,
+  "table_inventory_count": 22,
+  "candidate_info": {},
+  "issues": []
+}

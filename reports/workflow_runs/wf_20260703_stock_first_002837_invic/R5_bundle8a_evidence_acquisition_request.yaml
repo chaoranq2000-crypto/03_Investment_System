@@ -1,0 +1,75 @@
+schema_version: r5_bundle8a_evidence_acquisition_request_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+request_id: R5B8A_002837_EVIDENCE_GAP_CLOSURE_20260713
+request_type: stock_first
+object:
+  stock_code: 002837.SZ
+  company_id: cn_002837_invic
+  company_name: 英维克
+  segment_id: ai_server_liquid_cooling
+time_range:
+  start_date: '2024-01-01'
+  end_date: '2026-07-13'
+as_of_date: '2026-07-13'
+required_capabilities:
+  - official_disclosures
+  - financial_statements
+  - financial_indicators
+  - security_master
+  - daily_price
+  - valuation_snapshot
+  - technical_history
+  - fund_flow_context
+  - investor_relations
+  - industry_policy
+  - research_metadata
+  - news_clues
+required_outputs:
+  - evidence_manifest_rows
+  - metric_candidates
+  - company_identity_pack
+  - financial_metric_pack
+  - valuation_snapshot
+  - technical_snapshot
+  - market_sentiment_pack
+  - investor_relations_pack
+  - industry_evidence_pack
+  - peer_operating_evidence_pack
+  - research_report_inventory
+  - market_event_pack
+  - source_gap_report
+quality_gates:
+  - source_permission
+  - independent_fallback
+  - source_health
+  - raw_archive
+  - schema_drift
+  - api_params_hash
+  - metric_only_boundary
+  - freshness
+  - license
+execution:
+  dry_run_first: true
+  live_execution_authorized_by_user_goal: true
+  serial_public_http: true
+  stop_after_first_success: true
+  planned_adapters_must_remain_disabled: true
+evidence_boundaries:
+  official_disclosure: fact_after_parse_and_review
+  structured_database: metric_only
+  investor_relations: management_comment_or_clue
+  third_party_research: analyst_view_or_estimate
+  news_and_market_signal: clue_only
+  missing_issuer_disclosure: MISSING_DISCLOSURE
+existing_gap_sources:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_plan_from_gaps.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8_quality_gate_report.md
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/open_todos.csv
+expected_close_outputs:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/schema_drift_issue_list.csv
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/liquid_cooling_disclosure_gap_register.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_operating_evidence_pack.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_event_pack.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle8_close_quality_report.md
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle8_close_readout.md

@@ -1,59 +1,71 @@
----
 valuation_snapshot:
   metadata:
     workflow_id: wf_20260703_stock_first_002837_invic
-    stock_code: "002837"
+    stock_code: 002837
     company_id: cn_002837_invic
-    as_of_date: "2026-07-03"
+    as_of_date: '2026-07-10'
     generated_by: company-valuation
     caller_skill: stock-deep-dive
     no_advice_boundary: true
-
   market_data:
-    current_price: MISSING
-    market_cap: MISSING
-    shares_outstanding: MISSING
+    current_price: 73.54
+    market_cap: 93715669584.0
+    shares_outstanding: 1274349692
     currency: CNY
-    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_snapshot.csv
-    source_metric_ids: []
-    freshness_status: unknown
-    input_status: TODO_MARKET_DATA
-
+    source_path: data/raw/market_data/tushare_daily_basic_002837_2026-07-13_f8cc52ed.json
+    source_metric_ids:
+    - metric_company_cn_002837_invic_close_20260710_8b4e6cdd
+    - metric_company_cn_002837_invic_total_mv_20260710_94c6ec36
+    - metric_company_cn_002837_invic_circ_mv_20260710_17789f8b
+    - metric_company_cn_002837_invic_pe_ttm_20260710_f133fc07
+    - metric_company_cn_002837_invic_pb_20260710_e0bb0510
+    - metric_company_cn_002837_invic_ps_ttm_20260710_eb40d051
+    - metric_company_cn_002837_invic_turnover_rate_20260710_ba2d5de2
+    - metric_cn_002837_invic_shares_20251231_reviewed_anchor
+    freshness_status: fresh_for_valuation_as_of_date
   multiples:
-    pe_ttm: MISSING
-    pb: MISSING
-    ps: MISSING
-    ev_ebitda: MISSING
-    pe_forward: MISSING
-
+    pe_ttm: 194.2045
+    pb: 27.0715
+    ps: 14.8507
+    ev_ebitda: MISSING_NET_DEBT_AND_ENTERPRISE_VALUE
+    pe_forward:
+      2026E: 193.6141
+      2027E: 137.1687
+      2028E: 105.666
   peer_context:
     peer_market_snapshot_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv
-    peer_set_quality: todo
-    peer_median_multiples: {}
+    peer_set_quality: low
+    peer_median_multiples:
+      pe_ttm: 310.1249
+      pb: 11.6999
+      ps: 9.3076
     limitations:
-      - peer_market_snapshot.csv is present only as TODO_PEER_DATA placeholder.
-
+    - LOW_CONFIDENCE_PEER_SET
+    - no peer forward multiples
   model_context:
-    forecast_model_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
-    financial_metric_pack_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
-    valuation_input_readiness_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation_input_readiness.yaml
+    forecast_model_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/segment_forecast_model.yaml
     sensitivity_table_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
     scenario_summary:
-      bear: TODO_VALUATION_CONTEXT
-      base: TODO_VALUATION_CONTEXT
-      bull: TODO_VALUATION_CONTEXT
-
+      bear:
+        market_cap_range_CNY:
+        - 13577030338.5
+        - 20365545507.75
+        anchor_period: 2027E
+      base:
+        market_cap_range_CNY:
+        - 51241106038.5
+        - 68321474718.0
+        anchor_period: 2027E
+      bull:
+        market_cap_range_CNY:
+        - 102353339936.0
+        - 153530009904.0
+        anchor_period: 2027E
   labels:
     valuation_context_label: not_assessable
     confidence: low
-
   gaps:
-    - gap_id: TODO_MARKET_DATA
-      blocking_level: medium
-      owner_skill: evidence-ingest
-    - gap_id: TODO_PEER_DATA
-      blocking_level: medium
-      owner_skill: evidence-ingest
-    - gap_id: TODO_FORECAST_MODEL_NET_PROFIT
-      blocking_level: medium
-      owner_skill: stock-deep-dive
+  - MISSING_PEER_FORWARD_MULTIPLES
+  - MISSING_NET_DEBT_AND_ENTERPRISE_VALUE
+  - TODO_SEGMENT_DISCLOSURE
+  - TODO_DCF_DISCOUNT_AND_TERMINAL_INPUTS

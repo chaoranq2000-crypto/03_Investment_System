@@ -1,0 +1,16 @@
+{
+  "artifact_type": "R5_bundle10_human_review_submission_validation",
+  "schema_version": "v0.1",
+  "workflow_id": "wf_20260703_stock_first_002837_invic",
+  "submission_path": "C:/Projects/03_Investment_System/reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_human_review_submission.yaml",
+  "reviewer": "Q",
+  "reviewed_at": "2026-07-13T14:07:11+08:00",
+  "external_review_decision": "pass",
+  "report_sha256": "eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83",
+  "traceability_appendix_sha256": "7b883ffb664247ec323498db7ff995e9c7e6e0b61a0271650240fafbec385170",
+  "checklist_pass_count": 6,
+  "blocking_comment_count": 0,
+  "decision": "pass",
+  "eligible_for_bundle10_final_close": true,
+  "errors": []
+}

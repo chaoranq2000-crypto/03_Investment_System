@@ -1,0 +1,99 @@
+artifact_type: R5_bundle9_reverse_valuation
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+valuation_as_of_date: '2026-07-10'
+market_cap_anchor:
+  value: 93715669584.0
+  unit: CNY
+  claim_type: fact
+  evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+  metric_id: metric_company_cn_002837_invic_total_mv_20260710_94c6ec36
+  period: '2026-07-10'
+thresholds:
+- multiple:
+    value: 50.0
+    unit: multiple
+    claim_type: estimate
+    assumption_id: reverse_pe_50x
+  required_net_profit:
+    value: 1874313391.68
+    unit: CNY
+    claim_type: inference
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    assumption_id: reverse_pe_50x
+    calculation_method: current market cap / selected PE multiple
+  first_model_year_reaching_threshold:
+    bear: NOT_REACHED_2026E_2028E
+    base: NOT_REACHED_2026E_2028E
+    bull: NOT_REACHED_2026E_2028E
+- multiple:
+    value: 75.0
+    unit: multiple
+    claim_type: estimate
+    assumption_id: reverse_pe_75x
+  required_net_profit:
+    value: 1249542261.12
+    unit: CNY
+    claim_type: inference
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    assumption_id: reverse_pe_75x
+    calculation_method: current market cap / selected PE multiple
+  first_model_year_reaching_threshold:
+    bear: NOT_REACHED_2026E_2028E
+    base: NOT_REACHED_2026E_2028E
+    bull: 2028E
+- multiple:
+    value: 100.0
+    unit: multiple
+    claim_type: estimate
+    assumption_id: reverse_pe_100x
+  required_net_profit:
+    value: 937156695.84
+    unit: CNY
+    claim_type: inference
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    assumption_id: reverse_pe_100x
+    calculation_method: current market cap / selected PE multiple
+  first_model_year_reaching_threshold:
+    bear: NOT_REACHED_2026E_2028E
+    base: NOT_REACHED_2026E_2028E
+    bull: 2027E
+- multiple:
+    value: 150.0
+    unit: multiple
+    claim_type: estimate
+    assumption_id: reverse_pe_150x
+  required_net_profit:
+    value: 624771130.56
+    unit: CNY
+    claim_type: inference
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    assumption_id: reverse_pe_150x
+    calculation_method: current market cap / selected PE multiple
+  first_model_year_reaching_threshold:
+    bear: NOT_REACHED_2026E_2028E
+    base: 2027E
+    bull: 2026E
+- multiple:
+    value: 200.0
+    unit: multiple
+    claim_type: estimate
+    assumption_id: reverse_pe_200x
+  required_net_profit:
+    value: 468578347.92
+    unit: CNY
+    claim_type: inference
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    assumption_id: reverse_pe_200x
+    calculation_method: current market cap / selected PE multiple
+  first_model_year_reaching_threshold:
+    bear: NOT_REACHED_2026E_2028E
+    base: 2026E
+    bull: 2026E
+interpretation: 反向估值仅显示当前市值在不同倍数下所需的归母净利润，以及模型何时可能达到；它不是价值判断。
+limitations:
+- Selected multiples are explicit research stress points, not a validated fair-value
+  history.
+- Forecast profit is an estimate and can change with revenue, margin, expenses and
+  cash conversion.
+sample_quality_allowed: false

@@ -1,0 +1,17 @@
+job_id: r5_bundle8b_ir_2025_001_parse
+run_id: wf_20260703_stock_first_002837_invic
+evidence_id: ev_official_disclosure_002837_20250423_e78396
+raw_pdf_path: data/raw/announcements/cninfo_investor_relations_record_002837_2025-04-23.pdf
+normalization:
+  processed_text_path: data/processed/text/ev_official_disclosure_002837_20250423_e78396.md
+  content_json_path: data/processed/layout/ev_official_disclosure_002837_20250423_e78396_content.json
+  middle_json_path: data/processed/layout/ev_official_disclosure_002837_20250423_e78396_middle.json
+  tables_path: data/processed/tables/ev_official_disclosure_002837_20250423_e78396_tables.json
+  page_map_path: data/processed/page_maps/ev_official_disclosure_002837_20250423_e78396_page_map.yaml
+  parse_log_path: data/processed/logs/ev_official_disclosure_002837_20250423_e78396_parse_log.json
+candidate_generation:
+  generate_claim_candidates: false
+  generate_metric_candidates: false
+notes:
+  - 投资者关系问答必须按 management_comment 人工审阅，不使用通用 fact 候选生成器。
+  - 客户、订单、液冷收入与毛利表述不得升级为发行人分项财务事实。

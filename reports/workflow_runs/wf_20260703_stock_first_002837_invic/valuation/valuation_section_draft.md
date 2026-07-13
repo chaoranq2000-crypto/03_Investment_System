@@ -1,34 +1,50 @@
-# Valuation Section Draft - company-valuation
+## 五、估值分析
 
-## Context Boundary
+> 本节只作估值情景与研究假设整理，不提供交易动作、配置比例或收益承诺。
 
-本节仅提供估值上下文，不形成交易或配置语言。`company-valuation` 已接收 parseable 输入文件，但 `market_snapshot.csv` 与 `peer_market_snapshot.csv` 仍是 TODO 占位，`forecast_model.yaml` 仍缺前瞻净利、EPS 与利润率假设。
+### 5.1 静态估值
 
-## Static Valuation
+事实：截至 2026-07-10，收盘价为 73.54 元，总市值为 93.72 亿元，PE TTM 为 194.20 倍、PB 为 27.07 倍、PS TTM 为 14.85 倍。来源：`data/raw/market_data/tushare_daily_basic_002837_2026-07-13_f8cc52ed.json`；evidence_id=`ev_structured_market_data_002837_20260713_f8cc52`。这些数字只代表该日市场状态。
 
-- `unknown / TODO`: 当前价格、市值、PE TTM、PB、PS、EV/EBITDA 仍为 `TODO_MARKET_DATA`。
-- source: `reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_snapshot.csv`
-- boundary: 市场估值字段只能作为 market context，不能作为业务暴露证明。
+### 5.2 动态估值
 
-## Dynamic Valuation
+推断：以当前市值除以 Bundle 9 三情景归母净利润，得到下表动态 PE；预测均为 estimate，不是公司指引。
 
-- `estimate`: 收入预测继续使用历史收入 metric anchor，并标注为 estimate。
-- `TODO`: 前瞻净利、EPS、利润率与对应倍数仍为 `TODO_FORECAST_MODEL_NET_PROFIT`。
-- source: `reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml`
-- source: `reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv`
+| 情景 | 2026E | 2027E | 2028E |
+|---|---:|---:|---:|
+| bear | 477.1x | 345.1x | 254.0x |
+| base | 193.6x | 137.2x | 105.7x |
+| bull | 128.8x | 91.6x | 70.5x |
 
-## Peer Comparison
+券商或第三方观点：仅两家近期机构样本的 EPS 中点为 2026E 1.1715 元、2027E 1.8355 元、2028E 2.6395 元；Bundle 9 base 分别低 67.6%、70.8% 和 73.6%。该差异显示盈利假设分歧很大，且样本数量和股本口径尚未独立核验。来源：`analyst_forecast_comparison.csv`；evidence_id=`ev_third_party_research_002837_20260713_20f610`。
 
-- `TODO`: 未形成 reviewed peer set，也没有 dated peer multiples，因此 peer 中位数、相对位置与溢价/折价均为 `TODO_PEER_DATA`。
-- source: `reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv`
+### 5.3 同业估值对比
 
-## Remaining Gaps
+推断：四家同日样本的 PE TTM 中位数为 310.12 倍、PB 中位数为 11.70 倍、PS 中位数为 9.31 倍。英维克 PE TTM 低于该中位数，但 PB 与 PS 高于中位数，方向不一致，因此状态保持 `not_assessable`。
 
-| gap_id | status | next input |
-|---|---|---|
-| TODO_MARKET_DATA | open | reviewed market_snapshot.csv with price, market cap and multiples |
-| TODO_PEER_DATA | open | reviewed peer_market_snapshot.csv with peer selection reasons and dated multiples |
-| TODO_FORECAST_MODEL_NET_PROFIT | open | forecast_model.yaml with supported net profit, EPS and margin assumptions |
-| MISSING_DISCLOSURE | open | official segment revenue or margin disclosure |
+| 公司 | 代码 | PE TTM | PB | PS | 主要限制 |
+|---|---|---:|---:|---:|---|
+| 高澜股份 | 300499 | 385.9x | 8.5x | 11.9x | 业务组合与液冷纯度不可直接横比 |
+| 科创新源 | 300731 | 409.9x | 14.9x | 8.0x | 业务组合与液冷纯度不可直接横比 |
+| 申菱环境 | 301018 | 234.4x | 16.2x | 10.6x | 业务组合与液冷纯度不可直接横比 |
+| 飞荣达 | 300602 | 69.9x | 6.5x | 4.1x | 业务组合与液冷纯度不可直接横比 |
 
-`TODO_FINANCIAL_METRIC_PACK` is resolved to partial input because `financial_metric_pack.csv` now exists, but it remains company-level metric-only support and does not support segment attribution.
+### 5.4 情景估值、反向估值与敏感性
+
+估计：以 2027E 归母净利润为锚，bear 使用 50x-75x、base 使用 75x-100x、bull 使用 100x-150x 的显式研究倍数。倍数不是历史公允区间，而是用于显示利润与估值倍数联动的压力测试。
+
+| 情景 | 2027E 归母净利润 | 倍数区间 | 隐含市值区间 |
+|---|---:|---:|---:|
+| bear | 2.72 亿元 | 50x-75x | 13.58-20.37 亿元 |
+| base | 6.83 亿元 | 75x-100x | 51.24-68.32 亿元 |
+| bull | 10.24 亿元 | 100x-150x | 102.35-153.53 亿元 |
+
+反向估值：当前市值对应 100x PE 时需要约 9.37 亿元归母净利润；base 到 2028E 仍略低于该阈值，bull 在 2027E 超过。完整阈值见 `reverse_valuation.yaml`。2027E base 毛利率每变化 1 个百分点，模型归母净利润约变化 0.76 亿元；估值倍数每变化 25x，隐含市值约变化 170.80 亿元。
+
+### 5.5 分歧、反证与后续验证
+
+- unknown：同业远期倍数、企业价值与净负债口径仍缺失。
+- unknown：液冷独立收入、毛利率和利润贡献仍未披露，SOTP 不满足输入门。
+- unknown：折现率、终值增速和审阅后的净负债未形成，DCF 不满足输入门。
+- counter-evidence：2026Q1 盈利与经营现金流承压；若毛利率、费用率或回款不及模型，动态倍数和情景市值会明显变化。
+- 下一步：按 `valuation_gap_requests.yaml` 补齐同业远期口径、资产负债表桥、液冷独立经济性和折现输入。

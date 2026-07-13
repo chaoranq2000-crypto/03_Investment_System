@@ -1,0 +1,32 @@
+artifact_type: R5_bundle9_valuation_build_readout
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+decision: built_pending_quality_review
+valuation_as_of_date: '2026-07-10'
+peer_count: 4
+peer_set_quality: LOW_CONFIDENCE_PEER_SET
+methods_used:
+- static_multiples
+- dynamic_pe
+- peer_context
+- scenario_valuation
+- reverse_valuation
+methods_skipped:
+  dcf: missing_discount_terminal_and_net_debt_inputs
+  sotp: missing_standalone_segment_economics
+base_dynamic_pe:
+  2026E: 193.6141
+  2027E: 137.1687
+  2028E: 105.666
+scenario_market_cap_ranges_CNY:
+  bear:
+  - 13577030338.5
+  - 20365545507.75
+  base:
+  - 51241106038.5
+  - 68321474718.0
+  bull:
+  - 102353339936.0
+  - 153530009904.0
+open_gap_count: 5
+sample_quality_allowed: false

@@ -1,0 +1,92 @@
+{
+  "artifact_type": "R5_bundle10_close_input_validation",
+  "schema_version": "v0.1",
+  "workflow_id": "wf_20260703_stock_first_002837_invic",
+  "decision": "pass",
+  "checks": {
+    "required_artifacts": {
+      "count": 16,
+      "missing": [],
+      "final_close_missing": []
+    },
+    "writer_hardcoding": {
+      "identity_tokens_found": []
+    },
+    "reader_pack_contract": {
+      "section_count": 10,
+      "traceability_record_count": 18,
+      "issues": []
+    },
+    "reader_quality_gate": {
+      "decision": "candidate_ready_for_human_review",
+      "score": 98,
+      "threshold": 82,
+      "critical_blockers": 0,
+      "truthfulness": "pass",
+      "human_review": "pending"
+    },
+    "capabilities": {
+      "market_event": {
+        "technical": true,
+        "sentiment": true,
+        "future_dated_event": true,
+        "event_impact_path": true,
+        "event_verification_metric": true,
+        "event_counterevidence_condition": true
+      },
+      "forecast": {
+        "has_base_case_2026E_2028E": true,
+        "has_driver_assumptions": true,
+        "has_three_scenarios": true,
+        "arithmetic_reconciles": true,
+        "segment_driven": true,
+        "disaggregated_cost_tax_minority_bridge": true,
+        "uses_aggregate_residual_bridge": false,
+        "report_has_assumption_language": true,
+        "report_has_watch_or_counterevidence": true,
+        "consensus_comparison": true
+      },
+      "valuation": {
+        "dated_snapshot": true,
+        "denominator_control": true,
+        "peer_count": 4,
+        "credible_peer_count": 4,
+        "method_explanation": true,
+        "forward_context": true,
+        "reverse_valuation": true,
+        "scenario_value_ranges": true,
+        "report_has_peer_context": true
+      }
+    },
+    "cross_industry_regression": {
+      "decision": "pass",
+      "case_count": 2,
+      "distinct_industries": 2,
+      "fixture_boundary": "synthetic_layout_and_schema_regression_only",
+      "narrative_quality": {
+        "status": "pass",
+        "case_count": 2,
+        "total_duplicate_paragraph_count": 0,
+        "malformed_pattern_hits": [],
+        "prohibited_advice_hits": [],
+        "minimum_unique_section_judgment_count": 10,
+        "total_judgment_restatement_count": 0
+      }
+    },
+    "human_review_boundary": {
+      "lifecycle": "passed_external_human_review",
+      "handoff_status": "passed_external_human_review",
+      "review_form": "R5_stock_research_report_reader_v3_human_review_form.md",
+      "submission_template": "R5_stock_research_report_reader_v3_human_review_submission_template.yaml",
+      "submission_validator": "validate_r5_bundle10_human_review_submission.py",
+      "finalizer": "finalize_r5_bundle10_after_human_review.py",
+      "external_reviewer": "Q",
+      "ai_precheck": "pass_for_external_human_handoff",
+      "sample_quality_allowed": true,
+      "p2_allowed": false,
+      "submission_validation": "pass",
+      "final_close_validation": "pass"
+    }
+  },
+  "errors": []
+}

@@ -110,7 +110,7 @@ def check_canonical_workflow(errors: list[str]) -> None:
 def check_active_files(errors: list[str]) -> None:
     gate_table_line = re.compile(r"^\s*\|\s*G\d+\b", re.MULTILINE)
     stock_report_workflow_type = re.compile(r"workflow_type\s*:\s*stock_report_production")
-    high_gate_ids = re.compile(r"\bG(?:1[1-9]|[2-9]\d)\b")
+    high_gate_ids = re.compile(r"(?<![A-Za-z0-9_-])G(?:1[1-9]|[2-9]\d)\b")
 
     for path in iter_target_files():
         text = read(path)

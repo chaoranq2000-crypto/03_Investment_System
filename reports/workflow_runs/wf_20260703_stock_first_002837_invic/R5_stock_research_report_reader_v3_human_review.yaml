@@ -1,0 +1,59 @@
+artifact_type: R5_reader_external_human_review_handoff
+schema_version: v0.3
+workflow_id: wf_20260703_stock_first_002837_invic
+report_path: C:/Projects/03_Investment_System/reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3.md
+appendix_path: C:/Projects/03_Investment_System/reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_traceability_v3.yaml
+scorecard_path: C:/Projects/03_Investment_System/reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_quality_scorecard.yaml
+review_form_path: C:/Projects/03_Investment_System/reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_human_review_form.md
+submission_template_path: C:/Projects/03_Investment_System/reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_human_review_submission_template.yaml
+reader_report_sha256: eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83
+traceability_appendix_sha256: 7b883ffb664247ec323498db7ff995e9c7e6e0b61a0271650240fafbec385170
+quality_scorecard_sha256: 23852649595386e3cc8ac5d7d8b38c1c3557713027bbbe24d91e35a3e5d0514b
+reader_pack_sha256: a2581203cac06eda61d9d16c025a4a45646655bb1fd772aace67e5db7dccb8fd
+automated_gate:
+  decision: candidate_ready_for_human_review
+  score: 98
+  threshold: 82
+  truthfulness_status: pass
+  critical_blocker_count: 0
+external_reviewer: Q
+reviewed_at: '2026-07-13T14:07:11+08:00'
+status: passed_external_human_review
+blocking_comments: []
+nonblocking_comments: []
+required_checklist:
+- check_id: HR-1
+  check: 核心观点是否与证据和边界一致
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；核心观点与证据及披露边界一致。
+- check_id: HR-2
+  check: 事实估计推断管理层表述与分析师观点是否易于区分
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；事实、估计、推断、管理层表述与分析师观点清楚分离。
+- check_id: HR-3
+  check: 预测与估值假设是否清楚且不过度精确
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；预测估值假设、日期、分母、情景与敏感性清楚且可复算。
+- check_id: HR-4
+  check: 风险反证和观察条件是否足以推翻核心判断
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；风险、反证与观察条件足以触发判断或模型重估。
+- check_id: HR-5
+  check: 技术情绪事件是否只作为市场上下文
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；技术、情绪与事件仅作为有日期的市场上下文。
+- check_id: HR-6
+  check: 正文是否清晰可读且无内部机器字段
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；正文清晰且无内部机器字段，哈希与评审包一致。
+signoff_fields:
+  decision: pass
+  reviewer_name: Q
+  reviewed_at: '2026-07-13T14:07:11+08:00'
+  report_sha256_confirmed: eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83
+  blocking_comment_count: 0
+sample_quality_report_allowed: true
+p2_allowed: false
+boundary: External human review passed for the exact report hash; P2 remains a separate
+  readiness decision.
+external_review_submission_path: C:/Projects/03_Investment_System/reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_human_review_submission.yaml

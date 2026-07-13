@@ -1,0 +1,359 @@
+schema_version: 1
+catalog_id: evidence_source_routes_v1
+purpose: >-
+  Route evidence requests to approved source adapters while preserving source hierarchy,
+  independent fallbacks, claim boundaries, raw-archive requirements and health-based quarantine.
+
+defaults:
+  serial_only: true
+  stop_after_first_success: true
+  health_unknown_is_usable: true
+  schema_drift_is_failure: true
+  retry_policy: polite_public_http
+
+retry_policies:
+  official_disclosure:
+    max_attempts: 2
+    retry_http_statuses: [408, 425, 429, 500, 502, 503, 504]
+    no_retry_http_statuses: [400, 401, 403, 404]
+    base_delay_seconds: 1.0
+    max_delay_seconds: 8.0
+    jitter_ratio: 0.20
+  polite_public_http:
+    max_attempts: 3
+    retry_http_statuses: [408, 425, 429, 500, 502, 503, 504]
+    no_retry_http_statuses: [400, 401, 403, 404]
+    base_delay_seconds: 1.5
+    max_delay_seconds: 15.0
+    jitter_ratio: 0.25
+  structured_database:
+    max_attempts: 3
+    retry_http_statuses: [408, 425, 429, 500, 502, 503, 504]
+    no_retry_http_statuses: [400, 401, 403, 404]
+    base_delay_seconds: 1.0
+    max_delay_seconds: 10.0
+    jitter_ratio: 0.15
+
+capabilities:
+  official_disclosures:
+    claim_boundary: material_fact
+    require_official_source: true
+    min_independent_domains: 2
+    retry_policy: official_disclosure
+    expected_fields: [title, publish_date, source_url, raw_file_path]
+    sources:
+      - source_name: cninfo
+        role: primary
+        priority: 10
+        independence_domain: cninfo
+        adapter: official_disclosure_pull
+        endpoint_hint: announcement_search_and_download
+        enabled: true
+      - source_name: sse
+        role: fallback
+        priority: 20
+        independence_domain: sse
+        adapter: official_disclosure_pull
+        endpoint_hint: exchange_filing_download
+        enabled: true
+      - source_name: szse
+        role: fallback
+        priority: 30
+        independence_domain: szse
+        adapter: official_disclosure_pull
+        endpoint_hint: exchange_filing_download
+        enabled: true
+      - source_name: bse
+        role: fallback
+        priority: 40
+        independence_domain: bse
+        adapter: official_disclosure_pull
+        endpoint_hint: exchange_filing_download
+        enabled: true
+
+  financial_statements:
+    claim_boundary: metric_only
+    min_independent_domains: 2
+    retry_policy: structured_database
+    expected_fields: [ts_code, ann_date, end_date]
+    sources:
+      - source_name: tushare
+        role: primary
+        priority: 10
+        independence_domain: tushare
+        adapter: tushare_adapter
+        endpoint_hint: income_balancesheet_cashflow
+        enabled: true
+      - source_name: baostock
+        role: fallback
+        priority: 20
+        independence_domain: baostock
+        adapter: baostock_adapter
+        endpoint_hint: financial_fallback
+        enabled: true
+
+  financial_indicators:
+    claim_boundary: metric_only
+    min_independent_domains: 2
+    retry_policy: structured_database
+    expected_fields: [ts_code, ann_date, end_date]
+    sources:
+      - source_name: tushare
+        role: primary
+        priority: 10
+        independence_domain: tushare
+        adapter: tushare_adapter
+        endpoint_hint: fina_indicator
+        enabled: true
+      - source_name: baostock
+        role: fallback
+        priority: 20
+        independence_domain: baostock
+        adapter: baostock_adapter
+        endpoint_hint: query_profit_operation_growth_dupont
+        enabled: true
+
+  security_master:
+    claim_boundary: metric_only
+    min_independent_domains: 2
+    retry_policy: structured_database
+    expected_fields: [stock_code, stock_name, exchange]
+    sources:
+      - source_name: tushare
+        role: primary
+        priority: 10
+        independence_domain: tushare
+        adapter: tushare_adapter
+        endpoint_hint: stock_basic
+        enabled: true
+      - source_name: baostock
+        role: fallback
+        priority: 20
+        independence_domain: baostock
+        adapter: baostock_adapter
+        endpoint_hint: query_stock_basic
+        enabled: true
+
+  daily_price:
+    claim_boundary: metric_only
+    min_independent_domains: 2
+    retry_policy: polite_public_http
+    expected_fields: [trade_date, open, high, low, close, volume]
+    sources:
+      - source_name: mootdx
+        role: primary
+        priority: 10
+        independence_domain: tdx
+        adapter: market_snapshot_pull
+        endpoint_hint: daily_bar
+        enabled: true
+      - source_name: tencent_finance
+        role: fallback
+        priority: 20
+        independence_domain: tencent
+        adapter: market_snapshot_pull
+        endpoint_hint: quote_or_kline
+        enabled: true
+      - source_name: tushare
+        role: fallback
+        priority: 30
+        independence_domain: tushare
+        adapter: tushare_adapter
+        endpoint_hint: daily_or_pro_bar
+        enabled: true
+      - source_name: baostock
+        role: fallback
+        priority: 40
+        independence_domain: baostock
+        adapter: baostock_adapter
+        endpoint_hint: query_history_k_data_plus
+        enabled: true
+      - source_name: baidu_finance
+        role: fallback
+        priority: 50
+        independence_domain: baidu
+        adapter: planned_public_http_adapter
+        endpoint_hint: kline
+        enabled: false
+
+  valuation_snapshot:
+    claim_boundary: metric_only
+    min_independent_domains: 2
+    retry_policy: polite_public_http
+    expected_fields: [as_of_date, close, total_market_cap]
+    sources:
+      - source_name: tencent_finance
+        role: primary
+        priority: 10
+        independence_domain: tencent
+        adapter: market_snapshot_pull
+        endpoint_hint: quote_and_valuation
+        enabled: true
+      - source_name: tushare
+        role: fallback
+        priority: 20
+        independence_domain: tushare
+        adapter: tushare_adapter
+        endpoint_hint: daily_basic
+        enabled: true
+      - source_name: eastmoney_push2
+        role: fallback
+        priority: 30
+        independence_domain: eastmoney
+        adapter: planned_public_http_adapter
+        endpoint_hint: push2_quote
+        enabled: false
+
+  technical_history:
+    claim_boundary: metric_only
+    min_independent_domains: 2
+    retry_policy: polite_public_http
+    expected_fields: [trade_date, open, high, low, close, volume]
+    sources:
+      - source_name: mootdx
+        role: primary
+        priority: 10
+        independence_domain: tdx
+        adapter: market_snapshot_pull
+        endpoint_hint: historical_daily_bar
+        enabled: true
+      - source_name: baostock
+        role: fallback
+        priority: 20
+        independence_domain: baostock
+        adapter: baostock_adapter
+        endpoint_hint: query_history_k_data_plus
+        enabled: true
+      - source_name: tushare
+        role: fallback
+        priority: 30
+        independence_domain: tushare
+        adapter: tushare_adapter
+        endpoint_hint: pro_bar
+        enabled: true
+
+  fund_flow_context:
+    claim_boundary: clue_only
+    min_independent_domains: 1
+    retry_policy: polite_public_http
+    expected_fields: [as_of_date, source_name]
+    sources:
+      - source_name: sina_finance
+        role: primary
+        priority: 10
+        independence_domain: sina
+        adapter: planned_public_http_adapter
+        endpoint_hint: fund_flow
+        enabled: false
+      - source_name: eastmoney_push2
+        role: fallback
+        priority: 20
+        independence_domain: eastmoney
+        adapter: planned_public_http_adapter
+        endpoint_hint: fund_flow
+        enabled: true
+      - source_name: ths
+        role: fallback
+        priority: 30
+        independence_domain: ths
+        adapter: manual_or_snapshot
+        endpoint_hint: market_context
+        enabled: true
+
+  investor_relations:
+    claim_boundary: management_comment_only
+    min_independent_domains: 1
+    retry_policy: official_disclosure
+    expected_fields: [publish_date, question, answer, source_url]
+    sources:
+      - source_name: cninfo_ir
+        role: primary
+        priority: 10
+        independence_domain: cninfo
+        adapter: planned_public_http_adapter
+        endpoint_hint: irm_interaction
+        enabled: false
+      - source_name: cninfo
+        role: fallback
+        priority: 20
+        independence_domain: cninfo
+        adapter: official_disclosure_pull
+        endpoint_hint: investor_relations_activity_record
+        enabled: true
+
+  industry_policy:
+    claim_boundary: contextual_fact
+    min_independent_domains: 2
+    retry_policy: official_disclosure
+    expected_fields: [title, publisher, publish_date, source_url]
+    sources:
+      - source_name: policy_document
+        role: primary
+        priority: 10
+        independence_domain: regulator
+        adapter: manual_or_url_snapshot
+        endpoint_hint: official_policy_or_statistics
+        enabled: true
+      - source_name: industry_report
+        role: fallback
+        priority: 20
+        independence_domain: independent_industry_research
+        adapter: manual_or_url_snapshot
+        endpoint_hint: industry_report
+        enabled: true
+
+  research_metadata:
+    claim_boundary: analyst_view_only
+    min_independent_domains: 2
+    retry_policy: polite_public_http
+    expected_fields: [title, publisher, publish_date]
+    sources:
+      - source_name: eastmoney_push2
+        role: primary
+        priority: 10
+        independence_domain: eastmoney
+        adapter: planned_public_http_adapter
+        endpoint_hint: reportapi_metadata
+        enabled: true
+      - source_name: brokerage_report
+        role: fallback
+        priority: 20
+        independence_domain: brokerage
+        adapter: manual_or_url_snapshot
+        endpoint_hint: report_inventory
+        enabled: true
+
+  news_clues:
+    claim_boundary: clue_only
+    min_independent_domains: 1
+    retry_policy: polite_public_http
+    expected_fields: [title, publish_date, source_url]
+    sources:
+      - source_name: cls_market
+        role: primary
+        priority: 10
+        independence_domain: cls
+        adapter: planned_public_http_adapter
+        endpoint_hint: news_search
+        enabled: false
+      - source_name: news
+        role: fallback
+        priority: 20
+        independence_domain: general_news
+        adapter: manual_or_url_snapshot
+        endpoint_hint: news_clue
+        enabled: true
+      - source_name: eastmoney_push2
+        role: fallback
+        priority: 30
+        independence_domain: eastmoney
+        adapter: planned_public_http_adapter
+        endpoint_hint: news_clue
+        enabled: true
+      - source_name: ths
+        role: fallback
+        priority: 40
+        independence_domain: ths
+        adapter: manual_or_snapshot
+        endpoint_hint: hotlist_or_news_clue
+        enabled: true

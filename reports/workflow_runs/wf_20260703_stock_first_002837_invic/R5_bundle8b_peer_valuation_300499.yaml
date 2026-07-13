@@ -1,0 +1,34 @@
+stock_code: '300499'
+company_id: cn_300499_gaolan
+as_of_date: '2026-07-10'
+sources:
+- source_name: tushare
+  evidence_id: ev_structured_market_data_300499_20260713_57cd0b
+  api_params_hash: 57cd0b28e15a1b368aaa19af50816d65fdec54b7116257399e5e8b9761a9e7e8
+market_values:
+  price: '38.6'
+  market_cap: '1178259.596'
+  float_market_cap: '1047636.424'
+  pe_ttm: '385.8974'
+  pe_forward: TODO_MARKET_DATA
+  pb: '8.4621'
+  ps: '11.9122'
+  turnover_rate: '14.2575'
+  volume: TODO_MARKET_DATA
+  amount: TODO_MARKET_DATA
+market_value_units:
+  price: CNY_per_share
+  market_cap: 10k_CNY
+  float_market_cap: 10k_CNY
+  pe_ttm: multiple
+  pe_forward: multiple
+  pb: multiple
+  ps: multiple
+  turnover_rate: percent
+  volume: source_unit_unverified
+  amount: source_unit_unverified
+missing_fields:
+- amount
+- pe_forward
+- volume
+notes: Valuation snapshot is metric-only market context and not a company fact.

@@ -1,0 +1,937 @@
+artifact_type: R5_forecast_model_pack
+schema_version: r5_forecast_model_pack_v0.2
+status: ready
+as_of_date: '2026-07-13'
+model_type: bottom_up_disclosed_broad_business_lines_with_explicit_cashflow_bridge
+forecast_years:
+- 2026E
+- 2027E
+- 2028E
+required_metrics:
+- revenue
+- gross_margin
+- gross_profit
+- net_profit_attributable
+- eps
+historical_anchor:
+  period: 2025A
+  revenue: 6067759091.55
+  gross_profit: 1690633310.57
+  gross_margin: 27.8626
+  tax_surcharge: 31503818.55
+  selling_expense: 254101820.15
+  administrative_expense: 243986893.17
+  rd_expense: 445940662.45
+  financial_expense: 16182225.88
+  operating_profit: 590359558.6
+  total_profit: 597408857.0
+  income_tax: 54728876.14
+  net_income: 542679980.86
+  minority_profit: 20765207.86
+  net_profit_attributable: 521914773.0
+  operating_cashflow: 157273222.36
+  capex: 303000207.71
+  nwc_2024: 1507949639.5199997
+  nwc_2025: 2035857468.9900002
+  nwc_change: 527907829.4700005
+  accounts_receivable: 3053959547.65
+  inventories: 983397026.13
+  accounts_payable: 2001499104.79
+  shares: 1274349692
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+business_line_anchors:
+  room_cooling:
+    reported_name: 机房温控节能产品
+    revenue: 3448477492.62
+    gross_margin: 28.36
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    calculation_method: direct_reported_value
+  cabinet_cooling:
+    reported_name: 机柜温控节能产品
+    revenue: 1977423139.19
+    gross_margin: 27.24
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    calculation_method: direct_reported_value
+  other_businesses:
+    reported_name: 客车空调+轨道交通列车空调及服务+其他
+    revenue: 641858459.7400002
+    gross_margin: 27.134723467000825
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    calculation_method: audited_company_total_minus_two_reported_major_lines
+business_line_forecast:
+  base_case:
+    2026E:
+      room_cooling:
+        reported_name: 机房温控节能产品
+        revenue: 4414051190.55
+        revenue_growth: 28.0
+        gross_margin: 26.0
+        gross_profit: 1147653309.54
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_base_case_room_cooling_revenue_growth
+        margin_assumption_id: b9_base_case_room_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+        - ev_official_disclosure_002837_20250423_e78396
+        - ev_official_disclosure_002837_20250521_1b4421
+      cabinet_cooling:
+        reported_name: 机柜温控节能产品
+        revenue: 2333359304.24
+        revenue_growth: 18.0
+        gross_margin: 26.0
+        gross_profit: 606673419.1
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_base_case_cabinet_cooling_revenue_growth
+        margin_assumption_id: b9_base_case_cabinet_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+      other_businesses:
+        reported_name: 客车空调+轨道交通列车空调及服务+其他
+        revenue: 693207136.52
+        revenue_growth: 8.0
+        gross_margin: 24.5
+        gross_profit: 169835748.45
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_base_case_other_businesses_revenue_growth
+        margin_assumption_id: b9_base_case_other_businesses_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+    2027E:
+      room_cooling:
+        reported_name: 机房温控节能产品
+        revenue: 5385142452.48
+        revenue_growth: 22.0
+        gross_margin: 26.8
+        gross_profit: 1443218177.26
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_base_case_room_cooling_revenue_growth
+        margin_assumption_id: b9_base_case_room_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+        - ev_official_disclosure_002837_20250423_e78396
+        - ev_official_disclosure_002837_20250521_1b4421
+      cabinet_cooling:
+        reported_name: 机柜温控节能产品
+        revenue: 2683363199.88
+        revenue_growth: 15.0
+        gross_margin: 26.7
+        gross_profit: 716457974.37
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_base_case_cabinet_cooling_revenue_growth
+        margin_assumption_id: b9_base_case_cabinet_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+      other_businesses:
+        reported_name: 客车空调+轨道交通列车空调及服务+其他
+        revenue: 734799564.71
+        revenue_growth: 6.0
+        gross_margin: 25.2
+        gross_profit: 185169490.31
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_base_case_other_businesses_revenue_growth
+        margin_assumption_id: b9_base_case_other_businesses_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+    2028E:
+      room_cooling:
+        reported_name: 机房温控节能产品
+        revenue: 6354468093.92
+        revenue_growth: 18.0
+        gross_margin: 27.4
+        gross_profit: 1741124257.73
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_base_case_room_cooling_revenue_growth
+        margin_assumption_id: b9_base_case_room_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+        - ev_official_disclosure_002837_20250423_e78396
+        - ev_official_disclosure_002837_20250521_1b4421
+      cabinet_cooling:
+        reported_name: 机柜温控节能产品
+        revenue: 3005366783.87
+        revenue_growth: 12.0
+        gross_margin: 27.0
+        gross_profit: 811449031.64
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_base_case_cabinet_cooling_revenue_growth
+        margin_assumption_id: b9_base_case_cabinet_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+      other_businesses:
+        reported_name: 客车空调+轨道交通列车空调及服务+其他
+        revenue: 771539542.95
+        revenue_growth: 5.0
+        gross_margin: 25.8
+        gross_profit: 199057202.08
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_base_case_other_businesses_revenue_growth
+        margin_assumption_id: b9_base_case_other_businesses_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+  bull_case:
+    2026E:
+      room_cooling:
+        reported_name: 机房温控节能产品
+        revenue: 4655444615.04
+        revenue_growth: 35.0
+        gross_margin: 28.0
+        gross_profit: 1303524492.21
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bull_case_room_cooling_revenue_growth
+        margin_assumption_id: b9_bull_case_room_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+        - ev_official_disclosure_002837_20250423_e78396
+        - ev_official_disclosure_002837_20250521_1b4421
+      cabinet_cooling:
+        reported_name: 机柜温控节能产品
+        revenue: 2471778923.99
+        revenue_growth: 25.0
+        gross_margin: 27.5
+        gross_profit: 679739204.1
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bull_case_cabinet_cooling_revenue_growth
+        margin_assumption_id: b9_bull_case_cabinet_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+      other_businesses:
+        reported_name: 客车空调+轨道交通列车空调及服务+其他
+        revenue: 718881474.91
+        revenue_growth: 12.0
+        gross_margin: 26.0
+        gross_profit: 186909183.48
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bull_case_other_businesses_revenue_growth
+        margin_assumption_id: b9_bull_case_other_businesses_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+    2027E:
+      room_cooling:
+        reported_name: 机房温控节能产品
+        revenue: 5958969107.25
+        revenue_growth: 28.0
+        gross_margin: 28.5
+        gross_profit: 1698306195.57
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bull_case_room_cooling_revenue_growth
+        margin_assumption_id: b9_bull_case_room_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+        - ev_official_disclosure_002837_20250423_e78396
+        - ev_official_disclosure_002837_20250521_1b4421
+      cabinet_cooling:
+        reported_name: 机柜温控节能产品
+        revenue: 2966134708.79
+        revenue_growth: 20.0
+        gross_margin: 28.0
+        gross_profit: 830517718.46
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bull_case_cabinet_cooling_revenue_growth
+        margin_assumption_id: b9_bull_case_cabinet_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+      other_businesses:
+        reported_name: 客车空调+轨道交通列车空调及服务+其他
+        revenue: 790769622.4
+        revenue_growth: 10.0
+        gross_margin: 26.5
+        gross_profit: 209553949.94
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bull_case_other_businesses_revenue_growth
+        margin_assumption_id: b9_bull_case_other_businesses_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+    2028E:
+      room_cooling:
+        reported_name: 机房温控节能产品
+        revenue: 7269942310.84
+        revenue_growth: 22.0
+        gross_margin: 29.0
+        gross_profit: 2108283270.14
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bull_case_room_cooling_revenue_growth
+        margin_assumption_id: b9_bull_case_room_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+        - ev_official_disclosure_002837_20250423_e78396
+        - ev_official_disclosure_002837_20250521_1b4421
+      cabinet_cooling:
+        reported_name: 机柜温控节能产品
+        revenue: 3440716262.19
+        revenue_growth: 16.0
+        gross_margin: 28.3
+        gross_profit: 973722702.2
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bull_case_cabinet_cooling_revenue_growth
+        margin_assumption_id: b9_bull_case_cabinet_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+      other_businesses:
+        reported_name: 客车空调+轨道交通列车空调及服务+其他
+        revenue: 854031192.19
+        revenue_growth: 8.0
+        gross_margin: 27.0
+        gross_profit: 230588421.89
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bull_case_other_businesses_revenue_growth
+        margin_assumption_id: b9_bull_case_other_businesses_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+  bear_case:
+    2026E:
+      room_cooling:
+        reported_name: 机房温控节能产品
+        revenue: 3965749116.51
+        revenue_growth: 15.0
+        gross_margin: 23.5
+        gross_profit: 931951042.38
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bear_case_room_cooling_revenue_growth
+        margin_assumption_id: b9_bear_case_room_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+        - ev_official_disclosure_002837_20250423_e78396
+        - ev_official_disclosure_002837_20250521_1b4421
+      cabinet_cooling:
+        reported_name: 机柜温控节能产品
+        revenue: 2135616990.33
+        revenue_growth: 8.0
+        gross_margin: 23.5
+        gross_profit: 501869992.73
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bear_case_cabinet_cooling_revenue_growth
+        margin_assumption_id: b9_bear_case_cabinet_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+      other_businesses:
+        reported_name: 客车空调+轨道交通列车空调及服务+其他
+        revenue: 641858459.74
+        revenue_growth: 0.0
+        gross_margin: 21.5
+        gross_profit: 137999568.84
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bear_case_other_businesses_revenue_growth
+        margin_assumption_id: b9_bear_case_other_businesses_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+    2027E:
+      room_cooling:
+        reported_name: 机房温控节能产品
+        revenue: 4362324028.16
+        revenue_growth: 10.0
+        gross_margin: 24.0
+        gross_profit: 1046957766.76
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bear_case_room_cooling_revenue_growth
+        margin_assumption_id: b9_bear_case_room_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+        - ev_official_disclosure_002837_20250423_e78396
+        - ev_official_disclosure_002837_20250521_1b4421
+      cabinet_cooling:
+        reported_name: 机柜温控节能产品
+        revenue: 2263754009.74
+        revenue_growth: 6.0
+        gross_margin: 24.0
+        gross_profit: 543300962.34
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bear_case_cabinet_cooling_revenue_growth
+        margin_assumption_id: b9_bear_case_cabinet_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+      other_businesses:
+        reported_name: 客车空调+轨道交通列车空调及服务+其他
+        revenue: 654695628.93
+        revenue_growth: 2.0
+        gross_margin: 22.5
+        gross_profit: 147306516.51
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bear_case_other_businesses_revenue_growth
+        margin_assumption_id: b9_bear_case_other_businesses_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+    2028E:
+      room_cooling:
+        reported_name: 机房温控节能产品
+        revenue: 4711309950.42
+        revenue_growth: 8.0
+        gross_margin: 24.5
+        gross_profit: 1154270937.85
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bear_case_room_cooling_revenue_growth
+        margin_assumption_id: b9_bear_case_room_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+        - ev_official_disclosure_002837_20250423_e78396
+        - ev_official_disclosure_002837_20250521_1b4421
+      cabinet_cooling:
+        reported_name: 机柜温控节能产品
+        revenue: 2376941710.23
+        revenue_growth: 5.0
+        gross_margin: 24.5
+        gross_profit: 582350719.01
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bear_case_cabinet_cooling_revenue_growth
+        margin_assumption_id: b9_bear_case_cabinet_cooling_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+      other_businesses:
+        reported_name: 客车空调+轨道交通列车空调及服务+其他
+        revenue: 674336497.8
+        revenue_growth: 3.0
+        gross_margin: 23.5
+        gross_profit: 158469076.98
+        unit: CNY
+        claim_type: estimate
+        growth_assumption_id: b9_bear_case_other_businesses_revenue_growth
+        margin_assumption_id: b9_bear_case_other_businesses_gross_margin
+        evidence_ids:
+        - ev_annual_report_002837_20260421_2cbfc5
+assumption_registry_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9_forecast_assumption_registry.yaml
+assumptions:
+- b9_base_case_revenue_growth_consolidated
+- b9_base_case_gross_margin_consolidated
+- b9_base_case_opex_bridge
+- b9_base_case_net_profit_bridge
+- b9_base_case_eps_bridge
+- b9_base_case_tax_bridge
+- b9_base_case_cashflow_bridge
+- b9_base_case_capex_bridge
+- b9_bull_case_revenue_growth_consolidated
+- b9_bull_case_gross_margin_consolidated
+- b9_bull_case_opex_bridge
+- b9_bull_case_net_profit_bridge
+- b9_bull_case_eps_bridge
+- b9_bull_case_tax_bridge
+- b9_bull_case_cashflow_bridge
+- b9_bull_case_capex_bridge
+- b9_bear_case_revenue_growth_consolidated
+- b9_bear_case_gross_margin_consolidated
+- b9_bear_case_opex_bridge
+- b9_bear_case_net_profit_bridge
+- b9_bear_case_eps_bridge
+- b9_bear_case_tax_bridge
+- b9_bear_case_cashflow_bridge
+- b9_bear_case_capex_bridge
+scenarios:
+  base_case:
+    status: ready
+    claim_type: estimate
+    forecast_table:
+      2026E:
+        revenue:
+          value: 7440617631.31
+          unit: CNY
+          assumption_id: b9_base_case_revenue_growth_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 25.8603
+          unit: pct
+          assumption_id: b9_base_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 1924162477.09
+          unit: CNY
+          assumption_id: b9_base_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 484033304.32
+          unit: CNY
+          assumption_id: b9_base_case_net_profit_bridge
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.379828
+          unit: CNY_per_share
+          assumption_id: b9_base_case_eps_bridge
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2027E:
+        revenue:
+          value: 8803305217.07
+          unit: CNY
+          assumption_id: b9_base_case_revenue_growth_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 26.636
+          unit: pct
+          assumption_id: b9_base_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 2344845641.94
+          unit: CNY
+          assumption_id: b9_base_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 683214747.18
+          unit: CNY
+          assumption_id: b9_base_case_net_profit_bridge
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.536128
+          unit: CNY_per_share
+          assumption_id: b9_base_case_eps_bridge
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2028E:
+        revenue:
+          value: 10131374420.74
+          unit: CNY
+          assumption_id: b9_base_case_revenue_growth_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 27.1595
+          unit: pct
+          assumption_id: b9_base_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 2751630491.45
+          unit: CNY
+          assumption_id: b9_base_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 886905026.53
+          unit: CNY
+          assumption_id: b9_base_case_net_profit_bridge
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.695967
+          unit: CNY_per_share
+          assumption_id: b9_base_case_eps_bridge
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+  bull_case:
+    status: ready
+    claim_type: estimate
+    forecast_table:
+      2026E:
+        revenue:
+          value: 7846105013.94
+          unit: CNY
+          assumption_id: b9_bull_case_revenue_growth_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 27.6592
+          unit: pct
+          assumption_id: b9_bull_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 2170172879.79
+          unit: CNY
+          assumption_id: b9_bull_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 727844293.36
+          unit: CNY
+          assumption_id: b9_bull_case_net_profit_bridge
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.57115
+          unit: CNY_per_share
+          assumption_id: b9_bull_case_eps_bridge
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2027E:
+        revenue:
+          value: 9715873438.44
+          unit: CNY
+          assumption_id: b9_bull_case_revenue_growth_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 28.1846
+          unit: pct
+          assumption_id: b9_bull_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 2738377863.97
+          unit: CNY
+          assumption_id: b9_bull_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 1023533399.36
+          unit: CNY
+          assumption_id: b9_bull_case_net_profit_bridge
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.803181
+          unit: CNY_per_share
+          assumption_id: b9_bull_case_eps_bridge
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2028E:
+        revenue:
+          value: 11564689765.22
+          unit: CNY
+          assumption_id: b9_bull_case_revenue_growth_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 28.644
+          unit: pct
+          assumption_id: b9_bull_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 3312594394.23
+          unit: CNY
+          assumption_id: b9_bull_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 1328492967.99
+          unit: CNY
+          assumption_id: b9_bull_case_net_profit_bridge
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 1.042487
+          unit: CNY_per_share
+          assumption_id: b9_bull_case_eps_bridge
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+  bear_case:
+    status: ready
+    claim_type: estimate
+    forecast_table:
+      2026E:
+        revenue:
+          value: 6743224566.58
+          unit: CNY
+          assumption_id: b9_bear_case_revenue_growth_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 23.3096
+          unit: pct
+          assumption_id: b9_bear_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 1571820603.95
+          unit: CNY
+          assumption_id: b9_bear_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 196442721.15
+          unit: CNY
+          assumption_id: b9_bear_case_net_profit_bridge
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.154151
+          unit: CNY_per_share
+          assumption_id: b9_bear_case_eps_bridge
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2027E:
+        revenue:
+          value: 7280773666.83
+          unit: CNY
+          assumption_id: b9_bear_case_revenue_growth_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 23.8651
+          unit: pct
+          assumption_id: b9_bear_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 1737565245.61
+          unit: CNY
+          assumption_id: b9_bear_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 271540606.77
+          unit: CNY
+          assumption_id: b9_bear_case_net_profit_bridge
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.213082
+          unit: CNY_per_share
+          assumption_id: b9_bear_case_eps_bridge
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+      2028E:
+        revenue:
+          value: 7762588158.45
+          unit: CNY
+          assumption_id: b9_bear_case_revenue_growth_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_margin:
+          value: 24.4131
+          unit: pct
+          assumption_id: b9_bear_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        gross_profit:
+          value: 1895090733.84
+          unit: CNY
+          assumption_id: b9_bear_case_gross_margin_consolidated
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        net_profit_attributable:
+          value: 368966544.69
+          unit: CNY
+          assumption_id: b9_bear_case_net_profit_bridge
+          evidence_id: ev_annual_report_002837_20260421_2cbfc5
+          metric_id: null
+          claim_type: estimate
+        eps:
+          value: 0.289533
+          unit: CNY_per_share
+          assumption_id: b9_bear_case_eps_bridge
+          evidence_id: ev_structured_market_data_002837_20260710_eb0c08
+          metric_id: null
+          claim_type: estimate
+sensitivity_tests:
+- driver: room_cooling_revenue_growth
+  year: 2026E
+  change: +5pct_points
+  claim_type: estimate
+- driver: consolidated_gross_margin
+  year: 2026E
+  change: +1pct_point
+  claim_type: estimate
+- driver: opex_ratio
+  year: 2026E
+  change: +1pct_point
+  claim_type: estimate
+- driver: nwc_to_revenue
+  year: 2026E
+  change: +1pct_point
+  claim_type: estimate
+- driver: room_cooling_revenue_growth
+  year: 2027E
+  change: +5pct_points
+  claim_type: estimate
+- driver: consolidated_gross_margin
+  year: 2027E
+  change: +1pct_point
+  claim_type: estimate
+- driver: opex_ratio
+  year: 2027E
+  change: +1pct_point
+  claim_type: estimate
+- driver: nwc_to_revenue
+  year: 2027E
+  change: +1pct_point
+  claim_type: estimate
+- driver: room_cooling_revenue_growth
+  year: 2028E
+  change: +5pct_points
+  claim_type: estimate
+- driver: consolidated_gross_margin
+  year: 2028E
+  change: +1pct_point
+  claim_type: estimate
+- driver: opex_ratio
+  year: 2028E
+  change: +1pct_point
+  claim_type: estimate
+- driver: nwc_to_revenue
+  year: 2028E
+  change: +1pct_point
+  claim_type: estimate
+sensitivity_table:
+- driver: room_cooling_revenue_growth
+  change: 2026E:+5pct_points
+  impact_metric: net_profit_attributable
+  impact_value: 38935035.13
+  assumption_id_or_missing_reason: b9_base_case_room_cooling_revenue_growth
+- driver: consolidated_gross_margin
+  change: 2026E:+1pct_point
+  impact_metric: net_profit_attributable
+  impact_value: 64621764.13
+  assumption_id_or_missing_reason: b9_base_case_gross_margin_consolidated
+- driver: opex_ratio
+  change: 2026E:+1pct_point
+  impact_metric: net_profit_attributable
+  impact_value: -64621764.13
+  assumption_id_or_missing_reason: b9_base_case_opex_bridge
+- driver: nwc_to_revenue
+  change: 2026E:+1pct_point
+  impact_metric: operating_cashflow
+  impact_value: -74406176.31
+  assumption_id_or_missing_reason: b9_base_case_cashflow_bridge
+- driver: room_cooling_revenue_growth
+  change: 2027E:+5pct_points
+  impact_metric: net_profit_attributable
+  impact_value: 51370286.35
+  assumption_id_or_missing_reason: b9_base_case_room_cooling_revenue_growth
+- driver: consolidated_gross_margin
+  change: 2027E:+1pct_point
+  impact_metric: net_profit_attributable
+  impact_value: 76456705.81
+  assumption_id_or_missing_reason: b9_base_case_gross_margin_consolidated
+- driver: opex_ratio
+  change: 2027E:+1pct_point
+  impact_metric: net_profit_attributable
+  impact_value: -76456705.81
+  assumption_id_or_missing_reason: b9_base_case_opex_bridge
+- driver: nwc_to_revenue
+  change: 2027E:+1pct_point
+  impact_metric: operating_cashflow
+  impact_value: -88033052.17
+  assumption_id_or_missing_reason: b9_base_case_cashflow_bridge
+- driver: room_cooling_revenue_growth
+  change: 2028E:+5pct_points
+  impact_metric: net_profit_attributable
+  impact_value: 64074848.21
+  assumption_id_or_missing_reason: b9_base_case_room_cooling_revenue_growth
+- driver: consolidated_gross_margin
+  change: 2028E:+1pct_point
+  impact_metric: net_profit_attributable
+  impact_value: 87990986.84
+  assumption_id_or_missing_reason: b9_base_case_gross_margin_consolidated
+- driver: opex_ratio
+  change: 2028E:+1pct_point
+  impact_metric: net_profit_attributable
+  impact_value: -87990986.84
+  assumption_id_or_missing_reason: b9_base_case_opex_bridge
+- driver: nwc_to_revenue
+  change: 2028E:+1pct_point
+  impact_metric: operating_cashflow
+  impact_value: -101313744.21
+  assumption_id_or_missing_reason: b9_base_case_cashflow_bridge
+consensus_comparison:
+  status: limited_two_broker_context
+  as_of_date: '2026-07-13'
+  source_evidence_id: ev_third_party_research_002837_20260713_20f610
+  source_path: data/processed/normalized/eastmoney_report_metadata_002837_2026-07-13_20f6105e.csv
+  rows:
+    2026E:
+      base_model_eps: 0.379828
+      two_broker_midpoint_eps: 1.1715
+      base_minus_midpoint_pct: -67.5776
+      unit: CNY_per_share
+    2027E:
+      base_model_eps: 0.536128
+      two_broker_midpoint_eps: 1.8355
+      base_minus_midpoint_pct: -70.7912
+      unit: CNY_per_share
+    2028E:
+      base_model_eps: 0.695967
+      two_broker_midpoint_eps: 2.6395
+      base_minus_midpoint_pct: -73.6326
+      unit: CNY_per_share
+  claim_type: analyst_view
+  limitations:
+  - only two recent distinct brokers
+  - share-basis consistency has not been independently verified
+  - not a robust market consensus
+liquid_cooling_boundary:
+  2024_approximate_revenue: 300000000
+  unit: CNY
+  claim_type: management_comment
+  evidence_id: ev_official_disclosure_002837_20250423_e78396
+  usage: directional anchor only; not extrapolated as a standalone 2025 segment
+  2025_revenue: MISSING_DISCLOSURE
+  gross_margin: MISSING_DISCLOSURE
+missing_items:
+- liquid_cooling_revenue_2025_MISSING_DISCLOSURE
+- liquid_cooling_numeric_gross_margin_MISSING_DISCLOSURE
+- named_customer_orders_MISSING_DISCLOSURE
+source_gap_register:
+- gap_id: R5B9-FC-001
+  section: business_line_forecast
+  missing_data: standalone liquid-cooling revenue and margin
+  impact_on_conclusion: model uses disclosed broad lines and wider scenario ranges
+  fix_owner_skill: evidence-ingest
+  next_action: refresh after a same-definition issuer disclosure
+sample_quality_allowed: false
+p2_allowed: false
+no_advice_boundary: true

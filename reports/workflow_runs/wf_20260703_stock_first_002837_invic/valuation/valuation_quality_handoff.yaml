@@ -1,36 +1,32 @@
----
-valuation_quality_handoff:
-  workflow_id: wf_20260703_stock_first_002837_invic
-  stock_code: "002837"
-  source_skill: company-valuation
-  caller_skill: stock-deep-dive
-  artifact_paths:
-    valuation_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_model.yaml
-    valuation_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_snapshot.yaml
-    peer_comparison: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/peer_comparison.csv
-    sensitivity_table: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
-    valuation_section_draft: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_section_draft.md
-    valuation_gap_requests: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_gap_requests.yaml
-  input_artifact_paths:
-    market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_snapshot.csv
-    peer_market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv
-    financial_metric_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
-    forecast_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
-    valuation_input_readiness: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation_input_readiness.yaml
-  local_checks:
-    - QR-VAL-1
-    - QR-VAL-2
-    - QR-VAL-3
-    - QR-VAL-4
-    - QR-VAL-5
-    - QR-VAL-6
-  no_advice_boundary: pass
-  open_gaps:
-    - TODO_MARKET_DATA
-    - TODO_PEER_DATA
-    - TODO_FORECAST_MODEL_NET_PROFIT
-  resolved_gaps:
-    - TODO_FINANCIAL_METRIC_PACK
-  high_issues: 0
-  medium_todos: 3
-  notes: Input enrichment created parseable market, peer and financial metric inputs. Market, peer and forward profit valuation gaps remain visible.
+artifact_type: valuation_quality_handoff
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+valuation_as_of_date: '2026-07-10'
+artifact_paths:
+  valuation_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_model.yaml
+  valuation_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_snapshot.yaml
+  peer_comparison: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/peer_comparison.csv
+  sensitivity_table: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/sensitivity_table.csv
+  valuation_section_draft: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation/valuation_section_draft.md
+  reverse_valuation: reports/workflow_runs/wf_20260703_stock_first_002837_invic/reverse_valuation.yaml
+  scenario_valuation: reports/workflow_runs/wf_20260703_stock_first_002837_invic/scenario_valuation.yaml
+local_checks:
+- QR-VAL-1
+- QR-VAL-2
+- QR-VAL-3
+- QR-VAL-4
+- QR-VAL-5
+check_results:
+  QR-VAL-1: pass
+  QR-VAL-2: pass
+  QR-VAL-3: pass_with_low_confidence_peer_set
+  QR-VAL-4: pass
+  QR-VAL-5: pass
+no_advice_boundary: pass
+open_gaps:
+- CV_B9_001
+- CV_B9_002
+- CV_B9_003
+- CV_B9_004
+- CV_B9_005
+sample_quality_allowed: false

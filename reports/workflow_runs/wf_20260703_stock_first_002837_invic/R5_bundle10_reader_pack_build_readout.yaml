@@ -1,0 +1,11 @@
+artifact_type: R5_bundle10_reader_pack_build_readout
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+decision: built_pending_reader_gate
+section_count: 10
+traceability_record_count: 18
+technical_as_of_date: '2026-07-10'
+sentiment_event_status: ready_with_todos
+human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false

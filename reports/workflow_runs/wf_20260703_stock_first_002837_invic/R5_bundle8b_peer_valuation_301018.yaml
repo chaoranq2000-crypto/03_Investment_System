@@ -1,0 +1,34 @@
+stock_code: '301018'
+company_id: cn_301018_shenling
+as_of_date: '2026-07-10'
+sources:
+- source_name: tushare
+  evidence_id: ev_structured_market_data_301018_20260713_cc0ee3
+  api_params_hash: cc0ee3a401d8eeb17d5d0d61ab79c9453c1fb26e6001a226d360e398d43d622a
+market_values:
+  price: '119.56'
+  market_cap: '4474907.2228'
+  float_market_cap: '3381430.5924'
+  pe_ttm: '234.3524'
+  pe_forward: TODO_MARKET_DATA
+  pb: '16.2152'
+  ps: '10.6313'
+  turnover_rate: '7.0836'
+  volume: TODO_MARKET_DATA
+  amount: TODO_MARKET_DATA
+market_value_units:
+  price: CNY_per_share
+  market_cap: 10k_CNY
+  float_market_cap: 10k_CNY
+  pe_ttm: multiple
+  pe_forward: multiple
+  pb: multiple
+  ps: multiple
+  turnover_rate: percent
+  volume: source_unit_unverified
+  amount: source_unit_unverified
+missing_fields:
+- amount
+- pe_forward
+- volume
+notes: Valuation snapshot is metric-only market context and not a company fact.

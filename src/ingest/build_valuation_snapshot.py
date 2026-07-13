@@ -30,11 +30,23 @@ def _first_present(row: Mapping[str, str], aliases: Sequence[str]) -> str:
     return "TODO_MARKET_DATA"
 
 
+def _iso_date(value: str) -> str:
+    text = str(value or "").strip()
+    if len(text) == 8 and text.isdigit():
+        return f"{text[:4]}-{text[4:6]}-{text[6:]}"
+    return text
+
+
 def _read_latest_row(path: Path) -> dict[str, str]:
     rows = list(csv.DictReader(path.open("r", encoding="utf-8", newline=""))) if path.exists() else []
     if not rows:
         return {}
-    return rows[-1]
+    return max(
+        rows,
+        key=lambda row: str(
+            row.get("trade_date") or row.get("date") or row.get("as_of_date") or ""
+        ),
+    )
 
 
 def build_valuation_snapshot(
@@ -49,7 +61,9 @@ def build_valuation_snapshot(
     api_params_hash: str = "",
 ) -> dict[str, object]:
     row = _read_latest_row(input_csv)
-    trade_date = row.get("trade_date") or row.get("as_of_date") or as_of_date
+    trade_date = _iso_date(
+        row.get("trade_date") or row.get("date") or row.get("as_of_date") or as_of_date
+    )
     market_values = {
         field: _first_present(row, aliases) for field, aliases in FIELD_ALIASES.items()
     }
@@ -74,6 +88,18 @@ def build_valuation_snapshot(
             }
         ],
         "market_values": market_values,
+        "market_value_units": {
+            "price": "CNY_per_share" if source_name == "tushare" else "source_unit_unverified",
+            "market_cap": "10k_CNY" if source_name == "tushare" else "source_unit_unverified",
+            "float_market_cap": "10k_CNY" if source_name == "tushare" else "source_unit_unverified",
+            "pe_ttm": "multiple",
+            "pe_forward": "multiple",
+            "pb": "multiple",
+            "ps": "multiple",
+            "turnover_rate": "percent",
+            "volume": "source_unit_unverified",
+            "amount": "source_unit_unverified",
+        },
         "missing_fields": sorted(set(missing_fields)),
         "notes": "Valuation snapshot is metric-only market context and not a company fact.",
     }

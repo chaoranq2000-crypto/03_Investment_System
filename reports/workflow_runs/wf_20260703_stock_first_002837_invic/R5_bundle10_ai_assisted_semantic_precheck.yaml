@@ -1,0 +1,24 @@
+artifact_type: R5_bundle10_ai_assisted_semantic_precheck
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+reader_report_sha256: eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83
+traceability_appendix_sha256: 7b883ffb664247ec323498db7ff995e9c7e6e0b61a0271650240fafbec385170
+quality_scorecard_sha256: 23852649595386e3cc8ac5d7d8b38c1c3557713027bbbe24d91e35a3e5d0514b
+reader_pack_sha256: a2581203cac06eda61d9d16c025a4a45646655bb1fd772aace67e5db7dccb8fd
+reviewer_type: ai_assisted_manual_semantic_precheck
+reviewer: Codex
+status: pass_for_external_human_handoff
+checks:
+  identity_and_cutoff_visible: true
+  ten_sections_present: true
+  citations_resolved: true
+  machine_token_leakage_zero: true
+  numeric_format_violations_zero: true
+  forecast_bridge_reconciled: true
+  reverse_or_scenario_valuation_present: true
+  technical_sentiment_event_chain_present: true
+  automated_truthfulness_pass: true
+external_human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false
+boundary: This precheck is not external human signoff.

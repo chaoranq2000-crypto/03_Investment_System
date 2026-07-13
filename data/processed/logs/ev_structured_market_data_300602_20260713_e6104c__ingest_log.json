@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_structured_300602_daily_basic_e6104c",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-12T18:09:30Z",
+  "finished_at": "2026-07-12T18:09:30Z",
+  "result": "SUCCESS",
+  "stock_code": "300602",
+  "source_name": "tushare",
+  "source_type": "structured_market_data",
+  "api_name": "daily_basic",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "128",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest"
+}

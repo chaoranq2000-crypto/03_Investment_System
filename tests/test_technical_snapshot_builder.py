@@ -43,3 +43,30 @@ def test_technical_and_sentiment_builders_write_yaml(tmp_path: Path) -> None:
     assert "\\" not in parsed["price_series_source"]
     assert "\\" not in parsed["source"]
     assert sentiment["industry_sentiment"]["claim_type"] == "clue"
+
+
+def test_technical_builder_sorts_descending_dates_and_accepts_baostock_date_alias(
+    tmp_path: Path,
+) -> None:
+    market = tmp_path / "market_desc.csv"
+    market.write_text(
+        "date,close,volume,adjustflag\n"
+        "2026-07-05,15,150,3\n"
+        "2026-07-04,14,140,3\n"
+        "2026-07-03,13,130,3\n"
+        "2026-07-02,12,120,3\n"
+        "2026-07-01,11,110,3\n",
+        encoding="utf-8",
+    )
+
+    snapshot = build_technical_snapshot(
+        market_csv=market,
+        output_path=tmp_path / "technical_desc.yaml",
+        stock_code="002837",
+        as_of_date="2026-07-06",
+    )
+
+    assert snapshot["as_of_date"] == "2026-07-05"
+    assert snapshot["close"] == 15
+    assert snapshot["ma5"] == 13
+    assert snapshot["adjustment_policy"] == "none"

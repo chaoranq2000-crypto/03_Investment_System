@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_structured_002837_query_balance_data_cdf5ef",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-12T17:41:58Z",
+  "finished_at": "2026-07-12T17:41:58Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "baostock",
+  "source_type": "structured_financial_data",
+  "api_name": "query_balance_data",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "6",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest"
+}

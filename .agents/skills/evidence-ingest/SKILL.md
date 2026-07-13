@@ -65,6 +65,8 @@ Read these before execution:
 Read these for data-layer and source-adapter routing tasks:
 
 - `references/source_adapter_matrix.md`
+- `references/evidence_acquisition_resilience.md`
+- `references/a_stock_data_method_adoption.md`
 - `references/structured_data_adapter_contract.md`
 - `references/market_context_snapshot_contract.md`
 - `references/data_layer_quality_gate.md`
@@ -99,10 +101,24 @@ Read adapter notes only when relevant:
 Every ingest mode follows this chain:
 
 ```text
-discover → acquire → hash_dedup → archive_raw → parse_or_snapshot
+discover → capability_route → source_health_check → acquire_with_independent_fallback
+→ schema_fingerprint → hash_dedup → archive_raw → parse_or_snapshot
 → classify_source → assign_reliability_rank → register_manifest
 → generate_candidates → validate_manifest → output_ingest_log
 ```
+
+Routing and acquisition rules:
+
+- Build `adapter_run_queue.yaml` from `config/evidence_source_routes.yaml`; do not let a
+  report writer or research analyst call public endpoints directly.
+- Use official sources for material company facts; structured databases remain metric-only;
+  fund flow, hotlists, news and social data remain context or clues.
+- Prefer independent fallback domains instead of multiple endpoints with the same failure mode.
+- Public HTTP adapters are serial by default, reuse a session/opener, apply bounded retry with
+  jitter, respect `Retry-After`, and do not immediately retry `401/403/404`.
+- Record source health and schema drift. A circuit-open or quarantined source must be skipped
+  until the ledger permits another attempt.
+- Live acquisition must be explicitly enabled. Dry-run planning is the safe default.
 
 ## Stock-first evidence workflow
 
@@ -153,6 +169,11 @@ run_debug_cases.py
 src/ingest/stock_evidence_plan_runner.py
 src/ingest/official_disclosure_pull.py
 src/ingest/structured_api_pull.py
+src/ingest/source_routing.py
+src/ingest/source_health.py
+src/ingest/acquisition_orchestrator.py
+scripts/build_evidence_acquisition_plan.py
+scripts/run_source_route_quality_gate.py
 ```
 
 ## Guardrails
@@ -175,6 +196,9 @@ src/ingest/structured_api_pull.py
 - [ ] Claim and metric candidates remain draft and respect source-rank limits.
 - [ ] Structured API snapshots are metric-only unless separately verified by official disclosure.
 - [ ] D-level sources produce only clues or TODOs.
+- [ ] Source routes have independent fallbacks and no circuit-open source is scheduled.
+- [ ] Observed fields match the endpoint schema fingerprint or a schema-drift issue is emitted.
+- [ ] Live public HTTP acquisition is serial, bounded and explicitly enabled.
 - [ ] No buy/sell/hold recommendations or trading instructions are present.
 
 ## Readout format

@@ -50,6 +50,18 @@ def _posix_path(path: Path) -> str:
     return path.as_posix()
 
 
+def _row_date(row: dict[str, str]) -> str:
+    return str(row.get("trade_date") or row.get("date") or row.get("as_of_date") or "")
+
+
+def _adjustment_policy(row: dict[str, str]) -> str:
+    return {
+        "1": "hfq",
+        "2": "qfq",
+        "3": "none",
+    }.get(str(row.get("adjustflag", "")), "unknown")
+
+
 def build_technical_snapshot(
     *,
     market_csv: Path,
@@ -58,6 +70,7 @@ def build_technical_snapshot(
     as_of_date: str,
 ) -> dict[str, object]:
     rows = list(csv.DictReader(market_csv.open("r", encoding="utf-8", newline=""))) if market_csv.exists() else []
+    rows.sort(key=_row_date)
     closes = [_to_float(row.get("close", "")) for row in rows]
     closes = [value for value in closes if value is not None]
     latest = rows[-1] if rows else {}
@@ -69,13 +82,13 @@ def build_technical_snapshot(
     trend = INSUFFICIENT_PRICE_WINDOW
     if close is not None and isinstance(ma5_value, float):
         trend = "above_ma5" if close >= ma5_value else "below_ma5"
-    as_of = latest.get("trade_date") or latest.get("as_of_date") or as_of_date
+    as_of = _row_date(latest) or as_of_date
     source_path = _posix_path(market_csv)
     snapshot = {
         "stock_code": stock_code,
         "as_of_date": as_of,
         "price_series_source": source_path,
-        "adjustment_policy": "unknown",
+        "adjustment_policy": _adjustment_policy(latest),
         "windows": {
             "daily": {
                 "ma5": ma5_value,

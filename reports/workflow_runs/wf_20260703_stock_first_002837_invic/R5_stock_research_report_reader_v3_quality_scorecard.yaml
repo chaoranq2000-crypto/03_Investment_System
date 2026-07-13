@@ -1,0 +1,576 @@
+artifact_type: R5_reader_quality_scorecard
+schema_version: v0.2
+rubric_id: r5_bundle7_positive_reader_quality_gate
+scoring_method: positive_from_zero
+decision: candidate_ready_for_human_review
+quality_band: candidate_ready_for_human_review
+score: 98
+threshold: 82
+research_draft_threshold: 45
+critical_blocker_count: 0
+critical_blockers: []
+truthfulness_blockers: []
+candidate_blockers: []
+warnings: []
+dimension_scores:
+  evidence_integrity: 20
+  coverage_completeness: 15
+  analytical_synthesis: 19
+  forecast_and_valuation: 15
+  narrative_and_readability: 14
+  presentation_hygiene: 10
+  risks_and_watch_conditions: 5
+dimension_max_scores:
+  evidence_integrity: 20
+  coverage_completeness: 15
+  analytical_synthesis: 20
+  forecast_and_valuation: 15
+  narrative_and_readability: 15
+  presentation_hygiene: 10
+  risks_and_watch_conditions: 5
+required_section_coverage:
+  covered: 10
+  required: 10
+  missing: []
+  duplicated: []
+section_diagnostics:
+  executive_summary:
+    han_chars: 328
+    numeric_fact_count: 15
+    paragraph_count: 4
+    unique_references:
+    - E1
+    - E10
+    - E13
+    - E14
+    - E18
+    - E2
+    - E4
+    signals:
+      judgment: true
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: false
+      verification_metric: true
+    required_signals:
+    - judgment
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - judgment
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: true
+    analysis_unit_pass: true
+  company_context_and_scope:
+    han_chars: 404
+    numeric_fact_count: 9
+    paragraph_count: 5
+    unique_references:
+    - E1
+    - E16
+    - E3
+    - E4
+    - E5
+    - E6
+    - E7
+    signals:
+      judgment: true
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - judgment
+    - counterevidence
+    present_required_signals:
+    - judgment
+    - counterevidence
+    signal_ratio: 1.0
+    density_pass: true
+    analysis_unit_pass: true
+  financial_history_and_cashflow_quality:
+    han_chars: 459
+    numeric_fact_count: 33
+    paragraph_count: 7
+    unique_references:
+    - E1
+    - E10
+    - E2
+    - E3
+    - E5
+    signals:
+      judgment: true
+      trend: true
+      causal: false
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - trend
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - trend
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    signal_ratio: 0.8
+    density_pass: true
+    analysis_unit_pass: true
+  business_breakdown_and_economics:
+    han_chars: 542
+    numeric_fact_count: 14
+    paragraph_count: 7
+    unique_references:
+    - E1
+    - E2
+    - E3
+    - E4
+    - E5
+    - E6
+    signals:
+      judgment: true
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - judgment
+    - trend
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - judgment
+    - trend
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: true
+    analysis_unit_pass: true
+  industry_structure_and_competition:
+    han_chars: 675
+    numeric_fact_count: 8
+    paragraph_count: 8
+    unique_references:
+    - E1
+    - E16
+    - E7
+    - E8
+    - E9
+    signals:
+      judgment: true
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: true
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - judgment
+    - trend
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - judgment
+    - trend
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: true
+    analysis_unit_pass: true
+  forecast_and_scenarios:
+    han_chars: 439
+    numeric_fact_count: 30
+    paragraph_count: 6
+    unique_references:
+    - E1
+    - E10
+    - E12
+    - E17
+    - E2
+    - E5
+    signals:
+      judgment: false
+      trend: true
+      causal: false
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: false
+      sentiment: true
+      future_event: false
+      verification_metric: true
+    required_signals:
+    - assumption
+    - causal
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - assumption
+    - economic_impact
+    - counterevidence
+    - watchpoint
+    signal_ratio: 0.8
+    density_pass: false
+    analysis_unit_pass: false
+  valuation_and_market_expectations:
+    han_chars: 499
+    numeric_fact_count: 67
+    paragraph_count: 10
+    unique_references:
+    - E10
+    - E14
+    - E15
+    - E18
+    - E4
+    - E9
+    signals:
+      judgment: true
+      trend: false
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: true
+      reverse_valuation: true
+      technical: false
+      sentiment: false
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - judgment
+    - economic_impact
+    - peer
+    - reverse_valuation
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - judgment
+    - economic_impact
+    - peer
+    - reverse_valuation
+    - counterevidence
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: true
+    analysis_unit_pass: true
+  dated_events:
+    han_chars: 432
+    numeric_fact_count: 32
+    paragraph_count: 5
+    unique_references:
+    - E10
+    - E11
+    - E12
+    - E13
+    - E14
+    - E2
+    - E5
+    - E6
+    - E7
+    - E8
+    signals:
+      judgment: true
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: false
+      reverse_valuation: false
+      technical: true
+      sentiment: true
+      future_event: true
+      verification_metric: true
+    required_signals:
+    - future_event
+    - causal
+    - verification_metric
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - future_event
+    - causal
+    - verification_metric
+    - counterevidence
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: true
+    analysis_unit_pass: true
+  risks_counterevidence_and_watchpoints:
+    han_chars: 471
+    numeric_fact_count: 7
+    paragraph_count: 5
+    unique_references:
+    - E1
+    - E10
+    - E11
+    - E14
+    - E2
+    - E4
+    - E5
+    - E6
+    - E7
+    - E8
+    - E9
+    signals:
+      judgment: true
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: true
+      reverse_valuation: false
+      technical: false
+      sentiment: false
+      future_event: false
+      verification_metric: true
+    required_signals:
+    - counterevidence
+    - economic_impact
+    - watchpoint
+    present_required_signals:
+    - counterevidence
+    - economic_impact
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: true
+    analysis_unit_pass: true
+  research_conclusion:
+    han_chars: 413
+    numeric_fact_count: 10
+    paragraph_count: 6
+    unique_references:
+    - E1
+    - E10
+    - E11
+    - E12
+    - E13
+    - E14
+    - E2
+    - E4
+    - E5
+    - E6
+    - E7
+    - E8
+    - E9
+    signals:
+      judgment: true
+      trend: true
+      causal: true
+      economic_impact: true
+      counterevidence: true
+      watchpoint: true
+      assumption: true
+      peer: true
+      reverse_valuation: true
+      technical: false
+      sentiment: false
+      future_event: false
+      verification_metric: true
+    required_signals:
+    - judgment
+    - assumption
+    - counterevidence
+    - watchpoint
+    present_required_signals:
+    - judgment
+    - assumption
+    - counterevidence
+    - watchpoint
+    signal_ratio: 1.0
+    density_pass: true
+    analysis_unit_pass: true
+analysis_unit_coverage:
+  complete: 8
+  required_for_candidate: 7
+  complete_sections:
+  - executive_summary
+  - financial_history_and_cashflow_quality
+  - business_breakdown_and_economics
+  - industry_structure_and_competition
+  - valuation_and_market_expectations
+  - dated_events
+  - risks_counterevidence_and_watchpoints
+  - research_conclusion
+source_diagnostics:
+  underlying_source_count: 19
+  underlying_source_ids:
+  - annual_report_300499_gaolan_2025_122516
+  - annual_report_300731_cotran_2025_122523
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_official_disclosure_002837_20250423_e78396
+  - ev_official_disclosure_002837_20250428_108da3
+  - ev_official_disclosure_002837_20250521_1b4421
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_structured_financial_data_002837_20260713_a177f1
+  - ev_structured_market_data_002837_20260713_3145e0
+  - ev_structured_market_data_002837_20260713_f8cc52
+  - ev_structured_market_data_300499_20260713_57cd0b
+  - ev_structured_market_data_300602_20260713_e6104c
+  - ev_structured_market_data_300731_20260713_f4f0c0
+  - ev_structured_market_data_301018_20260713_cc0ee3
+  - ev_third_party_research_002837_20260713_20f610
+  - industry_report_caict_green_computing_2025_59947f
+  - policy_ndrc_green_data_center_20240723_30d310
+  - semiannual_report_300602_frd_2025_122450
+  - semiannual_report_301018_shenling_2025_122461
+  category_counts:
+    company_operating: 3
+    consensus: 1
+    industry: 2
+    issuer: 2
+    market: 6
+    other: 1
+    peer: 4
+  issuer_source_count: 2
+  independent_source_count: 17
+  independent_source_ids:
+  - annual_report_300499_gaolan_2025_122516
+  - annual_report_300731_cotran_2025_122523
+  - ev_official_disclosure_002837_20250423_e78396
+  - ev_official_disclosure_002837_20250428_108da3
+  - ev_official_disclosure_002837_20250521_1b4421
+  - ev_structured_financial_data_002837_20260713_a177f1
+  - ev_structured_market_data_002837_20260713_3145e0
+  - ev_structured_market_data_002837_20260713_f8cc52
+  - ev_structured_market_data_300499_20260713_57cd0b
+  - ev_structured_market_data_300602_20260713_e6104c
+  - ev_structured_market_data_300731_20260713_f4f0c0
+  - ev_structured_market_data_301018_20260713_cc0ee3
+  - ev_third_party_research_002837_20260713_20f610
+  - industry_report_caict_green_computing_2025_59947f
+  - policy_ndrc_green_data_center_20240723_30d310
+  - semiannual_report_300602_frd_2025_122450
+  - semiannual_report_301018_shenling_2025_122461
+  metadata_complete_ratio: 1.0
+forecast_capabilities:
+  has_base_case_2026E_2028E: true
+  has_driver_assumptions: true
+  has_three_scenarios: true
+  arithmetic_reconciles: true
+  segment_driven: true
+  disaggregated_cost_tax_minority_bridge: true
+  uses_aggregate_residual_bridge: false
+  report_has_assumption_language: true
+  report_has_watch_or_counterevidence: true
+  consensus_comparison: true
+valuation_capabilities:
+  dated_snapshot: true
+  denominator_control: true
+  peer_count: 4
+  credible_peer_count: 4
+  method_explanation: true
+  forward_context: true
+  reverse_valuation: true
+  scenario_value_ranges: true
+  report_has_peer_context: true
+market_event_capabilities:
+  technical: true
+  sentiment: true
+  dated_event_count: 2
+  future_dated_event: true
+  event_impact_path: true
+  event_verification_metric: true
+  event_counterevidence_condition: true
+  market_snapshot: true
+fix_routes: []
+display_citations:
+  used:
+  - E1
+  - E10
+  - E11
+  - E12
+  - E13
+  - E14
+  - E15
+  - E16
+  - E17
+  - E18
+  - E2
+  - E3
+  - E4
+  - E5
+  - E6
+  - E7
+  - E8
+  - E9
+  appendix_records: 18
+  unresolved: []
+  duplicate_appendix_references: []
+unresolved_citation_count: 0
+machine_token_leakage_count: 0
+numeric_format_violation_count: 0
+conclusion_state: candidate_ready_for_human_review
+truthfulness_status: pass
+human_review_required: true
+human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false
+input_hashes:
+  report_sha256: eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83
+  appendix_sha256: 7b883ffb664247ec323498db7ff995e9c7e6e0b61a0271650240fafbec385170
+  forecast_bridge_sha256: 9ef25c20bd3b3c7c94b2f207dcbfe86e87d70f3c39410eae2baf6b270bdb1ffe
+  valuation_reasoning_sha256: ac4b0587914d952e7839d25c131cfec723855d1f08c2f3a927f580fa77e2445c
+  live_rubric_sha256: 34c42febae86ee235b66f305c33d1a82a7798c2f74c6e3bc188254f2389b958d
+  density_targets_sha256: 97d21081a7995584fcf2aeac38702dc4ca7fb9c172842a17e1cc6f7ca2d578a1
+  benchmark_rubric_sha256: 06a268fbddc8e79547d6785d90fdda66fb04a45d7b3f4e523a64c176bb95b3b1

@@ -18,7 +18,7 @@ def load_yaml(path: Path):
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
-def test_current_reader_and_workflow_remain_fail_closed() -> None:
+def test_bundle7_reader_remains_historical_fail_closed_while_current_workflow_advances() -> None:
     scorecard = load_yaml(RUN / "R5_stock_research_report_reader_v2_quality_scorecard.yaml")
     state = load_yaml(RUN / "workflow_state.yaml")
 
@@ -28,9 +28,13 @@ def test_current_reader_and_workflow_remain_fail_closed() -> None:
     assert scorecard["truthfulness_status"] == "pass"
     assert scorecard["human_review_status"] == "not_ready"
     assert not scorecard["sample_quality_report_allowed"] and not scorecard["p2_allowed"]
-    assert state["status"] == "needs_fix"
-    assert state["next_stage"] == "T2_evidence_acquire_parse"
-    assert state["required_next_skill"] == "evidence-ingest"
+    assert state["status"] == "accepted_with_todos"
+    assert state["current_stage"] == "T10_close_readout"
+    assert state["next_stage"] is None
+    assert state["required_next_skill"] is None
+    assert state["bundle10_close"]["bundle_closed"] is True
+    assert state.get("quality_backflow", {}).get("sample_quality_report_allowed") is True
+    assert state.get("quality_backflow", {}).get("p2_allowed") is False
 
 
 def test_backflow_issues_routes_and_manifest_are_unique() -> None:

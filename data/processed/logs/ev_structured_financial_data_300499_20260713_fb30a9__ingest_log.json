@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_structured_300499_cashflow_fb30a9",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-12T18:08:21Z",
+  "finished_at": "2026-07-12T18:08:21Z",
+  "result": "SUCCESS",
+  "stock_code": "300499",
+  "source_name": "tushare",
+  "source_type": "structured_financial_data",
+  "api_name": "cashflow",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "621",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest"
+}

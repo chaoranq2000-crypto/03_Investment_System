@@ -1,0 +1,146 @@
+artifact_type: company_valuation_output
+schema_version: r5_company_valuation_output_v0.1
+valuation_as_of_date: '2026-07-10'
+input_status: partial_with_todos
+market_snapshot:
+  as_of_date: '2026-07-10'
+  current_price:
+    value: 73.54
+    unit: CNY_per_share
+    claim_type: fact
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    assumption_id: market_snapshot_source_20260710
+  market_cap:
+    value: 93715669584.0
+    unit: CNY
+    claim_type: fact
+    evidence_id: ev_structured_market_data_002837_20260713_f8cc52
+    assumption_id: market_snapshot_source_20260710
+  share_count:
+    value: 1274349692
+    unit: shares
+    claim_type: fact
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    assumption_id: reviewed_share_count_anchor
+peer_set:
+  quality: LOW_CONFIDENCE_PEER_SET
+  peers:
+  - '300499'
+  - '300731'
+  - '301018'
+  - '300602'
+  missing_reason: MISSING_PEER_FORWARD_MULTIPLES
+method_selection:
+  selected_methods:
+  - method: static_multiples
+    status: used
+    reason: reviewed dated snapshot
+  - method: dynamic_pe
+    status: used
+    reason: reviewed forecast assumptions
+  - method: peer_context
+    status: used_low_confidence
+    reason: four same-date peers with weak comparability
+  - method: scenario_and_reverse
+    status: used
+    reason: explicit scenarios and market-cap anchor
+  - method: dcf
+    status: skipped
+    reason: TODO_DCF_DISCOUNT_AND_TERMINAL_INPUTS
+  - method: sotp
+    status: skipped
+    reason: TODO_SEGMENT_DISCLOSURE
+scenario_outputs:
+  bear:
+    implied_market_cap_low:
+      value: 13577030338.5
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_bear_valuation_multiple_low
+    implied_market_cap_high:
+      value: 20365545507.75
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_bear_valuation_multiple_high
+    implied_multiple_low:
+      value: 50.0
+      unit: multiple
+      claim_type: estimate
+      assumption_id: b9_bear_valuation_multiple_low
+    implied_multiple_high:
+      value: 75.0
+      unit: multiple
+      claim_type: estimate
+      assumption_id: b9_bear_valuation_multiple_high
+  base:
+    implied_market_cap_low:
+      value: 51241106038.5
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_base_valuation_multiple_low
+    implied_market_cap_high:
+      value: 68321474718.0
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_base_valuation_multiple_high
+    implied_multiple_low:
+      value: 75.0
+      unit: multiple
+      claim_type: estimate
+      assumption_id: b9_base_valuation_multiple_low
+    implied_multiple_high:
+      value: 100.0
+      unit: multiple
+      claim_type: estimate
+      assumption_id: b9_base_valuation_multiple_high
+  bull:
+    implied_market_cap_low:
+      value: 102353339936.0
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_bull_valuation_multiple_low
+    implied_market_cap_high:
+      value: 153530009904.0
+      unit: CNY
+      claim_type: inference
+      assumption_id: b9_bull_valuation_multiple_high
+    implied_multiple_low:
+      value: 100.0
+      unit: multiple
+      claim_type: estimate
+      assumption_id: b9_bull_valuation_multiple_low
+    implied_multiple_high:
+      value: 150.0
+      unit: multiple
+      claim_type: estimate
+      assumption_id: b9_bull_valuation_multiple_high
+sensitivity:
+- driver: 2027E_PE_multiple
+  impact_metric: implied_market_cap
+  impact_value:
+    value: 17080368679.499998
+    unit: CNY_per_25x_change
+    claim_type: inference
+    assumption_id: b9_base_valuation_multiple_sensitivity
+- driver: 2027E_gross_margin
+  impact_metric: net_profit_attributable
+  impact_value:
+    value: 76456705.81
+    unit: CNY_per_1pct_point
+    claim_type: estimate
+    assumption_id: b9_base_case_gross_margin_consolidated
+source_gap:
+- gap_id: CV_B9_001
+  missing_data: peer_forward_multiples
+  next_action: refresh from reviewed same-basis forecasts
+- gap_id: CV_B9_002
+  missing_data: net_debt_and_enterprise_value
+  next_action: normalize reviewed balance-sheet inputs
+- gap_id: CV_B9_003
+  missing_data: standalone_liquid_cooling_economics
+  next_action: refresh after issuer disclosure
+- gap_id: CV_B9_004
+  missing_data: DCF_discount_and_terminal_inputs
+  next_action: keep method skipped until reviewed
+no_advice_disclaimer: This output is research context only and contains no action
+  recommendation or return assurance.

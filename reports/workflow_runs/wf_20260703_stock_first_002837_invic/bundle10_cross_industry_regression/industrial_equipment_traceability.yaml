@@ -1,0 +1,39 @@
+artifact_type: R5_stock_research_report_traceability_v2
+schema_version: v0.2
+workflow_id: fixture_industrial_equipment
+stock_code: FIX001
+cutoff_date: '2026-07-13'
+records:
+- display_reference_id: E1
+  claim_type: fixture_fact
+  claim_summary: 工业设备样例事实输入
+  period: fixture
+  unit: null
+  raw_evidence_ids:
+  - fixture_industrial_equipment_source_1
+  source_category: other
+  source_path: tests/fixtures/r5_reader_writer/cross_industry_cases.yaml
+  method: synthetic_writer_regression
+  confidence: fixture_only
+  limitation: 只验证动态渲染，不进入研究结论
+  reviewer_state: fixture
+  conflict_or_staleness_status: not_applicable
+  claim_text_digest: 7dec25130444a68e15dd6f87fd12d241dcac2d8d78ca2aabd462a3320ff82743
+- display_reference_id: E2
+  claim_type: fixture_counterevidence
+  claim_summary: 工业设备样例反证输入
+  period: fixture
+  unit: null
+  raw_evidence_ids:
+  - fixture_industrial_equipment_source_2
+  source_category: other
+  source_path: tests/fixtures/r5_reader_writer/cross_industry_cases.yaml
+  method: synthetic_writer_regression
+  confidence: fixture_only
+  limitation: 只验证动态渲染，不进入研究结论
+  reviewer_state: fixture
+  conflict_or_staleness_status: not_applicable
+  claim_text_digest: a1487a3a484b1f828f4142955133a22c9d8a72eb2264d6c671fc4f996c100582
+human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false

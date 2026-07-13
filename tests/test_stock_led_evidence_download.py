@@ -100,7 +100,8 @@ def test_official_disclosure_local_file_writes_manifest(tmp_path: Path) -> None:
     row = manifest[0]
     assert row["source_type"] == "annual_report"
     assert row["reliability_rank"] == "A"
-    assert row["material_claim_allowed"] == "requires_extraction_and_review"
+    assert row["material_claim_allowed"] == "true"
+    assert row["raw_archive_policy"] == "full_file_archived"
     assert row["raw_file_path"].startswith("data/raw/annual_reports/")
     assert row["source_url"] == ""
 

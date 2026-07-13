@@ -109,6 +109,7 @@ def test_tushare_live_mode_routes_mock_response_through_structured_ingest(
     class FakePro:
         def income(self, **params: str) -> FakeFrame:
             captured["params"] = params
+            captured["http_url"] = getattr(self, "_DataApi__http_url", "")
             return FakeFrame()
 
     fake_tushare = SimpleNamespace(
@@ -117,6 +118,7 @@ def test_tushare_live_mode_routes_mock_response_through_structured_ingest(
     )
     monkeypatch.setitem(sys.modules, "tushare", fake_tushare)
     monkeypatch.setenv("TUSHARE_TOKEN", token)
+    monkeypatch.setenv("TUSHARE_HTTP_URL", "https://tushare-proxy.example.test")
 
     readout = tmp_path / "tushare_live_readout.json"
     tushare_main(
@@ -145,6 +147,7 @@ def test_tushare_live_mode_routes_mock_response_through_structured_ingest(
 
     assert captured["token"] == token
     assert captured["params"]["ts_code"] == "002837.SZ"  # type: ignore[index]
+    assert captured["http_url"] == "https://tushare-proxy.example.test"
     payload = json.loads(readout.read_text(encoding="utf-8"))
     assert payload["adapter_status"] == "live_completed"
     assert payload["rows"] == 1
@@ -156,6 +159,7 @@ def test_tushare_live_mode_routes_mock_response_through_structured_ingest(
     assert manifest[0]["processed_table_path"]
     assert manifest[0]["api_params_hash"]
     assert {row["metric_name"] for row in metrics} == {"total_revenue"}
+    assert all(row["metric_candidate_id"].startswith("metric_company_") for row in metrics)
     for path in tmp_path.rglob("*"):
         if path.is_file():
             assert token not in path.read_text(encoding="utf-8", errors="ignore")
@@ -242,3 +246,65 @@ def test_tushare_api_params_hash_changes_when_params_change() -> None:
         start_date="20250101",
     )
     assert first != second
+
+
+def test_tushare_disclosure_date_uses_report_period_without_date_metrics(
+    tmp_path: Path, monkeypatch
+) -> None:
+    captured: dict[str, object] = {}
+
+    class FakeFrame:
+        def to_dict(self, orient: str) -> list[dict[str, str]]:
+            assert orient == "records"
+            return [
+                {
+                    "ts_code": "002837.SZ",
+                    "ann_date": "20260701",
+                    "end_date": "20260630",
+                    "pre_date": "20260825",
+                    "actual_date": "",
+                    "modify_date": "",
+                }
+            ]
+
+    class FakePro:
+        def disclosure_date(self, **params: str) -> FakeFrame:
+            captured["params"] = params
+            return FakeFrame()
+
+    fake_tushare = SimpleNamespace(
+        set_token=lambda value: captured.setdefault("token", value),
+        pro_api=lambda: FakePro(),
+    )
+    monkeypatch.setitem(sys.modules, "tushare", fake_tushare)
+    monkeypatch.setenv("TUSHARE_TOKEN", "event-calendar-token")
+
+    tushare_main(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--api-name",
+            "disclosure_date",
+            "--stock-code",
+            "002837",
+            "--company-id",
+            "cn_002837_invic",
+            "--mode",
+            "live",
+            "--allow-network",
+            "--start-date",
+            "20260101",
+            "--end-date",
+            "20260630",
+            "--as-of-date",
+            "2026-07-13",
+            "--publish-date",
+            "2026-07-13",
+        ]
+    )
+
+    assert captured["params"] == {"ts_code": "002837.SZ", "end_date": "20260630"}
+    metrics_path = tmp_path / "data/manifests/metrics_draft.csv"
+    assert not metrics_path.exists()
+    manifest = read_csv(tmp_path / "data/manifests/evidence_manifest.csv")
+    assert manifest[0]["candidate_status"] == "not_generated"

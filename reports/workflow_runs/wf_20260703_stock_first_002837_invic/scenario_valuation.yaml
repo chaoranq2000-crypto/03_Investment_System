@@ -1,0 +1,117 @@
+artifact_type: R5_bundle9_scenario_valuation
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+valuation_as_of_date: '2026-07-10'
+anchor_period: 2027E
+method: scenario_PE_on_attributable_profit
+scenarios:
+  bear:
+    profit_anchor:
+      value: 271540606.77
+      unit: CNY
+      claim_type: estimate
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      assumption_id: b9_bear_case_net_profit_bridge
+      period: 2027E
+    multiple_range:
+      low:
+        value: 50.0
+        unit: multiple
+        claim_type: estimate
+        assumption_id: b9_bear_valuation_multiple_low
+      high:
+        value: 75.0
+        unit: multiple
+        claim_type: estimate
+        assumption_id: b9_bear_valuation_multiple_high
+    implied_market_cap_range:
+      low:
+        value: 13577030338.5
+        unit: CNY
+        claim_type: inference
+        assumption_id: b9_bear_valuation_multiple_low
+        calculation_method: 2027E attributable profit * low scenario multiple
+      high:
+        value: 20365545507.75
+        unit: CNY
+        claim_type: inference
+        assumption_id: b9_bear_valuation_multiple_high
+        calculation_method: 2027E attributable profit * high scenario multiple
+    uncertainties:
+    - multiple range is a research assumption
+    - peer TTM multiples are distorted by low current earnings
+    - liquid-cooling standalone economics remain undisclosed
+  base:
+    profit_anchor:
+      value: 683214747.18
+      unit: CNY
+      claim_type: estimate
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      assumption_id: b9_base_case_net_profit_bridge
+      period: 2027E
+    multiple_range:
+      low:
+        value: 75.0
+        unit: multiple
+        claim_type: estimate
+        assumption_id: b9_base_valuation_multiple_low
+      high:
+        value: 100.0
+        unit: multiple
+        claim_type: estimate
+        assumption_id: b9_base_valuation_multiple_high
+    implied_market_cap_range:
+      low:
+        value: 51241106038.5
+        unit: CNY
+        claim_type: inference
+        assumption_id: b9_base_valuation_multiple_low
+        calculation_method: 2027E attributable profit * low scenario multiple
+      high:
+        value: 68321474718.0
+        unit: CNY
+        claim_type: inference
+        assumption_id: b9_base_valuation_multiple_high
+        calculation_method: 2027E attributable profit * high scenario multiple
+    uncertainties:
+    - multiple range is a research assumption
+    - peer TTM multiples are distorted by low current earnings
+    - liquid-cooling standalone economics remain undisclosed
+  bull:
+    profit_anchor:
+      value: 1023533399.36
+      unit: CNY
+      claim_type: estimate
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      assumption_id: b9_bull_case_net_profit_bridge
+      period: 2027E
+    multiple_range:
+      low:
+        value: 100.0
+        unit: multiple
+        claim_type: estimate
+        assumption_id: b9_bull_valuation_multiple_low
+      high:
+        value: 150.0
+        unit: multiple
+        claim_type: estimate
+        assumption_id: b9_bull_valuation_multiple_high
+    implied_market_cap_range:
+      low:
+        value: 102353339936.0
+        unit: CNY
+        claim_type: inference
+        assumption_id: b9_bull_valuation_multiple_low
+        calculation_method: 2027E attributable profit * low scenario multiple
+      high:
+        value: 153530009904.0
+        unit: CNY
+        claim_type: inference
+        assumption_id: b9_bull_valuation_multiple_high
+        calculation_method: 2027E attributable profit * high scenario multiple
+    uncertainties:
+    - multiple range is a research assumption
+    - peer TTM multiples are distorted by low current earnings
+    - liquid-cooling standalone economics remain undisclosed
+interpretation_boundary: market_cap_ranges_are_research_scenarios_only
+sample_quality_allowed: false

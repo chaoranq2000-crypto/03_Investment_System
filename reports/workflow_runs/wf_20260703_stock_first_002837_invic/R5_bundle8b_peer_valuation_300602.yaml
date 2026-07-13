@@ -1,0 +1,34 @@
+stock_code: '300602'
+company_id: cn_300602_frd
+as_of_date: '2026-07-10'
+sources:
+- source_name: tushare
+  evidence_id: ev_structured_market_data_300602_20260713_e6104c
+  api_params_hash: e6104cc8e55dc01bb68b4c4815a41fbb9347918b5c3f82d362ad84b0bc45a7f3
+market_values:
+  price: '45.82'
+  market_cap: '2687084.5752'
+  float_market_cap: '1838203.5526'
+  pe_ttm: '69.9482'
+  pe_forward: TODO_MARKET_DATA
+  pb: '6.4751'
+  ps: '4.1171'
+  turnover_rate: '6.9334'
+  volume: TODO_MARKET_DATA
+  amount: TODO_MARKET_DATA
+market_value_units:
+  price: CNY_per_share
+  market_cap: 10k_CNY
+  float_market_cap: 10k_CNY
+  pe_ttm: multiple
+  pe_forward: multiple
+  pb: multiple
+  ps: multiple
+  turnover_rate: percent
+  volume: source_unit_unverified
+  amount: source_unit_unverified
+missing_fields:
+- amount
+- pe_forward
+- volume
+notes: Valuation snapshot is metric-only market context and not a company fact.

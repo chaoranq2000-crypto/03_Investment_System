@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_structured_301018_fina_mainbz_41ff42",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-12T18:08:48Z",
+  "finished_at": "2026-07-12T18:08:48Z",
+  "result": "SUCCESS",
+  "stock_code": "301018",
+  "source_name": "tushare",
+  "source_type": "structured_financial_data",
+  "api_name": "fina_mainbz",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "82",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest"
+}

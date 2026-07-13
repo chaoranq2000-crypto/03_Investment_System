@@ -1,0 +1,142 @@
+schema_version: "1.0"
+artifact_type: R5_patch_plan_execution_audit
+workflow_id: wf_20260703_stock_first_002837_invic
+company_id: cn_002837_invic
+generated_at: '2026-07-13'
+generated_by_skill: research-orchestrator
+
+patch_package:
+  archive_name: R5_BUNDLE_8A_EVIDENCE_ACQUISITION_RESILIENCE_PATCH_2026-07-12.zip
+  sha256: BF2ADD026C981235D563F5D2C909391116AEB0856A95B752F2A435D164A232D7
+  checksum_validation: pass_25_of_25
+  overlay_validation: pass_19_of_19
+  branch: r5/bundle8a-evidence-acquisition-resilience
+
+overall:
+  automated_execution_complete: true
+  patch_plan_complete: true
+  status: complete_with_documented_todos
+  rationale: >-
+    Bundle 8A、Bundle 8、Bundle 9 与 Bundle 10 的本地自动化任务均已执行并通过相应校验；
+    补丁计划要求真实性门、读者质量门和外部人工评审同时通过后才允许升级样本状态，
+    外部评审人Q已对精确Reader哈希完成确认，三道门均通过，Bundle 10已关闭；
+    既有披露与方法TODO继续可见，P2仍为false。
+
+stages:
+  - stage: A_bundle8a_integration
+    execution_status: complete
+    close_status: accepted_with_todos
+    evidence:
+      - R5_bundle8a_integration_readout.md
+      - R5_bundle8a_source_route_quality_report.yaml
+      - R5_bundle8a_adapter_run_queue_dry_run.yaml
+  - stage: B_bundle8_live_evidence_closure
+    execution_status: complete
+    close_status: accepted_with_todos
+    evidence:
+      - bundle8_close_readout.md
+      - live_acquisition_run_log.yaml
+      - R5_bundle8b_close_input_validation.json
+    retained_uncertainty:
+      - 2024年液冷相关收入约3亿元仅为B类管理层口径，不是经审计分部事实
+      - 2025年液冷收入、毛利率、订单、客户与项目回款仍为MISSING
+  - stage: C_bundle9_forecast_and_valuation
+    execution_status: complete
+    close_status: accepted_with_todos
+    evidence:
+      - bundle9_close_readout.md
+      - R5_bundle9_forecast_assumption_registry.yaml
+      - segment_forecast_model.yaml
+      - R5_bundle9_valuation_pack.yaml
+    retained_uncertainty:
+      - 同业可比性为LOW_CONFIDENCE_PEER_SET
+      - 因必要输入缺失，DCF与SOTP未执行
+  - stage: D_bundle10_dynamic_writer_and_reader_gate
+    automated_execution_status: complete
+    final_close_status: accepted_with_todos
+    evidence:
+      - R5_stock_research_report_reader_v3.md
+      - R5_stock_research_report_reader_v3_quality_scorecard.yaml
+      - R5_bundle10_cross_industry_writer_regression.yaml
+      - R5_bundle10_ai_assisted_semantic_precheck.yaml
+      - R5_bundle10_independent_subagent_review.yaml
+      - R5_stock_research_report_reader_v3_human_review.yaml
+      - R5_stock_research_report_reader_v3_human_review_submission.yaml
+      - R5_bundle10_human_review_submission_validation.json
+      - R5_bundle10_final_close_validation.json
+      - bundle10_final_close_readout.md
+    cross_industry_scope: >-
+      工业设备与医疗服务两个合成fixture用于验证跨行业版式、字段契约、引用解析、身份隔离和叙事质量；
+      两个样本均通过10章节判断唯一性、零重复段落、零判断原文复述、零病句模式与零直接投资语言检查，
+      但不把合成fixture冒充真实公司研究证据。
+
+network_and_proxy_audit:
+  observed_global_codex_env:
+    path: C:/Users/Q/.codex/.env
+    HTTP_PROXY: http://127.0.0.1:6382
+    HTTPS_PROXY: http://127.0.0.1:6382
+  global_env_modified: false
+  live_smoke_scope: 本次执行期间的接口级连通性与真实抓取结果，不外推为永久可用性保证
+  interfaces:
+    - interface: tushare
+      result: pass
+      proxy_effect: no_block_observed
+    - interface: baostock
+      result: pass
+      proxy_effect: no_block_observed
+    - interface: cninfo_static
+      result: pass
+      proxy_effect: no_block_observed
+    - interface: szse
+      result: pass
+      proxy_effect: no_block_observed
+    - interface: tencent_quote
+      result: pass
+      proxy_effect: no_block_observed
+    - interface: eastmoney_reportapi
+      result: pass
+      proxy_effect: no_block_observed
+    - interface: eastmoney_push2
+      result: degraded
+      proxy_effect: blocked_on_inherited_proxy_path
+      observation: TLS_EOF_or_HTTP_502_via_proxy_but_HTTP_200_on_direct_probe
+      handling: 保持degraded；未声称live adapter成功；后续采用分源路由并补fixture/live smoke
+  conclusion: >-
+    全局6382代理没有统一阻断Tushare之外的接口；已实测的Baostock、CNINFO、SZSE、
+    Tencent和Eastmoney reportapi均可用。当前仅观察到Eastmoney push2的分源代理传输故障。
+
+gates:
+  truthfulness:
+    status: pass
+    blocker_count: 0
+  reader_quality:
+    status: candidate_ready_for_human_review
+    score: 98
+    threshold: 82
+  external_human_review:
+    status: passed_external_human_review
+    reviewer: Q
+    reviewed_at: '2026-07-13T14:07:11+08:00'
+    report_sha256: eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83
+    checklist_pass_count: 6
+    blocking_comment_count: 0
+  sample_quality_allowed: true
+  p2_allowed: false
+
+validation:
+  full_repo_pytest:
+    status: pass
+    passed: 642
+    skipped: 2
+  bundle10_close_validator: pass
+  git_diff_check: pass
+  staging_performed: false
+  commit_performed: false
+  push_performed: false
+  remote_ci_claimed: false
+
+next_required_action:
+  owner: none
+  action: none_for_patch_plan_close
+  patch_plan_complete: true
+  p2_next_step: separate_comparison_readiness_decision_not_started

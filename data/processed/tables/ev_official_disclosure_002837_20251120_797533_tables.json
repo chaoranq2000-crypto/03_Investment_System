@@ -1,0 +1,50 @@
+[
+  {
+    "table_id": "ev_official_disclosure_002837_20251120_797533_p2_t5",
+    "evidence_id": "ev_official_disclosure_002837_20251120_797533",
+    "page_no": 2,
+    "table_title": "5.请问董秘，公司与台企如奇宏、酷冷至尊等英伟达冷板供应商对比看，",
+    "parse_status": "line_inventory",
+    "text_excerpt": "5.请问董秘，公司与台企如奇宏、酷冷至尊等英伟达冷板供应商对比看，"
+  },
+  {
+    "table_id": "ev_official_disclosure_002837_20251120_797533_p3_t12",
+    "evidence_id": "ev_official_disclosure_002837_20251120_797533",
+    "page_no": 3,
+    "table_title": "14.随着国内算力建设提速，请问公司对国内客户资本开支意愿的边际变",
+    "parse_status": "line_inventory",
+    "text_excerpt": "14.随着国内算力建设提速，请问公司对国内客户资本开支意愿的边际变"
+  },
+  {
+    "table_id": "ev_official_disclosure_002837_20251120_797533_p3_t23",
+    "evidence_id": "ev_official_disclosure_002837_20251120_797533",
+    "page_no": 3,
+    "table_title": "16.您好，公司现阶段负债率较高，怎么财务规划方面是否可以满足各类",
+    "parse_status": "line_inventory",
+    "text_excerpt": "16.您好，公司现阶段负债率较高，怎么财务规划方面是否可以满足各类"
+  },
+  {
+    "table_id": "ev_official_disclosure_002837_20251120_797533_p4_t19",
+    "evidence_id": "ev_official_disclosure_002837_20251120_797533",
+    "page_no": 4,
+    "table_title": "21.请问网传公司已成为谷歌芯片液冷相关零部件的核心供应商，以及",
+    "parse_status": "line_inventory",
+    "text_excerpt": "21.请问网传公司已成为谷歌芯片液冷相关零部件的核心供应商，以及"
+  },
+  {
+    "table_id": "ev_official_disclosure_002837_20251120_797533_p5_t9",
+    "evidence_id": "ev_official_disclosure_002837_20251120_797533",
+    "page_no": 5,
+    "table_title": "的 Deschutes 5 型号的 CDU 产品，这是我们开展与该客户业务合作的重要进",
+    "parse_status": "line_inventory",
+    "text_excerpt": "的 Deschutes 5 型号的 CDU 产品，这是我们开展与该客户业务合作的重要进"
+  },
+  {
+    "table_id": "ev_official_disclosure_002837_20251120_797533_p5_t17",
+    "evidence_id": "ev_official_disclosure_002837_20251120_797533",
+    "page_no": 5,
+    "table_title": "26.国外客户审厂和送样的进展如何？现在有哪些客户已签合同和下单",
+    "parse_status": "line_inventory",
+    "text_excerpt": "26.国外客户审厂和送样的进展如何？现在有哪些客户已签合同和下单"
+  }
+]

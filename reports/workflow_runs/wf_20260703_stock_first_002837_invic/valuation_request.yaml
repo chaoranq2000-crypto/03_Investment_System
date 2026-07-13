@@ -1,47 +1,45 @@
----
 valuation_request:
   workflow_id: wf_20260703_stock_first_002837_invic
-  stock_code: "002837"
+  stock_code: 002837
   company_id: cn_002837_invic
   stock_name: 英维克
   exchange: SZSE
-  as_of_date: "2026-07-03"
+  as_of_date: '2026-07-10'
   caller_skill: stock-deep-dive
   parent_stage: RP6
   quality_target: publishable_candidate
   no_advice_boundary: true
-
   input_paths:
     stock_analysis_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_analysis_pack.yaml
-    forecast_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml
+    forecast_model: reports/workflow_runs/wf_20260703_stock_first_002837_invic/segment_forecast_model.yaml
     financial_metric_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
     reviewed_claims: reports/workflow_runs/wf_20260703_stock_first_002837_invic/claims_registry.csv
     reviewed_metrics: reports/workflow_runs/wf_20260703_stock_first_002837_invic/metrics_registry.csv
     market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/market_snapshot.csv
     peer_market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv
     valuation_input_readiness: reports/workflow_runs/wf_20260703_stock_first_002837_invic/valuation_input_readiness.yaml
-    source_gap_report: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_source_gap_report_v0_3.md
-
+    source_gap_report: reports/workflow_runs/wf_20260703_stock_first_002837_invic/liquid_cooling_disclosure_gap_register.yaml
   allowed_methods:
     static_multiples: true
     dynamic_multiples: true
     peer_comparison: true
     scenario_valuation: true
+    reverse_valuation: true
     dcf: conditional
     sotp: conditional
     ddm_or_pb: conditional
     nav_or_resource: conditional
-
   requested_sections:
-    - static_valuation
-    - dynamic_valuation
-    - peer_comparison
-    - scenario_sensitivity
-    - valuation_risks
-
+  - static_valuation
+  - dynamic_valuation
+  - peer_comparison
+  - scenario_sensitivity
+  - reverse_valuation
+  - valuation_risks
   known_gaps:
-    - TODO_MARKET_DATA
-    - TODO_PEER_DATA
-    - TODO_FORECAST_MODEL_NET_PROFIT
-    - MISSING_DISCLOSURE
-  notes: "P1.6 enrichment request uses parseable input files. Market and peer rows remain TODO; financial_metric_pack is partial metric-only support."
+  - MISSING_PEER_FORWARD_MULTIPLES
+  - MISSING_NET_DEBT_AND_ENTERPRISE_VALUE
+  - TODO_SEGMENT_DISCLOSURE
+  - TODO_DCF_DISCOUNT_AND_TERMINAL_INPUTS
+  notes: Bundle 9 uses reviewed archived inputs only; unsupported methods remain explicit
+    gaps.

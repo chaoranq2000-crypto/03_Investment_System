@@ -1,0 +1,146 @@
+artifact_type: R5_bundle10_reader_gate_forecast_adapter
+schema_version: v0.1
+base_case_bridge:
+- revenue: 7440617631.31
+  gross_profit: 1924162477.09
+  gross_margin: 25.8603
+  tax_surcharge: 38691211.68
+  selling_expense: 312505940.52
+  administrative_expense: 305065322.88
+  rd_expense: 572927557.61
+  financial_expense: 26042161.71
+  other_operating_drag: 119049882.1
+  operating_profit: 549880400.59
+  non_operating_net: 7440617.63
+  total_profit: 557321018.22
+  income_tax: 55732101.82
+  net_income: 501588916.4
+  minority_profit: 17555612.07
+  net_profit_attributable: 484033304.32
+  eps: 0.379828
+  shares: 1274349692
+  nwc: 2529809994.65
+  nwc_change: 493952525.66
+  noncash_addback: 171134205.52
+  operating_cashflow: 178770596.26
+  capex: 372030881.57
+  free_cashflow: -193260285.3
+  ratio_assumptions:
+    tax_surcharge: 0.52
+    selling_expense: 4.2
+    administrative_expense: 4.1
+    rd_expense: 7.7
+    financial_expense: 0.35
+    other_operating_drag: 1.6
+    non_operating_net: 0.1
+    effective_tax_rate: 10.0
+    minority_share_of_net_income: 3.5
+    nwc_to_revenue: 34.0
+    noncash_addback_to_revenue: 2.3
+    capex_to_revenue: 5.0
+  reconciliation_difference: 0.0
+  period: 2026E
+  gross_margin_pct: 25.8603
+- revenue: 8803305217.07
+  gross_profit: 2344845641.94
+  gross_margin: 26.636
+  tax_surcharge: 44016526.09
+  selling_expense: 360935513.9
+  administrative_expense: 352132208.68
+  rd_expense: 660247891.28
+  financial_expense: 26409915.65
+  other_operating_drag: 123246273.04
+  operating_profit: 777857313.3
+  non_operating_net: 8803305.22
+  total_profit: 786660618.52
+  income_tax: 78666061.85
+  net_income: 707994556.67
+  minority_profit: 24779809.48
+  net_profit_attributable: 683214747.18
+  eps: 0.536128
+  shares: 1274349692
+  nwc: 2905090721.63
+  nwc_change: 375280726.99
+  noncash_addback: 202476019.99
+  operating_cashflow: 535189849.67
+  capex: 396148734.77
+  free_cashflow: 139041114.9
+  ratio_assumptions:
+    tax_surcharge: 0.5
+    selling_expense: 4.1
+    administrative_expense: 4.0
+    rd_expense: 7.5
+    financial_expense: 0.3
+    other_operating_drag: 1.4
+    non_operating_net: 0.1
+    effective_tax_rate: 10.0
+    minority_share_of_net_income: 3.5
+    nwc_to_revenue: 33.0
+    noncash_addback_to_revenue: 2.3
+    capex_to_revenue: 4.5
+  reconciliation_difference: 0.0
+  period: 2027E
+  gross_margin_pct: 26.636
+- revenue: 10131374420.74
+  gross_profit: 2751630491.45
+  gross_margin: 27.1595
+  tax_surcharge: 50656872.1
+  selling_expense: 405254976.83
+  administrative_expense: 395123602.41
+  rd_expense: 739590332.71
+  financial_expense: 28367848.38
+  other_operating_drag: 121576493.05
+  operating_profit: 1011060365.97
+  non_operating_net: 10131374.42
+  total_profit: 1021191740.39
+  income_tax: 102119174.04
+  net_income: 919072566.35
+  minority_profit: 32167539.82
+  net_profit_attributable: 886905026.53
+  eps: 0.695967
+  shares: 1274349692
+  nwc: 3242039814.64
+  nwc_change: 336949093.0
+  noncash_addback: 233021611.68
+  operating_cashflow: 815145085.02
+  capex: 405254976.83
+  free_cashflow: 409890108.19
+  ratio_assumptions:
+    tax_surcharge: 0.5
+    selling_expense: 4.0
+    administrative_expense: 3.9
+    rd_expense: 7.3
+    financial_expense: 0.28
+    other_operating_drag: 1.2
+    non_operating_net: 0.1
+    effective_tax_rate: 10.0
+    minority_share_of_net_income: 3.5
+    nwc_to_revenue: 32.0
+    noncash_addback_to_revenue: 2.3
+    capex_to_revenue: 4.0
+  reconciliation_difference: 0.0
+  period: 2028E
+  gross_margin_pct: 27.1595
+scenarios:
+  base_case:
+    status: ready
+  bull_case:
+    status: ready
+  bear_case:
+    status: ready
+driver_assumptions:
+- driver: business_line_room_cooling_revenue_growth
+- driver: business_line_cabinet_cooling_revenue_growth
+- driver: business_line_other_revenue_growth
+- driver: business_line_gross_margin
+- driver: sales_expense_ratio
+- driver: admin_expense_ratio
+- driver: r&d_expense_ratio
+- driver: finance_expense_ratio
+- driver: tax_rate
+- driver: minority_profit_share
+- driver: nwc_to_revenue
+- driver: capex_to_revenue
+consensus_used: true
+source_forecast_model: segment_forecast_model.yaml
+source_forecast_bridge: forecast_bridge.yaml

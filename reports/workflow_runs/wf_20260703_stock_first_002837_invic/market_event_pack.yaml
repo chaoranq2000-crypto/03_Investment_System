@@ -1,0 +1,98 @@
+artifact_type: market_event_pack
+schema_version: v0.2
+workflow_id: wf_20260703_stock_first_002837_invic
+company_id: cn_002837_invic
+stock_code: '002837'
+as_of_date: '2026-07-13'
+review_status: draft_pending_quality_review
+market_state:
+  latest_trade_date: '2026-07-10'
+  technical_snapshot_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8b_technical_snapshot.yaml
+  valuation_snapshot_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8b_valuation_snapshot.yaml
+  price: {value: 73.54, unit: CNY_per_share}
+  pe_ttm: {value: 194.2045, unit: multiple}
+  pb: {value: 27.0715, unit: multiple}
+  ps_ttm: {value: 14.8507, unit: multiple}
+  source_evidence_ids:
+    - ev_structured_market_data_002837_20260713_3145e0
+    - ev_structured_market_data_002837_20260713_f8cc52
+  boundary: metric_only_market_context_no_trading_advice
+future_event_calendar:
+  - event_id: EVT-002837-2026H1-DISCLOSURE
+    event_type: scheduled_financial_report_disclosure
+    report_period: '2026-06-30'
+    planned_date: '2026-08-25'
+    actual_date: MISSING
+    status: scheduled_unverified_by_issuer_announcement
+    source_name: tushare
+    source_evidence_id: ev_structured_financial_data_002837_20260713_a177f1
+    source_path: data/processed/normalized/tushare_disclosure_date_002837_2026-07-13_a177f1cf.csv
+    claim_type: estimate
+    next_verification: confirm against CNINFO or SZSE issuer announcement before treating as a formal date
+    watch_metrics:
+      - audited_or_reported_business_revenue_by_disclosed_segment
+      - any_same_definition_liquid_cooling_related_revenue_update
+      - gross_margin_and_product_mix
+      - accounts_receivable_inventory_and_operating_cash_flow
+      - overseas_revenue_and_project_acceptance_timing
+historical_evidence_events:
+  - event_date: '2025-04-23'
+    event_type: investor_relations_record
+    evidence_id: ev_official_disclosure_002837_20250423_e78396
+    relevance: approximate_2024_liquid_cooling_related_revenue_and_1_2GW_delivery_context
+  - event_date: '2025-04-28'
+    event_type: investor_relations_record
+    evidence_id: ev_official_disclosure_002837_20250428_108da3
+    relevance: recognition_margin_and_collection_cycle_management_comments
+  - event_date: '2025-05-21'
+    event_type: investor_relations_record
+    evidence_id: ev_official_disclosure_002837_20250521_1b4421
+    relevance: project_acceptance_cycle_demand_mechanism_and_operating_risk
+  - event_date: '2025-11-20'
+    event_type: investor_relations_record
+    evidence_id: ev_official_disclosure_002837_20251120_797533
+    relevance: customer_order_disclosure_limits_and_growth_commentary
+analyst_estimate_context:
+  source_name: eastmoney_push2
+  source_evidence_id: ev_third_party_research_002837_20260713_20f610
+  source_path: data/processed/normalized/eastmoney_report_metadata_002837_2026-07-13_20f6105e.csv
+  report_metadata_rows: 14
+  estimate_candidates: 60
+  boundary: analyst_view_and_estimate_only
+  latest_2026_reports:
+    count: 2
+    distinct_organizations: 2
+    forecast_years:
+      '2026': {eps_low: 1.14, eps_high: 1.203, eps_midpoint: 1.1715, unit: CNY_per_share}
+      '2027': {eps_low: 1.68, eps_high: 1.991, eps_midpoint: 1.8355, unit: CNY_per_share}
+      '2028': {eps_low: 2.28, eps_high: 2.999, eps_midpoint: 2.6395, unit: CNY_per_share}
+    calculation_method: arithmetic_midpoint_of_two_latest_distinct_broker_metadata_rows
+    limitations:
+      - Two reports are too few to label as a robust market consensus.
+      - Historical rows contain possible share-basis and stale-price inconsistencies and were not pooled automatically.
+      - Report-time PE values are not current valuation multiples.
+peer_market_context:
+  valuation_snapshot_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8b_peer_valuation_300499.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8b_peer_valuation_300731.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8b_peer_valuation_301018.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8b_peer_valuation_300602.yaml
+  boundary: metric_only_and_not_yet_business_scope_adjusted
+proxy_and_source_health:
+  ledger_path: data/manifests/source_health_ledger.yaml
+  eastmoney_reportapi: healthy_through_inherited_proxy
+  eastmoney_push2: degraded_on_proxy_but_direct_probe_200
+  global_proxy_modified: false
+open_todos:
+  - issue_id: B8B-EVENT-001
+    severity: medium
+    owner: evidence-ingest
+    next_step: verify 2026H1 planned date against an issuer or exchange announcement
+  - issue_id: B8B-CONSENSUS-001
+    severity: medium
+    owner: quality-review
+    next_step: review share-basis consistency before any consensus comparison
+  - issue_id: B8B-PUSH2-001
+    severity: low
+    owner: evidence-ingest
+    next_step: implement and fixture-test a source-specific push2 adapter before live use

@@ -48,3 +48,104 @@ Bundle 8 handoff was explicitly not dispatched in this close task. The recorded 
 | Next dispatch | pending | Handoff 16 records a close-only patch followed by Bundle 9; neither is started until explicit publish/CI and close review. |
 
 Bundle 8 local M3/M4 execution is complete. Remote CI, close-only state synchronization, Bundle 9, Bundle 10 and P2 remain outside this execution boundary.
+
+## Bundle 8A evidence-acquisition resilience integration
+
+| Step | Status | Notes |
+|---|---|---|
+| Package integrity and apply | done | Latest archive SHA256 `BF2ADD026C981235D563F5D2C909391116AEB0856A95B752F2A435D164A232D7`; 25/25 package checksums and 19/19 live overlay hashes matched; package helper applied after `git apply --check`. |
+| Integration branch | done | Switched to `r5/bundle8a-evidence-acquisition-resilience`; no staging, commit or push performed. |
+| Route gate | done | `decision=pass`; capabilities=12; blocking=0. |
+| Planned adapter boundary | done | `sina_finance`, `baidu_finance`, `cls_market`, `hkex` and `cninfo_ir` remain planned; live-enabled tasks=0. |
+| Current workflow dry-run | done | Request `R5B8A_002837_EVIDENCE_GAP_CLOSURE_20260713`; 12 capabilities; 29 queue tasks; 0 blocked. |
+| Focused regression | done | Bundle 8A focused pytest: 11 passed; syntax check: 6 files passed. |
+| Full regression | done | Final repository pytest: 591 passed, 2 skipped. One first-attempt failure came from concurrently edited unrelated portfolio-tracker frontmatter and disappeared after that external edit completed; no portfolio file was changed by this workflow. |
+| Canonical boundary | preserved | workflow remains `needs_fix` at T2 with `evidence-ingest` next; Reader not regenerated; Bundle 8 not closed; Bundle 9 not dispatched. |
+
+Stage A is locally complete. Handoff 17 authorizes the evidence layer to proceed through implemented and permitted adapters only; all outputs must enter raw/manifest/candidate review before downstream use.
+
+## Bundle 8A/8B local close
+
+| Step | Status | Notes |
+|---|---|---|
+| Live acquisition | done | 46 evidence rows; 25,586 retained new draft metrics after unit and non-metric code normalization. |
+| Official IR review | done | Four CNINFO IR files parsed; seven management comments reviewed; no global claim promotion. |
+| Disclosure boundary | accepted_with_todos | 2024 approximate liquid-cooling-related revenue is category B; five category C gaps remain visible. |
+| Peer and market inputs | done | Five-company 2025 operating pack, four peer valuations, subject valuation, 250-day technical and event packs generated. |
+| Proxy audit | done | Tushare, Baostock, CNINFO, SZSE, Tencent and Eastmoney reportapi work; push2 remains degraded via inherited proxy. |
+| Quality gate | accepted_with_todos | No active critical/high issue; issue validator and Bundle 8B deterministic validator passed. |
+| Regression | done_local | Full repository pytest: 605 passed, 2 skipped. |
+| Canonical close | done_local | Bundle 8 closed; workflow remains needs_fix; Reader remains 59/82 rejected; next route is Bundle 9 stock-deep-dive. |
+| Publish boundary | preserved | No staging, commit, push or remote CI claim was performed. |
+
+## Bundle 9 local close
+
+| Step | Status | Notes |
+|---|---|---|
+| Forecast assumptions | done | 42 reviewed assumptions with evidence and metric anchors. |
+| Bottom-up model | done | Three audited broad business lines; bear/base/bull; 2026E-2028E. |
+| Profit and cash flow bridge | done | Expenses, tax, minority profit, working capital and capex separated; reconciliation difference 0. |
+| Forecast sensitivity | done | 12 rows covering revenue growth, gross margin, opex and working capital. |
+| Valuation inputs | accepted | One subject and four peer market rows; peer set remains low confidence. |
+| Valuation methods | accepted_with_todos | Static, dynamic, scenario and reverse used; DCF and SOTP remain unsupported. |
+| Quality gate | accepted_with_todos | No active critical/high issue; sample-quality permission remains false. |
+| Regression | done_local | Full repository pytest: 617 passed, 2 skipped. |
+| Canonical close | done_local | Bundle 9 closed; workflow remains needs_fix; Reader remains 59/82 rejected; next route is Bundle 10. |
+| Publish boundary | preserved | No staging, commit, push or remote CI claim was performed. |
+
+## Bundle 10 automated completion
+
+| Step | Status | Notes |
+|---|---|---|
+| Dynamic Writer | done | Pack-driven; current company identity hardcoding removed. |
+| Technical / sentiment / event | done_with_todos | 250-day technical context, three sentiment layers and future event chain. |
+| Reader v3 | done | Ten sections and 18 resolved display references. |
+| Reader quality gate | candidate_ready_for_human_review | Score 98/82; truthfulness pass; zero blockers. |
+| Cross-industry regression | pass | Two synthetic industries; no identity leakage, duplicate paragraphs, verbatim judgment restatement, malformed text or advice language. |
+| AI semantic precheck | pass_for_external_human_handoff | Explicitly not external signoff. |
+| Full regression | done_local | 637 passed, 2 skipped. |
+| Canonical state | external_human_review_pending | Bundle 10 automated work complete; bundle not finally closed. |
+| Sample quality / P2 | false / false | Requires hash-bound external human review. |
+| Publish boundary | preserved | No staging, commit, push or remote CI claim was performed. |
+
+## Bundle 10 independent subagent review
+
+| Step | Status | Notes |
+|---|---|---|
+| User-authorized panel | done | Three independent AI subagents reviewed evidence traceability, forecast/valuation, and narrative/risk. |
+| Initial review | needs_fix | Found exact-byte hash drift, peer-valuation citation mismatch, duplicate prose, date-metadata ambiguity and claim-language issues. |
+| Fix loop | done | Regenerated the Reader from the pack, split E15-E18 exact-value references, removed repeated prose, clarified dates and softened unsupported causality. |
+| Final panel review | recommend_pass | HR-1 through HR-6 all recommended pass; zero remaining blockers. |
+| Reader quality gate | candidate_ready_for_human_review | Score 98/82; truthfulness pass; zero blockers; exact report hash `eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83`. |
+| Regression | pass | Full repository pytest: 637 passed, 2 skipped; Bundle 10 close-input validation: pass. |
+| Identity boundary | preserved | AI panel is not an external human reviewer and does not satisfy the human attestation or P2 gate. |
+
+## Bundle 10 single-action human confirmation path
+
+| Step | Status | Notes |
+|---|---|---|
+| Complexity reduction | done | HR-1 through HR-6 professional judgments are supplied by the completed three-domain AI panel. |
+| Human action | reduced_to_one_message | The external human only attests full Reader review, as-needed appendix consultation, identity/time, panel acceptance or rejection, and overall decision. |
+| Hash binding | current | Reader, appendix, scorecard and AI-panel hashes are embedded in `R5_bundle10_single_action_human_confirmation.md`. |
+| Fail-closed boundary | preserved | The confirmation card is not a signoff; no canonical submission is generated and Bundle 10 remains pending until a real user sends the explicit confirmation. |
+| P2 boundary | preserved | P2 remains false even if Bundle 10 later closes. |
+
+## Bundle 10 final close after external human review
+
+| Step | Status | Notes |
+|---|---|---|
+| External human review | pass | Reviewer and timezone-aware timestamp recorded; exact Reader hash confirmed. |
+| Bundle 10 close | accepted_with_todos | Sample quality allowed; remaining TODOs visible. |
+| P2 | false | Separate readiness decision; not entered by this close. |
+
+## Patch-plan completion audit after Bundle 10 final close
+
+| Step | Status | Notes |
+|---|---|---|
+| Lifecycle compatibility | pass | Validators and tests now distinguish fail-closed pending templates from a hash-bound passed external review. |
+| Requirement matrix | complete_with_documented_todos | D-8 external review and D-9 three-gate sample-quality rule are both passed. |
+| Execution audit | complete_with_documented_todos | Bundle 8A through Bundle 10 are closed; network/proxy findings and retained uncertainty remain explicit. |
+| Canonical workflow readout | current | `workflow_readout.md` now reflects Bundle 10 final close while preserving older Bundle readouts as historical snapshots. |
+| Focused lifecycle regression | pass | 22 passed. |
+| Full repository regression | pass | 642 passed, 2 skipped in 27.14 seconds. |
+| Final boundary | pass | sample_quality_allowed=true; p2_allowed=false; no stage, commit, push or remote CI claim. |

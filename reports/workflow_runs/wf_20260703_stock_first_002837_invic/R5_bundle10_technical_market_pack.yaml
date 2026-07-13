@@ -1,0 +1,74 @@
+artifact_type: R5_technical_market_pack
+schema_version: r5_technical_market_v0.2
+status: ready_with_todos
+as_of_date: '2026-07-10'
+source_path: data/processed/normalized/baostock_query_history_k_data_plus_002837_2026-07-13_3145e0b6.csv
+current_price:
+  value: 73.54
+  unit: CNY_per_share
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+return_1m:
+  value: 6.7344
+  unit: pct
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+return_3m:
+  value: -19.6284
+  unit: pct
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+return_6m:
+  value: -32.7296
+  unit: pct
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+return_12m:
+  value: 149.6266
+  unit: pct
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+ytd_return:
+  value: -31.2003
+  unit: pct
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+52w_high:
+  value: 121.74
+  unit: CNY_per_share
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+52w_low:
+  value: 28.48
+  unit: CNY_per_share
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+MA5:
+  value: 73.376
+  unit: CNY_per_share
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+MA10:
+  value: 74.07
+  unit: CNY_per_share
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+MA20:
+  value: 75.5345
+  unit: CNY_per_share
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+MA60:
+  value: 87.9543
+  unit: CNY_per_share
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+turnover:
+  value: 6.3693
+  unit: pct
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+volume_percentile:
+  value: 76.0
+  unit: pct_of_250_sessions
+  source_id: ev_structured_market_data_002837_20260713_3145e0
+support_levels:
+- level: 66.08
+  basis: recent_range_computed_support
+  source_id_or_missing_reason: ev_structured_market_data_002837_20260713_3145e0
+resistance_levels:
+- level: 86.99
+  basis: recent_range_computed_resistance
+  source_id_or_missing_reason: ev_structured_market_data_002837_20260713_3145e0
+market_state_judgement: 截至2026-07-10，收盘价略高于MA5，但低于MA10、MA20和MA60；近20个交易日上涨9.5%，近60个交易日下降28.5%，短期反弹与中期压力并存。该结论只描述市场状态。
+limitations:
+- Unadjusted daily series; corporate-action impact has not been independently normalized.
+- Support and resistance are descriptive range statistics, not action levels.
+no_advice_boundary: true

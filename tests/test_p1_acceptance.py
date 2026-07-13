@@ -113,17 +113,24 @@ def test_evidence_manifest_and_claims_are_linked() -> None:
 def test_financial_metrics_are_traceable() -> None:
     metrics = read_csv("data/manifests/metrics_draft.csv")
     evidence_ids = {row["evidence_id"] for row in read_csv("data/manifests/evidence_manifest.csv")}
+    p1_fixture_metrics = [
+        row for row in metrics if row["source_evidence_id"].startswith("market_data_tushare_")
+    ]
 
-    assert len(metrics) >= 44
-    companies = {row["entity_id"] for row in metrics}
+    assert len(p1_fixture_metrics) >= 44
+    companies = {row["entity_id"] for row in p1_fixture_metrics}
     assert {"cn_002837_invic", "cn_300731_cotran"}.issubset(companies)
 
     for row in metrics:
         metric_id = row.get("metric_candidate_id") or row.get("metric_id", "")
         assert metric_id.startswith("metric_company_")
         assert row["entity_type"] == "company"
-        assert row["period"] in {"20251231", "20260331"}
+        assert row["period"]
         assert row["source_evidence_id"] in evidence_ids
+        assert row["review_status"] == "draft"
+
+    for row in p1_fixture_metrics:
+        assert row["period"] in {"20251231", "20260331"}
         assert row["is_estimate"] == "false"
         assert "不能直接等同AI服务器液冷业务贡献" in row["notes"]
 

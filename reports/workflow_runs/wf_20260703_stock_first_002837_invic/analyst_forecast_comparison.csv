@@ -1,0 +1,4 @@
+﻿period,base_model_eps,two_broker_midpoint_eps,base_minus_midpoint_pct,unit,claim_type,source_evidence_id,source_path,limitations
+2026E,0.379828,1.1715,-67.5776,CNY_per_share,analyst_view,ev_third_party_research_002837_20260713_20f610,data/processed/normalized/eastmoney_report_metadata_002837_2026-07-13_20f6105e.csv,Only two distinct brokers; share-basis consistency is unverified.
+2027E,0.536128,1.8355,-70.7912,CNY_per_share,analyst_view,ev_third_party_research_002837_20260713_20f610,data/processed/normalized/eastmoney_report_metadata_002837_2026-07-13_20f6105e.csv,Only two distinct brokers; share-basis consistency is unverified.
+2028E,0.695967,2.6395,-73.6326,CNY_per_share,analyst_view,ev_third_party_research_002837_20260713_20f610,data/processed/normalized/eastmoney_report_metadata_002837_2026-07-13_20f6105e.csv,Only two distinct brokers; share-basis consistency is unverified.

@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_structured_300731_fina_indicator_8065c2",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-12T18:08:34Z",
+  "finished_at": "2026-07-12T18:08:34Z",
+  "result": "SUCCESS",
+  "stock_code": "300731",
+  "source_name": "tushare",
+  "source_type": "structured_financial_data",
+  "api_name": "fina_indicator",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "940",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest"
+}

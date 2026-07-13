@@ -22,6 +22,7 @@ SUPPORTED_APIS = {
     "cashflow",
     "fina_indicator",
     "fina_mainbz",
+    "disclosure_date",
 }
 
 
@@ -143,6 +144,14 @@ def _live_params(args: argparse.Namespace) -> dict[str, str]:
     params: dict[str, str] = {}
     if args.api_name != "stock_basic":
         params["ts_code"] = _tushare_ts_code(args.stock_code)
+    if args.api_name == "disclosure_date":
+        # Tushare defines end_date here as the financial-report period, not a
+        # date-range upper bound.  start_date is not a supported parameter.
+        if args.end_date:
+            params["end_date"] = args.end_date
+        if args.fields:
+            params["fields"] = args.fields
+        return params
     for key in ["start_date", "end_date", "fields"]:
         value = getattr(args, key)
         if value:
@@ -154,11 +163,18 @@ def _fetch_tushare_live_rows(args: argparse.Namespace) -> list[dict[str, str]]:
     import tushare as ts  # type: ignore[import-not-found]
 
     ts.set_token(os.environ[args.token_env])
+    pro = ts.pro_api()
+    api_url = (
+        os.environ.get("TUSHARE_HTTP_URL")
+        or os.environ.get("TUSHARE_API_URL")
+        or ""
+    ).strip()
+    if api_url:
+        pro._DataApi__http_url = api_url
     params = _live_params(args)
     if args.api_name == "pro_bar":
-        result = ts.pro_bar(**params)
+        result = ts.pro_bar(api=pro, **params)
     else:
-        pro = ts.pro_api()
         result = getattr(pro, args.api_name)(**params)
     return _records_from_result(result)
 

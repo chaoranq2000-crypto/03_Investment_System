@@ -1,0 +1,36 @@
+artifact_type: R5_cross_industry_writer_fixture_cases
+schema_version: v0.1
+fixture_boundary: synthetic_layout_and_schema_regression_only
+cases:
+  - sample_id: industrial_equipment
+    company_name: 装备制造样例甲
+    stock_code: FIX001
+    company_id: fixture_industrial_equipment
+    industry: 工业设备
+    thesis: 订单扩张能否转化为利润和回款，是工业设备样例的核心研究矛盾。
+    company_context: 公司提供定制化工业设备，交付周期和验收节点决定收入确认节奏。
+    financial: 收入增长但应收同步上升，经营现金流需要由后续回款验证。
+    business: 设备销售贡献主要收入，服务业务提供较稳定但规模较小的毛利来源。
+    industry_context: 制造业资本开支支持需求，但价格竞争和客户延期验收构成反证。
+    forecast: 基准情景假设订单平稳转化，上行情景假设验收提速，下行情景保留延期风险。
+    valuation: 估值应结合周期利润、订单可见度和现金转换，不使用单一倍数下结论。
+    event: 下一次定期报告是验证订单、验收、毛利率和经营现金流的未来窗口。
+    risk: 若应收和存货继续快于收入增长，订单扩张的财务质量判断应触发降级。
+    conclusion: 保持证据观察，跟踪订单转化、毛利率、应收和经营现金流。
+    watch_metric: 订单验收与经营现金流
+  - sample_id: healthcare_services
+    company_name: 医疗服务样例乙
+    stock_code: FIX002
+    company_id: fixture_healthcare_services
+    industry: 医疗服务
+    thesis: 门店扩张与单店效率能否同时改善，是医疗服务样例的核心研究矛盾。
+    company_context: 公司通过门店网络提供医疗服务，客流、客单价和医生利用率共同决定收入。
+    financial: 收入增长仍需观察单店利润、租赁负担与经营现金流的同步性。
+    business: 成熟门店与新开门店处于不同爬坡阶段，合并增速不能替代同店经济性。
+    industry_context: 需求韧性提供基础，但监管、获客成本和人才供给可能压低利润率。
+    forecast: 基准情景假设同店温和增长，上行情景依赖利用率提升，下行情景保留获客成本压力。
+    valuation: 估值应结合成熟门店现金流、扩张资本需求和监管不确定性进行情景比较。
+    event: 下一次经营更新是验证同店收入、医生利用率和现金流的未来窗口。
+    risk: 若新店爬坡慢于预期且成熟店利润率下降，网络扩张判断应触发降级。
+    conclusion: 保持证据观察，跟踪同店收入、利用率、获客成本与经营现金流。
+    watch_metric: 同店收入与医生利用率

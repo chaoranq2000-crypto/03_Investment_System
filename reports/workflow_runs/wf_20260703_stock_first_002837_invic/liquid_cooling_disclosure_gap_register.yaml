@@ -1,0 +1,127 @@
+artifact_type: liquid_cooling_disclosure_gap_register
+schema_version: v0.2
+workflow_id: wf_20260703_stock_first_002837_invic
+company_id: cn_002837_invic
+stock_code: '002837'
+as_of_date: '2026-07-13'
+review_status: draft_pending_quality_review
+change_from_prior_state:
+  prior: liquid_cooling_revenue_was_treated_as_MISSING_DISCLOSURE
+  current: 2024_approximate_management_comment_found_but_no_audited_standalone_segment
+  change_type: evidence_gap_partially_closed
+classification_contract:
+  A_formal_fact:
+    definition: audited financial statement or formal filing metric with a stable business definition
+    allowed_claim_type: fact_or_metric_statement_after_review
+  B_approximate_or_computable_proxy:
+    definition: issuer approximation or explicit calculation with assumptions, range and confidence
+    allowed_claim_type: management_comment_or_estimate_after_review
+  C_missing_or_not_reliably_estimable:
+    definition: not disclosed or cannot be isolated without unsupported allocation
+    allowed_claim_type: unknown_or_TODO_only
+gap_register:
+  - gap_id: LC-DISC-REV-2024
+    requested_field: liquid_cooling_related_revenue
+    period: '2024'
+    classification: B_approximate_or_computable_proxy
+    status: observed_as_approximate_management_comment
+    value: 300000000
+    unit: CNY
+    qualifier: approximately
+    definition: revenue related to liquid-cooling technology from data-center rooms and computing equipment
+    claim_type: management_comment
+    evidence_id: ev_official_disclosure_002837_20250423_e78396
+    source_path: data/processed/text/ev_official_disclosure_002837_20250423_e78396.md
+    locator: page_3_lines_84_88
+    confidence: medium
+    limitations:
+      - The value is approximate and appears in an investor-relations record, not an audited standalone segment note.
+      - The wording is broader than server liquid cooling and does not establish product, customer or geography splits.
+      - It must not be combined with storage thermal-management revenue as if the scopes were identical.
+  - gap_id: LC-DISC-REV-2025
+    requested_field: liquid_cooling_related_revenue
+    period: '2025'
+    classification: C_missing_or_not_reliably_estimable
+    status: MISSING_DISCLOSURE
+    value: null
+    unit: CNY
+    next_step: check 2026H1 report and later issuer IR for a same-definition update
+  - gap_id: LC-DISC-GM
+    requested_field: liquid_cooling_gross_margin
+    period: latest
+    classification: C_missing_or_not_reliably_estimable
+    status: MISSING_DISCLOSURE
+    value: null
+    unit: percent
+    counterevidence:
+      claim_type: management_comment
+      statement: liquid-cooling product gross margin is not significantly higher than traditional air cooling and varies by application
+      evidence_id: ev_official_disclosure_002837_20250428_108da3
+      source_path: data/processed/text/ev_official_disclosure_002837_20250428_108da3.md
+      locator: page_6_lines_151_159
+    next_step: keep model margin as a scenario assumption rather than an observed segment metric
+  - gap_id: LC-DISC-ORDERS
+    requested_field: liquid_cooling_order_amount_and_backlog
+    period: latest
+    classification: C_missing_or_not_reliably_estimable
+    status: MISSING_DISCLOSURE
+    evidence:
+      - evidence_id: ev_official_disclosure_002837_20251120_797533
+        source_path: data/processed/text/ev_official_disclosure_002837_20251120_797533.md
+        locator: pages_4_to_6_lines_100_107_138_157
+        claim_type: management_comment
+        statement: order and customer-specific information is not planned for disclosure unless a mandatory threshold is triggered
+    next_step: do not convert demand clues or broker statements into issuer order facts
+  - gap_id: LC-DISC-CUSTOMERS
+    requested_field: named_customer_revenue_or_order_value
+    period: latest
+    classification: C_missing_or_not_reliably_estimable
+    status: MISSING_DISCLOSURE
+    evidence_id: ev_official_disclosure_002837_20251120_797533
+    source_path: data/processed/text/ev_official_disclosure_002837_20251120_797533.md
+    locator: pages_1_4_5_lines_31_37_106_110_132_147
+    next_step: retain named-customer statements as product or cooperation clues only
+  - gap_id: LC-DISC-CASH-COLLECTION
+    requested_field: liquid_cooling_project_cash_collection_cycle
+    period: latest
+    classification: C_missing_or_not_reliably_estimable
+    status: MISSING_DISCLOSURE
+    company_wide_proxy:
+      claim_type: management_comment
+      statement: for credit sales, the average period from customer acceptance to collection is about six months
+      evidence_id: ev_official_disclosure_002837_20250428_108da3
+      source_path: data/processed/text/ev_official_disclosure_002837_20250428_108da3.md
+      locator: page_6_lines_172_174
+      limitation: not specific to liquid-cooling projects and not a contractual weighted average
+    next_step: model working capital from company-wide audited balances and disclose the proxy limitation
+operating_context:
+  - context_id: LC-OPS-DELIVERY-001
+    metric: cumulative_liquid_cooling_chain_delivery
+    value: 1.2
+    unit: GW
+    as_of_date: '2025-03-31'
+    claim_type: management_comment
+    evidence_id: ev_official_disclosure_002837_20250423_e78396
+    source_path: data/processed/text/ev_official_disclosure_002837_20250423_e78396.md
+    locator: page_3_lines_84_88
+    limitation: cumulative operational indicator; not revenue, backlog, capacity or current-period shipment
+  - context_id: LC-OPS-RECOGNITION-001
+    metric: revenue_recognition_trigger
+    value: customer_acceptance_after_installation_for_applicable_room_projects
+    claim_type: management_comment
+    evidence_id: ev_official_disclosure_002837_20250428_108da3
+    source_path: data/processed/text/ev_official_disclosure_002837_20250428_108da3.md
+    locator: page_2_lines_42_48
+    limitation: contract-specific timing remains variable
+non_substitutable_metrics:
+  - metric: storage_thermal_management_revenue
+    values:
+      - {period: '2024', value: 1500000000, unit: CNY}
+      - {period: '2025H1', value: 800000000, unit: CNY}
+    evidence_id: ev_official_disclosure_002837_20251120_797533
+    locator: page_4_lines_112_115
+    reason: storage thermal management is not the same scope as data-center or computing-equipment liquid cooling
+promotion_decision:
+  global_claim_registry_updated: false
+  reason: all newly identified issuer statements require quality review and preserve management_comment or estimate classification
+  owner: quality-review

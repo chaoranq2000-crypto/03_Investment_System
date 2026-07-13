@@ -218,13 +218,26 @@ def _source_category(source_id: str) -> str:
 def _source_diagnostics(appendix: dict[str, Any]) -> dict[str, Any]:
     records = appendix.get("records", []) or []
     source_ids = _underlying_source_ids(appendix)
-    categories = Counter(_source_category(source_id) for source_id in source_ids)
+    explicit_categories: dict[str, str] = {}
+    for record in records:
+        category = str(record.get("source_category") or "").strip()
+        raw_ids = record.get("raw_evidence_ids") or []
+        if isinstance(raw_ids, str):
+            raw_ids = [raw_ids]
+        for source_id in raw_ids:
+            if category:
+                explicit_categories[str(source_id)] = category
+    category_by_source = {
+        source_id: explicit_categories.get(source_id, _source_category(source_id))
+        for source_id in source_ids
+    }
+    categories = Counter(category_by_source.values())
     independent_ids = {
         source_id
         for source_id in source_ids
-        if _source_category(source_id) in {"market", "industry", "peer", "consensus", "company_operating", "other"}
+        if category_by_source[source_id] in {"market", "industry", "peer", "consensus", "company_operating", "other"}
     }
-    issuer_ids = {source_id for source_id in source_ids if _source_category(source_id) == "issuer"}
+    issuer_ids = {source_id for source_id in source_ids if category_by_source[source_id] == "issuer"}
     complete_metadata = sum(
         1
         for record in records
@@ -277,7 +290,16 @@ def _valuation_capabilities(valuation: dict[str, Any], report_section: str) -> d
     scenario_context = valuation.get("scenario_context") or []
     methods = valuation.get("method_eligibility") or []
     active_methods = [item for item in methods if item.get("status") not in {"inactive", "disabled"}]
-    credible_peers = [item for item in peers if str(item.get("confidence", "")).lower() not in {"low", "very_low"}]
+    credible_peers = [
+        item
+        for item in peers
+        if str(item.get("confidence", "")).lower() not in {"low", "very_low"}
+        or (
+            str(item.get("source_status", "")).lower() in {"reviewed", "ready", "accepted"}
+            and bool(item.get("selection_reason") or item.get("inclusion_reason"))
+            and bool(item.get("comparability_limitation") or item.get("limitations"))
+        )
+    ]
     signals = _signals(report_section)
     has_reverse = signals["reverse_valuation"] or bool(valuation.get("reverse_valuation"))
     scenario_values = valuation.get("scenario_valuation") or valuation.get("valuation_ranges")

@@ -1,0 +1,42 @@
+artifact_type: R5_reader_external_human_review_submission
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+external_reviewer: Q
+reviewer_type: human
+reviewed_at: '2026-07-13T14:07:11+08:00'
+decision: pass
+report_sha256_confirmed: eff6f0a3d27243dc18a2fa9a144fcb4226805a1420d070b1233a9cfe08b97a83
+traceability_appendix_sha256_confirmed: 7b883ffb664247ec323498db7ff995e9c7e6e0b61a0271650240fafbec385170
+review_decision_source: explicit_external_human_confirmation_in_codex_thread
+submission_prepared_by: automated_agent_mechanical_transcription
+accepted_ai_panel:
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10_independent_subagent_review.yaml
+  sha256: 63c0348bc62a0e635c7e972f323cdbb0bc2cc9b2aa66b84ae7f168edf7dfe53f
+  decision: recommend_pass
+required_checklist:
+- check_id: HR-1
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；核心观点与证据及披露边界一致。
+- check_id: HR-2
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；事实、估计、推断、管理层表述与分析师观点清楚分离。
+- check_id: HR-3
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；预测估值假设、日期、分母、情景与敏感性清楚且可复算。
+- check_id: HR-4
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；风险、反证与观察条件足以触发判断或模型重估。
+- check_id: HR-5
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；技术、情绪与事件仅作为有日期的市场上下文。
+- check_id: HR-6
+  status: pass
+  comment: 评审人已阅读全文并接受独立 AI 面板结论；正文清晰且无内部机器字段，哈希与评审包一致。
+blocking_comments: []
+nonblocking_comments: []
+attestation:
+  external_human_review_confirmed: true
+  report_read_in_full: true
+  traceability_consulted_as_needed: true
+  automated_agent_generated: false
+attestation_scope_note: automated_agent_generated=false applies to the human review decision and attestations; the YAML transcription was prepared mechanically from the explicit user confirmation.

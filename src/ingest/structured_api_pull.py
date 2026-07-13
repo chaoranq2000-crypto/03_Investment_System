@@ -75,6 +75,93 @@ SOURCE_DEFAULTS = {
     },
 }
 
+NON_METRIC_FIELDS = {
+    "ts_code",
+    "symbol",
+    "name",
+    "stock_code",
+    "code",
+    "ann_date",
+    "f_ann_date",
+    "end_date",
+    "trade_date",
+    "date",
+    "pubDate",
+    "statDate",
+    "report_type",
+    "comp_type",
+    "end_type",
+    "update_flag",
+    "adjustflag",
+    "tradestatus",
+    "isST",
+    "bz_code",
+    "curr_type",
+}
+
+
+def infer_metric_unit(source_name: str, api_name: str, field_name: str) -> str:
+    """Return an explicit source-field unit without silently rescaling values."""
+
+    field = field_name.strip()
+    lower = field.lower()
+    if source_name == "tushare" and api_name in {"daily", "pro_bar"}:
+        if lower in {"open", "high", "low", "close", "pre_close", "change"}:
+            return "CNY_per_share"
+        if lower == "pct_chg":
+            return "percent"
+        if lower == "vol":
+            return "100_shares"
+        if lower == "amount":
+            return "1000_CNY"
+    if source_name == "tushare" and api_name == "daily_basic":
+        if lower == "close":
+            return "CNY_per_share"
+        if lower in {"turnover_rate", "turnover_rate_f", "dv_ratio", "dv_ttm"}:
+            return "percent"
+        if lower in {"volume_ratio", "pe", "pe_ttm", "pb", "ps", "ps_ttm"}:
+            return "multiple"
+        if lower in {"total_share", "float_share", "free_share"}:
+            return "10k_shares"
+        if lower in {"total_mv", "circ_mv"}:
+            return "10k_CNY"
+    if source_name == "baostock" and api_name == "query_history_k_data_plus":
+        if lower in {"open", "high", "low", "close", "preclose"}:
+            return "CNY_per_share"
+        if lower in {"turn", "pctchg"}:
+            return "percent"
+        if lower == "volume":
+            return "shares"
+        if lower == "amount":
+            return "CNY"
+    if source_name == "tushare" and api_name in {"income", "balancesheet", "cashflow"}:
+        if "eps" in lower or lower.endswith("_ps"):
+            return "CNY_per_share"
+        if lower == "total_share":
+            return "shares"
+        return "CNY"
+    if source_name == "tushare" and api_name == "fina_mainbz":
+        if lower in {"bz_sales", "bz_profit", "bz_cost"}:
+            return "CNY"
+    if source_name == "tushare" and api_name == "fina_indicator":
+        if "eps" in lower or lower.endswith(("_ps", "_bps")):
+            return "CNY_per_share"
+        if lower.endswith("_days"):
+            return "days"
+        if lower in {"ebit", "ebitda", "fcff", "fcfe", "rd_exp"}:
+            return "CNY"
+        if any(
+            token in lower
+            for token in ("margin", "roe", "roa", "roic", "ratio", "_yoy", "_qoq")
+        ) or lower in {"debt_to_assets", "profit_to_gr", "op_of_gr"}:
+            return "source_ratio_unscaled"
+    if source_name == "baostock" and api_name.startswith("query_"):
+        if "eps" in lower:
+            return "CNY_per_share"
+        if any(token in lower for token in ("ratio", "margin", "roe", "roa", "yoy")):
+            return "source_ratio_unscaled"
+    return "source_field_unit_unverified"
+
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Register a structured API/local fixture snapshot.")
@@ -209,25 +296,22 @@ def metric_candidates_from_rows(
     for row_index, row in enumerate(rows, start=1):
         period = detect_period(row)
         for key, value in row.items():
-            if key in {
-                "ts_code",
-                "symbol",
-                "name",
-                "stock_code",
-                "ann_date",
-                "f_ann_date",
-                "end_date",
-                "trade_date",
-                "report_type",
-                "comp_type",
-            }:
+            if key in NON_METRIC_FIELDS or key in {"pre_date", "actual_date", "modify_date"}:
                 continue
             if not is_number(value):
                 continue
+            inferred_unit = (
+                unit
+                if str(unit).strip() and str(unit).strip().lower() != "mixed"
+                else infer_metric_unit(source_name, api_name, key)
+            )
             metric_hash = short_hash(hash_json([source_evidence_id, row_index, key, period, value]), 8)
             candidates.append(
                 {
-                    "metric_candidate_id": f"metric_{safe_slug(api_name)}_{stock_code}_{period}_{safe_slug(key)}_{metric_hash}",
+                    "metric_candidate_id": (
+                        f"metric_company_{safe_slug(company_id or stock_code)}_"
+                        f"{safe_slug(key)}_{safe_slug(period)}_{metric_hash}"
+                    ),
                     "source_evidence_id": source_evidence_id,
                     "source_name": source_name,
                     "source_type": source_type,
@@ -241,10 +325,15 @@ def metric_candidates_from_rows(
                     "period": period,
                     "period_type": "unknown",
                     "value": value,
-                    "unit": unit,
-                    "currency": "",
+                    "unit": inferred_unit,
+                    "currency": (
+                        "CNY"
+                        if inferred_unit
+                        in {"CNY", "CNY_per_share", "1000_CNY", "10k_CNY"}
+                        else ""
+                    ),
                     "original_value_text": value,
-                    "original_unit_text": unit,
+                    "original_unit_text": inferred_unit,
                     "table_id": f"{source_name}_{api_name}",
                     "page_no_or_section": "",
                     "calculation_method": "raw_adapter_snapshot_no_recalculation",

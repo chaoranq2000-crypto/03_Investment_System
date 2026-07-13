@@ -85,7 +85,10 @@ def add(issues: list[Issue], severity: str, row: int, evidence_id: str, field: s
 
 
 def validate_rows(rows: list[dict[str, str]], fields: list[str], repo: Path, check_paths: bool = True, today: date | None = None) -> list[Issue]:
-    today = today or datetime.now(timezone.utc).date()
+    # Manifest date-only fields follow the operator/workspace local calendar.
+    # Using the UTC date creates false "future" errors during the local day
+    # immediately after midnight in an eastern timezone.
+    today = today or datetime.now().astimezone().date()
     issues: list[Issue] = []
 
     missing_columns = sorted(REQUIRED_FIELDS - set(fields))

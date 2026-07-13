@@ -1,0 +1,69 @@
+artifact_type: R5_valuation_input_registry
+schema_version: r5_valuation_input_registry_v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+company_id: cn_002837_invic
+as_of_date: '2026-07-10'
+no_live_api: true
+market_snapshot:
+  review_status: reviewed
+  source_evidence_ids:
+  - ev_structured_market_data_002837_20260713_f8cc52
+  - ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/raw/market_data/tushare_daily_basic_002837_2026-07-13_f8cc52ed.json
+  market_cap: 93715669584.0
+  pe_ttm: 194.2045
+peer_snapshot:
+  review_status: reviewed
+  source_evidence_ids:
+  - ev_structured_market_data_300499_20260713_57cd0b
+  - ev_structured_market_data_300731_20260713_f4f0c0
+  - ev_structured_market_data_301018_20260713_cc0ee3
+  - ev_structured_market_data_300602_20260713_e6104c
+  peer_count: 4
+  peer_set_quality: LOW_CONFIDENCE_PEER_SET
+  ranking_allowed: false
+forecast_model:
+  review_status: ready
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/segment_forecast_model.yaml
+  assumption_ids: []
+  claim_type: estimate
+business_line_split:
+  review_status: explicitly_scoped
+  source_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  standalone_liquid_cooling_economics: MISSING_DISCLOSURE
+valuation_methods:
+- method: static_multiples
+  eligibility: eligible
+  confidence: medium
+- method: dynamic_pe
+  eligibility: eligible
+  confidence: medium
+- method: relative_valuation
+  eligibility: eligible
+  confidence: low
+- method: scenario_valuation
+  eligibility: eligible
+  confidence: low
+- method: reverse_valuation
+  eligibility: eligible
+  confidence: medium
+- method: dcf
+  eligibility: ineligible_missing_discount_inputs
+  missing_items:
+  - discount_rate
+  - terminal_growth
+  - reviewed_net_debt
+- method: sotp
+  eligibility: ineligible_missing_segment_economics
+  missing_items:
+  - standalone_liquid_cooling_revenue
+  - segment_profit
+  - unallocated_costs
+open_gaps:
+- MISSING_PEER_FORWARD_MULTIPLES
+- MISSING_NET_DEBT_AND_ENTERPRISE_VALUE
+- TODO_SEGMENT_DISCLOSURE
+- TODO_DCF_DISCOUNT_AND_TERMINAL_INPUTS
+sample_quality_allowed: false

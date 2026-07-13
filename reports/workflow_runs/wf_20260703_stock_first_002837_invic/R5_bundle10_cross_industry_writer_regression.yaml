@@ -1,0 +1,51 @@
+artifact_type: R5_bundle10_cross_industry_writer_regression
+schema_version: v0.2
+fixture_boundary: synthetic_layout_and_schema_regression_only
+case_count: 2
+distinct_industries: 2
+results:
+- sample_id: industrial_equipment
+  industry: 工业设备
+  company_name: 装备制造样例甲
+  stock_code: FIX001
+  section_count: 10
+  citation_count: 2
+  report_sha256: 68e2dc7350bdf88722aedd6ccdd8076f266cfc11e3eb17923afd3ab5e1e8ebf5
+  narrative_quality:
+    status: pass
+    paragraph_count: 10
+    duplicate_paragraph_count: 0
+    unique_section_judgment_count: 10
+    judgment_restatement_count: 0
+    malformed_pattern_hits: []
+    prohibited_advice_hits: []
+    errors: []
+  status: pass
+- sample_id: healthcare_services
+  industry: 医疗服务
+  company_name: 医疗服务样例乙
+  stock_code: FIX002
+  section_count: 10
+  citation_count: 2
+  report_sha256: a04bd9fd7935204d7dce1517c4f4e54f021032d7930a55eb220fe9f1aaac4b34
+  narrative_quality:
+    status: pass
+    paragraph_count: 10
+    duplicate_paragraph_count: 0
+    unique_section_judgment_count: 10
+    judgment_restatement_count: 0
+    malformed_pattern_hits: []
+    prohibited_advice_hits: []
+    errors: []
+  status: pass
+writer_identity_hardcoding: false
+cross_sample_identity_leakage: false
+narrative_quality:
+  status: pass
+  case_count: 2
+  total_duplicate_paragraph_count: 0
+  malformed_pattern_hits: []
+  prohibited_advice_hits: []
+  minimum_unique_section_judgment_count: 10
+  total_judgment_restatement_count: 0
+decision: pass

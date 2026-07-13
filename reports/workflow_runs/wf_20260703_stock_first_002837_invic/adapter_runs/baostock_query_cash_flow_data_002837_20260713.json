@@ -1,0 +1,11 @@
+{
+  "source_name": "baostock",
+  "api_name": "query_cash_flow_data",
+  "mode": "live",
+  "adapter_status": "live_completed",
+  "result": "SUCCESS",
+  "rows": 1,
+  "frequency": "d",
+  "adjustflag": "3",
+  "notes": "live Baostock response used login-query-logout and was routed through structured_api_pull"
+}
