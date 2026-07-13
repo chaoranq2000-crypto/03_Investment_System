@@ -298,6 +298,9 @@ def test_dashboard_assets_are_self_contained_and_have_required_controls():
     html = (WEB_ASSET_DIR / "index.html").read_text(encoding="utf-8")
     css = (WEB_ASSET_DIR / "app.css").read_text(encoding="utf-8")
     javascript = (WEB_ASSET_DIR / "app.js").read_text(encoding="utf-8")
+    launcher = (WEB_ASSET_DIR.parents[2] / "scripts" / "start_portfolio_dashboard.ps1").read_text(
+        encoding="utf-8"
+    )
 
     assert "https://" not in html
     assert 'id="refreshButton"' in html
@@ -317,3 +320,11 @@ def test_dashboard_assets_are_self_contained_and_have_required_controls():
     assert "renderAllocation" in javascript
     assert "renderIndustries" in javascript
     assert "renderClearance" in javascript
+    assert 'content: "••••••"' in css
+    assert 'content: "金额已隐藏"' in css
+    assert "-webkit-text-fill-color: transparent !important" in css
+    assert "text-shadow: none !important" in css
+    assert "text-shadow: 0 0 11px" not in css
+    assert "git-common-dir" in launcher
+    assert '"--db"' in launcher
+    assert '"--env-file"' in launcher

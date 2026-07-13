@@ -1171,8 +1171,33 @@ h2 {
 
 .privacy-on .sensitive {
   color: transparent !important;
-  text-shadow: 0 0 11px color-mix(in oklch, var(--ink) 62%, transparent);
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+  position: relative;
   user-select: none;
+}
+
+.privacy-on .sensitive::after {
+  content: "••••••";
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: var(--ink);
+  -webkit-text-fill-color: var(--ink);
+  text-align: inherit;
+  text-shadow: none;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.privacy-on .hero-value.sensitive::after {
+  content: "金额已隐藏";
+  display: flex;
+  align-items: center;
+  font-family: var(--body);
+  font-size: clamp(20px, 2.4vw, 36px);
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 
 .sr-only {

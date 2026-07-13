@@ -7,7 +7,27 @@ param(
 $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$pythonPath = Join-Path $projectRoot ".conda\investment-system\python.exe"
+$runtimeRoot = $projectRoot
+
+# Linked worktrees keep code isolated, while the private runtime and ledger stay
+# in the primary worktree. In a normal checkout both roots resolve identically.
+try {
+    $gitCommonDir = (& git -C $projectRoot rev-parse --path-format=absolute --git-common-dir 2>$null | Select-Object -First 1)
+    if ($LASTEXITCODE -eq 0 -and $gitCommonDir) {
+        $primaryRoot = Split-Path -Parent $gitCommonDir.Trim()
+        $primaryPython = Join-Path $primaryRoot ".conda\investment-system\python.exe"
+        if (Test-Path -LiteralPath $primaryPython -PathType Leaf) {
+            $runtimeRoot = $primaryRoot
+        }
+    }
+}
+catch {
+    $runtimeRoot = $projectRoot
+}
+
+$pythonPath = Join-Path $runtimeRoot ".conda\investment-system\python.exe"
+$databasePath = Join-Path $runtimeRoot "data\db\portfolio.sqlite3"
+$envFilePath = Join-Path $runtimeRoot ".env.local"
 $dashboardUrl = "http://127.0.0.1:$Port/"
 $healthUrl = "${dashboardUrl}health"
 
@@ -42,6 +62,8 @@ if (-not (Test-PortfolioDashboard)) {
     $serverArguments = @(
         "-m",
         "src.portfolio",
+        "--db",
+        $databasePath,
         "web",
         "--no-open",
         "--host",
@@ -49,6 +71,10 @@ if (-not (Test-PortfolioDashboard)) {
         "--port",
         [string]$Port
     )
+
+    if (Test-Path -LiteralPath $envFilePath -PathType Leaf) {
+        $serverArguments += @("--env-file", $envFilePath)
+    }
 
     Start-Process `
         -FilePath $pythonPath `
