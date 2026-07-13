@@ -1,0 +1,35 @@
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+market_date: '2026-07-13'
+close_price:
+  value: 66.98
+  unit: CNY_per_share
+  claim_type: fact
+  evidence_id: ev_structured_market_data_002837_20260713_79bd83
+  metric_id: metric_company_cn_002837_invic_price_2026-07-13_3d56a6d7
+shares_outstanding:
+  value: 1274349692
+  unit: shares
+  claim_type: fact
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  metric_id: metric_cn_002837_invic_shares_20251231_reviewed_anchor
+market_cap:
+  value: 85356000000.0
+  unit: CNY
+  claim_type: fact
+  evidence_id: ev_structured_market_data_002837_20260713_79bd83
+  metric_id: metric_company_cn_002837_invic_mcap_yi_2026-07-13_4e590be8
+calculated_market_cap: 85355942370.16
+relative_difference: 6.752e-07
+reconciliation_decision: pass
+source_paths:
+- data/processed/normalized/tencent_quote_adapter_quote_and_valuation_002837_2026-07-13_79bd83ad.csv
+- data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+limitations:
+- Dated market context; refresh when market date changes.
+artifact_type: R5_bundle9r_market_snapshot
+input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+input_evidence_generation_lock: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_generation_lock_v2.yaml
+as_of_date: '2026-07-13'
+sample_quality_allowed: false
+p2_allowed: false

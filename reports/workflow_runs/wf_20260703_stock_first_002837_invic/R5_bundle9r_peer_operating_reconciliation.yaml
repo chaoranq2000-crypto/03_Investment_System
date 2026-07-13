@@ -1,0 +1,74 @@
+artifact_type: R5_bundle9r_peer_operating_reconciliation
+schema_version: v0.1
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-13'
+review_status: reviewed_with_limitations
+rows:
+- stock_code: '300499'
+  company_id: cn_300499_gaolan
+  company_name: 高澜股份
+  market_snapshot_status: reviewed_metric_context
+  operating_metric_status: draft_pending_official_numeric_reconciliation
+  official_scope_anchor: annual_report_300499_gaolan_2025_122516
+  source_evidence_ids:
+  - ev_structured_market_data_300499_20260713_57cd0b
+  - ev_structured_financial_data_300499_20260713_d68c27
+  - ev_structured_financial_data_300499_20260713_275338
+  - ev_structured_financial_data_300499_20260713_fb30a9
+  - ev_structured_financial_data_300499_20260713_75d3a7
+  allowed_usage: low_confidence_peer_context
+  ranking_allowed: false
+- stock_code: '300731'
+  company_id: cn_300731_cotran
+  company_name: 科创新源
+  market_snapshot_status: reviewed_metric_context
+  operating_metric_status: draft_pending_official_numeric_reconciliation
+  official_scope_anchor: annual_report_300731_cotran_2025_122523
+  source_evidence_ids:
+  - ev_structured_market_data_300731_20260713_f4f0c0
+  - ev_structured_financial_data_300731_20260713_7fa521
+  - ev_structured_financial_data_300731_20260713_8065c2
+  - ev_structured_financial_data_300731_20260713_cc62b3
+  - ev_structured_financial_data_300731_20260713_c94439
+  allowed_usage: low_confidence_peer_context
+  ranking_allowed: false
+- stock_code: '301018'
+  company_id: cn_301018_shenling
+  company_name: 申菱环境
+  market_snapshot_status: reviewed_metric_context
+  operating_metric_status: draft_pending_official_numeric_reconciliation
+  official_scope_anchor: semiannual_report_301018_shenling_2025_122461
+  source_evidence_ids:
+  - ev_structured_market_data_301018_20260713_cc0ee3
+  - ev_structured_financial_data_301018_20260713_32deab
+  - ev_structured_financial_data_301018_20260713_837ba6
+  - ev_structured_financial_data_301018_20260713_8e33bd
+  - ev_structured_financial_data_301018_20260713_c4e106
+  allowed_usage: low_confidence_peer_context
+  ranking_allowed: false
+- stock_code: '300602'
+  company_id: cn_300602_frd
+  company_name: 飞荣达
+  market_snapshot_status: reviewed_metric_context
+  operating_metric_status: draft_pending_official_numeric_reconciliation
+  official_scope_anchor: semiannual_report_300602_frd_2025_122450
+  source_evidence_ids:
+  - ev_structured_market_data_300602_20260713_e6104c
+  - ev_structured_financial_data_300602_20260713_22e974
+  - ev_structured_financial_data_300602_20260713_6bc035
+  - ev_structured_financial_data_300602_20260713_d99539
+  - ev_structured_financial_data_300602_20260713_ffee9a
+  allowed_usage: low_confidence_peer_context
+  ranking_allowed: false
+peer_set_quality: LOW_CONFIDENCE_PEER_SET
+limitations:
+- Forward peer multiples are unavailable.
+- Structured annual figures have not all been line-item reconciled to official 2025
+  annual reports.
+- Liquid-cooling revenue purity is not comparable across the peer set.
+sample_quality_allowed: false
+input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+input_evidence_generation_lock: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_generation_lock_v2.yaml
+p2_allowed: false
+ranking_allowed: false
+gap_id: missing_peer_liquid_cooling_purity

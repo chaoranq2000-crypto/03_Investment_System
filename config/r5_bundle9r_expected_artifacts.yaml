@@ -1,0 +1,54 @@
+schema_version: 1
+artifact_type: R5_bundle9r_expected_artifacts
+workflow_id: wf_20260703_stock_first_002837_invic
+run_dir: reports/workflow_runs/wf_20260703_stock_first_002837_invic
+artifacts:
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_input_review_ledger.yaml
+    owner: stock-deep-dive
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_forecast_assumption_registry.yaml
+    owner: stock-deep-dive
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_segment_driver_model.yaml
+    owner: stock-deep-dive
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_financial_statement_bridge.yaml
+    owner: stock-deep-dive
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_scenario_pack.yaml
+    owner: stock-deep-dive
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_sensitivity.csv
+    owner: stock-deep-dive
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_consensus_comparison.csv
+    owner: stock-deep-dive
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_peer_operating_reconciliation.yaml
+    owner: company-valuation
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_market_snapshot.yaml
+    owner: company-valuation
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_reverse_valuation.yaml
+    owner: company-valuation
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_scenario_valuation.yaml
+    owner: company-valuation
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_model_pack.yaml
+    owner: stock-deep-dive
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_quality_scorecard.yaml
+    owner: quality-review
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_model_generation_lock.yaml
+    owner: research-orchestrator
+    required: true
+  - path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_close_readout.md
+    owner: research-orchestrator
+    required: true
+historical_bundle9_paths_are_not_current: true
+bundle10r_may_start_only_after_model_generation_lock: true
+sample_quality_allowed: false
+p2_allowed: false

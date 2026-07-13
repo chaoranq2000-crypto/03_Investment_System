@@ -1,0 +1,43 @@
+artifact_type: R5_bundle9r_valuation_request
+schema_version: 1
+valuation_request:
+  workflow_id: wf_20260703_stock_first_002837_invic
+  stock_code: '002837'
+  company_id: cn_002837_invic
+  stock_name: 英维克
+  exchange: SZSE
+  as_of_date: '2026-07-13'
+  caller_skill: stock-deep-dive
+  parent_stage: R5_bundle9r_5_valuation_rebuild
+  quality_target: publishable_candidate_with_explicit_todos
+  no_advice_boundary: true
+  input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+  input_paths:
+    model_core: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_scenario_pack.yaml
+    statement_bridge: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_financial_statement_bridge.yaml
+    financial_metric_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/financial_metric_pack.csv
+    reviewed_claims: reports/workflow_runs/wf_20260703_stock_first_002837_invic/claims_registry.csv
+    reviewed_metrics: reports/workflow_runs/wf_20260703_stock_first_002837_invic/metrics_registry.csv
+    market_snapshot: data/processed/normalized/tencent_quote_adapter_quote_and_valuation_002837_2026-07-13_79bd83ad.csv
+    peer_market_snapshot: reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_market_snapshot.csv
+    source_gap_report: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_failed_missing_disclosure_register.yaml
+  allowed_methods:
+    static_multiples: true
+    dynamic_multiples: true
+    peer_comparison: true
+    scenario_valuation: true
+    reverse_valuation: true
+    dcf: false
+    sotp: false
+  requested_outputs:
+  - R5_bundle9r_peer_operating_reconciliation.yaml
+  - R5_bundle9r_market_snapshot.yaml
+  - R5_bundle9r_reverse_valuation.yaml
+  - R5_bundle9r_scenario_valuation.yaml
+  known_gaps:
+  - missing_liquid_cooling_segment_economics
+  - missing_peer_liquid_cooling_purity
+  - MISSING_NET_DEBT_AND_ENTERPRISE_VALUE
+  - TODO_DCF_INPUTS
+sample_quality_allowed: false
+p2_allowed: false

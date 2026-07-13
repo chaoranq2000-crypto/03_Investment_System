@@ -297,12 +297,21 @@ def validate_bundle10(repo_root: Path, workflow_id: str) -> dict[str, Any]:
             close = state.get("bundle10_close") or {}
             snapshot = state.get("reader_candidate_snapshot") or {}
             internal = state.get("bundle10_internal_completion") or {}
+            forward_bundle9r = state.get("bundle9r_close") or {}
+            historical_bundle10_close_is_preserved = (
+                state.get("current_stage") == "T10_close_readout"
+                or (
+                    state.get("current_stage") == "R5_bundle9r_closed"
+                    and forward_bundle9r.get("bundle_closed") is True
+                    and forward_bundle9r.get("historical_bundle10_preserved") is True
+                )
+            )
             if (
                 state.get("status") != "accepted_with_todos"
-                or state.get("current_stage") != "T10_close_readout"
+                or not historical_bundle10_close_is_preserved
                 or state.get("external_action_required") is not None
             ):
-                errors.append("workflow state is not at finalized Bundle 10 close readout")
+                errors.append("historical Bundle 10 close is not finalized or preserved across forward rebuild")
             if (
                 close.get("bundle_closed") is not True
                 or close.get("external_human_review") != "passed"

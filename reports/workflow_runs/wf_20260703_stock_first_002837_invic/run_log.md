@@ -149,3 +149,24 @@ Stage A is locally complete. Handoff 17 authorizes the evidence layer to proceed
 | Focused lifecycle regression | pass | 22 passed. |
 | Full repository regression | pass | 642 passed, 2 skipped in 27.14 seconds. |
 | Final boundary | pass | sample_quality_allowed=true; p2_allowed=false; no stage, commit, push or remote CI claim. |
+
+## Bundle 9R forward forecast and valuation rebuild
+
+| Step | Status | Notes |
+|---|---|---|
+| Latest package discovery | done | Applied `R5_BUNDLE_9R_FORECAST_VALUATION_REBUILD_PATCH_2026-07-13.zip`; package SHA256 `825B61587EAF97614C2DF4B71333660D6FDFD7FBD71C29795CAE28A60C690B02`. |
+| Package integrity | pass | 34 checksums verified; add-only overlay had no target collisions. |
+| Evidence-generation binding | corrected_then_pass | Original lock preserved after detecting an intermediate `claims_draft.csv` hash; v2 generation `evidence_gen_r5_bundle8r_231a51f4673156df` passed all six input hashes. |
+| Input review | accepted_with_explicit_gaps | 2025A and 2026Q1 official anchors reconciled; 45 assumptions carry claim type, evidence/metrics, confidence, reviewer decision and falsification condition. |
+| Segment model | done_with_todos | Three disclosed broad lines across three scenarios and three years; standalone liquid-cooling economics remain unquantified and nonadditive. |
+| Statement bridge | pass | Six signed audited operating components replace the prohibited aggregate residual; all profit, EPS and cash-flow arithmetic reconciles. |
+| Scenarios and sensitivity | pass | Revenue and attributable profit are monotonic; 12 one-way and 9 two-way sensitivity rows generated. |
+| Peer and consensus | accepted_with_todos | Consensus remains analyst_view; peer set remains LOW_CONFIDENCE and cannot be ranked. |
+| Valuation | pass_with_todos | Market denominator reconciled; reverse and scenario methods enabled; DCF and SOTP remain ineligible. |
+| Quality gate | pass | Zero critical/high issues; all required negative mutations fail for the intended reason. |
+| Determinism | pass | 12 generated artifacts rebuilt twice with zero hash changes. |
+| Publish line-ending preflight | pass | Generated CSV files now use repository-canonical LF so staged and checked-out bytes preserve model-lock hashes. |
+| Focused regression | pass | 38 passed. |
+| Full regression | pass | 674 passed, 2 skipped in 28.56 seconds. |
+| Model generation lock | done | `model_gen_r5_bundle9r_1cd42241e6a38fb3`; 13 artifacts; zero missing. |
+| Close boundary | preserved | Historical Bundle 9/10 kept; Bundle 10R not started; sample-quality=false; P2=false; no staging, commit, push or remote CI claim. |

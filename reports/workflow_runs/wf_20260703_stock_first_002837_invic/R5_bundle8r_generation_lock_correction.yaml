@@ -1,0 +1,38 @@
+schema_version: 1
+artifact_type: evidence_generation_lock_correction
+workflow_id: wf_20260703_stock_first_002837_invic
+recorded_at: '2026-07-13'
+decision: corrected_forward_generation_lock
+severity: critical
+owner: research-orchestrator
+baseline_commit: fe7ae5f5dd1b10b9e9111f2f69e664ef5d7506a4
+original_lock:
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_generation_lock.yaml
+  generation_id: evidence_gen_r5_bundle8r_b82ba6f33b5044e6
+  aggregate_sha256: b82ba6f33b5044e686e4c7210eba77675b0527a24169c48aea41ad8e4bc1846c
+  status: preserved_historical_invalid_for_forward_consumption
+corrected_lock:
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_generation_lock_v2.yaml
+  generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+  aggregate_sha256: 231a51f4673156dfd2fa24aa96ad7b915dfd3466483ac7bcd87c39b8d0b17e2b
+  status: current_for_forward_consumption
+affected_input:
+  path: data/manifests/claims_draft.csv
+  original_locked_sha256: b6d06f735edcb2507ddd022eb6235979dbd9fc4ee2694a8223fc02cb22766fb6
+  baseline_actual_sha256: 805b282eea2cf351b6bbb4671905ba3957ec51f70013b1a392e5a32b3631a606
+root_cause: >-
+  The original Bundle 8R lock captured an intermediate claims_draft.csv hash before
+  the final claims rows were appended, while the final CSV and the stale lock were
+  committed together in the declared baseline commit.
+correction_method: >-
+  Rebuild the generation lock deterministically from the unchanged declared baseline,
+  preserve the original lock, and bind only forward Bundle 9R consumption to the v2 lock.
+evidence_files_modified: false
+raw_data_modified: false
+historical_bundle9_bundle10_modified: false
+validation_required:
+- verify_all_locked_input_hashes
+- verify_generation_binding
+- preserve_original_lock
+sample_quality_allowed: false
+p2_allowed: false

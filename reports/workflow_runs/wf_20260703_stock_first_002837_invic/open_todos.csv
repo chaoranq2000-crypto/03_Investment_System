@@ -42,3 +42,8 @@ R5B10-G8-001,medium,T9_bundle10_quality_review,R5_bundle10_sentiment_event_pack.
 R5B10-G11-001,medium,T9_bundle10_quality_review,R5_stock_research_report_reader_v3_human_review.yaml,自动门达到97分且零blocker但外部人工签署仍为pending因此样例质量与P2许可保持false,quality-review,resolved_external_human_review,2026-07-13,2026-07-13T14:07:11+08:00,External human review passed for the exact Reader SHA256.
 R5B10-QR-HUMAN-001,medium,T9_bundle10_quality_review,R5_stock_research_report_reader_v3_human_review.yaml,AI语义预审只证明可交付外部审查且未生成外部审查者身份时间或通过结论,quality-review,resolved_external_human_review,2026-07-13,2026-07-13T14:07:11+08:00,External human review passed for the exact Reader SHA256.
 R5B10-QR-CI-001,low,T9_bundle10_quality_review,bundle10_quality_report.md,本地回归可完成但未获发布授权因此不声明远端CI结果,research-orchestrator,accepted_todo,2026-07-13,,仅在用户明确要求发布后提交推送并核验远端CI
+R5B9R-DISC-001,medium,R5_bundle9r_close,R5_bundle9r_segment_driver_model.yaml,发行人尚未单独披露液冷收入毛利项目现金与宽口径分部消除关系,evidence-ingest,accepted_todo,2026-07-13,,后续出现同口径发行人披露时刷新并保持当前分析视图不加总
+R5B9R-DRIVER-001,medium,R5_bundle9r_close,R5_bundle9r_segment_driver_model.yaml,项目数量容量单价验收节奏到收入的转换参数仍未形成可审阅数据链,stock-deep-dive,accepted_todo,2026-07-13,,补齐驱动转换证据前继续使用显式宽口径增长代理并保留低中置信度
+R5B9R-PEER-001,medium,R5_bundle9r_close,R5_bundle9r_peer_operating_reconciliation.yaml,四家同业的液冷纯度与官方经营科目仍不足以支持确定排名,company-valuation,accepted_todo,2026-07-13,,维持LOW_CONFIDENCE_PEER_SET且ranking_allowed=false
+R5B9R-DCF-001,medium,R5_bundle9r_close,R5_bundle9r_model_pack.yaml,净债务折现率与终值假设未完成审阅因此DCF不满足方法门,company-valuation,accepted_todo,2026-07-13,,补齐全部可追溯输入后重新执行方法资格检查
+R5B9R-SOTP-001,medium,R5_bundle9r_close,R5_bundle9r_model_pack.yaml,独立液冷经济性与未分配成本缺失因此SOTP不满足方法门,company-valuation,accepted_todo,2026-07-13,,获得可审阅分部经济性和消除关系后重新执行方法资格检查

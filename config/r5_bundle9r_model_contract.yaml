@@ -1,0 +1,87 @@
+schema_version: 1
+artifact_type: R5_bundle9r_model_contract
+contract_version: r5_bundle9r_v1
+periods: [2026E, 2027E, 2028E]
+scenarios: [bear, base, bull]
+minimum_segment_count: 3
+required_segment_ids:
+  - room_cooling
+  - cabinet_cooling
+  - other_businesses
+allowed_disclosure_basis:
+  - issuer_reported_broad_line
+  - issuer_reported_residual
+  - analytical_estimate
+required_bridge_fields:
+  - revenue
+  - gross_profit
+  - tax_surcharge
+  - selling_expense
+  - administrative_expense
+  - rd_expense
+  - financial_expense
+  - operating_profit
+  - non_operating_net
+  - pretax_profit
+  - income_tax
+  - minority_interest
+  - nonrecurring_items
+  - attributable_net_profit
+  - eps
+  - operating_cash_flow
+  - capex
+  - free_cash_flow
+other_operating_component_fields:
+  - investment_income
+  - fair_value_change
+  - other_income
+  - asset_impairment_loss
+  - credit_impairment_loss
+  - asset_disposal_gain
+prohibited_plug_fields:
+  - implied_tax_finance_other_and_minority
+  - other_operating_drag
+  - unexplained_residual
+  - balancing_plug
+  - plug
+numeric_tolerances:
+  segment_revenue_sum_abs_cny: 1.0
+  segment_gross_profit_sum_abs_cny: 1.0
+  bridge_arithmetic_abs_cny: 1.0
+  eps_abs_per_share: 0.000001
+  market_cap_relative: 0.005
+  scenario_monotonic_abs_cny: 1.0
+liquid_cooling_boundary:
+  issuer_disclosed_standalone_economics: false
+  analytical_estimate_allowed: true
+  required_claim_type: estimate
+  required_gap_id: missing_liquid_cooling_segment_economics
+  required_overlap_control: included_within_disclosed_total_not_additive
+  additive_to_company_total: false
+consensus_boundary:
+  allowed_claim_type: analyst_view
+  minimum_institution_count_for_consensus_label: 3
+peer_boundary:
+  low_confidence_labels:
+    - LOW_CONFIDENCE_PEER_SET
+    - partial_with_explicit_gap
+  ranking_allowed_when_low_confidence: false
+valuation_requirements:
+  required_methods:
+    - reverse_valuation
+    - scenario_valuation
+  sotp_requires_standalone_segment_economics: true
+  dcf_requires:
+    - forecast_free_cash_flow
+    - net_debt
+    - discount_rate
+    - terminal_value_assumption
+prohibited_action_language:
+  - 买入
+  - 卖出
+  - 持有
+  - 加仓
+  - 减仓
+  - 建议仓位
+  - 目标价
+  - 保证收益

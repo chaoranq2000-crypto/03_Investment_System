@@ -1,0 +1,7 @@
+artifact_type: R5_bundle9r_generation_binding_validation
+decision: pass
+current_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+checked_downstream_artifacts:
+- reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_model_pack.yaml
+locked_input_hashes_checked: true
+issues: []

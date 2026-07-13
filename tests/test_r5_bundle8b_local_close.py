@@ -24,6 +24,7 @@ def test_bundle8b_local_close_state_is_synchronized() -> None:
         "R5_bundle9_closed",
         "R5_bundle10_external_human_review_pending",
         "T10_close_readout",
+        "R5_bundle9r_closed",
     }
     assert state["bundle8_close"]["bundle_closed"] is True
     assert state["bundle8_close"]["reader_regenerated"] is False

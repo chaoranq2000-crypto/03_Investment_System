@@ -1,0 +1,1144 @@
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+historical_anchor:
+  period: 2025A
+  company_revenue: 6067759091.55
+  company_gross_profit: 1690633310.57
+  segments:
+    room_cooling:
+      reported_name: 机房温控节能产品
+      revenue: 3448477492.62
+      gross_margin: 28.36
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      calculation_method: direct_reported_value
+    cabinet_cooling:
+      reported_name: 机柜温控节能产品
+      revenue: 1977423139.19
+      gross_margin: 27.24
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      calculation_method: direct_reported_value
+    other_businesses:
+      reported_name: 客车空调+轨道交通列车空调及服务+其他
+      revenue: 641858459.7400002
+      gross_margin: 27.134723467000825
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+      calculation_method: audited_company_total_minus_two_reported_major_lines
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  reconciliation_difference_CNY: 0.0
+scenarios:
+  bear:
+    2026E:
+      segments:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 3965749116.51
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 15.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 23.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 931951042.38
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 2135616990.33
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 8.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 23.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 501869992.73
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          disclosure_basis: issuer_reported_residual
+          revenue:
+            value: 641858459.74
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 0.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 21.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 137999568.84
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+    2027E:
+      segments:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 4362324028.16
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 10.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 24.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 1046957766.76
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 2263754009.74
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 6.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 24.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 543300962.34
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          disclosure_basis: issuer_reported_residual
+          revenue:
+            value: 654695628.93
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 2.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 22.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 147306516.51
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+    2028E:
+      segments:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 4711309950.42
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 8.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 24.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 1154270937.85
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 2376941710.23
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 5.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 24.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 582350719.01
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          disclosure_basis: issuer_reported_residual
+          revenue:
+            value: 674336497.8
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 3.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 23.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 158469076.98
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bear_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+  base:
+    2026E:
+      segments:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 4414051190.55
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 28.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 26.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 1147653309.54
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+          claim_type: estimate
+          confidence: medium
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 2333359304.24
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 18.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 26.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 606673419.1
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: medium
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          disclosure_basis: issuer_reported_residual
+          revenue:
+            value: 693207136.52
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 8.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 24.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 169835748.45
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: medium
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+    2027E:
+      segments:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 5385142452.48
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 22.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 26.8
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 1443218177.26
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+          claim_type: estimate
+          confidence: medium
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 2683363199.88
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 15.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 26.7
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 716457974.37
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: medium
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          disclosure_basis: issuer_reported_residual
+          revenue:
+            value: 734799564.71
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 6.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 25.2
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 185169490.31
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: medium
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+    2028E:
+      segments:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 6354468093.92
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 18.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 27.4
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 1741124257.73
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+          claim_type: estimate
+          confidence: medium
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 3005366783.87
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 12.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 27.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 811449031.64
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: medium
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          disclosure_basis: issuer_reported_residual
+          revenue:
+            value: 771539542.95
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 5.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 25.8
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 199057202.08
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_base_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: medium
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+  bull:
+    2026E:
+      segments:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 4655444615.04
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 35.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 28.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 1303524492.21
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 2471778923.99
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 25.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 27.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 679739204.1
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          disclosure_basis: issuer_reported_residual
+          revenue:
+            value: 718881474.91
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 12.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 26.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 186909183.48
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+    2027E:
+      segments:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 5958969107.25
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 28.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 28.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 1698306195.57
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 2966134708.79
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 20.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 28.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 830517718.46
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          disclosure_basis: issuer_reported_residual
+          revenue:
+            value: 790769622.4
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 10.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 26.5
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 209553949.94
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+    2028E:
+      segments:
+        room_cooling:
+          reported_name: 机房温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 7269942310.84
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 22.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 29.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 2108283270.14
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_room_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          - ev_official_disclosure_002837_20250423_e78396
+          - ev_official_disclosure_002837_20250521_1b4421
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        cabinet_cooling:
+          reported_name: 机柜温控节能产品
+          disclosure_basis: issuer_reported_broad_line
+          revenue:
+            value: 3440716262.19
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 16.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 28.3
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 973722702.2
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_cabinet_cooling_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+        other_businesses:
+          reported_name: 客车空调+轨道交通列车空调及服务+其他
+          disclosure_basis: issuer_reported_residual
+          revenue:
+            value: 854031192.19
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          revenue_growth:
+            value: 8.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_revenue_growth
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_margin:
+            value: 27.0
+            unit: pct
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          gross_profit:
+            value: 230588421.89
+            unit: CNY
+            claim_type: estimate
+            assumption_id: b9r_bull_case_other_businesses_gross_margin
+            evidence_id: ev_annual_report_002837_20260421_2cbfc5
+            metric_id: null
+          source_evidence_ids:
+          - ev_annual_report_002837_20260421_2cbfc5
+          claim_type: estimate
+          confidence: low
+          driver_method: reviewed broad-line growth proxy because project-volume and
+            unit-value conversion is not disclosed
+          falsification_condition: Refresh when issuer broad-line revenue, margin,
+            project volume, capacity, pricing, or acceptance evidence changes.
+liquid_cooling_analytical_view:
+  view_id: liquid_cooling_analytical_view
+  claim_type: estimate
+  standalone_revenue: MISSING
+  standalone_gross_margin: MISSING
+  gap_id: missing_liquid_cooling_segment_economics
+  overlap_control: included_within_room_and_cabinet_not_additive
+  included_in_company_total: false
+  status: unquantified_due_to_issuer_nondisclosure
+  confidence: low
+  falsification_condition: Replace only when issuer-disclosed standalone revenue,
+    margin, and overlap eliminations become reviewable.
+limitations:
+- Forecasts use issuer-disclosed broad business lines.
+- Standalone liquid-cooling economics remain undisclosed and are not added to company
+  totals.
+artifact_type: R5_bundle9r_segment_driver_model
+input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+input_evidence_generation_lock: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_generation_lock_v2.yaml
+as_of_date: '2026-07-13'
+sample_quality_allowed: false
+p2_allowed: false

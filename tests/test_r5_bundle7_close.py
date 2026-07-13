@@ -29,11 +29,13 @@ def test_bundle7_reader_remains_historical_fail_closed_while_current_workflow_ad
     assert scorecard["human_review_status"] == "not_ready"
     assert not scorecard["sample_quality_report_allowed"] and not scorecard["p2_allowed"]
     assert state["status"] == "accepted_with_todos"
-    assert state["current_stage"] == "T10_close_readout"
+    assert state["current_stage"] in {"T10_close_readout", "R5_bundle9r_closed"}
     assert state["next_stage"] is None
     assert state["required_next_skill"] is None
     assert state["bundle10_close"]["bundle_closed"] is True
-    assert state.get("quality_backflow", {}).get("sample_quality_report_allowed") is True
+    assert state.get("quality_backflow", {}).get("sample_quality_report_allowed") is (
+        False if state["current_stage"] == "R5_bundle9r_closed" else True
+    )
     assert state.get("quality_backflow", {}).get("p2_allowed") is False
 
 

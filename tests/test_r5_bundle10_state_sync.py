@@ -23,7 +23,7 @@ def test_bundle10_state_is_finalized_after_external_human_review() -> None:
     )
     candidate = state["reader_candidate_snapshot"]
     assert state["status"] == "accepted_with_todos"
-    assert state["current_stage"] == "T10_close_readout"
+    assert state["current_stage"] in {"T10_close_readout", "R5_bundle9r_closed"}
     assert state["next_stage"] is None
     assert state["external_action_required"] is None
     assert state["bundle10_internal_completion"]["internal_execution_complete"] is True
@@ -45,6 +45,10 @@ def test_bundle10_state_is_finalized_after_external_human_review() -> None:
     assert candidate["external_reviewer"] == "Q"
     assert candidate["sample_quality_report_allowed"] is True
     assert candidate["p2_allowed"] is False
+    if state["current_stage"] == "R5_bundle9r_closed":
+        assert state["bundle9r_close"]["bundle_closed"] is True
+        assert state["bundle9r_close"]["historical_bundle10_preserved"] is True
+        assert state["quality_backflow"]["canonical_sample_quality_allowed"] is False
     assert scorecard["decision"] == "candidate_ready_for_human_review"
     assert scorecard["human_review_status"] == "pending"
     assert scorecard["sample_quality_report_allowed"] is False

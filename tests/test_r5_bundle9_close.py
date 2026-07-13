@@ -41,6 +41,7 @@ def test_bundle9_canonical_state_is_closed_but_reader_remains_fail_closed() -> N
         "R5_bundle9_closed",
         "R5_bundle10_external_human_review_pending",
         "T10_close_readout",
+        "R5_bundle9r_closed",
     }
     assert state["bundle9_close"]["bundle_closed"] is True
     assert state["bundle9_close"]["sample_quality_allowed"] is False

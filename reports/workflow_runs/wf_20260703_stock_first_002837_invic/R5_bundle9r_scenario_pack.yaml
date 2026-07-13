@@ -1,0 +1,81 @@
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+periods:
+- 2026E
+- 2027E
+- 2028E
+scenarios:
+  bear:
+    2026E:
+      revenue: 6743224566.58
+      gross_margin: 23.3096
+      attributable_net_profit: 196442721.14
+      eps: 0.154151
+      operating_cash_flow: -31981375.42
+      free_cash_flow: -335426480.92
+    2027E:
+      revenue: 7280773666.83
+      gross_margin: 23.8651
+      attributable_net_profit: 271540606.77
+      eps: 0.213082
+      operating_cash_flow: 256794916.96
+      free_cash_flow: -34436029.71
+    2028E:
+      revenue: 7762588158.45
+      gross_margin: 24.4131
+      attributable_net_profit: 368966544.7
+      eps: 0.289533
+      operating_cash_flow: 428239402.17
+      free_cash_flow: 156548816.62
+  base:
+    2026E:
+      revenue: 7440617631.31
+      gross_margin: 25.8603
+      attributable_net_profit: 484033304.33
+      eps: 0.379828
+      operating_cash_flow: 178770596.26
+      free_cash_flow: -193260285.31
+    2027E:
+      revenue: 8803305217.07
+      gross_margin: 26.636
+      attributable_net_profit: 683214747.19
+      eps: 0.536128
+      operating_cash_flow: 535189849.67
+      free_cash_flow: 139041114.9
+    2028E:
+      revenue: 10131374420.74
+      gross_margin: 27.1595
+      attributable_net_profit: 886905026.53
+      eps: 0.695967
+      operating_cash_flow: 815145085.02
+      free_cash_flow: 409890108.19
+  bull:
+    2026E:
+      revenue: 7846105013.94
+      gross_margin: 27.6592
+      attributable_net_profit: 727844293.36
+      eps: 0.57115
+      operating_cash_flow: 416688696.39
+      free_cash_flow: -14847079.38
+    2027E:
+      revenue: 9715873438.44
+      gross_margin: 28.1846
+      attributable_net_profit: 1023533399.36
+      eps: 0.803181
+      operating_cash_flow: 768138157.01
+      free_cash_flow: 282344485.09
+    2028E:
+      revenue: 11564689765.22
+      gross_margin: 28.644
+      attributable_net_profit: 1328492968.01
+      eps: 1.042487
+      operating_cash_flow: 1168837998.69
+      free_cash_flow: 648426959.26
+monotonicity_rule: bear <= base <= bull for revenue and attributable net profit
+claim_type: estimate
+artifact_type: R5_bundle9r_scenario_pack
+input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+input_evidence_generation_lock: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_generation_lock_v2.yaml
+as_of_date: '2026-07-13'
+sample_quality_allowed: false
+p2_allowed: false

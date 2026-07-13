@@ -1,0 +1,24 @@
+schema_version: 1
+artifact_type: R5_bundle9r_generation_binding
+package_date: '2026-07-13'
+target_repository: chaoranq2000-crypto/03_Investment_System
+expected_base_commit: fe7ae5f5dd1b10b9e9111f2f69e664ef5d7506a4
+workflow_id: wf_20260703_stock_first_002837_invic
+input_evidence_generation:
+  lock_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_generation_lock_v2.yaml
+  generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+  aggregate_sha256: 231a51f4673156dfd2fa24aa96ad7b915dfd3466483ac7bcd87c39b8d0b17e2b
+  required_consumer: R5_BUNDLE_9R_FORECAST_VALUATION_REBUILD
+  correction_record: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_generation_lock_correction.yaml
+historical_artifacts:
+  preserve:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/segment_forecast_model.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9_forecast_assumption_registry.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9_valuation_pack.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle9_close_readout.md
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3.md
+  status: historical_stale_after_bundle8r
+forward_output_prefix: R5_bundle9r_
+close_lock_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_model_generation_lock.yaml
+sample_quality_allowed_before_bundle10r: false
+p2_allowed: false

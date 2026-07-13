@@ -1,13 +1,13 @@
 workflow_id: wf_20260703_stock_first_002837_invic
 workflow_type: stock_first_closed_loop
 status: accepted_with_todos
-quality_target: R5_sample_quality_requalification
+quality_target: R5_bundle9r_model_generation_locked
 created_at: 2026-07-03
 updated_at: '2026-07-13'
 owner: mixed
 active_segment_id: ai_server_liquid_cooling
 active_company_id: cn_002837_invic
-current_stage: T10_close_readout
+current_stage: R5_bundle9r_closed
 completed_stages:
 - T0_intake
 - T1_evidence_plan
@@ -49,6 +49,15 @@ completed_stages:
 - R5_bundle8r_5_fallback_and_ci
 - R5_bundle8r_6_live_pilot
 - R5_bundle8r_7_quality_close
+- R5_bundle9r_0_generation_binding
+- R5_bundle9r_1_input_review
+- R5_bundle9r_2_segment_driver_model
+- R5_bundle9r_3_financial_statement_bridge
+- R5_bundle9r_4_scenarios_and_sensitivity
+- R5_bundle9r_5_peer_consensus_reconciliation
+- R5_bundle9r_6_reverse_scenario_valuation
+- R5_bundle9r_7_quality_gate
+- R5_bundle9r_8_close_model_generation_lock
 next_stage: null
 active_skill: null
 required_next_skill: null
@@ -63,7 +72,7 @@ evidence_snapshot:
   bundle8b_reviewed_official_ir_count: 4
   bundle8b_notes: 46 live evidence rows archived; official IR management comments
     reviewed; structured and research metadata remain draft.
-  input_evidence_generation_id: evidence_gen_r5_bundle8r_b82ba6f33b5044e6
+  input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
   bundle8r_notes: forward requalification accepted with explicit gaps; downstream
     9R/10R not executed; awaiting explicit follow-up plan
 claims_snapshot:
@@ -681,8 +690,8 @@ notes: Bundle 7 positive reader-quality rebaseline supersedes prior sample-quali
   labels. Historical artifacts are retained, but current routing follows quality_backflow.fix_routes.
 quality_backflow:
   source_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_quality_scorecard.yaml
-  decision: R5_sample_quality_ready
-  quality_band: sample_quality_ready_with_todos
+  decision: R5_bundle9r_model_ready
+  quality_band: model_generation_locked_reader_stale
   score: 98
   threshold: 82
   prior_state:
@@ -699,14 +708,16 @@ quality_backflow:
   - quality_review_v2 accepted_sample_quality
   fix_routes: []
   historical_acceptance_superseded: true
-  sample_quality_report_allowed: true
+  sample_quality_report_allowed: false
   p2_allowed: false
   bundle8_evidence_route_completed: true
-  current_first_route: null
-  current_first_stage: null
+  current_first_route: forecast_valuation_rebuild
+  current_first_stage: R5_bundle9r_closed
   bundle9_forecast_valuation_completed: true
   prior_source_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_quality_scorecard.yaml
   critical_blocker_count: 0
+  canonical_reader_status: stale_pending_bundle10r
+  canonical_sample_quality_allowed: false
 bundle8_close:
   decision: accepted_with_todos
   bundle_closed: true
@@ -805,27 +816,75 @@ bundle8r_requalification:
     bundle8_close_sha256: 3234d91abe0d824d45354fca8fb592335ca4455ac9c2c3003d514f71b1549581
     bundle9_close_sha256: 3060f3964288aa538d1dfbd4e446f43aab554803af6b7566fab231784cb84859
     bundle10_close_sha256: a591e267ef33c146120121b2d28c7364f3c14fb1d6683bfc886899f35134361d
-  canonical_reader_status: stale_pending_followup_plan
+  canonical_reader_status: stale_pending_bundle10r
   canonical_sample_quality_allowed: false
   p2_allowed: false
   backflow_target: evidence-ingest
-  required_close_artifact: R5_bundle8r_evidence_generation_lock.yaml
+  required_close_artifact: R5_bundle8r_evidence_generation_lock_v2.yaml
   downstream_plan:
     bundle9: preserved_historical_then_rebuild_as_bundle9r
     bundle10: preserved_historical_then_rebuild_as_bundle10r
   closed_at: '2026-07-13'
-  input_evidence_generation_id: evidence_gen_r5_bundle8r_b82ba6f33b5044e6
-  bundle9r_rebuilt: false
+  input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+  bundle9r_rebuilt: true
   bundle10r_rebuilt: false
   sample_quality_allowed: false
 bundle8r_close:
   decision: accepted_with_todos
   bundle_closed: true
   closed_at: '2026-07-13'
-  input_evidence_generation_id: evidence_gen_r5_bundle8r_b82ba6f33b5044e6
+  input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
   historical_bundle9_bundle10_preserved: true
-  next_bundle: TODO_AWAIT_FOLLOWUP_PLAN
+  next_bundle: R5_BUNDLE_10R_READER_REBUILD
   human_review_required: false
-  notes: Bundle 9R/10R were not executed; follow-up requires an explicit later plan.
+  notes: Bundle 9R closed from the corrected Bundle 8R evidence generation; historical
+    Bundle 9/10 remain snapshots and the prior Reader is stale for this model generation.
+bundle8r_generation_lock_correction:
+  decision: corrected_forward_generation_lock
+  original_generation_id: evidence_gen_r5_bundle8r_b82ba6f33b5044e6
+  corrected_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+  correction_record: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_generation_lock_correction.yaml
+  original_lock_preserved: true
+  evidence_files_modified: false
+  sample_quality_allowed: false
+  p2_allowed: false
+bundle9r_rebuild:
+  mode: forward_rebuild_not_history_rewrite
+  status: accepted_with_todos
+  started_at: '2026-07-13'
+  closed_at: '2026-07-13'
+  input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+  historical_bundle9_preserved: true
+  historical_bundle10_preserved: true
+  required_close_artifact: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_model_generation_lock.yaml
+  downstream_bundle: R5_BUNDLE_10R_READER_REBUILD
+  generation_binding_validation: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_generation_binding_validation.yaml
+  model_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_model_pack.yaml
+  quality_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_quality_scorecard.yaml
+  model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+  model_generation_aggregate_sha256: 1cd42241e6a38fb3fc24e6ceb5be1261dbad6e1ee860393b44932282bacd54cc
+  bundle10r_allowed: true
+  sample_quality_allowed: false
+  p2_allowed: false
+bundle9r_close:
+  decision: accepted_with_todos
+  bundle_closed: true
+  closed_at: '2026-07-13'
+  input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+  model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+  model_generation_aggregate_sha256: 1cd42241e6a38fb3fc24e6ceb5be1261dbad6e1ee860393b44932282bacd54cc
+  model_generation_lock: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_model_generation_lock.yaml
+  model_pack: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_model_pack.yaml
+  quality_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_quality_scorecard.yaml
+  critical_blocker_count: 0
+  high_blocker_count: 0
+  accepted_todos:
+  - missing_liquid_cooling_segment_economics
+  - missing_liquid_cooling_driver_conversion
+  - missing_peer_liquid_cooling_purity
+  - TODO_DCF_INPUTS
+  historical_bundle9_preserved: true
+  historical_bundle10_preserved: true
+  bundle10r_allowed: true
   sample_quality_allowed: false
   p2_allowed: false

@@ -1,0 +1,9 @@
+artifact_type: R5_bundle9r_model_quality_scorecard
+decision: pass
+input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+critical_blocker_count: 0
+high_blocker_count: 0
+issues: []
+bundle10r_allowed: true
+sample_quality_allowed: false
+p2_allowed: false
