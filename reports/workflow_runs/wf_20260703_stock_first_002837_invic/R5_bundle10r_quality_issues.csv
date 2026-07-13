@@ -1,0 +1,7 @@
+issue_id,severity,gate_id,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
+R5B10R-DCF-001,medium,R5-G6,R5_bundle10r_8_close,R5_bundle10r_reader_input_pack.yaml,valuation,"净债务、折现率与终值假设仍未形成完整可审阅输入，DCF 保持不可用。",company-valuation,accepted_with_todos,补齐全部可追溯输入后重新执行方法资格检查。,accepted_todo
+R5B10R-SOTP-001,medium,R5-G6,R5_bundle10r_8_close,R5_bundle10r_reader_input_pack.yaml,valuation,"液冷独立经济性、未分配成本与消除关系仍缺失，SOTP 保持不可用。",company-valuation,accepted_with_todos,取得同口径分部经济性与消除关系后重新执行方法资格检查。,accepted_todo
+R5B10R-HUMAN-001,medium,R5-G9,R5_bundle10r_8_close,R5_bundle10r_human_review_handoff.yaml,human_review,"Reader v4 收到叙事范围 revision_required；用户未声明完成全篇与追溯附录审阅。",quality-review,superseded_by_v5,改由外部人工审阅者审阅 Reader v5 精确哈希。,resolved_revision_required
+R5B10R-CI-001,low,R5-G10,R5_bundle10r_8_close,R5_bundle10r_quality_gate_report.md,remote_ci,本轮未获发布授权因此不声明远端 CI 结果。,research-orchestrator,accepted_with_todos,仅在用户明确要求发布后提交推送并核验远端 CI。,accepted_todo
+R5B10R-NARRATIVE-001,high,R5-G9,T9_quality_review,R5_bundle10r_reader_v5.md,narrative_coherence,Reader v5 将十个分析单元重编排为六个读者章节；模板重复、流程术语、段落近重复和标题碎片化检查全部通过。,stock-deep-dive,accepted,由新的精确哈希人工复核确认实际阅读质量。,resolved
+R5B10R-V5-HUMAN-001,medium,R5-G9,R5_bundle10r_v5_close,R5_bundle10r_human_review_handoff_v5.yaml,human_review,Reader v5 自动门通过但精确哈希人工审阅尚未发生；v4 局部反馈与历史签署均不得继承。,quality-review,accepted_with_todos,由外部人工审阅者完成 Reader v5 与按需追溯附录审阅。,accepted_todo

@@ -7,69 +7,59 @@
 | workflow_type | `stock_first_closed_loop` |
 | object | `002837 英维克` |
 | status | `accepted_with_todos` |
-| quality_target | `R5_bundle9r_model_generation_locked` |
-| current_stage | `R5_bundle9r_closed` |
-| input_evidence_generation | `evidence_gen_r5_bundle8r_231a51f4673156df` |
-| model_generation | `model_gen_r5_bundle9r_1cd42241e6a38fb3` |
-| canonical_reader | `stale_pending_bundle10r` |
-| sample_quality_allowed | `false` |
+| quality_target | `R5_bundle10r_reader_v5_candidate_ready_for_human_review` |
+| current_stage | `T10_close_readout` |
+| evidence generation | `evidence_gen_r5_bundle8r_231a51f4673156df` |
+| model generation | `model_gen_r5_bundle9r_1cd42241e6a38fb3` |
+| Reader generation | `reader_gen_r5_bundle10r_v5_574937bd3943edc1` |
+| canonical Reader | `reader_v5_candidate_ready_for_human_review_pending` |
+| human review | `pending` |
+| sample quality | `false` |
 | P2 | `false`；未进入 |
-| next_bundle | `R5_BUNDLE_10R_READER_REBUILD`；允许但未启动 |
 
-本文件是当前 canonical workflow readout。旧 Bundle 9、旧 Bundle 10、Reader v3 及其人工审阅记录继续作为历史快照保留；新 9R 模型代际已改变其输入，因此旧 Reader 不再提供当前 sample-quality 许可。
+本文件是当前 canonical workflow readout。Reader v4 在自动真值检查上通过，但用户指出正文机械化、干涩；本轮保留 v4 锁定历史，新增 Reader v5，把 10 个结构化分析单元编排为 6 个读者章节，并用新的反机械化非补偿质量门重新验证。自动候选通过不等于人工审阅通过。
 
-## 本轮技能路由
-
-- `research-orchestrator`：最新补丁发现、代际纠偏、状态迁移、三次 handoff、关闭锁与台账同步。
-- `stock-deep-dive`：输入审阅、45 条预测假设、三分部驱动、完整报表桥、情景与敏感性、集成 model pack。
-- `company-valuation`：市场分母、低置信度同业上下文、反向估值、三情景估值和方法资格。
-- `quality-review`：代际/算术/claim boundary/无动作建议门、负向变异回归与关闭判定。
-
-## 当前 9R 核心产物
+## 当前核心产物
 
 | artifact | status |
 |---|---|
-| `R5_bundle8r_evidence_generation_lock_v2.yaml` | 6 个输入；缺失 0；当前 forward evidence generation |
-| `R5_bundle9r_input_review_ledger.yaml` | 2025A / 2026Q1 官方锚点已核对；缺口显式 |
-| `R5_bundle9r_forecast_assumption_registry.yaml` | 45 条 reviewed estimate assumptions |
-| `R5_bundle9r_segment_driver_model.yaml` | 3 分部 × 3 情景 × 3 年；液冷分析视图不加总 |
-| `R5_bundle9r_financial_statement_bridge.yaml` | 6 个显式经营科目；禁用平衡项不存在 |
-| `R5_bundle9r_sensitivity.csv` | 12 条单变量、9 条双变量 |
-| `R5_bundle9r_consensus_comparison.csv` | 10—12 家机构；`analyst_view` |
-| `R5_bundle9r_peer_operating_reconciliation.yaml` | `LOW_CONFIDENCE_PEER_SET`；禁止排名 |
-| `R5_bundle9r_market_snapshot.yaml` | 市值与收盘价×股本核对通过 |
-| `R5_bundle9r_reverse_valuation.yaml` | 当前市场值所需经营表现的 inference |
-| `R5_bundle9r_scenario_valuation.yaml` | bear/base/bull 研究情景范围 |
-| `R5_bundle9r_model_pack.yaml` | 预测与估值统一 contract pack |
-| `R5_bundle9r_quality_scorecard.yaml` | `pass`；critical=0；high=0 |
-| `R5_bundle9r_model_generation_lock.yaml` | 13 个 artifact；缺失 0；aggregate `1cd42241…acd54cc` |
-| `R5_bundle9r_close_readout.md` | `accepted_with_todos` |
+| `R5_bundle10r_generation_binding_validation.yaml` | pass；绑定 9R model generation |
+| `R5_bundle10r_reader_input_pack.yaml` | reviewed；10 sections；22 display references |
+| `R5_bundle10r_human_feedback_v4.yaml` | revision_required；仅叙事范围；full_review_attested=false |
+| `R5_bundle10r_reader_narrative_plan_v5.yaml` | 6 reader-facing chapters |
+| `R5_bundle10r_reader_payload_v5.yaml` | current；底层仍保留 10 analysis units |
+| `R5_bundle10r_reader_v5.md` | candidate_ready_for_human_review；SHA256 `cb261412…1e6090` |
+| `R5_bundle10r_traceability_v5.yaml` | 22/22 references resolved |
+| `R5_bundle10r_reader_v5_quality_scorecard.yaml` | 100/82；三类 blocker 均为 0 |
+| `R5_bundle10r_human_review_handoff_v5.yaml` | pending；绑定 Reader v5 精确哈希 |
+| `R5_bundle10r_reader_generation_lock_v5.yaml` | 6 artifacts；missing 0；aggregate `574937bd…50ba70a` |
+| `R5_bundle10r_quality_gate_report_v5.md` | current quality decision |
+| `R5_bundle10r_close_readout_v5.md` | accepted_with_todos |
 
 完整路径、owner、stage 与状态以 `artifact_manifest.csv` 为准。
 
 ## 质量与验证
 
-| gate/check | result |
+| check | result |
 |---|---|
-| package integrity | 34/34 checksums pass |
-| evidence-generation binding | pass；6 个锁定输入哈希一致 |
-| official anchor reconciliation | 2025A、2026Q1 收入与归母净利润匹配发行人直接披露 |
-| model quality | pass；0 critical / 0 high |
-| scenario monotonicity | pass；收入、归母利润、情景权益价值均 bear <= base <= bull |
-| market denominator | pass；relative difference `0.00006752%` |
-| negative mutations | pass；13 类核心错误均 fail-closed |
-| deterministic rebuild | 12 个生成文件连续两次重建，hash change=0 |
-| focused compatibility regression | 38 passed |
-| full repository pytest | 674 passed，2 skipped，28.56 秒 |
+| package | `R5_BUNDLE_10R_READER_REBUILD_PATCH_2026-07-13.zip`；SHA256 `CD32691FA652607BBCBCB3669D4B6EEF75A319DD4B7E32E54CCAC7BA038F47C0` |
+| package integrity | 48/48 checksums pass |
+| package verification | 13 checks pass；18 focused tests pass |
+| generation binding | pass；13 current model artifacts |
+| Reader v5 gate | 100/82；truthfulness/core/candidate blockers = 0/0/0 |
+| narrative diagnostics | 4151 body Han chars；6 H2；31 paragraphs；四类反机械化问题均为 0 |
+| determinism | 6 locked outputs rebuilt twice；hash change=0 |
+| focused v5 and lifecycle regression | 35 passed |
+| full repository pytest | 704 passed，2 skipped，28.78 秒 |
 
 ## 保留缺口
 
-当前 9R 关闭新增 5 个 medium TODO，均已写入 `open_todos.csv`：独立液冷经济性、驱动转换、同业纯度/官方经营口径、DCF 输入、SOTP 输入。每项均含 owner 和 next action；没有活动 critical/high issue。
+`R5B10R-NARRATIVE-001` 已解决。当前保留 `R5B10R-DCF-001`、`R5B10R-SOTP-001`、`R5B10R-V5-HUMAN-001`、`R5B10R-CI-001`；分别覆盖 DCF 输入、SOTP 输入、Reader v5 精确哈希人工审阅和未授权远端 CI。当前没有 critical/high blocker。
 
 ## 历史状态说明
 
-旧 Bundle 10 的 Reader v3 曾完成精确哈希人工审阅，该事件与相关 close 对象没有被改写。Bundle 8R 之后的前向证据与 9R 模型代际已经变化，因此旧 Reader 只能作为历史快照；恢复 sample-quality 需要后续 Bundle 10R 基于 `R5_bundle9r_model_generation_lock.yaml` 重建并完成新的精确哈希审阅。
+旧 Bundle 10、Reader v3 及其精确哈希人工审阅继续作为历史快照保留。Reader v4 的报告、附录、scorecard、handoff 与 generation lock 也保持原字节；用户的 v4 叙事反馈另存为独立记录。历史签署和 v4 的局部反馈均不能转移到 Reader v5。历史 close 对象未被改写。
 
 ## 关闭边界
 
-本轮只执行最新 Bundle 9R 补丁计划。未启动 Bundle 10R，未进入 P2，未执行暂存、提交、推送或远端 CI，也没有删除或覆盖历史 Bundle 9/10 产物。
+本轮完成 Reader v5 叙事重构的自动范围。未伪造或代填人工审阅，未恢复 sample-quality，未进入 P2，未暂存、提交、推送，也未声明远端 CI。

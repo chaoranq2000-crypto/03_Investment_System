@@ -1,0 +1,57 @@
+schema_version: 2
+contract_id: r5_bundle10r_non_compensating_reader_gate_v2
+candidate_threshold: 82
+research_draft_threshold: 45
+scoring_method: positive_from_zero
+core_failure_is_candidate_blocker: true
+truthfulness_failure_is_blocker: true
+candidate_requirements:
+  min_total_han_chars: 3200
+  min_independent_underlying_sources: 4
+  required_source_categories: [issuer, industry, peer, market]
+  min_peer_sources: 3
+  technical_context_required: true
+  sentiment_context_required: true
+  future_event_chain_required: true
+  exact_model_generation_binding_required: true
+dimensions:
+  evidence_integrity: 20
+  coverage_completeness: 15
+  analytical_synthesis: 20
+  forecast_and_valuation: 15
+  narrative_and_readability: 15
+  presentation_hygiene: 10
+  risks_and_watch_conditions: 5
+narrative_quality:
+  applies_to_report_schema_versions: [v5]
+  template_repetition:
+    labels: [本节判断, 关键事实, 因果机制, 经济含义, 反向证据, 不确定性边界, 后续验证与触发条件]
+    min_section_ratio: 0.60
+    min_sections: 3
+    max_repeated_label_types: 2
+  process_audit_language:
+    max_occurrences: 0
+    patterns:
+      lineage: '(?:模型|证据)代际'
+      artifact_lock: '(?:模型工件|工件哈希|聚合哈希|精确哈希)'
+      quality_state: '(?:自动质量门|质量门|核心章节阻断|候选状态边界|人工复核(?:收口|完成前))'
+      workflow_token: '\b(?:workflow_state|generation_id|candidate_ready_for_human_review|sample_quality_allowed|p2_allowed)\b'
+  opening_repetition:
+    min_paragraph_han_chars: 45
+    opening_han_chars: 12
+    max_same_opening_occurrences: 2
+  paragraph_similarity:
+    min_paragraph_han_chars: 60
+    shingle_han_chars: 4
+    similarity_threshold: 0.72
+    max_similar_pairs: 1
+  heading_fragmentation:
+    max_h2_per_1000_han: 2.5
+    min_section_han_chars: 180
+    max_thin_section_ratio: 0.40
+prohibited_main_body_patterns:
+  internal_evidence_id: '(?:ev_|metric_|claim_|gap_|todo_)[A-Za-z0-9_\-]+'
+  internal_path: '(?:reports/workflow_runs/|data/raw/|registry/|workflow_state\.yaml)'
+  machine_token: '\b(?:TODO|MISSING|UNREVIEWED|READY_FOR|NEEDS_FIX)\b'
+  direct_action: '(?:买入|卖出|持有评级|加仓|减仓|仓位|目标价|止损|建仓|take profit|buy|sell|position sizing|target price)'
+  fabricated_review: '(?:人工审核已通过|human review accepted)'

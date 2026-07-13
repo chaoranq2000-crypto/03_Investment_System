@@ -1,0 +1,30 @@
+schema_version: 1
+contract_id: r5_bundle10r_non_compensating_reader_gate_v1
+candidate_threshold: 82
+research_draft_threshold: 45
+scoring_method: positive_from_zero
+core_failure_is_candidate_blocker: true
+truthfulness_failure_is_blocker: true
+candidate_requirements:
+  min_total_han_chars: 3200
+  min_independent_underlying_sources: 4
+  required_source_categories: [issuer, industry, peer, market]
+  min_peer_sources: 3
+  technical_context_required: true
+  sentiment_context_required: true
+  future_event_chain_required: true
+  exact_model_generation_binding_required: true
+dimensions:
+  evidence_integrity: 20
+  coverage_completeness: 15
+  analytical_synthesis: 20
+  forecast_and_valuation: 15
+  narrative_and_readability: 15
+  presentation_hygiene: 10
+  risks_and_watch_conditions: 5
+prohibited_main_body_patterns:
+  internal_evidence_id: '(?:ev_|metric_|claim_|gap_|todo_)[A-Za-z0-9_\-]+'
+  internal_path: '(?:reports/workflow_runs/|data/raw/|registry/|workflow_state\.yaml)'
+  machine_token: '\b(?:TODO|MISSING|UNREVIEWED|READY_FOR|NEEDS_FIX)\b'
+  direct_action: '(?:买入|卖出|持有评级|加仓|减仓|仓位|目标价|止损|建仓|take profit|buy|sell|position sizing|target price)'
+  fabricated_review: '(?:人工审核已通过|human review accepted)'

@@ -1,0 +1,25 @@
+artifact_type: R5_bundle10r_human_feedback
+schema_version: 1
+report_schema_version: v4
+reviewer_type: human
+feedback_scope:
+- R5-G9
+- narrative_and_readability
+decision: revision_required
+full_review_attested: false
+received_at: '2026-07-14T00:49:39+08:00'
+input_hashes:
+  report_sha256: 7c7286fb96f075016bbc8e3721a396392a392e7e7f4599e0dc45a04a225d9762
+  appendix_sha256: af0c8433219c4261d47460ff6ad8c94e24501a17c215893f8969fe054a8334d8
+  scorecard_sha256: 36bec894ac75c4745c43ba3962da0165b53e0762373902ef1714a9b3ac5b3e5f
+  handoff_sha256: 7310a6654821118b939e8dd78a45c89d6d767530d4ff2699441ff312b54359ff
+  generation_lock_sha256: c012881a0c4a8b5c8e1b451e7d01c1ef3ea6d226a757fbb086c3230c02f6389d
+finding:
+  issue_id: R5B10R-NARRATIVE-001
+  severity: high
+  comment: 当前报告仍然太机械化和干涩。
+  diagnosis: 十个章节逐节重复同一套审计标签，研究主线被合规脚手架稀释；自动可读性得分只覆盖字数与标题数量。
+  required_fix: 保留 v4 锁定产物，创建 Reader v5 自然叙事层并通过反机械化质量门后重新送审。
+boundary: 本记录只确认叙事与可读性反馈，不宣称用户已完成全篇证据和追溯附录审阅。
+sample_quality_allowed: false
+p2_allowed: false

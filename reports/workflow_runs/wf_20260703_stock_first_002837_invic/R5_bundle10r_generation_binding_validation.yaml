@@ -1,0 +1,9 @@
+artifact_type: R5_bundle10r_generation_binding_validation
+schema_version: 1
+decision: pass
+issue_count: 0
+issues: []
+model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+model_aggregate_sha256: 1cd42241e6a38fb3fc24e6ceb5be1261dbad6e1ee860393b44932282bacd54cc
+artifact_count: 13
+verified_artifact_hash_count: 13

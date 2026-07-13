@@ -1,0 +1,24 @@
+schema_version: 1
+bundle_id: R5_bundle10r_reader_rebuild
+workflow_id: wf_20260703_stock_first_002837_invic
+output_prefix: R5_bundle10r_
+expected_artifacts:
+  - R5_bundle10r_generation_binding_validation.yaml
+  - R5_bundle10r_reader_input_pack.yaml
+  - R5_bundle10r_reader_payload_v4.yaml
+  - R5_bundle10r_reader_v4.md
+  - R5_bundle10r_traceability_v4.yaml
+  - R5_bundle10r_quality_scorecard.yaml
+  - R5_bundle10r_human_review_handoff.yaml
+  - R5_bundle10r_reader_generation_lock.yaml
+  - R5_bundle10r_close_readout.md
+bundle10r_may_start_only_after_model_generation_lock: true
+bundle10r_may_close_only_if:
+  - model_generation_freshness_passes
+  - all_core_sections_pass
+  - truthfulness_blockers_equal_zero
+  - candidate_blockers_equal_zero
+  - deterministic_rerender_passes
+  - human_review_status_is_truthful
+sample_quality_allowed_after_close: false
+p2_allowed_after_close: false

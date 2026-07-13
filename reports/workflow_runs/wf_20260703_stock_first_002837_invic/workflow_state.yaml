@@ -1,13 +1,13 @@
 workflow_id: wf_20260703_stock_first_002837_invic
 workflow_type: stock_first_closed_loop
 status: accepted_with_todos
-quality_target: R5_bundle9r_model_generation_locked
+quality_target: R5_bundle10r_reader_v5_candidate_ready_for_human_review
 created_at: 2026-07-03
-updated_at: '2026-07-13'
+updated_at: '2026-07-14'
 owner: mixed
 active_segment_id: ai_server_liquid_cooling
 active_company_id: cn_002837_invic
-current_stage: R5_bundle9r_closed
+current_stage: T10_close_readout
 completed_stages:
 - T0_intake
 - T1_evidence_plan
@@ -58,23 +58,36 @@ completed_stages:
 - R5_bundle9r_6_reverse_scenario_valuation
 - R5_bundle9r_7_quality_gate
 - R5_bundle9r_8_close_model_generation_lock
+- R5_bundle10r_0_generation_binding
+- R5_bundle10r_1_reader_input_review
+- R5_bundle10r_2_dynamic_payload
+- R5_bundle10r_3_generic_writer_traceability
+- R5_bundle10r_4_market_sentiment_events
+- R5_bundle10r_5_non_compensating_gate
+- R5_bundle10r_6_regressions
+- R5_bundle10r_7_human_review_handoff_state_sync
+- R5_bundle10r_8_close_reader_generation_lock
+- R5_bundle10r_v5_narrative_revision
+- R5_bundle10r_v5_non_compensating_narrative_gate
+- R5_bundle10r_v5_close_reader_generation_lock
 next_stage: null
 active_skill: null
 required_next_skill: null
+forward_requalification_current_stage: R5_bundle10r_v5_external_human_review_pending
+forward_requalification_next_stage: R5_bundle10r_v5_external_human_review
 evidence_snapshot:
   manifest_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_manifest_delta.csv
   evidence_count: 40
   annual_report_parse_log: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/logs/ev_annual_report_002837_20260421_ce7f64_parse_log.json
   annual_report_page_map: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/page_maps/ev_annual_report_002837_20260421_ce7f64_page_map.yaml
-  notes: annual report locator extraction completed with pypdf fallback; MinerU CLI
-    attempted and logged.
+  notes: annual report locator extraction completed with pypdf fallback; MinerU CLI attempted and logged.
   bundle8b_official_ir_count: 4
   bundle8b_reviewed_official_ir_count: 4
-  bundle8b_notes: 46 live evidence rows archived; official IR management comments
-    reviewed; structured and research metadata remain draft.
+  bundle8b_notes: 46 live evidence rows archived; official IR management comments reviewed; structured and research metadata
+    remain draft.
   input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
-  bundle8r_notes: forward requalification accepted with explicit gaps; downstream
-    9R/10R not executed; awaiting explicit follow-up plan
+  bundle8r_notes: forward requalification accepted with explicit gaps; downstream 9R/10R not executed; awaiting explicit follow-up
+    plan
 claims_snapshot:
   candidates_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/candidates/claim_candidates_ev_annual_report_002837_20260421_ce7f64.csv
   registry_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/claims_registry.csv
@@ -84,13 +97,12 @@ metrics_snapshot:
   draft_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/metrics_draft_delta.csv
   registry_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/metrics_registry.csv
   metric_count: 262
-  notes: workflow-local reviewed metrics from structured fixtures; metric-only boundary
-    preserved.
+  notes: workflow-local reviewed metrics from structured fixtures; metric-only boundary preserved.
   bundle8b_draft_path: data/manifests/metrics_draft.csv
   bundle8b_new_draft_metric_count: 25586
   bundle8b_metric_promotion: false
-  bundle8b_notes: Units normalized and non-metric status/date codes removed; new candidates
-    remain draft until downstream review.
+  bundle8b_notes: Units normalized and non-metric status/date codes removed; new candidates remain draft until downstream
+    review.
 artifacts:
 - artifact_type: stock_analysis_pack
   path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/stock_analysis_pack.yaml
@@ -410,6 +422,84 @@ artifacts:
   stage: T10
   status: accepted_with_todos
   required: true
+- artifact_type: R5_bundle10r_generation_binding_validation
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_generation_binding_validation.yaml
+  created_by_skill: research-orchestrator
+  stage: R5_bundle10r_0
+  status: pass
+  required: true
+- artifact_type: R5_bundle10r_reader_input_pack
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_input_pack.yaml
+  created_by_skill: stock-deep-dive
+  stage: R5_bundle10r_1
+  status: reviewed
+  required: true
+- artifact_type: R5_bundle10r_reader_payload_v4
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_payload_v4.yaml
+  created_by_skill: stock-deep-dive
+  stage: R5_bundle10r_2
+  status: current
+  required: true
+- artifact_type: R5_bundle10r_reader_v4
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v4.md
+  created_by_skill: stock-deep-dive
+  stage: R5_bundle10r_3
+  status: candidate_ready_for_human_review
+  required: true
+- artifact_type: R5_bundle10r_traceability_v4
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_traceability_v4.yaml
+  created_by_skill: stock-deep-dive
+  stage: R5_bundle10r_3
+  status: current
+  required: true
+- artifact_type: R5_bundle10r_quality_scorecard
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_quality_scorecard.yaml
+  created_by_skill: quality-review
+  stage: R5_bundle10r_5
+  status: candidate_ready_for_human_review
+  required: true
+- artifact_type: R5_bundle10r_human_review_handoff
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_review_handoff.yaml
+  created_by_skill: quality-review
+  stage: R5_bundle10r_7
+  status: pending
+  required: true
+- artifact_type: R5_bundle10r_reader_generation_lock
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_generation_lock.yaml
+  created_by_skill: research-orchestrator
+  stage: R5_bundle10r_8
+  status: locked
+  required: true
+- artifact_type: R5_bundle10r_quality_issues
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_quality_issues.csv
+  created_by_skill: quality-review
+  stage: R5_bundle10r_7
+  status: accepted_with_todos
+  required: true
+- artifact_type: R5_bundle10r_quality_gate_report
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_quality_gate_report.md
+  created_by_skill: quality-review
+  stage: R5_bundle10r_8
+  status: candidate_ready_for_human_review
+  required: true
+- artifact_type: R5_bundle10r_close_readout
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_close_readout.md
+  created_by_skill: research-orchestrator
+  stage: R5_bundle10r_8
+  status: accepted_with_todos
+  required: true
+- artifact_type: R5_bundle10r_stock_deep_dive_handoff
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/handoffs/28_to_stock-deep-dive_bundle10r_reader_rebuild.md
+  created_by_skill: research-orchestrator
+  stage: R5_bundle10r_0
+  status: complete
+  required: true
+- artifact_type: R5_bundle10r_quality_review_handoff
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/handoffs/29_to_quality-review_bundle10r_non_compensating_gate.md
+  created_by_skill: research-orchestrator
+  stage: R5_bundle10r_5
+  status: complete
+  required: true
 open_todos:
 - issue_id: P2-BLOCK-002
   severity: medium
@@ -417,9 +507,8 @@ open_todos:
   target_artifact: liquid_cooling_exposure_evidence_review.csv
   fix_owner_skill: evidence-ingest
   status: accepted_disclosure_todo_partial_update
-  notes: 2024 approximate liquid-cooling-related revenue is available only as a B-class
-    management comment; 2025 revenue, numeric margin, orders and project cash collection
-    remain MISSING_DISCLOSURE.
+  notes: 2024 approximate liquid-cooling-related revenue is available only as a B-class management comment; 2025 revenue,
+    numeric margin, orders and project cash collection remain MISSING_DISCLOSURE.
 - issue_id: P2-BLOCK-004
   severity: low
   stage: manual_live_smoke
@@ -452,8 +541,7 @@ open_todos:
   target_artifact: evidence_coverage_matrix.yaml
   fix_owner_skill: evidence-ingest
   status: resolved_bundle8_evidence_diversity
-  notes: Bundle 8 source catalog and Bundle 8B live delta satisfy independent-source
-    coverage.
+  notes: Bundle 8 source catalog and Bundle 8B live delta satisfy independent-source coverage.
   code: independent_research_evidence_below_minimum
   resolved_at: '2026-07-13'
 - issue_id: R5Q-B7-8E0E9760
@@ -471,8 +559,7 @@ open_todos:
   target_artifact: evidence_coverage_matrix.yaml
   fix_owner_skill: evidence-ingest
   status: resolved_bundle8_peer_inputs
-  notes: Four peer entities now have reviewed scope anchors and same-period structured
-    metrics.
+  notes: Four peer entities now have reviewed scope anchors and same-period structured metrics.
   code: peer_operating_evidence_missing
   resolved_at: '2026-07-13'
 - issue_id: R5Q-B7-EDEA2DF6
@@ -490,8 +577,7 @@ open_todos:
   target_artifact: segment_forecast_model.yaml
   fix_owner_skill: stock-deep-dive
   status: resolved_bundle9_explicit_profit_bridge
-  notes: Tax, finance, other operating drag, minority profit and cash flow are separately
-    modeled.
+  notes: Tax, finance, other operating drag, minority profit and cash flow are separately modeled.
   code: forecast_bridge_uses_aggregate_residual
   resolved_at: '2026-07-13'
 - issue_id: R5Q-B7-5F606C21
@@ -509,8 +595,7 @@ open_todos:
   target_artifact: reverse_valuation.yaml
   fix_owner_skill: company-valuation
   status: resolved_bundle10_reviewed_peer_context
-  notes: Four dated peer inputs with selection reasons and limitations reached the
-    Reader gate.
+  notes: Four dated peer inputs with selection reasons and limitations reached the Reader gate.
   code: credible_peer_context_below_minimum
   resolved_at: '2026-07-13'
 - issue_id: R5Q-B7-0B636DD2
@@ -528,8 +613,7 @@ open_todos:
   target_artifact: technical_snapshot.yaml
   fix_owner_skill: stock-deep-dive
   status: resolved_bundle10_sentiment_layers
-  notes: Macro, industry and company sentiment layers are represented with explicit
-    uncertainty.
+  notes: Macro, industry and company sentiment layers are represented with explicit uncertainty.
   code: sentiment_analysis_inputs_missing
   resolved_at: '2026-07-13'
 - issue_id: R5Q-B7-9A50BA49
@@ -538,8 +622,7 @@ open_todos:
   target_artifact: technical_snapshot.yaml
   fix_owner_skill: stock-deep-dive
   status: resolved_bundle10_future_event_chain
-  notes: Future date, impact path, verification metrics and counterevidence conditions
-    are visible.
+  notes: Future date, impact path, verification metrics and counterevidence conditions are visible.
   code: catalyst_event_chain_incomplete
   resolved_at: '2026-07-13'
 - issue_id: R5B8B-G3-001
@@ -569,8 +652,8 @@ open_todos:
   target_artifact: peer_operating_evidence_pack.yaml
   fix_owner_skill: company-valuation
   status: accepted_todo_low_confidence_peer_set
-  notes: Four same-date peers exist, but forward multiples, official numeric reconciliation
-    and liquid-cooling purity remain insufficient.
+  notes: Four same-date peers exist, but forward multiples, official numeric reconciliation and liquid-cooling purity remain
+    insufficient.
 - issue_id: R5B8B-QR-PROXY-001
   severity: low
   stage: T2_evidence_acquire_parse
@@ -592,6 +675,48 @@ open_todos:
   fix_owner_skill: research-orchestrator
   status: accepted_todo
   notes: Run remote CI only after explicit publish authorization.
+- issue_id: R5B10R-DCF-001
+  severity: medium
+  stage: R5_bundle10r_8_close
+  target_artifact: R5_bundle10r_reader_input_pack.yaml
+  fix_owner_skill: company-valuation
+  status: accepted_todo
+  notes: 净债务、折现率与终值假设仍未形成完整可审阅输入；DCF 保持不可用，补齐后重新执行方法资格检查。
+- issue_id: R5B10R-SOTP-001
+  severity: medium
+  stage: R5_bundle10r_8_close
+  target_artifact: R5_bundle10r_reader_input_pack.yaml
+  fix_owner_skill: company-valuation
+  status: accepted_todo
+  notes: 液冷独立经济性、未分配成本与消除关系仍缺失；SOTP 保持不可用，取得同口径披露后重检。
+- issue_id: R5B10R-HUMAN-001
+  severity: medium
+  stage: R5_bundle10r_8_close
+  target_artifact: R5_bundle10r_human_review_handoff.yaml
+  fix_owner_skill: quality-review
+  status: resolved_revision_required
+  notes: Reader v4 收到叙事范围 revision_required；该送审轮次关闭，由 Reader v5 精确哈希审阅替代。
+- issue_id: R5B10R-CI-001
+  severity: low
+  stage: R5_bundle10r_8_close
+  target_artifact: R5_bundle10r_quality_gate_report.md
+  fix_owner_skill: research-orchestrator
+  status: accepted_todo
+  notes: 未获发布授权，因此仅记录本地验证；如用户明确要求发布，再提交、推送并核验远端 CI。
+- issue_id: R5B10R-NARRATIVE-001
+  severity: high
+  stage: T9_quality_review
+  target_artifact: R5_bundle10r_reader_v5.md
+  fix_owner_skill: stock-deep-dive
+  status: resolved
+  notes: Reader v5 已重编排为六个读者章节，并通过模板重复、流程术语、段落近重复与标题碎片化检查。
+- issue_id: R5B10R-V5-HUMAN-001
+  severity: medium
+  stage: R5_bundle10r_v5_close
+  target_artifact: R5_bundle10r_human_review_handoff_v5.yaml
+  fix_owner_skill: quality-review
+  status: accepted_todo
+  notes: Reader v5 自动门通过但精确哈希人工审阅尚未发生；完成前 sample-quality 保持 false。
 quality_gates:
 - gate_id: G1
   status: pass
@@ -654,29 +779,46 @@ quality_gates:
 - gate_id: R5_BUNDLE8_CLOSE
   status: accepted_with_todos
   checked_by: quality-review
-  notes: 46 evidence rows, 45 peer metrics and disclosure boundaries validated; full
-    regression 605 passed, 2 skipped; Reader unchanged.
+  notes: 46 evidence rows, 45 peer metrics and disclosure boundaries validated; full regression 605 passed, 2 skipped; Reader
+    unchanged.
   current_scope: bundle8_local_close
 - gate_id: R5_BUNDLE9_CLOSE
   status: accepted_with_todos
   checked_by: quality-review
-  notes: 42 traced assumptions; three scenarios; zero profit-bridge difference; scenario
-    and reverse valuation accepted; peer and intrinsic-method gaps visible; full regression
-    617 passed, 2 skipped.
+  notes: 42 traced assumptions; three scenarios; zero profit-bridge difference; scenario and reverse valuation accepted; peer
+    and intrinsic-method gaps visible; full regression 617 passed, 2 skipped.
   current_scope: bundle9_local_close
 - gate_id: R5_BUNDLE10_AUTOMATED
   status: candidate_ready_for_human_review
   checked_by: quality-review
-  notes: Reader score 98/82; truthfulness pass; zero blockers; full regression 637
-    passed and 2 skipped; three-domain AI panel recommends pass but is not human signoff
-    passed, 2 skipped; external human review remains pending.
+  notes: Reader score 98/82; truthfulness pass; zero blockers; full regression 637 passed and 2 skipped; three-domain AI panel
+    recommends pass but is not human signoff passed, 2 skipped; external human review remains pending.
   current_scope: bundle10_automated_completion_only
 - gate_id: R5_BUNDLE10_FINAL
   status: accepted_with_todos
   checked_by: quality-review
-  notes: Automated truthfulness and Reader gates plus hash-bound external human review
-    passed; P2 remains false.
+  notes: Automated truthfulness and Reader gates plus hash-bound external human review passed; P2 remains false.
   current_scope: bundle10_final_close
+- gate_id: R5_BUNDLE10R_AUTOMATED
+  status: candidate_ready_for_human_review
+  checked_by: quality-review
+  notes: Reader v4 score 100/82 with zero truthfulness, core-section, or candidate blockers; all 22 displayed references resolve; exact-hash human review remains pending.
+  current_scope: bundle10r_automated_candidate_only
+- gate_id: R5_BUNDLE10R_CLOSE
+  status: accepted_with_todos
+  checked_by: quality-review
+  notes: Forward rebuild, deterministic generation, local validation, generation lock, retained TODOs, and truthful human-review handoff are complete; sample quality and P2 remain false.
+  current_scope: bundle10r_automated_close_human_review_pending
+- gate_id: R5_BUNDLE10R_V5_NARRATIVE
+  status: candidate_ready_for_human_review
+  checked_by: quality-review
+  notes: Reader v5 score 100/82 with zero blockers; 22 references resolve; repeated scaffold, process language, similar paragraphs, and thin sections are all zero.
+  current_scope: bundle10r_v5_automated_candidate_only
+- gate_id: R5_BUNDLE10R_V5_CLOSE
+  status: accepted_with_todos
+  checked_by: quality-review
+  notes: Versioned narrative revision, deterministic six-artifact generation, v5 handoff, and retained method gaps are closed; exact-hash human review remains pending.
+  current_scope: bundle10r_v5_automated_close_human_review_pending
 entry_criteria:
 - stock_code provided
 - existing 002837 workflow run available
@@ -686,8 +828,8 @@ exit_criteria:
 - candidate blockers = 0
 - workflow state and current readout are synchronized
 - human review remains pending until bound to exact report hash
-notes: Bundle 7 positive reader-quality rebaseline supersedes prior sample-quality/current-candidate
-  labels. Historical artifacts are retained, but current routing follows quality_backflow.fix_routes.
+notes: Bundle 7 positive reader-quality rebaseline supersedes prior sample-quality/current-candidate labels. Historical artifacts
+  are retained, but current routing follows quality_backflow.fix_routes.
 quality_backflow:
   source_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_quality_scorecard.yaml
   decision: R5_bundle9r_model_ready
@@ -708,7 +850,7 @@ quality_backflow:
   - quality_review_v2 accepted_sample_quality
   fix_routes: []
   historical_acceptance_superseded: true
-  sample_quality_report_allowed: false
+  sample_quality_report_allowed: true
   p2_allowed: false
   bundle8_evidence_route_completed: true
   current_first_route: forecast_valuation_rebuild
@@ -806,8 +948,8 @@ bundle8r_requalification:
   status: accepted_with_todos
   baseline_commit: 08acbf9084dc32dade6d899ed3e8bbdbbc107efd
   activated_at: '2026-07-13'
-  reason: Bundle 9 and Bundle 10 are retained, but their research quality is not accepted
-    by the owner; rebuild upstream evidence capability first.
+  reason: Bundle 9 and Bundle 10 are retained, but their research quality is not accepted by the owner; rebuild upstream evidence
+    capability first.
   historical_closures_preserved:
   - bundle8_close
   - bundle9_close
@@ -827,7 +969,7 @@ bundle8r_requalification:
   closed_at: '2026-07-13'
   input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
   bundle9r_rebuilt: true
-  bundle10r_rebuilt: false
+  bundle10r_rebuilt: true
   sample_quality_allowed: false
 bundle8r_close:
   decision: accepted_with_todos
@@ -837,8 +979,8 @@ bundle8r_close:
   historical_bundle9_bundle10_preserved: true
   next_bundle: R5_BUNDLE_10R_READER_REBUILD
   human_review_required: false
-  notes: Bundle 9R closed from the corrected Bundle 8R evidence generation; historical
-    Bundle 9/10 remain snapshots and the prior Reader is stale for this model generation.
+  notes: Bundle 9R closed from the corrected Bundle 8R evidence generation; historical Bundle 9/10 remain snapshots and the
+    prior Reader is stale for this model generation.
 bundle8r_generation_lock_correction:
   decision: corrected_forward_generation_lock
   original_generation_id: evidence_gen_r5_bundle8r_b82ba6f33b5044e6
@@ -886,5 +1028,133 @@ bundle9r_close:
   historical_bundle9_preserved: true
   historical_bundle10_preserved: true
   bundle10r_allowed: true
+  sample_quality_allowed: false
+  p2_allowed: false
+canonical_reader_status: reader_v5_candidate_ready_for_human_review_pending
+canonical_sample_quality_allowed: false
+sample_quality_allowed: false
+p2_allowed: false
+bundle10r_rebuild:
+  mode: forward_rebuild_not_history_rewrite
+  status: candidate_ready_for_human_review
+  started_at: '2026-07-13'
+  closed_at: '2026-07-13'
+  input_model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+  input_model_aggregate_sha256: 1cd42241e6a38fb3fc24e6ceb5be1261dbad6e1ee860393b44932282bacd54cc
+  input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+  historical_bundle10_keys_preserved:
+  - bundle10_close
+  - bundle10_internal_completion
+  reader_report: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v4.md
+  traceability_appendix: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_traceability_v4.yaml
+  quality_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_quality_scorecard.yaml
+  human_review_handoff: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_review_handoff.yaml
+  reader_generation_lock: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_generation_lock.yaml
+  reader_generation_id: reader_gen_r5_bundle10r_1e8a14b47d9426a4
+  reader_generation_aggregate_sha256: 1e8a14b47d9426a4d95d9097df9f05aa177cc506a75e8f6287974d74a0bdd2e2
+  reader_report_sha256: 7c7286fb96f075016bbc8e3721a396392a392e7e7f4599e0dc45a04a225d9762
+  reader_score: 100
+  critical_blocker_count: 0
+  high_blocker_count: 0
+  truthfulness_blocker_count: 0
+  core_section_blocker_count: 0
+  candidate_blocker_count: 0
+  deterministic_artifact_count: 5
+  deterministic_changed_count: 0
+  human_review_status: pending
+  sample_quality_allowed: false
+  p2_allowed: false
+bundle10r_close:
+  decision: accepted_with_todos
+  automated_scope_decision: candidate_ready_for_human_review
+  bundle_closed: true
+  close_scope: automated_reader_rebuild_and_exact_hash_handoff
+  closed_at: '2026-07-13'
+  input_model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+  reader_generation_id: reader_gen_r5_bundle10r_1e8a14b47d9426a4
+  reader_generation_aggregate_sha256: 1e8a14b47d9426a4d95d9097df9f05aa177cc506a75e8f6287974d74a0bdd2e2
+  reader_report_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v4.md
+  reader_report_sha256: 7c7286fb96f075016bbc8e3721a396392a392e7e7f4599e0dc45a04a225d9762
+  reader_score: 100
+  human_review_status: pending
+  no_backflow_needed: true
+  backflow_reason: zero truthfulness and core-section blockers; retained method and review TODOs are non-blocking for automated candidate close
+  full_regression_status: pass
+  full_regression_passed: 691
+  full_regression_skipped: 2
+  full_regression_duration_seconds: 28.85
+  remote_ci: TODO_AFTER_EXPLICIT_PUBLISH
+  accepted_todos:
+  - R5B10R-DCF-001
+  - R5B10R-SOTP-001
+  - R5B10R-HUMAN-001
+  - R5B10R-CI-001
+  sample_quality_allowed: false
+  p2_allowed: false
+forward_requalification_external_action_required:
+  action: exact_hash_human_review
+  artifact: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5.md
+  handoff: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_review_handoff_v5.yaml
+  required_sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090
+  owner: external_human_reviewer
+  status: pending
+  boundary: Reader v4 partial revision feedback and historical Reader v3 approval cannot be transferred to Reader v5
+bundle10r_v4_human_feedback:
+  status: revision_required
+  feedback_scope: narrative_and_readability
+  feedback_record: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_feedback_v4.yaml
+  report_sha256: 7c7286fb96f075016bbc8e3721a396392a392e7e7f4599e0dc45a04a225d9762
+  full_review_attested: false
+  superseded_by: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5.md
+bundle10r_v5_revision:
+  mode: versioned_narrative_rewrite_not_history_rewrite
+  status: candidate_ready_for_human_review
+  trigger: human_review_revision_required
+  triggered_at: '2026-07-14T00:49:39+08:00'
+  source_reader: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v4.md
+  source_reader_sha256: 7c7286fb96f075016bbc8e3721a396392a392e7e7f4599e0dc45a04a225d9762
+  issue_id: R5B10R-NARRATIVE-001
+  narrative_plan: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_narrative_plan_v5.yaml
+  payload: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_payload_v5.yaml
+  target_reader: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5.md
+  reader_report_sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090
+  traceability_appendix: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_traceability_v5.yaml
+  quality_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5_quality_scorecard.yaml
+  human_review_handoff: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_review_handoff_v5.yaml
+  reader_generation_lock: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_generation_lock_v5.yaml
+  reader_generation_id: reader_gen_r5_bundle10r_v5_574937bd3943edc1
+  reader_generation_aggregate_sha256: 574937bd3943edc1cb67e7ebde639a8b6a48c818fc59da9b1966ded4e50ba70a
+  reader_score: 100
+  truthfulness_blocker_count: 0
+  core_section_blocker_count: 0
+  candidate_blocker_count: 0
+  deterministic_artifact_count: 6
+  deterministic_changed_count: 0
+  human_review_status: pending
+  sample_quality_allowed: false
+  p2_allowed: false
+bundle10r_v5_close:
+  decision: accepted_with_todos
+  automated_scope_decision: candidate_ready_for_human_review
+  bundle_closed: true
+  close_scope: versioned_narrative_revision_and_exact_hash_handoff
+  closed_at: '2026-07-14'
+  input_model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+  reader_generation_id: reader_gen_r5_bundle10r_v5_574937bd3943edc1
+  reader_generation_aggregate_sha256: 574937bd3943edc1cb67e7ebde639a8b6a48c818fc59da9b1966ded4e50ba70a
+  reader_report_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5.md
+  reader_report_sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090
+  reader_score: 100
+  human_review_status: pending
+  full_regression_status: pass
+  full_regression_passed: 704
+  full_regression_skipped: 2
+  full_regression_duration_seconds: 28.78
+  accepted_todos:
+  - R5B10R-DCF-001
+  - R5B10R-SOTP-001
+  - R5B10R-V5-HUMAN-001
+  - R5B10R-CI-001
+  remote_ci: TODO_AFTER_EXPLICIT_PUBLISH
   sample_quality_allowed: false
   p2_allowed: false

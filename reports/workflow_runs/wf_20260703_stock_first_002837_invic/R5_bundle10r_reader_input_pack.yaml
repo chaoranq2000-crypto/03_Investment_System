@@ -1,0 +1,756 @@
+artifact_type: R5_bundle10r_reader_input_pack
+schema_version: v1
+workflow_id: wf_20260703_stock_first_002837_invic
+company:
+  name: 英维克
+  ticker: 002837.SZ
+  as_of_date: '2026-07-13'
+report_level: 研究候选稿
+human_review_status: pending
+source_generation:
+  evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+  model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+  model_aggregate_sha256: 1cd42241e6a38fb3fc24e6ceb5be1261dbad6e1ee860393b44932282bacd54cc
+  historical_reader_status: stale_reference_only
+sections:
+  - section_id: executive_summary
+    title: 核心矛盾与研究边界
+    judgment: >-
+      现有证据支持英维克具备数据中心温控和端到端液冷产品平台，但尚不足以把公司整体增长解释为液冷收入增长；当前核心判断应限定为产品与技术平台暴露已验证、利润和现金贡献仍待分项披露与跨期验证。
+    judgment_refs: [E1, E2, E4, E19]
+    facts:
+      - text: >-
+          2025年公司营业收入约60.68亿元、归母净利润约5.22亿元，同比分别增长约32.23%和15.30%；2026年一季度毛利率约24.29%、净利率约1.20%，经营现金流净额约为负3.86亿元，规模扩张与利润、现金转化出现分化。
+        refs: [E1, E2]
+      - text: >-
+          当前模型代际以2025年审计宽口径业务线为锚，基准情景估计2026E至2028E归母净利润约4.84亿元、6.83亿元和8.87亿元；这些数值属于研究估计，不是发行人指引，也不单列液冷分部。
+        refs: [E10, E19]
+    causal_mechanism:
+      - text: >-
+          产品覆盖和行业需求只能先形成项目机会，随后还需经历客户验证、批量交付、验收确认与回款；若毛利率、费用纪律和营运资金没有同步改善，收入增长不会等比例转化为净利润和自由现金流。
+        refs: [E2, E4, E5, E10]
+    economic_implications:
+      - text: >-
+          研究价值不在于单一增长率，而在于判断产品平台能否转化为可复算的分业务利润和现金回报；当前市场资本化水平对盈利修复要求较高，模型偏差会直接改变估值压力测试结果。
+        refs: [E10, E14, E18]
+    counterevidence:
+      - text: >-
+          单季度现金流可能受验收与营运资金节奏扰动，不能据此认定长期恶化；同时公司已披露多部件液冷平台和客户验证线索，若后续批量交付与回款被正式披露，当前谨慎判断可以得到正向修订。
+        refs: [E1, E4, E5, E6]
+    uncertainty:
+      - text: >-
+          液冷独立收入、毛利率、项目价值量和回款周期尚无同口径发行人披露，外部盈利分布与三情景模型也均为估计，因此本稿只给出可证伪的研究框架，不给出确定性增长归因。
+        refs: [E4, E10, E12]
+    watchpoints:
+      - metric: 利润与现金转化
+        trigger: 连续2个可比报告期毛利率不再同比下降且经营现金流转正
+        horizon: 未来两个定期报告
+        direction: 同时满足才支持上调财务兑现判断
+        refs: [E1, E2]
+      - metric: 模型偏差
+        trigger: 实际收入、归母净利润或经营现金流相对基准模型偏差超过10%
+        horizon: 每次定期报告后
+        direction: 触发三情景和估值压力测试重算
+        refs: [E10, E17]
+    references: [E1, E2, E4, E5, E6, E10, E12, E14, E17, E18, E19]
+
+  - section_id: company_context_and_scope
+    title: 公司背景与可验证范围
+    judgment: >-
+      公司的可验证范围是数据中心温控及端到端液冷产品能力，尚不能延伸到液冷独立收入、毛利、订单金额或公司整体增长归因；管理层近似口径必须与审计分部事实分开。
+    judgment_refs: [E1, E4, E5, E6]
+    facts:
+      - text: >-
+          2025年年报披露的产品范围从机房温控延伸至冷板、冷却液分配装置、快接头和微模块液冷，并包含平台测试验证与客户定制案例；定期报告仍未给出液冷收入和毛利占比。
+        refs: [E1, E4]
+      - text: >-
+          管理层公开交流曾给出2024年数据中心机房及算力设备液冷技术相关收入约3亿元、截至2025年3月液冷链条累计交付约1.2GW的近似口径；两者不是审计分部收入、在手订单或产能。
+        refs: [E4, E5, E6]
+    causal_mechanism:
+      - text: >-
+          当机柜功率密度超过30kW，冷却方案需要同时处理芯片级换热、流体分配、连接可靠性、控制和现场服务；多部件平台若通过客户验证并进入批量交付，可能提高集成效率和供应商切换成本。
+        refs: [E1, E6, E7, E16]
+    economic_implications:
+      - text: >-
+          平台广度可能扩大单项目覆盖的设备与服务环节，但只有分项出货、验收、毛利和回款被披露后，才可判断其对公司利润和现金流的实际贡献。
+        refs: [E4, E5, E6]
+    counterevidence:
+      - text: >-
+          产品名称和测试验证并不等于批量收入；政策支持多种高效制冷路线，同业也存在热管理与液冷经营线索，平台覆盖可能受到替代技术、价格竞争和项目执行成本抵消。
+        refs: [E7, E8, E9, E20, E21, E22]
+    uncertainty:
+      - text: >-
+          管理层口径具有近似性，且尚缺2025年液冷独立收入、数值毛利率、客户订单金额和项目回款，现阶段不能把宽口径机房或机柜温控收入全部归为液冷。
+        refs: [E1, E4, E5]
+    watchpoints:
+      - metric: 产品平台延续性
+        trigger: 连续2期定期报告继续披露核心液冷产品、验证或批量交付进展
+        horizon: 未来两个定期报告
+        direction: 验证平台暴露是否保持
+        refs: [E1, E4]
+      - metric: 独立经济性披露
+        trigger: 首次出现可与公司总额勾稽的液冷收入和毛利率
+        horizon: 后续年度或中期报告
+        direction: 才允许从产品暴露升级为收入或利润暴露
+        refs: [E1, E4, E19]
+    references: [E1, E4, E5, E6, E7, E8, E9, E16, E19, E20, E21, E22]
+
+  - section_id: financial_quality
+    title: 财务质量与现金转化
+    judgment: >-
+      英维克2025年收入与归母净利润均增长，但利润增速低于收入增速，2026年一季度毛利率、净利率和经营现金流进一步承压；当前财务质量应评价为规模扩张已确认、利润和现金转化仍需跨期验证。
+    judgment_refs: [E1, E2]
+    facts:
+      - text: >-
+          2023A至2025A，公司收入由35.29亿元增至60.68亿元，归母净利润由3.44亿元增至5.22亿元，经营现金流却由4.53亿元降至1.57亿元，增长与现金转换方向分化。
+        refs: [E1, E2]
+      - text: >-
+          2026年一季度收入约11.75亿元、归母净利润约0.09亿元、毛利率约24.29%，经营现金流净额约为负3.86亿元；应收账款和存货占用使短期现金压力更加明显。
+        refs: [E2, E5]
+    causal_mechanism:
+      - text: >-
+          收入扩张快于利润增长可能来自产品结构、区域组合、价格或费用投入变化；若项目验收与回款慢于出货，应收和存货会先于现金回收上升，使账面增长与现金利润产生时差。
+        refs: [E1, E2, E5, E6]
+    economic_implications:
+      - text: >-
+          毛利率和现金转化若不能修复，收入增长对归母净利润、自由现金流和资本回报的贡献会被削弱，并提高后续营运资金需求；这一影响属于公司整体财务质量，不能直接归因于液冷业务。
+        refs: [E1, E2, E10]
+    counterevidence:
+      - text: >-
+          一季度现金流可能包含季节性采购、交付和回款错配，单个季度不足以证明长期恶化；2025年收入与利润仍保持增长，后续应通过连续报告期判断压力是否可逆。
+        refs: [E1, E2]
+    uncertainty:
+      - text: >-
+          现有披露不足以把毛利率和现金流变化准确拆分到产品结构、区域、客户、价格和项目阶段，因而不能在缺少分项证据时给出单一原因解释。
+        refs: [E1, E2, E5]
+    watchpoints:
+      - metric: 毛利率与经营现金流
+        trigger: 连续2个可比报告期毛利率不再同比下降且经营现金流为正
+        horizon: 未来两个定期报告
+        direction: 支持现金转化进入修复区间
+        refs: [E1, E2]
+      - metric: 营运资金质量
+        trigger: 应收账款与存货增速连续2期均低于收入增速
+        horizon: 未来两个定期报告
+        direction: 验证增长不再依赖加速资金占用
+        refs: [E1, E2, E5]
+    tables:
+      - title: 历史与最新季度财务快照
+        headers: [期间, 收入（亿元）, 归母净利润（亿元）, 经营现金流（亿元）, 毛利率]
+        rows:
+          - [2023A, '35.29', '3.44', '4.53', 未单列]
+          - [2024A, '45.89', '4.53', '2.00', 未单列]
+          - [2025A, '60.68', '5.22', '1.57', '27.9%']
+          - [2026Q1, '11.75', '0.09', '-3.86', '24.3%']
+        note: 年度数据来自审计年报，2026年一季度为季度口径，单季度不作全年外推。
+        refs: [E1, E2, E3]
+    references: [E1, E2, E3, E5, E6, E10]
+
+  - section_id: segment_economics
+    title: 业务拆分与细分经济性
+    judgment: >-
+      现有披露可确认英维克覆盖液冷系统多个部件和交付环节，但无法确认各环节收入、毛利率和价值量；分业务经济性应围绕验证、出货、验收和回款链条评估，不能用公司整体毛利率替代液冷分部利润率。
+    judgment_refs: [E1, E3, E4]
+    facts:
+      - text: >-
+          2025年机房温控节能产品收入约34.48亿元、占比约56.83%、毛利率约28.36%；机柜温控节能产品收入约19.77亿元、占比约32.59%、毛利率约27.24%，宽产品线可与公司收入总额勾稽。
+        refs: [E1, E3]
+      - text: >-
+          公司披露冷板、冷却液分配装置、快接头和微模块液冷等产品与验证案例，但液冷独立收入、毛利率和项目回款未单列，当前模型将相关经济性保留为未量化且不重复加总。
+        refs: [E1, E4, E19]
+    causal_mechanism:
+      - text: >-
+          多部件平台可能提高单项目覆盖价值，但定制开发、项目交付、验收周期、区域组合和竞争报价也会增加成本；验收拉长时，应收和存货会先于现金回收上升。
+        refs: [E3, E5, E6]
+    economic_implications:
+      - text: >-
+          正向情形是系统集成提高收入与毛利额并缩短客户集成周期，负向情形是项目复杂度、价格竞争和营运资金占用压低利润与现金转化；现阶段不对液冷单独估算收入或毛利。
+        refs: [E1, E2, E4, E5]
+    counterevidence:
+      - text: >-
+          平台覆盖可能被专业化同业的单品成本、不同技术路线和客户关系抵消；如果产品验证未形成批量交付、验收与回款，部件数量增加不能证明盈利贡献。
+        refs: [E5, E6, E9, E20, E21, E22]
+    uncertainty:
+      - text: >-
+          宽口径机房与机柜温控包含哪些液冷产品、各产品单价和项目容量、收入确认节奏及独立毛利均未披露，因此液冷经济性保持未量化、非加总状态。
+        refs: [E1, E4, E19]
+    watchpoints:
+      - metric: 分项经济性
+        trigger: 首次披露至少1个可复算的液冷收入、毛利或项目价值量指标
+        horizon: 后续定期报告或正式公告
+        direction: 用于替换当前未量化状态并检查重复加总
+        refs: [E1, E4]
+      - metric: 交付与回款链
+        trigger: 应收与存货增速连续2期快于收入且经营现金流未改善
+        horizon: 未来两个定期报告
+        direction: 触发平台经济性判断降级
+        refs: [E2, E5]
+    tables:
+      - title: 2025年宽产品线披露
+        headers: [宽产品线, 收入（亿元）, 收入占比, 毛利率]
+        rows:
+          - [机房温控节能产品, '34.48', '56.83%', '28.36%']
+          - [机柜温控节能产品, '19.77', '32.59%', '27.24%']
+          - [客车空调, '0.90', '1.49%', 未单列]
+          - [轨道交通列车空调及服务, '0.45', '0.74%', 未单列]
+          - [其他, '5.07', '8.35%', 未单列]
+        note: 年报宽产品线完整对上公司收入；未单列字段保持未披露，不用公司整体指标填补。
+        refs: [E1, E3, E4]
+    references: [E1, E2, E3, E4, E5, E6, E9, E19, E20, E21, E22]
+
+  - section_id: industry_and_competition
+    title: 行业结构与竞争边界
+    judgment: >-
+      独立来源支持数据中心规模扩张、机柜功率密度上升和能效约束趋严，液冷需求具有技术与政策基础；但政策并列支持多种高效制冷路线，同业经营口径又不可直接横比，行业景气不能自动映射为英维克收入或份额。
+    judgment_refs: [E7, E8, E16]
+    facts:
+      - text: >-
+          中国信通院研究资料显示，截至2024年底全国在用数据中心标准机架超过900万，单机柜功率密度已突破30kW；该信息属于独立行业研究口径，不是单一公司的经营事实。
+        refs: [E7, E16]
+      - text: >-
+          政策要求到2025年底全国平均电能利用效率不高于1.5，新建大型数据中心不高于1.25、国家枢纽项目不高于1.2，同时列举液冷、蒸发冷却、热管和氟泵等多种高效路线。
+        refs: [E8]
+      - text: >-
+          高澜股份、科创新源、申菱环境和飞荣达均有热管理或液冷经营线索，但液冷收入纯度、产品组合、客户结构和确认节奏不同；当前仅作低置信度经营上下文，不进行确定性排序。
+        refs: [E9, E20, E21, E22]
+    causal_mechanism:
+      - text: >-
+          高密度算力提高单位机柜热流密度，传统风冷的换热与能效边界收紧；能效约束进一步降低非信息技术能耗容忍度，从而推动冷板、浸没式及其他高效散热方案评估，但落地速度仍由可靠性、成本和客户标准决定。
+        refs: [E7, E8, E16]
+    economic_implications:
+      - text: >-
+          行业约束扩大高效散热设备、流体分配、换热与系统集成的潜在需求池；对英维克而言，只有批量出货、交付可靠性、价格和服务成本共同验证，需求池才可能转化为可持续利润。
+        refs: [E1, E7, E8]
+    counterevidence:
+      - text: >-
+          政策支持多种路线，专业化同业也可能依靠单品成本、细分客户或不同技术路线竞争；因此液冷需求增长不保证单一路线或单一公司持续受益。
+        refs: [E8, E9, E20, E21, E22]
+    uncertainty:
+      - text: >-
+          行业机架与功率密度数据来自研究资料，四家同业的官方经营口径尚未完成同期间、同分部、同价值链纯度对齐，当前比较不能推导市场份额或竞争优劣。
+        refs: [E7, E9, E16, E20, E21, E22]
+    watchpoints:
+      - metric: 高密度机柜趋势
+        trigger: 至少2个独立行业来源继续确认30kW以上机柜扩张
+        horizon: 年度行业资料更新
+        direction: 验证需求机制是否延续
+        refs: [E7, E16]
+      - metric: 同业可比性
+        trigger: 至少3家同业披露同期间可复算的液冷收入和毛利口径
+        horizon: 后续年度或中期报告
+        direction: 届时才评估更强的横向比较
+        refs: [E9, E20, E21, E22]
+    references: [E1, E7, E8, E9, E16, E20, E21, E22]
+
+  - section_id: forecast_and_scenarios
+    title: 预测、情景与现金流桥
+    judgment: >-
+      当前模型从2025年审计宽口径业务线出发，基准情景仍显示收入增长，但利润和自由现金流修复慢于外部盈利分布；液冷分项经营参数缺失使三情景区间和偏差跟踪比单点预测更重要。
+    judgment_refs: [E1, E2, E10, E12, E19]
+    facts:
+      - text: >-
+          基准情景估计2026E、2027E和2028E收入约74.41亿元、88.03亿元和101.31亿元，归母净利润约4.84亿元、6.83亿元和8.87亿元，每股收益约0.38元、0.54元和0.70元；利润桥最大勾稽差额为零。
+        refs: [E10, E19]
+      - text: >-
+          外部盈利分布的每股收益均值约为2026E的0.92元、2027E的1.58元和2028E的2.33元，明显高于内部基准；该分布属于分析师观点，不是发行人指引。
+        refs: [E12]
+      - text: >-
+          基准模型估计自由现金流由2026E约负1.93亿元改善至2027E约1.39亿元和2028E约4.10亿元，改善依赖毛利率、费用、营运资金和资本开支假设共同兑现。
+        refs: [E10, E17]
+    causal_mechanism:
+      - text: >-
+          模型分别设置机房温控、机柜温控及其他业务的收入增速与毛利率，并显式桥接销售、管理、研发、财务费用、税率、少数股东损益、营运资金和资本开支；利润与现金流对毛利和回款假设高度敏感。
+        refs: [E10, E17]
+    economic_implications:
+      - text: >-
+          内部基准低于外部盈利均值，意味着市场预期与审慎模型之间存在较大差距；若实际利润和现金流落在谨慎情景，估值压力会扩大，若分项收入、毛利与回款同步验证，模型才有上修依据。
+        refs: [E10, E12, E14]
+    counterevidence:
+      - text: >-
+          2025年收入仍快速增长，产品与行业证据也支持需求机会，毛利率和现金流可能在项目验收后修复；因此基准模型不是确定结果，必须保留谨慎和乐观情景。
+        refs: [E1, E4, E7, E10]
+    uncertainty:
+      - text: >-
+          项目量、容量、单价、验收节奏和液冷独立经济性没有发行人同口径披露，模型只能使用宽口径业务线与显式研究假设；外部盈利分布的机构模型和股本口径也未逐家复核。
+        refs: [E4, E10, E12]
+    watchpoints:
+      - metric: 收入与毛利偏差
+        trigger: 实际收入或毛利率相对基准情景偏差超过5%
+        horizon: 每次定期报告后
+        direction: 触发业务线假设与三情景重算
+        refs: [E10, E17]
+      - metric: 现金流偏差
+        trigger: 实际经营现金流相对年度模型锚偏差超过20%
+        horizon: 每个完整报告期
+        direction: 触发营运资金和自由现金流桥重估
+        refs: [E10, E17]
+    tables:
+      - title: 基准情景
+        headers: [期间, 收入（亿元）, 毛利率, 归母净利润（亿元）, 每股收益（元）]
+        rows:
+          - [2026E, '74.41', '25.9%', '4.84', '0.38']
+          - [2027E, '88.03', '26.6%', '6.83', '0.54']
+          - [2028E, '101.31', '27.2%', '8.87', '0.70']
+        note: 全部数值均为研究估计，依赖宽口径业务线，不把液冷虚构为独立分部。
+        refs: [E10, E19]
+      - title: 外部每股收益分布
+        headers: [期间, 内部基准, 外部最小值, 外部均值, 外部最大值, 机构数]
+        rows:
+          - [2026E, '0.38', '0.68', '0.92', '1.15', '12']
+          - [2027E, '0.54', '1.05', '1.58', '2.35', '12']
+          - [2028E, '0.70', '1.48', '2.33', '3.47', '10']
+        note: 外部区间属于分析师观点，不证明液冷收入，也不代表发行人指引。
+        refs: [E10, E12]
+    references: [E1, E2, E4, E7, E10, E12, E14, E17, E19]
+
+  - section_id: valuation_and_market_implied_expectations
+    title: 估值与市场隐含预期
+    judgment: >-
+      2026年7月13日市场快照对应较高的静态与基准动态倍数，当前市值隐含的盈利要求高于内部近期基准；估值只用于解释预期压力和情景差异，不能写成确定价值或行动结论。
+    judgment_refs: [E10, E14, E18, E19]
+    facts:
+      - text: >-
+          截至2026年7月13日，收盘价为66.98元、总市值约853.56亿元；按内部基准归母净利润计算，2026E、2027E和2028E动态市盈率约176.3倍、124.9倍和96.2倍，分母均为研究估计。
+        refs: [E10, E14, E18]
+      - text: >-
+          情景估值以2027E归母净利润与显式倍数压力点相乘：谨慎情景约135.8亿至203.7亿元，基准情景约512.4亿至683.2亿元，乐观情景约1023.5亿至1535.3亿元；区间不是已验证的公允价值。
+        refs: [E10, E14]
+      - text: >-
+          反向估值显示，100倍研究压力点对应约8.54亿元归母净利润；基准情景在2028E才达到，乐观情景在2027E达到，谨慎情景到2028E仍未达到。
+        refs: [E10, E14, E18]
+      - text: >-
+          四家同业仅提供低置信度经营与市场上下文，官方经营范围可定位，但液冷纯度、分部口径和确认节奏不可直接横比，因此不形成确定性排序。
+        refs: [E9, E15, E20, E21, E22]
+    causal_mechanism:
+      - text: >-
+          当前市值除以不同情景的归母净利润得到动态倍数，毛利率、费用率、营运资金和收入假设会通过利润分母放大估值变化；倍数本身不能反向证明业务竞争力。
+        refs: [E10, E14, E18]
+    economic_implications:
+      - text: >-
+          市场资本化水平要求利润修复持续兑现，实际结果若低于基准，隐含倍数和预期压力会进一步上升；若利润和现金流改善，压力可下降，但仍需结合方法限制解释。
+        refs: [E10, E14, E18]
+    counterevidence:
+      - text: >-
+          乐观情景在更高利润假设下可覆盖当前市值，基准情景也在2028E触及100倍利润压力点；这说明当前估值并非由单一结论决定，但所有覆盖都依赖尚未实现的估计。
+        refs: [E10, E14]
+    uncertainty:
+      - text: >-
+          净债务、企业价值、折现率、终值增速及液冷分部经济性仍不足，现金流折现和分部加总方法保持停用；同业缺乏可比的远期倍数与液冷纯度，比较只能低置信度使用。
+        refs: [E9, E14, E20, E21, E22]
+    watchpoints:
+      - metric: 利润压力点
+        trigger: 滚动归母净利润相对8.54亿元压力点偏差超过10%
+        horizon: 每次定期报告后
+        direction: 重算反向估值和动态倍数
+        refs: [E10, E14, E18]
+      - metric: 方法可用性
+        trigger: 至少补齐1套可审阅的折现率、终值或分部经济性输入
+        horizon: 新披露或模型方法更新后
+        direction: 再判断现金流折现或分部加总是否可启用
+        refs: [E4, E14, E19]
+    tables:
+      - title: 低置信度同业经营上下文
+        headers: [公司, 代码, 当前允许用途, 主要限制]
+        rows:
+          - [高澜股份, '300499', 经营范围与市场背景, 液冷纯度和官方数字尚未完全对齐]
+          - [科创新源, '300731', 经营范围与市场背景, 液冷纯度和官方数字尚未完全对齐]
+          - [申菱环境, '301018', 经营范围与市场背景, 分部口径与确认节奏不可直接横比]
+          - [飞荣达, '300602', 经营范围与市场背景, 分部口径与确认节奏不可直接横比]
+        note: 同业仅用于说明上下文和比较限制，不据此形成份额或优劣排序。
+        refs: [E9, E15, E20, E21, E22]
+    references: [E4, E9, E10, E14, E15, E18, E19, E20, E21, E22]
+
+  - section_id: market_technical_sentiment_and_events
+    title: 市场、技术、情绪与未来验证事件
+    judgment: >-
+      基准日价格显著波动且处于多条短期均线下方，但没有证据把单日变化归因于特定基本面事件；情绪材料只支持分层线索，未来仅保留一个尚待官方确认的验证窗口。
+    judgment_refs: [E11, E12, E13, E18]
+    facts:
+      - text: >-
+          2026年7月13日收盘价66.98元、单日变动约负8.92%、换手率约5.15%，低于5日均线71.96元、10日均线73.10元和20日均线75.58元；这些指标只描述市场状态。
+        refs: [E11, E18]
+      - text: >-
+          本轮没有足够的同日宏观指标形成独立宏观情绪结论；行业关注度与外部盈利分布属于分析师线索，公司层面的单日价格与成交变化也不能证明经营原因。
+        refs: [E7, E8, E11, E12]
+      - text: >-
+          当前官方来源没有确认基准日之后的公司事件日期，2026年8月25日只作为待官方确认的验证窗口使用，不写成已确定的业绩或公告日期。
+        refs: [E13]
+    causal_mechanism:
+      - text: >-
+          当外部盈利预期高于内部基准，价格会对利润、现金流和披露节奏的变化更敏感；但价格波动也可能受到市场情绪与交易结构影响，不能从单日走势反推基本面因果。
+        refs: [E10, E11, E12]
+    economic_implications:
+      - text: >-
+          技术与情绪信息的作用是标记预期压力和刷新时点，而不是证明业务暴露；只有正式披露改变收入、毛利、现金流或模型假设，才应调整研究结论。
+        refs: [E2, E10, E11]
+    counterevidence:
+      - text: >-
+          单日下跌可能在后续交易日修复，均线位置也会随价格序列快速变化；若没有公司正式披露，技术状态和行业关注线索不足以解释经营变化。
+        refs: [E11, E12]
+    uncertainty:
+      - text: >-
+          价格序列的复权口径仍需额外核验，宏观层缺少同日可比指标，未来验证窗口尚未由官方公告确认，因此本节保持条件式表述并要求下一证据周期刷新。
+        refs: [E11, E13]
+    watchpoints:
+      - metric: 短期市场状态
+        trigger: 5日与20日收益方向同时反转且成交变化超过20%
+        horizon: 下一次市场快照
+        direction: 仅更新市场状态描述，不改变业务事实
+        refs: [E11]
+      - metric: 未来事件确认
+        trigger: 官方来源确认1个基准日之后的披露日期
+        horizon: 下一证据刷新周期
+        direction: 用正式日期替换当前验证窗口
+        refs: [E13]
+    technical_context:
+      status: reviewed
+      as_of_date: '2026-07-13'
+      series_start: '2026-06-01'
+      refs: [E11]
+    sentiment_context:
+      status: reviewed
+      as_of_date: '2026-07-13'
+      layers: [宏观证据不足, 行业线索, 公司市场状态]
+      refs: [E7, E8, E11, E12]
+    events:
+      - date: '2026-08-25'
+        status: future
+        impact_path: 若该验证窗口被正式披露确认，则先核对宽口径与液冷分项，再更新毛利、费用、营运资金、现金流和三情景模型。
+        verification_metric: 正式披露日期、分业务收入、毛利率、应收、存货与经营现金流
+        counterevidence_condition: 官方来源未确认该日期，或正式披露仍没有可复算分项时，窗口不升级为确定事件。
+        refresh_trigger: 任何新的正式公告或定期报告日期出现
+        refs: [E2, E5, E10, E13, E14]
+    references: [E2, E5, E7, E8, E10, E11, E12, E13, E14, E18]
+
+  - section_id: risks_and_falsification
+    title: 风险、反证与证伪条件
+    judgment: >-
+      核心反证集中在液冷产品证据尚未转化为可量化分部经济性、2026年一季度利润率与经营现金流承压，以及行业存在替代路线和同业竞争；三类约束共同限制当前论点置信度。
+    judgment_refs: [E2, E4, E7, E8]
+    facts:
+      - text: >-
+          公司已披露液冷多部件与验证线索，但液冷收入、毛利、订单转化率和项目回款仍未单列；当前模型明确不把液冷作为独立可加总分部。
+        refs: [E1, E4, E19]
+      - text: >-
+          2026年一季度毛利率和经营现金流承压，行业政策又同时支持液冷、蒸发冷却、热管和氟泵等路线；四家同业仅能作为低置信度上下文。
+        refs: [E2, E8, E9, E20, E21, E22]
+    causal_mechanism:
+      - text: >-
+          如果客户验证未形成批量交付，或项目验收、价格竞争和服务成本恶化，产品覆盖不会自动转化为利润；营运资金占用会进一步放大现金流压力，而替代路线会削弱需求向单一公司的传导。
+        refs: [E5, E6, E7, E8]
+    economic_implications:
+      - text: >-
+          这些风险会同时影响收入增速、毛利率、现金流与估值分母，因而不能由总分或单一亮点抵消；任一核心章节出现证据越界都应阻断候选状态。
+        refs: [E2, E10, E14, E19]
+    counterevidence:
+      - text: >-
+          公司产品平台、行业高密度算力趋势和2025年整体增长构成正向证据；若连续报告期出现分项披露、利润率改善与现金流转正，可降低部分风险权重。
+        refs: [E1, E4, E7]
+    uncertainty:
+      - text: >-
+          项目量、单价、验收节奏、客户结构、液冷纯度和同业分部口径仍不完整，风险发生概率无法可靠量化；本节只列出影响路径、证伪条件和刷新要求。
+        refs: [E4, E5, E9, E19]
+    watchpoints:
+      - metric: 财务反证
+        trigger: 连续2个可比报告期收入增长仍伴随毛利率下降和经营现金流为负
+        horizon: 未来两个定期报告
+        direction: 触发财务质量和预测核心判断降级
+        refs: [E1, E2]
+      - metric: 业务反证
+        trigger: 连续2期未出现批量交付、验收、回款或可复算液冷分项证据
+        horizon: 未来两个定期报告
+        direction: 平台暴露继续停留在产品和技术层
+        refs: [E4, E5, E6]
+    references: [E1, E2, E4, E5, E6, E7, E8, E9, E10, E14, E19, E20, E21, E22]
+
+  - section_id: conclusion_and_watchlist
+    title: 研究结论与跟踪清单
+    judgment: >-
+      现有证据支持公司具备算力热管理与液冷产品平台，但财务兑现仍由宽口径温控业务、利润率和现金流决定；在独立液冷经济性、连续现金修复和真实人工复核完成前，本稿保持研究候选状态。
+    judgment_refs: [E1, E2, E4, E10, E19]
+    facts:
+      - text: >-
+          当前预测与估值已绑定纠正后的证据代际和9R模型代际，13项模型工件哈希一致；旧Reader与旧证据代际产物仅保留历史用途，不继承当前性。
+        refs: [E19]
+      - text: >-
+          当前基准模型低于外部盈利均值，市场资本化水平要求后续利润修复；与此同时，液冷独立经济性、同业可比性以及现金流折现和分部加总方法输入仍不完整。
+        refs: [E4, E10, E12, E14]
+    causal_mechanism:
+      - text: >-
+          研究主线由高密度算力与能效约束推动需求，公司平台通过验证进入交付，再由毛利、费用、验收和回款决定利润与现金，最终通过情景模型影响市场隐含预期。
+        refs: [E4, E6, E7, E8, E10, E14]
+    economic_implications:
+      - text: >-
+          后续判断应优先比较实际收入、毛利、利润与现金流相对三情景的偏差，再核对液冷分项和同业口径；任何结论变化都应回写模型、质量记录和刷新日志。
+        refs: [E2, E5, E10, E17]
+    counterevidence:
+      - text: >-
+          如果液冷独立经济性长期缺失、利润与现金流持续低于基准、替代路线或同业在可比口径下明显占优，平台暴露不能升级为高置信度财务贡献判断。
+        refs: [E2, E4, E8, E9, E20, E21, E22]
+    uncertainty:
+      - text: >-
+          本稿仍依赖研究估计、低置信度同业上下文和一个未由官方确认的未来验证窗口；自动质量门即使通过，也只表示可交付真实人工复核，不代表样例质量或横向比较许可。
+        refs: [E9, E10, E13, E19]
+    watchpoints:
+      - metric: 正式披露刷新
+        trigger: 每出现1次定期报告或重大正式公告即重跑证据、模型与Reader代际检查
+        horizon: 持续
+        direction: 保证结论不跨代际复用
+        refs: [E1, E2, E13, E19]
+      - metric: 候选状态边界
+        trigger: 质量门0个核心阻断且真实人工复核状态被精确哈希记录
+        horizon: 自动门完成后
+        direction: 仅允许进入人工复核收口，不自动开启更高阶段
+        refs: [E19]
+    references: [E1, E2, E4, E5, E6, E7, E8, E9, E10, E12, E13, E14, E17, E19, E20, E21, E22]
+
+claims:
+  - claim_id: r5b10r_consensus_boundary
+    topic: consensus
+    claim_type: analyst_view
+    confidence: medium
+    falsification_condition: 外部样本、股本口径或机构覆盖发生变化时重新计算分布
+    refs: [E12]
+  - claim_id: r5b10r_liquid_cooling_boundary
+    topic: liquid_cooling_standalone_economics
+    claim_type: unknown
+    additivity: non_additive
+    confidence: low
+    falsification_condition: 仅在发行人披露可复算的独立收入、毛利及重叠消除后替换
+    refs: [E4, E19]
+  - claim_id: r5b10r_peer_boundary
+    topic: peer_comparison
+    claim_type: analytical_view
+    peer_confidence: low_confidence_peer_set
+    ranking_performed: false
+    falsification_condition: 至少三家同业形成同期间同分部的官方可比口径后重新审阅
+    refs: [E9, E20, E21, E22]
+
+reference_catalog:
+  - display_reference_id: E1
+    underlying_source_id: issuer_002837_2025_annual_report
+    source_title: 英维克2025年年度报告
+    source_category: issuer
+    independent: false
+    claim_type: fact
+    period: 2025A
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    confidence: high
+    limitation: 公司整体与宽口径产品线不能替代液冷独立经济性
+  - display_reference_id: E2
+    underlying_source_id: issuer_002837_2026_q1_report
+    source_title: 英维克2026年第一季度报告
+    source_category: issuer
+    independent: false
+    claim_type: fact_and_inference
+    period: 2026Q1
+    source_path: data/processed/text/002837/szse_2026_q1_report_002837_2026-04-21.txt
+    confidence: high
+    limitation: 单季度不能直接外推全年或长期趋势
+  - display_reference_id: E3
+    underlying_source_id: issuer_002837_business_breakdown_review
+    source_title: 2025年宽产品线审阅与勾稽
+    source_category: issuer
+    independent: false
+    claim_type: fact_and_inference
+    period: 2025A
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_business_breakdown_candidate.yaml
+    confidence: high
+    limitation: 液冷没有独立分项
+  - display_reference_id: E4
+    underlying_source_id: issuer_002837_ir_20250423
+    source_title: 2025年4月23日投资者关系记录
+    source_category: issuer
+    independent: false
+    claim_type: management_comment
+    period: 2024A/2025-03
+    source_path: data/processed/text/ev_official_disclosure_002837_20250423_e78396.md
+    confidence: medium
+    limitation: 近似管理层口径，不是审计分部数据
+  - display_reference_id: E5
+    underlying_source_id: issuer_002837_ir_20250428
+    source_title: 2025年4月28日投资者关系记录
+    source_category: issuer
+    independent: false
+    claim_type: management_comment
+    period: 2025-04
+    source_path: data/processed/text/ev_official_disclosure_002837_20250428_108da3.md
+    confidence: medium
+    limitation: 回款周期为宽口径评论，不能替代液冷项目现金数据
+  - display_reference_id: E6
+    underlying_source_id: issuer_002837_ir_20250521
+    source_title: 2025年5月21日投资者关系记录
+    source_category: issuer
+    independent: false
+    claim_type: management_comment
+    period: 2025-05
+    source_path: data/processed/text/ev_official_disclosure_002837_20250521_1b4421.md
+    confidence: medium
+    limitation: 管理层评论需由实际交付和回款验证
+  - display_reference_id: E7
+    underlying_source_id: industry_caict_green_computing_2025
+    source_title: 中国信通院绿色算力研究资料
+    source_category: industry
+    independent: true
+    claim_type: analyst_view
+    period: 2024-2025
+    source_path: data/raw/industry_reports/industry_report_caict_green_computing_2025_59947f.pdf
+    confidence: medium
+    limitation: 行业研究不能证明单一公司收入或份额
+  - display_reference_id: E8
+    underlying_source_id: policy_ndrc_green_data_center_20240723
+    source_title: 数据中心绿色低碳发展专项行动计划
+    source_category: industry
+    independent: true
+    claim_type: fact
+    period: 2024-2025
+    source_path: data/raw/regulator_policy/policy_ndrc_green_data_center_20240723_30d310.pdf
+    confidence: high
+    limitation: 政策支持多种高效制冷方案
+  - display_reference_id: E9
+    underlying_source_id: peer_300499_2025_official_scope
+    source_title: 高澜股份2025年官方经营范围锚
+    source_category: peer
+    independent: true
+    claim_type: fact_and_inference
+    period: 2025A
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_peer_operating_reconciliation.yaml
+    confidence: low
+    limitation: 液冷纯度和官方数字尚未完全对齐，不形成排序
+  - display_reference_id: E10
+    underlying_source_id: model_002837_bundle9r
+    source_title: Bundle 9R三情景模型与财务桥
+    source_category: issuer
+    independent: false
+    claim_type: estimate
+    period: 2026E-2028E
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_model_pack.yaml
+    confidence: medium
+    limitation: 模型估计，不是发行人指引；液冷不单列
+  - display_reference_id: E11
+    underlying_source_id: market_002837_kline_20260713
+    source_title: 英维克2026年7月13日价格与均线序列
+    source_category: market
+    independent: true
+    claim_type: metric_statement
+    period: '2026-07-13'
+    source_path: data/processed/normalized/baidu_kline_adapter_kline_with_ma_002837_2026-07-13_b97b85e5.csv
+    confidence: medium
+    limitation: 复权口径仍需核验，只描述市场状态
+  - display_reference_id: E12
+    underlying_source_id: consensus_002837_20260713
+    source_title: 机构每股收益分布
+    source_category: consensus
+    independent: true
+    claim_type: analyst_view
+    period: 2026E-2028E
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_consensus_comparison.csv
+    confidence: medium
+    limitation: 外部估计分布，不是发行人指引，机构口径未逐家复核
+  - display_reference_id: E13
+    underlying_source_id: event_inventory_002837_20260713
+    source_title: 未来事件日历核对摘要
+    source_category: issuer
+    independent: false
+    claim_type: estimate_and_unknown
+    period: '2026-08-25'
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_future_event_calendar_summary.yaml
+    confidence: low
+    limitation: 日期只作为待官方确认的验证窗口
+  - display_reference_id: E14
+    underlying_source_id: valuation_002837_bundle9r
+    source_title: Bundle 9R情景与反向估值
+    source_category: market
+    independent: true
+    claim_type: inference
+    period: 2026-07-13/2027E
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_scenario_valuation.yaml
+    confidence: low_to_medium
+    limitation: 倍数为研究压力点，内在价值方法输入不足
+  - display_reference_id: E15
+    underlying_source_id: market_peer_snapshot_20260710
+    source_title: 四家同业市场快照与口径限制
+    source_category: market
+    independent: true
+    claim_type: metric_statement
+    period: '2026-07-10'
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_peer_operating_reconciliation.yaml
+    confidence: low
+    limitation: 公司级市场口径不能形成液冷业务排序
+  - display_reference_id: E16
+    underlying_source_id: industry_caict_green_computing_2025
+    source_title: 标准机架数量与单机柜功率密度
+    source_category: industry
+    independent: true
+    claim_type: metric_statement
+    period: '2024'
+    source_path: data/raw/industry_reports/industry_report_caict_green_computing_2025_59947f.pdf
+    confidence: medium
+    limitation: 第三方研究口径，不是官方统计或公司经营事实
+  - display_reference_id: E17
+    underlying_source_id: model_002837_bundle9r_sensitivity
+    source_title: Bundle 9R预测敏感性
+    source_category: issuer
+    independent: false
+    claim_type: estimate
+    period: 2026E-2028E
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_sensitivity.csv
+    confidence: medium
+    limitation: 压力测试不表示情景概率
+  - display_reference_id: E18
+    underlying_source_id: market_002837_quote_20260713
+    source_title: 英维克2026年7月13日价格与市值快照
+    source_category: market
+    independent: true
+    claim_type: fact
+    period: '2026-07-13'
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_market_snapshot.yaml
+    confidence: medium
+    limitation: 静态市场快照与预测分母不可混用
+  - display_reference_id: E19
+    underlying_source_id: generation_bundle8r_v2_bundle9r
+    source_title: 纠正后证据代际与Bundle 9R模型代际锁
+    source_category: issuer
+    independent: false
+    claim_type: method_statement
+    period: '2026-07-13'
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_model_generation_lock.yaml
+    confidence: high
+    limitation: 代际锁证明输入与哈希一致，不替代内容审阅
+  - display_reference_id: E20
+    underlying_source_id: peer_300731_2025_official_scope
+    source_title: 科创新源2025年官方经营范围锚
+    source_category: peer
+    independent: true
+    claim_type: fact_and_inference
+    period: 2025A
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_peer_operating_reconciliation.yaml
+    confidence: low
+    limitation: 液冷纯度和官方数字尚未完全对齐，不形成排序
+  - display_reference_id: E21
+    underlying_source_id: peer_301018_2025_official_scope
+    source_title: 申菱环境2025年官方经营范围锚
+    source_category: peer
+    independent: true
+    claim_type: fact_and_inference
+    period: 2025H1
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_peer_operating_reconciliation.yaml
+    confidence: low
+    limitation: 分部口径与确认节奏不可直接横比，不形成排序
+  - display_reference_id: E22
+    underlying_source_id: peer_300602_2025_official_scope
+    source_title: 飞荣达2025年官方经营范围锚
+    source_category: peer
+    independent: true
+    claim_type: fact_and_inference
+    period: 2025H1
+    source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_peer_operating_reconciliation.yaml
+    confidence: low
+    limitation: 分部口径与确认节奏不可直接横比，不形成排序
+
+guardrails:
+  sample_quality_allowed: false
+  p2_allowed: false
+  direct_action_language_allowed: false
+  liquid_cooling_standalone_additivity: non_additive
+  peer_ranking_allowed: false

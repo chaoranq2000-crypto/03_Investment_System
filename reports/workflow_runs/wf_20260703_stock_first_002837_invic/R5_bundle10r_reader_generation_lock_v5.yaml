@@ -1,0 +1,29 @@
+schema_version: 1
+generation_label: r5_bundle10r_reader_v5
+generation_id: reader_gen_r5_bundle10r_v5_574937bd3943edc1
+created_at: '2026-07-13'
+input_model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+input_model_aggregate_sha256: 1cd42241e6a38fb3fc24e6ceb5be1261dbad6e1ee860393b44932282bacd54cc
+input_evidence_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+human_review_status: pending
+artifact_count: 6
+missing_artifact_count: 0
+missing_artifacts: []
+artifacts:
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_review_handoff_v5.yaml
+  sha256: 6bbd352bd1fb6fec58095ca204465516b0923169d98b30eb2d5a5d9a29e7cccd
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_narrative_plan_v5.yaml
+  sha256: e8d0df8b110f89913ec91d8edbfcbb956eddac8234c94e780b9c8d47d682b366
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_payload_v5.yaml
+  sha256: 3fbcbdaf7676d97fe074b4831450544a12c0d4f3427293353e6d7aab95bfcc10
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5.md
+  sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5_quality_scorecard.yaml
+  sha256: 9cf773e45b95fd44fd3951d2842db3fc827b93431f31dd6079ce990667fe46fd
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_traceability_v5.yaml
+  sha256: 8e9a8bb99588806cebc8c4ff008474e217bbcc5f68f46f0233821b05e5354bb1
+aggregate_sha256: 574937bd3943edc1cb67e7ebde639a8b6a48c818fc59da9b1966ded4e50ba70a
+sample_quality_allowed: false
+p2_allowed: false
+downstream_consumers:
+- R5_HUMAN_REVIEW_FINALIZATION

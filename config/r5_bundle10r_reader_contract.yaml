@@ -1,0 +1,54 @@
+schema_version: 1
+contract_id: r5_bundle10r_reader_contract_v1
+report_schema_version: v4
+required_sections:
+  - executive_summary
+  - company_context_and_scope
+  - financial_quality
+  - segment_economics
+  - industry_and_competition
+  - forecast_and_scenarios
+  - valuation_and_market_implied_expectations
+  - market_technical_sentiment_and_events
+  - risks_and_falsification
+  - conclusion_and_watchlist
+core_sections:
+  - financial_quality
+  - segment_economics
+  - industry_and_competition
+  - forecast_and_scenarios
+  - valuation_and_market_implied_expectations
+  - risks_and_falsification
+  - conclusion_and_watchlist
+required_analysis_fields:
+  - judgment
+  - facts
+  - causal_mechanism
+  - economic_implications
+  - counterevidence
+  - uncertainty
+  - watchpoints
+  - references
+minimums:
+  facts_per_section: 2
+  causal_mechanisms_per_section: 1
+  implications_per_section: 1
+  counterevidence_per_section: 1
+  uncertainties_per_section: 1
+  watchpoints_per_section: 2
+  quantified_watchpoints_per_core_section: 1
+claim_boundaries:
+  consensus_allowed_claim_types: [analyst_view, estimate]
+  liquid_cooling_standalone_allowed_claim_types: [estimate, analytical_view, unknown]
+  liquid_cooling_required_additivity: non_additive
+  low_confidence_peer_ranking_allowed: false
+  direct_action_language_allowed: false
+  target_price_allowed: false
+main_report:
+  internal_evidence_ids_allowed: false
+  internal_paths_allowed: false
+  raw_gap_tokens_allowed: false
+  display_reference_pattern: '^E[1-9][0-9]*$'
+traceability:
+  one_record_per_display_reference: true
+  separate_appendix_required: true

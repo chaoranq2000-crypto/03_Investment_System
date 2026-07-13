@@ -170,3 +170,43 @@ Stage A is locally complete. Handoff 17 authorizes the evidence layer to proceed
 | Full regression | pass | 674 passed, 2 skipped in 28.56 seconds. |
 | Model generation lock | done | `model_gen_r5_bundle9r_1cd42241e6a38fb3`; 13 artifacts; zero missing. |
 | Close boundary | preserved | Historical Bundle 9/10 kept; Bundle 10R not started; sample-quality=false; P2=false; no staging, commit, push or remote CI claim. |
+
+## Bundle 10R forward Reader rebuild
+
+| Step | Status | Notes |
+|---|---|---|
+| Latest package discovery | done | Applied `R5_BUNDLE_10R_READER_REBUILD_PATCH_2026-07-13.zip`; package SHA256 `CD32691FA652607BBCBCB3669D4B6EEF75A319DD4B7E32E54CCAC7BA038F47C0`. |
+| Package integrity | pass | 48/48 checksums verified; add-only overlay applied without overwriting historical Reader artifacts. |
+| Package verification | pass | 13 verification checks passed; 18 package-focused tests passed. |
+| Model-generation binding | pass | Bound `model_gen_r5_bundle9r_1cd42241e6a38fb3`; all 13 model-lock artifact hashes resolve. |
+| Reader input review | pass_with_explicit_boundaries | Ten sections and 22 unique display references; liquid-cooling standalone economics, DCF and SOTP gaps remain explicit. |
+| Dynamic payload and Writer | done | Reader v4 and separate traceability appendix generated from the reviewed payload. |
+| Market / sentiment / events | pass | Technical context is dated; future-event window remains a conditional estimate and is not written as confirmed issuer disclosure. |
+| Non-compensating gate | candidate_ready_for_human_review | Score 100/82; truthfulness, core-section and candidate blocker counts are all zero; 22/22 display references resolve. |
+| Deterministic rebuild | pass | Five generation-locked outputs rebuilt twice with zero hash changes. |
+| Initial full regression | intermediate_state_only | Before final state sync: 685 passed, 2 skipped and 6 historical lifecycle tests failed because the workflow still reported `R5_bundle10r_reader_rebuild`. |
+| State and ledger sync | done | Historical `bundle10_close` and `bundle10_internal_completion` preserved; current 10R state, artifact manifest, TODO ledger, quality surfaces and readouts synchronized. |
+| Focused lifecycle regression | pass | The six original failure surfaces and related lifecycle tests: 17 passed. |
+| Full repository regression | pass | 691 passed, 2 skipped in 28.85 seconds. |
+| Reader generation lock | done | `reader_gen_r5_bundle10r_1e8a14b47d9426a4`; five artifacts; missing 0; aggregate `1e8a14b47d9426a4d95d9097df9f05aa177cc506a75e8f6287974d74a0bdd2e2`. |
+| Human review | pending | Exact Reader v4 hash handoff created; historical Reader v3 signoff was not transferred. |
+| Close boundary | accepted_with_todos | Automated plan closed; sample-quality=false; P2=false; no staging, commit, push or remote CI claim. |
+
+## Reader v5 narrative revision after human feedback
+
+| Step | Status | Notes |
+|---|---|---|
+| Human feedback capture | done | v4 received `revision_required` for narrative/readability only; `full_review_attested=false`; locked v4 artifacts remain byte-identical. |
+| Fix routing | done | High issue `R5B10R-NARRATIVE-001` routed from quality-review to stock-deep-dive, then back to quality-review through handoffs 30 and 31. |
+| Narrative architecture | done | Ten structured analysis units retained; reader surface reorganized into six question-led chapters. |
+| Writer / payload versioning | done | v5 Writer, optional narrative plan, v5 Reader contract and v2 quality contract added without changing v4 defaults. |
+| Anti-mechanical gate | pass | Repeated audit scaffold, process-language leakage, repeated openings, paragraph similarity and heading fragmentation now fail closed for v5. |
+| Reader v5 | candidate_ready_for_human_review | Score 100/82; truthfulness/core/candidate blockers 0/0/0; 22/22 references resolve. |
+| Narrative diagnostics | pass | 4151 body Han chars; 6 H2; 31 narrative paragraphs; repeated labels, process hits, similar pairs and thin sections all zero. |
+| Deterministic rebuild | pass | Six locked artifacts rebuilt twice with zero hash changes. |
+| v4 reproducibility | pass | Current code reproduced the historical v4 payload, report, appendix, scorecard, handoff and generation lock byte-for-byte. |
+| Focused lifecycle regression | pass | 35 passed across v5 artifacts, narrative rules and historical state compatibility. |
+| Full repository regression | pass | 704 passed, 2 skipped in 28.78 seconds. |
+| Reader generation lock | done | `reader_gen_r5_bundle10r_v5_574937bd3943edc1`; aggregate `574937bd3943edc1cb67e7ebde639a8b6a48c818fc59da9b1966ded4e50ba70a`. |
+| Human review | pending | New handoff binds Reader v5 SHA256 `cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090`. |
+| Boundary | preserved | sample-quality=false; P2=false; no staging, commit, push or remote CI claim. |
