@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>持仓账本 · Portfolio Ledger</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<!--
+  我的假设：
+  - 这是个人自用的桌面优先 Dashboard，需要在 1 米阅读距离快速判断总市值、盈亏与风险集中度。
+  - 视觉继承用户原持仓截图：黑底、白字、中国市场的红涨绿跌；不套通用 SaaS 卡片模板。
+  - 所有数字来自本地 SQLite；页面不含演示数据，也不提供任何交易建议。
+  - 图片不是这个数据工具的内容必需项，因此用原生数据可视化，不添加装饰图库素材。
+  - 主细节签名是“以零轴为中心的盈亏贡献图”，其他区域保持克制。
+  - 行业透视属于本地持仓核算的派生视图：股票使用 Tushare 行业，主题 ETF 使用名称中的明确行业属性，无可靠属性时保留未分类。
+  - 清仓收益只统计持仓由正数归零的完整周期；部分卖出仍在顶部已实现盈亏中，但不混入完整清仓周期。
+-->
+<body>
+  <div class="page-shell" id="pageShell">
+    <header class="topbar" data-reveal>
+      <div class="identity">
+        <span class="ledger-mark" aria-hidden="true">PL</span>
+        <div>
+          <p class="eyebrow">PRIVATE · LOCAL LEDGER</p>
+          <h1>持仓账本</h1>
+        </div>
+      </div>
+      <div class="toolbar" aria-label="页面操作">
+        <label class="date-control">
+          <span>回看日</span>
+          <input id="asOfInput" type="date" aria-label="历史回看日期">
+        </label>
+        <button class="text-button" id="latestButton" type="button">最新</button>
+        <button class="text-button" id="privacyButton" type="button" aria-pressed="false">隐藏金额</button>
+        <button class="text-button" id="exportButton" type="button">导出 CSV</button>
+        <button class="primary-action" id="refreshButton" type="button">
+          <span class="action-dot" aria-hidden="true"></span>
+          刷新收盘价
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="summary-grid" aria-labelledby="summaryTitle" data-reveal>
+        <div class="market-hero">
+          <p class="section-kicker" id="summaryTitle">PORTFOLIO VALUE</p>
+          <p class="hero-value sensitive" id="marketValue">—</p>
+          <div class="hero-meta">
+            <span id="positionCount">— 支持仓</span>
+            <span class="separator">/</span>
+            <span id="priceDate">收盘日 —</span>
+            <span class="separator">/</span>
+            <span id="dataStatus">正在读取本地账本</span>
+          </div>
+        </div>
+        <div class="summary-ledger">
+          <div class="summary-line">
+            <span>剩余成本</span>
+            <strong class="sensitive" id="remainingCost">—</strong>
+          </div>
+          <div class="summary-line summary-line-emphasis">
+            <span>浮动盈亏</span>
+            <strong class="sensitive" id="unrealizedPnl">—</strong>
+            <small id="unrealizedReturn">—</small>
+          </div>
+          <div class="summary-line">
+            <span>基准日后已实现</span>
+            <strong class="sensitive" id="realizedPnl">—</strong>
+          </div>
+          <div class="summary-line summary-line-muted">
+            <span>盈利 / 亏损</span>
+            <strong id="winLossCount">— / —</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="analysis-grid" data-reveal>
+        <article class="analysis-panel allocation-panel">
+          <header class="panel-heading">
+            <div>
+              <p class="section-kicker">EXPOSURE</p>
+              <h2>市值分布</h2>
+            </div>
+            <span class="panel-note" id="assetMix">—</span>
+          </header>
+          <div class="allocation-layout">
+            <div class="donut-wrap">
+              <svg class="donut" id="allocationDonut" viewBox="0 0 120 120" role="img" aria-label="持仓市值分布图">
+                <circle class="donut-track" cx="60" cy="60" r="45" pathLength="100"></circle>
+                <g id="donutSegments"></g>
+              </svg>
+              <div class="donut-center">
+                <span>TOP 1</span>
+                <strong id="topWeight">—</strong>
+              </div>
+            </div>
+            <ol class="allocation-legend" id="allocationLegend"></ol>
+          </div>
+        </article>
+
+        <article class="analysis-panel contribution-panel">
+          <header class="panel-heading">
+            <div>
+              <p class="section-kicker">CONTRIBUTION</p>
+              <h2>盈亏贡献</h2>
+            </div>
+            <span class="panel-note">红色盈利 · 绿色亏损</span>
+          </header>
+          <div class="contribution-chart" id="contributionChart" aria-label="各持仓浮动盈亏贡献"></div>
+        </article>
+      </section>
+
+      <section class="industry-section" aria-labelledby="industryTitle" data-reveal>
+        <header class="industry-heading">
+          <div>
+            <p class="section-kicker">INDUSTRY LENS</p>
+            <h2 id="industryTitle">行业透视</h2>
+          </div>
+          <div class="industry-heading-meta">
+            <span class="panel-note" id="industryCoverage">正在读取行业分类</span>
+            <button class="industry-refresh-button" id="industryRefreshButton" type="button">更新行业</button>
+          </div>
+        </header>
+        <div class="industry-layout">
+          <div class="industry-list" id="industryList" aria-label="行业市值、权重与盈亏"></div>
+          <aside class="industry-stats" aria-label="行业集中度摘要">
+            <div class="industry-stat">
+              <span>最大行业</span>
+              <strong id="topIndustry">—</strong>
+              <small id="topIndustryWeight">—</small>
+            </div>
+            <div class="industry-stat">
+              <span>前三行业集中度</span>
+              <strong id="top3IndustryWeight">—</strong>
+            </div>
+            <div class="industry-stat">
+              <span>未分类持仓</span>
+              <strong id="unclassifiedIndustryCount">—</strong>
+            </div>
+            <p class="industry-note" id="industryNote">行业标签是当前分类，不随历史回看日重放。</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="clearance-section" aria-labelledby="clearanceTitle" data-reveal>
+        <header class="clearance-heading">
+          <div>
+            <p class="section-kicker">CLOSED CYCLES</p>
+            <h2 id="clearanceTitle">清仓收益</h2>
+          </div>
+          <p class="panel-note" id="clearanceCoverage">正在重放成交台账</p>
+        </header>
+        <div class="clearance-summary" aria-label="清仓收益摘要">
+          <div class="clearance-total">
+            <span>累计清仓收益</span>
+            <strong class="sensitive" id="clearancePnl">—</strong>
+            <small id="clearanceReturn">—</small>
+          </div>
+          <div class="clearance-stat">
+            <span>完整周期</span>
+            <strong id="clearanceCycleCount">—</strong>
+          </div>
+          <div class="clearance-stat">
+            <span>盈利 / 亏损</span>
+            <strong id="clearanceWinLoss">— / —</strong>
+          </div>
+          <div class="clearance-stat">
+            <span>胜率</span>
+            <strong id="clearanceWinRate">—</strong>
+          </div>
+          <div class="clearance-stat">
+            <span>最近清仓</span>
+            <strong id="latestClearanceDate">—</strong>
+          </div>
+        </div>
+        <div class="clearance-table-wrap" id="clearanceTableWrap" hidden>
+          <table class="clearance-table">
+            <thead>
+              <tr>
+                <th>证券</th>
+                <th>持有区间</th>
+                <th class="numeric">清仓数量</th>
+                <th class="numeric">结转成本</th>
+                <th class="numeric">净卖出额</th>
+                <th class="numeric">清仓收益</th>
+                <th class="numeric">收益率</th>
+              </tr>
+            </thead>
+            <tbody id="clearanceBody"></tbody>
+          </table>
+        </div>
+        <div class="clearance-empty" id="clearanceEmpty">
+          <strong>暂无完整清仓记录</strong>
+          <p>导入卖出后持仓数量归零的交割单，系统会自动生成清仓周期与收益。</p>
+        </div>
+        <p class="clearance-note" id="clearanceNote">清仓收益采用移动加权平均成本。</p>
+      </section>
+
+      <section class="holdings-section" aria-labelledby="holdingsTitle" data-reveal>
+        <div class="holdings-heading">
+          <div>
+            <p class="section-kicker">POSITIONS</p>
+            <h2 id="holdingsTitle">持仓明细</h2>
+          </div>
+          <div class="table-controls">
+            <div class="filter-tabs" id="filterTabs" role="group" aria-label="持仓筛选">
+              <button class="filter-tab is-active" type="button" data-filter="all">全部</button>
+              <button class="filter-tab" type="button" data-filter="profit">盈利</button>
+              <button class="filter-tab" type="button" data-filter="loss">亏损</button>
+              <button class="filter-tab" type="button" data-filter="etf">ETF</button>
+            </div>
+            <label class="search-field">
+              <span class="sr-only">搜索证券</span>
+              <input id="searchInput" type="search" placeholder="搜索名称 / 代码" autocomplete="off">
+            </label>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="holdings-table">
+            <thead>
+              <tr>
+                <th><button type="button" data-sort="name">证券</button></th>
+                <th class="numeric"><button type="button" data-sort="close">最新价</button></th>
+                <th class="numeric"><button type="button" data-sort="pct_chg">当日</button></th>
+                <th class="numeric"><button type="button" data-sort="quantity">数量</button></th>
+                <th class="numeric"><button type="button" data-sort="average_cost">成本价</button></th>
+                <th class="numeric"><button type="button" data-sort="market_value">市值</button></th>
+                <th class="numeric"><button type="button" data-sort="unrealized_pnl">浮动盈亏</button></th>
+                <th class="numeric"><button type="button" data-sort="return_pct">收益率</button></th>
+                <th class="numeric"><button type="button" data-sort="weight_pct">权重</button></th>
+              </tr>
+            </thead>
+            <tbody id="holdingsBody"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" hidden>没有符合当前筛选条件的持仓。</div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer" data-reveal>
+      <div>
+        <span class="status-indicator" id="footerStatusDot" aria-hidden="true"></span>
+        <span id="footerStatus">本地 SQLite · 等待载入</span>
+      </div>
+      <p>仅用于记录与核算，不构成交易建议。</p>
+    </footer>
+  </div>
+
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="detail-drawer" id="detailDrawer" aria-hidden="true" aria-labelledby="drawerTitle">
+    <button class="drawer-close" id="drawerClose" type="button" aria-label="关闭详情">关闭</button>
+    <div id="drawerContent"></div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script src="/app.js"></script>
+</body>
+</html>

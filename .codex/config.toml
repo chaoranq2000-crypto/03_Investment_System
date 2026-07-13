@@ -54,3 +54,9 @@ enabled = true
 [[skills.config]]
 path = ".agents/skills/research-orchestrator"
 enabled = true
+
+# Standalone private bookkeeping utility. UI policy requires explicit invocation;
+# it is not part of research-orchestrator routing or any research gate.
+[[skills.config]]
+path = ".agents/skills/portfolio-tracker"
+enabled = true

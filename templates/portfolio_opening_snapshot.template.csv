@@ -1,0 +1,2 @@
+as_of_date,price_date,ts_code,name,asset_type,quantity,cost_price,total_cost,last_close,pct_chg,market_value,unrealized_pnl,note
+2026-07-10,2026-07-10,600000.SH,示例公司,equity,1000,10.0000,10000.00,11.0000,1.23,11000.00,1000.00,replace_with_your_opening_snapshot

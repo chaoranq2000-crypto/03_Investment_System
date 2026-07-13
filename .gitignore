@@ -33,6 +33,11 @@ docs/references/project_learning/
 *.parquet.tmp
 data/db/*.duckdb
 data/db/*.duckdb.wal
+data/db/*.sqlite3
+data/db/*.sqlite3-*
+data/db/*.csv
+data/db/*.xlsx
+data/db/*.xls
 data/processed/embeddings/*
 !data/processed/embeddings/.gitkeep
 data/db/vector.index

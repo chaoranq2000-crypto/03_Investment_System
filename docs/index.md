@@ -37,6 +37,7 @@
 ## Playbooks
 
 - `playbooks/OPERATING_PLAYBOOK.md` — 日常命令索引和轻量操作指南；不是工作流事实源。
+- `playbooks/PORTFOLIO_TRACKER.md` — 本地私有持仓、交割单成本重算和收盘价更新手册。
 - `playbooks/stock_report_case_study_shengyi_tech.md` — 个股报告案例研究。
 - `playbooks/stock_report_samples/README.md` — 样例报告目录说明。
 
