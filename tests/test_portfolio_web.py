@@ -326,5 +326,10 @@ def test_dashboard_assets_are_self_contained_and_have_required_controls():
     assert "text-shadow: none !important" in css
     assert "text-shadow: 0 0 11px" not in css
     assert "git-common-dir" in launcher
+    assert 'Join-Path $projectRoot ".git"' in launcher
+    assert "Get-Content -LiteralPath $gitPointerPath" in launcher
     assert '"--db"' in launcher
     assert '"--env-file"' in launcher
+    assert '"--app=$Url"' in launcher
+    assert '"explorer.exe"' in launcher
+    assert "无法打开页面" in launcher

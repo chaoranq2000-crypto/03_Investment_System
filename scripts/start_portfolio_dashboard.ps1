@@ -7,21 +7,44 @@ param(
 $ErrorActionPreference = "Stop"
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$runtimeRoot = $projectRoot
+$runtimeCandidates = @($projectRoot)
 
 # Linked worktrees keep code isolated, while the private runtime and ledger stay
 # in the primary worktree. In a normal checkout both roots resolve identically.
+$gitPointerPath = Join-Path $projectRoot ".git"
+if (Test-Path -LiteralPath $gitPointerPath -PathType Leaf) {
+    $gitPointer = Get-Content -LiteralPath $gitPointerPath -TotalCount 1
+    if ($gitPointer -match "^gitdir:\s*(.+)$") {
+        $linkedGitDir = $Matches[1].Trim()
+        if (-not [IO.Path]::IsPathRooted($linkedGitDir)) {
+            $linkedGitDir = Join-Path $projectRoot $linkedGitDir
+        }
+        $worktreesDir = Split-Path -Parent $linkedGitDir
+        $commonGitDir = Split-Path -Parent $worktreesDir
+        $runtimeCandidates += Split-Path -Parent $commonGitDir
+    }
+}
+
+# Keep Git discovery as a fallback for nonstandard worktree layouts, but do not
+# require Git to be present in the environment inherited by a desktop shortcut.
 try {
     $gitCommonDir = (& git -C $projectRoot rev-parse --path-format=absolute --git-common-dir 2>$null | Select-Object -First 1)
     if ($LASTEXITCODE -eq 0 -and $gitCommonDir) {
-        $primaryRoot = Split-Path -Parent $gitCommonDir.Trim()
-        $primaryPython = Join-Path $primaryRoot ".conda\investment-system\python.exe"
-        if (Test-Path -LiteralPath $primaryPython -PathType Leaf) {
-            $runtimeRoot = $primaryRoot
-        }
+        $runtimeCandidates += Split-Path -Parent $gitCommonDir.Trim()
     }
 }
 catch {
+    # The .git pointer above is sufficient for a normal linked worktree.
+}
+
+$runtimeRoot = $runtimeCandidates |
+    Select-Object -Unique |
+    Where-Object {
+        Test-Path -LiteralPath (Join-Path $_ ".conda\investment-system\python.exe") -PathType Leaf
+    } |
+    Select-Object -First 1
+
+if (-not $runtimeRoot) {
     $runtimeRoot = $projectRoot
 }
 
@@ -50,6 +73,41 @@ function Show-LauncherError {
     }
     catch {
         Write-Error $Message
+    }
+}
+
+function Open-PortfolioDashboard {
+    param([Parameter(Mandatory = $true)][string]$Url)
+
+    $edgeCandidates = @(
+        "${env:ProgramFiles(x86)}\Microsoft\Edge\Application\msedge.exe",
+        "$env:ProgramFiles\Microsoft\Edge\Application\msedge.exe",
+        "$env:LocalAppData\Microsoft\Edge\Application\msedge.exe"
+    )
+    $edgePath = $edgeCandidates |
+        Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } |
+        Select-Object -First 1
+
+    try {
+        if ($edgePath) {
+            Start-Process `
+                -FilePath $edgePath `
+                -ArgumentList @("--new-window", "--app=$Url", "--start-maximized") `
+                -WindowStyle Normal | Out-Null
+        }
+        else {
+            # Explorer invokes the registered HTTP handler more reliably than
+            # passing a URL directly to Start-Process on some Windows setups.
+            Start-Process `
+                -FilePath "explorer.exe" `
+                -ArgumentList @($Url) `
+                -WindowStyle Normal | Out-Null
+        }
+        return $true
+    }
+    catch {
+        Show-LauncherError "持仓服务已启动，但无法打开页面：`n$Url`n`n$($_.Exception.Message)"
+        return $false
     }
 }
 
@@ -97,5 +155,7 @@ if (-not (Test-PortfolioDashboard)) {
     }
 }
 
-# 浏览器是用户需要直接操作的前台程序，因此保持正常可见。
-Start-Process -FilePath $dashboardUrl
+# 页面以可见的独立应用窗口打开；失败时必须向用户显示原因。
+if (-not (Open-PortfolioDashboard -Url $dashboardUrl)) {
+    exit 1
+}
