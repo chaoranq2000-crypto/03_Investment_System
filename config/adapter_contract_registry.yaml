@@ -1,0 +1,581 @@
+schema_version: 1
+registry_id: adapter_contract_registry_v1
+purpose: Separate routed, importable, fixture-verified, live-verified and operational adapter states.
+ready_statuses:
+- live_verified
+- operational
+adapters:
+  official_disclosure_pull:
+    module: src.ingest.official_disclosure_pull
+    entrypoint: main
+    interface: cli_main
+    default_status: routed_only
+    source_bindings:
+      cninfo:
+        status: live_verified
+        supported_endpoint_hints:
+        - announcement_search_and_download
+        - investor_relations_activity_record
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: false
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+      sse:
+        status: routed_only
+        supported_endpoint_hints:
+        - exchange_filing_download
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+      szse:
+        status: routed_only
+        supported_endpoint_hints:
+        - exchange_filing_download
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+      bse:
+        status: routed_only
+        supported_endpoint_hints:
+        - exchange_filing_download
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+  tushare_adapter:
+    module: src.ingest.adapters.tushare_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: live_verified
+    source_bindings:
+      tushare:
+        status: live_verified
+        supported_endpoint_hints:
+        - income_balancesheet_cashflow
+        - fina_indicator
+        - stock_basic
+        - daily_or_pro_bar
+        - daily_basic
+        - pro_bar
+        - stk_holdernumber
+        - share_float
+        - dividend
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+  baostock_adapter:
+    module: src.ingest.adapters.baostock_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: live_verified
+    source_bindings:
+      baostock:
+        status: live_verified
+        supported_endpoint_hints:
+        - financial_fallback
+        - query_profit_operation_growth_dupont
+        - query_stock_basic
+        - query_history_k_data_plus
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+  eastmoney_report_adapter:
+    module: src.ingest.adapters.eastmoney_report_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: live_verified
+    source_bindings:
+      eastmoney_push2:
+        status: live_verified
+        supported_endpoint_hints:
+        - reportapi_metadata
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: false
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+  market_snapshot_pull:
+    module: src.ingest.market_snapshot_pull
+    entrypoint: main
+    interface: cli_main
+    default_status: offline_snapshot_only
+    source_bindings:
+      mootdx:
+        status: offline_snapshot_only
+        supported_endpoint_hints:
+        - daily_bar
+        - historical_daily_bar
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+      tencent_finance:
+        status: offline_snapshot_only
+        supported_endpoint_hints:
+        - quote_or_kline
+        - quote_and_valuation
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+    notes: Current implementation registers a supplied CSV; it is not a live mootdx or Tencent adapter.
+  planned_public_http_adapter:
+    module: ''
+    entrypoint: ''
+    interface: unimplemented
+    default_status: planned
+    source_bindings: {}
+  manual_or_snapshot:
+    module: ''
+    entrypoint: ''
+    interface: manual
+    default_status: manual_only
+    source_bindings: {}
+  manual_or_url_snapshot:
+    module: ''
+    entrypoint: ''
+    interface: manual
+    default_status: manual_only
+    source_bindings: {}
+  mootdx_adapter:
+    module: src.ingest.adapters.mootdx_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: planned
+    source_bindings:
+      mootdx:
+        status: planned
+        supported_endpoint_hints:
+        - daily_bar
+        - historical_daily_bar
+        - orderbook
+        - transactions
+        - finance_snapshot
+        - f10
+        fixture_verified: true
+        live_smoke_verified: false
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/mootdx_daily_bar.yaml
+  tencent_quote_adapter:
+    module: src.ingest.adapters.tencent_quote_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: operational
+    source_bindings:
+      tencent_finance:
+        status: operational
+        supported_endpoint_hints:
+        - quote_and_valuation
+        - quote_or_kline
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_and_valuation.yaml
+  baidu_kline_adapter:
+    module: src.ingest.adapters.baidu_kline_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: operational
+    source_bindings:
+      baidu_finance:
+        status: operational
+        supported_endpoint_hints:
+        - kline_with_ma
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/baidu_kline_with_ma.yaml
+  eastmoney_report_pdf_adapter:
+    module: src.ingest.adapters.eastmoney_report_pdf_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: operational
+    source_bindings:
+      eastmoney_push2:
+        status: operational
+        supported_endpoint_hints:
+        - report_pdf
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: false
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_report_pdf.yaml
+  eastmoney_industry_report_adapter:
+    module: src.ingest.adapters.eastmoney_industry_report_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: operational
+    source_bindings:
+      eastmoney_push2:
+        status: operational
+        supported_endpoint_hints:
+        - industry_reportapi_metadata
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: false
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_industry_reports.yaml
+  ths_consensus_adapter:
+    module: src.ingest.adapters.ths_consensus_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: operational
+    source_bindings:
+      ths:
+        status: operational
+        supported_endpoint_hints:
+        - consensus_eps
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/ths_consensus_eps.yaml
+  iwencai_adapter:
+    module: src.ingest.adapters.iwencai_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: planned
+    source_bindings:
+      iwencai:
+        status: planned
+        supported_endpoint_hints:
+        - semantic_search
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+  cninfo_irm_adapter:
+    module: src.ingest.adapters.cninfo_irm_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: operational
+    source_bindings:
+      cninfo_ir:
+        status: operational
+        supported_endpoint_hints:
+        - irm_interaction
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/cninfo_irm.yaml
+  sina_financial_adapter:
+    module: src.ingest.adapters.sina_financial_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: operational
+    source_bindings:
+      sina_finance:
+        status: operational
+        supported_endpoint_hints:
+        - financial_statements
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/sina_financial_statements.yaml
+  sina_fund_flow_adapter:
+    module: src.ingest.adapters.sina_fund_flow_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: planned
+    source_bindings:
+      sina_finance:
+        status: planned
+        supported_endpoint_hints:
+        - fund_flow_daily
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+  eastmoney_basic_adapter:
+    module: src.ingest.adapters.eastmoney_basic_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: planned
+    source_bindings:
+      eastmoney_push2:
+        status: planned
+        supported_endpoint_hints:
+        - stock_info
+        - concept_blocks
+        fixture_verified: true
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_stock_info.yaml
+  eastmoney_capital_adapter:
+    module: src.ingest.adapters.eastmoney_capital_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: operational
+    source_bindings:
+      eastmoney_push2:
+        status: operational
+        supported_endpoint_hints:
+        - lockup_expiry
+        - holder_count
+        - dividend_history
+        - margin_trading
+        - block_trade
+        - fund_flow_minute
+        - fund_flow_120d
+        - fund_flow
+        - dragon_tiger
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_holder_count.yaml
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_lockup_expiry.yaml
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_dividend_history.yaml
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_fund_flow.yaml
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_margin_trading.yaml
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_block_trade.yaml
+  eastmoney_market_context_adapter:
+    module: src.ingest.adapters.eastmoney_market_context_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: planned
+    source_bindings:
+      eastmoney_push2:
+        status: planned
+        supported_endpoint_hints:
+        - industry_ranking
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+  eastmoney_news_adapter:
+    module: src.ingest.adapters.eastmoney_news_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: operational
+    source_bindings:
+      eastmoney_push2:
+        status: operational
+        supported_endpoint_hints:
+        - stock_news
+        - news_clue
+        - global_news
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: false
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_news_clue.yaml
+  cls_telegraph_adapter:
+    module: src.ingest.adapters.cls_telegraph_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: operational
+    source_bindings:
+      cls_market:
+        status: operational
+        supported_endpoint_hints:
+        - telegraph
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/cls_telegraph.yaml
+  exchange_fallback_adapter:
+    module: src.ingest.adapters.exchange_fallback_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: planned
+    source_bindings:
+      sse:
+        status: planned
+        supported_endpoint_hints:
+        - dragon_tiger_official
+        - announcement_official
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+      szse:
+        status: operational
+        supported_endpoint_hints:
+        - dragon_tiger_official
+        - announcement_official
+        fixture_verified: true
+        live_smoke_verified: true
+        raw_archive_verified: true
+        manifest_write_verified: true
+        schema_fingerprint_verified: true
+        claim_boundary_verified: true
+        independent_fallback_verified: true
+        proof_paths:
+        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/szse_announcement_fallback.yaml
+      bse:
+        status: planned
+        supported_endpoint_hints:
+        - announcement_official
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+  ths_market_signal_adapter:
+    module: src.ingest.adapters.ths_market_signal_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: planned
+    source_bindings:
+      ths:
+        status: planned
+        supported_endpoint_hints:
+        - hot_reason
+        - northbound_intraday
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+  market_sentiment_adapter:
+    module: src.ingest.adapters.market_sentiment_adapter
+    entrypoint: main
+    interface: cli_main
+    default_status: planned
+    source_bindings:
+      ths:
+        status: planned
+        supported_endpoint_hints:
+        - hot_list
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []
+      eastmoney_push2:
+        status: planned
+        supported_endpoint_hints:
+        - hot_rank
+        - concept_heat
+        fixture_verified: false
+        live_smoke_verified: false
+        raw_archive_verified: false
+        manifest_write_verified: false
+        schema_fingerprint_verified: false
+        claim_boundary_verified: false
+        independent_fallback_verified: false
+        proof_paths: []

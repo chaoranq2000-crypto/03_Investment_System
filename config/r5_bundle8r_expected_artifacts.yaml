@@ -1,0 +1,45 @@
+schema_version: 1
+bundle: R5_BUNDLE_8R_A_STOCK_DATA_FORWARD_REQUALIFICATION
+mode: forward_requalification_not_rollback
+baseline_commit: 08acbf9084dc32dade6d899ed3e8bbdbbc107efd
+historical_bundle9_and_bundle10_artifacts_preserved: true
+canonical_sample_quality_allowed_during_requalification: false
+p2_allowed: false
+cards:
+  8R.0:
+  - R5_bundle8r_baseline_audit.yaml
+  - R5_bundle8r_forward_requalification_state.yaml
+  8R.1:
+  - R5_a_stock_data_capability_coverage.yaml
+  - R5_a_stock_data_adoption_decisions.csv
+  8R.2:
+  - R5_adapter_operational_gate.yaml
+  - R5_adapter_contract_registry_validation.yaml
+  8R.3:
+  - R5_market_fundamental_adapter_receipts.yaml
+  - R5_schema_drift_regression.yaml
+  8R.4:
+  - R5_research_ir_adapter_receipts.yaml
+  - R5_report_pdf_archive_manifest.csv
+  8R.5:
+  - R5_capital_event_news_adapter_receipts.yaml
+  - R5_independent_fallback_test.yaml
+  8R.6:
+  - R5_bundle8r_live_acquisition_run_log.yaml
+  - R5_bundle8r_evidence_manifest_delta.csv
+  - R5_bundle8r_source_health_ledger.yaml
+  8R.7:
+  - R5_bundle8r_evidence_generation_lock.yaml
+  - R5_bundle8r_coverage_matrix.yaml
+  - R5_bundle8r_close_quality_report.md
+  - R5_bundle8r_close_readout.md
+close_conditions:
+- all_43_upstream_capability_groups_have_explicit_adoption_decisions
+- all_adopt_core_capabilities_are_operational_or_have_an_approved_independent_alternative
+- no_enabled_route_points_to_planned_manual_or_offline_snapshot_adapter_as_live
+- all_operational_adapters_have_fixture_live_raw_manifest_schema_and_claim_boundary_receipts
+- core_capabilities_have_independent_failure_domain_fallbacks
+- 002837_live_pilot_produces_archived_raw_evidence_and_manifest_rows
+- coverage_is_measured_by_research_question_not_only_source_count
+- new_evidence_generation_lock_is_emitted
+- bundle9_and_bundle10_historical_outputs_remain_preserved_but_noncanonical_until_9R_10R_rebuild

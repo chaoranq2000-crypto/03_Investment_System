@@ -1,0 +1,7 @@
+schema_version: 1
+as_of_date: '2026-07-13'
+event_count: 20
+confirmed_future_event_count: 0
+decision: no_confirmed_future_event_in_current_sources
+next_step: refresh official announcements, share-float and dividend endpoints on the
+  next evidence cycle

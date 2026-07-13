@@ -1,0 +1,45 @@
+schema_version: 1
+request_id: r5_bundle8r_002837_research_inputs
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+company_id: cn_002837_invic
+as_of_date: '2026-07-13'
+required_capability_ids:
+- market_tdx_bars
+- market_tencent_quote_valuation
+- research_stock_reports
+- research_report_pdf_download
+- research_industry_reports
+- research_ths_consensus_eps
+- signal_lockup_calendar
+- capital_holder_count
+- capital_dividend_history
+- fundamental_eastmoney_stock_info
+- fundamental_sina_financial_statements
+- disclosure_cninfo_announcements
+- ir_cninfo_irm
+- fallback_announcements_exchange
+required_research_questions:
+- question_id: segment_economics
+  question: 各业务收入、毛利、价格、数量、客户、产能与订单如何变化？
+  minimum_source_domains: 3
+- question_id: industry_demand
+  question: 液冷与温控行业需求、渗透率、价值量和技术路线有哪些独立证据？
+  minimum_source_domains: 3
+- question_id: peer_position
+  question: 至少四家可比公司的同口径经营指标和竞争位置是什么？
+  minimum_source_domains: 4
+- question_id: forecast_drivers
+  question: 可验证的收入、毛利、费用、现金流驱动与一致预期差异是什么？
+  minimum_source_domains: 3
+- question_id: valuation_expectation
+  question: 当前市值隐含何种收入、利润率与液冷利润假设？
+  minimum_source_domains: 2
+- question_id: future_events
+  question: 未来六个月有哪些有日期、验证指标和反证条件的事件？
+  minimum_source_domains: 2
+prohibited_promotions:
+- news_to_fact
+- market_flow_to_company_fundamental
+- single_broker_estimate_to_consensus
+- irm_comment_to_reported_revenue

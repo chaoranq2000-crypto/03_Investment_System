@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_cls_telegraph_adapter_telegraph_16f5605f",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:21:53Z",
+  "finished_at": "2026-07-13T11:21:53Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "cls_market",
+  "source_type": "news_social_clue",
+  "api_name": "telegraph",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "0",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "claim_boundary=clue_only; transport=inherit"
+}

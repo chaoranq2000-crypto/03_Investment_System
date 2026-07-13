@@ -1,0 +1,37 @@
+{
+  "version": "f7fd7cbc27d12c92cd350b3098be0fc5",
+  "result": {
+    "pages": 1,
+    "data": [
+      {
+        "SECURITY_CODE": "002837",
+        "SECUCODE": "002837.SZ",
+        "SECURITY_NAME_ABBR": "英维克",
+        "HOLDER_NUM": 268700,
+        "PRE_HOLDER_NUM": 221500,
+        "HOLDER_NUM_CHANGE": 47200,
+        "HOLDER_NUM_RATIO": 21.309255079007,
+        "INTERVAL_CHRATE": 13.86861104,
+        "END_DATE": "2026-06-30 00:00:00",
+        "PRE_END_DATE": "2026-05-29 00:00:00",
+        "PRE_E_DATE": "05/29",
+        "AVG_MARKET_CAP": 377325.126518496,
+        "AVG_HOLD_NUM": 4742.64864905099,
+        "TOTAL_MARKET_CAP": 101387261495.52,
+        "TOTAL_A_SHARES": 1274349692,
+        "HOLD_NOTICE_DATE": "2026-07-03 00:00:00",
+        "HOLD_N_DATE": "07/03",
+        "CHANGE_SHARES": 294080698,
+        "CHANGE_REASON": "分红派息",
+        "CLOSE_PRICE": 79.56,
+        "TRADE_MARKET_CODE": "069001002001",
+        "ORG_CODE": "10196735",
+        "SECURITY_TYPE_CODE": "058001001"
+      }
+    ],
+    "count": 1
+  },
+  "success": true,
+  "message": "ok",
+  "code": 0
+}

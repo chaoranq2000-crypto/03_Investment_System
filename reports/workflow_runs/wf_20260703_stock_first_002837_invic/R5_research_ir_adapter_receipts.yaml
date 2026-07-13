@@ -1,0 +1,102 @@
+schema_version: 1
+artifact_type: R5_research_ir_adapter_receipts
+decision: pass
+receipt_count: 5
+missing_receipts: []
+approved_nonblocking_failures: []
+blocking_receipts: []
+receipts:
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_stock_reports_readout.json
+  adapter_id: ''
+  source_name: ''
+  endpoint_hint: ''
+  decision: pass
+  row_count: 14
+  evidence_id: ev_third_party_research_002837_20260713_20f610
+  raw_file_path: data/raw/market_data/eastmoney_report_metadata_002837_2026-07-13_20f6105e.json
+  processed_table_path: data/processed/normalized/eastmoney_report_metadata_002837_2026-07-13_20f6105e.csv
+  schema_fingerprint: ''
+  claim_boundary: ''
+  failure_class: ''
+  failure_message: ''
+  checks: {}
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_industry_reports.yaml
+  adapter_id: eastmoney_industry_report_adapter
+  source_name: eastmoney_push2
+  endpoint_hint: industry_reportapi_metadata
+  decision: pass
+  row_count: 100
+  evidence_id: ev_third_party_research_002837_20260713_9432c0
+  raw_file_path: data/raw/industry_reports/eastmoney_industry_report_adapter_industry_reportapi_metadata_002837_2026-07-13_9432c0a3.json
+  processed_table_path: data/processed/normalized/eastmoney_industry_report_adapter_industry_reportapi_metadata_002837_2026-07-13_9432c0a3.csv
+  schema_fingerprint: 6f687d9f417c4d195b50ea12d43f2b131da27795cd54d4fd06213a3aaea04cc2
+  claim_boundary: analyst_view_only
+  failure_class: ''
+  failure_message: ''
+  checks:
+    fixture_verified: false
+    live_smoke_verified: true
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: true
+    claim_boundary_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_report_pdf.yaml
+  adapter_id: eastmoney_report_pdf_adapter
+  source_name: eastmoney_push2
+  endpoint_hint: report_pdf
+  decision: pass
+  row_count: null
+  evidence_id: ''
+  raw_file_path: ''
+  processed_table_path: ''
+  schema_fingerprint: ''
+  claim_boundary: analyst_view_only
+  failure_class: ''
+  failure_message: ''
+  checks:
+    live_smoke_verified: true
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: true
+    claim_boundary_verified: true
+    pdf_provenance_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/ths_consensus_eps.yaml
+  adapter_id: ths_consensus_adapter
+  source_name: ths
+  endpoint_hint: consensus_eps
+  decision: pass
+  row_count: 3
+  evidence_id: ev_third_party_research_002837_20260713_1ca4d1
+  raw_file_path: data/raw/market_data/ths_consensus_adapter_consensus_eps_002837_2026-07-13_1ca4d1d4.json
+  processed_table_path: data/processed/normalized/ths_consensus_adapter_consensus_eps_002837_2026-07-13_1ca4d1d4.csv
+  schema_fingerprint: 2ea4456d3ff92847cbdcc819e9bb577e13a894c0e814d04ba9581288f59ad13b
+  claim_boundary: estimate_only
+  failure_class: ''
+  failure_message: ''
+  checks:
+    fixture_verified: false
+    live_smoke_verified: true
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: true
+    claim_boundary_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/cninfo_irm.yaml
+  adapter_id: cninfo_irm_adapter
+  source_name: cninfo_ir
+  endpoint_hint: irm_interaction
+  decision: pass
+  row_count: 49
+  evidence_id: ev_company_ir_product_002837_20260713_a9952c
+  raw_file_path: data/raw/company_ir_product/cninfo_irm_adapter_irm_interaction_002837_2026-07-13_a9952c30.json
+  processed_table_path: data/processed/normalized/cninfo_irm_adapter_irm_interaction_002837_2026-07-13_a9952c30.csv
+  schema_fingerprint: 5d82da6059008ec3bc551ce0830c4b64a65f2ca2343712217f331a5e7a40425b
+  claim_boundary: management_comment_only
+  failure_class: ''
+  failure_message: ''
+  checks:
+    fixture_verified: false
+    live_smoke_verified: true
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: true
+    claim_boundary_verified: true

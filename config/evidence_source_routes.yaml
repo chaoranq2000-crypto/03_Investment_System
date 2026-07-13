@@ -55,13 +55,13 @@ capabilities:
         independence_domain: sse
         adapter: official_disclosure_pull
         endpoint_hint: exchange_filing_download
-        enabled: true
+        enabled: false
       - source_name: szse
         role: fallback
         priority: 30
         independence_domain: szse
-        adapter: official_disclosure_pull
-        endpoint_hint: exchange_filing_download
+        adapter: exchange_fallback_adapter
+        endpoint_hint: announcement_official
         enabled: true
       - source_name: bse
         role: fallback
@@ -69,7 +69,7 @@ capabilities:
         independence_domain: bse
         adapter: official_disclosure_pull
         endpoint_hint: exchange_filing_download
-        enabled: true
+        enabled: false
 
   financial_statements:
     claim_boundary: metric_only
@@ -90,6 +90,13 @@ capabilities:
         independence_domain: baostock
         adapter: baostock_adapter
         endpoint_hint: financial_fallback
+        enabled: true
+      - source_name: sina_finance
+        role: fallback
+        priority: 30
+        independence_domain: sina
+        adapter: sina_financial_adapter
+        endpoint_hint: financial_statements
         enabled: true
 
   financial_indicators:
@@ -141,29 +148,30 @@ capabilities:
     expected_fields: [trade_date, open, high, low, close, volume]
     sources:
       - source_name: mootdx
-        role: primary
-        priority: 10
-        independence_domain: tdx
-        adapter: market_snapshot_pull
-        endpoint_hint: daily_bar
-        enabled: true
-      - source_name: tencent_finance
         role: fallback
-        priority: 20
+        priority: 30
+        independence_domain: tdx
+        adapter: mootdx_adapter
+        endpoint_hint: daily_bar
+        enabled: false
+        dry_run_probe: true
+      - source_name: tencent_finance
+        role: primary
+        priority: 5
         independence_domain: tencent
-        adapter: market_snapshot_pull
+        adapter: tencent_quote_adapter
         endpoint_hint: quote_or_kline
         enabled: true
       - source_name: tushare
         role: fallback
-        priority: 30
+        priority: 10
         independence_domain: tushare
         adapter: tushare_adapter
         endpoint_hint: daily_or_pro_bar
         enabled: true
       - source_name: baostock
         role: fallback
-        priority: 40
+        priority: 20
         independence_domain: baostock
         adapter: baostock_adapter
         endpoint_hint: query_history_k_data_plus
@@ -172,9 +180,9 @@ capabilities:
         role: fallback
         priority: 50
         independence_domain: baidu
-        adapter: planned_public_http_adapter
-        endpoint_hint: kline
-        enabled: false
+        adapter: baidu_kline_adapter
+        endpoint_hint: kline_with_ma
+        enabled: true
 
   valuation_snapshot:
     claim_boundary: metric_only
@@ -186,7 +194,7 @@ capabilities:
         role: primary
         priority: 10
         independence_domain: tencent
-        adapter: market_snapshot_pull
+        adapter: tencent_quote_adapter
         endpoint_hint: quote_and_valuation
         enabled: true
       - source_name: tushare
@@ -211,12 +219,12 @@ capabilities:
     expected_fields: [trade_date, open, high, low, close, volume]
     sources:
       - source_name: mootdx
-        role: primary
-        priority: 10
+        role: fallback
+        priority: 30
         independence_domain: tdx
-        adapter: market_snapshot_pull
+        adapter: mootdx_adapter
         endpoint_hint: historical_daily_bar
-        enabled: true
+        enabled: false
       - source_name: baostock
         role: fallback
         priority: 20
@@ -225,8 +233,8 @@ capabilities:
         endpoint_hint: query_history_k_data_plus
         enabled: true
       - source_name: tushare
-        role: fallback
-        priority: 30
+        role: primary
+        priority: 10
         independence_domain: tushare
         adapter: tushare_adapter
         endpoint_hint: pro_bar
@@ -240,16 +248,16 @@ capabilities:
     sources:
       - source_name: sina_finance
         role: primary
-        priority: 10
+        priority: 20
         independence_domain: sina
         adapter: planned_public_http_adapter
         endpoint_hint: fund_flow
         enabled: false
       - source_name: eastmoney_push2
-        role: fallback
-        priority: 20
+        role: primary
+        priority: 10
         independence_domain: eastmoney
-        adapter: planned_public_http_adapter
+        adapter: eastmoney_capital_adapter
         endpoint_hint: fund_flow
         enabled: true
       - source_name: ths
@@ -258,7 +266,7 @@ capabilities:
         independence_domain: ths
         adapter: manual_or_snapshot
         endpoint_hint: market_context
-        enabled: true
+        enabled: false
 
   investor_relations:
     claim_boundary: management_comment_only
@@ -270,9 +278,9 @@ capabilities:
         role: primary
         priority: 10
         independence_domain: cninfo
-        adapter: planned_public_http_adapter
+        adapter: cninfo_irm_adapter
         endpoint_hint: irm_interaction
-        enabled: false
+        enabled: true
       - source_name: cninfo
         role: fallback
         priority: 20
@@ -282,29 +290,29 @@ capabilities:
         enabled: true
 
   industry_policy:
-    claim_boundary: contextual_fact
-    min_independent_domains: 2
+    claim_boundary: analyst_view_only
+    min_independent_domains: 1
     retry_policy: official_disclosure
     expected_fields: [title, publisher, publish_date, source_url]
     sources:
       - source_name: policy_document
-        role: primary
-        priority: 10
+        role: fallback
+        priority: 20
         independence_domain: regulator
         adapter: manual_or_url_snapshot
         endpoint_hint: official_policy_or_statistics
-        enabled: true
-      - source_name: industry_report
-        role: fallback
-        priority: 20
+        enabled: false
+      - source_name: eastmoney_push2
+        role: primary
+        priority: 10
         independence_domain: independent_industry_research
-        adapter: manual_or_url_snapshot
-        endpoint_hint: industry_report
+        adapter: eastmoney_industry_report_adapter
+        endpoint_hint: industry_reportapi_metadata
         enabled: true
 
   research_metadata:
     claim_boundary: analyst_view_only
-    min_independent_domains: 2
+    min_independent_domains: 1
     retry_policy: polite_public_http
     expected_fields: [title, publisher, publish_date]
     sources:
@@ -312,7 +320,7 @@ capabilities:
         role: primary
         priority: 10
         independence_domain: eastmoney
-        adapter: planned_public_http_adapter
+        adapter: eastmoney_report_adapter
         endpoint_hint: reportapi_metadata
         enabled: true
       - source_name: brokerage_report
@@ -321,39 +329,137 @@ capabilities:
         independence_domain: brokerage
         adapter: manual_or_url_snapshot
         endpoint_hint: report_inventory
-        enabled: true
+        enabled: false
 
   news_clues:
     claim_boundary: clue_only
-    min_independent_domains: 1
+    min_independent_domains: 2
     retry_policy: polite_public_http
     expected_fields: [title, publish_date, source_url]
     sources:
       - source_name: cls_market
-        role: primary
-        priority: 10
-        independence_domain: cls
-        adapter: planned_public_http_adapter
-        endpoint_hint: news_search
-        enabled: false
-      - source_name: news
         role: fallback
         priority: 20
+        independence_domain: cls
+        adapter: cls_telegraph_adapter
+        endpoint_hint: telegraph
+        enabled: true
+      - source_name: news
+        role: fallback
+        priority: 40
         independence_domain: general_news
         adapter: manual_or_url_snapshot
         endpoint_hint: news_clue
-        enabled: true
+        enabled: false
       - source_name: eastmoney_push2
-        role: fallback
-        priority: 30
+        role: primary
+        priority: 10
         independence_domain: eastmoney
-        adapter: planned_public_http_adapter
+        adapter: eastmoney_news_adapter
         endpoint_hint: news_clue
         enabled: true
       - source_name: ths
         role: fallback
-        priority: 40
+        priority: 30
         independence_domain: ths
         adapter: manual_or_snapshot
         endpoint_hint: hotlist_or_news_clue
+        enabled: false
+
+  consensus_estimates:
+    claim_boundary: metric_only
+    min_independent_domains: 2
+    retry_policy: polite_public_http
+    expected_fields: [period, eps]
+    sources:
+      - source_name: ths
+        role: primary
+        priority: 10
+        independence_domain: ths
+        adapter: ths_consensus_adapter
+        endpoint_hint: consensus_eps
+        enabled: true
+      - source_name: eastmoney_push2
+        role: fallback
+        priority: 20
+        independence_domain: eastmoney
+        adapter: eastmoney_report_adapter
+        endpoint_hint: reportapi_metadata
+        enabled: true
+
+  research_report_pdf:
+    claim_boundary: analyst_view_only
+    min_independent_domains: 1
+    retry_policy: polite_public_http
+    expected_fields: [title, publisher, publish_date, raw_file_path, page_map_path]
+    sources:
+      - source_name: eastmoney_push2
+        role: primary
+        priority: 10
+        independence_domain: eastmoney
+        adapter: eastmoney_report_pdf_adapter
+        endpoint_hint: report_pdf
+        enabled: true
+
+  holder_count:
+    claim_boundary: metric_only
+    min_independent_domains: 2
+    retry_policy: structured_database
+    expected_fields: [period, holder_num]
+    sources:
+      - source_name: eastmoney_push2
+        role: primary
+        priority: 10
+        independence_domain: eastmoney
+        adapter: eastmoney_capital_adapter
+        endpoint_hint: holder_count
+        enabled: true
+      - source_name: tushare
+        role: fallback
+        priority: 20
+        independence_domain: tushare
+        adapter: tushare_adapter
+        endpoint_hint: stk_holdernumber
+        enabled: true
+
+  lockup_calendar:
+    claim_boundary: metric_only
+    min_independent_domains: 2
+    retry_policy: structured_database
+    expected_fields: [event_date, shares]
+    sources:
+      - source_name: eastmoney_push2
+        role: primary
+        priority: 10
+        independence_domain: eastmoney
+        adapter: eastmoney_capital_adapter
+        endpoint_hint: lockup_expiry
+        enabled: true
+      - source_name: tushare
+        role: fallback
+        priority: 20
+        independence_domain: tushare
+        adapter: tushare_adapter
+        endpoint_hint: share_float
+        enabled: true
+
+  dividend_history:
+    claim_boundary: metric_only
+    min_independent_domains: 2
+    retry_policy: structured_database
+    expected_fields: [event_date, plan]
+    sources:
+      - source_name: eastmoney_push2
+        role: primary
+        priority: 10
+        independence_domain: eastmoney
+        adapter: eastmoney_capital_adapter
+        endpoint_hint: dividend_history
+        enabled: true
+      - source_name: tushare
+        role: fallback
+        priority: 20
+        independence_domain: tushare
+        adapter: tushare_adapter
+        endpoint_hint: dividend
         enabled: true

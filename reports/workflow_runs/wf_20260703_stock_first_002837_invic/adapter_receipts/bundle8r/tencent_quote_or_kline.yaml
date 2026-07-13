@@ -1,0 +1,63 @@
+schema_version: 1
+decision: pass
+adapter_id: tencent_quote_adapter
+source_name: tencent_finance
+endpoint_hint: quote_or_kline
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+run_id: r5_bundle8r_tencent_quote_adapter_quote_or_kline_7eb667bd
+evidence_id: ev_structured_market_data_002837_20260713_7eb667
+claim_boundary: metric_only
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/market_data/tencent_quote_adapter_quote_or_kline_002837_2026-07-13_7eb667bd.json
+processed_table_path: data/processed/normalized/tencent_quote_adapter_quote_or_kline_002837_2026-07-13_7eb667bd.csv
+ingest_log_path: data/processed/logs/ev_structured_market_data_002837_20260713_7eb667__ingest_log.json
+source_url: https://qt.gtimg.cn/q=sz002837
+http_status: 200
+attempts: 1
+row_count: 1
+metric_candidates_created: 0
+claim_candidates_created: 0
+observed_fields:
+- amount_wan
+- amplitude_pct
+- as_of_date
+- change_amount
+- change_pct
+- close
+- float_mcap_yi
+- high
+- last_close
+- limit_down
+- limit_up
+- low
+- mcap_yi
+- name
+- open
+- pb
+- pe_static
+- pe_ttm
+- price
+- stock_code
+- trade_date
+- turnover_pct
+- volume
+- volume_ratio
+expected_fields:
+- trade_date
+- open
+- high
+- low
+- close
+- volume
+missing_fields: []
+schema_fingerprint: 0e642e91485c01cf0640a72e1b8294a1a83bf53f9aa2f79bf348d287c5d01381
+notes: Tencent field 43 is amplitude; PB is field 46.

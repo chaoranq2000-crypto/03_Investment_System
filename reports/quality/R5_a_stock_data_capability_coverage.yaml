@@ -1,0 +1,26 @@
+schema_version: 1
+decision: pass
+mode: forward_requalification_not_rollback
+capability_count: 43
+primary_capability_count: 40
+fallback_capability_count: 3
+decision_counts:
+  adapt_clue_only: 10
+  adopt_core: 14
+  adopt_enhancement: 13
+  defer_out_of_scope: 6
+implementation_status_counts:
+  alternative_source_operational: 1
+  approved_independent_alternative: 2
+  missing: 16
+  operational_verified: 12
+  out_of_scope: 6
+  routed_disabled: 2
+  routed_only: 4
+bundle8r_core_count: 14
+bundle8r_core_operational_count: 14
+bundle8r_core_direct_operational_count: 12
+bundle8r_core_alternative_count: 2
+bundle8r_core_blocker_count: 0
+bundle8r_core_blockers: []
+catalog_issues: []

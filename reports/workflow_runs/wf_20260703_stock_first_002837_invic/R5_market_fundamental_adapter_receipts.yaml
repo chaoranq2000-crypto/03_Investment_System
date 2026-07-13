@@ -1,0 +1,192 @@
+schema_version: 1
+artifact_type: R5_market_fundamental_adapter_receipts
+decision: pass
+receipt_count: 9
+missing_receipts: []
+approved_nonblocking_failures:
+- eastmoney_stock_info.yaml
+- mootdx_daily_bar.yaml
+blocking_receipts: []
+receipts:
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/mootdx_daily_bar.yaml
+  adapter_id: mootdx_adapter
+  source_name: mootdx
+  endpoint_hint: daily_bar
+  decision: needs_fix
+  row_count: 0
+  evidence_id: ev_structured_market_data_002837_20260713_0ae09a
+  raw_file_path: data/raw/market_data/mootdx_adapter_daily_bar_002837_2026-07-13_0ae09abc.json
+  processed_table_path: data/processed/normalized/mootdx_adapter_daily_bar_002837_2026-07-13_0ae09abc.csv
+  schema_fingerprint: c04163a2479699f6958fe80a4f459f6900f6aa3f551b8c81e50618e4eb955df4
+  claim_boundary: metric_only
+  failure_class: ''
+  failure_message: ''
+  checks:
+    fixture_verified: false
+    live_smoke_verified: false
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: false
+    claim_boundary_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/mootdx_finance_snapshot.yaml
+  adapter_id: mootdx_adapter
+  source_name: mootdx
+  endpoint_hint: finance_snapshot
+  decision: pass
+  row_count: 1
+  evidence_id: ev_structured_market_data_002837_20260713_bbb9e0
+  raw_file_path: data/raw/market_data/mootdx_adapter_finance_snapshot_002837_2026-07-13_bbb9e042.json
+  processed_table_path: data/processed/normalized/mootdx_adapter_finance_snapshot_002837_2026-07-13_bbb9e042.csv
+  schema_fingerprint: 085d327382771599ac5d414169153afb5ec15ecc2bfb8be91983466e8142f1d2
+  claim_boundary: metric_only
+  failure_class: ''
+  failure_message: ''
+  checks:
+    fixture_verified: false
+    live_smoke_verified: true
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: true
+    claim_boundary_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/mootdx_f10.yaml
+  adapter_id: mootdx_adapter
+  source_name: mootdx
+  endpoint_hint: f10
+  decision: pass
+  row_count: 1
+  evidence_id: ev_structured_market_data_002837_20260713_0ff555
+  raw_file_path: data/raw/market_data/mootdx_adapter_f10_002837_2026-07-13_0ff555c1.json
+  processed_table_path: data/processed/normalized/mootdx_adapter_f10_002837_2026-07-13_0ff555c1.csv
+  schema_fingerprint: 9b630f1aa3a917bd975f1312f207bbf78dc7ec97c5c5e1c62235397836326961
+  claim_boundary: clue_only_unless_official_archived
+  failure_class: ''
+  failure_message: ''
+  checks:
+    fixture_verified: false
+    live_smoke_verified: true
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: true
+    claim_boundary_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_and_valuation.yaml
+  adapter_id: tencent_quote_adapter
+  source_name: tencent_finance
+  endpoint_hint: quote_and_valuation
+  decision: pass
+  row_count: 1
+  evidence_id: ev_structured_market_data_002837_20260713_79bd83
+  raw_file_path: data/raw/market_data/tencent_quote_adapter_quote_and_valuation_002837_2026-07-13_79bd83ad.json
+  processed_table_path: data/processed/normalized/tencent_quote_adapter_quote_and_valuation_002837_2026-07-13_79bd83ad.csv
+  schema_fingerprint: 0e642e91485c01cf0640a72e1b8294a1a83bf53f9aa2f79bf348d287c5d01381
+  claim_boundary: metric_only
+  failure_class: ''
+  failure_message: ''
+  checks:
+    fixture_verified: false
+    live_smoke_verified: true
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: true
+    claim_boundary_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_or_kline.yaml
+  adapter_id: tencent_quote_adapter
+  source_name: tencent_finance
+  endpoint_hint: quote_or_kline
+  decision: pass
+  row_count: 1
+  evidence_id: ev_structured_market_data_002837_20260713_7eb667
+  raw_file_path: data/raw/market_data/tencent_quote_adapter_quote_or_kline_002837_2026-07-13_7eb667bd.json
+  processed_table_path: data/processed/normalized/tencent_quote_adapter_quote_or_kline_002837_2026-07-13_7eb667bd.csv
+  schema_fingerprint: 0e642e91485c01cf0640a72e1b8294a1a83bf53f9aa2f79bf348d287c5d01381
+  claim_boundary: metric_only
+  failure_class: ''
+  failure_message: ''
+  checks:
+    fixture_verified: false
+    live_smoke_verified: true
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: true
+    claim_boundary_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/baidu_kline_with_ma.yaml
+  adapter_id: baidu_kline_adapter
+  source_name: baidu_finance
+  endpoint_hint: kline_with_ma
+  decision: pass
+  row_count: 30
+  evidence_id: ev_structured_market_data_002837_20260713_b97b85
+  raw_file_path: data/raw/market_data/baidu_kline_adapter_kline_with_ma_002837_2026-07-13_b97b85e5.json
+  processed_table_path: data/processed/normalized/baidu_kline_adapter_kline_with_ma_002837_2026-07-13_b97b85e5.csv
+  schema_fingerprint: 44332a9990e7d41877ade67cc170f30524282c36ff20df416a37ec3034c79419
+  claim_boundary: metric_only
+  failure_class: ''
+  failure_message: ''
+  checks:
+    fixture_verified: false
+    live_smoke_verified: true
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: true
+    claim_boundary_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/sina_financial_statements.yaml
+  adapter_id: sina_financial_adapter
+  source_name: sina_finance
+  endpoint_hint: financial_statements
+  decision: pass
+  row_count: 995
+  evidence_id: ev_structured_financial_data_002837_20260713_6e0ecd
+  raw_file_path: data/raw/market_data/sina_financial_adapter_financial_statements_002837_2026-07-13_6e0ecd46.json
+  processed_table_path: data/processed/normalized/sina_financial_adapter_financial_statements_002837_2026-07-13_6e0ecd46.csv
+  schema_fingerprint: fda661afea1920ce50260f93d10b01967fc66e196975ad773d4d7fa1a58f5baa
+  claim_boundary: metric_only
+  failure_class: ''
+  failure_message: ''
+  checks:
+    fixture_verified: false
+    live_smoke_verified: true
+    raw_archive_verified: true
+    manifest_write_verified: true
+    schema_fingerprint_verified: true
+    claim_boundary_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_stock_info.yaml
+  adapter_id: eastmoney_basic_adapter
+  source_name: eastmoney_push2
+  endpoint_hint: stock_info
+  decision: needs_fix
+  row_count: null
+  evidence_id: ''
+  raw_file_path: ''
+  processed_table_path: ''
+  schema_fingerprint: ''
+  claim_boundary: metric_only
+  failure_class: RemoteDisconnected
+  failure_message: Remote end closed connection without response
+  checks:
+    fixture_verified: false
+    live_smoke_verified: false
+    raw_archive_verified: false
+    manifest_write_verified: false
+    schema_fingerprint_verified: false
+    claim_boundary_verified: true
+- proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tushare_stock_basic_scoped_readout.json
+  adapter_id: tushare
+  source_name: tushare
+  endpoint_hint: stock_basic
+  decision: pass
+  row_count: 1
+  evidence_id: ''
+  raw_file_path: ''
+  processed_table_path: ''
+  schema_fingerprint: ''
+  claim_boundary: ''
+  failure_class: ''
+  failure_message: ''
+  checks: {}
+approved_alternatives:
+  market_tdx_bars:
+  - tushare_adapter
+  - baostock_adapter
+  - baidu_kline_adapter
+  fundamental_eastmoney_stock_info:
+  - tushare_adapter
+  - tencent_quote_adapter

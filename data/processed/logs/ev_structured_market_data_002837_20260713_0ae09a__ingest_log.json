@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_mootdx_adapter_daily_bar_0ae09abc",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:00:08Z",
+  "finished_at": "2026-07-13T11:00:08Z",
+  "result": "PARTIAL_SUCCESS",
+  "stock_code": "002837",
+  "source_name": "mootdx",
+  "source_type": "structured_market_data",
+  "api_name": "daily_bar",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "0",
+  "claim_candidates": "0",
+  "issues": "missing_field:close;missing_field:high;missing_field:low;missing_field:open;missing_field:trade_date;missing_field:volume",
+  "notes": "claim_boundary=metric_only; transport=tcp"
+}

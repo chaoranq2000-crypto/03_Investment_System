@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_eastmoney_industry_report_adapter_industry_reportapi_metadata_9432c0a3",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:11:09Z",
+  "finished_at": "2026-07-13T11:11:10Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "eastmoney_push2",
+  "source_type": "third_party_research",
+  "api_name": "industry_reportapi_metadata",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "0",
+  "claim_candidates": "100",
+  "issues": "",
+  "notes": "claim_boundary=analyst_view_only; transport=inherit"
+}

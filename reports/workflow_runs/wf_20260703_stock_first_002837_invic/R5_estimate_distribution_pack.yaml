@@ -1,0 +1,34 @@
+schema_version: 1
+artifact_type: R5_estimate_distribution_pack
+as_of_date: '2026-07-13'
+claim_boundary: estimate_only
+ths_consensus:
+  evidence_id: ev_third_party_research_002837_20260713_1ca4d1
+  methodology: source-reported minimum, mean and maximum EPS distribution
+  rows:
+  - annual_period: '2026'
+    eps_max: '1.15'
+    eps_mean: '0.92'
+    eps_min: '0.68'
+    industry_average: '2.13'
+    institution_count: '12'
+  - annual_period: '2027'
+    eps_max: '2.35'
+    eps_mean: '1.58'
+    eps_min: '1.05'
+    industry_average: '2.78'
+    institution_count: '12'
+  - annual_period: '2028'
+    eps_max: '3.47'
+    eps_mean: '2.33'
+    eps_min: '1.48'
+    industry_average: '3.56'
+    institution_count: '10'
+single_broker_inventory:
+  evidence_id: ev_third_party_research_002837_20260713_20f610
+  source_path: data/processed/normalized/eastmoney_report_metadata_002837_2026-07-13_20f6105e.csv
+  boundary: analyst_view_only; individual estimates are not consensus
+report_pdf_evidence_ids:
+- ev_third_party_research_002837_20260424_1c32bf
+- ev_third_party_research_002837_20260422_d4aeec
+decision: ready_for_forecast_context_not_issuer_guidance

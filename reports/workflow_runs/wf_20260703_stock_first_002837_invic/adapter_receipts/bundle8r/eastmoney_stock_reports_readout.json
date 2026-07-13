@@ -1,0 +1,12 @@
+{
+  "result": "SUCCESS",
+  "evidence_id": "ev_third_party_research_002837_20260713_20f610",
+  "rows": 14,
+  "hits": 14,
+  "metric_candidates": 0,
+  "proxy_route": "inherit",
+  "http_status": 200,
+  "attempts": 1,
+  "raw_file_path": "data/raw/market_data/eastmoney_report_metadata_002837_2026-07-13_20f6105e.json",
+  "processed_table_path": "data/processed/normalized/eastmoney_report_metadata_002837_2026-07-13_20f6105e.csv"
+}

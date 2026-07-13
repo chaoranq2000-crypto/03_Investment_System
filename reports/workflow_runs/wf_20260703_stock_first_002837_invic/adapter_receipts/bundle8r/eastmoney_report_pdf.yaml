@@ -1,0 +1,36 @@
+schema_version: 1
+decision: pass
+adapter_id: eastmoney_report_pdf_adapter
+source_name: eastmoney_push2
+endpoint_hint: report_pdf
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+metadata_source_url: https://reportapi.eastmoney.com/report/list?pageNo=1&pageSize=20&code=002837&industryCode=%2A&industry=%2A&rating=%2A&ratingChange=%2A&beginTime=2025-01-01&endTime=2026-07-13&fields=&qType=0
+metadata_attempts: 1
+pdf_count: 2
+manifest_rows_created: 2
+claim_boundary: analyst_view_only
+checks:
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+  pdf_provenance_verified: true
+pdf_receipts:
+- info_code: AP202604241821526861
+  http_status: 200
+  attempts: 1
+  pdf_signature_verified: true
+  raw_archive_verified: true
+  text_or_page_map_verified: true
+- info_code: AP202604221821435857
+  http_status: 200
+  attempts: 1
+  pdf_signature_verified: true
+  raw_archive_verified: true
+  text_or_page_map_verified: true
+pdf_manifest_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_report_pdf_archive_manifest.csv
+ingest_log_path: data/processed/logs/r5_bundle8r_report_pdf_002837_319c2787.json

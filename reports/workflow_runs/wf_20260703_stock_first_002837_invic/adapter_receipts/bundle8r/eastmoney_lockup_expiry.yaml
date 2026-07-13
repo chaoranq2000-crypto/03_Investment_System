@@ -1,0 +1,41 @@
+schema_version: 1
+decision: pass
+adapter_id: eastmoney_capital_adapter
+source_name: eastmoney_push2
+endpoint_hint: lockup_expiry
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+run_id: r5_bundle8r_eastmoney_capital_adapter_lockup_expiry_41b285f6
+evidence_id: ev_structured_market_data_002837_20260713_41b285
+claim_boundary: event_metric_only
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/market_data/eastmoney_capital_adapter_lockup_expiry_002837_2026-07-13_41b285f6.json
+processed_table_path: data/processed/normalized/eastmoney_capital_adapter_lockup_expiry_002837_2026-07-13_41b285f6.csv
+ingest_log_path: data/processed/logs/ev_structured_market_data_002837_20260713_41b285__ingest_log.json
+source_url: https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_LIFT_STAGE&columns=ALL&filter=%28SECURITY_CODE%3D%22002837%22%29&pageNumber=1&pageSize=50&sortColumns=FREE_DATE&sortTypes=-1&source=WEB&client=WEB
+http_status: 200
+attempts: 1
+row_count: 10
+metric_candidates_created: 20
+claim_candidates_created: 0
+observed_fields:
+- event_date
+- event_type
+- free_ratio
+- shares
+expected_fields:
+- event_date
+- event_type
+- shares
+missing_fields: []
+schema_fingerprint: e924246ec8173ce001ccd4440dbe0391c2b22ddcd22480e237ce1ea5d950a3a8
+notes: Market/event snapshot only; official reconciliation remains required where
+  declared.

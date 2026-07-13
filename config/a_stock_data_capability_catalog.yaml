@@ -1,0 +1,1011 @@
+schema_version: 1
+catalog_id: a_stock_data_v3_4_0_normalized_capability_catalog
+purpose: Account for every upstream capability before forward requalification of R5 Bundle 8.
+upstream:
+  repository: https://github.com/simonlin1212/a-stock-data
+  version: 3.4.0
+  reviewed_commit: 9ed665c
+  reviewed_date: '2026-07-13'
+  declared_architecture_layers: 10
+  declared_primary_endpoint_groups: 40
+  declared_official_fallback_groups: 3
+  license: Apache-2.0
+  implementation_copy_policy: No upstream endpoint implementation is copied by this control-plane patch.
+    Capability names and operating methods are normalized with attribution.
+normalization_note: Compound route-table rows are split only where needed to preserve 40 primary capability
+  groups; upstream function names are retained in upstream_functions.
+decision_vocabulary:
+  adopt_core: Required to close Bundle 8R for research-quality evidence coverage.
+  adopt_enhancement: Useful after core close or for selected workflows; must still have a contract before
+    use.
+  adapt_clue_only: May be collected only as a clue or market context and cannot promote material facts.
+  defer_out_of_scope: Catalogued but excluded from the current non-trading research OS.
+capabilities:
+- capability_id: market_tdx_bars
+  upstream_layer: 1
+  upstream_section: '1.1'
+  upstream_functions:
+  - tdx_client().bars
+  upstream_source: mootdx
+  description: 多周期K线（上游提醒为不复权原始价）
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: metric_only
+  current_implementation_status: approved_independent_alternative
+  operational_resolution:
+    resolution_type: independent_alternative
+    primary_adapter_status: live_empty_needs_fix
+    approved_alternatives: [tushare_adapter, baostock_adapter]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/mootdx_daily_bar.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+  target_adapter: mootdx_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: market_tdx_orderbook_ticks
+  upstream_layer: 1
+  upstream_section: '1.1'
+  upstream_functions:
+  - tdx_client().quotes
+  - tdx_client().transaction
+  upstream_source: mootdx
+  description: 五档盘口与逐笔成交
+  adoption_decision: adapt_clue_only
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: market_context_only
+  current_implementation_status: routed_only
+  target_adapter: mootdx_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: market_tencent_quote_valuation
+  upstream_layer: 1
+  upstream_section: '1.2'
+  upstream_functions:
+  - tencent_quote
+  upstream_source: tencent_finance
+  description: 实时价、PE/PB、市值、换手、涨跌停、指数与ETF
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: metric_only
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: [tushare_adapter]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_and_valuation.yaml
+  target_adapter: tencent_quote_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: market_baidu_kline_ma
+  upstream_layer: 1
+  upstream_section: '1.3'
+  upstream_functions:
+  - baidu_kline_with_ma
+  upstream_source: baidu_finance
+  description: 带MA5/MA10/MA20的日K线独立回退
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: metric_only
+  current_implementation_status: routed_disabled
+  target_adapter: baidu_kline_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: research_stock_reports
+  upstream_layer: 2
+  upstream_section: '2.1'
+  upstream_functions:
+  - eastmoney_reports
+  upstream_source: eastmoney_push2
+  description: 个股研报元数据、评级与分年度EPS
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: analyst_view_only
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: []
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_stock_reports_readout.json
+  target_adapter: eastmoney_report_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: research_report_pdf_download
+  upstream_layer: 2
+  upstream_section: '2.1'
+  upstream_functions:
+  - download_pdf
+  upstream_source: eastmoney_push2
+  description: 研报PDF归档、哈希与正文解析入口
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: analyst_view_only
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: []
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_report_pdf.yaml
+  target_adapter: eastmoney_report_pdf_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: research_industry_reports
+  upstream_layer: 2
+  upstream_section: '2.1'
+  upstream_functions:
+  - eastmoney_industry_reports
+  upstream_source: eastmoney_push2
+  description: 行业研报目录与PDF入口
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: analyst_view_only
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: []
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_industry_reports.yaml
+  target_adapter: eastmoney_industry_report_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: research_ths_consensus_eps
+  upstream_layer: 2
+  upstream_section: '2.2'
+  upstream_functions:
+  - ths_eps_forecast
+  upstream_source: ths
+  description: 一致预期EPS及分布
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: estimate_only
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: [eastmoney_report_adapter]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/ths_consensus_eps.yaml
+  target_adapter: ths_consensus_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: research_iwencai_semantic_search
+  upstream_layer: 2
+  upstream_section: '2.3'
+  upstream_functions:
+  - iwencai_search
+  - iwencai_query
+  upstream_source: iwencai
+  description: 自然语言研报与选股检索（需密钥）
+  adoption_decision: adopt_enhancement
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: missing
+  target_adapter: iwencai_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: signal_ths_hot_reason
+  upstream_layer: 3
+  upstream_section: '3.1'
+  upstream_functions:
+  - ths_hot_reason
+  upstream_source: ths
+  description: 当日强势股与题材归因
+  adoption_decision: adapt_clue_only
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: missing
+  target_adapter: ths_market_signal_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: signal_northbound_intraday
+  upstream_layer: 3
+  upstream_section: '3.2'
+  upstream_functions:
+  - hsgt_realtime
+  upstream_source: ths
+  description: 北向分钟流向；深股通上游已标注可靠性限制
+  adoption_decision: adapt_clue_only
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: missing
+  target_adapter: ths_market_signal_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: signal_concept_membership
+  upstream_layer: 3
+  upstream_section: '3.3'
+  upstream_functions:
+  - eastmoney_concept_blocks
+  upstream_source: eastmoney_push2
+  description: 个股行业、地域与概念归属
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: classification_context
+  current_implementation_status: missing
+  target_adapter: eastmoney_basic_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: signal_fund_flow_intraday
+  upstream_layer: 3
+  upstream_section: '3.4'
+  upstream_functions:
+  - eastmoney_fund_flow_minute
+  upstream_source: eastmoney_push2
+  description: 分钟资金流
+  adoption_decision: adapt_clue_only
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: routed_only
+  target_adapter: eastmoney_capital_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: signal_dragon_tiger_stock
+  upstream_layer: 3
+  upstream_section: '3.5'
+  upstream_functions:
+  - dragon_tiger_board
+  upstream_source: eastmoney_push2
+  description: 个股龙虎榜与席位明细
+  adoption_decision: adopt_enhancement
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: market_context_only
+  current_implementation_status: missing
+  target_adapter: eastmoney_capital_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: signal_lockup_calendar
+  upstream_layer: 3
+  upstream_section: '3.6'
+  upstream_functions:
+  - lockup_expiry
+  upstream_source: eastmoney_push2
+  description: 历史与未来90天限售解禁
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: event_metric_only
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: [tushare_adapter]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_lockup_expiry.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tushare_share_float_readout.json
+  target_adapter: eastmoney_capital_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: signal_industry_ranking
+  upstream_layer: 3
+  upstream_section: '3.7'
+  upstream_functions:
+  - industry_comparison
+  upstream_source: eastmoney_push2
+  description: 行业板块涨跌与上涨下跌家数
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: market_context_only
+  current_implementation_status: missing
+  target_adapter: eastmoney_market_context_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: signal_dragon_tiger_market
+  upstream_layer: 3
+  upstream_section: '3.8'
+  upstream_functions:
+  - daily_dragon_tiger
+  upstream_source: eastmoney_push2
+  description: 全市场龙虎榜与净买额排名
+  adoption_decision: adapt_clue_only
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: missing
+  target_adapter: eastmoney_capital_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: capital_margin_trading
+  upstream_layer: 4
+  upstream_section: '4.1'
+  upstream_functions:
+  - margin_trading
+  upstream_source: eastmoney_push2
+  description: 融资融券余额与交易明细
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: metric_only
+  current_implementation_status: missing
+  target_adapter: eastmoney_capital_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: capital_block_trades
+  upstream_layer: 4
+  upstream_section: '4.2'
+  upstream_functions:
+  - block_trade
+  upstream_source: eastmoney_push2
+  description: 大宗交易及买卖营业部
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: market_context_only
+  current_implementation_status: missing
+  target_adapter: eastmoney_capital_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: capital_holder_count
+  upstream_layer: 4
+  upstream_section: '4.3'
+  upstream_functions:
+  - holder_num_change
+  upstream_source: eastmoney_push2
+  description: 股东户数及环比变化
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: metric_only_with_official_reconciliation
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: [tushare_adapter]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_holder_count.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tushare_stk_holdernumber_readout.json
+  target_adapter: eastmoney_capital_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: capital_dividend_history
+  upstream_layer: 4
+  upstream_section: '4.4'
+  upstream_functions:
+  - dividend_history
+  upstream_source: eastmoney_push2
+  description: 历史分红送转
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: metric_only_with_official_reconciliation
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: [tushare_adapter]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_dividend_history.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tushare_dividend_readout.json
+  target_adapter: eastmoney_capital_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: capital_fund_flow_120d
+  upstream_layer: 4
+  upstream_section: '4.5'
+  upstream_functions:
+  - stock_fund_flow_120d
+  upstream_source: eastmoney_push2
+  description: 120日主力及大中小单净流入
+  adoption_decision: adapt_clue_only
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: missing
+  target_adapter: eastmoney_capital_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: news_stock
+  upstream_layer: 5
+  upstream_section: '5.1'
+  upstream_functions:
+  - eastmoney_stock_news
+  upstream_source: eastmoney_push2
+  description: 个股新闻目录与原文链接
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: missing
+  target_adapter: eastmoney_news_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: news_cls_telegraph
+  upstream_layer: 5
+  upstream_section: '5.2'
+  upstream_functions:
+  - cls_telegraph
+  upstream_source: cls_market
+  description: 财联社7×24快讯独立新闻源
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: routed_disabled
+  target_adapter: cls_telegraph_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: news_global
+  upstream_layer: 5
+  upstream_section: '5.3'
+  upstream_functions:
+  - eastmoney_global_news
+  upstream_source: eastmoney_push2
+  description: 东财全球7×24资讯
+  adoption_decision: adapt_clue_only
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: missing
+  target_adapter: eastmoney_news_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: fundamental_tdx_finance_snapshot
+  upstream_layer: 6
+  upstream_section: '6.1'
+  upstream_functions:
+  - tdx_client().finance
+  upstream_source: mootdx
+  description: 37字段季度财务快照
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: metric_only
+  current_implementation_status: alternative_source_operational
+  target_adapter: mootdx_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: fundamental_tdx_f10
+  upstream_layer: 6
+  upstream_section: '6.2'
+  upstream_functions:
+  - tdx_client().F10
+  upstream_source: mootdx
+  description: 九类F10公司资料
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only_unless_official_archived
+  current_implementation_status: routed_only
+  target_adapter: mootdx_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: fundamental_eastmoney_stock_info
+  upstream_layer: 6
+  upstream_section: '6.3'
+  upstream_functions:
+  - eastmoney_stock_info
+  upstream_source: eastmoney_push2
+  description: 行业、股本、市值与上市日期
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: metric_only
+  current_implementation_status: approved_independent_alternative
+  operational_resolution:
+    resolution_type: independent_alternative
+    primary_adapter_status: transport_failure_needs_fix
+    approved_alternatives: [tushare_adapter, tencent_quote_adapter]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_stock_info.yaml
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tushare_stock_basic_scoped_readout.json
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_and_valuation.yaml
+  target_adapter: eastmoney_basic_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: fundamental_sina_financial_statements
+  upstream_layer: 6
+  upstream_section: '6.4'
+  upstream_functions:
+  - sina_financial_report
+  upstream_source: sina_finance
+  description: 新浪资产负债表、利润表与现金流量表独立回退
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: metric_only
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: [tushare_adapter, baostock_adapter]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/sina_financial_statements.yaml
+  target_adapter: sina_financial_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: disclosure_cninfo_announcements
+  upstream_layer: 7
+  upstream_section: '7.1'
+  upstream_functions:
+  - cninfo_announcements
+  upstream_source: cninfo
+  description: 巨潮公告检索、下载与原始PDF归档
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: material_fact_after_review
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: [exchange_fallback_adapter]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+  target_adapter: official_disclosure_pull
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: disclosure_tdx_announcement_summary
+  upstream_layer: 7
+  upstream_section: '7.2'
+  upstream_functions:
+  - tdx_client().F10(name='最新提示')
+  upstream_source: mootdx
+  description: 最新公告摘要线索
+  adoption_decision: adapt_clue_only
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: routed_only
+  target_adapter: mootdx_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: trading_limit_up_yesterday_pools
+  upstream_layer: 8
+  upstream_section: '8.1'
+  upstream_functions:
+  - em_zt_pool
+  - em_yzt_pool
+  upstream_source: eastmoney_push2
+  description: 涨停池与昨日涨停池
+  adoption_decision: defer_out_of_scope
+  priority: P3
+  required_for_bundle8r_close: false
+  claim_boundary: trading_signal_only
+  current_implementation_status: out_of_scope
+  target_adapter: ''
+  operational_definition:
+  - catalogued_and_explicitly_out_of_scope
+- capability_id: trading_break_limit_down_pools
+  upstream_layer: 8
+  upstream_section: '8.1'
+  upstream_functions:
+  - em_zb_pool
+  - em_dt_pool
+  upstream_source: eastmoney_push2
+  description: 炸板池与跌停池
+  adoption_decision: defer_out_of_scope
+  priority: P3
+  required_for_bundle8r_close: false
+  claim_boundary: trading_signal_only
+  current_implementation_status: out_of_scope
+  target_adapter: ''
+  operational_definition:
+  - catalogued_and_explicitly_out_of_scope
+- capability_id: trading_ths_limit_reason
+  upstream_layer: 8
+  upstream_section: '8.2'
+  upstream_functions:
+  - ths_limit_up_pool
+  upstream_source: ths
+  description: 涨停原因、封板成功率与板型
+  adoption_decision: defer_out_of_scope
+  priority: P3
+  required_for_bundle8r_close: false
+  claim_boundary: trading_signal_only
+  current_implementation_status: out_of_scope
+  target_adapter: ''
+  operational_definition:
+  - catalogued_and_explicitly_out_of_scope
+- capability_id: trading_limit_sentiment
+  upstream_layer: 8
+  upstream_section: '8.3'
+  upstream_functions:
+  - limit_up_sentiment
+  upstream_source: eastmoney_push2
+  description: 炸板率、连板高度与梯队
+  adoption_decision: defer_out_of_scope
+  priority: P3
+  required_for_bundle8r_close: false
+  claim_boundary: trading_signal_only
+  current_implementation_status: out_of_scope
+  target_adapter: ''
+  operational_definition:
+  - catalogued_and_explicitly_out_of_scope
+- capability_id: options_contract_list
+  upstream_layer: 9
+  upstream_section: '9.1'
+  upstream_functions:
+  - sina_option_codes
+  upstream_source: sina_finance
+  description: ETF期权合约清单
+  adoption_decision: defer_out_of_scope
+  priority: P3
+  required_for_bundle8r_close: false
+  claim_boundary: derivatives_market_only
+  current_implementation_status: out_of_scope
+  target_adapter: ''
+  operational_definition:
+  - catalogued_and_explicitly_out_of_scope
+- capability_id: options_quote_greeks
+  upstream_layer: 9
+  upstream_section: '9.1'
+  upstream_functions:
+  - sina_option_tquote
+  - sina_option_greeks
+  upstream_source: sina_finance
+  description: ETF期权T型报价、希腊字母与IV
+  adoption_decision: defer_out_of_scope
+  priority: P3
+  required_for_bundle8r_close: false
+  claim_boundary: derivatives_market_only
+  current_implementation_status: out_of_scope
+  target_adapter: ''
+  operational_definition:
+  - catalogued_and_explicitly_out_of_scope
+- capability_id: ir_cninfo_irm
+  upstream_layer: 10
+  upstream_section: '10.1'
+  upstream_functions:
+  - cninfo_irm
+  upstream_source: cninfo_ir
+  description: 互动易提问与公司回复
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: management_comment_only
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: [official_disclosure_pull]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/cninfo_irm.yaml
+  target_adapter: cninfo_irm_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: sentiment_rankings
+  upstream_layer: 10
+  upstream_section: '10.2'
+  upstream_functions:
+  - ths_hot_list
+  - em_hot_rank
+  upstream_source: ths+eastmoney
+  description: 同花顺热榜与东财人气榜
+  adoption_decision: adapt_clue_only
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: missing
+  target_adapter: market_sentiment_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: sentiment_concept_heat
+  upstream_layer: 10
+  upstream_section: '10.2'
+  upstream_functions:
+  - em_hot_concept
+  upstream_source: eastmoney_push2
+  description: 个股概念命中与热度
+  adoption_decision: adapt_clue_only
+  priority: P2
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: missing
+  target_adapter: market_sentiment_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: fallback_dragon_tiger_exchange
+  upstream_layer: fallback
+  upstream_section: 备用源速查
+  upstream_functions:
+  - dragon_tiger_backup
+  upstream_source: sse+szse
+  description: 交易所官方龙虎榜回退
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: market_context_only
+  current_implementation_status: missing
+  target_adapter: exchange_fallback_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: fallback_fund_flow_sina
+  upstream_layer: fallback
+  upstream_section: 备用源速查
+  upstream_functions:
+  - fund_flow_backup
+  upstream_source: sina_finance
+  description: 新浪日度资金流独立回退
+  adoption_decision: adopt_enhancement
+  priority: P1
+  required_for_bundle8r_close: false
+  claim_boundary: clue_only
+  current_implementation_status: missing
+  target_adapter: sina_fund_flow_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified
+- capability_id: fallback_announcements_exchange
+  upstream_layer: fallback
+  upstream_section: 备用源速查
+  upstream_functions:
+  - announcements_backup
+  upstream_source: sse+szse+eastmoney
+  description: 交易所官方公告回退与PDF
+  adoption_decision: adopt_core
+  priority: P0
+  required_for_bundle8r_close: true
+  claim_boundary: material_fact_after_review
+  current_implementation_status: operational_verified
+  operational_resolution:
+    resolution_type: direct_operational
+    approved_alternatives: [official_disclosure_pull]
+    proof_paths:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/szse_announcement_fallback.yaml
+  target_adapter: exchange_fallback_adapter
+  operational_definition:
+  - adapter_importable_or_cli_resolvable
+  - fixture_test_passed
+  - live_smoke_receipt_present_when_network_capable
+  - raw_archive_verified
+  - manifest_write_verified
+  - schema_fingerprint_verified
+  - independent_fallback_verified_for_core_capabilities
+  - claim_boundary_verified

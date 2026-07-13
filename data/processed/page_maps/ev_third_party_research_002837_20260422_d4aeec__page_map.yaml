@@ -1,0 +1,13 @@
+pages:
+- page_no: 1
+  text_length: 2227
+  text_sha256: 340c4497785654d9a846462bb89b98708c14b2f3ef42085ae27d298c8307d90a
+- page_no: 2
+  text_length: 2877
+  text_sha256: b771ebe04e52c618337423f5653d89a75fef53e9ec0ac1357b243acb76d5b011
+- page_no: 3
+  text_length: 1101
+  text_sha256: 91f8061c228aae9fe7ff9d0b35465bdaa61cf9cb7ef02420f59479ebeb577a40
+- page_no: 4
+  text_length: 1350
+  text_sha256: 4a919271f4d76170916df0b1a690d4572423b7a0c191bdebed2c8ffb027b668a

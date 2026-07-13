@@ -1,0 +1,41 @@
+schema_version: 1
+decision: pass
+adapter_id: eastmoney_news_adapter
+source_name: eastmoney_push2
+endpoint_hint: news_clue
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+run_id: r5_bundle8r_eastmoney_news_adapter_news_clue_a962f931
+evidence_id: ev_news_social_clue_002837_20260713_a962f9
+claim_boundary: clue_only
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/web_snapshots/eastmoney_news_adapter_news_clue_002837_2026-07-13_a962f931.json
+processed_table_path: data/processed/normalized/eastmoney_news_adapter_news_clue_002837_2026-07-13_a962f931.csv
+ingest_log_path: data/processed/logs/ev_news_social_clue_002837_20260713_a962f9__ingest_log.json
+source_url: https://search-api-web.eastmoney.com/search/jsonp?cb=jQuery_bundle8r&param=%7B%22uid%22%3A%22%22%2C%22keyword%22%3A%22002837%22%2C%22type%22%3A%5B%22cmsArticleWebOld%22%5D%2C%22client%22%3A%22web%22%2C%22clientType%22%3A%22web%22%2C%22clientVersion%22%3A%22curr%22%2C%22param%22%3A%7B%22cmsArticleWebOld%22%3A%7B%22searchScope%22%3A%22default%22%2C%22sort%22%3A%22default%22%2C%22pageIndex%22%3A1%2C%22pageSize%22%3A20%2C%22preTag%22%3A%22%22%2C%22postTag%22%3A%22%22%7D%7D%7D
+http_status: 200
+attempts: 1
+row_count: 20
+metric_candidates_created: 0
+claim_candidates_created: 20
+observed_fields:
+- content_excerpt
+- media_name
+- publish_date
+- source_url
+- title
+expected_fields:
+- title
+- publish_date
+- source_url
+missing_fields: []
+schema_fingerprint: fe74e6dabe16b88e9284c9b9ca161d52f2bbfcef519d4f176ab36bc9ea240671
+notes: D-rank clue only; never promoted directly to a material company fact.

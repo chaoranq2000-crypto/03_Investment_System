@@ -1,0 +1,43 @@
+schema_version: 1
+decision: pass
+adapter_id: eastmoney_capital_adapter
+source_name: eastmoney_push2
+endpoint_hint: fund_flow
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+run_id: r5_bundle8r_eastmoney_capital_adapter_fund_flow_d9b6efb6
+evidence_id: ev_structured_market_data_002837_20260713_d9b6ef
+claim_boundary: clue_only
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/market_data/eastmoney_capital_adapter_fund_flow_002837_2026-07-13_d9b6efb6.json
+processed_table_path: data/processed/normalized/eastmoney_capital_adapter_fund_flow_002837_2026-07-13_d9b6efb6.csv
+ingest_log_path: data/processed/logs/ev_structured_market_data_002837_20260713_d9b6ef__ingest_log.json
+source_url: https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=0.002837&fields1=f1%2Cf2%2Cf3%2Cf7&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf62%2Cf63&klt=101&lmt=30
+http_status: 200
+attempts: 1
+row_count: 30
+metric_candidates_created: 150
+claim_candidates_created: 0
+observed_fields:
+- large_net
+- main_net
+- medium_net
+- period
+- small_net
+- source_name
+- super_large_net
+expected_fields:
+- period
+- source_name
+missing_fields: []
+schema_fingerprint: 5d2ade85c13d2d49f342582eda53e60ae0267e39fcd2b97858be3bbcf433262f
+notes: Market/event snapshot only; official reconciliation remains required where
+  declared.

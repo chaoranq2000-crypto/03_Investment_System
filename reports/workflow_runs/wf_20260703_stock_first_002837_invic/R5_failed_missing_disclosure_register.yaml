@@ -1,0 +1,40 @@
+schema_version: 1
+artifact_type: R5_failed_missing_disclosure_register
+as_of_date: '2026-07-13'
+acquisition_failures:
+- capability_id: market_tdx_bars
+  failure_class: live_empty_response
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/mootdx_daily_bar.yaml
+  approved_alternatives:
+  - tushare
+  - baostock
+  - baidu_finance
+- capability_id: fundamental_eastmoney_stock_info
+  failure_class: transport_failure
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_stock_info.yaml
+  approved_alternatives:
+  - tushare
+  - tencent_finance
+issuer_nondisclosures:
+- gap_id: missing_liquid_cooling_segment_economics
+  status: MISSING_DISCLOSURE
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/segment_economics.yaml
+  missing_fields:
+  - 液冷分项收入
+  - 液冷分项毛利
+  - 项目现金回款
+- gap_id: missing_liquid_cooling_driver_conversion
+  status: MISSING_DISCLOSURE
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/business_driver_tree.yaml
+  missing_fields:
+  - 液冷产品出货量
+  - 订单转化率
+- gap_id: missing_peer_liquid_cooling_purity
+  status: MISSING_DISCLOSURE
+  source_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/competitive_position_matrix.yaml
+  missing_fields:
+  - 同业液冷收入
+  - 同业液冷毛利
+  - 同业客户口径
+classification_rule: acquisition failure is a source-access outcome; issuer nondisclosure
+  is preserved as unknown and is never inferred from another source

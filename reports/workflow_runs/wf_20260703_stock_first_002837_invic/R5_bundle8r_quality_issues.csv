@@ -1,0 +1,12 @@
+issue_id,severity,gate_id,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
+r5_8r_q_001,medium,R5-G3,bundle8r_close,R5_bundle8r_coverage_matrix.yaml,segment_economics,"发行人尚未单独披露液冷收入、毛利、出货量、订单转化率和项目现金回款。",stock-deep-dive,accepted_with_todos,"后续正式披露出现时刷新 segment_economics.yaml；当前保持 MISSING_DISCLOSURE。",accepted_todo
+r5_8r_q_002,medium,R5-G4,bundle8r_close,R5_bundle8r_coverage_matrix.yaml,peer_position,"同业公司级指标可比，但液冷收入纯度、毛利与客户口径不可比。",evidence-ingest,accepted_with_todos,"后续逐家补充正式披露；当前不得把公司级财务差异解释为液冷份额差异。",accepted_todo
+r5_8r_q_003,medium,R5-G5,bundle8r_close,R5_estimate_distribution_pack.yaml,forecast_drivers,"一致预期和单家研报只能作为 estimate 或 analyst_view，不能补齐发行人未披露的分项经营驱动。",company-valuation,accepted_with_todos,"Bundle 9R 使用情景假设并保留分项销量、价格和毛利桥接 TODO。",accepted_todo
+r5_8r_q_004,medium,R5-G6,bundle8r_close,R5_bundle8r_coverage_matrix.yaml,valuation_expectations,"净债务与企业价值、DCF 折现和终值、液冷分部 SOTP 输入仍缺失。",company-valuation,accepted_with_todos,"Bundle 9R 只重建有证据的估值方法，并对缺失方法保留 TODO。",accepted_todo
+r5_8r_q_005,low,R5-G8,bundle8r_close,R5_future_event_calendar_summary.yaml,future_events,"截至 2026-07-13 当前来源未返回基准日之后已确认的解禁或分红日期。",refresh-research,accepted_with_todos,"下次证据刷新重跑官方公告、share_float 和 dividend；不把零结果解释为不会发生事件。",accepted_todo
+r5_8r_q_006,low,R5-G1,bundle8r_close,R5_bundle8r_evidence_manifest_delta.csv,evidence_snapshot,"证据完整性门已核对 raw、manifest、schema 与 claim boundary。",quality-review,accepted,"保持 generation lock 输入与 manifest 同步。",resolved
+r5_8r_q_007,low,R5-G2,bundle8r_close,R5_market_fundamental_adapter_receipts.yaml,financial_history,"财务事实输入已归档并保持 metric-only，模型重建交由 Bundle 9R。",quality-review,accepted,"Bundle 9R 仅消费已审阅或明确 draft 边界的输入。",resolved
+r5_8r_q_008,low,R5-G7,bundle8r_close,R5_schema_drift_regression.yaml,technical_market,"市场与技术输入具有日期、原始归档、schema 指纹和独立来源。",quality-review,accepted,"保留 mootdx 日线零结果及替代来源记录。",resolved
+r5_8r_q_009,low,R5-G9,bundle8r_close,R5_bundle8r_coverage_matrix.yaml,narrative,"六个研究问题均按事实类型和缺口类型分类，未出现未分类结论。",quality-review,accepted,"Bundle 10R 叙事必须继承相同边界。",resolved
+r5_8r_q_010,low,R5-G10,bundle8r_close,R5_bundle8r_close_quality_report.md,no_advice,"No-advice gate 已核对，研究输入和关闭读数未引入行动指令。",quality-review,accepted,"Bundle 9R/10R 继续运行同一安全检查。",resolved
+r5_8r_q_011,medium,R5-G11,bundle8r_close,R5_bundle8r_close_readout.md,sample_benchmark,"Reader 样本质量必须在 Bundle 10R 基于新 generation 重新构建和评分。",quality-review,accepted_with_todos,"禁止复用旧 Reader 仅修改状态；完成 10R 后重新运行质量量表。",accepted_todo

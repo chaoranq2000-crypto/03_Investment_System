@@ -1,0 +1,10 @@
+{
+  "source_name": "tushare",
+  "api_name": "stk_holdernumber",
+  "mode": "live",
+  "adapter_status": "live_completed",
+  "result": "SUCCESS",
+  "rows": 143,
+  "token_env": "TUSHARE_TOKEN",
+  "notes": "live Tushare response was routed through structured_api_pull; token value was not stored"
+}

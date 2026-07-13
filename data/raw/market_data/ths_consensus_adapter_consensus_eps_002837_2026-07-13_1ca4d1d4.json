@@ -1,0 +1,30 @@
+{
+  "rows": [
+    {
+      "annual_period": 2026,
+      "institution_count": 12,
+      "eps_min": 0.68,
+      "eps_mean": 0.92,
+      "eps_max": 1.15,
+      "industry_average": 2.13
+    },
+    {
+      "annual_period": 2027,
+      "institution_count": 12,
+      "eps_min": 1.05,
+      "eps_mean": 1.58,
+      "eps_max": 2.35,
+      "industry_average": 2.78
+    },
+    {
+      "annual_period": 2028,
+      "institution_count": 10,
+      "eps_min": 1.48,
+      "eps_mean": 2.33,
+      "eps_max": 3.47,
+      "industry_average": 3.56
+    }
+  ],
+  "table_count": 32,
+  "html_sha_basis": "<!DOCTYPE HTML>\n<html>\n<head id=\"head\">\n\t\t    <title>英维克(002837) 盈利预测_F10_同花顺金融服务网</title>\n\t<meta http-equiv=\"X-UA-Compatible\" content=\"IE=EmulateIE7;IE=9\"/>\n\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=gbk\"/>\n\t<meta name=\"keywords\" content=\"英维克最新动态,英维克公司概况,英维克财务分析,英维克股东研究,英维克股本结构,英维克公司大事,英维克分红融资\"/>\n\t<meta name=\"description\" content=\"暂无\"/>\n\t<!-- 券商url参数添加，落地只落broker-pcf10.html -->\n\t\n\t<script type=\"text/javascript\" src=\"//s.thsi.cn/js/chameleon/chameleon.1.12.min.1783940.js\"></script> <script type=\"text/javascript\" src=\"//s.thsi.cn/js/chameleon/chameleon.min.1783940.js\"></script> <script>\r\n    function getUrlParams(key, url) {\r\n        var href = url ? url : window.location.href;\r\n        if (href.indexOf(\"?\") < 0 && href.indexOf(\"#\") < 0) {\r\n            return false;\r\n        }\r\n        var hrefStr = href.replace(/#/g, \"&\");\r\n        hrefStr = hrefStr.replace(/\\?/g, \"&\");\r\n        var paramsObj= {};\r\n        hrefStr.split(\"&\").forEach(function(i) {\r\n            if (i.indexOf(\"=\") > -1) {\r\n                paramsObj[i.split(\"=\")[0]] = i.split(\"=\")[1];\r\n            }\r\n        });\r\n        if (key) {\r\n            return paramsObj[key] || false;\r\n        } else {\r\n            return paramsObj;\r\n        }\r\n    }\r\n\r\n    function addParam(url, obj) {\r\n        var str = \"\",res;\r\n        for (var key in obj) {\r\n            str += (key + \"=\" + obj[key]);\r\n        }\r\n        if (url.indexOf(\"?\") > -1) {\r\n            res = url.split('?').join('?' + str + '&');\r\n        } else if (url.indexOf(\"#\") > -1) {\r\n            res = url.replace(/#/g, \"?\" + str + \"#\");\r\n        } else {\r\n            res = url + \"?\" + str;\r\n        }\r\n        return res;\r\n    }\r\n\r\n    var historyUrl = document.referrer;\r\n    if (historyUrl) {\r\n        var broker = getUrlParams('broker', historyUrl);\r\n        if (broker && window.history) {\r\n            var url = window.location.href;\r\n            url = addParam(url, broker ? {broker: broker} : {});\r\n            window.history.pushState('', '"
+}

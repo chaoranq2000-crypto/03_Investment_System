@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_ths_consensus_adapter_consensus_eps_1ca4d1d4",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:06:47Z",
+  "finished_at": "2026-07-13T11:06:48Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "ths",
+  "source_type": "third_party_research",
+  "api_name": "consensus_eps",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "15",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "claim_boundary=estimate_only; transport=inherit"
+}

@@ -1,0 +1,29 @@
+schema_version: 1
+generation_label: r5_bundle8r
+generation_id: evidence_gen_r5_bundle8r_b82ba6f33b5044e6
+created_at: '2026-07-13'
+input_count: 6
+missing_input_count: 0
+inputs:
+- path: config/a_stock_data_capability_catalog.yaml
+  exists: true
+  sha256: aa24832039409f17a487d63109b16347cc638d43d3231fa63b1424919f85fd54
+- path: config/adapter_contract_registry.yaml
+  exists: true
+  sha256: db6627c140d96090fe2322587d9d64a16cb179c14ba0f536820d2b0a3278a521
+- path: data/manifests/claims_draft.csv
+  exists: true
+  sha256: b6d06f735edcb2507ddd022eb6235979dbd9fc4ee2694a8223fc02cb22766fb6
+- path: data/manifests/evidence_manifest.csv
+  exists: true
+  sha256: 9181b77afbdd042387286030e52e7913985004fc3805f3d705ebaf84eedd9b6c
+- path: data/manifests/metrics_draft.csv
+  exists: true
+  sha256: d10c119878c4e67cba3d25786bdfc5053bad85422279757ab008c617ac762ffe
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_coverage_matrix.yaml
+  exists: true
+  sha256: c03b8f9f7abbe5062cdd77652764af5a3f0a7b94ce9473a1bb24d54ed8e4e1f9
+aggregate_sha256: b82ba6f33b5044e686e4c7210eba77675b0527a24169c48aea41ad8e4bc1846c
+downstream_consumers:
+- R5_BUNDLE_9R_FORECAST_VALUATION_REBUILD
+- R5_BUNDLE_10R_READER_REBUILD

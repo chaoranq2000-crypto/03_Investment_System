@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_baidu_kline_adapter_kline_with_ma_b97b85e5",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:21:45Z",
+  "finished_at": "2026-07-13T11:21:45Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "baidu_finance",
+  "source_type": "structured_market_data",
+  "api_name": "kline_with_ma",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "270",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "claim_boundary=metric_only; transport=inherit"
+}

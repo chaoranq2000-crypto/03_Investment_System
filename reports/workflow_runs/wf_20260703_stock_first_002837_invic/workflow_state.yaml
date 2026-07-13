@@ -1,7 +1,7 @@
 workflow_id: wf_20260703_stock_first_002837_invic
 workflow_type: stock_first_closed_loop
 status: accepted_with_todos
-quality_target: R5_sample_quality_ready
+quality_target: R5_sample_quality_requalification
 created_at: 2026-07-03
 updated_at: '2026-07-13'
 owner: mixed
@@ -41,12 +41,20 @@ completed_stages:
 - R5_bundle10_ai_semantic_precheck
 - R5_bundle10_external_human_review
 - R5_bundle10_final_close
+- R5_bundle8r_0_capability_audit
+- R5_bundle8r_1_market_fundamental_adapters
+- R5_bundle8r_2_research_ir_adapters
+- R5_bundle8r_3_report_pdf_archive
+- R5_bundle8r_4_capital_event_news_adapters
+- R5_bundle8r_5_fallback_and_ci
+- R5_bundle8r_6_live_pilot
+- R5_bundle8r_7_quality_close
 next_stage: null
-active_skill: research-orchestrator
+active_skill: null
 required_next_skill: null
 evidence_snapshot:
-  manifest_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8b_evidence_manifest_delta.csv
-  evidence_count: 46
+  manifest_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_manifest_delta.csv
+  evidence_count: 40
   annual_report_parse_log: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/logs/ev_annual_report_002837_20260421_ce7f64_parse_log.json
   annual_report_page_map: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/page_maps/ev_annual_report_002837_20260421_ce7f64_page_map.yaml
   notes: annual report locator extraction completed with pypdf fallback; MinerU CLI
@@ -55,6 +63,9 @@ evidence_snapshot:
   bundle8b_reviewed_official_ir_count: 4
   bundle8b_notes: 46 live evidence rows archived; official IR management comments
     reviewed; structured and research metadata remain draft.
+  input_evidence_generation_id: evidence_gen_r5_bundle8r_b82ba6f33b5044e6
+  bundle8r_notes: forward requalification accepted with explicit gaps; downstream
+    9R/10R not executed; awaiting explicit follow-up plan
 claims_snapshot:
   candidates_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/data/processed/candidates/claim_candidates_ev_annual_report_002837_20260421_ce7f64.csv
   registry_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/claims_registry.csv
@@ -779,3 +790,42 @@ bundle10_close:
   sample_quality_allowed: true
   p2_allowed: false
   remaining_todos_visible: true
+bundle8r_requalification:
+  mode: forward_requalification_not_rollback
+  status: accepted_with_todos
+  baseline_commit: 08acbf9084dc32dade6d899ed3e8bbdbbc107efd
+  activated_at: '2026-07-13'
+  reason: Bundle 9 and Bundle 10 are retained, but their research quality is not accepted
+    by the owner; rebuild upstream evidence capability first.
+  historical_closures_preserved:
+  - bundle8_close
+  - bundle9_close
+  - bundle10_close
+  historical_close_hashes:
+    bundle8_close_sha256: 3234d91abe0d824d45354fca8fb592335ca4455ac9c2c3003d514f71b1549581
+    bundle9_close_sha256: 3060f3964288aa538d1dfbd4e446f43aab554803af6b7566fab231784cb84859
+    bundle10_close_sha256: a591e267ef33c146120121b2d28c7364f3c14fb1d6683bfc886899f35134361d
+  canonical_reader_status: stale_pending_followup_plan
+  canonical_sample_quality_allowed: false
+  p2_allowed: false
+  backflow_target: evidence-ingest
+  required_close_artifact: R5_bundle8r_evidence_generation_lock.yaml
+  downstream_plan:
+    bundle9: preserved_historical_then_rebuild_as_bundle9r
+    bundle10: preserved_historical_then_rebuild_as_bundle10r
+  closed_at: '2026-07-13'
+  input_evidence_generation_id: evidence_gen_r5_bundle8r_b82ba6f33b5044e6
+  bundle9r_rebuilt: false
+  bundle10r_rebuilt: false
+  sample_quality_allowed: false
+bundle8r_close:
+  decision: accepted_with_todos
+  bundle_closed: true
+  closed_at: '2026-07-13'
+  input_evidence_generation_id: evidence_gen_r5_bundle8r_b82ba6f33b5044e6
+  historical_bundle9_bundle10_preserved: true
+  next_bundle: TODO_AWAIT_FOLLOWUP_PLAN
+  human_review_required: false
+  notes: Bundle 9R/10R were not executed; follow-up requires an explicit later plan.
+  sample_quality_allowed: false
+  p2_allowed: false

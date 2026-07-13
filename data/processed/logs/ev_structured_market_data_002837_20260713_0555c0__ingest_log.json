@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_eastmoney_capital_adapter_dividend_history_0555c0ab",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:12:12Z",
+  "finished_at": "2026-07-13T11:12:13Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "eastmoney_push2",
+  "source_type": "structured_market_data",
+  "api_name": "dividend_history",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "11",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "claim_boundary=metric_only_with_official_reconciliation; transport=inherit"
+}

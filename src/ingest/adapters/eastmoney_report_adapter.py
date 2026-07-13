@@ -10,29 +10,56 @@ from typing import Any, Mapping, Sequence
 from urllib.parse import urlencode
 from urllib.request import ProxyHandler, build_opener
 
-from evidence_io import (
-    EVIDENCE_FIELDNAMES,
-    INGEST_RUN_FIELDNAMES,
-    METRIC_CANDIDATE_FIELDNAMES,
-    evidence_id,
-    hash_json,
-    immutable_copy_or_write_bytes,
-    normalize_stock_code,
-    read_csv_dicts,
-    repo_rel,
-    safe_slug,
-    short_hash,
-    utc_now_iso,
-    write_csv_rows,
-    write_json,
-)
-from http_acquisition import (
-    HttpAcquisitionError,
-    HttpRequestSpec,
-    PoliteHttpClient,
-    RateLimitPolicy,
-    RetryPolicy,
-)
+try:
+    from src.ingest.evidence_io import (
+        EVIDENCE_FIELDNAMES,
+        INGEST_RUN_FIELDNAMES,
+        METRIC_CANDIDATE_FIELDNAMES,
+        evidence_id,
+        hash_json,
+        immutable_copy_or_write_bytes,
+        normalize_stock_code,
+        read_csv_dicts,
+        repo_rel,
+        safe_slug,
+        sha256_file,
+        short_hash,
+        utc_now_iso,
+        write_csv_rows,
+        write_json,
+    )
+    from src.ingest.http_acquisition import (
+        HttpAcquisitionError,
+        HttpRequestSpec,
+        PoliteHttpClient,
+        RateLimitPolicy,
+        RetryPolicy,
+    )
+except ModuleNotFoundError:  # compatibility with legacy direct-path test imports
+    from evidence_io import (
+        EVIDENCE_FIELDNAMES,
+        INGEST_RUN_FIELDNAMES,
+        METRIC_CANDIDATE_FIELDNAMES,
+        evidence_id,
+        hash_json,
+        immutable_copy_or_write_bytes,
+        normalize_stock_code,
+        read_csv_dicts,
+        repo_rel,
+        safe_slug,
+        sha256_file,
+        short_hash,
+        utc_now_iso,
+        write_csv_rows,
+        write_json,
+    )
+    from http_acquisition import (
+        HttpAcquisitionError,
+        HttpRequestSpec,
+        PoliteHttpClient,
+        RateLimitPolicy,
+        RetryPolicy,
+    )
 
 
 REPORT_API_URL = "https://reportapi.eastmoney.com/report/list"
@@ -266,9 +293,18 @@ def ingest(args: argparse.Namespace) -> dict[str, Any]:
         / "data/raw/market_data"
         / f"eastmoney_report_metadata_{stock_code}_{args.as_of_date}_{short_hash(body_hash, 8)}.json"
     )
-    raw_status, file_hash = immutable_copy_or_write_bytes(
-        raw_path, json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8") + b"\n"
-    )
+    raw_bytes = json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8") + b"\n"
+    try:
+        raw_status, file_hash = immutable_copy_or_write_bytes(raw_path, raw_bytes)
+    except FileExistsError:
+        # The endpoint may reorder JSON object keys between otherwise identical
+        # responses.  The semantic content hash (and therefore filename) is
+        # stable; preserve the immutable first archive and treat the rerun as
+        # idempotent only when the parsed payloads are equal.
+        existing_payload = json.loads(raw_path.read_text(encoding="utf-8"))
+        if existing_payload != payload:
+            raise
+        raw_status, file_hash = "unchanged_semantic", sha256_file(raw_path)
     normalized_path = (
         repo_root
         / "data/processed/normalized"

@@ -1,0 +1,8 @@
+schema_version: 1
+decision: pass
+registry_id: adapter_contract_registry_v1
+adapter_count: 26
+proof_files_verified: true
+issue_counts: {}
+blocking_issue_count: 0
+issues: []

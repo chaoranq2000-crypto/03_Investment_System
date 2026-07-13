@@ -9,23 +9,42 @@ from typing import Any, Mapping, Sequence
 
 import yaml
 
-from evidence_io import (
-    EVIDENCE_FIELDNAMES,
-    INGEST_RUN_FIELDNAMES,
-    METRIC_CANDIDATE_FIELDNAMES,
-    detect_period,
-    evidence_id,
-    hash_json,
-    immutable_copy_file,
-    is_number,
-    normalize_stock_code,
-    repo_rel,
-    safe_slug,
-    short_hash,
-    utc_now_iso,
-    write_csv_rows,
-    write_json,
-)
+try:
+    from src.ingest.evidence_io import (
+        EVIDENCE_FIELDNAMES,
+        INGEST_RUN_FIELDNAMES,
+        METRIC_CANDIDATE_FIELDNAMES,
+        detect_period,
+        evidence_id,
+        hash_json,
+        immutable_copy_file,
+        is_number,
+        normalize_stock_code,
+        repo_rel,
+        safe_slug,
+        short_hash,
+        utc_now_iso,
+        write_csv_rows,
+        write_json,
+    )
+except ModuleNotFoundError:  # compatibility with legacy direct-path execution
+    from evidence_io import (
+        EVIDENCE_FIELDNAMES,
+        INGEST_RUN_FIELDNAMES,
+        METRIC_CANDIDATE_FIELDNAMES,
+        detect_period,
+        evidence_id,
+        hash_json,
+        immutable_copy_file,
+        is_number,
+        normalize_stock_code,
+        repo_rel,
+        safe_slug,
+        short_hash,
+        utc_now_iso,
+        write_csv_rows,
+        write_json,
+    )
 
 
 MARKET_APIS = {

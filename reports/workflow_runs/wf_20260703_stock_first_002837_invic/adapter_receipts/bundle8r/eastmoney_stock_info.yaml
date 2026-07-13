@@ -1,0 +1,19 @@
+schema_version: 1
+decision: needs_fix
+adapter_id: eastmoney_basic_adapter
+source_name: eastmoney_push2
+endpoint_hint: stock_info
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+claim_boundary: metric_only
+failure_class: RemoteDisconnected
+failure_message: Remote end closed connection without response
+checks:
+  fixture_verified: false
+  live_smoke_verified: false
+  raw_archive_verified: false
+  manifest_write_verified: false
+  schema_fingerprint_verified: false
+  claim_boundary_verified: true

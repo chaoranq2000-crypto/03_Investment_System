@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_eastmoney_capital_adapter_block_trade_d8f3c8b1",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:19:40Z",
+  "finished_at": "2026-07-13T11:19:40Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "eastmoney_push2",
+  "source_type": "structured_market_data",
+  "api_name": "block_trade",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "100",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "claim_boundary=metric_only; transport=inherit"
+}

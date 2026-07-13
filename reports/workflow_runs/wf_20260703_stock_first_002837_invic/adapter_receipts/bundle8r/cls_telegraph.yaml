@@ -1,0 +1,41 @@
+schema_version: 1
+decision: pass
+adapter_id: cls_telegraph_adapter
+source_name: cls_market
+endpoint_hint: telegraph
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+run_id: r5_bundle8r_cls_telegraph_adapter_telegraph_16f5605f
+evidence_id: ev_news_social_clue_002837_20260713_16f560
+claim_boundary: clue_only
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/web_snapshots/cls_telegraph_adapter_telegraph_002837_2026-07-13_16f5605f.json
+processed_table_path: data/processed/normalized/cls_telegraph_adapter_telegraph_002837_2026-07-13_16f5605f.csv
+ingest_log_path: data/processed/logs/ev_news_social_clue_002837_20260713_16f560__ingest_log.json
+source_url: https://www.cls.cn/v1/roll/get_roll_list?appName=CailianpressWeb&os=web&sv=7.7.5&last_time=&refresh_type=1&rn=50&sign=b849fe86598f3ceca205eda7b33a49a1
+http_status: 200
+attempts: 1
+row_count: 0
+metric_candidates_created: 0
+claim_candidates_created: 0
+observed_fields:
+- empty_result
+- publish_date
+- source_url
+- title
+expected_fields:
+- title
+- publish_date
+- source_url
+missing_fields: []
+schema_fingerprint: f3e4044f9744726b2f45c95d0b8312b718ad59542fe2eda4a27ea1f6f5c8a13b
+notes: Global rolling-news clue only; keyword filtering does not establish a material
+  company fact.

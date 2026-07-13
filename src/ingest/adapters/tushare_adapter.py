@@ -8,8 +8,12 @@ from pathlib import Path
 from typing import Any, Mapping
 from typing import Sequence
 
-from structured_api_pull import main as structured_main
-from structured_api_pull import output_path, write_readout
+try:
+    from src.ingest.structured_api_pull import main as structured_main
+    from src.ingest.structured_api_pull import output_path, write_readout
+except ModuleNotFoundError:  # compatibility with legacy direct-path test imports
+    from structured_api_pull import main as structured_main
+    from structured_api_pull import output_path, write_readout
 
 
 SUPPORTED_APIS = {
@@ -23,6 +27,11 @@ SUPPORTED_APIS = {
     "fina_indicator",
     "fina_mainbz",
     "disclosure_date",
+    "stk_holdernumber",
+    "share_float",
+    "dividend",
+    "forecast",
+    "express",
 }
 
 
@@ -141,9 +150,7 @@ def _records_from_result(result: Any) -> list[dict[str, str]]:
 
 
 def _live_params(args: argparse.Namespace) -> dict[str, str]:
-    params: dict[str, str] = {}
-    if args.api_name != "stock_basic":
-        params["ts_code"] = _tushare_ts_code(args.stock_code)
+    params: dict[str, str] = {"ts_code": _tushare_ts_code(args.stock_code)}
     if args.api_name == "disclosure_date":
         # Tushare defines end_date here as the financial-report period, not a
         # date-range upper bound.  start_date is not a supported parameter.

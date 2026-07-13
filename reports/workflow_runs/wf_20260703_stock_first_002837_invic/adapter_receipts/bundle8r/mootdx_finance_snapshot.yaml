@@ -1,0 +1,74 @@
+schema_version: 1
+decision: pass
+adapter_id: mootdx_adapter
+source_name: mootdx
+endpoint_hint: finance_snapshot
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+run_id: r5_bundle8r_mootdx_adapter_finance_snapshot_bbb9e042
+evidence_id: ev_structured_market_data_002837_20260713_bbb9e0
+claim_boundary: metric_only
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/market_data/mootdx_adapter_finance_snapshot_002837_2026-07-13_bbb9e042.json
+processed_table_path: data/processed/normalized/mootdx_adapter_finance_snapshot_002837_2026-07-13_bbb9e042.csv
+ingest_log_path: data/processed/logs/ev_structured_market_data_002837_20260713_bbb9e0__ingest_log.json
+source_url: tdx://119.97.185.59:7709/002837
+http_status: 200
+attempts: 1
+row_count: 1
+metric_candidates_created: 0
+claim_candidates_created: 0
+observed_fields:
+- baoliu2
+- bgu
+- changqifuzhai
+- code
+- cunhuo
+- faqirenfarengu
+- farengu
+- gudingzichan
+- gudongrenshu
+- guojiagu
+- hgu
+- industry
+- ipo_date
+- jinglirun
+- jingyingxianjinliu
+- jingzichan
+- lirunzonghe
+- liudongfuzhai
+- liudongzichan
+- liutongguben
+- market
+- meigujingzichan
+- province
+- report_date
+- shuihoulirun
+- stock_code
+- touzishouyu
+- updated_date
+- weifenpeilirun
+- wuxingzichan
+- yingshouzhangkuan
+- yingyelirun
+- zhigonggu
+- zhuyinglirun
+- zhuyingshouru
+- zibengongjijin
+- zongguben
+- zongxianjinliu
+- zongzichan
+expected_fields:
+- stock_code
+- report_date
+missing_fields: []
+schema_fingerprint: 085d327382771599ac5d414169153afb5ec15ecc2bfb8be91983466e8142f1d2
+notes: Unadjusted TongdaXin prices; no research inference.

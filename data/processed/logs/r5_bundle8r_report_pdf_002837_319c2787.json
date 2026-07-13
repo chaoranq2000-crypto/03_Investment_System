@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_report_pdf_002837_319c2787",
+  "ingest_mode": "url_file",
+  "started_at": "2026-07-13T11:11:22Z",
+  "finished_at": "2026-07-13T11:11:22Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "eastmoney_push2",
+  "source_type": "third_party_research",
+  "api_name": "report_pdf",
+  "manifest_rows_created": "2",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "0",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "analyst_view_only; PDF bytes and page map retained"
+}

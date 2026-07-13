@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_structured_002837_dividend_f7eb71",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:04:51Z",
+  "finished_at": "2026-07-13T11:04:51Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "tushare",
+  "source_type": "structured_financial_data",
+  "api_name": "dividend",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "169",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "offline-capable structured snapshot ingest"
+}

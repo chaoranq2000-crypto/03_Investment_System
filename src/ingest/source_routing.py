@@ -29,6 +29,7 @@ class SourceOption:
     adapter: str
     endpoint_hint: str
     enabled: bool
+    dry_run_probe: bool = False
 
 
 @dataclass(frozen=True)
@@ -94,6 +95,7 @@ def parse_capability_route(
             adapter=str(item.get("adapter", "manual_or_snapshot")),
             endpoint_hint=str(item.get("endpoint_hint", "unspecified")),
             enabled=bool(item.get("enabled", True)),
+            dry_run_probe=bool(item.get("dry_run_probe", False)),
         )
         for item in raw_sources
     )

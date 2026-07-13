@@ -1,0 +1,39 @@
+schema_version: 1
+artifact_type: R5_bundle8r_baseline_audit
+workflow_id: wf_20260703_stock_first_002837_invic
+bundle_id: R5_BUNDLE_8R_A_STOCK_DATA_FORWARD_REQUALIFICATION
+mode: forward_requalification_not_rollback
+audited_at: '2026-07-13'
+baseline_commit: 08acbf9084dc32dade6d899ed3e8bbdbbc107efd
+patch_archive: R5_BUNDLE_8R_A_STOCK_DATA_FORWARD_REQUALIFICATION_PATCH_2026-07-13.zip
+patch_sha256: 17F5BE5373C6A83F07FCF749AF17D3A6EE6806C0B2C7B8A43074365C83ED2767
+patch_manifest_file_count: 30
+patch_internal_checksum_count: 43
+patch_checksums_verified: true
+patch_install_result:
+  installed_files: 30
+  identical_files: 0
+  overwrite_existing_files: 0
+baseline_gates:
+  capability_count: 43
+  bundle8r_core_ready: 1
+  bundle8r_core_total: 14
+  capability_decision: needs_fix
+  adapter_operational_blocking_issues: 16
+  adapter_decision: needs_fix
+  package_targeted_tests_passed: 8
+state_transition:
+  previous_status: accepted
+  forward_status: needs_fix
+  current_stage: R5_BUNDLE_8R_A_STOCK_DATA_FORWARD_REQUALIFICATION
+  next_stage: R5_bundle8r_0_capability_audit
+historical_preservation:
+  bundle8_close_object_equal_to_backup: true
+  bundle9_close_object_equal_to_backup: true
+  bundle10_close_object_equal_to_backup: true
+  backup_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/workflow_state.yaml.pre_bundle8r
+boundaries:
+  p2_allowed: false
+  direct_trading_advice_allowed: false
+  raw_evidence_overwrite_allowed: false
+decision: baseline_recorded_and_forward_requalification_started

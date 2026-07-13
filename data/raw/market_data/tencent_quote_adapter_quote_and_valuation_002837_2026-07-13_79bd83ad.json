@@ -1,0 +1,31 @@
+{
+  "rows": [
+    {
+      "stock_code": "002837",
+      "name": "英维克",
+      "as_of_date": "2026-07-13",
+      "trade_date": "2026-07-13",
+      "price": 66.98,
+      "close": 66.98,
+      "last_close": 73.54,
+      "open": 72.72,
+      "volume": 582259.0,
+      "change_amount": -6.56,
+      "change_pct": -8.92,
+      "high": 74.81,
+      "low": 66.4,
+      "amount_wan": 406076.0,
+      "turnover_pct": 5.15,
+      "pe_ttm": 176.88,
+      "amplitude_pct": 11.44,
+      "mcap_yi": 853.56,
+      "float_mcap_yi": 757.18,
+      "pb": 25.9,
+      "limit_up": 80.89,
+      "limit_down": 66.19,
+      "volume_ratio": 0.92,
+      "pe_static": 2464.77
+    }
+  ],
+  "raw_field_count": 88
+}

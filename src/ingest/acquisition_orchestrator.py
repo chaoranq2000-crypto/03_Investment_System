@@ -106,7 +106,26 @@ def build_adapter_run_queue(
             )
             continue
 
-        for index, option in enumerate(selection.selected, start=1):
+        planned_options: list[tuple[Any, int, bool]] = [
+            (option, option.priority, False) for option in selection.selected
+        ]
+        if mode == "dry_run":
+            # Disabled sources may opt into an isolated schema probe.  The
+            # probe exercises fallback and quarantine logic without making
+            # the source eligible for live routing or operational readiness.
+            probes = [
+                option
+                for option in route.sources
+                if not option.enabled and option.dry_run_probe
+            ]
+            for probe_index, option in enumerate(
+                sorted(probes, key=lambda item: item.priority)
+            ):
+                planned_options.append((option, -100 + probe_index, True))
+
+        for index, (option, effective_priority, diagnostic_probe) in enumerate(
+            sorted(planned_options, key=lambda item: item[1]), start=1
+        ):
             source = registry_sources[option.source_name]
             queue.append(
                 {
@@ -115,8 +134,10 @@ def build_adapter_run_queue(
                     "capability": capability,
                     "source_name": option.source_name,
                     "source_group": source.get("source_group"),
-                    "role": option.role,
-                    "priority": option.priority,
+                    "role": "diagnostic_probe" if diagnostic_probe else option.role,
+                    "priority": effective_priority,
+                    "configured_priority": option.priority,
+                    "diagnostic_probe": diagnostic_probe,
                     "independence_domain": option.independence_domain,
                     "adapter": option.adapter,
                     "endpoint_hint": option.endpoint_hint,

@@ -6,9 +6,9 @@ project:
     P0: conditional_pass
     P1: conditional_pass_with_medium_todos
   current_focus: pre_p2_hardening
-  report_date: 2026-07-01
-  as_of_date: 2026-07-01
-  generated_at: 2026-07-01
+  report_date: 2026-07-13
+  as_of_date: 2026-07-13
+  generated_at: 2026-07-13
   language: zh-CN
   timezone: Asia/Shanghai
   date_format: YYYY-MM-DD

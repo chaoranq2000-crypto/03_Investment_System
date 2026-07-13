@@ -11,6 +11,11 @@ if str(ROOT) not in sys.path:
 
 import yaml
 
+from src.ingest.adapter_contracts import (
+    load_contract_registry,
+    validate_contract_registry,
+    validate_route_adapter_readiness,
+)
 from src.ingest.source_routing import (
     load_route_catalog,
     load_source_registry,
@@ -35,11 +40,24 @@ def main() -> int:
         default="reports/quality/source_route_quality_report.yaml",
         help="Quality report path",
     )
+    parser.add_argument("--contracts", default="config/adapter_contract_registry.yaml")
+    parser.add_argument("--repo-root", default=".")
+    parser.add_argument("--import-check", action="store_true")
     args = parser.parse_args()
 
     catalog = load_route_catalog(args.routes)
     registry = load_source_registry(args.registry)
     issues = validate_route_catalog(catalog, registry)
+    contract_registry = load_contract_registry(args.contracts)
+    issues.extend(validate_contract_registry(contract_registry, repo_root=args.repo_root))
+    issues.extend(
+        validate_route_adapter_readiness(
+            catalog,
+            contract_registry,
+            repo_root=args.repo_root,
+            import_check=args.import_check,
+        )
+    )
     counts = Counter(item["severity"] for item in issues)
     blocking = [item for item in issues if item["severity"] in {"critical", "high"}]
     payload = {
@@ -47,6 +65,8 @@ def main() -> int:
         "decision": "pass" if not blocking else "needs_fix",
         "capability_count": len(catalog.get("capabilities", {})),
         "source_count": len(registry.get("sources", {})),
+        "adapter_operational_gate_included": True,
+        "adapter_import_check": bool(args.import_check),
         "issue_counts": dict(counts),
         "blocking_issue_count": len(blocking),
         "issues": issues,

@@ -8,8 +8,12 @@ import tempfile
 from pathlib import Path
 from typing import Sequence
 
-from structured_api_pull import main as structured_main
-from structured_api_pull import output_path, write_readout
+try:
+    from src.ingest.structured_api_pull import main as structured_main
+    from src.ingest.structured_api_pull import output_path, write_readout
+except ModuleNotFoundError:  # compatibility with legacy direct-path test imports
+    from structured_api_pull import main as structured_main
+    from structured_api_pull import output_path, write_readout
 
 
 SUPPORTED_APIS = {

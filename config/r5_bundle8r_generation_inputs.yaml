@@ -1,0 +1,12 @@
+schema_version: 1
+generation_label: r5_bundle8r
+required_inputs:
+- config/a_stock_data_capability_catalog.yaml
+- config/adapter_contract_registry.yaml
+- data/manifests/evidence_manifest.csv
+- data/manifests/claims_draft.csv
+- data/manifests/metrics_draft.csv
+- reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_coverage_matrix.yaml
+downstream_consumers:
+- R5_BUNDLE_9R_FORECAST_VALUATION_REBUILD
+- R5_BUNDLE_10R_READER_REBUILD

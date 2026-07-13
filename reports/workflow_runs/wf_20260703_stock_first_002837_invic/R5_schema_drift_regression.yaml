@@ -1,0 +1,84 @@
+schema_version: 1
+artifact_type: R5_schema_drift_regression
+decision: pass
+live_schema_receipt_count: 18
+live_schema_receipts:
+- adapter_id: mootdx_adapter
+  endpoint_hint: finance_snapshot
+  schema_fingerprint: 085d327382771599ac5d414169153afb5ec15ecc2bfb8be91983466e8142f1d2
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/mootdx_finance_snapshot.yaml
+- adapter_id: mootdx_adapter
+  endpoint_hint: f10
+  schema_fingerprint: 9b630f1aa3a917bd975f1312f207bbf78dc7ec97c5c5e1c62235397836326961
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/mootdx_f10.yaml
+- adapter_id: tencent_quote_adapter
+  endpoint_hint: quote_and_valuation
+  schema_fingerprint: 0e642e91485c01cf0640a72e1b8294a1a83bf53f9aa2f79bf348d287c5d01381
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_and_valuation.yaml
+- adapter_id: tencent_quote_adapter
+  endpoint_hint: quote_or_kline
+  schema_fingerprint: 0e642e91485c01cf0640a72e1b8294a1a83bf53f9aa2f79bf348d287c5d01381
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_or_kline.yaml
+- adapter_id: baidu_kline_adapter
+  endpoint_hint: kline_with_ma
+  schema_fingerprint: 44332a9990e7d41877ade67cc170f30524282c36ff20df416a37ec3034c79419
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/baidu_kline_with_ma.yaml
+- adapter_id: sina_financial_adapter
+  endpoint_hint: financial_statements
+  schema_fingerprint: fda661afea1920ce50260f93d10b01967fc66e196975ad773d4d7fa1a58f5baa
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/sina_financial_statements.yaml
+- adapter_id: eastmoney_industry_report_adapter
+  endpoint_hint: industry_reportapi_metadata
+  schema_fingerprint: 6f687d9f417c4d195b50ea12d43f2b131da27795cd54d4fd06213a3aaea04cc2
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_industry_reports.yaml
+- adapter_id: ths_consensus_adapter
+  endpoint_hint: consensus_eps
+  schema_fingerprint: 2ea4456d3ff92847cbdcc819e9bb577e13a894c0e814d04ba9581288f59ad13b
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/ths_consensus_eps.yaml
+- adapter_id: cninfo_irm_adapter
+  endpoint_hint: irm_interaction
+  schema_fingerprint: 5d82da6059008ec3bc551ce0830c4b64a65f2ca2343712217f331a5e7a40425b
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/cninfo_irm.yaml
+- adapter_id: eastmoney_capital_adapter
+  endpoint_hint: holder_count
+  schema_fingerprint: 0b58c00cadae76516b071196c44192b0ca32eca249d055f7920451523653c309
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_holder_count.yaml
+- adapter_id: eastmoney_capital_adapter
+  endpoint_hint: lockup_expiry
+  schema_fingerprint: e924246ec8173ce001ccd4440dbe0391c2b22ddcd22480e237ce1ea5d950a3a8
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_lockup_expiry.yaml
+- adapter_id: eastmoney_capital_adapter
+  endpoint_hint: dividend_history
+  schema_fingerprint: 9331d4185643415c7a922ec8271523b33482667d5604feda7951af5c317b8f2c
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_dividend_history.yaml
+- adapter_id: eastmoney_capital_adapter
+  endpoint_hint: margin_trading
+  schema_fingerprint: 68af8aeb33cf46bedc9fcb821f9c3ac79cdf4e171e55948089512826f8dcf93b
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_margin_trading.yaml
+- adapter_id: eastmoney_capital_adapter
+  endpoint_hint: block_trade
+  schema_fingerprint: 81865698ca4c414aa974c50d35fac2e5ebaa806dce28ea174a9682b7212ed79b
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_block_trade.yaml
+- adapter_id: eastmoney_capital_adapter
+  endpoint_hint: fund_flow
+  schema_fingerprint: 5d2ade85c13d2d49f342582eda53e60ae0267e39fcd2b97858be3bbcf433262f
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_fund_flow.yaml
+- adapter_id: eastmoney_news_adapter
+  endpoint_hint: news_clue
+  schema_fingerprint: fe74e6dabe16b88e9284c9b9ca161d52f2bbfcef519d4f176ab36bc9ea240671
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_news_clue.yaml
+- adapter_id: cls_telegraph_adapter
+  endpoint_hint: telegraph
+  schema_fingerprint: f3e4044f9744726b2f45c95d0b8312b718ad59542fe2eda4a27ea1f6f5c8a13b
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/cls_telegraph.yaml
+- adapter_id: exchange_fallback_adapter
+  endpoint_hint: announcement_official
+  schema_fingerprint: f3a2b18aa9d6651aaf1c110430ef502c44dd7caa356bf8e94f389a6a9ae4336c
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/szse_announcement_fallback.yaml
+fixture_regression:
+  proof_path: tests/test_r5_bundle8r_operational_adapters.py
+  includes_cross_exchange_fixture: true
+  cross_exchange_fixture: tests/fixtures/r5_bundle8r/baidu_kline_shanghai.json
+classified_non_schema_failures:
+- mootdx daily bars returned zero rows
+- Eastmoney stock-info transport closed before a response

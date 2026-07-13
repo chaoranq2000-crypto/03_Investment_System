@@ -1,0 +1,169 @@
+schema_version: 1
+artifact_type: R5_bundle8r_coverage_matrix
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+questions:
+- question_id: segment_economics
+  status: partial_with_explicit_gap
+  claim_types:
+  - fact
+  - management_comment
+  - inference
+  - unknown
+  source_diversity:
+    independent_domains: 3
+    domains:
+    - issuer_disclosure
+    - tushare
+    - cninfo_ir
+  freshness:
+    latest_as_of_date: '2026-07-13'
+    status: current
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_structured_financial_data_002837_20260713_6e0ecd
+  - ev_company_ir_product_002837_20260713_a9952c
+  source_paths:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/segment_economics.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/business_driver_tree.yaml
+  unresolved_gap_class: issuer_not_disclosed
+  unresolved_gap_reason: 液冷分项收入、毛利、出货量、订单转化率和项目现金回款未单独披露。
+- question_id: industry_demand
+  status: covered
+  claim_types:
+  - fact
+  - analyst_view
+  - counter_evidence
+  source_diversity:
+    independent_domains: 3
+    domains:
+    - caict
+    - ndrc
+    - eastmoney_broker_inventory
+  freshness:
+    latest_as_of_date: '2026-07-13'
+    status: current_inventory_with_reviewed_anchors
+  evidence_ids:
+  - industry_report_caict_green_computing_2025_59947f
+  - policy_ndrc_green_data_center_20240723_30d310
+  - ev_third_party_research_002837_20260713_9432c0
+  source_paths:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/industry_evidence_pack.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_industry_research_inventory.csv
+  unresolved_gap_class: none
+  unresolved_gap_reason: 新研报目录仅作为 analyst_view 库存，不替代已审阅行业事实锚点。
+- question_id: peer_position
+  status: partial_with_explicit_gap
+  claim_types:
+  - metric
+  - inference
+  - unknown
+  source_diversity:
+    independent_domains: 5
+    domains:
+    - tushare
+    - issuer_300499
+    - issuer_300602
+    - issuer_300731
+    - issuer_301018
+  freshness:
+    latest_as_of_date: '2026-07-13'
+    status: current
+  evidence_ids:
+  - ev_structured_financial_data_300499_20260713_d68c27
+  - ev_structured_financial_data_300602_20260713_22e974
+  - ev_structured_financial_data_300731_20260713_7fa521
+  - ev_structured_financial_data_301018_20260713_32deab
+  source_paths:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/peer_operating_evidence_pack.yaml
+  unresolved_gap_class: issuer_not_disclosed
+  unresolved_gap_reason: 公司级财务指标可比，但各同业液冷收入、毛利、客户口径和纯度不可比。
+- question_id: forecast_drivers
+  status: partial_with_explicit_gap
+  claim_types:
+  - fact
+  - estimate
+  - analyst_view
+  - inference
+  source_diversity:
+    independent_domains: 4
+    domains:
+    - issuer
+    - tushare
+    - ths
+    - eastmoney_brokers
+  freshness:
+    latest_as_of_date: '2026-07-13'
+    status: current
+  evidence_ids:
+  - ev_quarterly_report_002837_20260421_2f00c7
+  - ev_third_party_research_002837_20260713_1ca4d1
+  - ev_third_party_research_002837_20260713_20f610
+  source_paths:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_forecast_assumption_registry.yaml
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_estimate_distribution_pack.yaml
+  unresolved_gap_class: issuer_not_disclosed
+  unresolved_gap_reason: 缺少液冷分项销量、价格、订单转化和毛利桥接；外部预测只作为 estimate 分布。
+- question_id: valuation_expectations
+  status: covered_with_limitations
+  claim_types:
+  - metric
+  - estimate
+  - inference
+  - unknown
+  source_diversity:
+    independent_domains: 4
+    domains:
+    - tencent
+    - tushare
+    - ths
+    - eastmoney_brokers
+  freshness:
+    latest_as_of_date: '2026-07-13'
+    status: current
+  evidence_ids:
+  - ev_structured_market_data_002837_20260713_7eb667
+  - ev_third_party_research_002837_20260713_1ca4d1
+  - ev_third_party_research_002837_20260713_20f610
+  source_paths:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9_valuation_pack.yaml
+  unresolved_gap_class: model_input_missing
+  unresolved_gap_reason: 净债务/企业价值、DCF 折现与终值、液冷分部 SOTP 输入仍为 TODO；不得据此形成交易指令。
+- question_id: future_events
+  status: partial_with_explicit_gap
+  claim_types:
+  - official_fact
+  - event_metric
+  - clue
+  - unknown
+  source_diversity:
+    independent_domains: 5
+    domains:
+    - szse
+    - cninfo
+    - eastmoney
+    - tushare
+    - cls
+  freshness:
+    latest_as_of_date: '2026-07-13'
+    status: current
+  evidence_ids:
+  - ev_official_disclosure_002837_20260713_9dae3a
+  - ev_structured_market_data_002837_20260713_41b285
+  - ev_structured_market_data_002837_20260713_0555c0
+  - ev_structured_financial_data_002837_20260713_95bd89
+  - ev_structured_financial_data_002837_20260713_f7eb71
+  source_paths:
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_future_event_calendar.csv
+  - reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_failed_missing_disclosure_register.yaml
+  unresolved_gap_class: no_confirmed_future_event_in_current_sources
+  unresolved_gap_reason: 截至基准日未抓取到基准日之后已确认的解禁或分红日期；商业里程碑仍须等发行人正式披露。
+summary:
+  decision: pass_with_explicit_gaps
+  question_count: 6
+  covered_count: 2
+  partial_with_explicit_gap_count: 4
+  unclassified_count: 0
+  acquisition_failure_distinct_from_issuer_nondisclosure: true
+  bundle8r_close_ready: true

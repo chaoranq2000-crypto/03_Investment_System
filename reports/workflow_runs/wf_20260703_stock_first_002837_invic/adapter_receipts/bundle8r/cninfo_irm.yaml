@@ -1,0 +1,45 @@
+schema_version: 1
+decision: pass
+adapter_id: cninfo_irm_adapter
+source_name: cninfo_ir
+endpoint_hint: irm_interaction
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+run_id: r5_bundle8r_cninfo_irm_adapter_irm_interaction_a9952c30
+evidence_id: ev_company_ir_product_002837_20260713_a9952c
+claim_boundary: management_comment_only
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/company_ir_product/cninfo_irm_adapter_irm_interaction_002837_2026-07-13_a9952c30.json
+processed_table_path: data/processed/normalized/cninfo_irm_adapter_irm_interaction_002837_2026-07-13_a9952c30.csv
+ingest_log_path: data/processed/logs/ev_company_ir_product_002837_20260713_a9952c__ingest_log.json
+source_url: https://irm.cninfo.com.cn/newircs/company/question?_t=1&stockcode=002837&orgId=9900029666&pageSize=50&pageNum=1&keyWord=&startDay=&endDay=
+http_status: 200
+attempts: 2
+row_count: 49
+metric_candidates_created: 0
+claim_candidates_created: 36
+observed_fields:
+- answer
+- answerer
+- ask_time
+- company
+- question
+- source_url
+- stock_code
+expected_fields:
+- question
+- answer
+- ask_time
+- source_url
+missing_fields: []
+schema_fingerprint: 5d82da6059008ec3bc551ce0830c4b64a65f2ca2343712217f331a5e7a40425b
+notes: Company answers are management comments and never issuer-reported segment revenue
+  by themselves.

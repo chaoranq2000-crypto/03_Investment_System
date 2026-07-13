@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_sina_financial_adapter_financial_statements_6e0ecd46",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:06:48Z",
+  "finished_at": "2026-07-13T11:06:48Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "sina_finance",
+  "source_type": "structured_financial_data",
+  "api_name": "financial_statements",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "995",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "claim_boundary=metric_only; transport=inherit"
+}

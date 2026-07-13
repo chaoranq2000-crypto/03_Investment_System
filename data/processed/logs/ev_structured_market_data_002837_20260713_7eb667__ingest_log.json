@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_tencent_quote_adapter_quote_or_kline_7eb667bd",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T10:59:58Z",
+  "finished_at": "2026-07-13T10:59:58Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "tencent_finance",
+  "source_type": "structured_market_data",
+  "api_name": "quote_or_kline",
+  "manifest_rows_created": "0",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "0",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "claim_boundary=metric_only; transport=inherit"
+}

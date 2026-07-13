@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_exchange_fallback_adapter_announcement_official_9dae3a4c",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:06:51Z",
+  "finished_at": "2026-07-13T11:06:51Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "szse",
+  "source_type": "official_disclosure",
+  "api_name": "announcement_official",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "0",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "claim_boundary=material_fact_after_review; transport=inherit"
+}

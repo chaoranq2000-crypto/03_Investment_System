@@ -1,0 +1,40 @@
+schema_version: 1
+decision: pass
+adapter_id: eastmoney_capital_adapter
+source_name: eastmoney_push2
+endpoint_hint: margin_trading
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+run_id: r5_bundle8r_eastmoney_capital_adapter_margin_trading_48e0709b
+evidence_id: ev_structured_market_data_002837_20260713_48e070
+claim_boundary: metric_only
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/market_data/eastmoney_capital_adapter_margin_trading_002837_2026-07-13_48e0709b.json
+processed_table_path: data/processed/normalized/eastmoney_capital_adapter_margin_trading_002837_2026-07-13_48e0709b.csv
+ingest_log_path: data/processed/logs/ev_structured_market_data_002837_20260713_48e070__ingest_log.json
+source_url: https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_RZRQ_GGMX&columns=ALL&filter=%28SCODE%3D%22002837%22%29&pageNumber=1&pageSize=50&sortColumns=DATE&sortTypes=-1&source=WEB&client=WEB
+http_status: 200
+attempts: 1
+row_count: 50
+metric_candidates_created: 100
+claim_candidates_created: 0
+observed_fields:
+- margin_balance
+- margin_purchase
+- period
+- short_balance
+expected_fields:
+- period
+- margin_balance
+missing_fields: []
+schema_fingerprint: 68af8aeb33cf46bedc9fcb821f9c3ac79cdf4e171e55948089512826f8dcf93b
+notes: Market/event snapshot only; official reconciliation remains required where
+  declared.

@@ -1,0 +1,48 @@
+schema_version: 1
+decision: pass
+adapter_id: eastmoney_industry_report_adapter
+source_name: eastmoney_push2
+endpoint_hint: industry_reportapi_metadata
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+run_id: r5_bundle8r_eastmoney_industry_report_adapter_industry_reportapi_metadata_9432c0a3
+evidence_id: ev_third_party_research_002837_20260713_9432c0
+claim_boundary: analyst_view_only
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/industry_reports/eastmoney_industry_report_adapter_industry_reportapi_metadata_002837_2026-07-13_9432c0a3.json
+processed_table_path: data/processed/normalized/eastmoney_industry_report_adapter_industry_reportapi_metadata_002837_2026-07-13_9432c0a3.csv
+ingest_log_path: data/processed/logs/ev_third_party_research_002837_20260713_9432c0__ingest_log.json
+source_url: https://reportapi.eastmoney.com/report/list?industryCode=%2A&pageSize=100&industry=%2A&rating=%2A&ratingChange=%2A&beginTime=2024-01-01&endTime=2026-07-13&pageNo=1&fields=&qType=1
+http_status: 200
+attempts: 1
+row_count: 100
+metric_candidates_created: 0
+claim_candidates_created: 100
+observed_fields:
+- attach_pages
+- attach_size_kb
+- industry_code
+- industry_name
+- info_code
+- publish_date
+- publisher
+- rating
+- report_type
+- title
+expected_fields:
+- title
+- publisher
+- publish_date
+- info_code
+- industry_name
+missing_fields: []
+schema_fingerprint: 6f687d9f417c4d195b50ea12d43f2b131da27795cd54d4fd06213a3aaea04cc2
+notes: Industry report titles are analyst views; PDF provenance is handled separately.

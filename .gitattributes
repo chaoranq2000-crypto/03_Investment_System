@@ -5,3 +5,11 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.toml text eol=lf
+
+# These historical Bundle 10 artifacts are bound to an externally reviewed
+# SHA256 over CRLF bytes.  Force the worktree representation so checkout does
+# not invalidate the signed hashes while keeping the repository text-diffable.
+reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10_reader_pack.yaml text eol=crlf
+reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3.md text eol=crlf
+reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_traceability_v3.yaml text eol=crlf
+reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_quality_scorecard.yaml text eol=crlf

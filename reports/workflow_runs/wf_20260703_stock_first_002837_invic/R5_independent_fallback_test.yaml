@@ -1,0 +1,23 @@
+schema_version: 1
+artifact_type: R5_independent_fallback_test
+decision: pass
+forced_primary_failure:
+  source_name: eastmoney_push2
+  independence_domain: eastmoney
+  capability_id: fundamental_eastmoney_stock_info
+  failure_class: RemoteDisconnected
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_stock_info.yaml
+successful_alternatives:
+- source_name: tushare
+  independence_domain: tushare
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tushare_stock_basic_scoped_readout.json
+- source_name: tencent_finance
+  independence_domain: tencent
+  proof_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_and_valuation.yaml
+different_failure_domains_verified: true
+no_retry_http_statuses:
+- 400
+- 401
+- 403
+- 404
+no_retry_test_proof: tests/test_http_acquisition.py::test_403_is_not_retried

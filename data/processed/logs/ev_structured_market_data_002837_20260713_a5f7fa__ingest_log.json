@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_eastmoney_capital_adapter_holder_count_a5f7fa26",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:11:56Z",
+  "finished_at": "2026-07-13T11:11:56Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "eastmoney_push2",
+  "source_type": "structured_market_data",
+  "api_name": "holder_count",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "3",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "claim_boundary=metric_only_with_official_reconciliation; transport=inherit"
+}

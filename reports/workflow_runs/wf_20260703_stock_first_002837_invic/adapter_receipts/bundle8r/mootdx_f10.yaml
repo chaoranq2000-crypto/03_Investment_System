@@ -1,0 +1,39 @@
+schema_version: 1
+decision: pass
+adapter_id: mootdx_adapter
+source_name: mootdx
+endpoint_hint: f10
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+run_id: r5_bundle8r_mootdx_adapter_f10_0ff555c1
+evidence_id: ev_structured_market_data_002837_20260713_0ff555
+claim_boundary: clue_only_unless_official_archived
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/market_data/mootdx_adapter_f10_002837_2026-07-13_0ff555c1.json
+processed_table_path: data/processed/normalized/mootdx_adapter_f10_002837_2026-07-13_0ff555c1.csv
+ingest_log_path: data/processed/logs/ev_structured_market_data_002837_20260713_0ff555__ingest_log.json
+source_url: tdx://119.97.185.59:7709/002837
+http_status: 200
+attempts: 1
+row_count: 1
+metric_candidates_created: 0
+claim_candidates_created: 1
+observed_fields:
+- section
+- stock_code
+- text
+expected_fields:
+- stock_code
+- section
+- text
+missing_fields: []
+schema_fingerprint: 9b630f1aa3a917bd975f1312f207bbf78dc7ec97c5c5e1c62235397836326961
+notes: Unadjusted TongdaXin prices; no research inference.

@@ -1,0 +1,17 @@
+{
+  "run_id": "r5_bundle8r_mootdx_adapter_f10_0ff555c1",
+  "ingest_mode": "structured_api_pull",
+  "started_at": "2026-07-13T11:22:47Z",
+  "finished_at": "2026-07-13T11:22:47Z",
+  "result": "SUCCESS",
+  "stock_code": "002837",
+  "source_name": "mootdx",
+  "source_type": "structured_market_data",
+  "api_name": "f10",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "0",
+  "claim_candidates": "1",
+  "issues": "",
+  "notes": "claim_boundary=clue_only_unless_official_archived; transport=tcp"
+}
