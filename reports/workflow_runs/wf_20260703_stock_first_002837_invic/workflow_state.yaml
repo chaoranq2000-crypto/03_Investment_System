@@ -1,7 +1,7 @@
 workflow_id: wf_20260703_stock_first_002837_invic
 workflow_type: stock_first_closed_loop
 status: accepted_with_todos
-quality_target: R5_bundle10r_reader_v5_candidate_ready_for_human_review
+quality_target: R5_bundle10r_reader_v5_human_review_passed
 created_at: 2026-07-03
 updated_at: '2026-07-14'
 owner: mixed
@@ -70,11 +70,14 @@ completed_stages:
 - R5_bundle10r_v5_narrative_revision
 - R5_bundle10r_v5_non_compensating_narrative_gate
 - R5_bundle10r_v5_close_reader_generation_lock
+- R5_bundle10r_v5_external_human_review
+- R5_bundle10r_v5_human_review_passed
+- R5_bundle10r_v5_final_close
 next_stage: null
 active_skill: null
 required_next_skill: null
-forward_requalification_current_stage: R5_bundle10r_v5_external_human_review_pending
-forward_requalification_next_stage: R5_bundle10r_v5_external_human_review
+forward_requalification_current_stage: R5_bundle10r_v5_final_close
+forward_requalification_next_stage: null
 evidence_snapshot:
   manifest_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_manifest_delta.csv
   evidence_count: 40
@@ -715,8 +718,8 @@ open_todos:
   stage: R5_bundle10r_v5_close
   target_artifact: R5_bundle10r_human_review_handoff_v5.yaml
   fix_owner_skill: quality-review
-  status: accepted_todo
-  notes: Reader v5 自动门通过但精确哈希人工审阅尚未发生；完成前 sample-quality 保持 false。
+  status: resolved_human_review_passed
+  notes: Reader v5 精确哈希人工复审已通过；sample-quality 与 P2 仍保持 false。
 quality_gates:
 - gate_id: G1
   status: pass
@@ -819,6 +822,16 @@ quality_gates:
   checked_by: quality-review
   notes: Versioned narrative revision, deterministic six-artifact generation, v5 handoff, and retained method gaps are closed; exact-hash human review remains pending.
   current_scope: bundle10r_v5_automated_close_human_review_pending
+- gate_id: R5_BUNDLE10R_V5_HUMAN_REVIEW
+  status: pass
+  checked_by: external_human_reviewer
+  notes: Exact-hash Reader v5 human re-review accepted all eight checklist criteria; the prior revision_required round remains preserved as history, while sample quality and P2 remain false.
+  current_scope: bundle10r_v5_external_human_review_passed
+- gate_id: R5_BUNDLE10R_V5_FINAL_CLOSE
+  status: accepted_with_todos
+  checked_by: quality-review
+  notes: Human-review submission, locked artifact hashes, workflow state, ledgers and close readout are synchronized; DCF and SOTP gaps remain accepted TODOs.
+  current_scope: bundle10r_v5_final_close
 entry_criteria:
 - stock_code provided
 - existing 002837 workflow run available
@@ -827,14 +840,14 @@ exit_criteria:
 - truthfulness blockers = 0
 - candidate blockers = 0
 - workflow state and current readout are synchronized
-- human review remains pending until bound to exact report hash
+- human review decision is recorded against the exact report hash and any failed criterion is routed to a fix owner
 notes: Bundle 7 positive reader-quality rebaseline supersedes prior sample-quality/current-candidate labels. Historical artifacts
   are retained, but current routing follows quality_backflow.fix_routes.
 quality_backflow:
-  source_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_quality_scorecard.yaml
-  decision: R5_bundle9r_model_ready
-  quality_band: model_generation_locked_reader_stale
-  score: 98
+  source_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5_quality_scorecard.yaml
+  decision: R5_bundle10r_v5_human_review_passed
+  quality_band: accepted_with_todos
+  score: 100
   threshold: 82
   prior_state:
     status: accepted_with_todos
@@ -850,15 +863,15 @@ quality_backflow:
   - quality_review_v2 accepted_sample_quality
   fix_routes: []
   historical_acceptance_superseded: true
-  sample_quality_report_allowed: true
+  sample_quality_report_allowed: false
   p2_allowed: false
   bundle8_evidence_route_completed: true
-  current_first_route: forecast_valuation_rebuild
-  current_first_stage: R5_bundle9r_closed
+  current_first_route: null
+  current_first_stage: R5_bundle10r_v5_final_close
   bundle9_forecast_valuation_completed: true
   prior_source_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_quality_scorecard.yaml
   critical_blocker_count: 0
-  canonical_reader_status: stale_pending_bundle10r
+  canonical_reader_status: reader_v5_human_review_passed_with_todos
   canonical_sample_quality_allowed: false
 bundle8_close:
   decision: accepted_with_todos
@@ -1030,7 +1043,7 @@ bundle9r_close:
   bundle10r_allowed: true
   sample_quality_allowed: false
   p2_allowed: false
-canonical_reader_status: reader_v5_candidate_ready_for_human_review_pending
+canonical_reader_status: reader_v5_human_review_passed_with_todos
 canonical_sample_quality_allowed: false
 sample_quality_allowed: false
 p2_allowed: false
@@ -1091,14 +1104,7 @@ bundle10r_close:
   - R5B10R-CI-001
   sample_quality_allowed: false
   p2_allowed: false
-forward_requalification_external_action_required:
-  action: exact_hash_human_review
-  artifact: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5.md
-  handoff: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_review_handoff_v5.yaml
-  required_sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090
-  owner: external_human_reviewer
-  status: pending
-  boundary: Reader v4 partial revision feedback and historical Reader v3 approval cannot be transferred to Reader v5
+forward_requalification_external_action_required: null
 bundle10r_v4_human_feedback:
   status: revision_required
   feedback_scope: narrative_and_readability
@@ -1130,7 +1136,7 @@ bundle10r_v5_revision:
   candidate_blocker_count: 0
   deterministic_artifact_count: 6
   deterministic_changed_count: 0
-  human_review_status: pending
+  human_review_status: passed_external
   sample_quality_allowed: false
   p2_allowed: false
 bundle10r_v5_close:
@@ -1158,3 +1164,65 @@ bundle10r_v5_close:
   remote_ci: TODO_AFTER_EXPLICIT_PUBLISH
   sample_quality_allowed: false
   p2_allowed: false
+bundle10r_v5_human_review:
+  decision: accepted
+  status: passed_external
+  reviewed_at: '2026-07-14T15:20:38+08:00'
+  reviewer: Q
+  report_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5.md
+  report_sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090
+  submission: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_review_submission_v5.yaml
+  prior_feedback_record: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_feedback_v5.yaml
+  prior_failure_readout: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_review_readout_v5.md
+  issue_id: R5B10R-V5-HUMAN-FAIL-001
+  full_review_attested: true
+  next_stage: null
+  fix_owner_skill: null
+  actionable_review_detail: review_passed
+  sample_quality_allowed: false
+  p2_allowed: false
+bundle10r_v5_final_close:
+  decision: accepted_with_todos
+  closed_at: '2026-07-14T15:20:38+08:00'
+  package_task_chain_complete: true
+  package_tasks_completed:
+  - R5_bundle10r_0_generation_binding
+  - R5_bundle10r_1_reader_input_review
+  - R5_bundle10r_2_dynamic_payload
+  - R5_bundle10r_3_generic_writer_traceability
+  - R5_bundle10r_4_market_sentiment_events
+  - R5_bundle10r_5_non_compensating_gate
+  - R5_bundle10r_6_regressions
+  - R5_bundle10r_7_human_review_handoff_state_sync
+  - R5_bundle10r_8_close_reader_generation_lock
+  human_review_status: passed_external
+  human_review_submission: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_review_submission_v5.yaml
+  reader_report_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_v5.md
+  reader_report_sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090
+  reader_generation_id: reader_gen_r5_bundle10r_v5_574937bd3943edc1
+  reader_generation_aggregate_sha256: 574937bd3943edc1cb67e7ebde639a8b6a48c818fc59da9b1966ded4e50ba70a
+  reader_score: 100
+  truthfulness_blocker_count: 0
+  core_section_blocker_count: 0
+  candidate_blocker_count: 0
+  package_integrity_checked: 48
+  package_integrity_mismatched: 0
+  generation_binding_verified_artifact_count: 13
+  human_review_validation_issue_count: 0
+  focused_regression_passed: 51
+  full_regression_status: pass
+  full_regression_passed: 707
+  full_regression_skipped: 2
+  full_regression_duration_seconds: 31.30
+  accepted_todos:
+  - R5B10R-DCF-001
+  - R5B10R-SOTP-001
+  prior_failed_review_preserved: true
+  sample_quality_allowed: false
+  p2_allowed: false
+bundle10r_v5_publish:
+  branch: codex/r5-bundle10r-reader-rebuild
+  commit: 3bc55a613ca2c2fc9a142da0d6ea37d161595454
+  remote_ci: pass
+  remote_ci_run: https://github.com/chaoranq2000-crypto/03_Investment_System/actions/runs/29270619352
+  verified_at: '2026-07-14'

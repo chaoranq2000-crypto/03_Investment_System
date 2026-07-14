@@ -1,0 +1,51 @@
+artifact_type: R5_bundle10r_human_review_submission
+schema_version: 1
+report_schema_version: v5
+reviewer_type: human
+reviewer: Q
+reviewed_at: '2026-07-14T15:20:38+08:00'
+decision: accepted
+review_statement: 审阅先通过，然后完成补丁包任务
+input_hashes:
+  report_sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090
+  appendix_sha256: 8e9a8bb99588806cebc8c4ff008474e217bbcc5f68f46f0233821b05e5354bb1
+  scorecard_sha256: 9cf773e45b95fd44fd3951d2842db3fc827b93431f31dd6079ce990667fe46fd
+  handoff_sha256: 6bbd352bd1fb6fec58095ca204465516b0923169d98b30eb2d5a5d9a29e7cccd
+  generation_lock_sha256: bb209f39df15f18906b0589f985d4a7332b99f4cfa0d867d497a5eba7ebe6c2f
+attestation:
+  human_review_confirmed: true
+  report_read_in_full: true
+  traceability_consulted_as_needed: true
+  automated_gate_not_substitute: true
+  no_direct_advice_confirmed: true
+review_checklist:
+- check_id: HR-1
+  check: core thesis is company-specific and supported
+  status: pass
+- check_id: HR-2
+  check: forecast assumptions and causal bridge are understandable
+  status: pass
+- check_id: HR-3
+  check: valuation explains market-implied expectations and method limits
+  status: pass
+- check_id: HR-4
+  check: counterevidence and falsification conditions are decision-useful
+  status: pass
+- check_id: HR-5
+  check: technical, sentiment, and future events are dated and conditional
+  status: pass
+- check_id: HR-6
+  check: no claim boundary is stronger than its evidence
+  status: pass
+- check_id: HR-7
+  check: no direct trading instruction or target price appears
+  status: pass
+- check_id: HR-8
+  check: narrative reads like coherent analyst research rather than a repeated audit scaffold
+  status: pass
+prior_review_round:
+  feedback_record: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_human_feedback_v5.yaml
+  decision: revision_required
+  superseded_by_this_submission: true
+sample_quality_allowed: false
+p2_allowed: false

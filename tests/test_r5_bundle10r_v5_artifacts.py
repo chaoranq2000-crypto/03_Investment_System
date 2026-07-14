@@ -48,17 +48,31 @@ def test_v5_candidate_is_hash_bound_and_narrative_gate_clean():
     assert aggregate_artifacts(lock["artifacts"]) == lock["aggregate_sha256"]
 
 
-def test_v5_state_closes_automation_without_inheriting_human_approval():
+def test_v5_human_review_pass_closes_current_loop_without_rewriting_failure_history():
     state = load_yaml(RUN / "workflow_state.yaml")
     feedback = load_yaml(RUN / "R5_bundle10r_human_feedback_v4.yaml")
+    feedback_v5 = load_yaml(RUN / "R5_bundle10r_human_feedback_v5.yaml")
+    submission = load_yaml(RUN / "R5_bundle10r_human_review_submission_v5.yaml")
     assert feedback["decision"] == "revision_required"
     assert feedback["full_review_attested"] is False
+    assert feedback_v5["decision"] == "revision_required"
+    assert feedback_v5["finding"]["severity"] == "high"
+    assert feedback_v5["input_hashes"]["report_sha256"] == sha256_file(RUN / "R5_bundle10r_reader_v5.md")
+    assert submission["decision"] == "accepted"
+    assert submission["input_hashes"]["report_sha256"] == sha256_file(RUN / "R5_bundle10r_reader_v5.md")
+    assert submission["prior_review_round"]["decision"] == "revision_required"
     assert state["status"] == "accepted_with_todos"
     assert state["current_stage"] == "T10_close_readout"
-    assert state["canonical_reader_status"] == "reader_v5_candidate_ready_for_human_review_pending"
+    assert state["next_stage"] is None
+    assert state["required_next_skill"] is None
+    assert state["canonical_reader_status"] == "reader_v5_human_review_passed_with_todos"
     assert state["bundle10r_rebuild"]["human_review_status"] == "pending"
     assert state["bundle10r_v5_revision"]["status"] == "candidate_ready_for_human_review"
     assert state["bundle10r_v5_close"]["human_review_status"] == "pending"
-    assert state["quality_backflow"]["sample_quality_report_allowed"] is True
+    assert state["bundle10r_v5_human_review"]["decision"] == "accepted"
+    assert state["bundle10r_v5_human_review"]["status"] == "passed_external"
+    assert state["bundle10r_v5_human_review"]["next_stage"] is None
+    assert state["bundle10r_v5_final_close"]["decision"] == "accepted_with_todos"
+    assert state["quality_backflow"]["sample_quality_report_allowed"] is False
     assert state["sample_quality_allowed"] is False
     assert state["p2_allowed"] is False

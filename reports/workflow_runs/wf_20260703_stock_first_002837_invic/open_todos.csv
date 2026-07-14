@@ -50,6 +50,7 @@ R5B9R-SOTP-001,medium,R5_bundle9r_close,R5_bundle9r_model_pack.yaml,独立液冷
 R5B10R-DCF-001,medium,R5_bundle10r_8_close,R5_bundle10r_reader_input_pack.yaml,"净债务、折现率与终值假设仍未形成完整可审阅输入，DCF保持不可用",company-valuation,accepted_todo,2026-07-13,,补齐全部可追溯输入后重新执行方法资格检查
 R5B10R-SOTP-001,medium,R5_bundle10r_8_close,R5_bundle10r_reader_input_pack.yaml,"液冷独立经济性、未分配成本与消除关系仍缺失，SOTP保持不可用",company-valuation,accepted_todo,2026-07-13,,取得同口径分部经济性与消除关系后重新执行方法资格检查
 R5B10R-HUMAN-001,medium,R5_bundle10r_8_close,R5_bundle10r_human_review_handoff.yaml,"Reader v4收到叙事范围revision_required；用户未声明完成全篇与追溯附录审阅",quality-review,resolved_revision_required,2026-07-13,2026-07-14,该送审轮次关闭并由Reader v5精确哈希审阅替代
-R5B10R-CI-001,low,R5_bundle10r_8_close,R5_bundle10r_quality_gate_report.md,本轮未获发布授权因此不声明远端CI结果,research-orchestrator,accepted_todo,2026-07-13,,仅在用户明确要求发布后提交推送并核验远端CI
+R5B10R-CI-001,low,R5_bundle10r_8_close,R5_bundle10r_quality_gate_report.md,Bundle 10R Reader v5分支已推送且远端CI通过,research-orchestrator,resolved_remote_ci_pass,2026-07-13,2026-07-14,commit 3bc55a61；GitHub Actions run 29270619352 success
 R5B10R-NARRATIVE-001,high,T9_quality_review,R5_bundle10r_reader_v5.md,Reader v5已形成六章研究叙事并通过新增反机械化非补偿质量门,stock-deep-dive,resolved,2026-07-14,2026-07-14,自动检查100分且模板重复流程术语近重复段落和过薄章节均为0
-R5B10R-V5-HUMAN-001,medium,R5_bundle10r_v5_close,R5_bundle10r_human_review_handoff_v5.yaml,Reader v5自动门通过但精确哈希人工审阅尚未发生,quality-review,accepted_todo,2026-07-14,,由外部人工审阅者完成Reader v5与按需追溯附录审阅前sample-quality保持false
+R5B10R-V5-HUMAN-001,medium,R5_bundle10r_v5_close,R5_bundle10r_human_review_handoff_v5.yaml,Reader v5精确哈希人工复审已完成并通过8项清单,quality-review,resolved_human_review_passed,2026-07-14,2026-07-14T15:20:38+08:00,本轮pending由独立submission关闭；sample quality与P2仍为false
+R5B10R-V5-HUMAN-FAIL-001,high,T9_quality_review,R5_bundle10r_reader_v5.md,Reader v5前次精确哈希人工审阅不通过且未给出章节或段落级意见,quality-review,resolved_human_review_passed,2026-07-14,2026-07-14T15:20:38+08:00,同一锁定Reader的独立复审已8项通过；失败记录保留且无需启动v6

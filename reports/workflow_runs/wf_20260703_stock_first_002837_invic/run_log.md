@@ -210,3 +210,30 @@ Stage A is locally complete. Handoff 17 authorizes the evidence layer to proceed
 | Reader generation lock | done | `reader_gen_r5_bundle10r_v5_574937bd3943edc1`; aggregate `574937bd3943edc1cb67e7ebde639a8b6a48c818fc59da9b1966ded4e50ba70a`. |
 | Human review | pending | New handoff binds Reader v5 SHA256 `cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090`. |
 | Boundary | preserved | sample-quality=false; P2=false; no staging, commit, push or remote CI claim. |
+
+## Reader v5 external human review failure and fix-loop routing
+
+| Step | Status | Notes |
+|---|---|---|
+| Latest package rediscovery | pass | `R5_BUNDLE_10R_READER_REBUILD_PATCH_2026-07-13.zip` remains the newest local archive; SHA256 `CD32691FA652607BBCBCB3669D4B6EEF75A319DD4B7E32E54CCAC7BA038F47C0`. |
+| Existing package execution | verified | 10R.0—10R.8 automated artifacts and v5 forward revision already exist on the dedicated branch; the add-only patch was not reapplied over its compatible descendant. |
+| External human review | revision_required | Reviewer recorded “审阅结果为不通过” against Reader v5 SHA256 `cb261412…1e6090`. |
+| Feedback completeness | needs_detail | No chapter-level or paragraph-level edit criterion was supplied; the system does not infer unspoken failure reasons. |
+| State sync | done | Canonical workflow changed to `needs_fix`; current stage `T9_quality_review`; next stage `T7_stock_report_draft`; owner `stock-deep-dive`. |
+| History preservation | pass | Reader v5, payload, appendix, scorecard, pending dispatch handoff and generation lock remain byte-identical. |
+| Publish verification | pass | Commit `3bc55a61` is on `codex/r5-bundle10r-reader-rebuild`; GitHub Actions run `29270619352` passed. |
+| Boundary | preserved | sample-quality=false; P2=false; main merge remains blocked. |
+
+## Reader v5 exact-hash human re-review pass and final package close
+
+| Step | Status | Notes |
+|---|---|---|
+| Human re-review | accepted | Reviewer `Q` recorded “审阅先通过，然后完成补丁包任务” at `2026-07-14T15:20:38+08:00`; 8/8 handoff criteria passed. |
+| Exact-hash validation | pass | Reader, appendix, scorecard, original handoff and generation lock hashes match the independent submission. |
+| History preservation | pass | Earlier v5 `revision_required` feedback, failure readout and v6 routing handoff remain as dated history; six locked artifacts remain byte-identical. |
+| State sync | done | Canonical status `accepted_with_todos`; stage `T10_close_readout`; next stage and required skill are null; no open high issue. |
+| Package task chain | complete | 10R.0—10R.8 complete in the patch boundary. |
+| Focused regression | pass | 51 v5, 10R and historical lifecycle tests passed. |
+| Full repository regression | pass | 707 passed, 2 skipped in 31.30 seconds. |
+| Retained TODOs | accepted_todos | DCF and SOTP method gates remain disabled pending traceable inputs. |
+| Boundary | preserved | sample-quality=false; P2=false; no new commit, push or main merge is claimed. |

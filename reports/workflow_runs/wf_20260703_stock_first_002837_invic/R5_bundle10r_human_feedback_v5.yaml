@@ -1,0 +1,26 @@
+artifact_type: R5_bundle10r_human_feedback
+schema_version: 1
+report_schema_version: v5
+reviewer_type: human
+reviewer: Q
+feedback_scope:
+- external_human_review
+decision: revision_required
+full_review_attested: false
+received_at: '2026-07-14T15:02:31+08:00'
+input_hashes:
+  report_sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090
+  appendix_sha256: 8e9a8bb99588806cebc8c4ff008474e217bbcc5f68f46f0233821b05e5354bb1
+  scorecard_sha256: 9cf773e45b95fd44fd3951d2842db3fc827b93431f31dd6079ce990667fe46fd
+  handoff_sha256: 6bbd352bd1fb6fec58095ca204465516b0923169d98b30eb2d5a5d9a29e7cccd
+  generation_lock_sha256: bb209f39df15f18906b0589f985d4a7332b99f4cfa0d867d497a5eba7ebe6c2f
+finding:
+  issue_id: R5B10R-V5-HUMAN-FAIL-001
+  severity: high
+  comment: 审阅结果为不通过。
+  diagnosis: Reader v5 虽通过自动叙事与真值门，但自动检查不能替代人工可读性判断；当前反馈未提供章节级或段落级修改意见。
+  required_fix: 保留 v5 锁定产物，取得至少一条可执行的人审意见后，由 stock-deep-dive 创建版本化后继 Reader，并重新经过非补偿质量门和精确哈希人审。
+  next_required_input: 审阅者指出未通过的具体章节、段落或表达问题；在此之前不得凭空重写研究结论。
+boundary: 本记录只确认 Reader v5 精确哈希审阅未通过，不推断未提供的失败原因，也不改写 v5 历史产物。
+sample_quality_allowed: false
+p2_allowed: false

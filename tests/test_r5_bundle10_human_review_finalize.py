@@ -162,10 +162,13 @@ def test_real_workflow_remains_finalized_after_temp_finalizer_test() -> None:
     handoff = yaml.safe_load(
         (RUN / "R5_stock_research_report_reader_v3_human_review.yaml").read_text(encoding="utf-8")
     )
-    assert state["current_stage"] in {"T10_close_readout", "R5_bundle9r_closed"}
+    assert state["current_stage"] in {"T10_close_readout", "R5_bundle9r_closed", "T9_quality_review"}
     if state["current_stage"] == "R5_bundle9r_closed":
         assert state["bundle9r_close"]["bundle_closed"] is True
         assert state["bundle9r_close"]["historical_bundle10_preserved"] is True
+    if state["current_stage"] == "T9_quality_review":
+        assert state["bundle10r_v5_human_review"]["decision"] == "revision_required"
+        assert state["sample_quality_allowed"] is False
     assert state["bundle10_internal_completion"]["bundle_closed"] is True
     assert state["bundle10_internal_completion"]["p2_allowed"] is False
     assert handoff["status"] == "passed_external_human_review"

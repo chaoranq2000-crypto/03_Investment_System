@@ -22,9 +22,14 @@ def test_bundle10_state_is_finalized_after_external_human_review() -> None:
         (RUN / "R5_stock_research_report_reader_v3_quality_scorecard.yaml").read_text(encoding="utf-8")
     )
     candidate = state["reader_candidate_snapshot"]
-    assert state["status"] == "accepted_with_todos"
-    assert state["current_stage"] in {"T10_close_readout", "R5_bundle9r_closed"}
-    assert state["next_stage"] is None
+    assert state["status"] in {"accepted_with_todos", "needs_fix"}
+    assert state["current_stage"] in {"T10_close_readout", "R5_bundle9r_closed", "T9_quality_review"}
+    if state["current_stage"] == "T9_quality_review":
+        assert state["next_stage"] == "T7_stock_report_draft"
+        assert state["required_next_skill"] == "stock-deep-dive"
+        assert state["bundle10r_v5_human_review"]["decision"] == "revision_required"
+    else:
+        assert state["next_stage"] is None
     assert state["external_action_required"] is None
     assert state["bundle10_internal_completion"]["internal_execution_complete"] is True
     assert state["bundle10_internal_completion"]["bundle_closed"] is True

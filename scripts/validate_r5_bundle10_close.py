@@ -298,6 +298,18 @@ def validate_bundle10(repo_root: Path, workflow_id: str) -> dict[str, Any]:
             snapshot = state.get("reader_candidate_snapshot") or {}
             internal = state.get("bundle10_internal_completion") or {}
             forward_bundle9r = state.get("bundle9r_close") or {}
+            forward_bundle10r_review = state.get("bundle10r_v5_human_review") or {}
+            forward_bundle10r_review_failure_is_valid = (
+                state.get("status") == "needs_fix"
+                and state.get("current_stage") == "T9_quality_review"
+                and state.get("next_stage") == "T7_stock_report_draft"
+                and state.get("required_next_skill") == "stock-deep-dive"
+                and state.get("canonical_reader_status") == "reader_v5_human_review_revision_required"
+                and forward_bundle10r_review.get("decision") in {"revision_required", "rejected"}
+                and forward_bundle10r_review.get("status") == "needs_fix"
+                and forward_bundle10r_review.get("sample_quality_allowed") is False
+                and forward_bundle10r_review.get("p2_allowed") is False
+            )
             historical_bundle10_close_is_preserved = (
                 state.get("current_stage") == "T10_close_readout"
                 or (
@@ -305,9 +317,13 @@ def validate_bundle10(repo_root: Path, workflow_id: str) -> dict[str, Any]:
                     and forward_bundle9r.get("bundle_closed") is True
                     and forward_bundle9r.get("historical_bundle10_preserved") is True
                 )
+                or forward_bundle10r_review_failure_is_valid
             )
             if (
-                state.get("status") != "accepted_with_todos"
+                (
+                    state.get("status") != "accepted_with_todos"
+                    and not forward_bundle10r_review_failure_is_valid
+                )
                 or not historical_bundle10_close_is_preserved
                 or state.get("external_action_required") is not None
             ):
