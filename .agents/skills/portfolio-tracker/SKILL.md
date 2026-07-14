@@ -39,8 +39,9 @@ Default database: `data/db/portfolio.sqlite3`.
 4. Resolve six-digit codes to Tushare codes. Prefer existing instrument records; otherwise verify through the configured Tushare client. Never guess an ambiguous name/code mapping.
 5. Classify each statement relative to the opening baseline:
    - after baseline: preview and then apply as a real ledger entry;
-   - on/before baseline and already reflected in the snapshot: record with `--included-in-opening`; never double count;
-   - unclear: keep it un-applied and report the exact ambiguity.
+   - on/before baseline: do not infer inclusion from the date alone. Use `--included-in-opening` only when the user explicitly confirms the snapshot already includes the trade, or the snapshot quantity/cost arithmetic proves inclusion;
+   - if the user confirms that a later-supplied trade was omitted from the snapshot, move the accounting baseline to before the earliest omitted trade and replay it as a real ledger entry, even when the screenshot was submitted on a later date;
+   - unclear: keep it un-applied and report the exact ambiguity. Never treat the date the user supplied a screenshot as its accounting cutoff without evidence.
 6. Refresh latest available closing prices and industry classifications, render the CLI or local dashboard, and verify totals and affected securities. When the dashboard is on the latest view, also verify the non-persistent intraday quote overlay and its source/time labels.
 7. When sell entries reduce a security to zero, verify the completed clearance cycle: released moving-average cost, net sale proceeds, cycle cash income/fees, realized P&L, and return percentage. Never label a still-open partial sale as a completed clearance.
 8. Run `tests/test_portfolio_tracker.py` and `tests/test_portfolio_web.py`, then check that private files remain ignored.
@@ -55,6 +56,10 @@ Before the opening snapshot has been imported, consolidate corrections in an ign
 ```
 
 Prefer exact `total_cost = market_value - unrealized_pnl` over a rounded displayed cost price. Retain the displayed cost price only as a cross-check.
+
+Record two dates separately: the accounting cutoff represented by the holdings and the date/time the screenshot was supplied. The submission date does not prove that earlier-dated statements are included. Before marking any statement `included_in_opening`, reconcile `snapshot quantity = pre-trade quantity + buys - sells` and the corresponding cost movement, and retain the user's explicit inclusion/exclusion statement.
+
+If omitted pre-baseline trades are discovered later, rebuild in a shadow database: set the accounting baseline before the earliest omitted trade, import the corrected opening quantities/costs, replay all statements chronologically, preserve market-price observation dates and industry metadata, compare every unaffected position, then replace the live database only after validation and a backup. Do not relabel a later market observation as an earlier price.
 
 If the database already has an opening snapshot, do not invent trades to force a corrected quantity or cost. Use an explicit audited correction mechanism if one exists; otherwise stop and explain that a rebaseline/correction feature is required.
 
@@ -74,7 +79,7 @@ Apply only after the preview has zero errors:
   --input C:\path\to\statement.xlsx --broker broker_label --apply
 ```
 
-For old statements already included in the opening snapshot, preview and apply with both `--included-in-opening` and `--apply`. Confirm afterward with `reconciliations`; these records must not change quantity or cost.
+For old statements explicitly confirmed as already included in the opening snapshot, preview and apply with both `--included-in-opening` and `--apply`. Confirm afterward with `reconciliations`; these records must not change quantity or cost. Date ordering by itself is never sufficient evidence of inclusion.
 
 Reject or leave explicit TODOs for financing/margin trades, stock dividends, splits, transfers, and other events whose cost basis is not determined by the supplied evidence.
 
@@ -112,7 +117,7 @@ For Windows desktop launch, use `scripts/start_portfolio_dashboard.ps1`. It must
 ## Completion checks
 
 - Affected quantities, total costs, market values, and P&L match the supplied evidence.
-- Pre-baseline statement details are auditable but not double counted.
+- Pre-baseline statement details are classified from explicit inclusion evidence, not merely their dates; omitted trades are replayed and included trades are auditable without double counting.
 - Re-importing the same statement is idempotent.
 - Current prices include their trade dates and sources.
 - Latest-view intraday prices include quote timestamps and provider coverage; forced provider failure falls back to stored closing prices without changing SQLite.
