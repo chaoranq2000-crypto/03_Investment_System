@@ -10,9 +10,11 @@
 |---|---|
 | `R5_bundle11r_runtime_result.yaml` | candidate_inputs_ready；issue=0；backflow=0 |
 | `R5_bundle11r_operating_to_9r_reconciliation.yaml` | pass；9/9 |
-| `R5_bundle11r_reader.md` | candidate_ready_for_human_review |
+| `R5_bundle11r_reader.md` | candidate_ready_for_human_review；exact-hash human review accepted |
 | `R5_bundle11r_reader_quality_scorecard.yaml` | 100/82；blockers=0 |
-| `R5_bundle11r_human_review_handoff.yaml` | pending；SHA256 `0c059bf4e5b81f98052a0172fc2d0c25419a52f723b0295cc684765381cd372f` |
+| `R5_bundle11r_human_review_handoff.yaml` | 原始送审交接件保持pending且锁定；SHA256 `0c059bf4e5b81f98052a0172fc2d0c25419a52f723b0295cc684765381cd372f` |
+| `R5_bundle11r_human_review_submission.yaml` | accepted；8/8清单通过 |
+| `R5_bundle11r_human_review_validation.json` | pass；5/5输入哈希；25/25锁定工件 |
 | `R5_bundle11r_reader_generation_lock.yaml` | `reader_gen_r5_bundle11r_f73cb1a808ff5b43`；25 artifacts；missing=0 |
 | `R5_bundle11r_quality_issues.csv` | accepted_with_todos；critical/high=0 |
 
@@ -26,11 +28,11 @@
 
 ## 未完成但不阻断自动关闭的事项
 
-- 新Reader的真实人工复核仍待完成；旧v5哈希的人审结论只保留为历史。
+- 新Reader的真实人工复核已独立完成；旧v5哈希的人审结论只保留为历史且未跨哈希继承。
 - 液冷独立项目量、单位价值、验收周期、独立毛利、重叠消除与营运资金仍缺少正式口径。
 - 同业倍数、现金流折现和分部加总方法保持停用。
 - 样例质量与P2继续为false。
 
 ## 发布边界
 
-用户已授权将本轮变更提交并推送到当前分支 `codex/r5-bundle10r-reader-rebuild`；未授权合并。
+用户已授权将本轮人审状态更新提交并推送到当前分支，并授权快进合并到 `main` 后推送。

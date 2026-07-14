@@ -4,7 +4,7 @@
 
 ## 结论
 
-自动范围结论为 `accepted_with_todos`。002837真实输入 runtime 为 `candidate_inputs_ready`，经营驱动通过，同业方法限定为背景，语义检查通过，未生成研究回流任务。新Reader为 `candidate_ready_for_human_review`；真实人工复核仍为 `pending`。
+最终范围结论为 `accepted_with_todos`。002837真实输入 runtime 为 `candidate_inputs_ready`，经营驱动通过，同业方法限定为背景，语义检查通过，未生成研究回流任务。新Reader自动门为 `candidate_ready_for_human_review`；复核者 `Q` 已对精确报告哈希完成独立人工复核，8项清单全部通过。
 
 ## 可复核事实
 
@@ -20,6 +20,7 @@
 | references | 28/28 resolved |
 | exact report hash | `0c059bf4e5b81f98052a0172fc2d0c25419a52f723b0295cc684765381cd372f` |
 | full regression | 724 passed, 2 skipped, 30.94s |
+| exact-hash human review | accepted；5/5输入哈希与25/25锁定工件验证通过 |
 
 ## 证据与推断边界
 
@@ -31,8 +32,8 @@
 
 ## 保留事项
 
-`R5_bundle11r_quality_issues.csv` 记录14项门禁结果：critical/high为0；经营证据、分部指标、重叠消除、独立暴露、同业方法、DCF、SOTP与精确哈希人工复核作为medium/low TODO保留。所有事项均有owner和下一步。
+`R5_bundle11r_quality_issues.csv` 记录14项门禁结果：critical/high为0；精确哈希人工复核已关闭，经营证据、分部指标、重叠消除、独立暴露、同业方法、DCF与SOTP作为medium/low TODO保留。所有事项均有owner和下一步。
 
 ## 边界
 
-旧Reader v5的人审结论不转移到新哈希。`sample_quality_allowed=false`，`p2_allowed=false`。本文不构成投资建议。
+旧Reader v5的人审结论未转移到新哈希，本轮通过独立submission绑定当前哈希。`sample_quality_allowed=false`，`p2_allowed=false`。本文不构成投资建议。

@@ -1,0 +1,51 @@
+artifact_type: R5_bundle11r_human_review_submission
+schema_version: 1
+report_schema_version: v5_bundle11r
+reviewer_type: human
+reviewer: Q
+reviewed_at: '2026-07-14T22:11:52+08:00'
+decision: accepted
+review_statement: 确认（针对精确报告哈希与8项人审清单）
+input_hashes:
+  report_sha256: 0c059bf4e5b81f98052a0172fc2d0c25419a52f723b0295cc684765381cd372f
+  appendix_sha256: fde74c657bf56233d16d31f26b4550b1bd12e742e23b1b81a3f9ea6d2406b55b
+  scorecard_sha256: f832238ae1ebba7b1633ce4683f4ce7b258ed2b34c683f4ec3fa545b3fd642b2
+  handoff_sha256: 7bf1a4aa3cef201a2e5f2dce5103cdf8157cb194840f3c1654c97b836a85ee91
+  generation_lock_sha256: 2dbd537269fe2dd1b7a9962caa14b65cdda9f261e87c748afb4f17731b257796
+attestation:
+  human_review_confirmed: true
+  report_read_in_full: true
+  traceability_consulted_as_needed: true
+  automated_gate_not_substitute: true
+  no_direct_advice_confirmed: true
+review_checklist:
+- check_id: HR-1
+  check: core thesis is company-specific and supported
+  status: pass
+- check_id: HR-2
+  check: forecast assumptions and causal bridge are understandable
+  status: pass
+- check_id: HR-3
+  check: valuation explains market-implied expectations and method limits
+  status: pass
+- check_id: HR-4
+  check: counterevidence and falsification conditions are decision-useful
+  status: pass
+- check_id: HR-5
+  check: technical, sentiment, and future events are dated and conditional
+  status: pass
+- check_id: HR-6
+  check: no claim boundary is stronger than its evidence
+  status: pass
+- check_id: HR-7
+  check: no direct trading instruction or target price appears
+  status: pass
+- check_id: HR-8
+  check: narrative reads like coherent analyst research rather than a repeated audit scaffold
+  status: pass
+historical_review_transfer:
+  allowed: false
+  prior_report_sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090
+  current_review_is_independent: true
+sample_quality_allowed: false
+p2_allowed: false

@@ -1,7 +1,7 @@
 workflow_id: wf_20260703_stock_first_002837_invic
 workflow_type: stock_first_closed_loop
 status: accepted_with_todos
-quality_target: R5_bundle10r_reader_v5_human_review_passed
+quality_target: R5_bundle11r_reader_human_review_passed
 created_at: 2026-07-03
 updated_at: '2026-07-14'
 owner: mixed
@@ -82,6 +82,8 @@ completed_stages:
 - R5_bundle11r_6_reader_regeneration
 - R5_bundle11r_7_exact_hash_human_review_handoff
 - R5_bundle11r_8_automated_close
+- R5_bundle11r_9_exact_hash_human_review
+- R5_bundle11r_10_final_close
 next_stage: null
 active_skill: null
 required_next_skill: null
@@ -759,6 +761,27 @@ artifacts:
   status: complete
   required: true
   notes: Bundle 11R stage handoff
+- artifact_type: r5_bundle11r_human_review_submission
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_human_review_submission.yaml
+  created_by_skill: quality-review
+  stage: R5_bundle11r_9_exact_hash_human_review
+  status: accepted
+  required: true
+  notes: Independent exact-hash human review submission
+- artifact_type: r5_bundle11r_human_review_validation
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_human_review_validation.json
+  created_by_skill: quality-review
+  stage: R5_bundle11r_9_exact_hash_human_review
+  status: pass
+  required: true
+  notes: Five review inputs and twenty-five locked artifacts verified
+- artifact_type: r5_bundle11r_human_review_readout
+  path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_human_review_readout.md
+  created_by_skill: research-orchestrator
+  stage: R5_bundle11r_10_final_close
+  status: accepted_with_todos
+  required: true
+  notes: Exact-hash human review close readout
 open_todos:
 - issue_id: P2-BLOCK-002
   severity: medium
@@ -1037,11 +1060,12 @@ open_todos:
   severity: medium
   stage: R5_bundle11r_8_automated_close
   target_artifact: R5_bundle11r_human_review_handoff.yaml
-  description: 新Reader精确哈希人工复核待完成
+  description: 新Reader精确哈希人工复核已完成并通过8项清单
   fix_owner_skill: quality-review
-  status: open
+  status: closed
   created_at: '2026-07-14'
-  notes: 真实复核者提交独立哈希绑定结论
+  resolved_at: '2026-07-14T22:11:52+08:00'
+  notes: 复核者Q确认通过；5项输入哈希和25项锁定工件验证通过
 - issue_id: R5B11R-DCF-001
   severity: medium
   stage: R5_bundle11r_8_automated_close
@@ -1636,7 +1660,7 @@ bundle11r_close:
   reader_generation_id: reader_gen_r5_bundle11r_f73cb1a808ff5b43
   reader_generation_aggregate_sha256: f73cb1a808ff5b439fc6a5cc4b66bd8c044fcda2c1519cdc176f9c6d106490c4
   locked_artifact_count: 25
-  human_review_status: pending
+  human_review_status: passed_external
   historical_reader_human_review_transferred: false
   full_regression_status: pass
   full_regression_passed: 724
@@ -1648,12 +1672,48 @@ bundle11r_close:
   - R5B11R-TRACE-001
   - R5B11R-EXPOSURE-001
   - R5B11R-PEER-001
-  - R5B11R-HUMAN-001
   - R5B11R-DCF-001
   - R5B11R-SOTP-001
   sample_quality_allowed: false
   p2_allowed: false
-  publish_status: authorized_current_branch
+  publish_status: authorized_merge_to_main
   publish_branch: codex/r5-bundle10r-reader-rebuild
-  merge_authorized: false
-bundle11r_candidate_reader_status: pending_exact_hash_human_review
+  merge_authorized: true
+bundle11r_human_review:
+  decision: accepted
+  status: passed_external
+  reviewer: Q
+  reviewed_at: '2026-07-14T22:11:52+08:00'
+  report_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_reader.md
+  report_sha256: 0c059bf4e5b81f98052a0172fc2d0c25419a52f723b0295cc684765381cd372f
+  submission: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_human_review_submission.yaml
+  validation: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_human_review_validation.json
+  validation_issue_count: 0
+  verified_input_hash_count: 5
+  verified_locked_artifact_count: 25
+  historical_review_transferred: false
+  full_review_attested: true
+  sample_quality_allowed: false
+  p2_allowed: false
+bundle11r_final_close:
+  decision: accepted_with_todos
+  closed_at: '2026-07-14T22:11:52+08:00'
+  package_task_chain_complete: true
+  human_review_status: passed_external
+  human_review_submission: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_human_review_submission.yaml
+  reader_report_sha256: 0c059bf4e5b81f98052a0172fc2d0c25419a52f723b0295cc684765381cd372f
+  reader_generation_id: reader_gen_r5_bundle11r_f73cb1a808ff5b43
+  reader_generation_aggregate_sha256: f73cb1a808ff5b439fc6a5cc4b66bd8c044fcda2c1519cdc176f9c6d106490c4
+  reader_score: 100
+  human_review_validation_issue_count: 0
+  retained_todos:
+  - R5B11R-EVIDENCE-001
+  - R5B11R-METRIC-001
+  - R5B11R-TRACE-001
+  - R5B11R-EXPOSURE-001
+  - R5B11R-PEER-001
+  - R5B11R-DCF-001
+  - R5B11R-SOTP-001
+  sample_quality_allowed: false
+  p2_allowed: false
+bundle11r_candidate_reader_status: accepted_exact_hash_human_review

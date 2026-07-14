@@ -293,3 +293,13 @@ Stage A is locally complete. Handoff 17 authorizes the evidence layer to proceed
 
 用户已授权将本轮变更提交并推送到当前分支 `codex/r5-bundle10r-reader-rebuild`；未授权合并。
 <!-- R5_BUNDLE11R_CLOSE_END -->
+
+## Bundle 11R exact-hash human review and final close
+
+| Step | Status | Notes |
+|---|---|---|
+| Human review | accepted | Reviewer `Q` confirmed the exact Reader SHA256 `0c059bf4e5b81f98052a0172fc2d0c25419a52f723b0295cc684765381cd372f`; 8/8 checklist items passed. |
+| Exact-hash validation | pass | Reader, traceability appendix, scorecard, original handoff and generation lock hashes match the independent submission. |
+| Generation-lock validation | pass | 25/25 locked artifacts exist and match their recorded hashes; locked Reader-generation artifacts remain unchanged. |
+| Workflow sync | done | Human-review TODO closed; Bundle 11R status is `accepted_with_todos`; remaining evidence, metric, exposure, peer, DCF and SOTP TODOs remain visible. |
+| Boundary | preserved | sample-quality=false; P2=false; no direct investment advice introduced. |

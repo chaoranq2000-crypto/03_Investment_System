@@ -59,6 +59,6 @@ R5B11R-METRIC-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_research_qu
 R5B11R-TRACE-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_reader_input_pack.yaml,液冷与宽产品线收入的重叠消除规则缺失,evidence-ingest,open,2026-07-14,,取得分项与消除关系后更新claim
 R5B11R-EXPOSURE-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_segment_driver_plan.yaml,液冷独立收入、毛利与营运资金暴露仍不可拆分,segment-company-mapping,open,2026-07-14,,独立经济性出现后刷新暴露记录
 R5B11R-PEER-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_peer_eligibility.yaml,4家候选同业均不满足经营定义与预测日期可比要求,company-valuation,open,2026-07-14,,至少3家形成同口径后重审同业方法
-R5B11R-HUMAN-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_human_review_handoff.yaml,新Reader精确哈希人工复核待完成,quality-review,open,2026-07-14,,真实复核者提交独立哈希绑定结论
+R5B11R-HUMAN-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_human_review_handoff.yaml,新Reader精确哈希人工复核已完成并通过8项清单,quality-review,closed,2026-07-14,2026-07-14T22:11:52+08:00,独立submission验证5项输入哈希和25项锁定工件全部通过；sample quality与P2仍为false
 R5B11R-DCF-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_reader_input_pack.yaml,现金流折现方法输入仍不完整,company-valuation,open,2026-07-14,,补齐净债务、折现率和终值输入后重检
 R5B11R-SOTP-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_reader_input_pack.yaml,分部加总方法缺少独立经济性与消除关系,company-valuation,open,2026-07-14,,取得同口径输入后重检

@@ -1,0 +1,14 @@
+{
+  "artifact_type": "R5_bundle11r_human_review_validation",
+  "schema_version": 1,
+  "decision": "pass",
+  "issue_count": 0,
+  "issues": [],
+  "verified_input_hash_count": 5,
+  "verified_locked_artifact_count": 25,
+  "reviewer": "Q",
+  "reviewed_at": "2026-07-14T22:11:52+08:00",
+  "report_sha256": "0c059bf4e5b81f98052a0172fc2d0c25419a52f723b0295cc684765381cd372f",
+  "sample_quality_allowed": false,
+  "p2_allowed": false
+}
