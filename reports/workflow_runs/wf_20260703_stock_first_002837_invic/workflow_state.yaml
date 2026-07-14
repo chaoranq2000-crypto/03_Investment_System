@@ -1727,7 +1727,7 @@ bundle12r_close:
   status: closed_until_new_official_evidence
   closed_at: '2026-07-15'
   package_name: R5_BUNDLE_12R_OPERATING_EVIDENCE_QUALIFICATION_PATCH_2026-07-14.zip
-  package_sha256: 1429f3b11f9891f5be974e1c91af4990877a0684feeded6f07f679d57dd2ff4
+  package_sha256: 1429f3b11f9891f5be974e1c91af4990877a0684feedeed6f07f679d57dd2ff4
   generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
   generation_lock_sha256: ebf32dad2205641a36787456f5459a675757c2c48865e705868161a0786e985c
   generation_lock_validation: pass

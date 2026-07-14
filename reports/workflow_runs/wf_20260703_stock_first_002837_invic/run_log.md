@@ -306,7 +306,7 @@ Stage A is locally complete. Handoff 17 authorizes the evidence layer to proceed
 
 ## 2026-07-15 Bundle 12R operating-evidence qualification
 
-- 在隔离分支 `codex/r5-bundle12r-operating-evidence` 应用 `R5_BUNDLE_12R_OPERATING_EVIDENCE_QUALIFICATION_PATCH_2026-07-14.zip`，包 SHA256=`1429f3b11f9891f5be974e1c91af4990877a0684feeded6f07f679d57dd2ff4`。
+- 在隔离分支 `codex/r5-bundle12r-operating-evidence` 应用 `R5_BUNDLE_12R_OPERATING_EVIDENCE_QUALIFICATION_PATCH_2026-07-14.zip`，包 SHA256=`1429f3b11f9891f5be974e1c91af4990877a0684feedeed6f07f679d57dd2ff4`。
 - 补丁安装原始验证通过：17项聚焦测试、正反fixture、两套generation lock与`git diff --check`均通过；独立复核修复后Bundle 12R聚焦回归扩展为30项并全部通过；最终全量回归为754 passed、2 skipped、28.91s。
 - `evidence-ingest` 审阅2025年报、2025半年报、2025-001投资者关系记录及截至2026-07-13的官方快照；公司级销量未替代分部销量，IR数值保留为 `management_comment / bounded_estimate`。
 - 真实严格门禁返回exit=2，decision=`needs_backflow`；2024A液冷管理层口径未与2025A总量混算，收入覆盖89.42%、毛利覆盖89.70%、关键驱动覆盖10.00%，14个high blocker、3个medium方法资格问题。

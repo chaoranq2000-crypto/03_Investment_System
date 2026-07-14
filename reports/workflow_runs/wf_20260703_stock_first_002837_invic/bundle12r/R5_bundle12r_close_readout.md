@@ -3,7 +3,7 @@
 ## 执行结果
 
 - 补丁：`R5_BUNDLE_12R_OPERATING_EVIDENCE_QUALIFICATION_PATCH_2026-07-14.zip`
-- 包 SHA256：`1429f3b11f9891f5be974e1c91af4990877a0684feeded6f07f679d57dd2ff4`
+- 包 SHA256：`1429f3b11f9891f5be974e1c91af4990877a0684feedeed6f07f679d57dd2ff4`
 - 真实门禁 generation：`op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27`
 - 门禁结论：`needs_backflow`
 - blocker：14 high；方法资格问题：3 medium
