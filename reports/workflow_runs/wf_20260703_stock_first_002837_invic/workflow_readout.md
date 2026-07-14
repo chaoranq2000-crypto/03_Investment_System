@@ -49,16 +49,18 @@
 |---|---|
 | package | `R5_BUNDLE_10R_READER_REBUILD_PATCH_2026-07-13.zip`；SHA256 `CD32691FA652607BBCBCB3669D4B6EEF75A319DD4B7E32E54CCAC7BA038F47C0` |
 | package integrity | 48/48 checksums pass |
-| package verification | 13 checks pass；18 focused tests pass |
+| package verification | 13 checks pass；原始包验收 18 focused tests，当前等价复核 34 passed |
 | generation binding | pass；13 current model artifacts |
 | Reader v5 gate | 100/82；truthfulness/core/candidate blockers = 0/0/0 |
 | narrative diagnostics | 4151 body Han chars；6 H2；31 paragraphs；四类反机械化问题均为 0 |
 | determinism | 6 locked outputs rebuilt twice；hash change=0 |
 | focused v5 and lifecycle regression | 51 passed |
-| full repository pytest | 707 passed，2 skipped，31.30 秒 |
+| workflow state schema | pass；0 open high；已关闭项使用 `status=closed` |
+| required artifacts | 250/250 可解析；实际缺失 0 |
+| full repository pytest | 707 passed，2 skipped；本次复核 32.90 秒 |
 | external human review | accepted；8/8；精确绑定 Reader v5 SHA256 `cb261412…1e6090` |
 | locked artifact verification | 6/6 SHA256 匹配 |
-| remote CI | pass；commit `3bc55a61`；Actions run `29270619352` |
+| remote CI | 最终关闭 commit `80f01fdf` 通过；Actions run `29315103198`；先前 Reader rebuild run `29270619352` 保留 |
 
 ## 保留缺口
 
@@ -70,4 +72,4 @@
 
 ## 关闭边界
 
-最新补丁包 10R.0—10R.8 已完成，10R.7 的人工复审与状态同步也已闭环。当前结果为 `accepted_with_todos`，不恢复 sample-quality，不进入 P2，也不代表本地最终同步修改已经提交、推送或合并到 `main`。
+最新补丁包 10R.0—10R.8 已完成，10R.7 的人工复审与状态同步也已闭环。当前结果为 `accepted_with_todos`，不恢复 sample-quality，不进入 P2。最终人审关闭 commit `80f01fdf` 已推送至专用分支且 CI 通过；本次 `open_todos` 状态枚举同步修复仍是本地未提交改动，也未合并到 `main`。

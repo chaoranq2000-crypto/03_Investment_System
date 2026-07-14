@@ -237,3 +237,20 @@ Stage A is locally complete. Handoff 17 authorizes the evidence layer to proceed
 | Full repository regression | pass | 707 passed, 2 skipped in 31.30 seconds. |
 | Retained TODOs | accepted_todos | DCF and SOTP method gates remain disabled pending traceable inputs. |
 | Boundary | preserved | sample-quality=false; P2=false; no new commit, push or main merge is claimed. |
+
+## Latest-package goal revalidation and workflow-state enum repair
+
+| Step | Status | Notes |
+|---|---|---|
+| Revalidation timestamp | recorded | `2026-07-14T16:42:14+08:00`. |
+| Latest package rediscovery | pass | `R5_BUNDLE_10R_READER_REBUILD_PATCH_2026-07-13.zip` remains newest; SHA256 `CD32691FA652607BBCBCB3669D4B6EEF75A319DD4B7E32E54CCAC7BA038F47C0`. |
+| Package integrity | pass | 48/48 internal checksums; 39/39 overlay files exist. Eight package files have intentional v5 follow-on revisions and are covered by current regressions. |
+| Package verify equivalent | pass | 13 model-generation artifacts verified; 13 focused test files produced 34 passed; generic Writer literal scan and `git diff --check` passed. |
+| Deterministic v5 rebuild | pass | Payload, Reader, appendix, scorecard, pending handoff and generation lock rebuilt twice; all hashes match the locked artifacts. |
+| Human-review validation | pass | 0 issue; 5/5 submission input hashes and 6/6 locked artifacts verified. |
+| State validator finding | fixed | `R5B10R-NARRATIVE-001` was resolved but used quality-issue status `resolved`; workflow `open_todos` requires `closed`, so accepted state initially failed validation. |
+| Canonical state sync | pass | Current Bundle 10R closed items now use `closed`; final publish pointer updated to commit `80f01fdf` and Actions run `29315103198`. No evidence, model, Reader or historical failure artifact was changed. |
+| Focused state regression | pass | 11 passed; workflow-state validator, close validator and exact-hash human-review validator passed. |
+| Required artifacts | pass | 250/250 required manifest rows resolve: 194 from repo root and 56 from the workflow directory. |
+| Full repository regression | pass | 707 passed, 2 skipped in 32.90 seconds. |
+| Boundary | preserved | `accepted_with_todos`; sample-quality=false; P2=false; DCF and SOTP remain accepted TODOs. The enum-sync refresh is local and is not claimed as committed or pushed. |

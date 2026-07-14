@@ -697,28 +697,32 @@ open_todos:
   stage: R5_bundle10r_8_close
   target_artifact: R5_bundle10r_human_review_handoff.yaml
   fix_owner_skill: quality-review
-  status: resolved_revision_required
+  status: closed
+  resolved_at: '2026-07-14'
   notes: Reader v4 收到叙事范围 revision_required；该送审轮次关闭，由 Reader v5 精确哈希审阅替代。
 - issue_id: R5B10R-CI-001
   severity: low
   stage: R5_bundle10r_8_close
   target_artifact: R5_bundle10r_quality_gate_report.md
   fix_owner_skill: research-orchestrator
-  status: accepted_todo
-  notes: 未获发布授权，因此仅记录本地验证；如用户明确要求发布，再提交、推送并核验远端 CI。
+  status: closed
+  resolved_at: '2026-07-14'
+  notes: 最终闭环提交 80f01fdf 已推送至 origin/codex/r5-bundle10r-reader-rebuild；GitHub Actions run 29315103198 通过。
 - issue_id: R5B10R-NARRATIVE-001
   severity: high
   stage: T9_quality_review
   target_artifact: R5_bundle10r_reader_v5.md
   fix_owner_skill: stock-deep-dive
-  status: resolved
+  status: closed
+  resolved_at: '2026-07-14'
   notes: Reader v5 已重编排为六个读者章节，并通过模板重复、流程术语、段落近重复与标题碎片化检查。
 - issue_id: R5B10R-V5-HUMAN-001
   severity: medium
   stage: R5_bundle10r_v5_close
   target_artifact: R5_bundle10r_human_review_handoff_v5.yaml
   fix_owner_skill: quality-review
-  status: resolved_human_review_passed
+  status: closed
+  resolved_at: '2026-07-14T15:20:38+08:00'
   notes: Reader v5 精确哈希人工复审已通过；sample-quality 与 P2 仍保持 false。
 quality_gates:
 - gate_id: G1
@@ -1222,7 +1226,9 @@ bundle10r_v5_final_close:
   p2_allowed: false
 bundle10r_v5_publish:
   branch: codex/r5-bundle10r-reader-rebuild
-  commit: 3bc55a613ca2c2fc9a142da0d6ea37d161595454
+  commit: 80f01fdf432ad75c7e359c6cb82b20bb79e5c094
+  prior_reader_rebuild_commit: 3bc55a613ca2c2fc9a142da0d6ea37d161595454
   remote_ci: pass
-  remote_ci_run: https://github.com/chaoranq2000-crypto/03_Investment_System/actions/runs/29270619352
+  remote_ci_run: https://github.com/chaoranq2000-crypto/03_Investment_System/actions/runs/29315103198
+  prior_reader_rebuild_ci_run: https://github.com/chaoranq2000-crypto/03_Investment_System/actions/runs/29270619352
   verified_at: '2026-07-14'

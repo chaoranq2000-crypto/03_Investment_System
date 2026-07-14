@@ -10,6 +10,9 @@
 | Human review | accepted；8/8；绑定 Reader v5 SHA256 `cb261412…1e6090` |
 | Prior failed review | historical revision_required；独立记录保留，不覆盖 |
 | Fix route | none；`R5B10R-V5-HUMAN-FAIL-001` 已由同一锁定 Reader 的复审通过关闭 |
+| Workflow state schema | pass；0 open high；当前关闭项已统一为 `status=closed` |
+| Required artifact resolution | 250/250；实际缺失 0 |
+| Final-close remote CI | pass；commit `80f01fdf`；Actions run `29315103198` |
 | Remaining TODOs | `R5B10R-DCF-001`、`R5B10R-SOTP-001` |
 | Sample quality / P2 | false / false |
 

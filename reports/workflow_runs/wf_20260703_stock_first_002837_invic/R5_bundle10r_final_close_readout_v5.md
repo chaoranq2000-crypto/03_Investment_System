@@ -48,4 +48,12 @@
 - Bundle 10R generation binding：13 项通过。
 - 聚焦 v5、10R 与历史生命周期回归：51 passed。
 - 全量回归：707 passed，2 skipped，31.30 秒。
-- 远端分支既有 commit `3bc55a613ca2c2fc9a142da0d6ea37d161595454` 的 CI 已通过；本次最终闭环修改仍为本地未提交状态。
+- （最终闭环提交前快照）当时仅确认 Reader rebuild commit `3bc55a613ca2c2fc9a142da0d6ea37d161595454` 的 CI 通过，最终闭环修改尚未提交。
+
+## 2026-07-14 目标复核补记
+
+- 最终人审关闭 commit `80f01fdf432ad75c7e359c6cb82b20bb79e5c094` 已推送至 `origin/codex/r5-bundle10r-reader-rebuild`；GitHub Actions run `29315103198` 通过。
+- 本次重新验证补丁包 48/48 内部校验、13 项模型 generation binding、34 项当前 10R 聚焦测试、两次 v5 确定性重建、人审 5/5 输入哈希与 6/6 锁定产物，结果均通过。
+- 发现 canonical `workflow_state.yaml` 中已解决的 high issue 使用了 `resolved`，不符合 workflow `open_todos` 的 `closed` 枚举；已同步修正并通过 state validator，未修改证据、模型、Reader 或历史失败记录。
+- required artifact 250/250 可解析；全仓回归 707 passed、2 skipped（32.90 秒）。
+- 本次状态枚举与复核记录更新为本地未提交改动；`sample_quality_allowed=false`、`p2_allowed=false` 保持不变。
