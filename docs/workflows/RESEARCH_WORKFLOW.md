@@ -415,3 +415,20 @@ config/segment_taxonomy.yaml 更新或新增 candidate 说明
 
 阶段性建设顺序属于 `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md`，
 不在本 kernel 中维护。
+
+<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+## R5 Bundle 11R operating-research inner loop
+
+This extension preserves the global T0–T10 workflow. Inside stock-deep-dive report production, execute the following non-optional loop before Reader rendering:
+
+1. assign one or more economic archetypes to every material business line;
+2. generate a research-question matrix from required operating drivers;
+3. acquire or explicitly bound each thesis-critical driver;
+4. calculate segment economics and reconcile them to consolidated statements;
+5. qualify peers by operating definition before using peer multiples;
+6. run the semantic research gate;
+7. route every failed issue to its owning stage and skill;
+8. render only after high/critical research blockers are cleared or visibly retained as a non-sample-quality limitation.
+
+The runtime entrypoint is `scripts/run_r5_bundle11r_runtime.py`. Automation never sets human review, sample quality, or P2 to true.
+<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->

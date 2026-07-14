@@ -1,0 +1,14 @@
+schema_version: 1
+contract_id: r5_bundle11r_semantic_research_gate_v1
+core_sections: [financials, business, industry, forecast, valuation, risks]
+economic_sections: [business, forecast, valuation]
+minimum_company_specific_metrics_per_core_section: 1
+minimum_model_links_per_economic_section: 1
+maximum_proxy_revenue_share: 0.45
+minimum_eligible_peers_for_peer_multiples: 3
+minimum_high_to_low_length_ratio: 1.25
+maximum_repeated_sentences: 1
+non_compensating_issue_severities: [critical, high]
+fixed_boundaries:
+  sample_quality_allowed: false
+  p2_allowed: false

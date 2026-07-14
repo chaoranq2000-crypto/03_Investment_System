@@ -1,0 +1,92 @@
+schema_version: 1
+artifact_type: R5_bundle11r_002837_evidence_status
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-13'
+evidence_status:
+  room_cooling.volume:
+    status: bounded_estimate
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    metric_ids:
+    - metric_company_cn_002837_invic_precision_thermal_management_sales_volume_2025A_11r
+    range:
+    - 211796.926643
+    - 248631.174755
+    period: 2026E
+    confidence: low
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    calculation_method: bounded from reported 2025A company units and reviewed Bundle
+      9R scenario revenue; not a disclosed segment value
+  room_cooling.unit_price:
+    status: bounded_estimate
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    metric_ids:
+    - metric_company_cn_002837_invic_precision_thermal_management_sales_volume_2025A_11r
+    range:
+    - 18724.299636
+    - 18724.299636
+    period: 2026E
+    confidence: low
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    calculation_method: bounded from reported 2025A company units and reviewed Bundle
+      9R scenario revenue; not a disclosed segment value
+  cabinet_cooling.volume:
+    status: bounded_estimate
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    metric_ids:
+    - metric_company_cn_002837_invic_precision_thermal_management_sales_volume_2025A_11r
+    range:
+    - 114055.907661
+    - 132009.152385
+    period: 2026E
+    confidence: low
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    calculation_method: bounded from reported 2025A company units and reviewed Bundle
+      9R scenario revenue; not a disclosed segment value
+  cabinet_cooling.unit_price:
+    status: bounded_estimate
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    metric_ids:
+    - metric_company_cn_002837_invic_precision_thermal_management_sales_volume_2025A_11r
+    range:
+    - 18724.299636
+    - 18724.299636
+    period: 2026E
+    confidence: low
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    calculation_method: bounded from reported 2025A company units and reviewed Bundle
+      9R scenario revenue; not a disclosed segment value
+  other_businesses.volume:
+    status: bounded_estimate
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    metric_ids:
+    - metric_company_cn_002837_invic_precision_thermal_management_sales_volume_2025A_11r
+    range:
+    - 34279.437533
+    - 38392.970037
+    period: 2026E
+    confidence: low
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    calculation_method: bounded from reported 2025A company units and reviewed Bundle
+      9R scenario revenue; not a disclosed segment value
+  other_businesses.unit_price:
+    status: bounded_estimate
+    evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    metric_ids:
+    - metric_company_cn_002837_invic_precision_thermal_management_sales_volume_2025A_11r
+    range:
+    - 18724.299636
+    - 18724.299636
+    period: 2026E
+    confidence: low
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    calculation_method: bounded from reported 2025A company units and reviewed Bundle
+      9R scenario revenue; not a disclosed segment value
+fixed_boundaries:
+  sample_quality_allowed: false
+  p2_allowed: false

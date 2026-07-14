@@ -1,0 +1,36 @@
+schema_version: 1
+valuation_method_requested: peer_multiples
+peers:
+  - peer_id: peer_a
+    peer_name: 可比A
+    source_ids: [ev_peer_a]
+    dimensions:
+      business_definition_compatibility: 0.9
+      revenue_purity: 0.85
+      accounting_boundary_compatibility: 0.9
+      period_consistency: 1.0
+      forecast_date_consistency: 0.9
+      capital_intensity_similarity: 0.8
+      customer_and_revenue_recognition_similarity: 0.8
+  - peer_id: peer_b
+    peer_name: 可比B
+    source_ids: [ev_peer_b]
+    dimensions:
+      business_definition_compatibility: 0.8
+      revenue_purity: 0.75
+      accounting_boundary_compatibility: 0.8
+      period_consistency: 1.0
+      forecast_date_consistency: 0.9
+      capital_intensity_similarity: 0.75
+      customer_and_revenue_recognition_similarity: 0.8
+  - peer_id: peer_c
+    peer_name: 可比C
+    source_ids: [ev_peer_c]
+    dimensions:
+      business_definition_compatibility: 0.85
+      revenue_purity: 0.8
+      accounting_boundary_compatibility: 0.85
+      period_consistency: 1.0
+      forecast_date_consistency: 0.9
+      capital_intensity_similarity: 0.8
+      customer_and_revenue_recognition_similarity: 0.75

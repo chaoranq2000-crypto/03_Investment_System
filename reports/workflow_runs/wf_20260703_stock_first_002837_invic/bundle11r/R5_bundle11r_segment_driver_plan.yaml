@@ -1,0 +1,184 @@
+schema_version: 1
+artifact_type: R5_bundle11r_002837_segment_driver_plan
+workflow_id: wf_20260703_stock_first_002837_invic
+company_id: cn_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-13'
+input_model_generation_id: evidence_gen_r5_bundle8r_231a51f4673156df
+operating_model_boundary:
+  liquid_cooling_standalone_additivity: non_additive
+  liquid_cooling_standalone_revenue: MISSING_DISCLOSURE
+  liquid_cooling_standalone_gross_margin: MISSING_DISCLOSURE
+  project_count_unit_value_acceptance: TODO_SOURCE_REQUIRED
+  proxy_share_ceiling: 0.45
+segments:
+- segment_id: room_cooling
+  reported_name: 机房温控节能产品
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  allow_proxy: false
+  thesis_critical_drivers:
+  - volume
+  - unit_price
+  driver_values:
+    volume:
+      bear:
+        2026E: 211796.9266426021
+        2027E: 232976.6193068089
+        2028E: 251614.7488517382
+      base:
+        2026E: 235739.1879152302
+        2027E: 287601.8092570615
+        2028E: 339370.1349229908
+      bull:
+        2026E: 248631.1747547073
+        2027E: 318247.9036859613
+        2028E: 388262.4424966057
+    unit_price:
+      bear:
+        2026E: 18724.2996363305
+        2027E: 18724.2996363305
+        2028E: 18724.2996363305
+      base:
+        2026E: 18724.2996363305
+        2027E: 18724.2996363305
+        2028E: 18724.2996363305
+      bull:
+        2026E: 18724.2996363305
+        2027E: 18724.2996363305
+        2028E: 18724.2996363305
+  gross_margin:
+    bear:
+      2026E: 0.235
+      2027E: 0.24
+      2028E: 0.245
+    base:
+      2026E: 0.26
+      2027E: 0.268
+      2028E: 0.274
+    bull:
+      2026E: 0.28
+      2027E: 0.285
+      2028E: 0.29
+  evidence_basis:
+    historical_segment_revenue_CNY: 3448477492.62
+    company_sales_volume_units: 324058
+    company_blended_revenue_per_unit_CNY: 18724.2996363305
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    metric_ids:
+    - metric_company_cn_002837_invic_precision_thermal_management_sales_volume_2025A_11r
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    calculation_method: forecast segment revenue / 2025A company blended revenue per
+      reported unit
+    claim_type: estimate
+    confidence: low
+    limitation: equivalent units are a bounded estimate, not issuer-disclosed segment
+      shipments or project count
+- segment_id: cabinet_cooling
+  reported_name: 机柜温控节能产品
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  allow_proxy: false
+  thesis_critical_drivers:
+  - volume
+  - unit_price
+  driver_values:
+    volume:
+      bear:
+        2026E: 114055.9076605615
+        2027E: 120899.2621196718
+        2028E: 126944.2252258156
+      base:
+        2026E: 124616.6398508498
+        2027E: 143309.1358286909
+        2028E: 160506.2321283688
+      bull:
+        2026E: 132009.1523847459
+        2027E: 158410.9828618019
+        2028E: 183756.7401193484
+    unit_price:
+      bear:
+        2026E: 18724.2996363305
+        2027E: 18724.2996363305
+        2028E: 18724.2996363305
+      base:
+        2026E: 18724.2996363305
+        2027E: 18724.2996363305
+        2028E: 18724.2996363305
+      bull:
+        2026E: 18724.2996363305
+        2027E: 18724.2996363305
+        2028E: 18724.2996363305
+  gross_margin:
+    bear:
+      2026E: 0.235
+      2027E: 0.24
+      2028E: 0.245
+    base:
+      2026E: 0.26
+      2027E: 0.267
+      2028E: 0.27
+    bull:
+      2026E: 0.275
+      2027E: 0.28
+      2028E: 0.283
+  evidence_basis:
+    historical_segment_revenue_CNY: 1977423139.19
+    company_sales_volume_units: 324058
+    company_blended_revenue_per_unit_CNY: 18724.2996363305
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    metric_ids:
+    - metric_company_cn_002837_invic_precision_thermal_management_sales_volume_2025A_11r
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    calculation_method: forecast segment revenue / 2025A company blended revenue per
+      reported unit
+    claim_type: estimate
+    confidence: low
+    limitation: equivalent units are a bounded estimate, not issuer-disclosed segment
+      shipments or project count
+- segment_id: other_businesses
+  reported_name: 客车空调+轨道交通列车空调及服务+其他
+  archetype_id: volume_price_mix
+  method_tier: proxy
+  allow_proxy: true
+  proxy_reason: issuer disclosure supports only a residual revenue line; no stable
+    line-level volume or unit-price equation is reviewable
+  thesis_critical_drivers:
+  - volume
+  - unit_price
+  proxy_revenue:
+    bear:
+      2026E: 641858459.74
+      2027E: 654695628.93
+      2028E: 674336497.8
+    base:
+      2026E: 693207136.52
+      2027E: 734799564.71
+      2028E: 771539542.95
+    bull:
+      2026E: 718881474.91
+      2027E: 790769622.4
+      2028E: 854031192.19
+  proxy_gross_margin:
+    bear:
+      2026E: 0.215
+      2027E: 0.225
+      2028E: 0.235
+    base:
+      2026E: 0.245
+      2027E: 0.252
+      2028E: 0.258
+    bull:
+      2026E: 0.26
+      2027E: 0.265
+      2028E: 0.27
+  evidence_basis:
+    source_evidence_ids:
+    - ev_annual_report_002837_20260421_2cbfc5
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    calculation_method: audited company total minus two reported major product lines,
+      then apply reviewed Bundle 9R scenario assumptions
+    claim_type: estimate
+    confidence: low

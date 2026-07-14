@@ -343,3 +343,9 @@ Before closing a run, confirm:
 - No valuation output contains direct buy/sell/hold, target-price instruction, position sizing or guaranteed return.
 - There is no buy/sell/hold, rating instruction, position sizing, or direct trading instruction.
 - Quality-review status is recorded.
+
+<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+## Bundle 11R business-line operating contract
+
+Before forecasting, assign each material business line an economic archetype from `config/economic_archetype_registry.yaml`. A company may use several archetypes. Each thesis-critical assumption must carry source, unit, period, scenario, confidence, overlap treatment, and financial-statement mapping. A broad revenue-growth proxy is allowed only when labelled, bounded, and below the configured company-level proxy-share ceiling.
+<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->

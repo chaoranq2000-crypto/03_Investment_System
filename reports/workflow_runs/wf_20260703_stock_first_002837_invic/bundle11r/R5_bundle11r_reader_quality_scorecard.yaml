@@ -1,0 +1,242 @@
+artifact_type: R5_bundle10r_reader_quality_scorecard
+schema_version: 1
+scoring_method: positive_from_zero_non_compensating_core
+decision: candidate_ready_for_human_review
+quality_band: candidate_ready_for_human_review
+score: 100
+threshold: 82
+truthfulness_blockers: []
+core_section_blockers: []
+candidate_blockers: []
+warnings: []
+critical_blocker_count: 0
+dimension_scores:
+  evidence_integrity: 20
+  coverage_completeness: 15
+  analytical_synthesis: 20
+  forecast_and_valuation: 15
+  narrative_and_readability: 15
+  presentation_hygiene: 10
+  risks_and_watch_conditions: 5
+dimension_max_scores:
+  evidence_integrity: 20
+  coverage_completeness: 15
+  analytical_synthesis: 20
+  forecast_and_valuation: 15
+  narrative_and_readability: 15
+  presentation_hygiene: 10
+  risks_and_watch_conditions: 5
+section_diagnostics:
+  executive_summary:
+    section_id: executive_summary
+    core: false
+    decision: pass
+    issues: []
+    counts:
+      facts: 3
+      causal_mechanism: 1
+      economic_implications: 1
+      counterevidence: 1
+      uncertainty: 1
+      watchpoints: 2
+      references: 14
+    quantified_watchpoint_count: 2
+  company_context_and_scope:
+    section_id: company_context_and_scope
+    core: false
+    decision: pass
+    issues: []
+    counts:
+      facts: 2
+      causal_mechanism: 1
+      economic_implications: 1
+      counterevidence: 1
+      uncertainty: 1
+      watchpoints: 2
+      references: 12
+    quantified_watchpoint_count: 1
+  financial_quality:
+    section_id: financial_quality
+    core: true
+    decision: pass
+    issues: []
+    counts:
+      facts: 2
+      causal_mechanism: 1
+      economic_implications: 1
+      counterevidence: 1
+      uncertainty: 1
+      watchpoints: 2
+      references: 6
+    quantified_watchpoint_count: 2
+  segment_economics:
+    section_id: segment_economics
+    core: true
+    decision: pass
+    issues: []
+    counts:
+      facts: 3
+      causal_mechanism: 1
+      economic_implications: 1
+      counterevidence: 1
+      uncertainty: 1
+      watchpoints: 2
+      references: 14
+    quantified_watchpoint_count: 2
+  industry_and_competition:
+    section_id: industry_and_competition
+    core: true
+    decision: pass
+    issues: []
+    counts:
+      facts: 3
+      causal_mechanism: 1
+      economic_implications: 1
+      counterevidence: 1
+      uncertainty: 1
+      watchpoints: 2
+      references: 8
+    quantified_watchpoint_count: 2
+  forecast_and_scenarios:
+    section_id: forecast_and_scenarios
+    core: true
+    decision: pass
+    issues: []
+    counts:
+      facts: 4
+      causal_mechanism: 1
+      economic_implications: 1
+      counterevidence: 1
+      uncertainty: 1
+      watchpoints: 2
+      references: 11
+    quantified_watchpoint_count: 2
+  valuation_and_market_implied_expectations:
+    section_id: valuation_and_market_implied_expectations
+    core: true
+    decision: pass
+    issues: []
+    counts:
+      facts: 5
+      causal_mechanism: 1
+      economic_implications: 1
+      counterevidence: 1
+      uncertainty: 1
+      watchpoints: 2
+      references: 12
+    quantified_watchpoint_count: 2
+  market_technical_sentiment_and_events:
+    section_id: market_technical_sentiment_and_events
+    core: false
+    decision: pass
+    issues: []
+    counts:
+      facts: 3
+      causal_mechanism: 1
+      economic_implications: 1
+      counterevidence: 1
+      uncertainty: 1
+      watchpoints: 2
+      references: 10
+    quantified_watchpoint_count: 2
+  risks_and_falsification:
+    section_id: risks_and_falsification
+    core: true
+    decision: pass
+    issues: []
+    counts:
+      facts: 3
+      causal_mechanism: 1
+      economic_implications: 1
+      counterevidence: 1
+      uncertainty: 1
+      watchpoints: 2
+      references: 16
+    quantified_watchpoint_count: 2
+  conclusion_and_watchlist:
+    section_id: conclusion_and_watchlist
+    core: true
+    decision: pass
+    issues: []
+    counts:
+      facts: 3
+      causal_mechanism: 1
+      economic_implications: 1
+      counterevidence: 1
+      uncertainty: 1
+      watchpoints: 2
+      references: 21
+    quantified_watchpoint_count: 2
+narrative_style_diagnostics:
+  enforced: true
+  report_schema_version: v5
+  configuration_valid: true
+  body_han_chars: 4734
+  h2_section_count: 6
+  narrative_paragraph_count: 36
+  template_label_section_counts:
+    本节判断: 0
+    关键事实: 0
+    因果机制: 0
+    经济含义: 0
+    反向证据: 0
+    不确定性边界: 0
+    后续验证与触发条件: 0
+  repeated_template_labels: []
+  process_audit_hits: {}
+  repeated_openings: {}
+  similar_paragraph_pairs: []
+  h2_per_1000_han: 1.267
+  thin_section_count: 0
+  thin_section_ratio: 0.0
+  decision: pass
+source_diagnostics:
+  category_counts:
+    consensus: 1
+    industry: 3
+    issuer: 11
+    market: 4
+    model: 3
+    peer: 5
+    quality: 1
+  independent_source_count: 11
+  peer_source_count: 5
+  underlying_source_count: 27
+display_citations:
+  used:
+  - E1
+  - E2
+  - E3
+  - E4
+  - E5
+  - E6
+  - E7
+  - E8
+  - E9
+  - E10
+  - E11
+  - E12
+  - E13
+  - E14
+  - E15
+  - E16
+  - E17
+  - E18
+  - E19
+  - E20
+  - E21
+  - E22
+  - E23
+  - E24
+  - E25
+  - E26
+  - E27
+  - E28
+  unresolved: []
+  duplicates: []
+input_model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+input_model_aggregate_sha256: 1cd42241e6a38fb3fc24e6ceb5be1261dbad6e1ee860393b44932282bacd54cc
+human_review_required: true
+human_review_status: pending
+sample_quality_report_allowed: false
+p2_allowed: false

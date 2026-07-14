@@ -1,0 +1,45 @@
+schema_version: 1
+artifact_type: R5_bundle11r_reader_input_build_receipt
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-13'
+decision: pass
+input_artifacts:
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_runtime_result.yaml
+  sha256: 706b7d293fec9d9cbb4434899bce5ef5f45cafe5f9db4a7b7f73ec37506b8708
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_segment_driver_model.yaml
+  sha256: a2f4d91b9c9146afd4dda9bcfb41053fb773847f4add3888a2b2458fc4580c7e
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_model_generation_lock.yaml
+  sha256: 850d52cc1ab4ee4c438c059e0a5a6b59be3f0e8197d892a360d20576b6245594
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_input_pack.yaml
+  sha256: 84abde2e2f9dde4cb6550bfcc63a164f3723f5959b096917ed2b025c2dc260d5
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10r_reader_narrative_plan_v5.yaml
+  sha256: e8d0df8b110f89913ec91d8edbfcbb956eddac8234c94e780b9c8d47d682b366
+output_artifacts:
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_research_question_matrix.yaml
+  sha256: 2c389dac52c9a03c92f75af7ad6aafc067ad4c21e74047d3181ae529ec863ce5
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_operating_driver_pack.yaml
+  sha256: a575a76cf7eb1de37b7b468b02821185de9e0ba77bbc766a051ee430a4f8ab5a
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_peer_eligibility.yaml
+  sha256: ddc9a0d7e37fc17282cdc9b9101795a8d92e8789c39a7da65fc9797e0f10c3e0
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_semantic_quality_scorecard.yaml
+  sha256: 237473034f1951faa756a7958a5e7ec6d3b287eeafdc1e92b5bcaa09142f5c72
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_backflow_plan.yaml
+  sha256: 1dad922f8b84da7d83556ac2cd625117f1db0c2184f50596a337996eb2459186
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_operating_to_9r_reconciliation.yaml
+  sha256: 065bdcdd23f3dcef5491fa696797c2189e564d1b56aeecb8c3ab295432495380
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_reader_input_pack.yaml
+  sha256: e7eacf083c92a50f89d15d5f35504fa71efa7bafba7d6c51e9b9118583d44c33
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_reader_narrative_plan.yaml
+  sha256: 94fec4f407617e2597b7b59b36e818c65c49de12dcee8fd993be4096cd7b1aa8
+reconciliation_summary:
+  row_count: 9
+  passed_row_count: 9
+  max_absolute_revenue_difference_CNY: 2.3e-05
+  max_absolute_gross_profit_difference_CNY: 0.010076
+  max_proxy_revenue_share: 0.09518569
+  base_2026_proxy_revenue_share: 0.09316527
+  forecast_and_valuation_values_changed: false
+historical_human_review_transfer_allowed: false
+fixed_boundaries:
+  sample_quality_allowed: false
+  p2_allowed: false

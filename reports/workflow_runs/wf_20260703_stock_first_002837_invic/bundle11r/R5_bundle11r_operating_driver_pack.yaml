@@ -1,0 +1,419 @@
+schema_version: 1
+artifact_type: r5_bundle11r_operating_driver_pack
+decision: pass
+periods:
+- 2026E
+- 2027E
+- 2028E
+scenarios:
+- bear
+- base
+- bull
+segments:
+- segment_id: room_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bear
+  period: 2026E
+  revenue: 3965749116.509992
+  gross_profit: 931951042.379848
+  operating_cost: 3033798074.130144
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: room_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bear
+  period: 2027E
+  revenue: 4362324028.159991
+  gross_profit: 1046957766.758398
+  operating_cost: 3315366261.401593
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: room_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bear
+  period: 2028E
+  revenue: 4711309950.419991
+  gross_profit: 1154270937.852898
+  operating_cost: 3557039012.567093
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: room_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: base
+  period: 2026E
+  revenue: 4414051190.549992
+  gross_profit: 1147653309.542998
+  operating_cost: 3266397881.006994
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: room_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: base
+  period: 2027E
+  revenue: 5385142452.47999
+  gross_profit: 1443218177.264637
+  operating_cost: 3941924275.215353
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: room_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: base
+  period: 2028E
+  revenue: 6354468093.91999
+  gross_profit: 1741124257.734077
+  operating_cost: 4613343836.185912
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: room_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bull
+  period: 2026E
+  revenue: 4655444615.03999
+  gross_profit: 1303524492.211197
+  operating_cost: 3351920122.828793
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: room_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bull
+  period: 2027E
+  revenue: 5958969107.24999
+  gross_profit: 1698306195.566247
+  operating_cost: 4260662911.683743
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: room_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bull
+  period: 2028E
+  revenue: 7269942310.839985
+  gross_profit: 2108283270.143596
+  operating_cost: 5161659040.696389
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: cabinet_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bear
+  period: 2026E
+  revenue: 2135616990.329997
+  gross_profit: 501869992.727549
+  operating_cost: 1633746997.602448
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: cabinet_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bear
+  period: 2027E
+  revenue: 2263754009.739996
+  gross_profit: 543300962.337599
+  operating_cost: 1720453047.402397
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: cabinet_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bear
+  period: 2028E
+  revenue: 2376941710.229996
+  gross_profit: 582350719.006349
+  operating_cost: 1794590991.223647
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: cabinet_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: base
+  period: 2026E
+  revenue: 2333359304.239995
+  gross_profit: 606673419.102399
+  operating_cost: 1726685885.137597
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: cabinet_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: base
+  period: 2027E
+  revenue: 2683363199.879995
+  gross_profit: 716457974.367959
+  operating_cost: 1966905225.512036
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: cabinet_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: base
+  period: 2028E
+  revenue: 3005366783.869995
+  gross_profit: 811449031.644898
+  operating_cost: 2193917752.225096
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: cabinet_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bull
+  period: 2026E
+  revenue: 2471778923.989995
+  gross_profit: 679739204.097249
+  operating_cost: 1792039719.892746
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: cabinet_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bull
+  period: 2027E
+  revenue: 2966134708.789994
+  gross_profit: 830517718.461199
+  operating_cost: 2135616990.328796
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: cabinet_cooling
+  archetype_id: volume_price_mix
+  method_tier: hybrid
+  scenario: bull
+  period: 2028E
+  revenue: 3440716262.189993
+  gross_profit: 973722702.199768
+  operating_cost: 2466993559.990225
+  financial_expense: 0.0
+  proxy_revenue: 0.0
+  notes: []
+- segment_id: other_businesses
+  archetype_id: volume_price_mix
+  method_tier: proxy
+  scenario: bear
+  period: 2026E
+  revenue: 641858459.74
+  gross_profit: 137999568.8441
+  operating_cost: 503858890.8959
+  financial_expense: 0.0
+  proxy_revenue: 641858459.74
+  notes:
+  - proxy:issuer disclosure supports only a residual revenue line; no stable line-level
+    volume or unit-price equation is reviewable
+- segment_id: other_businesses
+  archetype_id: volume_price_mix
+  method_tier: proxy
+  scenario: bear
+  period: 2027E
+  revenue: 654695628.93
+  gross_profit: 147306516.50925
+  operating_cost: 507389112.42075
+  financial_expense: 0.0
+  proxy_revenue: 654695628.93
+  notes:
+  - proxy:issuer disclosure supports only a residual revenue line; no stable line-level
+    volume or unit-price equation is reviewable
+- segment_id: other_businesses
+  archetype_id: volume_price_mix
+  method_tier: proxy
+  scenario: bear
+  period: 2028E
+  revenue: 674336497.8
+  gross_profit: 158469076.983
+  operating_cost: 515867420.817
+  financial_expense: 0.0
+  proxy_revenue: 674336497.8
+  notes:
+  - proxy:issuer disclosure supports only a residual revenue line; no stable line-level
+    volume or unit-price equation is reviewable
+- segment_id: other_businesses
+  archetype_id: volume_price_mix
+  method_tier: proxy
+  scenario: base
+  period: 2026E
+  revenue: 693207136.52
+  gross_profit: 169835748.4474
+  operating_cost: 523371388.0726
+  financial_expense: 0.0
+  proxy_revenue: 693207136.52
+  notes:
+  - proxy:issuer disclosure supports only a residual revenue line; no stable line-level
+    volume or unit-price equation is reviewable
+- segment_id: other_businesses
+  archetype_id: volume_price_mix
+  method_tier: proxy
+  scenario: base
+  period: 2027E
+  revenue: 734799564.71
+  gross_profit: 185169490.30692
+  operating_cost: 549630074.40308
+  financial_expense: 0.0
+  proxy_revenue: 734799564.71
+  notes:
+  - proxy:issuer disclosure supports only a residual revenue line; no stable line-level
+    volume or unit-price equation is reviewable
+- segment_id: other_businesses
+  archetype_id: volume_price_mix
+  method_tier: proxy
+  scenario: base
+  period: 2028E
+  revenue: 771539542.95
+  gross_profit: 199057202.0811
+  operating_cost: 572482340.8689
+  financial_expense: 0.0
+  proxy_revenue: 771539542.95
+  notes:
+  - proxy:issuer disclosure supports only a residual revenue line; no stable line-level
+    volume or unit-price equation is reviewable
+- segment_id: other_businesses
+  archetype_id: volume_price_mix
+  method_tier: proxy
+  scenario: bull
+  period: 2026E
+  revenue: 718881474.91
+  gross_profit: 186909183.4766
+  operating_cost: 531972291.4334
+  financial_expense: 0.0
+  proxy_revenue: 718881474.91
+  notes:
+  - proxy:issuer disclosure supports only a residual revenue line; no stable line-level
+    volume or unit-price equation is reviewable
+- segment_id: other_businesses
+  archetype_id: volume_price_mix
+  method_tier: proxy
+  scenario: bull
+  period: 2027E
+  revenue: 790769622.4
+  gross_profit: 209553949.936
+  operating_cost: 581215672.464
+  financial_expense: 0.0
+  proxy_revenue: 790769622.4
+  notes:
+  - proxy:issuer disclosure supports only a residual revenue line; no stable line-level
+    volume or unit-price equation is reviewable
+- segment_id: other_businesses
+  archetype_id: volume_price_mix
+  method_tier: proxy
+  scenario: bull
+  period: 2028E
+  revenue: 854031192.19
+  gross_profit: 230588421.8913
+  operating_cost: 623442770.2987
+  financial_expense: 0.0
+  proxy_revenue: 854031192.19
+  notes:
+  - proxy:issuer disclosure supports only a residual revenue line; no stable line-level
+    volume or unit-price equation is reviewable
+consolidated:
+- scenario: bear
+  period: 2026E
+  revenue: 6743224566.579988
+  gross_profit: 1571820603.951497
+  gross_margin: 0.23309629
+  operating_cost: 5171403962.628491
+  financial_expense: 0.0
+  proxy_revenue: 641858459.74
+  proxy_revenue_share: 0.09518569
+  segment_count: 3
+- scenario: bear
+  period: 2027E
+  revenue: 7280773666.829988
+  gross_profit: 1737565245.605247
+  gross_margin: 0.23865118
+  operating_cost: 5543208421.224741
+  financial_expense: 0.0
+  proxy_revenue: 654695628.93
+  proxy_revenue_share: 0.08992116
+  segment_count: 3
+- scenario: bear
+  period: 2028E
+  revenue: 7762588158.449987
+  gross_profit: 1895090733.842247
+  gross_margin: 0.2441313
+  operating_cost: 5867497424.60774
+  financial_expense: 0.0
+  proxy_revenue: 674336497.8
+  proxy_revenue_share: 0.08687006
+  segment_count: 3
+- scenario: base
+  period: 2026E
+  revenue: 7440617631.309987
+  gross_profit: 1924162477.092797
+  gross_margin: 0.25860252
+  operating_cost: 5516455154.217191
+  financial_expense: 0.0
+  proxy_revenue: 693207136.52
+  proxy_revenue_share: 0.09316527
+  segment_count: 3
+- scenario: base
+  period: 2027E
+  revenue: 8803305217.069984
+  gross_profit: 2344845641.939516
+  gross_margin: 0.26635969
+  operating_cost: 6458459575.130468
+  financial_expense: 0.0
+  proxy_revenue: 734799564.71
+  proxy_revenue_share: 0.0834686
+  segment_count: 3
+- scenario: base
+  period: 2028E
+  revenue: 10131374420.739985
+  gross_profit: 2751630491.460076
+  gross_margin: 0.27159499
+  operating_cost: 7379743929.279908
+  financial_expense: 0.0
+  proxy_revenue: 771539542.95
+  proxy_revenue_share: 0.07615349
+  segment_count: 3
+- scenario: bull
+  period: 2026E
+  revenue: 7846105013.939985
+  gross_profit: 2170172879.785046
+  gross_margin: 0.27659238
+  operating_cost: 5675932134.15494
+  financial_expense: 0.0
+  proxy_revenue: 718881474.91
+  proxy_revenue_share: 0.09162272
+  segment_count: 3
+- scenario: bull
+  period: 2027E
+  revenue: 9715873438.439983
+  gross_profit: 2738377863.963445
+  gross_margin: 0.28184577
+  operating_cost: 6977495574.476539
+  financial_expense: 0.0
+  proxy_revenue: 790769622.4
+  proxy_revenue_share: 0.08138945
+  segment_count: 3
+- scenario: bull
+  period: 2028E
+  revenue: 11564689765.219978
+  gross_profit: 3312594394.234664
+  gross_margin: 0.2864404
+  operating_cost: 8252095370.985314
+  financial_expense: 0.0
+  proxy_revenue: 854031192.19
+  proxy_revenue_share: 0.07384817
+  segment_count: 3
+issues: []

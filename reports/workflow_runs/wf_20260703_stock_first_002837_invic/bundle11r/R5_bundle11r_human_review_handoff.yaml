@@ -1,0 +1,26 @@
+artifact_type: R5_bundle10r_human_review_handoff
+schema_version: 1
+report_schema_version: v5
+status: pending
+automated_candidate_decision: candidate_ready_for_human_review
+input_model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+input_hashes:
+  report_sha256: 0c059bf4e5b81f98052a0172fc2d0c25419a52f723b0295cc684765381cd372f
+  appendix_sha256: fde74c657bf56233d16d31f26b4550b1bd12e742e23b1b81a3f9ea6d2406b55b
+  scorecard_sha256: f832238ae1ebba7b1633ce4683f4ce7b258ed2b34c683f4ec3fa545b3fd642b2
+review_checklist:
+- core thesis is company-specific and supported
+- forecast assumptions and causal bridge are understandable
+- valuation explains market-implied expectations and method limits
+- counterevidence and falsification conditions are decision-useful
+- technical, sentiment, and future events are dated and conditional
+- no claim boundary is stronger than its evidence
+- no direct trading instruction or target price appears
+- narrative reads like coherent analyst research rather than a repeated audit scaffold
+reviewer: null
+reviewed_at: null
+decision: null
+comments: null
+sample_quality_allowed: false
+p2_allowed: false
+supersedes_report_sha256: cb261412f1c72dfd56e6dc9030c3d0f8bb06d4963a5525396059a6b1a21e6090

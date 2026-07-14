@@ -1,0 +1,12 @@
+schema_version: 1
+bundle_id: R5_bundle11r_runtime_operating_research
+workflow_kernel: T0-T10
+periods: [2026E, 2027E, 2028E]
+scenarios: [bear, base, bull]
+maximum_proxy_revenue_share: 0.45
+reconciliation_tolerance: 0.000001
+minimum_peer_score: 0.72
+minimum_eligible_peers: 3
+human_review_status_after_automation: pending
+sample_quality_allowed_after_runtime_pass: false
+p2_allowed: false

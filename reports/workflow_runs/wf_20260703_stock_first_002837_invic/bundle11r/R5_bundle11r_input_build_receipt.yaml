@@ -1,0 +1,29 @@
+schema_version: 1
+artifact_type: R5_bundle11r_002837_input_build_receipt
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-13'
+input_artifacts:
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_segment_driver_model.yaml
+  sha256: a2f4d91b9c9146afd4dda9bcfb41053fb773847f4add3888a2b2458fc4580c7e
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle9r_peer_operating_reconciliation.yaml
+  sha256: a0283ab9063c91b229978aa9e8e3745d312b2f28eda3ef14ad8d20f9bc2eed2d
+output_artifacts:
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_operating_metric_candidates.csv
+  sha256: fafbb3baf305549389524761e1b3fe4e6cf371419f305704d1b61a17e624a32f
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_segment_driver_plan.yaml
+  sha256: d5fb59b4fd88368caa03d2abc783c69947506149ed299f1305241f654ca4878f
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_evidence_status.yaml
+  sha256: 4eb153fd103e939fc45f658de48ef19c06c338fc992408942dbeebf4660382a7
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_peer_pack.yaml
+  sha256: f0b3bdc17236081ef84f7fab75e7e2db38dc60d829134a6b1e265c72cae2ab39
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_semantic_payload.yaml
+  sha256: 4fba3363122260c27b8ec741217cf7fc46de5a63709bda415375593d22c2cf67
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle11r/R5_bundle11r_operating_evidence_gap_requests.yaml
+  sha256: 5d39479a8e634d6ac9d03ce1d8dd42183864a7bf0afcfe09de6fd6a38ede1f0d
+method_boundary: two major reported product lines use hybrid equivalent-unit models;
+  residual businesses remain explicit proxy
+source_gap_boundary: project count, unit value, acceptance cycle, liquid-cooling margin
+  and working capital remain visible TODOs
+fixed_boundaries:
+  sample_quality_allowed: false
+  p2_allowed: false

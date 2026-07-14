@@ -1,0 +1,115 @@
+schema_version: 1
+artifact_type: R5_bundle11r_operating_to_9r_reconciliation
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-13'
+input_model_generation_id: model_gen_r5_bundle9r_1cd42241e6a38fb3
+input_runtime_result_sha256: 706b7d293fec9d9cbb4434899bce5ef5f45cafe5f9db4a7b7f73ec37506b8708
+decision: pass
+method: sum Bundle 9R broad-line segment revenue and gross profit, then compare with
+  Bundle 11R consolidated operating-driver output
+tolerance_CNY: 0.02
+summary:
+  row_count: 9
+  passed_row_count: 9
+  max_absolute_revenue_difference_CNY: 2.3e-05
+  max_absolute_gross_profit_difference_CNY: 0.010076
+  max_proxy_revenue_share: 0.09518569
+  base_2026_proxy_revenue_share: 0.09316527
+  forecast_and_valuation_values_changed: false
+rows:
+- scenario: bear
+  period: 2026E
+  bundle9r_revenue_CNY: 6743224566.58
+  bundle11r_revenue_CNY: 6743224566.579988
+  revenue_difference_CNY: -1.2e-05
+  bundle9r_gross_profit_CNY: 1571820603.95
+  bundle11r_gross_profit_CNY: 1571820603.951497
+  gross_profit_difference_CNY: 0.001497
+  proxy_revenue_share: 0.09518569
+  within_tolerance: true
+- scenario: bear
+  period: 2027E
+  bundle9r_revenue_CNY: 7280773666.83
+  bundle11r_revenue_CNY: 7280773666.829988
+  revenue_difference_CNY: -1.2e-05
+  bundle9r_gross_profit_CNY: 1737565245.61
+  bundle11r_gross_profit_CNY: 1737565245.605247
+  gross_profit_difference_CNY: -0.004753
+  proxy_revenue_share: 0.08992116
+  within_tolerance: true
+- scenario: bear
+  period: 2028E
+  bundle9r_revenue_CNY: 7762588158.45
+  bundle11r_revenue_CNY: 7762588158.449987
+  revenue_difference_CNY: -1.2e-05
+  bundle9r_gross_profit_CNY: 1895090733.84
+  bundle11r_gross_profit_CNY: 1895090733.842247
+  gross_profit_difference_CNY: 0.002247
+  proxy_revenue_share: 0.08687006
+  within_tolerance: true
+- scenario: base
+  period: 2026E
+  bundle9r_revenue_CNY: 7440617631.309999
+  bundle11r_revenue_CNY: 7440617631.309987
+  revenue_difference_CNY: -1.2e-05
+  bundle9r_gross_profit_CNY: 1924162477.09
+  bundle11r_gross_profit_CNY: 1924162477.092797
+  gross_profit_difference_CNY: 0.002797
+  proxy_revenue_share: 0.09316527
+  within_tolerance: true
+- scenario: base
+  period: 2027E
+  bundle9r_revenue_CNY: 8803305217.07
+  bundle11r_revenue_CNY: 8803305217.069984
+  revenue_difference_CNY: -1.5e-05
+  bundle9r_gross_profit_CNY: 2344845641.94
+  bundle11r_gross_profit_CNY: 2344845641.939516
+  gross_profit_difference_CNY: -0.000484
+  proxy_revenue_share: 0.0834686
+  within_tolerance: true
+- scenario: base
+  period: 2028E
+  bundle9r_revenue_CNY: 10131374420.74
+  bundle11r_revenue_CNY: 10131374420.739985
+  revenue_difference_CNY: -1.5e-05
+  bundle9r_gross_profit_CNY: 2751630491.45
+  bundle11r_gross_profit_CNY: 2751630491.460076
+  gross_profit_difference_CNY: 0.010076
+  proxy_revenue_share: 0.07615349
+  within_tolerance: true
+- scenario: bull
+  period: 2026E
+  bundle9r_revenue_CNY: 7846105013.94
+  bundle11r_revenue_CNY: 7846105013.939985
+  revenue_difference_CNY: -1.4e-05
+  bundle9r_gross_profit_CNY: 2170172879.79
+  bundle11r_gross_profit_CNY: 2170172879.785046
+  gross_profit_difference_CNY: -0.004954
+  proxy_revenue_share: 0.09162272
+  within_tolerance: true
+- scenario: bull
+  period: 2027E
+  bundle9r_revenue_CNY: 9715873438.44
+  bundle11r_revenue_CNY: 9715873438.439983
+  revenue_difference_CNY: -1.7e-05
+  bundle9r_gross_profit_CNY: 2738377863.97
+  bundle11r_gross_profit_CNY: 2738377863.963445
+  gross_profit_difference_CNY: -0.006555
+  proxy_revenue_share: 0.08138945
+  within_tolerance: true
+- scenario: bull
+  period: 2028E
+  bundle9r_revenue_CNY: 11564689765.220001
+  bundle11r_revenue_CNY: 11564689765.219978
+  revenue_difference_CNY: -2.3e-05
+  bundle9r_gross_profit_CNY: 3312594394.23
+  bundle11r_gross_profit_CNY: 3312594394.234664
+  gross_profit_difference_CNY: 0.004664
+  proxy_revenue_share: 0.07384817
+  within_tolerance: true
+interpretation_boundary: 11R decomposes the existing 9R broad-line model. It does
+  not add standalone liquid-cooling revenue or replace the reviewed reverse/scenario
+  valuation inputs.
+fixed_boundaries:
+  sample_quality_allowed: false
+  p2_allowed: false

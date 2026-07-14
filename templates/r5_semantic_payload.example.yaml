@@ -1,0 +1,51 @@
+schema_version: 1
+section_materiality:
+  business: high
+  forecast: high
+  financials: medium
+  industry: medium
+  valuation: medium
+  risks: low
+sections:
+  - section_id: financials
+    text: 2025年经营现金流与利润同步改善，应收周转天数下降，说明增长没有完全依赖赊销。
+    company_specific_metrics: [经营现金流, 应收周转天数]
+    model_links: []
+    insights: [利润与现金转换同步改善]
+    watchpoints:
+      - {metric: 经营现金流/净利润, trigger: 低于0.8, timeframe: 2026H1, disconfirming_condition: 连续两个报告期低于0.8}
+  - section_id: business
+    text: 机柜温控采用项目数、单位价值和验收率驱动；单位价值和验收率共同决定收入确认，而不是机械外推收入增速。
+    company_specific_metrics: [项目数, 单位价值, 验收率]
+    model_links: [cabinet_cooling.project_unit_value_acceptance]
+    insights: [验收节奏是收入兑现的关键约束]
+    watchpoints:
+      - {metric: 验收率, trigger: 低于基准情景5个百分点, timeframe: 2026H1, disconfirming_condition: 项目交付增长但验收率持续下降}
+  - section_id: industry
+    text: 液冷渗透提升只有在项目验收与单位价值可核验时才能转化为公司收入判断。
+    company_specific_metrics: [液冷项目验收]
+    model_links: []
+    insights: [行业渗透率不能替代公司收入转换证据]
+    watchpoints:
+      - {metric: 新增验收项目, trigger: 低于计划值, timeframe: 2026年, disconfirming_condition: 行业增长而公司项目不增长}
+  - section_id: forecast
+    text: 基准情景由容量利用率模型和项目验收模型汇总，其他业务代理收入占比低于45%，并明确保留替代证据请求。
+    company_specific_metrics: [代理收入占比]
+    model_links: [room_cooling.capacity_utilization_price, cabinet_cooling.project_unit_value_acceptance]
+    insights: [经营驱动先于报表桥]
+    watchpoints:
+      - {metric: 代理收入占比, trigger: 高于45%, timeframe: 每次模型更新, disconfirming_condition: 核心业务仍依赖宽口径代理}
+  - section_id: valuation
+    text: 同业倍数仅在至少三家定义兼容同业通过资格门时启用，否则采用反向估值与情景估值。
+    company_specific_metrics: [合格同业数量]
+    model_links: [peer_eligibility]
+    insights: [估值方法资格取决于经营定义可比性]
+    watchpoints:
+      - {metric: 合格同业数量, trigger: 少于3家, timeframe: 估值日, disconfirming_condition: 经营口径无法对齐}
+  - section_id: risks
+    text: 最大风险是项目交付未能转化为验收收入，或单位价值下降抵消项目数量增长。
+    company_specific_metrics: [项目验收率, 单位价值]
+    model_links: []
+    insights: [量增不一定带来毛利增长]
+    watchpoints:
+      - {metric: 单位价值, trigger: 同比下降10%, timeframe: 2026H1, disconfirming_condition: 项目增长但毛利率下滑}

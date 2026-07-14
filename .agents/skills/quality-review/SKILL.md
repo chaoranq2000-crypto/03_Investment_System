@@ -271,3 +271,9 @@ required_fixes.md
 9. Is update / backflow logging required?
 10. Is direct trading advice avoided?
 11. Are missing data-layer packs represented as TODO / MISSING rather than unsupported conclusions?
+
+<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+## Bundle 11R semantic research gate
+
+Review both truthfulness and decision usefulness. Fail a candidate when a core section lacks issuer-specific metrics, an economic section lacks a model link, peer multiples use an ineligible peer set, watchpoints are not falsifiable, the same insight is repeated across sections, proxy share exceeds the contract, or direct trading/target-price language appears. Extra length, citations, technical indicators, or unrelated passing sections cannot compensate for these failures.
+<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->

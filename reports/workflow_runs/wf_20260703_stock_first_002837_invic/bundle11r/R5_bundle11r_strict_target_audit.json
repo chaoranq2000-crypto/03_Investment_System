@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "artifact_type": "r5_bundle11r_target_audit",
+  "target_branch": "codex/r5-bundle10r-reader-rebuild",
+  "design_baseline": "3bc55a61",
+  "expected_model_generation": "model_gen_r5_bundle9r_1cd42241e6a38fb3",
+  "selected_artifacts": {
+    "reader_payload": "reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle10r_reader_payload_v5.yaml",
+    "reader_report": "reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle10r_reader_v5.md",
+    "traceability": "reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle10r_traceability_v5.yaml"
+  },
+  "checks": [
+    {
+      "name": "git_repository",
+      "ok": true,
+      "detail": "C:\\Projects\\03_Investment_System"
+    },
+    {
+      "name": "target_branch",
+      "ok": true,
+      "detail": {
+        "actual": "codex/r5-bundle10r-reader-rebuild",
+        "expected": "codex/r5-bundle10r-reader-rebuild"
+      }
+    },
+    {
+      "name": "head_resolved",
+      "ok": true,
+      "detail": "6b9efbe6a1658704daf2354209ef85a5281aa2b0"
+    },
+    {
+      "name": "target_commit_or_descendant",
+      "ok": true,
+      "detail": {
+        "base": "3bc55a613ca2c2fc9a142da0d6ea37d161595454",
+        "head": "6b9efbe6a1658704daf2354209ef85a5281aa2b0",
+        "is_ancestor": true
+      }
+    },
+    {
+      "name": "file:docs\\workflows\\RESEARCH_WORKFLOW.md",
+      "ok": true,
+      "detail": "14014eb56164937cea6039665ef40e1e836f5d91c82b25cf74d9b8b38cb9cc5c"
+    },
+    {
+      "name": "file:docs\\workflows\\WORKFLOW_ORCHESTRATION_SPEC.md",
+      "ok": true,
+      "detail": "ae5d733485a53c6d9baf24989ad1ab868e589d3f6ae65910085f19a520752a5e"
+    },
+    {
+      "name": "file:.agents\\skills\\research-orchestrator\\SKILL.md",
+      "ok": true,
+      "detail": "494a5a0112a17ac4411ec8af3c0406f4e9347721262216614a1e57cd931682e7"
+    },
+    {
+      "name": "file:.agents\\skills\\stock-deep-dive\\SKILL.md",
+      "ok": true,
+      "detail": "d3bb74706f689d07c88b3a5e40b4e4ccbd39a437cfd94ad6ce25c9c50c7d92d5"
+    },
+    {
+      "name": "file:.agents\\skills\\quality-review\\SKILL.md",
+      "ok": true,
+      "detail": "0cd50d84b30bbd2c2d3d0484fe399a6789ca09dca75ecc52d6d62aad9287091d"
+    },
+    {
+      "name": "file:reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle9r_model_generation_lock.yaml",
+      "ok": true,
+      "detail": "850d52cc1ab4ee4c438c059e0a5a6b59be3f0e8197d892a360d20576b6245594"
+    },
+    {
+      "name": "file:reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle10r_reader_generation_lock.yaml",
+      "ok": true,
+      "detail": "c012881a0c4a8b5c8e1b451e7d01c1ef3ea6d226a757fbb086c3230c02f6389d"
+    },
+    {
+      "name": "candidate_group:reader_payload",
+      "ok": true,
+      "detail": "reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle10r_reader_payload_v5.yaml"
+    },
+    {
+      "name": "candidate_group:reader_report",
+      "ok": true,
+      "detail": "reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle10r_reader_v5.md"
+    },
+    {
+      "name": "candidate_group:traceability",
+      "ok": true,
+      "detail": "reports\\workflow_runs\\wf_20260703_stock_first_002837_invic\\R5_bundle10r_traceability_v5.yaml"
+    },
+    {
+      "name": "bundle10r_model_generation_binding",
+      "ok": true,
+      "detail": [
+        "model_gen_r5_bundle9r_1cd42241e6a38fb3"
+      ]
+    }
+  ],
+  "pass": true
+}

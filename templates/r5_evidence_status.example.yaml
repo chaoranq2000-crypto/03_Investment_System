@@ -1,0 +1,8 @@
+schema_version: 1
+evidence_status:
+  room_cooling.installed_capacity: {status: confirmed, evidence_ids: [ev_capacity], period: 2025A, confidence: high}
+  room_cooling.utilization: {status: bounded_estimate, evidence_ids: [ev_utilization_clue], range: [0.6, 0.75], period: 2026E, confidence: medium}
+  room_cooling.unit_revenue: {status: missing, evidence_ids: [], confidence: low}
+  cabinet_cooling.project_count: {status: bounded_estimate, evidence_ids: [ev_projects], range: [50, 80], period: 2026E, confidence: medium}
+  cabinet_cooling.unit_value: {status: missing, evidence_ids: [], confidence: low}
+  cabinet_cooling.acceptance_rate: {status: missing, evidence_ids: [], confidence: low}

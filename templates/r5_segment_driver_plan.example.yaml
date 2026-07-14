@@ -1,0 +1,58 @@
+schema_version: 1
+company_id: example_002837
+segments:
+  - segment_id: room_cooling
+    archetype_id: capacity_utilization_price
+    method_tier: hybrid
+    allow_proxy: true
+    thesis_critical_drivers: [installed_capacity, utilization, unit_revenue]
+    driver_values:
+      installed_capacity:
+        bear: {2026E: 100, 2027E: 110, 2028E: 120}
+        base: {2026E: 105, 2027E: 120, 2028E: 135}
+        bull: {2026E: 110, 2027E: 130, 2028E: 150}
+      utilization:
+        bear: {2026E: 0.62, 2027E: 0.64, 2028E: 0.66}
+        base: {2026E: 0.68, 2027E: 0.72, 2028E: 0.75}
+        bull: {2026E: 0.72, 2027E: 0.78, 2028E: 0.82}
+      unit_revenue:
+        bear: {2026E: 1.0, 2027E: 1.0, 2028E: 1.0}
+        base: {2026E: 1.05, 2027E: 1.08, 2028E: 1.1}
+        bull: {2026E: 1.1, 2027E: 1.15, 2028E: 1.2}
+    gross_margin:
+      bear: {2026E: 0.25, 2027E: 0.25, 2028E: 0.25}
+      base: {2026E: 0.28, 2027E: 0.29, 2028E: 0.3}
+      bull: {2026E: 0.3, 2027E: 0.31, 2028E: 0.32}
+  - segment_id: cabinet_cooling
+    archetype_id: project_unit_value_acceptance
+    method_tier: bottom_up
+    thesis_critical_drivers: [project_count, unit_value, acceptance_rate]
+    driver_values:
+      project_count:
+        bear: {2026E: 50, 2027E: 60, 2028E: 70}
+        base: {2026E: 60, 2027E: 80, 2028E: 100}
+        bull: {2026E: 70, 2027E: 100, 2028E: 130}
+      unit_value:
+        bear: {2026E: 0.8, 2027E: 0.8, 2028E: 0.8}
+        base: {2026E: 0.9, 2027E: 0.92, 2028E: 0.95}
+        bull: {2026E: 1.0, 2027E: 1.05, 2028E: 1.1}
+      acceptance_rate:
+        bear: {2026E: 0.7, 2027E: 0.72, 2028E: 0.75}
+        base: {2026E: 0.8, 2027E: 0.83, 2028E: 0.85}
+        bull: {2026E: 0.85, 2027E: 0.88, 2028E: 0.9}
+    gross_margin:
+      bear: {2026E: 0.22, 2027E: 0.22, 2028E: 0.22}
+      base: {2026E: 0.25, 2027E: 0.26, 2028E: 0.27}
+      bull: {2026E: 0.28, 2027E: 0.29, 2028E: 0.3}
+  - segment_id: other_businesses
+    archetype_id: volume_price_mix
+    method_tier: proxy
+    proxy_reason: issuer disclosure does not support a separate operating equation yet
+    proxy_revenue:
+      bear: {2026E: 20, 2027E: 21, 2028E: 22}
+      base: {2026E: 22, 2027E: 24, 2028E: 26}
+      bull: {2026E: 24, 2027E: 27, 2028E: 30}
+    proxy_gross_margin:
+      bear: {2026E: 0.2, 2027E: 0.2, 2028E: 0.2}
+      base: {2026E: 0.22, 2027E: 0.22, 2028E: 0.22}
+      bull: {2026E: 0.24, 2027E: 0.24, 2028E: 0.24}

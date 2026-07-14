@@ -1,0 +1,68 @@
+schema_version: 1
+artifact_type: R5_bundle11r_operating_evidence_gap_requests
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-13'
+gaps:
+- gap_id: R5B11R-GAP-001
+  severity: medium
+  status: open
+  target_driver: liquid_cooling_project_or_delivery_capacity
+  description: 液冷项目数、交付容量或可复算等价容量未单独披露
+  required_source_type: issuer_official_disclosure_or_reviewed_ir_record
+  fix_owner_skill: evidence-ingest
+  next_action: 保持TODO_SOURCE_REQUIRED；获得官方可复算口径后替换bounded_estimate并重跑11R
+  blocking_for_automated_candidate: false
+  blocking_for_sample_quality: true
+- gap_id: R5B11R-GAP-002
+  severity: medium
+  status: open
+  target_driver: liquid_cooling_unit_value
+  description: 液冷项目或产品组合的单位价值未单独披露
+  required_source_type: issuer_official_disclosure_or_reviewed_ir_record
+  fix_owner_skill: evidence-ingest
+  next_action: 保持TODO_SOURCE_REQUIRED；获得官方可复算口径后替换bounded_estimate并重跑11R
+  blocking_for_automated_candidate: false
+  blocking_for_sample_quality: true
+- gap_id: R5B11R-GAP-003
+  severity: medium
+  status: open
+  target_driver: test_delivery_acceptance_revenue_cycle
+  description: 测试、交付、验收与收入确认周期缺少可复算官方口径
+  required_source_type: issuer_official_disclosure_or_reviewed_ir_record
+  fix_owner_skill: evidence-ingest
+  next_action: 保持TODO_SOURCE_REQUIRED；获得官方可复算口径后替换bounded_estimate并重跑11R
+  blocking_for_automated_candidate: false
+  blocking_for_sample_quality: true
+- gap_id: R5B11R-GAP-004
+  severity: medium
+  status: open
+  target_driver: liquid_cooling_overlap_elimination
+  description: 液冷与机房/机柜宽口径收入的重叠消除规则未披露
+  required_source_type: issuer_official_disclosure_or_reviewed_ir_record
+  fix_owner_skill: evidence-ingest
+  next_action: 保持TODO_SOURCE_REQUIRED；获得官方可复算口径后替换bounded_estimate并重跑11R
+  blocking_for_automated_candidate: false
+  blocking_for_sample_quality: true
+- gap_id: R5B11R-GAP-005
+  severity: medium
+  status: open
+  target_driver: liquid_cooling_gross_margin_bounds
+  description: 液冷独立毛利率上下限未披露
+  required_source_type: issuer_official_disclosure_or_reviewed_ir_record
+  fix_owner_skill: evidence-ingest
+  next_action: 保持TODO_SOURCE_REQUIRED；获得官方可复算口径后替换bounded_estimate并重跑11R
+  blocking_for_automated_candidate: false
+  blocking_for_sample_quality: true
+- gap_id: R5B11R-GAP-006
+  severity: medium
+  status: open
+  target_driver: liquid_cooling_working_capital
+  description: 液冷独立回款、应收与存货占用未披露
+  required_source_type: issuer_official_disclosure_or_reviewed_ir_record
+  fix_owner_skill: evidence-ingest
+  next_action: 保持TODO_SOURCE_REQUIRED；获得官方可复算口径后替换bounded_estimate并重跑11R
+  blocking_for_automated_candidate: false
+  blocking_for_sample_quality: true
+fixed_boundaries:
+  sample_quality_allowed: false
+  p2_allowed: false

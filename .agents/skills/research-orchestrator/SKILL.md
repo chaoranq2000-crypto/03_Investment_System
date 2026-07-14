@@ -207,3 +207,9 @@ This checklist is an operational close check, not a second global gate table.
 [ ] no high-severity quality issues remain
 [ ] workflow_readout.md states accepted / accepted_with_todos / needs_fix / blocked
 ```
+
+<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+## Bundle 11R runtime routing
+
+For a stock research workflow that has reached the post-10R research-depth stage, invoke `scripts/run_r5_bundle11r_runtime.py` with the business-line driver plan, evidence status, peer pack, and semantic payload. Persist its question matrix, driver pack, peer eligibility, semantic scorecard, and backflow plan under the workflow-run directory. Route the next action from `backflow_plan.tasks`; do not replace a failed operating-research gate by asking the Writer to add prose.
+<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->

@@ -189,3 +189,19 @@ fix loop 不新增 `workflow_type`、global `stage_id` 或 global `gate_id`。
 4. 直接写长篇研究结论替代下层 skill。
 5. 跳过 `quality-review` 直接 accepted。
 6. 将 scorecard / watchlist / memo 写成交易建议。
+
+<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+## R5 Bundle 11R issue backflow contract
+
+The orchestrator consumes `r5_bundle11r_backflow_plan` and must set `next_stage` and `required_next_skill` from the highest-severity blocking task. Typical routes are:
+
+- missing operating drivers or excessive proxy share → `RP2_operating_evidence` / `evidence-ingest`;
+- broken operating equation or missing model link → `RP4_operating_model` / `stock-deep-dive`;
+- ineligible peer set → `RP5_peer_valuation` / `compare-stocks`;
+- generic analysis or non-falsifiable watchpoints → `RP6_analysis_synthesis` / `stock-deep-dive`;
+- duplicated narrative or flat emphasis → `RP7_report_planning` / `memo-writer`;
+- direct trading language → `RP8_quality_review` / `quality-review`;
+- generation mismatch → `T0_orchestration` / `research-orchestrator`.
+
+A passing structure score cannot offset a high/critical research blocker.
+<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->

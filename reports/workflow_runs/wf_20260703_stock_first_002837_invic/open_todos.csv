@@ -47,10 +47,18 @@ R5B9R-DRIVER-001,medium,R5_bundle9r_close,R5_bundle9r_segment_driver_model.yaml,
 R5B9R-PEER-001,medium,R5_bundle9r_close,R5_bundle9r_peer_operating_reconciliation.yaml,四家同业的液冷纯度与官方经营科目仍不足以支持确定排名,company-valuation,accepted_todo,2026-07-13,,维持LOW_CONFIDENCE_PEER_SET且ranking_allowed=false
 R5B9R-DCF-001,medium,R5_bundle9r_close,R5_bundle9r_model_pack.yaml,净债务折现率与终值假设未完成审阅因此DCF不满足方法门,company-valuation,accepted_todo,2026-07-13,,补齐全部可追溯输入后重新执行方法资格检查
 R5B9R-SOTP-001,medium,R5_bundle9r_close,R5_bundle9r_model_pack.yaml,独立液冷经济性与未分配成本缺失因此SOTP不满足方法门,company-valuation,accepted_todo,2026-07-13,,获得可审阅分部经济性和消除关系后重新执行方法资格检查
-R5B10R-DCF-001,medium,R5_bundle10r_8_close,R5_bundle10r_reader_input_pack.yaml,"净债务、折现率与终值假设仍未形成完整可审阅输入，DCF保持不可用",company-valuation,accepted_todo,2026-07-13,,补齐全部可追溯输入后重新执行方法资格检查
-R5B10R-SOTP-001,medium,R5_bundle10r_8_close,R5_bundle10r_reader_input_pack.yaml,"液冷独立经济性、未分配成本与消除关系仍缺失，SOTP保持不可用",company-valuation,accepted_todo,2026-07-13,,取得同口径分部经济性与消除关系后重新执行方法资格检查
-R5B10R-HUMAN-001,medium,R5_bundle10r_8_close,R5_bundle10r_human_review_handoff.yaml,"Reader v4收到叙事范围revision_required；用户未声明完成全篇与追溯附录审阅",quality-review,closed,2026-07-13,2026-07-14,该送审轮次关闭并由Reader v5精确哈希审阅替代
+R5B10R-DCF-001,medium,R5_bundle10r_8_close,R5_bundle10r_reader_input_pack.yaml,净债务、折现率与终值假设仍未形成完整可审阅输入，DCF保持不可用,company-valuation,accepted_todo,2026-07-13,,补齐全部可追溯输入后重新执行方法资格检查
+R5B10R-SOTP-001,medium,R5_bundle10r_8_close,R5_bundle10r_reader_input_pack.yaml,液冷独立经济性、未分配成本与消除关系仍缺失，SOTP保持不可用,company-valuation,accepted_todo,2026-07-13,,取得同口径分部经济性与消除关系后重新执行方法资格检查
+R5B10R-HUMAN-001,medium,R5_bundle10r_8_close,R5_bundle10r_human_review_handoff.yaml,Reader v4收到叙事范围revision_required；用户未声明完成全篇与追溯附录审阅,quality-review,closed,2026-07-13,2026-07-14,该送审轮次关闭并由Reader v5精确哈希审阅替代
 R5B10R-CI-001,low,R5_bundle10r_8_close,R5_bundle10r_quality_gate_report.md,Bundle 10R Reader v5最终闭环分支已推送且远端CI通过,research-orchestrator,closed,2026-07-13,2026-07-14,commit 80f01fdf；GitHub Actions run 29315103198 success
 R5B10R-NARRATIVE-001,high,T9_quality_review,R5_bundle10r_reader_v5.md,Reader v5已形成六章研究叙事并通过新增反机械化非补偿质量门,stock-deep-dive,closed,2026-07-14,2026-07-14,自动检查100分且模板重复流程术语近重复段落和过薄章节均为0
 R5B10R-V5-HUMAN-001,medium,R5_bundle10r_v5_close,R5_bundle10r_human_review_handoff_v5.yaml,Reader v5精确哈希人工复审已完成并通过8项清单,quality-review,closed,2026-07-14,2026-07-14T15:20:38+08:00,本轮pending由独立submission关闭；sample quality与P2仍为false
 R5B10R-V5-HUMAN-FAIL-001,high,T9_quality_review,R5_bundle10r_reader_v5.md,Reader v5前次精确哈希人工审阅不通过且未给出章节或段落级意见,quality-review,closed,2026-07-14,2026-07-14T15:20:38+08:00,同一锁定Reader的独立复审已8项通过；失败记录保留且无需启动v6
+R5B11R-EVIDENCE-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_operating_evidence_gap_requests.yaml,液冷项目数或交付容量缺少可复算正式口径,evidence-ingest,open,2026-07-14,,取得正式披露后替换缺口并重跑经营驱动
+R5B11R-METRIC-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_research_question_matrix.yaml,分部单位价值、产品组合、单位成本与验收周期缺失,evidence-ingest,open,2026-07-14,,取得可复算口径后登记指标并替换有边界估计
+R5B11R-TRACE-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_reader_input_pack.yaml,液冷与宽产品线收入的重叠消除规则缺失,evidence-ingest,open,2026-07-14,,取得分项与消除关系后更新claim
+R5B11R-EXPOSURE-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_segment_driver_plan.yaml,液冷独立收入、毛利与营运资金暴露仍不可拆分,segment-company-mapping,open,2026-07-14,,独立经济性出现后刷新暴露记录
+R5B11R-PEER-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_peer_eligibility.yaml,4家候选同业均不满足经营定义与预测日期可比要求,company-valuation,open,2026-07-14,,至少3家形成同口径后重审同业方法
+R5B11R-HUMAN-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_human_review_handoff.yaml,新Reader精确哈希人工复核待完成,quality-review,open,2026-07-14,,真实复核者提交独立哈希绑定结论
+R5B11R-DCF-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_reader_input_pack.yaml,现金流折现方法输入仍不完整,company-valuation,open,2026-07-14,,补齐净债务、折现率和终值输入后重检
+R5B11R-SOTP-001,medium,R5_bundle11r_8_automated_close,R5_bundle11r_reader_input_pack.yaml,分部加总方法缺少独立经济性与消除关系,company-valuation,open,2026-07-14,,取得同口径输入后重检

@@ -1,0 +1,47 @@
+schema_version: 1
+artifact_type: r5_bundle11r_semantic_quality_scorecard
+decision: candidate_ready
+critical_blockers: 0
+high_blockers: 0
+medium_warnings: 0
+section_scores:
+- section_id: financials
+  company_specific_metric_count: 3
+  model_link_count: 2
+  insight_count: 1
+  issue_count: 0
+  pass: true
+- section_id: business
+  company_specific_metric_count: 3
+  model_link_count: 3
+  insight_count: 1
+  issue_count: 0
+  pass: true
+- section_id: industry
+  company_specific_metric_count: 1
+  model_link_count: 1
+  insight_count: 1
+  issue_count: 0
+  pass: true
+- section_id: forecast
+  company_specific_metric_count: 2
+  model_link_count: 3
+  insight_count: 1
+  issue_count: 0
+  pass: true
+- section_id: valuation
+  company_specific_metric_count: 2
+  model_link_count: 3
+  insight_count: 1
+  issue_count: 0
+  pass: true
+- section_id: risks
+  company_specific_metric_count: 3
+  model_link_count: 1
+  insight_count: 1
+  issue_count: 0
+  pass: true
+issues: []
+fixed_boundaries:
+  sample_quality_allowed: false
+  p2_allowed: false

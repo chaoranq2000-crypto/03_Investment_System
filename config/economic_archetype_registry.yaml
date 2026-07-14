@@ -1,0 +1,75 @@
+schema_version: 1
+registry_id: r5_economic_archetype_registry_v1
+archetypes:
+  - archetype_id: volume_price_mix
+    equation: volume_price_mix
+    output_unit: currency
+    allowed_method_tiers: [bottom_up, hybrid]
+    drivers:
+      - {driver_id: volume, unit: physical_volume, required: true}
+      - {driver_id: unit_price, unit: currency_per_unit, required: true}
+      - {driver_id: mix_factor, unit: ratio, required: false, lower_bound: 0}
+      - {driver_id: unit_cost, unit: currency_per_unit, required: false, lower_bound: 0}
+    financial_mapping: {revenue: operating_revenue, gross_profit: gross_profit}
+    notes: Suitable for chemicals, materials, products, and price-volume-mix businesses.
+  - archetype_id: capacity_utilization_price
+    equation: capacity_utilization_price
+    output_unit: currency
+    drivers:
+      - {driver_id: installed_capacity, unit: capacity, required: true, lower_bound: 0}
+      - {driver_id: utilization, unit: ratio, required: true, lower_bound: 0, upper_bound: 1}
+      - {driver_id: unit_revenue, unit: currency_per_capacity, required: true, lower_bound: 0}
+    financial_mapping: {revenue: operating_revenue, gross_profit: gross_profit}
+  - archetype_id: backlog_conversion_recognition
+    equation: backlog_conversion_recognition
+    output_unit: currency
+    drivers:
+      - {driver_id: backlog, unit: currency, required: true, lower_bound: 0}
+      - {driver_id: conversion_rate, unit: ratio, required: true, lower_bound: 0, upper_bound: 1}
+      - {driver_id: recognition_rate, unit: ratio, required: true, lower_bound: 0, upper_bound: 1}
+    financial_mapping: {revenue: operating_revenue, gross_profit: gross_profit, contract_liability: contract_liabilities}
+  - archetype_id: project_unit_value_acceptance
+    equation: project_unit_value_acceptance
+    output_unit: currency
+    drivers:
+      - {driver_id: project_count, unit: projects, required: true, lower_bound: 0}
+      - {driver_id: unit_value, unit: currency_per_project, required: true, lower_bound: 0}
+      - {driver_id: acceptance_rate, unit: ratio, required: true, lower_bound: 0, upper_bound: 1}
+    financial_mapping: {revenue: operating_revenue, gross_profit: gross_profit, receivables: accounts_receivable}
+    notes: Suitable for liquid cooling, engineering, and acceptance-based project businesses.
+  - archetype_id: commodity_volume_recovery_cost
+    equation: commodity_volume_recovery_cost
+    output_unit: currency
+    drivers:
+      - {driver_id: ore_or_sale_volume, unit: physical_volume, required: true, lower_bound: 0}
+      - {driver_id: commodity_price, unit: currency_per_unit, required: true, lower_bound: 0}
+      - {driver_id: recovery_rate, unit: ratio, required: true, lower_bound: 0, upper_bound: 1}
+      - {driver_id: unit_cash_cost, unit: currency_per_unit, required: true, lower_bound: 0}
+    financial_mapping: {revenue: operating_revenue, gross_profit: gross_profit, capex: capital_expenditure}
+  - archetype_id: idc_capacity_utilization_unit_revenue
+    equation: idc_capacity_utilization_unit_revenue
+    output_unit: currency
+    drivers:
+      - {driver_id: installed_capacity, unit: racks_or_mw, required: true, lower_bound: 0}
+      - {driver_id: utilization, unit: ratio, required: true, lower_bound: 0, upper_bound: 1}
+      - {driver_id: unit_revenue, unit: currency_per_rack_or_mw, required: true, lower_bound: 0}
+      - {driver_id: power_cost_per_unit, unit: currency_per_rack_or_mw, required: false, lower_bound: 0}
+      - {driver_id: other_cost_ratio, unit: ratio, required: false, lower_bound: 0, upper_bound: 1}
+    financial_mapping: {revenue: operating_revenue, gross_profit: gross_profit, power_cost: operating_cost}
+  - archetype_id: acquisition_consolidation_financing
+    equation: acquisition_consolidation_financing
+    output_unit: currency
+    drivers:
+      - {driver_id: target_revenue, unit: currency, required: true, lower_bound: 0}
+      - {driver_id: consolidation_fraction, unit: ratio, required: true, lower_bound: 0, upper_bound: 1}
+      - {driver_id: target_gross_margin, unit: ratio, required: true, lower_bound: 0, upper_bound: 1}
+      - {driver_id: debt_funding, unit: currency, required: false, lower_bound: 0}
+      - {driver_id: interest_rate, unit: ratio, required: false, lower_bound: 0}
+    financial_mapping: {revenue: operating_revenue, gross_profit: gross_profit, financial_expense: financial_expense}
+  - archetype_id: customers_arpu
+    equation: customers_arpu
+    output_unit: currency
+    drivers:
+      - {driver_id: customers, unit: customers, required: true, lower_bound: 0}
+      - {driver_id: arpu, unit: currency_per_customer, required: true, lower_bound: 0}
+    financial_mapping: {revenue: operating_revenue, gross_profit: gross_profit}

@@ -1,0 +1,128 @@
+schema_version: 1
+artifact_type: R5_bundle11r_002837_semantic_payload
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-13'
+section_materiality:
+  business: high
+  forecast: high
+  financials: medium
+  industry: low
+  valuation: medium
+  risks: medium
+sections:
+- section_id: financials
+  text: 2025年公司营业收入60.68亿元、综合毛利率27.86%，经营现金流净额1.57亿元。11R只把公司级指标用于财务桥和营运资金约束，不把它们写成液冷分部事实。
+  company_specific_metrics:
+  - 2025A营业收入60.68亿元
+  - 2025A综合毛利率27.86%
+  - 2025A经营现金流1.57亿元
+  model_links:
+  - R5_bundle9r_financial_statement_bridge
+  - R5_bundle11r_operating_driver_pack.consolidated
+  insights:
+  - 规模增长与现金转化必须分开验证
+  source_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  watchpoints:
+  - metric: 经营现金流净额/归母净利润
+    trigger: 滚动十二个月低于0.5
+    timeframe: 未来两个报告期
+    disconfirming_condition: 经营现金流持续转正且应收与存货增速低于收入增速
+- section_id: business
+  text: 2025年机房温控和机柜温控收入分别为34.48亿元和19.77亿元。11R以年报披露的公司级324,058台销量为锚，将两条主要宽口径产品线拆为等价销量乘公司级混合单价；等价销量属于bounded_estimate，不代表发行人披露的液冷项目数、出货量或订单。其他业务继续使用显式代理，液冷独立经济性保持不加总。
+  company_specific_metrics:
+  - 2025A机房温控收入34.48亿元
+  - 2025A机柜温控收入19.77亿元
+  - 2025A公司级销量324058台
+  model_links:
+  - room_cooling.volume_price_mix
+  - cabinet_cooling.volume_price_mix
+  - liquid_cooling_non_additive_boundary
+  insights:
+  - 宽口径销量桥可以约束报表预测，但不能替代液冷独立项目证据
+  source_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - metric_company_cn_002837_invic_precision_thermal_management_sales_volume_2025A_11r
+  watchpoints:
+  - metric: 液冷项目数、单位价值与验收率
+    trigger: 任一指标获得可复算官方披露
+    timeframe: 每次定期报告和投资者关系记录更新
+    disconfirming_condition: 项目或产品线证据无法与宽口径收入、毛利和回款勾稽
+- section_id: industry
+  text: 公司已披露端到端液冷产品覆盖与规模采购应用线索，但行业渗透和产品验证只有在宽口径收入、毛利与现金流中形成可复算兑现时，才能提高公司层面的结论置信度。
+  company_specific_metrics:
+  - 2025A机房温控收入34.48亿元
+  model_links:
+  - room_cooling.volume_price_mix
+  insights:
+  - 行业需求证据不等于公司液冷独立收入证据
+  source_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  watchpoints:
+  - metric: 机房温控收入增速与毛利率
+    trigger: 收入增速低于10%或毛利率低于24%
+    timeframe: 未来两个报告期
+    disconfirming_condition: 行业液冷扩张但公司宽口径机房温控收入与毛利未同步
+- section_id: forecast
+  text: 基准情景2026E营业收入为74.41亿元。机房与机柜温控由等价销量和混合单价驱动，其他业务代理收入占比为9.32%，低于45%硬上限；驱动结果与Bundle
+    9R宽口径分部收入和毛利逐项勾稽，因此没有通过额外加总液冷收入来抬高公司预测。
+  company_specific_metrics:
+  - 2026E基准收入74.41亿元
+  - 2026E基准代理收入占比9.32%
+  model_links:
+  - R5_bundle11r_operating_driver_pack
+  - R5_bundle9r_segment_driver_model
+  - R5_bundle9r_financial_statement_bridge
+  insights:
+  - 经营驱动桥先约束宽口径报表，再保留液冷独立经济性缺口
+  source_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - metric_company_cn_002837_invic_precision_thermal_management_sales_volume_2025A_11r
+  watchpoints:
+  - metric: 公司级代理收入占比
+    trigger: 高于45%
+    timeframe: 每次模型重算
+    disconfirming_condition: 两条主要业务线重新依赖宽口径收入增长代理而无经营驱动约束
+- section_id: valuation
+  text: 已审阅4家候选同业，但液冷收入纯度、会计边界、期间和预测日期不能同时对齐，因此同业倍数不作为核心锚；11R继续使用Bundle 9R反向估值与情景估值解释市场隐含要求。
+  company_specific_metrics:
+  - 候选同业4家
+  - 合格同业0家
+  model_links:
+  - R5_bundle11r_peer_eligibility
+  - R5_bundle9r_reverse_valuation
+  - R5_bundle9r_scenario_valuation
+  insights:
+  - 估值方法资格先于倍数结论
+  source_ids:
+  - R5_bundle9r_peer_operating_reconciliation
+  watchpoints:
+  - metric: 经营定义合格同业数量
+    trigger: 少于3家
+    timeframe: 每个估值基准日
+    disconfirming_condition: 同业液冷收入纯度、会计边界或预测日期无法形成同口径审阅
+- section_id: risks
+  text: 2025年末应收账款30.54亿元、存货9.83亿元，经营现金流1.57亿元；若宽口径收入增长未转化为毛利和回款，或液冷产品验证没有形成可复算交付与验收，经营驱动模型需要下修。
+  company_specific_metrics:
+  - 2025A应收账款30.54亿元
+  - 2025A存货9.83亿元
+  - 2025A经营现金流1.57亿元
+  model_links:
+  - R5_bundle9r_financial_statement_bridge
+  insights:
+  - 收入兑现必须同时接受毛利和营运资金反证
+  source_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  watchpoints:
+  - metric: 应收账款与存货合计增速
+    trigger: 连续两个报告期高于收入增速
+    timeframe: 未来两个报告期
+    disconfirming_condition: 收入、毛利和经营现金流同步改善且资金占用增速回落
+model_summary:
+  proxy_revenue_share: 0.09316527
+peer_summary:
+  eligible_count: 0
+  peer_multiples_used: false
+fixed_boundaries:
+  sample_quality_allowed: false
+  p2_allowed: false
