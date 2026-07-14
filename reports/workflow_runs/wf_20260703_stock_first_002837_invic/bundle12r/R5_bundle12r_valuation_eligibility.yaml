@@ -1,0 +1,36 @@
+peer_method:
+  eligible: false
+  input_gate_qualified: true
+  qualified_peer_ids: []
+  qualified_peer_count: 0
+  minimum_required: 3
+dcf_method:
+  eligible: false
+  operating_gate_qualified: false
+  qualified_ocf_periods: 3
+  qualified_capex_periods: 2
+  paired_cashflow_periods:
+  - 2024A
+  - 2025A
+  paired_cashflow_period_count: 2
+  cashflow_history_qualified: false
+  working_capital_observation_qualified: false
+  working_capital_bridge_qualified: false
+  tax_rate_qualified: false
+  wacc_qualified: false
+  terminal_growth_qualified: false
+  discount_spread_qualified: false
+  required_inputs_qualified: false
+sotp_method:
+  eligible: false
+  operating_gate_qualified: false
+  component_failures:
+  - room_cooling
+  - cabinet_cooling
+  - data_center_liquid_cooling_related
+  material_segment_count: 3
+fallback_methods:
+- reverse_valuation
+- scenario_valuation
+sample_quality_allowed: false
+p2_allowed: false

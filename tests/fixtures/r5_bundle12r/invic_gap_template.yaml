@@ -1,0 +1,52 @@
+artifact_type: R5_bundle12r_operating_evidence_input
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+issuer:
+  stock_code: 002837.SZ
+  company_name: 英维克
+as_of_date: '2026-07-14'
+fixture_type: gap_template_not_evidence
+segments:
+  - segment_id: broad_data_center_thermal
+    segment_name: 数据中心温控宽口径
+    materiality: material
+    archetype_id: project_count_unit_value_acceptance
+    revenue: {status: missing, unit: CNY_mn, period: 2025A, confidence: 0, source_tier: D, evidence_ids: []}
+    gross_profit: {status: missing, unit: CNY_mn, period: 2025A, confidence: 0, source_tier: D, evidence_ids: []}
+    independent_exposure: {status: missing, unit: exposure_score, period: 2025A, confidence: 0, source_tier: D, evidence_ids: [], quantitative_metric_ids: []}
+    drivers:
+      - {driver_id: project_count, status: missing, unit: projects_or_MW, period: 2025A, confidence: 0, source_tier: D, evidence_ids: [], financial_mapping: revenue}
+      - {driver_id: unit_value, status: missing, unit: CNY_mn_per_project_or_MW, period: 2025A, confidence: 0, source_tier: D, evidence_ids: [], financial_mapping: revenue}
+      - {driver_id: acceptance_rate, status: missing, unit: ratio, period: 2025A, confidence: 0, source_tier: D, evidence_ids: [], financial_mapping: revenue}
+      - {driver_id: gross_margin, status: missing, unit: ratio, period: 2025A, confidence: 0, source_tier: D, evidence_ids: [], financial_mapping: gross_profit}
+  - segment_id: liquid_cooling_related
+    segment_name: 液冷相关业务
+    materiality: material
+    archetype_id: project_count_unit_value_acceptance
+    revenue: {status: bounded_estimate, lower_bound: 0, upper_bound: 1, methodology: placeholder range only; replace with reviewed evidence, unit: normalized_index, period: 2024A, confidence: 0.50, source_tier: B, evidence_ids: [TODO_MANAGEMENT_COMMENT]}
+    gross_profit: {status: missing, unit: CNY_mn, period: 2025A, confidence: 0, source_tier: D, evidence_ids: []}
+    independent_exposure: {status: missing, unit: exposure_score, period: 2025A, confidence: 0, source_tier: D, evidence_ids: [], quantitative_metric_ids: []}
+    drivers:
+      - {driver_id: project_count, status: missing, unit: projects_or_MW, period: 2025A, confidence: 0, source_tier: D, evidence_ids: [], financial_mapping: revenue}
+      - {driver_id: unit_value, status: missing, unit: CNY_mn_per_project_or_MW, period: 2025A, confidence: 0, source_tier: D, evidence_ids: [], financial_mapping: revenue}
+      - {driver_id: acceptance_rate, status: missing, unit: ratio, period: 2025A, confidence: 0, source_tier: D, evidence_ids: [], financial_mapping: revenue}
+      - {driver_id: gross_margin, status: missing, unit: ratio, period: 2025A, confidence: 0, source_tier: D, evidence_ids: [], financial_mapping: gross_profit}
+overlaps:
+  - {left_segment_id: broad_data_center_thermal, right_segment_id: liquid_cooling_related, relation: unknown, allocation_method: ''}
+financial_totals:
+  revenue: {status: missing, unit: CNY_mn, period: 2025A, confidence: 0, source_tier: D, evidence_ids: []}
+  gross_profit: {status: missing, unit: CNY_mn, period: 2025A, confidence: 0, source_tier: D, evidence_ids: []}
+  operating_cash_flow_history: []
+  capex_history: []
+  working_capital_bridge: {status: missing, unit: CNY_mn, period: 2025A, confidence: 0, source_tier: D, evidence_ids: []}
+valuation_inputs:
+  peers:
+    - {peer_id: 300499.SZ, business_definition_match: false, period_match: true, metric_definition_match: false, confidence: 0.50, source_tier: B, operating_metric_evidence_ids: []}
+    - {peer_id: 300602.SZ, business_definition_match: false, period_match: true, metric_definition_match: false, confidence: 0.50, source_tier: B, operating_metric_evidence_ids: []}
+    - {peer_id: 300731.SZ, business_definition_match: false, period_match: true, metric_definition_match: false, confidence: 0.50, source_tier: B, operating_metric_evidence_ids: []}
+  dcf:
+    tax_rate: {status: missing, unit: ratio, period: 2025A, confidence: 0, source_tier: D, evidence_ids: []}
+    wacc: {status: missing, unit: ratio, period: 2026E, confidence: 0, source_tier: D, evidence_ids: []}
+    terminal_growth: {status: missing, unit: ratio, period: terminal, confidence: 0, source_tier: D, evidence_ids: []}
+  sotp:
+    components: []

@@ -1,0 +1,91 @@
+artifact_type: R5_bundle12r_evidence_review_ledger
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-15'
+review_owner_skill: evidence-ingest
+review_status: completed_with_material_gaps
+claim_boundary:
+  official_filing_values: fact
+  investor_relations_statements: management_comment
+  computed_values: estimate
+  unsupported_items: missing
+reviewed_sources:
+  - evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    source_tier: A
+    review_status: reviewed
+    source_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+    accepted_uses:
+      - total_revenue_and_cost_2025A
+      - room_cooling_revenue_cost_and_share_2025A
+      - cabinet_cooling_revenue_cost_and_share_2025A
+      - company_sales_volume_2025A_context_only
+      - operating_cash_flow_2023A_to_2025A
+      - capex_2024A_to_2025A
+    rejected_promotions:
+      - company_sales_volume_as_room_or_cabinet_segment_volume
+      - company_blended_price_as_segment_unit_price
+      - room_or_cabinet_wide_line_as_liquid_cooling_financials
+  - evidence_id: ev_interim_report_002837_20250819_47054e
+    source_tier: A
+    review_status: reviewed
+    source_path: data/processed/text/002837/cninfo_2025_interim_report_full_002837_2025-08-19.txt
+    accepted_uses:
+      - liquid_cooling_related_revenue_exceeded_CNY_200_mn_in_2025H1_as_context
+    rejected_promotions:
+      - one_sided_greater_than_statement_as_closed_numeric_range
+      - liquid_cooling_gross_profit_or_margin
+  - evidence_id: ev_official_disclosure_002837_20250423_e78396
+    source_tier: B
+    review_status: reviewed
+    source_path: data/processed/text/ev_official_disclosure_002837_20250423_e78396.md
+    claim_type: management_comment
+    accepted_uses:
+      - bounded_2024A_liquid_cooling_related_revenue
+      - bounded_cumulative_liquid_cooling_delivery_to_2025_03
+    rejected_promotions:
+      - audited_segment_revenue
+      - liquid_cooling_project_count
+      - liquid_cooling_unit_value
+      - liquid_cooling_acceptance_rate
+      - liquid_cooling_gross_margin
+  - evidence_id: ev_company_ir_product_002837_20260713_a9952c
+    source_tier: C
+    review_status: draft_snapshot_reviewed_for_gap_search_only
+    source_path: data/processed/normalized/cninfo_irm_adapter_irm_interaction_002837_2026-07-13_a9952c30.csv
+    finding: 未发现可关闭液冷独立量价、毛利、验收率、重叠消除或营运资金桥的量化披露。
+    accepted_uses: []
+  - evidence_id: ev_official_disclosure_002837_20260713_9dae3a
+    source_tier: A
+    review_status: draft_snapshot_reviewed_for_gap_search_only
+    source_path: data/processed/normalized/exchange_fallback_adapter_announcement_official_002837_2026-07-13_9dae3a4c.csv
+    finding: 截至快照日未发现可关闭上述经营证据缺口的新正式文件。
+    accepted_uses: []
+material_gaps:
+  - gap_id: R5B12R-EVIDENCE-SEGMENT-VOLUME
+    status: missing
+    owner_skill: evidence-ingest
+    severity: high
+    next_step: 等待发行人同口径机房、机柜或液冷交付单元披露。
+  - gap_id: R5B12R-EVIDENCE-UNIT-VALUE
+    status: missing
+    owner_skill: evidence-ingest
+    severity: high
+    next_step: 取得单项目、单机柜或单MW价值及期间口径。
+  - gap_id: R5B12R-EVIDENCE-ACCEPTANCE
+    status: missing
+    owner_skill: evidence-ingest
+    severity: high
+    next_step: 取得交付至验收的量化转换率或同口径历史桥。
+  - gap_id: R5B12R-EVIDENCE-LIQUID-GM
+    status: missing
+    owner_skill: evidence-ingest
+    severity: high
+    next_step: 取得液冷独立毛利率或可复算毛利区间。
+  - gap_id: R5B12R-EVIDENCE-OVERLAP
+    status: missing
+    owner_skill: stock-deep-dive
+    severity: high
+    next_step: 取得液冷与机房、机柜宽口径之间的收入及毛利扣减。
+source_exhaustion_conclusion: 截至2026-07-13已归档的官方来源不足以关闭RP-12R-OE；缺口保留为missing，不以行业平均或公司级代理填补。
+sample_quality_allowed: false
+p2_allowed: false

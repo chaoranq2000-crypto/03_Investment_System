@@ -303,3 +303,15 @@ Stage A is locally complete. Handoff 17 authorizes the evidence layer to proceed
 | Generation-lock validation | pass | 25/25 locked artifacts exist and match their recorded hashes; locked Reader-generation artifacts remain unchanged. |
 | Workflow sync | done | Human-review TODO closed; Bundle 11R status is `accepted_with_todos`; remaining evidence, metric, exposure, peer, DCF and SOTP TODOs remain visible. |
 | Boundary | preserved | sample-quality=false; P2=false; no direct investment advice introduced. |
+
+## 2026-07-15 Bundle 12R operating-evidence qualification
+
+- 在隔离分支 `codex/r5-bundle12r-operating-evidence` 应用 `R5_BUNDLE_12R_OPERATING_EVIDENCE_QUALIFICATION_PATCH_2026-07-14.zip`，包 SHA256=`1429f3b11f9891f5be974e1c91af4990877a0684feeded6f07f679d57dd2ff4`。
+- 补丁安装原始验证通过：17项聚焦测试、正反fixture、两套generation lock与`git diff --check`均通过；独立复核修复后Bundle 12R聚焦回归扩展为30项并全部通过；最终全量回归为754 passed、2 skipped、28.91s。
+- `evidence-ingest` 审阅2025年报、2025半年报、2025-001投资者关系记录及截至2026-07-13的官方快照；公司级销量未替代分部销量，IR数值保留为 `management_comment / bounded_estimate`。
+- 真实严格门禁返回exit=2，decision=`needs_backflow`；2024A液冷管理层口径未与2025A总量混算，收入覆盖89.42%、毛利覆盖89.70%、关键驱动覆盖10.00%，14个high blocker、3个medium方法资格问题。
+- `stock-deep-dive` 确认液冷与机房/机柜宽口径的收入和毛利扣减均未披露；`company-valuation` 确认peer、DCF、SOTP均不具资格。
+- 三个backflow分别路由并复核；现有来源不足以修复，状态固化为 `closed_until_new_official_evidence`。LF稳定化后第二次运行generation ID仍为`op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27`，锁SHA256不变且校验通过。
+- 条件阶段4未触发：未重算模型、未生成新Reader、未创建新人工审核状态；Bundle 11R精确哈希人审保持不变。
+- 独立子agent完成实现、负向变异、真实锁、状态面和旧Reader边界复核：0 blocker、0 advisory；建议功能分支远端CI通过后合并main。
+- `sample_quality_allowed=false`；`p2_allowed=false`；无投资指令。

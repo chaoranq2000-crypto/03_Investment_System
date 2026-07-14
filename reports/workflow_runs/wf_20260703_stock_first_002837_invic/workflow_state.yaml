@@ -3,7 +3,7 @@ workflow_type: stock_first_closed_loop
 status: accepted_with_todos
 quality_target: R5_bundle11r_reader_human_review_passed
 created_at: 2026-07-03
-updated_at: '2026-07-14'
+updated_at: '2026-07-15'
 owner: mixed
 active_segment_id: ai_server_liquid_cooling
 active_company_id: cn_002837_invic
@@ -84,11 +84,16 @@ completed_stages:
 - R5_bundle11r_8_automated_close
 - R5_bundle11r_9_exact_hash_human_review
 - R5_bundle11r_10_final_close
+- R5_bundle12r_0_patch_install
+- R5_bundle12r_1_official_operating_evidence
+- R5_bundle12r_2_overlap_exposure_gate
+- R5_bundle12r_3_valuation_eligibility_gate
+- R5_bundle12r_backflow_close
 next_stage: null
 active_skill: null
 required_next_skill: null
-forward_requalification_current_stage: R5_bundle11r_8_automated_close
-forward_requalification_next_stage: null
+forward_requalification_current_stage: R5_bundle12r_backflow_close
+forward_requalification_next_stage: T1_on_new_official_evidence
 evidence_snapshot:
   manifest_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle8r_evidence_manifest_delta.csv
   evidence_count: 40
@@ -1717,3 +1722,42 @@ bundle11r_final_close:
   sample_quality_allowed: false
   p2_allowed: false
 bundle11r_candidate_reader_status: accepted_exact_hash_human_review
+bundle12r_close:
+  decision: needs_backflow
+  status: closed_until_new_official_evidence
+  closed_at: '2026-07-15'
+  package_name: R5_BUNDLE_12R_OPERATING_EVIDENCE_QUALIFICATION_PATCH_2026-07-14.zip
+  package_sha256: 1429f3b11f9891f5be974e1c91af4990877a0684feeded6f07f679d57dd2ff4
+  generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+  generation_lock_sha256: ebf32dad2205641a36787456f5459a675757c2c48865e705868161a0786e985c
+  generation_lock_validation: pass
+  deterministic_rerun: true
+  focused_regression_passed: 30
+  full_regression_status: pass
+  full_regression_passed: 754
+  full_regression_skipped: 2
+  full_regression_duration_seconds: 28.91
+  independent_subagent_review:
+    status: pass
+    reviewer_task: /root/bundle12r_independent_review
+    blocker_count: 0
+    advisory_count: 0
+    artifact: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle12r/R5_bundle12r_independent_subagent_review.md
+    publish_recommendation: feature_branch_then_main_after_remote_ci
+  blocker_count: 14
+  issue_count: 17
+  revenue_coverage_ratio: 0.8942182
+  gross_profit_coverage_ratio: 0.89698149
+  essential_driver_coverage_ratio: 0.10
+  peer_method_eligible: false
+  dcf_method_eligible: false
+  sotp_method_eligible: false
+  backflow_resolution: closed_until_new_official_evidence
+  next_trigger: reviewed_new_official_operating_evidence
+  model_regenerated: false
+  reader_regenerated: false
+  human_review_status: not_triggered_no_new_reader
+  preserves_bundle11r_exact_hash_review: true
+  sample_quality_allowed: false
+  p2_allowed: false
+bundle12r_candidate_reader_status: not_generated_operating_gate_blocked

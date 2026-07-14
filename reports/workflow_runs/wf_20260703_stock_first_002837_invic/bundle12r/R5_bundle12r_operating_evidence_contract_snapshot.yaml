@@ -1,0 +1,146 @@
+artifact_type: R5_bundle12r_operating_evidence_contract
+schema_version: 1
+local_gate_id: RP-12R-OE
+source_tiers:
+  A:
+    description: audited filing, exchange disclosure, regulator or primary issuer evidence
+    eligible_for_confirmed: true
+    eligible_for_bounded_estimate: true
+  B:
+    description: attributable issuer IR or high-quality independent source with locators
+    eligible_for_confirmed: true
+    eligible_for_bounded_estimate: true
+  C:
+    description: secondary summary, unattributed aggregation or narrative-only source
+    eligible_for_confirmed: false
+    eligible_for_bounded_estimate: true
+  D:
+    description: unsupported narrative or unknown source
+    eligible_for_confirmed: false
+    eligible_for_bounded_estimate: false
+thresholds:
+  confirmed_min_confidence: 0.70
+  bounded_estimate_min_confidence: 0.50
+  revenue_coverage_min: 0.80
+  gross_profit_coverage_min: 0.70
+  essential_driver_coverage_min: 0.80
+  max_residual_share: 0.20
+  max_overcoverage_share: 0.02
+  min_comparable_peers: 3
+  peer_min_confidence: 0.70
+  min_cashflow_periods: 3
+archetypes:
+  volume_price_mix:
+    description: product or commodity business driven by volume, unit price and mix
+    essential_drivers:
+      - driver_id: volume
+        question: What qualified volume was produced or sold by {segment_name}, in what period and unit?
+        target_source_types: [audited_financial_note, issuer_operating_data, exchange_disclosure]
+      - driver_id: unit_price
+        question: What realized or bounded unit price applies to {segment_name}, and how is it reconciled to revenue?
+        target_source_types: [audited_financial_note, issuer_ir, industry_price_source]
+      - driver_id: product_mix
+        question: What product mix changes the unit economics of {segment_name}?
+        target_source_types: [issuer_product_note, issuer_ir, customer_certification]
+  capacity_utilization_unit_revenue:
+    description: manufacturing or infrastructure asset with capacity and utilization
+    essential_drivers:
+      - driver_id: effective_capacity
+        question: What effective production or service capacity is available for {segment_name}?
+        target_source_types: [audited_financial_note, project_announcement, issuer_capacity_table]
+      - driver_id: utilization
+        question: What qualified utilization or load factor applies to {segment_name}?
+        target_source_types: [issuer_operating_data, audited_financial_note, regulator_data]
+      - driver_id: unit_revenue
+        question: What revenue per effective capacity unit applies to {segment_name}?
+        target_source_types: [issuer_ir, audited_financial_note, contract_disclosure]
+      - driver_id: product_mix
+        question: What mix or technology generation changes the economics of {segment_name}?
+        target_source_types: [issuer_product_note, customer_certification, industry_standard]
+  backlog_conversion_recognition:
+    description: project or service platform driven by backlog and stage conversion
+    essential_drivers:
+      - driver_id: backlog
+        question: What qualified backlog or in-hand order value exists for {segment_name}?
+        target_source_types: [audited_financial_note, issuer_order_disclosure, contract_liability_note]
+      - driver_id: conversion_rate
+        question: What observed or bounded conversion rate moves backlog into delivered work for {segment_name}?
+        target_source_types: [issuer_ir, historical_financial_bridge, project_pipeline]
+      - driver_id: recognition_timing
+        question: What accounting or acceptance timing governs revenue recognition for {segment_name}?
+        target_source_types: [accounting_policy_note, contract_terms, issuer_ir]
+      - driver_id: stage_mix
+        question: What project-stage mix changes margin and conversion for {segment_name}?
+        target_source_types: [pipeline_table, issuer_ir, audited_financial_note]
+  project_count_unit_value_acceptance:
+    description: equipment or engineering business driven by project count, value and acceptance
+    essential_drivers:
+      - driver_id: project_count
+        question: How many qualified projects, cabinets, MW or delivery units belong to {segment_name}?
+        target_source_types: [issuer_project_list, exchange_disclosure, customer_acceptance]
+      - driver_id: unit_value
+        question: What bounded or confirmed value per project, cabinet, MW or delivery unit applies to {segment_name}?
+        target_source_types: [contract_disclosure, issuer_ir, tender_result]
+      - driver_id: acceptance_rate
+        question: What delivery-to-acceptance conversion rate governs {segment_name} revenue recognition?
+        target_source_types: [customer_acceptance, accounting_policy_note, issuer_ir]
+      - driver_id: gross_margin
+        question: What independent gross-margin evidence or bounded range applies to {segment_name}?
+        target_source_types: [audited_segment_note, issuer_ir, comparable_contract]
+  commodity_volume_recovery_unit_cost:
+    description: mining or resource business driven by price, volume, recovery and unit cost
+    essential_drivers:
+      - driver_id: commodity_price
+        question: What realized or reference commodity price applies to {segment_name}?
+        target_source_types: [issuer_sales_note, exchange_price, audited_financial_note]
+      - driver_id: production_volume
+        question: What qualified production or sales volume applies to {segment_name}?
+        target_source_types: [issuer_operating_data, audited_financial_note, regulator_filing]
+      - driver_id: recovery_or_yield
+        question: What recovery rate, grade or yield governs output for {segment_name}?
+        target_source_types: [technical_report, issuer_operating_data, reserve_report]
+      - driver_id: unit_cost
+        question: What cash cost or all-in unit cost applies to {segment_name}?
+        target_source_types: [audited_financial_note, issuer_cost_table, technical_report]
+  idc_capacity_utilization_unit_revenue_power_cost:
+    description: IDC or compute infrastructure driven by capacity, utilization, unit revenue and power cost
+    essential_drivers:
+      - driver_id: commissioned_capacity
+        question: What commissioned and billable capacity exists for {segment_name}?
+        target_source_types: [issuer_capacity_table, project_announcement, audited_financial_note]
+      - driver_id: utilization
+        question: What utilization or occupancy applies to {segment_name}?
+        target_source_types: [issuer_operating_data, issuer_ir, customer_contract]
+      - driver_id: unit_revenue
+        question: What revenue per cabinet, rack or MW applies to {segment_name}?
+        target_source_types: [contract_disclosure, issuer_ir, audited_financial_note]
+      - driver_id: power_cost
+        question: What power price, PUE and pass-through rule determine {segment_name} unit cost?
+        target_source_types: [power_contract, issuer_ir, audited_financial_note]
+  acquisition_consolidation_financing_cost:
+    description: acquisition-driven business requiring close-date, consolidation and financing bridges
+    essential_drivers:
+      - driver_id: close_date
+        question: What legally effective close date controls consolidation for {segment_name}?
+        target_source_types: [exchange_disclosure, regulator_approval, transaction_agreement]
+      - driver_id: consolidation_share
+        question: What ownership and consolidation share applies to {segment_name}?
+        target_source_types: [transaction_agreement, audited_financial_note, exchange_disclosure]
+      - driver_id: acquired_earnings
+        question: What qualified acquired revenue, profit and cash-flow base applies to {segment_name}?
+        target_source_types: [target_audited_financials, valuation_report, exchange_disclosure]
+      - driver_id: financing_cost
+        question: What debt, equity and incremental financing cost supports {segment_name} acquisition economics?
+        target_source_types: [financing_plan, loan_agreement, audited_financial_note]
+  customers_arpu_retention:
+    description: recurring service business driven by customers, ARPU and retention
+    essential_drivers:
+      - driver_id: active_customers
+        question: What qualified active customer count applies to {segment_name}?
+        target_source_types: [issuer_operating_data, audited_financial_note, regulator_data]
+      - driver_id: arpu
+        question: What average revenue per customer applies to {segment_name}?
+        target_source_types: [issuer_operating_data, audited_financial_note, contract_disclosure]
+      - driver_id: retention
+        question: What retention, churn or renewal metric applies to {segment_name}?
+        target_source_types: [issuer_ir, audited_financial_note, customer_cohort_table]

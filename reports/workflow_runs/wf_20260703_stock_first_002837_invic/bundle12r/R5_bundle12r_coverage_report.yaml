@@ -1,0 +1,84 @@
+local_gate_id: RP-12R-OE
+segment_results:
+- segment_id: room_cooling
+  materiality: material
+  archetype_id: volume_price_mix
+  required_driver_count: 3
+  qualified_driver_ids: []
+  unqualified_driver_ids:
+  - volume
+  - unit_price
+  - product_mix
+  independent_exposure_qualified: true
+- segment_id: cabinet_cooling
+  materiality: material
+  archetype_id: volume_price_mix
+  required_driver_count: 3
+  qualified_driver_ids: []
+  unqualified_driver_ids:
+  - volume
+  - unit_price
+  - product_mix
+  independent_exposure_qualified: true
+- segment_id: data_center_liquid_cooling_related
+  materiality: material
+  archetype_id: project_count_unit_value_acceptance
+  required_driver_count: 4
+  qualified_driver_ids:
+  - project_count
+  unqualified_driver_ids:
+  - unit_value
+  - acceptance_rate
+  - gross_margin
+  independent_exposure_qualified: true
+essential_driver_qualified: 1
+essential_driver_total: 10
+essential_driver_coverage_ratio: 0.1
+revenue_coverage:
+  field: revenue
+  total_qualified: true
+  total_reason: qualified confirmed observation
+  total_value: 6067.75909155
+  qualified_segment_count: 2
+  qualified_segment_values:
+    room_cooling: 3448.47749262
+    cabinet_cooling: 1977.42313919
+  overlap_deduction: 0.0
+  attributed_value: 5425.90063181
+  coverage_ratio: 0.8942182
+  residual_share: 0.1057818
+  overcoverage_share: 0.0
+  unresolved_overlap_pairs:
+  - room_cooling/data_center_liquid_cooling_related
+  - cabinet_cooling/data_center_liquid_cooling_related
+  incompatible_observations: []
+gross_profit_coverage:
+  field: gross_profit
+  total_qualified: true
+  total_reason: qualified confirmed observation
+  total_value: 1690.63331057
+  qualified_segment_count: 2
+  qualified_segment_values:
+    room_cooling: 977.82726653
+    cabinet_cooling: 538.63952594
+  overlap_deduction: 0.0
+  attributed_value: 1516.46679247
+  coverage_ratio: 0.89698149
+  residual_share: 0.10301851
+  overcoverage_share: 0.0
+  unresolved_overlap_pairs:
+  - room_cooling/data_center_liquid_cooling_related
+  - cabinet_cooling/data_center_liquid_cooling_related
+  incompatible_observations: []
+thresholds:
+  revenue_coverage_min: 0.8
+  gross_profit_coverage_min: 0.7
+  essential_driver_coverage_min: 0.8
+  max_residual_share: 0.2
+  max_overcoverage_share: 0.02
+blocking_issue_codes:
+- ESSENTIAL_DRIVER_NOT_QUALIFIED
+- ESSENTIAL_DRIVER_COVERAGE_BELOW_THRESHOLD
+- FINANCIAL_OVERLAP_ADJUSTMENT_MISSING
+operating_gate_passed: false
+input_gate_passed: true

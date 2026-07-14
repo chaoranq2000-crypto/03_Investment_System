@@ -349,3 +349,12 @@ Before closing a run, confirm:
 
 Before forecasting, assign each material business line an economic archetype from `config/economic_archetype_registry.yaml`. A company may use several archetypes. Each thesis-critical assumption must carry source, unit, period, scenario, confidence, overlap treatment, and financial-statement mapping. A broad revenue-growth proxy is allowed only when labelled, bounded, and below the configured company-level proxy-share ceiling.
 <!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+
+<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+## Bundle 12R operating-evidence profile
+
+For material segment modeling, read `references/operating_evidence_profile.md`.
+Bind every material segment to a registered archetype, reconcile overlaps and
+residuals, and run `scripts/run_r5_bundle12r_operating_evidence_gate.py` before
+claiming independent segment economics or handing valuation inputs downstream.
+<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->

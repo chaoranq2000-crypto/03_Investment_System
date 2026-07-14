@@ -1,0 +1,279 @@
+artifact_type: R5_bundle12r_research_question_plan
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+issuer:
+  stock_code: 002837.SZ
+  company_name: 英维克
+question_count: 13
+questions:
+- question_id: OEQ-001
+  segment_id: room_cooling
+  driver_id: volume
+  priority: high
+  question: What qualified volume was produced or sold by 机房温控节能产品, in what period and unit?
+  target_source_types:
+  - audited_financial_note
+  - issuer_operating_data
+  - exchange_disclosure
+  owner_skill: evidence-ingest
+  target_stage: T1
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- question_id: OEQ-002
+  segment_id: room_cooling
+  driver_id: unit_price
+  priority: high
+  question: What realized or bounded unit price applies to 机房温控节能产品, and how is it reconciled to revenue?
+  target_source_types:
+  - audited_financial_note
+  - issuer_ir
+  - industry_price_source
+  owner_skill: evidence-ingest
+  target_stage: T1
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- question_id: OEQ-003
+  segment_id: room_cooling
+  driver_id: product_mix
+  priority: high
+  question: What product mix changes the unit economics of 机房温控节能产品?
+  target_source_types:
+  - issuer_product_note
+  - issuer_ir
+  - customer_certification
+  owner_skill: evidence-ingest
+  target_stage: T1
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- question_id: OEQ-004
+  segment_id: cabinet_cooling
+  driver_id: volume
+  priority: high
+  question: What qualified volume was produced or sold by 机柜温控节能产品, in what period and unit?
+  target_source_types:
+  - audited_financial_note
+  - issuer_operating_data
+  - exchange_disclosure
+  owner_skill: evidence-ingest
+  target_stage: T1
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- question_id: OEQ-005
+  segment_id: cabinet_cooling
+  driver_id: unit_price
+  priority: high
+  question: What realized or bounded unit price applies to 机柜温控节能产品, and how is it reconciled to revenue?
+  target_source_types:
+  - audited_financial_note
+  - issuer_ir
+  - industry_price_source
+  owner_skill: evidence-ingest
+  target_stage: T1
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- question_id: OEQ-006
+  segment_id: cabinet_cooling
+  driver_id: product_mix
+  priority: high
+  question: What product mix changes the unit economics of 机柜温控节能产品?
+  target_source_types:
+  - issuer_product_note
+  - issuer_ir
+  - customer_certification
+  owner_skill: evidence-ingest
+  target_stage: T1
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- question_id: OEQ-007
+  segment_id: data_center_liquid_cooling_related
+  driver_id: unit_value
+  priority: high
+  question: What bounded or confirmed value per project, cabinet, MW or delivery unit applies to 数据中心机房及算力设备液冷技术相关业务?
+  target_source_types:
+  - contract_disclosure
+  - issuer_ir
+  - tender_result
+  owner_skill: evidence-ingest
+  target_stage: T1
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- question_id: OEQ-008
+  segment_id: data_center_liquid_cooling_related
+  driver_id: acceptance_rate
+  priority: high
+  question: What delivery-to-acceptance conversion rate governs 数据中心机房及算力设备液冷技术相关业务 revenue recognition?
+  target_source_types:
+  - customer_acceptance
+  - accounting_policy_note
+  - issuer_ir
+  owner_skill: evidence-ingest
+  target_stage: T1
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- question_id: OEQ-009
+  segment_id: data_center_liquid_cooling_related
+  driver_id: gross_margin
+  priority: high
+  question: What independent gross-margin evidence or bounded range applies to 数据中心机房及算力设备液冷技术相关业务?
+  target_source_types:
+  - audited_segment_note
+  - issuer_ir
+  - comparable_contract
+  owner_skill: evidence-ingest
+  target_stage: T1
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- question_id: OEQ-010
+  segment_id: ''
+  driver_id: overlap_reconciliation
+  priority: high
+  question: Determine whether the affected business definitions are disjoint, contained or overlapping; document a numeric
+    allocation or deduction rule.
+  target_source_types:
+  - issuer_segment_note
+  - issuer_ir
+  - audited_financial_note
+  owner_skill: stock-deep-dive
+  target_stage: T2
+  acceptance:
+    allowed_relations:
+    - disjoint
+    - contains
+    - overlaps
+    must_include:
+    - allocation_method
+    - evidence_ids
+- question_id: OEQ-011
+  segment_id: ''
+  driver_id: overlap_reconciliation
+  priority: high
+  question: Determine whether the affected business definitions are disjoint, contained or overlapping; document a numeric
+    allocation or deduction rule.
+  target_source_types:
+  - issuer_segment_note
+  - issuer_ir
+  - audited_financial_note
+  owner_skill: stock-deep-dive
+  target_stage: T2
+  acceptance:
+    allowed_relations:
+    - disjoint
+    - contains
+    - overlaps
+    must_include:
+    - allocation_method
+    - evidence_ids
+- question_id: OEQ-012
+  segment_id: ''
+  driver_id: overlap_reconciliation
+  priority: high
+  question: Determine whether the affected business definitions are disjoint, contained or overlapping; document a numeric
+    allocation or deduction rule.
+  target_source_types:
+  - issuer_segment_note
+  - issuer_ir
+  - audited_financial_note
+  owner_skill: stock-deep-dive
+  target_stage: T2
+  acceptance:
+    allowed_relations:
+    - disjoint
+    - contains
+    - overlaps
+    must_include:
+    - allocation_method
+    - evidence_ids
+- question_id: OEQ-013
+  segment_id: ''
+  driver_id: overlap_reconciliation
+  priority: high
+  question: Determine whether the affected business definitions are disjoint, contained or overlapping; document a numeric
+    allocation or deduction rule.
+  target_source_types:
+  - issuer_segment_note
+  - issuer_ir
+  - audited_financial_note
+  owner_skill: stock-deep-dive
+  target_stage: T2
+  acceptance:
+    allowed_relations:
+    - disjoint
+    - contains
+    - overlaps
+    must_include:
+    - allocation_method
+    - evidence_ids
+sample_quality_allowed: false
+p2_allowed: false

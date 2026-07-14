@@ -221,3 +221,13 @@ issues_by_severity:
 blocking_issues:
 next_todos:
 ```
+
+<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+## Bundle 12R operating-evidence acquisition
+
+For operating-driver requests, read
+`references/operating_evidence_acquisition_contract.md`. Return observations as
+`confirmed`, `bounded_estimate`, `missing`, or `conflicting`, with period, unit,
+confidence, source tier and evidence IDs; never promote narrative-only evidence
+into a confirmed numeric driver.
+<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->

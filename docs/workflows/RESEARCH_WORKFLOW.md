@@ -432,3 +432,13 @@ This extension preserves the global T0–T10 workflow. Inside stock-deep-dive re
 
 The runtime entrypoint is `scripts/run_r5_bundle11r_runtime.py`. Automation never sets human review, sample quality, or P2 to true.
 <!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+
+<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+### R5 Bundle 12R local operating-evidence profile
+
+For stock workflows that need operating-evidence qualification, use
+`docs/workflows/R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE.md` and local gate
+`RP-12R-OE`. This profile does not add a global `G` gate and does not replace
+the canonical T0–T10 workflow. A failed local gate must preserve Bundle 11R's
+exact-hash review and route issues through the generated backflow plan.
+<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->

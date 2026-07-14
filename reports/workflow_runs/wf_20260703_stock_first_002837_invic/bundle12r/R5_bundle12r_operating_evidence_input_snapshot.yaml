@@ -1,0 +1,270 @@
+artifact_type: R5_bundle12r_operating_evidence_input
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+issuer:
+  stock_code: 002837.SZ
+  company_name: 英维克
+as_of_date: '2026-07-15'
+input_type: reviewed_official_evidence
+segments:
+  - segment_id: room_cooling
+    segment_name: 机房温控节能产品
+    materiality: material
+    archetype_id: volume_price_mix
+    revenue:
+      status: confirmed
+      value: 3448.47749262
+      unit: CNY_mn
+      period: 2025A
+      confidence: 0.95
+      source_tier: A
+      evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+      source_locator: 2025年年度报告全文 lines 497-502
+    gross_profit:
+      status: confirmed
+      value: 977.82726653
+      unit: CNY_mn
+      period: 2025A
+      confidence: 0.95
+      source_tier: A
+      evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+      calculation_method: reported_revenue_minus_reported_cost
+      source_locator: 2025年年度报告全文 lines 525-528
+    independent_exposure:
+      status: confirmed
+      value: 0.5683
+      unit: revenue_share
+      period: 2025A
+      confidence: 0.95
+      source_tier: A
+      evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+      quantitative_metric_ids: [metric_company_cn_002837_invic_room_cooling_revenue_share_2025A_12r]
+      source_locator: 2025年年度报告全文 lines 497-502
+    drivers:
+      - driver_id: volume
+        status: missing
+        unit: segment_units
+        period: 2025A
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: revenue
+        notes: 公司仅披露精密温控节能设备公司级销量324058台，不能替代机房温控分部销量。
+      - driver_id: unit_price
+        status: missing
+        unit: CNY_per_segment_unit
+        period: 2025A
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: revenue
+        notes: 公司级混合单价不能作为机房温控已实现单价。
+      - driver_id: product_mix
+        status: missing
+        unit: ratio
+        period: 2025A
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: gross_profit
+        notes: 未披露同口径产品组合量化桥。
+
+  - segment_id: cabinet_cooling
+    segment_name: 机柜温控节能产品
+    materiality: material
+    archetype_id: volume_price_mix
+    revenue:
+      status: confirmed
+      value: 1977.42313919
+      unit: CNY_mn
+      period: 2025A
+      confidence: 0.95
+      source_tier: A
+      evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+      source_locator: 2025年年度报告全文 lines 497-502
+    gross_profit:
+      status: confirmed
+      value: 538.63952594
+      unit: CNY_mn
+      period: 2025A
+      confidence: 0.95
+      source_tier: A
+      evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+      calculation_method: reported_revenue_minus_reported_cost
+      source_locator: 2025年年度报告全文 lines 525-528
+    independent_exposure:
+      status: confirmed
+      value: 0.3259
+      unit: revenue_share
+      period: 2025A
+      confidence: 0.95
+      source_tier: A
+      evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+      quantitative_metric_ids: [metric_company_cn_002837_invic_cabinet_cooling_revenue_share_2025A_12r]
+      source_locator: 2025年年度报告全文 lines 497-502
+    drivers:
+      - driver_id: volume
+        status: missing
+        unit: segment_units
+        period: 2025A
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: revenue
+        notes: 公司级销量不能替代机柜温控分部销量。
+      - driver_id: unit_price
+        status: missing
+        unit: CNY_per_segment_unit
+        period: 2025A
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: revenue
+        notes: 公司级混合单价不能作为机柜温控已实现单价。
+      - driver_id: product_mix
+        status: missing
+        unit: ratio
+        period: 2025A
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: gross_profit
+        notes: 未披露同口径产品组合量化桥。
+
+  - segment_id: data_center_liquid_cooling_related
+    segment_name: 数据中心机房及算力设备液冷技术相关业务
+    materiality: material
+    archetype_id: project_count_unit_value_acceptance
+    revenue:
+      status: missing
+      unit: CNY_mn
+      period: 2025A
+      confidence: 0
+      source_tier: D
+      evidence_ids: []
+      notes: 仅有2024A“约3亿元”管理层口径，不能与2025A总收入及宽产品线收入混算覆盖率；旧期口径仅保留在独立暴露和候选指标中。
+    gross_profit:
+      status: missing
+      unit: CNY_mn
+      period: 2024A
+      confidence: 0
+      source_tier: D
+      evidence_ids: []
+      notes: 未披露液冷独立毛利额或可资格化毛利率区间。
+    independent_exposure:
+      status: bounded_estimate
+      lower_bound: 250
+      upper_bound: 350
+      methodology: 与上述液冷相关营业收入边界相同，仅证明存在独立量化暴露，不代表经审计分部。
+      unit: CNY_mn_revenue
+      period: 2024A
+      confidence: 0.55
+      source_tier: B
+      evidence_ids: [ev_official_disclosure_002837_20250423_e78396]
+      quantitative_metric_ids: [metric_company_cn_002837_invic_liquid_cooling_related_revenue_2024A_12r]
+      claim_type: management_comment
+    drivers:
+      - driver_id: project_count
+        status: bounded_estimate
+        lower_bound: 1200
+        upper_bound: 1200
+        methodology: 发行人称截至2025年3月液冷链条累计交付达1.2GW；按1000MW/GW换算，不等同项目数或2025A单期交付量。
+        unit: MW_cumulative_delivery
+        period: 2025-03
+        confidence: 0.60
+        source_tier: B
+        evidence_ids: [ev_official_disclosure_002837_20250423_e78396]
+        financial_mapping: revenue
+        claim_type: management_comment
+      - driver_id: unit_value
+        status: missing
+        unit: CNY_mn_per_project_or_MW
+        period: 2025A
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: revenue
+        notes: 未披露同口径项目数、单项目或单MW价值。
+      - driver_id: acceptance_rate
+        status: missing
+        unit: ratio
+        period: 2025A
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: revenue
+        notes: 仅有确认依赖客户验收的会计与管理层描述，未披露量化转换率。
+      - driver_id: gross_margin
+        status: missing
+        unit: ratio
+        period: 2025A
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: gross_profit
+        notes: 发行人未单独披露液冷毛利率。
+
+overlaps:
+  - left_segment_id: room_cooling
+    right_segment_id: cabinet_cooling
+    relation: disjoint
+    allocation_method: 年报按产品线分别披露收入与成本。
+  - left_segment_id: room_cooling
+    right_segment_id: data_center_liquid_cooling_related
+    relation: overlaps
+    allocation_method: MISSING_DISCLOSURE；发行人明确液冷相关收入部分计入机房温控宽口径，但未披露可核验扣减。
+    revenue_adjustment: {status: missing, unit: CNY_mn, period: 2024A, confidence: 0, source_tier: D, evidence_ids: []}
+    gross_profit_adjustment: {status: missing, unit: CNY_mn, period: 2024A, confidence: 0, source_tier: D, evidence_ids: []}
+  - left_segment_id: cabinet_cooling
+    right_segment_id: data_center_liquid_cooling_related
+    relation: overlaps
+    allocation_method: MISSING_DISCLOSURE；液冷口径同时覆盖算力设备，未披露与机柜温控宽口径的可核验扣减。
+    revenue_adjustment: {status: missing, unit: CNY_mn, period: 2024A, confidence: 0, source_tier: D, evidence_ids: []}
+    gross_profit_adjustment: {status: missing, unit: CNY_mn, period: 2024A, confidence: 0, source_tier: D, evidence_ids: []}
+
+financial_totals:
+  revenue:
+    status: confirmed
+    value: 6067.75909155
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0.99
+    source_tier: A
+    evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+  gross_profit:
+    status: confirmed
+    value: 1690.63331057
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0.99
+    source_tier: A
+    evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+    calculation_method: reported_revenue_minus_reported_cost
+  operating_cash_flow_history:
+    - {status: confirmed, value: 453.07204034, unit: CNY_mn, period: 2023A, confidence: 0.95, source_tier: A, evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]}
+    - {status: confirmed, value: 199.83501495, unit: CNY_mn, period: 2024A, confidence: 0.95, source_tier: A, evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]}
+    - {status: confirmed, value: 157.27322236, unit: CNY_mn, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]}
+  capex_history:
+    - {status: confirmed, value: 353.30247372, unit: CNY_mn, period: 2024A, confidence: 0.95, source_tier: A, evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]}
+    - {status: confirmed, value: 303.00020771, unit: CNY_mn, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]}
+  working_capital_bridge:
+    status: missing
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+    notes: 公司级应收、存货、合同负债可查，但没有液冷独立营运资金桥。
+
+valuation_inputs:
+  peers:
+    - {peer_id: 300499.SZ, business_definition_match: false, period_match: true, metric_definition_match: false, confidence: 0.50, source_tier: B, operating_metric_evidence_ids: []}
+    - {peer_id: 300602.SZ, business_definition_match: false, period_match: true, metric_definition_match: false, confidence: 0.50, source_tier: B, operating_metric_evidence_ids: []}
+    - {peer_id: 300731.SZ, business_definition_match: false, period_match: true, metric_definition_match: false, confidence: 0.50, source_tier: B, operating_metric_evidence_ids: []}
+    - {peer_id: 301018.SZ, business_definition_match: false, period_match: true, metric_definition_match: false, confidence: 0.50, source_tier: B, operating_metric_evidence_ids: []}
+  dcf:
+    tax_rate: {status: missing, unit: ratio, period: 2025A, confidence: 0, source_tier: D, evidence_ids: []}
+    wacc: {status: missing, unit: ratio, period: 2026E, confidence: 0, source_tier: D, evidence_ids: []}
+    terminal_growth: {status: missing, unit: ratio, period: terminal, confidence: 0, source_tier: D, evidence_ids: []}
+  sotp:
+    components: []

@@ -1,0 +1,29 @@
+artifact_type: R5_bundle12r_generation_lock
+schema_version: 1
+generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+workflow_id: wf_20260703_stock_first_002837_invic
+issuer:
+  stock_code: 002837.SZ
+  company_name: 英维克
+as_of_date: '2026-07-15'
+input_hashes:
+  operating_evidence_input:
+    file: R5_bundle12r_operating_evidence_input_snapshot.yaml
+    sha256: 9de6bc0588d0e27fb43d8071379880dfe02cd4b22218a5991cd11d177a3d203f
+  operating_evidence_contract:
+    file: R5_bundle12r_operating_evidence_contract_snapshot.yaml
+    sha256: 2594c6f89a6925821a84d46ae6307c5fafc0b6ab51c909d40e587b697cfd3b33
+artifact_hashes:
+  R5_bundle12r_backflow_plan.yaml: 8aacce378fc1b4838d9470770b71a82efb0ba614fe2ab3917059904485c5103f
+  R5_bundle12r_operating_evidence_contract_snapshot.yaml: 2594c6f89a6925821a84d46ae6307c5fafc0b6ab51c909d40e587b697cfd3b33
+  R5_bundle12r_coverage_report.yaml: 2a09a7cfc510389aa6029411211f91c63c9556516b7f8b877595d380273b6c95
+  R5_bundle12r_operating_evidence_input_snapshot.yaml: 9de6bc0588d0e27fb43d8071379880dfe02cd4b22218a5991cd11d177a3d203f
+  R5_bundle12r_quality_issues.csv: dc8126ccbae0e51c0bf2ee73ecba40a2266510b5f07702faa4bcf75f6ea7fb7c
+  R5_bundle12r_research_question_plan.yaml: 4260648fa3a9871dcea6031e2cb62af9141a46e4b2fd5709867aa1dd1bec0407
+  R5_bundle12r_readout.md: b80ee3e0775a3f75fc9164ae17ed4c9d38552d23a50d79222fd4ee5af699d352
+  R5_bundle12r_operating_evidence_result.yaml: 6bd9ff2064babdb013eb16b58f8b0b0dba2b89c7a9f2d8dd079ef6fbdf739eec
+  R5_bundle12r_valuation_eligibility.yaml: cf81e62515331b627d277294ceaf56c1fffa842c0476fea614ab6aaa667e4f3b
+decision: needs_backflow
+preserves_bundle11r_exact_hash_review: true
+sample_quality_allowed: false
+p2_allowed: false

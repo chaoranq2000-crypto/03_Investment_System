@@ -1,0 +1,35 @@
+artifact_type: R5_bundle12r_backflow_plan
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+decision: backflow_required
+actions:
+- action_id: BF12R-001
+  target_stage: RP6
+  required_next_skill: company-valuation
+  issue_codes:
+  - DCF_METHOD_NOT_ELIGIBLE
+  - PEER_METHOD_NOT_ELIGIBLE
+  - SOTP_METHOD_NOT_ELIGIBLE
+  target_artifacts:
+  - dcf_eligibility_pack.yaml
+  - peer_operating_evidence_pack.yaml
+  - sotp_eligibility_pack.yaml
+  status: open
+- action_id: BF12R-002
+  target_stage: T1
+  required_next_skill: evidence-ingest
+  issue_codes:
+  - ESSENTIAL_DRIVER_NOT_QUALIFIED
+  target_artifacts:
+  - R5_bundle12r_operating_evidence_input.yaml
+  status: open
+- action_id: BF12R-003
+  target_stage: T2
+  required_next_skill: stock-deep-dive
+  issue_codes:
+  - ESSENTIAL_DRIVER_COVERAGE_BELOW_THRESHOLD
+  - FINANCIAL_OVERLAP_ADJUSTMENT_MISSING
+  target_artifacts: []
+  status: open
+sample_quality_allowed: false
+p2_allowed: false

@@ -1,0 +1,18 @@
+code,severity,message,segment_id,driver_id,target_stage,owner_skill,target_artifact
+ESSENTIAL_DRIVER_COVERAGE_BELOW_THRESHOLD,high,Essential-driver coverage 10.00% is below 80.00%,,,T2,stock-deep-dive,
+ESSENTIAL_DRIVER_NOT_QUALIFIED,high,Material segment cabinet_cooling driver product_mix is not qualified: missing,cabinet_cooling,product_mix,T1,evidence-ingest,R5_bundle12r_operating_evidence_input.yaml
+ESSENTIAL_DRIVER_NOT_QUALIFIED,high,Material segment cabinet_cooling driver unit_price is not qualified: missing,cabinet_cooling,unit_price,T1,evidence-ingest,R5_bundle12r_operating_evidence_input.yaml
+ESSENTIAL_DRIVER_NOT_QUALIFIED,high,Material segment cabinet_cooling driver volume is not qualified: missing,cabinet_cooling,volume,T1,evidence-ingest,R5_bundle12r_operating_evidence_input.yaml
+ESSENTIAL_DRIVER_NOT_QUALIFIED,high,Material segment data_center_liquid_cooling_related driver acceptance_rate is not qualified: missing,data_center_liquid_cooling_related,acceptance_rate,T1,evidence-ingest,R5_bundle12r_operating_evidence_input.yaml
+ESSENTIAL_DRIVER_NOT_QUALIFIED,high,Material segment data_center_liquid_cooling_related driver gross_margin is not qualified: missing,data_center_liquid_cooling_related,gross_margin,T1,evidence-ingest,R5_bundle12r_operating_evidence_input.yaml
+ESSENTIAL_DRIVER_NOT_QUALIFIED,high,Material segment data_center_liquid_cooling_related driver unit_value is not qualified: missing,data_center_liquid_cooling_related,unit_value,T1,evidence-ingest,R5_bundle12r_operating_evidence_input.yaml
+ESSENTIAL_DRIVER_NOT_QUALIFIED,high,Material segment room_cooling driver product_mix is not qualified: missing,room_cooling,product_mix,T1,evidence-ingest,R5_bundle12r_operating_evidence_input.yaml
+ESSENTIAL_DRIVER_NOT_QUALIFIED,high,Material segment room_cooling driver unit_price is not qualified: missing,room_cooling,unit_price,T1,evidence-ingest,R5_bundle12r_operating_evidence_input.yaml
+ESSENTIAL_DRIVER_NOT_QUALIFIED,high,Material segment room_cooling driver volume is not qualified: missing,room_cooling,volume,T1,evidence-ingest,R5_bundle12r_operating_evidence_input.yaml
+FINANCIAL_OVERLAP_ADJUSTMENT_MISSING,high,revenue overlap adjustment missing for room_cooling/data_center_liquid_cooling_related,,,T2,stock-deep-dive,
+FINANCIAL_OVERLAP_ADJUSTMENT_MISSING,high,revenue overlap adjustment missing for cabinet_cooling/data_center_liquid_cooling_related,,,T2,stock-deep-dive,
+FINANCIAL_OVERLAP_ADJUSTMENT_MISSING,high,gross_profit overlap adjustment missing for room_cooling/data_center_liquid_cooling_related,,,T2,stock-deep-dive,
+FINANCIAL_OVERLAP_ADJUSTMENT_MISSING,high,gross_profit overlap adjustment missing for cabinet_cooling/data_center_liquid_cooling_related,,,T2,stock-deep-dive,
+DCF_METHOD_NOT_ELIGIBLE,medium,"DCF requires passed operating coverage, three aligned same-unit OCF/capex periods, a compatible working-capital bridge, tax, WACC and terminal growth",,,RP6,company-valuation,dcf_eligibility_pack.yaml
+PEER_METHOD_NOT_ELIGIBLE,medium,Only 0 qualified peers; 3 required,,,RP6,company-valuation,peer_operating_evidence_pack.yaml
+SOTP_METHOD_NOT_ELIGIBLE,medium,"SOTP requires every material segment to have independent quantitative exposure, qualified financials, a method and resolved overlap; failures=room_cooling,cabinet_cooling,data_center_liquid_cooling_related",,,RP6,company-valuation,sotp_eligibility_pack.yaml

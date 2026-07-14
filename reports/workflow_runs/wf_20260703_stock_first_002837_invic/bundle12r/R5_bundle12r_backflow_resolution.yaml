@@ -1,0 +1,46 @@
+artifact_type: R5_bundle12r_backflow_resolution
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-15'
+gate_generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+gate_decision: needs_backflow
+resolution_status: closed_until_new_official_evidence
+actions:
+  - action_id: BF12R-001
+    owner_skill: company-valuation
+    target_stage: RP6
+    review_result: unresolved_due_missing_inputs
+    method_decisions:
+      peer_method: not_eligible
+      dcf_method: not_eligible
+      sotp_method: not_eligible
+    next_trigger: 至少3家同口径同业，或补齐3期capex、营运资金桥、税率、WACC、终值增长及各重大业务独立财务量与重叠消除。
+  - action_id: BF12R-002
+    owner_skill: evidence-ingest
+    target_stage: T1
+    review_result: reviewed_sources_exhausted_material_gaps_preserved
+    reviewed_through: '2026-07-13'
+    next_trigger: 新的发行人定期报告、交易所披露或带可核验口径的发行人IR材料。
+  - action_id: BF12R-003
+    owner_skill: stock-deep-dive
+    target_stage: T2
+    review_result: unresolved_overlap_and_driver_coverage
+    essential_driver_coverage_ratio: 0.10
+    unresolved_overlap_pairs:
+      - room_cooling/data_center_liquid_cooling_related
+      - cabinet_cooling/data_center_liquid_cooling_related
+    next_trigger: 同口径收入及毛利扣减、分部量价、产品组合和液冷验收率进入已审阅证据。
+rerun:
+  strict_exit_code: 2
+  generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+  deterministic_lock_sha256: ebf32dad2205641a36787456f5459a675757c2c48865e705868161a0786e985c
+  generation_lock_validation: pass
+stage4:
+  model_regeneration: not_authorized
+  reader_regeneration: not_authorized
+  new_reader_created: false
+  human_review_status: not_triggered_no_new_reader
+  reason: decision不是operating_evidence_ready。
+preserves_bundle11r_exact_hash_review: true
+sample_quality_allowed: false
+p2_allowed: false

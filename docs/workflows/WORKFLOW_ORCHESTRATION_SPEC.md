@@ -205,3 +205,12 @@ The orchestrator consumes `r5_bundle11r_backflow_plan` and must set `next_stage`
 
 A passing structure score cannot offset a high/critical research blocker.
 <!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+
+<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+### Bundle 12R issue routing
+
+`RP-12R-OE` routes source/metric gaps to `T1/evidence-ingest`, business-boundary,
+overlap and independent-exposure gaps to `T2/stock-deep-dive`, and peer/DCF/SOTP
+eligibility gaps to `RP6/company-valuation`. The local gate may not set
+`sample_quality_allowed` or `p2_allowed` to true.
+<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->

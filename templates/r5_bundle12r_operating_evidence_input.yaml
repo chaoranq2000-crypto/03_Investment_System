@@ -1,0 +1,108 @@
+artifact_type: R5_bundle12r_operating_evidence_input
+schema_version: 1
+workflow_id: TODO_WORKFLOW_ID
+issuer:
+  stock_code: TODO_STOCK_CODE
+  company_name: TODO_COMPANY_NAME
+as_of_date: TODO_YYYY-MM-DD
+fixture_type: template_not_evidence
+segments:
+  - segment_id: TODO_SEGMENT_ID
+    segment_name: TODO_SEGMENT_NAME
+    materiality: material
+    archetype_id: project_count_unit_value_acceptance
+    revenue:
+      status: missing
+      value: null
+      lower_bound: null
+      upper_bound: null
+      unit: CNY_mn
+      period: TODO_PERIOD
+      confidence: 0
+      source_tier: D
+      evidence_ids: []
+    gross_profit:
+      status: missing
+      value: null
+      lower_bound: null
+      upper_bound: null
+      unit: CNY_mn
+      period: TODO_PERIOD
+      confidence: 0
+      source_tier: D
+      evidence_ids: []
+    independent_exposure:
+      status: missing
+      value: null
+      unit: exposure_score
+      period: TODO_PERIOD
+      confidence: 0
+      source_tier: D
+      evidence_ids: []
+      quantitative_metric_ids: []
+    drivers:
+      - driver_id: project_count
+        status: missing
+        unit: projects
+        period: TODO_PERIOD
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: revenue
+      - driver_id: unit_value
+        status: missing
+        unit: CNY_mn_per_project
+        period: TODO_PERIOD
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: revenue
+      - driver_id: acceptance_rate
+        status: missing
+        unit: ratio
+        period: TODO_PERIOD
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: revenue
+      - driver_id: gross_margin
+        status: missing
+        unit: ratio
+        period: TODO_PERIOD
+        confidence: 0
+        source_tier: D
+        evidence_ids: []
+        financial_mapping: gross_profit
+overlaps: []
+financial_totals:
+  revenue:
+    status: missing
+    unit: CNY_mn
+    period: TODO_PERIOD
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+  gross_profit:
+    status: missing
+    unit: CNY_mn
+    period: TODO_PERIOD
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+  operating_cash_flow_history: []
+  capex_history: []
+  working_capital_bridge:
+    status: missing
+    unit: CNY_mn
+    period: TODO_PERIOD
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+valuation_inputs:
+  peers: []
+  dcf:
+    tax_rate: {status: missing, unit: ratio, period: TODO_PERIOD, confidence: 0, source_tier: D, evidence_ids: []}
+    wacc: {status: missing, unit: ratio, period: TODO_PERIOD, confidence: 0, source_tier: D, evidence_ids: []}
+    terminal_growth: {status: missing, unit: ratio, period: TODO_PERIOD, confidence: 0, source_tier: D, evidence_ids: []}
+  sotp:
+    components: []

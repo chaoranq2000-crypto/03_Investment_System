@@ -213,3 +213,13 @@ This checklist is an operational close check, not a second global gate table.
 
 For a stock research workflow that has reached the post-10R research-depth stage, invoke `scripts/run_r5_bundle11r_runtime.py` with the business-line driver plan, evidence status, peer pack, and semantic payload. Persist its question matrix, driver pack, peer eligibility, semantic scorecard, and backflow plan under the workflow-run directory. Route the next action from `backflow_plan.tasks`; do not replace a failed operating-research gate by asking the Writer to add prose.
 <!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+
+<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+## Bundle 12R operating-evidence orchestration
+
+When operating evidence, overlap reconciliation or valuation-method eligibility
+is in scope, read `references/bundle12r_backflow_profile.md` and
+`docs/workflows/R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE.md`. Run the local gate,
+consume its backflow plan, and do not transfer Bundle 11R human review to a new
+Bundle 12R generation.
+<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->

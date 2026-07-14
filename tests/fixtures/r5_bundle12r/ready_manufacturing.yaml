@@ -1,0 +1,73 @@
+artifact_type: R5_bundle12r_operating_evidence_input
+schema_version: 1
+workflow_id: wf_fixture_bundle12r_ready
+issuer:
+  stock_code: 000001.SZ
+  company_name: 合成高端制造公司
+as_of_date: '2026-07-14'
+fixture_type: synthetic_regression_only
+segments:
+  - segment_id: high_end_material
+    segment_name: 高端材料
+    materiality: material
+    archetype_id: capacity_utilization_unit_revenue
+    revenue: {status: confirmed, value: 600, unit: CNY_mn, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [E1]}
+    gross_profit: {status: confirmed, value: 150, unit: CNY_mn, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [E2]}
+    independent_exposure: {status: confirmed, value: 1, unit: exposure_score, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [E3], quantitative_metric_ids: [M1]}
+    drivers:
+      - {driver_id: effective_capacity, status: confirmed, value: 10, unit: kt, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [E4], financial_mapping: revenue}
+      - {driver_id: utilization, status: confirmed, value: 0.9, unit: ratio, period: 2025A, confidence: 0.90, source_tier: A, evidence_ids: [E5], financial_mapping: revenue}
+      - {driver_id: unit_revenue, status: confirmed, value: 66.67, unit: CNY_mn_per_kt, period: 2025A, confidence: 0.90, source_tier: B, evidence_ids: [E6], financial_mapping: revenue}
+      - {driver_id: product_mix, status: bounded_estimate, lower_bound: 0.35, upper_bound: 0.45, methodology: audited product mix bridge, unit: ratio, period: 2025A, confidence: 0.75, source_tier: B, evidence_ids: [E7], financial_mapping: gross_profit}
+  - segment_id: battery_material
+    segment_name: 电池材料
+    materiality: material
+    archetype_id: capacity_utilization_unit_revenue
+    revenue: {status: confirmed, value: 300, unit: CNY_mn, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [E8]}
+    gross_profit: {status: confirmed, value: 30, unit: CNY_mn, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [E9]}
+    independent_exposure: {status: confirmed, value: 1, unit: exposure_score, period: 2025A, confidence: 0.90, source_tier: A, evidence_ids: [E10], quantitative_metric_ids: [M2]}
+    drivers:
+      - {driver_id: effective_capacity, status: confirmed, value: 8, unit: kt, period: 2025A, confidence: 0.90, source_tier: A, evidence_ids: [E11], financial_mapping: revenue}
+      - {driver_id: utilization, status: confirmed, value: 0.75, unit: ratio, period: 2025A, confidence: 0.85, source_tier: B, evidence_ids: [E12], financial_mapping: revenue}
+      - {driver_id: unit_revenue, status: confirmed, value: 50, unit: CNY_mn_per_kt, period: 2025A, confidence: 0.85, source_tier: B, evidence_ids: [E13], financial_mapping: revenue}
+      - {driver_id: product_mix, status: confirmed, value: 0.25, unit: ratio, period: 2025A, confidence: 0.80, source_tier: B, evidence_ids: [E14], financial_mapping: gross_profit}
+  - segment_id: other
+    segment_name: 其他
+    materiality: non_material
+    archetype_id: volume_price_mix
+    revenue: {status: confirmed, value: 100, unit: CNY_mn, period: 2025A, confidence: 0.90, source_tier: A, evidence_ids: [E15]}
+    gross_profit: {status: confirmed, value: 20, unit: CNY_mn, period: 2025A, confidence: 0.90, source_tier: A, evidence_ids: [E16]}
+    independent_exposure: {status: confirmed, value: 1, unit: exposure_score, period: 2025A, confidence: 0.80, source_tier: B, evidence_ids: [E17], quantitative_metric_ids: [M3]}
+    drivers:
+      - {driver_id: volume, status: confirmed, value: 1, unit: index, period: 2025A, confidence: 0.80, source_tier: B, evidence_ids: [E18], financial_mapping: revenue}
+      - {driver_id: unit_price, status: confirmed, value: 1, unit: index, period: 2025A, confidence: 0.80, source_tier: B, evidence_ids: [E19], financial_mapping: revenue}
+      - {driver_id: product_mix, status: confirmed, value: 1, unit: index, period: 2025A, confidence: 0.80, source_tier: B, evidence_ids: [E20], financial_mapping: gross_profit}
+overlaps:
+  - {left_segment_id: high_end_material, right_segment_id: battery_material, relation: disjoint, allocation_method: none}
+  - {left_segment_id: high_end_material, right_segment_id: other, relation: disjoint, allocation_method: none}
+  - {left_segment_id: battery_material, right_segment_id: other, relation: disjoint, allocation_method: none}
+financial_totals:
+  revenue: {status: confirmed, value: 1000, unit: CNY_mn, period: 2025A, confidence: 0.99, source_tier: A, evidence_ids: [E21]}
+  gross_profit: {status: confirmed, value: 200, unit: CNY_mn, period: 2025A, confidence: 0.99, source_tier: A, evidence_ids: [E22]}
+  operating_cash_flow_history:
+    - {status: confirmed, value: 100, unit: CNY_mn, period: 2023A, confidence: 0.95, source_tier: A, evidence_ids: [E23]}
+    - {status: confirmed, value: 120, unit: CNY_mn, period: 2024A, confidence: 0.95, source_tier: A, evidence_ids: [E24]}
+    - {status: confirmed, value: 150, unit: CNY_mn, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [E25]}
+  capex_history:
+    - {status: confirmed, value: 60, unit: CNY_mn, period: 2023A, confidence: 0.95, source_tier: A, evidence_ids: [E26]}
+    - {status: confirmed, value: 70, unit: CNY_mn, period: 2024A, confidence: 0.95, source_tier: A, evidence_ids: [E27]}
+    - {status: confirmed, value: 80, unit: CNY_mn, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [E28]}
+  working_capital_bridge: {status: confirmed, value: 20, unit: CNY_mn, period: 2025A, confidence: 0.90, source_tier: A, evidence_ids: [E29]}
+valuation_inputs:
+  peers:
+    - {peer_id: P1, business_definition_match: true, period_match: true, metric_definition_match: true, confidence: 0.90, source_tier: A, operating_metric_evidence_ids: [PE1]}
+    - {peer_id: P2, business_definition_match: true, period_match: true, metric_definition_match: true, confidence: 0.85, source_tier: A, operating_metric_evidence_ids: [PE2]}
+    - {peer_id: P3, business_definition_match: true, period_match: true, metric_definition_match: true, confidence: 0.80, source_tier: B, operating_metric_evidence_ids: [PE3]}
+  dcf:
+    tax_rate: {status: confirmed, value: 0.20, unit: ratio, period: 2025A, confidence: 0.90, source_tier: A, evidence_ids: [D1]}
+    wacc: {status: bounded_estimate, lower_bound: 0.08, upper_bound: 0.10, methodology: market inputs and capital structure, unit: ratio, period: 2026E, confidence: 0.75, source_tier: B, evidence_ids: [D2]}
+    terminal_growth: {status: bounded_estimate, lower_bound: 0.01, upper_bound: 0.03, methodology: nominal long-run range, unit: ratio, period: terminal, confidence: 0.70, source_tier: B, evidence_ids: [D3]}
+  sotp:
+    components:
+      - {segment_id: high_end_material, method: peer_multiple, overlap_resolved: true}
+      - {segment_id: battery_material, method: scenario_multiple, overlap_resolved: true}

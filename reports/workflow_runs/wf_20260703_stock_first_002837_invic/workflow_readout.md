@@ -34,3 +34,20 @@
 ## 发布边界
 
 用户已授权将本轮变更提交并推送到当前分支 `codex/r5-bundle10r-reader-rebuild`；未授权合并。
+
+## Bundle 12R operating-evidence qualification close
+
+| Step | Status | Notes |
+|---|---|---|
+| Patch installation | pass | 15 new paths, 6 integration markers, focused fixtures and locks passed. |
+| Official operating evidence | completed_with_gaps | Reviewed annual/interim reports, official IR record and latest archived official snapshots; unsupported fields remain `missing`. |
+| Operating gate | needs_backflow | Revenue 89.42%; gross profit 89.70%; essential drivers 10.00%; 14 high blockers. |
+| Overlap reconciliation | blocked | Liquid-cooling related revenue overlaps room/cabinet wide lines without numeric revenue or gross-profit deductions. |
+| Valuation eligibility | all_disabled | 0 qualified peers; DCF inputs incomplete; all SOTP material components fail. |
+| Focused regression | pass | 30 Bundle 12R tests, including independent-review negative mutations. |
+| Full regression | pass | 754 passed, 2 skipped in 28.91s. |
+| Independent subagent review | pass | 0 blockers; 0 advisories; publish feature branch and merge main after remote CI. |
+| Determinism | pass | `op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27`; LF-stable generation-lock SHA256 is stable across two runs and validates. |
+| Model / Reader regeneration | not_triggered | Conditional Stage 4 requires `operating_evidence_ready`; no new Reader or human-review record was created. |
+| Backflow | closed_until_new_official_evidence | Routed to evidence-ingest, stock-deep-dive and company-valuation; rerun from T1 after reviewed new official disclosure. |
+| Final boundary | pass | Bundle 11R exact-hash review preserved; `sample_quality_allowed=false`; `p2_allowed=false`. |
