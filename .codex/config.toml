@@ -60,3 +60,8 @@ enabled = true
 [[skills.config]]
 path = ".agents/skills/portfolio-tracker"
 enabled = true
+
+# KLineChart v10 integration guidance for the standalone portfolio dashboard.
+[[skills.config]]
+path = ".agents/skills/klinecharts"
+enabled = true

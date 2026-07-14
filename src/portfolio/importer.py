@@ -111,7 +111,12 @@ def _clean_cell(value: Any) -> str:
     if value is None:
         return ""
     text = str(value).strip()
-    return "" if text.lower() in {"nan", "nat", "none"} else text
+    if text.lower() in {"nan", "nat", "none"}:
+        return ""
+    excel_text = re.fullmatch(r'=\"(.*)\"', text, flags=re.DOTALL)
+    if excel_text:
+        return excel_text.group(1).replace('""', '"')
+    return text
 
 
 def read_tabular(path: str | Path, sheet: str | int | None = None) -> TabularData:
@@ -122,7 +127,9 @@ def read_tabular(path: str | Path, sheet: str | int | None = None) -> TabularDat
     digest = hashlib.sha256(raw).hexdigest()
     suffix = source_path.suffix.lower()
 
-    if suffix in {".xlsx", ".xls"}:
+    is_ooxml = raw.startswith(b"PK\x03\x04")
+    is_ole_workbook = raw.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1")
+    if suffix in {".xlsx", ".xls"} and (is_ooxml or is_ole_workbook):
         try:
             import pandas as pd
         except ModuleNotFoundError as exc:
@@ -150,7 +157,7 @@ def read_tabular(path: str | Path, sheet: str | int | None = None) -> TabularDat
     if decoded is None:
         raise RuntimeError(f"无法识别文本编码: {source_path.name}")
 
-    if suffix == ".tsv":
+    if suffix == ".tsv" or "\t" in decoded.partition("\n")[0]:
         delimiter = "\t"
     else:
         try:
@@ -288,6 +295,8 @@ def infer_asset_type(ts_code: str, raw_type: str = "") -> str:
     code = ts_code.split(".", 1)[0]
     if code.startswith(("15", "16", "18", "50", "51", "52", "56", "58")):
         return "etf"
+    if code.startswith(("110", "111", "113", "118", "123", "127", "128")):
+        return "unknown"
     return "equity"
 
 
@@ -299,11 +308,19 @@ def _classify_event(value: str) -> str | None:
         return "UNSUPPORTED_CREDIT"
     if any(token in normalized for token in ("红股", "送股", "转增", "证券转入", "证券转出")):
         return "UNSUPPORTED_CORPORATE_ACTION"
-    if normalized in {"b", "buy"} or "买入" in normalized or "配股缴款" in normalized:
+    if (
+        normalized in {"b", "buy"}
+        or "买入" in normalized
+        or "配股缴款" in normalized
+        or any(token in normalized for token in ("新股入账", "新债入账"))
+    ):
         return "BUY"
     if normalized in {"s", "sell"} or "卖出" in normalized:
         return "SELL"
-    if any(token in normalized for token in ("红利入账", "股息入账", "现金红利", "红利派发")):
+    if any(
+        token in normalized
+        for token in ("红利入账", "红利入帐", "股息入账", "股息入帐", "现金红利", "红利派发")
+    ):
         return "DIVIDEND"
     if any(token in normalized for token in ("红利差异税", "股息红利差异扣税", "红利税")):
         return "CASH_FEE"
@@ -417,6 +434,19 @@ def parse_statement(
                             if inferred >= ZERO:
                                 fees = inferred
                                 note_parts.append("fees_inferred_from_net_amount=true")
+                net_amount_for_audit = parse_decimal(
+                    _value(row, mapping, "net_amount"), field="资金发生额"
+                )
+                if gross_value is None and net_amount_for_audit is not None:
+                    inferred_gross = (
+                        abs(net_amount_for_audit) - fees
+                        if event_type == "BUY"
+                        else abs(net_amount_for_audit) + fees
+                    )
+                    if inferred_gross <= ZERO:
+                        raise ValueError("资金发生额与手续费无法还原正的成交金额")
+                    gross = inferred_gross
+                    note_parts.append("gross_inferred_from_net_amount=true")
                 cash_amount = ZERO
 
             payload = {

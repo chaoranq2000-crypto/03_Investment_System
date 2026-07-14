@@ -15,6 +15,8 @@ from src.utils.tushare_client import get_tushare_pro
 
 from .industries import IndustryFetchError, TushareIndustryProvider
 from .importer import parse_date_value, parse_opening_snapshot, parse_statement
+from .intraday import IntradayFetchError, IntradayService, build_intraday_provider
+from .kline import KlineFetchError, KlineNotFoundError, KlineService, TushareKlineProvider
 from .models import ImportIssue, decimal_to_text
 from .prices import PriceFetchError, TushareCloseProvider
 from .store import PortfolioStore
@@ -142,14 +144,18 @@ def command_import_statement(args: argparse.Namespace, store: PortfolioStore) ->
         print("交割单中没有可导入的成交或红利记录。", file=sys.stderr)
         return 2
 
-    preview = (
-        store.preview_included_statement(args.account, parsed.entries)
-        if args.included_in_opening
-        else store.preview_statement(args.account, parsed.entries)
-    )
+    if args.included_in_opening:
+        preview = store.preview_included_statement(args.account, parsed.entries)
+        disposition = "included_in_opening"
+    elif args.historical_closed:
+        preview = store.preview_historical_closed_statement(args.account, parsed.entries)
+        disposition = "historical_closed_ledger"
+    else:
+        preview = store.preview_statement(args.account, parsed.entries)
+        disposition = "post_baseline_ledger"
     summary = {
         "mode": "apply" if args.apply else "preview",
-        "disposition": "included_in_opening" if args.included_in_opening else "post_baseline_ledger",
+        "disposition": disposition,
         "source": parsed.source_name,
         "source_sha256": parsed.source_sha256,
         "data_rows": parsed.total_rows,
@@ -164,6 +170,17 @@ def command_import_statement(args: argparse.Namespace, store: PortfolioStore) ->
 
     if args.included_in_opening:
         outcome = store.record_included_statement(
+            account_id=args.account,
+            instruments=parsed.instruments.values(),
+            entries=parsed.entries,
+            broker=args.broker,
+            source_name=parsed.source_name,
+            source_sha256=parsed.source_sha256,
+            total_rows=parsed.total_rows,
+            skipped_rows=parsed.skipped_rows,
+        )
+    elif args.historical_closed:
+        outcome = store.apply_historical_closed_statement(
             account_id=args.account,
             instruments=parsed.instruments.values(),
             entries=parsed.entries,
@@ -229,6 +246,34 @@ def command_refresh_prices(args: argparse.Namespace, store: PortfolioStore) -> i
     return 0
 
 
+def command_refresh_kline(args: argparse.Namespace, store: PortfolioStore) -> int:
+    as_of = parse_date_value(args.as_of, field="K 线截止日") if args.as_of else date.today()
+    provider = TushareKlineProvider(get_tushare_pro(args.env_file))
+    payload = KlineService(store, account_id=args.account).refresh(
+        provider,
+        args.code,
+        range_key=args.range,
+        cycle_id=args.cycle_id,
+        as_of=as_of,
+    )
+    print(json.dumps(_raw(payload), ensure_ascii=False, indent=2))
+    return 0
+
+
+def command_refresh_intraday(args: argparse.Namespace, store: PortfolioStore) -> int:
+    trade_date = parse_date_value(args.date, field="分时交易日")
+    as_of = parse_date_value(args.as_of, field="分时截止日") if args.as_of else date.today()
+    payload = IntradayService(store, account_id=args.account).refresh(
+        build_intraday_provider(args.env_file),
+        args.code,
+        trade_date=trade_date,
+        cycle_id=args.cycle_id,
+        as_of=as_of,
+    )
+    print(json.dumps(_raw(payload), ensure_ascii=False, indent=2))
+    return 0
+
+
 def command_refresh_industries(args: argparse.Namespace, store: PortfolioStore) -> int:
     instruments = store.instruments_for_open_positions(args.account)
     if not instruments:
@@ -239,7 +284,7 @@ def command_refresh_industries(args: argparse.Namespace, store: PortfolioStore) 
     updated = store.set_industries(classifications)
     print(
         json.dumps(
-            {
+            _raw({
                 "fetched": len(classifications),
                 "updated": updated,
                 "missing": missing,
@@ -248,14 +293,53 @@ def command_refresh_industries(args: argparse.Namespace, store: PortfolioStore) 
                         "ts_code": item.ts_code,
                         "industry_name": item.industry_name,
                         "source": item.source,
+                        "method": item.method,
+                        "source_date": item.source_date,
+                        "confidence": item.confidence,
+                        "classified_weight_coverage": item.classified_weight_coverage,
+                        "constituent_count_coverage": item.constituent_count_coverage,
+                        "top_industry_weight": item.top_industry_weight,
                     }
                     for item in classifications
                 ],
-            },
+            }),
             ensure_ascii=False,
             indent=2,
         )
     )
+    return 0
+
+
+def command_set_cash(args: argparse.Namespace, store: PortfolioStore) -> int:
+    as_of = parse_date_value(args.as_of, field="现金余额日期") if args.as_of else date.today()
+    snapshot = store.set_cash_balance(
+        args.account,
+        args.amount,
+        as_of,
+        source="user_provided",
+        note=args.note,
+    )
+    print(json.dumps(_raw(snapshot), ensure_ascii=False, indent=2))
+    return 0
+
+
+def command_cash(args: argparse.Namespace, store: PortfolioStore) -> int:
+    rows = store.cash_history(args.account, args.limit)
+    if args.format == "json":
+        _emit(json.dumps(rows, ensure_ascii=False, indent=2), args.output)
+        return 0
+    headers = ["余额日期", "现金余额", "来源", "备注", "记录时间"]
+    table_rows = [
+        [
+            row["as_of_date"],
+            _quantized(Decimal(row["amount"]), 2, grouping=True),
+            row["source"],
+            row["note"],
+            row["recorded_at"],
+        ]
+        for row in rows
+    ]
+    _emit(render_table(headers, table_rows, right_columns={1}), args.output)
     return 0
 
 
@@ -294,7 +378,9 @@ def _portfolio_table(positions: list[dict[str, Any]], summary: dict[str, Any]) -
         "",
         f"持仓数量: {summary['position_count']}",
         f"剩余成本: {_quantized(summary['remaining_cost'], 3, grouping=True)} CNY",
-        f"最新市值: {_quantized(summary['market_value'], 3, grouping=True)} CNY",
+        f"证券市值: {_quantized(summary['market_value'], 3, grouping=True)} CNY",
+        f"现金余额: {_quantized(summary['cash_balance'], 2, grouping=True)} CNY",
+        f"总资产: {_quantized(summary['total_assets'], 3, grouping=True)} CNY",
         f"浮动盈亏: {_quantized(summary['unrealized_pnl'], 3, grouping=True)} CNY",
         (
             f"浮动收益率: {_quantized(summary['unrealized_return_pct'], 2)}%"
@@ -489,6 +575,38 @@ def command_reconciliations(args: argparse.Namespace, store: PortfolioStore) -> 
     return 0
 
 
+def command_transfers(args: argparse.Namespace, store: PortfolioStore) -> int:
+    rows = store.recent_internal_transfers(args.account, args.limit)
+    if args.format == "json":
+        _emit(json.dumps(rows, ensure_ascii=False, indent=2), args.output)
+        return 0
+    headers = [
+        "转出日",
+        "转入日",
+        "代码",
+        "数量",
+        "转出券商",
+        "转入券商",
+        "参考价",
+        "状态",
+    ]
+    table_rows = [
+        [
+            row["transfer_out_date"],
+            row["transfer_in_date"],
+            row["ts_code"],
+            row["quantity"],
+            row["from_broker"],
+            row["to_broker"],
+            row["reference_price"],
+            row["status"],
+        ]
+        for row in rows
+    ]
+    _emit(render_table(headers, table_rows, right_columns={3, 6}), args.output)
+    return 0
+
+
 def command_web(args: argparse.Namespace, store: PortfolioStore) -> int:
     serve_dashboard(
         store,
@@ -523,10 +641,16 @@ def build_parser() -> argparse.ArgumentParser:
     statement_parser.add_argument("--input", required=True, help="CSV/XLSX 交割单")
     statement_parser.add_argument("--sheet", help="Excel sheet 名或从 0 开始的序号")
     statement_parser.add_argument("--broker", default="generic", help="券商/导出来源标签")
-    statement_parser.add_argument(
+    statement_mode = statement_parser.add_mutually_exclusive_group()
+    statement_mode.add_argument(
         "--included-in-opening",
         action="store_true",
         help="登记基准日及以前、已包含在期初快照中的交割明细；不重复改变持仓",
+    )
+    statement_mode.add_argument(
+        "--historical-closed",
+        action="store_true",
+        help="导入基准日前从零建仓且最终归零的完整已清仓流水",
     )
     statement_parser.add_argument("--apply", action="store_true", help="确认预览后实际写入")
     statement_parser.set_defaults(handler=command_import_statement)
@@ -538,11 +662,47 @@ def build_parser() -> argparse.ArgumentParser:
     refresh_parser.add_argument("--allow-partial", action="store_true", help="允许部分证券缺失行情")
     refresh_parser.set_defaults(handler=command_refresh_prices)
 
+    kline_parser = subparsers.add_parser(
+        "refresh-kline", help="显式更新某一持仓周期的前复权日 K 线"
+    )
+    kline_parser.add_argument("--code", required=True, help="证券 Tushare 代码")
+    kline_parser.add_argument(
+        "--range", choices=("3m", "1y", "cycle"), default="3m", help="展示区间"
+    )
+    kline_parser.add_argument("--cycle-id", help="已清仓周期 ID；当前周期可省略")
+    kline_parser.add_argument("--as-of", help="行情与台账截止日，默认今天")
+    kline_parser.add_argument("--env-file", default=".env.local", help="Tushare 本地配置")
+    kline_parser.set_defaults(handler=command_refresh_kline)
+
+    intraday_parser = subparsers.add_parser(
+        "refresh-intraday", help="显式更新某一持仓周期的单日分钟行情"
+    )
+    intraday_parser.add_argument("--code", required=True, help="证券 Tushare 代码")
+    intraday_parser.add_argument("--date", required=True, help="交易日 YYYY-MM-DD")
+    intraday_parser.add_argument("--cycle-id", help="已清仓周期 ID；当前周期可省略")
+    intraday_parser.add_argument("--as-of", help="台账截止日，默认今天")
+    intraday_parser.add_argument(
+        "--env-file", default=".env.local", help="Tushare 本地配置"
+    )
+    intraday_parser.set_defaults(handler=command_refresh_intraday)
+
     industry_parser = subparsers.add_parser(
         "refresh-industries", help="更新股票与主题 ETF 的行业分类"
     )
     industry_parser.add_argument("--env-file", default=".env.local", help="Tushare 本地配置")
     industry_parser.set_defaults(handler=command_refresh_industries)
+
+    set_cash_parser = subparsers.add_parser("set-cash", help="记录指定日期的账户现金余额")
+    set_cash_parser.add_argument("--amount", type=Decimal, required=True, help="现金余额（CNY）")
+    set_cash_parser.add_argument("--as-of", help="余额日期，默认今天")
+    set_cash_parser.add_argument("--note", default="", help="可选来源说明")
+    set_cash_parser.set_defaults(handler=command_set_cash)
+
+    cash_parser = subparsers.add_parser("cash", help="查看现金余额快照历史")
+    cash_parser.add_argument("--limit", type=int, default=100)
+    cash_parser.add_argument("--format", choices=("table", "json"), default="table")
+    cash_parser.add_argument("--output", help="可选输出文件")
+    cash_parser.set_defaults(handler=command_cash)
 
     show_parser = subparsers.add_parser("show", help="查看当前或历史时点持仓盈亏")
     show_parser.add_argument("--as-of", help="按历史日期重放台账与行情")
@@ -570,6 +730,14 @@ def build_parser() -> argparse.ArgumentParser:
     reconciliation_parser.add_argument("--output", help="可选输出文件")
     reconciliation_parser.set_defaults(handler=command_reconciliations)
 
+    transfer_parser = subparsers.add_parser(
+        "transfers", help="查看不影响组合成本与盈亏的内部托管迁移"
+    )
+    transfer_parser.add_argument("--limit", type=int, default=100)
+    transfer_parser.add_argument("--format", choices=("table", "json"), default="table")
+    transfer_parser.add_argument("--output", help="可选输出文件")
+    transfer_parser.set_defaults(handler=command_transfers)
+
     web_parser = subparsers.add_parser("web", help="启动本地持仓可视化页面")
     web_parser.add_argument(
         "--host",
@@ -591,7 +759,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         store.initialize(args.account, args.account_name)
         return int(args.handler(args, store))
-    except (ValueError, RuntimeError, PriceFetchError, IndustryFetchError, OSError) as exc:
+    except (
+        ValueError,
+        RuntimeError,
+        KlineNotFoundError,
+        KlineFetchError,
+        IntradayFetchError,
+        PriceFetchError,
+        IndustryFetchError,
+        OSError,
+    ) as exc:
         print(f"错误: {exc}", file=sys.stderr)
         return 2
 

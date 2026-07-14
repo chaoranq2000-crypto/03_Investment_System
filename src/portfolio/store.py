@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 import uuid
@@ -10,19 +11,27 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Iterator
 
-from .accounting import AccountingError, build_closed_position_cycles, build_position_states
+from .accounting import (
+    AccountingError,
+    build_closed_position_cycles,
+    build_ledger_cycles,
+    build_position_states,
+)
 from .models import (
+    AdjustmentFactorObservation,
     ClosePrice,
+    DailyBarObservation,
     IndustryClassification,
     Instrument,
     LedgerEntry,
+    MinuteBarObservation,
     PositionState,
     ZERO,
     decimal_to_text,
 )
 
 
-SCHEMA_VERSION = "2"
+SCHEMA_VERSION = "6"
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS metadata (
@@ -37,6 +46,19 @@ CREATE TABLE IF NOT EXISTS accounts (
     baseline_date TEXT,
     created_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS cash_balance_snapshots (
+    snapshot_id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL REFERENCES accounts(account_id),
+    as_of_date TEXT NOT NULL,
+    amount TEXT NOT NULL,
+    source TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    recorded_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_cash_balance_account_date
+ON cash_balance_snapshots(account_id, as_of_date DESC, recorded_at DESC);
 
 CREATE TABLE IF NOT EXISTS instruments (
     ts_code TEXT PRIMARY KEY,
@@ -117,6 +139,32 @@ CREATE TABLE IF NOT EXISTS statement_observations (
 CREATE INDEX IF NOT EXISTS idx_statement_observations_account_date
 ON statement_observations(account_id, event_date, event_time, observation_id);
 
+CREATE TABLE IF NOT EXISTS internal_transfer_reconciliations (
+    transfer_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id TEXT NOT NULL REFERENCES accounts(account_id),
+    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),
+    quantity TEXT NOT NULL,
+    transfer_out_date TEXT NOT NULL,
+    transfer_in_date TEXT NOT NULL,
+    from_broker TEXT NOT NULL,
+    to_broker TEXT NOT NULL,
+    reference_price TEXT NOT NULL DEFAULT '0',
+    out_source_name TEXT NOT NULL DEFAULT '',
+    in_source_name TEXT NOT NULL DEFAULT '',
+    out_reference TEXT NOT NULL DEFAULT '',
+    in_reference TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL CHECK (status IN ('reconciled_internal')),
+    note TEXT NOT NULL DEFAULT '',
+    dedupe_key TEXT NOT NULL,
+    recorded_at TEXT NOT NULL,
+    UNIQUE(account_id, dedupe_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_internal_transfers_account_date
+ON internal_transfer_reconciliations(
+    account_id, transfer_in_date DESC, transfer_out_date DESC, transfer_id DESC
+);
+
 CREATE TABLE IF NOT EXISTS close_prices (
     observation_id INTEGER PRIMARY KEY AUTOINCREMENT,
     ts_code TEXT NOT NULL REFERENCES instruments(ts_code),
@@ -131,6 +179,80 @@ CREATE TABLE IF NOT EXISTS close_prices (
 
 CREATE INDEX IF NOT EXISTS idx_close_prices_code_date
 ON close_prices(ts_code, trade_date DESC, fetched_at DESC, observation_id DESC);
+
+CREATE TABLE IF NOT EXISTS daily_bar_observations (
+    observation_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),
+    trade_date TEXT NOT NULL,
+    open_price TEXT NOT NULL,
+    high_price TEXT NOT NULL,
+    low_price TEXT NOT NULL,
+    close_price TEXT NOT NULL,
+    volume_lots TEXT NOT NULL,
+    amount_k_cny TEXT NOT NULL,
+    source TEXT NOT NULL,
+    refresh_batch_id TEXT NOT NULL,
+    dedupe_key TEXT NOT NULL UNIQUE,
+    fetched_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_daily_bars_code_date
+ON daily_bar_observations(
+    ts_code, trade_date DESC, fetched_at DESC, observation_id DESC
+);
+
+CREATE TABLE IF NOT EXISTS adjustment_factor_observations (
+    observation_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),
+    trade_date TEXT NOT NULL,
+    adj_factor TEXT NOT NULL,
+    source TEXT NOT NULL,
+    refresh_batch_id TEXT NOT NULL,
+    dedupe_key TEXT NOT NULL UNIQUE,
+    fetched_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_adjustment_factors_code_date
+ON adjustment_factor_observations(
+    ts_code, trade_date DESC, fetched_at DESC, observation_id DESC
+);
+
+CREATE TABLE IF NOT EXISTS minute_refresh_batches (
+    refresh_batch_id TEXT PRIMARY KEY,
+    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),
+    trade_date TEXT NOT NULL,
+    frequency_minutes INTEGER NOT NULL CHECK (frequency_minutes IN (1, 5)),
+    source TEXT NOT NULL,
+    provider_attempts_json TEXT NOT NULL,
+    fetched_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_minute_batches_code_date
+ON minute_refresh_batches(
+    ts_code, trade_date DESC, frequency_minutes, fetched_at DESC
+);
+
+CREATE TABLE IF NOT EXISTS minute_bar_observations (
+    observation_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),
+    bar_time TEXT NOT NULL,
+    frequency_minutes INTEGER NOT NULL CHECK (frequency_minutes IN (1, 5)),
+    open_price TEXT NOT NULL,
+    high_price TEXT NOT NULL,
+    low_price TEXT NOT NULL,
+    close_price TEXT NOT NULL,
+    volume_shares TEXT NOT NULL,
+    amount_cny TEXT NOT NULL,
+    source TEXT NOT NULL,
+    refresh_batch_id TEXT NOT NULL REFERENCES minute_refresh_batches(refresh_batch_id),
+    dedupe_key TEXT NOT NULL UNIQUE,
+    fetched_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_minute_bars_code_time
+ON minute_bar_observations(
+    ts_code, bar_time DESC, frequency_minutes, fetched_at DESC, observation_id DESC
+);
 """
 
 
@@ -153,7 +275,42 @@ class PortfolioStore:
         finally:
             connection.close()
 
+    def _schema_version_on_disk(self) -> str | None:
+        if not self.path.is_file():
+            return None
+        connection = sqlite3.connect(self.path)
+        try:
+            table = connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'metadata'"
+            ).fetchone()
+            if table is None:
+                return None
+            row = connection.execute(
+                "SELECT value FROM metadata WHERE key = 'schema_version'"
+            ).fetchone()
+            return str(row[0]) if row is not None else None
+        finally:
+            connection.close()
+
+    def _backup_before_migration(self, current_version: str | None) -> Path | None:
+        if current_version not in {"1", "2", "3", "4", "5"} or not self.path.is_file():
+            return None
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+        backup_path = self.path.with_name(
+            f"{self.path.name}-v{current_version}-backup-{stamp}"
+        )
+        source = sqlite3.connect(self.path)
+        target = sqlite3.connect(backup_path)
+        try:
+            source.backup(target)
+        finally:
+            target.close()
+            source.close()
+        return backup_path
+
     def initialize(self, account_id: str = "default", account_name: str = "默认账户") -> None:
+        current_version = self._schema_version_on_disk()
+        self._backup_before_migration(current_version)
         now = utc_now()
         with self.connect() as connection:
             connection.executescript(SCHEMA_SQL)
@@ -179,6 +336,38 @@ class PortfolioStore:
                         connection.execute(
                             f"ALTER TABLE instruments ADD COLUMN {column_name} {column_definition}"
                         )
+                connection.execute(
+                    "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
+                    ("2",),
+                )
+                row = connection.execute(
+                    "SELECT value FROM metadata WHERE key = 'schema_version'"
+                ).fetchone()
+            if row is not None and row["value"] == "2":
+                connection.execute(
+                    "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
+                    ("3",),
+                )
+                row = connection.execute(
+                    "SELECT value FROM metadata WHERE key = 'schema_version'"
+                ).fetchone()
+            if row is not None and row["value"] == "3":
+                connection.execute(
+                    "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
+                    ("4",),
+                )
+                row = connection.execute(
+                    "SELECT value FROM metadata WHERE key = 'schema_version'"
+                ).fetchone()
+            if row is not None and row["value"] == "4":
+                connection.execute(
+                    "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
+                    ("5",),
+                )
+                row = connection.execute(
+                    "SELECT value FROM metadata WHERE key = 'schema_version'"
+                ).fetchone()
+            if row is not None and row["value"] == "5":
                 connection.execute(
                     "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
                     (SCHEMA_VERSION,),
@@ -211,6 +400,94 @@ class PortfolioStore:
     def baseline_date(self, account_id: str) -> date | None:
         value = self.account(account_id)["baseline_date"]
         return date.fromisoformat(value) if value else None
+
+    def set_cash_balance(
+        self,
+        account_id: str,
+        amount: Decimal,
+        as_of: date,
+        *,
+        source: str = "user_provided",
+        note: str = "",
+    ) -> dict[str, Any]:
+        if not amount.is_finite() or amount < ZERO:
+            raise ValueError("现金余额必须是大于或等于 0 的有限数值")
+        normalized_source = source.strip()
+        if not normalized_source:
+            raise ValueError("现金余额来源不能为空")
+        snapshot_id = str(uuid.uuid4())
+        recorded_at = utc_now()
+        with self.connect() as connection:
+            if connection.execute(
+                "SELECT 1 FROM accounts WHERE account_id = ?", (account_id,)
+            ).fetchone() is None:
+                raise ValueError(f"账户不存在: {account_id}")
+            connection.execute(
+                """
+                INSERT INTO cash_balance_snapshots(
+                    snapshot_id, account_id, as_of_date, amount, source, note, recorded_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    snapshot_id,
+                    account_id,
+                    as_of.isoformat(),
+                    decimal_to_text(amount),
+                    normalized_source,
+                    note.strip(),
+                    recorded_at,
+                ),
+            )
+            connection.commit()
+        return {
+            "snapshot_id": snapshot_id,
+            "account_id": account_id,
+            "as_of_date": as_of.isoformat(),
+            "amount": amount,
+            "source": normalized_source,
+            "note": note.strip(),
+            "recorded_at": recorded_at,
+        }
+
+    def cash_balance(
+        self, account_id: str, as_of: date | None = None
+    ) -> dict[str, Any] | None:
+        date_filter = "AND as_of_date <= ?" if as_of is not None else ""
+        params: tuple[str, ...] = (
+            (account_id, as_of.isoformat()) if as_of is not None else (account_id,)
+        )
+        with self.connect() as connection:
+            row = connection.execute(
+                f"""
+                SELECT snapshot_id, account_id, as_of_date, amount, source, note, recorded_at
+                FROM cash_balance_snapshots
+                WHERE account_id = ? {date_filter}
+                ORDER BY as_of_date DESC, recorded_at DESC, snapshot_id DESC
+                LIMIT 1
+                """,
+                params,
+            ).fetchone()
+        if row is None:
+            return None
+        result = dict(row)
+        result["amount"] = Decimal(result["amount"])
+        return result
+
+    def cash_history(self, account_id: str, limit: int = 100) -> list[dict[str, Any]]:
+        if limit < 1 or limit > 1000:
+            raise ValueError("limit 必须在 1 到 1000 之间")
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT snapshot_id, account_id, as_of_date, amount, source, note, recorded_at
+                FROM cash_balance_snapshots
+                WHERE account_id = ?
+                ORDER BY as_of_date DESC, recorded_at DESC, snapshot_id DESC
+                LIMIT ?
+                """,
+                (account_id, limit),
+            ).fetchall()
+        return [dict(row) for row in rows]
 
     @staticmethod
     def _upsert_instruments(
@@ -548,6 +825,158 @@ class PortfolioStore:
             "preview": preview,
         }
 
+    def preview_historical_closed_statement(
+        self, account_id: str, entries: list[LedgerEntry]
+    ) -> dict[str, Any]:
+        """校验基准日前、从零开始且最终完全清仓的一组历史流水。"""
+
+        baseline = self.baseline_date(account_id)
+        if baseline is None:
+            raise ValueError("账户还没有期初快照，不能导入历史已清仓流水")
+        later = [item for item in entries if item.event_date > baseline]
+        if later:
+            first = later[0]
+            raise ValueError(
+                f"第 {first.source_row or '?'} 行日期 {first.event_date.isoformat()} 晚于期初基准日 "
+                f"{baseline.isoformat()}，不能作为历史已清仓流水导入"
+            )
+
+        ordered_entries = sorted(
+            entries,
+            key=lambda item: (
+                item.event_date.isoformat(),
+                item.event_time or "99:99:99",
+                item.source_row or 0,
+            ),
+        )
+        candidate_rows = [
+            {
+                "event_date": item.event_date.isoformat(),
+                "event_time": item.event_time,
+                "event_type": item.event_type,
+                "ts_code": item.ts_code,
+                "quantity": decimal_to_text(item.quantity),
+                "price": decimal_to_text(item.price),
+                "gross_amount": decimal_to_text(item.gross_amount),
+                "fees": decimal_to_text(item.fees),
+                "total_cost": decimal_to_text(item.total_cost),
+                "cash_amount": decimal_to_text(item.cash_amount),
+                "source_row": item.source_row or 0,
+            }
+            for item in ordered_entries
+        ]
+        candidate_states = build_position_states(candidate_rows)
+        incomplete = sorted(
+            code for code, state in candidate_states.items() if state.quantity != ZERO
+        )
+        if incomplete:
+            raise ValueError(
+                "历史已清仓流水必须从零建仓并最终归零；以下证券仍有数量: "
+                + ", ".join(incomplete)
+            )
+        event_types: dict[str, set[str]] = {}
+        for item in ordered_entries:
+            event_types.setdefault(item.ts_code, set()).add(item.event_type)
+        missing_sides = sorted(
+            code
+            for code, types in event_types.items()
+            if not {"BUY", "SELL"}.issubset(types)
+        )
+        if missing_sides:
+            raise ValueError(
+                "历史已清仓流水必须同时包含建仓和清仓成交: "
+                + ", ".join(missing_sides)
+            )
+
+        with self.connect() as connection:
+            existing_keys = {
+                row["dedupe_key"]
+                for row in connection.execute(
+                    "SELECT dedupe_key FROM ledger_entries WHERE account_id = ?",
+                    (account_id,),
+                )
+            }
+            seen_keys = set(existing_keys)
+            unique_entries: list[LedgerEntry] = []
+            for item in entries:
+                if item.dedupe_key not in seen_keys:
+                    unique_entries.append(item)
+                    seen_keys.add(item.dedupe_key)
+            rows: list[Any] = list(self._ordered_ledger(connection, account_id))
+            rows.extend(
+                {
+                    "event_date": item.event_date.isoformat(),
+                    "event_time": item.event_time,
+                    "event_type": item.event_type,
+                    "ts_code": item.ts_code,
+                    "quantity": decimal_to_text(item.quantity),
+                    "price": decimal_to_text(item.price),
+                    "gross_amount": decimal_to_text(item.gross_amount),
+                    "fees": decimal_to_text(item.fees),
+                    "total_cost": decimal_to_text(item.total_cost),
+                    "cash_amount": decimal_to_text(item.cash_amount),
+                    "source_row": item.source_row or 0,
+                }
+                for item in unique_entries
+            )
+        rows.sort(
+            key=lambda row: (
+                str(row["event_date"]),
+                str(row["event_time"]) or "99:99:99",
+                int(row["source_row"] if isinstance(row, dict) else row["entry_id"]),
+            )
+        )
+        build_position_states(rows)
+        return {
+            "baseline_date": baseline.isoformat(),
+            "accepted_entries": len(unique_entries),
+            "duplicate_entries": len(entries) - len(unique_entries),
+            "closed_codes": sorted(candidate_states),
+        }
+
+    def apply_historical_closed_statement(
+        self,
+        *,
+        account_id: str,
+        instruments: Iterable[Instrument],
+        entries: list[LedgerEntry],
+        broker: str,
+        source_name: str,
+        source_sha256: str,
+        total_rows: int,
+        skipped_rows: int,
+    ) -> dict[str, Any]:
+        preview = self.preview_historical_closed_statement(account_id, entries)
+        batch_id = f"historical_closed_{uuid.uuid4().hex}"
+        with self.connect() as connection:
+            self._upsert_instruments(connection, instruments)
+            self._insert_batch(
+                connection,
+                batch_id=batch_id,
+                account_id=account_id,
+                import_kind="historical_closed_statement",
+                broker=broker,
+                source_name=source_name,
+                source_sha256=source_sha256,
+                total_rows=total_rows,
+                accepted_rows=0,
+                duplicate_rows=0,
+                skipped_rows=skipped_rows,
+            )
+            inserted, duplicates = self._insert_entries(connection, entries, batch_id)
+            build_position_states(self._ordered_ledger(connection, account_id))
+            connection.execute(
+                "UPDATE import_batches SET accepted_rows = ?, duplicate_rows = ? WHERE batch_id = ?",
+                (inserted, duplicates, batch_id),
+            )
+            connection.commit()
+        return {
+            "batch_id": batch_id,
+            "inserted_entries": inserted,
+            "duplicate_entries": duplicates,
+            "preview": preview,
+        }
+
     def preview_included_statement(
         self, account_id: str, entries: list[LedgerEntry]
     ) -> dict[str, Any]:
@@ -687,6 +1116,285 @@ class PortfolioStore:
             connection.commit()
         return inserted
 
+    def instrument(self, ts_code: str) -> Instrument | None:
+        normalized = ts_code.strip().upper()
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT ts_code, name, asset_type FROM instruments WHERE ts_code = ?",
+                (normalized,),
+            ).fetchone()
+        if row is None:
+            return None
+        return Instrument(
+            ts_code=row["ts_code"],
+            name=row["name"],
+            asset_type=row["asset_type"],
+        )
+
+    def add_kline_batch(
+        self,
+        bars: Iterable[DailyBarObservation],
+        factors: Iterable[AdjustmentFactorObservation],
+    ) -> dict[str, int]:
+        bar_list = list(bars)
+        factor_list = list(factors)
+        codes = {item.ts_code for item in [*bar_list, *factor_list]}
+        with self.connect() as connection:
+            known_codes = {
+                row["ts_code"]
+                for row in connection.execute("SELECT ts_code FROM instruments")
+            }
+            missing = sorted(codes - known_codes)
+            if missing:
+                raise ValueError(f"K 线包含未登记证券: {', '.join(missing)}")
+
+            inserted_bars = 0
+            for item in bar_list:
+                cursor = connection.execute(
+                    """
+                    INSERT OR IGNORE INTO daily_bar_observations(
+                        ts_code, trade_date, open_price, high_price, low_price,
+                        close_price, volume_lots, amount_k_cny, source,
+                        refresh_batch_id, dedupe_key, fetched_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        item.ts_code,
+                        item.trade_date.isoformat(),
+                        decimal_to_text(item.open),
+                        decimal_to_text(item.high),
+                        decimal_to_text(item.low),
+                        decimal_to_text(item.close),
+                        decimal_to_text(item.volume_lots),
+                        decimal_to_text(item.amount_k_cny),
+                        item.source,
+                        item.refresh_batch_id,
+                        item.dedupe_key,
+                        item.fetched_at or utc_now(),
+                    ),
+                )
+                inserted_bars += int(cursor.rowcount == 1)
+
+            inserted_factors = 0
+            for item in factor_list:
+                cursor = connection.execute(
+                    """
+                    INSERT OR IGNORE INTO adjustment_factor_observations(
+                        ts_code, trade_date, adj_factor, source,
+                        refresh_batch_id, dedupe_key, fetched_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        item.ts_code,
+                        item.trade_date.isoformat(),
+                        decimal_to_text(item.adj_factor),
+                        item.source,
+                        item.refresh_batch_id,
+                        item.dedupe_key,
+                        item.fetched_at or utc_now(),
+                    ),
+                )
+                inserted_factors += int(cursor.rowcount == 1)
+            connection.commit()
+        return {
+            "new_bar_observations": inserted_bars,
+            "new_factor_observations": inserted_factors,
+        }
+
+    def latest_daily_bars(
+        self, ts_code: str, start_date: date, end_date: date
+    ) -> list[dict[str, Any]]:
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT * FROM (
+                    SELECT daily_bar_observations.*,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY trade_date
+                            ORDER BY fetched_at DESC, observation_id DESC
+                        ) AS observation_rank
+                    FROM daily_bar_observations
+                    WHERE ts_code = ? AND trade_date BETWEEN ? AND ?
+                ) WHERE observation_rank = 1
+                ORDER BY trade_date, observation_id
+                """,
+                (ts_code, start_date.isoformat(), end_date.isoformat()),
+            ).fetchall()
+        result: list[dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["trade_date"] = date.fromisoformat(item["trade_date"])
+            for key in (
+                "open_price",
+                "high_price",
+                "low_price",
+                "close_price",
+                "volume_lots",
+                "amount_k_cny",
+            ):
+                item[key] = Decimal(item[key])
+            result.append(item)
+        return result
+
+    def latest_adjustment_factors(
+        self, ts_code: str, start_date: date, end_date: date
+    ) -> list[dict[str, Any]]:
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT * FROM (
+                    SELECT adjustment_factor_observations.*,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY trade_date
+                            ORDER BY fetched_at DESC, observation_id DESC
+                        ) AS observation_rank
+                    FROM adjustment_factor_observations
+                    WHERE ts_code = ? AND trade_date BETWEEN ? AND ?
+                ) WHERE observation_rank = 1
+                ORDER BY trade_date, observation_id
+                """,
+                (ts_code, start_date.isoformat(), end_date.isoformat()),
+            ).fetchall()
+        result: list[dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["trade_date"] = date.fromisoformat(item["trade_date"])
+            item["adj_factor"] = Decimal(item["adj_factor"])
+            result.append(item)
+        return result
+
+    def add_minute_batch(
+        self,
+        bars: Iterable[MinuteBarObservation],
+        *,
+        trade_date: date,
+        frequency_minutes: int,
+        source: str,
+        refresh_batch_id: str,
+        provider_attempts: list[dict[str, str]],
+        fetched_at: str,
+    ) -> dict[str, int]:
+        bar_list = list(bars)
+        if frequency_minutes not in {1, 5}:
+            raise ValueError("分钟行情频率只支持 1 或 5 分钟")
+        if any(item.ts_code != bar_list[0].ts_code for item in bar_list[1:]):
+            raise ValueError("同一刷新批次不能包含多只证券")
+        if any(item.frequency_minutes != frequency_minutes for item in bar_list):
+            raise ValueError("分钟行情批次频率不一致")
+        if not bar_list:
+            return {"new_refresh_batches": 0, "new_minute_observations": 0}
+
+        ts_code = bar_list[0].ts_code
+        with self.connect() as connection:
+            exists = connection.execute(
+                "SELECT 1 FROM instruments WHERE ts_code = ?", (ts_code,)
+            ).fetchone()
+            if exists is None:
+                raise ValueError(f"分钟行情包含未登记证券: {ts_code}")
+            batch_cursor = connection.execute(
+                """
+                INSERT OR IGNORE INTO minute_refresh_batches(
+                    refresh_batch_id, ts_code, trade_date, frequency_minutes,
+                    source, provider_attempts_json, fetched_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    refresh_batch_id,
+                    ts_code,
+                    trade_date.isoformat(),
+                    frequency_minutes,
+                    source,
+                    json.dumps(provider_attempts, ensure_ascii=False, sort_keys=True),
+                    fetched_at,
+                ),
+            )
+            inserted_bars = 0
+            for item in bar_list:
+                cursor = connection.execute(
+                    """
+                    INSERT OR IGNORE INTO minute_bar_observations(
+                        ts_code, bar_time, frequency_minutes, open_price, high_price,
+                        low_price, close_price, volume_shares, amount_cny, source,
+                        refresh_batch_id, dedupe_key, fetched_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        item.ts_code,
+                        item.bar_time.isoformat(),
+                        item.frequency_minutes,
+                        decimal_to_text(item.open),
+                        decimal_to_text(item.high),
+                        decimal_to_text(item.low),
+                        decimal_to_text(item.close),
+                        decimal_to_text(item.volume_shares),
+                        decimal_to_text(item.amount_cny),
+                        item.source,
+                        item.refresh_batch_id,
+                        item.dedupe_key,
+                        item.fetched_at or fetched_at,
+                    ),
+                )
+                inserted_bars += int(cursor.rowcount == 1)
+            connection.commit()
+        return {
+            "new_refresh_batches": int(batch_cursor.rowcount == 1),
+            "new_minute_observations": inserted_bars,
+        }
+
+    def latest_minute_bars(
+        self, ts_code: str, trade_date: date
+    ) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+        with self.connect() as connection:
+            batch = connection.execute(
+                """
+                SELECT * FROM minute_refresh_batches
+                WHERE ts_code = ? AND trade_date = ?
+                ORDER BY frequency_minutes ASC, fetched_at DESC, rowid DESC
+                LIMIT 1
+                """,
+                (ts_code, trade_date.isoformat()),
+            ).fetchone()
+            if batch is None:
+                return [], None
+            rows = connection.execute(
+                """
+                SELECT * FROM (
+                    SELECT minute_bar_observations.*,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY bar_time
+                            ORDER BY fetched_at DESC, observation_id DESC
+                        ) AS observation_rank
+                    FROM minute_bar_observations
+                    WHERE ts_code = ?
+                        AND frequency_minutes = ?
+                        AND substr(bar_time, 1, 10) = ?
+                ) WHERE observation_rank = 1
+                ORDER BY bar_time, observation_id
+                """,
+                (ts_code, batch["frequency_minutes"], trade_date.isoformat()),
+            ).fetchall()
+
+        result: list[dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["bar_time"] = datetime.fromisoformat(item["bar_time"])
+            for key in (
+                "open_price",
+                "high_price",
+                "low_price",
+                "close_price",
+                "volume_shares",
+                "amount_cny",
+            ):
+                item[key] = Decimal(item[key])
+            result.append(item)
+        metadata = dict(batch)
+        metadata["trade_date"] = date.fromisoformat(metadata["trade_date"])
+        metadata["provider_attempts"] = json.loads(
+            metadata.pop("provider_attempts_json")
+        )
+        return result, metadata
+
     def set_industries(
         self, classifications: Iterable[IndustryClassification]
     ) -> int:
@@ -777,11 +1485,24 @@ class PortfolioStore:
     ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         ledger = self.ledger(account_id, as_of)
         states = build_position_states(ledger)
+        baseline = self.baseline_date(account_id)
+        baseline_ledger = (
+            [row for row in ledger if date.fromisoformat(row["event_date"]) >= baseline]
+            if baseline is not None
+            else ledger
+        )
+        baseline_states = build_position_states(baseline_ledger)
+        active_cycles = {
+            cycle.ts_code: cycle
+            for cycle in build_ledger_cycles(ledger)
+            if not cycle.is_closed
+        }
         result: list[dict[str, Any]] = []
         with self.connect() as connection:
             for ts_code, state in states.items():
                 if state.quantity <= ZERO:
                     continue
+                active_cycle = active_cycles.get(ts_code)
                 instrument = connection.execute(
                     "SELECT * FROM instruments WHERE ts_code = ?", (ts_code,)
                 ).fetchone()
@@ -819,6 +1540,20 @@ class PortfolioStore:
                         "industry_classified": bool(
                             instrument and instrument["industry_name"]
                         ),
+                        "cycle_id": (
+                            active_cycle.cycle_id if active_cycle is not None else None
+                        ),
+                        "cycle_number": (
+                            active_cycle.cycle_number if active_cycle is not None else None
+                        ),
+                        "opened_on": (
+                            active_cycle.opened_on if active_cycle is not None else None
+                        ),
+                        "opening_event_type": (
+                            active_cycle.opening_event_type
+                            if active_cycle is not None
+                            else None
+                        ),
                         "quantity": state.quantity,
                         "average_cost": state.average_cost,
                         "remaining_cost": state.remaining_cost,
@@ -833,7 +1568,9 @@ class PortfolioStore:
                         "market_value": market_value,
                         "unrealized_pnl": unrealized,
                         "return_pct": return_pct,
-                        "realized_pnl": state.realized_pnl,
+                        "realized_pnl": baseline_states.get(
+                            ts_code, PositionState(ts_code=ts_code)
+                        ).realized_pnl,
                     }
                 )
 
@@ -841,15 +1578,23 @@ class PortfolioStore:
         priced_rows = [row for row in result if row["market_value"] is not None]
         market_value = sum((row["market_value"] for row in priced_rows), ZERO)
         unrealized = sum((row["unrealized_pnl"] for row in priced_rows), ZERO)
-        realized = sum((state.realized_pnl for state in states.values()), ZERO)
+        realized = sum((state.realized_pnl for state in baseline_states.values()), ZERO)
         missing_prices = [row["ts_code"] for row in result if row["close"] is None]
         fully_priced = not missing_prices
+        cash_snapshot = self.cash_balance(account_id, as_of)
+        cash_balance = cash_snapshot["amount"] if cash_snapshot is not None else ZERO
         summary = {
             "account_id": account_id,
             "as_of": as_of.isoformat() if as_of else None,
             "position_count": len(result),
             "remaining_cost": remaining_cost,
             "market_value": market_value if fully_priced else None,
+            "cash_balance": cash_balance,
+            "cash_as_of": (
+                cash_snapshot["as_of_date"] if cash_snapshot is not None else None
+            ),
+            "cash_source": cash_snapshot["source"] if cash_snapshot is not None else None,
+            "total_assets": market_value + cash_balance if fully_priced else None,
             "unrealized_pnl": unrealized if fully_priced else None,
             "unrealized_return_pct": (
                 unrealized / remaining_cost * Decimal("100")
@@ -997,6 +1742,124 @@ class PortfolioStore:
             ).fetchall()
         return [dict(row) for row in rows]
 
+    def record_internal_transfers(
+        self, account_id: str, transfers: Iterable[Mapping[str, Any]]
+    ) -> dict[str, int]:
+        """登记组合内部的券商托管迁移，不写入买卖台账。"""
+
+        normalized: list[dict[str, Any]] = []
+        for row in transfers:
+            ts_code = str(row.get("ts_code", "")).strip()
+            quantity = Decimal(str(row.get("quantity", "0")))
+            out_date = date.fromisoformat(str(row.get("transfer_out_date", "")).strip())
+            in_date = date.fromisoformat(str(row.get("transfer_in_date", "")).strip())
+            from_broker = str(row.get("from_broker", "")).strip()
+            to_broker = str(row.get("to_broker", "")).strip()
+            reference_price = Decimal(str(row.get("reference_price", "0") or "0"))
+            if not ts_code or quantity <= ZERO:
+                raise ValueError("内部托管迁移必须包含证券代码和正数量")
+            if in_date < out_date:
+                raise ValueError(f"{ts_code}: 托管转入日不能早于转出日")
+            if not from_broker or not to_broker or from_broker == to_broker:
+                raise ValueError(f"{ts_code}: 转出/转入券商必须明确且不同")
+            if reference_price < ZERO:
+                raise ValueError(f"{ts_code}: 参考价格不能为负")
+            payload = {
+                "account_id": account_id,
+                "ts_code": ts_code,
+                "quantity": decimal_to_text(quantity),
+                "transfer_out_date": out_date.isoformat(),
+                "transfer_in_date": in_date.isoformat(),
+                "from_broker": from_broker,
+                "to_broker": to_broker,
+            }
+            dedupe_key = hashlib.sha256(
+                json.dumps(
+                    payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+                ).encode("utf-8")
+            ).hexdigest()
+            normalized.append(
+                {
+                    **payload,
+                    "reference_price": decimal_to_text(reference_price),
+                    "out_source_name": str(row.get("out_source_name", "")).strip(),
+                    "in_source_name": str(row.get("in_source_name", "")).strip(),
+                    "out_reference": str(row.get("out_reference", "")).strip(),
+                    "in_reference": str(row.get("in_reference", "")).strip(),
+                    "note": str(row.get("note", "")).strip(),
+                    "dedupe_key": dedupe_key,
+                }
+            )
+
+        inserted = 0
+        duplicates = 0
+        now = utc_now()
+        with self.connect() as connection:
+            if connection.execute(
+                "SELECT 1 FROM accounts WHERE account_id = ?", (account_id,)
+            ).fetchone() is None:
+                raise ValueError(f"账户不存在: {account_id}")
+            known_codes = {
+                item["ts_code"]
+                for item in connection.execute("SELECT ts_code FROM instruments")
+            }
+            missing = sorted({item["ts_code"] for item in normalized} - known_codes)
+            if missing:
+                raise ValueError("托管迁移证券尚未登记: " + ", ".join(missing))
+            for item in normalized:
+                cursor = connection.execute(
+                    """
+                    INSERT OR IGNORE INTO internal_transfer_reconciliations(
+                        account_id, ts_code, quantity, transfer_out_date, transfer_in_date,
+                        from_broker, to_broker, reference_price, out_source_name,
+                        in_source_name, out_reference, in_reference, status, note,
+                        dedupe_key, recorded_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        'reconciled_internal', ?, ?, ?)
+                    """,
+                    (
+                        account_id,
+                        item["ts_code"],
+                        item["quantity"],
+                        item["transfer_out_date"],
+                        item["transfer_in_date"],
+                        item["from_broker"],
+                        item["to_broker"],
+                        item["reference_price"],
+                        item["out_source_name"],
+                        item["in_source_name"],
+                        item["out_reference"],
+                        item["in_reference"],
+                        item["note"],
+                        item["dedupe_key"],
+                        now,
+                    ),
+                )
+                if cursor.rowcount == 1:
+                    inserted += 1
+                else:
+                    duplicates += 1
+            connection.commit()
+        return {"inserted_transfers": inserted, "duplicate_transfers": duplicates}
+
+    def recent_internal_transfers(
+        self, account_id: str, limit: int = 100
+    ) -> list[dict[str, Any]]:
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT transfer_id, ts_code, quantity, transfer_out_date, transfer_in_date,
+                    from_broker, to_broker, reference_price, out_source_name,
+                    in_source_name, out_reference, in_reference, status, note, recorded_at
+                FROM internal_transfer_reconciliations
+                WHERE account_id = ?
+                ORDER BY transfer_in_date DESC, transfer_out_date DESC, transfer_id DESC
+                LIMIT ?
+                """,
+                (account_id, limit),
+            ).fetchall()
+        return [dict(row) for row in rows]
+
     def dashboard_metadata(self, account_id: str) -> dict[str, Any]:
         with self.connect() as connection:
             account = connection.execute(
@@ -1013,6 +1876,10 @@ class PortfolioStore:
                 "SELECT COUNT(*) AS count FROM statement_observations WHERE account_id = ?",
                 (account_id,),
             ).fetchone()["count"]
+            internal_transfer_count = connection.execute(
+                "SELECT COUNT(*) AS count FROM internal_transfer_reconciliations WHERE account_id = ?",
+                (account_id,),
+            ).fetchone()["count"]
             batch_count = connection.execute(
                 "SELECT COUNT(*) AS count FROM import_batches WHERE account_id = ?",
                 (account_id,),
@@ -1026,6 +1893,18 @@ class PortfolioStore:
             latest_industry_update = connection.execute(
                 "SELECT MAX(industry_updated_at) AS updated_at FROM instruments"
             ).fetchone()["updated_at"]
+            latest_kline_fetch = connection.execute(
+                """
+                SELECT MAX(fetched_at) AS fetched_at FROM (
+                    SELECT fetched_at FROM daily_bar_observations
+                    UNION ALL
+                    SELECT fetched_at FROM adjustment_factor_observations
+                )
+                """
+            ).fetchone()["fetched_at"]
+            latest_intraday_fetch = connection.execute(
+                "SELECT MAX(fetched_at) AS fetched_at FROM minute_refresh_batches"
+            ).fetchone()["fetched_at"]
         return {
             "account_name": account["name"],
             "base_currency": account["base_currency"],
@@ -1033,8 +1912,11 @@ class PortfolioStore:
             "account_created_at": account["created_at"],
             "ledger_count": ledger_count,
             "reconciliation_count": reconciliation_count,
+            "internal_transfer_count": internal_transfer_count,
             "import_batch_count": batch_count,
             "last_tushare_fetch_at": latest_fetch,
+            "last_kline_fetch_at": latest_kline_fetch,
+            "last_intraday_fetch_at": latest_intraday_fetch,
             "last_industry_update_at": latest_industry_update,
         }
 

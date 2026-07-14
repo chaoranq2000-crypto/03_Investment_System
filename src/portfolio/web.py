@@ -15,6 +15,14 @@ from urllib.parse import parse_qs, urlparse
 from src.utils.tushare_client import get_tushare_pro
 
 from .industries import IndustryFetchError, TushareIndustryProvider
+from .intraday import IntradayFetchError, IntradayService, build_intraday_provider
+from .kline import (
+    KlineFetchError,
+    KlineNotFoundError,
+    KlineRefreshBusyError,
+    KlineService,
+    TushareKlineProvider,
+)
 from .models import decimal_to_text
 from .prices import PriceFetchError, TushareCloseProvider
 from .realtime import FallbackRealtimeProvider, RealtimeQuote
@@ -22,6 +30,8 @@ from .store import PortfolioStore
 
 
 WEB_ASSET_DIR = Path(__file__).with_name("web_assets")
+DASHBOARD_API_VERSION = 2
+DASHBOARD_CAPABILITIES = ("daily-kline", "refresh-intraday")
 STATIC_ASSETS = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
@@ -120,6 +130,9 @@ class DashboardApplication:
             **summary,
             "remaining_cost": remaining_cost,
             "market_value": market_value if fully_priced else None,
+            "total_assets": (
+                market_value + summary["cash_balance"] if fully_priced else None
+            ),
             "unrealized_pnl": unrealized_pnl if fully_priced else None,
             "unrealized_return_pct": (
                 unrealized_pnl / remaining_cost * Decimal("100")
@@ -135,14 +148,14 @@ class DashboardApplication:
                 default=None,
             ),
         }
-        total_market_value = summary["market_value"]
+        total_assets = summary["total_assets"]
         enriched: list[dict[str, Any]] = []
         for position in positions:
             item = dict(position)
             item["weight_pct"] = (
-                position["market_value"] / total_market_value * Decimal("100")
+                position["market_value"] / total_assets * Decimal("100")
                 if position["market_value"] is not None
-                and total_market_value not in (None, Decimal("0"))
+                and total_assets not in (None, Decimal("0"))
                 else None
             )
             enriched.append(item)
@@ -155,9 +168,14 @@ class DashboardApplication:
             "flat_count": sum(item["unrealized_pnl"] == 0 for item in priced),
             "equity_count": sum(item["asset_type"] == "equity" for item in positions),
             "etf_count": sum(item["asset_type"] == "etf" for item in positions),
+            "cash_weight_pct": (
+                summary["cash_balance"] / total_assets * Decimal("100")
+                if total_assets not in (None, Decimal("0"))
+                else None
+            ),
         }
         industry_groups, industry_summary = self._industry_payload(
-            enriched, summary["market_value"]
+            enriched, summary["total_assets"]
         )
         metadata["market_data"] = market_data or {
             "mode": "closing",
@@ -247,6 +265,11 @@ class DashboardApplication:
     def _industry_payload(
         positions: list[dict[str, Any]], total_market_value: Decimal | None
     ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        def is_reliably_classified(position: dict[str, Any]) -> bool:
+            return bool(position["industry_classified"]) and not str(
+                position["industry_name"]
+            ).startswith("未分类")
+
         grouped: dict[str, dict[str, Any]] = {}
         for position in positions:
             industry_name = position["industry_name"]
@@ -267,7 +290,7 @@ class DashboardApplication:
             )
             group["position_count"] += 1
             group["etf_count"] += int(position["asset_type"] == "etf")
-            group["classified_position_count"] += int(position["industry_classified"])
+            group["classified_position_count"] += int(is_reliably_classified(position))
             group["remaining_cost"] += position["remaining_cost"]
             if position["market_value"] is None or position["unrealized_pnl"] is None:
                 group["fully_priced"] = False
@@ -279,6 +302,7 @@ class DashboardApplication:
                     "ts_code": position["ts_code"],
                     "name": position["name"],
                     "asset_type": position["asset_type"],
+                    "industry_source": position["industry_source"],
                 }
             )
             if position["industry_source"]:
@@ -323,19 +347,22 @@ class DashboardApplication:
             reverse=True,
         )
         classified_positions = sum(
-            int(position["industry_classified"]) for position in positions
+            int(is_reliably_classified(position)) for position in positions
         )
         classified_market_value = sum(
             (
                 position["market_value"]
                 for position in positions
-                if position["industry_classified"] and position["market_value"] is not None
+                if is_reliably_classified(position) and position["market_value"] is not None
             ),
             Decimal("0"),
         )
         weights = [
-            item["weight_pct"] for item in industries if item["weight_pct"] is not None
+            item["weight_pct"]
+            for item in industries
+            if item["classified"] and item["weight_pct"] is not None
         ]
+        classified_industries = [item for item in industries if item["classified"]]
         summary = {
             "industry_count": sum(item["classified"] for item in industries),
             "classified_position_count": classified_positions,
@@ -350,10 +377,15 @@ class DashboardApplication:
                 if total_market_value not in (None, Decimal("0"))
                 else None
             ),
-            "top_industry": industries[0]["industry_name"] if industries else None,
+            "top_industry": (
+                classified_industries[0]["industry_name"] if classified_industries else None
+            ),
             "top_industry_weight_pct": weights[0] if weights else None,
             "top3_weight_pct": sum(weights[:3], Decimal("0")),
-            "classification_note": "股票使用 Tushare 行业；主题 ETF 使用名称中的明确行业属性；无可靠属性时保留未分类。",
+            "classification_note": (
+                "股票按可合并一级行业归一；ETF 按交易所篮子、结构化成分行业与同日价格分类，"
+                "跨市场接口和季报持仓仅作可追溯回退；覆盖不足时明确保留未分类。"
+            ),
         }
         return industries, summary
 
@@ -422,10 +454,97 @@ class DashboardApplication:
                             "ts_code": item.ts_code,
                             "industry_name": item.industry_name,
                             "source": item.source,
+                            "method": item.method,
+                            "source_date": item.source_date,
+                            "confidence": item.confidence,
+                            "classified_weight_coverage": item.classified_weight_coverage,
+                            "constituent_count_coverage": item.constituent_count_coverage,
+                            "top_industry_weight": item.top_industry_weight,
                         }
                         for item in classifications
                     ],
                 }
+            )
+        finally:
+            self.refresh_lock.release()
+
+    def kline_payload(
+        self,
+        ts_code: str,
+        *,
+        range_key: str = "3m",
+        cycle_id: str | None = None,
+        as_of: date | None = None,
+    ) -> dict[str, Any]:
+        return _json_ready(
+            KlineService(self.store, account_id=self.account_id).get_payload(
+                ts_code,
+                range_key=range_key,
+                cycle_id=cycle_id,
+                as_of=as_of,
+            )
+        )
+
+    def refresh_kline(
+        self,
+        ts_code: str,
+        *,
+        range_key: str = "3m",
+        cycle_id: str | None = None,
+        as_of: date | None = None,
+    ) -> dict[str, Any]:
+        if not self.refresh_lock.acquire(blocking=False):
+            raise KlineRefreshBusyError("已有一个数据刷新任务正在运行")
+        try:
+            provider = TushareKlineProvider(get_tushare_pro(self.env_file))
+            return _json_ready(
+                KlineService(self.store, account_id=self.account_id).refresh(
+                    provider,
+                    ts_code,
+                    range_key=range_key,
+                    cycle_id=cycle_id,
+                    as_of=as_of,
+                )
+            )
+        finally:
+            self.refresh_lock.release()
+
+    def intraday_payload(
+        self,
+        ts_code: str,
+        *,
+        trade_date: date | None = None,
+        cycle_id: str | None = None,
+        as_of: date | None = None,
+    ) -> dict[str, Any]:
+        return _json_ready(
+            IntradayService(self.store, account_id=self.account_id).get_payload(
+                ts_code,
+                trade_date=trade_date,
+                cycle_id=cycle_id,
+                as_of=as_of,
+            )
+        )
+
+    def refresh_intraday(
+        self,
+        ts_code: str,
+        *,
+        trade_date: date,
+        cycle_id: str | None = None,
+        as_of: date | None = None,
+    ) -> dict[str, Any]:
+        if not self.refresh_lock.acquire(blocking=False):
+            raise KlineRefreshBusyError("已有一个数据刷新任务正在运行")
+        try:
+            return _json_ready(
+                IntradayService(self.store, account_id=self.account_id).refresh(
+                    build_intraday_provider(self.env_file),
+                    ts_code,
+                    trade_date=trade_date,
+                    cycle_id=cycle_id,
+                    as_of=as_of,
+                )
             )
         finally:
             self.refresh_lock.release()
@@ -487,7 +606,14 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         try:
             if parsed.path == "/health":
-                self._send_json(HTTPStatus.OK, {"status": "ok"})
+                self._send_json(
+                    HTTPStatus.OK,
+                    {
+                        "status": "ok",
+                        "api_version": DASHBOARD_API_VERSION,
+                        "capabilities": list(DASHBOARD_CAPABILITIES),
+                    },
+                )
                 return
             if parsed.path == "/api/portfolio":
                 query = parse_qs(parsed.query)
@@ -502,6 +628,47 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                     HTTPStatus.OK,
                     self.server.dashboard_app.realtime_portfolio_payload(),
                 )
+                return
+            if parsed.path == "/api/kline":
+                query = parse_qs(parsed.query)
+                ts_code = query.get("ts_code", [""])[0].strip()
+                if not ts_code:
+                    raise ValueError("ts_code 不能为空")
+                as_of = _parse_iso_date(query.get("as_of", [None])[0], "as_of")
+                range_key = query.get("range", ["3m"])[0]
+                cycle_id = query.get("cycle_id", [None])[0]
+                try:
+                    payload = self.server.dashboard_app.kline_payload(
+                        ts_code,
+                        range_key=range_key,
+                        cycle_id=cycle_id,
+                        as_of=as_of,
+                    )
+                except KlineNotFoundError as exc:
+                    self._send_json(HTTPStatus.NOT_FOUND, {"error": str(exc)})
+                    return
+                self._send_json(HTTPStatus.OK, payload)
+                return
+            if parsed.path == "/api/intraday":
+                query = parse_qs(parsed.query)
+                ts_code = query.get("ts_code", [""])[0].strip()
+                if not ts_code:
+                    raise ValueError("ts_code 不能为空")
+                try:
+                    payload = self.server.dashboard_app.intraday_payload(
+                        ts_code,
+                        trade_date=_parse_iso_date(
+                            query.get("trade_date", [None])[0], "trade_date"
+                        ),
+                        cycle_id=query.get("cycle_id", [None])[0],
+                        as_of=_parse_iso_date(
+                            query.get("as_of", [None])[0], "as_of"
+                        ),
+                    )
+                except KlineNotFoundError as exc:
+                    self._send_json(HTTPStatus.NOT_FOUND, {"error": str(exc)})
+                    return
+                self._send_json(HTTPStatus.OK, payload)
                 return
             if parsed.path in {"/api/ledger", "/api/reconciliations"}:
                 query = parse_qs(parsed.query)
@@ -528,6 +695,8 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
         actions = {
             "/api/refresh-prices": "refresh-prices",
             "/api/refresh-industries": "refresh-industries",
+            "/api/refresh-kline": "refresh-kline",
+            "/api/refresh-intraday": "refresh-intraday",
         }
         expected_action = actions.get(parsed.path)
         if expected_action is None:
@@ -542,6 +711,8 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                 raise ValueError("请求体过大")
             raw = self.rfile.read(content_length) if content_length else b"{}"
             payload = json.loads(raw.decode("utf-8"))
+            if not isinstance(payload, dict):
+                raise ValueError("请求体必须是 JSON 对象")
             if parsed.path == "/api/refresh-prices":
                 as_of = _parse_iso_date(payload.get("as_of"), "as_of")
                 lookback_days = int(payload.get("lookback_days", 60))
@@ -549,9 +720,47 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                     as_of=as_of,
                     lookback_days=lookback_days,
                 )
-            else:
+            elif parsed.path == "/api/refresh-industries":
                 result = self.server.dashboard_app.refresh_industries()
+            elif parsed.path == "/api/refresh-kline":
+                ts_code = str(payload.get("ts_code", "")).strip()
+                if not ts_code:
+                    raise ValueError("ts_code 不能为空")
+                result = self.server.dashboard_app.refresh_kline(
+                    ts_code,
+                    range_key=str(payload.get("range", "3m")),
+                    cycle_id=(
+                        str(payload["cycle_id"]) if payload.get("cycle_id") else None
+                    ),
+                    as_of=_parse_iso_date(payload.get("as_of"), "as_of"),
+                )
+            else:
+                ts_code = str(payload.get("ts_code", "")).strip()
+                if not ts_code:
+                    raise ValueError("ts_code 不能为空")
+                trade_date = _parse_iso_date(payload.get("trade_date"), "trade_date")
+                if trade_date is None:
+                    raise ValueError("trade_date 不能为空")
+                result = self.server.dashboard_app.refresh_intraday(
+                    ts_code,
+                    trade_date=trade_date,
+                    cycle_id=(
+                        str(payload["cycle_id"]) if payload.get("cycle_id") else None
+                    ),
+                    as_of=_parse_iso_date(payload.get("as_of"), "as_of"),
+                )
             self._send_json(HTTPStatus.OK, result)
+        except KlineNotFoundError as exc:
+            self._send_json(HTTPStatus.NOT_FOUND, {"error": str(exc)})
+        except KlineRefreshBusyError as exc:
+            self._send_json(HTTPStatus.CONFLICT, {"error": str(exc)})
+        except KlineFetchError as exc:
+            self._send_json(HTTPStatus.BAD_GATEWAY, {"error": str(exc)})
+        except IntradayFetchError as exc:
+            self._send_json(
+                HTTPStatus.BAD_GATEWAY,
+                {"error": str(exc), "provider_attempts": exc.provider_attempts},
+            )
         except (
             ValueError,
             RuntimeError,

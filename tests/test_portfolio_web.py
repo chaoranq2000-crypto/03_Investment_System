@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import threading
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 from urllib.error import HTTPError
@@ -10,6 +11,8 @@ from urllib.request import Request, urlopen
 import pytest
 
 from src.portfolio.importer import parse_opening_snapshot, parse_statement
+from src.portfolio.intraday import IntradayFetchError
+from src.portfolio.kline import KlineFetchError, KlineRefreshBusyError
 from src.portfolio.models import IndustryClassification
 from src.portfolio.realtime import RealtimeFetchResult, RealtimeQuote
 from src.portfolio.store import PortfolioStore
@@ -46,6 +49,8 @@ def test_dashboard_payload_uses_real_store_values(tmp_path):
     payload = DashboardApplication(store).portfolio_payload()
 
     assert payload["summary"]["market_value"] == "1200"
+    assert payload["summary"]["cash_balance"] == "0"
+    assert payload["summary"]["total_assets"] == "1200"
     assert payload["summary"]["unrealized_pnl"] == "200"
     assert payload["summary"]["gain_count"] == 1
     assert payload["positions"][0]["weight_pct"] == "100"
@@ -62,9 +67,14 @@ def test_dashboard_payload_uses_real_store_values(tmp_path):
             "unrealized_pnl": "200",
             "return_pct": "20",
             "weight_pct": "100",
-            "members": [
-                {"ts_code": "600000.SH", "name": "浦发银行", "asset_type": "equity"}
-            ],
+                "members": [
+                    {
+                        "ts_code": "600000.SH",
+                        "name": "浦发银行",
+                        "asset_type": "equity",
+                        "industry_source": "tushare.stock_basic.industry",
+                    }
+                ],
             "sources": ["tushare.stock_basic.industry"],
         }
     ]
@@ -75,6 +85,26 @@ def test_dashboard_payload_uses_real_store_values(tmp_path):
     assert payload["clearance_summary"]["total_realized_pnl"] == "0"
     assert payload["metadata"]["baseline_date"] == "2026-07-10"
     assert "不构成" in payload["boundary"]
+
+
+def test_dashboard_payload_includes_cash_in_total_assets_and_weights(tmp_path):
+    store = _build_store(tmp_path)
+    store.set_cash_balance(
+        "default",
+        Decimal("300"),
+        date(2026, 7, 14),
+        note="用户确认当前现金余额",
+    )
+
+    payload = DashboardApplication(store).portfolio_payload()
+
+    assert payload["summary"]["market_value"] == "1200"
+    assert payload["summary"]["cash_balance"] == "300"
+    assert payload["summary"]["cash_as_of"] == "2026-07-14"
+    assert payload["summary"]["cash_source"] == "user_provided"
+    assert payload["summary"]["total_assets"] == "1500"
+    assert payload["summary"]["cash_weight_pct"] == "20"
+    assert payload["positions"][0]["weight_pct"] == "80"
 
 
 def test_dashboard_payload_can_overlay_intraday_quotes_without_persisting(tmp_path):
@@ -207,16 +237,66 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
     base = f"http://{host}:{port}"
     try:
         with urlopen(f"{base}/health", timeout=5) as response:
-            assert json.load(response) == {"status": "ok"}
+            assert json.load(response) == {
+                "status": "ok",
+                "api_version": 2,
+                "capabilities": ["daily-kline", "refresh-intraday"],
+            }
 
         with urlopen(f"{base}/", timeout=5) as response:
             html = response.read().decode("utf-8")
             assert "持仓账本" in html
             assert response.headers["X-Frame-Options"] == "DENY"
+            assert response.headers["Content-Security-Policy"] == (
+                "default-src 'self'; style-src 'self'; script-src 'self'; "
+                "img-src 'self' data:; connect-src 'self'; base-uri 'none'; "
+                "form-action 'none'"
+            )
 
         with urlopen(f"{base}/api/portfolio", timeout=5) as response:
             payload = json.load(response)
             assert payload["positions"][0]["name"] == "浦发银行"
+
+        with urlopen(
+            f"{base}/api/kline?ts_code=600000.SH&range=3m&as_of=2026-07-10",
+            timeout=5,
+        ) as response:
+            payload = json.load(response)
+            assert payload["status"] == "missing"
+            assert payload["cycle"]["cycle_id"] == "600000.SH:1"
+            assert payload["operation_groups"][0]["event_type"] == "OPENING"
+            assert payload["technical_indicators"]["default_selected"] == ["VOL"]
+            assert payload["technical_indicators"]["calculation"]["mode"] == "client_side"
+
+        with urlopen(
+            f"{base}/api/intraday?ts_code=600000.SH&trade_date=2026-07-10&as_of=2026-07-10",
+            timeout=5,
+        ) as response:
+            payload = json.load(response)
+            assert payload["view"] == "intraday"
+            assert payload["status"] == "missing"
+            assert payload["bars"] == []
+            assert payload["operation_mapping"] == {
+                "status": "none",
+                "mapped_count": 0,
+                "unlocated_count": 0,
+            }
+
+        with urlopen(
+            f"{base}/api/intraday?ts_code=600000.SH&trade_date=2026-05-29&as_of=2026-07-10",
+            timeout=5,
+        ) as response:
+            payload = json.load(response)
+            assert payload["trade_date"] == "2026-05-29"
+            assert payload["date_scope"] == "pre_open_context"
+            assert payload["operation_groups"] == []
+
+        with pytest.raises(HTTPError) as missing_cycle:
+            urlopen(
+                f"{base}/api/kline?ts_code=600000.SH&range=3m&cycle_id=600000.SH%3A99",
+                timeout=5,
+            )
+        assert missing_cycle.value.code == 404
 
         server.dashboard_app.realtime_portfolio_payload = lambda: {
             "metadata": {"market_data": {"mode": "intraday"}}
@@ -248,6 +328,32 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
                 timeout=5,
             )
         assert industry_exc.value.code == 403
+
+        with pytest.raises(HTTPError) as kline_exc:
+            urlopen(
+                Request(
+                    f"{base}/api/refresh-kline",
+                    data=json.dumps({"ts_code": "600000.SH"}).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                ),
+                timeout=5,
+            )
+        assert kline_exc.value.code == 403
+
+        with pytest.raises(HTTPError) as intraday_exc:
+            urlopen(
+                Request(
+                    f"{base}/api/refresh-intraday",
+                    data=json.dumps(
+                        {"ts_code": "600000.SH", "trade_date": "2026-07-10"}
+                    ).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                ),
+                timeout=5,
+            )
+        assert intraday_exc.value.code == 403
 
         server.dashboard_app.refresh_prices = lambda **_: {
             "fetched": 1,
@@ -288,6 +394,123 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
         ) as response:
             payload = json.load(response)
             assert payload["updated"] == 1
+
+        server.dashboard_app.refresh_kline = lambda *_args, **_kwargs: {
+            "status": "ready",
+            "refresh": {"fetched_bars": 10},
+        }
+        with urlopen(
+            Request(
+                f"{base}/api/refresh-kline",
+                data=json.dumps(
+                    {"ts_code": "600000.SH", "range": "3m", "as_of": "2026-07-10"}
+                ).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Portfolio-Action": "refresh-kline",
+                },
+                method="POST",
+            ),
+            timeout=5,
+        ) as response:
+            payload = json.load(response)
+            assert payload["refresh"]["fetched_bars"] == 10
+
+        server.dashboard_app.refresh_intraday = lambda *_args, **_kwargs: {
+            "status": "ready",
+            "period": {"span": 5},
+            "refresh": {"fetched_bars": 48},
+        }
+        with urlopen(
+            Request(
+                f"{base}/api/refresh-intraday",
+                data=json.dumps(
+                    {
+                        "ts_code": "600000.SH",
+                        "trade_date": "2026-07-10",
+                        "as_of": "2026-07-10",
+                    }
+                ).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Portfolio-Action": "refresh-intraday",
+                },
+                method="POST",
+            ),
+            timeout=5,
+        ) as response:
+            payload = json.load(response)
+            assert payload["period"]["span"] == 5
+            assert payload["refresh"]["fetched_bars"] == 48
+
+        server.dashboard_app.refresh_intraday = lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            IntradayFetchError(
+                "分钟行情源均不可用",
+                [
+                    {
+                        "provider": "tushare.1m",
+                        "status": "failed",
+                        "reason": "permission_denied",
+                    }
+                ],
+            )
+        )
+        with pytest.raises(HTTPError) as intraday_provider_failure:
+            urlopen(
+                Request(
+                    f"{base}/api/refresh-intraday",
+                    data=json.dumps(
+                        {"ts_code": "600000.SH", "trade_date": "2026-07-10"}
+                    ).encode("utf-8"),
+                    headers={
+                        "Content-Type": "application/json",
+                        "X-Portfolio-Action": "refresh-intraday",
+                    },
+                    method="POST",
+                ),
+                timeout=5,
+            )
+        assert intraday_provider_failure.value.code == 502
+        error_payload = json.loads(intraday_provider_failure.value.read().decode("utf-8"))
+        assert error_payload["provider_attempts"][0]["reason"] == "permission_denied"
+
+        def fail_kline(*_args, **_kwargs):
+            raise KlineFetchError("provider unavailable")
+
+        server.dashboard_app.refresh_kline = fail_kline
+        with pytest.raises(HTTPError) as provider_failure:
+            urlopen(
+                Request(
+                    f"{base}/api/refresh-kline",
+                    data=json.dumps({"ts_code": "600000.SH"}).encode("utf-8"),
+                    headers={
+                        "Content-Type": "application/json",
+                        "X-Portfolio-Action": "refresh-kline",
+                    },
+                    method="POST",
+                ),
+                timeout=5,
+            )
+        assert provider_failure.value.code == 502
+
+        def busy_kline(*_args, **_kwargs):
+            raise KlineRefreshBusyError("refresh busy")
+
+        server.dashboard_app.refresh_kline = busy_kline
+        with pytest.raises(HTTPError) as refresh_conflict:
+            urlopen(
+                Request(
+                    f"{base}/api/refresh-kline",
+                    data=json.dumps({"ts_code": "600000.SH"}).encode("utf-8"),
+                    headers={
+                        "Content-Type": "application/json",
+                        "X-Portfolio-Action": "refresh-kline",
+                    },
+                    method="POST",
+                ),
+                timeout=5,
+            )
+        assert refresh_conflict.value.code == 409
     finally:
         server.shutdown()
         server.server_close()
@@ -311,15 +534,54 @@ def test_dashboard_assets_are_self_contained_and_have_required_controls():
     assert 'id="clearancePnl"' in html
     assert 'id="clearanceBody"' in html
     assert 'id="clearanceEmpty"' in html
+    assert 'id="cashBalance"' in html
+    assert html.count("data-collapsible=") == 6
+    assert 'aria-controls="industryContent"' in html
+    assert 'aria-controls="holdingsContent"' in html
     assert "@media (max-width: 840px)" in css
     assert 'api("/api/refresh-prices"' in javascript
     assert 'api("/api/refresh-industries"' in javascript
     assert 'api("/api/realtime-portfolio"' in javascript
-    assert "60_000" in javascript
+    assert "window.setInterval(refreshRealtime, 6e4)" in javascript
     assert "最新价" in html
     assert "renderAllocation" in javascript
     assert "renderIndustries" in javascript
     assert "renderClearance" in javascript
+    assert "summary.total_assets" in javascript
+    assert 'name: "现金"' in javascript
+    assert "industry.members || []" in javascript
+    assert "industry-position-row" in javascript
+    assert "portfolioCollapsedModules" in javascript
+    assert "initializeCollapsibleModules" in javascript
+    assert "/api/kline?" in javascript
+    assert 'api("/api/refresh-kline"' in javascript
+    assert "/api/intraday?" in javascript
+    assert 'api("/api/refresh-intraday"' in javascript
+    assert 'name: "portfolioOperation"' in javascript
+    assert "chart.setDataLoader" in javascript
+    assert 'chart.subscribeAction("onCandleBarClick"' in javascript
+    assert "openIntradayForTradeDate" in javascript
+    assert "openIntradayForLatestTradeDate" in javascript
+    assert "autoRefreshTradeDate" in javascript
+    assert "automatic: true" in javascript
+    assert "intradayBarSpaceLimit" in javascript
+    assert "intradayFitBarSpace" in javascript
+    assert "适应全日" in javascript
+    assert "chart.createOverlay" in javascript
+    assert "chart.createIndicator" in javascript
+    assert "portfolioKlineIndicators" in javascript
+    assert "portfolioIntradayIndicators" in javascript
+    assert "INTRADAY_AVG" in javascript
+    assert "隐藏全部" in javascript
+    assert "technical_indicator_" in javascript
+    assert "width: min(1040px, 96vw)" in css
+    assert ".kline-chart" in css
+    assert ".kline-indicator-picker" in css
+    assert ".operation-group" in css
+    assert ".collapsible-content[hidden]" in css
+    assert ".industry-position-list" in css
+    assert "--muted: oklch(0.84 0.012 245)" in css
+    assert "--dim: oklch(0.74 0.01 245)" in css
     assert 'content: "••••••"' in css
     assert 'content: "金额已隐藏"' in css
     assert "-webkit-text-fill-color: transparent !important" in css
@@ -333,3 +595,6 @@ def test_dashboard_assets_are_self_contained_and_have_required_controls():
     assert '"--app=$Url"' in launcher
     assert '"explorer.exe"' in launcher
     assert "无法打开页面" in launcher
+    assert '$requiredApiVersion = 2' in launcher
+    assert '$requiredCapability = "refresh-intraday"' in launcher
+    assert "Stop-IncompatiblePortfolioDashboard" in launcher

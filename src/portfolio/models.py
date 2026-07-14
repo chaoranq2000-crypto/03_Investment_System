@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
@@ -54,11 +54,61 @@ class ClosePrice:
 
 
 @dataclass(frozen=True)
+class DailyBarObservation:
+    ts_code: str
+    trade_date: date
+    open: Decimal
+    high: Decimal
+    low: Decimal
+    close: Decimal
+    volume_lots: Decimal
+    amount_k_cny: Decimal
+    source: str
+    refresh_batch_id: str
+    dedupe_key: str
+    fetched_at: str = ""
+
+
+@dataclass(frozen=True)
+class AdjustmentFactorObservation:
+    ts_code: str
+    trade_date: date
+    adj_factor: Decimal
+    source: str
+    refresh_batch_id: str
+    dedupe_key: str
+    fetched_at: str = ""
+
+
+@dataclass(frozen=True)
+class MinuteBarObservation:
+    ts_code: str
+    bar_time: datetime
+    frequency_minutes: int
+    open: Decimal
+    high: Decimal
+    low: Decimal
+    close: Decimal
+    volume_shares: Decimal
+    amount_cny: Decimal
+    source: str
+    refresh_batch_id: str
+    dedupe_key: str
+    fetched_at: str = ""
+
+
+@dataclass(frozen=True)
 class IndustryClassification:
     ts_code: str
     industry_name: str
     source: str
     classified_at: str = ""
+    method: str = ""
+    source_date: str = ""
+    confidence: str = ""
+    classified_weight_coverage: Decimal | None = None
+    constituent_count_coverage: Decimal | None = None
+    top_industry_weight: Decimal | None = None
 
 
 @dataclass
@@ -109,6 +159,24 @@ class ClosedPositionCycle:
     @property
     def holding_days(self) -> int:
         return (self.closed_on - self.opened_on).days
+
+
+@dataclass
+class LedgerCycle:
+    ts_code: str
+    cycle_number: int
+    opened_on: date
+    opening_event_type: str
+    entries: list[Any] = field(default_factory=list)
+    closed_on: date | None = None
+
+    @property
+    def cycle_id(self) -> str:
+        return f"{self.ts_code}:{self.cycle_number}"
+
+    @property
+    def is_closed(self) -> bool:
+        return self.closed_on is not None
 
 
 @dataclass(frozen=True)

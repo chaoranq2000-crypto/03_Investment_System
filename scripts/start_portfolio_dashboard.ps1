@@ -53,15 +53,76 @@ $databasePath = Join-Path $runtimeRoot "data\db\portfolio.sqlite3"
 $envFilePath = Join-Path $runtimeRoot ".env.local"
 $dashboardUrl = "http://127.0.0.1:$Port/"
 $healthUrl = "${dashboardUrl}health"
+$requiredApiVersion = 2
+$requiredCapability = "refresh-intraday"
 
 function Test-PortfolioDashboard {
     try {
         $response = Invoke-RestMethod -Uri $healthUrl -TimeoutSec 2
-        return $response.status -eq "ok"
+        return (
+            $response.status -eq "ok" -and
+            [int]$response.api_version -ge $requiredApiVersion -and
+            @($response.capabilities) -contains $requiredCapability
+        )
     }
     catch {
         return $false
     }
+}
+
+function Stop-IncompatiblePortfolioDashboard {
+    $listeners = @(
+        Get-NetTCPConnection `
+            -LocalPort $Port `
+            -State Listen `
+            -ErrorAction SilentlyContinue
+    )
+    if (-not $listeners) {
+        return
+    }
+
+    $listenerProcessIds = @($listeners.OwningProcess | Select-Object -Unique)
+    $listenerProcesses = @(
+        Get-CimInstance Win32_Process |
+            Where-Object { $_.ProcessId -in $listenerProcessIds }
+    )
+    $expectedPython = [IO.Path]::GetFullPath($pythonPath)
+    $databasePattern = [regex]::Escape([IO.Path]::GetFullPath($databasePath))
+    $portPattern = "--port\s+$Port(?:\s|$)"
+
+    foreach ($process in $listenerProcesses) {
+        $executable = if ($process.ExecutablePath) {
+            [IO.Path]::GetFullPath($process.ExecutablePath)
+        }
+        else {
+            ""
+        }
+        $commandLine = [string]$process.CommandLine
+        $isOwnedPortfolioServer = (
+            $executable.Equals($expectedPython, [StringComparison]::OrdinalIgnoreCase) -and
+            $commandLine -match "-m\s+src\.portfolio(?:\s|$)" -and
+            $commandLine -match $portPattern -and
+            $commandLine -match $databasePattern
+        )
+        if (-not $isOwnedPortfolioServer) {
+            throw "端口 $Port 被其他程序占用，未自动终止进程 $($process.ProcessId)。"
+        }
+    }
+
+    foreach ($process in $listenerProcesses) {
+        Stop-Process -Id $process.ProcessId -ErrorAction Stop
+    }
+    for ($attempt = 0; $attempt -lt 40; $attempt++) {
+        Start-Sleep -Milliseconds 100
+        $remaining = Get-NetTCPConnection `
+            -LocalPort $Port `
+            -State Listen `
+            -ErrorAction SilentlyContinue
+        if (-not $remaining) {
+            return
+        }
+    }
+    throw "旧版持仓服务未能释放端口 $Port。"
 }
 
 function Show-LauncherError {
@@ -117,6 +178,14 @@ if (-not (Test-Path -LiteralPath $pythonPath -PathType Leaf)) {
 }
 
 if (-not (Test-PortfolioDashboard)) {
+    try {
+        Stop-IncompatiblePortfolioDashboard
+    }
+    catch {
+        Show-LauncherError $_.Exception.Message
+        exit 1
+    }
+
     $serverArguments = @(
         "-m",
         "src.portfolio",

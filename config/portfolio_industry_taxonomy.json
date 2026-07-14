@@ -1,0 +1,31 @@
+{
+  "taxonomy_id": "portfolio_industry_v1",
+  "minimum_classified_weight_coverage": 0.70,
+  "minimum_constituent_count_coverage": 0.70,
+  "single_industry_high_confidence": 0.80,
+  "single_industry_medium_confidence": 0.60,
+  "theme_aggregations": [
+    {
+      "theme": "互联网",
+      "corroborating_index_keywords": ["互联网"],
+      "compatible_industries": ["互联网", "专业零售", "传媒", "电子"],
+      "minimum_share": 0.80
+    }
+  ],
+  "aliases": {
+    "医药生物": "医药生物",
+    "化学制药": "医药生物",
+    "生物医药": "医药生物",
+    "生物制药": "医药生物",
+    "生物科技": "医药生物",
+    "中成药": "医药生物",
+    "医疗保健": "医药生物",
+    "医疗器械": "医药生物",
+    "医药商业": "医药生物",
+    "药品及生物科技": "医药生物",
+    "医疗保健设备和服务": "医药生物",
+    "软件服务": "互联网",
+    "资讯科技器材": "电子",
+    "媒体及娱乐": "传媒"
+  }
+}

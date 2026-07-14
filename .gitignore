@@ -14,6 +14,7 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
+node_modules/
 
 # Jupyter
 .ipynb_checkpoints/
@@ -38,6 +39,7 @@ data/db/*.sqlite3-*
 data/db/*.csv
 data/db/*.xlsx
 data/db/*.xls
+data/db/broker_statements_*/
 data/processed/embeddings/*
 !data/processed/embeddings/.gitkeep
 data/db/vector.index
@@ -51,3 +53,7 @@ secrets/
 
 # Local/private third-party setup manuals
 docs/playbooks/tushare_configuration_guide.pdf
+
+# Local broker statement inputs
+/交割单-广发.pdf
+/总交割单-华泰.zip

@@ -6,7 +6,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Any
 
-from .models import ClosedPositionCycle, PositionState, ZERO, row_decimal
+from .models import ClosedPositionCycle, LedgerCycle, PositionState, ZERO, row_decimal
 
 
 class AccountingError(ValueError):
@@ -240,6 +240,62 @@ def build_closed_position_cycles(rows: Iterable[Any]) -> list[ClosedPositionCycl
         key=lambda item: (item.closed_on, item.ts_code, item.cycle_number), reverse=True
     )
     return closed_cycles
+
+
+def build_ledger_cycles(rows: Iterable[Any]) -> list[LedgerCycle]:
+    """按证券和轮次归集原始台账行，供操作复盘与当前周期定位使用。"""
+
+    ordered_rows = list(rows)
+    # 先执行完整会计校验，避免周期视图掩盖超卖或非法金额等台账错误。
+    build_position_states(ordered_rows)
+    quantities: dict[str, Decimal] = {}
+    cycle_counts: dict[str, int] = {}
+    active: dict[str, LedgerCycle] = {}
+    cycles: list[LedgerCycle] = []
+
+    for row in ordered_rows:
+        ts_code = str(_read(row, "ts_code")).strip()
+        event_type = str(_read(row, "event_type")).strip().upper()
+        event_day = _event_date(row)
+        quantity = row_decimal(row, "quantity")
+        current_quantity = quantities.get(ts_code, ZERO)
+
+        if event_type in {"OPENING", "BUY"}:
+            if current_quantity == ZERO:
+                cycle_number = cycle_counts.get(ts_code, 0) + 1
+                cycle_counts[ts_code] = cycle_number
+                cycle = LedgerCycle(
+                    ts_code=ts_code,
+                    cycle_number=cycle_number,
+                    opened_on=event_day,
+                    opening_event_type=event_type,
+                )
+                active[ts_code] = cycle
+                cycles.append(cycle)
+            active[ts_code].entries.append(row)
+            quantities[ts_code] = current_quantity + quantity
+            continue
+
+        if event_type == "SELL":
+            cycle = active.get(ts_code)
+            if cycle is None:
+                raise AccountingError(
+                    f"{event_day.isoformat()} {ts_code}: 卖出前没有可追溯的持仓周期"
+                )
+            cycle.entries.append(row)
+            next_quantity = current_quantity - quantity
+            quantities[ts_code] = next_quantity
+            if next_quantity == ZERO:
+                cycle.closed_on = event_day
+                del active[ts_code]
+            continue
+
+        if event_type in {"DIVIDEND", "CASH_FEE"}:
+            if ts_code in active:
+                active[ts_code].entries.append(row)
+            continue
+
+    return cycles
 
 
 def portfolio_totals(position_rows: Iterable[Mapping[str, Any]]) -> dict[str, Decimal]:
