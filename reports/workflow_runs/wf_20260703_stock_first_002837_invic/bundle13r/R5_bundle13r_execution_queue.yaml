@@ -1,0 +1,435 @@
+artifact_type: R5_bundle13r_execution_queue
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+source_bundle12r_generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+execution_order:
+- BF12R-002
+- BF12R-003
+- RERUN_BUNDLE12R_OPERATING_GATE
+- BF12R-001
+item_count: 21
+items:
+- item_id: FIN-GROSS_PROFIT
+  action_id: BF12R-002
+  target_kind: financial_total
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  metric_id: gross_profit
+  question: Qualify the consolidated gross_profit denominator for the same period and accounting boundary.
+  target_source_types:
+  - audited_financial_statement
+  - exchange_filing
+- item_id: FIN-REVENUE
+  action_id: BF12R-002
+  target_kind: financial_total
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  metric_id: revenue
+  question: Qualify the consolidated revenue denominator for the same period and accounting boundary.
+  target_source_types:
+  - audited_financial_statement
+  - exchange_filing
+- item_id: Q-OEQ-001
+  action_id: BF12R-002
+  target_kind: driver
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  question_id: OEQ-001
+  segment_id: room_cooling
+  driver_id: volume
+  question: What qualified volume was produced or sold by 机房温控节能产品, in what period and unit?
+  target_source_types:
+  - audited_financial_note
+  - issuer_operating_data
+  - exchange_disclosure
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- item_id: Q-OEQ-002
+  action_id: BF12R-002
+  target_kind: driver
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  question_id: OEQ-002
+  segment_id: room_cooling
+  driver_id: unit_price
+  question: What realized or bounded unit price applies to 机房温控节能产品, and how is it reconciled to revenue?
+  target_source_types:
+  - audited_financial_note
+  - issuer_ir
+  - industry_price_source
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- item_id: Q-OEQ-003
+  action_id: BF12R-002
+  target_kind: driver
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  question_id: OEQ-003
+  segment_id: room_cooling
+  driver_id: product_mix
+  question: What product mix changes the unit economics of 机房温控节能产品?
+  target_source_types:
+  - issuer_product_note
+  - issuer_ir
+  - customer_certification
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- item_id: Q-OEQ-004
+  action_id: BF12R-002
+  target_kind: driver
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  question_id: OEQ-004
+  segment_id: cabinet_cooling
+  driver_id: volume
+  question: What qualified volume was produced or sold by 机柜温控节能产品, in what period and unit?
+  target_source_types:
+  - audited_financial_note
+  - issuer_operating_data
+  - exchange_disclosure
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- item_id: Q-OEQ-005
+  action_id: BF12R-002
+  target_kind: driver
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  question_id: OEQ-005
+  segment_id: cabinet_cooling
+  driver_id: unit_price
+  question: What realized or bounded unit price applies to 机柜温控节能产品, and how is it reconciled to revenue?
+  target_source_types:
+  - audited_financial_note
+  - issuer_ir
+  - industry_price_source
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- item_id: Q-OEQ-006
+  action_id: BF12R-002
+  target_kind: driver
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  question_id: OEQ-006
+  segment_id: cabinet_cooling
+  driver_id: product_mix
+  question: What product mix changes the unit economics of 机柜温控节能产品?
+  target_source_types:
+  - issuer_product_note
+  - issuer_ir
+  - customer_certification
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- item_id: Q-OEQ-007
+  action_id: BF12R-002
+  target_kind: driver
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  question_id: OEQ-007
+  segment_id: data_center_liquid_cooling_related
+  driver_id: unit_value
+  question: What bounded or confirmed value per project, cabinet, MW or delivery unit applies to 数据中心机房及算力设备液冷技术相关业务?
+  target_source_types:
+  - contract_disclosure
+  - issuer_ir
+  - tender_result
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- item_id: Q-OEQ-008
+  action_id: BF12R-002
+  target_kind: driver
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  question_id: OEQ-008
+  segment_id: data_center_liquid_cooling_related
+  driver_id: acceptance_rate
+  question: What delivery-to-acceptance conversion rate governs 数据中心机房及算力设备液冷技术相关业务 revenue recognition?
+  target_source_types:
+  - customer_acceptance
+  - accounting_policy_note
+  - issuer_ir
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- item_id: Q-OEQ-009
+  action_id: BF12R-002
+  target_kind: driver
+  target_stage: T1
+  owner_skill: evidence-ingest
+  priority: high
+  dependencies: []
+  status: open
+  question_id: OEQ-009
+  segment_id: data_center_liquid_cooling_related
+  driver_id: gross_margin
+  question: What independent gross-margin evidence or bounded range applies to 数据中心机房及算力设备液冷技术相关业务?
+  target_source_types:
+  - audited_segment_note
+  - issuer_ir
+  - comparable_contract
+  acceptance:
+    allowed_statuses:
+    - confirmed
+    - bounded_estimate
+    must_include:
+    - unit
+    - period
+    - confidence
+    - evidence_ids
+    - financial_mapping
+- item_id: EXP-cabinet_cooling
+  action_id: BF12R-003
+  target_kind: independent_exposure
+  target_stage: T2
+  owner_skill: stock-deep-dive
+  priority: high
+  dependencies:
+  - FIN-REVENUE
+  - FIN-GROSS_PROFIT
+  status: open
+  segment_id: cabinet_cooling
+  question: Qualify independent quantitative exposure for cabinet_cooling without double counting contained themes.
+  target_source_types:
+  - audited_segment_note
+  - issuer_operating_data
+  - bounded_reconciliation
+- item_id: EXP-data_center_liquid_cooling_related
+  action_id: BF12R-003
+  target_kind: independent_exposure
+  target_stage: T2
+  owner_skill: stock-deep-dive
+  priority: high
+  dependencies:
+  - FIN-REVENUE
+  - FIN-GROSS_PROFIT
+  status: open
+  segment_id: data_center_liquid_cooling_related
+  question: Qualify independent quantitative exposure for data_center_liquid_cooling_related without double counting contained
+    themes.
+  target_source_types:
+  - audited_segment_note
+  - issuer_operating_data
+  - bounded_reconciliation
+- item_id: EXP-room_cooling
+  action_id: BF12R-003
+  target_kind: independent_exposure
+  target_stage: T2
+  owner_skill: stock-deep-dive
+  priority: high
+  dependencies:
+  - FIN-REVENUE
+  - FIN-GROSS_PROFIT
+  status: open
+  segment_id: room_cooling
+  question: Qualify independent quantitative exposure for room_cooling without double counting contained themes.
+  target_source_types:
+  - audited_segment_note
+  - issuer_operating_data
+  - bounded_reconciliation
+- item_id: OVL-001
+  action_id: BF12R-003
+  target_kind: overlap
+  target_stage: T2
+  owner_skill: stock-deep-dive
+  priority: high
+  dependencies:
+  - EXP-room_cooling
+  - EXP-cabinet_cooling
+  status: open
+  left_segment_id: room_cooling
+  right_segment_id: cabinet_cooling
+  question: Classify the relationship and supply an evidence-backed numeric allocation or deduction rule.
+  target_source_types:
+  - audited_segment_note
+  - issuer_ir
+  - accounting_reconciliation
+- item_id: OVL-002
+  action_id: BF12R-003
+  target_kind: overlap
+  target_stage: T2
+  owner_skill: stock-deep-dive
+  priority: high
+  dependencies:
+  - EXP-room_cooling
+  - EXP-data_center_liquid_cooling_related
+  status: open
+  left_segment_id: room_cooling
+  right_segment_id: data_center_liquid_cooling_related
+  question: Classify the relationship and supply an evidence-backed numeric allocation or deduction rule.
+  target_source_types:
+  - audited_segment_note
+  - issuer_ir
+  - accounting_reconciliation
+- item_id: OVL-003
+  action_id: BF12R-003
+  target_kind: overlap
+  target_stage: T2
+  owner_skill: stock-deep-dive
+  priority: high
+  dependencies:
+  - EXP-cabinet_cooling
+  - EXP-data_center_liquid_cooling_related
+  status: open
+  left_segment_id: cabinet_cooling
+  right_segment_id: data_center_liquid_cooling_related
+  question: Classify the relationship and supply an evidence-backed numeric allocation or deduction rule.
+  target_source_types:
+  - audited_segment_note
+  - issuer_ir
+  - accounting_reconciliation
+- item_id: RERUN-B12R
+  action_id: RERUN_BUNDLE12R_OPERATING_GATE
+  target_kind: gate_rerun
+  target_stage: RP-12R-OE
+  owner_skill: research-orchestrator
+  priority: high
+  dependencies:
+  - Q-OEQ-001
+  - Q-OEQ-002
+  - Q-OEQ-003
+  - Q-OEQ-004
+  - Q-OEQ-005
+  - Q-OEQ-006
+  - Q-OEQ-007
+  - Q-OEQ-008
+  - Q-OEQ-009
+  - FIN-REVENUE
+  - FIN-GROSS_PROFIT
+  - EXP-room_cooling
+  - EXP-cabinet_cooling
+  - EXP-data_center_liquid_cooling_related
+  - OVL-001
+  - OVL-002
+  - OVL-003
+  status: open
+  question: Re-run Bundle 12R on the promoted input and preserve the exact output generation.
+- item_id: VAL-DCF_ELIGIBILITY_PACK
+  action_id: BF12R-001
+  target_kind: valuation_eligibility
+  target_stage: RP6
+  owner_skill: company-valuation
+  priority: medium
+  dependencies:
+  - RERUN-B12R
+  status: open
+  target_artifact: dcf_eligibility_pack.yaml
+  question: Refresh this method-eligibility pack only after Bundle 12R returns operating_evidence_ready.
+  deferred: true
+- item_id: VAL-PEER_OPERATING_EVIDENCE_PACK
+  action_id: BF12R-001
+  target_kind: valuation_eligibility
+  target_stage: RP6
+  owner_skill: company-valuation
+  priority: medium
+  dependencies:
+  - RERUN-B12R
+  status: open
+  target_artifact: peer_operating_evidence_pack.yaml
+  question: Refresh this method-eligibility pack only after Bundle 12R returns operating_evidence_ready.
+  deferred: true
+- item_id: VAL-SOTP_ELIGIBILITY_PACK
+  action_id: BF12R-001
+  target_kind: valuation_eligibility
+  target_stage: RP6
+  owner_skill: company-valuation
+  priority: medium
+  dependencies:
+  - RERUN-B12R
+  status: open
+  target_artifact: sotp_eligibility_pack.yaml
+  question: Refresh this method-eligibility pack only after Bundle 12R returns operating_evidence_ready.
+  deferred: true
+sample_quality_allowed: false
+p2_allowed: false

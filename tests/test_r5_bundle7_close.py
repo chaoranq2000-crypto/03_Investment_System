@@ -28,11 +28,20 @@ def test_bundle7_reader_remains_historical_fail_closed_while_current_workflow_ad
     assert scorecard["truthfulness_status"] == "pass"
     assert scorecard["human_review_status"] == "not_ready"
     assert not scorecard["sample_quality_report_allowed"] and not scorecard["p2_allowed"]
-    assert state["status"] in {"accepted_with_todos", "needs_fix"}
-    assert state["current_stage"] in {"T10_close_readout", "R5_bundle9r_closed", "T9_quality_review"}
+    assert state["status"] in {"accepted_with_todos", "needs_fix", "in_progress"}
+    assert state["current_stage"] in {
+        "T10_close_readout",
+        "R5_bundle9r_closed",
+        "T9_quality_review",
+        "R5_bundle13r_t1_t2_evidence_backflow",
+    }
     if state["current_stage"] == "T9_quality_review":
         assert state["next_stage"] == "T7_stock_report_draft"
         assert state["required_next_skill"] == "stock-deep-dive"
+    elif state["current_stage"] == "R5_bundle13r_t1_t2_evidence_backflow":
+        assert state["next_stage"] == "R5_bundle13r_t1_t2_evidence_backflow"
+        assert state["required_next_skill"] == "evidence-ingest"
+        assert state["bundle13r_backflow_execution"]["status"] == "backflow_execution_in_progress"
     else:
         assert state["next_stage"] is None
         assert state["required_next_skill"] is None

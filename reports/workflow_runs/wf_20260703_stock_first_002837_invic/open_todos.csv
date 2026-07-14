@@ -67,3 +67,5 @@ R5B12R-OVERLAP-001,high,R5_bundle12r_backflow_close,R5_bundle12r_coverage_report
 R5B12R-PEER-001,medium,R5_bundle12r_backflow_close,R5_bundle12r_valuation_eligibility.yaml,0家同业同时满足业务定义期间指标定义和置信度要求,company-valuation,open,2026-07-15,,至少3家同口径经营指标通过审阅后重检
 R5B12R-DCF-001,medium,R5_bundle12r_backflow_close,R5_bundle12r_valuation_eligibility.yaml,DCF仅有3期OCF和2期capex且营运资金桥税率WACC终值增长不合格,company-valuation,open,2026-07-15,,补齐全部可追溯DCF输入后独立重检
 R5B12R-SOTP-001,medium,R5_bundle12r_backflow_close,R5_bundle12r_valuation_eligibility.yaml,三个重大业务均缺少完整独立财务量适用方法或重叠消除,company-valuation,open,2026-07-15,,取得同口径分部经济性与消除关系后独立重检
+R5B13R-DRIVER-001,high,R5_bundle13r_t1_t2_evidence_backflow,bundle13r/R5_bundle13r_unresolved_items.csv,live刷新后九个同口径经营驱动仍未资格化,evidence-ingest,open,2026-07-15,,等待发行人定期报告或IR披露机房机柜量价组合及液冷单位价值验收率毛利后从T1复跑
+R5B13R-OVERLAP-001,high,R5_bundle13r_t1_t2_evidence_backflow,bundle13r/R5_bundle13r_unresolved_items.csv,两组液冷横切口径仍缺收入和毛利数值扣减导致不能完成reconciliation,stock-deep-dive,open,2026-07-15,,先由evidence-ingest取得同期间分配证据再更新overlaps并从T2复跑

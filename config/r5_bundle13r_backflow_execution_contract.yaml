@@ -1,0 +1,81 @@
+artifact_type: R5_bundle13r_backflow_execution_contract
+schema_version: 1
+bundle_id: R5_BUNDLE_13R_EVIDENCE_BACKFLOW_EXECUTION
+local_gate_id: RP-13R-BF
+baseline:
+  target_commit_prefix: 64f6787b
+  allow_compatible_descendant: true
+  bundle12r_generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+  bundle12r_workflow_id: wf_20260703_stock_first_002837_invic
+  bundle12r_decision: needs_backflow
+  required_bundle12r_artifacts:
+    R5_bundle12r_backflow_plan.yaml: 8aacce378fc1b4838d9470770b71a82efb0ba614fe2ab3917059904485c5103f
+    R5_bundle12r_operating_evidence_input_snapshot.yaml: 9de6bc0588d0e27fb43d8071379880dfe02cd4b22218a5991cd11d177a3d203f
+    R5_bundle12r_operating_evidence_result.yaml: 6bd9ff2064babdb013eb16b58f8b0b0dba2b89c7a9f2d8dd079ef6fbdf739eec
+    R5_bundle12r_research_question_plan.yaml: 4260648fa3a9871dcea6031e2cb62af9141a46e4b2fd5709867aa1dd1bec0407
+execution_order:
+  - BF12R-002
+  - BF12R-003
+  - RERUN_BUNDLE12R_OPERATING_GATE
+  - BF12R-001
+execution_dependencies:
+  BF12R-002: []
+  BF12R-003: [BF12R-002]
+  RERUN_BUNDLE12R_OPERATING_GATE: [BF12R-002, BF12R-003]
+  BF12R-001: [RERUN_BUNDLE12R_OPERATING_GATE]
+source_tiers:
+  A:
+    allowed_for_confirmed: true
+    allowed_for_bounded_estimate: true
+  B:
+    allowed_for_confirmed: true
+    allowed_for_bounded_estimate: true
+  C:
+    allowed_for_confirmed: false
+    allowed_for_bounded_estimate: true
+  D:
+    allowed_for_confirmed: false
+    allowed_for_bounded_estimate: false
+qualification:
+  confirmed_min_confidence: 0.70
+  bounded_estimate_min_confidence: 0.50
+  require_review_status: reviewed
+  require_evidence_ids: true
+  require_locators: true
+  require_period: true
+  require_unit: true
+  require_financial_mapping_for_driver: true
+  bounded_estimate_requires:
+    - lower_bound
+    - upper_bound
+    - methodology
+    - overlap_treatment
+    - replacement_trigger
+  missing_or_conflicting_requires:
+    - report_limitation
+    - replacement_trigger
+promotion_requirements:
+  required_financial_denominators: [revenue, gross_profit]
+  material_segment_independent_exposure: true
+  overlap_relations: [disjoint, contains, overlaps]
+  overlap_numeric_adjustment_required_for: [contains, overlaps]
+  require_all_t1_t2_items_resolved_before_rerun: true
+  valuation_deferred_until_bundle12r_operating_ready: true
+prohibited_promotions:
+  - product_or_solution_exists_to_revenue
+  - customer_intention_to_accepted_project
+  - industry_market_size_to_issuer_revenue
+  - shipment_or_delivery_to_recognized_revenue_without_acceptance_rule
+  - broad_segment_plus_contained_theme_double_count
+  - missing_or_conflicting_to_confirmed_without_reviewed_evidence
+fixed_boundaries:
+  preserves_bundle11r_exact_hash_review: true
+  preserves_bundle12r_generation: true
+  human_review_status: pending
+  sample_quality_allowed: false
+  p2_allowed: false
+exit_codes:
+  ready_for_bundle12r_rerun: 0
+  operating_evidence_requalified: 0
+  backflow_execution_in_progress: 2
+  blocked_invalid_reviewed_backfill: 3

@@ -17,7 +17,7 @@ def read_csv(path: Path) -> list[dict[str, str]]:
 
 def test_bundle8b_local_close_state_is_synchronized() -> None:
     state = yaml.safe_load((RUN / "workflow_state.yaml").read_text(encoding="utf-8"))
-    assert state["status"] in {"accepted_with_todos", "needs_fix"}
+    assert state["status"] in {"accepted_with_todos", "needs_fix", "in_progress"}
     assert "R5_bundle8_research_depth_close" in state["completed_stages"]
     assert state["current_stage"] in {
         "R5_bundle8_closed",
@@ -26,7 +26,10 @@ def test_bundle8b_local_close_state_is_synchronized() -> None:
         "T10_close_readout",
         "R5_bundle9r_closed",
         "T9_quality_review",
+        "R5_bundle13r_t1_t2_evidence_backflow",
     }
+    if state["current_stage"] == "R5_bundle13r_t1_t2_evidence_backflow":
+        assert state["bundle13r_backflow_execution"]["status"] == "backflow_execution_in_progress"
     assert state["bundle8_close"]["bundle_closed"] is True
     assert state["bundle8_close"]["reader_regenerated"] is False
     assert state["bundle8_close"]["reader_decision"] == "rejected"

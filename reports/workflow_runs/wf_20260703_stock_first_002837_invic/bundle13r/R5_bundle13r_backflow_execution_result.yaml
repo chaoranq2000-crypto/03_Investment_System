@@ -1,0 +1,35 @@
+artifact_type: R5_bundle13r_backflow_execution_result
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+source_bundle12r_generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+decision: backflow_execution_in_progress
+resolved_t1_t2_item_count: 6
+unresolved_t1_t2_item_count: 11
+resolved_t1_t2_items:
+- EXP-cabinet_cooling
+- EXP-data_center_liquid_cooling_related
+- EXP-room_cooling
+- FIN-GROSS_PROFIT
+- FIN-REVENUE
+- OVL-001
+unresolved_t1_t2_items:
+- OVL-002
+- OVL-003
+- Q-OEQ-001
+- Q-OEQ-002
+- Q-OEQ-003
+- Q-OEQ-004
+- Q-OEQ-005
+- Q-OEQ-006
+- Q-OEQ-007
+- Q-OEQ-008
+- Q-OEQ-009
+validation_issue_count: 0
+blocker_count: 0
+issues: []
+bundle12r_rerun_decision: null
+valuation_backflow_allowed: false
+required_next_skill: evidence-ingest
+human_review_status: pending
+sample_quality_allowed: false
+p2_allowed: false

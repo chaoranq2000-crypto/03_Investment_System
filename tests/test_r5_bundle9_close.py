@@ -43,7 +43,10 @@ def test_bundle9_canonical_state_is_closed_but_reader_remains_fail_closed() -> N
         "T10_close_readout",
         "R5_bundle9r_closed",
         "T9_quality_review",
+        "R5_bundle13r_t1_t2_evidence_backflow",
     }
+    if state["current_stage"] == "R5_bundle13r_t1_t2_evidence_backflow":
+        assert state["bundle13r_backflow_execution"]["status"] == "backflow_execution_in_progress"
     assert state["bundle9_close"]["bundle_closed"] is True
     assert state["bundle9_close"]["sample_quality_allowed"] is False
     assert state["bundle9_close"]["p2_allowed"] is False

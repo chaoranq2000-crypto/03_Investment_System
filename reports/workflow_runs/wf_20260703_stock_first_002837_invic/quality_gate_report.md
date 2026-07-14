@@ -1,4 +1,6 @@
-# R5 Bundle 11R 质量报告
+# Workflow Quality Gate Report
+
+> 当前质量面：Bundle 13R 为 `needs_fix`，技术关闭状态为 `R5_BUNDLE13R_BACKFLOW_IN_PROGRESS`。下方 Bundle 11R 正文保留为历史；当前详细检查见 `bundle13r/R5_bundle13r_quality_report.md`。
 
 > 历史兼容标记：早期 `quality_gate_report.md` 中的 pre-Bundle 7 快照为 `historical_snapshot_superseded_by_bundle7_quality_rebaseline`；其替代质量面保存在 `R5_bundle7_quality_gate_report.md`。本文件当前正文记录11R前向候选，不改写该历史关系。
 
@@ -36,3 +38,15 @@
 ## 边界
 
 旧Reader v5的人审结论不转移到新哈希。`sample_quality_allowed=false`，`p2_allowed=false`。本文不构成投资建议。
+
+## Bundle 13R 当前质量面
+
+| check | result | notes |
+|---|---|---|
+| canonical binding | pass | `op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27` and four exact hashes verified. |
+| evidence / claim type | pass | Official source chain is traceable; facts, bounded management comments, inference and missing fields remain separated. |
+| driver qualification | needs_fix | Nine T1 operating drivers remain missing. |
+| exposure / overlap | needs_fix | Two liquid-theme overlaps lack revenue and gross-profit deductions. |
+| backflow truthfulness | pass | 6 resolved, 11 unresolved, 0 schema/validation blockers; rerun and valuation remain closed. |
+| regression / lock | pass | 773 passed, 2 skipped; generation lock valid; deterministic hash drift 0. |
+| safety | pass | `human_review_status=pending`; `sample_quality_allowed=false`; `p2_allowed=false`; no direct trading instruction. |

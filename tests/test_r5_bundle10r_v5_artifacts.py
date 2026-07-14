@@ -61,10 +61,15 @@ def test_v5_human_review_pass_closes_current_loop_without_rewriting_failure_hist
     assert submission["decision"] == "accepted"
     assert submission["input_hashes"]["report_sha256"] == sha256_file(RUN / "R5_bundle10r_reader_v5.md")
     assert submission["prior_review_round"]["decision"] == "revision_required"
-    assert state["status"] == "accepted_with_todos"
-    assert state["current_stage"] == "T10_close_readout"
-    assert state["next_stage"] is None
-    assert state["required_next_skill"] is None
+    assert state["status"] in {"accepted_with_todos", "in_progress"}
+    assert state["current_stage"] in {"T10_close_readout", "R5_bundle13r_t1_t2_evidence_backflow"}
+    if state["current_stage"] == "R5_bundle13r_t1_t2_evidence_backflow":
+        assert state["next_stage"] == "R5_bundle13r_t1_t2_evidence_backflow"
+        assert state["required_next_skill"] == "evidence-ingest"
+        assert state["bundle13r_backflow_execution"]["status"] == "backflow_execution_in_progress"
+    else:
+        assert state["next_stage"] is None
+        assert state["required_next_skill"] is None
     assert state["canonical_reader_status"] == "reader_v5_human_review_passed_with_todos"
     assert state["bundle10r_rebuild"]["human_review_status"] == "pending"
     assert state["bundle10r_v5_revision"]["status"] == "candidate_ready_for_human_review"

@@ -315,3 +315,20 @@ Stage A is locally complete. Handoff 17 authorizes the evidence layer to proceed
 - 条件阶段4未触发：未重算模型、未生成新Reader、未创建新人工审核状态；Bundle 11R精确哈希人审保持不变。
 - 独立子agent完成实现、负向变异、真实锁、状态面和旧Reader边界复核：0 blocker、0 advisory；建议功能分支远端CI通过后合并main。
 - `sample_quality_allowed=false`；`p2_allowed=false`；无投资指令。
+
+## 2026-07-15 Bundle 13R evidence backflow execution
+
+| Step | Status | Notes |
+|---|---|---|
+| Latest package rediscovery | pass | `R5_BUNDLE_13R_EVIDENCE_BACKFLOW_PACKAGE_20260715.zip` is latest; SHA256 `c9fbd577647b2e7eba2c9269f57bcfedf4664d7008695d7643c80b83e9ea0a49`. |
+| Original package preflight | rejected_then_repaired | Package bound the old `e356...` fixture generation and four mismatched hashes. The failure is preserved; canonical contract now binds `op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27`. |
+| T1 evidence refresh | completed_with_material_gaps | SZSE and CNINFO IR live receipts registered; no same-definition evidence closed the nine operating-driver gaps. |
+| T2 overlap review | partial | room/cabinet is disjoint; room/liquid and cabinet/liquid are overlaps with revenue and gross-profit adjustments still missing. |
+| Strict backflow | backflow_execution_in_progress | exit=2; resolved=6; unresolved=11; validation blockers=0; generation `backflow_gen_r5_bundle13r_fb8cefccfaa93293`. |
+| Bundle 12R rerun | not_executed | `ready_for_bundle12r_rerun` precondition is false. |
+| Valuation refresh | not_executed | `operating_evidence_requalified` precondition is false; peer/DCF/SOTP stay closed. |
+| State sync | pass | Preview reviewed, pre-state backup created, adapter fields and TODO ledgers synchronized; workflow remains `in_progress` with `evidence-ingest` next. |
+| Determinism and lock | pass | Eight generated/input artifacts have zero second-run hash drift; generation lock validates. |
+| Regression | pass | Bundle13R focused 19 passed; historical forward-state set 20 passed; full repository 773 passed, 2 skipped in 33.25s. |
+| Quality | needs_fix | Four open high research gaps; two original preflight critical issues are resolved. Technical close state is `R5_BUNDLE13R_BACKFLOW_IN_PROGRESS`. |
+| Boundary | preserved | Human review pending; sample quality=false; P2=false; no model/Reader regeneration, commit or push. |

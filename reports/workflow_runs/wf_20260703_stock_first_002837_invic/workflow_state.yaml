@@ -1,13 +1,13 @@
 workflow_id: wf_20260703_stock_first_002837_invic
 workflow_type: stock_first_closed_loop
-status: accepted_with_todos
-quality_target: R5_bundle11r_reader_human_review_passed
+status: in_progress
+quality_target: R5_bundle13r_evidence_backflow_execution
 created_at: 2026-07-03
 updated_at: '2026-07-15'
 owner: mixed
 active_segment_id: ai_server_liquid_cooling
 active_company_id: cn_002837_invic
-current_stage: T10_close_readout
+current_stage: R5_bundle13r_t1_t2_evidence_backflow
 completed_stages:
 - T0_intake
 - T1_evidence_plan
@@ -89,9 +89,9 @@ completed_stages:
 - R5_bundle12r_2_overlap_exposure_gate
 - R5_bundle12r_3_valuation_eligibility_gate
 - R5_bundle12r_backflow_close
-next_stage: null
-active_skill: null
-required_next_skill: null
+next_stage: R5_bundle13r_t1_t2_evidence_backflow
+active_skill: evidence-ingest
+required_next_skill: evidence-ingest
 forward_requalification_current_stage: R5_bundle12r_backflow_close
 forward_requalification_next_stage: T1_on_new_official_evidence
 evidence_snapshot:
@@ -1022,45 +1022,50 @@ open_todos:
   target_artifact: R5_bundle11r_operating_evidence_gap_requests.yaml
   description: 液冷项目数或交付容量缺少可复算正式口径
   fix_owner_skill: evidence-ingest
-  status: open
+  status: closed
   created_at: '2026-07-14'
-  notes: 取得正式披露后替换缺口并重跑经营驱动
+  resolved_at: '2026-07-15'
+  notes: 由 RP-12R-OE 严格门与 R5B12R-DRIVER-001 接管。
 - issue_id: R5B11R-METRIC-001
   severity: medium
   stage: R5_bundle11r_8_automated_close
   target_artifact: R5_bundle11r_research_question_matrix.yaml
   description: 分部单位价值、产品组合、单位成本与验收周期缺失
   fix_owner_skill: evidence-ingest
-  status: open
+  status: closed
   created_at: '2026-07-14'
-  notes: 取得可复算口径后登记指标并替换有边界估计
+  resolved_at: '2026-07-15'
+  notes: 由 RP-12R-OE 严格门与 R5B12R-DRIVER-001 接管。
 - issue_id: R5B11R-TRACE-001
   severity: medium
   stage: R5_bundle11r_8_automated_close
   target_artifact: R5_bundle11r_reader_input_pack.yaml
   description: 液冷与宽产品线收入的重叠消除规则缺失
   fix_owner_skill: evidence-ingest
-  status: open
+  status: closed
   created_at: '2026-07-14'
-  notes: 取得分项与消除关系后更新claim
+  resolved_at: '2026-07-15'
+  notes: 由 RP-12R-OE 严格门与 R5B12R-OVERLAP-001 接管。
 - issue_id: R5B11R-EXPOSURE-001
   severity: medium
   stage: R5_bundle11r_8_automated_close
   target_artifact: R5_bundle11r_segment_driver_plan.yaml
   description: 液冷独立收入、毛利与营运资金暴露仍不可拆分
   fix_owner_skill: segment-company-mapping
-  status: open
+  status: closed
   created_at: '2026-07-14'
-  notes: 独立经济性出现后刷新暴露记录
+  resolved_at: '2026-07-15'
+  notes: 由 RP-12R-OE 严格门接管。
 - issue_id: R5B11R-PEER-001
   severity: medium
   stage: R5_bundle11r_8_automated_close
   target_artifact: R5_bundle11r_peer_eligibility.yaml
   description: 4家候选同业均不满足经营定义与预测日期可比要求
   fix_owner_skill: company-valuation
-  status: open
+  status: closed
   created_at: '2026-07-14'
-  notes: 至少3家形成同口径后重审同业方法
+  resolved_at: '2026-07-15'
+  notes: 由 R5B12R-PEER-001 接管。
 - issue_id: R5B11R-HUMAN-001
   severity: medium
   stage: R5_bundle11r_8_automated_close
@@ -1077,18 +1082,83 @@ open_todos:
   target_artifact: R5_bundle11r_reader_input_pack.yaml
   description: 现金流折现方法输入仍不完整
   fix_owner_skill: company-valuation
-  status: open
+  status: closed
   created_at: '2026-07-14'
-  notes: 补齐净债务、折现率和终值输入后重检
+  resolved_at: '2026-07-15'
+  notes: 由 R5B12R-DCF-001 接管。
 - issue_id: R5B11R-SOTP-001
   severity: medium
   stage: R5_bundle11r_8_automated_close
   target_artifact: R5_bundle11r_reader_input_pack.yaml
   description: 分部加总方法缺少独立经济性与消除关系
   fix_owner_skill: company-valuation
-  status: open
+  status: closed
   created_at: '2026-07-14'
-  notes: 取得同口径输入后重检
+  resolved_at: '2026-07-15'
+  notes: 由 R5B12R-SOTP-001 接管。
+- issue_id: R5B12R-DRIVER-001
+  severity: high
+  stage: R5_bundle12r_backflow_close
+  target_artifact: bundle12r/R5_bundle12r_operating_evidence_input.yaml
+  description: 三个重大业务的关键驱动仅 1/10 合格，机房机柜量价组合及液冷单位价值、验收率、毛利缺失。
+  fix_owner_skill: evidence-ingest
+  status: open
+  created_at: '2026-07-15'
+  notes: 新官方披露出现后补齐同口径驱动并从 T1 重跑。
+- issue_id: R5B12R-OVERLAP-001
+  severity: high
+  stage: R5_bundle12r_backflow_close
+  target_artifact: bundle12r/R5_bundle12r_coverage_report.yaml
+  description: 液冷与机房机柜宽口径之间缺少收入及毛利数值扣减。
+  fix_owner_skill: stock-deep-dive
+  status: open
+  created_at: '2026-07-15'
+  notes: 取得同口径扣减或分配证据后更新 overlaps 并从 T2 重跑。
+- issue_id: R5B12R-PEER-001
+  severity: medium
+  stage: R5_bundle12r_backflow_close
+  target_artifact: bundle12r/R5_bundle12r_valuation_eligibility.yaml
+  description: 0 家同业同时满足业务定义、期间、指标定义和置信度要求。
+  fix_owner_skill: company-valuation
+  status: open
+  created_at: '2026-07-15'
+  notes: 至少 3 家同口径经营指标通过审阅后重检。
+- issue_id: R5B12R-DCF-001
+  severity: medium
+  stage: R5_bundle12r_backflow_close
+  target_artifact: bundle12r/R5_bundle12r_valuation_eligibility.yaml
+  description: DCF 缺少合格营运资金桥、税率、WACC、终值增长和完整期间输入。
+  fix_owner_skill: company-valuation
+  status: open
+  created_at: '2026-07-15'
+  notes: 补齐全部可追溯 DCF 输入后独立重检。
+- issue_id: R5B12R-SOTP-001
+  severity: medium
+  stage: R5_bundle12r_backflow_close
+  target_artifact: bundle12r/R5_bundle12r_valuation_eligibility.yaml
+  description: 三个重大业务均缺少完整独立财务量、适用方法或重叠消除。
+  fix_owner_skill: company-valuation
+  status: open
+  created_at: '2026-07-15'
+  notes: 取得同口径分部经济性与消除关系后独立重检。
+- issue_id: R5B13R-DRIVER-001
+  severity: high
+  stage: R5_bundle13r_t1_t2_evidence_backflow
+  target_artifact: bundle13r/R5_bundle13r_unresolved_items.csv
+  description: live 刷新后九个同口径经营驱动仍未资格化。
+  fix_owner_skill: evidence-ingest
+  status: open
+  created_at: '2026-07-15'
+  notes: 等待发行人定期报告或 IR 披露后从 T1 复跑。
+- issue_id: R5B13R-OVERLAP-001
+  severity: high
+  stage: R5_bundle13r_t1_t2_evidence_backflow
+  target_artifact: bundle13r/R5_bundle13r_unresolved_items.csv
+  description: 两组液冷横切口径仍缺收入和毛利数值扣减。
+  fix_owner_skill: stock-deep-dive
+  status: open
+  created_at: '2026-07-15'
+  notes: evidence-ingest 取得同期间分配证据后更新 overlaps 并从 T2 复跑。
 quality_gates:
 - gate_id: G1
   status: pass
@@ -1266,13 +1336,14 @@ quality_backflow:
   sample_quality_report_allowed: false
   p2_allowed: false
   bundle8_evidence_route_completed: true
-  current_first_route: null
-  current_first_stage: R5_bundle10r_v5_final_close
+  current_first_route: evidence-ingest
+  current_first_stage: R5_bundle13r_t1_t2_evidence_backflow
   bundle9_forecast_valuation_completed: true
   prior_source_scorecard: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3_quality_scorecard.yaml
   critical_blocker_count: 0
   canonical_reader_status: reader_v5_human_review_passed_with_todos
   canonical_sample_quality_allowed: false
+  canonical_p2_allowed: false
 bundle8_close:
   decision: accepted_with_todos
   bundle_closed: true
@@ -1761,3 +1832,32 @@ bundle12r_close:
   sample_quality_allowed: false
   p2_allowed: false
 bundle12r_candidate_reader_status: not_generated_operating_gate_blocked
+bundle13r_backflow_execution:
+  status: backflow_execution_in_progress
+  generation_id: backflow_gen_r5_bundle13r_fb8cefccfaa93293
+  source_bundle12r_generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+  resolved_t1_t2_item_count: 6
+  unresolved_t1_t2_item_count: 11
+  valuation_backflow_allowed: false
+  human_review_status: pending
+  sample_quality_allowed: false
+  p2_allowed: false
+bundle13r_technical_close:
+  decision: R5_BUNDLE13R_BACKFLOW_IN_PROGRESS
+  closed_at: '2026-07-15'
+  package_task_chain_processed: true
+  quality_outcome: needs_fix
+  open_critical: 0
+  open_high: 4
+  bundle12r_rerun_executed: false
+  valuation_refresh_executed: false
+  generation_lock_validation: pass
+  deterministic_hash_drift_count: 0
+  focused_regression_passed: 19
+  full_regression_passed: 773
+  full_regression_skipped: 2
+  close_readout: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle13r/R5_bundle13r_close_readout.md
+  next_trigger: reviewed_same-period_official_operating_evidence
+  human_review_status: pending
+  sample_quality_allowed: false
+  p2_allowed: false

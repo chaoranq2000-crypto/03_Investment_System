@@ -1,0 +1,237 @@
+artifact_type: R5_bundle13r_reviewed_backfill_input
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+issuer:
+  stock_code: 002837.SZ
+  company_name: 英维克
+as_of_date: '2026-07-15'
+source_bundle12r_generation_id: op_evidence_gen_r5_bundle12r_e3567efdc999aa91
+review:
+  status: reviewed
+  reviewer: fixture-reviewer
+  reviewed_at: '2026-07-15'
+  notes: synthetic contract fixture; not issuer evidence
+responses:
+- response_id: RESP-OEQ-001
+  question_id: OEQ-001
+  segment_id: broad_data_center_thermal
+  driver_id: project_count
+  status: confirmed
+  value: 20
+  unit: projects
+  period: 2025A
+  confidence: 0.8
+  source_tier: B
+  evidence_ids:
+  - FIX-OEQ-001
+  locators:
+  - fixture:OEQ-001
+  financial_mapping: revenue
+- response_id: RESP-OEQ-002
+  question_id: OEQ-002
+  segment_id: broad_data_center_thermal
+  driver_id: unit_value
+  status: confirmed
+  value: 40
+  unit: CNY_mn_per_project
+  period: 2025A
+  confidence: 0.8
+  source_tier: B
+  evidence_ids:
+  - FIX-OEQ-002
+  locators:
+  - fixture:OEQ-002
+  financial_mapping: revenue
+- response_id: RESP-OEQ-003
+  question_id: OEQ-003
+  segment_id: broad_data_center_thermal
+  driver_id: acceptance_rate
+  status: confirmed
+  value: 0.9
+  unit: ratio
+  period: 2025A
+  confidence: 0.8
+  source_tier: B
+  evidence_ids:
+  - FIX-OEQ-003
+  locators:
+  - fixture:OEQ-003
+  financial_mapping: revenue
+- response_id: RESP-OEQ-004
+  question_id: OEQ-004
+  segment_id: broad_data_center_thermal
+  driver_id: gross_margin
+  status: confirmed
+  value: 0.2875
+  unit: ratio
+  period: 2025A
+  confidence: 0.8
+  source_tier: B
+  evidence_ids:
+  - FIX-OEQ-004
+  locators:
+  - fixture:OEQ-004
+  financial_mapping: gross_profit
+- response_id: RESP-OEQ-005
+  question_id: OEQ-005
+  segment_id: liquid_cooling_related
+  driver_id: project_count
+  status: confirmed
+  value: 5
+  unit: projects
+  period: 2025A
+  confidence: 0.8
+  source_tier: B
+  evidence_ids:
+  - FIX-OEQ-005
+  locators:
+  - fixture:OEQ-005
+  financial_mapping: revenue
+- response_id: RESP-OEQ-006
+  question_id: OEQ-006
+  segment_id: liquid_cooling_related
+  driver_id: unit_value
+  status: confirmed
+  value: 40
+  unit: CNY_mn_per_project
+  period: 2025A
+  confidence: 0.8
+  source_tier: B
+  evidence_ids:
+  - FIX-OEQ-006
+  locators:
+  - fixture:OEQ-006
+  financial_mapping: revenue
+- response_id: RESP-OEQ-007
+  question_id: OEQ-007
+  segment_id: liquid_cooling_related
+  driver_id: acceptance_rate
+  status: confirmed
+  value: 1.0
+  unit: ratio
+  period: 2025A
+  confidence: 0.8
+  source_tier: B
+  evidence_ids:
+  - FIX-OEQ-007
+  locators:
+  - fixture:OEQ-007
+  financial_mapping: revenue
+- response_id: RESP-OEQ-008
+  question_id: OEQ-008
+  segment_id: liquid_cooling_related
+  driver_id: gross_margin
+  status: confirmed
+  value: 0.35
+  unit: ratio
+  period: 2025A
+  confidence: 0.8
+  source_tier: B
+  evidence_ids:
+  - FIX-OEQ-008
+  locators:
+  - fixture:OEQ-008
+  financial_mapping: gross_profit
+financial_totals:
+  revenue:
+    status: confirmed
+    value: 1000
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0.95
+    source_tier: A
+    evidence_ids:
+    - FIX-AUDITED-REV
+    locators:
+    - fixture:revenue
+  gross_profit:
+    status: confirmed
+    value: 300
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0.95
+    source_tier: A
+    evidence_ids:
+    - FIX-AUDITED-GP
+    locators:
+    - fixture:gross_profit
+  operating_cash_flow_history: []
+  capex_history: []
+  working_capital_bridge:
+    status: missing
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+    locators: []
+    report_limitation: Fixture does not qualify working capital.
+    replacement_trigger:
+      metric_or_event: working_capital_bridge
+      due_or_review_date: '2026-12-31'
+      source_plan: audited_notes
+independent_exposures:
+- segment_id: broad_data_center_thermal
+  status: confirmed
+  value: 800
+  unit: CNY_mn
+  period: 2025A
+  confidence: 0.85
+  source_tier: A
+  evidence_ids:
+  - FIX-SEG-BROAD
+  locators:
+  - fixture:broad
+  quantitative_metric_ids:
+  - metric_broad_revenue
+- segment_id: liquid_cooling_related
+  status: confirmed
+  value: 200
+  unit: CNY_mn
+  period: 2025A
+  confidence: 0.8
+  source_tier: B
+  evidence_ids:
+  - FIX-SEG-LC
+  locators:
+  - fixture:liquid
+  quantitative_metric_ids:
+  - metric_lc_revenue
+overlaps:
+- left_segment_id: broad_data_center_thermal
+  right_segment_id: liquid_cooling_related
+  relation: contains
+  allocation_method: direct_deduction_from_broad_segment
+  evidence_ids:
+  - FIX-OVERLAP
+  locators:
+  - fixture:overlap
+  revenue_adjustment:
+    status: confirmed
+    value: -200
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0.8
+    source_tier: B
+    evidence_ids:
+    - FIX-OVERLAP-REV
+    locators:
+    - fixture:overlap-revenue
+  gross_profit_adjustment:
+    status: confirmed
+    value: -70
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0.75
+    source_tier: B
+    evidence_ids:
+    - FIX-OVERLAP-GP
+    locators:
+    - fixture:overlap-gp
+valuation_inputs:
+  peers: []
+  dcf: {}
+  sotp:
+    components: []
+sample_quality_allowed: false
+p2_allowed: false

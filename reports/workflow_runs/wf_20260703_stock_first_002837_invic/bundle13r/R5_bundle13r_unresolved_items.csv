@@ -1,0 +1,12 @@
+item_id,action_id,target_kind,target_stage,owner_skill,segment_id,driver_id,question,dependencies
+Q-OEQ-001,BF12R-002,driver,T1,evidence-ingest,room_cooling,volume,"What qualified volume was produced or sold by 机房温控节能产品, in what period and unit?",
+Q-OEQ-002,BF12R-002,driver,T1,evidence-ingest,room_cooling,unit_price,"What realized or bounded unit price applies to 机房温控节能产品, and how is it reconciled to revenue?",
+Q-OEQ-003,BF12R-002,driver,T1,evidence-ingest,room_cooling,product_mix,What product mix changes the unit economics of 机房温控节能产品?,
+Q-OEQ-004,BF12R-002,driver,T1,evidence-ingest,cabinet_cooling,volume,"What qualified volume was produced or sold by 机柜温控节能产品, in what period and unit?",
+Q-OEQ-005,BF12R-002,driver,T1,evidence-ingest,cabinet_cooling,unit_price,"What realized or bounded unit price applies to 机柜温控节能产品, and how is it reconciled to revenue?",
+Q-OEQ-006,BF12R-002,driver,T1,evidence-ingest,cabinet_cooling,product_mix,What product mix changes the unit economics of 机柜温控节能产品?,
+Q-OEQ-007,BF12R-002,driver,T1,evidence-ingest,data_center_liquid_cooling_related,unit_value,"What bounded or confirmed value per project, cabinet, MW or delivery unit applies to 数据中心机房及算力设备液冷技术相关业务?",
+Q-OEQ-008,BF12R-002,driver,T1,evidence-ingest,data_center_liquid_cooling_related,acceptance_rate,What delivery-to-acceptance conversion rate governs 数据中心机房及算力设备液冷技术相关业务 revenue recognition?,
+Q-OEQ-009,BF12R-002,driver,T1,evidence-ingest,data_center_liquid_cooling_related,gross_margin,What independent gross-margin evidence or bounded range applies to 数据中心机房及算力设备液冷技术相关业务?,
+OVL-002,BF12R-003,overlap,T2,stock-deep-dive,,,Classify the relationship and supply an evidence-backed numeric allocation or deduction rule.,EXP-room_cooling;EXP-data_center_liquid_cooling_related
+OVL-003,BF12R-003,overlap,T2,stock-deep-dive,,,Classify the relationship and supply an evidence-backed numeric allocation or deduction rule.,EXP-cabinet_cooling;EXP-data_center_liquid_cooling_related

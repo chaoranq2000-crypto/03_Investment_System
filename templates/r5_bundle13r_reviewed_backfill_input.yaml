@@ -1,0 +1,277 @@
+artifact_type: R5_bundle13r_reviewed_backfill_input
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+issuer:
+  stock_code: 002837.SZ
+  company_name: 英维克
+as_of_date: '2026-07-15'
+source_bundle12r_generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+review:
+  status: pending
+  reviewer: ''
+  reviewed_at: ''
+  notes: 继承 Bundle 12R evidence review ledger；本回填映射仍需复核后才能改为 reviewed。
+responses:
+- response_id: RESP-OEQ-001
+  question_id: OEQ-001
+  segment_id: room_cooling
+  driver_id: volume
+  status: missing
+  unit: segment_units
+  period: 2025A
+  confidence: 0
+  source_tier: D
+  evidence_ids: []
+  locators: []
+  financial_mapping: revenue
+  report_limitation: MISSING：公司级销量不能替代机房温控分部销量。
+  replacement_trigger: {metric_or_event: room_cooling_segment_volume, due_or_review_date: '2026-08-31', source_plan: issuer_filing_and_ir}
+- response_id: RESP-OEQ-002
+  question_id: OEQ-002
+  segment_id: room_cooling
+  driver_id: unit_price
+  status: missing
+  unit: CNY_per_segment_unit
+  period: 2025A
+  confidence: 0
+  source_tier: D
+  evidence_ids: []
+  locators: []
+  financial_mapping: revenue
+  report_limitation: MISSING：公司级混合单价不能作为机房温控已实现单价。
+  replacement_trigger: {metric_or_event: room_cooling_realized_unit_price, due_or_review_date: '2026-08-31', source_plan: issuer_filing_and_ir}
+- response_id: RESP-OEQ-003
+  question_id: OEQ-003
+  segment_id: room_cooling
+  driver_id: product_mix
+  status: missing
+  unit: ratio
+  period: 2025A
+  confidence: 0
+  source_tier: D
+  evidence_ids: []
+  locators: []
+  financial_mapping: gross_profit
+  report_limitation: MISSING：未披露机房温控同口径产品组合量化桥。
+  replacement_trigger: {metric_or_event: room_cooling_product_mix_bridge, due_or_review_date: '2026-08-31', source_plan: issuer_product_note_and_ir}
+- response_id: RESP-OEQ-004
+  question_id: OEQ-004
+  segment_id: cabinet_cooling
+  driver_id: volume
+  status: missing
+  unit: segment_units
+  period: 2025A
+  confidence: 0
+  source_tier: D
+  evidence_ids: []
+  locators: []
+  financial_mapping: revenue
+  report_limitation: MISSING：公司级销量不能替代机柜温控分部销量。
+  replacement_trigger: {metric_or_event: cabinet_cooling_segment_volume, due_or_review_date: '2026-08-31', source_plan: issuer_filing_and_ir}
+- response_id: RESP-OEQ-005
+  question_id: OEQ-005
+  segment_id: cabinet_cooling
+  driver_id: unit_price
+  status: missing
+  unit: CNY_per_segment_unit
+  period: 2025A
+  confidence: 0
+  source_tier: D
+  evidence_ids: []
+  locators: []
+  financial_mapping: revenue
+  report_limitation: MISSING：公司级混合单价不能作为机柜温控已实现单价。
+  replacement_trigger: {metric_or_event: cabinet_cooling_realized_unit_price, due_or_review_date: '2026-08-31', source_plan: issuer_filing_and_ir}
+- response_id: RESP-OEQ-006
+  question_id: OEQ-006
+  segment_id: cabinet_cooling
+  driver_id: product_mix
+  status: missing
+  unit: ratio
+  period: 2025A
+  confidence: 0
+  source_tier: D
+  evidence_ids: []
+  locators: []
+  financial_mapping: gross_profit
+  report_limitation: MISSING：未披露机柜温控同口径产品组合量化桥。
+  replacement_trigger: {metric_or_event: cabinet_cooling_product_mix_bridge, due_or_review_date: '2026-08-31', source_plan: issuer_product_note_and_ir}
+- response_id: RESP-OEQ-007
+  question_id: OEQ-007
+  segment_id: data_center_liquid_cooling_related
+  driver_id: unit_value
+  status: missing
+  unit: CNY_mn_per_project_or_MW
+  period: 2025A
+  confidence: 0
+  source_tier: D
+  evidence_ids: []
+  locators: []
+  financial_mapping: revenue
+  report_limitation: MISSING：累计交付容量和旧期收入不能推导同口径单位价值量。
+  replacement_trigger: {metric_or_event: liquid_cooling_contract_or_tender_value, due_or_review_date: '2026-08-31', source_plan: contract_disclosure_and_tender_results}
+- response_id: RESP-OEQ-008
+  question_id: OEQ-008
+  segment_id: data_center_liquid_cooling_related
+  driver_id: acceptance_rate
+  status: missing
+  unit: ratio
+  period: 2025A
+  confidence: 0
+  source_tier: D
+  evidence_ids: []
+  locators: []
+  financial_mapping: revenue
+  report_limitation: MISSING：未披露液冷交付至验收和收入确认的量化转换率。
+  replacement_trigger: {metric_or_event: liquid_cooling_acceptance_cycle, due_or_review_date: '2026-08-31', source_plan: accounting_policy_customer_acceptance_and_ir}
+- response_id: RESP-OEQ-009
+  question_id: OEQ-009
+  segment_id: data_center_liquid_cooling_related
+  driver_id: gross_margin
+  status: missing
+  unit: ratio
+  period: 2025A
+  confidence: 0
+  source_tier: D
+  evidence_ids: []
+  locators: []
+  financial_mapping: gross_profit
+  report_limitation: MISSING：发行人未单独披露液冷相关业务毛利率或可复核区间。
+  replacement_trigger: {metric_or_event: liquid_cooling_margin_or_bounded_bridge, due_or_review_date: '2026-08-31', source_plan: issuer_disclosure_and_reviewed_bridge}
+financial_totals:
+  revenue:
+    status: confirmed
+    value: 6067.75909155
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0.99
+    source_tier: A
+    evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+    locators: [2025年年度报告全文 lines 497-502]
+  gross_profit:
+    status: confirmed
+    value: 1690.63331057
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0.99
+    source_tier: A
+    evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+    locators: [2025年年度报告全文 lines 525-528]
+    calculation_method: reported_revenue_minus_reported_cost
+  operating_cash_flow_history:
+  - {status: confirmed, value: 453.07204034, unit: CNY_mn, period: 2023A, confidence: 0.95, source_tier: A, evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]}
+  - {status: confirmed, value: 199.83501495, unit: CNY_mn, period: 2024A, confidence: 0.95, source_tier: A, evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]}
+  - {status: confirmed, value: 157.27322236, unit: CNY_mn, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]}
+  capex_history:
+  - {status: confirmed, value: 353.30247372, unit: CNY_mn, period: 2024A, confidence: 0.95, source_tier: A, evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]}
+  - {status: confirmed, value: 303.00020771, unit: CNY_mn, period: 2025A, confidence: 0.95, source_tier: A, evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]}
+  working_capital_bridge:
+    status: missing
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+    locators: []
+    report_limitation: MISSING：公司级营运资金数据不能替代液冷独立营运资金桥。
+    replacement_trigger: {metric_or_event: liquid_cooling_working_capital_bridge, due_or_review_date: '2026-08-31', source_plan: audited_financial_notes}
+independent_exposures:
+- segment_id: room_cooling
+  status: confirmed
+  value: 0.5683
+  unit: revenue_share
+  period: 2025A
+  confidence: 0.95
+  source_tier: A
+  evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+  locators: [2025年年度报告全文 lines 497-502]
+  quantitative_metric_ids: [metric_company_cn_002837_invic_room_cooling_revenue_share_2025A_12r]
+- segment_id: cabinet_cooling
+  status: confirmed
+  value: 0.3259
+  unit: revenue_share
+  period: 2025A
+  confidence: 0.95
+  source_tier: A
+  evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+  locators: [2025年年度报告全文 lines 497-502]
+  quantitative_metric_ids: [metric_company_cn_002837_invic_cabinet_cooling_revenue_share_2025A_12r]
+- segment_id: data_center_liquid_cooling_related
+  status: bounded_estimate
+  lower_bound: 250
+  upper_bound: 350
+  methodology: 以发行人对 2024A 液冷相关营业收入约 3 亿元的管理层表述形成保守区间。
+  overlap_treatment: 与机房、机柜宽口径存在未量化重叠，仅证明独立暴露存在，不与分部收入相加。
+  unit: CNY_mn_revenue
+  period: 2024A
+  confidence: 0.55
+  source_tier: B
+  evidence_ids: [ev_official_disclosure_002837_20250423_e78396]
+  locators: [2024年度业绩说明会记录 lines 84-88]
+  quantitative_metric_ids: [metric_company_cn_002837_invic_liquid_cooling_related_revenue_2024A_12r]
+  replacement_trigger: {metric_or_event: audited_liquid_cooling_revenue, due_or_review_date: '2026-08-31', source_plan: issuer_filing_and_ir}
+overlaps:
+- left_segment_id: room_cooling
+  right_segment_id: cabinet_cooling
+  relation: disjoint
+  allocation_method: 年报按两个产品线分别披露收入与成本，保持各自报告值，不做跨线相加调整。
+  evidence_ids: [ev_annual_report_002837_20260421_2cbfc5]
+  locators: [2025年年度报告全文 lines 500-502 and 526-528]
+- left_segment_id: room_cooling
+  right_segment_id: data_center_liquid_cooling_related
+  relation: overlaps
+  allocation_method: 保持未分配；液冷主题收入不得与机房温控收入相加，待发行人披露可核验扣减后再分配。
+  evidence_ids: [ev_annual_report_002837_20260421_2cbfc5, ev_official_disclosure_002837_20250423_e78396]
+  locators: [2025年年度报告全文 lines 500-502, 2024年度业绩说明会记录 lines 84-88]
+  revenue_adjustment:
+    status: missing
+    unit: CNY_mn
+    period: 2024A_vs_2025A
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+    locators: []
+    report_limitation: MISSING：未披露液冷主题计入机房温控收入的可核验金额。
+    replacement_trigger: {metric_or_event: room_liquid_revenue_allocation, due_or_review_date: '2026-08-31', source_plan: audited_segment_note_or_ir}
+  gross_profit_adjustment:
+    status: missing
+    unit: CNY_mn
+    period: 2024A_vs_2025A
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+    locators: []
+    report_limitation: MISSING：未披露液冷主题计入机房温控毛利的可核验金额。
+    replacement_trigger: {metric_or_event: room_liquid_gross_profit_allocation, due_or_review_date: '2026-08-31', source_plan: audited_segment_note_or_ir}
+- left_segment_id: cabinet_cooling
+  right_segment_id: data_center_liquid_cooling_related
+  relation: overlaps
+  allocation_method: 保持未分配；液冷主题收入不得与机柜温控收入相加，待发行人披露可核验扣减后再分配。
+  evidence_ids: [ev_annual_report_002837_20260421_2cbfc5, ev_official_disclosure_002837_20250423_e78396]
+  locators: [2025年年度报告全文 lines 500-502, 2024年度业绩说明会记录 lines 84-88]
+  revenue_adjustment:
+    status: missing
+    unit: CNY_mn
+    period: 2024A_vs_2025A
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+    locators: []
+    report_limitation: MISSING：未披露液冷主题计入机柜温控收入的可核验金额。
+    replacement_trigger: {metric_or_event: cabinet_liquid_revenue_allocation, due_or_review_date: '2026-08-31', source_plan: audited_segment_note_or_ir}
+  gross_profit_adjustment:
+    status: missing
+    unit: CNY_mn
+    period: 2024A_vs_2025A
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+    locators: []
+    report_limitation: MISSING：未披露液冷主题计入机柜温控毛利的可核验金额。
+    replacement_trigger: {metric_or_event: cabinet_liquid_gross_profit_allocation, due_or_review_date: '2026-08-31', source_plan: audited_segment_note_or_ir}
+valuation_inputs:
+  peers: []
+  dcf: {}
+  sotp: {components: []}
+sample_quality_allowed: false
+p2_allowed: false

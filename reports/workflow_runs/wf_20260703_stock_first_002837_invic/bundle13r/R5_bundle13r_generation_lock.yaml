@@ -1,0 +1,24 @@
+artifact_type: R5_bundle13r_generation_lock
+schema_version: 1
+generation_id: backflow_gen_r5_bundle13r_fb8cefccfaa93293
+workflow_id: wf_20260703_stock_first_002837_invic
+source_bundle12r_generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+decision: backflow_execution_in_progress
+input_hashes:
+  contract:
+    file: R5_bundle13r_backflow_execution_contract_snapshot.yaml
+    sha256: 7c313ce7b8a24e9c5615d3914501651702c403106a545a4479ff6ff03c919ffe
+  reviewed_backfill:
+    file: R5_bundle13r_reviewed_backfill_input_snapshot.yaml
+    sha256: 704d8fc40ed9f938c1588d0a0a76cfb7f2c80c807abcf20489024d649ceed011
+artifact_hashes:
+  R5_bundle13r_execution_queue.yaml: 471e149f8efeb59b247f9342e7eb1017bdaa98ca2ea82d4d14868a9745d51c11
+  R5_bundle13r_backflow_execution_result.yaml: 5fdffe16e79f8c85cea938f6fa834c7054b10e58477eba884a5b838c5d5aa059
+  R5_bundle13r_promoted_operating_evidence_input.yaml: ca3355274cfa15a861a955cee6f20f80dcb0202799722b142b3d4984b16c47b0
+  R5_bundle13r_unresolved_items.csv: f351bd8a6922322c2f79c90dfa22392f2add9512ce3e849c9abbc2a6aa99a39e
+  R5_bundle13r_rerun_bundle12r.md: b1880c62f62bc0eaadeac49616ae338019a0e75954857fc4c1e15e83a5b1d54e
+preserves_bundle11r_exact_hash_review: true
+preserves_bundle12r_generation: true
+human_review_status: pending
+sample_quality_allowed: false
+p2_allowed: false

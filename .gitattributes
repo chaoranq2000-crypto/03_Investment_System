@@ -6,6 +6,14 @@
 *.yaml text eol=lf
 *.toml text eol=lf
 
+# Bundle 13R evidence files carry SHA256-bound source bytes or are derived
+# receipts for those sources. Keep their checkout representation stable.
+data/raw/announcements/exchange_fallback_adapter_announcement_official_002837_2026-07-15_bd40f1a3.json text eol=lf
+data/raw/company_ir_product/cninfo_irm_adapter_irm_interaction_002837_2026-07-15_2430bfbf.json text eol=lf
+data/processed/logs/ev_official_disclosure_002837_20260715_bd40f1__ingest_log.json text eol=lf
+data/processed/logs/ev_company_ir_product_002837_20260715_2430bf__ingest_log.json text eol=lf
+reports/workflow_runs/wf_20260703_stock_first_002837_invic/workflow_state.yaml.pre_bundle13r_20260715.bak text eol=lf
+
 # These historical Bundle 10 artifacts are bound to an externally reviewed
 # SHA256 over CRLF bytes.  Force the worktree representation so checkout does
 # not invalidate the signed hashes while keeping the repository text-diffable.

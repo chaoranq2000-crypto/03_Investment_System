@@ -236,3 +236,9 @@ readouts:
     backflow rollback evidence and closed sample-quality/P2 boundaries
   replacement_or_supplement_path: null
   blocking_for_strict_smoke: true
+- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle13r/R5_bundle13r_close_readout.md
+  canonical_status: canonical
+  reason: Bundle 13R records the hash-bound evidence-backflow execution at the truthful
+    backflow-in-progress state with unresolved items and downstream gates closed
+  replacement_or_supplement_path: null
+  blocking_for_strict_smoke: true

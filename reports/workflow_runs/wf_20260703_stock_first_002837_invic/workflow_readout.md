@@ -51,3 +51,16 @@
 | Model / Reader regeneration | not_triggered | Conditional Stage 4 requires `operating_evidence_ready`; no new Reader or human-review record was created. |
 | Backflow | closed_until_new_official_evidence | Routed to evidence-ingest, stock-deep-dive and company-valuation; rerun from T1 after reviewed new official disclosure. |
 | Final boundary | pass | Bundle 11R exact-hash review preserved; `sample_quality_allowed=false`; `p2_allowed=false`. |
+
+## Bundle 13R evidence-backflow technical close
+
+| Step | Status | Notes |
+|---|---|---|
+| Baseline binding | pass_after_repair | Canonical Bundle 12R generation `op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27` and four physical hashes pass; original package mismatch is retained as history. |
+| T1 evidence review | partial_with_material_gaps | Financial denominators confirmed; nine operating drivers remain missing after live official-source refresh. |
+| T2 exposure and overlap | partial_with_material_gaps | Three independent exposures qualified; room/cabinet disjoint; two liquid overlaps lack revenue and gross-profit deductions. |
+| Strict backflow | backflow_execution_in_progress | 6 resolved, 11 unresolved, 0 validation blockers; generation `backflow_gen_r5_bundle13r_fb8cefccfaa93293`. |
+| Bundle 12R / valuation | not_triggered | Rerun and RP6 preconditions are false; methods remain closed. |
+| Verification | pass | 19 focused; 20 historical compatibility; 773 full-suite passed and 2 skipped; zero deterministic drift; lock/state/evidence/doc/diff checks pass. |
+| Current route | evidence-ingest | New same-period issuer operating evidence triggers T1 replay; overlap deduction evidence then triggers T2 replay. |
+| Final boundary | pass | `human_review_status=pending`; `sample_quality_allowed=false`; `p2_allowed=false`; no new Reader, commit or push. |

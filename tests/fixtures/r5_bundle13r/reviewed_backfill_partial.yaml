@@ -1,0 +1,93 @@
+artifact_type: R5_bundle13r_reviewed_backfill_input
+as_of_date: '2026-07-15'
+financial_totals:
+  capex_history: []
+  gross_profit:
+    status: missing
+    unit: CNY_mn
+    period: 2025A
+    confidence: 0
+    source_tier: D
+    evidence_ids: []
+    locators: []
+    report_limitation: Gross-profit denominator remains unavailable.
+    replacement_trigger:
+      metric_or_event: audited_gross_profit
+      due_or_review_date: '2026-08-31'
+      source_plan: annual_report
+  operating_cash_flow_history: []
+  revenue:
+    confidence: 0.95
+    evidence_ids:
+    - FIX-AUDITED-REV
+    locators:
+    - fixture:revenue
+    period: 2025A
+    source_tier: A
+    status: confirmed
+    unit: CNY_mn
+    value: 1000
+  working_capital_bridge:
+    confidence: 0
+    evidence_ids: []
+    locators: []
+    period: 2025A
+    replacement_trigger:
+      due_or_review_date: '2026-12-31'
+      metric_or_event: working_capital_bridge
+      source_plan: audited_notes
+    report_limitation: Fixture does not qualify working capital.
+    source_tier: D
+    status: missing
+    unit: CNY_mn
+independent_exposures: []
+issuer:
+  company_name: 英维克
+  stock_code: 002837.SZ
+overlaps: []
+p2_allowed: false
+responses:
+- confidence: 0.8
+  driver_id: project_count
+  evidence_ids:
+  - FIX-OEQ-001
+  financial_mapping: revenue
+  locators:
+  - fixture:OEQ-001
+  period: 2025A
+  question_id: OEQ-001
+  response_id: RESP-OEQ-001
+  segment_id: broad_data_center_thermal
+  source_tier: B
+  status: confirmed
+  unit: projects
+  value: 20
+- confidence: 0.8
+  driver_id: unit_value
+  evidence_ids:
+  - FIX-OEQ-002
+  financial_mapping: revenue
+  locators:
+  - fixture:OEQ-002
+  period: 2025A
+  question_id: OEQ-002
+  response_id: RESP-OEQ-002
+  segment_id: broad_data_center_thermal
+  source_tier: B
+  status: confirmed
+  unit: CNY_mn_per_project
+  value: 40
+review:
+  notes: synthetic contract fixture; not issuer evidence
+  reviewed_at: '2026-07-15'
+  reviewer: fixture-reviewer
+  status: reviewed
+sample_quality_allowed: false
+schema_version: 1
+source_bundle12r_generation_id: op_evidence_gen_r5_bundle12r_e3567efdc999aa91
+valuation_inputs:
+  dcf: {}
+  peers: []
+  sotp:
+    components: []
+workflow_id: wf_20260703_stock_first_002837_invic

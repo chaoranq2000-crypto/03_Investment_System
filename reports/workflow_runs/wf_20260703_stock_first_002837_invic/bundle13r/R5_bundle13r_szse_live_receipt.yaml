@@ -1,0 +1,42 @@
+schema_version: 1
+decision: pass
+adapter_id: exchange_fallback_adapter
+source_name: szse
+endpoint_hint: announcement_official
+mode: live
+workflow_id: wf_20260703_stock_first_002837_invic
+stock_code: 002837
+as_of_date: '2026-07-15'
+run_id: r5_bundle8r_exchange_fallback_adapter_announcement_official_bd40f1a3
+evidence_id: ev_official_disclosure_002837_20260715_bd40f1
+claim_boundary: material_fact_after_review
+checks:
+  fixture_verified: false
+  live_smoke_verified: true
+  raw_archive_verified: true
+  manifest_write_verified: true
+  schema_fingerprint_verified: true
+  claim_boundary_verified: true
+raw_file_path: data/raw/announcements/exchange_fallback_adapter_announcement_official_002837_2026-07-15_bd40f1a3.json
+processed_table_path: data/processed/normalized/exchange_fallback_adapter_announcement_official_002837_2026-07-15_bd40f1a3.csv
+ingest_log_path: data/processed/logs/ev_official_disclosure_002837_20260715_bd40f1__ingest_log.json
+source_url: https://www.szse.cn/api/disc/announcement/annList
+http_status: 200
+attempts: 1
+row_count: 50
+metric_candidates_created: 0
+claim_candidates_created: 0
+observed_fields:
+- pdf_url
+- publish_date
+- source_url
+- stock_code
+- title
+expected_fields:
+- title
+- publish_date
+- pdf_url
+- source_url
+missing_fields: []
+schema_fingerprint: f3a2b18aa9d6651aaf1c110430ef502c44dd7caa356bf8e94f389a6a9ae4336c
+notes: Official exchange fallback; claims still require document extraction and review.

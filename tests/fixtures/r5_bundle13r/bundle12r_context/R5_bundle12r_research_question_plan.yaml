@@ -1,0 +1,16 @@
+artifact_type: R5_bundle12r_research_question_plan
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+question_count: 9
+questions:
+  - {question_id: OEQ-001, segment_id: broad_data_center_thermal, driver_id: project_count, priority: high, question: project count, target_source_types: [issuer_project_list], owner_skill: evidence-ingest, target_stage: T1}
+  - {question_id: OEQ-002, segment_id: broad_data_center_thermal, driver_id: unit_value, priority: high, question: unit value, target_source_types: [contract_disclosure], owner_skill: evidence-ingest, target_stage: T1}
+  - {question_id: OEQ-003, segment_id: broad_data_center_thermal, driver_id: acceptance_rate, priority: high, question: acceptance rate, target_source_types: [accounting_policy_note], owner_skill: evidence-ingest, target_stage: T1}
+  - {question_id: OEQ-004, segment_id: broad_data_center_thermal, driver_id: gross_margin, priority: high, question: gross margin, target_source_types: [audited_segment_note], owner_skill: evidence-ingest, target_stage: T1}
+  - {question_id: OEQ-005, segment_id: liquid_cooling_related, driver_id: project_count, priority: high, question: project count, target_source_types: [issuer_project_list], owner_skill: evidence-ingest, target_stage: T1}
+  - {question_id: OEQ-006, segment_id: liquid_cooling_related, driver_id: unit_value, priority: high, question: unit value, target_source_types: [contract_disclosure], owner_skill: evidence-ingest, target_stage: T1}
+  - {question_id: OEQ-007, segment_id: liquid_cooling_related, driver_id: acceptance_rate, priority: high, question: acceptance rate, target_source_types: [accounting_policy_note], owner_skill: evidence-ingest, target_stage: T1}
+  - {question_id: OEQ-008, segment_id: liquid_cooling_related, driver_id: gross_margin, priority: high, question: gross margin, target_source_types: [audited_segment_note], owner_skill: evidence-ingest, target_stage: T1}
+  - {question_id: OEQ-009, segment_id: '', driver_id: overlap_reconciliation, priority: high, question: overlap, target_source_types: [audited_segment_note], owner_skill: stock-deep-dive, target_stage: T2}
+sample_quality_allowed: false
+p2_allowed: false

@@ -1,0 +1,66 @@
+artifact_type: R5_bundle13r_baseline_audit
+schema_version: 1
+expected_commit_prefix: 64f6787b
+observed_head: 64f6787beaf7b41807f3f41fefa305242e299004
+observed_branch: main
+commit_exact_or_descendant: true
+compatible_descendant: false
+bundle12r_context_valid: false
+bundle12r_context_issues:
+- code: BUNDLE12R_GENERATION_ID_MISMATCH
+  severity: critical
+  message: Expected op_evidence_gen_r5_bundle12r_e3567efdc999aa91, found op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+  scope: generation_id
+  target_stage: ''
+  owner_skill: ''
+- code: BUNDLE12R_LOCKED_HASH_MISMATCH
+  severity: critical
+  message: Lock hash for R5_bundle12r_backflow_plan.yaml does not match the Bundle 13R binding
+  scope: R5_bundle12r_backflow_plan.yaml
+  target_stage: ''
+  owner_skill: ''
+- code: BUNDLE12R_LOCKED_HASH_MISMATCH
+  severity: critical
+  message: Lock hash for R5_bundle12r_operating_evidence_input_snapshot.yaml does not match the Bundle 13R binding
+  scope: R5_bundle12r_operating_evidence_input_snapshot.yaml
+  target_stage: ''
+  owner_skill: ''
+- code: BUNDLE12R_LOCKED_HASH_MISMATCH
+  severity: critical
+  message: Lock hash for R5_bundle12r_operating_evidence_result.yaml does not match the Bundle 13R binding
+  scope: R5_bundle12r_operating_evidence_result.yaml
+  target_stage: ''
+  owner_skill: ''
+- code: BUNDLE12R_LOCKED_HASH_MISMATCH
+  severity: critical
+  message: Lock hash for R5_bundle12r_research_question_plan.yaml does not match the Bundle 13R binding
+  scope: R5_bundle12r_research_question_plan.yaml
+  target_stage: ''
+  owner_skill: ''
+- code: BUNDLE12R_PHYSICAL_HASH_MISMATCH
+  severity: critical
+  message: Physical hash mismatch for R5_bundle12r_backflow_plan.yaml
+  scope: R5_bundle12r_backflow_plan.yaml
+  target_stage: ''
+  owner_skill: ''
+- code: BUNDLE12R_PHYSICAL_HASH_MISMATCH
+  severity: critical
+  message: Physical hash mismatch for R5_bundle12r_operating_evidence_input_snapshot.yaml
+  scope: R5_bundle12r_operating_evidence_input_snapshot.yaml
+  target_stage: ''
+  owner_skill: ''
+- code: BUNDLE12R_PHYSICAL_HASH_MISMATCH
+  severity: critical
+  message: Physical hash mismatch for R5_bundle12r_operating_evidence_result.yaml
+  scope: R5_bundle12r_operating_evidence_result.yaml
+  target_stage: ''
+  owner_skill: ''
+- code: BUNDLE12R_PHYSICAL_HASH_MISMATCH
+  severity: critical
+  message: Physical hash mismatch for R5_bundle12r_research_question_plan.yaml
+  scope: R5_bundle12r_research_question_plan.yaml
+  target_stage: ''
+  owner_skill: ''
+decision: needs_fix
+sample_quality_allowed: false
+p2_allowed: false

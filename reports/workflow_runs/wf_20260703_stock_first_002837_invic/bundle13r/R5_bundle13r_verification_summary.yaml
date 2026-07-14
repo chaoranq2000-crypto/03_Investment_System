@@ -1,0 +1,76 @@
+artifact_type: R5_bundle13r_verification_summary
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+verified_at: '2026-07-15'
+package:
+  name: R5_BUNDLE_13R_EVIDENCE_BACKFLOW_PACKAGE_20260715.zip
+  sha256: c9fbd577647b2e7eba2c9269f57bcfedf4664d7008695d7643c80b83e9ea0a49
+  latest_local_archive: true
+  payload_file_count: 33
+  payload_exact_match_after_apply: true
+baseline:
+  observed_head: 64f6787beaf7b41807f3f41fefa305242e299004
+  observed_branch: main
+  source_bundle12r_generation_id: op_evidence_gen_r5_bundle12r_fd5d23c5eb35ac27
+  original_package_binding_rejected: true
+  canonical_baseline_audit: pass
+  original_failed_audit_preserved: true
+execution:
+  decision: backflow_execution_in_progress
+  generation_id: backflow_gen_r5_bundle13r_fb8cefccfaa93293
+  resolved_t1_t2_item_count: 6
+  unresolved_t1_t2_item_count: 11
+  validation_issue_count: 0
+  blocker_count: 0
+  bundle12r_rerun_executed: false
+  bundle12r_rerun_reason: decision_not_ready_for_bundle12r_rerun
+  valuation_refresh_executed: false
+  valuation_refresh_reason: operating_evidence_not_requalified
+checks:
+  focused_bundle13r:
+    status: pass
+    passed: 19
+    duration_seconds: 0.74
+  historical_forward_state_compatibility:
+    status: pass
+    passed: 20
+    duration_seconds: 1.68
+  full_repository:
+    status: pass
+    passed: 773
+    skipped: 2
+    duration_seconds: 33.25
+  deterministic_second_run:
+    status: pass
+    compared_artifact_count: 8
+    hash_drift_count: 0
+  generation_lock_validation: pass
+  workflow_state_validation: pass
+  evidence_manifest_validation: pass
+  evidence_path_validation: pass
+  candidate_validation: pass
+  doc_drift_check: pass
+  ast_compile:
+    status: pass
+    file_count: 7
+  bundle13r_yaml_parse:
+    status: pass
+    file_count: 13
+  quality_issue_schema:
+    status: pass
+    row_count: 4
+  git_diff_check: pass
+quality:
+  outcome: needs_fix
+  technical_close_state: R5_BUNDLE13R_BACKFLOW_IN_PROGRESS
+  open_critical: 0
+  open_high: 4
+  resolved_preflight_critical: 2
+boundaries:
+  human_review_status: pending
+  sample_quality_allowed: false
+  p2_allowed: false
+  reader_regenerated: false
+  model_regenerated: false
+  commit_created: false
+  push_performed: false

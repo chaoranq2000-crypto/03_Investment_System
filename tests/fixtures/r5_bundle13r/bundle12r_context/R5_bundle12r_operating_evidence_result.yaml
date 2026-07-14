@@ -1,0 +1,8 @@
+artifact_type: R5_bundle12r_operating_evidence_result
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+decision: needs_backflow
+blocker_count: 16
+issue_count: 19
+sample_quality_allowed: false
+p2_allowed: false

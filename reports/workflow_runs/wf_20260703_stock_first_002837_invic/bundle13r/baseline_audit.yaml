@@ -1,0 +1,12 @@
+artifact_type: R5_bundle13r_baseline_audit
+schema_version: 1
+expected_commit_prefix: 64f6787b
+observed_head: 64f6787beaf7b41807f3f41fefa305242e299004
+observed_branch: main
+commit_exact_or_descendant: true
+compatible_descendant: false
+bundle12r_context_valid: true
+bundle12r_context_issues: []
+decision: pass
+sample_quality_allowed: false
+p2_allowed: false
