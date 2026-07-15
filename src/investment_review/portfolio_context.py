@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -28,7 +28,22 @@ def _decimal_text(value: Decimal | None) -> str | None:
         return None
     if value == 0:
         return "0"
-    return format(value.normalize(), "f")
+    rendered = format(value, "f")
+    if "." in rendered:
+        rendered = rendered.rstrip("0").rstrip(".")
+    return rendered
+
+
+def _exact_sum(values: Iterable[Decimal]) -> Decimal:
+    items = tuple(values)
+    if not items:
+        return Decimal("0")
+    maximum_adjusted = max(item.adjusted() for item in items if item != 0) if any(items) else 0
+    minimum_exponent = min(item.as_tuple().exponent for item in items)
+    carry_digits = len(str(len(items))) + 2
+    with localcontext() as context:
+        context.prec = max(28, maximum_adjusted - minimum_exponent + carry_digits)
+        return sum(items, Decimal("0"))
 
 
 def _ratio(value: Decimal, denominator: Decimal) -> Decimal | None:
@@ -250,6 +265,89 @@ class PortfolioSnapshot:
         return snapshot
 
 
+@dataclass(frozen=True)
+class PortfolioWarning:
+    """A deterministic warning attached to one or more portfolio metrics."""
+
+    code: str
+    scope: str
+    message: str
+
+    def to_dict(self) -> dict[str, str]:
+        return {"code": self.code, "scope": self.scope, "message": self.message}
+
+
+@dataclass(frozen=True)
+class MetricEvidence:
+    """Traceable snapshot and position references used by a derived metric."""
+
+    source_id: str
+    source_path: str
+    snapshot_id: str
+    observed_at: str
+    available_at: str
+    position_keys: tuple[str, ...] = field(default_factory=tuple)
+
+    @property
+    def evidence_id(self) -> str:
+        material = {
+            "source_id": self.source_id,
+            "source_path": self.source_path,
+            "snapshot_id": self.snapshot_id,
+            "observed_at": self.observed_at,
+            "available_at": self.available_at,
+            "position_keys": list(self.position_keys),
+        }
+        return f"metric_evidence_{sha256_text(canonical_json(material))[:24]}"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "evidence_id": self.evidence_id,
+            "source_id": self.source_id,
+            "source_path": self.source_path,
+            "snapshot_id": self.snapshot_id,
+            "observed_at": self.observed_at,
+            "available_at": self.available_at,
+            "position_keys": list(self.position_keys),
+        }
+
+
+@dataclass(frozen=True)
+class PortfolioMetric:
+    """One observed or derived portfolio metric with evidence and uncertainty."""
+
+    metric_name: str
+    value: str | None
+    unit: str
+    calculation_method: str
+    as_of: str
+    available_at: str
+    status: str
+    source_refs: tuple[MetricEvidence, ...]
+    warnings: tuple[PortfolioWarning, ...] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        if self.status not in {"observed", "derived", "unavailable"}:
+            raise ModelValidationError(f"Unsupported portfolio metric status: {self.status}")
+        if self.status == "unavailable" and self.value is not None:
+            raise ModelValidationError("Unavailable portfolio metrics must not expose a value")
+        if not self.source_refs:
+            raise ModelValidationError("Portfolio metrics require at least one source reference")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "metric_name": self.metric_name,
+            "value": self.value,
+            "unit": self.unit,
+            "calculation_method": self.calculation_method,
+            "as_of": self.as_of,
+            "available_at": self.available_at,
+            "status": self.status,
+            "source_refs": [item.to_dict() for item in self.source_refs],
+            "warnings": [item.to_dict() for item in self.warnings],
+        }
+
+
 def snapshot_document(payload: Mapping[str, Any]) -> tuple[SourceDefinition, PortfolioSnapshot]:
     source_payload = payload.get("source")
     snapshot_payload = payload.get("snapshot")
@@ -385,6 +483,462 @@ def calculate_portfolio_metrics(snapshot: PortfolioSnapshot) -> dict[str, Any]:
     }
 
 
+def _metric_source_ref(
+    snapshot: PortfolioSnapshot,
+    position_keys: Iterable[str] = (),
+) -> MetricEvidence:
+    return MetricEvidence(
+        source_id=snapshot.source_id,
+        source_path=snapshot.source_path,
+        snapshot_id=snapshot.resolved_snapshot_id,
+        observed_at=snapshot.observed_at,
+        available_at=snapshot.known_at,
+        position_keys=tuple(sorted(set(position_keys))),
+    )
+
+
+_METRIC_CALCULATION_METHODS = {
+    "nav": "observed snapshot.net_asset_value",
+    "cash_value": "observed snapshot.cash",
+    "cash_weight": "cash_value / nav",
+    "long_market_value": "sum(positive base_market_value)",
+    "short_market_value": "sum(abs(negative base_market_value))",
+    "gross_market_value": "long_market_value + short_market_value",
+    "net_market_value": "long_market_value - short_market_value",
+    "long_exposure": "long_market_value / nav",
+    "short_exposure": "short_market_value / nav",
+    "gross_exposure": "gross_market_value / nav",
+    "net_exposure": "net_market_value / nav",
+    "position_count": "count(snapshot.positions)",
+    "valued_position_count": "count(positions with reviewed base_market_value)",
+    "valuation_coverage": "valued_position_count / position_count",
+    "missing_valuation_amount": "zero only when coverage is complete; otherwise unavailable",
+    "max_position_weight": "max(abs(base_market_value)) / gross_market_value",
+    "top3_concentration": "sum(top 3 abs(base_market_value)) / gross_market_value",
+    "top5_concentration": "sum(top 5 abs(base_market_value)) / gross_market_value",
+    "hhi": "sum((abs(base_market_value) / gross_market_value)^2)",
+    "max_industry_weight": "max(industry gross_market_value / gross_market_value)",
+    "unclassified_industry_weight": "UNKNOWN industry gross_market_value / gross_market_value",
+}
+
+
+def _metric_calculation_method(metric_name: str) -> str:
+    if metric_name.startswith("industry_weight::"):
+        return "industry gross_market_value / gross_market_value"
+    try:
+        return _METRIC_CALCULATION_METHODS[metric_name]
+    except KeyError as exc:
+        raise ModelValidationError(f"Missing calculation method for metric: {metric_name}") from exc
+
+
+def _portfolio_metric(
+    snapshot: PortfolioSnapshot,
+    *,
+    metric_name: str,
+    value: Decimal | int | None,
+    unit: str,
+    status: str,
+    position_keys: Iterable[str] = (),
+    warnings: Iterable[PortfolioWarning] = (),
+) -> PortfolioMetric:
+    rendered_value: str | None
+    if value is None:
+        rendered_value = None
+    elif isinstance(value, Decimal):
+        rendered_value = _decimal_text(value)
+    else:
+        rendered_value = str(value)
+    ordered_warnings = tuple(
+        sorted(warnings, key=lambda item: (item.code, item.scope, item.message))
+    )
+    return PortfolioMetric(
+        metric_name=metric_name,
+        value=rendered_value,
+        unit=unit,
+        calculation_method=_metric_calculation_method(metric_name),
+        as_of=snapshot.observed_at,
+        available_at=snapshot.known_at,
+        status=status,
+        source_refs=(_metric_source_ref(snapshot, position_keys),),
+        warnings=ordered_warnings,
+    )
+
+
+def calculate_portfolio_evidence_metrics(
+    snapshot: PortfolioSnapshot,
+) -> tuple[PortfolioMetric, ...]:
+    """Build deterministic, source-bound metrics for one reviewed snapshot.
+
+    Missing prices and FX rates remain outside valued aggregates.  Metrics based
+    on the available subset retain explicit warnings, while an unknown missing
+    valuation amount is never filled with zero.
+    """
+
+    snapshot.validate()
+    all_positions = sorted(snapshot.positions, key=lambda item: item.position_key)
+    all_keys = tuple(item.position_key for item in all_positions)
+    valued: list[tuple[PositionSnapshot, Decimal]] = []
+    missing: list[PositionSnapshot] = []
+    detail_warnings: list[PortfolioWarning] = []
+    for position in all_positions:
+        value = position.value_in_base(snapshot.base_currency)
+        if position.quantity < 0:
+            detail_warnings.append(
+                PortfolioWarning(
+                    code="NEGATIVE_QUANTITY_INTERPRETED_AS_SHORT",
+                    scope=position.position_key,
+                    message="Negative quantity is included as a short position in gross and net exposure.",
+                )
+            )
+        if (
+            position.market_value is not None
+            and position.quantity != 0
+            and (position.market_value > 0) != (position.quantity > 0)
+        ):
+            detail_warnings.append(
+                PortfolioWarning(
+                    code="QUANTITY_VALUE_SIGN_MISMATCH",
+                    scope=position.position_key,
+                    message="Quantity and explicit market value have inconsistent signs.",
+                )
+            )
+        zero_valuation = (
+            value == 0
+            and position.quantity != 0
+            and (position.price == 0 or position.market_value == 0)
+        )
+        if value is None or zero_valuation:
+            missing.append(position)
+            if position.currency != snapshot.base_currency and position.fx_rate_to_base is None:
+                detail_warnings.append(
+                    PortfolioWarning(
+                        code="MISSING_FX",
+                        scope=position.position_key,
+                        message="Non-base-currency valuation has no reviewed FX rate.",
+                    )
+                )
+            elif zero_valuation:
+                detail_warnings.append(
+                    PortfolioWarning(
+                        code="ZERO_VALUATION",
+                        scope=position.position_key,
+                        message="A non-zero position has a zero valuation and is excluded.",
+                    )
+                )
+            else:
+                detail_warnings.append(
+                    PortfolioWarning(
+                        code="MISSING_PRICE",
+                        scope=position.position_key,
+                        message="Position has neither a reviewed market value nor price.",
+                    )
+                )
+            continue
+        valued.append((position, value))
+
+    valued.sort(key=lambda item: (-abs(item[1]), item[0].position_key))
+    valued_keys = tuple(item.position_key for item, _ in valued)
+    long_value = _exact_sum(value for _, value in valued if value > 0)
+    short_value = _exact_sum(-value for _, value in valued if value < 0)
+    gross_value = _exact_sum((long_value, short_value))
+    net_value = _exact_sum((long_value, -short_value))
+    nav = snapshot.net_asset_value
+    reconciliation_gap = _exact_sum(
+        (nav, -snapshot.cash, -net_value, snapshot.financing)
+    )
+    if reconciliation_gap != 0:
+        detail_warnings.append(
+            PortfolioWarning(
+                code="NAV_RECONCILIATION_GAP",
+                scope="portfolio",
+                message="NAV does not reconcile to cash plus net valued positions less financing.",
+            )
+        )
+    nav_warning = PortfolioWarning(
+        code="NON_POSITIVE_NAV",
+        scope="portfolio",
+        message="NAV is not positive; weights and exposure ratios are unavailable.",
+    )
+    partial_warning = PortfolioWarning(
+        code="PARTIAL_VALUATION_COVERAGE",
+        scope="portfolio",
+        message="Valuation-based metrics use only positions with reviewed price and FX inputs.",
+    )
+    valuation_warnings: tuple[PortfolioWarning, ...] = tuple(
+        [*(detail_warnings), *([partial_warning] if missing else [])]
+    )
+
+    def nav_ratio_metric(
+        metric_name: str,
+        numerator: Decimal,
+        *,
+        position_keys: Iterable[str] = (),
+        warnings: Iterable[PortfolioWarning] = (),
+    ) -> PortfolioMetric:
+        if nav <= 0:
+            return _portfolio_metric(
+                snapshot,
+                metric_name=metric_name,
+                value=None,
+                unit="ratio_to_nav",
+                status="unavailable",
+                position_keys=position_keys,
+                warnings=(*warnings, nav_warning),
+            )
+        return _portfolio_metric(
+            snapshot,
+            metric_name=metric_name,
+            value=numerator / nav,
+            unit="ratio_to_nav",
+            status="derived",
+            position_keys=position_keys,
+            warnings=warnings,
+        )
+
+    metrics: list[PortfolioMetric] = [
+        _portfolio_metric(
+            snapshot,
+            metric_name="nav",
+            value=nav,
+            unit=snapshot.base_currency,
+            status="observed",
+        ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="cash_value",
+            value=snapshot.cash,
+            unit=snapshot.base_currency,
+            status="observed",
+        ),
+        nav_ratio_metric("cash_weight", snapshot.cash),
+        _portfolio_metric(
+            snapshot,
+            metric_name="long_market_value",
+            value=long_value,
+            unit=snapshot.base_currency,
+            status="derived",
+            position_keys=valued_keys,
+            warnings=valuation_warnings,
+        ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="short_market_value",
+            value=short_value,
+            unit=snapshot.base_currency,
+            status="derived",
+            position_keys=valued_keys,
+            warnings=valuation_warnings,
+        ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="gross_market_value",
+            value=gross_value,
+            unit=snapshot.base_currency,
+            status="derived",
+            position_keys=valued_keys,
+            warnings=valuation_warnings,
+        ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="net_market_value",
+            value=net_value,
+            unit=snapshot.base_currency,
+            status="derived",
+            position_keys=valued_keys,
+            warnings=valuation_warnings,
+        ),
+        nav_ratio_metric(
+            "long_exposure", long_value, position_keys=valued_keys, warnings=valuation_warnings
+        ),
+        nav_ratio_metric(
+            "short_exposure", short_value, position_keys=valued_keys, warnings=valuation_warnings
+        ),
+        nav_ratio_metric(
+            "gross_exposure", gross_value, position_keys=valued_keys, warnings=valuation_warnings
+        ),
+        nav_ratio_metric(
+            "net_exposure", net_value, position_keys=valued_keys, warnings=valuation_warnings
+        ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="position_count",
+            value=len(all_positions),
+            unit="count",
+            status="observed",
+            position_keys=all_keys,
+        ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="valued_position_count",
+            value=len(valued),
+            unit="count",
+            status="derived",
+            position_keys=all_keys,
+            warnings=valuation_warnings,
+        ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="valuation_coverage",
+            value=(
+                Decimal(len(valued)) / Decimal(len(all_positions))
+                if all_positions
+                else Decimal("1")
+            ),
+            unit="position_count_ratio",
+            status="derived",
+            position_keys=all_keys,
+            warnings=valuation_warnings,
+        ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="missing_valuation_amount",
+            value=None if missing else Decimal("0"),
+            unit=snapshot.base_currency,
+            status="unavailable" if missing else "derived",
+            position_keys=(item.position_key for item in missing),
+            warnings=(
+                *valuation_warnings,
+                *(
+                    (
+                        PortfolioWarning(
+                            code="MISSING_VALUATION_AMOUNT_UNKNOWN",
+                            scope="portfolio",
+                            message="Missing price or FX inputs prevent a base-currency amount.",
+                        ),
+                    )
+                    if missing
+                    else ()
+                ),
+            ),
+        ),
+    ]
+
+    concentration_warning_items = valuation_warnings
+    if nav <= 0:
+        concentration_warning_items = (*concentration_warning_items, nav_warning)
+
+    def gross_share_metric(metric_name: str, numerator: Decimal) -> PortfolioMetric:
+        if nav <= 0:
+            return _portfolio_metric(
+                snapshot,
+                metric_name=metric_name,
+                value=None,
+                unit="gross_share",
+                status="unavailable",
+                position_keys=valued_keys,
+                warnings=concentration_warning_items,
+            )
+        return _portfolio_metric(
+            snapshot,
+            metric_name=metric_name,
+            value=(numerator / gross_value if gross_value else Decimal("0")),
+            unit="gross_share",
+            status="derived",
+            position_keys=valued_keys,
+            warnings=valuation_warnings,
+        )
+
+    absolute_values = [abs(value) for _, value in valued]
+    metrics.extend(
+        [
+            gross_share_metric(
+                "max_position_weight", absolute_values[0] if absolute_values else Decimal("0")
+            ),
+            gross_share_metric("top3_concentration", _exact_sum(absolute_values[:3])),
+            gross_share_metric("top5_concentration", _exact_sum(absolute_values[:5])),
+            gross_share_metric(
+                "hhi",
+                (
+                    _exact_sum(value * value for value in absolute_values)
+                    / gross_value
+                    if gross_value
+                    else Decimal("0")
+                ),
+            ),
+        ]
+    )
+
+    industries: dict[str, list[tuple[str, Decimal]]] = {}
+    for position, value in valued:
+        industries.setdefault(position.industry or "UNKNOWN", []).append(
+            (position.position_key, abs(value))
+        )
+    industry_warning = PortfolioWarning(
+        code="UNCLASSIFIED_INDUSTRY",
+        scope="portfolio",
+        message="At least one valued position has no reviewed industry classification.",
+    )
+    industry_shares: list[tuple[str, Decimal, tuple[str, ...]]] = []
+    for industry, rows in sorted(industries.items()):
+        amount = _exact_sum(value for _, value in rows)
+        keys = tuple(key for key, _ in rows)
+        share = amount / gross_value if gross_value else Decimal("0")
+        industry_shares.append((industry, share, keys))
+        warnings = [*valuation_warnings]
+        if industry == "UNKNOWN":
+            warnings.append(industry_warning)
+        if nav <= 0:
+            warnings.append(nav_warning)
+        metrics.append(
+            _portfolio_metric(
+                snapshot,
+                metric_name=f"industry_weight::{industry}",
+                value=None if nav <= 0 else share,
+                unit="gross_share",
+                status="unavailable" if nav <= 0 else "derived",
+                position_keys=keys,
+                warnings=warnings,
+            )
+        )
+
+    max_industry = max(
+        industry_shares,
+        key=lambda item: (item[1], item[0]),
+        default=("", Decimal("0"), ()),
+    )
+    unknown_rows = next(
+        (item for item in industry_shares if item[0] == "UNKNOWN"),
+        ("UNKNOWN", Decimal("0"), ()),
+    )
+    summary_industry_warnings = [*valuation_warnings]
+    if unknown_rows[1] > 0:
+        summary_industry_warnings.append(industry_warning)
+    if nav <= 0:
+        summary_industry_warnings.append(nav_warning)
+    metrics.extend(
+        [
+            _portfolio_metric(
+                snapshot,
+                metric_name="max_industry_weight",
+                value=None if nav <= 0 else max_industry[1],
+                unit="gross_share",
+                status="unavailable" if nav <= 0 else "derived",
+                position_keys=max_industry[2],
+                warnings=summary_industry_warnings,
+            ),
+            _portfolio_metric(
+                snapshot,
+                metric_name="unclassified_industry_weight",
+                value=None if nav <= 0 else unknown_rows[1],
+                unit="gross_share",
+                status="unavailable" if nav <= 0 else "derived",
+                position_keys=unknown_rows[2],
+                warnings=summary_industry_warnings,
+            ),
+        ]
+    )
+    return tuple(metrics)
+
+
+def deterministic_portfolio_evidence_json(snapshot: PortfolioSnapshot) -> str:
+    return json.dumps(
+        [metric.to_dict() for metric in calculate_portfolio_evidence_metrics(snapshot)],
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
 def _target_position(snapshot: PortfolioSnapshot, symbol: str) -> tuple[Decimal, Decimal | None]:
     quantity = Decimal("0")
     value = Decimal("0")
@@ -503,6 +1057,10 @@ class PortfolioContext:
             "portfolio_facts_available_at_reference": {
                 "snapshot": self.before_snapshot.to_dict(),
                 "metrics": before_metrics,
+                "metric_evidence": [
+                    item.to_dict()
+                    for item in calculate_portfolio_evidence_metrics(self.before_snapshot)
+                ],
             },
             "post_event_observation": (
                 {

@@ -13,10 +13,15 @@ from .episodes import (
     validate_episode_collection,
 )
 from .portfolio_context import (
+    MetricEvidence,
     PortfolioContext,
+    PortfolioMetric,
     PortfolioSnapshot,
+    PortfolioWarning,
     PositionSnapshot,
+    calculate_portfolio_evidence_metrics,
     calculate_portfolio_metrics,
+    deterministic_portfolio_evidence_json,
 )
 from .store import DataConflictError, ReviewStore
 
@@ -24,13 +29,18 @@ __all__ = [
     "CanonicalTradeEvent",
     "DataConflictError",
     "DecisionRecord",
+    "MetricEvidence",
     "PortfolioContext",
+    "PortfolioMetric",
     "PortfolioSnapshot",
+    "PortfolioWarning",
     "PositionSnapshot",
     "ReviewStore",
     "SourceDefinition",
     "build_episode_collection",
+    "calculate_portfolio_evidence_metrics",
     "calculate_portfolio_metrics",
+    "deterministic_portfolio_evidence_json",
     "load_p2b_snapshot_references",
     "query_episode_collection",
     "validate_episode_collection",
