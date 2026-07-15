@@ -1,0 +1,78 @@
+{
+  "bundle14r_candidate_ready": false,
+  "case_id": "golden_gold_mining_cycle",
+  "classified_question_ids": [],
+  "conflict_count": 0,
+  "conflicts": [],
+  "covered_source_classes": [],
+  "decision": "evidence_qualification_pending",
+  "deterministic_rerun": false,
+  "driver_coverage_ratio": 0.0,
+  "duplicate_record_count": 0,
+  "eligible_valuation_methods": [],
+  "evidence_pack_complete": false,
+  "evidence_pack_present": false,
+  "exact_hash_human_review_status": "not_triggered",
+  "forecast_bridge_complete": false,
+  "input_contract_valid": true,
+  "issuer_ticker": "600988.SH",
+  "issues": [
+    {
+      "case_id": "golden_gold_mining_cycle",
+      "code": "PACK_MISSING",
+      "message": "no reviewed evidence pack has been supplied for this case",
+      "owner": "workflow_orchestrator",
+      "path": "reviewed_evidence_pack",
+      "severity": "blocker",
+      "skill": "evidence-ingest",
+      "stage": "T1_evidence_plan"
+    }
+  ],
+  "missing_driver_ids": [
+    "byproduct_economics",
+    "fx_tax_ownership_bridge",
+    "mine_production_volume",
+    "ore_grade_or_feed_quality",
+    "realized_gold_price",
+    "recovery_rate",
+    "stripping_ratio",
+    "sustaining_and_growth_capex",
+    "unit_cash_cost"
+  ],
+  "missing_question_ids": [
+    "GM-Q1",
+    "GM-Q2",
+    "GM-Q3",
+    "GM-Q4",
+    "GM-Q5",
+    "GM-Q6"
+  ],
+  "missing_source_classes": [
+    "industry_regulator_or_association",
+    "issuer_exchange_filings",
+    "issuer_investor_relations_records",
+    "market_data_primary_or_licensed",
+    "peer_official_disclosures"
+  ],
+  "overlap_resolved": false,
+  "p2_allowed": false,
+  "qualified_driver_ids": [],
+  "question_coverage_ratio": 0.0,
+  "required_driver_ids": [
+    "byproduct_economics",
+    "fx_tax_ownership_bridge",
+    "mine_production_volume",
+    "ore_grade_or_feed_quality",
+    "realized_gold_price",
+    "recovery_rate",
+    "stripping_ratio",
+    "sustaining_and_growth_capex",
+    "unit_cash_cost"
+  ],
+  "reviewed_official_source_count": 0,
+  "sample_quality_allowed": false,
+  "schema_version": "r5_bundle15r_qualification_suite_v1",
+  "semantic_gate_passed": false,
+  "valuation_eligible": false,
+  "workflow_state_mutation_allowed": false
+}

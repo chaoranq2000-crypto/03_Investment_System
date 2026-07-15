@@ -1,0 +1,105 @@
+{
+  "baseline_commit": "7ab395283f432faac7bbc0e83a0b0cf4976ed5dc",
+  "bundle_id": "R5_BUNDLE17R_ACTIVATION_RECEIPT",
+  "case_artifact_hashes": {
+    "golden_copper_foil_product_generation": {
+      "case_contract": "09f3831a46cd6bae6fd2ce1659eb6e0f85f82d8062e5793651d17c0f8daa7df7",
+      "generation_lock": "02953ca1a4f932e34a1298ab3e883c66daf26fc3cffbac96c4137b764b64f461",
+      "qualification": "e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa",
+      "quality_scorecard": "0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67",
+      "reader": "102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa",
+      "regression_result": "b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1",
+      "traceability": "903e305e29ccec711499847e123f30109977e9eec14f54ae2ca0389ef397ccd4"
+    },
+    "golden_crdmo_backlog_conversion": {
+      "case_contract": "8409ad6835649f424ce56fc854aa302bc8bbbca8bb4fea679d93837eb2b460f4",
+      "generation_lock": "80d673824269e8a65083e36694d4f64eaed0bd6380362cac9b25c8f6a1e0375f",
+      "qualification": "5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72",
+      "quality_scorecard": "a58faa678fa6150799f0ec267c46ada02df1199781ef6e61a1e18c72085bd108",
+      "reader": "04ec8a53a023c3678dfdb7682901c5b229b7040c86af216930b0b4eea739f701",
+      "regression_result": "b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1",
+      "traceability": "b6b59f9d1a00d1adfc6422563d9226c14e27f3526f74cecfa3e1feb2ebd2e386"
+    },
+    "golden_gold_mining_cycle": {
+      "case_contract": "7f0413564b3706a494ca1a5861f9ea331fa6ec86936345c7daa782f988a41027",
+      "generation_lock": "5cffa5fee240c6bb3c9f7bbf3b07d7cf4c2e8c799e1f07aa839cfb2449a3f0d1",
+      "qualification": "1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b",
+      "quality_scorecard": "ef5f0513e89e4d9f51f189fcae650e6b5ccbf02a1fe52065fba377c2e5358bf0",
+      "reader": "edc6e089537e64e4bbcc7578e02465cfa6d0d5c259f575e6f0eeff5e716b6030",
+      "regression_result": "b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1",
+      "traceability": "915fb3916e11378306a9cc6d5fd42a48f9cabe9bc8614d2a3ad7be6c70ff54d1"
+    },
+    "golden_multi_business_ai_infrastructure": {
+      "case_contract": "3532a714d8d5877a377576bebbe4628be32f8a0394b4dca9cac66d175903cf79",
+      "generation_lock": "cd445f4dade57e60f446dd0c5b747db4c298e4da5d2c0db11f1c4d3f9813c24e",
+      "qualification": "e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042",
+      "quality_scorecard": "e4ce4d287c5a426880960eff2436391e82d87c62d66593c9abf633da985611d7",
+      "reader": "2fc4dff78527743b5fa884df4c5329ef4cd014c73686e1b10cef7edff45daed9",
+      "regression_result": "b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1",
+      "traceability": "23486bae3c0f5316de8de82d1e4258c26033f06168fed8be2732d45d17c3e744"
+    }
+  },
+  "generation_id": "activation_gen_r5_bundle17r_1fb1ea838a59cba3",
+  "input_manifest_sha256": "e575602f514192edc9a20a6c3eaf99a334cef6fba749ddff8b7085be3e2c996e",
+  "output_artifacts": {
+    "R5_bundle17r_activation_receipt.json": {
+      "sha256": "5b18f1402b365a1a885062e7e8a044b6e5549b89d4d5ad6645e23ac074e33676",
+      "size_bytes": 5470
+    },
+    "R5_bundle17r_backflow_queue.csv": {
+      "sha256": "da23cb727e020946a79d4a7b93e7af00326010acb81cdfec7dfe1bbd2dd76107",
+      "size_bytes": 25990
+    },
+    "R5_bundle17r_case_matrix.csv": {
+      "sha256": "e9b575ad7dd40fbe069fdfcf126f9db7d662b634a86249322240f6d38a04f616",
+      "size_bytes": 494
+    },
+    "R5_bundle17r_close_readout.md": {
+      "sha256": "d1e1836d3d10331d0d484e866adc5a2bed23ad9a821a84bbab56b082802ac77d",
+      "size_bytes": 13278
+    },
+    "R5_bundle17r_status_proposal.yaml": {
+      "sha256": "e84d666cb6d77fe58f6af11416c3e8367117b70703accc5d2edf1ddf9ccc872e",
+      "size_bytes": 590
+    },
+    "human_review_handoffs/golden_copper_foil_product_generation.yaml": {
+      "sha256": "6bc45b5d0cbba3b24c57dd02edf4da1c94886b3d625538f1b424fca087b72a52",
+      "size_bytes": 1400
+    },
+    "human_review_handoffs/golden_crdmo_backlog_conversion.yaml": {
+      "sha256": "c8254bbed3ab22701ce4f2d5f55c6657a4533952a86bbf2d2fece47782a1170c",
+      "size_bytes": 1358
+    },
+    "human_review_handoffs/golden_gold_mining_cycle.yaml": {
+      "sha256": "00ea666a947080464f878fe9fc67cb519d83ec52cafb5b5712e44417e8d5db4a",
+      "size_bytes": 1355
+    },
+    "human_review_handoffs/golden_multi_business_ai_infrastructure.yaml": {
+      "sha256": "295baeb17b3d7e3f5038e6a2a7f0c397e4432b1cdfdfcd101c3365361257ab4b",
+      "size_bytes": 1355
+    }
+  },
+  "policy_sha256": "6abe1312243a704c330dfd420f4b308e3f52c6e5d10a5c9d6a4dbe1eaa687e15",
+  "release_boundaries": {
+    "canonical_workflow_state_mutation_allowed": false,
+    "p2_allowed": false,
+    "sample_quality_allowed": false
+  },
+  "run_id": "r5_bundle17r_activation_20260715_911136d_backflow",
+  "runtime_sha256": "520575f1f0a4c0744d5e56bcc4b84d8a1447c701e184553d2cef3353743fc1ce",
+  "schema_version": "r5_bundle17r_generation_lock_v1",
+  "stage_hashes": {
+    "materialization": {
+      "generation_lock": "c0bea5a689003c7e50dff86c37657b3709463ffdc4976eb941d73511f7fb7ba7",
+      "suite": "167bc67074643fb4654b9d3cf4f0c0a95b943e79d579686fe19a251c39800d12"
+    },
+    "qualification": {
+      "generation_lock": "1e8d82a893a144c70b25fde8210119353a04bb0f515053dc1ff072a61b8321c9",
+      "suite": "a72b5bc114fa40a552f81670f55c0411b392942e03b42a5937c2ca941f8c4c63"
+    },
+    "regression": {
+      "generation_lock": "c98d5cc13469f8e65cf9199b3912f0a903bb2f505a04408120274ca65b2d7257",
+      "suite": "b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1"
+    }
+  }
+}

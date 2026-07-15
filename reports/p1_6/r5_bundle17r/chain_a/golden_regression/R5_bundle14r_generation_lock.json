@@ -1,0 +1,20 @@
+{
+  "bundle_id": "R5_BUNDLE_14R",
+  "generation_id": "golden_regression_gen_3673ac6df27ae144",
+  "input_sha256": {
+    "declared:git_head": "911136de409a50dee2bd9828a117de4fa24ab75d",
+    "repo:scripts/run_r5_bundle14r_golden_regression.py": "d69810c211eba92827a6f5ab9fe28c353e9edc7429483ae48adc3cc1874e838e",
+    "repo:src/quality/r5_bundle14r_semantic_regression.py": "f8d15e593d40aa818d83096b247ee5b3244de5ca5e0537975cf17bd37e7f0cf9",
+    "repo:src/research/r5_bundle14r_golden_regression.py": "ac8f3fee709735cacbf82ddf3f0c90f9a8a1e9e8c3628cb28b105be298ad60b4",
+    "repo:tests/fixtures/r5_bundle14r/cases/copper_foil.yaml": "09f3831a46cd6bae6fd2ce1659eb6e0f85f82d8062e5793651d17c0f8daa7df7",
+    "repo:tests/fixtures/r5_bundle14r/cases/crdmo.yaml": "8409ad6835649f424ce56fc854aa302bc8bbbca8bb4fea679d93837eb2b460f4",
+    "repo:tests/fixtures/r5_bundle14r/cases/gold_mining.yaml": "7f0413564b3706a494ca1a5861f9ea331fa6ec86936345c7daa782f988a41027",
+    "repo:tests/fixtures/r5_bundle14r/cases/multi_business_ai_infrastructure.yaml": "3532a714d8d5877a377576bebbe4628be32f8a0394b4dca9cac66d175903cf79"
+  },
+  "p2_allowed": false,
+  "release_authority": false,
+  "sample_quality_allowed": false,
+  "schema_version": "r5_bundle14r_generation_lock_v1",
+  "suite_result_sha256": "f4cf616f6640b635e82c49be8b6e13242410512e9af065b50b77710769e39a01",
+  "workflow_state_mutation_allowed": false
+}

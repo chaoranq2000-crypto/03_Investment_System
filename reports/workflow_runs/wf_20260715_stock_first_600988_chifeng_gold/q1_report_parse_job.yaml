@@ -1,0 +1,14 @@
+job_id: job_20260715_600988_2026_q1_report_parse
+run_id: wf_20260715_stock_first_600988_chifeng_gold
+evidence_id: ev_quarterly_report_600988_20260425_4201ae
+stock_code: "600988"
+company_id: cn_600988_chifeng_gold
+source_type: quarterly_report
+raw_pdf_path: data/raw/announcements/cninfo_2026_q1_report_600988_2026-04-25.pdf
+candidate_generation:
+  generate_claim_candidates: false
+  generate_metric_candidates: false
+quality:
+  require_page_map: true
+  require_table_inventory: true
+  allow_partial_success: false

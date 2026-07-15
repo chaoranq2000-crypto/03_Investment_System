@@ -1,0 +1,75 @@
+case_id,issuer_ticker,task_type,task_id,owner_skill,target_stage,task
+golden_copper_foil_product_generation,301217.SZ,driver_mapping,capacity_utilization,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_copper_foil_product_generation,301217.SZ,driver_mapping,customer_certification_conversion,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_copper_foil_product_generation,301217.SZ,driver_mapping,hvlp_processing_fee,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_copper_foil_product_generation,301217.SZ,driver_mapping,hvlp_product_mix,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_copper_foil_product_generation,301217.SZ,driver_mapping,lithium_foil_margin,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_copper_foil_product_generation,301217.SZ,driver_mapping,pcb_capacity,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_copper_foil_product_generation,301217.SZ,driver_mapping,receivable_inventory_cash_conversion,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_copper_foil_product_generation,301217.SZ,driver_mapping,unit_conversion_cost,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_copper_foil_product_generation,301217.SZ,question_classification,CF-Q1,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_copper_foil_product_generation,301217.SZ,question_classification,CF-Q2,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_copper_foil_product_generation,301217.SZ,question_classification,CF-Q3,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_copper_foil_product_generation,301217.SZ,question_classification,CF-Q4,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_copper_foil_product_generation,301217.SZ,question_classification,CF-Q5,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_copper_foil_product_generation,301217.SZ,question_classification,CF-Q6,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,backlog_conversion_rate,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,backlog_definition,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,capacity_utilization,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,cash_conversion_and_capex,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,customer_geography_concentration,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,new_order_intake,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,pricing_and_productivity,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,project_stage_mix,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,qualified_capacity,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,regulatory_contract_transition,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,driver_mapping,tides_product_mix,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_crdmo_backlog_conversion,603259.SH,question_classification,CR-Q1,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_crdmo_backlog_conversion,603259.SH,question_classification,CR-Q2,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_crdmo_backlog_conversion,603259.SH,question_classification,CR-Q3,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_crdmo_backlog_conversion,603259.SH,question_classification,CR-Q4,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_crdmo_backlog_conversion,603259.SH,question_classification,CR-Q5,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_crdmo_backlog_conversion,603259.SH,question_classification,CR-Q6,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_crdmo_backlog_conversion,603259.SH,question_classification,CR-Q7,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_gold_mining_cycle,600988.SH,driver_mapping,byproduct_economics,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_gold_mining_cycle,600988.SH,driver_mapping,fx_tax_ownership_bridge,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_gold_mining_cycle,600988.SH,driver_mapping,mine_production_volume,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_gold_mining_cycle,600988.SH,driver_mapping,ore_grade_or_feed_quality,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_gold_mining_cycle,600988.SH,driver_mapping,realized_gold_price,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_gold_mining_cycle,600988.SH,driver_mapping,recovery_rate,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_gold_mining_cycle,600988.SH,driver_mapping,stripping_ratio,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_gold_mining_cycle,600988.SH,driver_mapping,sustaining_and_growth_capex,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_gold_mining_cycle,600988.SH,driver_mapping,unit_cash_cost,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_gold_mining_cycle,600988.SH,question_classification,GM-Q1,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_gold_mining_cycle,600988.SH,question_classification,GM-Q2,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_gold_mining_cycle,600988.SH,question_classification,GM-Q3,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_gold_mining_cycle,600988.SH,question_classification,GM-Q4,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_gold_mining_cycle,600988.SH,question_classification,GM-Q5,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_gold_mining_cycle,600988.SH,question_classification,GM-Q6,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,idc_commissioned_capacity,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,idc_power_cost,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,idc_unit_revenue,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,idc_utilization,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,incremental_financing_cost,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,liquid_cooling_acceptance,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,liquid_cooling_margin,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,liquid_cooling_projects_or_mw,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,liquid_cooling_unit_value,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,materials_capacity,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,materials_product_mix_and_fee,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,materials_utilization,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,ownership_and_minority_interest,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,refrigerant_quota,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,refrigerant_realized_price,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,refrigerant_unit_cost,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,refrigerant_volume,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,driver_mapping,transaction_close_and_consolidation,stock-deep-dive,T5_analysis_pack_build,Bind a reviewed high/medium-confidence record to the driver; do not invent a proxy
+golden_multi_business_ai_infrastructure,600673.SH,question_classification,MB-Q1,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_multi_business_ai_infrastructure,600673.SH,question_classification,MB-Q2,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_multi_business_ai_infrastructure,600673.SH,question_classification,MB-Q3,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_multi_business_ai_infrastructure,600673.SH,question_classification,MB-Q4,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_multi_business_ai_infrastructure,600673.SH,question_classification,MB-Q5,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_multi_business_ai_infrastructure,600673.SH,question_classification,MB-Q6,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_multi_business_ai_infrastructure,600673.SH,question_classification,MB-Q7,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_multi_business_ai_infrastructure,600673.SH,question_classification,MB-Q8,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"
+golden_multi_business_ai_infrastructure,600673.SH,question_classification,MB-Q9,stock-deep-dive,T5_analysis_pack_build,"Classify the question as confirmed, bounded, context-only, blocked or not-applicable"

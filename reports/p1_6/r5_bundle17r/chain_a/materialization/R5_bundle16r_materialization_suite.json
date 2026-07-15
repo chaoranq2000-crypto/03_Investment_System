@@ -1,0 +1,1564 @@
+{
+  "baseline_commit": "911136de409a50dee2bd9828a117de4fa24ab75d",
+  "blocker_count": 126,
+  "bundle_id": "R5_BUNDLE16R_REVIEWED_EVIDENCE_PACK_MATERIALIZATION",
+  "canonical_workflow_state_mutation_allowed": false,
+  "case_count": 4,
+  "cases": [
+    {
+      "artifact_block_status": {
+        "determinism": "default_blocked",
+        "exact_hash_human_review": "default_blocked",
+        "forecast_bridge": "default_blocked",
+        "overlap_reconciliation": "default_blocked",
+        "semantic_candidate": "default_blocked",
+        "valuation": "default_blocked"
+      },
+      "blocker_count": 26,
+      "bound_record_count": 0,
+      "bound_source_count": 0,
+      "case_id": "golden_copper_foil_product_generation",
+      "classified_question_ids": [],
+      "covered_source_classes": [],
+      "decision": "pack_not_materialized",
+      "issue_count": 27,
+      "issuer_name": "铜冠铜箔",
+      "issuer_ticker": "301217.SZ",
+      "issues": [
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[0].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[1].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: industry_regulator_or_association",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class industry_regulator_or_association",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: issuer_exchange_filings",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class issuer_exchange_filings",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: issuer_investor_relations_records",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class issuer_investor_relations_records",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: market_data_primary_or_licensed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class market_data_primary_or_licensed",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: peer_official_disclosures",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class peer_official_disclosures",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.capacity_utilization",
+          "message": "no qualifying reviewed record is mapped to driver capacity_utilization",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver capacity_utilization",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.customer_certification_conversion",
+          "message": "no qualifying reviewed record is mapped to driver customer_certification_conversion",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver customer_certification_conversion",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.hvlp_processing_fee",
+          "message": "no qualifying reviewed record is mapped to driver hvlp_processing_fee",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver hvlp_processing_fee",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.hvlp_product_mix",
+          "message": "no qualifying reviewed record is mapped to driver hvlp_product_mix",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver hvlp_product_mix",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.lithium_foil_margin",
+          "message": "no qualifying reviewed record is mapped to driver lithium_foil_margin",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver lithium_foil_margin",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.pcb_capacity",
+          "message": "no qualifying reviewed record is mapped to driver pcb_capacity",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver pcb_capacity",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.receivable_inventory_cash_conversion",
+          "message": "no qualifying reviewed record is mapped to driver receivable_inventory_cash_conversion",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver receivable_inventory_cash_conversion",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.unit_conversion_cost",
+          "message": "no qualifying reviewed record is mapped to driver unit_conversion_cost",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver unit_conversion_cost",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CF-Q1",
+          "message": "required question is not classified: CF-Q1",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CF-Q2",
+          "message": "required question is not classified: CF-Q2",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CF-Q3",
+          "message": "required question is not classified: CF-Q3",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CF-Q4",
+          "message": "required question is not classified: CF-Q4",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CF-Q5",
+          "message": "required question is not classified: CF-Q5",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CF-Q6",
+          "message": "required question is not classified: CF-Q6",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "OVERLAP_ARTIFACT_MISSING",
+          "field": "artifact_bindings.overlap_reconciliation",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "stock-deep-dive",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T5_analysis_pack_build"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "FORECAST_ARTIFACT_MISSING",
+          "field": "artifact_bindings.forecast_bridge",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "valuation-model",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "VALUATION_ARTIFACT_MISSING",
+          "field": "artifact_bindings.valuation",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "valuation-model",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "SEMANTIC_ARTIFACT_MISSING",
+          "field": "artifact_bindings.semantic_candidate",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "DETERMINISM_ARTIFACT_MISSING",
+          "field": "artifact_bindings.determinism",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "code": "HUMAN_REVIEW_ARTIFACT_MISSING",
+          "field": "artifact_bindings.exact_hash_human_review",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "info",
+          "target_stage": "T9_quality_review"
+        }
+      ],
+      "mapping_present": true,
+      "mapping_valid": true,
+      "missing_driver_ids": [
+        "capacity_utilization",
+        "customer_certification_conversion",
+        "hvlp_processing_fee",
+        "hvlp_product_mix",
+        "lithium_foil_margin",
+        "pcb_capacity",
+        "receivable_inventory_cash_conversion",
+        "unit_conversion_cost"
+      ],
+      "missing_question_ids": [
+        "CF-Q1",
+        "CF-Q2",
+        "CF-Q3",
+        "CF-Q4",
+        "CF-Q5",
+        "CF-Q6"
+      ],
+      "missing_source_classes": [
+        "industry_regulator_or_association",
+        "issuer_exchange_filings",
+        "issuer_investor_relations_records",
+        "market_data_primary_or_licensed",
+        "peer_official_disclosures"
+      ],
+      "pack_materialized": false,
+      "pack_relative_path": null,
+      "pack_schema_version": "r5_bundle15r_reviewed_evidence_pack_v1",
+      "pack_sha256": null,
+      "qualifying_driver_ids": [],
+      "required_driver_count": 8,
+      "required_question_count": 6,
+      "required_source_class_count": 5
+    },
+    {
+      "artifact_block_status": {
+        "determinism": "default_blocked",
+        "exact_hash_human_review": "default_blocked",
+        "forecast_bridge": "default_blocked",
+        "overlap_reconciliation": "default_blocked",
+        "semantic_candidate": "default_blocked",
+        "valuation": "default_blocked"
+      },
+      "blocker_count": 30,
+      "bound_record_count": 0,
+      "bound_source_count": 0,
+      "case_id": "golden_crdmo_backlog_conversion",
+      "classified_question_ids": [],
+      "covered_source_classes": [],
+      "decision": "pack_not_materialized",
+      "issue_count": 31,
+      "issuer_name": "药明康德",
+      "issuer_ticker": "603259.SH",
+      "issues": [
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[0].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[1].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: industry_regulator_or_association",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class industry_regulator_or_association",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: issuer_exchange_filings",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class issuer_exchange_filings",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: issuer_investor_relations_records",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class issuer_investor_relations_records",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: market_data_primary_or_licensed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class market_data_primary_or_licensed",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: peer_official_disclosures",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class peer_official_disclosures",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.backlog_conversion_rate",
+          "message": "no qualifying reviewed record is mapped to driver backlog_conversion_rate",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver backlog_conversion_rate",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.backlog_definition",
+          "message": "no qualifying reviewed record is mapped to driver backlog_definition",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver backlog_definition",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.capacity_utilization",
+          "message": "no qualifying reviewed record is mapped to driver capacity_utilization",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver capacity_utilization",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.cash_conversion_and_capex",
+          "message": "no qualifying reviewed record is mapped to driver cash_conversion_and_capex",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver cash_conversion_and_capex",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.customer_geography_concentration",
+          "message": "no qualifying reviewed record is mapped to driver customer_geography_concentration",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver customer_geography_concentration",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.new_order_intake",
+          "message": "no qualifying reviewed record is mapped to driver new_order_intake",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver new_order_intake",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.pricing_and_productivity",
+          "message": "no qualifying reviewed record is mapped to driver pricing_and_productivity",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver pricing_and_productivity",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.project_stage_mix",
+          "message": "no qualifying reviewed record is mapped to driver project_stage_mix",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver project_stage_mix",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.qualified_capacity",
+          "message": "no qualifying reviewed record is mapped to driver qualified_capacity",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver qualified_capacity",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.regulatory_contract_transition",
+          "message": "no qualifying reviewed record is mapped to driver regulatory_contract_transition",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver regulatory_contract_transition",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.tides_product_mix",
+          "message": "no qualifying reviewed record is mapped to driver tides_product_mix",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver tides_product_mix",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CR-Q1",
+          "message": "required question is not classified: CR-Q1",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CR-Q2",
+          "message": "required question is not classified: CR-Q2",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CR-Q3",
+          "message": "required question is not classified: CR-Q3",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CR-Q4",
+          "message": "required question is not classified: CR-Q4",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CR-Q5",
+          "message": "required question is not classified: CR-Q5",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CR-Q6",
+          "message": "required question is not classified: CR-Q6",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.CR-Q7",
+          "message": "required question is not classified: CR-Q7",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "OVERLAP_ARTIFACT_MISSING",
+          "field": "artifact_bindings.overlap_reconciliation",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "stock-deep-dive",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T5_analysis_pack_build"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "FORECAST_ARTIFACT_MISSING",
+          "field": "artifact_bindings.forecast_bridge",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "valuation-model",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "VALUATION_ARTIFACT_MISSING",
+          "field": "artifact_bindings.valuation",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "valuation-model",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "SEMANTIC_ARTIFACT_MISSING",
+          "field": "artifact_bindings.semantic_candidate",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "DETERMINISM_ARTIFACT_MISSING",
+          "field": "artifact_bindings.determinism",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "code": "HUMAN_REVIEW_ARTIFACT_MISSING",
+          "field": "artifact_bindings.exact_hash_human_review",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "info",
+          "target_stage": "T9_quality_review"
+        }
+      ],
+      "mapping_present": true,
+      "mapping_valid": true,
+      "missing_driver_ids": [
+        "backlog_conversion_rate",
+        "backlog_definition",
+        "capacity_utilization",
+        "cash_conversion_and_capex",
+        "customer_geography_concentration",
+        "new_order_intake",
+        "pricing_and_productivity",
+        "project_stage_mix",
+        "qualified_capacity",
+        "regulatory_contract_transition",
+        "tides_product_mix"
+      ],
+      "missing_question_ids": [
+        "CR-Q1",
+        "CR-Q2",
+        "CR-Q3",
+        "CR-Q4",
+        "CR-Q5",
+        "CR-Q6",
+        "CR-Q7"
+      ],
+      "missing_source_classes": [
+        "industry_regulator_or_association",
+        "issuer_exchange_filings",
+        "issuer_investor_relations_records",
+        "market_data_primary_or_licensed",
+        "peer_official_disclosures"
+      ],
+      "pack_materialized": false,
+      "pack_relative_path": null,
+      "pack_schema_version": "r5_bundle15r_reviewed_evidence_pack_v1",
+      "pack_sha256": null,
+      "qualifying_driver_ids": [],
+      "required_driver_count": 11,
+      "required_question_count": 7,
+      "required_source_class_count": 5
+    },
+    {
+      "artifact_block_status": {
+        "determinism": "default_blocked",
+        "exact_hash_human_review": "default_blocked",
+        "forecast_bridge": "default_blocked",
+        "overlap_reconciliation": "default_blocked",
+        "semantic_candidate": "default_blocked",
+        "valuation": "default_blocked"
+      },
+      "blocker_count": 28,
+      "bound_record_count": 0,
+      "bound_source_count": 0,
+      "case_id": "golden_gold_mining_cycle",
+      "classified_question_ids": [],
+      "covered_source_classes": [],
+      "decision": "pack_not_materialized",
+      "issue_count": 29,
+      "issuer_name": "赤峰黄金",
+      "issuer_ticker": "600988.SH",
+      "issues": [
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[0].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[1].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[2].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: industry_regulator_or_association",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class industry_regulator_or_association",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: issuer_exchange_filings",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class issuer_exchange_filings",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: issuer_investor_relations_records",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class issuer_investor_relations_records",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: market_data_primary_or_licensed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class market_data_primary_or_licensed",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: peer_official_disclosures",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class peer_official_disclosures",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.byproduct_economics",
+          "message": "no qualifying reviewed record is mapped to driver byproduct_economics",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver byproduct_economics",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.fx_tax_ownership_bridge",
+          "message": "no qualifying reviewed record is mapped to driver fx_tax_ownership_bridge",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver fx_tax_ownership_bridge",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.mine_production_volume",
+          "message": "no qualifying reviewed record is mapped to driver mine_production_volume",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver mine_production_volume",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.ore_grade_or_feed_quality",
+          "message": "no qualifying reviewed record is mapped to driver ore_grade_or_feed_quality",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver ore_grade_or_feed_quality",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.realized_gold_price",
+          "message": "no qualifying reviewed record is mapped to driver realized_gold_price",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver realized_gold_price",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.recovery_rate",
+          "message": "no qualifying reviewed record is mapped to driver recovery_rate",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver recovery_rate",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.stripping_ratio",
+          "message": "no qualifying reviewed record is mapped to driver stripping_ratio",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver stripping_ratio",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.sustaining_and_growth_capex",
+          "message": "no qualifying reviewed record is mapped to driver sustaining_and_growth_capex",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver sustaining_and_growth_capex",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.unit_cash_cost",
+          "message": "no qualifying reviewed record is mapped to driver unit_cash_cost",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver unit_cash_cost",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.GM-Q1",
+          "message": "required question is not classified: GM-Q1",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.GM-Q2",
+          "message": "required question is not classified: GM-Q2",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.GM-Q3",
+          "message": "required question is not classified: GM-Q3",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.GM-Q4",
+          "message": "required question is not classified: GM-Q4",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.GM-Q5",
+          "message": "required question is not classified: GM-Q5",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.GM-Q6",
+          "message": "required question is not classified: GM-Q6",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "OVERLAP_ARTIFACT_MISSING",
+          "field": "artifact_bindings.overlap_reconciliation",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "stock-deep-dive",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T5_analysis_pack_build"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "FORECAST_ARTIFACT_MISSING",
+          "field": "artifact_bindings.forecast_bridge",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "valuation-model",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "VALUATION_ARTIFACT_MISSING",
+          "field": "artifact_bindings.valuation",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "valuation-model",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "SEMANTIC_ARTIFACT_MISSING",
+          "field": "artifact_bindings.semantic_candidate",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "DETERMINISM_ARTIFACT_MISSING",
+          "field": "artifact_bindings.determinism",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "code": "HUMAN_REVIEW_ARTIFACT_MISSING",
+          "field": "artifact_bindings.exact_hash_human_review",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "info",
+          "target_stage": "T9_quality_review"
+        }
+      ],
+      "mapping_present": true,
+      "mapping_valid": true,
+      "missing_driver_ids": [
+        "byproduct_economics",
+        "fx_tax_ownership_bridge",
+        "mine_production_volume",
+        "ore_grade_or_feed_quality",
+        "realized_gold_price",
+        "recovery_rate",
+        "stripping_ratio",
+        "sustaining_and_growth_capex",
+        "unit_cash_cost"
+      ],
+      "missing_question_ids": [
+        "GM-Q1",
+        "GM-Q2",
+        "GM-Q3",
+        "GM-Q4",
+        "GM-Q5",
+        "GM-Q6"
+      ],
+      "missing_source_classes": [
+        "industry_regulator_or_association",
+        "issuer_exchange_filings",
+        "issuer_investor_relations_records",
+        "market_data_primary_or_licensed",
+        "peer_official_disclosures"
+      ],
+      "pack_materialized": false,
+      "pack_relative_path": null,
+      "pack_schema_version": "r5_bundle15r_reviewed_evidence_pack_v1",
+      "pack_sha256": null,
+      "qualifying_driver_ids": [],
+      "required_driver_count": 9,
+      "required_question_count": 6,
+      "required_source_class_count": 5
+    },
+    {
+      "artifact_block_status": {
+        "determinism": "default_blocked",
+        "exact_hash_human_review": "default_blocked",
+        "forecast_bridge": "default_blocked",
+        "overlap_reconciliation": "default_blocked",
+        "semantic_candidate": "default_blocked",
+        "valuation": "default_blocked"
+      },
+      "blocker_count": 42,
+      "bound_record_count": 0,
+      "bound_source_count": 0,
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "classified_question_ids": [],
+      "covered_source_classes": [],
+      "decision": "pack_not_materialized",
+      "issue_count": 43,
+      "issuer_name": "东阳光",
+      "issuer_ticker": "600673.SH",
+      "issues": [
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[0].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[1].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[2].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[3].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SOURCE_UNQUALIFIED",
+          "field": "source_bindings[4].review_status",
+          "message": "source is not reviewed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: industry_regulator_or_association",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class industry_regulator_or_association",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: issuer_exchange_filings",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class issuer_exchange_filings",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: issuer_investor_relations_records",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class issuer_investor_relations_records",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: market_data_primary_or_licensed",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class market_data_primary_or_licensed",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SOURCE_CLASS_MISSING",
+          "field": "source_bindings",
+          "message": "required source class is not bound: peer_official_disclosures",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Archive and review official evidence for source class peer_official_disclosures",
+          "severity": "blocker",
+          "target_stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.idc_commissioned_capacity",
+          "message": "no qualifying reviewed record is mapped to driver idc_commissioned_capacity",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver idc_commissioned_capacity",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.idc_power_cost",
+          "message": "no qualifying reviewed record is mapped to driver idc_power_cost",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver idc_power_cost",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.idc_unit_revenue",
+          "message": "no qualifying reviewed record is mapped to driver idc_unit_revenue",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver idc_unit_revenue",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.idc_utilization",
+          "message": "no qualifying reviewed record is mapped to driver idc_utilization",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver idc_utilization",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.incremental_financing_cost",
+          "message": "no qualifying reviewed record is mapped to driver incremental_financing_cost",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver incremental_financing_cost",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.liquid_cooling_acceptance",
+          "message": "no qualifying reviewed record is mapped to driver liquid_cooling_acceptance",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver liquid_cooling_acceptance",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.liquid_cooling_margin",
+          "message": "no qualifying reviewed record is mapped to driver liquid_cooling_margin",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver liquid_cooling_margin",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.liquid_cooling_projects_or_mw",
+          "message": "no qualifying reviewed record is mapped to driver liquid_cooling_projects_or_mw",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver liquid_cooling_projects_or_mw",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.liquid_cooling_unit_value",
+          "message": "no qualifying reviewed record is mapped to driver liquid_cooling_unit_value",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver liquid_cooling_unit_value",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.materials_capacity",
+          "message": "no qualifying reviewed record is mapped to driver materials_capacity",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver materials_capacity",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.materials_product_mix_and_fee",
+          "message": "no qualifying reviewed record is mapped to driver materials_product_mix_and_fee",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver materials_product_mix_and_fee",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.materials_utilization",
+          "message": "no qualifying reviewed record is mapped to driver materials_utilization",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver materials_utilization",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.ownership_and_minority_interest",
+          "message": "no qualifying reviewed record is mapped to driver ownership_and_minority_interest",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver ownership_and_minority_interest",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.refrigerant_quota",
+          "message": "no qualifying reviewed record is mapped to driver refrigerant_quota",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver refrigerant_quota",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.refrigerant_realized_price",
+          "message": "no qualifying reviewed record is mapped to driver refrigerant_realized_price",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver refrigerant_realized_price",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.refrigerant_unit_cost",
+          "message": "no qualifying reviewed record is mapped to driver refrigerant_unit_cost",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver refrigerant_unit_cost",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.refrigerant_volume",
+          "message": "no qualifying reviewed record is mapped to driver refrigerant_volume",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver refrigerant_volume",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DRIVER_MAPPING_MISSING",
+          "field": "drivers.transaction_close_and_consolidation",
+          "message": "no qualifying reviewed record is mapped to driver transaction_close_and_consolidation",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "Find or classify reviewed evidence for operating driver transaction_close_and_consolidation",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.MB-Q1",
+          "message": "required question is not classified: MB-Q1",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.MB-Q2",
+          "message": "required question is not classified: MB-Q2",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.MB-Q3",
+          "message": "required question is not classified: MB-Q3",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.MB-Q4",
+          "message": "required question is not classified: MB-Q4",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.MB-Q5",
+          "message": "required question is not classified: MB-Q5",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.MB-Q6",
+          "message": "required question is not classified: MB-Q6",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.MB-Q7",
+          "message": "required question is not classified: MB-Q7",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.MB-Q8",
+          "message": "required question is not classified: MB-Q8",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "QUESTION_MAPPING_MISSING",
+          "field": "research_questions.MB-Q9",
+          "message": "required question is not classified: MB-Q9",
+          "owner_skill": "evidence-ingest",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "OVERLAP_ARTIFACT_MISSING",
+          "field": "artifact_bindings.overlap_reconciliation",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "stock-deep-dive",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T5_analysis_pack_build"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "FORECAST_ARTIFACT_MISSING",
+          "field": "artifact_bindings.forecast_bridge",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "valuation-model",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "VALUATION_ARTIFACT_MISSING",
+          "field": "artifact_bindings.valuation",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "valuation-model",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "SEMANTIC_ARTIFACT_MISSING",
+          "field": "artifact_bindings.semantic_candidate",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "DETERMINISM_ARTIFACT_MISSING",
+          "field": "artifact_bindings.determinism",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "blocker",
+          "target_stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "code": "HUMAN_REVIEW_ARTIFACT_MISSING",
+          "field": "artifact_bindings.exact_hash_human_review",
+          "message": "hash-bound artifact not supplied",
+          "owner_skill": "quality-review",
+          "requested_evidence": "",
+          "severity": "info",
+          "target_stage": "T9_quality_review"
+        }
+      ],
+      "mapping_present": true,
+      "mapping_valid": true,
+      "missing_driver_ids": [
+        "idc_commissioned_capacity",
+        "idc_power_cost",
+        "idc_unit_revenue",
+        "idc_utilization",
+        "incremental_financing_cost",
+        "liquid_cooling_acceptance",
+        "liquid_cooling_margin",
+        "liquid_cooling_projects_or_mw",
+        "liquid_cooling_unit_value",
+        "materials_capacity",
+        "materials_product_mix_and_fee",
+        "materials_utilization",
+        "ownership_and_minority_interest",
+        "refrigerant_quota",
+        "refrigerant_realized_price",
+        "refrigerant_unit_cost",
+        "refrigerant_volume",
+        "transaction_close_and_consolidation"
+      ],
+      "missing_question_ids": [
+        "MB-Q1",
+        "MB-Q2",
+        "MB-Q3",
+        "MB-Q4",
+        "MB-Q5",
+        "MB-Q6",
+        "MB-Q7",
+        "MB-Q8",
+        "MB-Q9"
+      ],
+      "missing_source_classes": [
+        "industry_regulator_or_association",
+        "issuer_exchange_filings",
+        "issuer_investor_relations_records",
+        "market_data_primary_or_licensed",
+        "peer_official_disclosures"
+      ],
+      "pack_materialized": false,
+      "pack_relative_path": null,
+      "pack_schema_version": "r5_bundle15r_reviewed_evidence_pack_v1",
+      "pack_sha256": null,
+      "qualifying_driver_ids": [],
+      "required_driver_count": 18,
+      "required_question_count": 9,
+      "required_source_class_count": 5
+    }
+  ],
+  "decision": "waiting_for_reviewed_evidence_and_mapping",
+  "fully_mapped_case_count": 0,
+  "mapping_present_count": 4,
+  "mapping_task_count": 74,
+  "p2_allowed": false,
+  "pack_materialized_count": 0,
+  "sample_quality_allowed": false,
+  "schema_version": "r5_bundle16r_materialization_suite_v1",
+  "source_request_count": 20
+}

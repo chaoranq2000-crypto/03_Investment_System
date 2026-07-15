@@ -1,0 +1,14 @@
+job_id: job_20260715_600988_2025_annual_report_parse
+run_id: wf_20260715_stock_first_600988_chifeng_gold
+evidence_id: ev_annual_report_600988_20260321_d53382
+stock_code: "600988"
+company_id: cn_600988_chifeng_gold
+source_type: annual_report
+raw_pdf_path: data/raw/annual_reports/cninfo_2025_annual_report_600988_2026-03-21.pdf
+candidate_generation:
+  generate_claim_candidates: false
+  generate_metric_candidates: false
+quality:
+  require_page_map: true
+  require_table_inventory: true
+  allow_partial_success: false

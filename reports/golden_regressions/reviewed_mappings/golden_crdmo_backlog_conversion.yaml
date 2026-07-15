@@ -1,0 +1,13 @@
+schema_version: r5_bundle16r_review_mapping_v1
+case_id: golden_crdmo_backlog_conversion
+issuer_ticker: 603259.SH
+as_of_date: '2026-07-15'
+pack_review:
+  status: accepted_with_limitations
+  reviewer: OpenAI Codex - gap mapping only; no evidence acceptance
+  reviewed_at: '2026-07-15T22:20:01+08:00'
+source_bindings:
+  - catalog_source_id: ev_annual_report_603259_20260324_7f1431
+  - catalog_source_id: ev_quarterly_report_603259_20260428_379796
+record_bindings: []
+artifact_bindings: {}

@@ -1,0 +1,415 @@
+{
+  "artifact_type": "r5_bundle16r_forecast_model",
+  "assumption_traceability": 1.0,
+  "assumptions": [
+    {
+      "assumption_id": "assumption_600988_gold_price",
+      "estimate_logic": "黄金实现价格按下行、持平和上行情景设置，只做敏感性分析，不预测市场价格。"
+    },
+    {
+      "assumption_id": "assumption_600988_gold_volume",
+      "estimate_logic": "一季度产量同比下降，基准情景不假设立即恢复高增长。",
+      "evidence_ids": [
+        "ev_quarterly_report_600988_20260425_4201ae"
+      ],
+      "locator": "page:6"
+    },
+    {
+      "assumption_id": "assumption_600988_unit_cost",
+      "estimate_logic": "从已披露单位成本和AISC出发设置毛利率区间。",
+      "evidence_ids": [
+        "ev_annual_report_600988_20260321_d53382",
+        "ev_quarterly_report_600988_20260425_4201ae"
+      ],
+      "locator": "annual page:23; q1 page:6"
+    },
+    {
+      "assumption_id": "assumption_600988_h1_anchor",
+      "estimate_logic": "仅把管理层半年预告作为2026年刷新锚点，不外推为全年事实。",
+      "evidence_ids": [
+        "ev_announcement_600988_20260715_c11825"
+      ],
+      "locator": "page:1-2"
+    }
+  ],
+  "forecast_classification": "estimate",
+  "future_event_model_link_count": 2,
+  "future_events": [
+    {
+      "event_id": "event_600988_interim_actual",
+      "expected_window": "2026H1_report",
+      "model_links": [
+        "assumption_600988_h1_anchor",
+        "gold_mining"
+      ],
+      "verification_metric": "审计或正式半年报归母净利润、黄金产销量、实现价格与单位成本"
+    },
+    {
+      "event_id": "event_600988_cost_recovery",
+      "expected_window": "2026_annual_report",
+      "model_links": [
+        "assumption_600988_gold_volume",
+        "assumption_600988_unit_cost",
+        "gold_mining"
+      ],
+      "verification_metric": "全年黄金产量、品位、回收率、单位成本、AISC和资本开支"
+    }
+  ],
+  "management_guidance_is_not_fact": true,
+  "periods": [
+    "2026E",
+    "2027E",
+    "2028E"
+  ],
+  "scenarios": {
+    "base": {
+      "consolidated": [
+        {
+          "gross_margin": 0.52783133,
+          "gross_profit": 7765302376.415585,
+          "period": "2026E",
+          "revenue": 14711711736.062899
+        },
+        {
+          "gross_margin": 0.51076045,
+          "gross_profit": 7669930960.446943,
+          "period": "2027E",
+          "revenue": 15016689381.358198
+        },
+        {
+          "gross_margin": 0.49372531,
+          "gross_profit": 7567870080.417491,
+          "period": "2028E",
+          "revenue": 15328098243.026115
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.58,
+              "gross_profit": 7760355214.446703,
+              "period": "2026E",
+              "revenue": 13379922783.5288
+            },
+            {
+              "gross_margin": 0.56,
+              "gross_profit": 7642611893.951651,
+              "period": "2027E",
+              "revenue": 13647521239.199375
+            },
+            {
+              "gross_margin": 0.54,
+              "gross_profit": 7517054698.551016,
+              "period": "2028E",
+              "revenue": 13920471663.983362
+            }
+          ],
+          "segment_id": "gold_mining"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.02,
+              "gross_profit": 22110897.780882,
+              "period": "2026E",
+              "revenue": 1105544889.0441
+            },
+            {
+              "gross_margin": 0.03,
+              "gross_profit": 34161337.071463,
+              "period": "2027E",
+              "revenue": 1138711235.715423
+            },
+            {
+              "gross_margin": 0.04,
+              "gross_profit": 46914902.911475,
+              "period": "2028E",
+              "revenue": 1172872572.786886
+            }
+          ],
+          "segment_id": "copper_and_polymetallic"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": -0.1,
+              "gross_profit": -21064214.767,
+              "period": "2026E",
+              "revenue": 210642147.67
+            },
+            {
+              "gross_margin": -0.05,
+              "gross_profit": -10742749.53117,
+              "period": "2027E",
+              "revenue": 214854990.6234
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 219152090.435868
+            }
+          ],
+          "segment_id": "resource_recovery"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.25,
+              "gross_profit": 3900478.955,
+              "period": "2026E",
+              "revenue": 15601915.82
+            },
+            {
+              "gross_margin": 0.25,
+              "gross_profit": 3900478.955,
+              "period": "2027E",
+              "revenue": 15601915.82
+            },
+            {
+              "gross_margin": 0.25,
+              "gross_profit": 3900478.955,
+              "period": "2028E",
+              "revenue": 15601915.82
+            }
+          ],
+          "segment_id": "other_revenue"
+        }
+      ]
+    },
+    "bear": {
+      "consolidated": [
+        {
+          "gross_margin": 0.39774283,
+          "gross_profit": 4615007742.228551,
+          "period": "2026E",
+          "revenue": 11602994150.0532
+        },
+        {
+          "gross_margin": 0.37410867,
+          "gross_profit": 4006954672.192345,
+          "period": "2027E",
+          "revenue": 10710670412.218327
+        },
+        {
+          "gross_margin": 0.3564549,
+          "gross_profit": 3646821440.416173,
+          "period": "2028E",
+          "revenue": 10230807418.829395
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.45,
+              "gross_profit": 4694311891.848241,
+              "period": "2026E",
+              "revenue": 10431804204.1072
+            },
+            {
+              "gross_margin": 0.42,
+              "gross_profit": 4030849144.467022,
+              "period": "2027E",
+              "revenue": 9597259867.778625
+            },
+            {
+              "gross_margin": 0.4,
+              "gross_profit": 3646958749.755878,
+              "period": "2028E",
+              "revenue": 9117396874.389694
+            }
+          ],
+          "segment_id": "gold_mining"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": -0.05,
+              "gross_profit": -48300504.86115,
+              "period": "2026E",
+              "revenue": 966010097.223
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 917709592.36185
+            },
+            {
+              "gross_margin": 0.02,
+              "gross_profit": 18354191.847237,
+              "period": "2028E",
+              "revenue": 917709592.36185
+            }
+          ],
+          "segment_id": "copper_and_polymetallic"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": -0.18,
+              "gross_profit": -34124027.92254,
+              "period": "2026E",
+              "revenue": 189577932.903
+            },
+            {
+              "gross_margin": -0.15,
+              "gross_profit": -27014855.438677,
+              "period": "2027E",
+              "revenue": 180099036.25785
+            },
+            {
+              "gross_margin": -0.12,
+              "gross_profit": -21611884.350942,
+              "period": "2028E",
+              "revenue": 180099036.25785
+            }
+          ],
+          "segment_id": "resource_recovery"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.2,
+              "gross_profit": 3120383.164,
+              "period": "2026E",
+              "revenue": 15601915.82
+            },
+            {
+              "gross_margin": 0.2,
+              "gross_profit": 3120383.164,
+              "period": "2027E",
+              "revenue": 15601915.82
+            },
+            {
+              "gross_margin": 0.2,
+              "gross_profit": 3120383.164,
+              "period": "2028E",
+              "revenue": 15601915.82
+            }
+          ],
+          "segment_id": "other_revenue"
+        }
+      ]
+    },
+    "bull": {
+      "consolidated": [
+        {
+          "gross_margin": 0.60854869,
+          "gross_profit": 9970964692.296747,
+          "period": "2026E",
+          "revenue": 16384826427.961699
+        },
+        {
+          "gross_margin": 0.59263038,
+          "gross_profit": 10482285574.500935,
+          "period": "2027E",
+          "revenue": 17687729161.281433
+        },
+        {
+          "gross_margin": 0.55647703,
+          "gross_profit": 10331936970.566889,
+          "period": "2028E",
+          "revenue": 18566690864.19838
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.66,
+              "gross_profit": 9878465024.584993,
+              "period": "2026E",
+              "revenue": 14967371249.3712
+            },
+            {
+              "gross_margin": 0.64,
+              "gross_profit": 10345447007.565374,
+              "period": "2027E",
+              "revenue": 16164760949.320898
+            },
+            {
+              "gross_margin": 0.6,
+              "gross_profit": 10183799398.072166,
+              "period": "2028E",
+              "revenue": 16972998996.786943
+            }
+          ],
+          "segment_id": "gold_mining"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.08,
+              "gross_profit": 94454320.61736,
+              "period": "2026E",
+              "revenue": 1180679007.717
+            },
+            {
+              "gross_margin": 0.1,
+              "gross_profit": 127513332.833436,
+              "period": "2027E",
+              "revenue": 1275133328.33436
+            },
+            {
+              "gross_margin": 0.1,
+              "gross_profit": 133888999.475108,
+              "period": "2028E",
+              "revenue": 1338889994.751078
+            }
+          ],
+          "segment_id": "copper_and_polymetallic"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": -0.03,
+              "gross_profit": -6635227.651605,
+              "period": "2026E",
+              "revenue": 221174255.0535
+            },
+            {
+              "gross_margin": 0.02,
+              "gross_profit": 4644659.356123,
+              "period": "2027E",
+              "revenue": 232232967.806175
+            },
+            {
+              "gross_margin": 0.04,
+              "gross_profit": 9567998.273614,
+              "period": "2028E",
+              "revenue": 239199956.84036
+            }
+          ],
+          "segment_id": "resource_recovery"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.3,
+              "gross_profit": 4680574.746,
+              "period": "2026E",
+              "revenue": 15601915.82
+            },
+            {
+              "gross_margin": 0.3,
+              "gross_profit": 4680574.746,
+              "period": "2027E",
+              "revenue": 15601915.82
+            },
+            {
+              "gross_margin": 0.3,
+              "gross_profit": 4680574.746,
+              "period": "2028E",
+              "revenue": 15601915.82
+            }
+          ],
+          "segment_id": "other_revenue"
+        }
+      ]
+    }
+  },
+  "schema_version": 1
+}

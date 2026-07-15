@@ -1,0 +1,14 @@
+job_id: job_20260715_600673_2026_q1_report_parse
+run_id: wf_20260715_stock_first_600673_hec_tech
+evidence_id: ev_quarterly_report_600673_20260428_34ed1a
+stock_code: "600673"
+company_id: cn_600673_hec_tech
+source_type: quarterly_report
+raw_pdf_path: data/raw/announcements/cninfo_2026_q1_report_600673_2026-04-28.pdf
+candidate_generation:
+  generate_claim_candidates: false
+  generate_metric_candidates: false
+quality:
+  require_page_map: true
+  require_table_inventory: true
+  allow_partial_success: false

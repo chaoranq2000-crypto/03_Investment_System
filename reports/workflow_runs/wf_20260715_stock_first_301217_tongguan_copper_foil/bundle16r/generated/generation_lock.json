@@ -1,0 +1,18 @@
+{
+  "artifact_hashes": {
+    "evidence_pack": "903e305e29ccec711499847e123f30109977e9eec14f54ae2ca0389ef397ccd4",
+    "forecast_model": "d73769d256bb1e4d82f03eeef46f17ca8c6321e4840d51ff2aba307e94a6f3e7",
+    "operating_driver_pack": "d9a8bce553dbae8b39c6d52b179499891c552cc8e41c921c31face3604a0aa65",
+    "quality_readout": "0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67",
+    "reader_report": "102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa",
+    "valuation_pack": "472460e8215c0e741e104c1fffa5e36233092b1008471b2fd8ec6a570f8f3a36",
+    "workflow_state": "f0b1862f64e2269c4fc208c7f969d2957324b22139853d0212d5759878497b82"
+  },
+  "artifact_type": "r5_bundle16r_generation_lock",
+  "case_id": "301217_high_end_copper_foil",
+  "information_cutoff": "2026-07-15",
+  "input_path": "reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/research_input.yaml",
+  "input_sha256": "273f7101876fa8de37b69189a37aabc941e5a8fb1a30c35cb79de9e2f91a57ab",
+  "reader_report_sha256": "102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa",
+  "schema_version": 1
+}

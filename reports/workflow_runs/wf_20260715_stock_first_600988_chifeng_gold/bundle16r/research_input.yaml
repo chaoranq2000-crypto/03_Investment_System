@@ -1,0 +1,252 @@
+schema_version: r5_bundle16r_case_input_v1
+case_id: 600988_cycle_resource_gold
+ticker: "600988"
+issuer_name: 赤峰黄金
+company_id: cn_600988_chifeng_gold
+workflow_id: wf_20260715_stock_first_600988_chifeng_gold
+as_of_date: "2026-07-15"
+generated_at: "2026-07-15T15:00:00+08:00"
+sources:
+  - evidence_id: ev_annual_report_600988_20260321_d53382
+    source_class: official
+    source_type: annual_report
+    title: 2025年年度报告
+    source_path: data/raw/annual_reports/cninfo_2025_annual_report_600988_2026-03-21.pdf
+    processed_text_path: data/processed/text/ev_annual_report_600988_20260321_d53382.md
+    file_hash: d53382f3f9e7989347b91524d63140dca89cd56d8ade23a07d3e9a33dc1a043e
+    page_count: 219
+    review_status: reviewed
+  - evidence_id: ev_quarterly_report_600988_20260425_4201ae
+    source_class: official
+    source_type: quarterly_report
+    title: 2026年第一季度报告
+    source_path: data/raw/announcements/cninfo_2026_q1_report_600988_2026-04-25.pdf
+    processed_text_path: data/processed/text/ev_quarterly_report_600988_20260425_4201ae.md
+    file_hash: 4201aea82ab9528f3d8a6b2fdc1bddab57310eeefef1d24806444deab6213ae1
+    page_count: 13
+    review_status: reviewed
+  - evidence_id: ev_announcement_600988_20260715_c11825
+    source_class: official
+    source_type: performance_forecast
+    title: 2026年半年度业绩预告
+    source_path: data/raw/announcements/cninfo_2026_h1_performance_forecast_600988_2026-07-15.pdf
+    processed_text_path: data/processed/text/ev_announcement_600988_20260715_c11825.md
+    file_hash: c1182511d89de6249aa045f16197b0d3e43ce63c83ec201514cc17e7590fa46d
+    page_count: 2
+    review_status: reviewed
+historical:
+  period: 2025A
+  unit: CNY
+  total_revenue: 12638506229.12
+  total_gross_profit: 6630097539.50
+  segments:
+    - segment_id: gold_mining
+      display_name: 黄金产品
+      material: true
+      revenue: 11338917613.16
+      cost: 4704089809.87
+      disclosure_boundary: 年报披露黄金收入、成本、产销量、单位成本和AISC，但矿山级完整损益并未全部列示。
+      driver_contract:
+        archetype_id: commodity_price_volume_recovery_unit_cost
+        equation: 黄金销量 × 实现价格 - 销量 × 单位成本
+        driver_topics: [gold price, production volume, grade or recovery rate, unit cost, stripping ratio]
+        source_evidence_ids: [ev_annual_report_600988_20260321_d53382, ev_quarterly_report_600988_20260425_4201ae]
+    - segment_id: copper_and_polymetallic
+      display_name: 铜及多金属产品
+      material: true
+      revenue: 1073344552.47
+      cost: 1054841316.13
+      disclosure_boundary: 将电解铜、铜精粉、铅、锌、钼和稀土收入成本合并对账，不推断单矿盈利。
+      driver_contract:
+        archetype_id: mine_capacity_grade_recovery
+        equation: 各金属销量 × 实现价格 - 开采与选冶成本
+        driver_topics: [production volume, grade or recovery rate, unit cost, capital expenditure]
+        source_evidence_ids: [ev_annual_report_600988_20260321_d53382]
+    - segment_id: resource_recovery
+      display_name: 资源综合回收利用
+      material: false
+      revenue: 210642147.67
+      cost: 237826778.05
+      disclosure_boundary: 按年报分产品口径记录。
+      driver_contract:
+        archetype_id: volume_price_unit_cost
+        equation: 回收产品销量 × 售价 - 回收处理成本
+        driver_topics: [volume, price, unit cost]
+        source_evidence_ids: [ev_annual_report_600988_20260321_d53382]
+    - segment_id: other_revenue
+      display_name: 其他业务及对账残差
+      material: false
+      revenue: 15601915.82
+      cost: 11650785.57
+      disclosure_boundary: 合并口径与列示分产品合计的对账差额。
+      driver_contract:
+        archetype_id: reconciliation_residual
+        equation: 合并口径 - 已披露产品合计
+        driver_topics: [reconciliation]
+        source_evidence_ids: [ev_annual_report_600988_20260321_d53382]
+company_metrics:
+  - {metric_id: metric_600988_revenue_2025, name: 营业收入, value: 12638506229.12, unit: CNY, period: 2025A, evidence_id: ev_annual_report_600988_20260321_d53382, locator: "page:20"}
+  - {metric_id: metric_600988_gold_revenue_2025, name: 黄金收入, value: 11338917613.16, unit: CNY, period: 2025A, evidence_id: ev_annual_report_600988_20260321_d53382, locator: "page:21"}
+  - {metric_id: metric_600988_gold_margin_2025, name: 黄金毛利率, value: 58.51, unit: percent, period: 2025A, evidence_id: ev_annual_report_600988_20260321_d53382, locator: "page:21"}
+  - {metric_id: metric_600988_gold_output_2025, name: 黄金产量, value: 14510.58, unit: kg, period: 2025A, evidence_id: ev_annual_report_600988_20260321_d53382, locator: "page:22"}
+  - {metric_id: metric_600988_gold_sales_2025, name: 黄金销量, value: 14448.52, unit: kg, period: 2025A, evidence_id: ev_annual_report_600988_20260321_d53382, locator: "page:22"}
+  - {metric_id: metric_600988_unit_cost_2025, name: 黄金单位成本, value: 326.26, unit: CNY_per_g, period: 2025A, evidence_id: ev_annual_report_600988_20260321_d53382, locator: "page:23"}
+  - {metric_id: metric_600988_aisc_2025, name: 黄金全维持成本, value: 372.63, unit: CNY_per_g, period: 2025A, evidence_id: ev_annual_report_600988_20260321_d53382, locator: "page:23"}
+  - {metric_id: metric_600988_ocf_2025, name: 经营现金流, value: 5555589287.50, unit: CNY, period: 2025A, evidence_id: ev_annual_report_600988_20260321_d53382, locator: "page:20"}
+  - {metric_id: metric_600988_q1_price_2026, name: 一季度黄金销售价格, value: 1061.32, unit: CNY_per_g, period: 2026Q1, evidence_id: ev_quarterly_report_600988_20260425_4201ae, locator: "page:6"}
+  - {metric_id: metric_600988_q1_output_2026, name: 一季度黄金产量, value: 2981.35, unit: kg, period: 2026Q1, evidence_id: ev_quarterly_report_600988_20260425_4201ae, locator: "page:6"}
+  - {metric_id: metric_600988_q1_unit_cost_2026, name: 一季度黄金单位成本, value: 408.40, unit: CNY_per_g, period: 2026Q1, evidence_id: ev_quarterly_report_600988_20260425_4201ae, locator: "page:6"}
+  - {metric_id: metric_600988_q1_aisc_2026, name: 一季度黄金全维持成本, value: 483.87, unit: CNY_per_g, period: 2026Q1, evidence_id: ev_quarterly_report_600988_20260425_4201ae, locator: "page:6"}
+  - {metric_id: metric_600988_h1_np_low_2026, name: 半年度归母净利润预告下限, value: 1700000000, unit: CNY, period: 2026H1E_management, evidence_id: ev_announcement_600988_20260715_c11825, locator: "page:1"}
+  - {metric_id: metric_600988_h1_np_high_2026, name: 半年度归母净利润预告上限, value: 1780000000, unit: CNY, period: 2026H1E_management, evidence_id: ev_announcement_600988_20260715_c11825, locator: "page:1"}
+claims:
+  - claim_id: claim_600988_gold_concentration
+    claim_type: fact
+    text: 2025年黄金产品构成公司收入和毛利的绝对主体。
+    evidence_ids: [ev_annual_report_600988_20260321_d53382]
+    locator: "page:20-21"
+    counterevidence: 多金属和资源回收业务仍可能影响资本开支与尾部风险。
+  - claim_id: claim_600988_price_volume
+    claim_type: inference
+    text: 2026年一季度黄金价格同比上升而产量下降，利润改善不能解释为量价齐升。
+    evidence_ids: [ev_quarterly_report_600988_20260425_4201ae]
+    locator: "page:6"
+    counterevidence: 单季度产量受生产和销售时点影响，需用半年和全年数据验证。
+  - claim_id: claim_600988_cost_pressure
+    claim_type: fact
+    text: 一季度单位成本与AISC均高于2025年全年水平。
+    evidence_ids: [ev_annual_report_600988_20260321_d53382, ev_quarterly_report_600988_20260425_4201ae]
+    locator: "annual page:23; q1 page:6"
+    counterevidence: 季节性、矿山结构和阶段性剥离会影响单季度可比性。
+  - claim_id: claim_600988_h1_guidance
+    claim_type: management_comment
+    text: 公司预计2026年上半年归母净利润17.0亿至17.8亿元，数据未经审计，主要原因描述为黄金售价同比上升。
+    evidence_ids: [ev_announcement_600988_20260715_c11825]
+    locator: "page:1-2"
+    counterevidence: 业绩预告是管理层估计，不是审计后事实，也不代表全年利润。
+research_questions:
+  - {question_id: rq_600988_reconcile, severity: critical, status: resolved, resolution: 2025年产品收入成本与合并口径已完整对账}
+  - {question_id: rq_600988_q1_cost, severity: major, status: open, owner: future_refresh, next_step: 复核半年报单位成本、AISC、品位、回收率和剥采因素}
+evidence_integrity_incidents:
+  - incident_id: incident_600988_sse_challenge
+    status: rejected_and_superseded
+    detail: 首次SSE下载返回反爬HTML而非PDF，已拒绝并由CNINFO同一披露替代，不用于任何主张。
+    rejected_evidence_ids: [ev_annual_report_600988_20260321_e68281, ev_quarterly_report_600988_20260425_0f35e5]
+forecast:
+  periods: [2026E, 2027E, 2028E]
+  scenarios: [bear, base, bull]
+  assumptions:
+    - assumption_id: assumption_600988_gold_price
+      estimate_logic: 黄金实现价格按下行、持平和上行情景设置，只做敏感性分析，不预测市场价格。
+    - assumption_id: assumption_600988_gold_volume
+      evidence_ids: [ev_quarterly_report_600988_20260425_4201ae]
+      locator: "page:6"
+      estimate_logic: 一季度产量同比下降，基准情景不假设立即恢复高增长。
+    - assumption_id: assumption_600988_unit_cost
+      evidence_ids: [ev_annual_report_600988_20260321_d53382, ev_quarterly_report_600988_20260425_4201ae]
+      locator: "annual page:23; q1 page:6"
+      estimate_logic: 从已披露单位成本和AISC出发设置毛利率区间。
+    - assumption_id: assumption_600988_h1_anchor
+      evidence_ids: [ev_announcement_600988_20260715_c11825]
+      locator: "page:1-2"
+      estimate_logic: 仅把管理层半年预告作为2026年刷新锚点，不外推为全年事实。
+  segments:
+    - segment_id: gold_mining
+      base_revenue: 11338917613.16
+      growth_rates: {bear: [-0.08, -0.08, -0.05], base: [0.18, 0.02, 0.02], bull: [0.32, 0.08, 0.05]}
+      gross_margins: {bear: [0.45, 0.42, 0.40], base: [0.58, 0.56, 0.54], bull: [0.66, 0.64, 0.60]}
+    - segment_id: copper_and_polymetallic
+      base_revenue: 1073344552.47
+      growth_rates: {bear: [-0.10, -0.05, 0.00], base: [0.03, 0.03, 0.03], bull: [0.10, 0.08, 0.05]}
+      gross_margins: {bear: [-0.05, 0.00, 0.02], base: [0.02, 0.03, 0.04], bull: [0.08, 0.10, 0.10]}
+    - segment_id: resource_recovery
+      base_revenue: 210642147.67
+      growth_rates: {bear: [-0.10, -0.05, 0.00], base: [0.00, 0.02, 0.02], bull: [0.05, 0.05, 0.03]}
+      gross_margins: {bear: [-0.18, -0.15, -0.12], base: [-0.10, -0.05, 0.00], bull: [-0.03, 0.02, 0.04]}
+    - segment_id: other_revenue
+      base_revenue: 15601915.82
+      growth_rates: {bear: [0.00, 0.00, 0.00], base: [0.00, 0.00, 0.00], bull: [0.00, 0.00, 0.00]}
+      gross_margins: {bear: [0.20, 0.20, 0.20], base: [0.25, 0.25, 0.25], bull: [0.30, 0.30, 0.30]}
+  future_events:
+    - event_id: event_600988_interim_actual
+      expected_window: 2026H1_report
+      verification_metric: 审计或正式半年报归母净利润、黄金产销量、实现价格与单位成本
+      model_links: [assumption_600988_h1_anchor, gold_mining]
+    - event_id: event_600988_cost_recovery
+      expected_window: 2026_annual_report
+      verification_metric: 全年黄金产量、品位、回收率、单位成本、AISC和资本开支
+      model_links: [assumption_600988_gold_volume, assumption_600988_unit_cost, gold_mining]
+valuation:
+  peer_multiple_used: false
+  qualified_peers: []
+  alternative_method: scenario_valuation
+  eligibility: {status: context_only, reason: 商品价格与矿山资产差异使未校准同业倍数不可直接使用}
+  limitations: [不输出目标价或评级, 黄金价格只做敏感性情景, 业绩预告不当作审计后事实]
+reader:
+  sections:
+    - section_id: gold_core
+      title: 黄金主业集中度
+      judgment: 经营结果高度集中于黄金业务，研究模型应优先解释黄金价格、产量和单位成本，而非平均分配权重。
+      paragraphs:
+        - text: 2025年黄金收入和毛利率显示主业集中度，其余业务保留完整对账和风险观察。
+          refs: [metric_600988_revenue_2025, metric_600988_gold_revenue_2025, metric_600988_gold_margin_2025, claim_600988_gold_concentration]
+      model_links: [gold_mining]
+    - section_id: equation
+      title: 量价成本方程
+      judgment: 黄金利润可拆为销量、实现价格与单位成本三条主线，AISC用于补充维持运营和资本强度约束。
+      paragraphs:
+        - text: 2025年产销量与成本指标构成模型基准，但不等于未来稳定值。
+          refs: [metric_600988_gold_output_2025, metric_600988_gold_sales_2025, metric_600988_unit_cost_2025, metric_600988_aisc_2025]
+      model_links: [assumption_600988_gold_price, assumption_600988_gold_volume, assumption_600988_unit_cost]
+    - section_id: q1_divergence
+      title: 一季度量价分化
+      judgment: 一季度售价上升而产量下降，盈利变化首先体现价格弹性，尚不能证明生产端同步改善。
+      paragraphs:
+        - text: 后续必须用半年和全年产量验证季度波动是否消失。
+          refs: [metric_600988_q1_price_2026, metric_600988_q1_output_2026, claim_600988_price_volume]
+      model_links: [gold_mining, event_600988_interim_actual]
+    - section_id: cost
+      title: 成本与AISC约束
+      judgment: 一季度单位成本和AISC高于2025年全年水平，价格高位不能替代对成本曲线的持续复核。
+      paragraphs:
+        - text: 品位、回收率、剥采节奏和矿山组合都可能改变成本可比性。
+          refs: [metric_600988_q1_unit_cost_2026, metric_600988_q1_aisc_2026, claim_600988_cost_pressure]
+      model_links: [assumption_600988_unit_cost]
+    - section_id: cash
+      title: 现金流与资本开支
+      judgment: 2025年经营现金流较强，但矿业增长仍需与资本开支、建设进度和维持性投入共同评估。
+      paragraphs:
+        - text: 单一现金流总额不能证明所有矿山项目具有相同回报和回收周期。
+          refs: [metric_600988_ocf_2025, copper_and_polymetallic]
+      model_links: [copper_and_polymetallic, event_600988_cost_recovery]
+    - section_id: h1_forecast
+      title: 半年度业绩预告边界
+      judgment: 17.0亿至17.8亿元是管理层未经审计估计，只能作为刷新锚点，不能重写为已实现事实。
+      paragraphs:
+        - text: 预告解释指向黄金售价上升，仍需正式半年报补足产量和成本桥。
+          refs: [metric_600988_h1_np_low_2026, metric_600988_h1_np_high_2026, claim_600988_h1_guidance]
+      model_links: [assumption_600988_h1_anchor]
+    - section_id: scenarios
+      title: 商品价格三情景
+      judgment: 三情景只展示实现价格和成本组合的敏感性，不对黄金市场方向作确定判断。
+      paragraphs:
+        - text: 熊市情景同时考虑价格回落与成本粘性，乐观情景也要求产量和成本证据跟进。
+          refs: [assumption_600988_gold_price, assumption_600988_gold_volume, assumption_600988_unit_cost]
+      model_links: [gold_mining]
+    - section_id: falsification
+      title: 风险与证伪条件
+      judgment: 金价回落、产量持续下降、品位或回收率走弱、单位成本上升和资本开支失控均会压低情景结果。
+      paragraphs:
+        - text: 正式半年报若无法确认预告并解释成本变化，模型应回流重估而不是维持旧叙事。
+          refs: [claim_600988_price_volume, claim_600988_cost_pressure, event_600988_interim_actual, event_600988_cost_recovery]
+      model_links: [gold_mining]
+truthfulness:
+  sample_text_used_as_evidence: false
+  management_guidance_recast_as_fact: false
+  low_confidence_peer_ranked: false
+  direct_trading_instruction_present: false
+  past_event_presented_as_future: false
+  undisclosed_segment_economics_presented_as_fact: false
+  consensus_estimate_presented_as_issuer_fact: false
+backflow_tasks:
+  - {owner: future_refresh, severity: major, next_step: 正式半年报披露后用实际产销量、实现价格和成本替换预告锚点}

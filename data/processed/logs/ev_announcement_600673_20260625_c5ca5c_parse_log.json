@@ -1,0 +1,21 @@
+{
+  "job_id": "job_20260715_600673_idc_service_contract_parse",
+  "run_id": "wf_20260715_stock_first_600673_hec_tech",
+  "evidence_id": "ev_announcement_600673_20260625_c5ca5c",
+  "status": "SUCCESS",
+  "normalization_status": "SUCCESS",
+  "parser": "pypdf_text_extraction",
+  "mineru_status": "not_attempted",
+  "mineru": {
+    "attempted": false,
+    "reason": "external mineru call not requested"
+  },
+  "raw_pdf_path": "data/raw/announcements/cninfo_idc_service_contract_600673_2026-06-25.pdf",
+  "processed_text_path": "data/processed/text/ev_announcement_600673_20260625_c5ca5c.md",
+  "tables_path": "data/processed/tables/ev_announcement_600673_20260625_c5ca5c_tables.json",
+  "page_map_path": "data/processed/page_maps/ev_announcement_600673_20260625_c5ca5c_page_map.yaml",
+  "page_count": 4,
+  "table_inventory_count": 5,
+  "candidate_info": {},
+  "issues": []
+}

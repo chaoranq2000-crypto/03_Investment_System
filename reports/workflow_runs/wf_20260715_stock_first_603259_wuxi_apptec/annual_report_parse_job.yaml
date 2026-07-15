@@ -1,0 +1,14 @@
+job_id: job_20260715_603259_2025_annual_report_parse
+run_id: wf_20260715_stock_first_603259_wuxi_apptec
+evidence_id: ev_annual_report_603259_20260324_7f1431
+stock_code: "603259"
+company_id: cn_603259_wuxi_apptec
+source_type: annual_report
+raw_pdf_path: data/raw/annual_reports/cninfo_2025_annual_report_603259_2026-03-24.pdf
+candidate_generation:
+  generate_claim_candidates: false
+  generate_metric_candidates: false
+quality:
+  require_page_map: true
+  require_table_inventory: true
+  allow_partial_success: false

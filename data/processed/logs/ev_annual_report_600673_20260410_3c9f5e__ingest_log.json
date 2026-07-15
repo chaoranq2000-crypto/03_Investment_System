@@ -1,0 +1,17 @@
+{
+  "run_id": "ingest_official_600673_3c9f5e",
+  "ingest_mode": "official_disclosure_search",
+  "started_at": "2026-07-15T06:26:16Z",
+  "finished_at": "2026-07-15T06:26:16Z",
+  "result": "SUCCESS",
+  "stock_code": "600673",
+  "source_name": "sse",
+  "source_type": "annual_report",
+  "api_name": "",
+  "manifest_rows_created": "1",
+  "manifest_rows_updated": "0",
+  "metric_candidates": "0",
+  "claim_candidates": "0",
+  "issues": "",
+  "notes": "official disclosure registered; parse later before material claims"
+}

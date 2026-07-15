@@ -1,0 +1,21 @@
+{
+  "job_id": "job_20260715_600988_2025_annual_report_parse",
+  "run_id": "wf_20260715_stock_first_600988_chifeng_gold",
+  "evidence_id": "ev_annual_report_600988_20260321_d53382",
+  "status": "SUCCESS",
+  "normalization_status": "SUCCESS",
+  "parser": "pypdf_text_extraction",
+  "mineru_status": "not_attempted",
+  "mineru": {
+    "attempted": false,
+    "reason": "external mineru call not requested"
+  },
+  "raw_pdf_path": "data/raw/annual_reports/cninfo_2025_annual_report_600988_2026-03-21.pdf",
+  "processed_text_path": "data/processed/text/ev_annual_report_600988_20260321_d53382.md",
+  "tables_path": "data/processed/tables/ev_annual_report_600988_20260321_d53382_tables.json",
+  "page_map_path": "data/processed/page_maps/ev_annual_report_600988_20260321_d53382_page_map.yaml",
+  "page_count": 219,
+  "table_inventory_count": 1541,
+  "candidate_info": {},
+  "issues": []
+}

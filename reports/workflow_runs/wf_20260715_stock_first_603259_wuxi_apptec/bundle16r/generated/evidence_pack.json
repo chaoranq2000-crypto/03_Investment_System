@@ -1,0 +1,232 @@
+{
+  "artifact_type": "r5_bundle16r_reviewed_evidence_pack",
+  "as_of_date": "2026-07-15",
+  "case_id": "603259_crdmo_backlog_funnel",
+  "claims": [
+    {
+      "claim_id": "claim_603259_backlog_not_revenue",
+      "claim_type": "inference",
+      "counterevidence": "披露未提供统一的订单转收入期限，因此不能用订单额直接等同未来收入。",
+      "evidence_ids": [
+        "ev_annual_report_603259_20260324_7f1431",
+        "ev_quarterly_report_603259_20260428_379796"
+      ],
+      "locator": "annual page:11,14; q1 page:4",
+      "text": "在手订单提供收入可见度，但其确认仍取决于履约进度、客户项目推进、取消和汇率等条件。"
+    },
+    {
+      "claim_id": "claim_603259_funnel_progress",
+      "claim_type": "fact",
+      "counterevidence": "项目数增加不表示所有项目具有相同收入、利润或成功概率。",
+      "evidence_ids": [
+        "ev_annual_report_603259_20260324_7f1431",
+        "ev_quarterly_report_603259_20260428_379796"
+      ],
+      "locator": "annual page:14; q1 page:4",
+      "text": "分子项目总数及商业化项目数从2025年末到2026年一季度末均有增加。"
+    },
+    {
+      "claim_id": "claim_603259_tides_mix",
+      "claim_type": "fact",
+      "counterevidence": "高增速基数和客户项目结构可能使后续增速回落。",
+      "evidence_ids": [
+        "ev_annual_report_603259_20260324_7f1431"
+      ],
+      "locator": "page:14",
+      "text": "2025年TIDES业务收入113.7亿元，同比增长96%，在手订单同比增长20.2%。"
+    },
+    {
+      "claim_id": "claim_603259_outlook",
+      "claim_type": "management_comment",
+      "counterevidence": "目标受项目进度、客户预算、监管和汇率影响，不能当作已实现事实。",
+      "evidence_ids": [
+        "ev_annual_report_603259_20260324_7f1431"
+      ],
+      "locator": "management outlook section",
+      "text": "管理层给出的2026年持续经营收入目标为513亿至530亿元，并明确不构成盈利预测或承诺。"
+    }
+  ],
+  "company_metrics": [
+    {
+      "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+      "locator": "page:15",
+      "metric_id": "metric_603259_revenue_2025",
+      "name": "合并营业收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 45456165774.18
+    },
+    {
+      "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+      "locator": "page:11,15",
+      "metric_id": "metric_603259_continuing_revenue_2025",
+      "name": "持续经营收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 43420823700
+    },
+    {
+      "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+      "locator": "page:15",
+      "metric_id": "metric_603259_chem_revenue_2025",
+      "name": "化学业务收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 36465846900
+    },
+    {
+      "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+      "locator": "page:11",
+      "metric_id": "metric_603259_backlog_2025",
+      "name": "在手订单",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 58000000000
+    },
+    {
+      "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+      "locator": "page:14",
+      "metric_id": "metric_603259_dm_revenue_2025",
+      "name": "D&M业务收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 19920000000
+    },
+    {
+      "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+      "locator": "page:14",
+      "metric_id": "metric_603259_tides_revenue_2025",
+      "name": "TIDES业务收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 11370000000
+    },
+    {
+      "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+      "locator": "page:14",
+      "metric_id": "metric_603259_pipeline_2025",
+      "name": "分子项目总数",
+      "period": "2025A",
+      "unit": "molecule",
+      "value": 3452
+    },
+    {
+      "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+      "locator": "page:14",
+      "metric_id": "metric_603259_commercial_2025",
+      "name": "商业化项目数",
+      "period": "2025A",
+      "unit": "molecule",
+      "value": 83
+    },
+    {
+      "evidence_id": "ev_quarterly_report_603259_20260428_379796",
+      "locator": "page:4",
+      "metric_id": "metric_603259_q1_revenue_2026",
+      "name": "一季度营业收入",
+      "period": "2026Q1",
+      "unit": "CNY",
+      "value": 12435800000
+    },
+    {
+      "evidence_id": "ev_quarterly_report_603259_20260428_379796",
+      "locator": "page:4",
+      "metric_id": "metric_603259_q1_backlog_2026",
+      "name": "一季度末在手订单",
+      "period": "2026Q1",
+      "unit": "CNY",
+      "value": 59770000000
+    },
+    {
+      "evidence_id": "ev_quarterly_report_603259_20260428_379796",
+      "locator": "page:4",
+      "metric_id": "metric_603259_q1_pipeline_2026",
+      "name": "一季度末分子项目总数",
+      "period": "2026Q1",
+      "unit": "molecule",
+      "value": 3550
+    },
+    {
+      "evidence_id": "ev_quarterly_report_603259_20260428_379796",
+      "locator": "page:4",
+      "metric_id": "metric_603259_q1_commercial_2026",
+      "name": "一季度末商业化项目数",
+      "period": "2026Q1",
+      "unit": "molecule",
+      "value": 89
+    }
+  ],
+  "evidence_integrity_incidents": [
+    {
+      "detail": "首次SSE下载返回反爬HTML而非PDF，已拒绝并由CNINFO同一披露替代，不用于任何主张。",
+      "incident_id": "incident_603259_sse_challenge",
+      "rejected_evidence_ids": [
+        "ev_annual_report_603259_20260324_4d848b",
+        "ev_quarterly_report_603259_20260428_0eafaf"
+      ],
+      "status": "rejected_and_superseded"
+    }
+  ],
+  "official_source_count": 2,
+  "research_questions": [
+    {
+      "question_id": "rq_603259_reconcile",
+      "resolution": "持续经营分部与终止经营残差已对账至合并收入和毛利",
+      "severity": "critical",
+      "status": "resolved"
+    },
+    {
+      "next_step": "用半年报订单、收入及项目阶段变化估算转化率区间",
+      "owner": "future_refresh",
+      "question_id": "rq_603259_conversion",
+      "severity": "major",
+      "status": "open"
+    }
+  ],
+  "review_status": "reviewed",
+  "sample_reports_used_as_evidence": false,
+  "schema_version": 1,
+  "source_count": 2,
+  "source_integrity": [
+    {
+      "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+      "page_count": 249,
+      "processed_text_path": "data/processed/text/ev_annual_report_603259_20260324_7f1431.md",
+      "review_status": "reviewed",
+      "sha256": "7f1431d66eae399d4b35639bb650e23287c7f52dacbb47b4b4a197fb5026d6a2",
+      "source_path": "data/raw/annual_reports/cninfo_2025_annual_report_603259_2026-03-24.pdf"
+    },
+    {
+      "evidence_id": "ev_quarterly_report_603259_20260428_379796",
+      "page_count": 21,
+      "processed_text_path": "data/processed/text/ev_quarterly_report_603259_20260428_379796.md",
+      "review_status": "reviewed",
+      "sha256": "379796e63b15a126aecb33509824a76197114ca3a43e0db368dd27e3508560a6",
+      "source_path": "data/raw/announcements/cninfo_2026_q1_report_603259_2026-04-28.pdf"
+    }
+  ],
+  "sources": [
+    {
+      "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+      "file_hash": "7f1431d66eae399d4b35639bb650e23287c7f52dacbb47b4b4a197fb5026d6a2",
+      "page_count": 249,
+      "processed_text_path": "data/processed/text/ev_annual_report_603259_20260324_7f1431.md",
+      "review_status": "reviewed",
+      "source_class": "official",
+      "source_path": "data/raw/annual_reports/cninfo_2025_annual_report_603259_2026-03-24.pdf",
+      "source_type": "annual_report",
+      "title": "2025年年度报告"
+    },
+    {
+      "evidence_id": "ev_quarterly_report_603259_20260428_379796",
+      "file_hash": "379796e63b15a126aecb33509824a76197114ca3a43e0db368dd27e3508560a6",
+      "page_count": 21,
+      "processed_text_path": "data/processed/text/ev_quarterly_report_603259_20260428_379796.md",
+      "review_status": "reviewed",
+      "source_class": "official",
+      "source_path": "data/raw/announcements/cninfo_2026_q1_report_603259_2026-04-28.pdf",
+      "source_type": "quarterly_report",
+      "title": "2026年第一季度报告"
+    }
+  ]
+}

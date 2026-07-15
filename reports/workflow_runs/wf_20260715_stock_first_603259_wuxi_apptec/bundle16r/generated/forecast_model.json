@@ -1,0 +1,352 @@
+{
+  "artifact_type": "r5_bundle16r_forecast_model",
+  "assumption_traceability": 1.0,
+  "assumptions": [
+    {
+      "assumption_id": "assumption_603259_backlog_conversion",
+      "estimate_logic": "以订单增速和收入基数设置转化情景，不把全部在手订单一次性确认为收入。",
+      "evidence_ids": [
+        "ev_annual_report_603259_20260324_7f1431",
+        "ev_quarterly_report_603259_20260428_379796"
+      ],
+      "locator": "annual page:11; q1 page:4"
+    },
+    {
+      "assumption_id": "assumption_603259_pipeline",
+      "estimate_logic": "项目数量及阶段用于方向验证，不对单项目收入作未披露假设。",
+      "evidence_ids": [
+        "ev_annual_report_603259_20260324_7f1431",
+        "ev_quarterly_report_603259_20260428_379796"
+      ],
+      "locator": "annual page:14; q1 page:4"
+    },
+    {
+      "assumption_id": "assumption_603259_tides_mix",
+      "estimate_logic": "高增长业务结构改善只反映在化学业务情景增速与毛利敏感性中。",
+      "evidence_ids": [
+        "ev_annual_report_603259_20260324_7f1431"
+      ],
+      "locator": "page:14"
+    },
+    {
+      "assumption_id": "assumption_603259_management_outlook",
+      "estimate_logic": "管理层目标作为基准情景校验点，不认定为事实或盈利承诺。",
+      "evidence_ids": [
+        "ev_annual_report_603259_20260324_7f1431"
+      ],
+      "locator": "management outlook section"
+    }
+  ],
+  "forecast_classification": "estimate",
+  "future_event_model_link_count": 2,
+  "future_events": [
+    {
+      "event_id": "event_603259_interim_conversion",
+      "expected_window": "2026H1_report",
+      "model_links": [
+        "chemistry_crdmo",
+        "assumption_603259_backlog_conversion",
+        "assumption_603259_tides_mix"
+      ],
+      "verification_metric": "持续经营收入、在手订单、D&M与TIDES收入及项目阶段数"
+    },
+    {
+      "event_id": "event_603259_annual_pipeline",
+      "expected_window": "2026_annual_report",
+      "model_links": [
+        "chemistry_crdmo",
+        "testing_and_biology",
+        "assumption_603259_pipeline"
+      ],
+      "verification_metric": "商业化与III期项目数、订单转收入速度、产能利用及客户监管事件"
+    }
+  ],
+  "management_guidance_is_not_fact": true,
+  "periods": [
+    "2026E",
+    "2027E",
+    "2028E"
+  ],
+  "scenarios": {
+    "base": {
+      "consolidated": [
+        {
+          "gross_margin": 0.49282666,
+          "gross_profit": 25164587926.800003,
+          "period": "2026E",
+          "revenue": 51061741920.0
+        },
+        {
+          "gross_margin": 0.49408382,
+          "gross_profit": 28039744510.344006,
+          "period": "2027E",
+          "revenue": 56750987412.00001
+        },
+        {
+          "gross_margin": 0.48754366,
+          "gross_profit": 30284481568.944965,
+          "period": "2028E",
+          "revenue": 62116450586.06402
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.52,
+              "gross_profit": 22754688465.600002,
+              "period": "2026E",
+              "revenue": 43759016280.0
+            },
+            {
+              "gross_margin": 0.52,
+              "gross_profit": 25485251081.472004,
+              "period": "2027E",
+              "revenue": 49010098233.600006
+            },
+            {
+              "gross_margin": 0.51,
+              "gross_profit": 27494665109.049606,
+              "period": "2028E",
+              "revenue": 53911108056.960014
+            }
+          ],
+          "segment_id": "chemistry_crdmo"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.33,
+              "gross_profit": 2409899461.2,
+              "period": "2026E",
+              "revenue": 7302725640.0
+            },
+            {
+              "gross_margin": 0.33,
+              "gross_profit": 2554493428.872,
+              "period": "2027E",
+              "revenue": 7740889178.400001
+            },
+            {
+              "gross_margin": 0.34,
+              "gross_profit": 2789816459.89536,
+              "period": "2028E",
+              "revenue": 8205342529.104001
+            }
+          ],
+          "segment_id": "testing_and_biology"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "discontinued_operations"
+        }
+      ]
+    },
+    "bear": {
+      "consolidated": [
+        {
+          "gross_margin": 0.45240436,
+          "gross_profit": 21230571569.760002,
+          "period": "2026E",
+          "revenue": 46928308854.0
+        },
+        {
+          "gross_margin": 0.44329937,
+          "gross_profit": 21930627964.7364,
+          "period": "2027E",
+          "revenue": 49471372294.68
+        },
+        {
+          "gross_margin": 0.43511988,
+          "gross_profit": 22541775708.444557,
+          "period": "2028E",
+          "revenue": 51805897013.22841
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.48,
+              "gross_profit": 19253967163.2,
+              "period": "2026E",
+              "revenue": 40112431590.0
+            },
+            {
+              "gross_margin": 0.47,
+              "gross_profit": 19984013418.138,
+              "period": "2027E",
+              "revenue": 42519177485.4
+            },
+            {
+              "gross_margin": 0.46,
+              "gross_profit": 20536762725.448204,
+              "period": "2028E",
+              "revenue": 44645136359.670006
+            }
+          ],
+          "segment_id": "chemistry_crdmo"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.29,
+              "gross_profit": 1976604406.56,
+              "period": "2026E",
+              "revenue": 6815877264.0
+            },
+            {
+              "gross_margin": 0.28,
+              "gross_profit": 1946614546.5984,
+              "period": "2027E",
+              "revenue": 6952194809.28
+            },
+            {
+              "gross_margin": 0.28,
+              "gross_profit": 2005012982.996352,
+              "period": "2028E",
+              "revenue": 7160760653.5584
+            }
+          ],
+          "segment_id": "testing_and_biology"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "discontinued_operations"
+        }
+      ]
+    },
+    "bull": {
+      "consolidated": [
+        {
+          "gross_margin": 0.52448051,
+          "gross_profit": 28302069617.25,
+          "period": "2026E",
+          "revenue": 53962100043.0
+        },
+        {
+          "gross_margin": 0.53616922,
+          "gross_profit": 33771548701.6464,
+          "period": "2027E",
+          "revenue": 62986735347.54
+        },
+        {
+          "gross_margin": 0.5285281,
+          "gross_profit": 37686451941.02647,
+          "period": "2028E",
+          "revenue": 71304537265.20361
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.55,
+              "gross_profit": 25471394059.65,
+              "period": "2026E",
+              "revenue": 46311625563.0
+            },
+            {
+              "gross_margin": 0.56,
+              "gross_profit": 30602722172.0304,
+              "period": "2027E",
+              "revenue": 54647718164.34
+            },
+            {
+              "gross_margin": 0.55,
+              "gross_profit": 34264119289.041183,
+              "period": "2028E",
+              "revenue": 62298398707.3476
+            }
+          ],
+          "segment_id": "chemistry_crdmo"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.37,
+              "gross_profit": 2830675557.6,
+              "period": "2026E",
+              "revenue": 7650474480.000001
+            },
+            {
+              "gross_margin": 0.38,
+              "gross_profit": 3168826529.616001,
+              "period": "2027E",
+              "revenue": 8339017183.200002
+            },
+            {
+              "gross_margin": 0.38,
+              "gross_profit": 3422332651.985281,
+              "period": "2028E",
+              "revenue": 9006138557.856003
+            }
+          ],
+          "segment_id": "testing_and_biology"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "discontinued_operations"
+        }
+      ]
+    }
+  },
+  "schema_version": 1
+}

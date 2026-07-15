@@ -1,0 +1,12 @@
+active_company_id: cn_603259_wuxi_apptec
+active_stock_code: '603259'
+generated_at: '2026-07-15T15:00:00+08:00'
+information_cutoff: '2026-07-15'
+p2_allowed: false
+remaining_gate: exact_hash_human_review
+sample_quality_allowed: false
+schema_version: 1
+stage: bundle16r_engineering_candidate
+status: ready_for_exact_hash_human_review
+workflow_id: wf_20260715_stock_first_603259_wuxi_apptec
+workflow_type: stock_first_closed_loop

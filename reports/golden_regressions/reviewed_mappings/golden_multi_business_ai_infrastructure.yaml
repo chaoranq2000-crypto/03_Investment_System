@@ -1,0 +1,16 @@
+schema_version: r5_bundle16r_review_mapping_v1
+case_id: golden_multi_business_ai_infrastructure
+issuer_ticker: 600673.SH
+as_of_date: '2026-07-15'
+pack_review:
+  status: accepted_with_limitations
+  reviewer: OpenAI Codex - gap mapping only; no evidence acceptance
+  reviewed_at: '2026-07-15T22:20:01+08:00'
+source_bindings:
+  - catalog_source_id: ev_annual_report_600673_20260410_a8e2a1
+  - catalog_source_id: ev_quarterly_report_600673_20260428_34ed1a
+  - catalog_source_id: ev_announcement_600673_20260616_da320e
+  - catalog_source_id: ev_announcement_600673_20260625_c5ca5c
+  - catalog_source_id: ev_announcement_600673_20260711_54be9c
+record_bindings: []
+artifact_bindings: {}

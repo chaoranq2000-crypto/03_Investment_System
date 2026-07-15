@@ -1,0 +1,29 @@
+schema_version: r5_bundle17r_human_review_handoff_v1
+bundle_id: R5_BUNDLE17R_ACTIVATION_RECEIPT
+case_id: golden_gold_mining_cycle
+issuer_ticker: 600988.SH
+review_status: not_ready
+reviewer: null
+reviewed_at: null
+decision_notes: null
+reader:
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/reader_report.md
+  sha256: edc6e089537e64e4bbcc7578e02465cfa6d0d5c259f575e6f0eeff5e716b6030
+  size_bytes: 3857
+generation_lock:
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+  sha256: 5cffa5fee240c6bb3c9f7bbf3b07d7cf4c2e8c799e1f07aa839cfb2449a3f0d1
+  size_bytes: 1134
+quality_scorecard:
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+  sha256: ef5f0513e89e4d9f51f189fcae650e6b5ccbf02a1fe52065fba377c2e5358bf0
+  size_bytes: 1896
+traceability:
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/evidence_pack.json
+  sha256: 915fb3916e11378306a9cc6d5fd42a48f9cabe9bc8614d2a3ad7be6c70ff54d1
+  size_bytes: 9893
+automated_acceptance_allowed: false
+canonical_workflow_state_mutation_allowed: false
+sample_quality_allowed: false
+p2_allowed: false
+activation_generation_id: activation_gen_r5_bundle17r_1fb1ea838a59cba3

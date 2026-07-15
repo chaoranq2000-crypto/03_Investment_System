@@ -1,0 +1,380 @@
+{
+  "bundle_id": "R5_BUNDLE_14R",
+  "candidate_ready_case_count": 0,
+  "case_results": [
+    {
+      "archetype_count": 3,
+      "case_id": "golden_copper_foil_product_generation",
+      "contract_valid": true,
+      "expected_status": "evidence_qualification_pending",
+      "issuer_label": "铜冠铜箔 / 301217.SZ",
+      "issues": [],
+      "p2_allowed": false,
+      "release_authority": false,
+      "report_emphasis_top3_weight": 0.69,
+      "required_driver_count": 8,
+      "required_question_count": 6,
+      "sample_quality_allowed": false,
+      "source_path": "tests/fixtures/r5_bundle14r/cases/copper_foil.yaml",
+      "workflow_state_mutation_allowed": false
+    },
+    {
+      "archetype_count": 5,
+      "case_id": "golden_crdmo_backlog_conversion",
+      "contract_valid": true,
+      "expected_status": "evidence_qualification_pending",
+      "issuer_label": "药明康德 / 603259.SH",
+      "issues": [],
+      "p2_allowed": false,
+      "release_authority": false,
+      "report_emphasis_top3_weight": 0.67,
+      "required_driver_count": 11,
+      "required_question_count": 7,
+      "sample_quality_allowed": false,
+      "source_path": "tests/fixtures/r5_bundle14r/cases/crdmo.yaml",
+      "workflow_state_mutation_allowed": false
+    },
+    {
+      "archetype_count": 4,
+      "case_id": "golden_gold_mining_cycle",
+      "contract_valid": true,
+      "expected_status": "evidence_qualification_pending",
+      "issuer_label": "赤峰黄金 / 600988.SH",
+      "issues": [],
+      "p2_allowed": false,
+      "release_authority": false,
+      "report_emphasis_top3_weight": 0.69,
+      "required_driver_count": 9,
+      "required_question_count": 6,
+      "sample_quality_allowed": false,
+      "source_path": "tests/fixtures/r5_bundle14r/cases/gold_mining.yaml",
+      "workflow_state_mutation_allowed": false
+    },
+    {
+      "archetype_count": 5,
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "contract_valid": true,
+      "expected_status": "evidence_qualification_pending",
+      "issuer_label": "东阳光 / 600673.SH",
+      "issues": [],
+      "p2_allowed": false,
+      "release_authority": false,
+      "report_emphasis_top3_weight": 0.65,
+      "required_driver_count": 18,
+      "required_question_count": 9,
+      "sample_quality_allowed": false,
+      "source_path": "tests/fixtures/r5_bundle14r/cases/multi_business_ai_infrastructure.yaml",
+      "workflow_state_mutation_allowed": false
+    }
+  ],
+  "contract_passed": true,
+  "core_generality": {
+    "passed": true,
+    "scanned_paths": [
+      "src/research/r5_bundle14r_golden_regression.py",
+      "src/quality/r5_bundle14r_semantic_regression.py",
+      "scripts/run_r5_bundle14r_golden_regression.py"
+    ],
+    "violations": []
+  },
+  "p2_allowed": false,
+  "qualification_results": [
+    {
+      "backflow_items": [
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "issue_code": "EVIDENCE_MISSING",
+          "owner": "workflow_orchestrator",
+          "reason": "no reviewed official evidence pack has been attached",
+          "skill": "evidence-ingest",
+          "stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "issue_code": "DRIVER_UNQUALIFIED",
+          "owner": "workflow_orchestrator",
+          "reason": "required operating drivers remain unqualified: capacity_utilization, customer_certification_conversion, hvlp_processing_fee, hvlp_product_mix, lithium_foil_margin, pcb_capacity, receivable_inventory_cash_conversion, unit_conversion_cost",
+          "skill": "evidence-ingest",
+          "stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "issue_code": "OVERLAP_UNRESOLVED",
+          "owner": "workflow_orchestrator",
+          "reason": "segment and cross-cutting revenue/gross-profit overlap is unresolved",
+          "skill": "stock-deep-dive",
+          "stage": "T5_analysis_pack_build"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "issue_code": "DRIVER_UNQUALIFIED",
+          "owner": "workflow_orchestrator",
+          "reason": "driver-to-statement, working-capital, and cash-flow bridges are incomplete",
+          "skill": "evidence-ingest",
+          "stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "issue_code": "VALUATION_INELIGIBLE",
+          "owner": "workflow_orchestrator",
+          "reason": "no valuation method has passed its independent eligibility gate",
+          "skill": "valuation-model",
+          "stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "issue_code": "SEMANTIC_QUALITY_FAILED",
+          "owner": "workflow_orchestrator",
+          "reason": "semantic quality candidate has not passed",
+          "skill": "quality-review",
+          "stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_copper_foil_product_generation",
+          "issue_code": "SEMANTIC_QUALITY_FAILED",
+          "owner": "workflow_orchestrator",
+          "reason": "deterministic rerun has not been demonstrated",
+          "skill": "quality-review",
+          "stage": "T9_quality_review"
+        }
+      ],
+      "candidate_ready_for_exact_hash_review": false,
+      "case_id": "golden_copper_foil_product_generation",
+      "deterministic_rerun": false,
+      "exact_hash_human_review_status": "not_triggered",
+      "forecast_bridge_complete": false,
+      "p2_allowed": false,
+      "qualified_driver_count": 0,
+      "required_driver_count": 8,
+      "research_ready": false,
+      "reviewed_official_source_count": 0,
+      "sample_quality_allowed": false,
+      "semantic_gate_passed": false,
+      "status": "evidence_qualification_pending"
+    },
+    {
+      "backflow_items": [
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "issue_code": "EVIDENCE_MISSING",
+          "owner": "workflow_orchestrator",
+          "reason": "no reviewed official evidence pack has been attached",
+          "skill": "evidence-ingest",
+          "stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "issue_code": "DRIVER_UNQUALIFIED",
+          "owner": "workflow_orchestrator",
+          "reason": "required operating drivers remain unqualified: backlog_conversion_rate, backlog_definition, capacity_utilization, cash_conversion_and_capex, customer_geography_concentration, new_order_intake, pricing_and_productivity, project_stage_mix, qualified_capacity, regulatory_contract_transition, tides_product_mix",
+          "skill": "evidence-ingest",
+          "stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "issue_code": "OVERLAP_UNRESOLVED",
+          "owner": "workflow_orchestrator",
+          "reason": "segment and cross-cutting revenue/gross-profit overlap is unresolved",
+          "skill": "stock-deep-dive",
+          "stage": "T5_analysis_pack_build"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "issue_code": "DRIVER_UNQUALIFIED",
+          "owner": "workflow_orchestrator",
+          "reason": "driver-to-statement, working-capital, and cash-flow bridges are incomplete",
+          "skill": "evidence-ingest",
+          "stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "issue_code": "VALUATION_INELIGIBLE",
+          "owner": "workflow_orchestrator",
+          "reason": "no valuation method has passed its independent eligibility gate",
+          "skill": "valuation-model",
+          "stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "issue_code": "SEMANTIC_QUALITY_FAILED",
+          "owner": "workflow_orchestrator",
+          "reason": "semantic quality candidate has not passed",
+          "skill": "quality-review",
+          "stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_crdmo_backlog_conversion",
+          "issue_code": "SEMANTIC_QUALITY_FAILED",
+          "owner": "workflow_orchestrator",
+          "reason": "deterministic rerun has not been demonstrated",
+          "skill": "quality-review",
+          "stage": "T9_quality_review"
+        }
+      ],
+      "candidate_ready_for_exact_hash_review": false,
+      "case_id": "golden_crdmo_backlog_conversion",
+      "deterministic_rerun": false,
+      "exact_hash_human_review_status": "not_triggered",
+      "forecast_bridge_complete": false,
+      "p2_allowed": false,
+      "qualified_driver_count": 0,
+      "required_driver_count": 11,
+      "research_ready": false,
+      "reviewed_official_source_count": 0,
+      "sample_quality_allowed": false,
+      "semantic_gate_passed": false,
+      "status": "evidence_qualification_pending"
+    },
+    {
+      "backflow_items": [
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "issue_code": "EVIDENCE_MISSING",
+          "owner": "workflow_orchestrator",
+          "reason": "no reviewed official evidence pack has been attached",
+          "skill": "evidence-ingest",
+          "stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "issue_code": "DRIVER_UNQUALIFIED",
+          "owner": "workflow_orchestrator",
+          "reason": "required operating drivers remain unqualified: byproduct_economics, fx_tax_ownership_bridge, mine_production_volume, ore_grade_or_feed_quality, realized_gold_price, recovery_rate, stripping_ratio, sustaining_and_growth_capex, unit_cash_cost",
+          "skill": "evidence-ingest",
+          "stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "issue_code": "OVERLAP_UNRESOLVED",
+          "owner": "workflow_orchestrator",
+          "reason": "segment and cross-cutting revenue/gross-profit overlap is unresolved",
+          "skill": "stock-deep-dive",
+          "stage": "T5_analysis_pack_build"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "issue_code": "DRIVER_UNQUALIFIED",
+          "owner": "workflow_orchestrator",
+          "reason": "driver-to-statement, working-capital, and cash-flow bridges are incomplete",
+          "skill": "evidence-ingest",
+          "stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "issue_code": "VALUATION_INELIGIBLE",
+          "owner": "workflow_orchestrator",
+          "reason": "no valuation method has passed its independent eligibility gate",
+          "skill": "valuation-model",
+          "stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "issue_code": "SEMANTIC_QUALITY_FAILED",
+          "owner": "workflow_orchestrator",
+          "reason": "semantic quality candidate has not passed",
+          "skill": "quality-review",
+          "stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_gold_mining_cycle",
+          "issue_code": "SEMANTIC_QUALITY_FAILED",
+          "owner": "workflow_orchestrator",
+          "reason": "deterministic rerun has not been demonstrated",
+          "skill": "quality-review",
+          "stage": "T9_quality_review"
+        }
+      ],
+      "candidate_ready_for_exact_hash_review": false,
+      "case_id": "golden_gold_mining_cycle",
+      "deterministic_rerun": false,
+      "exact_hash_human_review_status": "not_triggered",
+      "forecast_bridge_complete": false,
+      "p2_allowed": false,
+      "qualified_driver_count": 0,
+      "required_driver_count": 9,
+      "research_ready": false,
+      "reviewed_official_source_count": 0,
+      "sample_quality_allowed": false,
+      "semantic_gate_passed": false,
+      "status": "evidence_qualification_pending"
+    },
+    {
+      "backflow_items": [
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "issue_code": "EVIDENCE_MISSING",
+          "owner": "workflow_orchestrator",
+          "reason": "no reviewed official evidence pack has been attached",
+          "skill": "evidence-ingest",
+          "stage": "T1_evidence_plan"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "issue_code": "DRIVER_UNQUALIFIED",
+          "owner": "workflow_orchestrator",
+          "reason": "required operating drivers remain unqualified: idc_commissioned_capacity, idc_power_cost, idc_unit_revenue, idc_utilization, incremental_financing_cost, liquid_cooling_acceptance, liquid_cooling_margin, liquid_cooling_projects_or_mw, liquid_cooling_unit_value, materials_capacity, materials_product_mix_and_fee, materials_utilization, ownership_and_minority_interest, refrigerant_quota, refrigerant_realized_price, refrigerant_unit_cost, refrigerant_volume, transaction_close_and_consolidation",
+          "skill": "evidence-ingest",
+          "stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "issue_code": "OVERLAP_UNRESOLVED",
+          "owner": "workflow_orchestrator",
+          "reason": "segment and cross-cutting revenue/gross-profit overlap is unresolved",
+          "skill": "stock-deep-dive",
+          "stage": "T5_analysis_pack_build"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "issue_code": "DRIVER_UNQUALIFIED",
+          "owner": "workflow_orchestrator",
+          "reason": "driver-to-statement, working-capital, and cash-flow bridges are incomplete",
+          "skill": "evidence-ingest",
+          "stage": "T2_evidence_acquire_parse"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "issue_code": "VALUATION_INELIGIBLE",
+          "owner": "workflow_orchestrator",
+          "reason": "no valuation method has passed its independent eligibility gate",
+          "skill": "valuation-model",
+          "stage": "T6_forecast_valuation_model"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "issue_code": "SEMANTIC_QUALITY_FAILED",
+          "owner": "workflow_orchestrator",
+          "reason": "semantic quality candidate has not passed",
+          "skill": "quality-review",
+          "stage": "T9_quality_review"
+        },
+        {
+          "case_id": "golden_multi_business_ai_infrastructure",
+          "issue_code": "SEMANTIC_QUALITY_FAILED",
+          "owner": "workflow_orchestrator",
+          "reason": "deterministic rerun has not been demonstrated",
+          "skill": "quality-review",
+          "stage": "T9_quality_review"
+        }
+      ],
+      "candidate_ready_for_exact_hash_review": false,
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "deterministic_rerun": false,
+      "exact_hash_human_review_status": "not_triggered",
+      "forecast_bridge_complete": false,
+      "p2_allowed": false,
+      "qualified_driver_count": 0,
+      "required_driver_count": 18,
+      "research_ready": false,
+      "reviewed_official_source_count": 0,
+      "sample_quality_allowed": false,
+      "semantic_gate_passed": false,
+      "status": "evidence_qualification_pending"
+    }
+  ],
+  "release_authority": false,
+  "research_ready_case_count": 0,
+  "sample_quality_allowed": false,
+  "schema_version": "r5_bundle14r_suite_v1",
+  "workflow_state_mutation_allowed": false
+}

@@ -1,0 +1,83 @@
+{
+  "artifact_type": "r5_bundle16r_valuation_pack",
+  "eligibility": {
+    "reason": "多业务口径、未验收项目和未完成并购使未经校准同业倍数不可用",
+    "status": "context_only"
+  },
+  "limitations": [
+    "不输出目标价或评级",
+    "合同金额不是收入",
+    "未交割交易不提前并表",
+    "新业务分部经济性保持缺失"
+  ],
+  "method": "scenario_valuation",
+  "no_advice_boundary": true,
+  "peer_multiple_used": false,
+  "position_instruction": null,
+  "price_target": null,
+  "qualified_peers": [],
+  "rating": null,
+  "scenario_operating_context": {
+    "base": [
+      {
+        "gross_margin": 0.20268641,
+        "gross_profit": 3172636709.265018,
+        "period": "2026E",
+        "revenue": 15652932829.928802
+      },
+      {
+        "gross_margin": 0.20607891,
+        "gross_profit": 3387600479.056854,
+        "period": "2027E",
+        "revenue": 16438365925.119078
+      },
+      {
+        "gross_margin": 0.20212052,
+        "gross_profit": 3461765352.968187,
+        "period": "2028E",
+        "revenue": 17127233667.792704
+      }
+    ],
+    "bear": [
+      {
+        "gross_margin": 0.13899461,
+        "gross_profit": 1931323920.771332,
+        "period": "2026E",
+        "revenue": 13894955770.143002
+      },
+      {
+        "gross_margin": 0.1315859,
+        "gross_profit": 1778568994.81246,
+        "period": "2027E",
+        "revenue": 13516410368.268652
+      },
+      {
+        "gross_margin": 0.13217421,
+        "gross_profit": 1795467792.469574,
+        "period": "2028E",
+        "revenue": 13584100830.568151
+      }
+    ],
+    "bull": [
+      {
+        "gross_margin": 0.25295356,
+        "gross_profit": 4231042990.818361,
+        "period": "2026E",
+        "revenue": 16726560171.624102
+      },
+      {
+        "gross_margin": 0.25797121,
+        "gross_profit": 4719874311.880648,
+        "period": "2027E",
+        "revenue": 18296128074.493847
+      },
+      {
+        "gross_margin": 0.25382675,
+        "gross_profit": 4973889757.63111,
+        "period": "2028E",
+        "revenue": 19595608767.85538
+      }
+    ]
+  },
+  "schema_version": 1
+}

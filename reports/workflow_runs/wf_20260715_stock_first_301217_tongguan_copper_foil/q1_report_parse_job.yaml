@@ -1,0 +1,14 @@
+job_id: job_20260715_301217_2026_q1_report_parse
+run_id: wf_20260715_stock_first_301217_tongguan_copper_foil
+evidence_id: ev_quarterly_report_301217_20260428_904702
+stock_code: "301217"
+company_id: cn_301217_tongguan_copper_foil
+source_type: quarterly_report
+raw_pdf_path: data/raw/announcements/cninfo_2026_q1_report_301217_2026-04-28.pdf
+candidate_generation:
+  generate_claim_candidates: false
+  generate_metric_candidates: false
+quality:
+  require_page_map: true
+  require_table_inventory: true
+  allow_partial_success: false

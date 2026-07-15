@@ -1,0 +1,42 @@
+[
+  {
+    "table_id": "ev_announcement_600673_20260625_c5ca5c_p1_t18",
+    "evidence_id": "ev_announcement_600673_20260625_c5ca5c",
+    "page_no": 1,
+    "table_title": "净资产绝对值 5%以上。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "净资产绝对值 5%以上。"
+  },
+  {
+    "table_id": "ev_announcement_600673_20260625_c5ca5c_p3_t7",
+    "evidence_id": "ev_announcement_600673_20260625_c5ca5c",
+    "page_no": 3,
+    "table_title": "资产总额 266.82 283.82",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产总额 266.82 283.82"
+  },
+  {
+    "table_id": "ev_announcement_600673_20260625_c5ca5c_p3_t8",
+    "evidence_id": "ev_announcement_600673_20260625_c5ca5c",
+    "page_no": 3,
+    "table_title": "负债总额 304.43 306.47",
+    "parse_status": "line_inventory",
+    "text_excerpt": "负债总额 304.43 306.47"
+  },
+  {
+    "table_id": "ev_announcement_600673_20260625_c5ca5c_p3_t10",
+    "evidence_id": "ev_announcement_600673_20260625_c5ca5c",
+    "page_no": 3,
+    "table_title": "资产负债率 114.10% 107.98%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产负债率 114.10% 107.98%"
+  },
+  {
+    "table_id": "ev_announcement_600673_20260625_c5ca5c_p3_t16",
+    "evidence_id": "ev_announcement_600673_20260625_c5ca5c",
+    "page_no": 3,
+    "table_title": "净利润 -14.96 -22.65",
+    "parse_status": "line_inventory",
+    "text_excerpt": "净利润 -14.96 -22.65"
+  }
+]

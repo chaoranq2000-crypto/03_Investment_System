@@ -1,0 +1,9 @@
+case_id: 600988_cycle_resource_gold
+generation_lock_sha256: 5cffa5fee240c6bb3c9f7bbf3b07d7cf4c2e8c799e1f07aa839cfb2449a3f0d1
+note: Automated generation cannot synthesize acceptance. A real reviewer must sign
+  the exact hashes.
+reader_report_sha256: edc6e089537e64e4bbcc7578e02465cfa6d0d5c259f575e6f0eeff5e716b6030
+reviewed_at: ''
+reviewer: ''
+schema_version: 1
+status: pending

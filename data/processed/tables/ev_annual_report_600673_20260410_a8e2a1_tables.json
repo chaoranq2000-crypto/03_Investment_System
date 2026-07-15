@@ -1,0 +1,3994 @@
+[
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p2_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 2,
+    "table_title": "根据天健会计师事务所（特殊普通合伙）审计，公司2025年度归母净利润275,469,968.49",
+    "parse_status": "line_inventory",
+    "text_excerpt": "根据天健会计师事务所（特殊普通合伙）审计，公司2025年度归母净利润275,469,968.49"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p7_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 7,
+    "table_title": "营业收入 14,934,605,535.39 12,199,116,451.46 22.42 10,853,708,505.08",
+    "parse_status": "line_inventory",
+    "text_excerpt": "营业收入 14,934,605,535.39 12,199,116,451.46 22.42 10,853,708,505.08"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p7_t9",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 7,
+    "table_title": "归属于上市公司股东的净利润 275,469,968.49 374,988,008.07 -26.54 -294,316,016.90",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净利润 275,469,968.49 374,988,008.07 -26.54 -294,316,016.90"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p7_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 7,
+    "table_title": "归属于上市公司股东的扣除非经常性损益的净利润 710,071,137.41 327,427,731.19 116.86 -440,393,495.02",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的扣除非经常性损益的净利润 710,071,137.41 327,427,731.19 116.86 -440,393,495.02"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p7_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 7,
+    "table_title": "经营活动产生的现金流量净额 1,308,997,218.30 568,080,354.49 130.42 409,999,034.31",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 1,308,997,218.30 568,080,354.49 130.42 409,999,034.31"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p7_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 7,
+    "table_title": "归属于上市公司股东的净资产 9,258,941,101.73 9,140,365,997.36 1.30 9,802,127,234.31",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净资产 9,258,941,101.73 9,140,365,997.36 1.30 9,802,127,234.31"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p7_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 7,
+    "table_title": "总资产 29,991,265,317.53 25,360,653,631.15 18.26 24,951,869,986.46",
+    "parse_status": "line_inventory",
+    "text_excerpt": "总资产 29,991,265,317.53 25,360,653,631.15 18.26 24,951,869,986.46"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p7_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 7,
+    "table_title": "因素影响后，公司实现归属于上市公司股东的净利润为 95,478.63 万元，归属于上市公司股东的扣除非经常性损益后的净利润为 86,782.83万元。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "因素影响后，公司实现归属于上市公司股东的净利润为 95,478.63 万元，归属于上市公司股东的扣除非经常性损益后的净利润为 86,782.83万元。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p7_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 7,
+    "table_title": "加权平均净资产收益率（%） 3.07 3.99 减少0.92个百分点 -2.99",
+    "parse_status": "line_inventory",
+    "text_excerpt": "加权平均净资产收益率（%） 3.07 3.99 减少0.92个百分点 -2.99"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p7_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 7,
+    "table_title": "扣除非经常性损益后的加权平均净资产收益率（%） 7.92 3.49 增加4.43个百分点 -4.47",
+    "parse_status": "line_inventory",
+    "text_excerpt": "扣除非经常性损益后的加权平均净资产收益率（%） 7.92 3.49 增加4.43个百分点 -4.47"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p8_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 8,
+    "table_title": "营业收入 3,346,763,925.04 3,777,007,285.01 3,846,518,801.43 3,964,315,523.91",
+    "parse_status": "line_inventory",
+    "text_excerpt": "营业收入 3,346,763,925.04 3,777,007,285.01 3,846,518,801.43 3,964,315,523.91"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p8_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 8,
+    "table_title": "归属于上市公司股东的净利润 278,042,479.42 334,591,511.83 292,866,764.88 -630,030,787.64",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净利润 278,042,479.42 334,591,511.83 292,866,764.88 -630,030,787.64"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p8_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 8,
+    "table_title": "经常性损益后的净利润 267,151,677.34 214,340,846.41 305,550,979.51 -76,972,365.85",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经常性损益后的净利润 267,151,677.34 214,340,846.41 305,550,979.51 -76,972,365.85"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p8_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 8,
+    "table_title": "经营活动产生的现金流量净额 158,217,317.16 107,993,924.15 219,582,386.85 823,203,590.14",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 158,217,317.16 107,993,924.15 219,582,386.85 823,203,590.14"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p8_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 8,
+    "table_title": "现归属于上市公司股东的净利润为 11,808.09 万元，归属于上市公司股东的扣除非经常性损",
+    "parse_status": "line_inventory",
+    "text_excerpt": "现归属于上市公司股东的净利润为 11,808.09 万元，归属于上市公司股东的扣除非经常性损"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p8_t30",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 8,
+    "table_title": "益后的净利润为 8,078.48 万元。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "益后的净利润为 8,078.48 万元。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p9_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 9,
+    "table_title": "因不可抗力因素，如遭受自然灾害而产生的各项资产损失 335,240.16",
+    "parse_status": "line_inventory",
+    "text_excerpt": "因不可抗力因素，如遭受自然灾害而产生的各项资产损失 335,240.16"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p9_t39",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 9,
+    "table_title": "扣除股份支付影响后的净利润 433,227,163.32 375,962,018.09 15.23 -66,511,970.74",
+    "parse_status": "line_inventory",
+    "text_excerpt": "扣除股份支付影响后的净利润 433,227,163.32 375,962,018.09 15.23 -66,511,970.74"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p9_t44",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 9,
+    "table_title": "交易性金融资产 29,744,369.73 34,372,830.11 4,628,460.38 5,489,687.54",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融资产 29,744,369.73 34,372,830.11 4,628,460.38 5,489,687.54"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p9_t45",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 9,
+    "table_title": "其他非流动金融资产 3,142,018,015.93 2,682,116,863.71 -459,901,152.22 -576,051,035.86",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动金融资产 3,142,018,015.93 2,682,116,863.71 -459,901,152.22 -576,051,035.86"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p10_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 10,
+    "table_title": "交易性金融负债 8,249,715.00 -8,249,715.00 4,162,379.72",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融负债 8,249,715.00 -8,249,715.00 4,162,379.72"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p15_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 15,
+    "table_title": "和 1.2 个百分点，实现营业收入 17.4 万亿元，同比增长 7.4%，实现利润总额 7,509 亿元，",
+    "parse_status": "line_inventory",
+    "text_excerpt": "和 1.2 个百分点，实现营业收入 17.4 万亿元，同比增长 7.4%，实现利润总额 7,509 亿元，"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p19_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 19,
+    "table_title": "司在浙江东阳的电容器工厂在规模逐渐释放与客户基数增多带动下，销售额增幅明显。2025",
+    "parse_status": "line_inventory",
+    "text_excerpt": "司在浙江东阳的电容器工厂在规模逐渐释放与客户基数增多带动下，销售额增幅明显。2025"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "（1）本报告期内，公司实现营业收入 14,934,605,535.39 元，同比上涨 22.42%；实现",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（1）本报告期内，公司实现营业收入 14,934,605,535.39 元，同比上涨 22.42%；实现"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "归属于母公司所有者的净利润 275,469,968.49 元，同比下降 26.54%；扣除非经常性损益后",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于母公司所有者的净利润 275,469,968.49 元，同比下降 26.54%；扣除非经常性损益后"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t6",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "归属于上市公司股东的净利润 710,071,137.41 元，同比上涨 116.86%；经营活动产生的现金",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净利润 710,071,137.41 元，同比上涨 116.86%；经营活动产生的现金"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "（2）报告期末公司资产总额 29,991,265,317.53 元，比上年末增长 18.26%；负债总额",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（2）报告期末公司资产总额 29,991,265,317.53 元，比上年末增长 18.26%；负债总额"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t9",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "19,814,598,355.85 元，资产负债率为 66.07%，比上年末上升 3.36 个百分点；归属于母公",
+    "parse_status": "line_inventory",
+    "text_excerpt": "19,814,598,355.85 元，资产负债率为 66.07%，比上年末上升 3.36 个百分点；归属于母公"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "1、利润表及现金流量表相关科目变动分析表",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1、利润表及现金流量表相关科目变动分析表"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "营业收入 14,934,605,535.39 12,199,116,451.46 22.42",
+    "parse_status": "line_inventory",
+    "text_excerpt": "营业收入 14,934,605,535.39 12,199,116,451.46 22.42"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "经营活动产生的现金流量净额 1,308,997,218.30 568,080,354.49 130.42",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 1,308,997,218.30 568,080,354.49 130.42"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "投资活动产生的现金流量净额 -3,834,882,180.51 -896,136,290.79 不适用",
+    "parse_status": "line_inventory",
+    "text_excerpt": "投资活动产生的现金流量净额 -3,834,882,180.51 -896,136,290.79 不适用"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "筹资活动产生的现金流量净额 3,927,975,454.70 -644,227,455.43 不适用",
+    "parse_status": "line_inventory",
+    "text_excerpt": "筹资活动产生的现金流量净额 3,927,975,454.70 -644,227,455.43 不适用"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p26_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 26,
+    "table_title": "营业收入变动原因说明：营业收入较上年同期增加 22.42%，主要系公司各个业务板块均",
+    "parse_status": "line_inventory",
+    "text_excerpt": "营业收入变动原因说明：营业收入较上年同期增加 22.42%，主要系公司各个业务板块均"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p27_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 27,
+    "table_title": "(1).主营业务分行业、分产品、分地区、分销售模式情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).主营业务分行业、分产品、分地区、分销售模式情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p31_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 31,
+    "table_title": "(7).主要销售客户及主要供应商情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(7).主要销售客户及主要供应商情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p31_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 31,
+    "table_title": "前五名客户销售额441,536.50万元，占年度销售总额26.63%；其中前五名客户销售额中",
+    "parse_status": "line_inventory",
+    "text_excerpt": "前五名客户销售额441,536.50万元，占年度销售总额26.63%；其中前五名客户销售额中"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p31_t17",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 31,
+    "table_title": "前五名供应商采购额 417,875.49 万元，占年度采购总额 34.48%；其中前五名供应商采",
+    "parse_status": "line_inventory",
+    "text_excerpt": "前五名供应商采购额 417,875.49 万元，占年度采购总额 34.48%；其中前五名供应商采"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p31_t19",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 31,
+    "table_title": "B.报告期内向单个客户的销售比例超过总额的 50%、前 5 名客户中存在新增客户的或严重依",
+    "parse_status": "line_inventory",
+    "text_excerpt": "B.报告期内向单个客户的销售比例超过总额的 50%、前 5 名客户中存在新增客户的或严重依"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p31_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 31,
+    "table_title": "报告期内向单个供应商的采购比例超过总额的 50%、前 5 名供应商中存在新增供应商的或严",
+    "parse_status": "line_inventory",
+    "text_excerpt": "报告期内向单个供应商的采购比例超过总额的 50%、前 5 名供应商中存在新增供应商的或严"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p31_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 31,
+    "table_title": "贸易业务占营业收入比例超过 10%前五名销售客户",
+    "parse_status": "line_inventory",
+    "text_excerpt": "贸易业务占营业收入比例超过 10%前五名销售客户"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p31_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 31,
+    "table_title": "贸易业务收入占营业收入比例超过 10%前五名供应商",
+    "parse_status": "line_inventory",
+    "text_excerpt": "贸易业务收入占营业收入比例超过 10%前五名供应商"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p32_t20",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 32,
+    "table_title": "研发投入总额占营业收入比例（%） 3.79",
+    "parse_status": "line_inventory",
+    "text_excerpt": "研发投入总额占营业收入比例（%） 3.79"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p33_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 33,
+    "table_title": "5、现金流",
+    "parse_status": "line_inventory",
+    "text_excerpt": "5、现金流"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p34_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 34,
+    "table_title": "1、资产及负债状况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1、资产及负债状况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p34_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 34,
+    "table_title": "其他非流动金融资产 2,682,116,863.71 8.94 3,142,018,015.93 12.39 -14.64 主要系本报告期参股公司广东东阳光药业",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动金融资产 2,682,116,863.71 8.94 3,142,018,015.93 12.39 -14.64 主要系本报告期参股公司广东东阳光药业股份有限公司公允"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p34_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 34,
+    "table_title": "其他非流动资产 3,167,006,741.55 10.56 91,127,999.50 0.36 3,375.34 主要系本报告期预付宜昌东数一号投资有限责任",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动资产 3,167,006,741.55 10.56 91,127,999.50 0.36 3,375.34 主要系本报告期预付宜昌东数一号投资有限责任公司股权款"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p34_t30",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 34,
+    "table_title": "一年内到期的非流动负债 2,338,002,302.42 7.80 1,616,683,761.15 6.37 44.62 主要系本报告期一年内到期的长期借款较",
+    "parse_status": "line_inventory",
+    "text_excerpt": "一年内到期的非流动负债 2,338,002,302.42 7.80 1,616,683,761.15 6.37 44.62 主要系本报告期一年内到期的长期借款较期初增加所致；"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p34_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 34,
+    "table_title": "其他非流动负债 855,590,932.98 2.85 377,086,264.09 1.49 126.90 主要系本报告期融资租赁借款增加所致；",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动负债 855,590,932.98 2.85 377,086,264.09 1.49 126.90 主要系本报告期融资租赁借款增加所致；"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p35_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 35,
+    "table_title": "2、境外资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2、境外资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p35_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 35,
+    "table_title": "3、截至报告期末主要资产受限情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3、截至报告期末主要资产受限情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p35_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 35,
+    "table_title": "固定资产 3,891,384,988.17 为借款提供抵押担保",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产 3,891,384,988.17 为借款提供抵押担保"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p35_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 35,
+    "table_title": "无形资产 1,322,353,115.39 为借款提供抵押担保",
+    "parse_status": "line_inventory",
+    "text_excerpt": "无形资产 1,322,353,115.39 为借款提供抵押担保"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p36_t96",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 36,
+    "table_title": "3、以公允价值计量的金融资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3、以公允价值计量的金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p37_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 37,
+    "table_title": "衍生金融资产 1,599,310.00 3,181,272.80 4,780,582.80",
+    "parse_status": "line_inventory",
+    "text_excerpt": "衍生金融资产 1,599,310.00 3,181,272.80 4,780,582.80"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p37_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 37,
+    "table_title": "注：以公允价值计量的金融资产包括应收款项融资，详见本报告“第八节财务报告”中“七、合并财务报表项目注释”之“7、应收款项融资”。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "注：以公允价值计量的金融资产包括应收款项融资，详见本报告“第八节财务报告”中“七、合并财务报表项目注释”之“7、应收款项融资”。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p37_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 37,
+    "table_title": "股票 06887 东阳光药 2,478,346,898.97 自有资金 2,938,565,457.28 -677,938,479.66 2,260,626,9",
+    "parse_status": "line_inventory",
+    "text_excerpt": "股票 06887 东阳光药 2,478,346,898.97 自有资金 2,938,565,457.28 -677,938,479.66 2,260,626,977.62 其他非流动金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p37_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 37,
+    "table_title": "股票 6175 立敦 75,000,000.00 自有资金 203,452,558.65 64,339,567.44 267,792,126.09 其他非流动金",
+    "parse_status": "line_inventory",
+    "text_excerpt": "股票 6175 立敦 75,000,000.00 自有资金 203,452,558.65 64,339,567.44 267,792,126.09 其他非流动金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p38_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 38,
+    "table_title": "4、报告期内重大资产重组整合的具体进展情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "4、报告期内重大资产重组整合的具体进展情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p38_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 38,
+    "table_title": "主要子公司及对公司净利润影响达 10%以上的参股公司情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "主要子公司及对公司净利润影响达 10%以上的参股公司情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p58_t43",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 58,
+    "table_title": "合并报表中归属于上市公司普通股股东的净利润 27,547.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "合并报表中归属于上市公司普通股股东的净利润 27,547.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p59_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 59,
+    "table_title": "东的净利润的比率（%） 112.98",
+    "parse_status": "line_inventory",
+    "text_excerpt": "东的净利润的比率（%） 112.98"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p59_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 59,
+    "table_title": "最近三个会计年度年均净利润金额(4) 11,871.40",
+    "parse_status": "line_inventory",
+    "text_excerpt": "最近三个会计年度年均净利润金额(4) 11,871.40"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p59_t19",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 59,
+    "table_title": "股东的净利润 27,547.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "股东的净利润 27,547.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p60_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 60,
+    "table_title": "公司 2025 年员工持股计划通过“安联裕远 22 号资产管理",
+    "parse_status": "line_inventory",
+    "text_excerpt": "公司 2025 年员工持股计划通过“安联裕远 22 号资产管理"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p60_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 60,
+    "table_title": "产品”、“安联裕远 23 号资产管理产品”以大宗交易的方",
+    "parse_status": "line_inventory",
+    "text_excerpt": "产品”、“安联裕远 23 号资产管理产品”以大宗交易的方"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p66_t6",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 66,
+    "table_title": "下属企业兼职。2、保证东阳光资产独立完整保证东阳光具",
+    "parse_status": "line_inventory",
+    "text_excerpt": "下属企业兼职。2、保证东阳光资产独立完整保证东阳光具"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p69_t50",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 69,
+    "table_title": "[注 1]：与 2021 年重大资产出售相关的承诺，详情请见公司于 2021 年 12 月 11 日在上交所网站 www.sse.com.cn 上发布的《广东东",
+    "parse_status": "line_inventory",
+    "text_excerpt": "[注 1]：与 2021 年重大资产出售相关的承诺，详情请见公司于 2021 年 12 月 11 日在上交所网站 www.sse.com.cn 上发布的《广东东阳光科技控股"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p69_t52",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 69,
+    "table_title": "[注 2]：与 2026 年发行股份购买资产并募集配套资金事项相关的部分承诺，详情请见公司于 2026 年 3 月 7 日在上交所网站 www.sse.com.",
+    "parse_status": "line_inventory",
+    "text_excerpt": "[注 2]：与 2026 年发行股份购买资产并募集配套资金事项相关的部分承诺，详情请见公司于 2026 年 3 月 7 日在上交所网站 www.sse.com.cn 上发"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p74_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 74,
+    "table_title": "（2）关联资产转让、债务重组情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（2）关联资产转让、债务重组情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p78_t66",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 78,
+    "table_title": "担保总额占公司净资产的比例(%) 97.01",
+    "parse_status": "line_inventory",
+    "text_excerpt": "担保总额占公司净资产的比例(%) 97.01"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p78_t69",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 78,
+    "table_title": "直接或间接为资产负债率超过70%的被担保对象提供的债务担保金额（D） 297,415.61",
+    "parse_status": "line_inventory",
+    "text_excerpt": "直接或间接为资产负债率超过70%的被担保对象提供的债务担保金额（D） 297,415.61"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p79_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 79,
+    "table_title": "担保总额超过净资产50%部分的金额（E） 478,366.89",
+    "parse_status": "line_inventory",
+    "text_excerpt": "担保总额超过净资产50%部分的金额（E） 478,366.89"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p81_t44",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 81,
+    "table_title": "3、股份变动对最近一年和最近一期每股收益、每股净资产等财务指标的影响（如有）",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3、股份变动对最近一年和最近一期每股收益、每股净资产等财务指标的影响（如有）"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p87_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 87,
+    "table_title": "6、 实际控制人通过信托或其他资产管理方式控制公司",
+    "parse_status": "line_inventory",
+    "text_excerpt": "6、 实际控制人通过信托或其他资产管理方式控制公司"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p93_t57",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 93,
+    "table_title": "是否超过合并口径净资产的 10%：□是 √否",
+    "parse_status": "line_inventory",
+    "text_excerpt": "是否超过合并口径净资产的 10%：□是 √否"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p94_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 94,
+    "table_title": "2、负债情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2、负债情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p94_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 94,
+    "table_title": "(3).可对抗第三人的优先偿付负债情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3).可对抗第三人的优先偿付负债情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p95_t20",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 95,
+    "table_title": "(六) 公司报告期内合并报表范围亏损超过上年末净资产 10%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(六) 公司报告期内合并报表范围亏损超过上年末净资产 10%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p95_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 95,
+    "table_title": "经常性损益的净利润 710,071,137.41 327,427,731.19 116.86 业绩上升",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经常性损益的净利润 710,071,137.41 327,427,731.19 116.86 业绩上升"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p95_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 95,
+    "table_title": "资产负债率（%） 66.07 62.71 3.36",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产负债率（%） 66.07 62.71 3.36"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p97_t9",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 97,
+    "table_title": "2025 年 12 月 31 日的合并及母公司资产负债表，2025 年度的合并及母公司利润表、合并及",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2025 年 12 月 31 日的合并及母公司资产负债表，2025 年度的合并及母公司利润表、合并及"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p97_t28",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 97,
+    "table_title": "东阳光公司的营业收入主要来自于销售高端铝箔、电子元器件、化工新材料等。2025 年",
+    "parse_status": "line_inventory",
+    "text_excerpt": "东阳光公司的营业收入主要来自于销售高端铝箔、电子元器件、化工新材料等。2025 年"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p97_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 97,
+    "table_title": "度，东阳光公司营业收入为人民币 1,493,460.55 万元。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "度，东阳光公司营业收入为人民币 1,493,460.55 万元。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p98_t6",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 98,
+    "table_title": "(3)按月度、产品、客户等对营业收入和毛利率实施分析程序，识别是否存在重大或异",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3)按月度、产品、客户等对营业收入和毛利率实施分析程序，识别是否存在重大或异"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p98_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 98,
+    "table_title": "(4)对本期新增重要客户进行背景调查，获取其工商登记资料，并询问东阳光公司相关",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4)对本期新增重要客户进行背景调查，获取其工商登记资料，并询问东阳光公司相关"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p98_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 98,
+    "table_title": "(8)检查与营业收入相关的信息是否已在财务报表中作出恰当列报。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(8)检查与营业收入相关的信息是否已在财务报表中作出恰当列报。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p98_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 98,
+    "table_title": "(4)对于以单项为基础计量预期信用损失的应收账款，复核管理层对预期收取现金流量",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4)对于以单项为基础计量预期信用损失的应收账款，复核管理层对预期收取现金流量"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "交易性金融资产 34,372,830.11 29,744,369.73",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融资产 34,372,830.11 29,744,369.73"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "其他流动资产 156,305,259.95 170,043,922.17",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他流动资产 156,305,259.95 170,043,922.17"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "流动资产合计 11,289,420,425.71 9,649,677,960.96",
+    "parse_status": "line_inventory",
+    "text_excerpt": "流动资产合计 11,289,420,425.71 9,649,677,960.96"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "其他非流动金融资产 2,682,116,863.71 3,142,018,015.93",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动金融资产 2,682,116,863.71 3,142,018,015.93"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "固定资产 8,079,962,474.24 7,717,082,222.61",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产 8,079,962,474.24 7,717,082,222.61"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t40",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "使用权资产 44,711,684.08 34,988,924.47",
+    "parse_status": "line_inventory",
+    "text_excerpt": "使用权资产 44,711,684.08 34,988,924.47"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t41",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "无形资产 2,103,986,807.06 2,145,207,718.75",
+    "parse_status": "line_inventory",
+    "text_excerpt": "无形资产 2,103,986,807.06 2,145,207,718.75"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t47",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "递延所得税资产 200,425,336.24 223,767,112.44",
+    "parse_status": "line_inventory",
+    "text_excerpt": "递延所得税资产 200,425,336.24 223,767,112.44"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t48",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "其他非流动资产 3,167,006,741.55 91,127,999.50",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动资产 3,167,006,741.55 91,127,999.50"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t49",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "非流动资产合计 18,701,844,891.82 15,710,975,670.19",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非流动资产合计 18,701,844,891.82 15,710,975,670.19"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p101_t50",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 101,
+    "table_title": "资产总计 29,991,265,317.53 25,360,653,631.15",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产总计 29,991,265,317.53 25,360,653,631.15"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "交易性金融负债 8,249,715.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融负债 8,249,715.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "合同负债 96,338,797.53 81,506,421.05",
+    "parse_status": "line_inventory",
+    "text_excerpt": "合同负债 96,338,797.53 81,506,421.05"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "一年内到期的非流动负债 2,338,002,302.42 1,616,683,761.15",
+    "parse_status": "line_inventory",
+    "text_excerpt": "一年内到期的非流动负债 2,338,002,302.42 1,616,683,761.15"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "其他流动负债 11,268,497.13 9,950,385.03",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他流动负债 11,268,497.13 9,950,385.03"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "流动负债合计 14,285,579,381.44 11,995,099,833.47",
+    "parse_status": "line_inventory",
+    "text_excerpt": "流动负债合计 14,285,579,381.44 11,995,099,833.47"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "租赁负债 34,279,581.08 20,350,433.32",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债 34,279,581.08 20,350,433.32"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t37",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "预计负债 136,769,832.72 133,079,577.59",
+    "parse_status": "line_inventory",
+    "text_excerpt": "预计负债 136,769,832.72 133,079,577.59"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t39",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "递延所得税负债 217,574,165.49 315,498,300.78",
+    "parse_status": "line_inventory",
+    "text_excerpt": "递延所得税负债 217,574,165.49 315,498,300.78"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t40",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "其他非流动负债 855,590,932.98 377,086,264.09",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动负债 855,590,932.98 377,086,264.09"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t41",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "非流动负债合计 5,529,018,974.41 3,909,259,143.18",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非流动负债合计 5,529,018,974.41 3,909,259,143.18"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p102_t42",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 102,
+    "table_title": "负债合计 19,814,598,355.85 15,904,358,976.65",
+    "parse_status": "line_inventory",
+    "text_excerpt": "负债合计 19,814,598,355.85 15,904,358,976.65"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p103_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 103,
+    "table_title": "交易性金融资产 29,592,247.31 29,744,369.73",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融资产 29,592,247.31 29,744,369.73"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p103_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 103,
+    "table_title": "其他流动资产 16,788,852.58",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他流动资产 16,788,852.58"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p103_t37",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 103,
+    "table_title": "流动资产合计 6,921,813,950.67 5,525,727,881.12",
+    "parse_status": "line_inventory",
+    "text_excerpt": "流动资产合计 6,921,813,950.67 5,525,727,881.12"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p103_t44",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 103,
+    "table_title": "其他非流动金融资产 2,682,116,863.71 3,142,018,015.93",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动金融资产 2,682,116,863.71 3,142,018,015.93"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p103_t46",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 103,
+    "table_title": "固定资产 1,768,147.75 1,925,367.43",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产 1,768,147.75 1,925,367.43"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "使用权资产 11,415,604.14 16,590,055.56",
+    "parse_status": "line_inventory",
+    "text_excerpt": "使用权资产 11,415,604.14 16,590,055.56"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "无形资产 2,168,126.68 526,769.85",
+    "parse_status": "line_inventory",
+    "text_excerpt": "无形资产 2,168,126.68 526,769.85"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "递延所得税资产 28,646,480.98 60,084,916.76",
+    "parse_status": "line_inventory",
+    "text_excerpt": "递延所得税资产 28,646,480.98 60,084,916.76"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "其他非流动资产 3,000,000,000.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动资产 3,000,000,000.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "非流动资产合计 11,328,692,930.34 8,587,017,838.94",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非流动资产合计 11,328,692,930.34 8,587,017,838.94"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "资产总计 18,250,506,881.01 14,112,745,720.06",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产总计 18,250,506,881.01 14,112,745,720.06"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "一年内到期的非流动负债 217,232,015.17 201,886,551.85",
+    "parse_status": "line_inventory",
+    "text_excerpt": "一年内到期的非流动负债 217,232,015.17 201,886,551.85"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "流动负债合计 10,106,025,367.89 6,087,676,534.81",
+    "parse_status": "line_inventory",
+    "text_excerpt": "流动负债合计 10,106,025,367.89 6,087,676,534.81"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t37",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "租赁负债 10,901,635.39 11,842,689.71",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债 10,901,635.39 11,842,689.71"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t40",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "预计负债 292,799.58 3,405,317.18",
+    "parse_status": "line_inventory",
+    "text_excerpt": "预计负债 292,799.58 3,405,317.18"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t42",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "递延所得税负债 28,646,480.98 121,485,303.89",
+    "parse_status": "line_inventory",
+    "text_excerpt": "递延所得税负债 28,646,480.98 121,485,303.89"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t44",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "非流动负债合计 811,471,964.95 145,089,687.62",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非流动负债合计 811,471,964.95 145,089,687.62"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p104_t45",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 104,
+    "table_title": "负债合计 10,917,497,332.84 6,232,766,222.43",
+    "parse_status": "line_inventory",
+    "text_excerpt": "负债合计 10,917,497,332.84 6,232,766,222.43"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p105_t19",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 105,
+    "table_title": "其中：营业收入 14,934,605,535.39 12,199,116,451.46",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其中：营业收入 14,934,605,535.39 12,199,116,451.46"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p105_t47",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 105,
+    "table_title": "资产减值损失（损失以“-”号填列） -43,827,078.96 -43,115,696.61",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产减值损失（损失以“-”号填列） -43,827,078.96 -43,115,696.61"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p105_t48",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 105,
+    "table_title": "资产处置收益（损失以“－”号填列） -5,183,754.73 -962,733.69",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产处置收益（损失以“－”号填列） -5,183,754.73 -962,733.69"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p106_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 106,
+    "table_title": "五、净利润（净亏损以“－”号填列） 291,149,779.26 374,892,053.61",
+    "parse_status": "line_inventory",
+    "text_excerpt": "五、净利润（净亏损以“－”号填列） 291,149,779.26 374,892,053.61"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p106_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 106,
+    "table_title": "1.持续经营净利润（净亏损以“－”号填列） 291,149,779.26 374,892,053.61",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.持续经营净利润（净亏损以“－”号填列） 291,149,779.26 374,892,053.61"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p106_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 106,
+    "table_title": "2.终止经营净利润（净亏损以“－”号填列）",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2.终止经营净利润（净亏损以“－”号填列）"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p106_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 106,
+    "table_title": "1.归属于母公司股东的净利润（净亏损以“-”号填列） 275,469,968.49 374,988,008.07",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.归属于母公司股东的净利润（净亏损以“-”号填列） 275,469,968.49 374,988,008.07"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p106_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 106,
+    "table_title": "（3）金融资产重分类计入其他综合收益的金额",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（3）金融资产重分类计入其他综合收益的金额"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p106_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 106,
+    "table_title": "（5）现金流量套期储备",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（5）现金流量套期储备"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p106_t37",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 106,
+    "table_title": "本期发生同一控制下企业合并的，被合并方在合并前实现的净利润为：0.00元,上期被合并",
+    "parse_status": "line_inventory",
+    "text_excerpt": "本期发生同一控制下企业合并的，被合并方在合并前实现的净利润为：0.00元,上期被合并"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p106_t38",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 106,
+    "table_title": "方实现的净利润为：0.00元。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "方实现的净利润为：0.00元。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p106_t44",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 106,
+    "table_title": "一、营业收入 0.00 26,305.47",
+    "parse_status": "line_inventory",
+    "text_excerpt": "一、营业收入 0.00 26,305.47"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p107_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 107,
+    "table_title": "资产处置收益（损失以“－”号填列） -251,527.68",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产处置收益（损失以“－”号填列） -251,527.68"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p107_t21",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 107,
+    "table_title": "四、净利润（净亏损以“－”号填列） -588,500,394.67 -47,857,848.59",
+    "parse_status": "line_inventory",
+    "text_excerpt": "四、净利润（净亏损以“－”号填列） -588,500,394.67 -47,857,848.59"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p107_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 107,
+    "table_title": "（一）持续经营净利润（净亏损以“－”号填列） -588,500,394.67 -47,857,848.59",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（一）持续经营净利润（净亏损以“－”号填列） -588,500,394.67 -47,857,848.59"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p107_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 107,
+    "table_title": "3.金融资产重分类计入其他综合收益的金额",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3.金融资产重分类计入其他综合收益的金额"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p107_t35",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 107,
+    "table_title": "5.现金流量套期储备",
+    "parse_status": "line_inventory",
+    "text_excerpt": "5.现金流量套期储备"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p108_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 108,
+    "table_title": "经营活动现金流入小计 15,188,174,441.69 15,331,814,460.70",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动现金流入小计 15,188,174,441.69 15,331,814,460.70"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p108_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 108,
+    "table_title": "经营活动现金流出小计 13,879,177,223.39 14,763,734,106.21",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动现金流出小计 13,879,177,223.39 14,763,734,106.21"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p108_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 108,
+    "table_title": "经营活动产生的现金流量净额 1,308,997,218.30 568,080,354.49",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 1,308,997,218.30 568,080,354.49"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p108_t35",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 108,
+    "table_title": "投资活动现金流入小计 1,495,766,764.92 662,573,199.35",
+    "parse_status": "line_inventory",
+    "text_excerpt": "投资活动现金流入小计 1,495,766,764.92 662,573,199.35"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p108_t42",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 108,
+    "table_title": "投资活动现金流出小计 5,330,648,945.43 1,558,709,490.14",
+    "parse_status": "line_inventory",
+    "text_excerpt": "投资活动现金流出小计 5,330,648,945.43 1,558,709,490.14"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p108_t43",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 108,
+    "table_title": "投资活动产生的现金流量净额 -3,834,882,180.51 -896,136,290.79",
+    "parse_status": "line_inventory",
+    "text_excerpt": "投资活动产生的现金流量净额 -3,834,882,180.51 -896,136,290.79"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p108_t49",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 108,
+    "table_title": "筹资活动现金流入小计 16,835,812,617.27 11,105,048,959.36",
+    "parse_status": "line_inventory",
+    "text_excerpt": "筹资活动现金流入小计 16,835,812,617.27 11,105,048,959.36"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p109_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 109,
+    "table_title": "筹资活动现金流出小计 12,907,837,162.57 11,749,276,414.79",
+    "parse_status": "line_inventory",
+    "text_excerpt": "筹资活动现金流出小计 12,907,837,162.57 11,749,276,414.79"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p109_t6",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 109,
+    "table_title": "筹资活动产生的现金流量净额 3,927,975,454.70 -644,227,455.43",
+    "parse_status": "line_inventory",
+    "text_excerpt": "筹资活动产生的现金流量净额 3,927,975,454.70 -644,227,455.43"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p109_t20",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 109,
+    "table_title": "经营活动现金流入小计 25,345,447,006.96 24,000,618,553.29",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动现金流入小计 25,345,447,006.96 24,000,618,553.29"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p109_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 109,
+    "table_title": "经营活动现金流出小计 23,126,956,590.56 23,703,944,346.24",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动现金流出小计 23,126,956,590.56 23,703,944,346.24"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p109_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 109,
+    "table_title": "经营活动产生的现金流量净额 2,218,490,416.40 296,674,207.05",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 2,218,490,416.40 296,674,207.05"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p109_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 109,
+    "table_title": "投资活动现金流入小计 1,093,011,261.66 69,876,072.24",
+    "parse_status": "line_inventory",
+    "text_excerpt": "投资活动现金流入小计 1,093,011,261.66 69,876,072.24"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p109_t40",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 109,
+    "table_title": "投资活动现金流出小计 4,161,178,185.32 59,287,810.35",
+    "parse_status": "line_inventory",
+    "text_excerpt": "投资活动现金流出小计 4,161,178,185.32 59,287,810.35"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p109_t41",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 109,
+    "table_title": "投资活动产生的现金流量净额 -3,068,166,923.66 10,588,261.89",
+    "parse_status": "line_inventory",
+    "text_excerpt": "投资活动产生的现金流量净额 -3,068,166,923.66 10,588,261.89"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p109_t46",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 109,
+    "table_title": "筹资活动现金流入小计 2,201,568,713.40 760,000,000.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "筹资活动现金流入小计 2,201,568,713.40 760,000,000.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p110_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 110,
+    "table_title": "筹资活动现金流出小计 1,237,403,229.12 1,765,860,635.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "筹资活动现金流出小计 1,237,403,229.12 1,765,860,635.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p110_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 110,
+    "table_title": "筹资活动产生的现金流量净额 964,165,484.28 -1,005,860,635.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "筹资活动产生的现金流量净额 964,165,484.28 -1,005,860,635.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "公司经营业务的营业周期较短，以 12 个月作为资产和负债的流动性划分标准。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "公司经营业务的营业周期较短，以 12 个月作为资产和负债的流动性划分标准。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的单项计提坏账准备的应收账款 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的单项计提坏账准备的应收账款 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的应收账款坏账准备收回或转回 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的应收账款坏账准备收回或转回 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的核销应收账款 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的核销应收账款 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的单项计提坏账准备的其他应收款 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的单项计提坏账准备的其他应收款 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的账龄超过 1年的预付款项 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的账龄超过 1年的预付款项 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的在建工程项目 单项工程投资总额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的在建工程项目 单项工程投资总额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t28",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的账龄超过 1年的应付账款 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的账龄超过 1年的应付账款 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的账龄超过 1年的其他应付款 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的账龄超过 1年的其他应付款 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t30",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的账龄超过 1年的合同负债 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的账龄超过 1年的合同负债 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的预计负债 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的预计负债 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的投资活动现金流量 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的投资活动现金流量 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "资产/总收入/利润总额的 15%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产/总收入/利润总额的 15%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "资产/总收入/利润总额的 15%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产/总收入/利润总额的 15%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t39",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "资产的 15%/单项权益法核算的投资收益",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产的 15%/单项权益法核算的投资收益"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p118_t41",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 118,
+    "table_title": "重要的或有事项 单项金额超过资产总额 0.3%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "重要的或有事项 单项金额超过资产总额 0.3%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p119_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 119,
+    "table_title": "(1)确认单独所持有的资产，以及按持有份额确认共同持有的资产；",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1)确认单独所持有的资产，以及按持有份额确认共同持有的资产；"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p119_t30",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 119,
+    "table_title": "(2)确认单独所承担的负债，以及按持有份额确认共同承担的负债；",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2)确认单独所承担的负债，以及按持有份额确认共同承担的负债；"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p119_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 119,
+    "table_title": "(4)按公司持有份额确认共同经营因出售资产所产生的收入；",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4)按公司持有份额确认共同经营因出售资产所产生的收入；"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p120_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 120,
+    "table_title": "1.金融资产和金融负债的分类",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.金融资产和金融负债的分类"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p120_t17",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 120,
+    "table_title": "金融资产在初始确认时划分为以下三类：(1)以摊余成本计量的金融资产；(2)以公允价值",
+    "parse_status": "line_inventory",
+    "text_excerpt": "金融资产在初始确认时划分为以下三类：(1)以摊余成本计量的金融资产；(2)以公允价值"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p120_t18",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 120,
+    "table_title": "计量且其变动计入其他综合收益的金融资产；(3)以公允价值计量且其变动计入当期损益的金",
+    "parse_status": "line_inventory",
+    "text_excerpt": "计量且其变动计入其他综合收益的金融资产；(3)以公允价值计量且其变动计入当期损益的金"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p120_t20",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 120,
+    "table_title": "金融负债在初始确认时划分为以下四类：(1)以公允价值计量且其变动计入当期损益的金",
+    "parse_status": "line_inventory",
+    "text_excerpt": "金融负债在初始确认时划分为以下四类：(1)以公允价值计量且其变动计入当期损益的金"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p120_t21",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 120,
+    "table_title": "融负债；(2)金融资产转移不符合终止确认条件或继续涉入被转移金融资产所形成的金融负债；",
+    "parse_status": "line_inventory",
+    "text_excerpt": "融负债；(2)金融资产转移不符合终止确认条件或继续涉入被转移金融资产所形成的金融负债；"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p120_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 120,
+    "table_title": "诺；(4)以摊余成本计量的金融负债。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "诺；(4)以摊余成本计量的金融负债。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p120_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 120,
+    "table_title": "2.金融资产和金融负债的确认依据、计量方法和终止确认条件",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2.金融资产和金融负债的确认依据、计量方法和终止确认条件"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p120_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 120,
+    "table_title": "(1)金融资产和金融负债的确认依据和初始计量方法",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1)金融资产和金融负债的确认依据和初始计量方法"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p120_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 120,
+    "table_title": "(2)金融资产的后续计量方法",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2)金融资产的后续计量方法"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p120_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 120,
+    "table_title": "1)以摊余成本计量的金融资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1)以摊余成本计量的金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p121_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 121,
+    "table_title": "4)以公允价值计量且其变动计入当期损益的金融资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "4)以公允价值计量且其变动计入当期损益的金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p121_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 121,
+    "table_title": "(3)金融负债的后续计量方法",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3)金融负债的后续计量方法"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p121_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 121,
+    "table_title": "1)以公允价值计量且其变动计入当期损益的金融负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1)以公允价值计量且其变动计入当期损益的金融负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p121_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 121,
+    "table_title": "2)金融资产转移不符合终止确认条件或继续涉入被转移金融资产所形成的金融负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2)金融资产转移不符合终止确认条件或继续涉入被转移金融资产所形成的金融负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p121_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 121,
+    "table_title": "按照《企业会计准则第 23 号——金融资产转移》相关规定进行计量。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "按照《企业会计准则第 23 号——金融资产转移》相关规定进行计量。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p121_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 121,
+    "table_title": "4)以摊余成本计量的金融负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "4)以摊余成本计量的金融负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p121_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 121,
+    "table_title": "(4)金融资产和金融负债的终止确认",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4)金融资产和金融负债的终止确认"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p121_t35",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 121,
+    "table_title": "1)当满足下列条件之一时，终止确认金融资产：",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1)当满足下列条件之一时，终止确认金融资产："
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "②金融资产已转移，且该转移满足《企业会计准则第23号——金融资产转移》关于金融",
+    "parse_status": "line_inventory",
+    "text_excerpt": "②金融资产已转移，且该转移满足《企业会计准则第23号——金融资产转移》关于金融"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "2)当金融负债（或其一部分）的现时义务已经解除时，相应终止确认该金融负债（或该",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2)当金融负债（或其一部分）的现时义务已经解除时，相应终止确认该金融负债（或该"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "3.金融资产转移的确认依据和计量方法",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3.金融资产转移的确认依据和计量方法"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "几乎所有的风险和报酬的，分别下列情况处理：(1)未保留对该金融资产控制的，终止确认该",
+    "parse_status": "line_inventory",
+    "text_excerpt": "几乎所有的风险和报酬的，分别下列情况处理：(1)未保留对该金融资产控制的，终止确认该"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "金融资产，并将转移中产生或保留的权利和义务单独确认为资产或负债；(2)保留了对该金融",
+    "parse_status": "line_inventory",
+    "text_excerpt": "金融资产，并将转移中产生或保留的权利和义务单独确认为资产或负债；(2)保留了对该金融"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "金融资产整体转移满足终止确认条件的，将下列两项金额的差额计入当期损益：(1)所转",
+    "parse_status": "line_inventory",
+    "text_excerpt": "金融资产整体转移满足终止确认条件的，将下列两项金额的差额计入当期损益：(1)所转"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "移金融资产在终止确认日的账面价值；(2)因转移金融资产而收到的对价，与原直接计入其他",
+    "parse_status": "line_inventory",
+    "text_excerpt": "移金融资产在终止确认日的账面价值；(2)因转移金融资产而收到的对价，与原直接计入其他"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "4.金融资产和金融负债的公允价值确定方法",
+    "parse_status": "line_inventory",
+    "text_excerpt": "4.金融资产和金融负债的公允价值确定方法"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "(1)第一层次输入值是在计量日能够取得的相同资产或负债在活跃市场上未经调整的报",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1)第一层次输入值是在计量日能够取得的相同资产或负债在活跃市场上未经调整的报"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t28",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "(2)第二层次输入值是除第一层次输入值外相关资产或负债直接或间接可观察的输入值，",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2)第二层次输入值是除第一层次输入值外相关资产或负债直接或间接可观察的输入值，"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p122_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 122,
+    "table_title": "(3)第三层次输入值是相关资产或负债的不可观察输入值，包括不能直接观察或无法由",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3)第三层次输入值是相关资产或负债的不可观察输入值，包括不能直接观察或无法由"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p123_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 123,
+    "table_title": "6.金融资产和金融负债的抵销",
+    "parse_status": "line_inventory",
+    "text_excerpt": "6.金融资产和金融负债的抵销"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p123_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 123,
+    "table_title": "公司以相互抵销后的净额在资产负债表内列示：(1)公司具有抵销已确认金额的法定权利，且",
+    "parse_status": "line_inventory",
+    "text_excerpt": "公司以相互抵销后的净额在资产负债表内列示：(1)公司具有抵销已确认金额的法定权利，且"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p123_t35",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 123,
+    "table_title": "该种法定权利是当前可执行的；(2)公司计划以净额结算，或同时变现该金融资产和清偿该金",
+    "parse_status": "line_inventory",
+    "text_excerpt": "该种法定权利是当前可执行的；(2)公司计划以净额结算，或同时变现该金融资产和清偿该金"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p124_t58",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 124,
+    "table_title": "（3）按单项计提预期信用损失的应收款项和合同资产的认定标准",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（3）按单项计提预期信用损失的应收款项和合同资产的认定标准"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p127_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 127,
+    "table_title": "17、 合同资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "17、 合同资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p127_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 127,
+    "table_title": "18、 持有待售的非流动资产或处置组",
+    "parse_status": "line_inventory",
+    "text_excerpt": "18、 持有待售的非流动资产或处置组"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p128_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 128,
+    "table_title": "(1)同一控制下的企业合并形成的，合并方以支付现金、转让非现金资产、承担债务或发",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1)同一控制下的企业合并形成的，合并方以支付现金、转让非现金资产、承担债务或发"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p128_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 128,
+    "table_title": "以非货币性资产交换取得的，按《企业会计准则第 7 号——非货币性资产交换》确定其初始",
+    "parse_status": "line_inventory",
+    "text_excerpt": "以非货币性资产交换取得的，按《企业会计准则第 7 号——非货币性资产交换》确定其初始"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p130_t9",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 130,
+    "table_title": "21、 固定资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "21、 固定资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p130_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 130,
+    "table_title": "1.固定资产确认条件",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.固定资产确认条件"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p130_t30",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 130,
+    "table_title": "2.在建工程达到预定可使用状态时，按工程实际成本转入固定资产。已达到预定可使用",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2.在建工程达到预定可使用状态时，按工程实际成本转入固定资产。已达到预定可使用"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p131_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 131,
+    "table_title": "(1)当借款费用同时满足下列条件时，开始资本化：1)资产支出已经发生；2)借款费用已",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1)当借款费用同时满足下列条件时，开始资本化：1)资产支出已经发生；2)借款费用已"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p131_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 131,
+    "table_title": "经发生；3)为使资产达到预定可使用或可销售状态所必要的购建或者生产活动已经开始。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经发生；3)为使资产达到预定可使用或可销售状态所必要的购建或者生产活动已经开始。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p131_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 131,
+    "table_title": "(2)若符合资本化条件的资产在购建或者生产过程中发生非正常中断，并且中断时间连续",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2)若符合资本化条件的资产在购建或者生产过程中发生非正常中断，并且中断时间连续"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p131_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 131,
+    "table_title": "超过 3 个月，暂停借款费用的资本化；中断期间发生的借款费用确认为当期费用，直至资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "超过 3 个月，暂停借款费用的资本化；中断期间发生的借款费用确认为当期费用，直至资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p131_t18",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 131,
+    "table_title": "(3)当所购建或者生产符合资本化条件的资产达到预定可使用或可销售状态时，借款费用",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3)当所购建或者生产符合资本化条件的资产达到预定可使用或可销售状态时，借款费用"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p131_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 131,
+    "table_title": "24、 生物资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "24、 生物资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p131_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 131,
+    "table_title": "25、 油气资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "25、 油气资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p131_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 131,
+    "table_title": "26、 无形资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "26、 无形资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p132_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 132,
+    "table_title": "1.无形资产包括土地使用权、专利技术、非专利技术、采矿权、探矿权及软件使用权等，",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.无形资产包括土地使用权、专利技术、非专利技术、采矿权、探矿权及软件使用权等，"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p132_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 132,
+    "table_title": "2.使用寿命有限的无形资产，在使用寿命内按照与该项无形资产有关的经济利益的预期",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2.使用寿命有限的无形资产，在使用寿命内按照与该项无形资产有关的经济利益的预期"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p132_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 132,
+    "table_title": "构成固定资产的样品、样机及一般测试手段购置费，试制产品的检验费；3)用于研究开发活",
+    "parse_status": "line_inventory",
+    "text_excerpt": "构成固定资产的样品、样机及一般测试手段购置费，试制产品的检验费；3)用于研究开发活"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p132_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 132,
+    "table_title": "(4)无形资产摊销费用",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4)无形资产摊销费用"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p133_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 133,
+    "table_title": "阶段的支出，同时满足下列条件的，确认为无形资产：(1)完成该无形资产以使其能够使用或",
+    "parse_status": "line_inventory",
+    "text_excerpt": "阶段的支出，同时满足下列条件的，确认为无形资产：(1)完成该无形资产以使其能够使用或"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p133_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 133,
+    "table_title": "出售在技术上具有可行性；(2)具有完成该无形资产并使用或出售的意图；(3)无形资产产生经",
+    "parse_status": "line_inventory",
+    "text_excerpt": "出售在技术上具有可行性；(2)具有完成该无形资产并使用或出售的意图；(3)无形资产产生经"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p133_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 133,
+    "table_title": "无形资产将在内部使用的，能证明其有用性；(4)有足够的技术、财务资源和其他资源支持，",
+    "parse_status": "line_inventory",
+    "text_excerpt": "无形资产将在内部使用的，能证明其有用性；(4)有足够的技术、财务资源和其他资源支持，"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p133_t17",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 133,
+    "table_title": "以完成该无形资产的开发，并有能力使用或出售该无形资产；(5)归属于该无形资产开发阶段",
+    "parse_status": "line_inventory",
+    "text_excerpt": "以完成该无形资产的开发，并有能力使用或出售该无形资产；(5)归属于该无形资产开发阶段"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p134_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 134,
+    "table_title": "27、 长期资产减值",
+    "parse_status": "line_inventory",
+    "text_excerpt": "27、 长期资产减值"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p134_t17",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 134,
+    "table_title": "29、 合同负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "29、 合同负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p134_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 134,
+    "table_title": "(1)在职工为公司提供服务的会计期间，根据设定提存计划计算的应缴存金额确认为负债，",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1)在职工为公司提供服务的会计期间，根据设定提存计划计算的应缴存金额确认为负债，"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p135_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 135,
+    "table_title": "2)设定受益计划存在资产的，将设定受益计划义务现值减去设定受益计划资产公允价值",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2)设定受益计划存在资产的，将设定受益计划义务现值减去设定受益计划资产公允价值"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p135_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 135,
+    "table_title": "3)期末，将设定受益计划产生的职工薪酬成本确认为服务成本、设定受益计划净负债或",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3)期末，将设定受益计划产生的职工薪酬成本确认为服务成本、设定受益计划净负债或"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p135_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 135,
+    "table_title": "31、 预计负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "31、 预计负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p135_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 135,
+    "table_title": "2.公司按照履行相关现时义务所需支出的最佳估计数对预计负债进行初始计量，并在资",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2.公司按照履行相关现时义务所需支出的最佳估计数对预计负债进行初始计量，并在资"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p137_t6",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 137,
+    "table_title": "约义务：(1)客户在公司履约的同时即取得并消耗公司履约所带来的经济利益；(2)客户能够控",
+    "parse_status": "line_inventory",
+    "text_excerpt": "约义务：(1)客户在公司履约的同时即取得并消耗公司履约所带来的经济利益；(2)客户能够控"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p137_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 137,
+    "table_title": "(1)公司就该商品享有现时收款权利，即客户就该商品负有现时付款义务；(2)公司已将该商品",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1)公司就该商品享有现时收款权利，即客户就该商品负有现时付款义务；(2)公司已将该商品"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p137_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 137,
+    "table_title": "的法定所有权转移给客户，即客户已拥有该商品的法定所有权；(3)公司已将该商品实物转移",
+    "parse_status": "line_inventory",
+    "text_excerpt": "的法定所有权转移给客户，即客户已拥有该商品的法定所有权；(3)公司已将该商品实物转移"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p137_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 137,
+    "table_title": "给客户，即客户已实物占有该商品；(4)公司已将该商品所有权上的主要风险和报酬转移给客",
+    "parse_status": "line_inventory",
+    "text_excerpt": "给客户，即客户已实物占有该商品；(4)公司已将该商品所有权上的主要风险和报酬转移给客"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p137_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 137,
+    "table_title": "户，即客户已取得该商品所有权上的主要风险和报酬；(5)客户已接受该商品；(6)其他表明客",
+    "parse_status": "line_inventory",
+    "text_excerpt": "户，即客户已取得该商品所有权上的主要风险和报酬；(5)客户已接受该商品；(6)其他表明客"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p137_t19",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 137,
+    "table_title": "(1)公司按照分摊至各单项履约义务的交易价格计量收入。交易价格是公司因向客户转让",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1)公司按照分摊至各单项履约义务的交易价格计量收入。交易价格是公司因向客户转让"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p137_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 137,
+    "table_title": "(3)合同中存在重大融资成分的，公司按照假定客户在取得商品或服务控制权时即以现金",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3)合同中存在重大融资成分的，公司按照假定客户在取得商品或服务控制权时即以现金"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p138_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 138,
+    "table_title": "2.与资产相关的政府补助判断依据及会计处理方法",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2.与资产相关的政府补助判断依据及会计处理方法"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p139_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 139,
+    "table_title": "37、 递延所得税资产/递延所得税负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "37、 递延所得税资产/递延所得税负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p139_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 139,
+    "table_title": "1.根据资产、负债的账面价值与其计税基础之间的差额（未作为资产和负债确认的项目",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.根据资产、负债的账面价值与其计税基础之间的差额（未作为资产和负债确认的项目"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p139_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 139,
+    "table_title": "2.确认递延所得税资产以很可能取得用来抵扣可抵扣暂时性差异的应纳税所得额为限。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2.确认递延所得税资产以很可能取得用来抵扣可抵扣暂时性差异的应纳税所得额为限。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p139_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 139,
+    "table_title": "3.资产负债表日，对递延所得税资产的账面价值进行复核，如果未来期间很可能无法获",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3.资产负债表日，对递延所得税资产的账面价值进行复核，如果未来期间很可能无法获"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p139_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 139,
+    "table_title": "5.同时满足下列条件时，公司将递延所得税资产及递延所得税负债以抵销后的净额列示：",
+    "parse_status": "line_inventory",
+    "text_excerpt": "5.同时满足下列条件时，公司将递延所得税资产及递延所得税负债以抵销后的净额列示："
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p139_t17",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 139,
+    "table_title": "(1)拥有以净额结算当期所得税资产及当期所得税负债的法定权利；(2)递延所得税资产和递",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1)拥有以净额结算当期所得税资产及当期所得税负债的法定权利；(2)递延所得税资产和递"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p139_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 139,
+    "table_title": "(1)使用权资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1)使用权资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p139_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 139,
+    "table_title": "使用权资产按照成本进行初始计量，该成本包括：1)租赁负债的初始计量金额；2)在租",
+    "parse_status": "line_inventory",
+    "text_excerpt": "使用权资产按照成本进行初始计量，该成本包括：1)租赁负债的初始计量金额；2)在租"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p139_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 139,
+    "table_title": "3)承租人发生的初始直接费用；4)承租人为拆卸及移除租赁资产、复原租赁资产所在场地或",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3)承租人发生的初始直接费用；4)承租人为拆卸及移除租赁资产、复原租赁资产所在场地或"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p140_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 140,
+    "table_title": "(2)租赁负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2)租赁负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p140_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 140,
+    "table_title": "公司按照《企业会计准则第 14 号——收入》的规定，评估确定售后租回交易中的资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "公司按照《企业会计准则第 14 号——收入》的规定，评估确定售后租回交易中的资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p141_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 141,
+    "table_title": "转让收入等额的金融负债，并按照《企业会计准则第 22 号——金融工具确认和计量》对该",
+    "parse_status": "line_inventory",
+    "text_excerpt": "转让收入等额的金融负债，并按照《企业会计准则第 22 号——金融工具确认和计量》对该"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p141_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 141,
+    "table_title": "公司按照《企业会计准则第 14 号——收入》的规定，评估确定售后租回交易中的资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "公司按照《企业会计准则第 14 号——收入》的规定，评估确定售后租回交易中的资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p141_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 141,
+    "table_title": "进行会计处理，并根据《企业会计准则第 21 号——租赁》对资产出租进行会计处理。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "进行会计处理，并根据《企业会计准则第 21 号——租赁》对资产出租进行会计处理。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p141_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 141,
+    "table_title": "收入等额的金融资产，并按照《企业会计准则第 22 号——金融工具确认和计量》对该金融",
+    "parse_status": "line_inventory",
+    "text_excerpt": "收入等额的金融资产，并按照《企业会计准则第 22 号——金融工具确认和计量》对该金融"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p142_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 142,
+    "table_title": "3）能够通过分析取得该组成部分的财务状况、经营成果和现金流量等有关会计信息。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3）能够通过分析取得该组成部分的财务状况、经营成果和现金流量等有关会计信息。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p144_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 144,
+    "table_title": "8.香港地区规定：当期净利润在 200 万港币及以下适用 8.25%的所得税税率，当期净利",
+    "parse_status": "line_inventory",
+    "text_excerpt": "8.香港地区规定：当期净利润在 200 万港币及以下适用 8.25%的所得税税率，当期净利"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p145_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 145,
+    "table_title": "2、交易性金融资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2、交易性金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p145_t21",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 145,
+    "table_title": "入当期损益的金融资产 34,372,830.11 29,744,369.73 /",
+    "parse_status": "line_inventory",
+    "text_excerpt": "入当期损益的金融资产 34,372,830.11 29,744,369.73 /"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p145_t28",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 145,
+    "table_title": "3、衍生金融资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3、衍生金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p145_t39",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 145,
+    "table_title": "(3).期末公司已背书或贴现且在资产负债表日尚未到期的应收票据",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3).期末公司已背书或贴现且在资产负债表日尚未到期的应收票据"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p150_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 150,
+    "table_title": "(5).按欠款方归集的期末余额前五名的应收账款和合同资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(5).按欠款方归集的期末余额前五名的应收账款和合同资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p150_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 150,
+    "table_title": "二十五条规定，以同一控制原则合并披露前 5名客户",
+    "parse_status": "line_inventory",
+    "text_excerpt": "二十五条规定，以同一控制原则合并披露前 5名客户"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p150_t39",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 150,
+    "table_title": "6、合同资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "6、合同资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p150_t40",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 150,
+    "table_title": "(1).合同资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).合同资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p151_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 151,
+    "table_title": "(4).本期合同资产计提坏账准备情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4).本期合同资产计提坏账准备情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p151_t20",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 151,
+    "table_title": "(5).本期实际核销的合同资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(5).本期实际核销的合同资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p152_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 152,
+    "table_title": "(3).期末公司已背书或贴现且在资产负债表日尚未到期的应收款项融资",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3).期末公司已背书或贴现且在资产负债表日尚未到期的应收款项融资"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p160_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 160,
+    "table_title": "11、持有待售资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "11、持有待售资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p160_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 160,
+    "table_title": "12、一年内到期的非流动资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "12、一年内到期的非流动资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p160_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 160,
+    "table_title": "13、其他流动资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "13、其他流动资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p165_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 165,
+    "table_title": "19、其他非流动金融资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "19、其他非流动金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p165_t19",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 165,
+    "table_title": "当期损益的金融资产 2,682,116,863.71 3,142,018,015.93",
+    "parse_status": "line_inventory",
+    "text_excerpt": "当期损益的金融资产 2,682,116,863.71 3,142,018,015.93"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p165_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 165,
+    "table_title": "21、固定资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "21、固定资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p165_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 165,
+    "table_title": "固定资产 8,079,962,474.24 7,716,776,938.23",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产 8,079,962,474.24 7,716,776,938.23"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p165_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 165,
+    "table_title": "固定资产清理 305,284.38",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产清理 305,284.38"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p166_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 166,
+    "table_title": "(1).固定资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).固定资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p167_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 167,
+    "table_title": "[注 1]企业合并增加系本期非同一控制下合并日本光阳株式会社增加的固定资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "[注 1]企业合并增加系本期非同一控制下合并日本光阳株式会社增加的固定资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p167_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 167,
+    "table_title": "[注 2]其他减少为东莞东阳光科研发有限公司捐赠固定资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "[注 2]其他减少为东莞东阳光科研发有限公司捐赠固定资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p168_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 168,
+    "table_title": "(2).暂时闲置的固定资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2).暂时闲置的固定资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p168_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 168,
+    "table_title": "(3).通过经营租赁租出的固定资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3).通过经营租赁租出的固定资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p168_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 168,
+    "table_title": "(4).未办妥产权证书的固定资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4).未办妥产权证书的固定资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p168_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 168,
+    "table_title": "(5).固定资产的减值测试情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(5).固定资产的减值测试情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p171_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 171,
+    "table_title": "23、生产性生物资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "23、生产性生物资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p171_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 171,
+    "table_title": "(1).采用成本计量模式的生产性生物资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).采用成本计量模式的生产性生物资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p171_t17",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 171,
+    "table_title": "(2).采用成本计量模式的生产性生物资产的减值测试情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2).采用成本计量模式的生产性生物资产的减值测试情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p171_t19",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 171,
+    "table_title": "(3).采用公允价值计量模式的生产性生物资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3).采用公允价值计量模式的生产性生物资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p171_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 171,
+    "table_title": "24、油气资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "24、油气资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p171_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 171,
+    "table_title": "(1).油气资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).油气资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p171_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 171,
+    "table_title": "(2).油气资产的减值测试情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2).油气资产的减值测试情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p171_t30",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 171,
+    "table_title": "25、使用权资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "25、使用权资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p171_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 171,
+    "table_title": "(1). 使用权资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1). 使用权资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p172_t28",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 172,
+    "table_title": "(2). 使用权资产的减值测试情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2). 使用权资产的减值测试情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p173_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 173,
+    "table_title": "26、无形资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "26、无形资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p173_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 173,
+    "table_title": "(1).无形资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).无形资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p174_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 174,
+    "table_title": "本期末通过公司内部研发形成的无形资产占无形资产余额的比例是16.70%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "本期末通过公司内部研发形成的无形资产占无形资产余额的比例是16.70%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p174_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 174,
+    "table_title": "[注 1]企业合并增加系本期非同一控制下合并日本光阳株式会社增加的无形资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "[注 1]企业合并增加系本期非同一控制下合并日本光阳株式会社增加的无形资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p175_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 175,
+    "table_title": "(2).确认为无形资产的数据资源",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2).确认为无形资产的数据资源"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p175_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 175,
+    "table_title": "(4).无形资产的减值测试情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4).无形资产的减值测试情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p175_t21",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 175,
+    "table_title": "碱化工相关资产组 1,595,616.68 1,595,616.68",
+    "parse_status": "line_inventory",
+    "text_excerpt": "碱化工相关资产组 1,595,616.68 1,595,616.68"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p175_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 175,
+    "table_title": "(3).商誉所在资产组或资产组组合的相关信息",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3).商誉所在资产组或资产组组合的相关信息"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p175_t39",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 175,
+    "table_title": "批准的 5年期现金流量预测为基础，公司根据历史实际经营数据、行业发展趋势、预期收入",
+    "parse_status": "line_inventory",
+    "text_excerpt": "批准的 5年期现金流量预测为基础，公司根据历史实际经营数据、行业发展趋势、预期收入"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p175_t40",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 175,
+    "table_title": "增长率、毛利率等指标编制预测未来 5年现金流量，预测期以后的现金流量维持不变。减值",
+    "parse_status": "line_inventory",
+    "text_excerpt": "增长率、毛利率等指标编制预测未来 5年现金流量，预测期以后的现金流量维持不变。减值"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p176_t30",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 176,
+    "table_title": "29、递延所得税资产/递延所得税负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "29、递延所得税资产/递延所得税负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p176_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 176,
+    "table_title": "(1).未经抵销的递延所得税资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).未经抵销的递延所得税资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "预计负债 56,776,846.95 14,009,120.71 56,474,029.40 13,777,975.64",
+    "parse_status": "line_inventory",
+    "text_excerpt": "预计负债 56,776,846.95 14,009,120.71 56,474,029.40 13,777,975.64"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "无形资产摊销差异 56,666,124.54 12,440,815.97 60,599,275.78 8,959,702.69",
+    "parse_status": "line_inventory",
+    "text_excerpt": "无形资产摊销差异 56,666,124.54 12,440,815.97 60,599,275.78 8,959,702.69"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "长期资产减值准备 45,663,254.47 11,415,813.62 45,663,254.47 11,415,813.62",
+    "parse_status": "line_inventory",
+    "text_excerpt": "长期资产减值准备 45,663,254.47 11,415,813.62 45,663,254.47 11,415,813.62"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "租赁负债 44,303,767.72 5,665,231.49 34,812,212.15 5,549,985.46",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债 44,303,767.72 5,665,231.49 34,812,212.15 5,549,985.46"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t9",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "财政贴息冲减固定资产 3,899,749.37 584,962.41 5,237,861.45 736,971.43",
+    "parse_status": "line_inventory",
+    "text_excerpt": "财政贴息冲减固定资产 3,899,749.37 584,962.41 5,237,861.45 736,971.43"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "(2).未经抵销的递延所得税负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2).未经抵销的递延所得税负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "并资产评估增值 630,867,756.19 157,329,592.26 656,116,207.17 163,399,402.42",
+    "parse_status": "line_inventory",
+    "text_excerpt": "并资产评估增值 630,867,756.19 157,329,592.26 656,116,207.17 163,399,402.42"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "固定资产折旧差异 121,705,772.99 18,874,547.40 129,747,299.30 18,740,275.50",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产折旧差异 121,705,772.99 18,874,547.40 129,747,299.30 18,740,275.50"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "使用权资产 44,711,684.08 5,880,921.62 34,988,924.47 5,694,529.53",
+    "parse_status": "line_inventory",
+    "text_excerpt": "使用权资产 44,711,684.08 5,880,921.62 34,988,924.47 5,694,529.53"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "用而增加的固定资产 34,219,855.40 8,554,963.85 34,651,853.66 8,662,963.42",
+    "parse_status": "line_inventory",
+    "text_excerpt": "用而增加的固定资产 34,219,855.40 8,554,963.85 34,651,853.66 8,662,963.42"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "(3).以抵销后净额列示的递延所得税资产或负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3).以抵销后净额列示的递延所得税资产或负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "(4).未确认递延所得税资产明细",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4).未确认递延所得税资产明细"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p177_t40",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 177,
+    "table_title": "(5).未确认递延所得税资产的可抵扣亏损将于以下年度到期",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(5).未确认递延所得税资产的可抵扣亏损将于以下年度到期"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p178_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 178,
+    "table_title": "30、其他非流动资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "30、其他非流动资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p179_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 179,
+    "table_title": "31、所有权或使用权受限资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "31、所有权或使用权受限资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p179_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 179,
+    "table_title": "固定资产 6,976,590,389.92 3,891,384,988.17 抵押 为借款提供抵押担保 6,294,332,509.86 3,337,759,9",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产 6,976,590,389.92 3,891,384,988.17 抵押 为借款提供抵押担保 6,294,332,509.86 3,337,759,980.22 抵押 为借款提供抵押担保"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p179_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 179,
+    "table_title": "无形资产 1,612,051,760.15 1,322,353,115.39 抵押 为借款提供抵押担保 1,084,484,459.82 842,156,636",
+    "parse_status": "line_inventory",
+    "text_excerpt": "无形资产 1,612,051,760.15 1,322,353,115.39 抵押 为借款提供抵押担保 1,084,484,459.82 842,156,636.09 抵押 为借款提供抵押担保"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p180_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 180,
+    "table_title": "33、交易性金融负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "33、交易性金融负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p180_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 180,
+    "table_title": "交易性金融负债 8,249,715.00 /",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融负债 8,249,715.00 /"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p180_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 180,
+    "table_title": "衍生金融负债 8,249,715.00 /",
+    "parse_status": "line_inventory",
+    "text_excerpt": "衍生金融负债 8,249,715.00 /"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p180_t35",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 180,
+    "table_title": "34、衍生金融负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "34、衍生金融负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p182_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 182,
+    "table_title": "38、合同负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "38、合同负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p182_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 182,
+    "table_title": "(1).合同负债情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).合同负债情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p182_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 182,
+    "table_title": "(2).账龄超过1 年的重要合同负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2).账龄超过1 年的重要合同负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p184_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 184,
+    "table_title": "42、持有待售负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "42、持有待售负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p184_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 184,
+    "table_title": "43、1 年内到期的非流动负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "43、1 年内到期的非流动负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p184_t38",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 184,
+    "table_title": "一年内到期的租赁负债 10,576,485.54 14,896,291.14",
+    "parse_status": "line_inventory",
+    "text_excerpt": "一年内到期的租赁负债 10,576,485.54 14,896,291.14"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p185_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 185,
+    "table_title": "44、其他流动负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "44、其他流动负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p186_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 186,
+    "table_title": "(2).应付债券的具体情况：（不包括划分为金融负债的优先股、永续债等其他金融工具）",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2).应付债券的具体情况：（不包括划分为金融负债的优先股、永续债等其他金融工具）"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p187_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 187,
+    "table_title": "(4).划分为金融负债的其他金融工具说明",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4).划分为金融负债的其他金融工具说明"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p187_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 187,
+    "table_title": "47、租赁负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "47、租赁负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p188_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 188,
+    "table_title": "50、预计负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "50、预计负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p189_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 189,
+    "table_title": "52、其他非流动负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "52、其他非流动负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p192_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 192,
+    "table_title": "加：本期归属于母公司所有者的净利润 275,469,968.49 374,988,008.07",
+    "parse_status": "line_inventory",
+    "text_excerpt": "加：本期归属于母公司所有者的净利润 275,469,968.49 374,988,008.07"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p192_t35",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 192,
+    "table_title": "61、营业收入和营业成本",
+    "parse_status": "line_inventory",
+    "text_excerpt": "61、营业收入和营业成本"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p192_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 192,
+    "table_title": "(1).营业收入和营业成本情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).营业收入和营业成本情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p193_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 193,
+    "table_title": "(2).营业收入、营业成本的分解信息",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2).营业收入、营业成本的分解信息"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p195_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 195,
+    "table_title": "与资产相关的政府补助 35,926,683.32 23,615,927.45",
+    "parse_status": "line_inventory",
+    "text_excerpt": "与资产相关的政府补助 35,926,683.32 23,615,927.45"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p195_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 195,
+    "table_title": "其他非流动金融资产在持有期间取得的股利收入 37,547,876.36",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动金融资产在持有期间取得的股利收入 37,547,876.36"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p195_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 195,
+    "table_title": "处置交易性金融资产取得的投资收益 4,042,499.96 1,863,361.10",
+    "parse_status": "line_inventory",
+    "text_excerpt": "处置交易性金融资产取得的投资收益 4,042,499.96 1,863,361.10"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p195_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 195,
+    "table_title": "处置交易性金融负债取得的投资收益 252,219.72 -5,856,223.52",
+    "parse_status": "line_inventory",
+    "text_excerpt": "处置交易性金融负债取得的投资收益 252,219.72 -5,856,223.52"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p195_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 195,
+    "table_title": "交易性金融资产在持有期间的投资收益 4,303,061.03",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融资产在持有期间的投资收益 4,303,061.03"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p195_t28",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 195,
+    "table_title": "处置长期股权投资产生的投资收益 13,234.74",
+    "parse_status": "line_inventory",
+    "text_excerpt": "处置长期股权投资产生的投资收益 13,234.74"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p195_t38",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 195,
+    "table_title": "交易性金融资产 -612,151,724.64 12,405,676.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融资产 -612,151,724.64 12,405,676.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p195_t40",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 195,
+    "table_title": "融资产产生的公允价值变动收益 -613,751,034.64 12,405,676.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "融资产产生的公允价值变动收益 -613,751,034.64 12,405,676.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p195_t42",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 195,
+    "table_title": "交易性金融负债 3,910,160.00 -1,688,640.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融负债 3,910,160.00 -1,688,640.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p196_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 196,
+    "table_title": "72、资产减值损失",
+    "parse_status": "line_inventory",
+    "text_excerpt": "72、资产减值损失"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p196_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 196,
+    "table_title": "73、资产处置收益",
+    "parse_status": "line_inventory",
+    "text_excerpt": "73、资产处置收益"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p196_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 196,
+    "table_title": "固定资产处置收益 -5,860,298.88 -962,733.69",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产处置收益 -5,860,298.88 -962,733.69"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p196_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 196,
+    "table_title": "无形资产处置收益 676,544.15",
+    "parse_status": "line_inventory",
+    "text_excerpt": "无形资产处置收益 676,544.15"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p197_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 197,
+    "table_title": "税率调整导致期初递延所得税资产/负债余额的变化 -11,263,371.54",
+    "parse_status": "line_inventory",
+    "text_excerpt": "税率调整导致期初递延所得税资产/负债余额的变化 -11,263,371.54"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p197_t38",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 197,
+    "table_title": "使用前期未确认递延所得税资产的可抵扣亏损的影响 -2,197,067.42",
+    "parse_status": "line_inventory",
+    "text_excerpt": "使用前期未确认递延所得税资产的可抵扣亏损的影响 -2,197,067.42"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p197_t39",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 197,
+    "table_title": "本期未确认递延所得税资产的可抵扣暂时性差异或可抵扣亏损的影响 205,680,453.01",
+    "parse_status": "line_inventory",
+    "text_excerpt": "本期未确认递延所得税资产的可抵扣暂时性差异或可抵扣亏损的影响 205,680,453.01"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p198_t6",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 198,
+    "table_title": "78、现金流量表项目",
+    "parse_status": "line_inventory",
+    "text_excerpt": "78、现金流量表项目"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p200_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 200,
+    "table_title": "支付租赁负债款 21,559,466.41 15,680,997.95",
+    "parse_status": "line_inventory",
+    "text_excerpt": "支付租赁负债款 21,559,466.41 15,680,997.95"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p201_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 201,
+    "table_title": "租赁负债（含一年内到期的租赁负债） 35,246,724.46 40,414,208.38 21,559,466.41 9,245,399.81 44,856,",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债（含一年内到期的租赁负债） 35,246,724.46 40,414,208.38 21,559,466.41 9,245,399.81 44,856,066.62"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p201_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 201,
+    "table_title": "其他非流动负债（含一年内到期的其他非流动负债） 870,949,104.62 1,196,614,510.00 60,847,055.75 683,706,87",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动负债（含一年内到期的其他非流动负债） 870,949,104.62 1,196,614,510.00 60,847,055.75 683,706,873.45 19,018,107.88 1,425,685,689.04"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "(4).以净额列报现金流量的说明",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4).以净额列报现金流量的说明"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "(5).不涉及当期现金收支、但影响企业财务状况或在未来可能影响企业现金流量的重大活动",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(5).不涉及当期现金收支、但影响企业财务状况或在未来可能影响企业现金流量的重大活动"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "支付固定资产等长期资产购置款 569,945,723.77 308,760,519.02",
+    "parse_status": "line_inventory",
+    "text_excerpt": "支付固定资产等长期资产购置款 569,945,723.77 308,760,519.02"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t13",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "79、现金流量表补充资料",
+    "parse_status": "line_inventory",
+    "text_excerpt": "79、现金流量表补充资料"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "(1).现金流量表补充资料",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).现金流量表补充资料"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t18",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "1．将净利润调节为经营活动现金流量：",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1．将净利润调节为经营活动现金流量："
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t19",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "净利润 291,149,779.26 374,892,053.61",
+    "parse_status": "line_inventory",
+    "text_excerpt": "净利润 291,149,779.26 374,892,053.61"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t20",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "加：资产减值准备 43,827,078.96 43,115,696.61",
+    "parse_status": "line_inventory",
+    "text_excerpt": "加：资产减值准备 43,827,078.96 43,115,696.61"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "固定资产折旧、油气资产折耗、生产性生物资产折旧 658,295,166.70 567,084,259.66",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产折旧、油气资产折耗、生产性生物资产折旧 658,295,166.70 567,084,259.66"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "无形资产摊销 62,506,054.50 54,865,517.08",
+    "parse_status": "line_inventory",
+    "text_excerpt": "无形资产摊销 62,506,054.50 54,865,517.08"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t28",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "固定资产报废损失（收益以“－”号填列） 13,606,095.52 12,171,178.98",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产报废损失（收益以“－”号填列） 13,606,095.52 12,171,178.98"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "递延所得税资产减少（增加以“－”号填列） 23,341,776.20 -91,743,767.30",
+    "parse_status": "line_inventory",
+    "text_excerpt": "递延所得税资产减少（增加以“－”号填列） 23,341,776.20 -91,743,767.30"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "递延所得税负债增加（减少以“－”号填列） -97,924,135.29 141,025,591.85",
+    "parse_status": "line_inventory",
+    "text_excerpt": "递延所得税负债增加（减少以“－”号填列） -97,924,135.29 141,025,591.85"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p202_t38",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 202,
+    "table_title": "经营活动产生的现金流量净额 1,308,997,218.30 568,080,354.49",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 1,308,997,218.30 568,080,354.49"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p205_t41",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 205,
+    "table_title": "1) 使用权资产相关信息详见本报告第八节、七、25 之说明。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1) 使用权资产相关信息详见本报告第八节、七、25 之说明。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p205_t42",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 205,
+    "table_title": "2) 公司对短期租赁和低价值资产租赁的会计政策详见本报告第八节、五、38 之说明。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2) 公司对短期租赁和低价值资产租赁的会计政策详见本报告第八节、五、38 之说明。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p206_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 206,
+    "table_title": "3) 与租赁相关的当期损益及现金流",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3) 与租赁相关的当期损益及现金流"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p206_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 206,
+    "table_title": "租赁负债的利息费用 2,008,640.43 2,030,157.82",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债的利息费用 2,008,640.43 2,030,157.82"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p206_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 206,
+    "table_title": "与租赁相关的总现金流出 27,263,341.95 19,251,061.81",
+    "parse_status": "line_inventory",
+    "text_excerpt": "与租赁相关的总现金流出 27,263,341.95 19,251,061.81"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p206_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 206,
+    "table_title": "4) 租赁负债的到期期限分析和相应流动性风险管理详见本报告第八节、十二、1、（2）",
+    "parse_status": "line_inventory",
+    "text_excerpt": "4) 租赁负债的到期期限分析和相应流动性风险管理详见本报告第八节、十二、1、（2）"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p206_t20",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 206,
+    "table_title": "与租赁相关的现金流出总额27,263,341.95(单位：元 币种：人民币)",
+    "parse_status": "line_inventory",
+    "text_excerpt": "与租赁相关的现金流出总额27,263,341.95(单位：元 币种：人民币)"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p206_t30",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 206,
+    "table_title": "2）经营租赁资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2）经营租赁资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p206_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 206,
+    "table_title": "固定资产 137,119,182.24 146,643,259.53",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产 137,119,182.24 146,643,259.53"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p206_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 206,
+    "table_title": "无形资产 10,352,876.92 593,345.58",
+    "parse_status": "line_inventory",
+    "text_excerpt": "无形资产 10,352,876.92 593,345.58"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p206_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 206,
+    "table_title": "经营租出固定资产详见本报告第八节、七、21 之说明。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营租出固定资产详见本报告第八节、七、21 之说明。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p210_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 210,
+    "table_title": "减：取得的可辨认净资产公允价值份额 5,770,200.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "减：取得的可辨认净资产公允价值份额 5,770,200.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p210_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 210,
+    "table_title": "(3).被购买方于购买日可辨认资产、负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3).被购买方于购买日可辨认资产、负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p210_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 210,
+    "table_title": "(5).购买日或合并当期期末无法合理确定合并对价或被购买方可辨认资产、负债公允价值的",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(5).购买日或合并当期期末无法合理确定合并对价或被购买方可辨认资产、负债公允价值的"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p215_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 215,
+    "table_title": "(4).使用企业集团资产和清偿企业集团债务的重大限制",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(4).使用企业集团资产和清偿企业集团债务的重大限制"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p215_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 215,
+    "table_title": "流动资产 1,749,109,938.27 1,400,665,025.55",
+    "parse_status": "line_inventory",
+    "text_excerpt": "流动资产 1,749,109,938.27 1,400,665,025.55"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p215_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 215,
+    "table_title": "非流动资产 1,037,901,154.88 996,378,919.80",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非流动资产 1,037,901,154.88 996,378,919.80"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p215_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 215,
+    "table_title": "资产合计 2,787,011,093.15 2,397,043,945.35",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产合计 2,787,011,093.15 2,397,043,945.35"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p215_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 215,
+    "table_title": "流动负债 1,040,091,121.92 762,493,186.29",
+    "parse_status": "line_inventory",
+    "text_excerpt": "流动负债 1,040,091,121.92 762,493,186.29"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p215_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 215,
+    "table_title": "非流动负债 64,277,651.72 317,552,793.77",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非流动负债 64,277,651.72 317,552,793.77"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p215_t35",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 215,
+    "table_title": "负债合计 1,104,368,773.64 1,080,045,980.06",
+    "parse_status": "line_inventory",
+    "text_excerpt": "负债合计 1,104,368,773.64 1,080,045,980.06"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p216_t15",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 216,
+    "table_title": "营业收入 1,509,303,558.31 1,074,144,969.69",
+    "parse_status": "line_inventory",
+    "text_excerpt": "营业收入 1,509,303,558.31 1,074,144,969.69"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p216_t18",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 216,
+    "table_title": "净利润 483,210,969.37 338,490,272.85",
+    "parse_status": "line_inventory",
+    "text_excerpt": "净利润 483,210,969.37 338,490,272.85"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p216_t33",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 216,
+    "table_title": "--净利润 5,641,169.26 439,714.03",
+    "parse_status": "line_inventory",
+    "text_excerpt": "--净利润 5,641,169.26 439,714.03"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p216_t39",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 216,
+    "table_title": "--净利润 42,348,737.68 50,429,368.42",
+    "parse_status": "line_inventory",
+    "text_excerpt": "--净利润 42,348,737.68 50,429,368.42"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p217_t9",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 217,
+    "table_title": "(8).与合营企业或联营企业投资相关的或有负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(8).与合营企业或联营企业投资相关的或有负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p217_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 217,
+    "table_title": "2、 涉及政府补助的负债项目",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2、 涉及政府补助的负债项目"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p217_t35",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 217,
+    "table_title": "递延收益 230,602,514.20 35,479,000.00 35,926,683.32 230,154,830.88 与资产相关",
+    "parse_status": "line_inventory",
+    "text_excerpt": "递延收益 230,602,514.20 35,479,000.00 35,926,683.32 230,154,830.88 与资产相关"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p217_t41",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 217,
+    "table_title": "与资产相关 35,926,683.32 23,615,927.45",
+    "parse_status": "line_inventory",
+    "text_excerpt": "与资产相关 35,926,683.32 23,615,927.45"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p218_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 218,
+    "table_title": "(1.3.2)违约和已发生信用减值资产的定义",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1.3.2)违约和已发生信用减值资产的定义"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p219_t19",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 219,
+    "table_title": "由于本公司的应收账款风险点分布于多个合作方和多个客户，截至 2025 年 12 月 31 日，",
+    "parse_status": "line_inventory",
+    "text_excerpt": "由于本公司的应收账款风险点分布于多个合作方和多个客户，截至 2025 年 12 月 31 日，"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p219_t20",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 219,
+    "table_title": "本公司应收账款的 25.77%（2024 年 12 月 31 日：15.79%）源于余额前五名客户，本公司不",
+    "parse_status": "line_inventory",
+    "text_excerpt": "本公司应收账款的 25.77%（2024 年 12 月 31 日：15.79%）源于余额前五名客户，本公司不"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p219_t37",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 219,
+    "table_title": "其他非流动负债 1,425,685,689.04 1,522,053,936.02 630,811,363.73 891,242,572.29",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动负债 1,425,685,689.04 1,522,053,936.02 630,811,363.73 891,242,572.29"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p220_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 220,
+    "table_title": "租赁负债[注 3] 44,856,066.62 53,135,836.50 11,979,374.72 14,660,749.93 26,495,711.85",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债[注 3] 44,856,066.62 53,135,836.50 11,979,374.72 14,660,749.93 26,495,711.85"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p220_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 220,
+    "table_title": "其他流动负债 1,993,677.65 1,993,677.65 1,993,677.65",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他流动负债 1,993,677.65 1,993,677.65 1,993,677.65"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p220_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 220,
+    "table_title": "租赁负债[注 3] 35,246,724.46 41,304,794.41 16,284,993.65 8,790,818.74 16,228,982.02",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债[注 3] 35,246,724.46 41,304,794.41 16,284,993.65 8,790,818.74 16,228,982.02"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p220_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 220,
+    "table_title": "交易性金融负债 8,249,715.00 8,249,715.00 8,249,715.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融负债 8,249,715.00 8,249,715.00 8,249,715.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p220_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 220,
+    "table_title": "[注 2]其他非流动负债包括其他非流动负债、一年内到期的融资租赁借款、一年内到期",
+    "parse_status": "line_inventory",
+    "text_excerpt": "[注 2]其他非流动负债包括其他非流动负债、一年内到期的融资租赁借款、一年内到期"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p220_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 220,
+    "table_title": "[注 3]租赁负债包括租赁负债、一年内到期的租赁负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "[注 3]租赁负债包括租赁负债、一年内到期的租赁负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p221_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 221,
+    "table_title": "本公司期末外币货币性资产和负债情况详见本报告第八节、七、81 之说明。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "本公司期末外币货币性资产和负债情况详见本报告第八节、七、81 之说明。"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p221_t30",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 221,
+    "table_title": "3、 金融资产转移",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3、 金融资产转移"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p222_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 222,
+    "table_title": "(2). 因转移而终止确认的金融资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2). 因转移而终止确认的金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p222_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 222,
+    "table_title": "(3). 继续涉入的转移金融资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3). 继续涉入的转移金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p222_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 222,
+    "table_title": "1、以公允价值计量的资产和负债的期末公允价值",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1、以公允价值计量的资产和负债的期末公允价值"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p222_t36",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 222,
+    "table_title": "（一）交易性金融资产 272,572,708.89 2,443,916,984.93 2,716,489,693.82",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（一）交易性金融资产 272,572,708.89 2,443,916,984.93 2,716,489,693.82"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p222_t37",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 222,
+    "table_title": "1.以公允价值计量且变动计入当期损益的金融资产 272,572,708.89 2,443,916,984.93 2,716,489,693.82",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.以公允价值计量且变动计入当期损益的金融资产 272,572,708.89 2,443,916,984.93 2,716,489,693.82"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p222_t42",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 222,
+    "table_title": "（5）衍生金融资产 4,780,582.80 4,780,582.80",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（5）衍生金融资产 4,780,582.80 4,780,582.80"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p223_t6",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 223,
+    "table_title": "1.消耗性生物资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.消耗性生物资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p223_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 223,
+    "table_title": "2.生产性生物资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2.生产性生物资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p223_t9",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 223,
+    "table_title": "持续以公允价值计量的资产总额 272,572,708.89 2,806,318,643.41 3,078,891,352.30",
+    "parse_status": "line_inventory",
+    "text_excerpt": "持续以公允价值计量的资产总额 272,572,708.89 2,806,318,643.41 3,078,891,352.30"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p223_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 223,
+    "table_title": "1.以公允价值计量且变动计入当期损益的金融负债",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.以公允价值计量且变动计入当期损益的金融负债"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p223_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 223,
+    "table_title": "(1).交易性金融资产和其他非流动金融资产",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).交易性金融资产和其他非流动金融资产"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p224_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 224,
+    "table_title": "8、不以公允价值计量的金融资产和金融负债的公允价值情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "8、不以公允价值计量的金融资产和金融负债的公允价值情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p236_t37",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 236,
+    "table_title": "(6). 关联方资产转让、债务重组情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(6). 关联方资产转让、债务重组情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p238_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 238,
+    "table_title": "合同负债 乳源东阳光氟树脂有限公司 34,949.19 624,972.90",
+    "parse_status": "line_inventory",
+    "text_excerpt": "合同负债 乳源东阳光氟树脂有限公司 34,949.19 624,972.90"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p238_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 238,
+    "table_title": "合同负债 韶关市山城水都建筑工程有限公司 3,032.54",
+    "parse_status": "line_inventory",
+    "text_excerpt": "合同负债 韶关市山城水都建筑工程有限公司 3,032.54"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p238_t40",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 238,
+    "table_title": "租赁负债 乳源东阳光药业有限公司 11,870,991.59 12,526,957.67",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债 乳源东阳光药业有限公司 11,870,991.59 12,526,957.67"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p238_t41",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 238,
+    "table_title": "租赁负债 深圳市东阳光实业发展有限公司 850,547.09 4,292,603.20",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债 深圳市东阳光实业发展有限公司 850,547.09 4,292,603.20"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p238_t42",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 238,
+    "table_title": "租赁负债 东莞东阳光药物研发有限公司 7,055,227.41",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债 东莞东阳光药物研发有限公司 7,055,227.41"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p240_t24",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 240,
+    "table_title": "(1).资产负债表日存在的重要或有事项",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).资产负债表日存在的重要或有事项"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p240_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 240,
+    "table_title": "1）未决诉讼仲裁形成的或有负债及其财务影响",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1）未决诉讼仲裁形成的或有负债及其财务影响"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p241_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 241,
+    "table_title": "起诉的案件计算预计承担的或有债务本金和利息共计 81,551,096.52 元计提预计负债，并对",
+    "parse_status": "line_inventory",
+    "text_excerpt": "起诉的案件计算预计承担的或有债务本金和利息共计 81,551,096.52 元计提预计负债，并对"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p241_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 241,
+    "table_title": "2）为其他单位提供债务担保形成的或有负债及其财务影响",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2）为其他单位提供债务担保形成的或有负债及其财务影响"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p241_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 241,
+    "table_title": "4、其他资产负债表日后事项说明",
+    "parse_status": "line_inventory",
+    "text_excerpt": "4、其他资产负债表日后事项说明"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p242_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 242,
+    "table_title": "3、资产置换",
+    "parse_status": "line_inventory",
+    "text_excerpt": "3、资产置换"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p242_t6",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 242,
+    "table_title": "(1).非货币性资产交换",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).非货币性资产交换"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p242_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 242,
+    "table_title": "(2).其他资产置换",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2).其他资产置换"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p242_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 242,
+    "table_title": "营业收入 16,596,154,911.71 1,661,549,376.32 14,934,605,535.39",
+    "parse_status": "line_inventory",
+    "text_excerpt": "营业收入 16,596,154,911.71 1,661,549,376.32 14,934,605,535.39"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p242_t25",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 242,
+    "table_title": "资产总额 47,244,386,259.30 17,253,120,941.77 29,991,265,317.53",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产总额 47,244,386,259.30 17,253,120,941.77 29,991,265,317.53"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p242_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 242,
+    "table_title": "负债总额 31,058,827,572.06 11,244,229,216.21 19,814,598,355.85",
+    "parse_status": "line_inventory",
+    "text_excerpt": "负债总额 31,058,827,572.06 11,244,229,216.21 19,814,598,355.85"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p242_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 242,
+    "table_title": "(3).公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(3).公司无报告分部的，或者不能披露各报告分部的资产总额和负债总额的，应说明原因"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p243_t21",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 243,
+    "table_title": "续进行验收，待验收完成后，方可取得安全许可证。2019 年，狮溪煤业鑫源煤矿相关资产及",
+    "parse_status": "line_inventory",
+    "text_excerpt": "续进行验收，待验收完成后，方可取得安全许可证。2019 年，狮溪煤业鑫源煤矿相关资产及"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p244_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 244,
+    "table_title": "(5).按欠款方归集的期末余额前五名的应收账款和合同资产情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(5).按欠款方归集的期末余额前五名的应收账款和合同资产情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p252_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 252,
+    "table_title": "4、营业收入和营业成本",
+    "parse_status": "line_inventory",
+    "text_excerpt": "4、营业收入和营业成本"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p252_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 252,
+    "table_title": "(1).营业收入和营业成本情况",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).营业收入和营业成本情况"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p252_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 252,
+    "table_title": "(2).营业收入、营业成本的分解信息",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(2).营业收入、营业成本的分解信息"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p252_t30",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 252,
+    "table_title": "交易性金融资产在持有期间的投资收益 4,303,061.03",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融资产在持有期间的投资收益 4,303,061.03"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p252_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 252,
+    "table_title": "处置长期股权投资产生的投资收益 13,234.74",
+    "parse_status": "line_inventory",
+    "text_excerpt": "处置长期股权投资产生的投资收益 13,234.74"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p252_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 252,
+    "table_title": "处置交易性金融资产取得的投资收益 -758,482.04",
+    "parse_status": "line_inventory",
+    "text_excerpt": "处置交易性金融资产取得的投资收益 -758,482.04"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p252_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 252,
+    "table_title": "其他非流动金融资产在持有期间取得的股利收入 37,547,876.36",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动金融资产在持有期间取得的股利收入 37,547,876.36"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p253_t10",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 253,
+    "table_title": "非流动性资产处置损益，包括已计提资产减值准备的冲销部分 -18,728,355.17",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非流动性资产处置损益，包括已计提资产减值准备的冲销部分 -18,728,355.17"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p253_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 253,
+    "table_title": "产生的公允价值变动损益以及处置金融资产和金融负债产生的损益 -566,398,968.60",
+    "parse_status": "line_inventory",
+    "text_excerpt": "产生的公允价值变动损益以及处置金融资产和金融负债产生的损益 -566,398,968.60"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t3",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "2、 净资产收益率及每股收益",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2、 净资产收益率及每股收益"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "公司普通股股东的净利润 7.92 0.24 0.24",
+    "parse_status": "line_inventory",
+    "text_excerpt": "公司普通股股东的净利润 7.92 0.24 0.24"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t17",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "(1).加权平均净资产收益率的计算过程",
+    "parse_status": "line_inventory",
+    "text_excerpt": "(1).加权平均净资产收益率的计算过程"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t20",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "归属于公司普通股股东的净利润 A 275,469,968.49",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于公司普通股股东的净利润 A 275,469,968.49"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "扣除非经常性损益后的归属于公司普通股股东的净利润 C=A-B 710,071,137.41",
+    "parse_status": "line_inventory",
+    "text_excerpt": "扣除非经常性损益后的归属于公司普通股股东的净利润 C=A-B 710,071,137.41"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t23",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "归属于公司普通股股东的期初净资产 D 9,140,365,997.36",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于公司普通股股东的期初净资产 D 9,140,365,997.36"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t26",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "回购或现金分红等减少的、归属于公司普通股股东的净资产 G1 307,728,215.76",
+    "parse_status": "line_inventory",
+    "text_excerpt": "回购或现金分红等减少的、归属于公司普通股股东的净资产 G1 307,728,215.76"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t27",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "减少净资产次月起至报告期期末的累计月数 H1 8.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "减少净资产次月起至报告期期末的累计月数 H1 8.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t28",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "回购或现金分红等减少的、归属于公司普通股股东的净资产 G2 -219,808,000.24",
+    "parse_status": "line_inventory",
+    "text_excerpt": "回购或现金分红等减少的、归属于公司普通股股东的净资产 G2 -219,808,000.24"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t29",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "减少净资产次月起至报告期期末的累计月数 H2",
+    "parse_status": "line_inventory",
+    "text_excerpt": "减少净资产次月起至报告期期末的累计月数 H2"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t31",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "报告期实施股权激励增加的净资产 I1 171,321,133.30",
+    "parse_status": "line_inventory",
+    "text_excerpt": "报告期实施股权激励增加的净资产 I1 171,321,133.30"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t32",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "增减净资产次月起至报告期期末的累计月数 J1 2.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "增减净资产次月起至报告期期末的累计月数 J1 2.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t34",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "的差额减少净资产 I2 -42,248,791.24",
+    "parse_status": "line_inventory",
+    "text_excerpt": "的差额减少净资产 I2 -42,248,791.24"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t35",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "增减净资产次月起至报告期期末的累计月数 J2",
+    "parse_status": "line_inventory",
+    "text_excerpt": "增减净资产次月起至报告期期末的累计月数 J2"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t37",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "净资产 I3 1,351,672.61",
+    "parse_status": "line_inventory",
+    "text_excerpt": "净资产 I3 1,351,672.61"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p254_t38",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 254,
+    "table_title": "增减净资产次月起至报告期期末的累计月数 J3 6.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "增减净资产次月起至报告期期末的累计月数 J3 6.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t4",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "非同控合并增加净资产 I3 -3,179,591.02",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非同控合并增加净资产 I3 -3,179,591.02"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t5",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "增减净资产次月起至报告期期末的累计月数 J3 8.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "增减净资产次月起至报告期期末的累计月数 J3 8.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t6",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "权益性交易减少净资产 I4 -814,492,956.80",
+    "parse_status": "line_inventory",
+    "text_excerpt": "权益性交易减少净资产 I4 -814,492,956.80"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t7",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "增加净资产次月起至报告期期末的累计月数 J4 2.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "增加净资产次月起至报告期期末的累计月数 J4 2.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t8",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "报告期子公司引入少数股东增加的净资产 I5 617,876,318.41",
+    "parse_status": "line_inventory",
+    "text_excerpt": "报告期子公司引入少数股东增加的净资产 I5 617,876,318.41"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t9",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "增加净资产次月起至报告期期末的累计月数 J5",
+    "parse_status": "line_inventory",
+    "text_excerpt": "增加净资产次月起至报告期期末的累计月数 J5"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t11",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "股东的净资产 I6 397,566.14",
+    "parse_status": "line_inventory",
+    "text_excerpt": "股东的净资产 I6 397,566.14"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t12",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "增加净资产次月起至报告期期末的累计月数 J6 6.00",
+    "parse_status": "line_inventory",
+    "text_excerpt": "增加净资产次月起至报告期期末的累计月数 J6 6.00"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t14",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "加权平均净资产 L=D+A/2+E×F/K-G×",
+    "parse_status": "line_inventory",
+    "text_excerpt": "加权平均净资产 L=D+A/2+E×F/K-G×"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t16",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "加权平均净资产收益率 M=A/L 3.07%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "加权平均净资产收益率 M=A/L 3.07%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t17",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "扣除非经常性损益加权平均净资产收益率 N=C/L 7.92%",
+    "parse_status": "line_inventory",
+    "text_excerpt": "扣除非经常性损益加权平均净资产收益率 N=C/L 7.92%"
+  },
+  {
+    "table_id": "ev_annual_report_600673_20260410_a8e2a1_p255_t22",
+    "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+    "page_no": 255,
+    "table_title": "归属于公司普通股股东的净利润 A 275,469,968.49",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于公司普通股股东的净利润 A 275,469,968.49"
+  }
+]

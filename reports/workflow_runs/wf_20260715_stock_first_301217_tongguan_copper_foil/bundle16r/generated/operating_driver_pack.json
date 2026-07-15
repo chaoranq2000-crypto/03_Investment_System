@@ -1,0 +1,115 @@
+{
+  "artifact_type": "r5_bundle16r_operating_driver_pack",
+  "coverage_metrics": {
+    "gross_profit_explained_ratio": 1.0,
+    "material_segment_driver_coverage": 1.0,
+    "residual_gross_profit_ratio": 0.0,
+    "residual_revenue_ratio": 0.0,
+    "revenue_explained_ratio": 1.0
+  },
+  "decision": "pass",
+  "period": "2025A",
+  "reconciliation": {
+    "gross_profit_difference": -0.0,
+    "revenue_difference": 0.0,
+    "segment_gross_profit_sum": 237474689.82,
+    "segment_revenue_sum": 6689205991.67
+  },
+  "schema_version": 1,
+  "segments": [
+    {
+      "cost": 3475494389.65,
+      "disclosure_boundary": "年报披露分产品收入与成本，未披露高端牌号独立损益。",
+      "display_name": "PCB铜箔",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "capacity_utilization_yield_price",
+        "driver_topics": [
+          "HVLP product generation",
+          "processing fee",
+          "capacity and utilization",
+          "product mix"
+        ],
+        "equation": "销量 ×（铜价联动基价 + 加工费）",
+        "source_evidence_ids": [
+          "ev_annual_report_301217_20260418_d3f361"
+        ]
+      },
+      "gross_margin": 0.06162726,
+      "gross_profit": 228251743.71,
+      "material": true,
+      "revenue": 3703746133.36,
+      "segment_id": "pcb_copper_foil"
+    },
+    {
+      "cost": 2616497949.92,
+      "disclosure_boundary": "年报披露分产品收入与成本，客户认证与单品价格未单独量化。",
+      "display_name": "锂电池铜箔",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "volume_price_mix",
+        "driver_topics": [
+          "customer certification",
+          "processing fee",
+          "product mix",
+          "unit gross profit"
+        ],
+        "equation": "销量 × 铜价联动价格 + 产品结构带来的加工费差异",
+        "source_evidence_ids": [
+          "ev_annual_report_301217_20260418_d3f361"
+        ]
+      },
+      "gross_margin": 0.00191876,
+      "gross_profit": 5030091.14,
+      "material": true,
+      "revenue": 2621528041.06,
+      "segment_id": "lithium_battery_copper_foil"
+    },
+    {
+      "cost": 299428871.24,
+      "disclosure_boundary": "按年报其他主营产品口径处理。",
+      "display_name": "铜扁线等",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "volume_price_mix",
+        "driver_topics": [
+          "volume",
+          "price"
+        ],
+        "equation": "销量 × 售价",
+        "source_evidence_ids": [
+          "ev_annual_report_301217_20260418_d3f361"
+        ]
+      },
+      "gross_margin": 0.02597846,
+      "gross_profit": 7986168.12,
+      "material": false,
+      "revenue": 307415039.36,
+      "segment_id": "copper_flat_wire"
+    },
+    {
+      "cost": 60310091.04,
+      "disclosure_boundary": "由合并营业收入、营业成本与主营分部之差推导，不解释为独立经营分部。",
+      "display_name": "其他业务及对账残差",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "reconciliation_residual",
+        "driver_topics": [
+          "reconciliation"
+        ],
+        "equation": "合并口径 - 已披露主营分部合计",
+        "source_evidence_ids": [
+          "ev_annual_report_301217_20260418_d3f361"
+        ]
+      },
+      "gross_margin": -0.06711835,
+      "gross_profit": -3793313.15,
+      "material": false,
+      "revenue": 56516777.89,
+      "segment_id": "other_revenue"
+    }
+  ],
+  "total_gross_profit": 237474689.82,
+  "total_revenue": 6689205991.67,
+  "unit": "CNY"
+}

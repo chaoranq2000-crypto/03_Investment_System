@@ -1,0 +1,402 @@
+[
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p1_t21",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 1,
+    "table_title": "营业收入 3,554,318,743.96 2,407,203,605.84 47.65",
+    "parse_status": "line_inventory",
+    "text_excerpt": "营业收入 3,554,318,743.96 2,407,203,605.84 47.65"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p1_t23",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 1,
+    "table_title": "归属于上市公司股东的净利润 988,242,794.57 483,416,308.44 104.43",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净利润 988,242,794.57 483,416,308.44 104.43"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p1_t27",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 1,
+    "table_title": "经营活动产生的现金流量净额 496,810,882.92 338,008,396.30 46.98",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 496,810,882.92 338,008,396.30 46.98"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p1_t30",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 1,
+    "table_title": "加权平均净资产收益率（%） 7.13 5.93 增加 1.20 个百分点",
+    "parse_status": "line_inventory",
+    "text_excerpt": "加权平均净资产收益率（%） 7.13 5.93 增加 1.20 个百分点"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p2_t7",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 2,
+    "table_title": "总资产 24,866,565,232.31 24,980,770,851.47 (0.46)",
+    "parse_status": "line_inventory",
+    "text_excerpt": "总资产 24,866,565,232.31 24,980,770,851.47 (0.46)"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p2_t8",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 2,
+    "table_title": "归属于上市公司股东的净资产 14,289,040,547.47 13,415,188,878.23 6.51",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净资产 14,289,040,547.47 13,415,188,878.23 6.51"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p2_t9",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 2,
+    "table_title": "资产负债率（%） 29.36 33.91 下降 4.55 个百分点",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产负债率（%） 29.36 33.91 下降 4.55 个百分点"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p2_t14",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 2,
+    "table_title": "非流动性资产处置损益，包括已计提资产减值准备的冲销部分 332,431.07",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非流动性资产处置损益，包括已计提资产减值准备的冲销部分 332,431.07"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p3_t6",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 3,
+    "table_title": "营业收入 47.65",
+    "parse_status": "line_inventory",
+    "text_excerpt": "营业收入 47.65"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p3_t14",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 3,
+    "table_title": "归属于上市公司股东的净利润 104.43",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净利润 104.43"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p3_t18",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 3,
+    "table_title": "经营活动产生的现金流量净额 46.98",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 46.98"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p3_t21",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 3,
+    "table_title": "归属于上市公司股东的净资产 6.51 主要系公司经营积累增加所致。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "归属于上市公司股东的净资产 6.51 主要系公司经营积累增加所致。"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p8_t14",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 8,
+    "table_title": "交易性金融资产 67,079,593.46 19,231,618.75",
+    "parse_status": "line_inventory",
+    "text_excerpt": "交易性金融资产 67,079,593.46 19,231,618.75"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p8_t19",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 8,
+    "table_title": "其他流动资产 105,003,438.28 63,977,818.30",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他流动资产 105,003,438.28 63,977,818.30"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p8_t20",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 8,
+    "table_title": "流动资产合计 9,969,465,403.87 10,250,550,760.55",
+    "parse_status": "line_inventory",
+    "text_excerpt": "流动资产合计 9,969,465,403.87 10,250,550,760.55"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p8_t24",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 8,
+    "table_title": "固定资产 6,901,806,817.30 7,075,444,419.93",
+    "parse_status": "line_inventory",
+    "text_excerpt": "固定资产 6,901,806,817.30 7,075,444,419.93"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p8_t26",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 8,
+    "table_title": "使用权资产 175,444,401.97 183,438,730.03",
+    "parse_status": "line_inventory",
+    "text_excerpt": "使用权资产 175,444,401.97 183,438,730.03"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p8_t27",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 8,
+    "table_title": "无形资产 6,213,570,849.67 6,294,132,658.94",
+    "parse_status": "line_inventory",
+    "text_excerpt": "无形资产 6,213,570,849.67 6,294,132,658.94"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p8_t30",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 8,
+    "table_title": "递延所得税资产 64,271,423.96 75,121,867.75",
+    "parse_status": "line_inventory",
+    "text_excerpt": "递延所得税资产 64,271,423.96 75,121,867.75"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p8_t31",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 8,
+    "table_title": "其他非流动资产 295,435,995.93 253,470,802.69",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动资产 295,435,995.93 253,470,802.69"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t3",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "非流动资产合计 14,897,099,828.44 14,730,220,090.92",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非流动资产合计 14,897,099,828.44 14,730,220,090.92"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t4",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "资产总计 24,866,565,232.31 24,980,770,851.47",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产总计 24,866,565,232.31 24,980,770,851.47"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t8",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "合同负债 47,903,915.50 48,084,781.82",
+    "parse_status": "line_inventory",
+    "text_excerpt": "合同负债 47,903,915.50 48,084,781.82"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t12",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "一年内到期的非流动负债 179,034,370.21 187,225,340.40",
+    "parse_status": "line_inventory",
+    "text_excerpt": "一年内到期的非流动负债 179,034,370.21 187,225,340.40"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t13",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "其他流动负债 295,576.47 348,709.56",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他流动负债 295,576.47 348,709.56"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t14",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "流动负债合计 2,651,576,311.30 3,723,601,389.02",
+    "parse_status": "line_inventory",
+    "text_excerpt": "流动负债合计 2,651,576,311.30 3,723,601,389.02"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t17",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "租赁负债 141,100,414.65 148,516,989.79",
+    "parse_status": "line_inventory",
+    "text_excerpt": "租赁负债 141,100,414.65 148,516,989.79"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t19",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "预计负债 1,650,786,642.95 1,653,501,445.60",
+    "parse_status": "line_inventory",
+    "text_excerpt": "预计负债 1,650,786,642.95 1,653,501,445.60"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t21",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "递延所得税负债 2,216,832,549.19 2,252,289,493.16",
+    "parse_status": "line_inventory",
+    "text_excerpt": "递延所得税负债 2,216,832,549.19 2,252,289,493.16"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t22",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "其他非流动负债 550,628,479.12 563,555,634.09",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其他非流动负债 550,628,479.12 563,555,634.09"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t23",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "非流动负债合计 4,648,676,862.13 4,746,525,125.38",
+    "parse_status": "line_inventory",
+    "text_excerpt": "非流动负债合计 4,648,676,862.13 4,746,525,125.38"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p9_t24",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 9,
+    "table_title": "负债合计 7,300,253,173.43 8,470,126,514.40",
+    "parse_status": "line_inventory",
+    "text_excerpt": "负债合计 7,300,253,173.43 8,470,126,514.40"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p10_t8",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 10,
+    "table_title": "负债和股东权益总计 24,866,565,232.31 24,980,770,851.47",
+    "parse_status": "line_inventory",
+    "text_excerpt": "负债和股东权益总计 24,866,565,232.31 24,980,770,851.47"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p10_t16",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 10,
+    "table_title": "其中：营业收入 3,554,318,743.96 2,407,203,605.84",
+    "parse_status": "line_inventory",
+    "text_excerpt": "其中：营业收入 3,554,318,743.96 2,407,203,605.84"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p11_t4",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 11,
+    "table_title": "资产减值损失（损失以“()”号填列） 34,837,023.32 (2,238,524.19)",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产减值损失（损失以“()”号填列） 34,837,023.32 (2,238,524.19)"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p11_t5",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 11,
+    "table_title": "资产处置收益 332,431.07 80,774.68",
+    "parse_status": "line_inventory",
+    "text_excerpt": "资产处置收益 332,431.07 80,774.68"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p11_t11",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 11,
+    "table_title": "五、净利润 1,155,470,972.35 564,725,020.39",
+    "parse_status": "line_inventory",
+    "text_excerpt": "五、净利润 1,155,470,972.35 564,725,020.39"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p11_t13",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 11,
+    "table_title": "1.持续经营净利润 1,155,470,972.35 564,725,020.39",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.持续经营净利润 1,155,470,972.35 564,725,020.39"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p11_t14",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 11,
+    "table_title": "2.终止经营净利润 - -",
+    "parse_status": "line_inventory",
+    "text_excerpt": "2.终止经营净利润 - -"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p11_t16",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 11,
+    "table_title": "1.归属于母公司股东的净利润 988,242,794.57 483,416,308.44",
+    "parse_status": "line_inventory",
+    "text_excerpt": "1.归属于母公司股东的净利润 988,242,794.57 483,416,308.44"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p11_t24",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 11,
+    "table_title": "（1）现金流量套期储备 - (4,298,262.92)",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（1）现金流量套期储备 - (4,298,262.92)"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p12_t14",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 12,
+    "table_title": "经营活动现金流入小计 3,666,577,708.90 2,532,725,524.33",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动现金流入小计 3,666,577,708.90 2,532,725,524.33"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p12_t19",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 12,
+    "table_title": "经营活动现金流出小计 3,169,766,825.98 2,194,717,128.03",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动现金流出小计 3,169,766,825.98 2,194,717,128.03"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p12_t20",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 12,
+    "table_title": "经营活动产生的现金流量净额 496,810,882.92 338,008,396.30",
+    "parse_status": "line_inventory",
+    "text_excerpt": "经营活动产生的现金流量净额 496,810,882.92 338,008,396.30"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p12_t27",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 12,
+    "table_title": "投资活动现金流入小计 2,021,085,644.25 120,420,667.89",
+    "parse_status": "line_inventory",
+    "text_excerpt": "投资活动现金流入小计 2,021,085,644.25 120,420,667.89"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p13_t4",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 13,
+    "table_title": "投资活动现金流出小计 2,641,941,153.12 525,378,673.68",
+    "parse_status": "line_inventory",
+    "text_excerpt": "投资活动现金流出小计 2,641,941,153.12 525,378,673.68"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p13_t5",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 13,
+    "table_title": "投资活动使用的现金流量净额 (620,855,508.87) (404,958,005.79)",
+    "parse_status": "line_inventory",
+    "text_excerpt": "投资活动使用的现金流量净额 (620,855,508.87) (404,958,005.79)"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p13_t11",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 13,
+    "table_title": "筹资活动现金流入小计 232,164,800.00 3,441,542,090.32",
+    "parse_status": "line_inventory",
+    "text_excerpt": "筹资活动现金流入小计 232,164,800.00 3,441,542,090.32"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p13_t15",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 13,
+    "table_title": "筹资活动现金流出小计 511,792,773.75 1,321,573,697.23",
+    "parse_status": "line_inventory",
+    "text_excerpt": "筹资活动现金流出小计 511,792,773.75 1,321,573,697.23"
+  },
+  {
+    "table_id": "ev_quarterly_report_600988_20260425_4201ae_p13_t16",
+    "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+    "page_no": 13,
+    "table_title": "筹资活动（使用）/产生的现金流量净额 (279,627,973.75) 2,119,968,393.09",
+    "parse_status": "line_inventory",
+    "text_excerpt": "筹资活动（使用）/产生的现金流量净额 (279,627,973.75) 2,119,968,393.09"
+  }
+]

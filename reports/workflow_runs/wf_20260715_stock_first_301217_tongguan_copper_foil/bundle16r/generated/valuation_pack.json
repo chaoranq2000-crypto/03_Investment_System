@@ -1,0 +1,82 @@
+{
+  "artifact_type": "r5_bundle16r_valuation_pack",
+  "eligibility": {
+    "reason": "缺少同口径高端牌号利润和可复核同业倍数",
+    "status": "context_only"
+  },
+  "limitations": [
+    "不输出目标价或评级",
+    "情景预测是分析估计而非公司承诺",
+    "铜价传导和加工费需分开验证"
+  ],
+  "method": "scenario_valuation",
+  "no_advice_boundary": true,
+  "peer_multiple_used": false,
+  "position_instruction": null,
+  "price_target": null,
+  "qualified_peers": [],
+  "rating": null,
+  "scenario_operating_context": {
+    "base": [
+      {
+        "gross_margin": 0.04403929,
+        "gross_profit": 311370969.230131,
+        "period": "2026E",
+        "revenue": 7070299824.3578
+      },
+      {
+        "gross_margin": 0.05103819,
+        "gross_profit": 385776473.712993,
+        "period": "2027E",
+        "revenue": 7558585190.020557
+      },
+      {
+        "gross_margin": 0.05778613,
+        "gross_profit": 462053047.629834,
+        "period": "2028E",
+        "revenue": 7995915910.470385
+      }
+    ],
+    "bear": [
+      {
+        "gross_margin": 0.02458224,
+        "gross_profit": 162807747.444978,
+        "period": "2026E",
+        "revenue": 6622982061.103401
+      },
+      {
+        "gross_margin": 0.02870693,
+        "gross_profit": 193378995.419089,
+        "period": "2027E",
+        "revenue": 6736316692.784217
+      },
+      {
+        "gross_margin": 0.03253989,
+        "gross_profit": 224618335.668522,
+        "period": "2028E",
+        "revenue": 6902860396.195597
+      }
+    ],
+    "bull": [
+      {
+        "gross_margin": 0.05909951,
+        "gross_profit": 439276256.790984,
+        "period": "2026E",
+        "revenue": 7432823445.593201
+      },
+      {
+        "gross_margin": 0.07089748,
+        "gross_profit": 583878502.970845,
+        "period": "2027E",
+        "revenue": 8235532376.724449
+      },
+      {
+        "gross_margin": 0.07768547,
+        "gross_profit": 689308499.253848,
+        "period": "2028E",
+        "revenue": 8873068763.48215
+      }
+    ]
+  },
+  "schema_version": 1
+}

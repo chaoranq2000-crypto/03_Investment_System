@@ -1,0 +1,29 @@
+schema_version: r5_bundle17r_human_review_handoff_v1
+bundle_id: R5_BUNDLE17R_ACTIVATION_RECEIPT
+case_id: golden_copper_foil_product_generation
+issuer_ticker: 301217.SZ
+review_status: not_ready
+reviewer: null
+reviewed_at: null
+decision_notes: null
+reader:
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/reader_report.md
+  sha256: 102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa
+  size_bytes: 3844
+generation_lock:
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+  sha256: 02953ca1a4f932e34a1298ab3e883c66daf26fc3cffbac96c4137b764b64f461
+  size_bytes: 1143
+quality_scorecard:
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+  sha256: 0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67
+  size_bytes: 1888
+traceability:
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/evidence_pack.json
+  sha256: 903e305e29ccec711499847e123f30109977e9eec14f54ae2ca0389ef397ccd4
+  size_bytes: 7500
+automated_acceptance_allowed: false
+canonical_workflow_state_mutation_allowed: false
+sample_quality_allowed: false
+p2_allowed: false
+activation_generation_id: activation_gen_r5_bundle17r_1fb1ea838a59cba3

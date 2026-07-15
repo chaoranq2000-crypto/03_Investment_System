@@ -1,0 +1,53 @@
+{
+  "artifact_type": "r5_bundle16r_quality_readout",
+  "backflow_tasks": [
+    {
+      "next_step": "半年报后更新存量分部量价成本和新业务确认口径",
+      "owner": "future_refresh",
+      "severity": "major"
+    },
+    {
+      "next_step": "每次交易进展公告后更新审批交割融资与并表状态",
+      "owner": "future_refresh",
+      "severity": "major"
+    }
+  ],
+  "case_id": "600673_multi_business_ma",
+  "decision": "pass",
+  "gate_issues": [],
+  "metric_provenance": {
+    "company_specific_metric_count": "derived from complete metric records",
+    "forecast_assumption_traceability": "derived from evidence locators or explicit estimate logic",
+    "future_event_model_link_count": "derived from dated verification events with model links",
+    "operating_metrics": "derived from reconciled historical segment bridge and driver bindings",
+    "reader_metrics": "derived from physical section references and sentence novelty"
+  },
+  "metrics": {
+    "citation_resolution_rate": 1.0,
+    "company_specific_metric_count": 14,
+    "forecast_assumption_traceability": 1.0,
+    "future_event_model_link_count": 3,
+    "gross_profit_explained_ratio": 1.0,
+    "material_segment_driver_coverage": 1.0,
+    "model_linked_core_section_ratio": 1.0,
+    "qualified_peer_count": 0,
+    "residual_gross_profit_ratio": 0.0,
+    "residual_revenue_ratio": 0.0,
+    "revenue_explained_ratio": 1.0,
+    "section_novelty_ratio": 1.0,
+    "unresolved_critical_question_count": 0
+  },
+  "no_advice_boundary": true,
+  "p2_allowed": false,
+  "sample_quality_allowed": false,
+  "schema_version": 1,
+  "truthfulness": {
+    "consensus_estimate_presented_as_issuer_fact": false,
+    "direct_trading_instruction_present": false,
+    "low_confidence_peer_ranked": false,
+    "management_guidance_recast_as_fact": false,
+    "past_event_presented_as_future": false,
+    "sample_text_used_as_evidence": false,
+    "undisclosed_segment_economics_presented_as_fact": false
+  }
+}

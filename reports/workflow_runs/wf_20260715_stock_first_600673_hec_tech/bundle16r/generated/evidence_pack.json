@@ -1,0 +1,322 @@
+{
+  "artifact_type": "r5_bundle16r_reviewed_evidence_pack",
+  "as_of_date": "2026-07-15",
+  "case_id": "600673_multi_business_ma",
+  "claims": [
+    {
+      "claim_id": "claim_600673_mix",
+      "claim_type": "fact",
+      "counterevidence": "分业务毛利率仍未揭示单品、客户和产线差异。",
+      "evidence_ids": [
+        "ev_annual_report_600673_20260410_a8e2a1"
+      ],
+      "locator": "page:27",
+      "text": "2025年高端铝箔收入规模最大，但化工新材料毛利率显著更高，收入规模与利润贡献不能混同。"
+    },
+    {
+      "claim_id": "claim_600673_quota",
+      "claim_type": "management_comment",
+      "counterevidence": "配额不等于销量，价格和成本变化也会改变利润。",
+      "evidence_ids": [
+        "ev_annual_report_600673_20260410_a8e2a1"
+      ],
+      "locator": "page:12",
+      "text": "年报披露公司2026年第三代制冷剂配额约6万吨，实际销量、价格和盈利仍需后续验证。"
+    },
+    {
+      "claim_id": "claim_600673_ma_pending",
+      "claim_type": "fact",
+      "counterevidence": "审批、交割、融资安排和最终并表时点均存在不确定性。",
+      "evidence_ids": [
+        "ev_announcement_600673_20260616_da320e"
+      ],
+      "locator": "page:16,25",
+      "text": "交易草案列示作价80.502亿元及拟实现间接持有目标公司100%股权，但交易仍需股东会、交易所审核、注册及可能的反垄断程序。"
+    },
+    {
+      "claim_id": "claim_600673_idc_cost",
+      "claim_type": "fact",
+      "counterevidence": "实际费用取决于机柜、电量、投运和结算，关联交易还需持续检查公允性。",
+      "evidence_ids": [
+        "ev_announcement_600673_20260625_c5ca5c"
+      ],
+      "locator": "page:1,3",
+      "text": "IDC关联采购公告预计十二个月采购费用不超过2亿元，该金额属于成本上限而非收入。"
+    },
+    {
+      "claim_id": "claim_600673_compute_contract",
+      "claim_type": "fact",
+      "counterevidence": "交付验收、融资、利用率、客户回款和采购成本均可能影响实际履行。",
+      "evidence_ids": [
+        "ev_announcement_600673_20260711_54be9c"
+      ],
+      "locator": "page:1,3",
+      "text": "算力服务采购合同预计总额130亿至150亿元、期限为验收交付后60个月，最终以实际结算为准，公告明确不构成业绩承诺或盈利预测。"
+    }
+  ],
+  "company_metrics": [
+    {
+      "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+      "locator": "page:7",
+      "metric_id": "metric_600673_revenue_2025",
+      "name": "营业收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 14934605535.39
+    },
+    {
+      "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+      "locator": "page:7,27",
+      "metric_id": "metric_600673_gp_2025",
+      "name": "合并毛利",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 2969811839.59
+    },
+    {
+      "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+      "locator": "page:27",
+      "metric_id": "metric_600673_fluoro_revenue_2025",
+      "name": "化工新材料收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 4059837302.27
+    },
+    {
+      "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+      "locator": "page:27",
+      "metric_id": "metric_600673_fluoro_margin_2025",
+      "name": "化工新材料毛利率",
+      "period": "2025A",
+      "unit": "percent",
+      "value": 43.33
+    },
+    {
+      "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+      "locator": "page:27",
+      "metric_id": "metric_600673_electronic_revenue_2025",
+      "name": "电子元器件收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 3562655910.5
+    },
+    {
+      "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+      "locator": "page:27",
+      "metric_id": "metric_600673_aluminum_revenue_2025",
+      "name": "高端铝箔收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 5920905657.53
+    },
+    {
+      "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+      "locator": "page:12",
+      "metric_id": "metric_600673_refrigerant_quota_2026",
+      "name": "第三代制冷剂配额",
+      "period": "2026E_quota",
+      "unit": "tonne_approx",
+      "value": 60000
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600673_20260428_34ed1a",
+      "locator": "page:3",
+      "metric_id": "metric_600673_q1_revenue_2026",
+      "name": "一季度营业收入",
+      "period": "2026Q1",
+      "unit": "CNY",
+      "value": 4248632543.63
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600673_20260428_34ed1a",
+      "locator": "page:3",
+      "metric_id": "metric_600673_q1_np_2026",
+      "name": "一季度归母净利润",
+      "period": "2026Q1",
+      "unit": "CNY",
+      "value": 119276129.55
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600673_20260428_34ed1a",
+      "locator": "page:3",
+      "metric_id": "metric_600673_q1_ocf_2026",
+      "name": "一季度经营现金流",
+      "period": "2026Q1",
+      "unit": "CNY",
+      "value": 164217679.13
+    },
+    {
+      "evidence_id": "ev_announcement_600673_20260616_da320e",
+      "locator": "page:16",
+      "metric_id": "metric_600673_ma_value_2026",
+      "name": "并购交易作价",
+      "period": "transaction_draft_2026",
+      "unit": "CNY",
+      "value": 8050200000
+    },
+    {
+      "evidence_id": "ev_announcement_600673_20260625_c5ca5c",
+      "locator": "page:1,3",
+      "metric_id": "metric_600673_idc_cost_ceiling_2026",
+      "name": "十二个月IDC服务预计采购上限",
+      "period": "contract_estimate_12m",
+      "unit": "CNY",
+      "value": 200000000
+    },
+    {
+      "evidence_id": "ev_announcement_600673_20260711_54be9c",
+      "locator": "page:1",
+      "metric_id": "metric_600673_compute_contract_low_2026",
+      "name": "算力服务合同预计总额下限",
+      "period": "contract_estimate_60m",
+      "unit": "CNY",
+      "value": 13000000000
+    },
+    {
+      "evidence_id": "ev_announcement_600673_20260711_54be9c",
+      "locator": "page:1",
+      "metric_id": "metric_600673_compute_contract_high_2026",
+      "name": "算力服务合同预计总额上限",
+      "period": "contract_estimate_60m",
+      "unit": "CNY",
+      "value": 15000000000
+    }
+  ],
+  "evidence_integrity_incidents": [
+    {
+      "detail": "首次SSE下载返回反爬HTML而非PDF，已拒绝并由CNINFO同一披露替代，不用于任何主张。",
+      "incident_id": "incident_600673_sse_challenge",
+      "rejected_evidence_ids": [
+        "ev_annual_report_600673_20260410_3c9f5e",
+        "ev_quarterly_report_600673_20260428_0f2301"
+      ],
+      "status": "rejected_and_superseded"
+    }
+  ],
+  "official_source_count": 5,
+  "research_questions": [
+    {
+      "question_id": "rq_600673_reconcile",
+      "resolution": "2025年主营业务与其他业务已对账至合并收入和毛利",
+      "severity": "critical",
+      "status": "resolved"
+    },
+    {
+      "next_step": "获取液冷、IDC与算力业务验收、投运、利用率、收入及成本证据",
+      "owner": "future_refresh",
+      "question_id": "rq_600673_new_business",
+      "severity": "major",
+      "status": "open"
+    },
+    {
+      "next_step": "跟踪审议审核注册交割及融资安排",
+      "owner": "future_refresh",
+      "question_id": "rq_600673_ma_close",
+      "severity": "major",
+      "status": "open"
+    }
+  ],
+  "review_status": "reviewed",
+  "sample_reports_used_as_evidence": false,
+  "schema_version": 1,
+  "source_count": 5,
+  "source_integrity": [
+    {
+      "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+      "page_count": 256,
+      "processed_text_path": "data/processed/text/ev_annual_report_600673_20260410_a8e2a1.md",
+      "review_status": "reviewed",
+      "sha256": "a8e2a13be86d3b3cad6dea2ac88b4ecc13e1057547c54621b6b81404f6fbfaad",
+      "source_path": "data/raw/annual_reports/cninfo_2025_annual_report_600673_2026-04-10.pdf"
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600673_20260428_34ed1a",
+      "page_count": 12,
+      "processed_text_path": "data/processed/text/ev_quarterly_report_600673_20260428_34ed1a.md",
+      "review_status": "reviewed",
+      "sha256": "34ed1a7f95fbed5e96aebd8eeee4c15e2e98fdbdc82d0e21eb1bd913bce1e268",
+      "source_path": "data/raw/announcements/cninfo_2026_q1_report_600673_2026-04-28.pdf"
+    },
+    {
+      "evidence_id": "ev_announcement_600673_20260616_da320e",
+      "page_count": 634,
+      "processed_text_path": "data/processed/text/ev_announcement_600673_20260616_da320e.md",
+      "review_status": "reviewed",
+      "sha256": "da320e145a27de95d0927e9342066c0e954673addcbf97c353ab37c7126116e4",
+      "source_path": "data/raw/announcements/cninfo_ma_transaction_draft_600673_2026-06-16.pdf"
+    },
+    {
+      "evidence_id": "ev_announcement_600673_20260625_c5ca5c",
+      "page_count": 4,
+      "processed_text_path": "data/processed/text/ev_announcement_600673_20260625_c5ca5c.md",
+      "review_status": "reviewed",
+      "sha256": "c5ca5c45f8316dc14999388789ce28f58b2642e752c375b9b87a8ea437a6ae2c",
+      "source_path": "data/raw/announcements/cninfo_idc_service_contract_600673_2026-06-25.pdf"
+    },
+    {
+      "evidence_id": "ev_announcement_600673_20260711_54be9c",
+      "page_count": 5,
+      "processed_text_path": "data/processed/text/ev_announcement_600673_20260711_54be9c.md",
+      "review_status": "reviewed",
+      "sha256": "54be9c9a093fed9a6bd69377a21092e1c2ef4cd2cb907c0aff0aecacf1174f7f",
+      "source_path": "data/raw/announcements/cninfo_compute_service_procurement_contract_600673_2026-07-11.pdf"
+    }
+  ],
+  "sources": [
+    {
+      "evidence_id": "ev_annual_report_600673_20260410_a8e2a1",
+      "file_hash": "a8e2a13be86d3b3cad6dea2ac88b4ecc13e1057547c54621b6b81404f6fbfaad",
+      "page_count": 256,
+      "processed_text_path": "data/processed/text/ev_annual_report_600673_20260410_a8e2a1.md",
+      "review_status": "reviewed",
+      "source_class": "official",
+      "source_path": "data/raw/annual_reports/cninfo_2025_annual_report_600673_2026-04-10.pdf",
+      "source_type": "annual_report",
+      "title": "2025年年度报告"
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600673_20260428_34ed1a",
+      "file_hash": "34ed1a7f95fbed5e96aebd8eeee4c15e2e98fdbdc82d0e21eb1bd913bce1e268",
+      "page_count": 12,
+      "processed_text_path": "data/processed/text/ev_quarterly_report_600673_20260428_34ed1a.md",
+      "review_status": "reviewed",
+      "source_class": "official",
+      "source_path": "data/raw/announcements/cninfo_2026_q1_report_600673_2026-04-28.pdf",
+      "source_type": "quarterly_report",
+      "title": "2026年第一季度报告"
+    },
+    {
+      "evidence_id": "ev_announcement_600673_20260616_da320e",
+      "file_hash": "da320e145a27de95d0927e9342066c0e954673addcbf97c353ab37c7126116e4",
+      "page_count": 634,
+      "processed_text_path": "data/processed/text/ev_announcement_600673_20260616_da320e.md",
+      "review_status": "reviewed",
+      "source_class": "official",
+      "source_path": "data/raw/announcements/cninfo_ma_transaction_draft_600673_2026-06-16.pdf",
+      "source_type": "transaction_draft",
+      "title": "发行股份及支付现金购买资产并募集配套资金暨关联交易报告书（草案）"
+    },
+    {
+      "evidence_id": "ev_announcement_600673_20260625_c5ca5c",
+      "file_hash": "c5ca5c45f8316dc14999388789ce28f58b2642e752c375b9b87a8ea437a6ae2c",
+      "page_count": 4,
+      "processed_text_path": "data/processed/text/ev_announcement_600673_20260625_c5ca5c.md",
+      "review_status": "reviewed",
+      "source_class": "official",
+      "source_path": "data/raw/announcements/cninfo_idc_service_contract_600673_2026-06-25.pdf",
+      "source_type": "related_party_contract",
+      "title": "IDC服务采购暨关联交易公告"
+    },
+    {
+      "evidence_id": "ev_announcement_600673_20260711_54be9c",
+      "file_hash": "54be9c9a093fed9a6bd69377a21092e1c2ef4cd2cb907c0aff0aecacf1174f7f",
+      "page_count": 5,
+      "processed_text_path": "data/processed/text/ev_announcement_600673_20260711_54be9c.md",
+      "review_status": "reviewed",
+      "source_class": "official",
+      "source_path": "data/raw/announcements/cninfo_compute_service_procurement_contract_600673_2026-07-11.pdf",
+      "source_type": "material_contract",
+      "title": "算力服务采购合同公告"
+    }
+  ]
+}

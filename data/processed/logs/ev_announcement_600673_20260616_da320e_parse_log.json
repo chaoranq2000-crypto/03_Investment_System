@@ -1,0 +1,21 @@
+{
+  "job_id": "job_20260715_600673_ma_transaction_draft_parse",
+  "run_id": "wf_20260715_stock_first_600673_hec_tech",
+  "evidence_id": "ev_announcement_600673_20260616_da320e",
+  "status": "SUCCESS",
+  "normalization_status": "SUCCESS",
+  "parser": "pypdf_text_extraction",
+  "mineru_status": "not_attempted",
+  "mineru": {
+    "attempted": false,
+    "reason": "external mineru call not requested"
+  },
+  "raw_pdf_path": "data/raw/announcements/cninfo_ma_transaction_draft_600673_2026-06-16.pdf",
+  "processed_text_path": "data/processed/text/ev_announcement_600673_20260616_da320e.md",
+  "tables_path": "data/processed/tables/ev_announcement_600673_20260616_da320e_tables.json",
+  "page_map_path": "data/processed/page_maps/ev_announcement_600673_20260616_da320e_page_map.yaml",
+  "page_count": 634,
+  "table_inventory_count": 2021,
+  "candidate_info": {},
+  "issues": []
+}

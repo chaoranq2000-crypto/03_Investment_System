@@ -1,0 +1,82 @@
+{
+  "artifact_type": "r5_bundle16r_valuation_pack",
+  "eligibility": {
+    "reason": "商品价格与矿山资产差异使未校准同业倍数不可直接使用",
+    "status": "context_only"
+  },
+  "limitations": [
+    "不输出目标价或评级",
+    "黄金价格只做敏感性情景",
+    "业绩预告不当作审计后事实"
+  ],
+  "method": "scenario_valuation",
+  "no_advice_boundary": true,
+  "peer_multiple_used": false,
+  "position_instruction": null,
+  "price_target": null,
+  "qualified_peers": [],
+  "rating": null,
+  "scenario_operating_context": {
+    "base": [
+      {
+        "gross_margin": 0.52783133,
+        "gross_profit": 7765302376.415585,
+        "period": "2026E",
+        "revenue": 14711711736.062899
+      },
+      {
+        "gross_margin": 0.51076045,
+        "gross_profit": 7669930960.446943,
+        "period": "2027E",
+        "revenue": 15016689381.358198
+      },
+      {
+        "gross_margin": 0.49372531,
+        "gross_profit": 7567870080.417491,
+        "period": "2028E",
+        "revenue": 15328098243.026115
+      }
+    ],
+    "bear": [
+      {
+        "gross_margin": 0.39774283,
+        "gross_profit": 4615007742.228551,
+        "period": "2026E",
+        "revenue": 11602994150.0532
+      },
+      {
+        "gross_margin": 0.37410867,
+        "gross_profit": 4006954672.192345,
+        "period": "2027E",
+        "revenue": 10710670412.218327
+      },
+      {
+        "gross_margin": 0.3564549,
+        "gross_profit": 3646821440.416173,
+        "period": "2028E",
+        "revenue": 10230807418.829395
+      }
+    ],
+    "bull": [
+      {
+        "gross_margin": 0.60854869,
+        "gross_profit": 9970964692.296747,
+        "period": "2026E",
+        "revenue": 16384826427.961699
+      },
+      {
+        "gross_margin": 0.59263038,
+        "gross_profit": 10482285574.500935,
+        "period": "2027E",
+        "revenue": 17687729161.281433
+      },
+      {
+        "gross_margin": 0.55647703,
+        "gross_profit": 10331936970.566889,
+        "period": "2028E",
+        "revenue": 18566690864.19838
+      }
+    ]
+  },
+  "schema_version": 1
+}

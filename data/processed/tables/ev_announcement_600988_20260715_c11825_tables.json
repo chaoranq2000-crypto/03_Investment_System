@@ -1,0 +1,42 @@
+[
+  {
+    "table_id": "ev_announcement_600988_20260715_c11825_p1_t9",
+    "evidence_id": "ev_announcement_600988_20260715_c11825",
+    "page_no": 1,
+    "table_title": "半年度实现归属于上市公司股东的净利润 170,000 万元到 178,000 万元，与上年",
+    "parse_status": "line_inventory",
+    "text_excerpt": "半年度实现归属于上市公司股东的净利润 170,000 万元到 178,000 万元，与上年"
+  },
+  {
+    "table_id": "ev_announcement_600988_20260715_c11825_p1_t21",
+    "evidence_id": "ev_announcement_600988_20260715_c11825",
+    "page_no": 1,
+    "table_title": "预计 2026 年半年度实现归属于上市公司股东的扣除非经常性损益的净利润",
+    "parse_status": "line_inventory",
+    "text_excerpt": "预计 2026 年半年度实现归属于上市公司股东的扣除非经常性损益的净利润"
+  },
+  {
+    "table_id": "ev_announcement_600988_20260715_c11825_p2_t6",
+    "evidence_id": "ev_announcement_600988_20260715_c11825",
+    "page_no": 2,
+    "table_title": "（一）2025 年半年度归属于上市公司股东的净利润：110,690 万元。",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（一）2025 年半年度归属于上市公司股东的净利润：110,690 万元。"
+  },
+  {
+    "table_id": "ev_announcement_600988_20260715_c11825_p2_t7",
+    "evidence_id": "ev_announcement_600988_20260715_c11825",
+    "page_no": 2,
+    "table_title": "（二）2025 年半年度归属于上市公司股东的扣除非经常性损益的净利润：",
+    "parse_status": "line_inventory",
+    "text_excerpt": "（二）2025 年半年度归属于上市公司股东的扣除非经常性损益的净利润："
+  },
+  {
+    "table_id": "ev_announcement_600988_20260715_c11825_p2_t11",
+    "evidence_id": "ev_announcement_600988_20260715_c11825",
+    "page_no": 2,
+    "table_title": "公司 2026 年半年度实现归属于上市公司股东的净利润、归属于上市公司股",
+    "parse_status": "line_inventory",
+    "text_excerpt": "公司 2026 年半年度实现归属于上市公司股东的净利润、归属于上市公司股"
+  }
+]

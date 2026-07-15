@@ -1,0 +1,8 @@
+bundle_id: R5_BUNDLE16R_REVIEWED_EVIDENCE_PACK_MATERIALIZATION
+canonical_workflow_state_mutation_allowed: false
+note: Non-canonical proposal only. Run Bundle 15R and, when applicable, Bundle 14R
+  before any research-orchestrator state synchronization.
+p2_allowed: false
+proposed_status: R5_BUNDLE16R_WAITING_FOR_REVIEWED_EVIDENCE_AND_MAPPING
+sample_quality_allowed: false
+schema_version: r5_bundle16r_status_proposal_v1

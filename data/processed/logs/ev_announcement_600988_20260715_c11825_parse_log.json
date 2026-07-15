@@ -1,0 +1,21 @@
+{
+  "job_id": "job_20260715_600988_h1_performance_forecast_parse",
+  "run_id": "wf_20260715_stock_first_600988_chifeng_gold",
+  "evidence_id": "ev_announcement_600988_20260715_c11825",
+  "status": "SUCCESS",
+  "normalization_status": "SUCCESS",
+  "parser": "pypdf_text_extraction",
+  "mineru_status": "not_attempted",
+  "mineru": {
+    "attempted": false,
+    "reason": "external mineru call not requested"
+  },
+  "raw_pdf_path": "data/raw/announcements/cninfo_2026_h1_performance_forecast_600988_2026-07-15.pdf",
+  "processed_text_path": "data/processed/text/ev_announcement_600988_20260715_c11825.md",
+  "tables_path": "data/processed/tables/ev_announcement_600988_20260715_c11825_tables.json",
+  "page_map_path": "data/processed/page_maps/ev_announcement_600988_20260715_c11825_page_map.yaml",
+  "page_count": 2,
+  "table_inventory_count": 5,
+  "candidate_info": {},
+  "issues": []
+}

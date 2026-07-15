@@ -1,0 +1,50 @@
+{
+  "bundle_id": "R5_BUNDLE15R_REVIEWED_EVIDENCE_QUALIFICATION",
+  "extra_inputs": {
+    "git_head": "911136de409a50dee2bd9828a117de4fa24ab75d"
+  },
+  "files": [
+    {
+      "path": "tests/fixtures/r5_bundle14r/cases/copper_foil.yaml",
+      "role": "case_contract",
+      "sha256": "09f3831a46cd6bae6fd2ce1659eb6e0f85f82d8062e5793651d17c0f8daa7df7"
+    },
+    {
+      "path": "tests/fixtures/r5_bundle14r/cases/crdmo.yaml",
+      "role": "case_contract",
+      "sha256": "8409ad6835649f424ce56fc854aa302bc8bbbca8bb4fea679d93837eb2b460f4"
+    },
+    {
+      "path": "tests/fixtures/r5_bundle14r/cases/gold_mining.yaml",
+      "role": "case_contract",
+      "sha256": "7f0413564b3706a494ca1a5861f9ea331fa6ec86936345c7daa782f988a41027"
+    },
+    {
+      "path": "tests/fixtures/r5_bundle14r/cases/multi_business_ai_infrastructure.yaml",
+      "role": "case_contract",
+      "sha256": "3532a714d8d5877a377576bebbe4628be32f8a0394b4dca9cac66d175903cf79"
+    },
+    {
+      "path": "config/r5_bundle15r_evidence_qualification_policy.yaml",
+      "role": "compiler_source",
+      "sha256": "8066007af0bd353329157c157292a374c7ddaa43c8e4e4867dceef27cc80fdbd"
+    },
+    {
+      "path": "scripts/run_r5_bundle15r_evidence_qualification.py",
+      "role": "compiler_source",
+      "sha256": "4d71c80ce5e50fc4c692777fc5fb47f62be0c282473e7e0144ddf7c829f0b1bf"
+    },
+    {
+      "path": "src/research/r5_bundle15r_evidence_qualification.py",
+      "role": "compiler_source",
+      "sha256": "dafd990d1b702eedb25c9c5c9a3fa9eab6a9f50a3efe4ca61743c9e45c8fe8f2"
+    }
+  ],
+  "generation_id": "evidence_qualification_gen_r5_bundle15r_4f6962ea1c57ac98",
+  "p2_allowed": false,
+  "release_authority": false,
+  "sample_quality_allowed": false,
+  "schema_version": "r5_bundle15r_qualification_suite_v1",
+  "suite_sha256": "0cba5a54b3b10da677a16b5865fb8cdf5e091fd2909ac72d9f54f0653ee81669",
+  "workflow_state_mutation_allowed": false
+}

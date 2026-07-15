@@ -1,0 +1,9 @@
+case_id: 603259_crdmo_backlog_funnel
+generation_lock_sha256: 80d673824269e8a65083e36694d4f64eaed0bd6380362cac9b25c8f6a1e0375f
+note: Automated generation cannot synthesize acceptance. A real reviewer must sign
+  the exact hashes.
+reader_report_sha256: 04ec8a53a023c3678dfdb7682901c5b229b7040c86af216930b0b4eea739f701
+reviewed_at: ''
+reviewer: ''
+schema_version: 1
+status: pending

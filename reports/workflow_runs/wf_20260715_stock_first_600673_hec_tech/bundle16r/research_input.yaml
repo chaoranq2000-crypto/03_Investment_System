@@ -1,0 +1,361 @@
+schema_version: r5_bundle16r_case_input_v1
+case_id: 600673_multi_business_ma
+ticker: "600673"
+issuer_name: 东阳光
+company_id: cn_600673_hec_tech
+workflow_id: wf_20260715_stock_first_600673_hec_tech
+as_of_date: "2026-07-15"
+generated_at: "2026-07-15T15:00:00+08:00"
+sources:
+  - evidence_id: ev_annual_report_600673_20260410_a8e2a1
+    source_class: official
+    source_type: annual_report
+    title: 2025年年度报告
+    source_path: data/raw/annual_reports/cninfo_2025_annual_report_600673_2026-04-10.pdf
+    processed_text_path: data/processed/text/ev_annual_report_600673_20260410_a8e2a1.md
+    file_hash: a8e2a13be86d3b3cad6dea2ac88b4ecc13e1057547c54621b6b81404f6fbfaad
+    page_count: 256
+    review_status: reviewed
+  - evidence_id: ev_quarterly_report_600673_20260428_34ed1a
+    source_class: official
+    source_type: quarterly_report
+    title: 2026年第一季度报告
+    source_path: data/raw/announcements/cninfo_2026_q1_report_600673_2026-04-28.pdf
+    processed_text_path: data/processed/text/ev_quarterly_report_600673_20260428_34ed1a.md
+    file_hash: 34ed1a7f95fbed5e96aebd8eeee4c15e2e98fdbdc82d0e21eb1bd913bce1e268
+    page_count: 12
+    review_status: reviewed
+  - evidence_id: ev_announcement_600673_20260616_da320e
+    source_class: official
+    source_type: transaction_draft
+    title: 发行股份及支付现金购买资产并募集配套资金暨关联交易报告书（草案）
+    source_path: data/raw/announcements/cninfo_ma_transaction_draft_600673_2026-06-16.pdf
+    processed_text_path: data/processed/text/ev_announcement_600673_20260616_da320e.md
+    file_hash: da320e145a27de95d0927e9342066c0e954673addcbf97c353ab37c7126116e4
+    page_count: 634
+    review_status: reviewed
+  - evidence_id: ev_announcement_600673_20260625_c5ca5c
+    source_class: official
+    source_type: related_party_contract
+    title: IDC服务采购暨关联交易公告
+    source_path: data/raw/announcements/cninfo_idc_service_contract_600673_2026-06-25.pdf
+    processed_text_path: data/processed/text/ev_announcement_600673_20260625_c5ca5c.md
+    file_hash: c5ca5c45f8316dc14999388789ce28f58b2642e752c375b9b87a8ea437a6ae2c
+    page_count: 4
+    review_status: reviewed
+  - evidence_id: ev_announcement_600673_20260711_54be9c
+    source_class: official
+    source_type: material_contract
+    title: 算力服务采购合同公告
+    source_path: data/raw/announcements/cninfo_compute_service_procurement_contract_600673_2026-07-11.pdf
+    processed_text_path: data/processed/text/ev_announcement_600673_20260711_54be9c.md
+    file_hash: 54be9c9a093fed9a6bd69377a21092e1c2ef4cd2cb907c0aff0aecacf1174f7f
+    page_count: 5
+    review_status: reviewed
+historical:
+  period: 2025A
+  unit: CNY
+  total_revenue: 14934605535.39
+  total_gross_profit: 2969811839.59
+  segments:
+    - segment_id: fluorochemicals
+      display_name: 化工新材料
+      material: true
+      revenue: 4059837302.27
+      cost: 2300679891.33
+      disclosure_boundary: 年报披露分部收入成本和制冷剂配额，未披露单一制冷剂完整损益。
+      driver_contract:
+        archetype_id: quota_volume_price_unit_cost
+        equation: 配额约束销量 × 实现价格 - 单位原料与制造成本
+        driver_topics: [refrigerant quota and price, unit cost, product mix]
+        source_evidence_ids: [ev_annual_report_600673_20260410_a8e2a1]
+    - segment_id: electronic_materials
+      display_name: 电子元器件
+      material: true
+      revenue: 3562655910.50
+      cost: 2776963417.12
+      disclosure_boundary: 年报披露分部收入成本，未披露全部产品线产能利用率和单品加工费。
+      driver_contract:
+        archetype_id: capacity_utilization_mix_processing_fee
+        equation: 有效产能 × 利用率 × 产品结构价格 - 制造成本
+        driver_topics: [electronic material capacity, capacity utilization, product mix]
+        source_evidence_ids: [ev_annual_report_600673_20260410_a8e2a1]
+    - segment_id: high_end_aluminum
+      display_name: 高端铝箔
+      material: false
+      revenue: 5920905657.53
+      cost: 5676855656.79
+      disclosure_boundary: 按年报分业务收入成本列示。
+      driver_contract:
+        archetype_id: volume_price_unit_cost
+        equation: 销量 × 售价 - 加工与原料成本
+        driver_topics: [volume, price, unit cost]
+        source_evidence_ids: [ev_annual_report_600673_20260410_a8e2a1]
+    - segment_id: energy_materials
+      display_name: 能源材料
+      material: false
+      revenue: 630575329.38
+      cost: 610464365.90
+      disclosure_boundary: 按年报分业务收入成本列示。
+      driver_contract:
+        archetype_id: volume_price_unit_cost
+        equation: 销量 × 售价 - 制造成本
+        driver_topics: [volume, price, unit cost]
+        source_evidence_ids: [ev_annual_report_600673_20260410_a8e2a1]
+    - segment_id: other_main_business
+      display_name: 其他主营业务
+      material: false
+      revenue: 159057452.43
+      cost: 110878076.64
+      disclosure_boundary: 按年报其他主营业务口径列示。
+      driver_contract:
+        archetype_id: volume_price_unit_cost
+        equation: 收入 - 成本
+        driver_topics: [revenue, cost]
+        source_evidence_ids: [ev_annual_report_600673_20260410_a8e2a1]
+    - segment_id: other_revenue
+      display_name: 其他业务及对账残差
+      material: false
+      revenue: 601573883.28
+      cost: 488952288.02
+      disclosure_boundary: 合并口径与主营分部合计之差，不作为独立经营分部解释。
+      driver_contract:
+        archetype_id: reconciliation_residual
+        equation: 合并口径 - 主营分部合计
+        driver_topics: [reconciliation]
+        source_evidence_ids: [ev_annual_report_600673_20260410_a8e2a1]
+    - segment_id: liquid_cooling
+      display_name: 液冷项目
+      material: true
+      revenue: 0
+      cost: 0
+      disclosure_boundary: 截至信息截止日，所用披露未提供可与历史合并收入对账的独立液冷收入和成本，保持零基数与MISSING_DISCLOSURE。
+      driver_contract:
+        archetype_id: project_unit_value_acceptance
+        equation: 已验收项目数量 × 可确认单位价值
+        driver_topics: [liquid-cooling project conversion, acceptance]
+        estimate_logic: 未验收与未披露的项目不确认收入。
+    - segment_id: idc_and_compute_infrastructure
+      display_name: IDC与算力基础设施
+      material: true
+      revenue: 0
+      cost: 0
+      disclosure_boundary: 合同披露的是采购成本或估计合同总额，不是历史收入，当前保持零基数。
+      driver_contract:
+        archetype_id: idc_capacity_utilization_unit_revenue_power_cost
+        equation: 验收并投运能力 × 利用率 × 单位收入 - 电力与服务采购成本
+        driver_topics: [IDC capacity and utilization, power cost, acceptance]
+        source_evidence_ids: [ev_announcement_600673_20260625_c5ca5c, ev_announcement_600673_20260711_54be9c]
+    - segment_id: acquisition_consolidation
+      display_name: 并购与并表影响
+      material: true
+      revenue: 0
+      cost: 0
+      disclosure_boundary: 交易尚需审议、审核、注册及可能的经营者集中程序，不在历史或预测基准中提前并表。
+      driver_contract:
+        archetype_id: deal_close_consolidation_financing_cost
+        equation: 交割概率 × 并表月份 × 标的可确认损益 - 融资成本
+        driver_topics: [deal closing and consolidation, financing cost]
+        source_evidence_ids: [ev_announcement_600673_20260616_da320e]
+company_metrics:
+  - {metric_id: metric_600673_revenue_2025, name: 营业收入, value: 14934605535.39, unit: CNY, period: 2025A, evidence_id: ev_annual_report_600673_20260410_a8e2a1, locator: "page:7"}
+  - {metric_id: metric_600673_gp_2025, name: 合并毛利, value: 2969811839.59, unit: CNY, period: 2025A, evidence_id: ev_annual_report_600673_20260410_a8e2a1, locator: "page:7,27"}
+  - {metric_id: metric_600673_fluoro_revenue_2025, name: 化工新材料收入, value: 4059837302.27, unit: CNY, period: 2025A, evidence_id: ev_annual_report_600673_20260410_a8e2a1, locator: "page:27"}
+  - {metric_id: metric_600673_fluoro_margin_2025, name: 化工新材料毛利率, value: 43.33, unit: percent, period: 2025A, evidence_id: ev_annual_report_600673_20260410_a8e2a1, locator: "page:27"}
+  - {metric_id: metric_600673_electronic_revenue_2025, name: 电子元器件收入, value: 3562655910.50, unit: CNY, period: 2025A, evidence_id: ev_annual_report_600673_20260410_a8e2a1, locator: "page:27"}
+  - {metric_id: metric_600673_aluminum_revenue_2025, name: 高端铝箔收入, value: 5920905657.53, unit: CNY, period: 2025A, evidence_id: ev_annual_report_600673_20260410_a8e2a1, locator: "page:27"}
+  - {metric_id: metric_600673_refrigerant_quota_2026, name: 第三代制冷剂配额, value: 60000, unit: tonne_approx, period: 2026E_quota, evidence_id: ev_annual_report_600673_20260410_a8e2a1, locator: "page:12"}
+  - {metric_id: metric_600673_q1_revenue_2026, name: 一季度营业收入, value: 4248632543.63, unit: CNY, period: 2026Q1, evidence_id: ev_quarterly_report_600673_20260428_34ed1a, locator: "page:3"}
+  - {metric_id: metric_600673_q1_np_2026, name: 一季度归母净利润, value: 119276129.55, unit: CNY, period: 2026Q1, evidence_id: ev_quarterly_report_600673_20260428_34ed1a, locator: "page:3"}
+  - {metric_id: metric_600673_q1_ocf_2026, name: 一季度经营现金流, value: 164217679.13, unit: CNY, period: 2026Q1, evidence_id: ev_quarterly_report_600673_20260428_34ed1a, locator: "page:3"}
+  - {metric_id: metric_600673_ma_value_2026, name: 并购交易作价, value: 8050200000, unit: CNY, period: transaction_draft_2026, evidence_id: ev_announcement_600673_20260616_da320e, locator: "page:16"}
+  - {metric_id: metric_600673_idc_cost_ceiling_2026, name: 十二个月IDC服务预计采购上限, value: 200000000, unit: CNY, period: contract_estimate_12m, evidence_id: ev_announcement_600673_20260625_c5ca5c, locator: "page:1,3"}
+  - {metric_id: metric_600673_compute_contract_low_2026, name: 算力服务合同预计总额下限, value: 13000000000, unit: CNY, period: contract_estimate_60m, evidence_id: ev_announcement_600673_20260711_54be9c, locator: "page:1"}
+  - {metric_id: metric_600673_compute_contract_high_2026, name: 算力服务合同预计总额上限, value: 15000000000, unit: CNY, period: contract_estimate_60m, evidence_id: ev_announcement_600673_20260711_54be9c, locator: "page:1"}
+claims:
+  - claim_id: claim_600673_mix
+    claim_type: fact
+    text: 2025年高端铝箔收入规模最大，但化工新材料毛利率显著更高，收入规模与利润贡献不能混同。
+    evidence_ids: [ev_annual_report_600673_20260410_a8e2a1]
+    locator: "page:27"
+    counterevidence: 分业务毛利率仍未揭示单品、客户和产线差异。
+  - claim_id: claim_600673_quota
+    claim_type: management_comment
+    text: 年报披露公司2026年第三代制冷剂配额约6万吨，实际销量、价格和盈利仍需后续验证。
+    evidence_ids: [ev_annual_report_600673_20260410_a8e2a1]
+    locator: "page:12"
+    counterevidence: 配额不等于销量，价格和成本变化也会改变利润。
+  - claim_id: claim_600673_ma_pending
+    claim_type: fact
+    text: 交易草案列示作价80.502亿元及拟实现间接持有目标公司100%股权，但交易仍需股东会、交易所审核、注册及可能的反垄断程序。
+    evidence_ids: [ev_announcement_600673_20260616_da320e]
+    locator: "page:16,25"
+    counterevidence: 审批、交割、融资安排和最终并表时点均存在不确定性。
+  - claim_id: claim_600673_idc_cost
+    claim_type: fact
+    text: IDC关联采购公告预计十二个月采购费用不超过2亿元，该金额属于成本上限而非收入。
+    evidence_ids: [ev_announcement_600673_20260625_c5ca5c]
+    locator: "page:1,3"
+    counterevidence: 实际费用取决于机柜、电量、投运和结算，关联交易还需持续检查公允性。
+  - claim_id: claim_600673_compute_contract
+    claim_type: fact
+    text: 算力服务采购合同预计总额130亿至150亿元、期限为验收交付后60个月，最终以实际结算为准，公告明确不构成业绩承诺或盈利预测。
+    evidence_ids: [ev_announcement_600673_20260711_54be9c]
+    locator: "page:1,3"
+    counterevidence: 交付验收、融资、利用率、客户回款和采购成本均可能影响实际履行。
+research_questions:
+  - {question_id: rq_600673_reconcile, severity: critical, status: resolved, resolution: 2025年主营业务与其他业务已对账至合并收入和毛利}
+  - {question_id: rq_600673_new_business, severity: major, status: open, owner: future_refresh, next_step: 获取液冷、IDC与算力业务验收、投运、利用率、收入及成本证据}
+  - {question_id: rq_600673_ma_close, severity: major, status: open, owner: future_refresh, next_step: 跟踪审议审核注册交割及融资安排}
+evidence_integrity_incidents:
+  - incident_id: incident_600673_sse_challenge
+    status: rejected_and_superseded
+    detail: 首次SSE下载返回反爬HTML而非PDF，已拒绝并由CNINFO同一披露替代，不用于任何主张。
+    rejected_evidence_ids: [ev_annual_report_600673_20260410_3c9f5e, ev_quarterly_report_600673_20260428_0f2301]
+forecast:
+  periods: [2026E, 2027E, 2028E]
+  scenarios: [bear, base, bull]
+  assumptions:
+    - assumption_id: assumption_600673_fluoro
+      evidence_ids: [ev_annual_report_600673_20260410_a8e2a1]
+      locator: "page:12,27"
+      estimate_logic: 以分部历史收入毛利和制冷剂配额设置量价成本三情景，不把配额等同销量。
+    - assumption_id: assumption_600673_electronics
+      evidence_ids: [ev_annual_report_600673_20260410_a8e2a1]
+      locator: "page:27"
+      estimate_logic: 以2025年分部毛利为基准设置利用率和产品结构敏感性。
+    - assumption_id: assumption_600673_new_projects
+      evidence_ids: [ev_announcement_600673_20260625_c5ca5c, ev_announcement_600673_20260711_54be9c]
+      locator: "IDC page:1,3; compute page:1,3"
+      estimate_logic: 在正式验收、投运和收入披露前，液冷、IDC与算力业务收入保持零，不以合同总额替代收入。
+    - assumption_id: assumption_600673_ma
+      evidence_ids: [ev_announcement_600673_20260616_da320e]
+      locator: "page:16,25"
+      estimate_logic: 审批交割未完成前所有情景均不提前并表，只保留事件触发器。
+    - assumption_id: assumption_600673_other_business
+      estimate_logic: 高端铝箔、能源材料及其他业务按历史分部毛利设置温和情景，不引入未披露扩产。
+  segments:
+    - segment_id: fluorochemicals
+      base_revenue: 4059837302.27
+      growth_rates: {bear: [-0.08, -0.05, 0.00], base: [0.10, 0.08, 0.05], bull: [0.22, 0.15, 0.10]}
+      gross_margins: {bear: [0.30, 0.28, 0.28], base: [0.43, 0.42, 0.40], bull: [0.52, 0.50, 0.47]}
+    - segment_id: electronic_materials
+      base_revenue: 3562655910.50
+      growth_rates: {bear: [-0.05, 0.00, 0.02], base: [0.05, 0.06, 0.06], bull: [0.12, 0.10, 0.08]}
+      gross_margins: {bear: [0.18, 0.17, 0.17], base: [0.22, 0.23, 0.23], bull: [0.26, 0.27, 0.27]}
+    - segment_id: high_end_aluminum
+      base_revenue: 5920905657.53
+      growth_rates: {bear: [-0.08, -0.03, 0.00], base: [0.02, 0.03, 0.03], bull: [0.07, 0.06, 0.05]}
+      gross_margins: {bear: [0.02, 0.02, 0.02], base: [0.041, 0.042, 0.043], bull: [0.06, 0.065, 0.07]}
+    - segment_id: energy_materials
+      base_revenue: 630575329.38
+      growth_rates: {bear: [-0.10, -0.05, 0.00], base: [0.02, 0.03, 0.03], bull: [0.08, 0.06, 0.05]}
+      gross_margins: {bear: [-0.02, 0.00, 0.01], base: [0.032, 0.04, 0.045], bull: [0.07, 0.08, 0.08]}
+    - segment_id: other_main_business
+      base_revenue: 159057452.43
+      growth_rates: {bear: [0.00, 0.00, 0.00], base: [0.02, 0.02, 0.02], bull: [0.04, 0.04, 0.04]}
+      gross_margins: {bear: [0.20, 0.20, 0.20], base: [0.30, 0.30, 0.30], bull: [0.35, 0.35, 0.35]}
+    - segment_id: other_revenue
+      base_revenue: 601573883.28
+      growth_rates: {bear: [0.00, 0.00, 0.00], base: [0.00, 0.00, 0.00], bull: [0.00, 0.00, 0.00]}
+      gross_margins: {bear: [0.12, 0.12, 0.12], base: [0.187, 0.187, 0.187], bull: [0.22, 0.22, 0.22]}
+    - segment_id: liquid_cooling
+      base_revenue: 0
+      revenue_values: {bear: [0, 0, 0], base: [0, 0, 0], bull: [0, 0, 0]}
+      gross_margins: {bear: [0, 0, 0], base: [0, 0, 0], bull: [0, 0, 0]}
+    - segment_id: idc_and_compute_infrastructure
+      base_revenue: 0
+      revenue_values: {bear: [0, 0, 0], base: [0, 0, 0], bull: [0, 0, 0]}
+      gross_margins: {bear: [0, 0, 0], base: [0, 0, 0], bull: [0, 0, 0]}
+    - segment_id: acquisition_consolidation
+      base_revenue: 0
+      revenue_values: {bear: [0, 0, 0], base: [0, 0, 0], bull: [0, 0, 0]}
+      gross_margins: {bear: [0, 0, 0], base: [0, 0, 0], bull: [0, 0, 0]}
+  future_events:
+    - event_id: event_600673_interim_segments
+      expected_window: 2026H1_report
+      verification_metric: 分业务收入成本毛利、制冷剂销量价格及新业务确认收入
+      model_links: [fluorochemicals, electronic_materials, assumption_600673_new_projects]
+    - event_id: event_600673_compute_acceptance
+      expected_window: contract_delivery_and_acceptance
+      verification_metric: 交付验收量、投运时间、利用率、采购成本、确认收入与现金回款
+      model_links: [idc_and_compute_infrastructure, liquid_cooling, assumption_600673_new_projects]
+    - event_id: event_600673_ma_approval
+      expected_window: regulatory_and_closing_updates
+      verification_metric: 股东会、交易所审核、注册、反垄断、交割、融资成本与并表日
+      model_links: [acquisition_consolidation, assumption_600673_ma]
+valuation:
+  peer_multiple_used: false
+  qualified_peers: []
+  alternative_method: scenario_valuation
+  eligibility: {status: context_only, reason: 多业务口径、未验收项目和未完成并购使未经校准同业倍数不可用}
+  limitations: [不输出目标价或评级, 合同金额不是收入, 未交割交易不提前并表, 新业务分部经济性保持缺失]
+reader:
+  sections:
+    - section_id: existing_mix
+      title: 存量业务结构
+      judgment: 高端铝箔收入规模较大但毛利率较低，化工新材料是更重要的毛利来源，电子材料提供第二条利润主线。
+      paragraphs:
+        - text: 2025年分业务收入成本与合并口径完成对账，新项目没有被塞入历史分部。
+          refs: [metric_600673_revenue_2025, metric_600673_fluoro_revenue_2025, metric_600673_fluoro_margin_2025, metric_600673_electronic_revenue_2025, metric_600673_aluminum_revenue_2025, claim_600673_mix]
+      model_links: [fluorochemicals, electronic_materials, high_end_aluminum]
+    - section_id: fluorochemicals
+      title: 制冷剂量价成本方程
+      judgment: 制冷剂配额约束供给，但配额、销量、实现价格和单位成本必须逐层区分。
+      paragraphs:
+        - text: 约6万吨配额只作为经营约束，不直接写成销量或利润。
+          refs: [metric_600673_refrigerant_quota_2026, claim_600673_quota, assumption_600673_fluoro]
+      model_links: [fluorochemicals]
+    - section_id: electronics
+      title: 电子材料利用率与结构
+      judgment: 电子元器件业务的关键是有效产能、利用率和产品结构，年报分部毛利只能作为合并起点。
+      paragraphs:
+        - text: 未披露产品线级利用率时，模型仅做分部级敏感性，不制造单品经济性。
+          refs: [metric_600673_electronic_revenue_2025, electronic_materials, assumption_600673_electronics]
+      model_links: [electronic_materials]
+    - section_id: q1
+      title: 一季度经营更新
+      judgment: 2026年一季度收入、利润和经营现金流均有披露，但单季总量无法解释各业务的变化来源。
+      paragraphs:
+        - text: 半年报需要恢复分部桥，检查化工、电子材料和铝箔的量价成本贡献。
+          refs: [metric_600673_q1_revenue_2026, metric_600673_q1_np_2026, metric_600673_q1_ocf_2026, event_600673_interim_segments]
+      model_links: [fluorochemicals, electronic_materials]
+    - section_id: projects
+      title: 液冷与算力项目边界
+      judgment: IDC采购上限和算力服务合同总额均是合同条件，不是已确认收入；交付、验收、投运和结算才是模型入口。
+      paragraphs:
+        - text: 在缺少验收和收入成本披露前，液冷及算力相关分部在预测中保持零收入。
+          refs: [metric_600673_idc_cost_ceiling_2026, metric_600673_compute_contract_low_2026, metric_600673_compute_contract_high_2026, claim_600673_idc_cost, claim_600673_compute_contract]
+      model_links: [liquid_cooling, idc_and_compute_infrastructure, assumption_600673_new_projects]
+    - section_id: ma
+      title: 并购交割漏斗
+      judgment: 交易作价与拟取得股权是草案条款，审批、注册、交割、融资及并表时点尚未完成。
+      paragraphs:
+        - text: 所有预测情景都不提前并表，只有事件触发后才能增加合并口径。
+          refs: [metric_600673_ma_value_2026, claim_600673_ma_pending, event_600673_ma_approval]
+      model_links: [acquisition_consolidation, assumption_600673_ma]
+    - section_id: scenarios
+      title: 分层情景预测
+      judgment: 存量业务使用量价成本敏感性，新项目使用零基数事件门，并购使用交割门，三类路径不相互替代。
+      paragraphs:
+        - text: 这种处理牺牲表面增长数字，却避免把合同金额和交易草案当成经营事实。
+          refs: [assumption_600673_fluoro, assumption_600673_electronics, assumption_600673_new_projects, assumption_600673_ma]
+      model_links: [fluorochemicals, electronic_materials, liquid_cooling, idc_and_compute_infrastructure, acquisition_consolidation]
+    - section_id: risks
+      title: 风险与证伪条件
+      judgment: 制冷剂价格回落、电子材料利用率下降、项目验收或回款延迟、IDC电力成本上升、并购审批失败与融资成本超预期均可能压低情景结果。
+      paragraphs:
+        - text: 若后续披露仍无法形成新业务收入成本桥，应继续保留缺失状态而非用合同总额填补。
+          refs: [claim_600673_compute_contract, claim_600673_ma_pending, event_600673_compute_acceptance, event_600673_ma_approval]
+      model_links: [idc_and_compute_infrastructure, acquisition_consolidation]
+truthfulness:
+  sample_text_used_as_evidence: false
+  management_guidance_recast_as_fact: false
+  low_confidence_peer_ranked: false
+  direct_trading_instruction_present: false
+  past_event_presented_as_future: false
+  undisclosed_segment_economics_presented_as_fact: false
+  consensus_estimate_presented_as_issuer_fact: false
+backflow_tasks:
+  - {owner: future_refresh, severity: major, next_step: 半年报后更新存量分部量价成本和新业务确认口径}
+  - {owner: future_refresh, severity: major, next_step: 每次交易进展公告后更新审批交割融资与并表状态}

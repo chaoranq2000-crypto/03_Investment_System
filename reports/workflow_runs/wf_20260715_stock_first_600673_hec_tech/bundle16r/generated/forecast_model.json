@@ -1,0 +1,778 @@
+{
+  "artifact_type": "r5_bundle16r_forecast_model",
+  "assumption_traceability": 1.0,
+  "assumptions": [
+    {
+      "assumption_id": "assumption_600673_fluoro",
+      "estimate_logic": "以分部历史收入毛利和制冷剂配额设置量价成本三情景，不把配额等同销量。",
+      "evidence_ids": [
+        "ev_annual_report_600673_20260410_a8e2a1"
+      ],
+      "locator": "page:12,27"
+    },
+    {
+      "assumption_id": "assumption_600673_electronics",
+      "estimate_logic": "以2025年分部毛利为基准设置利用率和产品结构敏感性。",
+      "evidence_ids": [
+        "ev_annual_report_600673_20260410_a8e2a1"
+      ],
+      "locator": "page:27"
+    },
+    {
+      "assumption_id": "assumption_600673_new_projects",
+      "estimate_logic": "在正式验收、投运和收入披露前，液冷、IDC与算力业务收入保持零，不以合同总额替代收入。",
+      "evidence_ids": [
+        "ev_announcement_600673_20260625_c5ca5c",
+        "ev_announcement_600673_20260711_54be9c"
+      ],
+      "locator": "IDC page:1,3; compute page:1,3"
+    },
+    {
+      "assumption_id": "assumption_600673_ma",
+      "estimate_logic": "审批交割未完成前所有情景均不提前并表，只保留事件触发器。",
+      "evidence_ids": [
+        "ev_announcement_600673_20260616_da320e"
+      ],
+      "locator": "page:16,25"
+    },
+    {
+      "assumption_id": "assumption_600673_other_business",
+      "estimate_logic": "高端铝箔、能源材料及其他业务按历史分部毛利设置温和情景，不引入未披露扩产。"
+    }
+  ],
+  "forecast_classification": "estimate",
+  "future_event_model_link_count": 3,
+  "future_events": [
+    {
+      "event_id": "event_600673_interim_segments",
+      "expected_window": "2026H1_report",
+      "model_links": [
+        "fluorochemicals",
+        "electronic_materials",
+        "assumption_600673_new_projects"
+      ],
+      "verification_metric": "分业务收入成本毛利、制冷剂销量价格及新业务确认收入"
+    },
+    {
+      "event_id": "event_600673_compute_acceptance",
+      "expected_window": "contract_delivery_and_acceptance",
+      "model_links": [
+        "idc_and_compute_infrastructure",
+        "liquid_cooling",
+        "assumption_600673_new_projects"
+      ],
+      "verification_metric": "交付验收量、投运时间、利用率、采购成本、确认收入与现金回款"
+    },
+    {
+      "event_id": "event_600673_ma_approval",
+      "expected_window": "regulatory_and_closing_updates",
+      "model_links": [
+        "acquisition_consolidation",
+        "assumption_600673_ma"
+      ],
+      "verification_metric": "股东会、交易所审核、注册、反垄断、交割、融资成本与并表日"
+    }
+  ],
+  "management_guidance_is_not_fact": true,
+  "periods": [
+    "2026E",
+    "2027E",
+    "2028E"
+  ],
+  "scenarios": {
+    "base": {
+      "consolidated": [
+        {
+          "gross_margin": 0.20268641,
+          "gross_profit": 3172636709.265018,
+          "period": "2026E",
+          "revenue": 15652932829.928802
+        },
+        {
+          "gross_margin": 0.20607891,
+          "gross_profit": 3387600479.056854,
+          "period": "2027E",
+          "revenue": 16438365925.119078
+        },
+        {
+          "gross_margin": 0.20212052,
+          "gross_profit": 3461765352.968187,
+          "period": "2028E",
+          "revenue": 17127233667.792704
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.43,
+              "gross_profit": 1920303043.97371,
+              "period": "2026E",
+              "revenue": 4465821032.497001
+            },
+            {
+              "gross_margin": 0.42,
+              "gross_profit": 2025696420.340639,
+              "period": "2027E",
+              "revenue": 4823086715.096761
+            },
+            {
+              "gross_margin": 0.4,
+              "gross_profit": 2025696420.34064,
+              "period": "2028E",
+              "revenue": 5064241050.851599
+            }
+          ],
+          "segment_id": "fluorochemicals"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.22,
+              "gross_profit": 822973515.3255,
+              "period": "2026E",
+              "revenue": 3740788706.025
+            },
+            {
+              "gross_margin": 0.23,
+              "gross_profit": 912004286.528895,
+              "period": "2027E",
+              "revenue": 3965236028.3865
+            },
+            {
+              "gross_margin": 0.23,
+              "gross_profit": 966724543.720629,
+              "period": "2028E",
+              "revenue": 4203150190.089691
+            }
+          ],
+          "segment_id": "electronic_materials"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.041,
+              "gross_profit": 247612274.597905,
+              "period": "2026E",
+              "revenue": 6039323770.6806
+            },
+            {
+              "gross_margin": 0.042,
+              "gross_profit": 261261146.319643,
+              "period": "2027E",
+              "revenue": 6220503483.801019
+            },
+            {
+              "gross_margin": 0.043,
+              "gross_profit": 275506099.297547,
+              "period": "2028E",
+              "revenue": 6407118588.315049
+            }
+          ],
+          "segment_id": "high_end_aluminum"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.032,
+              "gross_profit": 20581978.750963,
+              "period": "2026E",
+              "revenue": 643186835.9676
+            },
+            {
+              "gross_margin": 0.04,
+              "gross_profit": 26499297.641865,
+              "period": "2027E",
+              "revenue": 662482441.046628
+            },
+            {
+              "gross_margin": 0.045,
+              "gross_profit": 30706061.142511,
+              "period": "2028E",
+              "revenue": 682356914.278027
+            }
+          ],
+          "segment_id": "energy_materials"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.3,
+              "gross_profit": 48671580.44358,
+              "period": "2026E",
+              "revenue": 162238601.4786
+            },
+            {
+              "gross_margin": 0.3,
+              "gross_profit": 49645012.052452,
+              "period": "2027E",
+              "revenue": 165483373.508172
+            },
+            {
+              "gross_margin": 0.3,
+              "gross_profit": 50637912.293501,
+              "period": "2028E",
+              "revenue": 168793040.978335
+            }
+          ],
+          "segment_id": "other_main_business"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.187,
+              "gross_profit": 112494316.17336,
+              "period": "2026E",
+              "revenue": 601573883.28
+            },
+            {
+              "gross_margin": 0.187,
+              "gross_profit": 112494316.17336,
+              "period": "2027E",
+              "revenue": 601573883.28
+            },
+            {
+              "gross_margin": 0.187,
+              "gross_profit": 112494316.17336,
+              "period": "2028E",
+              "revenue": 601573883.28
+            }
+          ],
+          "segment_id": "other_revenue"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "liquid_cooling"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "idc_and_compute_infrastructure"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "acquisition_consolidation"
+        }
+      ]
+    },
+    "bear": {
+      "consolidated": [
+        {
+          "gross_margin": 0.13899461,
+          "gross_profit": 1931323920.771332,
+          "period": "2026E",
+          "revenue": 13894955770.143002
+        },
+        {
+          "gross_margin": 0.1315859,
+          "gross_profit": 1778568994.81246,
+          "period": "2027E",
+          "revenue": 13516410368.268652
+        },
+        {
+          "gross_margin": 0.13217421,
+          "gross_profit": 1795467792.469574,
+          "period": "2028E",
+          "revenue": 13584100830.568151
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.3,
+              "gross_profit": 1120515095.42652,
+              "period": "2026E",
+              "revenue": 3735050318.0884
+            },
+            {
+              "gross_margin": 0.28,
+              "gross_profit": 993523384.611514,
+              "period": "2027E",
+              "revenue": 3548297802.18398
+            },
+            {
+              "gross_margin": 0.28,
+              "gross_profit": 993523384.611514,
+              "period": "2028E",
+              "revenue": 3548297802.18398
+            }
+          ],
+          "segment_id": "fluorochemicals"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.18,
+              "gross_profit": 609214160.6955,
+              "period": "2026E",
+              "revenue": 3384523114.975
+            },
+            {
+              "gross_margin": 0.17,
+              "gross_profit": 575368929.54575,
+              "period": "2027E",
+              "revenue": 3384523114.975
+            },
+            {
+              "gross_margin": 0.17,
+              "gross_profit": 586876308.136665,
+              "period": "2028E",
+              "revenue": 3452213577.2745
+            }
+          ],
+          "segment_id": "electronic_materials"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.02,
+              "gross_profit": 108944664.098552,
+              "period": "2026E",
+              "revenue": 5447233204.9276
+            },
+            {
+              "gross_margin": 0.02,
+              "gross_profit": 105676324.175595,
+              "period": "2027E",
+              "revenue": 5283816208.779772
+            },
+            {
+              "gross_margin": 0.02,
+              "gross_profit": 105676324.175595,
+              "period": "2028E",
+              "revenue": 5283816208.779772
+            }
+          ],
+          "segment_id": "high_end_aluminum"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": -0.02,
+              "gross_profit": -11350355.92884,
+              "period": "2026E",
+              "revenue": 567517796.442
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 539141906.6199
+            },
+            {
+              "gross_margin": 0.01,
+              "gross_profit": 5391419.066199,
+              "period": "2028E",
+              "revenue": 539141906.6199
+            }
+          ],
+          "segment_id": "energy_materials"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.2,
+              "gross_profit": 31811490.486,
+              "period": "2026E",
+              "revenue": 159057452.43
+            },
+            {
+              "gross_margin": 0.2,
+              "gross_profit": 31811490.486,
+              "period": "2027E",
+              "revenue": 159057452.43
+            },
+            {
+              "gross_margin": 0.2,
+              "gross_profit": 31811490.486,
+              "period": "2028E",
+              "revenue": 159057452.43
+            }
+          ],
+          "segment_id": "other_main_business"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.12,
+              "gross_profit": 72188865.9936,
+              "period": "2026E",
+              "revenue": 601573883.28
+            },
+            {
+              "gross_margin": 0.12,
+              "gross_profit": 72188865.9936,
+              "period": "2027E",
+              "revenue": 601573883.28
+            },
+            {
+              "gross_margin": 0.12,
+              "gross_profit": 72188865.9936,
+              "period": "2028E",
+              "revenue": 601573883.28
+            }
+          ],
+          "segment_id": "other_revenue"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "liquid_cooling"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "idc_and_compute_infrastructure"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "acquisition_consolidation"
+        }
+      ]
+    },
+    "bull": {
+      "consolidated": [
+        {
+          "gross_margin": 0.25295356,
+          "gross_profit": 4231042990.818361,
+          "period": "2026E",
+          "revenue": 16726560171.624102
+        },
+        {
+          "gross_margin": 0.25797121,
+          "gross_profit": 4719874311.880648,
+          "period": "2027E",
+          "revenue": 18296128074.493847
+        },
+        {
+          "gross_margin": 0.25382675,
+          "gross_profit": 4973889757.63111,
+          "period": "2028E",
+          "revenue": 19595608767.85538
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.52,
+              "gross_profit": 2575560784.560088,
+              "period": "2026E",
+              "revenue": 4953001508.7694
+            },
+            {
+              "gross_margin": 0.5,
+              "gross_profit": 2847975867.542405,
+              "period": "2027E",
+              "revenue": 5695951735.084809
+            },
+            {
+              "gross_margin": 0.47,
+              "gross_profit": 2944807047.038846,
+              "period": "2028E",
+              "revenue": 6265546908.59329
+            }
+          ],
+          "segment_id": "fluorochemicals"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.26,
+              "gross_profit": 1037445401.1376,
+              "period": "2026E",
+              "revenue": 3990174619.76
+            },
+            {
+              "gross_margin": 0.27,
+              "gross_profit": 1185081862.06872,
+              "period": "2027E",
+              "revenue": 4389192081.736001
+            },
+            {
+              "gross_margin": 0.27,
+              "gross_profit": 1279888411.034218,
+              "period": "2028E",
+              "revenue": 4740327448.274881
+            }
+          ],
+          "segment_id": "electronic_materials"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.06,
+              "gross_profit": 380122143.213426,
+              "period": "2026E",
+              "revenue": 6335369053.5571
+            },
+            {
+              "gross_margin": 0.065,
+              "gross_profit": 436506927.790084,
+              "period": "2027E",
+              "revenue": 6715491196.770527
+            },
+            {
+              "gross_margin": 0.07,
+              "gross_profit": 493588602.962634,
+              "period": "2028E",
+              "revenue": 7051265756.609054
+            }
+          ],
+          "segment_id": "high_end_aluminum"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.07,
+              "gross_profit": 47671494.901128,
+              "period": "2026E",
+              "revenue": 681021355.7304
+            },
+            {
+              "gross_margin": 0.08,
+              "gross_profit": 57750610.965938,
+              "period": "2027E",
+              "revenue": 721882637.074224
+            },
+            {
+              "gross_margin": 0.08,
+              "gross_profit": 60638141.514235,
+              "period": "2028E",
+              "revenue": 757976768.927935
+            }
+          ],
+          "segment_id": "energy_materials"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.35,
+              "gross_profit": 57896912.68452,
+              "period": "2026E",
+              "revenue": 165419750.5272
+            },
+            {
+              "gross_margin": 0.35,
+              "gross_profit": 60212789.191901,
+              "period": "2027E",
+              "revenue": 172036540.548288
+            },
+            {
+              "gross_margin": 0.35,
+              "gross_profit": 62621300.759577,
+              "period": "2028E",
+              "revenue": 178918002.17022
+            }
+          ],
+          "segment_id": "other_main_business"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.22,
+              "gross_profit": 132346254.3216,
+              "period": "2026E",
+              "revenue": 601573883.28
+            },
+            {
+              "gross_margin": 0.22,
+              "gross_profit": 132346254.3216,
+              "period": "2027E",
+              "revenue": 601573883.28
+            },
+            {
+              "gross_margin": 0.22,
+              "gross_profit": 132346254.3216,
+              "period": "2028E",
+              "revenue": 601573883.28
+            }
+          ],
+          "segment_id": "other_revenue"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "liquid_cooling"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "idc_and_compute_infrastructure"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2026E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 0.0
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2028E",
+              "revenue": 0.0
+            }
+          ],
+          "segment_id": "acquisition_consolidation"
+        }
+      ]
+    }
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,82 @@
+{
+  "artifact_type": "r5_bundle16r_valuation_pack",
+  "eligibility": {
+    "reason": "订单口径、业务组合和监管暴露差异使未经校准的同业倍数不可用",
+    "status": "context_only"
+  },
+  "limitations": [
+    "不输出目标价或评级",
+    "在手订单不等于无条件收入",
+    "管理层目标不当作事实"
+  ],
+  "method": "scenario_valuation",
+  "no_advice_boundary": true,
+  "peer_multiple_used": false,
+  "position_instruction": null,
+  "price_target": null,
+  "qualified_peers": [],
+  "rating": null,
+  "scenario_operating_context": {
+    "base": [
+      {
+        "gross_margin": 0.49282666,
+        "gross_profit": 25164587926.800003,
+        "period": "2026E",
+        "revenue": 51061741920.0
+      },
+      {
+        "gross_margin": 0.49408382,
+        "gross_profit": 28039744510.344006,
+        "period": "2027E",
+        "revenue": 56750987412.00001
+      },
+      {
+        "gross_margin": 0.48754366,
+        "gross_profit": 30284481568.944965,
+        "period": "2028E",
+        "revenue": 62116450586.06402
+      }
+    ],
+    "bear": [
+      {
+        "gross_margin": 0.45240436,
+        "gross_profit": 21230571569.760002,
+        "period": "2026E",
+        "revenue": 46928308854.0
+      },
+      {
+        "gross_margin": 0.44329937,
+        "gross_profit": 21930627964.7364,
+        "period": "2027E",
+        "revenue": 49471372294.68
+      },
+      {
+        "gross_margin": 0.43511988,
+        "gross_profit": 22541775708.444557,
+        "period": "2028E",
+        "revenue": 51805897013.22841
+      }
+    ],
+    "bull": [
+      {
+        "gross_margin": 0.52448051,
+        "gross_profit": 28302069617.25,
+        "period": "2026E",
+        "revenue": 53962100043.0
+      },
+      {
+        "gross_margin": 0.53616922,
+        "gross_profit": 33771548701.6464,
+        "period": "2027E",
+        "revenue": 62986735347.54
+      },
+      {
+        "gross_margin": 0.5285281,
+        "gross_profit": 37686451941.02647,
+        "period": "2028E",
+        "revenue": 71304537265.20361
+      }
+    ]
+  },
+  "schema_version": 1
+}

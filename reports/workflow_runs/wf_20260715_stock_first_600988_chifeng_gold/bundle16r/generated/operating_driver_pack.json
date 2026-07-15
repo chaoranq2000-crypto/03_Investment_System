@@ -1,0 +1,118 @@
+{
+  "artifact_type": "r5_bundle16r_operating_driver_pack",
+  "coverage_metrics": {
+    "gross_profit_explained_ratio": 1.0,
+    "material_segment_driver_coverage": 1.0,
+    "residual_gross_profit_ratio": 0.0,
+    "residual_revenue_ratio": 0.0,
+    "revenue_explained_ratio": 1.0
+  },
+  "decision": "pass",
+  "period": "2025A",
+  "reconciliation": {
+    "gross_profit_difference": 0.0,
+    "revenue_difference": 2e-06,
+    "segment_gross_profit_sum": 6630097539.5,
+    "segment_revenue_sum": 12638506229.119999
+  },
+  "schema_version": 1,
+  "segments": [
+    {
+      "cost": 4704089809.87,
+      "disclosure_boundary": "年报披露黄金收入、成本、产销量、单位成本和AISC，但矿山级完整损益并未全部列示。",
+      "display_name": "黄金产品",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "commodity_price_volume_recovery_unit_cost",
+        "driver_topics": [
+          "gold price",
+          "production volume",
+          "grade or recovery rate",
+          "unit cost",
+          "stripping ratio"
+        ],
+        "equation": "黄金销量 × 实现价格 - 销量 × 单位成本",
+        "source_evidence_ids": [
+          "ev_annual_report_600988_20260321_d53382",
+          "ev_quarterly_report_600988_20260425_4201ae"
+        ]
+      },
+      "gross_margin": 0.58513767,
+      "gross_profit": 6634827803.29,
+      "material": true,
+      "revenue": 11338917613.16,
+      "segment_id": "gold_mining"
+    },
+    {
+      "cost": 1054841316.13,
+      "disclosure_boundary": "将电解铜、铜精粉、铅、锌、钼和稀土收入成本合并对账，不推断单矿盈利。",
+      "display_name": "铜及多金属产品",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "mine_capacity_grade_recovery",
+        "driver_topics": [
+          "production volume",
+          "grade or recovery rate",
+          "unit cost",
+          "capital expenditure"
+        ],
+        "equation": "各金属销量 × 实现价格 - 开采与选冶成本",
+        "source_evidence_ids": [
+          "ev_annual_report_600988_20260321_d53382"
+        ]
+      },
+      "gross_margin": 0.01723886,
+      "gross_profit": 18503236.34,
+      "material": true,
+      "revenue": 1073344552.47,
+      "segment_id": "copper_and_polymetallic"
+    },
+    {
+      "cost": 237826778.05,
+      "disclosure_boundary": "按年报分产品口径记录。",
+      "display_name": "资源综合回收利用",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "volume_price_unit_cost",
+        "driver_topics": [
+          "volume",
+          "price",
+          "unit cost"
+        ],
+        "equation": "回收产品销量 × 售价 - 回收处理成本",
+        "source_evidence_ids": [
+          "ev_annual_report_600988_20260321_d53382"
+        ]
+      },
+      "gross_margin": -0.12905599,
+      "gross_profit": -27184630.38,
+      "material": false,
+      "revenue": 210642147.67,
+      "segment_id": "resource_recovery"
+    },
+    {
+      "cost": 11650785.57,
+      "disclosure_boundary": "合并口径与列示分产品合计的对账差额。",
+      "display_name": "其他业务及对账残差",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "reconciliation_residual",
+        "driver_topics": [
+          "reconciliation"
+        ],
+        "equation": "合并口径 - 已披露产品合计",
+        "source_evidence_ids": [
+          "ev_annual_report_600988_20260321_d53382"
+        ]
+      },
+      "gross_margin": 0.25324648,
+      "gross_profit": 3951130.25,
+      "material": false,
+      "revenue": 15601915.82,
+      "segment_id": "other_revenue"
+    }
+  ],
+  "total_gross_profit": 6630097539.5,
+  "total_revenue": 12638506229.12,
+  "unit": "CNY"
+}

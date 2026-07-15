@@ -1,0 +1,18 @@
+{
+  "artifact_hashes": {
+    "evidence_pack": "b6b59f9d1a00d1adfc6422563d9226c14e27f3526f74cecfa3e1feb2ebd2e386",
+    "forecast_model": "5279f36cf9ab4ea8fe3055d4f230381016e8a664bbca64df164cf4ba3c94ad9d",
+    "operating_driver_pack": "e0d2225347b99b688f8a94b34649f8366c5a51cba992ebdaf48ccf0f8b79825d",
+    "quality_readout": "a58faa678fa6150799f0ec267c46ada02df1199781ef6e61a1e18c72085bd108",
+    "reader_report": "04ec8a53a023c3678dfdb7682901c5b229b7040c86af216930b0b4eea739f701",
+    "valuation_pack": "52e28e426d3f49f3016dcee2b85bd3c80f28c67373ae524e52f19df94221b94c",
+    "workflow_state": "6a921191d30d789fee40d818c9e201bcabb108a29ef889e4e20809ae174416aa"
+  },
+  "artifact_type": "r5_bundle16r_generation_lock",
+  "case_id": "603259_crdmo_backlog_funnel",
+  "information_cutoff": "2026-07-15",
+  "input_path": "reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/research_input.yaml",
+  "input_sha256": "fa7b149f16de4b1c6a45006fb7b8f6844cf9ad7d2a9051dc77ef39bcbfd142ce",
+  "reader_report_sha256": "04ec8a53a023c3678dfdb7682901c5b229b7040c86af216930b0b4eea739f701",
+  "schema_version": 1
+}

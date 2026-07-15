@@ -1,0 +1,9 @@
+case_id: 301217_high_end_copper_foil
+generation_lock_sha256: 02953ca1a4f932e34a1298ab3e883c66daf26fc3cffbac96c4137b764b64f461
+note: Automated generation cannot synthesize acceptance. A real reviewer must sign
+  the exact hashes.
+reader_report_sha256: 102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa
+reviewed_at: ''
+reviewer: ''
+schema_version: 1
+status: pending

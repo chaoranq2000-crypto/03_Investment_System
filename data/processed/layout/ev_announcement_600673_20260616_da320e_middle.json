@@ -1,0 +1,8 @@
+{
+  "evidence_id": "ev_announcement_600673_20260616_da320e",
+  "parser": "pypdf_text_extraction",
+  "mineru": {
+    "attempted": false,
+    "reason": "external mineru call not requested"
+  }
+}

@@ -1,0 +1,406 @@
+{
+  "artifact_type": "r5_bundle16r_forecast_model",
+  "assumption_traceability": 1.0,
+  "assumptions": [
+    {
+      "assumption_id": "assumption_301217_pcb_growth",
+      "estimate_logic": "基于2025年产销规模、8万吨年产能和高端产品结构变化设置三档收入增速，不作为公司指引。"
+    },
+    {
+      "assumption_id": "assumption_301217_lithium_growth",
+      "estimate_logic": "基于2025年近盈亏平衡毛利率设置保守修复情景，不假设未披露客户认证一定转化。"
+    },
+    {
+      "assumption_id": "assumption_301217_margin",
+      "estimate_logic": "毛利率从2025年分产品实际值出发，按加工费与产品结构敏感性设置情景。"
+    },
+    {
+      "assumption_id": "assumption_301217_cash_conversion",
+      "estimate_logic": "一季度经营现金流为负，因此模型不把会计利润等同现金回收。",
+      "evidence_ids": [
+        "ev_quarterly_report_301217_20260428_904702"
+      ],
+      "locator": "page:2"
+    }
+  ],
+  "forecast_classification": "estimate",
+  "future_event_model_link_count": 2,
+  "future_events": [
+    {
+      "event_id": "event_301217_interim_mix",
+      "expected_window": "2026H1_report",
+      "model_links": [
+        "pcb_copper_foil",
+        "assumption_301217_pcb_growth",
+        "assumption_301217_margin"
+      ],
+      "verification_metric": "PCB铜箔收入占比、加工费与分产品毛利率"
+    },
+    {
+      "event_id": "event_301217_capacity_conversion",
+      "expected_window": "2026_annual_report",
+      "model_links": [
+        "pcb_copper_foil",
+        "lithium_battery_copper_foil"
+      ],
+      "verification_metric": "产销量、产能利用率及HVLP批量供应信息"
+    }
+  ],
+  "management_guidance_is_not_fact": true,
+  "periods": [
+    "2026E",
+    "2027E",
+    "2028E"
+  ],
+  "scenarios": {
+    "base": {
+      "consolidated": [
+        {
+          "gross_margin": 0.04403929,
+          "gross_profit": 311370969.230131,
+          "period": "2026E",
+          "revenue": 7070299824.3578
+        },
+        {
+          "gross_margin": 0.05103819,
+          "gross_profit": 385776473.712993,
+          "period": "2027E",
+          "revenue": 7558585190.020557
+        },
+        {
+          "gross_margin": 0.05778613,
+          "gross_profit": 462053047.629834,
+          "period": "2028E",
+          "revenue": 7995915910.470385
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.07,
+              "gross_profit": 280003207.682016,
+              "period": "2026E",
+              "revenue": 4000045824.0288
+            },
+            {
+              "gross_margin": 0.075,
+              "gross_profit": 324003711.746333,
+              "period": "2027E",
+              "revenue": 4320049489.951105
+            },
+            {
+              "gross_margin": 0.08,
+              "gross_profit": 366340196.747854,
+              "period": "2028E",
+              "revenue": 4579252459.348171
+            }
+          ],
+          "segment_id": "pcb_copper_foil"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.01,
+              "gross_profit": 27001738.822918,
+              "period": "2026E",
+              "revenue": 2700173882.2918
+            },
+            {
+              "gross_margin": 0.02,
+              "gross_profit": 57243686.304586,
+              "period": "2027E",
+              "revenue": 2862184315.229308
+            },
+            {
+              "gross_margin": 0.03,
+              "gross_profit": 91017461.224292,
+              "period": "2028E",
+              "revenue": 3033915374.143067
+            }
+          ],
+          "segment_id": "lithium_battery_copper_foil"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.026,
+              "gross_profit": 8152646.843827,
+              "period": "2026E",
+              "revenue": 313563340.1472
+            },
+            {
+              "gross_margin": 0.026,
+              "gross_profit": 8315699.780704,
+              "period": "2027E",
+              "revenue": 319834606.950144
+            },
+            {
+              "gross_margin": 0.026,
+              "gross_profit": 8482013.776318,
+              "period": "2028E",
+              "revenue": 326231299.089147
+            }
+          ],
+          "segment_id": "copper_flat_wire"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": -0.067,
+              "gross_profit": -3786624.11863,
+              "period": "2026E",
+              "revenue": 56516777.89
+            },
+            {
+              "gross_margin": -0.067,
+              "gross_profit": -3786624.11863,
+              "period": "2027E",
+              "revenue": 56516777.89
+            },
+            {
+              "gross_margin": -0.067,
+              "gross_profit": -3786624.11863,
+              "period": "2028E",
+              "revenue": 56516777.89
+            }
+          ],
+          "segment_id": "other_revenue"
+        }
+      ]
+    },
+    "bear": {
+      "consolidated": [
+        {
+          "gross_margin": 0.02458224,
+          "gross_profit": 162807747.444978,
+          "period": "2026E",
+          "revenue": 6622982061.103401
+        },
+        {
+          "gross_margin": 0.02870693,
+          "gross_profit": 193378995.419089,
+          "period": "2027E",
+          "revenue": 6736316692.784217
+        },
+        {
+          "gross_margin": 0.03253989,
+          "gross_profit": 224618335.668522,
+          "period": "2028E",
+          "revenue": 6902860396.195597
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.05,
+              "gross_profit": 188891052.80136,
+              "period": "2026E",
+              "revenue": 3777821056.0272
+            },
+            {
+              "gross_margin": 0.05,
+              "gross_profit": 194557784.385401,
+              "period": "2027E",
+              "revenue": 3891155687.708016
+            },
+            {
+              "gross_margin": 0.05,
+              "gross_profit": 200394517.916963,
+              "period": "2028E",
+              "revenue": 4007890358.339257
+            }
+          ],
+          "segment_id": "pcb_copper_foil"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": -0.01,
+              "gross_profit": -24904516.39007,
+              "period": "2026E",
+              "revenue": 2490451639.007
+            },
+            {
+              "gross_margin": 0.0,
+              "gross_profit": 0.0,
+              "period": "2027E",
+              "revenue": 2490451639.007
+            },
+            {
+              "gross_margin": 0.01,
+              "gross_profit": 25402606.717871,
+              "period": "2028E",
+              "revenue": 2540260671.78714
+            }
+          ],
+          "segment_id": "lithium_battery_copper_foil"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.015,
+              "gross_profit": 4472888.822688,
+              "period": "2026E",
+              "revenue": 298192588.1792
+            },
+            {
+              "gross_margin": 0.015,
+              "gross_profit": 4472888.822688,
+              "period": "2027E",
+              "revenue": 298192588.1792
+            },
+            {
+              "gross_margin": 0.015,
+              "gross_profit": 4472888.822688,
+              "period": "2028E",
+              "revenue": 298192588.1792
+            }
+          ],
+          "segment_id": "copper_flat_wire"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": -0.1,
+              "gross_profit": -5651677.789,
+              "period": "2026E",
+              "revenue": 56516777.89
+            },
+            {
+              "gross_margin": -0.1,
+              "gross_profit": -5651677.789,
+              "period": "2027E",
+              "revenue": 56516777.89
+            },
+            {
+              "gross_margin": -0.1,
+              "gross_profit": -5651677.789,
+              "period": "2028E",
+              "revenue": 56516777.89
+            }
+          ],
+          "segment_id": "other_revenue"
+        }
+      ]
+    },
+    "bull": {
+      "consolidated": [
+        {
+          "gross_margin": 0.05909951,
+          "gross_profit": 439276256.790984,
+          "period": "2026E",
+          "revenue": 7432823445.593201
+        },
+        {
+          "gross_margin": 0.07089748,
+          "gross_profit": 583878502.970845,
+          "period": "2027E",
+          "revenue": 8235532376.724449
+        },
+        {
+          "gross_margin": 0.07768547,
+          "gross_profit": 689308499.253848,
+          "period": "2028E",
+          "revenue": 8873068763.48215
+        }
+      ],
+      "segments": [
+        {
+          "projections": [
+            {
+              "gross_margin": 0.085,
+              "gross_profit": 358893000.322584,
+              "period": "2026E",
+              "revenue": 4222270592.030401
+            },
+            {
+              "gross_margin": 0.095,
+              "gross_profit": 449249590.992035,
+              "period": "2027E",
+              "revenue": 4728943063.074049
+            },
+            {
+              "gross_margin": 0.1,
+              "gross_profit": 510725850.811997,
+              "period": "2028E",
+              "revenue": 5107258508.119973
+            }
+          ],
+          "segment_id": "pcb_copper_foil"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.025,
+              "gross_profit": 70781257.10862,
+              "period": "2026E",
+              "revenue": 2831250284.3448
+            },
+            {
+              "gross_margin": 0.04,
+              "gross_profit": 124575012.511171,
+              "period": "2027E",
+              "revenue": 3114375312.77928
+            },
+            {
+              "gross_margin": 0.05,
+              "gross_profit": 168176266.890081,
+              "period": "2028E",
+              "revenue": 3363525337.801623
+            }
+          ],
+          "segment_id": "lithium_battery_copper_foil"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": 0.035,
+              "gross_profit": 11297502.69648,
+              "period": "2026E",
+              "revenue": 322785791.328
+            },
+            {
+              "gross_margin": 0.035,
+              "gross_profit": 11749402.804339,
+              "period": "2027E",
+              "revenue": 335697222.98112
+            },
+            {
+              "gross_margin": 0.035,
+              "gross_profit": 12101884.888469,
+              "period": "2028E",
+              "revenue": 345768139.670554
+            }
+          ],
+          "segment_id": "copper_flat_wire"
+        },
+        {
+          "projections": [
+            {
+              "gross_margin": -0.03,
+              "gross_profit": -1695503.3367,
+              "period": "2026E",
+              "revenue": 56516777.89
+            },
+            {
+              "gross_margin": -0.03,
+              "gross_profit": -1695503.3367,
+              "period": "2027E",
+              "revenue": 56516777.89
+            },
+            {
+              "gross_margin": -0.03,
+              "gross_profit": -1695503.3367,
+              "period": "2028E",
+              "revenue": 56516777.89
+            }
+          ],
+          "segment_id": "other_revenue"
+        }
+      ]
+    }
+  },
+  "schema_version": 1
+}

@@ -1,0 +1,96 @@
+# Generated stock evidence plan for stock_first_closed_loop.
+workflow_id: "wf_20260715_stock_first_600673_hec_tech"
+stock_code: "600673"
+ts_code: "600673.SH"
+company_id: "cn_600673_hec_tech"
+company_name: "东阳光"
+exchange: "SSE"
+date_range:
+  start: "2025-01-01"
+  end: "2026-07-15"
+as_of_date: "2026-07-15"
+created_at: "2026-07-15T06:25:28Z"
+
+required_evidence:
+  official_filings:
+    - evidence_need: latest_annual_report
+      source_type: annual_report
+      preferred_sources: [cninfo, sse, szse, bse]
+      required_for: [business_exposure, business_breakdown, risk]
+      status: TODO
+      evidence_id: ""
+      notes: "Annual report required before claiming revenue/product exposure."
+    - evidence_need: latest_interim_report
+      source_type: interim_report
+      preferred_sources: [cninfo, sse, szse, bse]
+      required_for: [business_update, financial_update]
+      status: TODO
+      evidence_id: ""
+      notes: "Use TODO if not published in date range."
+    - evidence_need: latest_quarterly_report
+      source_type: quarterly_report
+      preferred_sources: [cninfo, sse, szse, bse]
+      required_for: [financial_update]
+      status: TODO
+      evidence_id: ""
+      notes: "Quarterly report supports metrics, not segment exposure alone."
+    - evidence_need: material_announcements_last_12m
+      source_type: announcement
+      preferred_sources: [cninfo, sse, szse, bse]
+      required_for: [orders, capex, projects, risks]
+      status: TODO
+      evidence_id: ""
+      notes: "Do not treat framework agreements as revenue."
+
+  structured_financial_data:
+    - api_name: stock_basic
+      source_type: structured_market_data
+      preferred_sources: [tushare, baostock]
+      status: TODO
+      evidence_id: ""
+    - api_name: income
+      source_type: structured_financial_data
+      preferred_sources: [tushare]
+      status: TODO
+      evidence_id: ""
+    - api_name: balancesheet
+      source_type: structured_financial_data
+      preferred_sources: [tushare]
+      status: TODO
+      evidence_id: ""
+    - api_name: cashflow
+      source_type: structured_financial_data
+      preferred_sources: [tushare]
+      status: TODO
+      evidence_id: ""
+    - api_name: fina_indicator
+      source_type: structured_financial_data
+      preferred_sources: [tushare]
+      status: TODO
+      evidence_id: ""
+
+  optional_context:
+    - evidence_need: investor_relations
+      source_type: company_ir_product
+      status: TODO
+      notes: "Management comments must be tagged management_comment."
+    - evidence_need: company_website
+      source_type: company_ir_product
+      status: TODO
+      notes: "Useful for product clues; not enough for financial exposure."
+    - evidence_need: exchange_inquiry_reply
+      source_type: announcement
+      status: TODO
+      notes: "Prefer official exchange disclosure if available."
+    - evidence_need: news_clues
+      source_type: news_social_clue
+      status: TODO
+      notes: "Clue only; must be verified with official disclosure."
+
+rules:
+  annual_report_required_for_business_exposure: true
+  structured_data_metric_only: true
+  news_clue_only: true
+  management_comment_not_fact: true
+  revenue_pct_profit_pct_must_be_disclosed_or_missing: true
+  no_buy_sell_hold_advice: true

@@ -1,0 +1,232 @@
+schema_version: r5_bundle16r_case_input_v1
+case_id: 301217_high_end_copper_foil
+ticker: "301217"
+issuer_name: 铜冠铜箔
+company_id: cn_301217_tongguan_copper_foil
+workflow_id: wf_20260715_stock_first_301217_tongguan_copper_foil
+as_of_date: "2026-07-15"
+generated_at: "2026-07-15T15:00:00+08:00"
+sources:
+  - evidence_id: ev_annual_report_301217_20260418_d3f361
+    source_class: official
+    source_type: annual_report
+    title: 2025年年度报告
+    source_path: data/raw/annual_reports/cninfo_2025_annual_report_301217_2026-04-18.pdf
+    processed_text_path: data/processed/text/ev_annual_report_301217_20260418_d3f361.md
+    file_hash: d3f36125542893772a2199c7fc77ca156aef20550242629771328d2c3ce05e49
+    page_count: 215
+    review_status: reviewed
+  - evidence_id: ev_quarterly_report_301217_20260428_904702
+    source_class: official
+    source_type: quarterly_report
+    title: 2026年第一季度报告
+    source_path: data/raw/announcements/cninfo_2026_q1_report_301217_2026-04-28.pdf
+    processed_text_path: data/processed/text/ev_quarterly_report_301217_20260428_904702.md
+    file_hash: 90470297793edf3f0e4811e5e118d2245a4748985050187c8934cc82e01bf86a
+    page_count: 11
+    review_status: reviewed
+historical:
+  period: 2025A
+  unit: CNY
+  total_revenue: 6689205991.67
+  total_gross_profit: 237474689.82
+  segments:
+    - segment_id: pcb_copper_foil
+      display_name: PCB铜箔
+      material: true
+      revenue: 3703746133.36
+      cost: 3475494389.65
+      disclosure_boundary: 年报披露分产品收入与成本，未披露高端牌号独立损益。
+      driver_contract:
+        archetype_id: capacity_utilization_yield_price
+        equation: 销量 ×（铜价联动基价 + 加工费）
+        driver_topics: [HVLP product generation, processing fee, capacity and utilization, product mix]
+        source_evidence_ids: [ev_annual_report_301217_20260418_d3f361]
+    - segment_id: lithium_battery_copper_foil
+      display_name: 锂电池铜箔
+      material: true
+      revenue: 2621528041.06
+      cost: 2616497949.92
+      disclosure_boundary: 年报披露分产品收入与成本，客户认证与单品价格未单独量化。
+      driver_contract:
+        archetype_id: volume_price_mix
+        equation: 销量 × 铜价联动价格 + 产品结构带来的加工费差异
+        driver_topics: [customer certification, processing fee, product mix, unit gross profit]
+        source_evidence_ids: [ev_annual_report_301217_20260418_d3f361]
+    - segment_id: copper_flat_wire
+      display_name: 铜扁线等
+      material: false
+      revenue: 307415039.36
+      cost: 299428871.24
+      disclosure_boundary: 按年报其他主营产品口径处理。
+      driver_contract:
+        archetype_id: volume_price_mix
+        equation: 销量 × 售价
+        driver_topics: [volume, price]
+        source_evidence_ids: [ev_annual_report_301217_20260418_d3f361]
+    - segment_id: other_revenue
+      display_name: 其他业务及对账残差
+      material: false
+      revenue: 56516777.89
+      cost: 60310091.04
+      disclosure_boundary: 由合并营业收入、营业成本与主营分部之差推导，不解释为独立经营分部。
+      driver_contract:
+        archetype_id: reconciliation_residual
+        equation: 合并口径 - 已披露主营分部合计
+        driver_topics: [reconciliation]
+        source_evidence_ids: [ev_annual_report_301217_20260418_d3f361]
+company_metrics:
+  - {metric_id: metric_301217_revenue_2025, name: 营业收入, value: 6689205991.67, unit: CNY, period: 2025A, evidence_id: ev_annual_report_301217_20260418_d3f361, locator: "page:19"}
+  - {metric_id: metric_301217_pcb_revenue_2025, name: PCB铜箔收入, value: 3703746133.36, unit: CNY, period: 2025A, evidence_id: ev_annual_report_301217_20260418_d3f361, locator: "page:19-20"}
+  - {metric_id: metric_301217_lithium_revenue_2025, name: 锂电池铜箔收入, value: 2621528041.06, unit: CNY, period: 2025A, evidence_id: ev_annual_report_301217_20260418_d3f361, locator: "page:19-20"}
+  - {metric_id: metric_301217_pcb_margin_2025, name: PCB铜箔毛利率, value: 6.16, unit: percent, period: 2025A, evidence_id: ev_annual_report_301217_20260418_d3f361, locator: "page:20"}
+  - {metric_id: metric_301217_lithium_margin_2025, name: 锂电池铜箔毛利率, value: 0.19, unit: percent, period: 2025A, evidence_id: ev_annual_report_301217_20260418_d3f361, locator: "page:20"}
+  - {metric_id: metric_301217_output_2025, name: 铜箔产量, value: 71462, unit: tonne, period: 2025A, evidence_id: ev_annual_report_301217_20260418_d3f361, locator: "page:19"}
+  - {metric_id: metric_301217_sales_2025, name: 铜箔销量, value: 72070, unit: tonne, period: 2025A, evidence_id: ev_annual_report_301217_20260418_d3f361, locator: "page:19"}
+  - {metric_id: metric_301217_capacity_2025, name: 铜箔年产能, value: 80000, unit: tonne_per_year, period: 2025A, evidence_id: ev_annual_report_301217_20260418_d3f361, locator: "page:11,20"}
+  - {metric_id: metric_301217_q1_revenue_2026, name: 一季度营业收入, value: 1841754256.18, unit: CNY, period: 2026Q1, evidence_id: ev_quarterly_report_301217_20260428_904702, locator: "page:2"}
+  - {metric_id: metric_301217_q1_np_2026, name: 一季度归母净利润, value: 106347061.66, unit: CNY, period: 2026Q1, evidence_id: ev_quarterly_report_301217_20260428_904702, locator: "page:2"}
+  - {metric_id: metric_301217_q1_ocf_2026, name: 一季度经营现金流, value: -319063339.21, unit: CNY, period: 2026Q1, evidence_id: ev_quarterly_report_301217_20260428_904702, locator: "page:2"}
+claims:
+  - claim_id: claim_301217_pricing
+    claim_type: fact
+    text: 铜箔销售定价采用铜价加加工费模式，铜价传导与加工费共同决定收入和单位毛利。
+    evidence_ids: [ev_annual_report_301217_20260418_d3f361]
+    locator: "page:13"
+    counterevidence: 加工费、产品结构和客户议价变化可能使收入与铜价不同步。
+  - claim_id: claim_301217_hvlp_output
+    claim_type: fact
+    text: 2025年HVLP铜箔产量同比增长232%，但年报未披露该产品独立收入和利润。
+    evidence_ids: [ev_annual_report_301217_20260418_d3f361]
+    locator: "page:19"
+    counterevidence: 产量增长不等于认证、售价和利润同步兑现。
+  - claim_id: claim_301217_margin_divergence
+    claim_type: inference
+    text: PCB铜箔对毛利的贡献明显高于锂电池铜箔，结构升级比单纯放量更关键。
+    evidence_ids: [ev_annual_report_301217_20260418_d3f361]
+    locator: "page:19-20"
+    counterevidence: 该判断基于分产品毛利，未拆分单一牌号和客户。
+  - claim_id: claim_301217_q1_cash
+    claim_type: fact
+    text: 2026年一季度经营现金流为负，需与利润增长分开观察。
+    evidence_ids: [ev_quarterly_report_301217_20260428_904702]
+    locator: "page:2"
+    counterevidence: 单季度现金流可能受备货、铜价及结算节奏影响。
+research_questions:
+  - {question_id: rq_301217_reconcile, severity: critical, status: resolved, resolution: 2025年分部收入与毛利已与合并口径对账}
+  - {question_id: rq_301217_hvlp_profit, severity: major, status: open, owner: future_refresh, next_step: 等待牌号级销量、加工费或毛利披露}
+evidence_integrity_incidents: []
+forecast:
+  periods: [2026E, 2027E, 2028E]
+  scenarios: [bear, base, bull]
+  assumptions:
+    - assumption_id: assumption_301217_pcb_growth
+      estimate_logic: 基于2025年产销规模、8万吨年产能和高端产品结构变化设置三档收入增速，不作为公司指引。
+    - assumption_id: assumption_301217_lithium_growth
+      estimate_logic: 基于2025年近盈亏平衡毛利率设置保守修复情景，不假设未披露客户认证一定转化。
+    - assumption_id: assumption_301217_margin
+      estimate_logic: 毛利率从2025年分产品实际值出发，按加工费与产品结构敏感性设置情景。
+    - assumption_id: assumption_301217_cash_conversion
+      evidence_ids: [ev_quarterly_report_301217_20260428_904702]
+      locator: "page:2"
+      estimate_logic: 一季度经营现金流为负，因此模型不把会计利润等同现金回收。
+  segments:
+    - segment_id: pcb_copper_foil
+      base_revenue: 3703746133.36
+      growth_rates: {bear: [0.02, 0.03, 0.03], base: [0.08, 0.08, 0.06], bull: [0.14, 0.12, 0.08]}
+      gross_margins: {bear: [0.05, 0.05, 0.05], base: [0.07, 0.075, 0.08], bull: [0.085, 0.095, 0.10]}
+    - segment_id: lithium_battery_copper_foil
+      base_revenue: 2621528041.06
+      growth_rates: {bear: [-0.05, 0.00, 0.02], base: [0.03, 0.06, 0.06], bull: [0.08, 0.10, 0.08]}
+      gross_margins: {bear: [-0.01, 0.00, 0.01], base: [0.01, 0.02, 0.03], bull: [0.025, 0.04, 0.05]}
+    - segment_id: copper_flat_wire
+      base_revenue: 307415039.36
+      growth_rates: {bear: [-0.03, 0.00, 0.00], base: [0.02, 0.02, 0.02], bull: [0.05, 0.04, 0.03]}
+      gross_margins: {bear: [0.015, 0.015, 0.015], base: [0.026, 0.026, 0.026], bull: [0.035, 0.035, 0.035]}
+    - segment_id: other_revenue
+      base_revenue: 56516777.89
+      growth_rates: {bear: [0.00, 0.00, 0.00], base: [0.00, 0.00, 0.00], bull: [0.00, 0.00, 0.00]}
+      gross_margins: {bear: [-0.10, -0.10, -0.10], base: [-0.067, -0.067, -0.067], bull: [-0.03, -0.03, -0.03]}
+  future_events:
+    - event_id: event_301217_interim_mix
+      expected_window: 2026H1_report
+      verification_metric: PCB铜箔收入占比、加工费与分产品毛利率
+      model_links: [pcb_copper_foil, assumption_301217_pcb_growth, assumption_301217_margin]
+    - event_id: event_301217_capacity_conversion
+      expected_window: 2026_annual_report
+      verification_metric: 产销量、产能利用率及HVLP批量供应信息
+      model_links: [pcb_copper_foil, lithium_battery_copper_foil]
+valuation:
+  peer_multiple_used: false
+  qualified_peers: []
+  alternative_method: scenario_valuation
+  eligibility: {status: context_only, reason: 缺少同口径高端牌号利润和可复核同业倍数}
+  limitations: [不输出目标价或评级, 情景预测是分析估计而非公司承诺, 铜价传导和加工费需分开验证]
+reader:
+  sections:
+    - section_id: business_boundary
+      title: 业务边界与收入底盘
+      judgment: 公司收入主要来自PCB铜箔和锂电池铜箔，不能把高端牌号的产量增速直接替代合并收入判断。
+      paragraphs:
+        - text: 2025年两类铜箔合计构成绝大部分收入，其他业务仅用于完整对账。
+          refs: [metric_301217_revenue_2025, metric_301217_pcb_revenue_2025, metric_301217_lithium_revenue_2025, other_revenue]
+      model_links: [pcb_copper_foil, lithium_battery_copper_foil]
+    - section_id: driver_equation
+      title: 经营驱动方程
+      judgment: 收入的核心方程是销量乘以铜价联动基价与加工费，利润更依赖加工费、产品结构和良率。
+      paragraphs:
+        - text: 铜价加加工费的定价规则意味着铜价上涨可能抬高收入，却不必然等比例抬高单位毛利。
+          refs: [claim_301217_pricing, pcb_copper_foil, assumption_301217_margin]
+      model_links: [pcb_copper_foil, assumption_301217_margin]
+    - section_id: product_generation
+      title: 高端产品代际验证
+      judgment: HVLP产量增长提供结构升级线索，但缺少牌号级收入和利润，当前只能作为转化漏斗的前置证据。
+      paragraphs:
+        - text: 需要后续披露把认证、批量供货、加工费和毛利串成闭环。
+          refs: [claim_301217_hvlp_output, event_301217_capacity_conversion]
+      model_links: [pcb_copper_foil]
+    - section_id: margin_bridge
+      title: 分产品毛利桥
+      judgment: PCB铜箔已有正毛利缓冲，锂电铜箔2025年接近盈亏平衡，二者对利润的弹性并不相同。
+      paragraphs:
+        - text: 情景模型因此分别设置两条毛利路径，不用合并平均值掩盖分化。
+          refs: [metric_301217_pcb_margin_2025, metric_301217_lithium_margin_2025, claim_301217_margin_divergence]
+      model_links: [pcb_copper_foil, lithium_battery_copper_foil]
+    - section_id: capacity
+      title: 产能与产销约束
+      judgment: 2025年销量接近8万吨年产能量级，新增增长需要由利用率、产品组合或新增有效能力解释。
+      paragraphs:
+        - text: 产量与销量接近，但不能据此推定所有产能均处于稳定高良率状态。
+          refs: [metric_301217_output_2025, metric_301217_sales_2025, metric_301217_capacity_2025]
+      model_links: [assumption_301217_pcb_growth]
+    - section_id: q1_update
+      title: 2026年一季度更新
+      judgment: 一季度收入和利润提供正向更新，经营现金流为负则提示营运资金占用仍需复核。
+      paragraphs:
+        - text: 单季度利润不能替代现金转化验证，后续需检查应收、存货和铜价变化。
+          refs: [metric_301217_q1_revenue_2026, metric_301217_q1_np_2026, metric_301217_q1_ocf_2026, claim_301217_q1_cash]
+      model_links: [assumption_301217_cash_conversion]
+    - section_id: scenarios
+      title: 三情景预测边界
+      judgment: 预测仅表示加工费和产品结构变化的敏感性，不将客户认证或高端牌号放量写成既定事实。
+      paragraphs:
+        - text: 熊市情景保留锂电铜箔负毛利可能，基准与乐观情景要求后续分产品数据验证。
+          refs: [assumption_301217_lithium_growth, assumption_301217_margin, event_301217_interim_mix]
+      model_links: [lithium_battery_copper_foil]
+    - section_id: risks
+      title: 风险与反证
+      judgment: 铜价波动、加工费下行、客户认证延迟、良率不达预期和现金回收偏弱均可否定乐观情景。
+      paragraphs:
+        - text: 当前最重要的缺口是高端产品牌号级经济性，而不是再增加无出处的行业叙事。
+          refs: [claim_301217_hvlp_output, claim_301217_pricing, claim_301217_q1_cash]
+      model_links: [event_301217_interim_mix, event_301217_capacity_conversion]
+truthfulness:
+  sample_text_used_as_evidence: false
+  management_guidance_recast_as_fact: false
+  low_confidence_peer_ranked: false
+  direct_trading_instruction_present: false
+  past_event_presented_as_future: false
+  undisclosed_segment_economics_presented_as_fact: false
+  consensus_estimate_presented_as_issuer_fact: false
+backflow_tasks:
+  - {owner: future_refresh, severity: major, next_step: 在半年度或年度披露后补充高端牌号转化与单位毛利证据}

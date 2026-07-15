@@ -1,0 +1,47 @@
+bundle15r_audit:
+  conflict_count: 0
+  decision: evidence_qualification_pending
+  driver_coverage_ratio: 0.0
+  eligible_valuation_methods: []
+  evidence_pack_complete: false
+  issue_count: 1
+  missing_driver_ids:
+  - backlog_conversion_rate
+  - backlog_definition
+  - capacity_utilization
+  - cash_conversion_and_capex
+  - customer_geography_concentration
+  - new_order_intake
+  - pricing_and_productivity
+  - project_stage_mix
+  - qualified_capacity
+  - regulatory_contract_transition
+  - tides_product_mix
+  missing_question_ids:
+  - CR-Q1
+  - CR-Q2
+  - CR-Q3
+  - CR-Q4
+  - CR-Q5
+  - CR-Q6
+  - CR-Q7
+  missing_source_classes:
+  - industry_regulator_or_association
+  - issuer_exchange_filings
+  - issuer_investor_relations_records
+  - market_data_primary_or_licensed
+  - peer_official_disclosures
+  p2_allowed: false
+  question_coverage_ratio: 0.0
+  sample_quality_allowed: false
+  workflow_state_mutation_allowed: false
+case_id: golden_crdmo_backlog_conversion
+deterministic_rerun: false
+exact_hash_human_review_status: not_triggered
+forecast_bridge_complete: false
+overlap_resolved: false
+qualified_driver_ids: []
+reviewed_official_source_count: 0
+schema_version: r5_bundle14r_qualification_v1
+semantic_gate_passed: false
+valuation_eligible: false

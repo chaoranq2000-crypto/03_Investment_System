@@ -1,0 +1,29 @@
+schema_version: r5_bundle17r_human_review_handoff_v1
+bundle_id: R5_BUNDLE17R_ACTIVATION_RECEIPT
+case_id: golden_multi_business_ai_infrastructure
+issuer_ticker: 600673.SH
+review_status: not_ready
+reviewer: null
+reviewed_at: null
+decision_notes: null
+reader:
+  path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/reader_report.md
+  sha256: 2fc4dff78527743b5fa884df4c5329ef4cd014c73686e1b10cef7edff45daed9
+  size_bytes: 4397
+generation_lock:
+  path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/generation_lock.json
+  sha256: cd445f4dade57e60f446dd0c5b747db4c298e4da5d2c0db11f1c4d3f9813c24e
+  size_bytes: 1128
+quality_scorecard:
+  path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+  sha256: e4ce4d287c5a426880960eff2436391e82d87c62d66593c9abf633da985611d7
+  size_bytes: 2042
+traceability:
+  path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/evidence_pack.json
+  sha256: 23486bae3c0f5316de8de82d1e4258c26033f06168fed8be2732d45d17c3e744
+  size_bytes: 12865
+automated_acceptance_allowed: false
+canonical_workflow_state_mutation_allowed: false
+sample_quality_allowed: false
+p2_allowed: false
+activation_generation_id: activation_gen_r5_bundle17r_1fb1ea838a59cba3

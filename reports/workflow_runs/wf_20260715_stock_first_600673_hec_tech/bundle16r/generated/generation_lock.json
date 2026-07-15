@@ -1,0 +1,18 @@
+{
+  "artifact_hashes": {
+    "evidence_pack": "23486bae3c0f5316de8de82d1e4258c26033f06168fed8be2732d45d17c3e744",
+    "forecast_model": "f87421d658bdd1f288ed74940ff9a349c24076dc251e47d374988adeda2b805e",
+    "operating_driver_pack": "b7e960087861cfd84af479169f372899553e8f804a9a58f47effd3f130f82919",
+    "quality_readout": "e4ce4d287c5a426880960eff2436391e82d87c62d66593c9abf633da985611d7",
+    "reader_report": "2fc4dff78527743b5fa884df4c5329ef4cd014c73686e1b10cef7edff45daed9",
+    "valuation_pack": "066047366991c7d92132b5fcb145b13fb5b3ba714574efbb11f84c34ec9eb1b4",
+    "workflow_state": "c563b4b3106a37bb1517e057cae703a268bf5585b9bab520415b31de92ee45a7"
+  },
+  "artifact_type": "r5_bundle16r_generation_lock",
+  "case_id": "600673_multi_business_ma",
+  "information_cutoff": "2026-07-15",
+  "input_path": "reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/research_input.yaml",
+  "input_sha256": "05149554d28f3b0773501d0d580d72b0758bff1458bbf51a301f249ed22d58fd",
+  "reader_report_sha256": "2fc4dff78527743b5fa884df4c5329ef4cd014c73686e1b10cef7edff45daed9",
+  "schema_version": 1
+}

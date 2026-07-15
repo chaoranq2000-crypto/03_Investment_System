@@ -1,0 +1,13 @@
+schema_version: r5_bundle16r_review_mapping_v1
+case_id: golden_copper_foil_product_generation
+issuer_ticker: 301217.SZ
+as_of_date: '2026-07-15'
+pack_review:
+  status: accepted_with_limitations
+  reviewer: OpenAI Codex - gap mapping only; no evidence acceptance
+  reviewed_at: '2026-07-15T22:20:01+08:00'
+source_bindings:
+  - catalog_source_id: ev_annual_report_301217_20260418_d3f361
+  - catalog_source_id: ev_quarterly_report_301217_20260428_904702
+record_bindings: []
+artifact_bindings: {}

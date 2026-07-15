@@ -1,0 +1,14 @@
+job_id: job_20260715_600988_h1_performance_forecast_parse
+run_id: wf_20260715_stock_first_600988_chifeng_gold
+evidence_id: ev_announcement_600988_20260715_c11825
+stock_code: "600988"
+company_id: cn_600988_chifeng_gold
+source_type: announcement
+raw_pdf_path: data/raw/announcements/cninfo_2026_h1_performance_forecast_600988_2026-07-15.pdf
+candidate_generation:
+  generate_claim_candidates: false
+  generate_metric_candidates: false
+quality:
+  require_page_map: true
+  require_table_inventory: true
+  allow_partial_success: false

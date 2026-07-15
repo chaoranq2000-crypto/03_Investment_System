@@ -1,0 +1,172 @@
+{
+  "case_contracts": [
+    {
+      "case_id": "golden_copper_foil_product_generation",
+      "driver_ids": [
+        "capacity_utilization",
+        "customer_certification_conversion",
+        "hvlp_processing_fee",
+        "hvlp_product_mix",
+        "lithium_foil_margin",
+        "pcb_capacity",
+        "receivable_inventory_cash_conversion",
+        "unit_conversion_cost"
+      ],
+      "issuer_ticker": "301217.SZ",
+      "required_question_ids": [
+        "CF-Q1",
+        "CF-Q2",
+        "CF-Q3",
+        "CF-Q4",
+        "CF-Q5",
+        "CF-Q6"
+      ],
+      "required_source_classes": [
+        "industry_regulator_or_association",
+        "issuer_exchange_filings",
+        "issuer_investor_relations_records",
+        "market_data_primary_or_licensed",
+        "peer_official_disclosures"
+      ],
+      "sha256": "09f3831a46cd6bae6fd2ce1659eb6e0f85f82d8062e5793651d17c0f8daa7df7",
+      "source_path": "tests/fixtures/r5_bundle14r/cases/copper_foil.yaml"
+    },
+    {
+      "case_id": "golden_crdmo_backlog_conversion",
+      "driver_ids": [
+        "backlog_conversion_rate",
+        "backlog_definition",
+        "capacity_utilization",
+        "cash_conversion_and_capex",
+        "customer_geography_concentration",
+        "new_order_intake",
+        "pricing_and_productivity",
+        "project_stage_mix",
+        "qualified_capacity",
+        "regulatory_contract_transition",
+        "tides_product_mix"
+      ],
+      "issuer_ticker": "603259.SH",
+      "required_question_ids": [
+        "CR-Q1",
+        "CR-Q2",
+        "CR-Q3",
+        "CR-Q4",
+        "CR-Q5",
+        "CR-Q6",
+        "CR-Q7"
+      ],
+      "required_source_classes": [
+        "industry_regulator_or_association",
+        "issuer_exchange_filings",
+        "issuer_investor_relations_records",
+        "market_data_primary_or_licensed",
+        "peer_official_disclosures"
+      ],
+      "sha256": "8409ad6835649f424ce56fc854aa302bc8bbbca8bb4fea679d93837eb2b460f4",
+      "source_path": "tests/fixtures/r5_bundle14r/cases/crdmo.yaml"
+    },
+    {
+      "case_id": "golden_gold_mining_cycle",
+      "driver_ids": [
+        "byproduct_economics",
+        "fx_tax_ownership_bridge",
+        "mine_production_volume",
+        "ore_grade_or_feed_quality",
+        "realized_gold_price",
+        "recovery_rate",
+        "stripping_ratio",
+        "sustaining_and_growth_capex",
+        "unit_cash_cost"
+      ],
+      "issuer_ticker": "600988.SH",
+      "required_question_ids": [
+        "GM-Q1",
+        "GM-Q2",
+        "GM-Q3",
+        "GM-Q4",
+        "GM-Q5",
+        "GM-Q6"
+      ],
+      "required_source_classes": [
+        "industry_regulator_or_association",
+        "issuer_exchange_filings",
+        "issuer_investor_relations_records",
+        "market_data_primary_or_licensed",
+        "peer_official_disclosures"
+      ],
+      "sha256": "7f0413564b3706a494ca1a5861f9ea331fa6ec86936345c7daa782f988a41027",
+      "source_path": "tests/fixtures/r5_bundle14r/cases/gold_mining.yaml"
+    },
+    {
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "driver_ids": [
+        "idc_commissioned_capacity",
+        "idc_power_cost",
+        "idc_unit_revenue",
+        "idc_utilization",
+        "incremental_financing_cost",
+        "liquid_cooling_acceptance",
+        "liquid_cooling_margin",
+        "liquid_cooling_projects_or_mw",
+        "liquid_cooling_unit_value",
+        "materials_capacity",
+        "materials_product_mix_and_fee",
+        "materials_utilization",
+        "ownership_and_minority_interest",
+        "refrigerant_quota",
+        "refrigerant_realized_price",
+        "refrigerant_unit_cost",
+        "refrigerant_volume",
+        "transaction_close_and_consolidation"
+      ],
+      "issuer_ticker": "600673.SH",
+      "required_question_ids": [
+        "MB-Q1",
+        "MB-Q2",
+        "MB-Q3",
+        "MB-Q4",
+        "MB-Q5",
+        "MB-Q6",
+        "MB-Q7",
+        "MB-Q8",
+        "MB-Q9"
+      ],
+      "required_source_classes": [
+        "industry_regulator_or_association",
+        "issuer_exchange_filings",
+        "issuer_investor_relations_records",
+        "market_data_primary_or_licensed",
+        "peer_official_disclosures"
+      ],
+      "sha256": "3532a714d8d5877a377576bebbe4628be32f8a0394b4dca9cac66d175903cf79",
+      "source_path": "tests/fixtures/r5_bundle14r/cases/multi_business_ai_infrastructure.yaml"
+    }
+  ],
+  "catalog_paths": [
+    "data/manifests/claims_registry.csv",
+    "data/manifests/evidence_manifest.csv",
+    "data/manifests/metrics_registry.csv"
+  ],
+  "catalog_sha256": {
+    "data/manifests/claims_registry.csv": "2c514ffb22320b9cb3e341088d384506d30d7612809850a9c1fad8b73dff0337",
+    "data/manifests/evidence_manifest.csv": "34568fb9f31dc84c16e4b086b751a81ef8770591086c59a901ea7107510175ae",
+    "data/manifests/metrics_registry.csv": "16ef9791435c03d45f50166501df7ef6e838f811cbe250cb6ab59ff0e445945a"
+  },
+  "duplicate_record_count": 0,
+  "duplicate_source_count": 0,
+  "mapping_sha256": {
+    "reports/golden_regressions/reviewed_mappings/golden_copper_foil_product_generation.yaml": "2a135da1bf46db6a3675c83ba554de4f7a7b6ff9f69a180633d0c58a1198c325",
+    "reports/golden_regressions/reviewed_mappings/golden_crdmo_backlog_conversion.yaml": "f8178c9ca7392c4c4b42a6ad467e0977c11e968e432b5c51d85e32fb74b90728",
+    "reports/golden_regressions/reviewed_mappings/golden_gold_mining_cycle.yaml": "14aff0d501b27d391fa8e07d67e535bab21ec853bc7d715b8ed6fec2ab360967",
+    "reports/golden_regressions/reviewed_mappings/golden_multi_business_ai_infrastructure.yaml": "1fdd4491ad556f8768795e0aa272e4df09e5600e24bb65ec97dc63dfeb614323"
+  },
+  "record_count": 77,
+  "release": {
+    "p2_allowed": false,
+    "sample_quality_allowed": false,
+    "workflow_state_mutation_allowed": false
+  },
+  "schema_version": "r5_bundle16r_catalog_inventory_v1",
+  "source_count": 113
+}

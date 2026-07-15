@@ -1,0 +1,21 @@
+{
+  "job_id": "job_20260715_603259_2025_annual_report_parse",
+  "run_id": "wf_20260715_stock_first_603259_wuxi_apptec",
+  "evidence_id": "ev_annual_report_603259_20260324_7f1431",
+  "status": "SUCCESS",
+  "normalization_status": "SUCCESS",
+  "parser": "pypdf_text_extraction",
+  "mineru_status": "not_attempted",
+  "mineru": {
+    "attempted": false,
+    "reason": "external mineru call not requested"
+  },
+  "raw_pdf_path": "data/raw/annual_reports/cninfo_2025_annual_report_603259_2026-03-24.pdf",
+  "processed_text_path": "data/processed/text/ev_annual_report_603259_20260324_7f1431.md",
+  "tables_path": "data/processed/tables/ev_annual_report_603259_20260324_7f1431_tables.json",
+  "page_map_path": "data/processed/page_maps/ev_annual_report_603259_20260324_7f1431_page_map.yaml",
+  "page_count": 249,
+  "table_inventory_count": 450,
+  "candidate_info": {},
+  "issues": []
+}

@@ -1,0 +1,14 @@
+schema_version: r5_bundle17r_status_proposal_v1
+bundle_id: R5_BUNDLE17R_ACTIVATION_RECEIPT
+activation_generation_id: activation_gen_r5_bundle17r_1fb1ea838a59cba3
+run_id: r5_bundle17r_activation_20260715_911136d_backflow
+proposed_state: needs_targeted_backflow
+next_stage: R5_bundle17r_targeted_backflow
+case_count: 4
+engineering_pass_count: 0
+blocker_count: 63
+canonical_workflow_state_mutation_allowed: false
+sample_quality_allowed: false
+p2_allowed: false
+note: Non-canonical proposal. A later reviewed Bundle 18R decision is required before
+  any sample-quality promotion.

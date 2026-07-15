@@ -1,0 +1,16 @@
+artifact_type: R5_bundle15r_noncanonical_status_proposal
+blocker_count: 4
+bundle14r_candidate_ready_count: 0
+bundle_id: R5_BUNDLE15R_REVIEWED_EVIDENCE_QUALIFICATION
+canonical_workflow_state_mutation_allowed: false
+case_count: 4
+conflict_count: 0
+evidence_pack_complete_count: 0
+evidence_pack_present_count: 0
+generation_id: evidence_qualification_gen_r5_bundle15r_4f6962ea1c57ac98
+git_head: 911136de409a50dee2bd9828a117de4fa24ab75d
+note: This is a proposed status artifact only. The research-orchestrator must review it before any later canonical status synchronization.
+p2_allowed: false
+proposed_execution_state: R5_BUNDLE15R_WAITING_FOR_REVIEWED_OFFICIAL_EVIDENCE
+sample_quality_allowed: false
+schema_version: r5_bundle15r_status_proposal_v1

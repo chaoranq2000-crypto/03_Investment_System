@@ -1,0 +1,14 @@
+job_id: job_20260715_600673_ma_transaction_draft_parse
+run_id: wf_20260715_stock_first_600673_hec_tech
+evidence_id: ev_announcement_600673_20260616_da320e
+stock_code: "600673"
+company_id: cn_600673_hec_tech
+source_type: announcement
+raw_pdf_path: data/raw/announcements/cninfo_ma_transaction_draft_600673_2026-06-16.pdf
+candidate_generation:
+  generate_claim_candidates: false
+  generate_metric_candidates: false
+quality:
+  require_page_map: true
+  require_table_inventory: true
+  allow_partial_success: false

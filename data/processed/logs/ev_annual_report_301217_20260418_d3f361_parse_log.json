@@ -1,0 +1,21 @@
+{
+  "job_id": "job_20260715_301217_2025_annual_report_parse",
+  "run_id": "wf_20260715_stock_first_301217_tongguan_copper_foil",
+  "evidence_id": "ev_annual_report_301217_20260418_d3f361",
+  "status": "SUCCESS",
+  "normalization_status": "SUCCESS",
+  "parser": "pypdf_text_extraction",
+  "mineru_status": "not_attempted",
+  "mineru": {
+    "attempted": false,
+    "reason": "external mineru call not requested"
+  },
+  "raw_pdf_path": "data/raw/annual_reports/cninfo_2025_annual_report_301217_2026-04-18.pdf",
+  "processed_text_path": "data/processed/text/ev_annual_report_301217_20260418_d3f361.md",
+  "tables_path": "data/processed/tables/ev_annual_report_301217_20260418_d3f361_tables.json",
+  "page_map_path": "data/processed/page_maps/ev_annual_report_301217_20260418_d3f361_page_map.yaml",
+  "page_count": 215,
+  "table_inventory_count": 0,
+  "candidate_info": {},
+  "issues": []
+}

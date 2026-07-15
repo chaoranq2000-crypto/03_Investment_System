@@ -1,0 +1,9 @@
+case_id: 600673_multi_business_ma
+generation_lock_sha256: cd445f4dade57e60f446dd0c5b747db4c298e4da5d2c0db11f1c4d3f9813c24e
+note: Automated generation cannot synthesize acceptance. A real reviewer must sign
+  the exact hashes.
+reader_report_sha256: 2fc4dff78527743b5fa884df4c5329ef4cd014c73686e1b10cef7edff45daed9
+reviewed_at: ''
+reviewer: ''
+schema_version: 1
+status: pending

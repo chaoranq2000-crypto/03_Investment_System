@@ -1,0 +1,268 @@
+{
+  "artifact_type": "r5_bundle16r_reviewed_evidence_pack",
+  "as_of_date": "2026-07-15",
+  "case_id": "600988_cycle_resource_gold",
+  "claims": [
+    {
+      "claim_id": "claim_600988_gold_concentration",
+      "claim_type": "fact",
+      "counterevidence": "多金属和资源回收业务仍可能影响资本开支与尾部风险。",
+      "evidence_ids": [
+        "ev_annual_report_600988_20260321_d53382"
+      ],
+      "locator": "page:20-21",
+      "text": "2025年黄金产品构成公司收入和毛利的绝对主体。"
+    },
+    {
+      "claim_id": "claim_600988_price_volume",
+      "claim_type": "inference",
+      "counterevidence": "单季度产量受生产和销售时点影响，需用半年和全年数据验证。",
+      "evidence_ids": [
+        "ev_quarterly_report_600988_20260425_4201ae"
+      ],
+      "locator": "page:6",
+      "text": "2026年一季度黄金价格同比上升而产量下降，利润改善不能解释为量价齐升。"
+    },
+    {
+      "claim_id": "claim_600988_cost_pressure",
+      "claim_type": "fact",
+      "counterevidence": "季节性、矿山结构和阶段性剥离会影响单季度可比性。",
+      "evidence_ids": [
+        "ev_annual_report_600988_20260321_d53382",
+        "ev_quarterly_report_600988_20260425_4201ae"
+      ],
+      "locator": "annual page:23; q1 page:6",
+      "text": "一季度单位成本与AISC均高于2025年全年水平。"
+    },
+    {
+      "claim_id": "claim_600988_h1_guidance",
+      "claim_type": "management_comment",
+      "counterevidence": "业绩预告是管理层估计，不是审计后事实，也不代表全年利润。",
+      "evidence_ids": [
+        "ev_announcement_600988_20260715_c11825"
+      ],
+      "locator": "page:1-2",
+      "text": "公司预计2026年上半年归母净利润17.0亿至17.8亿元，数据未经审计，主要原因描述为黄金售价同比上升。"
+    }
+  ],
+  "company_metrics": [
+    {
+      "evidence_id": "ev_annual_report_600988_20260321_d53382",
+      "locator": "page:20",
+      "metric_id": "metric_600988_revenue_2025",
+      "name": "营业收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 12638506229.12
+    },
+    {
+      "evidence_id": "ev_annual_report_600988_20260321_d53382",
+      "locator": "page:21",
+      "metric_id": "metric_600988_gold_revenue_2025",
+      "name": "黄金收入",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 11338917613.16
+    },
+    {
+      "evidence_id": "ev_annual_report_600988_20260321_d53382",
+      "locator": "page:21",
+      "metric_id": "metric_600988_gold_margin_2025",
+      "name": "黄金毛利率",
+      "period": "2025A",
+      "unit": "percent",
+      "value": 58.51
+    },
+    {
+      "evidence_id": "ev_annual_report_600988_20260321_d53382",
+      "locator": "page:22",
+      "metric_id": "metric_600988_gold_output_2025",
+      "name": "黄金产量",
+      "period": "2025A",
+      "unit": "kg",
+      "value": 14510.58
+    },
+    {
+      "evidence_id": "ev_annual_report_600988_20260321_d53382",
+      "locator": "page:22",
+      "metric_id": "metric_600988_gold_sales_2025",
+      "name": "黄金销量",
+      "period": "2025A",
+      "unit": "kg",
+      "value": 14448.52
+    },
+    {
+      "evidence_id": "ev_annual_report_600988_20260321_d53382",
+      "locator": "page:23",
+      "metric_id": "metric_600988_unit_cost_2025",
+      "name": "黄金单位成本",
+      "period": "2025A",
+      "unit": "CNY_per_g",
+      "value": 326.26
+    },
+    {
+      "evidence_id": "ev_annual_report_600988_20260321_d53382",
+      "locator": "page:23",
+      "metric_id": "metric_600988_aisc_2025",
+      "name": "黄金全维持成本",
+      "period": "2025A",
+      "unit": "CNY_per_g",
+      "value": 372.63
+    },
+    {
+      "evidence_id": "ev_annual_report_600988_20260321_d53382",
+      "locator": "page:20",
+      "metric_id": "metric_600988_ocf_2025",
+      "name": "经营现金流",
+      "period": "2025A",
+      "unit": "CNY",
+      "value": 5555589287.5
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+      "locator": "page:6",
+      "metric_id": "metric_600988_q1_price_2026",
+      "name": "一季度黄金销售价格",
+      "period": "2026Q1",
+      "unit": "CNY_per_g",
+      "value": 1061.32
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+      "locator": "page:6",
+      "metric_id": "metric_600988_q1_output_2026",
+      "name": "一季度黄金产量",
+      "period": "2026Q1",
+      "unit": "kg",
+      "value": 2981.35
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+      "locator": "page:6",
+      "metric_id": "metric_600988_q1_unit_cost_2026",
+      "name": "一季度黄金单位成本",
+      "period": "2026Q1",
+      "unit": "CNY_per_g",
+      "value": 408.4
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+      "locator": "page:6",
+      "metric_id": "metric_600988_q1_aisc_2026",
+      "name": "一季度黄金全维持成本",
+      "period": "2026Q1",
+      "unit": "CNY_per_g",
+      "value": 483.87
+    },
+    {
+      "evidence_id": "ev_announcement_600988_20260715_c11825",
+      "locator": "page:1",
+      "metric_id": "metric_600988_h1_np_low_2026",
+      "name": "半年度归母净利润预告下限",
+      "period": "2026H1E_management",
+      "unit": "CNY",
+      "value": 1700000000
+    },
+    {
+      "evidence_id": "ev_announcement_600988_20260715_c11825",
+      "locator": "page:1",
+      "metric_id": "metric_600988_h1_np_high_2026",
+      "name": "半年度归母净利润预告上限",
+      "period": "2026H1E_management",
+      "unit": "CNY",
+      "value": 1780000000
+    }
+  ],
+  "evidence_integrity_incidents": [
+    {
+      "detail": "首次SSE下载返回反爬HTML而非PDF，已拒绝并由CNINFO同一披露替代，不用于任何主张。",
+      "incident_id": "incident_600988_sse_challenge",
+      "rejected_evidence_ids": [
+        "ev_annual_report_600988_20260321_e68281",
+        "ev_quarterly_report_600988_20260425_0f35e5"
+      ],
+      "status": "rejected_and_superseded"
+    }
+  ],
+  "official_source_count": 3,
+  "research_questions": [
+    {
+      "question_id": "rq_600988_reconcile",
+      "resolution": "2025年产品收入成本与合并口径已完整对账",
+      "severity": "critical",
+      "status": "resolved"
+    },
+    {
+      "next_step": "复核半年报单位成本、AISC、品位、回收率和剥采因素",
+      "owner": "future_refresh",
+      "question_id": "rq_600988_q1_cost",
+      "severity": "major",
+      "status": "open"
+    }
+  ],
+  "review_status": "reviewed",
+  "sample_reports_used_as_evidence": false,
+  "schema_version": 1,
+  "source_count": 3,
+  "source_integrity": [
+    {
+      "evidence_id": "ev_annual_report_600988_20260321_d53382",
+      "page_count": 219,
+      "processed_text_path": "data/processed/text/ev_annual_report_600988_20260321_d53382.md",
+      "review_status": "reviewed",
+      "sha256": "d53382f3f9e7989347b91524d63140dca89cd56d8ade23a07d3e9a33dc1a043e",
+      "source_path": "data/raw/annual_reports/cninfo_2025_annual_report_600988_2026-03-21.pdf"
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+      "page_count": 13,
+      "processed_text_path": "data/processed/text/ev_quarterly_report_600988_20260425_4201ae.md",
+      "review_status": "reviewed",
+      "sha256": "4201aea82ab9528f3d8a6b2fdc1bddab57310eeefef1d24806444deab6213ae1",
+      "source_path": "data/raw/announcements/cninfo_2026_q1_report_600988_2026-04-25.pdf"
+    },
+    {
+      "evidence_id": "ev_announcement_600988_20260715_c11825",
+      "page_count": 2,
+      "processed_text_path": "data/processed/text/ev_announcement_600988_20260715_c11825.md",
+      "review_status": "reviewed",
+      "sha256": "c1182511d89de6249aa045f16197b0d3e43ce63c83ec201514cc17e7590fa46d",
+      "source_path": "data/raw/announcements/cninfo_2026_h1_performance_forecast_600988_2026-07-15.pdf"
+    }
+  ],
+  "sources": [
+    {
+      "evidence_id": "ev_annual_report_600988_20260321_d53382",
+      "file_hash": "d53382f3f9e7989347b91524d63140dca89cd56d8ade23a07d3e9a33dc1a043e",
+      "page_count": 219,
+      "processed_text_path": "data/processed/text/ev_annual_report_600988_20260321_d53382.md",
+      "review_status": "reviewed",
+      "source_class": "official",
+      "source_path": "data/raw/annual_reports/cninfo_2025_annual_report_600988_2026-03-21.pdf",
+      "source_type": "annual_report",
+      "title": "2025年年度报告"
+    },
+    {
+      "evidence_id": "ev_quarterly_report_600988_20260425_4201ae",
+      "file_hash": "4201aea82ab9528f3d8a6b2fdc1bddab57310eeefef1d24806444deab6213ae1",
+      "page_count": 13,
+      "processed_text_path": "data/processed/text/ev_quarterly_report_600988_20260425_4201ae.md",
+      "review_status": "reviewed",
+      "source_class": "official",
+      "source_path": "data/raw/announcements/cninfo_2026_q1_report_600988_2026-04-25.pdf",
+      "source_type": "quarterly_report",
+      "title": "2026年第一季度报告"
+    },
+    {
+      "evidence_id": "ev_announcement_600988_20260715_c11825",
+      "file_hash": "c1182511d89de6249aa045f16197b0d3e43ce63c83ec201514cc17e7590fa46d",
+      "page_count": 2,
+      "processed_text_path": "data/processed/text/ev_announcement_600988_20260715_c11825.md",
+      "review_status": "reviewed",
+      "source_class": "official",
+      "source_path": "data/raw/announcements/cninfo_2026_h1_performance_forecast_600988_2026-07-15.pdf",
+      "source_type": "performance_forecast",
+      "title": "2026年半年度业绩预告"
+    }
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "artifact_type": "r5_bundle16r_operating_driver_pack",
+  "coverage_metrics": {
+    "gross_profit_explained_ratio": 1.0,
+    "material_segment_driver_coverage": 1.0,
+    "residual_gross_profit_ratio": 0.0,
+    "residual_revenue_ratio": 0.0,
+    "revenue_explained_ratio": 1.0
+  },
+  "decision": "pass",
+  "period": "2025A",
+  "reconciliation": {
+    "gross_profit_difference": 0.0,
+    "revenue_difference": 0.0,
+    "segment_gross_profit_sum": 2969811839.59,
+    "segment_revenue_sum": 14934605535.39
+  },
+  "schema_version": 1,
+  "segments": [
+    {
+      "cost": 2300679891.33,
+      "disclosure_boundary": "年报披露分部收入成本和制冷剂配额，未披露单一制冷剂完整损益。",
+      "display_name": "化工新材料",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "quota_volume_price_unit_cost",
+        "driver_topics": [
+          "refrigerant quota and price",
+          "unit cost",
+          "product mix"
+        ],
+        "equation": "配额约束销量 × 实现价格 - 单位原料与制造成本",
+        "source_evidence_ids": [
+          "ev_annual_report_600673_20260410_a8e2a1"
+        ]
+      },
+      "gross_margin": 0.43330737,
+      "gross_profit": 1759157410.94,
+      "material": true,
+      "revenue": 4059837302.27,
+      "segment_id": "fluorochemicals"
+    },
+    {
+      "cost": 2776963417.12,
+      "disclosure_boundary": "年报披露分部收入成本，未披露全部产品线产能利用率和单品加工费。",
+      "display_name": "电子元器件",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "capacity_utilization_mix_processing_fee",
+        "driver_topics": [
+          "electronic material capacity",
+          "capacity utilization",
+          "product mix"
+        ],
+        "equation": "有效产能 × 利用率 × 产品结构价格 - 制造成本",
+        "source_evidence_ids": [
+          "ev_annual_report_600673_20260410_a8e2a1"
+        ]
+      },
+      "gross_margin": 0.22053561,
+      "gross_profit": 785692493.38,
+      "material": true,
+      "revenue": 3562655910.5,
+      "segment_id": "electronic_materials"
+    },
+    {
+      "cost": 5676855656.79,
+      "disclosure_boundary": "按年报分业务收入成本列示。",
+      "display_name": "高端铝箔",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "volume_price_unit_cost",
+        "driver_topics": [
+          "volume",
+          "price",
+          "unit cost"
+        ],
+        "equation": "销量 × 售价 - 加工与原料成本",
+        "source_evidence_ids": [
+          "ev_annual_report_600673_20260410_a8e2a1"
+        ]
+      },
+      "gross_margin": 0.04121836,
+      "gross_profit": 244050000.74,
+      "material": false,
+      "revenue": 5920905657.53,
+      "segment_id": "high_end_aluminum"
+    },
+    {
+      "cost": 610464365.9,
+      "disclosure_boundary": "按年报分业务收入成本列示。",
+      "display_name": "能源材料",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "volume_price_unit_cost",
+        "driver_topics": [
+          "volume",
+          "price",
+          "unit cost"
+        ],
+        "equation": "销量 × 售价 - 制造成本",
+        "source_evidence_ids": [
+          "ev_annual_report_600673_20260410_a8e2a1"
+        ]
+      },
+      "gross_margin": 0.03189304,
+      "gross_profit": 20110963.48,
+      "material": false,
+      "revenue": 630575329.38,
+      "segment_id": "energy_materials"
+    },
+    {
+      "cost": 110878076.64,
+      "disclosure_boundary": "按年报其他主营业务口径列示。",
+      "display_name": "其他主营业务",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "volume_price_unit_cost",
+        "driver_topics": [
+          "revenue",
+          "cost"
+        ],
+        "equation": "收入 - 成本",
+        "source_evidence_ids": [
+          "ev_annual_report_600673_20260410_a8e2a1"
+        ]
+      },
+      "gross_margin": 0.30290549,
+      "gross_profit": 48179375.79,
+      "material": false,
+      "revenue": 159057452.43,
+      "segment_id": "other_main_business"
+    },
+    {
+      "cost": 488952288.02,
+      "disclosure_boundary": "合并口径与主营分部合计之差，不作为独立经营分部解释。",
+      "display_name": "其他业务及对账残差",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "reconciliation_residual",
+        "driver_topics": [
+          "reconciliation"
+        ],
+        "equation": "合并口径 - 主营分部合计",
+        "source_evidence_ids": [
+          "ev_annual_report_600673_20260410_a8e2a1"
+        ]
+      },
+      "gross_margin": 0.18721158,
+      "gross_profit": 112621595.26,
+      "material": false,
+      "revenue": 601573883.28,
+      "segment_id": "other_revenue"
+    },
+    {
+      "cost": 0.0,
+      "disclosure_boundary": "截至信息截止日，所用披露未提供可与历史合并收入对账的独立液冷收入和成本，保持零基数与MISSING_DISCLOSURE。",
+      "display_name": "液冷项目",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "project_unit_value_acceptance",
+        "driver_topics": [
+          "liquid-cooling project conversion",
+          "acceptance"
+        ],
+        "equation": "已验收项目数量 × 可确认单位价值",
+        "estimate_logic": "未验收与未披露的项目不确认收入。"
+      },
+      "gross_margin": null,
+      "gross_profit": 0.0,
+      "material": true,
+      "revenue": 0.0,
+      "segment_id": "liquid_cooling"
+    },
+    {
+      "cost": 0.0,
+      "disclosure_boundary": "合同披露的是采购成本或估计合同总额，不是历史收入，当前保持零基数。",
+      "display_name": "IDC与算力基础设施",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "idc_capacity_utilization_unit_revenue_power_cost",
+        "driver_topics": [
+          "IDC capacity and utilization",
+          "power cost",
+          "acceptance"
+        ],
+        "equation": "验收并投运能力 × 利用率 × 单位收入 - 电力与服务采购成本",
+        "source_evidence_ids": [
+          "ev_announcement_600673_20260625_c5ca5c",
+          "ev_announcement_600673_20260711_54be9c"
+        ]
+      },
+      "gross_margin": null,
+      "gross_profit": 0.0,
+      "material": true,
+      "revenue": 0.0,
+      "segment_id": "idc_and_compute_infrastructure"
+    },
+    {
+      "cost": 0.0,
+      "disclosure_boundary": "交易尚需审议、审核、注册及可能的经营者集中程序，不在历史或预测基准中提前并表。",
+      "display_name": "并购与并表影响",
+      "driver_bound": true,
+      "driver_contract": {
+        "archetype_id": "deal_close_consolidation_financing_cost",
+        "driver_topics": [
+          "deal closing and consolidation",
+          "financing cost"
+        ],
+        "equation": "交割概率 × 并表月份 × 标的可确认损益 - 融资成本",
+        "source_evidence_ids": [
+          "ev_announcement_600673_20260616_da320e"
+        ]
+      },
+      "gross_margin": null,
+      "gross_profit": 0.0,
+      "material": true,
+      "revenue": 0.0,
+      "segment_id": "acquisition_consolidation"
+    }
+  ],
+  "total_gross_profit": 2969811839.59,
+  "total_revenue": 14934605535.39,
+  "unit": "CNY"
+}

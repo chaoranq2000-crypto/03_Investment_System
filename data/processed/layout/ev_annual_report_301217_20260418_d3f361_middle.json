@@ -1,0 +1,8 @@
+{
+  "evidence_id": "ev_annual_report_301217_20260418_d3f361",
+  "parser": "pypdf_text_extraction",
+  "mineru": {
+    "attempted": false,
+    "reason": "external mineru call not requested"
+  }
+}
