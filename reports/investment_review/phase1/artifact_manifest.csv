@@ -1,0 +1,16 @@
+artifact_id,artifact_type,path,created_by_skill,stage,required,exists,status,notes
+ir_p1_skill,skill_contract,.agents/skills/investment-review/SKILL.md,investment-review,Gate 1,true,true,current,Explicitly enabled by AGENTS.md as an isolated repo-local utility
+ir_p1_example_mapping,mapping_template,config/investment_review.example.json,investment-review,Gate 1,true,true,current,Package template
+ir_p1_generated_mapping,mapping_suggestion,config/investment_review.portfolio.generated.json,investment-review,Gate 1,true,true,current,Machine-generated and review_required=true; allowed for dry-run only
+ir_p1_reviewed_mapping,mapping,config/investment_review.portfolio.reviewed.json,human,Gate 1,true,true,current,Reviewed mapping uses account_id::external_id and locks source path table schema generated input and complete reviewed content
+ir_p1_plan,implementation_plan,docs/plans/INVESTMENT_REVIEW_IMPLEMENTATION_PLAN.md,investment-review,Gate 1,true,true,current,Gate 2-5 remain future scope
+ir_p1_playbook,playbook,docs/playbooks/INVESTMENT_REVIEW_PHASE1.md,investment-review,Gate 1,true,true,current,Updated for schema v2 review lock cash_amount explicit event-run lineage and linked-worktree conda behavior
+ir_p1_launcher,launcher,scripts/start_investment_review.ps1,investment-review,Gate 1,true,true,current,Resolves the primary worktree conda environment
+ir_p1_module,python_module,src/investment_review,investment-review,Gate 1,true,true,current,Schema v2 deterministic data foundation with application lock and explicit run-event lineage
+ir_p1_tests,test_suite,tests/test_investment_review_phase1.py,investment-review,Gate 1,true,true,current,14 tests pass
+ir_p1_schema_manifest,schema_manifest,reports/investment_review/phase1/schema_manifest.json,investment-review,Gate 1,true,true,current,Generated read-only from the canonical portfolio database
+ir_p1_review_db,sqlite_sidecar,data/db/investment_review.sqlite3,investment-review,Gate 1,true,true,current,Ignored schema v2 sidecar; application_id=0x49525657; 961 events and 3844 run-event links across 4 runs; integrity_check=ok
+ir_p1_validation,validation_summary,reports/investment_review/phase1/validation_summary.json,quality-review,Gate 1,true,true,current,Machine-readable acceptance evidence
+ir_p1_quality_report,quality_gate_report,reports/investment_review/phase1/quality_gate_report.md,quality-review,Gate 1,true,true,current,Accepted_with_todos; independent final review passed
+ir_p1_quality_issues,quality_issues,reports/investment_review/phase1/quality_issues.csv,quality-review,Gate 1,true,true,current,Open critical/high=0; resolved high=16; accepted TODO=5
+ir_p1_acceptance,workflow_readout,reports/investment_review/phase1/gate1_acceptance.md,research-orchestrator,Gate 1,true,true,current,Gate 1 current snapshot accepted_with_todos and independently confirmed; Gate 2 not started

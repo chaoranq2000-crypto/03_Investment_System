@@ -1,0 +1,48 @@
+{
+  "mapping_version": 1,
+  "source": {
+    "name": "broker-fills-example",
+    "kind": "broker_csv",
+    "uri": "data/imports/replace-with-your-file.csv",
+    "identity_key": "replace-with-stable-broker-account-export-namespace",
+    "timezone": "Asia/Shanghai",
+    "read_only": true
+  },
+  "csv": {
+    "encoding": "utf-8-sig",
+    "delimiter": ","
+  },
+  "mapping": {
+    "record_id": "成交编号",
+    "occurred_at": {
+      "join": ["成交日期", "成交时间"],
+      "separator": " "
+    },
+    "known_at": null,
+    "symbol": "证券代码",
+    "side": "买卖标志",
+    "quantity": "成交数量",
+    "price": "成交价格",
+    "gross_amount": "成交金额",
+    "cash_amount": null,
+    "fees": ["佣金", "印花税", "过户费"],
+    "account": {
+      "constant": "default"
+    },
+    "market": "交易市场",
+    "currency": {
+      "constant": "CNY"
+    },
+    "event_type": {
+      "constant": "fill"
+    }
+  },
+  "values": {
+    "side": {
+      "买入": "BUY",
+      "证券买入": "BUY",
+      "卖出": "SELL",
+      "证券卖出": "SELL"
+    }
+  }
+}

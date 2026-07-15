@@ -1,0 +1,65 @@
+{
+  "source": {
+    "name": "portfolio-ledger:portfolio:ledger_entries",
+    "kind": "portfolio_sqlite",
+    "uri": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+    "timezone": "Asia/Shanghai",
+    "read_only": true
+  },
+  "sqlite": {
+    "table": "ledger_entries"
+  },
+  "mapping": {
+    "record_id": {
+      "join": [
+        "account_id",
+        "external_id"
+      ],
+      "separator": "::"
+    },
+    "symbol": "ts_code",
+    "side": "event_type",
+    "quantity": "quantity",
+    "price": "price",
+    "gross_amount": "gross_amount",
+    "cash_amount": "cash_amount",
+    "fees": "fees",
+    "known_at": "created_at",
+    "account": "account_id",
+    "market": null,
+    "currency": {
+      "constant": "CNY"
+    },
+    "event_type": "event_type",
+    "occurred_at": {
+      "join": [
+        "event_date",
+        "event_time"
+      ],
+      "separator": " "
+    }
+  },
+  "values": {
+    "side": {
+      "买入": "BUY",
+      "证券买入": "BUY",
+      "BUY": "BUY",
+      "B": "BUY",
+      "卖出": "SELL",
+      "证券卖出": "SELL",
+      "SELL": "SELL",
+      "S": "SELL",
+      "DIVIDEND": "OTHER",
+      "CASH_FEE": "OTHER",
+      "OPENING": "OTHER"
+    }
+  },
+  "generated_from": {
+    "database": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+    "table": "ledger_entries",
+    "table_schema_sha256": "26a979d503a276afa0e42957c90878eb479ab63bcd7d59374366525c959c79bf",
+    "trade_score": 5,
+    "review_required": true,
+    "missing_required_fields": []
+  }
+}

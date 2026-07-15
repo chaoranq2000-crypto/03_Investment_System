@@ -1,0 +1,1494 @@
+{
+  "mode": "read_only",
+  "database_count": 1,
+  "databases": [
+    {
+      "generated_at": "2026-07-14T20:24:22Z",
+      "database": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+      "read_only": true,
+      "size_bytes": 757760,
+      "mtime_ns": 1784056102437399300,
+      "sqlite_user_version": 0,
+      "sqlite_application_id": 0,
+      "tables": [
+        {
+          "name": "accounts",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "account_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "name",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "base_currency",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'CNY'",
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "baseline_date",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "created_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 0,
+            "position_score": 0,
+            "matched_fields": {
+              "known_at": "created_at",
+              "account": "account_id"
+            }
+          },
+          "create_sql": "CREATE TABLE accounts (\n    account_id TEXT PRIMARY KEY,\n    name TEXT NOT NULL,\n    base_currency TEXT NOT NULL DEFAULT 'CNY',\n    baseline_date TEXT,\n    created_at TEXT NOT NULL\n)",
+          "row_count": 1
+        },
+        {
+          "name": "adjustment_factor_observations",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "observation_id",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "ts_code",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "trade_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "adj_factor",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "source",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "refresh_batch_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "dedupe_key",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "fetched_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 2,
+            "position_score": 1,
+            "matched_fields": {
+              "record_id": "dedupe_key",
+              "trade_date": "trade_date",
+              "symbol": "ts_code"
+            }
+          },
+          "create_sql": "CREATE TABLE adjustment_factor_observations (\n    observation_id INTEGER PRIMARY KEY AUTOINCREMENT,\n    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),\n    trade_date TEXT NOT NULL,\n    adj_factor TEXT NOT NULL,\n    source TEXT NOT NULL,\n    refresh_batch_id TEXT NOT NULL,\n    dedupe_key TEXT NOT NULL UNIQUE,\n    fetched_at TEXT NOT NULL\n)",
+          "row_count": 96
+        },
+        {
+          "name": "cash_balance_snapshots",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "snapshot_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "account_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "as_of_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "amount",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "source",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "note",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "recorded_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 0,
+            "position_score": 0,
+            "matched_fields": {
+              "gross_amount": "amount",
+              "account": "account_id"
+            }
+          },
+          "create_sql": "CREATE TABLE cash_balance_snapshots (\n    snapshot_id TEXT PRIMARY KEY,\n    account_id TEXT NOT NULL REFERENCES accounts(account_id),\n    as_of_date TEXT NOT NULL,\n    amount TEXT NOT NULL,\n    source TEXT NOT NULL,\n    note TEXT NOT NULL DEFAULT '',\n    recorded_at TEXT NOT NULL\n)",
+          "row_count": 1
+        },
+        {
+          "name": "close_prices",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "observation_id",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "ts_code",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "trade_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "close",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "pre_close",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "pct_chg",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "source",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "fetched_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 2,
+            "position_score": 1,
+            "matched_fields": {
+              "trade_date": "trade_date",
+              "symbol": "ts_code"
+            }
+          },
+          "create_sql": "CREATE TABLE close_prices (\n    observation_id INTEGER PRIMARY KEY AUTOINCREMENT,\n    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),\n    trade_date TEXT NOT NULL,\n    close TEXT NOT NULL,\n    pre_close TEXT NOT NULL DEFAULT '',\n    pct_chg TEXT NOT NULL DEFAULT '',\n    source TEXT NOT NULL,\n    fetched_at TEXT NOT NULL,\n    UNIQUE(ts_code, trade_date, close, pre_close, pct_chg, source)\n)",
+          "row_count": 19
+        },
+        {
+          "name": "daily_bar_observations",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "observation_id",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "ts_code",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "trade_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "open_price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "high_price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "low_price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "close_price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "volume_lots",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "amount_k_cny",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "source",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 10,
+              "name": "refresh_batch_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 11,
+              "name": "dedupe_key",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 12,
+              "name": "fetched_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 2,
+            "position_score": 1,
+            "matched_fields": {
+              "record_id": "dedupe_key",
+              "trade_date": "trade_date",
+              "symbol": "ts_code"
+            }
+          },
+          "create_sql": "CREATE TABLE daily_bar_observations (\n    observation_id INTEGER PRIMARY KEY AUTOINCREMENT,\n    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),\n    trade_date TEXT NOT NULL,\n    open_price TEXT NOT NULL,\n    high_price TEXT NOT NULL,\n    low_price TEXT NOT NULL,\n    close_price TEXT NOT NULL,\n    volume_lots TEXT NOT NULL,\n    amount_k_cny TEXT NOT NULL,\n    source TEXT NOT NULL,\n    refresh_batch_id TEXT NOT NULL,\n    dedupe_key TEXT NOT NULL UNIQUE,\n    fetched_at TEXT NOT NULL\n)",
+          "row_count": 96
+        },
+        {
+          "name": "import_batches",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "batch_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "account_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "import_kind",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "broker",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "source_name",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "source_sha256",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "total_rows",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "accepted_rows",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "duplicate_rows",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "skipped_rows",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 10,
+              "name": "imported_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 0,
+            "position_score": 0,
+            "matched_fields": {
+              "account": "account_id"
+            }
+          },
+          "create_sql": "CREATE TABLE import_batches (\n    batch_id TEXT PRIMARY KEY,\n    account_id TEXT NOT NULL REFERENCES accounts(account_id),\n    import_kind TEXT NOT NULL,\n    broker TEXT NOT NULL,\n    source_name TEXT NOT NULL,\n    source_sha256 TEXT NOT NULL,\n    total_rows INTEGER NOT NULL,\n    accepted_rows INTEGER NOT NULL,\n    duplicate_rows INTEGER NOT NULL,\n    skipped_rows INTEGER NOT NULL,\n    imported_at TEXT NOT NULL\n)",
+          "row_count": 1
+        },
+        {
+          "name": "instruments",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "ts_code",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "name",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "asset_type",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "exchange",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "currency",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'CNY'",
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "industry_name",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "industry_source",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "industry_updated_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "updated_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 1,
+            "position_score": 1,
+            "matched_fields": {
+              "symbol": "ts_code",
+              "market": "exchange",
+              "currency": "currency"
+            }
+          },
+          "create_sql": "CREATE TABLE instruments (\n    ts_code TEXT PRIMARY KEY,\n    name TEXT NOT NULL,\n    asset_type TEXT NOT NULL CHECK (asset_type IN ('equity', 'etf', 'unknown')),\n    exchange TEXT NOT NULL,\n    currency TEXT NOT NULL DEFAULT 'CNY',\n    industry_name TEXT NOT NULL DEFAULT '',\n    industry_source TEXT NOT NULL DEFAULT '',\n    industry_updated_at TEXT NOT NULL DEFAULT '',\n    updated_at TEXT NOT NULL\n)",
+          "row_count": 74
+        },
+        {
+          "name": "internal_transfer_reconciliations",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "transfer_id",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "account_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "ts_code",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "quantity",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "transfer_out_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "transfer_in_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "from_broker",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "to_broker",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "reference_price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "out_source_name",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 10,
+              "name": "in_source_name",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 11,
+              "name": "out_reference",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 12,
+              "name": "in_reference",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 13,
+              "name": "status",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 14,
+              "name": "note",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 15,
+              "name": "dedupe_key",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 16,
+              "name": "recorded_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 2,
+            "position_score": 2,
+            "matched_fields": {
+              "record_id": "dedupe_key",
+              "symbol": "ts_code",
+              "quantity": "quantity",
+              "account": "account_id"
+            }
+          },
+          "create_sql": "CREATE TABLE internal_transfer_reconciliations (\n    transfer_id INTEGER PRIMARY KEY AUTOINCREMENT,\n    account_id TEXT NOT NULL REFERENCES accounts(account_id),\n    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),\n    quantity TEXT NOT NULL,\n    transfer_out_date TEXT NOT NULL,\n    transfer_in_date TEXT NOT NULL,\n    from_broker TEXT NOT NULL,\n    to_broker TEXT NOT NULL,\n    reference_price TEXT NOT NULL DEFAULT '0',\n    out_source_name TEXT NOT NULL DEFAULT '',\n    in_source_name TEXT NOT NULL DEFAULT '',\n    out_reference TEXT NOT NULL DEFAULT '',\n    in_reference TEXT NOT NULL DEFAULT '',\n    status TEXT NOT NULL CHECK (status IN ('reconciled_internal')),\n    note TEXT NOT NULL DEFAULT '',\n    dedupe_key TEXT NOT NULL,\n    recorded_at TEXT NOT NULL,\n    UNIQUE(account_id, dedupe_key)\n)",
+          "row_count": 9
+        },
+        {
+          "name": "ledger_entries",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "entry_id",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "account_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "event_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "event_time",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "event_type",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "ts_code",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "quantity",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "gross_amount",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "fees",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 10,
+              "name": "total_cost",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 11,
+              "name": "cash_amount",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 12,
+              "name": "external_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 13,
+              "name": "dedupe_key",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 14,
+              "name": "import_batch_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 15,
+              "name": "source_row",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 16,
+              "name": "note",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 17,
+              "name": "created_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [
+              "trade_event_candidate"
+            ],
+            "trade_score": 5,
+            "position_score": 2,
+            "matched_fields": {
+              "record_id": "external_id",
+              "trade_date": "event_date",
+              "trade_clock": "event_time",
+              "known_at": "created_at",
+              "symbol": "ts_code",
+              "side": "event_type",
+              "quantity": "quantity",
+              "price": "price",
+              "gross_amount": "gross_amount",
+              "cash_amount": "cash_amount",
+              "fees": "fees",
+              "account": "account_id"
+            }
+          },
+          "create_sql": "CREATE TABLE ledger_entries (\n    entry_id INTEGER PRIMARY KEY AUTOINCREMENT,\n    account_id TEXT NOT NULL REFERENCES accounts(account_id),\n    event_date TEXT NOT NULL,\n    event_time TEXT NOT NULL DEFAULT '',\n    event_type TEXT NOT NULL CHECK (\n        event_type IN ('OPENING', 'BUY', 'SELL', 'DIVIDEND', 'CASH_FEE')\n    ),\n    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),\n    quantity TEXT NOT NULL DEFAULT '0',\n    price TEXT NOT NULL DEFAULT '0',\n    gross_amount TEXT NOT NULL DEFAULT '0',\n    fees TEXT NOT NULL DEFAULT '0',\n    total_cost TEXT NOT NULL DEFAULT '0',\n    cash_amount TEXT NOT NULL DEFAULT '0',\n    external_id TEXT NOT NULL DEFAULT '',\n    dedupe_key TEXT NOT NULL,\n    import_batch_id TEXT REFERENCES import_batches(batch_id),\n    source_row INTEGER,\n    note TEXT NOT NULL DEFAULT '',\n    created_at TEXT NOT NULL,\n    UNIQUE(account_id, dedupe_key)\n)",
+          "row_count": 961
+        },
+        {
+          "name": "metadata",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "key",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "value",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 0,
+            "position_score": 0,
+            "matched_fields": {}
+          },
+          "create_sql": "CREATE TABLE metadata (\n    key TEXT PRIMARY KEY,\n    value TEXT NOT NULL\n)",
+          "row_count": 1
+        },
+        {
+          "name": "minute_bar_observations",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "observation_id",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "ts_code",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "bar_time",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "frequency_minutes",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "open_price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "high_price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "low_price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "close_price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "volume_shares",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "amount_cny",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 10,
+              "name": "source",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 11,
+              "name": "refresh_batch_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 12,
+              "name": "dedupe_key",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 13,
+              "name": "fetched_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 1,
+            "position_score": 1,
+            "matched_fields": {
+              "record_id": "dedupe_key",
+              "symbol": "ts_code"
+            }
+          },
+          "create_sql": "CREATE TABLE minute_bar_observations (\n    observation_id INTEGER PRIMARY KEY AUTOINCREMENT,\n    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),\n    bar_time TEXT NOT NULL,\n    frequency_minutes INTEGER NOT NULL CHECK (frequency_minutes IN (1, 5)),\n    open_price TEXT NOT NULL,\n    high_price TEXT NOT NULL,\n    low_price TEXT NOT NULL,\n    close_price TEXT NOT NULL,\n    volume_shares TEXT NOT NULL,\n    amount_cny TEXT NOT NULL,\n    source TEXT NOT NULL,\n    refresh_batch_id TEXT NOT NULL REFERENCES minute_refresh_batches(refresh_batch_id),\n    dedupe_key TEXT NOT NULL UNIQUE,\n    fetched_at TEXT NOT NULL\n)",
+          "row_count": 0
+        },
+        {
+          "name": "minute_refresh_batches",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "refresh_batch_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "ts_code",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "trade_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "frequency_minutes",
+              "type": "INTEGER",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "source",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "provider_attempts_json",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "fetched_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 2,
+            "position_score": 1,
+            "matched_fields": {
+              "trade_date": "trade_date",
+              "symbol": "ts_code"
+            }
+          },
+          "create_sql": "CREATE TABLE minute_refresh_batches (\n    refresh_batch_id TEXT PRIMARY KEY,\n    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),\n    trade_date TEXT NOT NULL,\n    frequency_minutes INTEGER NOT NULL CHECK (frequency_minutes IN (1, 5)),\n    source TEXT NOT NULL,\n    provider_attempts_json TEXT NOT NULL,\n    fetched_at TEXT NOT NULL\n)",
+          "row_count": 0
+        },
+        {
+          "name": "position_cost_rebases",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "rebase_id",
+              "type": "TEXT",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "account_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "ts_code",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "as_of_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "target_quantity",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "total_cost",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "source_path",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "status",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "note",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "recorded_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [],
+            "trade_score": 1,
+            "position_score": 1,
+            "matched_fields": {
+              "symbol": "ts_code",
+              "account": "account_id"
+            }
+          },
+          "create_sql": "CREATE TABLE position_cost_rebases (\n    rebase_id TEXT PRIMARY KEY,\n    account_id TEXT NOT NULL REFERENCES accounts(account_id),\n    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),\n    as_of_date TEXT NOT NULL,\n    target_quantity TEXT NOT NULL,\n    total_cost TEXT NOT NULL,\n    source_path TEXT NOT NULL,\n    status TEXT NOT NULL CHECK (status IN ('reviewed', 'unverified')),\n    note TEXT NOT NULL DEFAULT '',\n    recorded_at TEXT NOT NULL,\n    UNIQUE(account_id, ts_code, as_of_date, source_path, status)\n)",
+          "row_count": 38
+        },
+        {
+          "name": "statement_observations",
+          "columns": [
+            {
+              "cid": 0,
+              "name": "observation_id",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 1
+            },
+            {
+              "cid": 1,
+              "name": "account_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 2,
+              "name": "event_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 3,
+              "name": "event_time",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 4,
+              "name": "event_type",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 5,
+              "name": "ts_code",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 6,
+              "name": "quantity",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 7,
+              "name": "price",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 8,
+              "name": "gross_amount",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 9,
+              "name": "fees",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 10,
+              "name": "cash_amount",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "'0'",
+              "pk": 0
+            },
+            {
+              "cid": 11,
+              "name": "external_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 12,
+              "name": "dedupe_key",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 13,
+              "name": "disposition",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 14,
+              "name": "baseline_date",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 15,
+              "name": "import_batch_id",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 16,
+              "name": "source_row",
+              "type": "INTEGER",
+              "notnull": 0,
+              "dflt_value": null,
+              "pk": 0
+            },
+            {
+              "cid": 17,
+              "name": "note",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": "''",
+              "pk": 0
+            },
+            {
+              "cid": 18,
+              "name": "recorded_at",
+              "type": "TEXT",
+              "notnull": 1,
+              "dflt_value": null,
+              "pk": 0
+            }
+          ],
+          "candidate": {
+            "roles": [
+              "trade_event_candidate"
+            ],
+            "trade_score": 5,
+            "position_score": 2,
+            "matched_fields": {
+              "record_id": "external_id",
+              "trade_date": "event_date",
+              "trade_clock": "event_time",
+              "symbol": "ts_code",
+              "side": "event_type",
+              "quantity": "quantity",
+              "price": "price",
+              "gross_amount": "gross_amount",
+              "cash_amount": "cash_amount",
+              "fees": "fees",
+              "account": "account_id"
+            }
+          },
+          "create_sql": "CREATE TABLE statement_observations (\n    observation_id INTEGER PRIMARY KEY AUTOINCREMENT,\n    account_id TEXT NOT NULL REFERENCES accounts(account_id),\n    event_date TEXT NOT NULL,\n    event_time TEXT NOT NULL DEFAULT '',\n    event_type TEXT NOT NULL,\n    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),\n    quantity TEXT NOT NULL DEFAULT '0',\n    price TEXT NOT NULL DEFAULT '0',\n    gross_amount TEXT NOT NULL DEFAULT '0',\n    fees TEXT NOT NULL DEFAULT '0',\n    cash_amount TEXT NOT NULL DEFAULT '0',\n    external_id TEXT NOT NULL DEFAULT '',\n    dedupe_key TEXT NOT NULL,\n    disposition TEXT NOT NULL CHECK (disposition IN ('included_in_opening')),\n    baseline_date TEXT NOT NULL,\n    import_batch_id TEXT NOT NULL REFERENCES import_batches(batch_id),\n    source_row INTEGER,\n    note TEXT NOT NULL DEFAULT '',\n    recorded_at TEXT NOT NULL,\n    UNIQUE(account_id, dedupe_key, disposition)\n)",
+          "row_count": 0
+        }
+      ],
+      "candidates": [
+        {
+          "table": "ledger_entries",
+          "roles": [
+            "trade_event_candidate"
+          ],
+          "trade_score": 5,
+          "position_score": 2,
+          "matched_fields": {
+            "record_id": "external_id",
+            "trade_date": "event_date",
+            "trade_clock": "event_time",
+            "known_at": "created_at",
+            "symbol": "ts_code",
+            "side": "event_type",
+            "quantity": "quantity",
+            "price": "price",
+            "gross_amount": "gross_amount",
+            "cash_amount": "cash_amount",
+            "fees": "fees",
+            "account": "account_id"
+          }
+        },
+        {
+          "table": "statement_observations",
+          "roles": [
+            "trade_event_candidate"
+          ],
+          "trade_score": 5,
+          "position_score": 2,
+          "matched_fields": {
+            "record_id": "external_id",
+            "trade_date": "event_date",
+            "trade_clock": "event_time",
+            "symbol": "ts_code",
+            "side": "event_type",
+            "quantity": "quantity",
+            "price": "price",
+            "gross_amount": "gross_amount",
+            "cash_amount": "cash_amount",
+            "fees": "fees",
+            "account": "account_id"
+          }
+        }
+      ]
+    }
+  ]
+}

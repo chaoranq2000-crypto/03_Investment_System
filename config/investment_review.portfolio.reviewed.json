@@ -1,0 +1,73 @@
+{
+  "mapping_version": 1,
+  "source": {
+    "name": "portfolio-ledger:portfolio:ledger_entries",
+    "kind": "portfolio_sqlite",
+    "uri": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+    "timezone": "Asia/Shanghai",
+    "read_only": true
+  },
+  "sqlite": {
+    "table": "ledger_entries"
+  },
+  "mapping": {
+    "record_id": {
+      "join": [
+        "account_id",
+        "external_id"
+      ],
+      "separator": "::"
+    },
+    "occurred_at": {
+      "join": [
+        "event_date",
+        "event_time"
+      ],
+      "separator": " "
+    },
+    "known_at": null,
+    "symbol": "ts_code",
+    "side": "event_type",
+    "quantity": "quantity",
+    "price": "price",
+    "gross_amount": "gross_amount",
+    "cash_amount": "cash_amount",
+    "fees": "fees",
+    "account": "account_id",
+    "market": null,
+    "currency": {
+      "constant": "CNY"
+    },
+    "event_type": "event_type"
+  },
+  "values": {
+    "side": {
+      "BUY": "BUY",
+      "SELL": "SELL",
+      "DIVIDEND": "OTHER",
+      "CASH_FEE": "OTHER"
+    }
+  },
+  "generated_from": {
+    "database": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+    "table": "ledger_entries",
+    "table_schema_sha256": "26a979d503a276afa0e42957c90878eb479ab63bcd7d59374366525c959c79bf",
+    "trade_score": 5,
+    "review_required": true,
+    "missing_required_fields": []
+  },
+  "review": {
+    "status": "reviewed",
+    "reviewed_at": "2026-07-15T04:24:38+08:00",
+    "reviewed_by": "codex",
+    "schema_manifest_path": "reports/investment_review/phase1/schema_manifest.json",
+    "schema_manifest_sha256": "a4e23bf8d6bfe8b0cd15d2241e65fca1fe0305b7ffb3495fd57abaee9c4b34f0",
+    "generated_mapping_path": "config/investment_review.portfolio.generated.json",
+    "generated_mapping_sha256": "a707064ba00cc8795e7e6164b5b7240b4c86a55f7a9aaa4433af3b26cd498b9e",
+    "mapping_content_sha256": "a3a89c8c728ab37b08f32fc394120dd34318f037f00f4be968a916909b69cb46",
+    "reason": "Reviewed against the current canonical portfolio schema after doctor detected ledger_entries with trade_score 5/5.",
+    "record_id_policy": "Use account_id + external_id as the stable source record identity; retain dedupe_key in raw payload for content drift checks.",
+    "known_at_policy": "The ledger created_at value is a 2026-07-14 rebuild timestamp, not historical investor knowledge. Leave known_at unmapped so the importer uses occurred_at and records known_at_fallback=true.",
+    "non_trade_side_policy": "DIVIDEND and CASH_FEE retain their event_type, use side=OTHER, and preserve source cash_amount as a separate canonical field."
+  }
+}

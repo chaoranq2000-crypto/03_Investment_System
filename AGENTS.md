@@ -51,6 +51,7 @@ Use the existing workspace structure. Do not create ad hoc top-level folders.
 | Segment reports | `reports/segments/<segment_id>/` |
 | Stock reports | `reports/stocks/<stock_code>_<company_slug>/` |
 | Workflow run state and handoffs | `reports/workflow_runs/<workflow_id>/` |
+| Personal investment review manifests and readouts | `reports/investment_review/<phase>/` |
 | Thesis, watchlist, and postmortems | `decisions/` |
 
 ## Workflow routing
@@ -71,8 +72,15 @@ Lower-level skills are repeatable research actions:
 | `compare-segments` | Compare multiple segments after readiness gates pass. |
 | `compare-stocks` | Compare multiple stocks after relevant stock packages are ready. |
 | `memo-writer` | Convert reviewed research into memos, watchlist notes, or thesis notes. |
+| `investment-review` | Maintain a separate, read-only personal trade-review data foundation and provenance chain. |
 
 Do not use a disabled, retired, or unlisted skill unless the repository configuration explicitly enables it.
+
+`investment-review` is explicitly enabled as an independent repo-local utility. It is not a canonical A-share
+research `workflow_type`, is not routed through `research-orchestrator`, and must not change research evidence,
+portfolio accounting, order execution, or P2 readiness. Its source portfolio SQLite must remain read-only; review
+data must be written to a separate sidecar database. Follow `.agents/skills/investment-review/SKILL.md` for its
+phase boundary.
 
 ## Completion gates
 

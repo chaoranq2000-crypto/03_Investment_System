@@ -1,0 +1,200 @@
+{
+  "phase": "gate_1_data_contract_and_provenance",
+  "status": "accepted_with_todos",
+  "independent_final_review": "passed",
+  "as_of": "2026-07-15",
+  "patch": {
+    "path": "investment_review_phase1_patch_a12cbb8.zip",
+    "sha256": "2E08B87F60C70F232D31969CE397239DFDB1D3698DFF71539603A4C8E5BFED2A",
+    "base_commit": "a12cbb8a9b90e348c117f8eff3087a5a89c5c1b3",
+    "internal_checksums_verified": 23,
+    "internal_checksum_failures": 0
+  },
+  "source": {
+    "path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+    "table": "ledger_entries",
+    "read_only": true,
+    "quick_check": "ok",
+    "sha256_before": "B625D58AC54514A77620269F6D3CEB7214BA1446A2697257522D11B6F493645E",
+    "sha256_after": "B625D58AC54514A77620269F6D3CEB7214BA1446A2697257522D11B6F493645E",
+    "size_bytes_before": 757760,
+    "size_bytes_after": 757760,
+    "mtime_utc_before": "2026-07-14T19:08:22.4373993Z",
+    "mtime_utc_after": "2026-07-14T19:08:22.4373993Z",
+    "unchanged": true
+  },
+  "doctor": {
+    "mode": "read_only",
+    "database_count": 1,
+    "candidate_count": 2,
+    "top_table": "ledger_entries",
+    "top_trade_score": 5,
+    "top_trade_score_max": 5,
+    "ledger_row_count": 961,
+    "mapping_review_required": true,
+    "missing_required_fields": []
+  },
+  "reviewed_mapping": {
+    "path": "config/investment_review.portfolio.reviewed.json",
+    "file_sha256": "9db2934e2e965a0c7b38c1008bf50c6273ab393a7239b5e7b1571625f6d1a562",
+    "mapping_content_sha256": "a3a89c8c728ab37b08f32fc394120dd34318f037f00f4be968a916909b69cb46",
+    "mapping_content_hash_scope": "complete_reviewed_document_excluding_only_review.mapping_content_sha256",
+    "schema_manifest_sha256": "a4e23bf8d6bfe8b0cd15d2241e65fca1fe0305b7ffb3495fd57abaee9c4b34f0",
+    "generated_mapping_sha256": "a707064ba00cc8795e7e6164b5b7240b4c86a55f7a9aaa4433af3b26cd498b9e",
+    "table_schema_sha256": "26a979d503a276afa0e42957c90878eb479ab63bcd7d59374366525c959c79bf",
+    "record_id": "account_id::external_id",
+    "occurred_at": "event_date + event_time",
+    "known_at": null,
+    "known_at_policy": "occurred_at_fallback_with_raw_flag",
+    "symbol": "ts_code",
+    "side": "event_type",
+    "event_type": "event_type",
+    "gross_amount": "gross_amount",
+    "cash_amount": "cash_amount",
+    "non_trade_side_policy": "OTHER",
+    "formal_import_lock": "pass"
+  },
+  "mapping_policy_checks": {
+    "generated_mapping_formal_import": "rejected",
+    "generated_mapping_dry_run": "allowed",
+    "reviewed_mapping_provenance": "pass",
+    "mapping_content_lock": "pass",
+    "mapping_toctou_guard": "pass",
+    "sqlite_source_path_table_and_schema_binding": "pass",
+    "csv_stable_identity_key_required": "pass",
+    "record_id_required": "pass"
+  },
+  "dry_run": {
+    "status": "DRY_RUN",
+    "seen": 961,
+    "representative_event_types_reviewed": [
+      "BUY",
+      "SELL",
+      "DIVIDEND",
+      "CASH_FEE"
+    ],
+    "field_alignment": "pass",
+    "source_unchanged": true
+  },
+  "imports": [
+    {
+      "run_id": "run_17f51358aee04c2388e204c7cf39d69d",
+      "status": "COMPLETED",
+      "seen": 961,
+      "inserted": 961,
+      "skipped": 0,
+      "mapping_file_sha256": "e3ab506b2d6746d8a379792e250d0e2fe679b4747a225085b47364f6525d7d48"
+    },
+    {
+      "run_id": "run_343100a5b35e415bb2bbe3292fb122e4",
+      "status": "COMPLETED",
+      "seen": 961,
+      "inserted": 0,
+      "skipped": 961,
+      "mapping_file_sha256": "e3ab506b2d6746d8a379792e250d0e2fe679b4747a225085b47364f6525d7d48"
+    },
+    {
+      "run_id": "run_e781fadf03714777a870cfdca1a73990",
+      "status": "COMPLETED",
+      "seen": 961,
+      "inserted": 0,
+      "skipped": 961,
+      "mapping_file_sha256": "d49b74a03c7d05a825a01900ee7e9ffe3d92d4fc535643928925c02914e17f43",
+      "review_lock": "mapping_content_sha256_verified"
+    },
+    {
+      "run_id": "run_d4aeac0e8c82487ebc5fcac6d312deca",
+      "status": "COMPLETED",
+      "seen": 961,
+      "inserted": 0,
+      "skipped": 961,
+      "mapping_file_sha256": "9db2934e2e965a0c7b38c1008bf50c6273ab393a7239b5e7b1571625f6d1a562",
+      "review_lock": "source_path_table_schema_and_mapping_content_verified"
+    }
+  ],
+  "review_database": {
+    "path": "data/db/investment_review.sqlite3",
+    "schema_version": 2,
+    "sqlite_user_version": 2,
+    "sqlite_application_id": 1230132823,
+    "sqlite_application_id_hex": "0x49525657",
+    "quick_check": "ok",
+    "integrity_check": "ok",
+    "foreign_key_issues": 0,
+    "data_sources": 1,
+    "source_config_versions": 3,
+    "ingest_runs": 4,
+    "ingest_run_events": 3844,
+    "trade_events": 961,
+    "decisions": 0,
+    "decision_event_links": 0,
+    "portfolio_snapshots": 0
+  },
+  "lineage": {
+    "distinct_event_ids": 961,
+    "distinct_source_record_ids": 961,
+    "missing_source_record_ids": 0,
+    "missing_raw_payloads": 0,
+    "invalid_payload_sha256": 0,
+    "orphan_sources": 0,
+    "events_without_inserted_run_link": 0,
+    "ingest_run_event_payload_mismatches": 0,
+    "first_ingest_run_mismatches": 0,
+    "canonical_or_raw_mismatches": 0,
+    "known_at_before_occurred_at": 0,
+    "known_at_fallback_events": 961
+  },
+  "event_counts": {
+    "buy": 489,
+    "sell": 404,
+    "dividend": 39,
+    "cash_fee": 29
+  },
+  "cash_amount_sums": {
+    "buy": "0",
+    "sell": "0",
+    "dividend": "6465.15",
+    "cash_fee": "369.49"
+  },
+  "safety_checks": {
+    "wrong_db_application_lock": "pass",
+    "wrong_db_exit_code": 2,
+    "wrong_db_created_wal_or_shm": false,
+    "legacy_v1_auto_upgrade": "refused_reimport_required",
+    "stable_source_identity": "pass",
+    "removed_source_snapshot_detection": "pass",
+    "account_market_and_config_drift_detection": "pass",
+    "sqlite_source_path_table_schema_binding": "pass",
+    "csv_identity_key_stability": "pass",
+    "record_id_requirement": "pass"
+  },
+  "tests": {
+    "compileall": "pass",
+    "unittest_module": "tests.test_investment_review_phase1",
+    "unittest_passed": 14,
+    "unittest_failed": 0,
+    "git_diff_check": "pass",
+    "launcher_status": "pass"
+  },
+  "quality": {
+    "open_critical": 0,
+    "open_high": 0,
+    "resolved_high": 16,
+    "accepted_medium_todo": 4,
+    "accepted_low_todo": 1,
+    "accepted_todos": [
+      "payload_sha256 hashes the complete source_row and may conservatively conflict on technical-only rebuild changes",
+      "incremental CSV exports require a future explicit snapshot_mode=full|append contract",
+      "961 events use known_at fallback and need future known_at_quality and precision metadata",
+      "decisions=0 and historical motives must not be inferred",
+      "Gate 2 remains out of scope and nullable market composite-key semantics must be resolved before position_snapshot_items is enabled"
+    ],
+    "final_review_note": "Independent final review confirmed the current four-run snapshot with open critical=0 and open high=0"
+  },
+  "scope": {
+    "gate_2_started": false,
+    "p2_started": false,
+    "portfolio_accounting_modified_by_this_plan": false,
+    "direct_trading_advice_generated": false
+  }
+}
