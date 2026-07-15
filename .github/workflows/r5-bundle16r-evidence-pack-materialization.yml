@@ -1,0 +1,109 @@
+name: R5 Bundle 16R Evidence Pack Materialization
+
+on:
+  push:
+    paths:
+      - "src/research/r5_bundle16r_evidence_pack_materializer.py"
+      - "scripts/run_r5_bundle16r_evidence_pack_materializer.py"
+      - "config/r5_bundle16r_pack_materialization_policy.yaml"
+      - "schemas/r5_bundle16r_review_mapping.schema.yaml"
+      - "templates/r5_bundle16r_review_mapping.example.yaml"
+      - "tests/test_r5_bundle16r_evidence_pack_materializer.py"
+      - "tests/fixtures/r5_bundle14r/cases/**"
+      - ".github/workflows/r5-bundle16r-evidence-pack-materialization.yml"
+  pull_request:
+    paths:
+      - "src/research/r5_bundle16r_evidence_pack_materializer.py"
+      - "scripts/run_r5_bundle16r_evidence_pack_materializer.py"
+      - "config/r5_bundle16r_pack_materialization_policy.yaml"
+      - "schemas/r5_bundle16r_review_mapping.schema.yaml"
+      - "templates/r5_bundle16r_review_mapping.example.yaml"
+      - "tests/test_r5_bundle16r_evidence_pack_materializer.py"
+      - "tests/fixtures/r5_bundle14r/cases/**"
+      - ".github/workflows/r5-bundle16r-evidence-pack-materialization.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  materialization-contract-and-seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install focused dependencies
+        run: python -m pip install --upgrade "pytest>=8,<10" "PyYAML>=6,<7"
+
+      - name: Compile Bundle 16R
+        run: |
+          python -m py_compile \
+            src/research/r5_bundle16r_evidence_pack_materializer.py \
+            scripts/run_r5_bundle16r_evidence_pack_materializer.py
+
+      - name: Run focused and compatibility tests
+        run: |
+          python -m pytest -q \
+            tests/test_r5_bundle16r_evidence_pack_materializer.py \
+            tests/test_r5_bundle15r_evidence_qualification.py \
+            tests/test_r5_bundle14r_golden_regression.py
+
+      - name: Parse YAML contracts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          for path in (
+              Path("config/r5_bundle16r_pack_materialization_policy.yaml"),
+              Path("schemas/r5_bundle16r_review_mapping.schema.yaml"),
+              Path("templates/r5_bundle16r_review_mapping.example.yaml"),
+              Path(".github/workflows/r5-bundle16r-evidence-pack-materialization.yml"),
+          ):
+              yaml.safe_load(path.read_text(encoding="utf-8"))
+          PY
+
+      - name: Run fail-closed empty-catalog seed twice
+        run: |
+          python scripts/run_r5_bundle16r_evidence_pack_materializer.py \
+            --repo-root . \
+            --output-dir "${{ runner.temp }}/seed-a"
+          python scripts/run_r5_bundle16r_evidence_pack_materializer.py \
+            --repo-root . \
+            --output-dir "${{ runner.temp }}/seed-b"
+          diff -ru "${{ runner.temp }}/seed-a" "${{ runner.temp }}/seed-b"
+
+      - name: Assert release boundaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          suite = json.loads((Path("${{ runner.temp }}/seed-a") / "R5_bundle16r_materialization_suite.json").read_text())
+          assert suite["case_count"] == 4, suite
+          assert suite["pack_materialized_count"] == 0, suite
+          assert suite["fully_mapped_case_count"] == 0, suite
+          assert suite["canonical_workflow_state_mutation_allowed"] is False, suite
+          assert suite["sample_quality_allowed"] is False, suite
+          assert suite["p2_allowed"] is False, suite
+          PY
+
+      - name: Reject issuer-specific runtime tokens
+        run: |
+          ! grep -En "铜冠铜箔|赤峰黄金|药明康德|东阳光|301217|600988|603259|600673" \
+            src/research/r5_bundle16r_evidence_pack_materializer.py \
+            scripts/run_r5_bundle16r_evidence_pack_materializer.py \
+            config/r5_bundle16r_pack_materialization_policy.yaml \
+            schemas/r5_bundle16r_review_mapping.schema.yaml
+
+      - name: Upload deterministic seed
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-bundle16r-empty-catalog-seed
+          path: ${{ runner.temp }}/seed-a
+          if-no-files-found: error

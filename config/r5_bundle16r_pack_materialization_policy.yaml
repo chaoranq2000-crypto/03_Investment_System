@@ -1,0 +1,46 @@
+schema_version: r5_bundle16r_materialization_policy_v1
+bundle_id: R5_BUNDLE16R_REVIEWED_EVIDENCE_PACK_MATERIALIZATION
+purpose: >-
+  Convert already-reviewed, physically archived official evidence and explicit
+  reviewer mappings into deterministic Bundle 15R reviewed-evidence-pack
+  candidates. Missing inputs remain blocked and are routed back to their owner
+  stage.
+allowed_catalog_extensions:
+  - .yaml
+  - .yml
+  - .json
+  - .csv
+required_source_official: true
+allowed_review_statuses:
+  - accepted
+  - accepted_with_limitations
+qualifying_confidence:
+  - high
+  - medium
+require_physical_source_hash: true
+require_pack_review_identity: true
+forbidden_path_fragments:
+  - 个股研究报告样例
+  - 个股研究案例样例
+  - narrative_sample
+  - sample_report
+  - reports/samples
+truthfulness:
+  fetch_evidence: false
+  review_evidence: false
+  numeric_value_override_in_mapping: false
+  narrative_sample_as_evidence: false
+  generated_reader_as_evidence: false
+  management_guidance_as_fact: false
+  consensus_as_issuer_fact: false
+  direct_trading_instruction: false
+output_policy:
+  preview_is_default: true
+  atomic_pack_publish_requires_flag: true
+  canonical_workflow_state_mutation: false
+  selective_bundle15r_execution: true
+  bundle14r_execution_only_via_existing_bundle15r_runner: true
+release:
+  sample_quality_allowed: false
+  p2_allowed: false
+  workflow_state_mutation_allowed: false

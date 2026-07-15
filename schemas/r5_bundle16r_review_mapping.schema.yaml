@@ -1,0 +1,122 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: r5_bundle16r_review_mapping_v1
+title: R5 Bundle 16R reviewer-authored evidence mapping
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - case_id
+  - issuer_ticker
+  - as_of_date
+  - pack_review
+  - source_bindings
+  - record_bindings
+  - artifact_bindings
+properties:
+  schema_version:
+    const: r5_bundle16r_review_mapping_v1
+  case_id:
+    type: string
+    minLength: 1
+  issuer_ticker:
+    type: string
+    minLength: 1
+  as_of_date:
+    type: string
+    format: date
+  pack_review:
+    type: object
+    additionalProperties: false
+    required: [status, reviewer, reviewed_at]
+    properties:
+      status:
+        enum: [accepted, accepted_with_limitations]
+      reviewer:
+        type: string
+        minLength: 1
+      reviewed_at:
+        type: string
+        format: date-time
+  source_bindings:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required: [catalog_source_id]
+      properties:
+        catalog_source_id:
+          type: string
+          minLength: 1
+        output_source_id:
+          type: string
+          minLength: 1
+  record_bindings:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required:
+        - catalog_record_id
+        - driver_id
+        - question_ids
+        - status
+        - overlap_rule
+        - stale_trigger
+      properties:
+        catalog_record_id:
+          type: string
+          minLength: 1
+        output_record_id:
+          type: string
+          minLength: 1
+        driver_id:
+          type: string
+          minLength: 1
+        question_ids:
+          type: array
+          items:
+            type: string
+            minLength: 1
+        status:
+          enum: [confirmed, bounded_estimate, context_only, blocked, not_applicable]
+        overlap_rule:
+          type: string
+          minLength: 1
+        stale_trigger:
+          type: string
+          minLength: 1
+        dependencies:
+          type: array
+          items:
+            type: string
+            minLength: 1
+  artifact_bindings:
+    type: object
+    additionalProperties: false
+    properties:
+      overlap_reconciliation:
+        $ref: '#/$defs/artifactBinding'
+      forecast_bridge:
+        $ref: '#/$defs/artifactBinding'
+      valuation:
+        $ref: '#/$defs/artifactBinding'
+      semantic_candidate:
+        $ref: '#/$defs/artifactBinding'
+      determinism:
+        $ref: '#/$defs/artifactBinding'
+      exact_hash_human_review:
+        $ref: '#/$defs/artifactBinding'
+$defs:
+  artifactBinding:
+    type: object
+    additionalProperties: false
+    required: [artifact_path, artifact_sha256]
+    properties:
+      artifact_path:
+        type: string
+        minLength: 1
+      artifact_sha256:
+        type: string
+        pattern: '^[0-9a-f]{64}$'
+      json_pointer:
+        type: string

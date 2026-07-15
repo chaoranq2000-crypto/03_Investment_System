@@ -1,0 +1,46 @@
+schema_version: r5_bundle16r_review_mapping_v1
+case_id: replace_with_bundle14r_case_id
+issuer_ticker: 000000.SZ
+as_of_date: '2026-07-15'
+pack_review:
+  status: accepted_with_limitations
+  reviewer: replace_with_real_reviewer
+  reviewed_at: '2026-07-15T12:00:00+01:00'
+source_bindings:
+  - catalog_source_id: replace_with_reviewed_catalog_source_id
+    output_source_id: replace_with_stable_output_source_id
+record_bindings:
+  - catalog_record_id: replace_with_reviewed_catalog_record_id
+    output_record_id: replace_with_stable_output_record_id
+    driver_id: replace_with_exact_bundle14r_driver_id
+    question_ids:
+      - replace_with_exact_bundle14r_question_id
+    status: confirmed
+    overlap_rule: replace_with_reviewer_authored_non_overlap_rule
+    stale_trigger: replace_with_specific_new_filing_or_evidence_trigger
+    dependencies: []
+artifact_bindings:
+  overlap_reconciliation:
+    artifact_path: reports/replace/overlap_reconciliation.yaml
+    artifact_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+    json_pointer: /overlap_reconciliation
+  forecast_bridge:
+    artifact_path: reports/replace/forecast_bridge.yaml
+    artifact_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+    json_pointer: /forecast_bridge
+  valuation:
+    artifact_path: reports/replace/valuation_eligibility.yaml
+    artifact_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+    json_pointer: /valuation
+  semantic_candidate:
+    artifact_path: reports/replace/semantic_quality_report.json
+    artifact_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+    json_pointer: /
+  determinism:
+    artifact_path: reports/replace/generation_lock.json
+    artifact_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+    json_pointer: /determinism
+  exact_hash_human_review:
+    artifact_path: reports/replace/exact_hash_human_review.yaml
+    artifact_sha256: 0000000000000000000000000000000000000000000000000000000000000000
+    json_pointer: /
