@@ -14575,6 +14575,17 @@ function dispose(dcs) {
 	}
 }
 //#endregion
+//#region src/contribution.js
+function selectContributionPositions(positions, limitPerSide = 5) {
+	const ranked = (positions || []).map((position) => ({
+		position,
+		pnl: Number(position.unrealized_pnl)
+	})).filter(({ pnl }) => Number.isFinite(pnl) && pnl !== 0);
+	const gains = ranked.filter(({ pnl }) => pnl > 0).sort((left, right) => right.pnl - left.pnl).slice(0, limitPerSide);
+	const losses = ranked.filter(({ pnl }) => pnl < 0).sort((left, right) => left.pnl - right.pnl).slice(0, limitPerSide);
+	return [...gains, ...losses].sort((left, right) => Math.abs(right.pnl) - Math.abs(left.pnl)).map(({ position }) => position);
+}
+//#endregion
 //#region src/kline.js
 var EVENT_PRIORITY = {
 	OPENING: 0,
@@ -14935,12 +14946,20 @@ var state = {
 	query: "",
 	sortKey: "market_value",
 	sortDirection: "desc",
+	clearanceSortKey: "closed_on",
+	clearanceSortDirection: "desc",
+	performanceRange: "month",
+	performanceLookbackMonths: localStorage.getItem("portfolioPerformanceLookbackMonths") || "3",
+	performanceRefreshStarted: false,
+	performanceRefreshLoading: false,
+	performanceRefreshMessage: "",
 	asOf: null,
 	privacy: localStorage.getItem("portfolioPrivacy") === "true",
 	liveLoading: false,
 	liveTimer: null,
 	collapsedModules: readStoredSet("portfolioCollapsedModules"),
 	expandedIndustries: /* @__PURE__ */ new Set(),
+	expandedClearanceGroups: /* @__PURE__ */ new Set(),
 	drawerContext: null,
 	drawerRequestId: 0,
 	chart: null,
@@ -14957,6 +14976,16 @@ var allocationColors = [
 	"#f5d90a",
 	"#3e63dd",
 	"#8e4ec6",
+	"#8d8d86"
+];
+var industryColors = [
+	"#3e63dd",
+	"#e5484d",
+	"#30a46c",
+	"#f5d90a",
+	"#8e4ec6",
+	"#e57a00",
+	"#2b9a9a",
 	"#8d8d86"
 ];
 registerOverlay({
@@ -15055,7 +15084,22 @@ var elements = {
 	cashBalance: document.getElementById("cashBalance"),
 	unrealizedPnl: document.getElementById("unrealizedPnl"),
 	unrealizedReturn: document.getElementById("unrealizedReturn"),
-	realizedPnl: document.getElementById("realizedPnl"),
+	monthPnl: document.getElementById("monthPnl"),
+	yearPnl: document.getElementById("yearPnl"),
+	allPnl: document.getElementById("allPnl"),
+	lookbackPnl: document.getElementById("lookbackPnl"),
+	performanceLookbackPicker: document.getElementById("performanceLookbackPicker"),
+	performanceLookbackSelect: document.getElementById("performanceLookbackSelect"),
+	performanceChart: document.getElementById("performanceChart"),
+	performanceChartShell: document.getElementById("performanceChartShell"),
+	performanceZeroLine: document.getElementById("performanceZeroLine"),
+	performanceArea: document.getElementById("performanceArea"),
+	performanceLine: document.getElementById("performanceLine"),
+	performancePoints: document.getElementById("performancePoints"),
+	performanceEmpty: document.getElementById("performanceEmpty"),
+	performanceTooltip: document.getElementById("performanceTooltip"),
+	performanceRangeDates: document.getElementById("performanceRangeDates"),
+	performanceNote: document.getElementById("performanceNote"),
 	positionCount: document.getElementById("positionCount"),
 	priceDate: document.getElementById("priceDate"),
 	dataStatus: document.getElementById("dataStatus"),
@@ -15068,6 +15112,10 @@ var elements = {
 	industryCoverage: document.getElementById("industryCoverage"),
 	industryRefreshButton: document.getElementById("industryRefreshButton"),
 	industryList: document.getElementById("industryList"),
+	industryPie: document.getElementById("industryPie"),
+	industryPieSegments: document.getElementById("industryPieSegments"),
+	industryPieLegend: document.getElementById("industryPieLegend"),
+	industryPieEmpty: document.getElementById("industryPieEmpty"),
 	topIndustry: document.getElementById("topIndustry"),
 	topIndustryWeight: document.getElementById("topIndustryWeight"),
 	top3IndustryWeight: document.getElementById("top3IndustryWeight"),
@@ -15081,9 +15129,17 @@ var elements = {
 	clearanceWinRate: document.getElementById("clearanceWinRate"),
 	latestClearanceDate: document.getElementById("latestClearanceDate"),
 	clearanceTableWrap: document.getElementById("clearanceTableWrap"),
+	clearanceTable: document.querySelector(".clearance-table"),
+	clearanceStickyHeader: document.getElementById("clearanceStickyHeader"),
+	clearanceStickyViewport: document.getElementById("clearanceStickyViewport"),
 	clearanceBody: document.getElementById("clearanceBody"),
 	clearanceEmpty: document.getElementById("clearanceEmpty"),
 	clearanceNote: document.getElementById("clearanceNote"),
+	topbar: document.querySelector(".topbar"),
+	holdingsTable: document.querySelector(".holdings-table"),
+	holdingsContent: document.getElementById("holdingsContent"),
+	holdingsStickyHeader: document.getElementById("holdingsStickyHeader"),
+	holdingsStickyViewport: document.getElementById("holdingsStickyViewport"),
 	holdingsBody: document.getElementById("holdingsBody"),
 	emptyState: document.getElementById("emptyState"),
 	filterTabs: document.getElementById("filterTabs"),
@@ -15113,6 +15169,15 @@ function money(value, signed = false) {
 	if (numeric < 0) return `-¥${absolute}`;
 	if (signed && numeric > 0) return `+¥${absolute}`;
 	return `¥${absolute}`;
+}
+function compactMoney(value, signed = false) {
+	const numeric = numberValue(value);
+	if (numeric === null) return "MISSING";
+	const absolute = Math.abs(numeric);
+	const prefix = numeric < 0 ? "-" : signed && numeric > 0 ? "+" : "";
+	if (absolute >= 1e8) return `${prefix}¥${(absolute / 1e8).toFixed(2).replace(/\.00$/, "")}亿`;
+	if (absolute >= 1e4) return `${prefix}¥${(absolute / 1e4).toFixed(2).replace(/\.00$/, "")}万`;
+	return money(numeric, signed);
 }
 function percent(value, signed = false, digits = 2) {
 	const numeric = numberValue(value);
@@ -15228,14 +15293,22 @@ async function api(path, options = {}) {
 }
 async function loadPortfolio({ announce = false } = {}) {
 	const query = state.asOf ? `?as_of=${encodeURIComponent(state.asOf)}` : "";
+	if (!state.asOf && !state.performanceRefreshStarted) {
+		state.performanceRefreshLoading = true;
+		state.performanceRefreshMessage = "正在自动补齐盈亏曲线所需的历史收盘价…";
+	}
 	elements.dataStatus.textContent = "正在读取本地账本";
 	try {
 		state.payload = await api(`/api/portfolio${query}`);
 		renderAll();
 		elements.footerStatusDot.classList.add("is-ready");
-		if (!state.asOf) await refreshRealtime();
+		if (!state.asOf) {
+			await refreshRealtime();
+			refreshPerformanceHistoryOnOpen();
+		}
 		if (announce) showToast(state.asOf ? `已切换到 ${state.asOf}` : "已恢复最新持仓");
 	} catch (error) {
+		state.performanceRefreshLoading = false;
 		elements.dataStatus.textContent = "读取失败";
 		elements.footerStatus.textContent = `本地账本错误 · ${error.message}`;
 		showToast(error.message, true);
@@ -15281,7 +15354,6 @@ function renderSummary() {
 	elements.cashBalance.textContent = money(summary.cash_balance);
 	elements.unrealizedPnl.textContent = money(summary.unrealized_pnl, true);
 	elements.unrealizedReturn.textContent = percent(summary.unrealized_return_pct, true);
-	elements.realizedPnl.textContent = money(summary.realized_pnl_since_baseline, true);
 	elements.positionCount.textContent = `${summary.position_count} 支持仓`;
 	const isIntraday = ["intraday", "mixed"].includes(marketData.mode);
 	const quoteTime = marketData.quote_time ? formatFetchTime(marketData.quote_time) : "—";
@@ -15299,7 +15371,7 @@ function renderSummary() {
 	elements.assetMix.textContent = `${summary.equity_count} 只股票 · ${summary.etf_count} 只 ETF · 现金 ${percent(summary.cash_weight_pct)}`;
 	setTone(elements.unrealizedPnl, summary.unrealized_pnl);
 	setTone(elements.unrealizedReturn, summary.unrealized_return_pct);
-	setTone(elements.realizedPnl, summary.realized_pnl_since_baseline);
+	renderPerformance();
 	const providerLabels = {
 		"tencent.quote": "腾讯行情",
 		"sina.quote": "新浪备用"
@@ -15307,6 +15379,169 @@ function renderSummary() {
 	const providers = (marketData.providers || []).map((item) => providerLabels[item] || item).join(" + ");
 	const fetchTime = formatFetchTime(isIntraday ? marketData.fetched_at : metadata.last_tushare_fetch_at);
 	elements.footerStatus.textContent = isIntraday ? `本地 SQLite · ${providers || "盘中行情"} ${fetchTime} · 60秒自动刷新` : `本地 SQLite · Tushare收盘价 ${fetchTime} · ${metadata.reconciliation_count} 条期初核对`;
+}
+async function refreshPerformanceHistoryOnOpen() {
+	if (state.asOf || state.performanceRefreshStarted) return;
+	state.performanceRefreshStarted = true;
+	state.performanceRefreshLoading = true;
+	state.performanceRefreshMessage = "正在自动补齐盈亏曲线所需的历史收盘价…";
+	renderPerformance();
+	try {
+		const result = await api("/api/refresh-performance", {
+			method: "POST",
+			headers: { "X-Portfolio-Action": "refresh-performance" },
+			body: JSON.stringify({})
+		});
+		const errorCount = (result.errors || []).length;
+		if (result.requested_range_count === 0) state.performanceRefreshMessage = "曲线行情已是最新。";
+		else if (errorCount) state.performanceRefreshMessage = `自动更新完成：新增 ${result.new_observations} 个收盘价，${errorCount} 个区间待重试。`;
+		else state.performanceRefreshMessage = `自动更新完成：新增 ${result.new_observations} 个收盘价。`;
+		if (!state.asOf) {
+			state.payload = await api("/api/portfolio");
+			renderAll();
+			await refreshRealtime();
+		}
+	} catch (error) {
+		state.performanceRefreshMessage = `自动更新失败：${error.message}；已保留现有曲线。`;
+	} finally {
+		state.performanceRefreshLoading = false;
+		renderPerformance();
+	}
+}
+function showPerformanceTooltip(point, x, y) {
+	elements.performanceTooltip.textContent = `${point.date} · ${money(point.pnl, true)}`;
+	elements.performanceTooltip.style.left = `${x / 480 * 100}%`;
+	elements.performanceTooltip.style.top = `${y / 148 * 100}%`;
+	elements.performanceTooltip.hidden = false;
+}
+function hidePerformanceTooltip() {
+	elements.performanceTooltip.hidden = true;
+}
+function selectedLookbackPeriod(recentRanges) {
+	const availableMonths = recentRanges.map((period) => String(period.months));
+	if (!availableMonths.includes(state.performanceLookbackMonths)) state.performanceLookbackMonths = availableMonths.includes("3") ? "3" : availableMonths[0] || "3";
+	elements.performanceLookbackSelect.value = state.performanceLookbackMonths;
+	return recentRanges.find((period) => String(period.months) === state.performanceLookbackMonths) || null;
+}
+function renderPerformance() {
+	const performance = state.payload?.pnl_performance || {};
+	const periods = performance.periods || {};
+	const lookbackPeriod = selectedLookbackPeriod(performance.recent_ranges || []);
+	const refreshLoading = state.performanceRefreshLoading && !state.asOf;
+	const refreshMessage = state.asOf ? "" : state.performanceRefreshMessage;
+	const valueElements = {
+		month: elements.monthPnl,
+		year: elements.yearPnl,
+		all: elements.allPnl
+	};
+	Object.entries(valueElements).forEach(([key, element]) => {
+		const value = periods[key]?.pnl;
+		element.textContent = refreshLoading ? "更新中" : compactMoney(value, true);
+		setTone(element, refreshLoading ? null : value);
+	});
+	elements.lookbackPnl.textContent = refreshLoading ? "更新中" : compactMoney(lookbackPeriod?.pnl, true);
+	setTone(elements.lookbackPnl, refreshLoading ? null : lookbackPeriod?.pnl);
+	const selectablePeriods = {
+		...periods,
+		...lookbackPeriod ? { lookback: lookbackPeriod } : {}
+	};
+	if (!selectablePeriods[state.performanceRange]) state.performanceRange = [
+		"month",
+		"year",
+		"lookback",
+		"all"
+	].find((key) => selectablePeriods[key]) || "month";
+	const period = selectablePeriods[state.performanceRange];
+	document.querySelectorAll("[data-performance-range]").forEach((button) => {
+		const active = button.dataset.performanceRange === state.performanceRange;
+		button.classList.toggle("is-active", active);
+		button.setAttribute("aria-selected", String(active));
+		button.tabIndex = active ? 0 : -1;
+	});
+	elements.performancePoints.replaceChildren();
+	elements.performanceLine.setAttribute("d", "");
+	elements.performanceArea.setAttribute("d", "");
+	hidePerformanceTooltip();
+	if (refreshLoading) {
+		elements.performanceRangeDates.textContent = "自动更新中";
+		elements.performanceNote.textContent = refreshMessage;
+		elements.performanceEmpty.textContent = "正在抓取历史收盘价并重算曲线";
+		elements.performanceEmpty.hidden = false;
+		elements.performanceChart.setAttribute("aria-label", "盈亏曲线正在自动更新");
+		elements.performanceChartShell.classList.remove("gain", "loss");
+		elements.performanceChartShell.classList.add("neutral");
+		return;
+	}
+	if (!period) {
+		elements.performanceRangeDates.textContent = "暂无可追溯区间";
+		elements.performanceNote.textContent = [refreshMessage, performance.data_note || "暂无可追溯台账。"].filter(Boolean).join(" ");
+		elements.performanceEmpty.hidden = false;
+		elements.performanceChart.setAttribute("aria-label", "盈亏曲线暂无数据");
+		return;
+	}
+	elements.performanceRangeDates.textContent = `${period.start_date} → ${period.end_date}`;
+	elements.performanceNote.textContent = [
+		refreshMessage,
+		period.coverage_note,
+		performance.data_note || "曲线来自本地台账与收盘价。"
+	].filter(Boolean).join(" ");
+	elements.performanceChart.setAttribute("aria-label", `${period.label}曲线`);
+	elements.performanceChartShell.classList.remove("gain", "loss", "neutral");
+	elements.performanceChartShell.classList.add(toneClass(period.pnl));
+	elements.performanceEmpty.textContent = period.status === "partial_history" ? "区间早于账户基准日，历史不完整" : "本地收盘价不足，暂不能绘制曲线";
+	const series = (period.series || []).map((point) => ({
+		date: point.date,
+		pnl: numberValue(point.pnl)
+	})).filter((point) => point.pnl !== null);
+	elements.performanceEmpty.hidden = series.length !== 0;
+	if (series.length === 0) return;
+	const width = 480;
+	const height = 148;
+	const horizontalPadding = 7;
+	const verticalPadding = 13;
+	const timestamps = series.map((point) => Date.parse(`${point.date}T00:00:00Z`));
+	const firstTimestamp = Math.min(...timestamps);
+	const lastTimestamp = Math.max(...timestamps);
+	const rawValues = series.map((point) => point.pnl);
+	let minimum = Math.min(0, ...rawValues);
+	let maximum = Math.max(0, ...rawValues);
+	if (minimum === maximum) {
+		minimum -= 1;
+		maximum += 1;
+	} else {
+		const padding = (maximum - minimum) * .1;
+		minimum -= padding;
+		maximum += padding;
+	}
+	const xAt = (timestamp) => firstTimestamp === lastTimestamp ? width / 2 : horizontalPadding + (timestamp - firstTimestamp) / (lastTimestamp - firstTimestamp) * (width - horizontalPadding * 2);
+	const yAt = (value) => verticalPadding + (maximum - value) / (maximum - minimum) * (height - verticalPadding * 2);
+	const coordinates = series.map((point, index) => ({
+		point,
+		x: xAt(timestamps[index]),
+		y: yAt(point.pnl)
+	}));
+	const linePath = coordinates.map(({ x, y }, index) => `${index === 0 ? "M" : "L"}${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
+	const zeroY = yAt(0);
+	const first = coordinates[0];
+	const areaPath = `${linePath} L${coordinates.at(-1).x.toFixed(2)},${zeroY.toFixed(2)} L${first.x.toFixed(2)},${zeroY.toFixed(2)} Z`;
+	elements.performanceLine.setAttribute("d", linePath);
+	elements.performanceArea.setAttribute("d", areaPath);
+	elements.performanceZeroLine.setAttribute("y1", zeroY.toFixed(2));
+	elements.performanceZeroLine.setAttribute("y2", zeroY.toFixed(2));
+	coordinates.forEach(({ point, x, y }, index) => {
+		const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+		circle.setAttribute("class", index === coordinates.length - 1 ? "performance-point is-latest" : "performance-point");
+		circle.setAttribute("cx", x.toFixed(2));
+		circle.setAttribute("cy", y.toFixed(2));
+		circle.setAttribute("r", index === coordinates.length - 1 ? "4" : "2.5");
+		circle.setAttribute("tabindex", "0");
+		circle.setAttribute("aria-label", `${point.date}，${money(point.pnl, true)}`);
+		circle.addEventListener("pointerenter", () => showPerformanceTooltip(point, x, y));
+		circle.addEventListener("pointerleave", hidePerformanceTooltip);
+		circle.addEventListener("focus", () => showPerformanceTooltip(point, x, y));
+		circle.addEventListener("blur", hidePerformanceTooltip);
+		elements.performancePoints.appendChild(circle);
+	});
 }
 function allocationGroups() {
 	const assets = [...state.payload.positions].filter((item) => numberValue(item.market_value) !== null).map((item) => ({
@@ -15363,7 +15598,7 @@ function renderAllocation() {
 	elements.topWeight.textContent = groups.length ? percent(groups[0].weight) : "—";
 }
 function renderContribution() {
-	const positions = [...state.payload.positions].filter((item) => numberValue(item.unrealized_pnl) !== null).sort((a, b) => Math.abs(numberValue(b.unrealized_pnl)) - Math.abs(numberValue(a.unrealized_pnl))).slice(0, 10);
+	const positions = selectContributionPositions(state.payload.positions);
 	const maxAbsolute = Math.max(...positions.map((item) => Math.abs(numberValue(item.unrealized_pnl))), 1);
 	elements.contributionChart.replaceChildren();
 	positions.forEach((position) => {
@@ -15379,11 +15614,79 @@ function renderContribution() {
 		elements.contributionChart.appendChild(row);
 	});
 }
+function industryPieGroups(industries) {
+	const weighted = industries.map((industry) => ({
+		name: industry.industry_name,
+		weight: numberValue(industry.weight_pct) || 0
+	})).filter((industry) => industry.weight > 0);
+	const groups = weighted.slice(0, 7);
+	const otherWeight = weighted.slice(7).reduce((total, industry) => total + industry.weight, 0);
+	if (otherWeight > .001) groups.push({
+		name: "其他行业",
+		weight: otherWeight
+	});
+	return groups;
+}
+function piePoint(angle, radius = 84) {
+	const radians = (angle - 90) * Math.PI / 180;
+	return {
+		x: 100 + radius * Math.cos(radians),
+		y: 100 + radius * Math.sin(radians)
+	};
+}
+function pieSlicePath(startAngle, endAngle) {
+	if (endAngle - startAngle >= 359.999) return "M 100 16 A 84 84 0 1 1 100 184 A 84 84 0 1 1 100 16 Z";
+	const start = piePoint(startAngle);
+	const end = piePoint(endAngle);
+	const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+	return [
+		"M 100 100",
+		`L ${start.x.toFixed(3)} ${start.y.toFixed(3)}`,
+		`A 84 84 0 ${largeArc} 1 ${end.x.toFixed(3)} ${end.y.toFixed(3)}`,
+		"Z"
+	].join(" ");
+}
+function renderIndustryPie(industries) {
+	const groups = industryPieGroups(industries);
+	const totalWeight = groups.reduce((total, group) => total + group.weight, 0);
+	const hasData = totalWeight > 0;
+	elements.industryPie.hidden = !hasData;
+	elements.industryPieEmpty.hidden = hasData;
+	elements.industryPieLegend.hidden = !hasData;
+	elements.industryPieSegments.replaceChildren();
+	elements.industryPieLegend.replaceChildren();
+	if (!hasData) {
+		elements.industryPie.setAttribute("aria-label", "行业市值占比饼图暂无数据");
+		return;
+	}
+	const svgNamespace = "http://www.w3.org/2000/svg";
+	let angle = 0;
+	groups.forEach((group, index) => {
+		const sweep = group.weight / totalWeight * 360;
+		const color = group.name.startsWith("未分类") ? "#8d8d86" : industryColors[index % industryColors.length];
+		const segment = document.createElementNS(svgNamespace, "path");
+		segment.setAttribute("class", "industry-pie-segment");
+		segment.setAttribute("d", pieSlicePath(angle, angle + sweep));
+		segment.setAttribute("fill", color);
+		const title = document.createElementNS(svgNamespace, "title");
+		title.textContent = `${group.name} ${group.weight.toFixed(2)}%`;
+		segment.appendChild(title);
+		elements.industryPieSegments.appendChild(segment);
+		angle += sweep;
+		const legendItem = makeElement("li", "industry-pie-legend-item");
+		const swatch = makeElement("span", "industry-pie-swatch");
+		swatch.style.backgroundColor = color;
+		legendItem.append(swatch, makeElement("span", "industry-pie-name", group.name), makeElement("strong", "industry-pie-weight sensitive", percent(group.weight)));
+		elements.industryPieLegend.appendChild(legendItem);
+	});
+	elements.industryPie.setAttribute("aria-label", `行业市值占比：${groups.map((group) => `${group.name} ${percent(group.weight)}`).join("，")}`);
+}
 function renderIndustries() {
 	const industries = state.payload.industries || [];
 	const positionsByCode = new Map((state.payload.positions || []).map((position) => [position.ts_code, position]));
 	const summary = state.payload.industry_summary || {};
 	const metadata = state.payload.metadata || {};
+	renderIndustryPie(industries);
 	const maxWeight = Math.max(...industries.map((item) => numberValue(item.weight_pct) || 0), 1);
 	elements.industryList.replaceChildren();
 	industries.forEach((industry, index) => {
@@ -15432,11 +15735,11 @@ function renderIndustries() {
 			const security = makeElement("span", "industry-position-security");
 			security.append(makeElement("strong", "", item.name), makeElement("small", "", item.ts_code));
 			if (item.asset_type === "etf" && item.industry_source) {
-				const sourceDate = item.industry_source.match(/as_of=(\d{8})/);
+				const sourceDate = item.industry_source.match(/reviewed_at=(\d{4}-\d{2}-\d{2})/);
 				const coverage = item.industry_source.match(/coverage=([^|]+)/);
 				const confidence = item.industry_source.match(/confidence=([^|]+)/);
 				const evidence = [
-					sourceDate ? `持仓 ${sourceDate[1]}` : "持仓证据不足",
+					sourceDate ? `复核 ${sourceDate[1]}` : "复核映射",
 					coverage ? `覆盖 ${coverage[1]}` : null,
 					confidence ? `置信 ${confidence[1]}` : null
 				].filter(Boolean).join(" · ");
@@ -15469,8 +15772,55 @@ function renderIndustries() {
 	const updatedAt = formatFetchTime(metadata.last_industry_update_at);
 	elements.industryNote.textContent = `${summary.classification_note || "行业分类来源未记录。"} 最近更新 ${updatedAt}。历史回看使用当前行业标签。`;
 }
+function sortedClearanceGroups() {
+	const providedGroups = state.payload?.closed_position_groups || [];
+	return (providedGroups.length > 0 ? [...providedGroups] : (state.payload?.closed_positions || []).map((cycle) => ({
+		...cycle,
+		group_id: `security:${cycle.ts_code}`,
+		cycle_count: 1,
+		cycles: [cycle]
+	}))).sort((leftGroup, rightGroup) => {
+		const key = state.clearanceSortKey;
+		const leftRaw = leftGroup[key];
+		const rightRaw = rightGroup[key];
+		const leftMissing = leftRaw === null || leftRaw === void 0 || leftRaw === "";
+		const rightMissing = rightRaw === null || rightRaw === void 0 || rightRaw === "";
+		if (leftMissing && !rightMissing) return 1;
+		if (!leftMissing && rightMissing) return -1;
+		let order = 0;
+		if (!leftMissing && key === "name") order = String(leftRaw).localeCompare(String(rightRaw), "zh-CN");
+		else if (!leftMissing && key === "closed_on") order = String(leftRaw).localeCompare(String(rightRaw));
+		else if (!leftMissing) order = numberValue(leftRaw) - numberValue(rightRaw);
+		if (order === 0) order = String(leftGroup.ts_code).localeCompare(String(rightGroup.ts_code));
+		return state.clearanceSortDirection === "asc" ? order : -order;
+	});
+}
+function makeClearanceCycleRow(cycle) {
+	const row = document.createElement("tr");
+	row.className = "clearance-cycle-row";
+	row.tabIndex = 0;
+	row.id = `clearance-cycle-${cycle.cycle_id.replaceAll(/[^a-zA-Z0-9_-]/g, "-")}`;
+	row.setAttribute("aria-label", `查看 ${cycle.name} 第 ${cycle.cycle_number} 次清仓操作复盘`);
+	const cycleCell = makeElement("td");
+	const cycleLabel = makeElement("div", "clearance-cycle-label");
+	cycleLabel.append(makeElement("span", "clearance-cycle-branch", "↳"), makeElement("span", "security-name", `第 ${cycle.cycle_number} 次清仓`), makeElement("span", "security-code", cycle.ts_code));
+	cycleCell.appendChild(cycleLabel);
+	const intervalCell = makeElement("td");
+	const interval = makeElement("div", "clearance-interval");
+	interval.append(makeElement("span", "clearance-dates", `${cycle.opened_on} → ${cycle.closed_on}`), makeElement("small", "", `${cycle.holding_days} 天 · ${cycle.sell_count} 笔卖出`));
+	intervalCell.appendChild(interval);
+	row.append(cycleCell, intervalCell, dataCell(quantity(cycle.sold_quantity), "numeric sensitive"), dataCell(money(cycle.cost_basis).replace("¥", ""), "numeric sensitive"), dataCell(money(cycle.net_sale_proceeds).replace("¥", ""), "numeric sensitive"), dataCell(money(cycle.realized_pnl, true).replace("¥", ""), `numeric sensitive ${toneClass(cycle.realized_pnl)}`), dataCell(percent(cycle.return_pct, true), `numeric ${toneClass(cycle.return_pct)}`));
+	row.addEventListener("click", () => openDrawer(cycle, "closed"));
+	row.addEventListener("keydown", (event) => {
+		if (event.key === "Enter" || event.key === " ") {
+			event.preventDefault();
+			openDrawer(cycle, "closed");
+		}
+	});
+	return row;
+}
 function renderClearance() {
-	const cycles = state.payload.closed_positions || [];
+	const groups = sortedClearanceGroups();
 	const summary = state.payload.clearance_summary || {};
 	const cycleCount = numberValue(summary.cycle_count) || 0;
 	const securityCount = numberValue(summary.security_count) || 0;
@@ -15484,34 +15834,55 @@ function renderClearance() {
 	setTone(elements.clearancePnl, summary.total_realized_pnl);
 	setTone(elements.clearanceReturn, summary.return_pct);
 	elements.clearanceBody.replaceChildren();
-	elements.clearanceTableWrap.hidden = cycles.length === 0;
-	elements.clearanceEmpty.hidden = cycles.length !== 0;
-	cycles.forEach((cycle) => {
+	elements.clearanceTableWrap.hidden = groups.length === 0;
+	elements.clearanceEmpty.hidden = groups.length !== 0;
+	groups.forEach((group) => {
 		const row = document.createElement("tr");
+		row.className = "clearance-group-row";
 		row.tabIndex = 0;
-		row.setAttribute("aria-label", `查看 ${cycle.name} 第 ${cycle.cycle_number} 轮操作复盘`);
+		const expanded = state.expandedClearanceGroups.has(group.ts_code);
+		row.setAttribute("aria-expanded", String(expanded));
+		row.setAttribute("aria-label", `${expanded ? "收起" : "展开"}${group.name}的 ${group.cycle_count} 次清仓记录`);
 		const securityCell = makeElement("td");
 		const security = makeElement("div", "security-cell");
-		const cycleLabel = cycle.cycle_number > 1 ? ` · 第 ${cycle.cycle_number} 轮` : "";
-		security.append(makeElement("span", "security-name", cycle.name), makeElement("span", "security-code", `${cycle.ts_code}${cycleLabel}`));
+		security.append(makeElement("span", "security-name", group.name), makeElement("span", "security-code", `${group.ts_code} · ${group.cycle_count} 次清仓`), makeElement("span", "clearance-group-toggle", expanded ? "收起明细" : "展开明细"));
 		securityCell.appendChild(security);
 		const intervalCell = makeElement("td");
 		const interval = makeElement("div", "clearance-interval");
-		interval.append(makeElement("span", "clearance-dates", `${cycle.opened_on} → ${cycle.closed_on}`), makeElement("small", "", `${cycle.holding_days} 天 · ${cycle.sell_count} 笔卖出`));
+		interval.append(makeElement("span", "clearance-dates", `${group.opened_on} → ${group.closed_on}`), makeElement("small", "", `${group.cycle_count} 个完整周期 · ${group.sell_count} 笔卖出`));
 		intervalCell.appendChild(interval);
-		row.append(securityCell, intervalCell, dataCell(quantity(cycle.sold_quantity), "numeric sensitive"), dataCell(money(cycle.cost_basis).replace("¥", ""), "numeric sensitive"), dataCell(money(cycle.net_sale_proceeds).replace("¥", ""), "numeric sensitive"), dataCell(money(cycle.realized_pnl, true).replace("¥", ""), `numeric sensitive ${toneClass(cycle.realized_pnl)}`), dataCell(percent(cycle.return_pct, true), `numeric ${toneClass(cycle.return_pct)}`));
-		row.addEventListener("click", () => openDrawer(cycle, "closed"));
+		row.append(securityCell, intervalCell, dataCell(quantity(group.sold_quantity), "numeric sensitive"), dataCell(money(group.cost_basis).replace("¥", ""), "numeric sensitive"), dataCell(money(group.net_sale_proceeds).replace("¥", ""), "numeric sensitive"), dataCell(money(group.realized_pnl, true).replace("¥", ""), `numeric sensitive ${toneClass(group.realized_pnl)}`), dataCell(percent(group.return_pct, true), `numeric ${toneClass(group.return_pct)}`));
+		const cycleRows = (group.cycles || []).map(makeClearanceCycleRow);
+		cycleRows.forEach((cycleRow) => {
+			cycleRow.hidden = !expanded;
+		});
+		row.setAttribute("aria-controls", cycleRows.map((cycleRow) => cycleRow.id).join(" "));
+		const toggleGroup = () => {
+			const nextExpanded = row.getAttribute("aria-expanded") !== "true";
+			row.setAttribute("aria-expanded", String(nextExpanded));
+			row.setAttribute("aria-label", `${nextExpanded ? "收起" : "展开"}${group.name}的 ${group.cycle_count} 次清仓记录`);
+			row.querySelector(".clearance-group-toggle").textContent = nextExpanded ? "收起明细" : "展开明细";
+			cycleRows.forEach((cycleRow) => {
+				cycleRow.hidden = !nextExpanded;
+			});
+			if (nextExpanded) state.expandedClearanceGroups.add(group.ts_code);
+			else state.expandedClearanceGroups.delete(group.ts_code);
+			scheduleStickyTableHeadersSync();
+		};
+		row.addEventListener("click", toggleGroup);
 		row.addEventListener("keydown", (event) => {
 			if (event.key === "Enter" || event.key === " ") {
 				event.preventDefault();
-				openDrawer(cycle, "closed");
+				toggleGroup();
 			}
 		});
-		elements.clearanceBody.appendChild(row);
+		elements.clearanceBody.append(row, ...cycleRows);
 	});
 	const outside = numberValue(summary.realized_pnl_outside_closed_cycles) || 0;
 	const outsideNote = outside === 0 ? "" : ` 另有 ${money(outside, true)} 已实现盈亏来自未完成清仓周期或周期外现金项目，未计入本区。`;
 	elements.clearanceNote.textContent = `${summary.calculation_note || "仅统计完整清仓周期。"}${outsideNote}`;
+	updateClearanceSortIndicators();
+	scheduleStickyTableHeadersSync();
 }
 function visiblePositions() {
 	if (!state.payload) return [];
@@ -15567,6 +15938,81 @@ function renderTable() {
 		elements.holdingsBody.appendChild(row);
 	});
 	updateSortIndicators();
+	scheduleStickyTableHeadersSync();
+}
+var stickyTableHeaderControllers = [];
+var stickyTableHeaderFrame = null;
+function scheduleStickyTableHeadersSync() {
+	if (stickyTableHeaderFrame !== null) return;
+	stickyTableHeaderFrame = window.requestAnimationFrame(() => {
+		stickyTableHeaderFrame = null;
+		stickyTableHeaderControllers.forEach(syncStickyTableHeader);
+	});
+}
+function syncStickyTableHeader(controller) {
+	const { sourceTable, scrollContainer, stickyHeader, stickyViewport, stickyTable } = controller;
+	if (!stickyTable || scrollContainer.hidden) {
+		stickyHeader.classList.remove("is-visible");
+		stickyHeader.setAttribute("aria-hidden", "true");
+		stickyHeader.inert = true;
+		return;
+	}
+	const stickyTop = window.getComputedStyle(elements.topbar).position === "sticky" ? elements.topbar.getBoundingClientRect().height : 0;
+	const scrollContainerRect = scrollContainer.getBoundingClientRect();
+	const sourceTableRect = sourceTable.getBoundingClientRect();
+	const sourceHeadRect = sourceTable.tHead.getBoundingClientRect();
+	stickyHeader.style.setProperty("--sticky-table-top", `${stickyTop}px`);
+	stickyHeader.style.setProperty("--sticky-table-left", `${scrollContainerRect.left}px`);
+	stickyHeader.style.setProperty("--sticky-table-width", `${scrollContainerRect.width}px`);
+	stickyHeader.style.setProperty("--sticky-table-height", `${sourceHeadRect.height}px`);
+	stickyTable.style.width = `${sourceTableRect.width}px`;
+	stickyTable.style.transform = `translateX(${-scrollContainer.scrollLeft}px)`;
+	const sourceHeaders = [...sourceTable.tHead.rows[0].cells];
+	const stickyHeaders = [...stickyTable.tHead.rows[0].cells];
+	sourceHeaders.forEach((header, index) => {
+		const width = header.getBoundingClientRect().width;
+		if (stickyHeaders[index]) stickyHeaders[index].style.width = `${width}px`;
+	});
+	const shouldShow = sourceHeadRect.bottom <= stickyTop && sourceTableRect.bottom > stickyTop + sourceHeadRect.height;
+	stickyHeader.classList.toggle("is-visible", shouldShow);
+	stickyHeader.setAttribute("aria-hidden", String(!shouldShow));
+	stickyHeader.inert = !shouldShow;
+}
+function registerStickyTableHeader({ sourceTable, scrollContainer, stickyHeader, stickyViewport }) {
+	const stickyTable = sourceTable.cloneNode(false);
+	const stickyHead = sourceTable.tHead.cloneNode(true);
+	stickyTable.classList.add("sticky-table-copy");
+	stickyTable.appendChild(stickyHead);
+	stickyViewport.appendChild(stickyTable);
+	stickyTableHeaderControllers.push({
+		sourceTable,
+		scrollContainer,
+		stickyHeader,
+		stickyViewport,
+		stickyTable
+	});
+	scrollContainer.addEventListener("scroll", scheduleStickyTableHeadersSync, { passive: true });
+}
+function initializeStickyTableHeaders() {
+	registerStickyTableHeader({
+		sourceTable: elements.clearanceTable,
+		scrollContainer: elements.clearanceTableWrap,
+		stickyHeader: elements.clearanceStickyHeader,
+		stickyViewport: elements.clearanceStickyViewport
+	});
+	registerStickyTableHeader({
+		sourceTable: elements.holdingsTable,
+		scrollContainer: elements.holdingsContent,
+		stickyHeader: elements.holdingsStickyHeader,
+		stickyViewport: elements.holdingsStickyViewport
+	});
+	window.addEventListener("scroll", scheduleStickyTableHeadersSync, { passive: true });
+	window.addEventListener("resize", scheduleStickyTableHeadersSync);
+	const stickyHeaderResizeObserver = new ResizeObserver(scheduleStickyTableHeadersSync);
+	stickyHeaderResizeObserver.observe(elements.topbar);
+	stickyHeaderResizeObserver.observe(elements.clearanceTableWrap);
+	stickyHeaderResizeObserver.observe(elements.holdingsContent);
+	stickyTableHeaderControllers.forEach(syncStickyTableHeader);
 }
 function drawerRow(label, value, extraClass = "") {
 	const row = makeElement("div", "drawer-row");
@@ -16464,8 +16910,8 @@ function openDrawer(item, kind = "position") {
 	const returnValue = makeElement("p", `drawer-return ${toneClass(item.return_pct)}`, `${percent(item.return_pct, true)} ${closed ? "清仓收益率" : "浮动收益率"}`);
 	const grid = makeElement("dl", "drawer-grid");
 	if (closed) grid.append(drawerRow("行业分类", item.industry_name || "未分类"), drawerRow("持有区间", `${item.opened_on} → ${item.closed_on}`), drawerRow("清仓数量", quantity(item.sold_quantity), "sensitive"), drawerRow("结转成本", money(item.cost_basis), "sensitive"), drawerRow("净卖出额", money(item.net_sale_proceeds), "sensitive"), drawerRow("交易盈亏", money(item.trading_pnl, true), "sensitive"), drawerRow("现金收入", money(item.cash_income), "sensitive"), drawerRow("现金税费", money(item.cash_fees), "sensitive"));
-	else grid.append(drawerRow("行业分类", item.industry_name || "未分类"), drawerRow("本轮开始", item.opened_on || "MISSING"), drawerRow("持仓数量", quantity(item.quantity), "sensitive"), drawerRow("平均成本", price(item.average_cost, item.asset_type), "sensitive"), drawerRow("剩余成本", money(item.remaining_cost), "sensitive"), drawerRow(item.is_live ? "盘中最新价" : "最新收盘价", price(item.close, item.asset_type)), drawerRow("最新市值", money(item.market_value), "sensitive"), drawerRow("组合权重", percent(item.weight_pct), "sensitive"), drawerRow("当日涨跌", percent(item.pct_chg, true), toneClass(item.pct_chg)), drawerRow("基准日后已实现", money(item.realized_pnl, true), "sensitive"));
-	const source = makeElement("p", "drawer-source", closed ? `核算来源 ${item.calculation_source || "MISSING"}\n行业来源 ${item.industry_source || "MISSING"}\n操作点仅来自该轮 ledger_entries` : `行情日期 ${item.price_date || "MISSING"}\n行情时间 ${item.quote_time || "正式收盘"}\n行情来源 ${item.price_source || "MISSING"}\n行业来源 ${item.industry_source || "MISSING"}`);
+	else grid.append(drawerRow("行业分类", item.industry_name || "未分类"), drawerRow("本轮开始", item.opened_on || "MISSING"), drawerRow("持仓数量", quantity(item.quantity), "sensitive"), drawerRow("平均成本", price(item.average_cost, item.asset_type), "sensitive"), drawerRow("剩余成本", money(item.remaining_cost), "sensitive"), drawerRow(item.is_live ? "盘中最新价" : "最新收盘价", price(item.close, item.asset_type)), drawerRow("最新市值", money(item.market_value), "sensitive"), drawerRow("组合权重", percent(item.weight_pct), "sensitive"), drawerRow("当日涨跌", percent(item.pct_chg, true), toneClass(item.pct_chg)), drawerRow("已实现盈亏", money(item.realized_pnl, true), "sensitive"));
+	const source = makeElement("p", "drawer-source", closed ? `核算来源 ${item.calculation_source || "MISSING"}\n行业来源 ${item.industry_source || "MISSING"}\n操作点仅来自该轮 ledger_entries` : `行情日期 ${item.price_date || "MISSING"}\n行情时间 ${item.quote_time || "正式收盘"}\n行情来源 ${item.price_source || "MISSING"}\n成本口径 ${item.cost_basis_method || "ledger_entries.diluted_cost"}\n成本状态 ${item.cost_basis_status || "ledger_only"}\n成本锚点 ${item.cost_basis_source_path || "MISSING"}\n行业来源 ${item.industry_source || "MISSING"}`);
 	source.style.whiteSpace = "pre-line";
 	elements.drawerContent.append(kicker, title, code, pnl, returnValue, grid, source, createKlinePanel());
 	renderKlineIndicatorControls();
@@ -16494,6 +16940,14 @@ function updateSortIndicators() {
 		button.classList.toggle("is-sorted", active);
 		button.dataset.direction = active ? state.sortDirection === "asc" ? "↑" : "↓" : "";
 		button.closest("th").setAttribute("aria-sort", active ? state.sortDirection === "asc" ? "ascending" : "descending" : "none");
+	});
+}
+function updateClearanceSortIndicators() {
+	document.querySelectorAll("[data-clearance-sort]").forEach((button) => {
+		const active = button.dataset.clearanceSort === state.clearanceSortKey;
+		button.classList.toggle("is-sorted", active);
+		button.dataset.direction = active ? state.clearanceSortDirection === "asc" ? "↑" : "↓" : "";
+		button.closest("th").setAttribute("aria-sort", active ? state.clearanceSortDirection === "asc" ? "ascending" : "descending" : "none");
 	});
 }
 function csvValue(value) {
@@ -16576,6 +17030,27 @@ function applyPrivacyState() {
 	elements.privacyButton.setAttribute("aria-pressed", String(state.privacy));
 }
 function bindEvents() {
+	document.querySelectorAll("[data-performance-range]").forEach((button) => {
+		button.addEventListener("click", () => {
+			state.performanceRange = button.dataset.performanceRange;
+			renderPerformance();
+		});
+		button.addEventListener("keydown", (event) => {
+			if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+			event.preventDefault();
+			const buttons = [...document.querySelectorAll("[data-performance-range]")];
+			const offset = event.key === "ArrowRight" ? 1 : -1;
+			const nextIndex = (buttons.indexOf(button) + offset + buttons.length) % buttons.length;
+			buttons[nextIndex].click();
+			buttons[nextIndex].focus();
+		});
+	});
+	elements.performanceLookbackSelect.addEventListener("change", (event) => {
+		state.performanceLookbackMonths = event.target.value;
+		state.performanceRange = "lookback";
+		localStorage.setItem("portfolioPerformanceLookbackMonths", state.performanceLookbackMonths);
+		renderPerformance();
+	});
 	elements.filterTabs.addEventListener("click", (event) => {
 		const button = event.target.closest("[data-filter]");
 		if (!button) return;
@@ -16589,7 +17064,7 @@ function bindEvents() {
 		state.query = event.target.value;
 		renderTable();
 	});
-	document.querySelector(".holdings-table thead").addEventListener("click", (event) => {
+	document.querySelectorAll(".holdings-table thead").forEach((header) => header.addEventListener("click", (event) => {
 		const button = event.target.closest("[data-sort]");
 		if (!button) return;
 		const nextKey = button.dataset.sort;
@@ -16599,7 +17074,18 @@ function bindEvents() {
 			state.sortDirection = nextKey === "name" ? "asc" : "desc";
 		}
 		renderTable();
-	});
+	}));
+	document.querySelectorAll(".clearance-table thead").forEach((header) => header.addEventListener("click", (event) => {
+		const button = event.target.closest("[data-clearance-sort]");
+		if (!button) return;
+		const nextKey = button.dataset.clearanceSort;
+		if (state.clearanceSortKey === nextKey) state.clearanceSortDirection = state.clearanceSortDirection === "asc" ? "desc" : "asc";
+		else {
+			state.clearanceSortKey = nextKey;
+			state.clearanceSortDirection = nextKey === "name" ? "asc" : "desc";
+		}
+		renderClearance();
+	}));
 	elements.asOfInput.addEventListener("change", async (event) => {
 		state.asOf = event.target.value || null;
 		await loadPortfolio({ announce: true });
@@ -16625,6 +17111,7 @@ function bindEvents() {
 }
 applyPrivacyState();
 initializeCollapsibleModules();
+initializeStickyTableHeaders();
 bindEvents();
 startRealtimeTimer();
 loadPortfolio();

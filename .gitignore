@@ -40,6 +40,7 @@ data/db/*.csv
 data/db/*.xlsx
 data/db/*.xls
 data/db/broker_statements_*/
+data/db/cost_reconciliation_*/
 data/processed/embeddings/*
 !data/processed/embeddings/.gitkeep
 data/db/vector.index

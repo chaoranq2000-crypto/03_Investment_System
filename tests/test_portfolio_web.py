@@ -13,7 +13,7 @@ import pytest
 from src.portfolio.importer import parse_opening_snapshot, parse_statement
 from src.portfolio.intraday import IntradayFetchError
 from src.portfolio.kline import KlineFetchError, KlineRefreshBusyError
-from src.portfolio.models import IndustryClassification
+from src.portfolio.models import ClosePrice, IndustryClassification
 from src.portfolio.realtime import RealtimeFetchResult, RealtimeQuote
 from src.portfolio.store import PortfolioStore
 from src.portfolio.web import DashboardApplication, WEB_ASSET_DIR, create_dashboard_server
@@ -52,6 +52,8 @@ def test_dashboard_payload_uses_real_store_values(tmp_path):
     assert payload["summary"]["cash_balance"] == "0"
     assert payload["summary"]["total_assets"] == "1200"
     assert payload["summary"]["unrealized_pnl"] == "200"
+    assert payload["summary"]["realized_pnl"] == "0"
+    assert "realized_pnl_since_baseline" not in payload["summary"]
     assert payload["summary"]["gain_count"] == 1
     assert payload["positions"][0]["weight_pct"] == "100"
     assert payload["positions"][0]["price_source"] == "opening_snapshot"
@@ -83,6 +85,13 @@ def test_dashboard_payload_uses_real_store_values(tmp_path):
     assert payload["closed_positions"] == []
     assert payload["clearance_summary"]["cycle_count"] == 0
     assert payload["clearance_summary"]["total_realized_pnl"] == "0"
+    assert payload["pnl_performance"]["periods"]["month"]["status"] == "partial_history"
+    assert payload["pnl_performance"]["periods"]["month"]["pnl"] is None
+    three_months = payload["pnl_performance"]["recent_ranges"][1]
+    assert three_months["key"] == "3m"
+    assert three_months["pnl"] == "0"
+    assert three_months["status"] == "partial_history"
+    assert three_months["series"][0] == {"date": "2026-07-10", "pnl": "0"}
     assert payload["metadata"]["baseline_date"] == "2026-07-10"
     assert "不构成" in payload["boundary"]
 
@@ -105,6 +114,137 @@ def test_dashboard_payload_includes_cash_in_total_assets_and_weights(tmp_path):
     assert payload["summary"]["total_assets"] == "1500"
     assert payload["summary"]["cash_weight_pct"] == "20"
     assert payload["positions"][0]["weight_pct"] == "80"
+
+
+def test_dashboard_payload_includes_month_year_and_lifetime_pnl_curves(tmp_path):
+    opening_path = tmp_path / "opening.csv"
+    opening_path.write_text(
+        "as_of_date,ts_code,name,quantity,total_cost,last_close\n"
+        "2025-12-31,600000,浦发银行,100,1000,10\n",
+        encoding="utf-8",
+    )
+    store = PortfolioStore(tmp_path / "portfolio.sqlite3")
+    store.initialize()
+    opening = parse_opening_snapshot(opening_path, account_id="default")
+    store.apply_opening_snapshot(
+        account_id="default",
+        instruments=opening.instruments.values(),
+        entries=opening.entries,
+        prices=opening.prices,
+        source_name=opening.source_name,
+        source_sha256=opening.source_sha256,
+        total_rows=opening.total_rows,
+    )
+    store.add_close_prices(
+        [
+            ClosePrice("600000.SH", date(2026, 1, 2), Decimal("11"), "test"),
+            ClosePrice("600000.SH", date(2026, 6, 30), Decimal("12"), "test"),
+            ClosePrice("600000.SH", date(2026, 7, 1), Decimal("13"), "test"),
+            ClosePrice("600000.SH", date(2026, 7, 15), Decimal("14"), "test"),
+        ]
+    )
+
+    payload = DashboardApplication(store).portfolio_payload(date(2026, 7, 15))
+
+    periods = payload["pnl_performance"]["periods"]
+    assert periods["month"]["label"] == "本月盈亏"
+    assert periods["month"]["pnl"] == "200"
+    assert periods["month"]["series"][0] == {
+        "date": "2026-06-30",
+        "pnl": "0",
+    }
+    assert periods["year"]["label"] == "今年盈亏"
+    assert periods["year"]["pnl"] == "400"
+    assert periods["all"]["label"] == "投资以来盈亏"
+    assert periods["all"]["pnl"] == "400"
+    assert periods["all"]["series"][-1] == {
+        "date": "2026-07-15",
+        "pnl": "400",
+    }
+    recent_ranges = payload["pnl_performance"]["recent_ranges"]
+    assert [period["key"] for period in recent_ranges] == [
+        "1m",
+        "3m",
+        "6m",
+        "12m",
+        "24m",
+    ]
+    assert recent_ranges[0]["label"] == "近1个月盈亏"
+    assert recent_ranges[0]["requested_start_date"] == "2026-06-15"
+    assert recent_ranges[0]["pnl"] == "300"
+    assert recent_ranges[1]["requested_start_date"] == "2026-04-15"
+    assert recent_ranges[1]["pnl"] == "300"
+    assert recent_ranges[3]["start_date"] == "2025-12-31"
+    assert recent_ranges[3]["pnl"] == "400"
+    assert recent_ranges[3]["status"] == "partial_history"
+    assert "账户基准日" in recent_ranges[3]["coverage_note"]
+    assert recent_ranges[4]["label"] == "近24个月盈亏"
+    assert recent_ranges[4]["requested_start_date"] == "2024-07-15"
+
+
+def test_performance_price_refresh_is_incremental_and_rebuilds_curves(
+    tmp_path, monkeypatch
+):
+    store = _build_store(tmp_path)
+    calls = []
+    rows = [
+        {
+            "ts_code": "600000.SH",
+            "trade_date": trade_date,
+            "close": close,
+            "pre_close": pre_close,
+            "pct_chg": pct_chg,
+        }
+        for trade_date, close, pre_close, pct_chg in [
+            ("20260710", 12, 11.5, 4.35),
+            ("20260711", 12.5, 12, 4.17),
+            ("20260714", 13, 12.5, 4),
+            ("20260715", 14, 13, 7.69),
+        ]
+    ]
+
+    class HistoryPro:
+        def daily(self, **kwargs):
+            calls.append((kwargs["start_date"], kwargs["end_date"]))
+            return [
+                row
+                for row in rows
+                if kwargs["start_date"] <= row["trade_date"] <= kwargs["end_date"]
+            ]
+
+    monkeypatch.setattr("src.portfolio.web.get_tushare_pro", lambda _: HistoryPro())
+    application = DashboardApplication(store)
+
+    # 先建立缓存，再验证历史行情写入后会自动失效并重算。
+    application.portfolio_payload(date(2026, 7, 14))
+    first = application.refresh_performance_prices(as_of=date(2026, 7, 14))
+    assert calls == [("20260710", "20260714")]
+    assert first["new_observations"] == 3
+    assert first["errors"] == []
+
+    second = application.refresh_performance_prices(as_of=date(2026, 7, 15))
+    assert calls[-1] == ("20260715", "20260715")
+    assert second["requested_range_count"] == 1
+    assert second["new_observations"] == 1
+
+    third = application.refresh_performance_prices(as_of=date(2026, 7, 15))
+    assert third["requested_range_count"] == 0
+    assert third["already_covered_count"] == 1
+    assert len(calls) == 2
+    assert store.performance_price_coverage("default", "600000.SH") == {
+        "start_date": date(2026, 7, 10),
+        "end_date": date(2026, 7, 15),
+        "updated_at": store.performance_price_coverage(
+            "default", "600000.SH"
+        )["updated_at"],
+    }
+
+    payload = application.portfolio_payload(date(2026, 7, 15))
+    assert payload["pnl_performance"]["periods"]["all"]["pnl"] == "400"
+    assert payload["pnl_performance"]["periods"]["all"]["series"][-1] == {
+        "date": "2026-07-15",
+        "pnl": "400",
+    }
 
 
 def test_dashboard_payload_can_overlay_intraday_quotes_without_persisting(tmp_path):
@@ -219,13 +359,48 @@ def test_dashboard_payload_includes_closed_position_cycles(tmp_path):
             "close_price": "13",
             "buy_count": 0,
             "sell_count": 1,
-            "calculation_source": "ledger_entries.moving_average_cost",
+            "calculation_source": "ledger_entries.end_of_day_diluted_cost",
         }
     ]
     assert payload["clearance_summary"]["total_realized_pnl"] == "298"
     assert payload["clearance_summary"]["return_pct"] == "29.8"
     assert payload["clearance_summary"]["win_rate_pct"] == "100"
     assert payload["clearance_summary"]["latest_close_date"] == "2026-07-11"
+
+
+def test_dashboard_groups_repeated_clearances_by_security(tmp_path):
+    store = _build_store(tmp_path)
+    statement_path = tmp_path / "two_cycles.csv"
+    statement_path.write_text(
+        "成交日期,成交时间,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费\n"
+        "2026-07-11,10:01:03,600000,浦发银行,卖出,13,100,1300,2\n"
+        "2026-07-12,10:01:03,600000,浦发银行,买入,10,50,500,1\n"
+        "2026-07-13,10:01:03,600000,浦发银行,卖出,12,50,600,1\n",
+        encoding="utf-8",
+    )
+    statement = parse_statement(statement_path, account_id="default", broker="test")
+    store.apply_statement(
+        account_id="default",
+        instruments=statement.instruments.values(),
+        entries=statement.entries,
+        broker="test",
+        source_name=statement.source_name,
+        source_sha256=statement.source_sha256,
+        total_rows=statement.total_rows,
+        skipped_rows=statement.skipped_rows,
+    )
+
+    payload = DashboardApplication(store).portfolio_payload()
+
+    assert len(payload["closed_position_groups"]) == 1
+    group = payload["closed_position_groups"][0]
+    assert group["ts_code"] == "600000.SH"
+    assert group["cycle_count"] == 2
+    assert group["sold_quantity"] == "150"
+    assert group["cost_basis"] == "1501"
+    assert group["net_sale_proceeds"] == "1897"
+    assert group["realized_pnl"] == "396"
+    assert [item["cycle_number"] for item in group["cycles"]] == [2, 1]
 
 
 def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
@@ -240,7 +415,11 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
             assert json.load(response) == {
                 "status": "ok",
                 "api_version": 2,
-                "capabilities": ["daily-kline", "refresh-intraday"],
+                "capabilities": [
+                    "daily-kline",
+                    "refresh-intraday",
+                    "auto-performance-history",
+                ],
             }
 
         with urlopen(f"{base}/", timeout=5) as response:
@@ -374,6 +553,26 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
         ) as response:
             payload = json.load(response)
             assert payload["fetched"] == 1
+
+        server.dashboard_app.refresh_performance_prices = lambda **_: {
+            "requested_range_count": 1,
+            "new_observations": 4,
+            "errors": [],
+        }
+        with urlopen(
+            Request(
+                f"{base}/api/refresh-performance",
+                data=b"{}",
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Portfolio-Action": "refresh-performance",
+                },
+                method="POST",
+            ),
+            timeout=5,
+        ) as response:
+            payload = json.load(response)
+            assert payload["new_observations"] == 4
 
         server.dashboard_app.refresh_industries = lambda: {
             "fetched": 1,
@@ -529,10 +728,24 @@ def test_dashboard_assets_are_self_contained_and_have_required_controls():
     assert 'id="refreshButton"' in html
     assert 'id="privacyButton"' in html
     assert 'id="holdingsBody"' in html
+    assert 'id="holdingsStickyHeader"' in html
+    assert 'id="clearanceStickyHeader"' in html
     assert 'id="industryList"' in html
     assert 'id="industryRefreshButton"' in html
+    assert 'id="industryPie"' in html
+    assert 'id="industryPieSegments"' in html
+    assert 'id="industryPieLegend"' in html
     assert 'id="clearancePnl"' in html
     assert 'id="clearanceBody"' in html
+    assert 'data-clearance-sort="realized_pnl"' in html
+    assert 'id="performanceChart"' in html
+    assert 'data-performance-range="month"' in html
+    assert 'data-performance-range="year"' in html
+    assert 'data-performance-range="all"' in html
+    assert 'data-performance-range="lookback"' in html
+    assert 'id="performanceLookbackSelect"' in html
+    assert '<option value="3" selected>近 3 个月</option>' in html
+    assert '<option value="24">近 2 年</option>' in html
     assert 'id="clearanceEmpty"' in html
     assert 'id="cashBalance"' in html
     assert html.count("data-collapsible=") == 6
@@ -542,11 +755,22 @@ def test_dashboard_assets_are_self_contained_and_have_required_controls():
     assert 'api("/api/refresh-prices"' in javascript
     assert 'api("/api/refresh-industries"' in javascript
     assert 'api("/api/realtime-portfolio"' in javascript
+    assert 'api("/api/refresh-performance"' in javascript
+    assert '"X-Portfolio-Action": "refresh-performance"' in javascript
+    assert 'state.payload = await api("/api/portfolio")' in javascript
+    assert "正在抓取历史收盘价并重算曲线" in javascript
     assert "window.setInterval(refreshRealtime, 6e4)" in javascript
     assert "最新价" in html
     assert "renderAllocation" in javascript
     assert "renderIndustries" in javascript
+    assert "renderIndustryPie" in javascript
+    assert "pieSlicePath" in javascript
     assert "renderClearance" in javascript
+    assert "renderPerformance" in javascript
+    assert "performance.recent_ranges" in javascript
+    assert "portfolioPerformanceLookbackMonths" in javascript
+    assert "closed_position_groups" in javascript
+    assert "expandedClearanceGroups" in javascript
     assert "summary.total_assets" in javascript
     assert 'name: "现金"' in javascript
     assert "industry.members || []" in javascript
@@ -580,6 +804,13 @@ def test_dashboard_assets_are_self_contained_and_have_required_controls():
     assert ".operation-group" in css
     assert ".collapsible-content[hidden]" in css
     assert ".industry-position-list" in css
+    assert ".industry-pie-segment" in css
+    assert ".industry-pie-legend" in css
+    assert ".sticky-table-header.is-visible" in css
+    assert ".performance-chart-plot" in css
+    assert ".performance-lookback-picker" in css
+    assert ".clearance-cycle-row" in css
+    assert "initializeStickyTableHeaders" in javascript
     assert "--muted: oklch(0.84 0.012 245)" in css
     assert "--dim: oklch(0.74 0.01 245)" in css
     assert 'content: "••••••"' in css

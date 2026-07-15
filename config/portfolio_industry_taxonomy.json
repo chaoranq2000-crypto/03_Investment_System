@@ -1,17 +1,35 @@
 {
-  "taxonomy_id": "portfolio_industry_v1",
-  "minimum_classified_weight_coverage": 0.70,
-  "minimum_constituent_count_coverage": 0.70,
-  "single_industry_high_confidence": 0.80,
-  "single_industry_medium_confidence": 0.60,
-  "theme_aggregations": [
-    {
-      "theme": "互联网",
-      "corroborating_index_keywords": ["互联网"],
-      "compatible_industries": ["互联网", "专业零售", "传媒", "电子"],
-      "minimum_share": 0.80
+  "taxonomy_id": "portfolio_industry_v2",
+  "etf_overrides": {
+    "159892.SZ": {
+      "industry_name": "医药生物",
+      "index_code": "HSBIO.HI",
+      "index_name": "恒生生物科技",
+      "reviewed_at": "2026-07-15",
+      "evidence_source": "tushare.etf_basic"
+    },
+    "513970.SH": {
+      "industry_name": "消费",
+      "index_code": "HSCGSI.HI",
+      "index_name": "恒生消费",
+      "reviewed_at": "2026-07-15",
+      "evidence_source": "tushare.etf_basic"
+    },
+    "159792.SZ": {
+      "industry_name": "互联网",
+      "index_code": "931637.CSI",
+      "index_name": "港股通互联网",
+      "reviewed_at": "2026-07-15",
+      "evidence_source": "tushare.etf_basic"
+    },
+    "513330.SH": {
+      "industry_name": "互联网",
+      "index_code": "HSIII.HI",
+      "index_name": "恒生互联网科技业",
+      "reviewed_at": "2026-07-15",
+      "evidence_source": "tushare.etf_basic"
     }
-  ],
+  },
   "aliases": {
     "医药生物": "医药生物",
     "化学制药": "医药生物",

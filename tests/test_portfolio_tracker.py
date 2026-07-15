@@ -42,7 +42,36 @@ from src.portfolio.realtime import (
     parse_sina_response,
     parse_tencent_response,
 )
+from src.portfolio.runtime import (
+    canonical_database_path,
+    default_database_path,
+    default_env_file_path,
+)
 from src.portfolio.store import SCHEMA_VERSION, PortfolioStore
+
+
+def test_linked_worktree_defaults_to_primary_private_runtime(tmp_path):
+    primary = tmp_path / "primary"
+    linked = tmp_path / "feature"
+    linked_git_dir = primary / ".git" / "worktrees" / "feature"
+    linked_git_dir.mkdir(parents=True)
+    linked.mkdir()
+    (linked / ".git").write_text(f"gitdir: {linked_git_dir}\n", encoding="utf-8")
+
+    assert default_database_path(linked) == primary / "data" / "db" / "portfolio.sqlite3"
+    assert default_env_file_path(linked) == primary / ".env.local"
+    assert canonical_database_path(
+        linked / "data" / "db" / "portfolio.sqlite3", linked
+    ) == primary / "data" / "db" / "portfolio.sqlite3"
+    shadow = linked / "data" / "db" / "portfolio.shadow.sqlite3"
+    assert canonical_database_path(shadow, linked) == shadow
+
+
+def test_normal_checkout_keeps_private_runtime_in_its_own_root(tmp_path):
+    root = tmp_path / "checkout"
+    (root / ".git").mkdir(parents=True)
+
+    assert default_database_path(root) == root / "data" / "db" / "portfolio.sqlite3"
 
 
 def _row(
@@ -138,7 +167,7 @@ def test_realtime_provider_falls_back_after_primary_error():
     assert result.errors and result.errors[0].startswith("broken:")
 
 
-def test_moving_average_cost_realized_pnl_and_cash_items():
+def test_diluted_cost_rolls_open_cycle_trades_and_cash_items_into_cost():
     states = build_position_states(
         [
             _row("OPENING", quantity="100", total_cost="1000"),
@@ -151,10 +180,10 @@ def test_moving_average_cost_realized_pnl_and_cash_items():
 
     state = states["600000.SH"]
     assert state.quantity == Decimal("150")
-    assert state.remaining_cost == Decimal("1653.75")
-    assert state.average_cost == Decimal("11.025")
-    assert state.realized_trading_pnl == Decimal("96.75")
-    assert state.realized_pnl == Decimal("104.75")
+    assert state.remaining_cost == Decimal("1549")
+    assert state.average_cost == Decimal("1549") / Decimal("150")
+    assert state.realized_trading_pnl == Decimal("0")
+    assert state.realized_pnl == Decimal("0")
 
 
 def test_accounting_rejects_oversell():
@@ -235,6 +264,25 @@ def test_partial_sale_is_not_reported_as_closed_cycle():
     assert cycles == []
 
 
+def test_intraday_zero_then_rebuy_stays_in_one_open_diluted_cost_cycle():
+    rows = [
+        _row("OPENING", event_date="2026-07-10", quantity="100", total_cost="1000"),
+        _row("SELL", event_date="2026-07-11", quantity="100", price="9", gross="900"),
+        _row("BUY", event_date="2026-07-11", quantity="50", price="8", gross="400"),
+    ]
+
+    state = build_position_states(rows)["600000.SH"]
+    assert state.quantity == Decimal("50")
+    assert state.remaining_cost == Decimal("500")
+    assert state.average_cost == Decimal("10")
+    assert state.realized_pnl == Decimal("0")
+    assert build_closed_position_cycles(rows) == []
+    ledger_cycles = build_ledger_cycles(rows)
+    assert len(ledger_cycles) == 1
+    assert ledger_cycles[0].cycle_id == "600000.SH:1"
+    assert ledger_cycles[0].closed_on is None
+
+
 def test_opening_snapshot_and_statement_are_idempotent(tmp_path):
     opening_path = tmp_path / "opening.csv"
     opening_path.write_text(
@@ -286,8 +334,8 @@ def test_opening_snapshot_and_statement_are_idempotent(tmp_path):
     assert second_preview == {"accepted_entries": 0, "duplicate_entries": 2}
     positions, summary = store.position_report("default")
     assert positions[0]["quantity"] == Decimal("150")
-    assert positions[0]["remaining_cost"] == Decimal("1728.75")
-    assert positions[0]["realized_pnl"] == Decimal("121.75")
+    assert positions[0]["remaining_cost"] == Decimal("1607")
+    assert positions[0]["realized_pnl"] == Decimal("0")
     assert summary["position_count"] == 1
 
 
@@ -319,6 +367,141 @@ def test_cash_balance_snapshots_are_append_only_and_support_historical_as_of(tmp
     assert latest_summary["cash_balance"] == Decimal("12345.67")
     assert latest_summary["total_assets"] == Decimal("12345.67")
     assert historical_summary["cash_balance"] == Decimal("10000")
+
+
+def test_cash_balance_uses_append_order_when_timestamps_match(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        "src.portfolio.store.utc_now",
+        lambda: "2026-07-15T00:00:00+00:00",
+    )
+    store = PortfolioStore(tmp_path / "portfolio.sqlite3")
+    store.initialize()
+
+    store.set_cash_balance("default", Decimal("100"), date(2026, 7, 15))
+    store.set_cash_balance("default", Decimal("200"), date(2026, 7, 15))
+
+    assert store.cash_balance("default")["amount"] == Decimal("200")
+    assert [row["amount"] for row in store.cash_history("default")] == ["200", "100"]
+
+
+def test_statement_import_replays_cash_from_latest_user_anchor_and_is_idempotent(tmp_path):
+    store = PortfolioStore(tmp_path / "portfolio.sqlite3")
+    store.initialize()
+    store.set_cash_balance(
+        "default", Decimal("10000"), date(2026, 7, 10), note="用户确认日终现金"
+    )
+    statement_path = tmp_path / "statement.csv"
+    statement_path.write_text(
+        "成交日期,成交时间,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费\n"
+        "2026-07-11,09:31:02,600000,浦发银行,买入,13,100,1300,5\n"
+        "2026-07-12,10:01:03,600000,浦发银行,卖出,14,50,700,2\n",
+        encoding="utf-8",
+    )
+    statement = parse_statement(statement_path, account_id="default", broker="test")
+
+    preview = store.preview_statement_cash("default", statement.entries)
+    assert preview["status"] == "ready"
+    assert preview["anchor_amount"] == "10000"
+    assert preview["cash_change"] == "-607"
+    assert preview["amount"] == "9393"
+    assert preview["breakdown"] == {
+        "buy_outflow": "1305",
+        "sell_inflow": "698",
+        "dividend_inflow": "0",
+        "cash_fee_outflow": "0",
+    }
+
+    outcome = store.apply_statement(
+        account_id="default",
+        instruments=statement.instruments.values(),
+        entries=statement.entries,
+        broker="test",
+        source_name=statement.source_name,
+        source_sha256=statement.source_sha256,
+        total_rows=statement.total_rows,
+        skipped_rows=statement.skipped_rows,
+    )
+    assert outcome["cash_update"]["status"] == "updated"
+    assert outcome["cash_update"]["calculation_status"] == "complete"
+    assert store.cash_balance("default")["amount"] == Decimal("9393")
+    assert store.cash_balance("default")["source"] == "statement_calculated"
+
+    later_path = tmp_path / "later.csv"
+    later_path.write_text(
+        "成交日期,成交时间,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费\n"
+        "2026-07-12,14:30:00,600000,浦发银行,买入,10,10,100,0\n",
+        encoding="utf-8",
+    )
+    later = parse_statement(later_path, account_id="default", broker="test")
+    later_outcome = store.apply_statement(
+        account_id="default",
+        instruments=later.instruments.values(),
+        entries=later.entries,
+        broker="test",
+        source_name=later.source_name,
+        source_sha256=later.source_sha256,
+        total_rows=later.total_rows,
+        skipped_rows=later.skipped_rows,
+    )
+    assert later_outcome["cash_update"]["amount"] == "9293"
+    assert store.cash_balance("default")["amount"] == Decimal("9293")
+
+    duplicate = store.apply_statement(
+        account_id="default",
+        instruments=later.instruments.values(),
+        entries=later.entries,
+        broker="test",
+        source_name=later.source_name,
+        source_sha256=later.source_sha256,
+        total_rows=later.total_rows,
+        skipped_rows=later.skipped_rows,
+    )
+    assert duplicate["inserted_entries"] == 0
+    assert duplicate["cash_update"]["status"] == "unchanged"
+    assert len(store.cash_history("default")) == 3
+
+
+def test_statement_cash_requires_user_anchor_and_refuses_negative_snapshot(tmp_path):
+    statement_path = tmp_path / "statement.csv"
+    statement_path.write_text(
+        "成交日期,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费\n"
+        "2026-07-11,600000,浦发银行,买入,2,100,200,0\n",
+        encoding="utf-8",
+    )
+    statement = parse_statement(statement_path, account_id="default", broker="test")
+
+    missing_anchor_store = PortfolioStore(tmp_path / "missing.sqlite3")
+    missing_anchor_store.initialize()
+    missing = missing_anchor_store.apply_statement(
+        account_id="default",
+        instruments=statement.instruments.values(),
+        entries=statement.entries,
+        broker="test",
+        source_name=statement.source_name,
+        source_sha256=statement.source_sha256,
+        total_rows=statement.total_rows,
+        skipped_rows=statement.skipped_rows,
+    )
+    assert missing["cash_update"]["status"] == "missing_cash_anchor"
+    assert missing_anchor_store.cash_balance("default") is None
+
+    negative_store = PortfolioStore(tmp_path / "negative.sqlite3")
+    negative_store.initialize()
+    negative_store.set_cash_balance("default", Decimal("100"), date(2026, 7, 10))
+    negative = negative_store.apply_statement(
+        account_id="default",
+        instruments=statement.instruments.values(),
+        entries=statement.entries,
+        broker="test",
+        source_name=statement.source_name,
+        source_sha256=statement.source_sha256,
+        total_rows=statement.total_rows,
+        skipped_rows=statement.skipped_rows,
+    )
+    assert negative["cash_update"]["status"] == "negative_projected_cash"
+    assert negative["cash_update"]["amount"] == "-100"
+    assert negative_store.cash_balance("default")["amount"] == Decimal("100")
+    assert len(negative_store.cash_history("default")) == 1
 
 
 def test_store_closed_position_report_supports_historical_as_of(tmp_path):
@@ -364,7 +547,7 @@ def test_store_closed_position_report_supports_historical_as_of(tmp_path):
     )
     assert earlier_cycles == []
     assert earlier_summary["cycle_count"] == 0
-    assert earlier_summary["realized_pnl_outside_closed_cycles"] == Decimal("78")
+    assert earlier_summary["realized_pnl_outside_closed_cycles"] == Decimal("0")
 
     cycles, summary = store.closed_position_report("default")
     assert len(cycles) == 1
@@ -470,7 +653,111 @@ def test_internal_transfer_reconciliation_is_idempotent_and_has_no_ledger_effect
     assert positions[0]["remaining_cost"] == Decimal("5278")
 
 
-def test_historical_closed_statement_is_replayable_without_changing_baseline_pnl(tmp_path):
+def test_reviewed_cost_rebase_is_applied_and_unverified_rebase_is_audited(tmp_path):
+    opening_path = tmp_path / "opening.csv"
+    opening_path.write_text(
+        "as_of_date,ts_code,name,quantity,total_cost,last_close\n"
+        "2026-07-10,600000,浦发银行,100,1000,12\n",
+        encoding="utf-8",
+    )
+    store = PortfolioStore(tmp_path / "portfolio.sqlite3")
+    store.initialize()
+    opening = parse_opening_snapshot(opening_path, account_id="default")
+    store.apply_opening_snapshot(
+        account_id="default",
+        instruments=opening.instruments.values(),
+        entries=opening.entries,
+        prices=opening.prices,
+        source_name=opening.source_name,
+        source_sha256=opening.source_sha256,
+        total_rows=opening.total_rows,
+    )
+
+    reviewed = {
+        "ts_code": "600000.SH",
+        "as_of_date": "2026-07-10",
+        "target_quantity": "100",
+        "total_cost": "1500",
+        "source_path": "reviewed_snapshot.csv:2",
+        "status": "reviewed",
+        "note": "user_confirmed_diluted_cost",
+    }
+    first = store.record_position_cost_rebases("default", [reviewed])
+    second = store.record_position_cost_rebases("default", [reviewed])
+    assert first == {"inserted_rebases": 1, "duplicate_rebases": 0}
+    assert second == {"inserted_rebases": 0, "duplicate_rebases": 1}
+
+    positions, _ = store.position_report("default")
+    assert positions[0]["quantity"] == Decimal("100")
+    assert positions[0]["remaining_cost"] == Decimal("1500")
+    assert positions[0]["average_cost"] == Decimal("15")
+    assert positions[0]["cost_basis_status"] == "reviewed"
+    assert positions[0]["cost_basis_source_path"] == "reviewed_snapshot.csv:2"
+    assert store.recent_ledger("default")[0]["event_type"] == "COST_REBASE"
+
+    unverified = dict(reviewed)
+    unverified.update(
+        {
+            "as_of_date": "2026-07-11",
+            "target_quantity": "120",
+            "total_cost": "1800",
+            "source_path": "unverified_snapshot.csv:2",
+            "status": "unverified",
+        }
+    )
+    store.record_position_cost_rebases("default", [unverified])
+    positions, _ = store.position_report("default")
+    assert positions[0]["quantity"] == Decimal("100")
+    assert positions[0]["remaining_cost"] == Decimal("1500")
+    assert store.recent_position_cost_rebases("default")[0]["status"] == "unverified"
+
+
+def test_statement_preview_handles_reviewed_cost_rebase_synthetic_row(tmp_path):
+    opening_path = tmp_path / "opening.csv"
+    opening_path.write_text(
+        "as_of_date,ts_code,name,quantity,total_cost,last_close\n"
+        "2026-07-10,600000,浦发银行,100,1000,12\n",
+        encoding="utf-8",
+    )
+    statement_path = tmp_path / "statement.csv"
+    statement_path.write_text(
+        "成交日期,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费,资金流水号\n"
+        "2026-07-11,600000,浦发银行,买入,11,10,110,5,post-rebase-buy\n",
+        encoding="utf-8",
+    )
+    store = PortfolioStore(tmp_path / "portfolio.sqlite3")
+    store.initialize()
+    opening = parse_opening_snapshot(opening_path, account_id="default")
+    store.apply_opening_snapshot(
+        account_id="default",
+        instruments=opening.instruments.values(),
+        entries=opening.entries,
+        prices=opening.prices,
+        source_name=opening.source_name,
+        source_sha256=opening.source_sha256,
+        total_rows=opening.total_rows,
+    )
+    store.record_position_cost_rebases(
+        "default",
+        [
+            {
+                "ts_code": "600000.SH",
+                "as_of_date": "2026-07-10",
+                "target_quantity": "100",
+                "total_cost": "1000",
+                "source_path": "reviewed_snapshot.csv:2",
+                "status": "reviewed",
+            }
+        ],
+    )
+    statement = parse_statement(statement_path, account_id="default", broker="test")
+
+    preview = store.preview_statement("default", statement.entries)
+
+    assert preview == {"accepted_entries": 1, "duplicate_entries": 0}
+
+
+def test_historical_closed_statement_is_replayable_and_counts_realized_pnl(tmp_path):
     opening_path = tmp_path / "opening.csv"
     opening_path.write_text(
         "as_of_date,ts_code,name,quantity,total_cost,last_close\n"
@@ -516,7 +803,7 @@ def test_historical_closed_statement_is_replayable_without_changing_baseline_pnl
     positions, summary = store.position_report("default")
     assert positions[0]["ts_code"] == "600000.SH"
     assert positions[0]["quantity"] == Decimal("100")
-    assert summary["realized_pnl_since_baseline"] == Decimal("0")
+    assert summary["realized_pnl"] == Decimal("189")
     cycles, cycle_summary = store.closed_position_report("default")
     assert len(cycles) == 1
     assert cycles[0]["ts_code"] == "000001.SZ"
@@ -601,6 +888,7 @@ def test_gbk_tsv_disguised_as_xls_and_excel_text_codes_are_supported(tmp_path):
     assert parsed.entries[0].ts_code == "159792.SZ"
     assert parsed.entries[0].external_id == "0104000075848146"
     assert parsed.entries[0].quantity == Decimal("14000")
+    assert "fees_missing=true" in parsed.entries[0].note
 
 
 def test_broker_dividend_account_character_variant_is_supported(tmp_path):
@@ -677,56 +965,6 @@ class _FakePro:
             ]
         )
 
-    def etf_sz_cons(self, **kwargs):
-        baskets = {
-            "159892.SZ": [
-                {
-                    "trade_date": "20260710",
-                    "con_code": "159900.SZ",
-                    "con_name": "申赎现金",
-                    "qty": 0,
-                },
-                {
-                    "trade_date": "20260710",
-                    "con_code": "000001.SZ",
-                    "con_name": "示例制药",
-                    "qty": 100,
-                },
-                {
-                    "trade_date": "20260710",
-                    "con_code": "000002.SZ",
-                    "con_name": "示例生物",
-                    "qty": 50,
-                },
-            ],
-            "159919.SZ": [
-                {
-                    "trade_date": "20260710",
-                    "con_code": "000001.SZ",
-                    "con_name": "示例制药",
-                    "qty": 100,
-                },
-                {
-                    "trade_date": "20260710",
-                    "con_code": "000003.SZ",
-                    "con_name": "示例证券",
-                    "qty": 100,
-                },
-            ],
-            "159999.SZ": [
-                {
-                    "trade_date": "20260710",
-                    "con_code": "00013.HK",
-                    "con_name": "未复核港股",
-                    "qty": 100,
-                }
-            ],
-        }
-        return _Frame(baskets.get(kwargs["ts_code"], []))
-
-    def fund_portfolio(self, **kwargs):
-        return _Frame([])
-
     def etf_basic(self, **kwargs):
         return _Frame(
             [
@@ -753,6 +991,71 @@ def test_tushare_provider_routes_equity_and_etf():
         ("600000.SH", Decimal("12.34"), "tushare.daily"),
         ("159892.SZ", Decimal("0.73"), "tushare.fund_daily"),
     ]
+
+
+def test_tushare_close_provider_fetches_sorted_ranges_and_routes_bonds():
+    class RangePro:
+        def __init__(self):
+            self.calls = []
+
+        def daily(self, **kwargs):
+            self.calls.append(("daily", kwargs))
+            return _Frame(
+                [
+                    {
+                        "ts_code": kwargs["ts_code"],
+                        "trade_date": "20260715",
+                        "close": 14,
+                        "pre_close": 13,
+                        "pct_chg": 7.69,
+                    },
+                    {
+                        "ts_code": kwargs["ts_code"],
+                        "trade_date": "20260714",
+                        "close": 13,
+                        "pre_close": 12.5,
+                        "pct_chg": 4,
+                    },
+                ]
+            )
+
+        def cb_daily(self, **kwargs):
+            self.calls.append(("cb_daily", kwargs))
+            return _Frame(
+                [
+                    {
+                        "ts_code": kwargs["ts_code"],
+                        "trade_date": "20260715",
+                        "close": 120,
+                        "pre_close": 119,
+                        "pct_chg": 0.84,
+                    }
+                ]
+            )
+
+    pro = RangePro()
+    provider = TushareCloseProvider(pro)
+    equity_prices = provider.fetch_range(
+        Instrument("600000.SH", "浦发银行", "equity"),
+        start_date=date(2026, 7, 14),
+        end_date=date(2026, 7, 15),
+    )
+    bond_prices = provider.fetch_range(
+        Instrument("113000.SH", "示例转债", "bond"),
+        start_date=date(2026, 7, 15),
+        end_date=date(2026, 7, 15),
+    )
+
+    assert [item.trade_date for item in equity_prices] == [
+        date(2026, 7, 14),
+        date(2026, 7, 15),
+    ]
+    assert [item.source for item in equity_prices] == [
+        "tushare.daily",
+        "tushare.daily",
+    ]
+    assert bond_prices[0].source == "tushare.cb_daily"
+    assert [name for name, _ in pro.calls] == ["daily", "cb_daily"]
 
 
 def test_tushare_kline_provider_routes_equity_and_etf_with_factors():
@@ -1376,18 +1679,21 @@ def test_intraday_unknown_asset_is_explicitly_unsupported_without_fetch(tmp_path
     assert payload["bars"] == []
 
 
-def test_industry_provider_normalizes_equity_and_classifies_etf_from_holdings():
-    classifications, missing = TushareIndustryProvider(
-        _FakePro(),
-        hk_industry_provider=None,
-        hk_close_provider=None,
-    ).fetch_many(
+def test_industry_provider_normalizes_equity_and_uses_reviewed_etf_mapping():
+    class ReviewedEtfPro(_FakePro):
+        def etf_basic(self, **kwargs):
+            identities = {
+                "159892.SZ": ("HSBIO.HI", "恒生生物科技"),
+            }
+            index_code, index_name = identities.get(kwargs["ts_code"], ("", ""))
+            return _Frame([{"index_code": index_code, "index_name": index_name}])
+
+    classifications, missing = TushareIndustryProvider(ReviewedEtfPro()).fetch_many(
         [
             Instrument("600000.SH", "浦发银行", "equity"),
             Instrument("000001.SZ", "示例制药", "equity"),
             Instrument("159892.SZ", "恒生医药ETF华夏", "etf"),
-            Instrument("159919.SZ", "沪深300ETF", "etf"),
-            Instrument("159999.SZ", "医药名字不能替代持仓证据ETF", "etf"),
+            Instrument("159999.SZ", "未复核ETF", "etf"),
         ]
     )
 
@@ -1398,132 +1704,39 @@ def test_industry_provider_normalizes_equity_and_classifies_etf_from_holdings():
     assert "raw=化学制药" in by_code["000001.SZ"].source
     assert by_code["159892.SZ"].industry_name == "医药生物"
     assert by_code["159892.SZ"].confidence == "high"
-    assert by_code["159892.SZ"].classified_weight_coverage == Decimal("1")
-    assert "tushare.etf_sz_cons" in by_code["159892.SZ"].source
-    assert "index_role=corroboration_only" in by_code["159892.SZ"].source
-    assert by_code["159919.SZ"].industry_name == "跨行业ETF"
-    assert by_code["159999.SZ"].industry_name == "未分类（ETF持仓覆盖不足）"
+    assert "verification=live_index_match" in by_code["159892.SZ"].source
+    assert by_code["159999.SZ"].industry_name == "未分类（ETF需复核映射）"
     assert by_code["159999.SZ"].confidence == "unverified"
     assert missing == ["159999.SZ"]
 
 
-def test_industry_provider_classifies_hk_etf_with_reviewed_industry_and_same_day_close():
-    class HongKongIndustryProvider:
-        source = "eastmoney.test.BELONG_INDUSTRY"
-
-        def fetch_many(self, ts_codes):
-            assert set(ts_codes) == {"00013.HK"}
-            return {"00013.HK": "药品及生物科技"}
-
-    class HongKongCloseProvider:
-        source = "sina.test.close"
-
-        def fetch_many(self, ts_codes, trade_date):
-            assert set(ts_codes) == {"00013.HK"}
-            assert trade_date == "20260710"
-            return {"00013.HK": Decimal("10")}
-
-    classifications, missing = TushareIndustryProvider(
-        _FakePro(),
-        hk_industry_provider=HongKongIndustryProvider(),
-        hk_close_provider=HongKongCloseProvider(),
-    ).fetch_many([Instrument("159999.SZ", "名称不参与判断ETF", "etf")])
-
-    assert missing == []
-    assert classifications[0].industry_name == "医药生物"
-    assert classifications[0].confidence == "high"
-    assert classifications[0].source_date == "20260710"
-    assert "industry_source=eastmoney.test.BELONG_INDUSTRY" in classifications[0].source
-    assert "price_source=sina.test.close" in classifications[0].source
-
-
-def test_industry_provider_uses_reviewed_theme_aggregation_only_after_holdings_pass():
-    class InternetEtfPro(_FakePro):
-        def etf_sz_cons(self, **kwargs):
-            return _Frame(
-                [
-                    {
-                        "trade_date": "20260710",
-                        "con_code": "00700.HK",
-                        "con_name": "示例软件平台",
-                        "qty": 60,
-                    },
-                    {
-                        "trade_date": "20260710",
-                        "con_code": "09988.HK",
-                        "con_name": "示例电商平台",
-                        "qty": 40,
-                    },
-                ]
-            )
-
+def test_industry_provider_rejects_reviewed_mapping_when_index_identity_changes():
+    class ChangedIndexPro(_FakePro):
         def etf_basic(self, **kwargs):
-            return _Frame([{"index_name": "港股通互联网"}])
+            return _Frame([{"index_code": "OTHER.HI", "index_name": "其他指数"}])
 
-    class HongKongIndustryProvider:
-        source = "eastmoney.test.BELONG_INDUSTRY"
+    classifications, missing = TushareIndustryProvider(ChangedIndexPro()).fetch_many(
+        [Instrument("159792.SZ", "港股通互联网ETF", "etf")]
+    )
 
-        def fetch_many(self, ts_codes):
-            assert set(ts_codes) == {"00700.HK", "09988.HK"}
-            return {"00700.HK": "软件服务", "09988.HK": "专业零售"}
-
-    class HongKongCloseProvider:
-        source = "sina.test.close"
-
-        def fetch_many(self, ts_codes, trade_date):
-            return {"00700.HK": Decimal("10"), "09988.HK": Decimal("10")}
-
-    classifications, missing = TushareIndustryProvider(
-        InternetEtfPro(),
-        hk_industry_provider=HongKongIndustryProvider(),
-        hk_close_provider=HongKongCloseProvider(),
-    ).fetch_many([Instrument("159792.SZ", "名称不参与判断ETF", "etf")])
-
-    assert missing == []
-    assert classifications[0].industry_name == "互联网"
-    assert classifications[0].confidence == "high"
-    assert classifications[0].top_industry_weight == Decimal("1")
-    assert "index_role=theme_aggregation_selector" in classifications[0].source
+    assert classifications[0].industry_name == "未分类（ETF需复核映射）"
+    assert "reviewed_override_mismatch" in classifications[0].source
+    assert missing == ["159792.SZ"]
 
 
-def test_industry_provider_uses_latest_fund_portfolio_when_basket_is_unavailable():
-    class PortfolioOnlyPro(_FakePro):
-        def etf_sz_cons(self, **kwargs):
-            return _Frame([])
+def test_industry_provider_can_use_reviewed_mapping_when_etf_basic_is_unavailable():
+    class OfflineIndexPro(_FakePro):
+        def etf_basic(self, **kwargs):
+            raise RuntimeError("offline")
 
-        def fund_portfolio(self, **kwargs):
-            return _Frame(
-                [
-                    {
-                        "end_date": "20260331",
-                        "symbol": "000001.SZ",
-                        "mkv": 800,
-                        "stk_mkv_ratio": 0,
-                    },
-                    {
-                        "end_date": "20260331",
-                        "symbol": "000003.SZ",
-                        "mkv": 200,
-                        "stk_mkv_ratio": 0,
-                    },
-                    {
-                        "end_date": "20251231",
-                        "symbol": "000003.SZ",
-                        "mkv": 1000,
-                        "stk_mkv_ratio": 0,
-                    },
-                ]
-            )
-
-    classifications, missing = TushareIndustryProvider(PortfolioOnlyPro()).fetch_many(
-        [Instrument("159892.SZ", "不能按名称判断ETF", "etf")]
+    classifications, missing = TushareIndustryProvider(OfflineIndexPro()).fetch_many(
+        [Instrument("513330.SH", "恒生互联网ETF", "etf")]
     )
 
     assert missing == []
-    assert classifications[0].industry_name == "医药生物"
-    assert classifications[0].confidence == "high"
-    assert classifications[0].method == "mkv"
-    assert classifications[0].source_date == "20260331"
+    assert classifications[0].industry_name == "互联网"
+    assert classifications[0].method == "reviewed_etf_override"
+    assert "verification=reviewed_config" in classifications[0].source
 
 
 def test_store_migrates_v1_database_and_persists_industry(tmp_path):

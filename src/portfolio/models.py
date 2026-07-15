@@ -7,7 +7,14 @@ from typing import Any
 
 
 ZERO = Decimal("0")
-SUPPORTED_EVENT_TYPES = {"OPENING", "BUY", "SELL", "DIVIDEND", "CASH_FEE"}
+SUPPORTED_EVENT_TYPES = {
+    "OPENING",
+    "BUY",
+    "SELL",
+    "DIVIDEND",
+    "CASH_FEE",
+    "COST_REBASE",
+}
 SUPPORTED_ASSET_TYPES = {"equity", "etf", "unknown"}
 
 
@@ -106,9 +113,6 @@ class IndustryClassification:
     method: str = ""
     source_date: str = ""
     confidence: str = ""
-    classified_weight_coverage: Decimal | None = None
-    constituent_count_coverage: Decimal | None = None
-    top_industry_weight: Decimal | None = None
 
 
 @dataclass

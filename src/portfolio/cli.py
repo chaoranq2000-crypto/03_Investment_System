@@ -20,6 +20,7 @@ from .intraday import IntradayFetchError, IntradayService, build_intraday_provid
 from .kline import KlineFetchError, KlineNotFoundError, KlineService, TushareKlineProvider
 from .models import ImportIssue, decimal_to_text
 from .prices import PriceFetchError, TushareCloseProvider
+from .runtime import default_database_path, default_env_file_path
 from .store import PortfolioStore
 from .web import serve_dashboard
 
@@ -161,12 +162,21 @@ def command_import_statement(args: argparse.Namespace, store: PortfolioStore) ->
     if args.included_in_opening:
         preview = store.preview_included_statement(args.account, parsed.entries)
         disposition = "included_in_opening"
+        cash_preview = {
+            "status": "not_applicable",
+            "reason": "已包含在期初快照中的观察记录不改变当前现金",
+        }
     elif args.historical_closed:
         preview = store.preview_historical_closed_statement(args.account, parsed.entries)
         disposition = "historical_closed_ledger"
+        cash_preview = {
+            "status": "not_applicable",
+            "reason": "基准日前历史已清仓流水不改变当前现金",
+        }
     else:
         preview = store.preview_statement(args.account, parsed.entries)
         disposition = "post_baseline_ledger"
+        cash_preview = store.preview_statement_cash(args.account, parsed.entries)
     summary = {
         "mode": "apply" if args.apply else "preview",
         "disposition": disposition,
@@ -176,6 +186,7 @@ def command_import_statement(args: argparse.Namespace, store: PortfolioStore) ->
         "accepted_entries": preview["accepted_entries"],
         "duplicate_entries": preview["duplicate_entries"],
         "skipped_rows": parsed.skipped_rows,
+        "cash_preview": cash_preview,
     }
     if not args.apply:
         print(json.dumps(summary, ensure_ascii=False, indent=2))
@@ -216,7 +227,7 @@ def command_import_statement(args: argparse.Namespace, store: PortfolioStore) ->
             skipped_rows=parsed.skipped_rows,
         )
     summary.update(outcome)
-    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    print(json.dumps(_raw(summary), ensure_ascii=False, indent=2))
     return 0
 
 
@@ -310,9 +321,6 @@ def command_refresh_industries(args: argparse.Namespace, store: PortfolioStore) 
                         "method": item.method,
                         "source_date": item.source_date,
                         "confidence": item.confidence,
-                        "classified_weight_coverage": item.classified_weight_coverage,
-                        "constituent_count_coverage": item.constituent_count_coverage,
-                        "top_industry_weight": item.top_industry_weight,
                     }
                     for item in classifications
                 ],
@@ -488,7 +496,7 @@ def _portfolio_table(positions: list[dict[str, Any]], summary: dict[str, Any]) -
         "市值",
         "浮动盈亏",
         "收益率",
-        "基准日后已实现",
+        "已实现盈亏",
     ]
     rows = [
         [
@@ -520,7 +528,7 @@ def _portfolio_table(positions: list[dict[str, Any]], summary: dict[str, Any]) -
             if summary["unrealized_return_pct"] is not None
             else "浮动收益率: MISSING"
         ),
-        f"基准日后已实现盈亏: {_quantized(summary['realized_pnl_since_baseline'], 3, grouping=True)} CNY",
+        f"已实现盈亏: {_quantized(summary['realized_pnl'], 3, grouping=True)} CNY",
     ]
     if summary["missing_prices"]:
         summary_lines.append("缺失行情: " + ", ".join(summary["missing_prices"]))
@@ -543,7 +551,7 @@ def _portfolio_csv(positions: list[dict[str, Any]]) -> str:
         "market_value",
         "unrealized_pnl",
         "return_pct",
-        "realized_pnl_since_baseline",
+        "realized_pnl",
     ]
     buffer = io.StringIO()
     writer = csv.DictWriter(buffer, fieldnames=fieldnames, lineterminator="\n")
@@ -565,7 +573,7 @@ def _portfolio_csv(positions: list[dict[str, Any]]) -> str:
                 "market_value": decimal_to_text(row["market_value"]),
                 "unrealized_pnl": decimal_to_text(row["unrealized_pnl"]),
                 "return_pct": decimal_to_text(row["return_pct"]),
-                "realized_pnl_since_baseline": decimal_to_text(row["realized_pnl"]),
+                "realized_pnl": decimal_to_text(row["realized_pnl"]),
             }
         )
     return buffer.getvalue()
@@ -753,11 +761,17 @@ def command_web(args: argparse.Namespace, store: PortfolioStore) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    default_db = str(default_database_path())
+    default_env_file = str(default_env_file_path())
     parser = argparse.ArgumentParser(
         prog="portfolio-tracker",
         description="本地持仓台账、交割单成本重算与 Tushare 收盘价更新。",
     )
-    parser.add_argument("--db", default="data/db/portfolio.sqlite3", help="本地 SQLite 路径")
+    parser.add_argument(
+        "--db",
+        default=default_db,
+        help="正式 SQLite 路径；linked worktree 默认解析到主工作树",
+    )
     parser.add_argument("--account", default="default", help="账户 ID")
     parser.add_argument("--account-name", default="默认账户", help="首次创建账户时使用的名称")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -789,7 +803,7 @@ def build_parser() -> argparse.ArgumentParser:
     statement_parser.set_defaults(handler=command_import_statement)
 
     refresh_parser = subparsers.add_parser("refresh-prices", help="抓取最新可得收盘价")
-    refresh_parser.add_argument("--env-file", default=".env.local", help="Tushare 本地配置")
+    refresh_parser.add_argument("--env-file", default=default_env_file, help="Tushare 本地配置")
     refresh_parser.add_argument("--as-of", help="只取该日或此前的最新收盘价")
     refresh_parser.add_argument("--lookback-days", type=int, default=60)
     refresh_parser.add_argument("--allow-partial", action="store_true", help="允许部分证券缺失行情")
@@ -804,7 +818,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     kline_parser.add_argument("--cycle-id", help="已清仓周期 ID；当前周期可省略")
     kline_parser.add_argument("--as-of", help="行情与台账截止日，默认今天")
-    kline_parser.add_argument("--env-file", default=".env.local", help="Tushare 本地配置")
+    kline_parser.add_argument("--env-file", default=default_env_file, help="Tushare 本地配置")
     kline_parser.set_defaults(handler=command_refresh_kline)
 
     intraday_parser = subparsers.add_parser(
@@ -815,14 +829,14 @@ def build_parser() -> argparse.ArgumentParser:
     intraday_parser.add_argument("--cycle-id", help="已清仓周期 ID；当前周期可省略")
     intraday_parser.add_argument("--as-of", help="台账截止日，默认今天")
     intraday_parser.add_argument(
-        "--env-file", default=".env.local", help="Tushare 本地配置"
+        "--env-file", default=default_env_file, help="Tushare 本地配置"
     )
     intraday_parser.set_defaults(handler=command_refresh_intraday)
 
     industry_parser = subparsers.add_parser(
         "refresh-industries", help="更新股票与主题 ETF 的行业分类"
     )
-    industry_parser.add_argument("--env-file", default=".env.local", help="Tushare 本地配置")
+    industry_parser.add_argument("--env-file", default=default_env_file, help="Tushare 本地配置")
     industry_parser.set_defaults(handler=command_refresh_industries)
 
     set_cash_parser = subparsers.add_parser("set-cash", help="记录指定日期的账户现金余额")
@@ -913,7 +927,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="只允许本机回环地址",
     )
     web_parser.add_argument("--port", type=int, default=8765, help="本地服务端口")
-    web_parser.add_argument("--env-file", default=".env.local", help="Tushare 本地配置")
+    web_parser.add_argument("--env-file", default=default_env_file, help="Tushare 本地配置")
     web_parser.add_argument("--no-open", action="store_true", help="启动后不自动打开浏览器")
     web_parser.set_defaults(handler=command_web)
     return parser

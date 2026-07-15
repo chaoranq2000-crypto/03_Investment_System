@@ -5,6 +5,7 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.toml text eol=lf
+src/portfolio/web_assets/index.html text eol=lf
 
 # Preserve the exact reviewed bytes for Bundle 10 hash-bound artifacts.
 reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v3.md binary

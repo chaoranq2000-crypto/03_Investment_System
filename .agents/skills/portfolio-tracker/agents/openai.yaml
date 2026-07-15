@@ -1,6 +1,6 @@
 interface:
   display_name: "本地持仓台账"
   short_description: "维护本地持仓、盈亏、日K/分时复盘与ETF行业透视"
-  default_prompt: "Use $portfolio-tracker to update my private local holdings, verify P&L, and classify ETF industries from disclosed constituents."
+  default_prompt: "Use $portfolio-tracker to update my private local holdings, verify P&L, and apply reviewed stock/ETF industry labels."
 policy:
   allow_implicit_invocation: false

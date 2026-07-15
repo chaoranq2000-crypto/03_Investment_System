@@ -434,6 +434,8 @@ def parse_statement(
                             if inferred >= ZERO:
                                 fees = inferred
                                 note_parts.append("fees_inferred_from_net_amount=true")
+                        else:
+                            note_parts.append("fees_missing=true")
                 net_amount_for_audit = parse_decimal(
                     _value(row, mapping, "net_amount"), field="资金发生额"
                 )

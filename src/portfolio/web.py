@@ -4,7 +4,8 @@ import json
 import threading
 import time
 import webbrowser
-from datetime import date, datetime, timezone
+from copy import deepcopy
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -31,7 +32,11 @@ from .store import PortfolioStore
 
 WEB_ASSET_DIR = Path(__file__).with_name("web_assets")
 DASHBOARD_API_VERSION = 2
-DASHBOARD_CAPABILITIES = ("daily-kline", "refresh-intraday")
+DASHBOARD_CAPABILITIES = (
+    "daily-kline",
+    "refresh-intraday",
+    "auto-performance-history",
+)
 STATIC_ASSETS = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
@@ -79,6 +84,7 @@ class DashboardApplication:
         self.realtime_provider = realtime_provider or FallbackRealtimeProvider()
         self.realtime_cache_seconds = realtime_cache_seconds
         self._realtime_cache: tuple[float, dict[str, Any]] | None = None
+        self._performance_cache: tuple[tuple[Any, ...], dict[str, Any]] | None = None
 
     def portfolio_payload(
         self,
@@ -91,6 +97,7 @@ class DashboardApplication:
         closed_positions, clearance_summary = self.store.closed_position_report(
             self.account_id, as_of
         )
+        closed_position_groups = self._closed_position_groups(closed_positions)
         metadata = dict(self.store.dashboard_metadata(self.account_id))
         live_quotes = quote_overrides or {}
         for position in positions:
@@ -125,7 +132,7 @@ class DashboardApplication:
         priced = [item for item in positions if item["market_value"] is not None]
         market_value = sum((item["market_value"] for item in priced), Decimal("0"))
         unrealized_pnl = sum((item["unrealized_pnl"] for item in priced), Decimal("0"))
-        realized_pnl = summary["realized_pnl_since_baseline"]
+        realized_pnl = summary["realized_pnl"]
         summary = {
             **summary,
             "remaining_cost": remaining_cost,
@@ -139,7 +146,7 @@ class DashboardApplication:
                 if fully_priced and remaining_cost != 0
                 else None
             ),
-            "total_pnl_since_baseline": (
+            "total_pnl_lifetime": (
                 unrealized_pnl + realized_pnl if fully_priced else None
             ),
             "missing_prices": missing_prices,
@@ -177,6 +184,11 @@ class DashboardApplication:
         industry_groups, industry_summary = self._industry_payload(
             enriched, summary["total_assets"]
         )
+        pnl_performance = self._performance_payload(
+            as_of,
+            metadata,
+            summary["total_pnl_lifetime"],
+        )
         metadata["market_data"] = market_data or {
             "mode": "closing",
             "providers": sorted(
@@ -202,11 +214,59 @@ class DashboardApplication:
                 "industries": industry_groups,
                 "industry_summary": industry_summary,
                 "closed_positions": closed_positions,
+                "closed_position_groups": closed_position_groups,
                 "clearance_summary": clearance_summary,
+                "pnl_performance": pnl_performance,
                 "metadata": metadata,
                 "boundary": "记录与核算工具，不构成买入、卖出、持有或仓位建议。",
             }
         )
+
+    def _performance_payload(
+        self,
+        as_of: date | None,
+        metadata: dict[str, Any],
+        current_total_pnl: Decimal | None,
+    ) -> dict[str, Any]:
+        target_date = as_of or date.today()
+        cache_key = (
+            target_date.isoformat(),
+            metadata.get("ledger_count"),
+            metadata.get("cost_rebase_count"),
+            metadata.get("close_price_count"),
+            metadata.get("last_price_fetch_at"),
+        )
+        if self._performance_cache is None or self._performance_cache[0] != cache_key:
+            base_payload = self.store.performance_report(self.account_id, target_date)
+            self._performance_cache = (cache_key, base_payload)
+        else:
+            base_payload = self._performance_cache[1]
+
+        payload = deepcopy(base_payload)
+        periods = payload.get("periods", {})
+        lifetime_period = periods.get("all")
+        base_total_pnl = lifetime_period.get("pnl") if lifetime_period else None
+        if current_total_pnl is None or base_total_pnl is None:
+            return payload
+        delta = current_total_pnl - base_total_pnl
+
+        def apply_current_delta(period: dict[str, Any]) -> None:
+            if period.get("pnl") is None:
+                return
+            period["pnl"] += delta
+            series = period.get("series", [])
+            current_point = {"date": target_date, "pnl": period["pnl"]}
+            if series and series[-1]["date"] == target_date:
+                series[-1] = current_point
+            else:
+                series.append(current_point)
+
+        for period in periods.values():
+            apply_current_delta(period)
+        for period in payload.get("recent_ranges", []):
+            if period.get("end_date") == target_date:
+                apply_current_delta(period)
+        return payload
 
     def realtime_portfolio_payload(self) -> dict[str, Any]:
         now = time.monotonic()
@@ -260,6 +320,57 @@ class DashboardApplication:
             return payload
         finally:
             self.realtime_lock.release()
+
+    @staticmethod
+    def _closed_position_groups(
+        cycles: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        grouped: dict[str, dict[str, Any]] = {}
+        for cycle in cycles:
+            ts_code = cycle["ts_code"]
+            group = grouped.setdefault(
+                ts_code,
+                {
+                    "group_id": f"security:{ts_code}",
+                    "ts_code": ts_code,
+                    "name": cycle["name"],
+                    "asset_type": cycle["asset_type"],
+                    "industry_name": cycle["industry_name"],
+                    "industry_source": cycle["industry_source"],
+                    "cycle_count": 0,
+                    "opened_on": cycle["opened_on"],
+                    "closed_on": cycle["closed_on"],
+                    "sold_quantity": Decimal("0"),
+                    "cost_basis": Decimal("0"),
+                    "net_sale_proceeds": Decimal("0"),
+                    "realized_pnl": Decimal("0"),
+                    "sell_count": 0,
+                    "cycles": [],
+                },
+            )
+            group["cycle_count"] += 1
+            group["opened_on"] = min(group["opened_on"], cycle["opened_on"])
+            group["closed_on"] = max(group["closed_on"], cycle["closed_on"])
+            group["sold_quantity"] += cycle["sold_quantity"]
+            group["cost_basis"] += cycle["cost_basis"]
+            group["net_sale_proceeds"] += cycle["net_sale_proceeds"]
+            group["realized_pnl"] += cycle["realized_pnl"]
+            group["sell_count"] += cycle["sell_count"]
+            group["cycles"].append(cycle)
+
+        result = list(grouped.values())
+        for group in result:
+            group["return_pct"] = (
+                group["realized_pnl"] / group["cost_basis"] * Decimal("100")
+                if group["cost_basis"] != 0
+                else None
+            )
+            group["cycles"].sort(
+                key=lambda item: (item["closed_on"], item["cycle_number"]),
+                reverse=True,
+            )
+        result.sort(key=lambda item: (item["closed_on"], item["ts_code"]), reverse=True)
+        return result
 
     @staticmethod
     def _industry_payload(
@@ -383,8 +494,8 @@ class DashboardApplication:
             "top_industry_weight_pct": weights[0] if weights else None,
             "top3_weight_pct": sum(weights[:3], Decimal("0")),
             "classification_note": (
-                "股票按可合并一级行业归一；ETF 按交易所篮子、结构化成分行业与同日价格分类，"
-                "跨市场接口和季报持仓仅作可追溯回退；覆盖不足时明确保留未分类。"
+                "股票按归一行业分类；主题 ETF 使用经复核的代码与跟踪指数映射，"
+                "宽基或未复核 ETF 保留跨行业或未分类。"
             ),
         }
         return industries, summary
@@ -420,6 +531,8 @@ class DashboardApplication:
                     "以下证券没有找到可用收盘价，未写入任何行情: " + ", ".join(missing)
                 )
             inserted = self.store.add_close_prices(prices)
+            self._performance_cache = None
+            self._realtime_cache = None
             return _json_ready(
                 {
                     "requested_as_of": target.isoformat(),
@@ -429,6 +542,125 @@ class DashboardApplication:
                     "latest_trade_date": max(
                         (item.trade_date for item in prices), default=None
                     ),
+                }
+            )
+        finally:
+            self.refresh_lock.release()
+
+    def refresh_performance_prices(
+        self,
+        *,
+        as_of: date | None = None,
+    ) -> dict[str, Any]:
+        """增量补齐盈亏曲线所需的历史收盘价。"""
+
+        target_date = as_of or date.today()
+        if not self.refresh_lock.acquire(blocking=False):
+            raise RuntimeError("已有一个数据刷新任务正在运行")
+        try:
+            targets = self.store.performance_price_targets(
+                self.account_id, target_date
+            )
+            if not targets:
+                return {
+                    "requested_as_of": target_date.isoformat(),
+                    "security_count": 0,
+                    "requested_range_count": 0,
+                    "fetched_observations": 0,
+                    "new_observations": 0,
+                    "updated_security_count": 0,
+                    "already_covered_count": 0,
+                    "errors": [],
+                }
+
+            provider = TushareCloseProvider(get_tushare_pro(self.env_file))
+            requested_range_count = 0
+            fetched_observations = 0
+            new_observations = 0
+            updated_codes: set[str] = set()
+            already_covered_count = 0
+            errors: list[dict[str, str]] = []
+
+            for item in targets:
+                ts_code = item["ts_code"]
+                start_date = item["start_date"]
+                end_date = item["end_date"]
+                coverage = self.store.performance_price_coverage(
+                    self.account_id, ts_code
+                )
+                ranges: list[tuple[date, date]] = []
+                if coverage is None:
+                    ranges.append((start_date, end_date))
+                else:
+                    if start_date < coverage["start_date"]:
+                        ranges.append(
+                            (start_date, coverage["start_date"] - timedelta(days=1))
+                        )
+                    if end_date > coverage["end_date"]:
+                        ranges.append(
+                            (coverage["end_date"] + timedelta(days=1), end_date)
+                        )
+                if not ranges:
+                    already_covered_count += 1
+                    continue
+
+                for range_start, range_end in ranges:
+                    requested_range_count += 1
+                    try:
+                        prices = provider.fetch_range(
+                            item["instrument"],
+                            start_date=range_start,
+                            end_date=range_end,
+                        )
+                    except PriceFetchError as exc:
+                        errors.append(
+                            {
+                                "ts_code": ts_code,
+                                "range": (
+                                    f"{range_start.isoformat()}..{range_end.isoformat()}"
+                                ),
+                                "error": str(exc),
+                            }
+                        )
+                        continue
+
+                    # 短区间可能全部是周末或休市日，仍记录已请求范围；
+                    # 较长区间完全无数据时保留为待重试，避免永久掩盖代码或接口异常。
+                    if not prices and (range_end - range_start).days > 7:
+                        errors.append(
+                            {
+                                "ts_code": ts_code,
+                                "range": (
+                                    f"{range_start.isoformat()}..{range_end.isoformat()}"
+                                ),
+                                "error": "Tushare 未返回任何收盘价",
+                            }
+                        )
+                        continue
+
+                    fetched_observations += len(prices)
+                    new_observations += self.store.add_close_prices(prices)
+                    self.store.record_performance_price_coverage(
+                        self.account_id,
+                        ts_code,
+                        range_start,
+                        range_end,
+                    )
+                    updated_codes.add(ts_code)
+
+            if new_observations:
+                self._performance_cache = None
+                self._realtime_cache = None
+            return _json_ready(
+                {
+                    "requested_as_of": target_date.isoformat(),
+                    "security_count": len(targets),
+                    "requested_range_count": requested_range_count,
+                    "fetched_observations": fetched_observations,
+                    "new_observations": new_observations,
+                    "updated_security_count": len(updated_codes),
+                    "already_covered_count": already_covered_count,
+                    "errors": errors,
                 }
             )
         finally:
@@ -457,9 +689,6 @@ class DashboardApplication:
                             "method": item.method,
                             "source_date": item.source_date,
                             "confidence": item.confidence,
-                            "classified_weight_coverage": item.classified_weight_coverage,
-                            "constituent_count_coverage": item.constituent_count_coverage,
-                            "top_industry_weight": item.top_industry_weight,
                         }
                         for item in classifications
                     ],
@@ -694,6 +923,7 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         actions = {
             "/api/refresh-prices": "refresh-prices",
+            "/api/refresh-performance": "refresh-performance",
             "/api/refresh-industries": "refresh-industries",
             "/api/refresh-kline": "refresh-kline",
             "/api/refresh-intraday": "refresh-intraday",
@@ -719,6 +949,10 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                 result = self.server.dashboard_app.refresh_prices(
                     as_of=as_of,
                     lookback_days=lookback_days,
+                )
+            elif parsed.path == "/api/refresh-performance":
+                result = self.server.dashboard_app.refresh_performance_prices(
+                    as_of=_parse_iso_date(payload.get("as_of"), "as_of")
                 )
             elif parsed.path == "/api/refresh-industries":
                 result = self.server.dashboard_app.refresh_industries()

@@ -13,8 +13,8 @@
   - 所有数字来自本地 SQLite；页面不含演示数据，也不提供任何交易建议。
   - 图片不是这个数据工具的内容必需项，因此用原生数据可视化，不添加装饰图库素材。
   - 主细节签名是“以零轴为中心的盈亏贡献图”，其他区域保持克制。
-  - 行业透视属于本地持仓核算的派生视图：股票行业会归一化，ETF 按可追溯成分篮子与可比较权重分类，覆盖不足时保留未分类。
-  - 清仓收益只统计持仓由正数归零的完整周期；部分卖出仍在顶部已实现盈亏中，但不混入完整清仓周期。
+  - 行业透视属于本地持仓核算的派生视图：股票行业会归一化，主题 ETF 仅采用经复核的代码与跟踪指数映射，未复核时保留未分类。
+  - 清仓收益只统计日终持仓真正归零的完整周期；部分卖出及日内临时归零继续滚入摊薄成本。
 -->
 <body>
   <div class="page-shell" id="pageShell">
@@ -78,9 +78,50 @@
             <strong class="sensitive" id="unrealizedPnl">—</strong>
             <small id="unrealizedReturn">—</small>
           </div>
-          <div class="summary-line">
-            <span>基准日后已实现</span>
-            <strong class="sensitive" id="realizedPnl">—</strong>
+          <div class="performance-card" aria-labelledby="performanceTitle">
+            <div class="performance-heading">
+              <span id="performanceTitle">盈亏曲线</span>
+              <small id="performanceRangeDates">—</small>
+            </div>
+            <div class="performance-tabs" role="tablist" aria-label="盈亏曲线范围">
+              <button class="performance-tab is-active" type="button" role="tab" aria-selected="true" data-performance-range="month">
+                <span>本月盈亏</span>
+                <strong class="sensitive" id="monthPnl">—</strong>
+              </button>
+              <button class="performance-tab" type="button" role="tab" aria-selected="false" data-performance-range="year">
+                <span>今年盈亏</span>
+                <strong class="sensitive" id="yearPnl">—</strong>
+              </button>
+              <button class="performance-tab" type="button" role="tab" aria-selected="false" data-performance-range="lookback">
+                <span>近几个月</span>
+                <strong class="sensitive" id="lookbackPnl">—</strong>
+              </button>
+              <button class="performance-tab" type="button" role="tab" aria-selected="false" data-performance-range="all">
+                <span>投资以来盈亏</span>
+                <strong class="sensitive" id="allPnl">—</strong>
+              </button>
+            </div>
+            <div class="performance-lookback-picker" id="performanceLookbackPicker">
+              <label for="performanceLookbackSelect">滚动区间</label>
+              <select id="performanceLookbackSelect" aria-label="选择盈亏曲线回看时长">
+                <option value="1">近 1 个月</option>
+                <option value="3" selected>近 3 个月</option>
+                <option value="6">近 6 个月</option>
+                <option value="12">近 12 个月</option>
+                <option value="24">近 2 年</option>
+              </select>
+            </div>
+            <div class="performance-chart-shell" id="performanceChartShell">
+              <svg class="performance-chart-plot" id="performanceChart" viewBox="0 0 480 148" role="img" aria-label="本月盈亏曲线">
+                <line class="performance-zero-line" id="performanceZeroLine" x1="0" x2="480" y1="74" y2="74"></line>
+                <path class="performance-area" id="performanceArea" d=""></path>
+                <path class="performance-line" id="performanceLine" d=""></path>
+                <g id="performancePoints"></g>
+              </svg>
+              <div class="performance-empty" id="performanceEmpty" hidden>本地收盘价不足，暂不能绘制曲线</div>
+              <div class="performance-tooltip sensitive" id="performanceTooltip" hidden></div>
+            </div>
+            <p class="performance-note" id="performanceNote">正在重放本地台账与收盘价</p>
           </div>
           <div class="summary-line summary-line-muted">
             <span>盈利 / 亏损</span>
@@ -126,7 +167,7 @@
               <h2>盈亏贡献</h2>
             </div>
             <div class="panel-heading-meta">
-              <span class="panel-note">红色盈利 · 绿色亏损</span>
+              <span class="panel-note">红色浮盈前 5 · 绿色浮亏前 5</span>
               <button class="collapse-button" type="button" data-collapse-button aria-expanded="true" aria-controls="contributionContent">
                 <span data-collapse-label>收起</span><span class="collapse-icon" aria-hidden="true"></span>
               </button>
@@ -155,6 +196,19 @@
         <div class="industry-layout collapsible-content" id="industryContent">
           <div class="industry-list" id="industryList" aria-label="行业市值、权重与盈亏"></div>
           <aside class="industry-stats" aria-label="行业集中度摘要">
+            <figure class="industry-pie-card">
+              <figcaption class="industry-pie-heading">
+                <strong>行业市值占比</strong>
+                <span>TOP 7 + 其他</span>
+              </figcaption>
+              <div class="industry-pie-wrap">
+                <svg class="industry-pie" id="industryPie" viewBox="0 0 200 200" role="img" aria-label="行业市值占比饼图">
+                  <g id="industryPieSegments"></g>
+                </svg>
+                <p class="industry-pie-empty" id="industryPieEmpty" hidden>暂无可绘制的行业市值</p>
+              </div>
+              <ol class="industry-pie-legend" id="industryPieLegend" aria-label="行业市值占比图例"></ol>
+            </figure>
             <div class="industry-stat">
               <span>最大行业</span>
               <strong id="topIndustry">—</strong>
@@ -214,13 +268,13 @@
           <table class="clearance-table">
             <thead>
               <tr>
-                <th>证券</th>
-                <th>持有区间</th>
-                <th class="numeric">清仓数量</th>
-                <th class="numeric">结转成本</th>
-                <th class="numeric">净卖出额</th>
-                <th class="numeric">清仓收益</th>
-                <th class="numeric">收益率</th>
+                <th><button type="button" data-clearance-sort="name">证券</button></th>
+                <th><button type="button" data-clearance-sort="closed_on" title="按清仓日期排序">持有区间</button></th>
+                <th class="numeric"><button type="button" data-clearance-sort="sold_quantity">清仓数量</button></th>
+                <th class="numeric"><button type="button" data-clearance-sort="cost_basis">结转成本</button></th>
+                <th class="numeric"><button type="button" data-clearance-sort="net_sale_proceeds">净卖出额</button></th>
+                <th class="numeric"><button type="button" data-clearance-sort="realized_pnl">清仓收益</button></th>
+                <th class="numeric"><button type="button" data-clearance-sort="return_pct">收益率</button></th>
               </tr>
             </thead>
             <tbody id="clearanceBody"></tbody>
@@ -230,7 +284,7 @@
           <strong>暂无完整清仓记录</strong>
           <p>导入卖出后持仓数量归零的交割单，系统会自动生成清仓周期与收益。</p>
           </div>
-          <p class="clearance-note" id="clearanceNote">清仓收益采用移动加权平均成本。</p>
+          <p class="clearance-note" id="clearanceNote">仅在日终持仓真正归零时确认清仓收益；日内做 T 延续摊薄成本。</p>
         </div>
       </section>
 
@@ -256,6 +310,9 @@
             </button>
           </div>
         </div>
+        <div class="sticky-table-header holdings-sticky-header" id="holdingsStickyHeader" aria-hidden="true" inert>
+          <div class="sticky-table-viewport holdings-sticky-viewport" id="holdingsStickyViewport"></div>
+        </div>
         <div class="table-wrap collapsible-content" id="holdingsContent">
           <table class="holdings-table">
             <thead>
@@ -277,6 +334,10 @@
         </div>
       </section>
     </main>
+
+    <div class="sticky-table-header clearance-sticky-header" id="clearanceStickyHeader" aria-hidden="true" inert>
+      <div class="sticky-table-viewport clearance-sticky-viewport" id="clearanceStickyViewport"></div>
+    </div>
 
     <footer class="footer" data-reveal>
       <div>

@@ -39,7 +39,62 @@ class TushareCloseProvider:
             return ["fund_daily"]
         if instrument.asset_type == "equity":
             return ["daily"]
+        code = instrument.ts_code.split(".", 1)[0]
+        if code.startswith(("110", "111", "113", "118", "123", "127", "128")):
+            return ["cb_daily"]
         return ["daily", "fund_daily"]
+
+    def fetch_range(
+        self,
+        instrument: Instrument,
+        *,
+        start_date: date,
+        end_date: date,
+    ) -> list[ClosePrice]:
+        if start_date > end_date:
+            raise ValueError("start_date 不能晚于 end_date")
+        errors: list[str] = []
+        for endpoint_name in self._endpoints(instrument):
+            try:
+                endpoint = getattr(self.pro, endpoint_name)
+                frame = endpoint(
+                    ts_code=instrument.ts_code,
+                    start_date=start_date.strftime("%Y%m%d"),
+                    end_date=end_date.strftime("%Y%m%d"),
+                    fields="ts_code,trade_date,close,pre_close,pct_chg",
+                )
+            except Exception as exc:  # Tushare SDK 统一抛出 Exception
+                errors.append(f"{endpoint_name}: {type(exc).__name__}: {exc}")
+                continue
+
+            rows: dict[date, ClosePrice] = {}
+            fetched_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            for row in _records(frame):
+                raw_date = str(row.get("trade_date", "")).replace("-", "")
+                if len(raw_date) != 8 or not raw_date.isdigit():
+                    continue
+                trade_date = datetime.strptime(raw_date, "%Y%m%d").date()
+                if not start_date <= trade_date <= end_date:
+                    continue
+                close = _optional_decimal(row.get("close"))
+                if close is None or close <= 0:
+                    raise PriceFetchError(
+                        f"{instrument.ts_code} {trade_date.isoformat()} 的收盘价无效: {close}"
+                    )
+                rows[trade_date] = ClosePrice(
+                    ts_code=instrument.ts_code,
+                    trade_date=trade_date,
+                    close=close,
+                    pre_close=_optional_decimal(row.get("pre_close")),
+                    pct_chg=_optional_decimal(row.get("pct_chg")),
+                    source=f"tushare.{endpoint_name}",
+                    fetched_at=fetched_at,
+                )
+            if rows:
+                return [rows[item] for item in sorted(rows)]
+        if errors:
+            raise PriceFetchError(f"{instrument.ts_code} 行情抓取失败；" + " | ".join(errors))
+        return []
 
     def fetch_one(
         self,
@@ -48,49 +103,12 @@ class TushareCloseProvider:
         as_of: date,
         lookback_days: int = 60,
     ) -> ClosePrice | None:
-        start_date = (as_of - timedelta(days=lookback_days)).strftime("%Y%m%d")
-        end_date = as_of.strftime("%Y%m%d")
-        errors: list[str] = []
-        for endpoint_name in self._endpoints(instrument):
-            endpoint = getattr(self.pro, endpoint_name)
-            try:
-                frame = endpoint(
-                    ts_code=instrument.ts_code,
-                    start_date=start_date,
-                    end_date=end_date,
-                    fields="ts_code,trade_date,close,pre_close,pct_chg",
-                )
-            except Exception as exc:  # Tushare SDK 统一抛出 Exception
-                errors.append(f"{endpoint_name}: {type(exc).__name__}: {exc}")
-                continue
-            rows = []
-            for row in _records(frame):
-                raw_date = str(row.get("trade_date", "")).replace("-", "")
-                if len(raw_date) != 8 or not raw_date.isdigit():
-                    continue
-                trade_date = datetime.strptime(raw_date, "%Y%m%d").date()
-                if trade_date <= as_of:
-                    rows.append((trade_date, row))
-            if not rows:
-                continue
-            trade_date, row = max(rows, key=lambda item: item[0])
-            close = _optional_decimal(row.get("close"))
-            if close is None or close <= 0:
-                raise PriceFetchError(
-                    f"{instrument.ts_code} {trade_date.isoformat()} 的收盘价无效: {close}"
-                )
-            return ClosePrice(
-                ts_code=instrument.ts_code,
-                trade_date=trade_date,
-                close=close,
-                pre_close=_optional_decimal(row.get("pre_close")),
-                pct_chg=_optional_decimal(row.get("pct_chg")),
-                source=f"tushare.{endpoint_name}",
-                fetched_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            )
-        if errors:
-            raise PriceFetchError(f"{instrument.ts_code} 行情抓取失败；" + " | ".join(errors))
-        return None
+        prices = self.fetch_range(
+            instrument,
+            start_date=as_of - timedelta(days=lookback_days),
+            end_date=as_of,
+        )
+        return prices[-1] if prices else None
 
     def fetch_many(
         self,

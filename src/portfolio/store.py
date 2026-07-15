@@ -4,9 +4,10 @@ import hashlib
 import json
 import sqlite3
 import uuid
+from calendar import monthrange
 from collections.abc import Iterable, Mapping
 from contextlib import contextmanager
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Iterator
@@ -28,10 +29,12 @@ from .models import (
     ZERO,
     decimal_to_text,
 )
+from .runtime import canonical_database_path, default_database_path
 
 
-SCHEMA_VERSION = "7"
+SCHEMA_VERSION = "8"
 SNAPSHOT_ENGINE_VERSION = "portfolio-snapshot-v1"
+STATEMENT_CASH_SOURCE = "statement_calculated"
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS metadata (
@@ -164,6 +167,23 @@ CREATE INDEX IF NOT EXISTS idx_internal_transfers_account_date
 ON internal_transfer_reconciliations(
     account_id, transfer_in_date DESC, transfer_out_date DESC, transfer_id DESC
 );
+
+CREATE TABLE IF NOT EXISTS position_cost_rebases (
+    rebase_id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL REFERENCES accounts(account_id),
+    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),
+    as_of_date TEXT NOT NULL,
+    target_quantity TEXT NOT NULL,
+    total_cost TEXT NOT NULL,
+    source_path TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('reviewed', 'unverified')),
+    note TEXT NOT NULL DEFAULT '',
+    recorded_at TEXT NOT NULL,
+    UNIQUE(account_id, ts_code, as_of_date, source_path, status)
+);
+
+CREATE INDEX IF NOT EXISTS idx_position_cost_rebases_account_date
+ON position_cost_rebases(account_id, as_of_date, ts_code, recorded_at);
 
 CREATE TABLE IF NOT EXISTS close_prices (
     observation_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -328,8 +348,10 @@ def _canonical_json(value: Any) -> str:
 
 
 class PortfolioStore:
-    def __init__(self, path: str | Path = "data/db/portfolio.sqlite3") -> None:
-        self.path = Path(path)
+    def __init__(self, path: str | Path | None = None) -> None:
+        self.path = (
+            canonical_database_path(path) if path is not None else default_database_path()
+        )
 
     @contextmanager
     def connect(self) -> Iterator[sqlite3.Connection]:
@@ -360,7 +382,7 @@ class PortfolioStore:
             connection.close()
 
     def _backup_before_migration(self, current_version: str | None) -> Path | None:
-        if current_version not in {"1", "2", "3", "4", "5", "6"} or not self.path.is_file():
+        if current_version not in {"1", "2", "3", "4", "5", "6", "7"} or not self.path.is_file():
             return None
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
         backup_path = self.path.with_name(
@@ -449,6 +471,14 @@ class PortfolioStore:
                     "SELECT value FROM metadata WHERE key = 'schema_version'"
                 ).fetchone()
             if row is not None and row["value"] == "6":
+                connection.execute(
+                    "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
+                    ("7",),
+                )
+                row = connection.execute(
+                    "SELECT value FROM metadata WHERE key = 'schema_version'"
+                ).fetchone()
+            if row is not None and row["value"] == "7":
                 connection.execute(
                     "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
                     (SCHEMA_VERSION,),
@@ -544,7 +574,7 @@ class PortfolioStore:
                 SELECT snapshot_id, account_id, as_of_date, amount, source, note, recorded_at
                 FROM cash_balance_snapshots
                 WHERE account_id = ? {date_filter}
-                ORDER BY as_of_date DESC, recorded_at DESC, snapshot_id DESC
+                ORDER BY as_of_date DESC, recorded_at DESC, rowid DESC
                 LIMIT 1
                 """,
                 params,
@@ -564,12 +594,253 @@ class PortfolioStore:
                 SELECT snapshot_id, account_id, as_of_date, amount, source, note, recorded_at
                 FROM cash_balance_snapshots
                 WHERE account_id = ?
-                ORDER BY as_of_date DESC, recorded_at DESC, snapshot_id DESC
+                ORDER BY as_of_date DESC, recorded_at DESC, rowid DESC
                 LIMIT ?
                 """,
                 (account_id, limit),
             ).fetchall()
         return [dict(row) for row in rows]
+
+    @staticmethod
+    def _cash_row_value(row: Any, key: str, default: Any = "") -> Any:
+        if isinstance(row, LedgerEntry):
+            return getattr(row, key, default)
+        try:
+            return row[key]
+        except (KeyError, IndexError, TypeError):
+            return getattr(row, key, default)
+
+    @classmethod
+    def _statement_cash_projection(
+        cls,
+        connection: sqlite3.Connection,
+        account_id: str,
+        additional_entries: Iterable[LedgerEntry] = (),
+    ) -> dict[str, Any]:
+        anchor = connection.execute(
+            """
+            SELECT snapshot_id, account_id, as_of_date, amount, source, note, recorded_at
+            FROM cash_balance_snapshots
+            WHERE account_id = ? AND source <> ?
+            ORDER BY as_of_date DESC, recorded_at DESC, rowid DESC
+            LIMIT 1
+            """,
+            (account_id, STATEMENT_CASH_SOURCE),
+        ).fetchone()
+        if anchor is None:
+            return {
+                "status": "missing_cash_anchor",
+                "calculation_status": "not_available",
+                "updated": False,
+                "reason": "请先用 set-cash 记录一笔用户确认的日终现金余额",
+            }
+
+        anchor_date = date.fromisoformat(anchor["as_of_date"])
+        rows: list[Any] = list(
+            connection.execute(
+                """
+                SELECT * FROM ledger_entries
+                WHERE account_id = ? AND event_date > ?
+                  AND event_type IN ('BUY', 'SELL', 'DIVIDEND', 'CASH_FEE')
+                ORDER BY event_date,
+                    CASE WHEN event_time = '' THEN '99:99:99' ELSE event_time END,
+                    entry_id
+                """,
+                (account_id, anchor_date.isoformat()),
+            )
+        )
+        seen_keys = {
+            row["dedupe_key"]
+            for row in connection.execute(
+                "SELECT dedupe_key FROM ledger_entries WHERE account_id = ?",
+                (account_id,),
+            )
+        }
+        for item in additional_entries:
+            if item.dedupe_key in seen_keys:
+                continue
+            seen_keys.add(item.dedupe_key)
+            if item.event_date <= anchor_date:
+                continue
+            if item.event_type not in {"BUY", "SELL", "DIVIDEND", "CASH_FEE"}:
+                continue
+            rows.append(item)
+
+        if not rows:
+            return {
+                "status": "no_post_anchor_entries",
+                "calculation_status": "complete",
+                "updated": False,
+                "anchor_snapshot_id": anchor["snapshot_id"],
+                "anchor_as_of": anchor["as_of_date"],
+                "anchor_amount": anchor["amount"],
+                "as_of": anchor["as_of_date"],
+                "amount": anchor["amount"],
+                "cash_change": "0",
+                "ledger_entries": 0,
+                "fee_pending_entries": 0,
+            }
+
+        def event_date_of(row: Any) -> date:
+            value = cls._cash_row_value(row, "event_date")
+            return value if isinstance(value, date) else date.fromisoformat(str(value))
+
+        rows.sort(
+            key=lambda row: (
+                event_date_of(row),
+                str(cls._cash_row_value(row, "event_time")) or "99:99:99",
+                str(cls._cash_row_value(row, "dedupe_key")),
+            )
+        )
+        buy_outflow = ZERO
+        sell_inflow = ZERO
+        dividend_inflow = ZERO
+        cash_fee_outflow = ZERO
+        fee_pending_entries = 0
+        fingerprint_rows: list[dict[str, str]] = []
+        for row in rows:
+            event_type = str(cls._cash_row_value(row, "event_type")).upper()
+            gross_amount = Decimal(str(cls._cash_row_value(row, "gross_amount", "0") or "0"))
+            fees = Decimal(str(cls._cash_row_value(row, "fees", "0") or "0"))
+            cash_amount = Decimal(str(cls._cash_row_value(row, "cash_amount", "0") or "0"))
+            note = str(cls._cash_row_value(row, "note", ""))
+            if event_type == "BUY":
+                buy_outflow += gross_amount + fees
+            elif event_type == "SELL":
+                sell_inflow += gross_amount - fees
+            elif event_type == "DIVIDEND":
+                dividend_inflow += cash_amount
+            elif event_type == "CASH_FEE":
+                cash_fee_outflow += cash_amount
+            if event_type in {"BUY", "SELL"} and any(
+                marker in note.lower()
+                for marker in ("fee_pending", "fees_missing=true", "missing_source_column")
+            ):
+                fee_pending_entries += 1
+            fingerprint_rows.append(
+                {
+                    "event_date": event_date_of(row).isoformat(),
+                    "event_time": str(cls._cash_row_value(row, "event_time", "")),
+                    "event_type": event_type,
+                    "ts_code": str(cls._cash_row_value(row, "ts_code", "")),
+                    "gross_amount": decimal_to_text(gross_amount),
+                    "fees": decimal_to_text(fees),
+                    "cash_amount": decimal_to_text(cash_amount),
+                    "dedupe_key": str(cls._cash_row_value(row, "dedupe_key", "")),
+                }
+            )
+
+        cash_change = sell_inflow + dividend_inflow - buy_outflow - cash_fee_outflow
+        amount = Decimal(anchor["amount"]) + cash_change
+        calculation_status = "fee_pending" if fee_pending_entries else "complete"
+        status = "negative_projected_cash" if amount < ZERO else "ready"
+        return {
+            "status": status,
+            "calculation_status": calculation_status,
+            "updated": False,
+            "anchor_snapshot_id": anchor["snapshot_id"],
+            "anchor_as_of": anchor["as_of_date"],
+            "anchor_amount": anchor["amount"],
+            "as_of": max(event_date_of(row) for row in rows).isoformat(),
+            "amount": decimal_to_text(amount),
+            "cash_change": decimal_to_text(cash_change),
+            "ledger_entries": len(rows),
+            "fee_pending_entries": fee_pending_entries,
+            "ledger_fingerprint": hashlib.sha256(
+                _canonical_json(fingerprint_rows).encode("utf-8")
+            ).hexdigest(),
+            "breakdown": {
+                "buy_outflow": decimal_to_text(buy_outflow),
+                "sell_inflow": decimal_to_text(sell_inflow),
+                "dividend_inflow": decimal_to_text(dividend_inflow),
+                "cash_fee_outflow": decimal_to_text(cash_fee_outflow),
+            },
+        }
+
+    @classmethod
+    def _write_statement_cash_snapshot(
+        cls, connection: sqlite3.Connection, account_id: str
+    ) -> dict[str, Any]:
+        projection = cls._statement_cash_projection(connection, account_id)
+        if projection["status"] != "ready":
+            return projection
+
+        note = (
+            "statement_cash_replay; "
+            f"anchor_snapshot_id={projection['anchor_snapshot_id']}; "
+            f"anchor_as_of={projection['anchor_as_of']}; "
+            f"ledger_entries={projection['ledger_entries']}; "
+            f"cash_change={projection['cash_change']}; "
+            f"fee_pending_entries={projection['fee_pending_entries']}; "
+            f"calculation_status={projection['calculation_status']}; "
+            f"ledger_fingerprint={projection['ledger_fingerprint']}"
+        )
+        existing = connection.execute(
+            """
+            SELECT snapshot_id, as_of_date, amount, note, recorded_at
+            FROM cash_balance_snapshots
+            WHERE account_id = ? AND source = ?
+            ORDER BY recorded_at DESC, rowid DESC
+            LIMIT 1
+            """,
+            (account_id, STATEMENT_CASH_SOURCE),
+        ).fetchone()
+        if (
+            existing is not None
+            and existing["as_of_date"] == projection["as_of"]
+            and existing["amount"] == projection["amount"]
+            and existing["note"] == note
+        ):
+            return {
+                **projection,
+                "status": "unchanged",
+                "snapshot_id": existing["snapshot_id"],
+                "recorded_at": existing["recorded_at"],
+            }
+
+        snapshot_id = str(uuid.uuid4())
+        recorded_at = utc_now()
+        connection.execute(
+            """
+            INSERT INTO cash_balance_snapshots(
+                snapshot_id, account_id, as_of_date, amount, source, note, recorded_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                snapshot_id,
+                account_id,
+                projection["as_of"],
+                projection["amount"],
+                STATEMENT_CASH_SOURCE,
+                note,
+                recorded_at,
+            ),
+        )
+        return {
+            **projection,
+            "status": "updated",
+            "updated": True,
+            "snapshot_id": snapshot_id,
+            "source": STATEMENT_CASH_SOURCE,
+            "note": note,
+            "recorded_at": recorded_at,
+        }
+
+    def preview_statement_cash(
+        self, account_id: str, entries: Iterable[LedgerEntry] = ()
+    ) -> dict[str, Any]:
+        with self.connect() as connection:
+            return self._statement_cash_projection(connection, account_id, entries)
+
+    def recalculate_cash_from_ledger(self, account_id: str) -> dict[str, Any]:
+        with self.connect() as connection:
+            if connection.execute(
+                "SELECT 1 FROM accounts WHERE account_id = ?", (account_id,)
+            ).fetchone() is None:
+                raise ValueError(f"账户不存在: {account_id}")
+            result = self._write_statement_cash_snapshot(connection, account_id)
+            connection.commit()
+        return result
 
     @staticmethod
     def _upsert_instruments(
@@ -668,13 +939,13 @@ class PortfolioStore:
     @staticmethod
     def _ordered_ledger(
         connection: sqlite3.Connection, account_id: str, as_of: date | None = None
-    ) -> list[sqlite3.Row]:
+    ) -> list[Mapping[str, Any]]:
         params: list[Any] = [account_id]
         date_filter = ""
         if as_of is not None:
             date_filter = "AND event_date <= ?"
             params.append(as_of.isoformat())
-        return list(
+        ledger_rows = list(
             connection.execute(
                 f"""
                 SELECT * FROM ledger_entries
@@ -686,6 +957,72 @@ class PortfolioStore:
                 params,
             )
         )
+        rebase_params: list[Any] = [account_id]
+        rebase_date_filter = ""
+        if as_of is not None:
+            rebase_date_filter = "AND as_of_date <= ?"
+            rebase_params.append(as_of.isoformat())
+        rebase_rows = list(
+            connection.execute(
+                f"""
+                SELECT * FROM position_cost_rebases AS current
+                WHERE account_id = ? AND status = 'reviewed' {rebase_date_filter}
+                  AND NOT EXISTS (
+                    SELECT 1 FROM position_cost_rebases AS newer
+                    WHERE newer.account_id = current.account_id
+                      AND newer.ts_code = current.ts_code
+                      AND newer.as_of_date = current.as_of_date
+                      AND newer.status = 'reviewed'
+                      AND (
+                        newer.recorded_at > current.recorded_at
+                        OR (
+                          newer.recorded_at = current.recorded_at
+                          AND newer.rebase_id > current.rebase_id
+                        )
+                      )
+                  )
+                """,
+                rebase_params,
+            )
+        )
+        ordered: list[tuple[tuple[str, str, int, str], Mapping[str, Any]]] = []
+        for row in ledger_rows:
+            event_time = row["event_time"] or "99:99:99"
+            ordered.append(
+                ((row["event_date"], event_time, 0, str(row["entry_id"])), row)
+            )
+        for row in rebase_rows:
+            synthetic = {
+                "entry_id": f"rebase:{row['rebase_id']}",
+                "account_id": row["account_id"],
+                "event_date": row["as_of_date"],
+                "event_time": "99:99:99",
+                "event_type": "COST_REBASE",
+                "ts_code": row["ts_code"],
+                "quantity": row["target_quantity"],
+                "price": "0",
+                "gross_amount": "0",
+                "fees": "0",
+                "total_cost": row["total_cost"],
+                "cash_amount": "0",
+                "external_id": row["rebase_id"],
+                "dedupe_key": row["rebase_id"],
+                "import_batch_id": None,
+                "source_row": None,
+                "note": (
+                    f"reviewed_cost_rebase; source_path={row['source_path']}; "
+                    f"{row['note']}"
+                ).rstrip("; "),
+                "created_at": row["recorded_at"],
+            }
+            ordered.append(
+                (
+                    (row["as_of_date"], "99:99:99", 1, str(row["rebase_id"])),
+                    synthetic,
+                )
+            )
+        ordered.sort(key=lambda item: item[0])
+        return [row for _, row in ordered]
 
     @staticmethod
     def _insert_batch(
@@ -846,12 +1183,22 @@ class PortfolioStore:
                 }
                 for item in unique_entries
             )
+
+        def preview_sequence_key(row: Mapping[str, Any]) -> tuple[int, int | str]:
+            value = row.get("source_row") if isinstance(row, dict) else row["entry_id"]
+            if value in (None, "") and isinstance(row, dict):
+                value = row.get("entry_id", "")
+            try:
+                return (0, int(value))
+            except (TypeError, ValueError):
+                return (1, str(value))
+
         rows.sort(
             key=lambda row: (
                 str(row["event_date"]),
                 str(row.get("event_time", "") if isinstance(row, dict) else row["event_time"])
                 or "99:99:99",
-                int(row.get("source_row", 0) if isinstance(row, dict) else row["entry_id"]),
+                preview_sequence_key(row),
             )
         )
         build_position_states(rows)
@@ -899,12 +1246,14 @@ class PortfolioStore:
                 """,
                 (inserted, duplicates, batch_id),
             )
+            cash_update = self._write_statement_cash_snapshot(connection, account_id)
             connection.commit()
         return {
             "batch_id": batch_id,
             "inserted_entries": inserted,
             "duplicate_entries": duplicates,
             "preview": preview,
+            "cash_update": cash_update,
         }
 
     def preview_historical_closed_statement(
@@ -1197,6 +1546,59 @@ class PortfolioStore:
             inserted = self._insert_prices(connection, price_list)
             connection.commit()
         return inserted
+
+    @staticmethod
+    def _performance_coverage_key(account_id: str, ts_code: str) -> str:
+        return f"portfolio.performance_price_coverage:{account_id}:{ts_code}"
+
+    def performance_price_coverage(
+        self, account_id: str, ts_code: str
+    ) -> dict[str, Any] | None:
+        key = self._performance_coverage_key(account_id, ts_code)
+        with self.connect() as connection:
+            row = connection.execute(
+                "SELECT value FROM metadata WHERE key = ?", (key,)
+            ).fetchone()
+        if row is None:
+            return None
+        try:
+            payload = json.loads(row["value"])
+            return {
+                "start_date": date.fromisoformat(payload["start_date"]),
+                "end_date": date.fromisoformat(payload["end_date"]),
+                "updated_at": payload.get("updated_at"),
+            }
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+            return None
+
+    def record_performance_price_coverage(
+        self,
+        account_id: str,
+        ts_code: str,
+        start_date: date,
+        end_date: date,
+    ) -> dict[str, Any]:
+        if start_date > end_date:
+            raise ValueError("start_date 不能晚于 end_date")
+        existing = self.performance_price_coverage(account_id, ts_code)
+        covered_start = min(start_date, existing["start_date"]) if existing else start_date
+        covered_end = max(end_date, existing["end_date"]) if existing else end_date
+        payload = {
+            "start_date": covered_start.isoformat(),
+            "end_date": covered_end.isoformat(),
+            "updated_at": utc_now(),
+        }
+        key = self._performance_coverage_key(account_id, ts_code)
+        with self.connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO metadata(key, value) VALUES (?, ?)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value
+                """,
+                (key, json.dumps(payload, ensure_ascii=False, sort_keys=True)),
+            )
+            connection.commit()
+        return payload
 
     def instrument(self, ts_code: str) -> Instrument | None:
         normalized = ts_code.strip().upper()
@@ -1513,7 +1915,9 @@ class PortfolioStore:
             connection.commit()
         return updated
 
-    def ledger(self, account_id: str, as_of: date | None = None) -> list[sqlite3.Row]:
+    def ledger(
+        self, account_id: str, as_of: date | None = None
+    ) -> list[Mapping[str, Any]]:
         with self.connect() as connection:
             return self._ordered_ledger(connection, account_id, as_of)
 
@@ -1542,6 +1946,60 @@ class PortfolioStore:
             for code in open_codes
         ]
 
+    def performance_price_targets(
+        self, account_id: str, as_of: date | None = None
+    ) -> list[dict[str, Any]]:
+        """返回每只曾持有证券需要覆盖的盈亏曲线收盘价区间。"""
+
+        target_date = as_of or date.today()
+        cycles = build_ledger_cycles(self.ledger(account_id, target_date))
+        grouped: dict[str, dict[str, Any]] = {}
+        for cycle in cycles:
+            group = grouped.setdefault(
+                cycle.ts_code,
+                {
+                    "ts_code": cycle.ts_code,
+                    "start_date": cycle.opened_on,
+                    "end_date": cycle.closed_on or target_date,
+                    "has_open_cycle": not cycle.is_closed,
+                },
+            )
+            group["start_date"] = min(group["start_date"], cycle.opened_on)
+            group["end_date"] = max(
+                group["end_date"], cycle.closed_on or target_date
+            )
+            group["has_open_cycle"] = group["has_open_cycle"] or not cycle.is_closed
+
+        if not grouped:
+            return []
+        placeholders = ",".join("?" for _ in grouped)
+        with self.connect() as connection:
+            instrument_rows = {
+                row["ts_code"]: row
+                for row in connection.execute(
+                    f"""
+                    SELECT ts_code, name, asset_type FROM instruments
+                    WHERE ts_code IN ({placeholders})
+                    """,
+                    tuple(grouped),
+                )
+            }
+        result: list[dict[str, Any]] = []
+        for ts_code, group in grouped.items():
+            row = instrument_rows.get(ts_code)
+            result.append(
+                {
+                    **group,
+                    "instrument": Instrument(
+                        ts_code=ts_code,
+                        name=row["name"] if row is not None else ts_code,
+                        asset_type=row["asset_type"] if row is not None else "unknown",
+                    ),
+                }
+            )
+        result.sort(key=lambda item: item["ts_code"])
+        return result
+
     @staticmethod
     def _latest_price(
         connection: sqlite3.Connection, ts_code: str, as_of: date | None
@@ -1567,13 +2025,6 @@ class PortfolioStore:
     ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
         ledger = self.ledger(account_id, as_of)
         states = build_position_states(ledger)
-        baseline = self.baseline_date(account_id)
-        baseline_ledger = (
-            [row for row in ledger if date.fromisoformat(row["event_date"]) >= baseline]
-            if baseline is not None
-            else ledger
-        )
-        baseline_states = build_position_states(baseline_ledger)
         active_cycles = {
             cycle.ts_code: cycle
             for cycle in build_ledger_cycles(ledger)
@@ -1587,6 +2038,23 @@ class PortfolioStore:
                 active_cycle = active_cycles.get(ts_code)
                 instrument = connection.execute(
                     "SELECT * FROM instruments WHERE ts_code = ?", (ts_code,)
+                ).fetchone()
+                rebase_params: tuple[Any, ...] = (
+                    (account_id, ts_code, as_of.isoformat())
+                    if as_of is not None
+                    else (account_id, ts_code)
+                )
+                rebase_date_filter = "AND as_of_date <= ?" if as_of is not None else ""
+                cost_rebase = connection.execute(
+                    f"""
+                    SELECT as_of_date, target_quantity, total_cost, source_path,
+                           status, note, recorded_at
+                    FROM position_cost_rebases
+                    WHERE account_id = ? AND ts_code = ? {rebase_date_filter}
+                    ORDER BY as_of_date DESC, recorded_at DESC, rebase_id DESC
+                    LIMIT 1
+                    """,
+                    rebase_params,
                 ).fetchone()
                 quote = self._latest_price(connection, ts_code, as_of)
                 close = Decimal(quote["close"]) if quote is not None else None
@@ -1639,6 +2107,23 @@ class PortfolioStore:
                         "quantity": state.quantity,
                         "average_cost": state.average_cost,
                         "remaining_cost": state.remaining_cost,
+                        "cost_basis_method": (
+                            "reviewed_rebase_then_diluted_cost"
+                            if cost_rebase is not None and cost_rebase["status"] == "reviewed"
+                            else "ledger_entries.diluted_cost"
+                        ),
+                        "cost_basis_status": (
+                            cost_rebase["status"] if cost_rebase is not None else "ledger_only"
+                        ),
+                        "cost_basis_as_of": (
+                            cost_rebase["as_of_date"] if cost_rebase is not None else None
+                        ),
+                        "cost_basis_source_path": (
+                            cost_rebase["source_path"] if cost_rebase is not None else None
+                        ),
+                        "cost_basis_note": (
+                            cost_rebase["note"] if cost_rebase is not None else ""
+                        ),
                         "close": close,
                         "price_date": quote["trade_date"] if quote is not None else None,
                         "price_source": quote["source"] if quote is not None else None,
@@ -1650,7 +2135,7 @@ class PortfolioStore:
                         "market_value": market_value,
                         "unrealized_pnl": unrealized,
                         "return_pct": return_pct,
-                        "realized_pnl": baseline_states.get(
+                        "realized_pnl": states.get(
                             ts_code, PositionState(ts_code=ts_code)
                         ).realized_pnl,
                     }
@@ -1660,7 +2145,7 @@ class PortfolioStore:
         priced_rows = [row for row in result if row["market_value"] is not None]
         market_value = sum((row["market_value"] for row in priced_rows), ZERO)
         unrealized = sum((row["unrealized_pnl"] for row in priced_rows), ZERO)
-        realized = sum((state.realized_pnl for state in baseline_states.values()), ZERO)
+        realized = sum((state.realized_pnl for state in states.values()), ZERO)
         missing_prices = [row["ts_code"] for row in result if row["close"] is None]
         fully_priced = not missing_prices
         cash_snapshot = self.cash_balance(account_id, as_of)
@@ -1683,8 +2168,10 @@ class PortfolioStore:
                 if fully_priced and remaining_cost != ZERO
                 else None
             ),
-            "realized_pnl_since_baseline": realized,
-            "total_pnl_since_baseline": unrealized + realized if fully_priced else None,
+            "realized_pnl": realized,
+            "total_pnl_lifetime": (
+                unrealized + realized if fully_priced else None
+            ),
             "missing_prices": missing_prices,
             "latest_price_date": max(
                 (row["price_date"] for row in result if row["price_date"]),
@@ -2276,6 +2763,259 @@ class PortfolioStore:
             )
             return [self._snapshot_summary_from_row(row) for row in rows]
 
+    @staticmethod
+    def _sample_performance_dates(
+        dates: list[date], year_start: date, *, limit: int = 420
+    ) -> list[date]:
+        """保留本年全部本地估值日，并对更早日期做等距抽样。"""
+
+        ordered = sorted(set(dates))
+        if len(ordered) <= limit:
+            return ordered
+        current_year = [item for item in ordered if item >= year_start]
+        older = [item for item in ordered if item < year_start]
+        if len(current_year) >= limit:
+            indexes = {
+                round(index * (len(current_year) - 1) / (limit - 1))
+                for index in range(limit)
+            }
+            return [current_year[index] for index in sorted(indexes)]
+
+        older_limit = limit - len(current_year)
+        if older_limit == 1:
+            sampled_older = [older[0]]
+        else:
+            indexes = {
+                round(index * (len(older) - 1) / (older_limit - 1))
+                for index in range(older_limit)
+            }
+            sampled_older = [older[index] for index in sorted(indexes)]
+        return sampled_older + current_year
+
+    def performance_report(
+        self,
+        account_id: str,
+        as_of: date | None = None,
+        *,
+        current_total_pnl: Decimal | None = None,
+    ) -> dict[str, Any]:
+        """按本地台账与已归档收盘价生成指定月、年度和投资以来盈亏曲线。"""
+
+        with self.connect() as connection:
+            ledger_date_rows = connection.execute(
+                """
+                SELECT DISTINCT event_date FROM ledger_entries
+                WHERE account_id = ?
+                ORDER BY event_date
+                """,
+                (account_id,),
+            ).fetchall()
+            price_date_rows = connection.execute(
+                """
+                SELECT DISTINCT prices.trade_date
+                FROM close_prices AS prices
+                WHERE EXISTS (
+                    SELECT 1 FROM ledger_entries AS ledger
+                    WHERE ledger.account_id = ? AND ledger.ts_code = prices.ts_code
+                )
+                ORDER BY prices.trade_date
+                """,
+                (account_id,),
+            ).fetchall()
+
+        ledger_dates = [date.fromisoformat(row[0]) for row in ledger_date_rows]
+        price_dates = [date.fromisoformat(row[0]) for row in price_date_rows]
+        known_dates = sorted(set(ledger_dates + price_dates))
+        if not known_dates:
+            return {
+                "as_of": as_of.isoformat() if as_of else None,
+                "periods": {},
+                "data_note": "暂无可追溯台账，不能生成盈亏曲线。",
+            }
+
+        end_date = as_of or known_dates[-1]
+        eligible_dates = [item for item in known_dates if item <= end_date]
+        eligible_ledger_dates = [item for item in ledger_dates if item <= end_date]
+        if not eligible_dates or not eligible_ledger_dates:
+            return {
+                "as_of": end_date.isoformat(),
+                "periods": {},
+                "data_note": "回看日前暂无可追溯台账，不能生成盈亏曲线。",
+            }
+
+        investment_start = min(eligible_ledger_dates)
+        baseline = self.baseline_date(account_id)
+        month_start = date(end_date.year, end_date.month, 1)
+        year_start = date(end_date.year, 1, 1)
+        curve_dates = self._sample_performance_dates(
+            sorted(set(eligible_dates + [end_date])), year_start
+        )
+        value_cache: dict[date, Decimal | None] = {}
+
+        def value_at(point_date: date) -> Decimal | None:
+            if point_date in value_cache:
+                return value_cache[point_date]
+            if point_date == end_date and current_total_pnl is not None:
+                value = current_total_pnl
+            else:
+                _, point_summary = self.position_report(account_id, point_date)
+                value = point_summary["total_pnl_lifetime"]
+            value_cache[point_date] = value
+            return value
+
+        raw_points = [
+            {"date": point_date, "pnl": value_at(point_date)}
+            for point_date in curve_dates
+            if value_at(point_date) is not None
+        ]
+        current_value = value_at(end_date)
+
+        def period_payload(
+            key: str,
+            label: str,
+            start_date: date,
+            period_end_date: date = end_date,
+        ) -> dict[str, Any]:
+            if baseline is not None and start_date <= baseline:
+                return {
+                    "key": key,
+                    "label": label,
+                    "start_date": start_date,
+                    "end_date": period_end_date,
+                    "pnl": None,
+                    "series": [],
+                    "status": "partial_history",
+                }
+            if start_date <= investment_start:
+                anchor_date = None
+                anchor_value = ZERO
+            else:
+                anchor_date = start_date - timedelta(days=1)
+                anchor_value = value_at(anchor_date)
+                if anchor_value is None:
+                    prior = [
+                        point for point in raw_points if point["date"] < start_date
+                    ]
+                    if prior:
+                        anchor_date = prior[-1]["date"]
+                        anchor_value = prior[-1]["pnl"]
+
+            period_value = value_at(period_end_date)
+            series: list[dict[str, Any]] = []
+            if anchor_value is not None and anchor_date is not None:
+                series.append({"date": anchor_date, "pnl": ZERO})
+            if anchor_value is not None:
+                series.extend(
+                    {
+                        "date": point["date"],
+                        "pnl": point["pnl"] - anchor_value,
+                    }
+                    for point in raw_points
+                    if start_date <= point["date"] <= period_end_date
+                )
+                if period_value is not None:
+                    end_point = {
+                        "date": period_end_date,
+                        "pnl": period_value - anchor_value,
+                    }
+                    if series and series[-1]["date"] == period_end_date:
+                        series[-1] = end_point
+                    else:
+                        series.append(end_point)
+            return {
+                "key": key,
+                "label": label,
+                "start_date": start_date,
+                "end_date": period_end_date,
+                "pnl": (
+                    period_value - anchor_value
+                    if period_value is not None and anchor_value is not None
+                    else None
+                ),
+                "series": series,
+                "status": (
+                    "complete"
+                    if period_value is not None and anchor_value is not None
+                    else "missing_price"
+                ),
+            }
+
+        def shift_date_by_months(value: date, offset: int) -> date:
+            month_index = value.year * 12 + value.month - 1 + offset
+            year = month_index // 12
+            month = month_index % 12 + 1
+            day = min(value.day, monthrange(year, month)[1])
+            return date(year, month, day)
+
+        def rolling_range_payload(months: int) -> dict[str, Any]:
+            requested_start = shift_date_by_months(end_date, -months)
+            partial_from_baseline = (
+                baseline is not None and requested_start <= baseline <= end_date
+            )
+            effective_start = (
+                baseline + timedelta(days=1)
+                if partial_from_baseline and baseline is not None
+                else requested_start
+            )
+            if effective_start > end_date and baseline is not None:
+                payload = {
+                    "key": f"{months}m",
+                    "label": f"近{months}个月盈亏",
+                    "start_date": baseline,
+                    "end_date": end_date,
+                    "pnl": ZERO,
+                    "series": [{"date": baseline, "pnl": ZERO}],
+                    "status": "partial_history",
+                }
+            else:
+                payload = period_payload(
+                    f"{months}m",
+                    f"近{months}个月盈亏",
+                    effective_start,
+                    end_date,
+                )
+            payload["months"] = months
+            payload["requested_start_date"] = requested_start
+            if partial_from_baseline and baseline is not None and payload["pnl"] is not None:
+                payload["start_date"] = baseline
+                payload["status"] = "partial_history"
+                payload["coverage_note"] = (
+                    f"所选区间早于账户基准日，当前显示 {baseline.isoformat()} 起的可追溯盈亏。"
+                )
+            return payload
+
+        recent_ranges = [
+            rolling_range_payload(months) for months in (1, 3, 6, 12, 24)
+        ]
+
+        investment_series = [
+            point for point in raw_points if point["date"] >= investment_start
+        ]
+        periods = {
+            "month": period_payload("month", "本月盈亏", month_start),
+            "year": period_payload("year", "今年盈亏", year_start),
+            "all": {
+                "key": "all",
+                "label": "投资以来盈亏",
+                "start_date": investment_start,
+                "end_date": end_date,
+                "pnl": current_value,
+                "series": investment_series,
+                "status": "complete" if current_value is not None else "missing_price",
+            },
+        }
+        return {
+            "as_of": end_date,
+            "periods": periods,
+            "recent_ranges": recent_ranges,
+            "point_count": len(raw_points),
+            "data_note": (
+                "曲线由本地台账和已归档收盘价重放；无新收盘价的日期沿用最近一次可用收盘价，"
+                "缺失行情时明确标记为不可用；滚动区间早于账户基准日时从基准日开始展示，"
+                "并明确标记为历史不完整。"
+            ),
+        }
+
     def closed_position_report(
         self, account_id: str, as_of: date | None = None
     ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
@@ -2326,7 +3066,7 @@ class PortfolioStore:
                     "close_price": cycle.close_price,
                     "buy_count": cycle.buy_count,
                     "sell_count": cycle.sell_count,
-                    "calculation_source": "ledger_entries.moving_average_cost",
+                    "calculation_source": "ledger_entries.end_of_day_diluted_cost",
                 }
             )
 
@@ -2373,25 +3113,31 @@ class PortfolioStore:
                 max((item["closed_on"] for item in result), default=None)
             ),
             "calculation_note": (
-                "仅统计持仓数量由正数归零的完整周期；移动加权平均成本、卖出费用、"
-                "周期内现金红利和现金税费均计入。部分卖出但尚未归零的已实现盈亏不计入本视图。"
+                "仅统计日终持仓真正归零的完整周期；日内临时归零后同日回补不拆分周期。"
+                "开放持仓采用券商摊薄成本，卖出净额、现金红利和现金税费均滚入剩余成本。"
             ),
         }
         return result, summary
 
     def recent_ledger(self, account_id: str, limit: int = 100) -> list[dict[str, Any]]:
-        with self.connect() as connection:
-            rows = connection.execute(
-                """
-                SELECT entry_id, event_date, event_time, event_type, ts_code, quantity,
-                    price, gross_amount, fees, total_cost, cash_amount, external_id,
-                    source_row, note
-                FROM ledger_entries WHERE account_id = ?
-                ORDER BY event_date DESC, event_time DESC, entry_id DESC LIMIT ?
-                """,
-                (account_id, limit),
-            ).fetchall()
-        return [dict(row) for row in rows]
+        fields = (
+            "entry_id",
+            "event_date",
+            "event_time",
+            "event_type",
+            "ts_code",
+            "quantity",
+            "price",
+            "gross_amount",
+            "fees",
+            "total_cost",
+            "cash_amount",
+            "external_id",
+            "source_row",
+            "note",
+        )
+        rows = list(reversed(self.ledger(account_id)))[:limit]
+        return [{field: row[field] for field in fields} for row in rows]
 
     def recent_reconciliations(self, account_id: str, limit: int = 100) -> list[dict[str, Any]]:
         with self.connect() as connection:
@@ -2402,6 +3148,104 @@ class PortfolioStore:
                     baseline_date, external_id, source_row, note
                 FROM statement_observations WHERE account_id = ?
                 ORDER BY event_date DESC, event_time DESC, observation_id DESC LIMIT ?
+                """,
+                (account_id, limit),
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def record_position_cost_rebases(
+        self, account_id: str, rebases: Iterable[Mapping[str, Any]]
+    ) -> dict[str, int]:
+        """登记有来源的持仓成本锚点；只有 reviewed 记录进入核算。"""
+
+        normalized: list[dict[str, Any]] = []
+        for row in rebases:
+            ts_code = str(row.get("ts_code", "")).strip()
+            as_of = date.fromisoformat(str(row.get("as_of_date", "")).strip())
+            target_quantity = Decimal(str(row.get("target_quantity", "0")))
+            total_cost = Decimal(str(row.get("total_cost", "0")))
+            source_path = str(row.get("source_path", "")).strip()
+            status = str(row.get("status", "reviewed")).strip().lower()
+            note = str(row.get("note", "")).strip()
+            if not ts_code or target_quantity <= ZERO:
+                raise ValueError("成本锚点必须包含证券代码和正数量")
+            if not total_cost.is_finite():
+                raise ValueError(f"{ts_code}: 成本锚点必须是有限数值")
+            if not source_path:
+                raise ValueError(f"{ts_code}: 成本锚点必须保留 source_path")
+            if status not in {"reviewed", "unverified"}:
+                raise ValueError(f"{ts_code}: 不支持的成本锚点状态 {status!r}")
+            normalized.append(
+                {
+                    "rebase_id": uuid.uuid4().hex,
+                    "account_id": account_id,
+                    "ts_code": ts_code,
+                    "as_of_date": as_of.isoformat(),
+                    "target_quantity": decimal_to_text(target_quantity),
+                    "total_cost": decimal_to_text(total_cost),
+                    "source_path": source_path,
+                    "status": status,
+                    "note": note,
+                }
+            )
+
+        inserted = 0
+        duplicates = 0
+        recorded_at = utc_now()
+        with self.connect() as connection:
+            if connection.execute(
+                "SELECT 1 FROM accounts WHERE account_id = ?", (account_id,)
+            ).fetchone() is None:
+                raise ValueError(f"账户不存在: {account_id}")
+            known_codes = {
+                row["ts_code"]
+                for row in connection.execute("SELECT ts_code FROM instruments")
+            }
+            missing = sorted(
+                {item["ts_code"] for item in normalized if item["ts_code"] not in known_codes}
+            )
+            if missing:
+                raise ValueError(f"成本锚点包含未登记证券: {', '.join(missing)}")
+            for item in normalized:
+                cursor = connection.execute(
+                    """
+                    INSERT OR IGNORE INTO position_cost_rebases(
+                        rebase_id, account_id, ts_code, as_of_date, target_quantity,
+                        total_cost, source_path, status, note, recorded_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        item["rebase_id"],
+                        item["account_id"],
+                        item["ts_code"],
+                        item["as_of_date"],
+                        item["target_quantity"],
+                        item["total_cost"],
+                        item["source_path"],
+                        item["status"],
+                        item["note"],
+                        recorded_at,
+                    ),
+                )
+                if cursor.rowcount == 1:
+                    inserted += 1
+                else:
+                    duplicates += 1
+            connection.commit()
+        return {"inserted_rebases": inserted, "duplicate_rebases": duplicates}
+
+    def recent_position_cost_rebases(
+        self, account_id: str, limit: int = 100
+    ) -> list[dict[str, Any]]:
+        with self.connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT rebase_id, ts_code, as_of_date, target_quantity, total_cost,
+                       source_path, status, note, recorded_at
+                FROM position_cost_rebases
+                WHERE account_id = ?
+                ORDER BY as_of_date DESC, recorded_at DESC, rebase_id DESC
+                LIMIT ?
                 """,
                 (account_id, limit),
             ).fetchall()
@@ -2545,6 +3389,10 @@ class PortfolioStore:
                 "SELECT COUNT(*) AS count FROM internal_transfer_reconciliations WHERE account_id = ?",
                 (account_id,),
             ).fetchone()["count"]
+            cost_rebase_count = connection.execute(
+                "SELECT COUNT(*) AS count FROM position_cost_rebases WHERE account_id = ?",
+                (account_id,),
+            ).fetchone()["count"]
             batch_count = connection.execute(
                 "SELECT COUNT(*) AS count FROM import_batches WHERE account_id = ?",
                 (account_id,),
@@ -2555,6 +3403,12 @@ class PortfolioStore:
                 WHERE source LIKE 'tushare.%'
                 """
             ).fetchone()["fetched_at"]
+            price_state = connection.execute(
+                """
+                SELECT COUNT(*) AS count, MAX(fetched_at) AS fetched_at
+                FROM close_prices
+                """
+            ).fetchone()
             latest_industry_update = connection.execute(
                 "SELECT MAX(industry_updated_at) AS updated_at FROM instruments"
             ).fetchone()["updated_at"]
@@ -2578,8 +3432,11 @@ class PortfolioStore:
             "ledger_count": ledger_count,
             "reconciliation_count": reconciliation_count,
             "internal_transfer_count": internal_transfer_count,
+            "cost_rebase_count": cost_rebase_count,
             "import_batch_count": batch_count,
             "last_tushare_fetch_at": latest_fetch,
+            "last_price_fetch_at": price_state["fetched_at"],
+            "close_price_count": price_state["count"],
             "last_kline_fetch_at": latest_kline_fetch,
             "last_intraday_fetch_at": latest_intraday_fetch,
             "last_industry_update_at": latest_industry_update,

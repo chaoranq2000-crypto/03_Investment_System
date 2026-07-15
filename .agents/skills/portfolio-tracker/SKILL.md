@@ -1,6 +1,6 @@
 ---
 name: portfolio-tracker
-description: Maintain the repo-local private portfolio ledger from holding screenshots, broker CSV/XLSX statements, closing prices, qfq daily K-line and raw single-day minute observations, cycle-scoped operation markers, source-labeled equity industries, ETF-holdings-driven industry classifications, and completed clearance-cycle P&L. Use for opening snapshots, statement reconciliation, cost/P&L refreshes, factual daily/intraday chart review, closed-position returns, industry perspective, ETF constituent classification, and portfolio audits. This is a standalone utility skill and must never route through or mutate the research-orchestrator workflow.
+description: Maintain the repo-local private portfolio ledger, prices, factual charts, reviewed stock/ETF industry labels, and clearance-cycle P&L. Use for snapshots, statement reconciliation, cost/P&L refreshes, chart review, industry perspective, and portfolio audits. This standalone utility must never mutate the research workflow.
 ---
 
 # Portfolio Tracker
@@ -25,7 +25,11 @@ Run commands from the repository root with:
 .\.conda\investment-system\python.exe -m src.portfolio <command>
 ```
 
-Default database: `data/db/portfolio.sqlite3`.
+The canonical private database is the primary worktree's `data/db/portfolio.sqlite3`.
+CLI and desktop startup resolve linked worktrees to that primary runtime automatically.
+The linked worktree's reserved `data/db/portfolio.sqlite3` path redirects to the primary ledger
+even when an old command passes it explicitly. Shadow validation must use a distinct filename such
+as `--db data/db/portfolio.shadow.sqlite3`; never maintain a second formal ledger.
 
 ## Workflow
 
@@ -40,10 +44,10 @@ Default database: `data/db/portfolio.sqlite3`.
 5. Classify each statement relative to the opening baseline:
    - after baseline: preview and then apply as a real ledger entry;
    - on/before baseline: do not infer inclusion from the date alone. Use `--included-in-opening` only when the user explicitly confirms the snapshot already includes the trade, or the snapshot quantity/cost arithmetic proves inclusion;
-   - complete historical clearance before the baseline: use `--historical-closed` only when the supplied batch independently starts from zero, never oversells, and ends at zero. Its cycles belong in clearance review, while its P&L must stay outside `realized_pnl_since_baseline`;
+   - complete historical clearance before the baseline: use `--historical-closed` only when the supplied batch independently starts from zero, never oversells, and ends at zero. Its cycles belong in clearance review, and their realized P&L is included in the unified realized-P&L total;
    - if the user confirms that a later-supplied trade was omitted from the snapshot, move the accounting baseline to before the earliest omitted trade and replay it as a real ledger entry, even when the screenshot was submitted on a later date;
    - unclear: keep it un-applied and report the exact ambiguity. Never treat the date the user supplied a screenshot as its accounting cutoff without evidence.
-6. Refresh latest available closing prices and industry classifications, render the CLI or local dashboard, and verify totals and affected securities. Refresh daily K-line or single-day minute data only when the user explicitly clicks the corresponding update control, clicks a daily candle, enters/selects a ledger BUY/SELL date in the intraday view, or runs `refresh-kline` / `refresh-intraday`; opening a drawer, switching daily ranges, and selecting a non-trade date must remain cache-only. Never batch-refresh every trade date in a cycle. Before classifying any ETF, read `references/etf_industry_classification.md` and use disclosed constituents rather than its name as the primary evidence. When the dashboard is on the latest view, also verify the non-persistent intraday quote overlay and its source/time labels.
+6. Refresh latest available closing prices and industry labels, render the CLI or local dashboard, and verify totals and affected securities. Refresh daily K-line or single-day minute data only after the explicit UI/CLI action; ordinary viewing stays cache-only. For ETF labels, follow `references/etf_industry_classification.md`: use only the reviewed code/index mapping, never infer from the display name. When the dashboard is on the latest view, also verify the non-persistent intraday quote overlay and its source/time labels.
 7. When sell entries reduce a security to zero, verify the completed clearance cycle: released moving-average cost, net sale proceeds, cycle cash income/fees, realized P&L, and return percentage. Never label a still-open partial sale as a completed clearance.
 8. Run `tests/test_portfolio_tracker.py` and `tests/test_portfolio_web.py`, then check that private files remain ignored.
 
@@ -120,7 +124,7 @@ Daily-candle navigation may refresh a displayed pre-opening or post-close contex
 - Cache a successful server response for slightly less than one refresh interval so multiple local tabs do not multiply upstream requests. Pause browser polling while the page is hidden and refresh once when it becomes visible again.
 - Do not high-frequency poll Eastmoney for this feature. The reviewed upstream reference prioritizes Tencent/mootdx for quotes and warns that Eastmoney endpoints share IP-level rate controls.
 
-Industry perspective is also private bookkeeping output. Use Tushare `stock_basic.industry` as the raw label for A-share equities, then normalize it without overwriting the source label. Classify an ETF from its latest usable disclosed constituent set and constituent industry distribution according to `references/etf_industry_classification.md`; for cross-market constituents, use the documented structured-industry and same-date-close fallback chain before declaring a coverage gap. Treat the ETF name as corroboration or an explicitly labeled low-confidence fallback. A tracking-index name may select a reviewed, machine-readable theme aggregation only after constituent coverage passes and the aggregated constituent weight meets its own threshold; it may never create the result alone. Preserve `未分类（ETF持仓覆盖不足）` when constituent coverage, freshness, or weighting is inadequate. Always retain source dates and methods, and never write these portfolio classifications into segment-company mapping or research evidence artifacts.
+Industry perspective is private bookkeeping output. Use Tushare `stock_basic.industry` for A-share equities and normalize the raw label without hiding its source. For ETFs, read the explicit `etf_overrides` entry in `config/portfolio_industry_taxonomy.json`; optionally verify its `index_code` and `index_name` with `tushare.etf_basic`. A mismatch or missing mapping stays `未分类（ETF需复核映射）`. Do not fetch constituents, infer from the ETF name, or write portfolio labels into research evidence or segment-company mapping.
 
 Clearance P&L is derived by replaying the private ledger; do not persist a second manually editable profit table. One cycle starts when quantity moves from zero to positive (or from the opening snapshot) and closes only when quantity returns to zero. Include moving-average released cost, sell fees, and cash income/fees recorded while that cycle is open. Keep realized P&L from still-open partial sales visible outside the completed-clearance total.
 
@@ -136,7 +140,7 @@ For Windows desktop launch, use `scripts/start_portfolio_dashboard.ps1`. It must
 - K-line reads are cache-only until explicit refresh; qfq bars cite both raw-bar and factor sources, and every marker resolves to original ledger entries or an explicit coverage gap.
 - Single-day minute reads are cache-only until explicit refresh or a dashboard-triggered refresh for the selected ledger BUY/SELL date; source, 1/5-minute precision, fallback reason, refresh time, mapped trades, and unlocated trades remain visible, and forced dual-source failure preserves the existing cache.
 - Latest-view intraday prices include quote timestamps and provider coverage; forced provider failure falls back to stored closing prices without changing SQLite.
-- Industry groups include raw and normalized classification sources. ETF labels are backed by dated constituent coverage and weighting metadata; broad, stale, insufficiently covered, or ambiguous ETFs remain visibly unclassified instead of falling back silently to their names.
+- Industry groups include raw and normalized sources. ETF labels cite a dated reviewed code/index mapping; missing or mismatched mappings remain visibly unclassified.
 - Completed clearance cycles reconcile to ledger realized P&L, and partial sales are not mislabeled as closed positions.
 - Personal data is ignored by Git.
 - Research workflow files are unchanged.
