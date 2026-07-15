@@ -1,0 +1,423 @@
+# Schema-valid template. Every all-zero SHA-256 is a deliberate placeholder and
+# will fail physical hash verification until replaced. Case ordering must match
+# the Bundle 14R qualification_results array used by the regression pointers.
+schema_version: r5_bundle17r_activation_manifest_v1
+baseline_commit: 7ab395283f432faac7bbc0e83a0b0cf4976ed5dc
+run_id: replace_with_real_activation_run_id
+stage_bindings:
+  materialization:
+    suite:
+      path: reports/p1_6/r5_bundle16r/materialization/R5_bundle16r_materialization_suite.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    generation_lock:
+      path: reports/p1_6/r5_bundle16r/materialization/R5_bundle16r_generation_lock.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    assertions:
+      case_count: /case_count
+      packs_materialized: /pack_materialized_count
+      fully_mapped: /fully_mapped_case_count
+      blockers_zero: /blocker_count
+      canonical_mutation_false: /canonical_workflow_state_mutation_allowed
+      sample_quality_false: /sample_quality_allowed
+      p2_false: /p2_allowed
+      suite_hash_bound:
+        artifact: generation_lock
+        pointer: /suite_sha256
+      generation_id_present:
+        artifact: generation_lock
+        pointer: /generation_id
+  qualification:
+    suite:
+      path: reports/p1_6/r5_bundle16r/qualification/R5_bundle15r_qualification_suite.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    generation_lock:
+      path: reports/p1_6/r5_bundle16r/qualification/R5_bundle15r_generation_lock.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    assertions:
+      case_count: /case_count
+      packs_complete: /evidence_pack_complete_count
+      bundle14_ready: /bundle14r_candidate_ready_count
+      blockers_zero: /blocker_count
+      canonical_mutation_false: /workflow_state_mutation_allowed
+      sample_quality_false: /sample_quality_allowed
+      p2_false: /p2_allowed
+      suite_hash_bound:
+        artifact: generation_lock
+        pointer: /suite_sha256
+      generation_id_present:
+        artifact: generation_lock
+        pointer: /generation_id
+  regression:
+    suite:
+      path: reports/p1_6/r5_bundle16r/golden_regression/R5_bundle14r_suite_result.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    generation_lock:
+      path: reports/p1_6/r5_bundle16r/golden_regression/R5_bundle14r_generation_lock.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    assertions:
+      contract_passed: /contract_passed
+      research_ready_count: /research_ready_case_count
+      candidate_ready_count: /candidate_ready_case_count
+      release_authority_false: /release_authority
+      canonical_mutation_false: /workflow_state_mutation_allowed
+      sample_quality_false: /sample_quality_allowed
+      p2_false: /p2_allowed
+      suite_hash_bound:
+        artifact: generation_lock
+        pointer: /suite_result_sha256
+      generation_id_present:
+        artifact: generation_lock
+        pointer: /generation_id
+cases:
+- case_id: replace_with_exact_bundle14r_case_id_1
+  issuer_ticker: replace_with_registered_ticker_1
+  artifacts:
+    case_contract:
+      path: tests/fixtures/r5_bundle14r/cases/replace_case_1.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    qualification:
+      path: reports/p1_6/r5_bundle16r/qualification/qualification/replace_case_1.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    regression_result:
+      path: reports/p1_6/r5_bundle16r/golden_regression/R5_bundle14r_suite_result.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    reader:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_1/reader.md
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    generation_lock:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_1/generation_lock.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    quality_scorecard:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_1/quality_scorecard.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    traceability:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_1/traceability.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+  assertions:
+    contract_case_id:
+      artifact: case_contract
+      pointer: /case_id
+    contract_issuer_ticker:
+      artifact: case_contract
+      pointer: /issuer/ticker
+    qualification_case_id:
+      artifact: qualification
+      pointer: /case_id
+    qualification_evidence_complete:
+      artifact: qualification
+      pointer: /bundle15r_audit/evidence_pack_complete
+    qualification_official_sources_present:
+      artifact: qualification
+      pointer: /reviewed_official_source_count
+    qualification_drivers_present:
+      artifact: qualification
+      pointer: /qualified_driver_ids
+    qualification_overlap_resolved:
+      artifact: qualification
+      pointer: /overlap_resolved
+    qualification_forecast_bridge_complete:
+      artifact: qualification
+      pointer: /forecast_bridge_complete
+    qualification_valuation_eligible:
+      artifact: qualification
+      pointer: /valuation_eligible
+    qualification_semantic_gate_passed:
+      artifact: qualification
+      pointer: /semantic_gate_passed
+    qualification_deterministic_rerun:
+      artifact: qualification
+      pointer: /deterministic_rerun
+    qualification_review_status_present:
+      artifact: qualification
+      pointer: /exact_hash_human_review_status
+    regression_case_id:
+      artifact: regression_result
+      pointer: /qualification_results/0/case_id
+    regression_research_ready:
+      artifact: regression_result
+      pointer: /qualification_results/0/research_ready
+    regression_candidate_ready:
+      artifact: regression_result
+      pointer: /qualification_results/0/candidate_ready_for_exact_hash_review
+    quality_case_id:
+      artifact: quality_scorecard
+      pointer: /case_id
+    quality_gate_pass:
+      artifact: quality_scorecard
+      pointer: /candidate_ready_for_exact_hash_review
+    generation_id_present:
+      artifact: generation_lock
+      pointer: /generation_id
+    reader_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/reader/sha256
+    quality_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/quality_scorecard/sha256
+    traceability_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/traceability/sha256
+- case_id: replace_with_exact_bundle14r_case_id_2
+  issuer_ticker: replace_with_registered_ticker_2
+  artifacts:
+    case_contract:
+      path: tests/fixtures/r5_bundle14r/cases/replace_case_2.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    qualification:
+      path: reports/p1_6/r5_bundle16r/qualification/qualification/replace_case_2.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    regression_result:
+      path: reports/p1_6/r5_bundle16r/golden_regression/R5_bundle14r_suite_result.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    reader:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_2/reader.md
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    generation_lock:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_2/generation_lock.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    quality_scorecard:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_2/quality_scorecard.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    traceability:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_2/traceability.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+  assertions:
+    contract_case_id:
+      artifact: case_contract
+      pointer: /case_id
+    contract_issuer_ticker:
+      artifact: case_contract
+      pointer: /issuer/ticker
+    qualification_case_id:
+      artifact: qualification
+      pointer: /case_id
+    qualification_evidence_complete:
+      artifact: qualification
+      pointer: /bundle15r_audit/evidence_pack_complete
+    qualification_official_sources_present:
+      artifact: qualification
+      pointer: /reviewed_official_source_count
+    qualification_drivers_present:
+      artifact: qualification
+      pointer: /qualified_driver_ids
+    qualification_overlap_resolved:
+      artifact: qualification
+      pointer: /overlap_resolved
+    qualification_forecast_bridge_complete:
+      artifact: qualification
+      pointer: /forecast_bridge_complete
+    qualification_valuation_eligible:
+      artifact: qualification
+      pointer: /valuation_eligible
+    qualification_semantic_gate_passed:
+      artifact: qualification
+      pointer: /semantic_gate_passed
+    qualification_deterministic_rerun:
+      artifact: qualification
+      pointer: /deterministic_rerun
+    qualification_review_status_present:
+      artifact: qualification
+      pointer: /exact_hash_human_review_status
+    regression_case_id:
+      artifact: regression_result
+      pointer: /qualification_results/1/case_id
+    regression_research_ready:
+      artifact: regression_result
+      pointer: /qualification_results/1/research_ready
+    regression_candidate_ready:
+      artifact: regression_result
+      pointer: /qualification_results/1/candidate_ready_for_exact_hash_review
+    quality_case_id:
+      artifact: quality_scorecard
+      pointer: /case_id
+    quality_gate_pass:
+      artifact: quality_scorecard
+      pointer: /candidate_ready_for_exact_hash_review
+    generation_id_present:
+      artifact: generation_lock
+      pointer: /generation_id
+    reader_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/reader/sha256
+    quality_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/quality_scorecard/sha256
+    traceability_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/traceability/sha256
+- case_id: replace_with_exact_bundle14r_case_id_3
+  issuer_ticker: replace_with_registered_ticker_3
+  artifacts:
+    case_contract:
+      path: tests/fixtures/r5_bundle14r/cases/replace_case_3.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    qualification:
+      path: reports/p1_6/r5_bundle16r/qualification/qualification/replace_case_3.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    regression_result:
+      path: reports/p1_6/r5_bundle16r/golden_regression/R5_bundle14r_suite_result.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    reader:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_3/reader.md
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    generation_lock:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_3/generation_lock.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    quality_scorecard:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_3/quality_scorecard.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    traceability:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_3/traceability.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+  assertions:
+    contract_case_id:
+      artifact: case_contract
+      pointer: /case_id
+    contract_issuer_ticker:
+      artifact: case_contract
+      pointer: /issuer/ticker
+    qualification_case_id:
+      artifact: qualification
+      pointer: /case_id
+    qualification_evidence_complete:
+      artifact: qualification
+      pointer: /bundle15r_audit/evidence_pack_complete
+    qualification_official_sources_present:
+      artifact: qualification
+      pointer: /reviewed_official_source_count
+    qualification_drivers_present:
+      artifact: qualification
+      pointer: /qualified_driver_ids
+    qualification_overlap_resolved:
+      artifact: qualification
+      pointer: /overlap_resolved
+    qualification_forecast_bridge_complete:
+      artifact: qualification
+      pointer: /forecast_bridge_complete
+    qualification_valuation_eligible:
+      artifact: qualification
+      pointer: /valuation_eligible
+    qualification_semantic_gate_passed:
+      artifact: qualification
+      pointer: /semantic_gate_passed
+    qualification_deterministic_rerun:
+      artifact: qualification
+      pointer: /deterministic_rerun
+    qualification_review_status_present:
+      artifact: qualification
+      pointer: /exact_hash_human_review_status
+    regression_case_id:
+      artifact: regression_result
+      pointer: /qualification_results/2/case_id
+    regression_research_ready:
+      artifact: regression_result
+      pointer: /qualification_results/2/research_ready
+    regression_candidate_ready:
+      artifact: regression_result
+      pointer: /qualification_results/2/candidate_ready_for_exact_hash_review
+    quality_case_id:
+      artifact: quality_scorecard
+      pointer: /case_id
+    quality_gate_pass:
+      artifact: quality_scorecard
+      pointer: /candidate_ready_for_exact_hash_review
+    generation_id_present:
+      artifact: generation_lock
+      pointer: /generation_id
+    reader_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/reader/sha256
+    quality_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/quality_scorecard/sha256
+    traceability_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/traceability/sha256
+- case_id: replace_with_exact_bundle14r_case_id_4
+  issuer_ticker: replace_with_registered_ticker_4
+  artifacts:
+    case_contract:
+      path: tests/fixtures/r5_bundle14r/cases/replace_case_4.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    qualification:
+      path: reports/p1_6/r5_bundle16r/qualification/qualification/replace_case_4.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    regression_result:
+      path: reports/p1_6/r5_bundle16r/golden_regression/R5_bundle14r_suite_result.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    reader:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_4/reader.md
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    generation_lock:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_4/generation_lock.json
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    quality_scorecard:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_4/quality_scorecard.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+    traceability:
+      path: reports/p1_6/r5_bundle17r_inputs/replace_case_4/traceability.yaml
+      sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+  assertions:
+    contract_case_id:
+      artifact: case_contract
+      pointer: /case_id
+    contract_issuer_ticker:
+      artifact: case_contract
+      pointer: /issuer/ticker
+    qualification_case_id:
+      artifact: qualification
+      pointer: /case_id
+    qualification_evidence_complete:
+      artifact: qualification
+      pointer: /bundle15r_audit/evidence_pack_complete
+    qualification_official_sources_present:
+      artifact: qualification
+      pointer: /reviewed_official_source_count
+    qualification_drivers_present:
+      artifact: qualification
+      pointer: /qualified_driver_ids
+    qualification_overlap_resolved:
+      artifact: qualification
+      pointer: /overlap_resolved
+    qualification_forecast_bridge_complete:
+      artifact: qualification
+      pointer: /forecast_bridge_complete
+    qualification_valuation_eligible:
+      artifact: qualification
+      pointer: /valuation_eligible
+    qualification_semantic_gate_passed:
+      artifact: qualification
+      pointer: /semantic_gate_passed
+    qualification_deterministic_rerun:
+      artifact: qualification
+      pointer: /deterministic_rerun
+    qualification_review_status_present:
+      artifact: qualification
+      pointer: /exact_hash_human_review_status
+    regression_case_id:
+      artifact: regression_result
+      pointer: /qualification_results/3/case_id
+    regression_research_ready:
+      artifact: regression_result
+      pointer: /qualification_results/3/research_ready
+    regression_candidate_ready:
+      artifact: regression_result
+      pointer: /qualification_results/3/candidate_ready_for_exact_hash_review
+    quality_case_id:
+      artifact: quality_scorecard
+      pointer: /case_id
+    quality_gate_pass:
+      artifact: quality_scorecard
+      pointer: /candidate_ready_for_exact_hash_review
+    generation_id_present:
+      artifact: generation_lock
+      pointer: /generation_id
+    reader_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/reader/sha256
+    quality_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/quality_scorecard/sha256
+    traceability_hash_bound:
+      artifact: generation_lock
+      pointer: /artifacts/traceability/sha256

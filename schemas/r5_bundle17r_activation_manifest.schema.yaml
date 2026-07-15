@@ -1,0 +1,86 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: r5_bundle17r_activation_manifest_v1
+title: R5 Bundle 17R activation manifest
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - baseline_commit
+  - run_id
+  - stage_bindings
+  - cases
+properties:
+  schema_version:
+    const: r5_bundle17r_activation_manifest_v1
+  baseline_commit:
+    type: string
+    pattern: '^[0-9a-f]{40}$'
+  run_id:
+    type: string
+    minLength: 1
+  stage_bindings:
+    type: object
+    additionalProperties: false
+    required: [materialization, qualification, regression]
+    properties:
+      materialization: {$ref: '#/$defs/stageBinding'}
+      qualification: {$ref: '#/$defs/stageBinding'}
+      regression: {$ref: '#/$defs/stageBinding'}
+  cases:
+    type: array
+    minItems: 4
+    maxItems: 4
+    items: {$ref: '#/$defs/caseBinding'}
+$defs:
+  artifactBinding:
+    type: object
+    additionalProperties: false
+    required: [path, sha256]
+    properties:
+      path:
+        type: string
+        minLength: 1
+      sha256:
+        type: string
+        pattern: '^[0-9a-f]{64}$'
+  assertionPointer:
+    oneOf:
+      - type: string
+        pattern: '^/'
+      - type: object
+        additionalProperties: false
+        required: [artifact, pointer]
+        properties:
+          artifact: {type: string, minLength: 1}
+          pointer: {type: string, pattern: '^/'}
+  stageBinding:
+    type: object
+    additionalProperties: false
+    required: [suite, generation_lock, assertions]
+    properties:
+      suite: {$ref: '#/$defs/artifactBinding'}
+      generation_lock: {$ref: '#/$defs/artifactBinding'}
+      assertions:
+        type: object
+        additionalProperties: {$ref: '#/$defs/assertionPointer'}
+  caseBinding:
+    type: object
+    additionalProperties: false
+    required: [case_id, issuer_ticker, artifacts, assertions]
+    properties:
+      case_id: {type: string, minLength: 1}
+      issuer_ticker: {type: string, minLength: 1}
+      artifacts:
+        type: object
+        additionalProperties: {$ref: '#/$defs/artifactBinding'}
+        required:
+          - case_contract
+          - qualification
+          - regression_result
+          - reader
+          - generation_lock
+          - quality_scorecard
+          - traceability
+      assertions:
+        type: object
+        additionalProperties: {$ref: '#/$defs/assertionPointer'}

@@ -1,0 +1,93 @@
+schema_version: r5_bundle17r_activation_policy_v1
+manifest_schema_version: r5_bundle17r_activation_manifest_v1
+bundle_id: R5_BUNDLE17R_ACTIVATION_RECEIPT
+required_ancestor_commit: 7ab395283f432faac7bbc0e83a0b0cf4976ed5dc
+expected_case_count: 4
+minimum_reader_bytes: 1000
+allowed_artifact_roots:
+- reports/
+- bundle14r/
+- bundle15r/
+- bundle16r/
+- bundle17r/
+- tests/fixtures/r5_bundle14r/cases/
+allowed_artifact_extensions:
+- .json
+- .yaml
+- .yml
+- .md
+- .txt
+- .csv
+forbidden_path_fragments:
+- 个股研究报告样例
+- 个股研究案例样例
+- narrative_sample
+- sample_report
+- reports/samples
+- __pycache__
+required_case_artifacts:
+- case_contract
+- qualification
+- regression_result
+- reader
+- generation_lock
+- quality_scorecard
+- traceability
+suite_assertions:
+  materialization:
+    case_count: 4
+    packs_materialized: 4
+    fully_mapped: 4
+    blockers_zero: 0
+    canonical_mutation_false: false
+    sample_quality_false: false
+    p2_false: false
+    suite_hash_bound: $artifact_sha256:suite
+    generation_id_present: $nonempty
+  qualification:
+    case_count: 4
+    packs_complete: 4
+    bundle14_ready: 4
+    blockers_zero: 0
+    canonical_mutation_false: false
+    sample_quality_false: false
+    p2_false: false
+    suite_hash_bound: $artifact_sha256:suite
+    generation_id_present: $nonempty
+  regression:
+    contract_passed: true
+    research_ready_count: 4
+    candidate_ready_count: 4
+    release_authority_false: false
+    canonical_mutation_false: false
+    sample_quality_false: false
+    p2_false: false
+    suite_hash_bound: $artifact_sha256:suite
+    generation_id_present: $nonempty
+case_assertions:
+  contract_case_id: $case_id
+  contract_issuer_ticker: $issuer_ticker
+  qualification_case_id: $case_id
+  qualification_evidence_complete: true
+  qualification_official_sources_present: $nonempty
+  qualification_drivers_present: $nonempty
+  qualification_overlap_resolved: true
+  qualification_forecast_bridge_complete: true
+  qualification_valuation_eligible: true
+  qualification_semantic_gate_passed: true
+  qualification_deterministic_rerun: true
+  qualification_review_status_present: $pre_human_review
+  regression_case_id: $case_id
+  regression_research_ready: true
+  regression_candidate_ready: true
+  quality_case_id: $case_id
+  quality_gate_pass: true
+  generation_id_present: $nonempty
+  reader_hash_bound: $artifact_sha256:reader
+  quality_hash_bound: $artifact_sha256:quality_scorecard
+  traceability_hash_bound: $artifact_sha256:traceability
+release_boundaries:
+  canonical_workflow_state_mutation_allowed: false
+  automated_human_acceptance_allowed: false
+  sample_quality_allowed: false
+  p2_allowed: false

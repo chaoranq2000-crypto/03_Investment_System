@@ -1,0 +1,73 @@
+name: R5 Bundle 17R Activation Receipt
+
+on:
+  push:
+    paths:
+      - "src/research/r5_bundle17r_activation_receipt.py"
+      - "scripts/run_r5_bundle17r_activation_receipt.py"
+      - "config/r5_bundle17r_activation_policy.yaml"
+      - "schemas/r5_bundle17r_activation_manifest.schema.yaml"
+      - "templates/r5_bundle17r_activation_manifest.example.yaml"
+      - "tests/test_r5_bundle17r_activation_receipt.py"
+      - ".github/workflows/r5-bundle17r-activation-receipt.yml"
+  pull_request:
+    paths:
+      - "src/research/r5_bundle17r_activation_receipt.py"
+      - "scripts/run_r5_bundle17r_activation_receipt.py"
+      - "config/r5_bundle17r_activation_policy.yaml"
+      - "schemas/r5_bundle17r_activation_manifest.schema.yaml"
+      - "templates/r5_bundle17r_activation_manifest.example.yaml"
+      - "tests/test_r5_bundle17r_activation_receipt.py"
+      - ".github/workflows/r5-bundle17r-activation-receipt.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract-and-compatibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install focused dependencies
+        run: python -m pip install --upgrade "pytest>=8,<10" "PyYAML>=6,<7" "jsonschema>=4,<5"
+      - name: Compile Bundle 17R
+        run: |
+          python -m py_compile \
+            src/research/r5_bundle17r_activation_receipt.py \
+            scripts/run_r5_bundle17r_activation_receipt.py
+      - name: Run focused and upstream compatibility tests
+        run: |
+          python -m pytest -q \
+            tests/test_r5_bundle17r_activation_receipt.py \
+            tests/test_r5_bundle16r_evidence_pack_materializer.py \
+            tests/test_r5_bundle15r_evidence_qualification.py \
+            tests/test_r5_bundle14r_golden_regression.py
+      - name: Parse YAML contracts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import jsonschema
+          import yaml
+          for path in (
+              Path("config/r5_bundle17r_activation_policy.yaml"),
+              Path("schemas/r5_bundle17r_activation_manifest.schema.yaml"),
+              Path("templates/r5_bundle17r_activation_manifest.example.yaml"),
+              Path(".github/workflows/r5-bundle17r-activation-receipt.yml"),
+          ):
+              yaml.safe_load(path.read_text(encoding="utf-8"))
+          schema = yaml.safe_load(Path("schemas/r5_bundle17r_activation_manifest.schema.yaml").read_text(encoding="utf-8"))
+          example = yaml.safe_load(Path("templates/r5_bundle17r_activation_manifest.example.yaml").read_text(encoding="utf-8"))
+          jsonschema.Draft202012Validator(schema).validate(example)
+          PY
+      - name: Reject issuer-specific tokens in generic runtime
+        run: |
+          ! grep -En "铜冠铜箔|赤峰黄金|药明康德|东阳光|301217|600988|603259|600673" \
+            src/research/r5_bundle17r_activation_receipt.py \
+            scripts/run_r5_bundle17r_activation_receipt.py \
+            config/r5_bundle17r_activation_policy.yaml \
+            schemas/r5_bundle17r_activation_manifest.schema.yaml
