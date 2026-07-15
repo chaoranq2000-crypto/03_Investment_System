@@ -100,4 +100,14 @@ $research-orchestrator 启动细分到个股闭环：AI服务器液冷。
 
 ## 本地持仓记录
 
-项目提供独立的本地持仓台账和可视化页面，可用期初快照记录持仓、通过 Tushare 刷新最新可得收盘价，并用券商交割单按移动加权平均成本重算数量、成本和盈亏。页面同时提供带来源的行业透视和从成交台账自动重放的清仓收益；主题 ETF 在行业属性明确时参与行业汇总，宽基或跨行业 ETF 保留未分类。运行 `.\.conda\investment-system\python.exe -m src.portfolio web` 后可在 `http://127.0.0.1:8765/` 查看；个人数据库及导入文件位于 `data/db/`，默认不进入 Git。完整命令和边界见 `docs/playbooks/PORTFOLIO_TRACKER.md`。
+项目提供独立的本地持仓台账和可视化页面，可用期初快照记录持仓、通过 Tushare 刷新最新可得收盘价，并用券商交割单按移动加权平均成本重算数量、成本和盈亏。页面同时提供带来源的行业透视和从成交台账自动重放的清仓收益；主题 ETF 在行业属性明确时参与行业汇总，宽基或跨行业 ETF 保留未分类。运行 `.\.conda\investment-system\python.exe -m src.portfolio web` 后可在 `http://127.0.0.1:8765/` 查看；个人数据库及导入文件位于 `data/db/`，默认不进入 Git。
+
+台账还可把指定日期的组合状态保存为不可变、可修订的审计快照：
+
+```powershell
+.\.conda\investment-system\python.exe -m src.portfolio snapshot --as-of 2026-07-14
+.\.conda\investment-system\python.exe -m src.portfolio snapshot-list
+.\.conda\investment-system\python.exe -m src.portfolio snapshot-show --as-of 2026-07-14
+```
+
+历史快照只消费不晚于 `as_of` 的交易和收盘价；需要按当时可见信息重放时，可额外传入带时区的 `--knowledge-cutoff`。未定价和陈旧价格会显式保留，重复输入保持同一修订，补录历史交易或行情后产生新修订且旧版本仍可查询。完整命令、字段口径和限制见 `docs/playbooks/PORTFOLIO_TRACKER.md`。

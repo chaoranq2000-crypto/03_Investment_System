@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any, Iterator
 
 from .accounting import (
-    AccountingError,
     build_closed_position_cycles,
     build_ledger_cycles,
     build_position_states,
@@ -31,7 +30,8 @@ from .models import (
 )
 
 
-SCHEMA_VERSION = "6"
+SCHEMA_VERSION = "7"
+SNAPSHOT_ENGINE_VERSION = "portfolio-snapshot-v1"
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS metadata (
@@ -180,6 +180,64 @@ CREATE TABLE IF NOT EXISTS close_prices (
 CREATE INDEX IF NOT EXISTS idx_close_prices_code_date
 ON close_prices(ts_code, trade_date DESC, fetched_at DESC, observation_id DESC);
 
+CREATE TABLE IF NOT EXISTS portfolio_snapshots (
+    snapshot_id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL REFERENCES accounts(account_id),
+    as_of_date TEXT NOT NULL,
+    knowledge_cutoff_at TEXT NOT NULL DEFAULT '',
+    calculated_at TEXT NOT NULL,
+    revision INTEGER NOT NULL CHECK (revision > 0),
+    engine_version TEXT NOT NULL,
+    schema_version TEXT NOT NULL,
+    source_state_hash TEXT NOT NULL,
+    currency TEXT NOT NULL,
+    cost_basis TEXT NOT NULL,
+    market_value TEXT NOT NULL,
+    unrealized_pnl TEXT NOT NULL,
+    realized_pnl_to_date TEXT NOT NULL,
+    cash_balance TEXT,
+    cash_as_of_date TEXT,
+    cash_source TEXT,
+    cash_status TEXT NOT NULL CHECK (cash_status IN ('available', 'unavailable')),
+    position_count INTEGER NOT NULL,
+    priced_position_count INTEGER NOT NULL,
+    unpriced_position_count INTEGER NOT NULL,
+    valuation_complete INTEGER NOT NULL CHECK (valuation_complete IN (0, 1)),
+    created_from_json TEXT NOT NULL,
+    UNIQUE(account_id, as_of_date, knowledge_cutoff_at, engine_version, source_state_hash),
+    UNIQUE(account_id, as_of_date, revision)
+);
+
+CREATE INDEX IF NOT EXISTS idx_portfolio_snapshots_account_date
+ON portfolio_snapshots(account_id, as_of_date DESC, revision DESC);
+
+CREATE TABLE IF NOT EXISTS position_snapshots (
+    snapshot_id TEXT NOT NULL REFERENCES portfolio_snapshots(snapshot_id),
+    ts_code TEXT NOT NULL REFERENCES instruments(ts_code),
+    quantity TEXT NOT NULL,
+    average_cost TEXT,
+    cost_basis TEXT NOT NULL,
+    price TEXT,
+    price_date TEXT,
+    price_source TEXT,
+    staleness_days INTEGER,
+    valuation_status TEXT NOT NULL CHECK (
+        valuation_status IN ('priced', 'stale', 'unpriced')
+    ),
+    market_value TEXT,
+    unrealized_pnl TEXT,
+    portfolio_weight TEXT,
+    industry_name TEXT NOT NULL DEFAULT '',
+    industry_source TEXT NOT NULL DEFAULT '',
+    engine_version TEXT NOT NULL,
+    source_state_hash TEXT NOT NULL,
+    lineage_json TEXT NOT NULL,
+    PRIMARY KEY(snapshot_id, ts_code)
+);
+
+CREATE INDEX IF NOT EXISTS idx_position_snapshots_code
+ON position_snapshots(ts_code, snapshot_id);
+
 CREATE TABLE IF NOT EXISTS daily_bar_observations (
     observation_id INTEGER PRIMARY KEY AUTOINCREMENT,
     ts_code TEXT NOT NULL REFERENCES instruments(ts_code),
@@ -260,6 +318,15 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+def _canonical_json(value: Any) -> str:
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
 class PortfolioStore:
     def __init__(self, path: str | Path = "data/db/portfolio.sqlite3") -> None:
         self.path = Path(path)
@@ -293,7 +360,7 @@ class PortfolioStore:
             connection.close()
 
     def _backup_before_migration(self, current_version: str | None) -> Path | None:
-        if current_version not in {"1", "2", "3", "4", "5"} or not self.path.is_file():
+        if current_version not in {"1", "2", "3", "4", "5", "6"} or not self.path.is_file():
             return None
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
         backup_path = self.path.with_name(
@@ -308,7 +375,13 @@ class PortfolioStore:
             source.close()
         return backup_path
 
-    def initialize(self, account_id: str = "default", account_name: str = "默认账户") -> None:
+    def initialize(
+        self,
+        account_id: str = "default",
+        account_name: str = "默认账户",
+        *,
+        create_account: bool = True,
+    ) -> None:
         current_version = self._schema_version_on_disk()
         self._backup_before_migration(current_version)
         now = utc_now()
@@ -370,6 +443,14 @@ class PortfolioStore:
             if row is not None and row["value"] == "5":
                 connection.execute(
                     "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
+                    ("6",),
+                )
+                row = connection.execute(
+                    "SELECT value FROM metadata WHERE key = 'schema_version'"
+                ).fetchone()
+            if row is not None and row["value"] == "6":
+                connection.execute(
+                    "UPDATE metadata SET value = ? WHERE key = 'schema_version'",
                     (SCHEMA_VERSION,),
                 )
                 row = connection.execute(
@@ -379,13 +460,14 @@ class PortfolioStore:
                 raise RuntimeError(
                     f"不支持的持仓数据库版本: {None if row is None else row['value']}"
                 )
-            connection.execute(
-                """
-                INSERT OR IGNORE INTO accounts(account_id, name, base_currency, created_at)
-                VALUES (?, ?, 'CNY', ?)
-                """,
-                (account_id, account_name, now),
-            )
+            if create_account:
+                connection.execute(
+                    """
+                    INSERT OR IGNORE INTO accounts(account_id, name, base_currency, created_at)
+                    VALUES (?, ?, 'CNY', ?)
+                    """,
+                    (account_id, account_name, now),
+                )
             connection.commit()
 
     def account(self, account_id: str) -> sqlite3.Row:
@@ -1610,6 +1692,589 @@ class PortfolioStore:
             ),
         }
         return result, summary
+
+    @staticmethod
+    def _snapshot_cutoff_text(knowledge_cutoff_at: datetime | None) -> str:
+        if knowledge_cutoff_at is None:
+            return ""
+        if knowledge_cutoff_at.tzinfo is None:
+            raise ValueError("knowledge_cutoff_at 必须包含时区")
+        return knowledge_cutoff_at.astimezone(timezone.utc).isoformat(timespec="seconds")
+
+    @staticmethod
+    def _snapshot_ledger(
+        connection: sqlite3.Connection,
+        account_id: str,
+        as_of_date: date,
+        cutoff_text: str,
+    ) -> list[sqlite3.Row]:
+        params: list[Any] = [account_id, as_of_date.isoformat()]
+        known_filter = ""
+        if cutoff_text:
+            known_filter = (
+                "AND julianday(ledger_entries.created_at) <= julianday(?)"
+            )
+            params.append(cutoff_text)
+        return list(
+            connection.execute(
+                f"""
+                SELECT ledger_entries.*,
+                    import_batches.source_name AS import_source_name,
+                    import_batches.source_sha256 AS import_source_sha256,
+                    import_batches.broker AS import_broker,
+                    import_batches.imported_at AS import_known_at
+                FROM ledger_entries
+                LEFT JOIN import_batches
+                  ON import_batches.batch_id = ledger_entries.import_batch_id
+                WHERE ledger_entries.account_id = ?
+                  AND ledger_entries.event_date <= ?
+                  {known_filter}
+                ORDER BY ledger_entries.event_date,
+                    CASE WHEN ledger_entries.event_time = ''
+                        THEN '99:99:99' ELSE ledger_entries.event_time END,
+                    ledger_entries.entry_id
+                """,
+                params,
+            )
+        )
+
+    @staticmethod
+    def _snapshot_price(
+        connection: sqlite3.Connection,
+        ts_code: str,
+        as_of_date: date,
+        cutoff_text: str,
+    ) -> sqlite3.Row | None:
+        params: list[Any] = [ts_code, as_of_date.isoformat()]
+        known_filter = ""
+        if cutoff_text:
+            known_filter = "AND julianday(fetched_at) <= julianday(?)"
+            params.append(cutoff_text)
+        return connection.execute(
+            f"""
+            SELECT * FROM close_prices
+            WHERE ts_code = ? AND trade_date <= ? {known_filter}
+            ORDER BY trade_date DESC, fetched_at DESC, observation_id DESC
+            LIMIT 1
+            """,
+            params,
+        ).fetchone()
+
+    @staticmethod
+    def _snapshot_cash(
+        connection: sqlite3.Connection,
+        account_id: str,
+        as_of_date: date,
+        cutoff_text: str,
+    ) -> sqlite3.Row | None:
+        params: list[Any] = [account_id, as_of_date.isoformat()]
+        known_filter = ""
+        if cutoff_text:
+            known_filter = "AND julianday(recorded_at) <= julianday(?)"
+            params.append(cutoff_text)
+        return connection.execute(
+            f"""
+            SELECT * FROM cash_balance_snapshots
+            WHERE account_id = ? AND as_of_date <= ? {known_filter}
+            ORDER BY as_of_date DESC, recorded_at DESC, snapshot_id DESC
+            LIMIT 1
+            """,
+            params,
+        ).fetchone()
+
+    @staticmethod
+    def _snapshot_from_row(
+        connection: sqlite3.Connection, row: sqlite3.Row
+    ) -> dict[str, Any]:
+        snapshot = dict(row)
+        snapshot["knowledge_cutoff_at"] = snapshot["knowledge_cutoff_at"] or None
+        snapshot["valuation_complete"] = bool(snapshot["valuation_complete"])
+        snapshot["created_from"] = json.loads(snapshot.pop("created_from_json"))
+        for field in (
+            "cost_basis",
+            "market_value",
+            "unrealized_pnl",
+            "realized_pnl_to_date",
+            "cash_balance",
+        ):
+            value = snapshot[field]
+            snapshot[field] = Decimal(value) if value is not None else None
+
+        positions: list[dict[str, Any]] = []
+        for position_row in connection.execute(
+            "SELECT * FROM position_snapshots WHERE snapshot_id = ? ORDER BY ts_code",
+            (row["snapshot_id"],),
+        ):
+            position = dict(position_row)
+            for field in (
+                "quantity",
+                "average_cost",
+                "cost_basis",
+                "price",
+                "market_value",
+                "unrealized_pnl",
+                "portfolio_weight",
+            ):
+                value = position[field]
+                position[field] = Decimal(value) if value is not None else None
+            position["lineage"] = json.loads(position.pop("lineage_json"))
+            positions.append(position)
+        snapshot["positions"] = positions
+        return snapshot
+
+    @staticmethod
+    def _snapshot_summary_from_row(row: sqlite3.Row) -> dict[str, Any]:
+        return {
+            "snapshot_id": row["snapshot_id"],
+            "account_id": row["account_id"],
+            "as_of_date": row["as_of_date"],
+            "knowledge_cutoff_at": row["knowledge_cutoff_at"] or None,
+            "calculated_at": row["calculated_at"],
+            "revision": row["revision"],
+            "engine_version": row["engine_version"],
+            "source_state_hash": row["source_state_hash"],
+            "currency": row["currency"],
+            "cost_basis": Decimal(row["cost_basis"]),
+            "market_value": Decimal(row["market_value"]),
+            "unrealized_pnl": Decimal(row["unrealized_pnl"]),
+            "realized_pnl_to_date": Decimal(row["realized_pnl_to_date"]),
+            "position_count": row["position_count"],
+            "priced_position_count": row["priced_position_count"],
+            "unpriced_position_count": row["unpriced_position_count"],
+            "valuation_complete": bool(row["valuation_complete"]),
+        }
+
+    def build_snapshot(
+        self,
+        account_id: str,
+        as_of_date: date,
+        *,
+        knowledge_cutoff_at: datetime | None = None,
+    ) -> dict[str, Any]:
+        cutoff_text = self._snapshot_cutoff_text(knowledge_cutoff_at)
+        as_of_text = as_of_date.isoformat()
+
+        with self.connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            try:
+                account = connection.execute(
+                    "SELECT * FROM accounts WHERE account_id = ?", (account_id,)
+                ).fetchone()
+                if account is None:
+                    raise ValueError(f"账户不存在: {account_id}")
+
+                ledger = self._snapshot_ledger(
+                    connection, account_id, as_of_date, cutoff_text
+                )
+                states = build_position_states(ledger)
+                open_codes = sorted(
+                    code for code, state in states.items() if state.quantity > ZERO
+                )
+                instruments: dict[str, sqlite3.Row] = {}
+                prices: dict[str, sqlite3.Row | None] = {}
+                for ts_code in open_codes:
+                    instrument = connection.execute(
+                        "SELECT * FROM instruments WHERE ts_code = ?", (ts_code,)
+                    ).fetchone()
+                    if instrument is None:
+                        raise RuntimeError(f"持仓证券缺少 instrument 记录: {ts_code}")
+                    instruments[ts_code] = instrument
+                    prices[ts_code] = self._snapshot_price(
+                        connection, ts_code, as_of_date, cutoff_text
+                    )
+                cash = self._snapshot_cash(
+                    connection, account_id, as_of_date, cutoff_text
+                )
+
+                ledger_inputs = [
+                    {
+                        "event_date": row["event_date"],
+                        "event_time": row["event_time"],
+                        "event_type": row["event_type"],
+                        "ts_code": row["ts_code"],
+                        "quantity": row["quantity"],
+                        "price": row["price"],
+                        "gross_amount": row["gross_amount"],
+                        "fees": row["fees"],
+                        "total_cost": row["total_cost"],
+                        "cash_amount": row["cash_amount"],
+                        "external_id": row["external_id"],
+                        "dedupe_key": row["dedupe_key"],
+                        "source_row": row["source_row"],
+                        "note": row["note"],
+                        "known_at": row["created_at"],
+                        "source_name": row["import_source_name"],
+                        "source_sha256": row["import_source_sha256"],
+                        "broker": row["import_broker"],
+                    }
+                    for row in ledger
+                ]
+                instrument_inputs = [
+                    {
+                        "ts_code": code,
+                        "name": instruments[code]["name"],
+                        "asset_type": instruments[code]["asset_type"],
+                        "exchange": instruments[code]["exchange"],
+                        "currency": instruments[code]["currency"],
+                        "industry_name": instruments[code]["industry_name"],
+                        "industry_source": instruments[code]["industry_source"],
+                        "industry_updated_at": instruments[code]["industry_updated_at"],
+                    }
+                    for code in open_codes
+                ]
+                price_inputs = [
+                    {
+                        "ts_code": code,
+                        "trade_date": prices[code]["trade_date"],
+                        "close": prices[code]["close"],
+                        "source": prices[code]["source"],
+                        "known_at": prices[code]["fetched_at"],
+                    }
+                    for code in open_codes
+                    if prices[code] is not None
+                ]
+                cash_input = (
+                    {
+                        "as_of_date": cash["as_of_date"],
+                        "amount": cash["amount"],
+                        "source": cash["source"],
+                        "note": cash["note"],
+                        "known_at": cash["recorded_at"],
+                    }
+                    if cash is not None
+                    else None
+                )
+                source_document = {
+                    "account": {
+                        "account_id": account_id,
+                        "currency": account["base_currency"],
+                    },
+                    "as_of_date": as_of_text,
+                    "knowledge_cutoff_at": cutoff_text or None,
+                    "engine_version": SNAPSHOT_ENGINE_VERSION,
+                    "schema_version": SCHEMA_VERSION,
+                    "policies": {
+                        "business_cutoff": "event_date<=as_of_date",
+                        "known_time": (
+                            "created_at/fetched_at/recorded_at<=knowledge_cutoff_at"
+                            if cutoff_text
+                            else "current_database_state"
+                        ),
+                        "price_selection": "latest_trade_date_not_after_as_of",
+                        "staleness_days": "calendar_days",
+                        "industry": "current_metadata_not_point_in_time",
+                    },
+                    "ledger": ledger_inputs,
+                    "instruments": instrument_inputs,
+                    "selected_prices": price_inputs,
+                    "cash": cash_input,
+                }
+                source_state_hash = hashlib.sha256(
+                    _canonical_json(source_document).encode("utf-8")
+                ).hexdigest()
+
+                existing = connection.execute(
+                    """
+                    SELECT * FROM portfolio_snapshots
+                    WHERE account_id = ? AND as_of_date = ?
+                      AND knowledge_cutoff_at = ? AND engine_version = ?
+                      AND source_state_hash = ?
+                    """,
+                    (
+                        account_id,
+                        as_of_text,
+                        cutoff_text,
+                        SNAPSHOT_ENGINE_VERSION,
+                        source_state_hash,
+                    ),
+                ).fetchone()
+                if existing is not None:
+                    result = self._snapshot_from_row(connection, existing)
+                    connection.commit()
+                    return result
+
+                position_rows: list[dict[str, Any]] = []
+                for ts_code in open_codes:
+                    state = states[ts_code]
+                    instrument = instruments[ts_code]
+                    quote = prices[ts_code]
+                    price = Decimal(quote["close"]) if quote is not None else None
+                    price_date = (
+                        date.fromisoformat(quote["trade_date"])
+                        if quote is not None
+                        else None
+                    )
+                    staleness_days = (
+                        (as_of_date - price_date).days if price_date is not None else None
+                    )
+                    valuation_status = (
+                        "unpriced"
+                        if price is None
+                        else "stale" if staleness_days and staleness_days > 0 else "priced"
+                    )
+                    market_value = price * state.quantity if price is not None else None
+                    unrealized_pnl = (
+                        market_value - state.remaining_cost
+                        if market_value is not None
+                        else None
+                    )
+                    transaction_refs = [
+                        {
+                            "dedupe_key": row["dedupe_key"],
+                            "effective_date": row["event_date"],
+                            "known_at": row["created_at"],
+                            "source_sha256": row["import_source_sha256"],
+                        }
+                        for row in ledger
+                        if row["ts_code"] == ts_code
+                    ]
+                    lineage = {
+                        "transaction_cutoff": as_of_text,
+                        "knowledge_cutoff_at": cutoff_text or None,
+                        "transactions": transaction_refs,
+                        "price": (
+                            {
+                                "trade_date": quote["trade_date"],
+                                "source": quote["source"],
+                                "known_at": quote["fetched_at"],
+                            }
+                            if quote is not None
+                            else None
+                        ),
+                        "industry": {
+                            "name": instrument["industry_name"],
+                            "source": instrument["industry_source"],
+                            "updated_at": instrument["industry_updated_at"],
+                            "point_in_time": False,
+                        },
+                    }
+                    position_rows.append(
+                        {
+                            "ts_code": ts_code,
+                            "quantity": state.quantity,
+                            "average_cost": state.average_cost,
+                            "cost_basis": state.remaining_cost,
+                            "price": price,
+                            "price_date": quote["trade_date"] if quote is not None else None,
+                            "price_source": quote["source"] if quote is not None else None,
+                            "staleness_days": staleness_days,
+                            "valuation_status": valuation_status,
+                            "market_value": market_value,
+                            "unrealized_pnl": unrealized_pnl,
+                            "portfolio_weight": None,
+                            "industry_name": instrument["industry_name"],
+                            "industry_source": instrument["industry_source"],
+                            "lineage": lineage,
+                        }
+                    )
+
+                cost_basis = sum(
+                    (item["cost_basis"] for item in position_rows), ZERO
+                )
+                market_value = sum(
+                    (
+                        item["market_value"]
+                        for item in position_rows
+                        if item["market_value"] is not None
+                    ),
+                    ZERO,
+                )
+                unrealized_pnl = sum(
+                    (
+                        item["unrealized_pnl"]
+                        for item in position_rows
+                        if item["unrealized_pnl"] is not None
+                    ),
+                    ZERO,
+                )
+                realized_pnl = sum(
+                    (state.realized_pnl for state in states.values()), ZERO
+                )
+                priced_count = sum(
+                    item["valuation_status"] != "unpriced" for item in position_rows
+                )
+                unpriced_count = len(position_rows) - priced_count
+                valuation_complete = unpriced_count == 0
+                if valuation_complete and market_value != ZERO:
+                    for item in position_rows:
+                        item["portfolio_weight"] = item["market_value"] / market_value
+
+                revision = int(
+                    connection.execute(
+                        """
+                        SELECT COALESCE(MAX(revision), 0) + 1 AS next_revision
+                        FROM portfolio_snapshots
+                        WHERE account_id = ? AND as_of_date = ?
+                        """,
+                        (account_id, as_of_text),
+                    ).fetchone()["next_revision"]
+                )
+                snapshot_identity = _canonical_json(
+                    {
+                        "account_id": account_id,
+                        "as_of_date": as_of_text,
+                        "knowledge_cutoff_at": cutoff_text or None,
+                        "engine_version": SNAPSHOT_ENGINE_VERSION,
+                        "source_state_hash": source_state_hash,
+                    }
+                )
+                snapshot_id = "ps_" + hashlib.sha256(
+                    snapshot_identity.encode("utf-8")
+                ).hexdigest()[:32]
+                calculated_at = utc_now()
+                created_from = {
+                    "ledger_entry_count": len(ledger_inputs),
+                    "selected_price_count": len(price_inputs),
+                    "cash_status": "available" if cash is not None else "unavailable",
+                    "ledger_scope": "recorded_ledger_since_baseline",
+                    "source_document_sha256": source_state_hash,
+                }
+                connection.execute(
+                    """
+                    INSERT INTO portfolio_snapshots(
+                        snapshot_id, account_id, as_of_date, knowledge_cutoff_at,
+                        calculated_at, revision, engine_version, schema_version,
+                        source_state_hash, currency, cost_basis, market_value,
+                        unrealized_pnl, realized_pnl_to_date, cash_balance,
+                        cash_as_of_date, cash_source, cash_status, position_count,
+                        priced_position_count, unpriced_position_count,
+                        valuation_complete, created_from_json
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        snapshot_id,
+                        account_id,
+                        as_of_text,
+                        cutoff_text,
+                        calculated_at,
+                        revision,
+                        SNAPSHOT_ENGINE_VERSION,
+                        SCHEMA_VERSION,
+                        source_state_hash,
+                        account["base_currency"],
+                        decimal_to_text(cost_basis),
+                        decimal_to_text(market_value),
+                        decimal_to_text(unrealized_pnl),
+                        decimal_to_text(realized_pnl),
+                        Decimal(cash["amount"]).to_eng_string() if cash is not None else None,
+                        cash["as_of_date"] if cash is not None else None,
+                        cash["source"] if cash is not None else None,
+                        "available" if cash is not None else "unavailable",
+                        len(position_rows),
+                        priced_count,
+                        unpriced_count,
+                        int(valuation_complete),
+                        _canonical_json(created_from),
+                    ),
+                )
+                for item in position_rows:
+                    connection.execute(
+                        """
+                        INSERT INTO position_snapshots(
+                            snapshot_id, ts_code, quantity, average_cost, cost_basis,
+                            price, price_date, price_source, staleness_days,
+                            valuation_status, market_value, unrealized_pnl,
+                            portfolio_weight, industry_name, industry_source,
+                            engine_version, source_state_hash, lineage_json
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            snapshot_id,
+                            item["ts_code"],
+                            decimal_to_text(item["quantity"]),
+                            decimal_to_text(item["average_cost"]),
+                            decimal_to_text(item["cost_basis"]),
+                            decimal_to_text(item["price"]),
+                            item["price_date"],
+                            item["price_source"],
+                            item["staleness_days"],
+                            item["valuation_status"],
+                            decimal_to_text(item["market_value"]),
+                            decimal_to_text(item["unrealized_pnl"]),
+                            decimal_to_text(item["portfolio_weight"]),
+                            item["industry_name"],
+                            item["industry_source"],
+                            SNAPSHOT_ENGINE_VERSION,
+                            source_state_hash,
+                            _canonical_json(item["lineage"]),
+                        ),
+                    )
+                connection.commit()
+            except Exception:
+                connection.rollback()
+                raise
+
+        snapshot = self.get_snapshot(account_id, as_of_date, revision=revision)
+        if snapshot is None:
+            raise RuntimeError(f"快照写入后无法读取: {snapshot_id}")
+        return snapshot
+
+    def get_snapshot(
+        self,
+        account_id: str,
+        as_of_date: date,
+        *,
+        revision: int | None = None,
+    ) -> dict[str, Any] | None:
+        if revision is not None and revision < 1:
+            raise ValueError("revision 必须大于 0")
+        with self.connect() as connection:
+            account = connection.execute(
+                "SELECT 1 FROM accounts WHERE account_id = ?", (account_id,)
+            ).fetchone()
+            if account is None:
+                raise ValueError(f"账户不存在: {account_id}")
+            if revision is None:
+                row = connection.execute(
+                    """
+                    SELECT * FROM portfolio_snapshots
+                    WHERE account_id = ? AND as_of_date = ?
+                    ORDER BY revision DESC LIMIT 1
+                    """,
+                    (account_id, as_of_date.isoformat()),
+                ).fetchone()
+            else:
+                row = connection.execute(
+                    """
+                    SELECT * FROM portfolio_snapshots
+                    WHERE account_id = ? AND as_of_date = ? AND revision = ?
+                    """,
+                    (account_id, as_of_date.isoformat(), revision),
+                ).fetchone()
+            return self._snapshot_from_row(connection, row) if row is not None else None
+
+    def list_snapshots(
+        self,
+        account_id: str,
+        *,
+        date_from: date | None = None,
+        date_to: date | None = None,
+    ) -> list[dict[str, Any]]:
+        if date_from is not None and date_to is not None and date_from > date_to:
+            raise ValueError("date_from 不能晚于 date_to")
+        with self.connect() as connection:
+            account = connection.execute(
+                "SELECT 1 FROM accounts WHERE account_id = ?", (account_id,)
+            ).fetchone()
+            if account is None:
+                raise ValueError(f"账户不存在: {account_id}")
+            params: list[Any] = [account_id]
+            filters = ["account_id = ?"]
+            if date_from is not None:
+                filters.append("as_of_date >= ?")
+                params.append(date_from.isoformat())
+            if date_to is not None:
+                filters.append("as_of_date <= ?")
+                params.append(date_to.isoformat())
+            rows = connection.execute(
+                f"""
+                SELECT * FROM portfolio_snapshots
+                WHERE {' AND '.join(filters)}
+                ORDER BY as_of_date DESC, revision DESC
+                """,
+                params,
+            )
+            return [self._snapshot_summary_from_row(row) for row in rows]
 
     def closed_position_report(
         self, account_id: str, as_of: date | None = None

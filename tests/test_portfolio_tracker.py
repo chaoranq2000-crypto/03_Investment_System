@@ -1574,7 +1574,7 @@ def test_store_migrates_v1_database_and_persists_industry(tmp_path):
     assert len(list(tmp_path.glob("portfolio.sqlite3-v1-backup-*"))) == 1
 
 
-@pytest.mark.parametrize("legacy_version", ["2", "3", "4", "5"])
+@pytest.mark.parametrize("legacy_version", ["2", "3", "4", "5", "6"])
 def test_store_migrates_legacy_databases_to_current_version_with_backup(
     tmp_path, legacy_version
 ):
@@ -1605,6 +1605,8 @@ def test_store_migrates_legacy_databases_to_current_version_with_backup(
     assert "minute_refresh_batches" in tables
     assert "minute_bar_observations" in tables
     assert "internal_transfer_reconciliations" in tables
+    assert "portfolio_snapshots" in tables
+    assert "position_snapshots" in tables
     assert len(list(tmp_path.glob(f"portfolio.sqlite3-v{legacy_version}-backup-*"))) == 1
 
 

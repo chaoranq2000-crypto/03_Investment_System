@@ -4,9 +4,10 @@ import argparse
 import csv
 import io
 import json
+import sqlite3
 import sys
 import unicodedata
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from typing import Any, Sequence
@@ -27,6 +28,19 @@ def _sheet(value: str | None) -> str | int | None:
     if value is None:
         return None
     return int(value) if value.isdigit() else value
+
+
+def _knowledge_cutoff(value: str | None) -> datetime | None:
+    if value is None:
+        return None
+    normalized = value.strip().replace("Z", "+00:00")
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise ValueError("knowledge cutoff 必须是 ISO 8601 日期时间") from exc
+    if parsed.tzinfo is None:
+        raise ValueError("knowledge cutoff 必须包含时区，例如 +08:00 或 Z")
+    return parsed
 
 
 def _quantized(value: Decimal | None, places: int, *, grouping: bool = False) -> str:
@@ -340,6 +354,125 @@ def command_cash(args: argparse.Namespace, store: PortfolioStore) -> int:
         for row in rows
     ]
     _emit(render_table(headers, table_rows, right_columns={1}), args.output)
+    return 0
+
+
+def _snapshot_table(snapshot: dict[str, Any]) -> str:
+    headers = [
+        "代码",
+        "数量",
+        "成本",
+        "价格",
+        "价格日",
+        "状态",
+        "市值",
+        "浮动盈亏",
+        "权重",
+    ]
+    rows = [
+        [
+            row["ts_code"],
+            _quantized(row["quantity"], 3, grouping=True),
+            _quantized(row["cost_basis"], 3, grouping=True),
+            _quantized(row["price"], 4),
+            row["price_date"] or "MISSING",
+            row["valuation_status"],
+            _quantized(row["market_value"], 3, grouping=True),
+            _quantized(row["unrealized_pnl"], 3, grouping=True),
+            (
+                f"{_quantized(row['portfolio_weight'] * Decimal('100'), 2)}%"
+                if row["portfolio_weight"] is not None
+                else "MISSING"
+            ),
+        ]
+        for row in snapshot["positions"]
+    ]
+    table = render_table(headers, rows, right_columns={1, 2, 3, 6, 7, 8})
+    summary = [
+        "",
+        f"snapshot_id: {snapshot['snapshot_id']}",
+        f"as_of: {snapshot['as_of_date']}  revision: {snapshot['revision']}",
+        f"knowledge_cutoff_at: {snapshot['knowledge_cutoff_at'] or 'current_database_state'}",
+        f"cost_basis: {_quantized(snapshot['cost_basis'], 3, grouping=True)} {snapshot['currency']}",
+        f"priced_market_value: {_quantized(snapshot['market_value'], 3, grouping=True)} {snapshot['currency']}",
+        f"unrealized_pnl_priced: {_quantized(snapshot['unrealized_pnl'], 3, grouping=True)} {snapshot['currency']}",
+        f"priced / unpriced: {snapshot['priced_position_count']} / {snapshot['unpriced_position_count']}",
+        f"valuation_complete: {str(snapshot['valuation_complete']).lower()}",
+        f"source_state_hash: {snapshot['source_state_hash']}",
+    ]
+    return table + "\n" + "\n".join(summary)
+
+
+def command_snapshot(args: argparse.Namespace, store: PortfolioStore) -> int:
+    as_of = parse_date_value(args.as_of, field="快照日期")
+    snapshot = store.build_snapshot(
+        args.account,
+        as_of,
+        knowledge_cutoff_at=_knowledge_cutoff(args.knowledge_cutoff),
+    )
+    text = (
+        json.dumps(_raw(snapshot), ensure_ascii=False, indent=2)
+        if args.format == "json"
+        else _snapshot_table(snapshot)
+    )
+    _emit(text, args.output)
+    return 0
+
+
+def command_snapshot_show(args: argparse.Namespace, store: PortfolioStore) -> int:
+    as_of = parse_date_value(args.as_of, field="快照日期")
+    snapshot = store.get_snapshot(args.account, as_of, revision=args.revision)
+    if snapshot is None:
+        suffix = f" revision={args.revision}" if args.revision is not None else ""
+        raise ValueError(f"未找到快照: {args.account} {as_of.isoformat()}{suffix}")
+    text = (
+        json.dumps(_raw(snapshot), ensure_ascii=False, indent=2)
+        if args.format == "json"
+        else _snapshot_table(snapshot)
+    )
+    _emit(text, args.output)
+    return 0
+
+
+def command_snapshot_list(args: argparse.Namespace, store: PortfolioStore) -> int:
+    date_from = (
+        parse_date_value(args.date_from, field="快照起始日")
+        if args.date_from
+        else None
+    )
+    date_to = (
+        parse_date_value(args.date_to, field="快照结束日") if args.date_to else None
+    )
+    rows = store.list_snapshots(
+        args.account,
+        date_from=date_from,
+        date_to=date_to,
+    )
+    if args.format == "json":
+        _emit(json.dumps(_raw(rows), ensure_ascii=False, indent=2), args.output)
+        return 0
+    headers = [
+        "日期",
+        "修订",
+        "持仓",
+        "未定价",
+        "估值完整",
+        "已定价市值",
+        "source hash",
+    ]
+    table_rows = [
+        [
+            row["as_of_date"],
+            str(row["revision"]),
+            str(row["position_count"]),
+            str(row["unpriced_position_count"]),
+            str(row["valuation_complete"]).lower(),
+            _quantized(row["market_value"], 3, grouping=True),
+            row["source_state_hash"][:12],
+        ]
+        for row in rows
+    ]
+    _emit(render_table(headers, table_rows, right_columns={1, 2, 3, 5}), args.output)
     return 0
 
 
@@ -704,6 +837,40 @@ def build_parser() -> argparse.ArgumentParser:
     cash_parser.add_argument("--output", help="可选输出文件")
     cash_parser.set_defaults(handler=command_cash)
 
+    snapshot_parser = subparsers.add_parser(
+        "snapshot", help="按业务时点和信息可见截止生成不可变组合快照"
+    )
+    snapshot_parser.add_argument("--as-of", required=True, help="业务日期 YYYY-MM-DD")
+    snapshot_parser.add_argument(
+        "--knowledge-cutoff",
+        help="可选 ISO 8601 信息可见截止；不传表示当前数据库已知状态",
+    )
+    snapshot_parser.add_argument("--format", choices=("table", "json"), default="table")
+    snapshot_parser.add_argument("--output", help="可选输出文件")
+    snapshot_parser.set_defaults(handler=command_snapshot)
+
+    snapshot_show_parser = subparsers.add_parser(
+        "snapshot-show", help="读取已保存快照；默认返回该日期最新修订"
+    )
+    snapshot_show_parser.add_argument("--as-of", required=True, help="业务日期 YYYY-MM-DD")
+    snapshot_show_parser.add_argument("--revision", type=int, help="指定修订号")
+    snapshot_show_parser.add_argument(
+        "--format", choices=("table", "json"), default="table"
+    )
+    snapshot_show_parser.add_argument("--output", help="可选输出文件")
+    snapshot_show_parser.set_defaults(handler=command_snapshot_show)
+
+    snapshot_list_parser = subparsers.add_parser(
+        "snapshot-list", help="列出已保存的组合快照与修订"
+    )
+    snapshot_list_parser.add_argument("--from", dest="date_from", help="起始日 YYYY-MM-DD")
+    snapshot_list_parser.add_argument("--to", dest="date_to", help="结束日 YYYY-MM-DD")
+    snapshot_list_parser.add_argument(
+        "--format", choices=("table", "json"), default="table"
+    )
+    snapshot_list_parser.add_argument("--output", help="可选输出文件")
+    snapshot_list_parser.set_defaults(handler=command_snapshot_list)
+
     show_parser = subparsers.add_parser("show", help="查看当前或历史时点持仓盈亏")
     show_parser.add_argument("--as-of", help="按历史日期重放台账与行情")
     show_parser.add_argument("--format", choices=("table", "json", "csv"), default="table")
@@ -757,7 +924,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     store = PortfolioStore(args.db)
     try:
-        store.initialize(args.account, args.account_name)
+        if args.command in {"snapshot", "snapshot-show", "snapshot-list"}:
+            store.initialize(create_account=False)
+        else:
+            store.initialize(args.account, args.account_name)
         return int(args.handler(args, store))
     except (
         ValueError,
@@ -767,6 +937,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         IntradayFetchError,
         PriceFetchError,
         IndustryFetchError,
+        sqlite3.Error,
         OSError,
     ) as exc:
         print(f"错误: {exc}", file=sys.stderr)
