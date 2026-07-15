@@ -1,0 +1,328 @@
+schema_version: r5_bundle14r_case_v1
+case_id: golden_gold_mining_cycle
+issuer:
+  name: 赤峰黄金
+  ticker: 600988.SH
+  jurisdiction: CN
+benchmark_policy:
+  sample_reports_role: narrative_dimensions_only
+  sample_text_as_evidence: prohibited
+  official_evidence_role: required
+release_policy:
+  automated_sample_quality_allowed: false
+  automated_p2_allowed: false
+  workflow_state_mutation_allowed: false
+  exact_hash_human_review_required: true
+required_source_classes:
+- issuer_exchange_filings
+- issuer_investor_relations_records
+- peer_official_disclosures
+- industry_regulator_or_association
+- market_data_primary_or_licensed
+forecast_contract:
+  horizon_years:
+  - 2026
+  - 2027
+  - 2028
+  minimum_segment_revenue_coverage: 0.8
+  minimum_segment_gross_profit_coverage: 0.8
+  requires_cash_flow_bridge: true
+  requires_working_capital_bridge: true
+  requires_driver_to_statement_reconciliation: true
+valuation_methods:
+- method: reverse_valuation
+  eligibility: conditional
+  gate: market value, share count, forecast definition, and implied operating assumptions
+    reconcile
+  automatically_eligible: false
+- method: peer_multiples
+  eligibility: conditional
+  gate: at least three peers pass definition, period, metric, and confidence compatibility
+  automatically_eligible: false
+- method: dcf_or_sotp
+  eligibility: conditional
+  gate: cash-flow or segment economics, overlap elimination, discount inputs, and
+    terminal assumptions qualify independently
+  automatically_eligible: false
+semantic_requirements:
+  company_specific_metric_minimum: 5
+  quantified_driver_to_financial_links_minimum: 3
+  unique_core_conclusions_minimum: 3
+  maximum_duplicate_insight_ratio: 0.25
+backflow_routes:
+  EVIDENCE_MISSING:
+    stage: T1_evidence_plan
+    skill: evidence-ingest
+  DRIVER_UNQUALIFIED:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+  OVERLAP_UNRESOLVED:
+    stage: T5_analysis_pack_build
+    skill: stock-deep-dive
+  VALUATION_INELIGIBLE:
+    stage: T6_forecast_valuation_model
+    skill: valuation-model
+  SEMANTIC_QUALITY_FAILED:
+    stage: T9_quality_review
+    skill: quality-review
+expected_artifacts:
+- role: reviewed_evidence_pack
+  relative_path: reports/golden_regressions/golden_gold_mining_cycle/evidence/reviewed_evidence_pack.yaml
+- role: operating_driver_model
+  relative_path: reports/golden_regressions/golden_gold_mining_cycle/model/operating_driver_model.json
+- role: forecast_valuation_model
+  relative_path: reports/golden_regressions/golden_gold_mining_cycle/model/forecast_valuation_model.json
+- role: reader_report
+  relative_path: reports/golden_regressions/golden_gold_mining_cycle/reader/reader_report.md
+- role: semantic_quality_report
+  relative_path: reports/golden_regressions/golden_gold_mining_cycle/quality/semantic_quality_report.json
+- role: generation_lock
+  relative_path: reports/golden_regressions/golden_gold_mining_cycle/locks/generation_lock.json
+- role: exact_hash_human_review
+  relative_path: reports/golden_regressions/golden_gold_mining_cycle/review/exact_hash_human_review.yaml
+expected_status: evidence_qualification_pending
+economic_archetypes:
+- archetype_id: commodity_price_volume_cost
+  segment_ids:
+  - gold_mining
+  formula: realized_gold_price × saleable_gold_volume − unit_cash_cost × saleable_gold_volume
+  required_driver_ids:
+  - realized_gold_price
+  - mine_production_volume
+  - unit_cash_cost
+- archetype_id: resource_recovery_and_grade
+  segment_ids:
+  - major_mines
+  formula: ore_processed × head_grade × recovery_rate × payable_factor
+  required_driver_ids:
+  - ore_grade_or_feed_quality
+  - recovery_rate
+  - mine_production_volume
+- archetype_id: mine_plan_capital_intensity
+  segment_ids:
+  - major_mines
+  - free_cash_flow
+  formula: stripping_and_development + sustaining_capex + growth_capex
+  required_driver_ids:
+  - stripping_ratio
+  - sustaining_and_growth_capex
+  - unit_cash_cost
+- archetype_id: byproduct_fx_tax_bridge
+  segment_ids:
+  - byproducts
+  - attributable_profit
+  formula: byproduct_price × byproduct_volume ± FX − tax − minority_interest
+  required_driver_ids:
+  - byproduct_economics
+  - fx_tax_ownership_bridge
+drivers:
+- driver_id: realized_gold_price
+  label: 黄金实际销售价格
+  unit: currency_per_ounce_or_gram
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: realized price, sales basis, hedging, and currency translation
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - gold_mining.revenue
+  - gold_mining.gross_profit
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: mine_production_volume
+  label: 分矿山可销售黄金产量
+  unit: tonnes_or_ounces
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: mine-by-mine production and sales with consistent payable definition
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - gold_mining.revenue
+  - inventory_change
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: ore_grade_or_feed_quality
+  label: 入选品位或可审计矿石质量代理
+  unit: grams_per_tonne
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: official grade, ore source, or bounded mine-plan proxy
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - major_mines.production
+  - unit_cash_cost
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: recovery_rate
+  label: 选矿回收率
+  unit: percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: same-process recovery rate and reconciliation to metal output
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - major_mines.production
+  - major_mines.unit_cost
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: unit_cash_cost
+  label: 单位现金成本或AISC桥
+  unit: currency_per_ounce_or_gram
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: cash cost components, royalties, sustaining capital, and definition
+      reconciliation
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - gold_mining.gross_profit
+  - operating_cash_flow
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: stripping_ratio
+  label: 剥采比与开发节奏
+  unit: waste_to_ore_ratio
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: mine-plan stripping and capitalization policy
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - unit_cash_cost
+  - capitalized_mine_development
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: sustaining_and_growth_capex
+  label: 维持性与增长性资本开支
+  unit: currency
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: capex split, construction milestones, and commissioning timing
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - capital_expenditure
+  - free_cash_flow
+  - future_capacity
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: byproduct_economics
+  label: 铜及其他伴生产品经济性
+  unit: volume_price_margin
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: official volume, price, treatment charge, and unit cost
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - byproducts.revenue
+  - byproducts.gross_profit
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: fx_tax_ownership_bridge
+  label: 汇率、税率和权益归属桥
+  unit: currency_and_percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: entity-level currency, effective tax, minority interest, and ownership
+      changes
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - attributable_net_profit
+  - minority_interest
+  - cash_tax
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+research_questions:
+- question_id: GM-Q1
+  question: 金价、销量和汇率如何共同决定实际销售收入？
+  driver_ids:
+  - realized_gold_price
+  - mine_production_volume
+  - fx_tax_ownership_bridge
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: GM-Q2
+  question: 分矿山产量变化来自处理量、品位还是回收率？
+  driver_ids:
+  - mine_production_volume
+  - ore_grade_or_feed_quality
+  - recovery_rate
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: GM-Q3
+  question: 单位现金成本上升或下降由哪些矿山和成本项目驱动？
+  driver_ids:
+  - unit_cash_cost
+  - stripping_ratio
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: GM-Q4
+  question: 维持性与增长性资本开支如何影响自由现金流和未来产量？
+  driver_ids:
+  - sustaining_and_growth_capex
+  - mine_production_volume
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: GM-Q5
+  question: 伴生产品是利润贡献、成本抵减还是风险来源？
+  driver_ids:
+  - byproduct_economics
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: GM-Q6
+  question: 税、少数股东和汇率是否导致经营利润与归母利润分化？
+  driver_ids:
+  - fx_tax_ownership_bridge
+  required: true
+  resolution_policy: bounded_estimate_or_block
+report_emphasis:
+- topic_id: gold_price_volume_cost_bridge
+  weight: 0.27
+  reason: 周期资源股必须先解释价格、产量与单位成本
+- topic_id: mine_level_recovery_and_grade
+  weight: 0.23
+  reason: 产量质量需要分矿山、品位和回收率验证
+- topic_id: capex_and_free_cash_flow
+  weight: 0.19
+  reason: 资本开支决定增储扩产与现金回报的平衡
+- topic_id: ownership_integration_and_tax
+  weight: 0.12
+  reason: 控制权、税和少数权益会改变归母口径
+- topic_id: commodity_scenario_valuation
+  weight: 0.11
+  reason: 估值必须与金价和成本情景绑定
+- topic_id: byproduct_and_country_risk
+  weight: 0.08
+  reason: 伴生产品与国别风险提供反证

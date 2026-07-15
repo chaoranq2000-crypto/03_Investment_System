@@ -1,0 +1,303 @@
+schema_version: r5_bundle14r_case_v1
+case_id: golden_copper_foil_product_generation
+issuer:
+  name: 铜冠铜箔
+  ticker: 301217.SZ
+  jurisdiction: CN
+benchmark_policy:
+  sample_reports_role: narrative_dimensions_only
+  sample_text_as_evidence: prohibited
+  official_evidence_role: required
+release_policy:
+  automated_sample_quality_allowed: false
+  automated_p2_allowed: false
+  workflow_state_mutation_allowed: false
+  exact_hash_human_review_required: true
+required_source_classes:
+- issuer_exchange_filings
+- issuer_investor_relations_records
+- peer_official_disclosures
+- industry_regulator_or_association
+- market_data_primary_or_licensed
+forecast_contract:
+  horizon_years:
+  - 2026
+  - 2027
+  - 2028
+  minimum_segment_revenue_coverage: 0.8
+  minimum_segment_gross_profit_coverage: 0.8
+  requires_cash_flow_bridge: true
+  requires_working_capital_bridge: true
+  requires_driver_to_statement_reconciliation: true
+valuation_methods:
+- method: reverse_valuation
+  eligibility: conditional
+  gate: market value, share count, forecast definition, and implied operating assumptions
+    reconcile
+  automatically_eligible: false
+- method: peer_multiples
+  eligibility: conditional
+  gate: at least three peers pass definition, period, metric, and confidence compatibility
+  automatically_eligible: false
+- method: dcf_or_sotp
+  eligibility: conditional
+  gate: cash-flow or segment economics, overlap elimination, discount inputs, and
+    terminal assumptions qualify independently
+  automatically_eligible: false
+semantic_requirements:
+  company_specific_metric_minimum: 5
+  quantified_driver_to_financial_links_minimum: 3
+  unique_core_conclusions_minimum: 3
+  maximum_duplicate_insight_ratio: 0.25
+backflow_routes:
+  EVIDENCE_MISSING:
+    stage: T1_evidence_plan
+    skill: evidence-ingest
+  DRIVER_UNQUALIFIED:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+  OVERLAP_UNRESOLVED:
+    stage: T5_analysis_pack_build
+    skill: stock-deep-dive
+  VALUATION_INELIGIBLE:
+    stage: T6_forecast_valuation_model
+    skill: valuation-model
+  SEMANTIC_QUALITY_FAILED:
+    stage: T9_quality_review
+    skill: quality-review
+expected_artifacts:
+- role: reviewed_evidence_pack
+  relative_path: reports/golden_regressions/golden_copper_foil_product_generation/evidence/reviewed_evidence_pack.yaml
+- role: operating_driver_model
+  relative_path: reports/golden_regressions/golden_copper_foil_product_generation/model/operating_driver_model.json
+- role: forecast_valuation_model
+  relative_path: reports/golden_regressions/golden_copper_foil_product_generation/model/forecast_valuation_model.json
+- role: reader_report
+  relative_path: reports/golden_regressions/golden_copper_foil_product_generation/reader/reader_report.md
+- role: semantic_quality_report
+  relative_path: reports/golden_regressions/golden_copper_foil_product_generation/quality/semantic_quality_report.json
+- role: generation_lock
+  relative_path: reports/golden_regressions/golden_copper_foil_product_generation/locks/generation_lock.json
+- role: exact_hash_human_review
+  relative_path: reports/golden_regressions/golden_copper_foil_product_generation/review/exact_hash_human_review.yaml
+expected_status: evidence_qualification_pending
+economic_archetypes:
+- archetype_id: capacity_utilization_product_mix
+  segment_ids:
+  - pcb_copper_foil
+  - lithium_battery_copper_foil
+  formula: capacity × utilization × yield × product_mix × processing_fee
+  required_driver_ids:
+  - pcb_capacity
+  - capacity_utilization
+  - hvlp_product_mix
+  - hvlp_processing_fee
+  - unit_conversion_cost
+  - lithium_foil_margin
+- archetype_id: customer_certification_ramp
+  segment_ids:
+  - hvlp_high_end_products
+  formula: qualified_customer_programs × conversion_rate × average_program_volume
+  required_driver_ids:
+  - customer_certification_conversion
+  - hvlp_product_mix
+- archetype_id: working_capital_cash_conversion
+  segment_ids:
+  - consolidated_cash_flow
+  formula: revenue_growth × receivable_days + inventory_days − payable_days
+  required_driver_ids:
+  - receivable_inventory_cash_conversion
+drivers:
+- driver_id: pcb_capacity
+  label: PCB铜箔有效产能
+  unit: tonnes_per_year
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: effective capacity by product family and period
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - pcb_copper_foil.revenue
+  - capital_employed
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: capacity_utilization
+  label: 产能利用率与良率
+  unit: percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: utilization and yield using consistent capacity definitions
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - segment_volume
+  - segment_gross_margin
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: hvlp_product_mix
+  label: 高端HVLP产品结构
+  unit: percent_of_pcb_volume
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: shipment or revenue mix by qualified product generation
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - pcb_copper_foil.average_processing_fee
+  - pcb_copper_foil.gross_margin
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: hvlp_processing_fee
+  label: HVLP加工费或可审计价格代理
+  unit: currency_per_tonne
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: issuer-confirmed fee range or bounded official proxy without sample-text
+      promotion
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - pcb_copper_foil.revenue
+  - pcb_copper_foil.gross_profit
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: unit_conversion_cost
+  label: 单位加工成本
+  unit: currency_per_tonne
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: electricity, depreciation, labour, and yield-adjusted conversion
+      cost
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - pcb_copper_foil.gross_profit
+  - segment_cash_cost
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: lithium_foil_margin
+  label: 锂电铜箔单位利润边界
+  unit: currency_per_tonne
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: same-period selling fee and unit cost or bounded margin disclosure
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - lithium_battery_copper_foil.gross_profit
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: customer_certification_conversion
+  label: 客户认证到批量供货转化
+  unit: programs_and_percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: officially disclosed certification stage, customer class, and conversion
+      timing
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - hvlp_high_end_products.revenue
+  - forecast_confidence
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: receivable_inventory_cash_conversion
+  label: 应收与存货现金转换
+  unit: days_and_currency
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: receivables, inventory, payables, impairment, and cash collection
+      bridge
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - working_capital
+  - operating_cash_flow
+  - free_cash_flow
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+research_questions:
+- question_id: CF-Q1
+  question: 有效产能、利用率和良率如何共同决定可销售铜箔量？
+  driver_ids:
+  - pcb_capacity
+  - capacity_utilization
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: CF-Q2
+  question: 高端产品代际结构变化如何传导至平均加工费和毛利？
+  driver_ids:
+  - hvlp_product_mix
+  - hvlp_processing_fee
+  - unit_conversion_cost
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: CF-Q3
+  question: 客户认证处于测试、合格供应商还是批量供货的哪个阶段？
+  driver_ids:
+  - customer_certification_conversion
+  required: true
+  resolution_policy: official_fact
+- question_id: CF-Q4
+  question: 锂电铜箔是否从收入贡献转为可持续毛利贡献？
+  driver_ids:
+  - lithium_foil_margin
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: CF-Q5
+  question: 应收和存货增长是否使账面利润与经营现金流背离？
+  driver_ids:
+  - receivable_inventory_cash_conversion
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: CF-Q6
+  question: 加工费、产品结构和利用率分别对利润有多大敏感性？
+  driver_ids:
+  - capacity_utilization
+  - hvlp_product_mix
+  - hvlp_processing_fee
+  required: true
+  resolution_policy: bounded_estimate_or_block
+report_emphasis:
+- topic_id: product_generation_and_mix
+  weight: 0.28
+  reason: 核心差异来自高端产品代际及结构升级
+- topic_id: processing_fee_to_unit_margin
+  weight: 0.23
+  reason: 必须把价格代理转换为单位利润和报表毛利
+- topic_id: customer_certification_conversion
+  weight: 0.18
+  reason: 认证状态决定高端产品放量可信度
+- topic_id: cash_conversion_quality
+  weight: 0.13
+  reason: 高增长下需验证应收、存货和经营现金流
+- topic_id: valuation_expectation_gap
+  weight: 0.1
+  reason: 高估值只能由可验证经营变量解释
+- topic_id: competition_and_substitution
+  weight: 0.08
+  reason: 技术追赶和替代路线构成反证

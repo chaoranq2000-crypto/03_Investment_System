@@ -1,0 +1,58 @@
+name: R5 Bundle 14R Golden Regression
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "src/research/r5_bundle14r_golden_regression.py"
+      - "src/quality/r5_bundle14r_semantic_regression.py"
+      - "scripts/run_r5_bundle14r_golden_regression.py"
+      - "tests/test_r5_bundle14r_golden_regression.py"
+      - "tests/fixtures/r5_bundle14r/**"
+      - ".github/workflows/r5-bundle14r-golden-regression.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "src/research/r5_bundle14r_golden_regression.py"
+      - "src/quality/r5_bundle14r_semantic_regression.py"
+      - "scripts/run_r5_bundle14r_golden_regression.py"
+      - "tests/test_r5_bundle14r_golden_regression.py"
+      - "tests/fixtures/r5_bundle14r/**"
+      - ".github/workflows/r5-bundle14r-golden-regression.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  contract-and-semantic-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install focused test dependencies
+        run: python -m pip install --upgrade "pytest>=8,<10" "PyYAML>=6,<7"
+
+      - name: Run Bundle 14R focused tests
+        run: python -m pytest -q tests/test_r5_bundle14r_golden_regression.py
+
+      - name: Run seeded golden-regression contracts
+        run: |
+          python scripts/run_r5_bundle14r_golden_regression.py \
+            --repo-root . \
+            --cases-dir tests/fixtures/r5_bundle14r/cases \
+            --output-dir "${{ runner.temp }}/r5_bundle14r"
+
+      - name: Upload deterministic seed outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-bundle14r-seed-output
+          path: ${{ runner.temp }}/r5_bundle14r
+          if-no-files-found: error

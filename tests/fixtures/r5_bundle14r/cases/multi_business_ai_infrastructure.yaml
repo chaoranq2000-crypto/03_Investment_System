@@ -1,0 +1,513 @@
+schema_version: r5_bundle14r_case_v1
+case_id: golden_multi_business_ai_infrastructure
+issuer:
+  name: 东阳光
+  ticker: 600673.SH
+  jurisdiction: CN
+benchmark_policy:
+  sample_reports_role: narrative_dimensions_only
+  sample_text_as_evidence: prohibited
+  official_evidence_role: required
+release_policy:
+  automated_sample_quality_allowed: false
+  automated_p2_allowed: false
+  workflow_state_mutation_allowed: false
+  exact_hash_human_review_required: true
+required_source_classes:
+- issuer_exchange_filings
+- issuer_investor_relations_records
+- peer_official_disclosures
+- industry_regulator_or_association
+- market_data_primary_or_licensed
+forecast_contract:
+  horizon_years:
+  - 2026
+  - 2027
+  - 2028
+  minimum_segment_revenue_coverage: 0.8
+  minimum_segment_gross_profit_coverage: 0.8
+  requires_cash_flow_bridge: true
+  requires_working_capital_bridge: true
+  requires_driver_to_statement_reconciliation: true
+valuation_methods:
+- method: reverse_valuation
+  eligibility: conditional
+  gate: market value, share count, forecast definition, and implied operating assumptions
+    reconcile
+  automatically_eligible: false
+- method: peer_multiples
+  eligibility: conditional
+  gate: at least three peers pass definition, period, metric, and confidence compatibility
+  automatically_eligible: false
+- method: dcf_or_sotp
+  eligibility: conditional
+  gate: cash-flow or segment economics, overlap elimination, discount inputs, and
+    terminal assumptions qualify independently
+  automatically_eligible: false
+semantic_requirements:
+  company_specific_metric_minimum: 5
+  quantified_driver_to_financial_links_minimum: 3
+  unique_core_conclusions_minimum: 3
+  maximum_duplicate_insight_ratio: 0.25
+backflow_routes:
+  EVIDENCE_MISSING:
+    stage: T1_evidence_plan
+    skill: evidence-ingest
+  DRIVER_UNQUALIFIED:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+  OVERLAP_UNRESOLVED:
+    stage: T5_analysis_pack_build
+    skill: stock-deep-dive
+  VALUATION_INELIGIBLE:
+    stage: T6_forecast_valuation_model
+    skill: valuation-model
+  SEMANTIC_QUALITY_FAILED:
+    stage: T9_quality_review
+    skill: quality-review
+expected_artifacts:
+- role: reviewed_evidence_pack
+  relative_path: reports/golden_regressions/golden_multi_business_ai_infrastructure/evidence/reviewed_evidence_pack.yaml
+- role: operating_driver_model
+  relative_path: reports/golden_regressions/golden_multi_business_ai_infrastructure/model/operating_driver_model.json
+- role: forecast_valuation_model
+  relative_path: reports/golden_regressions/golden_multi_business_ai_infrastructure/model/forecast_valuation_model.json
+- role: reader_report
+  relative_path: reports/golden_regressions/golden_multi_business_ai_infrastructure/reader/reader_report.md
+- role: semantic_quality_report
+  relative_path: reports/golden_regressions/golden_multi_business_ai_infrastructure/quality/semantic_quality_report.json
+- role: generation_lock
+  relative_path: reports/golden_regressions/golden_multi_business_ai_infrastructure/locks/generation_lock.json
+- role: exact_hash_human_review
+  relative_path: reports/golden_regressions/golden_multi_business_ai_infrastructure/review/exact_hash_human_review.yaml
+expected_status: evidence_qualification_pending
+economic_archetypes:
+- archetype_id: regulated_quota_price_cost
+  segment_ids:
+  - refrigerants_and_chemical_materials
+  formula: quota × saleable_volume × realized_price − unit_cost × saleable_volume
+  required_driver_ids:
+  - refrigerant_quota
+  - refrigerant_volume
+  - refrigerant_realized_price
+  - refrigerant_unit_cost
+- archetype_id: capacity_utilization_product_mix
+  segment_ids:
+  - electronic_materials
+  - aluminium_foil
+  formula: capacity × utilization × product_mix × processing_fee
+  required_driver_ids:
+  - materials_capacity
+  - materials_utilization
+  - materials_product_mix_and_fee
+- archetype_id: project_unit_value_acceptance
+  segment_ids:
+  - liquid_cooling
+  formula: qualified_projects_or_MW × unit_value × acceptance_rate × revenue_recognition_factor
+  required_driver_ids:
+  - liquid_cooling_projects_or_mw
+  - liquid_cooling_unit_value
+  - liquid_cooling_acceptance
+  - liquid_cooling_margin
+- archetype_id: idc_capacity_utilization_power
+  segment_ids:
+  - idc_and_ai_infrastructure
+  formula: commissioned_capacity × utilization × unit_revenue − power_and_operating_cost
+  required_driver_ids:
+  - idc_commissioned_capacity
+  - idc_utilization
+  - idc_unit_revenue
+  - idc_power_cost
+- archetype_id: ma_consolidation_financing
+  segment_ids:
+  - acquired_assets
+  - consolidated_financials
+  formula: target_results × ownership × consolidation_fraction − incremental_financing_cost
+    − purchase_accounting_adjustments
+  required_driver_ids:
+  - transaction_close_and_consolidation
+  - ownership_and_minority_interest
+  - incremental_financing_cost
+drivers:
+- driver_id: refrigerant_quota
+  label: 制冷剂配额与可用量
+  unit: tonnes_per_period
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: official quota allocation, production allowance, and product definition
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - chemical_materials.volume
+  - scarcity_value
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: refrigerant_volume
+  label: 制冷剂销量
+  unit: tonnes_per_period
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: same-product production, sales, inventory, and export reconciliation
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - chemical_materials.revenue
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: refrigerant_realized_price
+  label: 制冷剂实际销售价格
+  unit: currency_per_tonne
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: realized price or official bounded proxy adjusted for product mix
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - chemical_materials.revenue
+  - chemical_materials.gross_profit
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: refrigerant_unit_cost
+  label: 制冷剂单位成本
+  unit: currency_per_tonne
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: feedstock, energy, utilization, and compliance cost bridge
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - chemical_materials.gross_profit
+  - operating_cash_flow
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: materials_capacity
+  label: 电子材料与铝箔有效产能
+  unit: tonnes_or_square_metres
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: commissioned effective capacity by product and period
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - materials.revenue
+  - capital_employed
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: materials_utilization
+  label: 材料业务利用率与良率
+  unit: percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: same-definition utilization and yield
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - materials.volume
+  - materials.gross_margin
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: materials_product_mix_and_fee
+  label: 高附加值产品结构与加工费
+  unit: mix_percent_and_currency_per_unit
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: official product mix, price, processing fee, or bounded proxy
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - materials.revenue
+  - materials.gross_profit
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: liquid_cooling_projects_or_mw
+  label: 液冷项目、机柜或MW交付量
+  unit: projects_racks_or_mw
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: official project, shipment, rack, or MW evidence with definition
+      and period
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - liquid_cooling.revenue
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: liquid_cooling_unit_value
+  label: 液冷单位价值
+  unit: currency_per_project_rack_or_mw
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: official contract/unit value or bounded component-to-system range
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - liquid_cooling.revenue
+  - liquid_cooling.order_value
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: liquid_cooling_acceptance
+  label: 测试交付验收到收入确认
+  unit: percent_and_days
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: official acceptance milestones, recognition policy, and conversion
+      timing
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - liquid_cooling.revenue_recognition
+  - contract_assets
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: liquid_cooling_margin
+  label: 液冷独立毛利边界
+  unit: percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: standalone economics or defensible upper/lower bound after overlap
+      elimination
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - liquid_cooling.gross_profit
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: idc_commissioned_capacity
+  label: IDC已投运容量
+  unit: MW_or_cabinets
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: commissioned and revenue-capable capacity, excluding announced pipeline
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - idc.revenue
+  - capital_employed
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: idc_utilization
+  label: IDC上架或利用率
+  unit: percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: same-definition utilization, contracted vs billed capacity
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - idc.revenue
+  - idc.margin
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: idc_unit_revenue
+  label: IDC单位收入
+  unit: currency_per_MW_or_cabinet
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: contracted/billed unit revenue and service mix
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - idc.revenue
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: idc_power_cost
+  label: 电力与运营单位成本
+  unit: currency_per_kwh_or_MW
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: tariff, PUE, green power, maintenance, and lease cost
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - idc.gross_profit
+  - idc.operating_cash_flow
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: transaction_close_and_consolidation
+  label: 并购交割与并表比例
+  unit: date_and_fraction
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: exchange/regulatory milestones, closing date, and accounting consolidation
+      start
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - consolidated_revenue
+  - consolidated_profit
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: ownership_and_minority_interest
+  label: 权益比例与少数股东
+  unit: percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: post-transaction ownership and attributable profit bridge
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - attributable_net_profit
+  - minority_interest
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: incremental_financing_cost
+  label: 新增融资成本
+  unit: currency_and_percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: debt/equity funding, interest rate, fees, refinancing, and purchase
+      accounting
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - finance_expense
+  - free_cash_flow
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+research_questions:
+- question_id: MB-Q1
+  question: 制冷剂配额、销量、价格和单位成本如何形成分部利润？
+  driver_ids:
+  - refrigerant_quota
+  - refrigerant_volume
+  - refrigerant_realized_price
+  - refrigerant_unit_cost
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: MB-Q2
+  question: 材料业务增长来自产能、利用率还是产品结构与加工费？
+  driver_ids:
+  - materials_capacity
+  - materials_utilization
+  - materials_product_mix_and_fee
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: MB-Q3
+  question: 液冷披露究竟是项目数、机柜、MW、部件出货还是宽口径业务收入？
+  driver_ids:
+  - liquid_cooling_projects_or_mw
+  required: true
+  resolution_policy: official_fact
+- question_id: MB-Q4
+  question: 液冷单位价值、验收率和收入确认周期能否建立量化桥？
+  driver_ids:
+  - liquid_cooling_unit_value
+  - liquid_cooling_acceptance
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: MB-Q5
+  question: 液冷与机房、机柜、材料等宽口径收入如何消除重复？
+  driver_ids:
+  - liquid_cooling_projects_or_mw
+  - liquid_cooling_margin
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: MB-Q6
+  question: IDC已投运容量、利用率、单位收入和电力成本如何决定利润？
+  driver_ids:
+  - idc_commissioned_capacity
+  - idc_utilization
+  - idc_unit_revenue
+  - idc_power_cost
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: MB-Q7
+  question: 并购何时交割并表，权益与融资安排如何影响归母利润？
+  driver_ids:
+  - transaction_close_and_consolidation
+  - ownership_and_minority_interest
+  - incremental_financing_cost
+  required: true
+  resolution_policy: official_fact
+- question_id: MB-Q8
+  question: 多业务分部是否具备独立经济性和SOTP资格？
+  driver_ids:
+  - materials_product_mix_and_fee
+  - liquid_cooling_margin
+  - idc_unit_revenue
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: MB-Q9
+  question: 增长是否由经营现金流支持，还是依赖营运资金与融资扩张？
+  driver_ids:
+  - refrigerant_unit_cost
+  - idc_power_cost
+  - incremental_financing_cost
+  required: true
+  resolution_policy: bounded_estimate_or_block
+report_emphasis:
+- topic_id: segment_economic_model_reconciliation
+  weight: 0.24
+  reason: 多业务公司必须先形成分部经济模型与报表勾稽
+- topic_id: liquid_cooling_unit_economics_and_overlap
+  weight: 0.22
+  reason: 项目量、单位价值、验收与重叠是核心未决问题
+- topic_id: idc_acquisition_consolidation_financing
+  weight: 0.19
+  reason: 并购并表与融资成本决定利润和估值跃迁
+- topic_id: refrigerant_quota_price_cost
+  weight: 0.14
+  reason: 传统主业利润需由配额、价格和成本解释
+- topic_id: materials_mix_and_capacity
+  weight: 0.1
+  reason: 材料平台需验证产品结构和资本效率
+- topic_id: valuation_method_eligibility
+  weight: 0.07
+  reason: SOTP、DCF和同业倍数必须独立过门
+- topic_id: risk_and_falsification
+  weight: 0.04
+  reason: 交易、价格和项目验收风险需对称呈现

@@ -1,0 +1,375 @@
+schema_version: r5_bundle14r_case_v1
+case_id: golden_crdmo_backlog_conversion
+issuer:
+  name: 药明康德
+  ticker: 603259.SH
+  jurisdiction: CN
+benchmark_policy:
+  sample_reports_role: narrative_dimensions_only
+  sample_text_as_evidence: prohibited
+  official_evidence_role: required
+release_policy:
+  automated_sample_quality_allowed: false
+  automated_p2_allowed: false
+  workflow_state_mutation_allowed: false
+  exact_hash_human_review_required: true
+required_source_classes:
+- issuer_exchange_filings
+- issuer_investor_relations_records
+- peer_official_disclosures
+- industry_regulator_or_association
+- market_data_primary_or_licensed
+forecast_contract:
+  horizon_years:
+  - 2026
+  - 2027
+  - 2028
+  minimum_segment_revenue_coverage: 0.8
+  minimum_segment_gross_profit_coverage: 0.8
+  requires_cash_flow_bridge: true
+  requires_working_capital_bridge: true
+  requires_driver_to_statement_reconciliation: true
+valuation_methods:
+- method: reverse_valuation
+  eligibility: conditional
+  gate: market value, share count, forecast definition, and implied operating assumptions
+    reconcile
+  automatically_eligible: false
+- method: peer_multiples
+  eligibility: conditional
+  gate: at least three peers pass definition, period, metric, and confidence compatibility
+  automatically_eligible: false
+- method: dcf_or_sotp
+  eligibility: conditional
+  gate: cash-flow or segment economics, overlap elimination, discount inputs, and
+    terminal assumptions qualify independently
+  automatically_eligible: false
+semantic_requirements:
+  company_specific_metric_minimum: 5
+  quantified_driver_to_financial_links_minimum: 3
+  unique_core_conclusions_minimum: 3
+  maximum_duplicate_insight_ratio: 0.25
+backflow_routes:
+  EVIDENCE_MISSING:
+    stage: T1_evidence_plan
+    skill: evidence-ingest
+  DRIVER_UNQUALIFIED:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+  OVERLAP_UNRESOLVED:
+    stage: T5_analysis_pack_build
+    skill: stock-deep-dive
+  VALUATION_INELIGIBLE:
+    stage: T6_forecast_valuation_model
+    skill: valuation-model
+  SEMANTIC_QUALITY_FAILED:
+    stage: T9_quality_review
+    skill: quality-review
+expected_artifacts:
+- role: reviewed_evidence_pack
+  relative_path: reports/golden_regressions/golden_crdmo_backlog_conversion/evidence/reviewed_evidence_pack.yaml
+- role: operating_driver_model
+  relative_path: reports/golden_regressions/golden_crdmo_backlog_conversion/model/operating_driver_model.json
+- role: forecast_valuation_model
+  relative_path: reports/golden_regressions/golden_crdmo_backlog_conversion/model/forecast_valuation_model.json
+- role: reader_report
+  relative_path: reports/golden_regressions/golden_crdmo_backlog_conversion/reader/reader_report.md
+- role: semantic_quality_report
+  relative_path: reports/golden_regressions/golden_crdmo_backlog_conversion/quality/semantic_quality_report.json
+- role: generation_lock
+  relative_path: reports/golden_regressions/golden_crdmo_backlog_conversion/locks/generation_lock.json
+- role: exact_hash_human_review
+  relative_path: reports/golden_regressions/golden_crdmo_backlog_conversion/review/exact_hash_human_review.yaml
+expected_status: evidence_qualification_pending
+economic_archetypes:
+- archetype_id: backlog_conversion_recognition
+  segment_ids:
+  - chemistry_crdmo
+  - testing_and_biology
+  formula: opening_backlog × conversion_rate + new_orders_converted − cancellations
+  required_driver_ids:
+  - backlog_definition
+  - backlog_conversion_rate
+  - new_order_intake
+- archetype_id: project_stage_mix_margin
+  segment_ids:
+  - small_molecule_d_and_m
+  - tides
+  formula: projects_by_stage × revenue_per_project × stage_margin
+  required_driver_ids:
+  - project_stage_mix
+  - tides_product_mix
+  - pricing_and_productivity
+- archetype_id: capacity_utilization_service_margin
+  segment_ids:
+  - manufacturing_capacity
+  - segment_margin
+  formula: qualified_capacity × utilization × yield × price − variable_and_fixed_cost
+  required_driver_ids:
+  - qualified_capacity
+  - capacity_utilization
+  - pricing_and_productivity
+- archetype_id: geography_regulatory_attrition
+  segment_ids:
+  - regional_revenue
+  - risk_scenarios
+  formula: regional_pipeline × retention_rate × contract_transition_factor
+  required_driver_ids:
+  - customer_geography_concentration
+  - regulatory_contract_transition
+- archetype_id: cash_conversion_capex
+  segment_ids:
+  - free_cash_flow
+  formula: operating_profit − working_capital_change − cash_tax − capex
+  required_driver_ids:
+  - cash_conversion_and_capex
+drivers:
+- driver_id: backlog_definition
+  label: 在手订单定义与可执行性
+  unit: currency_and_contract_status
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: official backlog definition, cancellation terms, and period comparability
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - revenue_coverage
+  - forecast_confidence
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: backlog_conversion_rate
+  label: 订单转收入转换率
+  unit: percent_per_period
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: historical or guided conversion by service line and project stage
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - segment_revenue
+  - contract_liabilities
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: new_order_intake
+  label: 新增订单与净订单流入
+  unit: currency_per_period
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: same-definition additions, renewals, cancellations, and FX effects
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - ending_backlog
+  - future_revenue
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: project_stage_mix
+  label: 项目阶段结构
+  unit: project_count_and_percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: discovery, preclinical, clinical, late-stage, and commercial project
+      counts under consistent definitions
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - revenue_per_project
+  - segment_margin
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: tides_product_mix
+  label: 多肽与寡核苷酸产品结构
+  unit: percent_of_segment_revenue_or_volume
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: official molecule, capacity, customer, and revenue mix disclosures
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - tides.revenue
+  - tides.gross_margin
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: qualified_capacity
+  label: 合规有效产能
+  unit: reactor_or_line_capacity
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: qualified and commissioned capacity, not announced nameplate capacity
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - manufacturing_capacity
+  - capital_employed
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: capacity_utilization
+  label: 产能利用率
+  unit: percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: same-definition utilization or bounded evidence-backed proxy
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - segment_revenue
+  - segment_margin
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: pricing_and_productivity
+  label: 价格、项目复杂度与生产效率
+  unit: price_index_and_cost_index
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: price/mix, yield, cycle time, labour, and automation evidence
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - segment_margin
+  - operating_margin
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: customer_geography_concentration
+  label: 客户与地域集中度
+  unit: percent
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: official customer/geography mix and concentration without naming
+      unsupported customers
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - regional_revenue
+  - risk_scenarios
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: regulatory_contract_transition
+  label: 监管清单与合同过渡机制
+  unit: scenario_factor
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: primary legal text, effective dates, transition rules, and contract
+      eligibility
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - risk_scenario_revenue
+  - risk_scenario_margin
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+- driver_id: cash_conversion_and_capex
+  label: 现金转换与全球产能资本开支
+  unit: currency_and_days
+  period_rule: same_definition_same_period_or_explicitly_reconciled
+  evidence_requirements:
+  - source_class: issuer_exchange_filings
+    requirement: receivables, contract balances, cash tax, capex, and disposal-adjusted
+      cash flow
+  - source_class: issuer_investor_relations_records
+    requirement: cross-check definition, period, and management wording
+  model_mapping:
+  - working_capital
+  - capital_expenditure
+  - free_cash_flow
+  fallback_policy: block
+  backflow_route:
+    stage: T2_evidence_acquire_parse
+    skill: evidence-ingest
+research_questions:
+- question_id: CR-Q1
+  question: 在手订单的定义、取消条款和收入覆盖率是否可跨期比较？
+  driver_ids:
+  - backlog_definition
+  - backlog_conversion_rate
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: CR-Q2
+  question: 新增订单、取消和汇率如何解释期末订单变化？
+  driver_ids:
+  - new_order_intake
+  - backlog_definition
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: CR-Q3
+  question: 项目从早期向临床后期和商业化转换如何改变收入和利润率？
+  driver_ids:
+  - project_stage_mix
+  - backlog_conversion_rate
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: CR-Q4
+  question: TIDES产品结构、有效产能和利用率如何共同决定增长？
+  driver_ids:
+  - tides_product_mix
+  - qualified_capacity
+  - capacity_utilization
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: CR-Q5
+  question: 价格、复杂度、良率和自动化分别如何影响利润率？
+  driver_ids:
+  - pricing_and_productivity
+  required: true
+  resolution_policy: bounded_estimate_or_block
+- question_id: CR-Q6
+  question: 监管事件通过哪些合同和地域暴露传导至收入？
+  driver_ids:
+  - customer_geography_concentration
+  - regulatory_contract_transition
+  required: true
+  resolution_policy: official_fact
+- question_id: CR-Q7
+  question: 利润增长是否转化为经营现金流，扩产需要多少资本？
+  driver_ids:
+  - cash_conversion_and_capex
+  required: true
+  resolution_policy: bounded_estimate_or_block
+report_emphasis:
+- topic_id: backlog_to_revenue_conversion
+  weight: 0.26
+  reason: 订单可执行性和转换率是收入确定性的核心
+- topic_id: project_stage_and_tides_mix
+  weight: 0.23
+  reason: 项目阶段与新分子结构决定增长和利润率
+- topic_id: capacity_utilization_and_productivity
+  weight: 0.18
+  reason: 有效产能而非名义产能决定经营杠杆
+- topic_id: regulatory_contract_scenarios
+  weight: 0.15
+  reason: 监管风险必须映射到合同过渡和地域收入
+- topic_id: cash_conversion_and_capex
+  weight: 0.1
+  reason: 高质量增长应体现为现金流和资本效率
+- topic_id: valuation_and_falsification
+  weight: 0.08
+  reason: 估值需与订单、利用率和监管情景绑定
