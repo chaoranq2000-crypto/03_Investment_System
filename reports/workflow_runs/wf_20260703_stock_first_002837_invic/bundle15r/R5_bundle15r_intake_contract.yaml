@@ -1,0 +1,32 @@
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+bundle_id: R5_BUNDLE15R_REVIEWED_EVIDENCE_INTAKE
+baseline_commit: 86ab78675f5b2594bba23733e2dceb6ae66323ac
+source_bundle: R5_BUNDLE14R_EVIDENCE_TRIGGER_BACKFLOW
+source_state: R5_BUNDLE14R_WAITING_FOR_OFFICIAL_EVIDENCE
+source_registry: ../bundle14r/R5_bundle14r_evidence_trigger_registry.yaml
+candidate_output_contract: ../bundle14r/R5_bundle14r_candidate_evidence_pack.yaml
+policies:
+  allowed_source_classes:
+    - issuer_periodic_report
+    - issuer_announcement
+    - issuer_ir_record
+  reviewed_statuses:
+    - reviewed
+    - accepted
+  require_official_issuer_source: true
+  require_period_compatible: true
+  require_exact_period_anchor: true
+  require_sha256_source_hash: true
+  require_nonempty_locator: true
+  conflicting_values: fail_closed
+  equal_value_duplicates: deterministic_suppression
+  overwrite_canonical_workflow_state: false
+fixed_boundaries:
+  bundle12r_rerun_allowed: false
+  valuation_refresh_allowed: false
+  model_regeneration_allowed: false
+  reader_regeneration_allowed: false
+  human_review_status: pending
+  sample_quality_allowed: false
+  p2_allowed: false

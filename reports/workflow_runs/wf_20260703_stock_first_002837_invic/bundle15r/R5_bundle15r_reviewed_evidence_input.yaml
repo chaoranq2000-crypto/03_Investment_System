@@ -1,0 +1,11 @@
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+as_of: '2026-07-15'
+period_anchor_ref: bundle12r/R5_bundle12r_operating_evidence_input.yaml
+status: waiting_for_reviewed_same-period_official_operating_evidence
+records: []
+notes:
+  - 本文件只接收已经由正常 evidence-ingest 流程审阅的官方发行人证据。
+  - 新闻、券商报告、未审阅 IR 线索、推断值和样例报告不得写入 records。
+  - 每个 metric.payload 必须包含对应 Bundle 14R trigger 的全部必需字段及具体值。
+  - 空 records 是真实等待状态，不得用合成 fixture 关闭生产门禁。

@@ -1,0 +1,49 @@
+schema_version: 1
+name: r5_bundle15r_reviewed_evidence_intake
+purpose: >-
+  Normalize already-reviewed official issuer evidence into a deterministic,
+  conflict-aware Bundle 14R candidate pack.
+input_required_fields:
+  - schema_version
+  - workflow_id
+  - as_of
+  - period_anchor_ref
+  - records
+record_required_fields:
+  - evidence_id
+  - source_class
+  - official_issuer_source
+  - review_status
+  - document_date
+  - period_compatible
+  - period_anchor_ref
+  - source_hash
+  - locator
+  - metrics
+metric_required_fields:
+  - metric_key
+  - payload
+allowed_source_classes:
+  - issuer_periodic_report
+  - issuer_announcement
+  - issuer_ir_record
+reviewed_statuses:
+  - reviewed
+  - accepted
+hard_guardrails:
+  - raw evidence remains immutable
+  - input does not equal claim promotion
+  - nonissuer or unreviewed material cannot qualify
+  - period and anchor must match
+  - every trigger-required field must contain a concrete value
+  - conflicting reviewed values fail closed
+  - duplicate equal values are deterministically suppressed
+  - canonical workflow state is never overwritten by the builder
+  - valuation model Reader sample quality and P2 remain closed
+generated_artifacts:
+  - R5_bundle15r_candidate_pack.yaml
+  - R5_bundle15r_rejection_ledger.csv
+  - R5_bundle15r_conflict_ledger.yaml
+  - R5_bundle15r_intake_summary.yaml
+  - R5_bundle15r_generation_lock.yaml
+  - workflow_state.bundle15r.proposed.yaml
