@@ -1,0 +1,91 @@
+{
+  "schema_version": "r5_bundle16r_acceptance_matrix_v1",
+  "bundle": "R5 Bundle 16R",
+  "baseline_commit": "1d4b1f151b97337d8def33c409532f28794b6652",
+  "gates": [
+    {
+      "id": "B16R-G01",
+      "name": "exact four-case registry",
+      "type": "hard",
+      "pass_condition": "registry contains exactly 301217, 600988, 603259 and 600673 with unique IDs and economic archetypes"
+    },
+    {
+      "id": "B16R-G02",
+      "name": "physical artifact and hash integrity",
+      "type": "hard",
+      "pass_condition": "all nine required artifact roles exist and their SHA-256 values match"
+    },
+    {
+      "id": "B16R-G03",
+      "name": "sample prose is not evidence",
+      "type": "truthfulness_blocker",
+      "pass_condition": "no evidence artifact points to narrative sample paths or carries narrative_density_only purpose"
+    },
+    {
+      "id": "B16R-G04",
+      "name": "operating-driver coverage",
+      "type": "hard_non_compensating",
+      "pass_condition": "material segment coverage, revenue explanation and gross-profit explanation are each at least 80%; residual ratios are at most 20%"
+    },
+    {
+      "id": "B16R-G05",
+      "name": "forecast and report model links",
+      "type": "hard_non_compensating",
+      "pass_condition": "forecast traceability >=90%, model-linked core sections >=75%, citation resolution =100%"
+    },
+    {
+      "id": "B16R-G06",
+      "name": "semantic incrementality",
+      "type": "hard_non_compensating",
+      "pass_condition": "section novelty >=70%, at least 8 company-specific metrics and 2 future event-to-model links"
+    },
+    {
+      "id": "B16R-G07",
+      "name": "critical research questions",
+      "type": "hard",
+      "pass_condition": "zero unresolved critical research questions; otherwise case remains blocked and backflows"
+    },
+    {
+      "id": "B16R-G08",
+      "name": "peer valuation qualification",
+      "type": "hard",
+      "pass_condition": "peer multiple use requires at least three definition-compatible, period-aligned peers; otherwise an allowed fallback is used"
+    },
+    {
+      "id": "B16R-G09",
+      "name": "issuer-neutral runtime",
+      "type": "hard",
+      "pass_condition": "registered issuer names, tickers and company-specific product tokens do not appear in generic runtime paths"
+    },
+    {
+      "id": "B16R-G10",
+      "name": "exact-hash human review",
+      "type": "sample_quality_release",
+      "pass_condition": "all four accepted reviews bind exact Reader and generation-lock hashes with reviewer identity and timestamp"
+    },
+    {
+      "id": "B16R-G11",
+      "name": "P2 separation",
+      "type": "governance",
+      "pass_condition": "p2_allowed remains false and requires a separate canonical authorization"
+    },
+    {
+      "id": "B16R-G12",
+      "name": "deterministic readout",
+      "type": "hard",
+      "pass_condition": "identical inputs produce byte-identical JSON and Markdown outputs"
+    }
+  ],
+  "close_states": {
+    "engineering_closed_human_pending": {
+      "engineering_pass": true,
+      "sample_quality_allowed": false,
+      "p2_allowed": false
+    },
+    "sample_quality_prerequisites_complete": {
+      "engineering_pass": true,
+      "sample_quality_allowed": true,
+      "p2_allowed": false
+    }
+  }
+}

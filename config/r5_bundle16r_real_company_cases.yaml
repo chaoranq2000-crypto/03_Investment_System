@@ -1,0 +1,175 @@
+{
+  "schema_version": "r5_bundle16r_real_company_regression_v1",
+  "suite_id": "r5_bundle16r_four_company_golden_regression",
+  "baseline_commit": "1d4b1f151b97337d8def33c409532f28794b6652",
+  "required_artifact_roles": [
+    "workflow_state",
+    "evidence_pack",
+    "operating_driver_pack",
+    "forecast_model",
+    "valuation_pack",
+    "reader_report",
+    "quality_readout",
+    "generation_lock",
+    "human_review"
+  ],
+  "thresholds": {
+    "material_segment_driver_coverage_min": 0.8,
+    "revenue_explained_ratio_min": 0.8,
+    "gross_profit_explained_ratio_min": 0.8,
+    "residual_revenue_ratio_max": 0.2,
+    "residual_gross_profit_ratio_max": 0.2,
+    "forecast_assumption_traceability_min": 0.9,
+    "model_linked_core_section_ratio_min": 0.75,
+    "section_novelty_ratio_min": 0.7,
+    "citation_resolution_rate_min": 1.0,
+    "company_specific_metric_count_min": 8,
+    "future_event_model_link_count_min": 2,
+    "qualified_peer_count_min_when_peer_multiple_used": 3
+  },
+  "runtime_scan": {
+    "enabled": true,
+    "include_dirs": [
+      "src/research",
+      ".agents/skills/research-orchestrator",
+      ".agents/skills/stock-deep-dive",
+      ".agents/skills/quality-review",
+      "scripts"
+    ],
+    "extensions": [".py"],
+    "allow_paths": [
+      "src/research/r5_bundle16r_real_company_regression.py"
+    ]
+  },
+  "release_policy": {
+    "engineering_pass_does_not_imply_sample_quality": true,
+    "all_four_exact_hash_human_reviews_required": true,
+    "sample_quality_default": false,
+    "p2_default": false,
+    "p2_requires_separate_canonical_authorization": true,
+    "sample_reports_are_not_fact_sources": true
+  },
+  "cases": [
+    {
+      "case_id": "301217_high_end_copper_foil",
+      "ticker": "301217",
+      "issuer_name": "铜冠铜箔",
+      "case_role": "high_end_manufacturing_product_generation",
+      "material_segments": [
+        "pcb_copper_foil",
+        "lithium_battery_copper_foil"
+      ],
+      "required_economic_archetypes": [
+        "capacity_utilization_yield_price",
+        "volume_price_mix",
+        "certification_to_batch_supply_conversion"
+      ],
+      "minimum_company_specific_driver_topics": [
+        "HVLP product generation",
+        "processing fee",
+        "capacity and utilization",
+        "customer certification",
+        "product mix",
+        "unit gross profit"
+      ],
+      "forbidden_runtime_tokens": ["HVLP4", "HVLP5"],
+      "benchmark_policy": {
+        "sample_text_role": "narrative_density_only",
+        "sample_text_may_be_evidence": false,
+        "official_source_pack_required": true
+      }
+    },
+    {
+      "case_id": "600988_cycle_resource_gold",
+      "ticker": "600988",
+      "issuer_name": "赤峰黄金",
+      "case_role": "cyclical_resource_mining",
+      "material_segments": [
+        "gold_mining",
+        "copper_and_polymetallic"
+      ],
+      "required_economic_archetypes": [
+        "commodity_price_volume_recovery_unit_cost",
+        "mine_capacity_grade_recovery",
+        "capital_expenditure_and_ramp"
+      ],
+      "minimum_company_specific_driver_topics": [
+        "gold price",
+        "production volume",
+        "grade or recovery rate",
+        "unit cost",
+        "stripping ratio",
+        "capital expenditure"
+      ],
+      "forbidden_runtime_tokens": ["Sepon", "Wassa"],
+      "benchmark_policy": {
+        "sample_text_role": "narrative_density_only",
+        "sample_text_may_be_evidence": false,
+        "official_source_pack_required": true
+      }
+    },
+    {
+      "case_id": "603259_crdmo_backlog_funnel",
+      "ticker": "603259",
+      "issuer_name": "药明康德",
+      "case_role": "order_backlog_project_funnel_service_platform",
+      "material_segments": [
+        "chemistry_crdmo",
+        "testing_and_biology"
+      ],
+      "required_economic_archetypes": [
+        "backlog_conversion_recognition",
+        "project_stage_progression",
+        "capacity_utilization_price_mix"
+      ],
+      "minimum_company_specific_driver_topics": [
+        "backlog",
+        "project stage",
+        "late-stage and commercial conversion",
+        "capacity",
+        "TIDES mix",
+        "customer and regulatory risk"
+      ],
+      "forbidden_runtime_tokens": ["TIDES", "GLP-1"],
+      "benchmark_policy": {
+        "sample_text_role": "narrative_density_only",
+        "sample_text_may_be_evidence": false,
+        "official_source_pack_required": true
+      }
+    },
+    {
+      "case_id": "600673_multi_business_ma",
+      "ticker": "600673",
+      "issuer_name": "东阳光",
+      "case_role": "multi_business_project_and_acquisition",
+      "material_segments": [
+        "fluorochemicals",
+        "electronic_materials",
+        "liquid_cooling",
+        "idc_and_compute_infrastructure",
+        "acquisition_consolidation"
+      ],
+      "required_economic_archetypes": [
+        "quota_volume_price_unit_cost",
+        "capacity_utilization_mix_processing_fee",
+        "project_unit_value_acceptance",
+        "idc_capacity_utilization_unit_revenue_power_cost",
+        "deal_close_consolidation_financing_cost"
+      ],
+      "minimum_company_specific_driver_topics": [
+        "refrigerant quota and price",
+        "electronic material capacity",
+        "liquid-cooling project conversion",
+        "IDC capacity and utilization",
+        "deal closing and consolidation",
+        "financing cost"
+      ],
+      "forbidden_runtime_tokens": ["秦淮数据", "R32", "R134a"],
+      "benchmark_policy": {
+        "sample_text_role": "narrative_density_only",
+        "sample_text_may_be_evidence": false,
+        "official_source_pack_required": true
+      }
+    }
+  ]
+}
