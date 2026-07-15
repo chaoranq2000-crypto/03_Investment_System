@@ -1,0 +1,33 @@
+allowlist:
+  implementation:
+    - src/investment_review/episodes.py
+    - src/investment_review/store.py
+    - src/investment_review/cli.py
+    - src/investment_review/__init__.py
+  tests_and_fixtures:
+    - tests/test_investment_review_trade_episodes.py
+    - tests/fixtures/investment_review_p2c/**
+  contracts_and_operations:
+    - .agents/skills/investment-review/SKILL.md
+    - docs/playbooks/INVESTMENT_REVIEW_P2C.md
+    - docs/plans/INVESTMENT_REVIEW_IMPLEMENTATION_PLAN.md
+    - docs/index.md
+    - README.md
+    - reports/investment_review/p2c/**
+
+denylist:
+  bundle_10r:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/**
+    - scripts/*r5_bundle10*.py
+    - scripts/*bundle10*.py
+    - tests/test_r5_bundle10*.py
+  canonical_research_state:
+    - reports/p1_6/**
+    - config/r5_readout_canonical_index.yaml
+    - docs/workflows/**
+    - data/manifests/**
+  private_or_raw_inputs:
+    - data/db/**
+    - data/raw/**
+    - '**/*.zip'
+    - '**/.env*'

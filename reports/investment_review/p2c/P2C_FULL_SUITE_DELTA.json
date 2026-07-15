@@ -1,0 +1,34 @@
+{
+  "schema_version": "portfolio.trade_episode.full_suite_delta.v1",
+  "base_sha": "1d5084526e5b9d0905480e954b09c00c7343fd9a",
+  "baseline": {
+    "result": "5 failed, 699 passed, 2 skipped",
+    "duration_seconds": 33.08,
+    "failed_node_ids": [
+      "tests/test_r5_bundle10_close.py::test_bundle10_completion_and_external_review_lifecycle_passes",
+      "tests/test_r5_bundle10_human_review_finalize.py::test_finalizer_closes_only_a_validated_temp_human_submission",
+      "tests/test_r5_bundle10_human_review_handoff.py::test_bundle10_finalized_human_review_handoff_is_hash_bound",
+      "tests/test_r5_bundle10_human_review_submission.py::test_finalized_human_submission_validates_without_mutating_handoff",
+      "tests/test_r5_bundle10_state_sync.py::test_bundle10_state_is_finalized_after_external_human_review"
+    ]
+  },
+  "candidate": {
+    "result": "5 failed, 720 passed, 2 skipped",
+    "duration_seconds": 38.16,
+    "failed_node_ids": [
+      "tests/test_r5_bundle10_close.py::test_bundle10_completion_and_external_review_lifecycle_passes",
+      "tests/test_r5_bundle10_human_review_finalize.py::test_finalizer_closes_only_a_validated_temp_human_submission",
+      "tests/test_r5_bundle10_human_review_handoff.py::test_bundle10_finalized_human_review_handoff_is_hash_bound",
+      "tests/test_r5_bundle10_human_review_submission.py::test_finalized_human_submission_validates_without_mutating_handoff",
+      "tests/test_r5_bundle10_state_sync.py::test_bundle10_state_is_finalized_after_external_human_review"
+    ]
+  },
+  "comparison": {
+    "same_exact_known_failures": true,
+    "new_failures": [],
+    "resolved_known_failures": [],
+    "signature_drift": [],
+    "new_passed_tests": 21,
+    "bundle_10r_action": "none"
+  }
+}

@@ -111,3 +111,15 @@ $research-orchestrator 启动细分到个股闭环：AI服务器液冷。
 ```
 
 历史快照只消费不晚于 `as_of` 的交易和收盘价；需要按当时可见信息重放时，可额外传入带时区的 `--knowledge-cutoff`。未定价和陈旧价格会显式保留，重复输入保持同一修订，补录历史交易或行情后产生新修订且旧版本仍可查询。完整命令、字段口径和限制见 `docs/playbooks/PORTFOLIO_TRACKER.md`。
+
+在已审核的 review sidecar 事件和 P2B 快照之上，可生成确定性的交易周期事实 artifact：
+
+```powershell
+.\.conda\investment-system\python.exe -m src.investment_review `
+  --db data/db/investment_review.sqlite3 `
+  episode-build --cutoff-at "2026-07-15T15:00:00+08:00" `
+  --portfolio-db data/db/portfolio.sqlite3 `
+  --output data/processed/normalized/trade_episodes.local.json
+```
+
+该命令只读源库，不推断决策原因；无法证明的快照/Decision 链接会保留为 missing、unlinked、ambiguous 或 invalid。契约、查询和验证命令见 `docs/playbooks/INVESTMENT_REVIEW_P2C.md`。

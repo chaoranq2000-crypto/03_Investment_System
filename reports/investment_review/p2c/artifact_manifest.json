@@ -1,0 +1,20 @@
+{
+  "schema_version": "investment_review.p2c.artifact_manifest.v1",
+  "artifacts": [
+    {"path": "src/investment_review/episodes.py", "role": "contract_builder_linker_validator_query", "status": "complete"},
+    {"path": "src/investment_review/store.py", "role": "explicit_event_and_decision_projection_input", "status": "complete"},
+    {"path": "src/investment_review/cli.py", "role": "build_query_validate_cli", "status": "complete"},
+    {"path": "tests/test_investment_review_trade_episodes.py", "role": "focused_contract_and_regression_tests", "status": "complete"},
+    {"path": "tests/fixtures/investment_review_p2c/scenario_manifest.json", "role": "package_test_matrix_mapping", "status": "complete"},
+    {"path": "docs/playbooks/INVESTMENT_REVIEW_P2C.md", "role": "canonical_operating_contract", "status": "complete"},
+    {"path": "reports/investment_review/p2c/P2C_BASELINE_MANIFEST.yaml", "role": "patch00_baseline", "status": "complete"},
+    {"path": "reports/investment_review/p2c/P2C_FULL_SUITE_DELTA.json", "role": "exact_failure_set_delta", "status": "complete"},
+    {"path": "reports/investment_review/p2c/quality_gate_report.md", "role": "quality_decision", "status": "complete"},
+    {"path": "reports/investment_review/p2c/open_todos.json", "role": "visible_data_gaps", "status": "complete"},
+    {"path": "reports/investment_review/p2c/P2C_CLOSE_READOUT.md", "role": "handoff", "status": "complete"}
+  ],
+  "private_untracked_artifacts": [
+    "C:/Projects/03_Investment_System_portfolio_p2c/.codex_tmp/p2c_close/",
+    "C:/Projects/03_Investment_System_portfolio_p2c/.codex_tmp/p2c_live/"
+  ]
+}

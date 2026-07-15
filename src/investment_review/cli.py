@@ -8,6 +8,14 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from .episodes import (
+    build_episode_collection,
+    load_episode_collection,
+    load_p2b_snapshot_references,
+    query_episode_collection,
+    save_episode_collection,
+    validate_episode_collection,
+)
 from .ingest import ingest_csv, ingest_sqlite
 from .introspection import (
     discover_sqlite_files,
@@ -134,6 +142,38 @@ def build_parser() -> argparse.ArgumentParser:
     context.add_argument("--after-snapshot")
     context.add_argument("--out-json")
     context.add_argument("--out-markdown")
+
+    episode_build = sub.add_parser(
+        "episode-build",
+        help="Build deterministic TradeEpisode v1 artifacts from normalized review events",
+    )
+    episode_build.add_argument("--cutoff-at", required=True)
+    episode_build.add_argument("--timezone", default="Asia/Shanghai")
+    episode_build.add_argument("--account")
+    episode_build.add_argument("--symbol")
+    episode_build.add_argument(
+        "--portfolio-db",
+        help="Optional P2B portfolio SQLite; opened strictly read-only for snapshot links",
+    )
+    episode_build.add_argument("--output", required=True)
+
+    episode_query = sub.add_parser(
+        "episode-query", help="Query a canonical TradeEpisode collection artifact"
+    )
+    episode_query.add_argument("artifact")
+    episode_query.add_argument("--episode-id")
+    episode_query.add_argument("--account")
+    episode_query.add_argument("--instrument")
+    episode_query.add_argument(
+        "--status", choices=["open", "closed", "data_gap", "ambiguous"]
+    )
+    episode_query.add_argument("--from", dest="interval_start")
+    episode_query.add_argument("--to", dest="interval_end")
+
+    episode_validate = sub.add_parser(
+        "episode-validate", help="Validate a canonical TradeEpisode collection artifact"
+    )
+    episode_validate.add_argument("artifact")
 
     return parser
 
@@ -266,6 +306,46 @@ def main(argv: list[str] | None = None) -> int:
                 output.parent.mkdir(parents=True, exist_ok=True)
                 output.write_text(render_portfolio_context_markdown(payload), encoding="utf-8")
             _print(payload)
+        elif args.command == "episode-build":
+            cutoff_at = utc_iso(args.cutoff_at, args.timezone)
+            events = store.list_episode_projection_inputs(
+                account=args.account,
+                symbol=args.symbol,
+            )
+            snapshots = (
+                load_p2b_snapshot_references(args.portfolio_db, account=args.account)
+                if args.portfolio_db
+                else []
+            )
+            collection = build_episode_collection(
+                events,
+                cutoff_at=cutoff_at,
+                snapshot_references=snapshots,
+            )
+            output = save_episode_collection(args.output, collection)
+            _print(
+                {
+                    "status": collection["validation"]["validation_status"],
+                    "episode_count": len(collection["episodes"]),
+                    "collection_digest": collection["collection_digest"],
+                    "output": str(output),
+                }
+            )
+        elif args.command == "episode-query":
+            collection = load_episode_collection(args.artifact)
+            _print(
+                query_episode_collection(
+                    collection,
+                    episode_id=args.episode_id,
+                    account=args.account,
+                    instrument=args.instrument,
+                    status=args.status,
+                    interval_start=args.interval_start,
+                    interval_end=args.interval_end,
+                )
+            )
+        elif args.command == "episode-validate":
+            _print(validate_episode_collection(load_episode_collection(args.artifact)))
         else:
             parser.error(f"Unhandled command: {args.command}")
     except Exception as exc:

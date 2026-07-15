@@ -46,6 +46,28 @@ time. It does not authorize full episode reconstruction, historical portfolio
 replay, complex risk models, AI behavioral claims, UI changes or brokerage
 writes. See `docs/playbooks/INVESTMENT_REVIEW_P2A.md` for formulas and commands.
 
+## P2C trade-episode boundary
+
+After the P2B point-in-time snapshot contract is accepted, the implementation
+may also:
+
+- build deterministic `TradeEpisode` v1 projections from the reviewed v2
+  sidecar `trade_events`;
+- consume P2B portfolio/position snapshot references through a read-only SQLite
+  connection;
+- preserve an event-consumption ledger, stable identities, canonical digests,
+  explicit data-gap/ambiguity statuses and blocker/warning/info findings;
+- link Decisions only through `decision_event_links` and retain `unlinked` when
+  no explicit relation exists;
+- write a versioned local JSON projection and query it without migrating the
+  sidecar schema.
+
+P2C must not write the portfolio database, infer Decision links, use snapshots
+without point-in-time-safe knowledge cutoffs as historical decision facts, split
+one reversal event across two episodes, or add P&L attribution, behavioral
+interpretation, advice, UI or execution. See
+`docs/playbooks/INVESTMENT_REVIEW_P2C.md`.
+
 ## Required workflow
 
 1. Run `python -m src.investment_review --db data/db/investment_review.sqlite3 init`.
@@ -69,6 +91,17 @@ For an approved P2A context run:
     time; any after-snapshot stays in `post_event_observation`.
 11. Preserve metric definitions, data-quality flags, snapshot IDs, source IDs,
     source paths and payload SHA-256 in the output.
+
+For an approved P2C episode run:
+
+12. Build only from reviewed sidecar events whose `occurred_at` and `known_at`
+    are no later than the explicit cutoff.
+13. Read P2B snapshot references in SQLite read-only mode; use exact after links
+    only when event inclusion is proven, otherwise retain `missing`.
+14. Preserve every input in the consumption ledger as consumed, classified,
+    rejected, blocked or cutoff-excluded; never drop it silently.
+15. Rebuild after shuffled input and require identical episode/collection
+    digests before promotion.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate

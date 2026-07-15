@@ -1,0 +1,30 @@
+{
+  "schema_version": "investment_review.p2c.open_todos.v1",
+  "blocking_count": 0,
+  "items": [
+    {
+      "todo_id": "p2c_live_p2b_snapshot_schema_not_initialized",
+      "severity": "medium",
+      "owner": "portfolio_tracker_p2b_operator",
+      "status": "open",
+      "evidence": "The live portfolio SQLite lacks portfolio_snapshots and position_snapshots; P2C refused to fabricate links.",
+      "next_step": "In a separately approved P2B operation, back up and initialize the live v7 schema, then create point-in-time snapshots with explicit knowledge cutoffs before rebuilding P2C."
+    },
+    {
+      "todo_id": "p2c_live_known_at_fallback",
+      "severity": "medium",
+      "owner": "investment_review_data_owner",
+      "status": "open",
+      "evidence": "The reviewed portfolio mapping explicitly falls back known_at to occurred_at for historical ledger rows.",
+      "next_step": "Preserve the warning until a trustworthy source can provide independent historical known_at values; do not backfill by guess."
+    },
+    {
+      "todo_id": "p2c_live_decision_links_empty",
+      "severity": "low",
+      "owner": "user",
+      "status": "open",
+      "evidence": "The live v2 review sidecar contains zero decisions and zero decision_event_links.",
+      "next_step": "Use explicit note-add and link records when historical evidence exists, or address durable dual-time Decision/Information Event capture in a separately approved P2D gate."
+    }
+  ]
+}

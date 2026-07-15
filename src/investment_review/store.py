@@ -744,6 +744,70 @@ class ReviewStore:
             rows = conn.execute(query, params).fetchall()
         return [dict(row) for row in rows]
 
+    def list_episode_projection_inputs(
+        self,
+        *,
+        account: str | None = None,
+        symbol: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Return all canonical event inputs plus explicit Decision links for P2C."""
+
+        self._ensure_initialized()
+        filters: list[str] = []
+        params: list[Any] = []
+        if account:
+            filters.append("account = ?")
+            params.append(account.strip())
+        if symbol:
+            filters.append("symbol = ?")
+            params.append(symbol.strip().upper())
+        where = f"WHERE {' AND '.join(filters)}" if filters else ""
+        with self.connection(read_only=True) as conn:
+            rows = conn.execute(
+                f"""
+                SELECT * FROM trade_events
+                {where}
+                ORDER BY account, market, symbol, occurred_at, source_record_id, event_id
+                """,
+                params,
+            ).fetchall()
+            event_ids = [str(row["event_id"]) for row in rows]
+            links: dict[str, list[dict[str, Any]]] = {event_id: [] for event_id in event_ids}
+            if event_ids:
+                placeholders = ",".join("?" for _ in event_ids)
+                for link in conn.execute(
+                    f"""
+                    SELECT l.event_id, l.relation,
+                           d.decision_id, d.symbol, d.market,
+                           d.occurred_at, d.known_at, d.status
+                    FROM decision_event_links l
+                    JOIN decisions d ON d.decision_id = l.decision_id
+                    WHERE l.event_id IN ({placeholders})
+                    ORDER BY l.event_id, d.decision_id, l.relation
+                    """,
+                    event_ids,
+                ):
+                    links[str(link["event_id"])].append(
+                        {
+                            "decision_id": link["decision_id"],
+                            "event_id": link["event_id"],
+                            "relation": link["relation"],
+                            "symbol": link["symbol"],
+                            "market": link["market"],
+                            "occurred_at": link["occurred_at"],
+                            "known_at": link["known_at"],
+                            "status": link["status"],
+                            "link_source": "decision_event_links",
+                        }
+                    )
+        result: list[dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            item["raw_payload"] = json.loads(item.pop("raw_payload_json"))
+            item["decision_refs"] = links[str(item["event_id"])]
+            result.append(item)
+        return result
+
     def status(self) -> dict[str, Any]:
         self._ensure_initialized()
         with self.connection(read_only=True) as conn:

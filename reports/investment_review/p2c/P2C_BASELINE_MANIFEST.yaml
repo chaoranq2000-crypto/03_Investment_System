@@ -1,0 +1,91 @@
+package_id: portfolio_tracker_p2c_trade_episode_reconstruction
+package_version: 1
+package_sha256: 230fb8035a62c79bedc603a6e077b4ee6b21fef27be016aac0ddff74e76263d2
+captured_on: 2026-07-15
+repository: chaoranq2000-crypto/03_Investment_System
+
+base:
+  branch: codex/portfolio-tracker-p2b
+  sha: 1d5084526e5b9d0905480e954b09c00c7343fd9a
+  worktree: C:/Projects/03_Investment_System_portfolio_p2b
+  worktree_clean: true
+  local_remote_sha_match: true
+
+environment:
+  python: C:/Projects/03_Investment_System/.conda/investment-system/python.exe
+  python_version: 3.12.13
+  dependency_environment: conda investment-system
+
+focused_baseline:
+  command: >-
+    python -m pytest -q tests/test_investment_review_phase1.py
+    tests/test_investment_review_portfolio_context.py
+    tests/test_portfolio_snapshots.py tests/test_portfolio_snapshot_cli.py
+    tests/test_portfolio_tracker.py
+  result: 74 passed
+  duration_seconds: 7.86
+  junit_artifact: C:/Projects/03_Investment_System_portfolio_p2b/.codex_tmp/p2c_baseline/focused.xml
+  log_artifact: C:/Projects/03_Investment_System_portfolio_p2b/.codex_tmp/p2c_baseline/focused.log
+
+full_suite_baseline:
+  command: python -m pytest -q --tb=short
+  result: 5 failed, 699 passed, 2 skipped
+  duration_seconds: 33.08
+  accepted_existing_failure_count: 5
+  accepted_existing_failure_family: Bundle_10R_hash_binding
+  accepted_new_failure_count: 0
+  junit_artifact: C:/Projects/03_Investment_System_portfolio_p2b/.codex_tmp/p2c_baseline/full_suite.xml
+  log_artifact: C:/Projects/03_Investment_System_portfolio_p2b/.codex_tmp/p2c_baseline/full_suite.log
+  failures:
+    - node_id: tests/test_r5_bundle10_close.py::test_bundle10_completion_and_external_review_lifecycle_passes
+      failure_type: AssertionError
+      stable_signature: scorecard report hash does not match reader v3
+      p2c_action: none
+    - node_id: tests/test_r5_bundle10_human_review_finalize.py::test_finalizer_closes_only_a_validated_temp_human_submission
+      failure_type: ValueError
+      stable_signature: pending handoff report hash does not match current Reader
+      p2c_action: none
+    - node_id: tests/test_r5_bundle10_human_review_handoff.py::test_bundle10_finalized_human_review_handoff_is_hash_bound
+      failure_type: AssertionError
+      stable_signature: reader_report_sha256 differs from R5_stock_research_report_reader_v3.md
+      p2c_action: none
+    - node_id: tests/test_r5_bundle10_human_review_submission.py::test_finalized_human_submission_validates_without_mutating_handoff
+      failure_type: AssertionError
+      stable_signature: submission report hash does not match current Reader
+      p2c_action: none
+    - node_id: tests/test_r5_bundle10_state_sync.py::test_bundle10_state_is_finalized_after_external_human_review
+      failure_type: AssertionError
+      stable_signature: candidate report_sha256 differs from current Reader hash
+      p2c_action: none
+
+scope:
+  allowlist:
+    - .agents/skills/investment-review/SKILL.md
+    - README.md
+    - docs/index.md
+    - docs/plans/INVESTMENT_REVIEW_IMPLEMENTATION_PLAN.md
+    - docs/playbooks/INVESTMENT_REVIEW_P2C.md
+    - src/investment_review/__init__.py
+    - src/investment_review/cli.py
+    - src/investment_review/episodes.py
+    - src/investment_review/store.py
+    - tests/test_investment_review_trade_episodes.py
+    - tests/fixtures/investment_review_p2c/**
+    - reports/investment_review/p2c/**
+  protected_denylist:
+    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/**
+    - reports/p1_6/**
+    - config/r5_readout_canonical_index.yaml
+    - scripts/*r5_bundle10*.py
+    - scripts/*bundle10*.py
+    - tests/test_r5_bundle10*.py
+    - docs/workflows/**
+    - data/manifests/**
+
+verification:
+  base_sha_verified: true
+  exact_known_failures_captured: true
+  focused_p2b_tests_green: true
+  p2c_path_allowlist_recorded: true
+  bundle_10r_denylist_recorded: true
+  ready_to_implement: true

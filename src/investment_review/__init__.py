@@ -6,6 +6,12 @@ separate SQLite database so later analysis remains traceable and reversible.
 """
 
 from .models import CanonicalTradeEvent, DecisionRecord, SourceDefinition
+from .episodes import (
+    build_episode_collection,
+    load_p2b_snapshot_references,
+    query_episode_collection,
+    validate_episode_collection,
+)
 from .portfolio_context import (
     PortfolioContext,
     PortfolioSnapshot,
@@ -23,7 +29,11 @@ __all__ = [
     "PositionSnapshot",
     "ReviewStore",
     "SourceDefinition",
+    "build_episode_collection",
     "calculate_portfolio_metrics",
+    "load_p2b_snapshot_references",
+    "query_episode_collection",
+    "validate_episode_collection",
 ]
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
