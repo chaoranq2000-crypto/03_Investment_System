@@ -1,0 +1,42 @@
+schema_version: 1
+name: r5_bundle14r_evidence_trigger_contract
+purpose: >-
+  Qualify only reviewed, same-period, official issuer evidence for the nine unresolved
+  operating-driver contracts and two unresolved overlap-elimination contracts.
+registry_required_fields:
+  - workflow_id
+  - base_commit
+  - source_bundle13r_generation_id
+  - period_anchor_ref
+  - triggers
+trigger_required_fields:
+  - trigger_id
+  - issue_id
+  - kind
+  - owner_stage
+  - metric_key
+  - business_scope
+  - severity
+  - period_policy
+  - allowed_source_classes
+  - required_fields
+  - status
+candidate_required_fields:
+  - evidence_id
+  - source_class
+  - official_issuer_source
+  - review_status
+  - document_date
+  - period_compatible
+  - period_anchor_ref
+  - metric_keys
+  - available_fields
+  - source_hash
+  - locator
+hard_guardrails:
+  - unreviewed material cannot qualify
+  - non-issuer material cannot qualify
+  - period-incompatible material cannot qualify
+  - qualification does not promote a claim automatically
+  - valuation remains a separate gate
+  - Reader and P2 remain frozen

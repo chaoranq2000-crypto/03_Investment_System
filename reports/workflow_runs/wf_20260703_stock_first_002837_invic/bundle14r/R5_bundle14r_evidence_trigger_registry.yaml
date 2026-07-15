@@ -1,0 +1,132 @@
+schema_version: 1
+workflow_id: wf_20260703_stock_first_002837_invic
+base_commit: 32d2c3617c2c95d389682b5de634be9768187f46
+source_bundle13r_generation_id: backflow_gen_r5_bundle13r_fb8cefccfaa93293
+period_anchor_ref: bundle12r/R5_bundle12r_operating_evidence_input.yaml
+status: active_waiting_for_official_evidence
+resolved_at_bundle13r: 6
+unresolved_at_bundle13r: 11
+triggers:
+  - trigger_id: B14R-T1-ROOM-VOLUME
+    issue_id: R5B13R-DRIVER-001
+    kind: operating_driver
+    owner_stage: T1_evidence_backflow
+    metric_key: room_cooling.volume
+    business_scope: 机房温控
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [metric_value, unit, period, business_scope, source_evidence_id, locator]
+    status: unresolved
+  - trigger_id: B14R-T1-ROOM-UNIT-VALUE
+    issue_id: R5B13R-DRIVER-001
+    kind: operating_driver
+    owner_stage: T1_evidence_backflow
+    metric_key: room_cooling.unit_value
+    business_scope: 机房温控
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [metric_value, unit, period, business_scope, source_evidence_id, locator]
+    status: unresolved
+  - trigger_id: B14R-T1-ROOM-MIX
+    issue_id: R5B13R-DRIVER-001
+    kind: operating_driver
+    owner_stage: T1_evidence_backflow
+    metric_key: room_cooling.product_mix
+    business_scope: 机房温控
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [metric_value, unit, period, business_scope, source_evidence_id, locator]
+    status: unresolved
+  - trigger_id: B14R-T1-CABINET-VOLUME
+    issue_id: R5B13R-DRIVER-001
+    kind: operating_driver
+    owner_stage: T1_evidence_backflow
+    metric_key: cabinet_cooling.volume
+    business_scope: 机柜温控
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [metric_value, unit, period, business_scope, source_evidence_id, locator]
+    status: unresolved
+  - trigger_id: B14R-T1-CABINET-UNIT-VALUE
+    issue_id: R5B13R-DRIVER-001
+    kind: operating_driver
+    owner_stage: T1_evidence_backflow
+    metric_key: cabinet_cooling.unit_value
+    business_scope: 机柜温控
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [metric_value, unit, period, business_scope, source_evidence_id, locator]
+    status: unresolved
+  - trigger_id: B14R-T1-CABINET-MIX
+    issue_id: R5B13R-DRIVER-001
+    kind: operating_driver
+    owner_stage: T1_evidence_backflow
+    metric_key: cabinet_cooling.product_mix
+    business_scope: 机柜温控
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [metric_value, unit, period, business_scope, source_evidence_id, locator]
+    status: unresolved
+  - trigger_id: B14R-T1-LIQUID-UNIT-VALUE
+    issue_id: R5B13R-DRIVER-001
+    kind: operating_driver
+    owner_stage: T1_evidence_backflow
+    metric_key: liquid_cooling.unit_value
+    business_scope: 液冷横切口径
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [metric_value, unit, period, business_scope, source_evidence_id, locator]
+    status: unresolved
+  - trigger_id: B14R-T1-LIQUID-ACCEPTANCE
+    issue_id: R5B13R-DRIVER-001
+    kind: operating_driver
+    owner_stage: T1_evidence_backflow
+    metric_key: liquid_cooling.acceptance_rate
+    business_scope: 液冷横切口径
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [metric_value, unit, period, business_scope, source_evidence_id, locator]
+    status: unresolved
+  - trigger_id: B14R-T1-LIQUID-GROSS-MARGIN
+    issue_id: R5B13R-DRIVER-001
+    kind: operating_driver
+    owner_stage: T1_evidence_backflow
+    metric_key: liquid_cooling.gross_margin
+    business_scope: 液冷横切口径
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [metric_value, unit, period, business_scope, source_evidence_id, locator]
+    status: unresolved
+  - trigger_id: B14R-T2-ROOM-LIQUID-OVERLAP
+    issue_id: R5B13R-OVERLAP-001
+    unresolved_item_id: OVL-002
+    kind: overlap_elimination
+    owner_stage: T2_mapping_backflow
+    metric_key: room_cooling.liquid_cooling.overlap_numeric_adjustments
+    business_scope: 机房温控与液冷横切口径重叠
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [base_scope, cross_cutting_scope, revenue_deduction_value, gross_profit_deduction_value, unit, period, allocation_rule, source_evidence_id, locator]
+    status: unresolved
+  - trigger_id: B14R-T2-CABINET-LIQUID-OVERLAP
+    issue_id: R5B13R-OVERLAP-001
+    unresolved_item_id: OVL-003
+    kind: overlap_elimination
+    owner_stage: T2_mapping_backflow
+    metric_key: cabinet_cooling.liquid_cooling.overlap_numeric_adjustments
+    business_scope: 机柜温控与液冷横切口径重叠
+    severity: high
+    period_policy: same_period_as_anchor
+    allowed_source_classes: [issuer_periodic_report, issuer_announcement, issuer_ir_record]
+    required_fields: [base_scope, cross_cutting_scope, revenue_deduction_value, gross_profit_deduction_value, unit, period, allocation_rule, source_evidence_id, locator]
+    status: unresolved
