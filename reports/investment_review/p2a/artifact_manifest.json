@@ -1,0 +1,69 @@
+{
+  "patch_id": "P2A-portfolio-context-foundation",
+  "status": "accepted_with_todos",
+  "artifacts": [
+    {
+      "artifact_id": "p2a_code_001",
+      "artifact_type": "source",
+      "path": "src/investment_review/portfolio_context.py",
+      "status": "complete",
+      "source_or_evidence": "P2A snapshot and metric contract"
+    },
+    {
+      "artifact_id": "p2a_code_002",
+      "artifact_type": "source",
+      "path": "src/investment_review/store.py",
+      "status": "complete",
+      "source_or_evidence": "v2 sidecar snapshot tables"
+    },
+    {
+      "artifact_id": "p2a_code_003",
+      "artifact_type": "source",
+      "path": "src/investment_review/cli.py",
+      "status": "complete",
+      "source_or_evidence": "snapshot-add and portfolio-context commands"
+    },
+    {
+      "artifact_id": "p2a_test_001",
+      "artifact_type": "test",
+      "path": "tests/test_investment_review_portfolio_context.py",
+      "status": "passed",
+      "source_or_evidence": "9 P2A tests"
+    },
+    {
+      "artifact_id": "p2a_doc_001",
+      "artifact_type": "playbook",
+      "path": "docs/playbooks/INVESTMENT_REVIEW_P2A.md",
+      "status": "complete",
+      "source_or_evidence": "formula and operating boundary"
+    },
+    {
+      "artifact_id": "p2a_cfg_001",
+      "artifact_type": "synthetic_example",
+      "path": "config/investment_review.portfolio_snapshot.example.json",
+      "status": "complete",
+      "source_or_evidence": "no real account data"
+    },
+    {
+      "artifact_id": "p2a_gate_001",
+      "artifact_type": "quality_report",
+      "path": "reports/investment_review/p2a/quality_gate_report.md",
+      "status": "accepted_with_todos",
+      "source_or_evidence": "clean apply and failure-set comparison"
+    },
+    {
+      "artifact_id": "p2a_gate_002",
+      "artifact_type": "todo_register",
+      "path": "reports/investment_review/p2a/open_todos.json",
+      "status": "current",
+      "source_or_evidence": "owners severity and next steps"
+    },
+    {
+      "artifact_id": "p2a_gate_003",
+      "artifact_type": "run_log",
+      "path": "reports/investment_review/p2a/run_log.md",
+      "status": "complete",
+      "source_or_evidence": "ordered execution evidence"
+    }
+  ]
+}

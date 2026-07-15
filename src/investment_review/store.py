@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sqlite3
 import uuid
 from contextlib import contextmanager
@@ -10,6 +11,7 @@ from pathlib import Path
 from typing import Any, Iterator, Sequence
 
 from .models import CanonicalTradeEvent, DecisionRecord, SourceDefinition, canonical_json
+from .portfolio_context import PortfolioContext, PortfolioSnapshot, calculate_portfolio_metrics
 
 
 SCHEMA_VERSION = 2
@@ -600,6 +602,124 @@ class ReviewStore:
                     (decision_id, event_id, relation, _now()),
                 )
 
+    def save_portfolio_snapshot(
+        self, source: SourceDefinition, snapshot: PortfolioSnapshot
+    ) -> dict[str, Any]:
+        """Persist one immutable portfolio snapshot in the sidecar review DB."""
+
+        self._ensure_initialized()
+        source.validate()
+        snapshot.validate()
+        if not source.read_only:
+            raise ReviewStoreError("Portfolio snapshot source must be read-only")
+        if snapshot.source_id != source.source_id:
+            raise ReviewStoreError("Snapshot source_id does not match source definition")
+        snapshot_id = snapshot.resolved_snapshot_id
+        payload = snapshot.to_dict()
+        payload_sha256 = snapshot.payload_sha256
+        metrics = calculate_portfolio_metrics(snapshot)
+        now = _now()
+        with self.connection() as conn:
+            with conn:
+                self._upsert_source(conn, source)
+                self._register_source_version(conn, source)
+                existing = conn.execute(
+                    "SELECT payload_sha256 FROM portfolio_snapshots WHERE snapshot_id = ?",
+                    (snapshot_id,),
+                ).fetchone()
+                if existing is not None:
+                    if existing["payload_sha256"] != payload_sha256:
+                        raise DataConflictError(
+                            f"Portfolio snapshot {snapshot_id} was observed with different content"
+                        )
+                    return {"snapshot_id": snapshot_id, "status": "SKIPPED"}
+                conn.execute(
+                    """
+                    INSERT INTO portfolio_snapshots(
+                        snapshot_id, source_id, source_record_id, observed_at, known_at,
+                        account, nav, cash, gross_exposure, net_exposure,
+                        payload_json, payload_sha256, ingested_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        snapshot_id,
+                        source.source_id,
+                        snapshot.source_record_id,
+                        snapshot.observed_at,
+                        snapshot.known_at,
+                        snapshot.account,
+                        str(snapshot.net_asset_value),
+                        str(snapshot.cash),
+                        metrics["gross_exposure"],
+                        metrics["net_exposure"],
+                        canonical_json(payload),
+                        payload_sha256,
+                        now,
+                    ),
+                )
+                for position in snapshot.positions:
+                    conn.execute(
+                        """
+                        INSERT INTO position_snapshot_items(
+                            snapshot_id, symbol, market, quantity, cost_basis,
+                            market_price, market_value, currency, payload_json
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            snapshot_id,
+                            position.symbol,
+                            position.market or "",
+                            str(position.quantity),
+                            str(position.cost_basis) if position.cost_basis is not None else None,
+                            str(position.price) if position.price is not None else None,
+                            str(position.market_value) if position.market_value is not None else None,
+                            position.currency,
+                            canonical_json(position.to_dict()),
+                        ),
+                    )
+        return {"snapshot_id": snapshot_id, "status": "INSERTED"}
+
+    def load_portfolio_snapshot(self, snapshot_id: str) -> PortfolioSnapshot:
+        self._ensure_initialized()
+        with self.connection(read_only=True) as conn:
+            row = conn.execute(
+                "SELECT payload_json FROM portfolio_snapshots WHERE snapshot_id = ?",
+                (snapshot_id,),
+            ).fetchone()
+        if row is None:
+            raise ReviewStoreError(f"Portfolio snapshot not found: {snapshot_id}")
+        payload = json.loads(row["payload_json"])
+        return PortfolioSnapshot.from_dict(payload, default_source_id=payload.get("source_id"), timezone="UTC")
+
+    def get_decision(self, decision_id: str) -> dict[str, Any]:
+        self._ensure_initialized()
+        with self.connection(read_only=True) as conn:
+            row = conn.execute(
+                "SELECT * FROM decisions WHERE decision_id = ?", (decision_id,)
+            ).fetchone()
+        if row is None:
+            raise ReviewStoreError(f"Decision not found: {decision_id}")
+        return dict(row)
+
+    def build_decision_portfolio_context(
+        self,
+        *,
+        decision_id: str,
+        before_snapshot_id: str,
+        after_snapshot_id: str | None = None,
+    ) -> PortfolioContext:
+        decision = self.get_decision(decision_id)
+        return PortfolioContext(
+            reference_type="decision",
+            reference_id=decision_id,
+            reference_symbol=decision["symbol"],
+            reference_occurred_at=decision["occurred_at"],
+            before_snapshot=self.load_portfolio_snapshot(before_snapshot_id),
+            after_snapshot=(
+                self.load_portfolio_snapshot(after_snapshot_id) if after_snapshot_id else None
+            ),
+        )
+
     def list_events(
         self,
         *,
@@ -638,6 +758,7 @@ class ReviewStore:
                     "decisions",
                     "decision_event_links",
                     "portfolio_snapshots",
+                    "position_snapshot_items",
                 )
             }
             integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]

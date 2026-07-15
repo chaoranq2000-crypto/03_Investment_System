@@ -1,0 +1,29 @@
+{
+  "status": "accepted_with_todos",
+  "todos": [
+    {
+      "todo_id": "P2A-TODO-001",
+      "severity": "medium",
+      "owner": "investment-review",
+      "status": "pending",
+      "next_step": "另行批准后实现真实历史快照适配器和事件重放",
+      "scope_note": "不属于 P2A 单快照上下文补丁"
+    },
+    {
+      "todo_id": "P2A-TODO-002",
+      "severity": "medium",
+      "owner": "human-reviewer",
+      "status": "pending",
+      "next_step": "在仓库外准备并人工审核真实快照后使用 snapshot-add",
+      "scope_note": "本补丁仅使用合成测试数据且未写正式旁路库"
+    },
+    {
+      "todo_id": "P2A-TODO-003",
+      "severity": "high",
+      "owner": "bundle10-maintainer",
+      "status": "out_of_scope",
+      "next_step": "按独立维护补丁修复 5 个确定性哈希绑定失败",
+      "scope_note": "不得混入 portfolio context 功能补丁"
+    }
+  ]
+}

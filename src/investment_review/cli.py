@@ -1,4 +1,4 @@
-"""Command-line entry point for the Phase 1 review foundation."""
+"""Command-line entry point for the review foundation and P2A context."""
 
 from __future__ import annotations
 
@@ -16,7 +16,13 @@ from .introspection import (
     write_json,
 )
 from .models import DecisionRecord
+from .portfolio_context import (
+    PortfolioContext,
+    load_snapshot_document,
+    render_portfolio_context_markdown,
+)
 from .store import ReviewStore
+from .time_utils import utc_iso
 
 
 DEFAULT_DB = "data/db/investment_review.sqlite3"
@@ -29,7 +35,7 @@ def _print(payload: Any) -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m src.investment_review",
-        description="Evidence-first investment review data foundation",
+        description="Evidence-first investment review data and portfolio context",
     )
     parser.add_argument(
         "--db",
@@ -108,6 +114,26 @@ def build_parser() -> argparse.ArgumentParser:
     link.add_argument("decision_id")
     link.add_argument("event_id")
     link.add_argument("--relation", default="execution")
+
+    snapshot = sub.add_parser(
+        "snapshot-add", help="Add one reviewed portfolio snapshot to the sidecar database"
+    )
+    snapshot.add_argument("snapshot_json", help="JSON document with source and snapshot objects")
+
+    context = sub.add_parser(
+        "portfolio-context",
+        help="Build a deterministic portfolio analysis block for a decision or trade episode",
+    )
+    reference = context.add_mutually_exclusive_group(required=True)
+    reference.add_argument("--decision-id")
+    reference.add_argument("--episode-id")
+    context.add_argument("--symbol", help="Required with --episode-id")
+    context.add_argument("--occurred-at", help="Required with --episode-id")
+    context.add_argument("--timezone", default="Asia/Shanghai")
+    context.add_argument("--before-snapshot", required=True)
+    context.add_argument("--after-snapshot")
+    context.add_argument("--out-json")
+    context.add_argument("--out-markdown")
 
     return parser
 
@@ -202,6 +228,44 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "link":
             store.link_decision_event(args.decision_id, args.event_id, args.relation)
             _print({"status": "LINKED", "decision_id": args.decision_id, "event_id": args.event_id})
+        elif args.command == "snapshot-add":
+            source, snapshot = load_snapshot_document(args.snapshot_json)
+            _print(store.save_portfolio_snapshot(source, snapshot))
+        elif args.command == "portfolio-context":
+            if args.decision_id:
+                context = store.build_decision_portfolio_context(
+                    decision_id=args.decision_id,
+                    before_snapshot_id=args.before_snapshot,
+                    after_snapshot_id=args.after_snapshot,
+                )
+            else:
+                if not args.symbol or not args.occurred_at:
+                    raise ValueError("--symbol and --occurred-at are required with --episode-id")
+                context = PortfolioContext(
+                    reference_type="trade_episode",
+                    reference_id=args.episode_id,
+                    reference_symbol=args.symbol.strip().upper(),
+                    reference_occurred_at=utc_iso(args.occurred_at, args.timezone),
+                    before_snapshot=store.load_portfolio_snapshot(args.before_snapshot),
+                    after_snapshot=(
+                        store.load_portfolio_snapshot(args.after_snapshot)
+                        if args.after_snapshot
+                        else None
+                    ),
+                )
+            payload = context.to_dict()
+            if args.out_json:
+                output = Path(args.out_json)
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_text(
+                    json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True),
+                    encoding="utf-8",
+                )
+            if args.out_markdown:
+                output = Path(args.out_markdown)
+                output.parent.mkdir(parents=True, exist_ok=True)
+                output.write_text(render_portfolio_context_markdown(payload), encoding="utf-8")
+            _print(payload)
         else:
             parser.error(f"Unhandled command: {args.command}")
     except Exception as exc:

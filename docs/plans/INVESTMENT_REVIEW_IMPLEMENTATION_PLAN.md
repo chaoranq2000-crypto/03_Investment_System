@@ -107,9 +107,10 @@
 
 ## 当前下一动作
 
-Gate 1 已完成现场执行并产出真实 schema manifest。下一动作不是自动进入 Gate 2，
-而是等待单独批准；后续补丁必须消费已审核的 mapping / schema signature，并继续
-显式处理 `known_at` 质量、增量 CSV 语义与快照键约束，不能重新猜测 portfolio 字段。
+Gate 1 已完成现场执行。P2A 已获得单独批准并实现 Gate 2 的一个受限子集：组合/持仓
+快照契约、单快照确定性指标、决策/episode 上下文和输出接线。下一步仍不是自动推进
+完整 Gate 2；真实历史快照生成、事件重放、episode 重构与现有 portfolio 对账需另行批准，
+并继续消费已审核 mapping / schema signature，不能重新猜测 portfolio 字段。
 
 ## 2026-07-15 Phase 1 现场执行状态
 
@@ -119,3 +120,12 @@ Gate 1 已完成现场执行并产出真实 schema manifest。下一动作不是
 - 当前停在 Gate 1，Gate 2–5 未启动；
 - 详细证据和未决项见 `reports/investment_review/phase1/gate1_acceptance.md`、
   `quality_gate_report.md` 与 `quality_issues.csv`。
+
+## 2026-07-15 P2A 实施状态
+
+- 已实现 `PositionSnapshot`、`PortfolioSnapshot`、`PortfolioContext`；
+- 已实现现金、gross/net、权重、Top 1/5、HHI、行业/标签暴露和前后仓位变化；
+- 已将事前事实与事后观察分区，阻断晚于决策时点的 `known_at`；
+- 已复用 v2 旁路库预留快照表，不修改现有 portfolio 源库；
+- 已增加独立组合仓位分析 JSON/Markdown 输出；
+- 未进入完整 episode 重构、复杂风险模型、AI 编排或 UI 阶段。

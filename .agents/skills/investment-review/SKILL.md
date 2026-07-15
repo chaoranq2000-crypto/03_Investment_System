@@ -28,6 +28,24 @@ It must not:
 - collapse evidence into one mechanical score;
 - use information whose `known_at` is later than the decision being reviewed.
 
+## P2A portfolio-context boundary
+
+After the Phase 1 evidence layer is accepted, the implementation may also:
+
+- store reviewed `PositionSnapshot` and `PortfolioSnapshot` objects in the
+  existing v2 sidecar snapshot tables;
+- calculate deterministic single-snapshot cash, gross/net exposure,
+  concentration, industry and label metrics;
+- link a pre-reference snapshot and optional post-event snapshot to a Decision
+  or externally identified Trade Episode;
+- render a separate portfolio-analysis block with provenance, uncertainty and
+  alternative explanations.
+
+P2A must keep post-event observations outside facts available at the decision
+time. It does not authorize full episode reconstruction, historical portfolio
+replay, complex risk models, AI behavioral claims, UI changes or brokerage
+writes. See `docs/playbooks/INVESTMENT_REVIEW_P2A.md` for formulas and commands.
+
 ## Required workflow
 
 1. Run `python -m src.investment_review --db data/db/investment_review.sqlite3 init`.
@@ -39,6 +57,18 @@ It must not:
 5. Run the actual import. Repeated imports must be idempotent.
 6. Capture missing decision context with `note-add`.
 7. Only after the evidence layer is complete, proceed to episode reconstruction or analysis.
+
+For an approved P2A context run:
+
+8. Review a snapshot JSON document and verify `source.read_only=true`,
+   `source_path`, `observed_at`, `known_at`, cash/NAV, positions and currencies.
+9. Run `snapshot-add`; repeated identical snapshots must return `SKIPPED`, while
+   same-ID content drift must fail.
+10. Run `portfolio-context` with a Decision or Trade Episode reference. The
+    before-snapshot `observed_at` and `known_at` must not exceed the reference
+    time; any after-snapshot stays in `post_event_observation`.
+11. Preserve metric definitions, data-quality flags, snapshot IDs, source IDs,
+    source paths and payload SHA-256 in the output.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate

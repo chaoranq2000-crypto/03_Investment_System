@@ -1,0 +1,49 @@
+{
+  "source": {
+    "name": "reviewed_portfolio_snapshot",
+    "kind": "json_snapshot",
+    "uri": "data/processed/normalized/portfolio_snapshot.example.json",
+    "identity_key": "example_account_portfolio_snapshots",
+    "timezone": "Asia/Shanghai",
+    "read_only": true,
+    "config": {
+      "review_status": "example_only"
+    }
+  },
+  "snapshot": {
+    "source_path": "data/processed/normalized/portfolio_snapshot.example.json#snapshot=before",
+    "source_record_id": "example-before-20260715T095900",
+    "account": "example_account",
+    "observed_at": "2026-07-15 09:59:00",
+    "known_at": "2026-07-15 09:59:30",
+    "cash": "50000",
+    "total_assets": "100000",
+    "net_asset_value": "100000",
+    "financing": "0",
+    "base_currency": "CNY",
+    "positions": [
+      {
+        "symbol": "600000.SH",
+        "market": "CN",
+        "quantity": "3000",
+        "cost_basis": "9.80",
+        "price": "10.00",
+        "market_value": "30000",
+        "currency": "CNY",
+        "industry": "银行",
+        "labels": ["dividend"]
+      },
+      {
+        "symbol": "510300.SH",
+        "market": "CN",
+        "quantity": "5000",
+        "cost_basis": "3.95",
+        "price": "4.00",
+        "market_value": "20000",
+        "currency": "CNY",
+        "industry": "宽基指数",
+        "labels": ["core"]
+      }
+    ]
+  }
+}
