@@ -1,0 +1,189 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: r5_bundle15r_reviewed_evidence_pack_v1
+title: R5 Bundle 15R reviewed evidence pack
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - case_id
+  - issuer
+  - as_of_date
+  - review
+  - sources
+  - records
+  - overlap_reconciliation
+  - forecast_bridge
+  - valuation
+  - semantic_candidate
+  - determinism
+  - exact_hash_human_review
+  - release
+properties:
+  schema_version:
+    const: r5_bundle15r_reviewed_evidence_pack_v1
+  case_id:
+    type: string
+    minLength: 1
+  issuer:
+    type: object
+    additionalProperties: false
+    required: [ticker]
+    properties:
+      ticker: {type: string, minLength: 1}
+  as_of_date:
+    type: string
+    format: date
+  review:
+    type: object
+    additionalProperties: false
+    required: [status, reviewer, reviewed_at]
+    properties:
+      status:
+        enum: [accepted, accepted_with_limitations]
+      reviewer: {type: string, minLength: 1}
+      reviewed_at: {type: string, format: date-time}
+  sources:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      additionalProperties: false
+      required:
+        - source_id
+        - source_class
+        - official
+        - review_status
+        - archive_path
+        - sha256
+        - publication_date
+        - covered_period
+      properties:
+        source_id: {type: string, minLength: 1}
+        source_class: {type: string, minLength: 1}
+        official: {const: true}
+        review_status:
+          enum: [accepted, accepted_with_limitations]
+        archive_path: {type: string, minLength: 1}
+        sha256:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+        publication_date: {type: string, format: date}
+        covered_period: {type: string, minLength: 1}
+        locator: {type: string}
+        limitations: {type: string}
+  records:
+    type: array
+    items:
+      type: object
+      additionalProperties: false
+      required:
+        - record_id
+        - driver_id
+        - question_ids
+        - status
+        - value
+        - unit
+        - period
+        - definition
+        - confidence
+        - review_status
+        - source_ids
+        - overlap_rule
+        - stale_trigger
+      properties:
+        record_id: {type: string, minLength: 1}
+        driver_id: {type: string, minLength: 1}
+        question_ids:
+          type: array
+          items: {type: string, minLength: 1}
+        status:
+          enum: [confirmed, bounded_estimate, context_only, blocked, not_applicable]
+        value: {}
+        unit: {type: string}
+        period: {type: string}
+        definition: {type: string}
+        confidence:
+          enum: [high, medium, low]
+        review_status:
+          enum: [accepted, accepted_with_limitations]
+        source_ids:
+          type: array
+          items: {type: string, minLength: 1}
+        overlap_rule: {type: string}
+        stale_trigger: {type: string}
+        dependencies:
+          type: array
+          items: {type: string}
+  overlap_reconciliation:
+    type: object
+    additionalProperties: false
+    required:
+      - status
+      - revenue_overlap_resolved
+      - gross_profit_overlap_resolved
+      - unresolved_items
+    properties:
+      status: {enum: [passed, blocked]}
+      revenue_overlap_resolved: {type: boolean}
+      gross_profit_overlap_resolved: {type: boolean}
+      unresolved_items:
+        type: array
+        items: {type: string}
+  forecast_bridge:
+    type: object
+    additionalProperties: false
+    required:
+      - status
+      - driver_to_statement_reconciliation
+      - working_capital_bridge
+      - cash_flow_bridge
+      - segment_revenue_coverage
+      - segment_gross_profit_coverage
+    properties:
+      status: {enum: [passed, blocked]}
+      driver_to_statement_reconciliation: {type: boolean}
+      working_capital_bridge: {type: boolean}
+      cash_flow_bridge: {type: boolean}
+      segment_revenue_coverage: {type: number, minimum: 0, maximum: 1}
+      segment_gross_profit_coverage: {type: number, minimum: 0, maximum: 1}
+  valuation:
+    type: object
+    additionalProperties: false
+    required: [methods]
+    properties:
+      methods:
+        type: array
+        items: {type: object}
+  semantic_candidate:
+    type: object
+    additionalProperties: false
+    required: [status, semantic_gate_path, semantic_gate_sha256]
+    properties:
+      status: {enum: [pending, passed, failed]}
+      semantic_gate_path: {type: [string, 'null']}
+      semantic_gate_sha256: {type: [string, 'null']}
+  determinism:
+    type: object
+    additionalProperties: false
+    required: [rerun_hash_equal, input_lock_complete, output_lock_complete]
+    properties:
+      rerun_hash_equal: {type: boolean}
+      input_lock_complete: {type: boolean}
+      output_lock_complete: {type: boolean}
+  exact_hash_human_review:
+    type: object
+    required: [status]
+    properties:
+      status: {enum: [not_triggered, pending, accepted, rejected]}
+      reviewer: {type: string}
+      reviewed_at: {type: string}
+      review_path: {type: string}
+      review_sha256: {type: string}
+  release:
+    type: object
+    additionalProperties: false
+    required: [sample_quality_allowed, p2_allowed, workflow_state_mutation_allowed]
+    properties:
+      sample_quality_allowed: {const: false}
+      p2_allowed: {const: false}
+      workflow_state_mutation_allowed: {const: false}

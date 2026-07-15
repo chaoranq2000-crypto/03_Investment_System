@@ -1,0 +1,92 @@
+name: R5 Bundle 15R Reviewed Evidence Qualification
+
+on:
+  push:
+    paths:
+      - "src/research/r5_bundle15r_evidence_qualification.py"
+      - "scripts/run_r5_bundle15r_evidence_qualification.py"
+      - "config/r5_bundle15r_evidence_qualification_policy.yaml"
+      - "schemas/r5_bundle15r_reviewed_evidence_pack.schema.yaml"
+      - "tests/test_r5_bundle15r_evidence_qualification.py"
+      - "tests/fixtures/r5_bundle14r/cases/**"
+      - ".github/workflows/r5-bundle15r-evidence-qualification.yml"
+  pull_request:
+    paths:
+      - "src/research/r5_bundle15r_evidence_qualification.py"
+      - "scripts/run_r5_bundle15r_evidence_qualification.py"
+      - "config/r5_bundle15r_evidence_qualification_policy.yaml"
+      - "schemas/r5_bundle15r_reviewed_evidence_pack.schema.yaml"
+      - "tests/test_r5_bundle15r_evidence_qualification.py"
+      - "tests/fixtures/r5_bundle14r/cases/**"
+      - ".github/workflows/r5-bundle15r-evidence-qualification.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qualification-contract-and-seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install focused dependencies
+        run: python -m pip install --upgrade "pytest>=8,<10" "PyYAML>=6,<7"
+
+      - name: Compile Bundle 15R
+        run: |
+          python -m py_compile \
+            src/research/r5_bundle15r_evidence_qualification.py \
+            scripts/run_r5_bundle15r_evidence_qualification.py
+
+      - name: Run focused tests
+        run: python -m pytest -q tests/test_r5_bundle15r_evidence_qualification.py
+
+      - name: Run deterministic empty-pack seed twice
+        run: |
+          mkdir -p "${{ runner.temp }}/empty-packs"
+          python scripts/run_r5_bundle15r_evidence_qualification.py \
+            --repo-root . \
+            --packs-dir "${{ runner.temp }}/empty-packs" \
+            --scaffold-dir "${{ runner.temp }}/seed-a-scaffolds" \
+            --output-dir "${{ runner.temp }}/seed-a"
+          python scripts/run_r5_bundle15r_evidence_qualification.py \
+            --repo-root . \
+            --packs-dir "${{ runner.temp }}/empty-packs" \
+            --scaffold-dir "${{ runner.temp }}/seed-b-scaffolds" \
+            --output-dir "${{ runner.temp }}/seed-b"
+          diff -ru "${{ runner.temp }}/seed-a" "${{ runner.temp }}/seed-b"
+          diff -ru "${{ runner.temp }}/seed-a-scaffolds" "${{ runner.temp }}/seed-b-scaffolds"
+
+      - name: Assert fail-closed seed outcome
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          suite = json.loads(
+              (Path("${{ runner.temp }}/seed-a") / "R5_bundle15r_qualification_suite.json").read_text()
+          )
+          assert suite["case_count"] == 4, suite
+          assert suite["evidence_pack_present_count"] == 0, suite
+          assert suite["evidence_pack_complete_count"] == 0, suite
+          assert suite["bundle14r_candidate_ready_count"] == 0, suite
+          assert suite["sample_quality_allowed"] is False, suite
+          assert suite["p2_allowed"] is False, suite
+          assert suite["workflow_state_mutation_allowed"] is False, suite
+          PY
+
+      - name: Upload deterministic seed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-bundle15r-empty-pack-seed
+          path: |
+            ${{ runner.temp }}/seed-a
+            ${{ runner.temp }}/seed-a-scaffolds
+          if-no-files-found: error
