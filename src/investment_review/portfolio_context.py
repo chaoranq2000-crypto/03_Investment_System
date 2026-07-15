@@ -339,6 +339,7 @@ class PortfolioMetric:
             "metric_name": self.metric_name,
             "value": self.value,
             "unit": self.unit,
+            "method": portfolio_metric_method_ref(self.metric_name),
             "calculation_method": self.calculation_method,
             "as_of": self.as_of,
             "available_at": self.available_at,
@@ -497,36 +498,186 @@ def _metric_source_ref(
     )
 
 
+PORTFOLIO_METRIC_REGISTRY_VERSION = "p2e2.portfolio_metric_registry.v1"
+"""Version of the public P2E-2 portfolio metric method registry."""
+
+_INDUSTRY_WEIGHT_REGISTRY_KEY = "industry_weight::*"
+
+PORTFOLIO_METRIC_METHOD_REGISTRY: dict[str, dict[str, str]] = {
+    "nav": {
+        "method_id": "nav",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "snapshot.net_asset_value input",
+    },
+    "cash_value": {
+        "method_id": "cash_value",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "snapshot.cash input",
+    },
+    "cash_weight": {
+        "method_id": "cash_weight",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "cash_value / nav",
+    },
+    "long_market_value": {
+        "method_id": "long_market_value",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "sum(positive base_market_value)",
+    },
+    "short_market_value": {
+        "method_id": "short_market_value",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "sum(abs(negative base_market_value))",
+    },
+    "gross_market_value": {
+        "method_id": "gross_market_value",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "long_market_value + short_market_value",
+    },
+    "net_market_value": {
+        "method_id": "net_market_value",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "long_market_value - short_market_value",
+    },
+    "long_exposure": {
+        "method_id": "long_exposure",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "long_market_value / nav",
+    },
+    "short_exposure": {
+        "method_id": "short_exposure",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "short_market_value / nav",
+    },
+    "gross_exposure": {
+        "method_id": "gross_exposure",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "gross_market_value / nav",
+    },
+    "net_exposure": {
+        "method_id": "net_exposure",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "net_market_value / nav",
+    },
+    "position_count": {
+        "method_id": "position_count",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "count(snapshot.positions)",
+    },
+    "valued_position_count": {
+        "method_id": "valued_position_count",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "count(positions with reviewed base_market_value)",
+    },
+    "unpriced_position_count": {
+        "method_id": "unpriced_position_count",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "count(positions in the explicit missing valuation set)",
+    },
+    "valuation_coverage": {
+        "method_id": "valuation_coverage",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "valued_position_count / position_count",
+    },
+    "unpriced_position_ratio": {
+        "method_id": "unpriced_position_ratio",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "unpriced_position_count / position_count",
+    },
+    "missing_valuation_amount": {
+        "method_id": "missing_valuation_amount",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "zero only when coverage is complete; otherwise unavailable",
+    },
+    "stale_position_count": {
+        "method_id": "stale_position_count",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "count(position_keys explicitly marked stale)",
+    },
+    "stale_position_ratio": {
+        "method_id": "stale_position_ratio",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "stale_position_count / position_count",
+    },
+    "target_position_value": {
+        "method_id": "target_position_value",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "sum(target_symbol base_market_value)",
+    },
+    "target_position_weight": {
+        "method_id": "target_position_weight",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "target_position_value / nav",
+    },
+    "max_position_weight": {
+        "method_id": "max_position_weight",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "max(abs(base_market_value)) / gross_market_value",
+    },
+    "top3_concentration": {
+        "method_id": "top3_concentration",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "sum(top 3 abs(base_market_value)) / gross_market_value",
+    },
+    "top5_concentration": {
+        "method_id": "top5_concentration",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "sum(top 5 abs(base_market_value)) / gross_market_value",
+    },
+    "hhi": {
+        "method_id": "hhi",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "sum((abs(base_market_value) / gross_market_value)^2)",
+    },
+    _INDUSTRY_WEIGHT_REGISTRY_KEY: {
+        "method_id": "industry_weight",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "industry gross_market_value / gross_market_value",
+    },
+    "max_industry_weight": {
+        "method_id": "max_industry_weight",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "max(industry gross_market_value / gross_market_value)",
+    },
+    "unclassified_industry_weight": {
+        "method_id": "unclassified_industry_weight",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+        "calculation_method": "UNKNOWN industry gross_market_value / gross_market_value",
+    },
+}
+"""Stable metric IDs, versions and formulas exported for P2E-3 consumers."""
+
 _METRIC_CALCULATION_METHODS = {
-    "nav": "observed snapshot.net_asset_value",
-    "cash_value": "observed snapshot.cash",
-    "cash_weight": "cash_value / nav",
-    "long_market_value": "sum(positive base_market_value)",
-    "short_market_value": "sum(abs(negative base_market_value))",
-    "gross_market_value": "long_market_value + short_market_value",
-    "net_market_value": "long_market_value - short_market_value",
-    "long_exposure": "long_market_value / nav",
-    "short_exposure": "short_market_value / nav",
-    "gross_exposure": "gross_market_value / nav",
-    "net_exposure": "net_market_value / nav",
-    "position_count": "count(snapshot.positions)",
-    "valued_position_count": "count(positions with reviewed base_market_value)",
-    "valuation_coverage": "valued_position_count / position_count",
-    "missing_valuation_amount": "zero only when coverage is complete; otherwise unavailable",
-    "max_position_weight": "max(abs(base_market_value)) / gross_market_value",
-    "top3_concentration": "sum(top 3 abs(base_market_value)) / gross_market_value",
-    "top5_concentration": "sum(top 5 abs(base_market_value)) / gross_market_value",
-    "hhi": "sum((abs(base_market_value) / gross_market_value)^2)",
-    "max_industry_weight": "max(industry gross_market_value / gross_market_value)",
-    "unclassified_industry_weight": "UNKNOWN industry gross_market_value / gross_market_value",
+    metric_name: spec["calculation_method"]
+    for metric_name, spec in PORTFOLIO_METRIC_METHOD_REGISTRY.items()
 }
 
 
-def _metric_calculation_method(metric_name: str) -> str:
-    if metric_name.startswith("industry_weight::"):
-        return "industry gross_market_value / gross_market_value"
+def _metric_registry_key(metric_name: str) -> str:
+    return (
+        _INDUSTRY_WEIGHT_REGISTRY_KEY
+        if metric_name.startswith("industry_weight::")
+        else metric_name
+    )
+
+
+def portfolio_metric_method_ref(metric_name: str) -> dict[str, str]:
+    """Return the stable method identity for one public portfolio metric."""
+
+    registry_key = _metric_registry_key(metric_name)
     try:
-        return _METRIC_CALCULATION_METHODS[metric_name]
+        spec = PORTFOLIO_METRIC_METHOD_REGISTRY[registry_key]
+    except KeyError as exc:
+        raise ModelValidationError(f"Missing metric method registration: {metric_name}") from exc
+    return {
+        "method_id": spec["method_id"],
+        "method_version": spec["method_version"],
+    }
+
+
+def _metric_calculation_method(metric_name: str) -> str:
+    try:
+        return _METRIC_CALCULATION_METHODS[_metric_registry_key(metric_name)]
     except KeyError as exc:
         raise ModelValidationError(f"Missing calculation method for metric: {metric_name}") from exc
 
@@ -566,6 +717,9 @@ def _portfolio_metric(
 
 def calculate_portfolio_evidence_metrics(
     snapshot: PortfolioSnapshot,
+    *,
+    target_symbol: str | None = None,
+    stale_position_keys: Iterable[str] | None = None,
 ) -> tuple[PortfolioMetric, ...]:
     """Build deterministic, source-bound metrics for one reviewed snapshot.
 
@@ -577,7 +731,36 @@ def calculate_portfolio_evidence_metrics(
     snapshot.validate()
     all_positions = sorted(snapshot.positions, key=lambda item: item.position_key)
     all_keys = tuple(item.position_key for item in all_positions)
+    all_key_set = set(all_keys)
+    normalized_target_symbol: str | None = None
+    if target_symbol is not None:
+        normalized_target_symbol = str(target_symbol).strip().upper()
+        if not normalized_target_symbol:
+            raise ModelValidationError("target_symbol cannot be blank")
+
+    normalized_stale_keys: tuple[str, ...] | None = None
+    if stale_position_keys is not None:
+        raw_stale_keys = (
+            (stale_position_keys,)
+            if isinstance(stale_position_keys, str)
+            else stale_position_keys
+        )
+        stale_key_set: set[str] = set()
+        for raw_key in raw_stale_keys:
+            key = str(raw_key).strip()
+            if not key:
+                raise ModelValidationError("stale_position_keys cannot contain a blank key")
+            stale_key_set.add(key)
+        unknown_stale_keys = sorted(stale_key_set - all_key_set)
+        if unknown_stale_keys:
+            raise ModelValidationError(
+                "stale_position_keys are not present in the snapshot: "
+                + ", ".join(unknown_stale_keys)
+            )
+        normalized_stale_keys = tuple(sorted(stale_key_set))
+
     valued: list[tuple[PositionSnapshot, Decimal]] = []
+    valued_by_key: dict[str, Decimal] = {}
     missing: list[PositionSnapshot] = []
     detail_warnings: list[PortfolioWarning] = []
     for position in all_positions:
@@ -635,9 +818,11 @@ def calculate_portfolio_evidence_metrics(
                 )
             continue
         valued.append((position, value))
+        valued_by_key[position.position_key] = value
 
     valued.sort(key=lambda item: (-abs(item[1]), item[0].position_key))
     valued_keys = tuple(item.position_key for item, _ in valued)
+    missing_keys = tuple(item.position_key for item in missing)
     long_value = _exact_sum(value for _, value in valued if value > 0)
     short_value = _exact_sum(-value for _, value in valued if value < 0)
     gross_value = _exact_sum((long_value, short_value))
@@ -667,6 +852,65 @@ def calculate_portfolio_evidence_metrics(
     valuation_warnings: tuple[PortfolioWarning, ...] = tuple(
         [*(detail_warnings), *([partial_warning] if missing else [])]
     )
+
+    stale_metadata_warning = PortfolioWarning(
+        code="STALE_POSITION_METADATA_UNAVAILABLE",
+        scope="portfolio",
+        message="No reviewed stale-position metadata was supplied for this snapshot.",
+    )
+    stale_warnings: tuple[PortfolioWarning, ...]
+    if normalized_stale_keys is None:
+        stale_warnings = (stale_metadata_warning,)
+        stale_count: int | None = None
+        stale_ratio: Decimal | None = None
+    else:
+        stale_warnings = tuple(
+            PortfolioWarning(
+                code="STALE_POSITION",
+                scope=position_key,
+                message="The position was explicitly marked stale by reviewed metadata.",
+            )
+            for position_key in normalized_stale_keys
+        )
+        stale_count = len(normalized_stale_keys)
+        stale_ratio = (
+            Decimal(stale_count) / Decimal(len(all_positions))
+            if all_positions
+            else Decimal("0")
+        )
+
+    target_keys: tuple[str, ...] = ()
+    target_value: Decimal | None = None
+    target_warnings: tuple[PortfolioWarning, ...] = ()
+    if normalized_target_symbol is not None:
+        target_positions = tuple(
+            position
+            for position in all_positions
+            if position.symbol == normalized_target_symbol
+        )
+        target_keys = tuple(position.position_key for position in target_positions)
+        target_missing_keys = tuple(
+            position_key for position_key in target_keys if position_key in set(missing_keys)
+        )
+        if not target_positions:
+            target_value = Decimal("0")
+        elif target_missing_keys:
+            target_value = None
+            target_warning_items = [
+                warning
+                for warning in detail_warnings
+                if warning.scope in set(target_missing_keys)
+            ]
+            target_warning_items.append(
+                PortfolioWarning(
+                    code="TARGET_POSITION_UNPRICED",
+                    scope=normalized_target_symbol,
+                    message="At least one target position lacks a reviewed base-currency valuation.",
+                )
+            )
+            target_warnings = tuple(target_warning_items)
+        else:
+            target_value = _exact_sum(valued_by_key[position_key] for position_key in target_keys)
 
     def nav_ratio_metric(
         metric_name: str,
@@ -778,11 +1022,33 @@ def calculate_portfolio_evidence_metrics(
         ),
         _portfolio_metric(
             snapshot,
+            metric_name="unpriced_position_count",
+            value=len(missing),
+            unit="count",
+            status="derived",
+            position_keys=missing_keys,
+            warnings=valuation_warnings,
+        ),
+        _portfolio_metric(
+            snapshot,
             metric_name="valuation_coverage",
             value=(
                 Decimal(len(valued)) / Decimal(len(all_positions))
                 if all_positions
                 else Decimal("1")
+            ),
+            unit="position_count_ratio",
+            status="derived",
+            position_keys=all_keys,
+            warnings=valuation_warnings,
+        ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="unpriced_position_ratio",
+            value=(
+                Decimal(len(missing)) / Decimal(len(all_positions))
+                if all_positions
+                else Decimal("0")
             ),
             unit="position_count_ratio",
             status="derived",
@@ -811,7 +1077,62 @@ def calculate_portfolio_evidence_metrics(
                 ),
             ),
         ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="stale_position_count",
+            value=stale_count,
+            unit="count",
+            status="unavailable" if stale_count is None else "derived",
+            position_keys=(
+                all_keys if normalized_stale_keys is None else normalized_stale_keys
+            ),
+            warnings=stale_warnings,
+        ),
+        _portfolio_metric(
+            snapshot,
+            metric_name="stale_position_ratio",
+            value=stale_ratio,
+            unit="position_count_ratio",
+            status="unavailable" if stale_ratio is None else "derived",
+            position_keys=all_keys,
+            warnings=stale_warnings,
+        ),
     ]
+
+    if normalized_target_symbol is not None:
+        target_status = "unavailable" if target_value is None else "derived"
+        metrics.append(
+            _portfolio_metric(
+                snapshot,
+                metric_name="target_position_value",
+                value=target_value,
+                unit=snapshot.base_currency,
+                status=target_status,
+                position_keys=target_keys,
+                warnings=target_warnings,
+            )
+        )
+        if target_value is None:
+            metrics.append(
+                _portfolio_metric(
+                    snapshot,
+                    metric_name="target_position_weight",
+                    value=None,
+                    unit="ratio_to_nav",
+                    status="unavailable",
+                    position_keys=target_keys,
+                    warnings=target_warnings,
+                )
+            )
+        else:
+            metrics.append(
+                nav_ratio_metric(
+                    "target_position_weight",
+                    target_value,
+                    position_keys=target_keys,
+                    warnings=target_warnings,
+                )
+            )
 
     concentration_warning_items = valuation_warnings
     if nav <= 0:
@@ -930,9 +1251,21 @@ def calculate_portfolio_evidence_metrics(
     return tuple(metrics)
 
 
-def deterministic_portfolio_evidence_json(snapshot: PortfolioSnapshot) -> str:
+def deterministic_portfolio_evidence_json(
+    snapshot: PortfolioSnapshot,
+    *,
+    target_symbol: str | None = None,
+    stale_position_keys: Iterable[str] | None = None,
+) -> str:
     return json.dumps(
-        [metric.to_dict() for metric in calculate_portfolio_evidence_metrics(snapshot)],
+        [
+            metric.to_dict()
+            for metric in calculate_portfolio_evidence_metrics(
+                snapshot,
+                target_symbol=target_symbol,
+                stale_position_keys=stale_position_keys,
+            )
+        ],
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),

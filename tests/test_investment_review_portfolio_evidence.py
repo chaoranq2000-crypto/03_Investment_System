@@ -7,10 +7,13 @@ import pytest
 
 from src.investment_review.models import ModelValidationError
 from src.investment_review.portfolio_context import (
+    PORTFOLIO_METRIC_METHOD_REGISTRY,
+    PORTFOLIO_METRIC_REGISTRY_VERSION,
     PortfolioContext,
     PortfolioSnapshot,
     calculate_portfolio_evidence_metrics,
     deterministic_portfolio_evidence_json,
+    portfolio_metric_method_ref,
 )
 
 
@@ -43,8 +46,11 @@ def snapshot(
     )
 
 
-def metric_map(value: PortfolioSnapshot) -> dict[str, dict]:
-    return {item.metric_name: item.to_dict() for item in calculate_portfolio_evidence_metrics(value)}
+def metric_map(value: PortfolioSnapshot, **kwargs: object) -> dict[str, dict]:
+    return {
+        item.metric_name: item.to_dict()
+        for item in calculate_portfolio_evidence_metrics(value, **kwargs)
+    }
 
 
 def warning_codes(metric: dict) -> set[str]:
@@ -133,6 +139,80 @@ def test_missing_price_is_excluded_without_becoming_zero() -> None:
     )
 
 
+def test_unpriced_position_count_and_ratio_come_from_the_missing_valuation_set() -> None:
+    metrics = metric_map(
+        snapshot(
+            positions=[
+                {"symbol": "UNPRICED", "quantity": "10", "industry": "I1"},
+                {"symbol": "VALUED", "quantity": "10", "price": "10", "industry": "I1"},
+            ]
+        )
+    )
+
+    assert metrics["unpriced_position_count"]["value"] == "1"
+    assert metrics["unpriced_position_count"]["status"] == "derived"
+    assert metrics["unpriced_position_ratio"]["value"] == "0.5"
+    assert metrics["unpriced_position_ratio"]["status"] == "derived"
+    assert metrics["unpriced_position_count"]["source_refs"][0]["position_keys"] == [
+        "UNPRICED|"
+    ]
+
+
+def test_stale_metrics_distinguish_missing_metadata_from_reviewed_zero() -> None:
+    value = snapshot(
+        positions=[
+            {"symbol": "A", "quantity": "10", "price": "10"},
+            {"symbol": "B", "quantity": "10", "price": "10"},
+        ]
+    )
+
+    unknown = metric_map(value)
+    assert unknown["stale_position_count"]["value"] is None
+    assert unknown["stale_position_count"]["status"] == "unavailable"
+    assert unknown["stale_position_ratio"]["value"] is None
+    assert "STALE_POSITION_METADATA_UNAVAILABLE" in warning_codes(
+        unknown["stale_position_count"]
+    )
+
+    reviewed_zero = metric_map(value, stale_position_keys=[])
+    assert reviewed_zero["stale_position_count"]["value"] == "0"
+    assert reviewed_zero["stale_position_ratio"]["value"] == "0"
+
+    reviewed_stale = metric_map(value, stale_position_keys=["B|"])
+    assert reviewed_stale["stale_position_count"]["value"] == "1"
+    assert reviewed_stale["stale_position_ratio"]["value"] == "0.5"
+    assert "STALE_POSITION" in warning_codes(reviewed_stale["stale_position_count"])
+
+
+def test_target_metrics_distinguish_absent_valued_and_unpriced_positions() -> None:
+    value = snapshot(
+        positions=[
+            {"symbol": "TARGET", "quantity": "2", "price": "25", "industry": "I1"},
+            {"symbol": "OTHER", "quantity": "10", "price": "10", "industry": "I2"},
+        ]
+    )
+
+    valued = metric_map(value, target_symbol="target")
+    assert valued["target_position_value"]["value"] == "50"
+    assert valued["target_position_weight"]["value"] == "0.05"
+    assert valued["target_position_weight"]["unit"] == "ratio_to_nav"
+
+    absent = metric_map(value, target_symbol="ABSENT")
+    assert absent["target_position_value"]["value"] == "0"
+    assert absent["target_position_weight"]["value"] == "0"
+
+    unpriced = metric_map(
+        snapshot(positions=[{"symbol": "TARGET", "quantity": "2", "industry": "I1"}]),
+        target_symbol="TARGET",
+    )
+    assert unpriced["target_position_value"]["value"] is None
+    assert unpriced["target_position_value"]["status"] == "unavailable"
+    assert unpriced["target_position_weight"]["value"] is None
+    assert "TARGET_POSITION_UNPRICED" in warning_codes(
+        unpriced["target_position_value"]
+    )
+
+
 def test_missing_fx_is_visible_and_not_counted_as_a_base_currency_valuation() -> None:
     metrics = metric_map(
         snapshot(
@@ -206,6 +286,44 @@ def test_input_order_does_not_change_the_deterministic_json() -> None:
     assert deterministic_portfolio_evidence_json(snapshot(positions=rows)) == (
         deterministic_portfolio_evidence_json(snapshot(positions=list(reversed(rows))))
     )
+
+
+def test_target_and_stale_inputs_remain_deterministic_when_orders_change() -> None:
+    rows = [
+        {"symbol": "B", "quantity": "10", "price": "10", "industry": "I2"},
+        {"symbol": "A", "quantity": "10", "price": "10", "industry": "I1"},
+    ]
+
+    assert deterministic_portfolio_evidence_json(
+        snapshot(positions=rows),
+        target_symbol="A",
+        stale_position_keys=["B|", "A|"],
+    ) == deterministic_portfolio_evidence_json(
+        snapshot(positions=list(reversed(rows))),
+        target_symbol="a",
+        stale_position_keys=["A|", "B|"],
+    )
+
+
+def test_public_metric_registry_exposes_versioned_methods_and_keeps_formula_text() -> None:
+    method = portfolio_metric_method_ref("cash_weight")
+    assert method == {
+        "method_id": "cash_weight",
+        "method_version": PORTFOLIO_METRIC_REGISTRY_VERSION,
+    }
+    assert portfolio_metric_method_ref("industry_weight::银行")["method_id"] == (
+        "industry_weight"
+    )
+    assert PORTFOLIO_METRIC_METHOD_REGISTRY["target_position_weight"][
+        "calculation_method"
+    ] == "target_position_value / nav"
+
+    metric = metric_map(snapshot(cash="1000"))["cash_weight"]
+    assert metric["method"] == method
+    assert metric["calculation_method"] == "cash_value / nav"
+
+    with pytest.raises(ModelValidationError, match="Missing metric method registration"):
+        portfolio_metric_method_ref("not_registered")
 
 
 def test_large_amounts_and_decimal_precision_are_not_converted_to_float() -> None:
