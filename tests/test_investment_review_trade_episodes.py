@@ -316,7 +316,27 @@ def decision(decision_id: str, event_id: str, *, known_at: datetime, symbol: str
 
 def test_decision_links_are_explicit_temporal_and_unambiguous() -> None:
     linked = build([event("e1", decisions=[decision("d1", "e1", known_at=BASE - timedelta(minutes=1))])])
-    assert linked["episodes"][0]["decision_linkage"]["status"] == "linked"
+    linked_evidence = linked["episodes"][0]["decision_linkage"]
+    assert linked_evidence["status"] == "linked"
+    assert linked_evidence["decision_refs"] == ["d1"]
+    assert linked_evidence["decision_links"] == [
+        {
+            "decision_id": "d1",
+            "container_event_id": "e1",
+            "event_id": "e1",
+            "relation": "execution",
+            "effective_at": (BASE - timedelta(minutes=2)).isoformat(
+                timespec="seconds"
+            ),
+            "known_at": (BASE - timedelta(minutes=1)).isoformat(
+                timespec="seconds"
+            ),
+            "symbol": "600000.SH",
+            "market": None,
+            "status": "OPEN",
+            "link_source": "decision_event_links",
+        }
+    ]
 
     unlinked = build([event("e1")])
     assert unlinked["episodes"][0]["decision_linkage"]["status"] == "unlinked"
@@ -338,6 +358,121 @@ def test_decision_links_are_explicit_temporal_and_unambiguous() -> None:
     invalid = build([event("e1", decisions=[decision("d1", "e1", known_at=BASE + timedelta(minutes=1))])])
     assert invalid["episodes"][0]["decision_linkage"]["status"] == "invalid"
     assert "DECISION_LINK_INVALID" in codes(invalid["episodes"][0]["validation"])
+
+
+def test_one_decision_can_cover_multiple_execution_events() -> None:
+    shared_known_at = BASE - timedelta(minutes=1)
+    result = build(
+        [
+            event(
+                "e1",
+                decisions=[decision("d-shared", "e1", known_at=shared_known_at)],
+            ),
+            event(
+                "e2",
+                at=BASE + timedelta(minutes=1),
+                side="SELL",
+                sequence=2,
+                decisions=[decision("d-shared", "e2", known_at=shared_known_at)],
+            ),
+        ]
+    )
+    linkage = result["episodes"][0]["decision_linkage"]
+    assert linkage["status"] == "linked"
+    assert linkage["decision_refs"] == ["d-shared"]
+    assert [item["event_id"] for item in linkage["decision_links"]] == ["e1", "e2"]
+    assert "DECISION_LINK_AMBIGUOUS" not in codes(result["validation"])
+    assert "DECISION_LINK_STATUS_MISMATCH" not in codes(result["validation"])
+
+
+@pytest.mark.parametrize("missing_field", ["decision_id", "event_id", "link_source"])
+def test_malformed_explicit_decision_link_is_not_downgraded_to_unlinked(
+    missing_field: str,
+) -> None:
+    raw = decision("d1", "e1", known_at=BASE - timedelta(minutes=1))
+    raw.pop(missing_field)
+    result = build([event("e1", decisions=[raw])])
+    linkage = result["episodes"][0]["decision_linkage"]
+    assert linkage["status"] == "invalid"
+    assert "DECISION_LINK_INVALID" in codes(result["validation"])
+
+
+def test_decision_link_rejects_forged_status_and_conflicting_time_alias() -> None:
+    forged_status = decision("d1", "e1", known_at=BASE - timedelta(minutes=1))
+    forged_status["status"] = "FORGED"
+    invalid = build([event("e1", decisions=[forged_status])])
+    assert invalid["episodes"][0]["decision_linkage"]["status"] == "invalid"
+
+    conflicting_time = decision(
+        "d2", "e1", known_at=BASE - timedelta(minutes=1)
+    )
+    conflicting_time["effective_at"] = (BASE - timedelta(hours=1)).isoformat()
+    conflict = build([event("e1", decisions=[conflicting_time])])
+    assert conflict["episodes"][0]["decision_linkage"]["status"] == "invalid"
+    assert "DECISION_LINK_INVALID" in codes(conflict["validation"])
+
+
+def test_numeric_event_sequence_is_validated_structurally_not_lexically() -> None:
+    result = build(
+        [
+            event("e10", quantity="10", sequence=10),
+            event("e2", quantity="10", sequence=2),
+        ]
+    )
+    episode = result["episodes"][0]
+    assert [int(item["ordering_key"][2]) for item in episode["event_refs"]] == [2, 10]
+    assert "NON_CANONICAL_EVENT_ORDER" not in codes(
+        validate_episode(episode)
+    )
+
+    numeric_rank_episode = deepcopy(episode)
+    numeric_rank_episode["event_refs"][0]["ordering_key"][1] = 2
+    numeric_rank_episode["event_refs"][1]["ordering_key"][1] = 10
+    assert "NON_CANONICAL_EVENT_ORDER" not in codes(
+        validate_episode(numeric_rank_episode)
+    )
+
+
+def test_validator_requires_canonical_decision_link_evidence() -> None:
+    collection = build(
+        [
+            event(
+                "e1",
+                decisions=[
+                    decision("d1", "e1", known_at=BASE - timedelta(minutes=1))
+                ],
+            )
+        ]
+    )
+    episode = deepcopy(collection["episodes"][0])
+    episode["decision_linkage"].pop("decision_links")
+    validation = validate_episode(episode)
+    assert validation["validation_status"] == "blocked"
+    assert "MALFORMED_DECISION_LINKAGE" in codes(validation)
+    assert "DECISION_LINK_CLOSURE_MISMATCH" in codes(validation)
+
+
+def test_decision_link_cannot_move_to_another_event_or_relation() -> None:
+    moved = decision(
+        "d1", "e2", known_at=BASE - timedelta(minutes=1)
+    )
+    moved["relation"] = "forged_relation"
+    collection = build(
+        [
+            event("e1", decisions=[moved]),
+            event(
+                "e2",
+                at=BASE + timedelta(minutes=1),
+                side="SELL",
+                sequence=2,
+            ),
+        ]
+    )
+    linkage = collection["episodes"][0]["decision_linkage"]
+    assert linkage["status"] == "invalid"
+    assert linkage["decision_links"][0]["container_event_id"] == "e1"
+    assert linkage["decision_links"][0]["event_id"] == "e2"
+    assert "DECISION_LINK_INVALID" in codes(collection["validation"])
 
 
 def test_validator_blocks_tampered_contracts() -> None:
@@ -414,6 +549,50 @@ def test_validator_rejects_snapshot_scope_and_future_tampering() -> None:
     )
     catalog[0]["knowledge_cutoff_at"] = (BASE + timedelta(minutes=1)).isoformat()
     assert "FUTURE_SNAPSHOT_LINK" in codes(validate_episode(episode, snapshot_catalog=catalog))
+
+
+def test_snapshot_links_require_exact_catalog_time_and_role_set_closure() -> None:
+    result = build(
+        [event("e1")],
+        [
+            snapshot(
+                "after-open",
+                as_of="2026-07-01",
+                cutoff=BASE,
+                included=["e1"],
+                instruments=["600000.SH"],
+            )
+        ],
+    )
+    episode = deepcopy(result["episodes"][0])
+    catalog = deepcopy(result["snapshot_catalog"])
+    linked = next(
+        item for item in episode["snapshot_links"] if item["snapshot_ref"]
+    )
+    linked["snapshot_as_of"] = "2026-07-02"
+    validation = validate_episode(episode, snapshot_catalog=catalog)
+    assert "SNAPSHOT_LINK_CLOSURE_MISMATCH" in codes(validation)
+
+    removed = deepcopy(result["episodes"][0])
+    removed["snapshot_links"] = [
+        item for item in removed["snapshot_links"] if item["link_role"] != "after_open"
+    ]
+    validation = validate_episode(removed, snapshot_catalog=catalog)
+    assert "SNAPSHOT_LINK_SET_MISMATCH" in codes(validation)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"ending_quantity": {"bad": 1}},
+        {"event_refs": "bad"},
+        {"snapshot_links": "bad"},
+    ],
+)
+def test_episode_validator_is_total_for_malformed_json(payload: dict) -> None:
+    validation = validate_episode(payload)
+    assert validation["validation_status"] == "blocked"
+    assert validation["findings"]
 
 
 def test_snapshot_cursor_proof_is_preserved_and_invalid_claims_block() -> None:

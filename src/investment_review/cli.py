@@ -37,6 +37,14 @@ from .portfolio_context import (
     load_snapshot_document,
     render_portfolio_context_markdown,
 )
+from .review_input_bundle import (
+    build_review_input_bundle,
+    load_review_input_bundle,
+    query_review_input_bundle,
+    replay_validate_review_input_bundle,
+    save_review_input_bundle,
+    validate_review_input_bundle,
+)
 from .store import ReviewStore
 from .time_utils import utc_iso
 
@@ -46,6 +54,17 @@ DEFAULT_DB = "data/db/investment_review.sqlite3"
 
 def _print(payload: Any) -> None:
     print(json.dumps(payload, ensure_ascii=False, indent=2, default=str))
+
+
+def _load_json_documents(paths: list[str]) -> list[dict[str, Any]]:
+    documents: list[dict[str, Any]] = []
+    for value in paths:
+        payload = json.loads(Path(value).read_text(encoding="utf-8"))
+        rows = payload if isinstance(payload, list) else [payload]
+        if not all(isinstance(item, dict) for item in rows):
+            raise ValueError(f"{value} must contain one JSON object or an array of objects")
+        documents.extend(rows)
+    return documents
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -232,6 +251,63 @@ def build_parser() -> argparse.ArgumentParser:
     )
     episode_context_validate.add_argument("--episode-artifact")
     episode_context_validate.add_argument("--portfolio-db")
+
+    review_input_build = sub.add_parser(
+        "review-input-build",
+        help="Freeze one source-verified episode and its P2E-3 evidence for P2F",
+    )
+    review_input_build.add_argument("--episode-artifact", required=True)
+    review_input_build.add_argument("--portfolio-context")
+    review_input_build.add_argument("--portfolio-db", required=True)
+    review_input_build.add_argument("--episode-id", required=True)
+    review_input_build.add_argument("--review-cutoff", required=True)
+    review_input_build.add_argument(
+        "--decision-source",
+        action="append",
+        default=[],
+        help="Optional JSON source document; may be supplied more than once",
+    )
+    review_input_build.add_argument(
+        "--supplemental-source",
+        action="append",
+        default=[],
+        help="Optional cutoff-aware market/outcome/note JSON source document",
+    )
+    review_input_build.add_argument("--output", required=True)
+    review_input_build.add_argument(
+        "--allow-missing-portfolio-context",
+        action="store_true",
+        help="Build an explicit contract-only, release-blocked bundle",
+    )
+
+    review_input_show = sub.add_parser(
+        "review-input-show",
+        help="Query a canonical P2F review input bundle",
+    )
+    review_input_show.add_argument("artifact")
+    review_input_show.add_argument("--section")
+    review_input_show.add_argument("--source-id")
+    review_input_show.add_argument("--content-id")
+
+    review_input_validate = sub.add_parser(
+        "review-input-validate",
+        help="Validate a canonical P2F review input bundle",
+    )
+    review_input_validate.add_argument("artifact")
+    review_input_validate.add_argument(
+        "--source-replay",
+        action="store_true",
+        help="Rebuild from the original P2C/P2E-3/P2B sources",
+    )
+    review_input_validate.add_argument("--episode-artifact")
+    review_input_validate.add_argument("--portfolio-context")
+    review_input_validate.add_argument("--portfolio-db")
+    review_input_validate.add_argument(
+        "--decision-source", action="append", default=[]
+    )
+    review_input_validate.add_argument(
+        "--supplemental-source", action="append", default=[]
+    )
 
     return parser
 
@@ -454,6 +530,101 @@ def main(argv: list[str] | None = None) -> int:
                 )
             _print(validation)
             if validation["validation_status"] == "blocked":
+                return 2
+        elif args.command == "review-input-build":
+            decision_sources = _load_json_documents(args.decision_source)
+            supplemental_sources = _load_json_documents(args.supplemental_source)
+            if (
+                not args.portfolio_context
+                and not args.allow_missing_portfolio_context
+            ):
+                raise ValueError(
+                    "--portfolio-context is required unless "
+                    "--allow-missing-portfolio-context is explicit"
+                )
+            artifact = build_review_input_bundle(
+                load_episode_collection(args.episode_artifact),
+                (
+                    load_episode_portfolio_context(args.portfolio_context)
+                    if args.portfolio_context
+                    else None
+                ),
+                portfolio_db=args.portfolio_db,
+                episode_id=args.episode_id,
+                review_cutoff=args.review_cutoff,
+                decision_sources=decision_sources,
+                supplemental_sources=supplemental_sources,
+                allow_missing_portfolio_context=(
+                    args.allow_missing_portfolio_context
+                ),
+            )
+            validation = validate_review_input_bundle(artifact)
+            if validation["validation_status"] == "blocked":
+                raise ValueError("P2F review input bundle failed validation")
+            output = save_review_input_bundle(args.output, artifact)
+            _print(
+                {
+                    "status": validation["validation_status"],
+                    "content_id": artifact["content_id"],
+                    "episode_id": artifact["episode_ref"]["episode_id"],
+                    "source_count": len(artifact["source_inventory"]),
+                    "release_readiness": artifact["release_readiness"]["status"],
+                    "output": str(output),
+                }
+            )
+            if artifact["release_readiness"]["status"] != "ready":
+                return 2
+        elif args.command == "review-input-show":
+            _print(
+                query_review_input_bundle(
+                    load_review_input_bundle(args.artifact),
+                    section=args.section,
+                    source_id=args.source_id,
+                    content_id=args.content_id,
+                )
+            )
+        elif args.command == "review-input-validate":
+            artifact = load_review_input_bundle(args.artifact)
+            if args.source_replay:
+                missing_context = (
+                    artifact["portfolio_context_ref"]["status"] == "missing"
+                )
+                if not args.episode_artifact or not args.portfolio_db:
+                    raise ValueError(
+                        "--source-replay requires --episode-artifact and "
+                        "--portfolio-db"
+                    )
+                if not missing_context and not args.portfolio_context:
+                    raise ValueError(
+                        "--source-replay requires --portfolio-context for a "
+                        "release-ready bundle"
+                    )
+                validation = replay_validate_review_input_bundle(
+                    artifact,
+                    episode_collection=load_episode_collection(
+                        args.episode_artifact
+                    ),
+                    episode_portfolio_context=(
+                        load_episode_portfolio_context(args.portfolio_context)
+                        if args.portfolio_context
+                        else None
+                    ),
+                    portfolio_db=args.portfolio_db,
+                    decision_sources=_load_json_documents(
+                        args.decision_source
+                    ),
+                    supplemental_sources=_load_json_documents(
+                        args.supplemental_source
+                    ),
+                )
+            else:
+                validation = validate_review_input_bundle(artifact)
+            _print(validation)
+            if (
+                validation["validation_status"] == "blocked"
+                or artifact["release_readiness"]["status"] != "ready"
+                or artifact["source_verification"]["status"] != "verified"
+            ):
                 return 2
         else:
             parser.error(f"Unhandled command: {args.command}")

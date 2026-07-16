@@ -59,6 +59,9 @@ may also:
   explicit data-gap/ambiguity statuses and blocker/warning/info findings;
 - link Decisions only through `decision_event_links` and retain `unlinked` when
   no explicit relation exists;
+- preserve canonical `decision_links` evidence (event, relation, effective and
+  knowledge times, identity, status and registry source) alongside the
+  backward-compatible Decision ID projection;
 - write a versioned local JSON projection and query it without migrating the
   sidecar schema.
 

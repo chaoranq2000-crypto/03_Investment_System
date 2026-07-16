@@ -1,0 +1,1265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/p2f.review_input_bundle.v1.schema.json",
+  "title": "P2F Review Input Bundle v1",
+  "description": "Deterministic, source-verified and cutoff-safe inputs frozen for one episode review.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "content_id",
+    "build_request",
+    "episode_ref",
+    "portfolio_context_ref",
+    "source_verification",
+    "frozen_sources",
+    "source_requests",
+    "excluded_sources",
+    "source_inventory",
+    "section_availability",
+    "release_readiness",
+    "warnings",
+    "canonicalization"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "p2f.review_input_bundle.v1"
+    },
+    "content_id": {
+      "$ref": "#/$defs/content_id"
+    },
+    "build_request": {
+      "$ref": "#/$defs/build_request"
+    },
+    "episode_ref": {
+      "$ref": "#/$defs/episode_ref"
+    },
+    "portfolio_context_ref": {
+      "$ref": "#/$defs/portfolio_context_ref"
+    },
+    "source_verification": {
+      "$ref": "#/$defs/source_verification"
+    },
+    "frozen_sources": {
+      "$ref": "#/$defs/frozen_sources"
+    },
+    "source_requests": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/source_request"}
+    },
+    "excluded_sources": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/excluded_source"}
+    },
+    "source_inventory": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/source_inventory_item"
+      }
+    },
+    "section_availability": {
+      "$ref": "#/$defs/section_availability"
+    },
+    "release_readiness": {
+      "$ref": "#/$defs/release_readiness"
+    },
+    "warnings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/warning"
+      }
+    },
+    "canonicalization": {
+      "$ref": "#/$defs/canonicalization"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "portfolio_context_ref": {
+            "properties": {
+              "status": {
+                "const": "missing"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "portfolio_context_ref"
+        ]
+      },
+      "then": {
+        "properties": {
+          "source_verification": {
+            "properties": {
+              "status": {
+                "const": "missing"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "frozen_sources": {
+            "properties": {
+              "portfolio_context_episode_slice": {
+                "$ref": "#/$defs/missing_frozen_source"
+              }
+            }
+          },
+          "release_readiness": {
+            "properties": {
+              "status": {
+                "const": "blocked"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "source_verification": {
+            "properties": {
+              "status": {
+                "const": "verified"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "frozen_sources": {
+            "properties": {
+              "portfolio_context_episode_slice": {
+                "not": {
+                  "$ref": "#/$defs/missing_frozen_source"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "release_readiness": {
+            "properties": {
+              "status": {
+                "const": "ready"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "release_readiness"
+        ]
+      },
+      "then": {
+        "properties": {
+          "portfolio_context_ref": {
+            "properties": {
+              "status": {
+                "const": "available"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "source_verification": {
+            "properties": {
+              "status": {
+                "const": "verified"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "content_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "sha256_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "stable_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "warning_code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "availability": {
+      "enum": [
+        "available",
+        "missing",
+        "unlinked",
+        "ambiguous",
+        "stale",
+        "unpriced",
+        "invalid",
+        "not_applicable",
+        "withheld_by_cutoff"
+      ]
+    },
+    "source_kind": {
+      "enum": [
+        "episode_collection",
+        "trade_episode",
+        "portfolio_context",
+        "portfolio_context_slice",
+        "material_event",
+        "context",
+        "delta",
+        "decision",
+        "note",
+        "market_context",
+        "outcome",
+        "price",
+        "classification",
+        "order",
+        "fill",
+        "snapshot",
+        "other"
+      ]
+    },
+    "build_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selection_mode",
+        "episode_id",
+        "as_of",
+        "knowledge_cutoff",
+        "review_cutoff",
+        "include_linked_decisions",
+        "requested_supplemental_source_ids"
+      ],
+      "properties": {
+        "selection_mode": {
+          "const": "explicit_episode"
+        },
+        "episode_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "as_of": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "knowledge_cutoff": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "review_cutoff": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "include_linked_decisions": {
+          "const": true
+        },
+        "requested_supplemental_source_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          }
+        }
+      }
+    },
+    "p2c_episode_lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "normalized_event_digest",
+        "snapshot_set_digest",
+        "input_digest",
+        "canonical_content_digest",
+        "builder_version"
+      ],
+      "properties": {
+        "normalized_event_digest": {
+          "$ref": "#/$defs/sha256_digest"
+        },
+        "snapshot_set_digest": {
+          "$ref": "#/$defs/sha256_digest"
+        },
+        "input_digest": {
+          "$ref": "#/$defs/sha256_digest"
+        },
+        "canonical_content_digest": {
+          "$ref": "#/$defs/sha256_digest"
+        },
+        "builder_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "episode_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collection_schema_version",
+        "collection_digest",
+        "episode_schema_version",
+        "episode_id",
+        "lineage"
+      ],
+      "properties": {
+        "collection_schema_version": {
+          "const": "portfolio.trade_episode.collection.v1"
+        },
+        "collection_digest": {
+          "$ref": "#/$defs/sha256_digest"
+        },
+        "episode_schema_version": {
+          "const": "portfolio.trade_episode.v1"
+        },
+        "episode_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "lineage": {
+          "$ref": "#/$defs/p2c_episode_lineage"
+        }
+      }
+    },
+    "portfolio_context_ref": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/available_portfolio_context_ref"
+        },
+        {
+          "$ref": "#/$defs/missing_portfolio_context_ref"
+        }
+      ]
+    },
+    "available_portfolio_context_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "schema_version",
+        "content_id",
+        "episode_id"
+      ],
+      "properties": {
+        "status": {
+          "const": "available"
+        },
+        "schema_version": {
+          "const": "p2e3.trade_episode_portfolio_context.v1"
+        },
+        "content_id": {
+          "$ref": "#/$defs/content_id"
+        },
+        "episode_id": {
+          "$ref": "#/$defs/stable_id"
+        }
+      }
+    },
+    "missing_portfolio_context_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "expected_schema_version",
+        "episode_id",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "missing"
+        },
+        "expected_schema_version": {
+          "const": "p2e3.trade_episode_portfolio_context.v1"
+        },
+        "episode_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "source_verification": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/verified_source_verification"
+        },
+        {
+          "$ref": "#/$defs/missing_source_verification"
+        }
+      ]
+    },
+    "verified_source_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "validation_mode",
+        "verified_content_id",
+        "rebuilt_content_id",
+        "portfolio_db_sha256_before",
+        "portfolio_db_sha256_after",
+        "database_unchanged",
+        "validator_version"
+      ],
+      "properties": {
+        "status": {
+          "const": "verified"
+        },
+        "validation_mode": {
+          "const": "source_replay"
+        },
+        "verified_content_id": {
+          "$ref": "#/$defs/content_id"
+        },
+        "rebuilt_content_id": {
+          "$ref": "#/$defs/content_id"
+        },
+        "portfolio_db_sha256_before": {
+          "$ref": "#/$defs/sha256_digest"
+        },
+        "portfolio_db_sha256_after": {
+          "$ref": "#/$defs/sha256_digest"
+        },
+        "database_unchanged": {
+          "const": true
+        },
+        "validator_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "missing_source_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "validation_mode",
+        "reason",
+        "validator_version"
+      ],
+      "properties": {
+        "status": {
+          "const": "missing"
+        },
+        "validation_mode": {
+          "const": "not_run"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "validator_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "frozen_sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "episode",
+        "episode_snapshot_catalog",
+        "portfolio_context_episode_slice",
+        "linked_decisions",
+        "supplemental_sources"
+      ],
+      "properties": {
+        "episode": {
+          "description": "Exact upstream P2C episode payload. Its shape remains owned by the P2C contract.",
+          "type": "object",
+          "required": [
+            "schema_version",
+            "episode_id",
+            "scope",
+            "opened_at",
+            "closed_at",
+            "cutoff_at",
+            "status",
+            "event_refs",
+            "decision_linkage",
+            "lineage",
+            "validation"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": "portfolio.trade_episode.v1"
+            },
+            "episode_id": {
+              "$ref": "#/$defs/stable_id"
+            },
+            "opened_at": {
+              "$ref": "#/$defs/timestamp"
+            },
+            "closed_at": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/timestamp"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "cutoff_at": {
+              "$ref": "#/$defs/timestamp"
+            },
+            "event_refs": {
+              "type": "array"
+            },
+            "lineage": {
+              "$ref": "#/$defs/p2c_episode_lineage"
+            }
+          }
+        },
+        "episode_snapshot_catalog": {
+          "description": "Exact P2C snapshot_catalog rows referenced by the frozen episode.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "snapshot_id",
+              "account_id",
+              "as_of_date",
+              "knowledge_cutoff_at",
+              "revision",
+              "engine_version",
+              "source_state_hash",
+              "source_path",
+              "instrument_ids",
+              "included_event_ids",
+              "cursor_scope",
+              "included_event_set_complete"
+            ],
+            "properties": {
+              "snapshot_id": {"$ref": "#/$defs/stable_id"},
+              "account_id": {"$ref": "#/$defs/stable_id"},
+              "as_of_date": {"type": "string", "format": "date"},
+              "knowledge_cutoff_at": {
+                "oneOf": [
+                  {"$ref": "#/$defs/timestamp"},
+                  {"type": "null"}
+                ]
+              },
+              "revision": {"type": "integer", "minimum": 1},
+              "engine_version": {"type": "string"},
+              "source_state_hash": {"type": "string"},
+              "source_path": {"type": "string"},
+              "instrument_ids": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {"type": "string", "minLength": 1}
+              },
+              "included_event_ids": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {"type": "string", "minLength": 1}
+              },
+              "cursor_scope": {"enum": ["account", "partition"]},
+              "included_event_set_complete": {"type": "boolean"}
+            }
+          }
+        },
+        "portfolio_context_episode_slice": {
+          "description": "Exact P2E-3 payload slice for episode_ref, or an explicit contract-only missing marker.",
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "schema_version",
+                "artifact_content_id",
+                "episode_id",
+                "episode_artifact_ref",
+                "source_binding",
+                "as_of",
+                "knowledge_cutoff",
+                "metric_registry_version",
+                "material_events",
+                "contexts",
+                "deltas",
+                "warnings",
+                "slice_content_id"
+              ],
+              "properties": {
+                "schema_version": {
+                  "const": "p2e3.trade_episode_portfolio_context.v1"
+                },
+                "artifact_content_id": {
+                  "$ref": "#/$defs/content_id"
+                },
+                "episode_id": {
+                  "$ref": "#/$defs/stable_id"
+                },
+                "episode_artifact_ref": {
+                  "type": "object"
+                },
+                "source_binding": {
+                  "type": "object"
+                },
+                "as_of": {
+                  "$ref": "#/$defs/timestamp"
+                },
+                "knowledge_cutoff": {
+                  "$ref": "#/$defs/timestamp"
+                },
+                "metric_registry_version": {
+                  "const": "p2e2.portfolio_metric_registry.v1"
+                },
+                "material_events": {
+                  "type": "array"
+                },
+                "contexts": {
+                  "type": "array"
+                },
+                "deltas": {
+                  "type": "array"
+                },
+                "warnings": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/p2e3_scoped_warning"
+                  }
+                },
+                "slice_content_id": {
+                  "$ref": "#/$defs/content_id"
+                }
+              },
+              "not": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "const": "missing"
+                  }
+                }
+              }
+            },
+            {
+              "$ref": "#/$defs/missing_frozen_source"
+            }
+          ]
+        },
+        "linked_decisions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/frozen_decision"
+          }
+        },
+        "supplemental_sources": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/frozen_supplemental_source"
+          }
+        }
+      }
+    },
+    "frozen_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "source_kind",
+        "decision_link_refs",
+        "source_availability",
+        "source_warning_codes",
+        "payload_content_id",
+        "content_id",
+        "availability",
+        "effective_at",
+        "knowledge_at",
+        "locator",
+        "warning_codes",
+        "payload"
+      ],
+      "properties": {
+        "source_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "source_kind": {
+          "const": "decision"
+        },
+        "decision_link_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/decision_link_ref"
+          }
+        },
+        "source_availability": {
+          "$ref": "#/$defs/availability"
+        },
+        "source_warning_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/warning_code"
+          }
+        },
+        "payload_content_id": {
+          "$ref": "#/$defs/content_id"
+        },
+        "content_id": {
+          "$ref": "#/$defs/content_id"
+        },
+        "availability": {
+          "$ref": "#/$defs/availability"
+        },
+        "effective_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "knowledge_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "locator": {
+          "type": "string"
+        },
+        "warning_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/warning_code"
+          }
+        },
+        "payload": {
+          "description": "Exact upstream Decision or note payload.",
+          "type": "object"
+        }
+      }
+    },
+    "decision_link_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_id",
+        "relation",
+        "link_content_id",
+        "availability",
+        "warning_codes"
+      ],
+      "properties": {
+        "event_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "relation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "link_content_id": {
+          "$ref": "#/$defs/content_id"
+        },
+        "availability": {
+          "$ref": "#/$defs/availability"
+        },
+        "warning_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/warning_code"
+          }
+        }
+      }
+    },
+    "p2e3_scoped_warning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "message",
+        "source_refs",
+        "scope"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/warning_code"
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "error"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "scope": {
+          "enum": [
+            "episode",
+            "collection"
+          ]
+        }
+      }
+    },
+    "frozen_supplemental_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "source_kind",
+        "payload_content_id",
+        "content_id",
+        "availability",
+        "effective_at",
+        "knowledge_at",
+        "locator",
+        "warning_codes",
+        "payload"
+      ],
+      "properties": {
+        "source_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "source_kind": {
+          "enum": [
+            "note",
+            "market_context",
+            "outcome",
+            "price",
+            "classification",
+            "order",
+            "fill",
+            "snapshot",
+            "other"
+          ]
+        },
+        "payload_content_id": {
+          "$ref": "#/$defs/content_id"
+        },
+        "content_id": {
+          "$ref": "#/$defs/content_id"
+        },
+        "availability": {
+          "$ref": "#/$defs/availability"
+        },
+        "effective_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "knowledge_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "locator": {
+          "type": "string"
+        },
+        "warning_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/warning_code"
+          }
+        },
+        "payload": {
+          "description": "Exact upstream supplemental source payload.",
+          "type": "object"
+        }
+      }
+    },
+    "source_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id", "source_kind", "request_basis", "provided",
+        "payload_content_id"
+      ],
+      "properties": {
+        "source_id": {"$ref": "#/$defs/stable_id"},
+        "source_kind": {"$ref": "#/$defs/source_kind"},
+        "request_basis": {
+          "enum": ["p2c_decision_link", "caller_supplemental"]
+        },
+        "provided": {"type": "boolean"},
+        "payload_content_id": {
+          "oneOf": [
+            {"$ref": "#/$defs/content_id"},
+            {"type": "null"}
+          ]
+        }
+      }
+    },
+    "excluded_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id", "source_kind", "reason_code", "effective_at",
+        "knowledge_at", "payload_content_id", "locator"
+      ],
+      "properties": {
+        "source_id": {"$ref": "#/$defs/stable_id"},
+        "source_kind": {"$ref": "#/$defs/source_kind"},
+        "reason_code": {"$ref": "#/$defs/warning_code"},
+        "effective_at": {"$ref": "#/$defs/timestamp"},
+        "knowledge_at": {"$ref": "#/$defs/timestamp"},
+        "payload_content_id": {"$ref": "#/$defs/content_id"},
+        "locator": {"type": "string"}
+      }
+    },
+    "source_inventory_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "source_kind",
+        "status",
+        "effective_at",
+        "effective_date",
+        "effective_precision",
+        "knowledge_at",
+        "content_id",
+        "locator",
+        "frozen_pointer",
+        "warning_codes"
+      ],
+      "properties": {
+        "source_id": {
+          "$ref": "#/$defs/stable_id"
+        },
+        "source_kind": {
+          "$ref": "#/$defs/source_kind"
+        },
+        "status": {
+          "$ref": "#/$defs/availability"
+        },
+        "effective_at": {
+          "oneOf": [
+            {"$ref": "#/$defs/timestamp"},
+            {"type": "null"}
+          ]
+        },
+        "effective_date": {
+          "oneOf": [
+            {"type": "string", "format": "date"},
+            {"type": "null"}
+          ]
+        },
+        "effective_precision": {
+          "enum": ["second", "date"]
+        },
+        "knowledge_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "content_id": {
+          "$ref": "#/$defs/content_id"
+        },
+        "locator": {
+          "type": "string"
+        },
+        "frozen_pointer": {
+          "type": "string",
+          "pattern": "^/frozen_sources/"
+        },
+        "warning_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/warning_code"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"effective_precision": {"const": "date"}}},
+          "then": {
+            "properties": {
+              "effective_at": {"type": "null"},
+              "effective_date": {"type": "string", "format": "date"}
+            }
+          },
+          "else": {
+            "properties": {
+              "effective_at": {"$ref": "#/$defs/timestamp"},
+              "effective_date": {"type": "null"}
+            }
+          }
+        }
+      ]
+    },
+    "section_availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeline",
+        "security_context",
+        "portfolio_context",
+        "market_context",
+        "outcome_context",
+        "execution_consistency"
+      ],
+      "properties": {
+        "timeline": {
+          "$ref": "#/$defs/section_availability_item"
+        },
+        "security_context": {
+          "$ref": "#/$defs/section_availability_item"
+        },
+        "portfolio_context": {
+          "$ref": "#/$defs/section_availability_item"
+        },
+        "market_context": {
+          "$ref": "#/$defs/section_availability_item"
+        },
+        "outcome_context": {
+          "$ref": "#/$defs/section_availability_item"
+        },
+        "execution_consistency": {
+          "$ref": "#/$defs/section_availability_item"
+        }
+      }
+    },
+    "section_availability_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "source_ids",
+        "warning_codes"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/availability"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "source_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          }
+        },
+        "warning_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/warning_code"
+          }
+        }
+      }
+    },
+    "missing_frozen_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "missing"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "release_readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "blocker_codes",
+        "reasons"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "ready",
+            "blocked"
+          ]
+        },
+        "blocker_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/warning_code"
+          }
+        },
+        "reasons": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "ready"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "blocker_codes": {
+                "maxItems": 0
+              },
+              "reasons": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "blocker_codes": {
+                "minItems": 1
+              },
+              "reasons": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "warning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "message",
+        "source_ids"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/warning_code"
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "error"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/stable_id"
+          }
+        }
+      }
+    },
+    "canonicalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "json_profile",
+        "sort_version",
+        "hash_algorithm",
+        "excluded_fields",
+        "array_order"
+      ],
+      "properties": {
+        "json_profile": {
+          "const": "utf8-json-sorted-keys-no-float"
+        },
+        "sort_version": {
+          "const": "p2f.review_input_bundle.sort.v1"
+        },
+        "hash_algorithm": {
+          "const": "sha256"
+        },
+        "excluded_fields": {
+          "const": [
+            "content_id"
+          ]
+        },
+        "array_order": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "frozen_sources.linked_decisions",
+            "frozen_sources.episode_snapshot_catalog",
+            "frozen_sources.supplemental_sources",
+            "source_requests",
+            "excluded_sources",
+            "source_inventory",
+            "warnings"
+          ],
+          "properties": {
+            "frozen_sources.linked_decisions": {
+              "const": "source_id,content_id"
+            },
+            "frozen_sources.episode_snapshot_catalog": {
+              "const": "account_id,as_of_date,knowledge_cutoff_at,revision,snapshot_id"
+            },
+            "frozen_sources.supplemental_sources": {
+              "const": "source_kind,source_id,content_id"
+            },
+            "source_requests": {
+              "const": "source_kind,source_id,request_basis"
+            },
+            "excluded_sources": {
+              "const": "source_kind,source_id,reason_code"
+            },
+            "source_inventory": {
+              "const": "source_kind,source_id,content_id"
+            },
+            "warnings": {
+              "const": "severity,code,source_ids"
+            }
+          }
+        }
+      }
+    }
+  }
+}

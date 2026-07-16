@@ -19,17 +19,95 @@ from .models import canonical_json
 
 EPISODE_SCHEMA_VERSION = "portfolio.trade_episode.v1"
 COLLECTION_SCHEMA_VERSION = "portfolio.trade_episode.collection.v1"
-VALIDATION_SCHEMA_VERSION = "portfolio.trade_episode.validation.v1"
-PROJECTION_VERSION = "p2c_v1"
+VALIDATION_SCHEMA_VERSION = "portfolio.trade_episode.validation.v2"
+PROJECTION_VERSION = "p2c_v1_1"
+LEGACY_PROJECTION_VERSION = "p2c_v1"
+DECISION_LINKAGE_CONTRACT_VERSION = "p2c.decision_linkage.v2"
 
 _SEVERITY_ORDER = {"blocker": 0, "warning": 1, "info": 2}
 _POSITION_SIDES = {"BUY": Decimal(1), "SELL": Decimal(-1), "TRANSFER_IN": Decimal(1), "TRANSFER_OUT": Decimal(-1)}
 _NON_POSITION_TYPES = {"dividend", "cash_fee"}
 _SPECIAL_QUANTITY_TYPES = {"opening", "transfer", "corporate_action", "correction"}
+_DECISION_STATUSES = {"OPEN", "CLOSED", "INVALIDATED", "WATCHING"}
+_SNAPSHOT_CATALOG_FIELDS = {
+    "snapshot_id",
+    "account_id",
+    "as_of_date",
+    "knowledge_cutoff_at",
+    "revision",
+    "engine_version",
+    "source_state_hash",
+    "source_path",
+    "instrument_ids",
+    "included_event_ids",
+    "cursor_scope",
+    "included_event_set_complete",
+}
+_SNAPSHOT_LINK_FIELDS = {
+    "link_role",
+    "snapshot_ref",
+    "link_method",
+    "snapshot_as_of",
+    "snapshot_knowledge_cutoff_at",
+    "event_ref",
+    "event_time",
+    "temporal_distance_seconds",
+    "validation_status",
+    "reason",
+}
+_EPISODE_FIELDS = {
+    "schema_version",
+    "episode_id",
+    "projection_version",
+    "scope",
+    "status",
+    "origin",
+    "direction",
+    "opened_at",
+    "closed_at",
+    "cutoff_at",
+    "opening_event_ref",
+    "closing_event_ref",
+    "starting_quantity",
+    "ending_quantity",
+    "maximum_absolute_quantity",
+    "material_transition_count",
+    "event_refs",
+    "snapshot_links",
+    "decision_linkage",
+    "lineage",
+}
+_EVENT_REF_FIELDS = {
+    "event_id",
+    "event_type",
+    "effective_at",
+    "known_at",
+    "side",
+    "signed_quantity",
+    "quantity_before",
+    "quantity_after",
+    "source_refs",
+    "ordering_key",
+}
 
 
 class EpisodeProjectionError(ValueError):
     """Raised when an episode artifact or projection input is invalid."""
+
+
+def snapshot_catalog_sort_key(item: Mapping[str, Any]) -> tuple[str, str, str, int, str]:
+    """Canonical P2C ordering shared by downstream frozen catalog subsets."""
+
+    revision = item.get("revision")
+    return (
+        str(item.get("account_id") or ""),
+        str(item.get("as_of_date") or ""),
+        str(item.get("knowledge_cutoff_at") or ""),
+        revision
+        if isinstance(revision, int) and not isinstance(revision, bool)
+        else 0,
+        str(item.get("snapshot_id") or ""),
+    )
 
 
 def _sha256(value: object) -> str:
@@ -225,6 +303,8 @@ class ProjectionEvent:
         decisions = payload.get("decision_refs", [])
         if not isinstance(decisions, Sequence) or isinstance(decisions, (str, bytes)):
             raise EpisodeProjectionError("decision_refs must be a list")
+        if any(not isinstance(item, Mapping) for item in decisions):
+            raise EpisodeProjectionError("decision_refs must contain only objects")
         return cls(
             event_id=event_id,
             source_id=source_id,
@@ -240,7 +320,7 @@ class ProjectionEvent:
             quantity=quantity,
             currency=str(payload.get("currency") or "CNY").strip().upper(),
             raw_payload=raw,
-            decision_refs=tuple(dict(item) for item in decisions if isinstance(item, Mapping)),
+            decision_refs=tuple(dict(item) for item in decisions),
             source_sequence=_source_sequence(raw, source_record_id, event_id),
             source_keys=_source_keys(raw, source_record_id),
             source_known_at=_source_known_at(raw, known_at),
@@ -344,15 +424,7 @@ def _normalize_snapshots(
                     related_refs=[str(raw_snapshot.get("snapshot_id") or "unknown_snapshot")],
                 )
             )
-    normalized.sort(
-        key=lambda item: (
-            item["account_id"],
-            item["as_of_date"],
-            item["knowledge_cutoff_at"] or "",
-            item["revision"],
-            item["snapshot_id"],
-        )
-    )
+    normalized.sort(key=snapshot_catalog_sort_key)
     return normalized, findings
 
 
@@ -651,8 +723,90 @@ def _link_snapshots(
     return links, findings
 
 
+def _decision_link_sort_key(link: Mapping[str, Any]) -> tuple[str, ...]:
+    return (
+        str(link.get("decision_id") or ""),
+        str(link.get("container_event_id") or ""),
+        str(link.get("event_id") or ""),
+        str(link.get("relation") or ""),
+        str(link.get("effective_at") or ""),
+        str(link.get("known_at") or ""),
+        str(link.get("link_source") or ""),
+    )
+
+
+def _decision_identity_key(link: Mapping[str, Any]) -> tuple[str, ...]:
+    """Return the Decision fields that must agree across execution links."""
+
+    return (
+        str(link.get("decision_id") or ""),
+        str(link.get("relation") or ""),
+        str(link.get("effective_at") or ""),
+        str(link.get("known_at") or ""),
+        str(link.get("symbol") or ""),
+        str(link.get("market") or ""),
+        str(link.get("status") or ""),
+        str(link.get("link_source") or ""),
+    )
+
+
+def _decision_link_conflicts(links: Sequence[Mapping[str, Any]]) -> bool:
+    """Detect contradictory evidence, while allowing one Decision to cover many fills."""
+
+    by_relation: dict[tuple[str, str, str], set[str]] = defaultdict(set)
+    identities: dict[str, set[tuple[str, ...]]] = defaultdict(set)
+    slot_decisions: dict[tuple[str, str], set[str]] = defaultdict(set)
+    for link in links:
+        decision_id = str(link.get("decision_id") or "")
+        relation_key = (
+            decision_id,
+            str(link.get("event_id") or ""),
+            str(link.get("relation") or ""),
+        )
+        by_relation[relation_key].add(canonical_json(link))
+        identities[decision_id].add(_decision_identity_key(link))
+        slot_decisions[
+            (
+                str(link.get("event_id") or ""),
+                str(link.get("relation") or ""),
+            )
+        ].add(decision_id)
+    return any(len(values) > 1 for values in by_relation.values()) or any(
+        len(values) > 1 for values in identities.values()
+    ) or any(len(values) > 1 for values in slot_decisions.values())
+
+
+def _canonical_decision_link(
+    ref: Mapping[str, Any], *, default_event_id: str
+) -> dict[str, Any]:
+    def canonical_time(value: object, *, field: str) -> str:
+        try:
+            return _iso(_aware_datetime(value, field=field))
+        except EpisodeProjectionError:
+            return str(value or "")
+
+    market = str(ref.get("market") or "").strip().upper()
+    return {
+        "decision_id": str(ref.get("decision_id") or "").strip(),
+        "container_event_id": default_event_id,
+        "event_id": str(ref.get("event_id") or "").strip(),
+        "relation": str(ref.get("relation") or "").strip(),
+        "effective_at": canonical_time(
+            ref.get("effective_at") or ref.get("occurred_at"),
+            field="decision.effective_at",
+        ),
+        "known_at": canonical_time(
+            ref.get("known_at"), field="decision.known_at"
+        ),
+        "symbol": str(ref.get("symbol") or "").strip().upper(),
+        "market": market or None,
+        "status": str(ref.get("status") or ""),
+        "link_source": str(ref.get("link_source") or ""),
+    }
+
+
 def _decision_linkage(events: Sequence[ProjectionEvent]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    refs: dict[str, dict[str, Any]] = {}
+    refs: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {}
     findings: list[dict[str, Any]] = []
     event_by_id = {event.event_id: event for event in events}
     for event in events:
@@ -660,10 +814,15 @@ def _decision_linkage(events: Sequence[ProjectionEvent]) -> tuple[dict[str, Any]
             ref = dict(raw_ref)
             decision_id = str(ref.get("decision_id") or "").strip()
             if not decision_id:
+                canonical_link = _canonical_decision_link(
+                    ref, default_event_id=event.event_id
+                )
+                refs[canonical_json(canonical_link)] = (canonical_link, ref)
                 continue
-            ref.setdefault("event_id", event.event_id)
-            ref.setdefault("link_source", "decision_event_links")
-            refs[decision_id] = ref
+            canonical_link = _canonical_decision_link(
+                ref, default_event_id=event.event_id
+            )
+            refs[canonical_json(canonical_link)] = (canonical_link, ref)
     if not refs:
         findings.append(
             _finding(
@@ -672,28 +831,103 @@ def _decision_linkage(events: Sequence[ProjectionEvent]) -> tuple[dict[str, Any]
                 "no explicit Decision reference was supplied; no inference was made",
             )
         )
-        return {"status": "unlinked", "decision_refs": [], "reason": "no_explicit_upstream_reference"}, findings
+        return {
+            "contract_version": DECISION_LINKAGE_CONTRACT_VERSION,
+            "status": "unlinked",
+            "decision_refs": [],
+            "decision_links": [],
+            "reason": "no_explicit_upstream_reference",
+        }, findings
 
     valid: list[dict[str, Any]] = []
     invalid: list[dict[str, Any]] = []
-    for decision_id, ref in sorted(refs.items()):
+    canonical_links = sorted(
+        (value[0] for value in refs.values()), key=_decision_link_sort_key
+    )
+    raw_by_link = {key: value[1] for key, value in refs.items()}
+    for link in canonical_links:
+        decision_id = str(link["decision_id"])
+        ref = raw_by_link[canonical_json(link)]
         event = event_by_id.get(str(ref.get("event_id") or ""))
         try:
+            required_raw_strings = (
+                "decision_id",
+                "event_id",
+                "relation",
+                "known_at",
+                "symbol",
+                "status",
+                "link_source",
+            )
+            if any(
+                not isinstance(ref.get(field), str) or not ref.get(field)
+                for field in required_raw_strings
+            ):
+                raise EpisodeProjectionError(
+                    "Decision reference string fields must be non-empty strings"
+                )
+            if not isinstance(
+                ref.get("effective_at") or ref.get("occurred_at"), str
+            ):
+                raise EpisodeProjectionError(
+                    "Decision effective time must be a timestamp string"
+                )
+            if ref.get("effective_at") not in (None, "") and ref.get(
+                "occurred_at"
+            ) not in (None, ""):
+                explicit_effective = _aware_datetime(
+                    ref.get("effective_at"), field="decision.effective_at"
+                )
+                occurred_effective = _aware_datetime(
+                    ref.get("occurred_at"), field="decision.occurred_at"
+                )
+                if explicit_effective != occurred_effective:
+                    raise EpisodeProjectionError(
+                        "Decision effective_at conflicts with occurred_at"
+                    )
+            if ref.get("market") is not None and not isinstance(
+                ref.get("market"), str
+            ):
+                raise EpisodeProjectionError(
+                    "Decision market must be a string or null"
+                )
             if ref.get("link_source") != "decision_event_links":
                 raise EpisodeProjectionError("Decision reference is not from the explicit link registry")
+            if not decision_id:
+                raise EpisodeProjectionError("Decision reference is missing decision_id")
             if event is None:
                 raise EpisodeProjectionError("linked execution event is not in the episode")
+            if str(link.get("container_event_id") or "") != str(
+                ref.get("event_id") or ""
+            ):
+                raise EpisodeProjectionError(
+                    "Decision link event does not match its containing trade event"
+                )
+            if str(ref.get("relation") or "").strip() != "execution":
+                raise EpisodeProjectionError(
+                    "Decision relation must be explicit execution"
+                )
+            if ref.get("status") not in _DECISION_STATUSES:
+                raise EpisodeProjectionError("Decision status is unsupported")
             if str(ref.get("symbol") or "").strip().upper() != event.symbol:
                 raise EpisodeProjectionError("Decision symbol does not match the linked event")
             decision_market = str(ref.get("market") or "").strip().upper()
             if decision_market and event.market and decision_market != event.market:
                 raise EpisodeProjectionError("Decision market does not match the linked event")
+            effective_at = _aware_datetime(
+                ref.get("effective_at") or ref.get("occurred_at"),
+                field="decision.effective_at",
+            )
             known_at = _aware_datetime(ref.get("known_at"), field="decision.known_at")
+            if known_at < effective_at:
+                raise EpisodeProjectionError(
+                    "Decision known_at cannot precede effective_at"
+                )
             if known_at > event.occurred_at:
                 raise EpisodeProjectionError("Decision was not known by the linked execution time")
-            valid.append(ref)
+            valid.append(link)
         except EpisodeProjectionError as exc:
-            invalid.append(ref)
+            invalid.append(link)
             findings.append(
                 _finding(
                     "blocker",
@@ -702,19 +936,312 @@ def _decision_linkage(events: Sequence[ProjectionEvent]) -> tuple[dict[str, Any]
                     related_refs=[decision_id, str(ref.get("event_id") or "")],
                 )
             )
+    decision_refs = sorted(
+        {
+            str(item["decision_id"])
+            for item in canonical_links
+            if str(item.get("decision_id") or "")
+        }
+    )
     if invalid:
-        return {"status": "invalid", "decision_refs": sorted(refs), "reason": "explicit_reference_failed_validation"}, findings
-    if len(valid) > 1:
+        return {
+            "contract_version": DECISION_LINKAGE_CONTRACT_VERSION,
+            "status": "invalid",
+            "decision_refs": decision_refs,
+            "decision_links": canonical_links,
+            "reason": "explicit_reference_failed_validation",
+        }, findings
+    if _decision_link_conflicts(valid):
         findings.append(
             _finding(
                 "blocker",
                 "DECISION_LINK_AMBIGUOUS",
-                "multiple explicit Decision references require manual resolution",
-                related_refs=sorted(refs),
+                "explicit Decision links contain contradictory registry evidence",
+                related_refs=decision_refs,
             )
         )
-        return {"status": "ambiguous", "decision_refs": sorted(refs), "reason": "multiple_explicit_references"}, findings
-    return {"status": "linked", "decision_refs": sorted(refs), "reason": "explicit_registry_link"}, findings
+        return {
+            "contract_version": DECISION_LINKAGE_CONTRACT_VERSION,
+            "status": "ambiguous",
+            "decision_refs": decision_refs,
+            "decision_links": canonical_links,
+            "reason": "conflicting_explicit_references",
+        }, findings
+    return {
+        "contract_version": DECISION_LINKAGE_CONTRACT_VERSION,
+        "status": "linked",
+        "decision_refs": decision_refs,
+        "decision_links": canonical_links,
+        "reason": "explicit_registry_link",
+    }, findings
+
+
+def _validate_decision_linkage_v2(
+    decision: object,
+    *,
+    episode_id: str,
+    events_by_id: Mapping[str, Mapping[str, Any]],
+    scope: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    findings: list[dict[str, Any]] = []
+    if not isinstance(decision, Mapping):
+        return [
+            _finding(
+                "blocker",
+                "MALFORMED_DECISION_LINKAGE",
+                "decision_linkage must be an object",
+                related_refs=[episode_id],
+            )
+        ]
+    required_fields = {
+        "contract_version",
+        "status",
+        "decision_refs",
+        "decision_links",
+        "reason",
+    }
+    if set(decision) != required_fields:
+        findings.append(
+            _finding(
+                "blocker",
+                "MALFORMED_DECISION_LINKAGE",
+                "decision_linkage has an unexpected shape",
+                related_refs=[episode_id],
+            )
+        )
+    if decision.get("contract_version") != DECISION_LINKAGE_CONTRACT_VERSION:
+        findings.append(
+            _finding(
+                "blocker",
+                "UNSUPPORTED_DECISION_LINKAGE_CONTRACT",
+                "decision_linkage contract version is unsupported",
+                related_refs=[episode_id],
+            )
+        )
+    raw_refs = decision.get("decision_refs")
+    raw_links = decision.get("decision_links")
+    if not isinstance(raw_refs, list) or any(
+        not isinstance(item, str) or not item for item in raw_refs
+    ):
+        findings.append(
+            _finding(
+                "blocker",
+                "MALFORMED_DECISION_LINK_EVIDENCE",
+                "decision_refs must be a list of non-empty strings",
+                related_refs=[episode_id],
+            )
+        )
+        decision_refs: list[str] = []
+    else:
+        decision_refs = list(raw_refs)
+    if not isinstance(raw_links, list) or any(
+        not isinstance(item, Mapping) for item in raw_links
+    ):
+        findings.append(
+            _finding(
+                "blocker",
+                "MALFORMED_DECISION_LINK_EVIDENCE",
+                "decision_links must be a list of objects",
+                related_refs=[episode_id],
+            )
+        )
+        canonical_links: list[dict[str, Any]] = []
+    else:
+        canonical_links = [dict(item) for item in raw_links]
+    if decision_refs != sorted(set(decision_refs)):
+        findings.append(
+            _finding(
+                "blocker",
+                "NON_CANONICAL_DECISION_REFS",
+                "decision_refs must be sorted and unique",
+                related_refs=[episode_id],
+            )
+        )
+    if canonical_links != sorted(canonical_links, key=_decision_link_sort_key):
+        findings.append(
+            _finding(
+                "blocker",
+                "NON_CANONICAL_DECISION_LINK_ORDER",
+                "decision_links are not in canonical order",
+                related_refs=[episode_id],
+            )
+        )
+    if len({canonical_json(item) for item in canonical_links}) != len(canonical_links):
+        findings.append(
+            _finding(
+                "blocker",
+                "DUPLICATE_DECISION_LINK_EVIDENCE",
+                "decision_links contain duplicate canonical links",
+                related_refs=[episode_id],
+            )
+        )
+    expected_refs = sorted(
+        {
+            str(item.get("decision_id") or "")
+            for item in canonical_links
+            if str(item.get("decision_id") or "")
+        }
+    )
+    if decision_refs != expected_refs:
+        findings.append(
+            _finding(
+                "blocker",
+                "DECISION_LINK_CLOSURE_MISMATCH",
+                "decision_refs are not the exact ID projection of decision_links",
+                related_refs=[episode_id],
+            )
+        )
+
+    required_link_fields = {
+        "decision_id",
+        "container_event_id",
+        "event_id",
+        "relation",
+        "effective_at",
+        "known_at",
+        "symbol",
+        "market",
+        "status",
+        "link_source",
+    }
+    valid_links: list[dict[str, Any]] = []
+    invalid_links = 0
+    for link in canonical_links:
+        link_refs = [
+            str(link.get("decision_id") or ""),
+            str(link.get("event_id") or ""),
+        ]
+        try:
+            if set(link) != required_link_fields:
+                raise EpisodeProjectionError(
+                    "Decision link evidence has an unexpected shape"
+                )
+            string_fields = (
+                "decision_id",
+                "container_event_id",
+                "event_id",
+                "relation",
+                "effective_at",
+                "known_at",
+                "symbol",
+                "status",
+                "link_source",
+            )
+            if any(
+                not isinstance(link.get(field), str) or not link.get(field)
+                for field in string_fields
+            ):
+                raise EpisodeProjectionError(
+                    "Decision link string fields must be non-empty strings"
+                )
+            if link.get("market") is not None and (
+                not isinstance(link.get("market"), str) or not link.get("market")
+            ):
+                raise EpisodeProjectionError(
+                    "Decision link market must be a non-empty string or null"
+                )
+            decision_id = str(link.get("decision_id") or "").strip()
+            event_id = str(link.get("event_id") or "").strip()
+            if not decision_id:
+                raise EpisodeProjectionError("Decision link ID is missing")
+            event = events_by_id.get(event_id)
+            if event is None:
+                raise EpisodeProjectionError("Decision link event is outside the episode")
+            if link.get("link_source") != "decision_event_links":
+                raise EpisodeProjectionError(
+                    "Decision link source is not the explicit registry"
+                )
+            if str(link.get("container_event_id") or "") != event_id:
+                raise EpisodeProjectionError(
+                    "Decision link event does not match its containing trade event"
+                )
+            if str(link.get("relation") or "") != "execution":
+                raise EpisodeProjectionError(
+                    "Decision relation must be explicit execution"
+                )
+            if link.get("status") not in _DECISION_STATUSES:
+                raise EpisodeProjectionError("Decision status is unsupported")
+            if str(link.get("symbol") or "").strip().upper() != str(
+                scope.get("symbol") or ""
+            ).strip().upper():
+                raise EpisodeProjectionError(
+                    "Decision link symbol does not match the episode"
+                )
+            link_market = str(link.get("market") or "").strip().upper()
+            episode_market = str(scope.get("market") or "").strip().upper()
+            if link_market and episode_market and link_market != episode_market:
+                raise EpisodeProjectionError(
+                    "Decision link market does not match the episode"
+                )
+            effective_at = _aware_datetime(
+                link.get("effective_at"), field="decision_link.effective_at"
+            )
+            known_at = _aware_datetime(
+                link.get("known_at"), field="decision_link.known_at"
+            )
+            event_at = _aware_datetime(
+                event.get("effective_at"), field="event.effective_at"
+            )
+            if link.get("effective_at") != _iso(effective_at) or link.get(
+                "known_at"
+            ) != _iso(known_at):
+                raise EpisodeProjectionError(
+                    "Decision link times are not canonical UTC seconds"
+                )
+            if known_at < effective_at:
+                raise EpisodeProjectionError(
+                    "Decision known_at cannot precede effective_at"
+                )
+            if known_at > event_at:
+                raise EpisodeProjectionError(
+                    "Decision was not known by the linked execution time"
+                )
+            valid_links.append(link)
+        except EpisodeProjectionError as exc:
+            invalid_links += 1
+            findings.append(
+                _finding(
+                    "blocker",
+                    "DECISION_LINK_INVALID",
+                    str(exc),
+                    related_refs=link_refs,
+                )
+            )
+    conflict = not invalid_links and _decision_link_conflicts(valid_links)
+    expected_status = (
+        "unlinked"
+        if not canonical_links
+        else "invalid"
+        if invalid_links
+        else "ambiguous"
+        if conflict
+        else "linked"
+    )
+    expected_reason = {
+        "unlinked": "no_explicit_upstream_reference",
+        "invalid": "explicit_reference_failed_validation",
+        "ambiguous": "conflicting_explicit_references",
+        "linked": "explicit_registry_link",
+    }[expected_status]
+    if decision.get("status") != expected_status:
+        findings.append(
+            _finding(
+                "blocker",
+                "DECISION_LINK_STATUS_MISMATCH",
+                "decision_linkage.status is not derived from canonical links",
+                related_refs=[episode_id],
+            )
+        )
+    if decision.get("reason") != expected_reason:
+        findings.append(
+            _finding(
+                "blocker",
+                "DECISION_LINK_REASON_MISMATCH",
+                "decision_linkage.reason is not derived from canonical links",
+                related_refs=[episode_id],
+            )
+        )
+    return findings
 
 
 def _episode_digest_payload(episode: Mapping[str, Any]) -> dict[str, Any]:
@@ -724,6 +1251,105 @@ def _episode_digest_payload(episode: Mapping[str, Any]) -> dict[str, Any]:
     lineage.pop("canonical_content_digest", None)
     payload["lineage"] = lineage
     return payload
+
+
+def _validate_snapshot_catalog_rows(
+    snapshot_catalog: object,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    findings: list[dict[str, Any]] = []
+    if not isinstance(snapshot_catalog, list):
+        return [], [
+            _finding(
+                "blocker",
+                "MALFORMED_SNAPSHOT_CATALOG",
+                "snapshot_catalog must be a list",
+            )
+        ]
+    rows: list[dict[str, Any]] = []
+    for index, raw in enumerate(snapshot_catalog):
+        if not isinstance(raw, Mapping):
+            findings.append(
+                _finding(
+                    "blocker",
+                    "MALFORMED_SNAPSHOT_CATALOG",
+                    "snapshot catalog rows must be objects",
+                    related_refs=[str(index)],
+                )
+            )
+            continue
+        row = dict(raw)
+        rows.append(row)
+        snapshot_id = str(row.get("snapshot_id") or "")
+        try:
+            if set(row) != _SNAPSHOT_CATALOG_FIELDS:
+                raise EpisodeProjectionError(
+                    "snapshot catalog row has an unexpected shape"
+                )
+            if not snapshot_id or not isinstance(row.get("snapshot_id"), str):
+                raise EpisodeProjectionError("snapshot_id must be a non-empty string")
+            if not isinstance(row.get("account_id"), str) or not row["account_id"]:
+                raise EpisodeProjectionError("account_id must be a non-empty string")
+            date.fromisoformat(str(row.get("as_of_date") or ""))
+            cutoff = _optional_aware_datetime(
+                row.get("knowledge_cutoff_at"),
+                field="snapshot.knowledge_cutoff_at",
+            )
+            if cutoff is not None and row.get("knowledge_cutoff_at") != _iso(cutoff):
+                raise EpisodeProjectionError(
+                    "snapshot knowledge_cutoff_at is not canonical UTC seconds"
+                )
+            revision = row.get("revision")
+            if isinstance(revision, bool) or not isinstance(revision, int) or revision < 1:
+                raise EpisodeProjectionError("snapshot revision must be a positive integer")
+            for field in ("engine_version", "source_state_hash", "source_path"):
+                if not isinstance(row.get(field), str):
+                    raise EpisodeProjectionError(f"snapshot {field} must be a string")
+            for field in ("instrument_ids", "included_event_ids"):
+                values = row.get(field)
+                if not isinstance(values, list) or any(
+                    not isinstance(item, str) or not item for item in values
+                ):
+                    raise EpisodeProjectionError(
+                        f"snapshot {field} must be a list of non-empty strings"
+                    )
+                if values != sorted(set(values)):
+                    raise EpisodeProjectionError(
+                        f"snapshot {field} must be sorted and unique"
+                    )
+            if row.get("cursor_scope") not in {"account", "partition"}:
+                raise EpisodeProjectionError(
+                    "snapshot cursor_scope must be account or partition"
+                )
+            if not isinstance(row.get("included_event_set_complete"), bool):
+                raise EpisodeProjectionError(
+                    "snapshot included_event_set_complete must be boolean"
+                )
+            if (
+                row.get("included_event_set_complete") is True
+                and row.get("cursor_scope") != "account"
+            ):
+                raise EpisodeProjectionError(
+                    "included_event_set_complete requires account cursor_scope"
+                )
+        except (EpisodeProjectionError, ValueError) as exc:
+            findings.append(
+                _finding(
+                    "blocker",
+                    "INVALID_SNAPSHOT_CATALOG_ROW",
+                    str(exc),
+                    related_refs=[snapshot_id or str(index)],
+                )
+            )
+    expected_order = sorted(rows, key=snapshot_catalog_sort_key)
+    if rows != expected_order:
+        findings.append(
+            _finding(
+                "blocker",
+                "NON_CANONICAL_SNAPSHOT_CATALOG_ORDER",
+                "snapshot_catalog is not in canonical order",
+            )
+        )
+    return rows, findings
 
 
 def _make_episode(
@@ -1139,10 +1765,106 @@ def build_episode_collection(
     return collection
 
 
-def validate_episode(
-    episode: Mapping[str, Any], *, snapshot_catalog: Iterable[Mapping[str, Any]] = ()
+def _validate_episode_shape_v1_1(
+    episode: Mapping[str, Any], findings: list[dict[str, Any]]
+) -> None:
+    episode_id = str(episode.get("episode_id") or "")
+    allowed_fields = _EPISODE_FIELDS | ({"validation"} if "validation" in episode else set())
+    if set(episode) != allowed_fields:
+        findings.append(
+            _finding(
+                "blocker",
+                "MALFORMED_EPISODE_SHAPE",
+                "current P2C episode has an unexpected top-level shape",
+                related_refs=[episode_id],
+            )
+        )
+    scope = episode.get("scope")
+    if not isinstance(scope, Mapping) or set(scope) != {
+        "account_id",
+        "instrument_id",
+        "symbol",
+        "market",
+        "currency",
+    }:
+        findings.append(
+            _finding(
+                "blocker",
+                "MALFORMED_EPISODE_SCOPE",
+                "episode scope has an unexpected shape",
+                related_refs=[episode_id],
+            )
+        )
+    event_refs = episode.get("event_refs")
+    if isinstance(event_refs, list):
+        for index, item in enumerate(event_refs):
+            if not isinstance(item, Mapping) or set(item) != _EVENT_REF_FIELDS:
+                findings.append(
+                    _finding(
+                        "blocker",
+                        "MALFORMED_EVENT_REFERENCE",
+                        "event reference has an unexpected shape",
+                        related_refs=[episode_id, str(index)],
+                    )
+                )
+                continue
+            source_refs = item.get("source_refs")
+            if not isinstance(source_refs, Mapping) or set(source_refs) != {
+                "source_id",
+                "source_record_id",
+                "payload_sha256",
+                "source_keys",
+            }:
+                findings.append(
+                    _finding(
+                        "blocker",
+                        "MALFORMED_SOURCE_LINEAGE",
+                        "event source_refs has an unexpected shape",
+                        related_refs=[str(item.get("event_id") or index)],
+                    )
+                )
+    lineage = episode.get("lineage")
+    if not isinstance(lineage, Mapping) or set(lineage) != {
+        "normalized_event_digest",
+        "snapshot_set_digest",
+        "input_digest",
+        "canonical_content_digest",
+        "builder_version",
+    }:
+        findings.append(
+            _finding(
+                "blocker",
+                "MALFORMED_EPISODE_LINEAGE",
+                "episode lineage has an unexpected shape",
+                related_refs=[episode_id],
+            )
+        )
+    if "validation" in episode:
+        validation = episode.get("validation")
+        if not isinstance(validation, Mapping) or set(validation) != {
+            "schema_version",
+            "validation_status",
+            "findings",
+        }:
+            findings.append(
+                _finding(
+                    "blocker",
+                    "MALFORMED_EMBEDDED_VALIDATION",
+                    "episode validation has an unexpected shape",
+                    related_refs=[episode_id],
+                )
+            )
+
+
+def _validate_episode_impl(
+    episode: Mapping[str, Any],
+    *,
+    snapshot_catalog: Iterable[Mapping[str, Any]] = (),
+    _catalog_validated: bool = False,
 ) -> dict[str, Any]:
     findings: list[dict[str, Any]] = []
+    if episode.get("projection_version") == PROJECTION_VERSION:
+        _validate_episode_shape_v1_1(episode, findings)
     episode_id = str(episode.get("episode_id") or "")
     if episode.get("schema_version") != EPISODE_SCHEMA_VERSION:
         findings.append(_finding("blocker", "UNSUPPORTED_EPISODE_SCHEMA", "unsupported TradeEpisode schema version", related_refs=[episode_id]))
@@ -1168,14 +1890,16 @@ def validate_episode(
     if len(event_ids) != len(set(event_ids)):
         findings.append(_finding("blocker", "DUPLICATE_EVENT_CONSUMPTION", "an event appears more than once in one episode", related_refs=event_ids))
     previous_after: Decimal | None = None
-    previous_key: str | None = None
+    previous_key: tuple[datetime, int, str, str] | None = None
     for item in event_refs:
         if not isinstance(item, Mapping):
             findings.append(_finding("blocker", "MALFORMED_EVENT_REFERENCE", "event reference must be an object", related_refs=[episode_id]))
             continue
         event_id = str(item.get("event_id") or "")
         try:
-            _aware_datetime(item.get("effective_at"), field="event.effective_at")
+            event_effective = _aware_datetime(
+                item.get("effective_at"), field="event.effective_at"
+            )
             _aware_datetime(item.get("known_at"), field="event.known_at")
             before = _decimal(item.get("quantity_before"), field="quantity_before")
             after = _decimal(item.get("quantity_after"), field="quantity_after")
@@ -1185,7 +1909,43 @@ def validate_episode(
             if previous_after is not None and before != previous_after:
                 findings.append(_finding("blocker", "QUANTITY_PATH_GAP", "adjacent quantity transitions do not connect", related_refs=[event_id]))
             previous_after = after
-            ordering_key = canonical_json(item.get("ordering_key", []))
+            raw_ordering = item.get("ordering_key")
+            if not isinstance(raw_ordering, list) or len(raw_ordering) != 4:
+                raise EpisodeProjectionError(
+                    "event ordering_key must contain exactly four fields"
+                )
+            ordering_time = _aware_datetime(
+                raw_ordering[0], field="event.ordering_key[0]"
+            )
+            if raw_ordering[0] != _iso(ordering_time):
+                raise EpisodeProjectionError(
+                    "event ordering_key time is not canonical UTC seconds"
+                )
+            if ordering_time != event_effective:
+                raise EpisodeProjectionError(
+                    "event ordering_key time does not equal effective_at"
+                )
+            rank = raw_ordering[1]
+            if isinstance(rank, bool) or not isinstance(rank, int):
+                raise EpisodeProjectionError(
+                    "event ordering_key sequence rank must be an integer"
+                )
+            if not isinstance(raw_ordering[2], str) or not isinstance(
+                raw_ordering[3], str
+            ):
+                raise EpisodeProjectionError(
+                    "event ordering_key tie-break fields must be strings"
+                )
+            if raw_ordering[3] != event_id:
+                raise EpisodeProjectionError(
+                    "event ordering_key is not bound to event_id"
+                )
+            ordering_key = (
+                ordering_time,
+                rank,
+                raw_ordering[2],
+                raw_ordering[3],
+            )
             if previous_key is not None and ordering_key < previous_key:
                 findings.append(_finding("blocker", "NON_CANONICAL_EVENT_ORDER", "event references are not canonically ordered", related_refs=[event_id]))
             previous_key = ordering_key
@@ -1210,7 +1970,13 @@ def validate_episode(
         except EpisodeProjectionError:
             pass
     lineage = episode.get("lineage") if isinstance(episode.get("lineage"), Mapping) else {}
-    for field in ("normalized_event_digest", "input_digest", "builder_version", "canonical_content_digest"):
+    for field in (
+        "normalized_event_digest",
+        "input_digest",
+        "builder_version",
+        "snapshot_set_digest",
+        "canonical_content_digest",
+    ):
         if not lineage.get(field):
             findings.append(_finding("blocker", "MISSING_EPISODE_LINEAGE", f"lineage.{field} is required", related_refs=[episode_id]))
     if lineage.get("canonical_content_digest"):
@@ -1218,23 +1984,264 @@ def validate_episode(
         if lineage.get("canonical_content_digest") != expected_digest:
             findings.append(_finding("blocker", "EPISODE_DIGEST_MISMATCH", "canonical episode content digest does not match", related_refs=[episode_id]))
 
-    snapshot_index = {str(item.get("snapshot_id")): item for item in snapshot_catalog}
+    try:
+        raw_catalog = (
+            list(snapshot_catalog)
+            if not isinstance(snapshot_catalog, list)
+            else snapshot_catalog
+        )
+    except TypeError:
+        raw_catalog = []
+        findings.append(
+            _finding(
+                "blocker",
+                "MALFORMED_SNAPSHOT_CATALOG",
+                "snapshot_catalog must be iterable",
+            )
+        )
+    if _catalog_validated:
+        catalog_rows = [dict(item) for item in raw_catalog if isinstance(item, Mapping)]
+    else:
+        catalog_rows, catalog_findings = _validate_snapshot_catalog_rows(raw_catalog)
+        findings.extend(catalog_findings)
+    snapshot_index = {
+        str(item.get("snapshot_id")): item for item in catalog_rows
+    }
     events_by_id = {str(item.get("event_id")): item for item in event_refs}
-    for link in episode.get("snapshot_links", []):
+    raw_snapshot_links = episode.get("snapshot_links")
+    if not isinstance(raw_snapshot_links, list):
+        findings.append(
+            _finding(
+                "blocker",
+                "MALFORMED_SNAPSHOT_LINKS",
+                "snapshot_links must be a list",
+                related_refs=[episode_id],
+            )
+        )
+        raw_snapshot_links = []
+    if lineage.get("snapshot_set_digest") != _sha256(raw_snapshot_links):
+        findings.append(
+            _finding(
+                "blocker",
+                "SNAPSHOT_SET_DIGEST_MISMATCH",
+                "lineage.snapshot_set_digest does not hash snapshot_links",
+                related_refs=[episode_id],
+            )
+        )
+    expected_snapshot_link_keys: list[tuple[str | None, str]] = []
+    for index, event_ref in enumerate(event_refs):
+        event_id = str(event_ref.get("event_id") or "") if isinstance(event_ref, Mapping) else ""
+        if index == 0:
+            before_role, after_role = "before_open", "after_open"
+        elif episode.get("closing_event_ref") == event_id:
+            before_role, after_role = "before_close", "after_close"
+        else:
+            before_role, after_role = "before_change", "after_change"
+        expected_snapshot_link_keys.extend(
+            [(event_id, before_role), (event_id, after_role)]
+        )
+    if status in {"open", "data_gap"}:
+        expected_snapshot_link_keys.append((None, "at_cutoff"))
+    actual_snapshot_link_keys = [
+        (item.get("event_ref"), str(item.get("link_role") or ""))
+        for item in raw_snapshot_links
+        if isinstance(item, Mapping)
+    ]
+    if actual_snapshot_link_keys != expected_snapshot_link_keys:
+        findings.append(
+            _finding(
+                "blocker",
+                "SNAPSHOT_LINK_SET_MISMATCH",
+                "snapshot_links are not the exact canonical episode/event role set",
+                related_refs=[episode_id],
+            )
+        )
+    for index, raw_link in enumerate(raw_snapshot_links):
+        if not isinstance(raw_link, Mapping):
+            findings.append(
+                _finding(
+                    "blocker",
+                    "MALFORMED_SNAPSHOT_LINK",
+                    "snapshot links must be objects",
+                    related_refs=[episode_id, str(index)],
+                )
+            )
+            continue
+        link = dict(raw_link)
+        if set(link) != _SNAPSHOT_LINK_FIELDS:
+            findings.append(
+                _finding(
+                    "blocker",
+                    "MALFORMED_SNAPSHOT_LINK",
+                    "snapshot link has an unexpected shape",
+                    related_refs=[episode_id, str(index)],
+                )
+            )
+        role = link.get("link_role")
+        allowed_roles = {
+            "before_open",
+            "after_open",
+            "before_change",
+            "after_change",
+            "before_close",
+            "after_close",
+            "at_cutoff",
+        }
+        if not isinstance(role, str) or role not in allowed_roles:
+            findings.append(
+                _finding(
+                    "blocker",
+                    "INVALID_SNAPSHOT_LINK_ROLE",
+                    "snapshot link_role is unsupported",
+                    related_refs=[episode_id, str(index)],
+                )
+            )
+            role = str(role or "")
+        event_ref = link.get("event_ref")
+        event = events_by_id.get(str(event_ref or ""))
+        if role == "at_cutoff":
+            if event_ref is not None or link.get("event_time") is not None:
+                findings.append(
+                    _finding(
+                        "blocker",
+                        "SNAPSHOT_EVENT_TIME_MISMATCH",
+                        "at_cutoff links must not carry an event reference",
+                        related_refs=[episode_id, str(index)],
+                    )
+                )
+        elif not isinstance(event_ref, str) or not event_ref or event is None:
+            findings.append(
+                _finding(
+                    "blocker",
+                    "SNAPSHOT_EVENT_REFERENCE_NOT_FOUND",
+                    "event-bound snapshot link does not resolve in the episode",
+                    related_refs=[episode_id, str(event_ref or index)],
+                )
+            )
+        elif link.get("event_time") != event.get("effective_at"):
+            findings.append(
+                _finding(
+                    "blocker",
+                    "SNAPSHOT_EVENT_TIME_MISMATCH",
+                    "snapshot link event_time does not equal the referenced event",
+                    related_refs=[episode_id, event_ref],
+                )
+            )
         snapshot_ref = link.get("snapshot_ref")
         if not snapshot_ref:
+            if (
+                link.get("snapshot_as_of") is not None
+                or link.get("snapshot_knowledge_cutoff_at") is not None
+                or link.get("link_method") != "missing"
+                or link.get("validation_status") != "missing"
+                or link.get("temporal_distance_seconds") is not None
+                or not isinstance(link.get("reason"), str)
+                or not link.get("reason")
+            ):
+                findings.append(
+                    _finding(
+                        "blocker",
+                        "SNAPSHOT_LINK_CLOSURE_MISMATCH",
+                        "missing snapshot link carries inconsistent metadata",
+                        related_refs=[episode_id, str(index)],
+                    )
+                )
             continue
+        if not isinstance(snapshot_ref, str):
+            findings.append(
+                _finding(
+                    "blocker",
+                    "MALFORMED_SNAPSHOT_LINK",
+                    "snapshot_ref must be a string or null",
+                    related_refs=[episode_id, str(index)],
+                )
+            )
         snapshot = snapshot_index.get(str(snapshot_ref))
         if snapshot is None:
             findings.append(_finding("blocker", "SNAPSHOT_REFERENCE_NOT_FOUND", "snapshot reference does not resolve", related_refs=[str(snapshot_ref)]))
             continue
+        if (
+            link.get("snapshot_as_of") != snapshot.get("as_of_date")
+            or link.get("snapshot_knowledge_cutoff_at")
+            != snapshot.get("knowledge_cutoff_at")
+            or link.get("validation_status") != "linked"
+            or link.get("reason") is not None
+        ):
+            findings.append(
+                _finding(
+                    "blocker",
+                    "SNAPSHOT_LINK_CLOSURE_MISMATCH",
+                    "snapshot link time/status metadata does not equal its catalog row",
+                    related_refs=[str(snapshot_ref)],
+                )
+            )
         if snapshot.get("account_id") != scope.get("account_id"):
             findings.append(_finding("blocker", "SNAPSHOT_ACCOUNT_MISMATCH", "snapshot account does not match episode", related_refs=[episode_id, str(snapshot_ref)]))
-        event = events_by_id.get(str(link.get("event_ref") or ""))
-        snapshot_cutoff = _optional_aware_datetime(snapshot.get("knowledge_cutoff_at"), field="snapshot.knowledge_cutoff_at")
+        try:
+            snapshot_cutoff = _optional_aware_datetime(snapshot.get("knowledge_cutoff_at"), field="snapshot.knowledge_cutoff_at")
+        except EpisodeProjectionError as exc:
+            findings.append(
+                _finding(
+                    "blocker",
+                    "INVALID_SNAPSHOT_LINK_TIME",
+                    str(exc),
+                    related_refs=[str(snapshot_ref)],
+                )
+            )
+            snapshot_cutoff = None
+        expected_method = (
+            "exact_event_cursor" if role.startswith("after") else "latest_at_or_before"
+        )
+        if link.get("link_method") != expected_method:
+            findings.append(
+                _finding(
+                    "blocker",
+                    "SNAPSHOT_LINK_METHOD_MISMATCH",
+                    "snapshot link method is inconsistent with its role",
+                    related_refs=[str(snapshot_ref)],
+                )
+            )
+        distance = link.get("temporal_distance_seconds")
+        if role.startswith("after"):
+            if distance is not None:
+                findings.append(
+                    _finding(
+                        "blocker",
+                        "SNAPSHOT_LINK_DISTANCE_MISMATCH",
+                        "exact after links must not carry a fallback distance",
+                        related_refs=[str(snapshot_ref)],
+                    )
+                )
+        elif snapshot_cutoff is not None:
+            boundary = (
+                cutoff
+                if role == "at_cutoff"
+                else _aware_datetime(
+                    event.get("effective_at"), field="event.effective_at"
+                )
+                if event is not None
+                else None
+            )
+            expected_distance = (
+                max(0, int((boundary - snapshot_cutoff).total_seconds()))
+                if boundary is not None
+                else None
+            )
+            if (
+                isinstance(distance, bool)
+                or not isinstance(distance, int)
+                or distance != expected_distance
+            ):
+                findings.append(
+                    _finding(
+                        "blocker",
+                        "SNAPSHOT_LINK_DISTANCE_MISMATCH",
+                        "snapshot link fallback distance does not match its boundary",
+                        related_refs=[str(snapshot_ref)],
+                    )
+                )
         if event and snapshot_cutoff:
             event_time = _aware_datetime(event.get("effective_at"), field="event.effective_at")
-            role = str(link.get("link_role") or "")
             if role.startswith("before") and snapshot_cutoff > event_time:
                 findings.append(_finding("blocker", "FUTURE_SNAPSHOT_LINK", "state-before snapshot is later than the event", related_refs=[str(snapshot_ref), str(event.get("event_id"))]))
             if role.startswith("after"):
@@ -1244,9 +2251,50 @@ def validate_episode(
         if str(link.get("link_role", "")).startswith("after") and instruments:
             if str(scope.get("instrument_id", "")).upper() not in instruments and str(scope.get("symbol", "")).upper() not in instruments:
                 findings.append(_finding("blocker", "SNAPSHOT_INSTRUMENT_MISMATCH", "state-after snapshot does not contain the episode instrument", related_refs=[episode_id, str(snapshot_ref)]))
-    decision = episode.get("decision_linkage") if isinstance(episode.get("decision_linkage"), Mapping) else {}
-    if decision.get("status") == "linked" and not decision.get("decision_refs"):
-        findings.append(_finding("blocker", "MISSING_EXPLICIT_DECISION_REF", "linked status requires an explicit Decision reference", related_refs=[episode_id]))
+    projection_version = str(episode.get("projection_version") or "")
+    builder_version = str(lineage.get("builder_version") or "")
+    decision = episode.get("decision_linkage")
+    if projection_version == PROJECTION_VERSION and builder_version == PROJECTION_VERSION:
+        findings.extend(
+            _validate_decision_linkage_v2(
+                decision,
+                episode_id=episode_id,
+                events_by_id=events_by_id,
+                scope=scope,
+            )
+        )
+    elif (
+        projection_version == LEGACY_PROJECTION_VERSION
+        and builder_version == LEGACY_PROJECTION_VERSION
+        and isinstance(decision, Mapping)
+        and decision.get("contract_version") in (None, "")
+    ):
+        findings.append(
+            _finding(
+                "warning",
+                "LEGACY_DECISION_LINKAGE_CONTRACT",
+                "legacy P2C Decision linkage lacks canonical relation closure; rebuild before P2F",
+                related_refs=[episode_id],
+            )
+        )
+        if decision.get("status") == "linked" and not decision.get("decision_refs"):
+            findings.append(
+                _finding(
+                    "blocker",
+                    "MISSING_EXPLICIT_DECISION_REF",
+                    "linked status requires an explicit Decision reference",
+                    related_refs=[episode_id],
+                )
+            )
+    else:
+        findings.append(
+            _finding(
+                "blocker",
+                "P2C_PROJECTION_CONTRACT_MISMATCH",
+                "episode projection, builder, and Decision-linkage contracts do not agree",
+                related_refs=[episode_id],
+            )
+        )
     return {
         "schema_version": VALIDATION_SCHEMA_VERSION,
         "episode_id": episode_id,
@@ -1255,12 +2303,72 @@ def validate_episode(
     }
 
 
+def validate_episode(
+    episode: Mapping[str, Any],
+    *,
+    snapshot_catalog: Iterable[Mapping[str, Any]] = (),
+    _catalog_validated: bool = False,
+) -> dict[str, Any]:
+    """Validate any JSON-like input without leaking semantic exceptions."""
+
+    episode_id = (
+        str(episode.get("episode_id") or "")
+        if isinstance(episode, Mapping)
+        else ""
+    )
+    if not isinstance(episode, Mapping):
+        return {
+            "schema_version": VALIDATION_SCHEMA_VERSION,
+            "episode_id": episode_id,
+            "validation_status": "blocked",
+            "findings": [
+                _finding(
+                    "blocker",
+                    "MALFORMED_EPISODE",
+                    "episode must be an object",
+                )
+            ],
+        }
+    try:
+        return _validate_episode_impl(
+            episode,
+            snapshot_catalog=snapshot_catalog,
+            _catalog_validated=_catalog_validated,
+        )
+    except Exception as exc:
+        return {
+            "schema_version": VALIDATION_SCHEMA_VERSION,
+            "episode_id": episode_id,
+            "validation_status": "blocked",
+            "findings": [
+                _finding(
+                    "blocker",
+                    "MALFORMED_EPISODE",
+                    str(exc),
+                    related_refs=[episode_id] if episode_id else [],
+                )
+            ],
+        }
+
+
 def validate_episode_collection(
     collection: Mapping[str, Any], *, extra_findings: Iterable[Mapping[str, Any]] = ()
 ) -> dict[str, Any]:
     findings = list(extra_findings)
     if collection.get("schema_version") != COLLECTION_SCHEMA_VERSION:
         findings.append(_finding("blocker", "UNSUPPORTED_COLLECTION_SCHEMA", "unsupported episode collection schema"))
+    collection_projection = str(collection.get("projection_version") or "")
+    if collection_projection not in {
+        PROJECTION_VERSION,
+        LEGACY_PROJECTION_VERSION,
+    }:
+        findings.append(
+            _finding(
+                "blocker",
+                "UNSUPPORTED_PROJECTION_VERSION",
+                "unsupported episode collection projection version",
+            )
+        )
     if collection.get("collection_digest"):
         digest_payload = deepcopy(dict(collection))
         digest_payload.pop("validation", None)
@@ -1273,7 +2381,10 @@ def validate_episode_collection(
                     "canonical collection digest does not match the artifact content",
                 )
             )
-    snapshot_catalog = collection.get("snapshot_catalog", [])
+    snapshot_catalog, catalog_findings = _validate_snapshot_catalog_rows(
+        collection.get("snapshot_catalog", [])
+    )
+    findings.extend(catalog_findings)
     snapshot_ids = [
         str(item.get("snapshot_id") or "")
         for item in snapshot_catalog
@@ -1294,6 +2405,15 @@ def validate_episode_collection(
             )
         )
     episodes = collection.get("episodes", [])
+    if not isinstance(episodes, list):
+        findings.append(
+            _finding(
+                "blocker",
+                "MALFORMED_EPISODE_COLLECTION",
+                "episodes must be a list",
+            )
+        )
+        episodes = []
     episode_ids = [
         str(item.get("episode_id") or "")
         for item in episodes
@@ -1315,7 +2435,29 @@ def validate_episode_collection(
         )
     consumed: dict[str, list[str]] = defaultdict(list)
     for episode in episodes:
-        result = validate_episode(episode, snapshot_catalog=snapshot_catalog)
+        if not isinstance(episode, Mapping):
+            findings.append(
+                _finding(
+                    "blocker",
+                    "MALFORMED_EPISODE_COLLECTION",
+                    "episodes must contain only objects",
+                )
+            )
+            continue
+        if str(episode.get("projection_version") or "") != collection_projection:
+            findings.append(
+                _finding(
+                    "blocker",
+                    "COLLECTION_EPISODE_PROJECTION_MISMATCH",
+                    "episode projection_version does not match the collection",
+                    related_refs=[str(episode.get("episode_id") or "")],
+                )
+            )
+        result = validate_episode(
+            episode,
+            snapshot_catalog=snapshot_catalog,
+            _catalog_validated=True,
+        )
         findings.extend(result["findings"])
         existing_validation = episode.get("validation", {})
         if isinstance(existing_validation, Mapping):
