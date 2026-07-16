@@ -20,8 +20,7 @@
       "const": "p2f.episode_review.v1"
     },
     "content_id": {
-      "type": "string",
-      "pattern": "^sha256:[0-9a-f]{64}$"
+      "$ref": "#/$defs/contentId"
     },
     "review_id": {
       "type": "string",
@@ -35,7 +34,9 @@
       "additionalProperties": false,
       "required": [
         "revision_no",
-        "status"
+        "status",
+        "supersedes_content_id",
+        "correction_reason"
       ],
       "properties": {
         "revision_no": {
@@ -51,15 +52,24 @@
           ]
         },
         "supersedes_content_id": {
-          "type": [
-            "string",
-            "null"
+          "oneOf": [
+            {
+              "$ref": "#/$defs/contentId"
+            },
+            {
+              "type": "null"
+            }
           ]
         },
         "correction_reason": {
-          "type": [
-            "string",
-            "null"
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
           ]
         }
       }
@@ -147,6 +157,7 @@
         "no_advice",
         "no_mechanical_score",
         "generation_mode",
+        "model_generation",
         "human_reviews"
       ],
       "properties": {
@@ -179,7 +190,9 @@
                 "prompt_template_id",
                 "prompt_hash",
                 "input_content_id",
-                "output_hash"
+                "output_hash",
+                "parameters",
+                "generated_at"
               ],
               "properties": {
                 "model_id": {
@@ -191,19 +204,16 @@
                   "minLength": 1
                 },
                 "prompt_hash": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/contentId"
                 },
                 "input_content_id": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/contentId"
                 },
                 "output_hash": {
-                  "type": "string",
-                  "minLength": 1
+                  "$ref": "#/$defs/contentId"
                 },
                 "parameters": {
-                  "type": "object"
+                  "$ref": "#/$defs/canonicalObject"
                 },
                 "generated_at": {
                   "type": "string",
@@ -215,6 +225,7 @@
         },
         "human_reviews": {
           "type": "array",
+          "uniqueItems": true,
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -261,11 +272,123 @@
     },
     "warnings": {
       "type": "array",
+      "uniqueItems": true,
       "items": {
         "$ref": "#/$defs/warning"
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "governance": {
+            "properties": {
+              "generation_mode": {
+                "const": "facts_only"
+              }
+            },
+            "required": [
+              "generation_mode"
+            ]
+          }
+        },
+        "required": [
+          "governance"
+        ]
+      },
+      "then": {
+        "properties": {
+          "governance": {
+            "properties": {
+              "model_generation": {
+                "type": "null"
+              }
+            }
+          },
+          "interpretation_sections": {
+            "properties": {
+              "main_tensions": {
+                "maxItems": 0
+              },
+              "hypotheses": {
+                "maxItems": 0
+              },
+              "alternative_explanations": {
+                "maxItems": 0
+              },
+              "counterfactual_options": {
+                "maxItems": 0
+              },
+              "history_links": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "governance": {
+            "properties": {
+              "generation_mode": {
+                "const": "model_assisted"
+              }
+            },
+            "required": [
+              "generation_mode"
+            ]
+          }
+        },
+        "required": [
+          "governance"
+        ]
+      },
+      "then": {
+        "properties": {
+          "governance": {
+            "properties": {
+              "model_generation": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "governance": {
+            "properties": {
+              "generation_mode": {
+                "const": "human_authored"
+              }
+            },
+            "required": [
+              "generation_mode"
+            ]
+          }
+        },
+        "required": [
+          "governance"
+        ]
+      },
+      "then": {
+        "properties": {
+          "governance": {
+            "properties": {
+              "model_generation": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "artifactRef": {
       "type": "object",
@@ -273,22 +396,60 @@
       "required": [
         "schema_version",
         "content_id",
-        "artifact_id"
+        "episode_id"
       ],
       "properties": {
         "schema_version": {
-          "type": "string",
-          "minLength": 1
+          "const": "p2f.review_input_bundle.v1"
         },
         "content_id": {
-          "type": "string",
-          "minLength": 1
+          "$ref": "#/$defs/contentId"
         },
-        "artifact_id": {
+        "episode_id": {
           "type": "string",
           "minLength": 1
         }
       }
+    },
+    "contentId": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "warningCode": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "canonicalObject": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/canonicalValue"
+      }
+    },
+    "canonicalValue": {
+      "description": "Canonical JSON value. Fractional numerics must be Decimal strings; runtime semantic validation must additionally reject binary float values such as 1.0 that JSON Schema may classify as integer-valued numbers.",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/canonicalValue"
+          }
+        },
+        {
+          "$ref": "#/$defs/canonicalObject"
+        }
+      ]
     },
     "availability": {
       "enum": [
@@ -300,25 +461,38 @@
         "unpriced",
         "invalid",
         "not_applicable",
-        "withheld_by_cutoff"
+        "withheld_by_cutoff",
+        "partial"
       ]
     },
     "sourceRef": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "source_id"
+        "source_id",
+        "source_kind",
+        "content_id",
+        "locator",
+        "frozen_pointer"
       ],
       "properties": {
         "source_id": {
           "type": "string",
           "minLength": 1
         },
+        "source_kind": {
+          "type": "string",
+          "minLength": 1
+        },
         "content_id": {
-          "type": "string"
+          "$ref": "#/$defs/contentId"
         },
         "locator": {
           "type": "string"
+        },
+        "frozen_pointer": {
+          "type": "string",
+          "pattern": "^/frozen_sources/"
         }
       }
     },
@@ -327,15 +501,47 @@
       "additionalProperties": false,
       "required": [
         "fact_id",
+        "kind",
+        "claim_type",
         "statement",
         "availability",
         "temporal_role",
-        "source_refs"
+        "effective_at",
+        "knowledge_at",
+        "source_refs",
+        "warning_codes",
+        "data"
       ],
       "properties": {
         "fact_id": {
           "type": "string",
           "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "episode_lifecycle",
+            "execution_event",
+            "security_identity",
+            "recorded_decision",
+            "recorded_note",
+            "portfolio_anchor",
+            "portfolio_metric",
+            "portfolio_delta",
+            "market_record",
+            "outcome_record",
+            "decision_execution_link",
+            "plan_execution_comparison"
+          ]
+        },
+        "claim_type": {
+          "enum": [
+            "fact",
+            "estimate",
+            "management_comment",
+            "analyst_view",
+            "opinion",
+            "unknown"
+          ]
         },
         "statement": {
           "type": "string",
@@ -368,15 +574,21 @@
         },
         "source_refs": {
           "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
           "items": {
             "$ref": "#/$defs/sourceRef"
           }
         },
         "warning_codes": {
           "type": "array",
+          "uniqueItems": true,
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/warningCode"
           }
+        },
+        "data": {
+          "$ref": "#/$defs/canonicalObject"
         }
       }
     },
@@ -385,22 +597,47 @@
       "additionalProperties": false,
       "required": [
         "status",
+        "reason",
+        "source_ids",
+        "warning_codes",
+        "gap_codes",
         "facts"
       ],
       "properties": {
         "status": {
           "$ref": "#/$defs/availability"
         },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "warning_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/warningCode"
+          }
+        },
         "facts": {
           "type": "array",
+          "uniqueItems": true,
           "items": {
             "$ref": "#/$defs/fact"
           }
         },
         "gap_codes": {
           "type": "array",
+          "uniqueItems": true,
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/warningCode"
           }
         }
       }

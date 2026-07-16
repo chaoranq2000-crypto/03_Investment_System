@@ -170,3 +170,18 @@ P2C episode、P2E-3 episode slice 和显式链接来源；后续 facts/interpret
 构建过程会再次执行 P2E-3 source replay，并核对组合数据库构建前后的
 SHA-256。Decision、市场或结果来源只能通过显式 JSON source 文档传入；超过
 双时间截止点的来源会被排除并留下 warning，缺失值不会被补成 `0`。
+
+P2F-2 只从上述冻结 bundle 构建六节可追溯事实复盘；它不再查询源库，也不调用模型：
+
+```powershell
+.\.conda\investment-system\python.exe -m src.investment_review `
+  episode-review-build `
+  --input-bundle data/processed/normalized/review_input_bundle.local.json `
+  --facts-only `
+  --output data/processed/normalized/episode_review.local.json `
+  --markdown-output reports/investment_review/p2f/episode_review.local.md
+```
+
+事实 ID、双时间角色、availability 和 P2F-1 source refs 都进入 canonical hash。
+进入解释或发布阶段前，应使用原 bundle 运行 `episode-review-validate --source-replay`；
+盈利/亏损不会自动生成“决策正确/错误”，缺失计划、市场或结果会保留为 gap。

@@ -92,6 +92,26 @@ scores, narratives or advice. Same-time events or snapshots without an explicit
 business sequence/revision must remain `ambiguous`. See
 `docs/playbooks/INVESTMENT_REVIEW_P2E_3.md`.
 
+## P2F-1/P2F-2 frozen-input and facts-only boundary
+
+After P2C and P2E-3 pass source replay, the implementation may also:
+
+- freeze one episode, its P2E-3 slice, explicit Decisions and cutoff-safe
+  supplemental sources into a canonical `p2f.review_input_bundle.v1`;
+- build a deterministic `p2f.episode_review.v1` facts-only revision from that
+  bundle without querying any database, network service or model;
+- preserve six fact sections, stable fact IDs, dual-time roles, availability,
+  explicit gaps and exact five-field references to the frozen source inventory;
+- compare only explicitly structured plan fields with linked execution facts,
+  using neutral `matches`/`deviates` results;
+- render facts-only JSON/Markdown and source-replay the review against the exact
+  input bundle before downstream use.
+
+P2F facts must not promote free source text into objective claims, infer missing
+investment logic, backfill outcomes as entry reasons, diagnose psychology,
+score decisions, or emit buy/sell/hold guidance. Missing, ambiguous, stale,
+partial and unpriced states remain explicit.
+
 The current P2C snapshot cursor is partition-scoped. Unless a catalog record
 explicitly proves a complete account-wide cursor, same-business-day P2E-3
 metrics must be `partial` with `PORTFOLIO_CURSOR_SCOPE_LIMITED`; they must not
@@ -147,6 +167,15 @@ For an approved P2E-3 context run:
 20. Treat offline validation as internal-consistency checking only. Before any
     downstream P2F use, run source-aware replay with the identified P2C artifact
     and read-only P2B database and require `source_verification.status=verified`.
+
+For an approved P2F facts-only run:
+
+21. Build a release-ready P2F-1 bundle and preserve its exact `content_id` and
+    source inventory; do not reopen the databases during the facts step.
+22. Build the six-section facts-only review, then validate fixed templates,
+    dual-time roles, fact/source IDs, explicit gaps and no-advice/no-score flags.
+23. Source-replay the review from the exact input bundle and require a byte-for-byte
+    rebuild before interpretations or publication.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate

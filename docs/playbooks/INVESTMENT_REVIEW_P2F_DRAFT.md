@@ -76,7 +76,43 @@ P2C、P2E-3 和 P2B SQLite 执行 source replay。artifact 自报的
 python -m src.investment_review episode-review-build `
   --input-bundle <path> `
   --facts-only `
-  --output <path>
+  --output <path> `
+  --markdown-output <optional-path>
+```
+
+P2F-2 只接受 `release_readiness.status=ready` 且
+`source_verification.status=verified` 的 P2F-1 bundle。它不会接收数据库、网络或
+模型参数，也不会在构建过程中重新读取来源。输出固定为
+`p2f.episode_review.v1` 的 revision 1/draft，并包含六个事实区：
+
+- `timeline`：episode lifecycle 与 canonical execution events；
+- `security_context`：标的身份、显式 Decision 与记录型 note；
+- `portfolio_context`：P2E-3 anchors、metrics 与可比较 deltas；
+- `market_context`：cutoff-safe market/price/classification 来源记录；
+- `outcome_context`：结果来源及其实际双时间角色；
+- `execution_consistency`：显式 Decision link 与结构化计划字段比较。
+
+每条 fact 都保存稳定 `fact_id`、`claim_type=fact`、availability、
+`effective_at/knowledge_at`、temporal role、固定中性 statement、闭合 data 以及
+指向 P2F-1 inventory 的五字段 source ref。原始自由文本不晋升为客观事实；市场、
+note 与 outcome 只保留来源存在、类型、内容哈希、字段清单和经过白名单的结构化值。
+
+只有显式结构化的 `planned_symbol/planned_market/planned_side/planned_quantity`
+（或 `execution_plan` 中的同名语义字段）可以与执行事实比较。输出只使用
+`matches/deviates`，不评价交易或决策好坏；没有可比较字段、偏离原因缺失、
+多事件数量不可直接比较时均写入 gap code。
+
+时间角色只能是 `known_at_decision / learned_during_episode /
+known_after_episode / not_applicable`。execution、post context、delta、outcome 和
+consistency 不得回填为事前事实；open episode 不伪造 final outcome。
+
+离线 validator 证明 schema、hash、fact ID、固定模板和内部双时间规则；发布或下游
+解释前还必须执行 source replay：
+
+```powershell
+python -m src.investment_review episode-review-validate <review.json> `
+  --source-replay `
+  --input-bundle <review-input.json>
 ```
 
 facts-only 输出不得包含：

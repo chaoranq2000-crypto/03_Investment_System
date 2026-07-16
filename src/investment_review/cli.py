@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from .artifact_io import atomic_write_bytes
 from .episodes import (
     build_episode_collection,
     load_episode_collection,
@@ -23,6 +24,16 @@ from .episode_portfolio_context import (
     replay_validate_episode_portfolio_context,
     save_episode_portfolio_context,
     validate_episode_portfolio_context,
+)
+from .episode_review import (
+    FACT_SECTION_NAMES,
+    build_facts_only_episode_review,
+    load_episode_review,
+    query_episode_review,
+    render_episode_review_markdown,
+    replay_validate_episode_review,
+    save_episode_review,
+    validate_episode_review,
 )
 from .ingest import ingest_csv, ingest_sqlite
 from .introspection import (
@@ -308,6 +319,42 @@ def build_parser() -> argparse.ArgumentParser:
     review_input_validate.add_argument(
         "--supplemental-source", action="append", default=[]
     )
+
+    episode_review_build = sub.add_parser(
+        "episode-review-build",
+        help="Build a deterministic facts-only review from one frozen P2F-1 bundle",
+    )
+    episode_review_build.add_argument("--input-bundle", required=True)
+    episode_review_build.add_argument(
+        "--facts-only",
+        action="store_true",
+        required=True,
+        help="Explicitly select the P2F-2 deterministic facts engine",
+    )
+    episode_review_build.add_argument("--output", required=True)
+    episode_review_build.add_argument(
+        "--markdown-output",
+        help="Optional facts-only Markdown rendering written after JSON validation",
+    )
+
+    episode_review_show = sub.add_parser(
+        "episode-review-show", help="Query a canonical P2F episode-review artifact"
+    )
+    episode_review_show.add_argument("artifact")
+    episode_review_show.add_argument("--section", choices=list(FACT_SECTION_NAMES))
+    episode_review_show.add_argument("--fact-id")
+    episode_review_show.add_argument("--content-id")
+
+    episode_review_validate = sub.add_parser(
+        "episode-review-validate", help="Validate a canonical P2F episode review"
+    )
+    episode_review_validate.add_argument("artifact")
+    episode_review_validate.add_argument(
+        "--source-replay",
+        action="store_true",
+        help="Rebuild facts from the supplied frozen P2F-1 bundle",
+    )
+    episode_review_validate.add_argument("--input-bundle")
 
     return parser
 
@@ -625,6 +672,58 @@ def main(argv: list[str] | None = None) -> int:
                 or artifact["release_readiness"]["status"] != "ready"
                 or artifact["source_verification"]["status"] != "verified"
             ):
+                return 2
+        elif args.command == "episode-review-build":
+            input_bundle = load_review_input_bundle(args.input_bundle)
+            artifact = build_facts_only_episode_review(input_bundle)
+            validation = validate_episode_review(artifact)
+            if validation["validation_status"] == "blocked":
+                raise ValueError("P2F facts-only episode review failed validation")
+            output = save_episode_review(args.output, artifact)
+            markdown_output = None
+            if args.markdown_output:
+                markdown_output = atomic_write_bytes(
+                    args.markdown_output,
+                    render_episode_review_markdown(artifact).encode("utf-8"),
+                )
+            _print(
+                {
+                    "status": validation["validation_status"],
+                    "content_id": artifact["content_id"],
+                    "review_id": artifact["review_id"],
+                    "episode_id": artifact["input_bundle_ref"]["episode_id"],
+                    "fact_count": sum(
+                        len(section["facts"])
+                        for section in artifact["fact_sections"].values()
+                    ),
+                    "output": str(output),
+                    "markdown_output": (
+                        str(markdown_output) if markdown_output is not None else None
+                    ),
+                }
+            )
+        elif args.command == "episode-review-show":
+            _print(
+                query_episode_review(
+                    load_episode_review(args.artifact),
+                    section=args.section,
+                    fact_id=args.fact_id,
+                    content_id=args.content_id,
+                )
+            )
+        elif args.command == "episode-review-validate":
+            artifact = load_episode_review(args.artifact)
+            if args.source_replay:
+                if not args.input_bundle:
+                    raise ValueError("--source-replay requires --input-bundle")
+                validation = replay_validate_episode_review(
+                    artifact,
+                    input_bundle=load_review_input_bundle(args.input_bundle),
+                )
+            else:
+                validation = validate_episode_review(artifact)
+            _print(validation)
+            if validation["validation_status"] == "blocked":
                 return 2
         else:
             parser.error(f"Unhandled command: {args.command}")
