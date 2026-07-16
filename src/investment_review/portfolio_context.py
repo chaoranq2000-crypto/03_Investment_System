@@ -647,6 +647,76 @@ PORTFOLIO_METRIC_METHOD_REGISTRY: dict[str, dict[str, str]] = {
 }
 """Stable metric IDs, versions and formulas exported for P2E-3 consumers."""
 
+_PORTFOLIO_METRIC_SEMANTIC_GROUPS: tuple[
+    tuple[tuple[str, ...], str, str], ...
+] = (
+    (
+        ("nav", "cash_value", "net_market_value", "target_position_value"),
+        "base_currency",
+        "signed",
+    ),
+    (
+        ("long_market_value", "short_market_value", "gross_market_value"),
+        "base_currency",
+        "nonnegative",
+    ),
+    (("missing_valuation_amount",), "base_currency", "zero_if_numeric"),
+    (
+        ("cash_weight", "net_exposure", "target_position_weight"),
+        "ratio_to_nav",
+        "signed",
+    ),
+    (
+        ("long_exposure", "short_exposure", "gross_exposure"),
+        "ratio_to_nav",
+        "nonnegative",
+    ),
+    (
+        (
+            "position_count",
+            "valued_position_count",
+            "unpriced_position_count",
+            "stale_position_count",
+        ),
+        "count",
+        "nonnegative_integer",
+    ),
+    (
+        (
+            "valuation_coverage",
+            "unpriced_position_ratio",
+            "stale_position_ratio",
+        ),
+        "position_count_ratio",
+        "unit_interval",
+    ),
+    (
+        (
+            "max_position_weight",
+            "top3_concentration",
+            "top5_concentration",
+            "hhi",
+            _INDUSTRY_WEIGHT_REGISTRY_KEY,
+            "max_industry_weight",
+            "unclassified_industry_weight",
+        ),
+        "gross_share",
+        "unit_interval",
+    ),
+)
+
+for _metric_names, _unit_kind, _value_domain in _PORTFOLIO_METRIC_SEMANTIC_GROUPS:
+    for _metric_name in _metric_names:
+        PORTFOLIO_METRIC_METHOD_REGISTRY[_metric_name].update(
+            {"unit_kind": _unit_kind, "value_domain": _value_domain}
+        )
+
+if any(
+    "unit_kind" not in spec or "value_domain" not in spec
+    for spec in PORTFOLIO_METRIC_METHOD_REGISTRY.values()
+):
+    raise RuntimeError("portfolio metric semantic registry is incomplete")
+
 _METRIC_CALCULATION_METHODS = {
     metric_name: spec["calculation_method"]
     for metric_name, spec in PORTFOLIO_METRIC_METHOD_REGISTRY.items()

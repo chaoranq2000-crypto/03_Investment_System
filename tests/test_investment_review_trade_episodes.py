@@ -83,6 +83,8 @@ def snapshot(
     account: str = "acct-1",
     instruments: list[str] | None = None,
     revision: int = 1,
+    cursor_scope: str = "partition",
+    included_event_set_complete: bool = False,
 ) -> dict:
     return {
         "snapshot_id": snapshot_id,
@@ -95,6 +97,8 @@ def snapshot(
         "source_path": "fixture.sqlite3",
         "instrument_ids": instruments or [],
         "included_event_ids": included or [],
+        "cursor_scope": cursor_scope,
+        "included_event_set_complete": included_event_set_complete,
     }
 
 
@@ -143,6 +147,31 @@ def test_reentry_creates_distinct_stable_episode_ids() -> None:
     assert len(first["episodes"]) == 2
     assert first["episodes"][0]["episode_id"] != first["episodes"][1]["episode_id"]
     assert first["collection_digest"] == second["collection_digest"]
+
+
+def test_collection_rejects_duplicate_episode_identity_after_rehash() -> None:
+    result = build(
+        [
+            event("e1", account="acct-a", symbol="600000.SH"),
+            event("e2", account="acct-b", symbol="000001.SZ"),
+        ]
+    )
+    assert len(result["episodes"]) == 2
+    result["episodes"][1]["episode_id"] = result["episodes"][0]["episode_id"]
+    material = deepcopy(result)
+    material.pop("validation", None)
+    material["collection_digest"] = ""
+    result["collection_digest"] = hashlib.sha256(
+        json.dumps(
+            material,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    validation = validate_episode_collection(result)
+    assert validation["validation_status"] == "blocked"
+    assert "DUPLICATE_EPISODE_IDENTITY" in codes(validation)
 
 
 def test_partitioning_is_explicit_by_account_and_instrument() -> None:
@@ -385,6 +414,41 @@ def test_validator_rejects_snapshot_scope_and_future_tampering() -> None:
     )
     catalog[0]["knowledge_cutoff_at"] = (BASE + timedelta(minutes=1)).isoformat()
     assert "FUTURE_SNAPSHOT_LINK" in codes(validate_episode(episode, snapshot_catalog=catalog))
+
+
+def test_snapshot_cursor_proof_is_preserved_and_invalid_claims_block() -> None:
+    proven = build(
+        [event("e1")],
+        [
+            snapshot(
+                "after-open",
+                as_of="2026-07-01",
+                cutoff=BASE,
+                included=["e1"],
+                instruments=["600000.SH"],
+                cursor_scope="account",
+                included_event_set_complete=True,
+            )
+        ],
+    )
+    assert proven["snapshot_catalog"][0]["cursor_scope"] == "account"
+    assert proven["snapshot_catalog"][0]["included_event_set_complete"] is True
+
+    invalid = build(
+        [event("e1")],
+        [
+            snapshot(
+                "bad-proof",
+                as_of="2026-07-01",
+                cutoff=BASE,
+                included=["e1"],
+                cursor_scope="partition",
+                included_event_set_complete=True,
+            )
+        ],
+    )
+    assert invalid["validation"]["validation_status"] == "blocked"
+    assert "INVALID_SNAPSHOT_REFERENCE" in codes(invalid["validation"])
 
 
 def test_artifact_round_trip_query_and_canonical_serialization(tmp_path: Path) -> None:

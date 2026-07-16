@@ -123,3 +123,31 @@ $research-orchestrator 启动细分到个股闭环：AI服务器液冷。
 ```
 
 该命令只读源库，不推断决策原因；无法证明的快照/Decision 链接会保留为 missing、unlinked、ambiguous 或 invalid。契约、查询和验证命令见 `docs/playbooks/INVESTMENT_REVIEW_P2C.md`。
+
+P2E-3 可进一步把 P2C 的逐事件 `pre/post` 锚点绑定到可证明的组合快照和
+P2E-2 指标：
+
+```powershell
+.\.conda\investment-system\python.exe -m src.investment_review `
+  episode-portfolio-context-build `
+  --episode-artifact data/processed/normalized/trade_episodes.local.json `
+  --portfolio-db data/db/portfolio.sqlite3 `
+  --cutoff-at "2026-07-15T15:00:00+08:00" `
+  --knowledge-cutoff "2026-07-15T15:00:00+08:00" `
+  --output data/processed/normalized/trade_episode_portfolio_context.local.json
+```
+
+该入口保持源库只读；无法证明盘中顺序或双时间可见性的状态不会被猜测补齐。
+进入下游阶段前还应使用同一 P2C artifact 与 P2B 数据库执行带源重放验证；单独重算
+artifact 的 SHA-256 只能证明内部内容一致，不能证明外部来源真实：
+
+```powershell
+.\.conda\investment-system\python.exe -m src.investment_review `
+  episode-portfolio-context-validate `
+  data/processed/normalized/trade_episode_portfolio_context.local.json `
+  --source-replay `
+  --episode-artifact data/processed/normalized/trade_episodes.local.json `
+  --portfolio-db data/db/portfolio.sqlite3
+```
+
+完整边界见 `docs/playbooks/INVESTMENT_REVIEW_P2E_3.md`。

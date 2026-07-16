@@ -5,10 +5,10 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
-from collections import defaultdict
+from collections import Counter, defaultdict
 from copy import deepcopy
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
@@ -72,7 +72,7 @@ def _optional_aware_datetime(value: object, *, field: str) -> datetime | None:
 
 
 def _iso(value: datetime) -> str:
-    return value.isoformat(timespec="seconds")
+    return value.astimezone(timezone.utc).isoformat(timespec="seconds")
 
 
 def _finding(
@@ -307,6 +307,18 @@ def _normalize_snapshots(
             explicit_ids = {str(value) for value in raw_snapshot.get("included_event_ids", [])}
             for source_key in raw_snapshot.get("included_source_keys", []):
                 explicit_ids.update(source_to_event.get(str(source_key), set()))
+            cursor_scope = str(raw_snapshot.get("cursor_scope") or "partition")
+            if cursor_scope not in {"account", "partition"}:
+                raise EpisodeProjectionError(
+                    "snapshot cursor_scope must be account or partition"
+                )
+            included_event_set_complete = (
+                raw_snapshot.get("included_event_set_complete") is True
+            )
+            if cursor_scope != "account" and included_event_set_complete:
+                raise EpisodeProjectionError(
+                    "included_event_set_complete requires account cursor_scope"
+                )
             normalized.append(
                 {
                     "snapshot_id": snapshot_id,
@@ -319,6 +331,8 @@ def _normalize_snapshots(
                     "source_path": str(raw_snapshot.get("source_path") or ""),
                     "instrument_ids": sorted({str(value).upper() for value in raw_snapshot.get("instrument_ids", [])}),
                     "included_event_ids": sorted(explicit_ids),
+                    "cursor_scope": cursor_scope,
+                    "included_event_set_complete": included_event_set_complete,
                 }
             )
         except Exception as exc:
@@ -1260,8 +1274,47 @@ def validate_episode_collection(
                 )
             )
     snapshot_catalog = collection.get("snapshot_catalog", [])
+    snapshot_ids = [
+        str(item.get("snapshot_id") or "")
+        for item in snapshot_catalog
+        if isinstance(item, Mapping)
+    ]
+    duplicate_snapshot_ids = sorted(
+        snapshot_id
+        for snapshot_id, count in Counter(snapshot_ids).items()
+        if snapshot_id and count > 1
+    )
+    if duplicate_snapshot_ids:
+        findings.append(
+            _finding(
+                "blocker",
+                "DUPLICATE_SNAPSHOT_IDENTITY",
+                "snapshot_catalog contains duplicate snapshot IDs",
+                related_refs=duplicate_snapshot_ids,
+            )
+        )
+    episodes = collection.get("episodes", [])
+    episode_ids = [
+        str(item.get("episode_id") or "")
+        for item in episodes
+        if isinstance(item, Mapping)
+    ]
+    duplicate_episode_ids = sorted(
+        episode_id
+        for episode_id, count in Counter(episode_ids).items()
+        if episode_id and count > 1
+    )
+    if duplicate_episode_ids:
+        findings.append(
+            _finding(
+                "blocker",
+                "DUPLICATE_EPISODE_IDENTITY",
+                "episodes contains duplicate episode IDs",
+                related_refs=duplicate_episode_ids,
+            )
+        )
     consumed: dict[str, list[str]] = defaultdict(list)
-    for episode in collection.get("episodes", []):
+    for episode in episodes:
         result = validate_episode(episode, snapshot_catalog=snapshot_catalog)
         findings.extend(result["findings"])
         existing_validation = episode.get("validation", {})

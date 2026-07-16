@@ -360,6 +360,43 @@ def test_snapshot_cash_uses_as_of_and_known_time_lineage(tmp_path):
     assert hidden["cash_status"] == "unavailable"
 
 
+def test_same_rank_cash_snapshots_are_unavailable_independent_of_insert_order(
+    tmp_path,
+):
+    observed = []
+    for name, amounts in (("forward", ("1000", "2000")), ("reverse", ("2000", "1000"))):
+        case_path = tmp_path / name
+        case_path.mkdir()
+        store = _build_store(case_path)
+        ids = []
+        for amount in amounts:
+            ids.append(
+                store.set_cash_balance(
+                    "default",
+                    Decimal(amount),
+                    date(2026, 7, 11),
+                    source="reviewed_cash",
+                )["snapshot_id"]
+            )
+        with store.connect() as connection:
+            connection.executemany(
+                "UPDATE cash_balance_snapshots SET recorded_at = ? WHERE snapshot_id = ?",
+                [("2026-07-11T09:00:00+00:00", snapshot_id) for snapshot_id in ids],
+            )
+            connection.commit()
+        observed.append(
+            store.build_snapshot(
+                "default",
+                date(2026, 7, 12),
+                knowledge_cutoff_at=datetime(2026, 7, 12, tzinfo=timezone.utc),
+            )
+        )
+
+    assert [item["cash_status"] for item in observed] == ["unavailable", "unavailable"]
+    assert [item["cash_balance"] for item in observed] == [None, None]
+    assert observed[0]["source_state_hash"] == observed[1]["source_state_hash"]
+
+
 def test_snapshot_rejects_naive_knowledge_cutoff_and_bad_ranges(tmp_path):
     store = _build_store(tmp_path)
     with pytest.raises(ValueError, match="必须包含时区"):

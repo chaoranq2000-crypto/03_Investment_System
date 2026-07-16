@@ -2259,15 +2259,30 @@ class PortfolioStore:
         if cutoff_text:
             known_filter = "AND julianday(recorded_at) <= julianday(?)"
             params.append(cutoff_text)
-        return connection.execute(
+        rows = connection.execute(
             f"""
             SELECT * FROM cash_balance_snapshots
             WHERE account_id = ? AND as_of_date <= ? {known_filter}
             ORDER BY as_of_date DESC, recorded_at DESC, snapshot_id DESC
-            LIMIT 1
             """,
             params,
-        ).fetchone()
+        ).fetchall()
+        if not rows:
+            return None
+        explicit_rank = (rows[0]["as_of_date"], rows[0]["recorded_at"])
+        tied = [
+            row
+            for row in rows
+            if (row["as_of_date"], row["recorded_at"]) == explicit_rank
+        ]
+        distinct_states = {
+            (row["amount"], row["source"], row["note"]) for row in tied
+        }
+        if len(distinct_states) > 1:
+            # Random UUID order is not a business revision. Preserve ambiguity
+            # as unavailable cash instead of guessing one same-rank state.
+            return None
+        return tied[0]
 
     @staticmethod
     def _snapshot_from_row(

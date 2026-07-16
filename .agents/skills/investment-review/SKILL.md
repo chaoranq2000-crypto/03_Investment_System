@@ -68,6 +68,34 @@ one reversal event across two episodes, or add P&L attribution, behavioral
 interpretation, advice, UI or execution. See
 `docs/playbooks/INVESTMENT_REVIEW_P2C.md`.
 
+## P2E-3 episode portfolio-context boundary
+
+After P2C and the P2E-2 metric registry are accepted, the implementation may also:
+
+- bind every material Trade Episode event to deterministic `pre` and `post` anchors;
+- read P2B snapshot tables through SQLite `mode=ro` plus `query_only`;
+- reuse the versioned P2E-2 metric registry and preserve Decimal strings,
+  method versions, source references and warning codes;
+- calculate compatible pre/post metric deltas;
+- save, validate and query a canonical
+  `p2e3.trade_episode_portfolio_context.v1` local artifact atomically.
+- bind the visible material-event set, snapshot state, cursor scope and metric
+  availability ceiling into the artifact, then source-replay it before P2F use.
+
+P2E-3 must not treat a stable ID tie-break as proof of business order, use a
+future price/classification/revision, replace missing values with zero, copy
+P2E-2 formulas, modify either source database, or emit behavior diagnoses,
+scores, narratives or advice. Same-time events or snapshots without an explicit
+business sequence/revision must remain `ambiguous`. See
+`docs/playbooks/INVESTMENT_REVIEW_P2E_3.md`.
+
+The current P2C snapshot cursor is partition-scoped. Unless a catalog record
+explicitly proves a complete account-wide cursor, same-business-day P2E-3
+metrics must be `partial` with `PORTFOLIO_CURSOR_SCOPE_LIMITED`; they must not
+be promoted to `exact`, and partial endpoints must not publish numeric deltas.
+Incomplete valuation coverage must leave NAV-dependent context metrics absent,
+not derive NAV from only the priced subset.
+
 ## Required workflow
 
 1. Run `python -m src.investment_review --db data/db/investment_review.sqlite3 init`.
@@ -102,6 +130,20 @@ For an approved P2C episode run:
     rejected, blocked or cutoff-excluded; never drop it silently.
 15. Rebuild after shuffled input and require identical episode/collection
     digests before promotion.
+
+For an approved P2E-3 context run:
+
+16. Validate the P2C source artifact and require explicit timezone-aware
+    `as_of` and `knowledge_cutoff` values.
+17. Build each material event's `pre`/`post` context only from source rows whose
+    effective and knowledge times satisfy the anchor boundary.
+18. Preserve `missing`, `ambiguous`, `stale`, `unpriced` and `invalid` states;
+    compute deltas only when method version and unit are compatible.
+19. Rebuild after input/SQLite insertion reordering and require the same bytes
+    and `content_id`; verify the source database hash is unchanged.
+20. Treat offline validation as internal-consistency checking only. Before any
+    downstream P2F use, run source-aware replay with the identified P2C artifact
+    and read-only P2B database and require `source_verification.status=verified`.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate

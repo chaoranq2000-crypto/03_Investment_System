@@ -16,6 +16,14 @@ from .episodes import (
     save_episode_collection,
     validate_episode_collection,
 )
+from .episode_portfolio_context import (
+    build_episode_portfolio_context,
+    load_episode_portfolio_context,
+    query_episode_portfolio_context,
+    replay_validate_episode_portfolio_context,
+    save_episode_portfolio_context,
+    validate_episode_portfolio_context,
+)
 from .ingest import ingest_csv, ingest_sqlite
 from .introspection import (
     discover_sqlite_files,
@@ -174,6 +182,56 @@ def build_parser() -> argparse.ArgumentParser:
         "episode-validate", help="Validate a canonical TradeEpisode collection artifact"
     )
     episode_validate.add_argument("artifact")
+
+    episode_context_build = sub.add_parser(
+        "episode-portfolio-context-build",
+        help="Bind point-in-time portfolio evidence to TradeEpisode event anchors",
+    )
+    episode_context_build.add_argument("--episode-artifact", required=True)
+    episode_context_build.add_argument(
+        "--portfolio-db",
+        required=True,
+        help="P2B portfolio or reviewed snapshot SQLite opened strictly read-only",
+    )
+    episode_context_build.add_argument(
+        "--cutoff-at",
+        required=True,
+        help="Latest episode/event time included in the artifact",
+    )
+    episode_context_build.add_argument(
+        "--knowledge-cutoff",
+        required=True,
+        help="Latest source knowledge time visible to this artifact revision",
+    )
+    episode_context_build.add_argument(
+        "--episode-id",
+        action="append",
+        default=[],
+        help="Optional episode ID filter; may be supplied more than once",
+    )
+    episode_context_build.add_argument("--output", required=True)
+
+    episode_context_show = sub.add_parser(
+        "episode-portfolio-context-show",
+        help="Query a canonical TradeEpisode portfolio-context artifact",
+    )
+    episode_context_show.add_argument("artifact")
+    episode_context_show.add_argument("--episode-id")
+    episode_context_show.add_argument("--context-id")
+    episode_context_show.add_argument("--content-id")
+
+    episode_context_validate = sub.add_parser(
+        "episode-portfolio-context-validate",
+        help="Validate a canonical TradeEpisode portfolio-context artifact",
+    )
+    episode_context_validate.add_argument("artifact")
+    episode_context_validate.add_argument(
+        "--source-replay",
+        action="store_true",
+        help="Rebuild from the supplied P2C artifact and read-only P2B database",
+    )
+    episode_context_validate.add_argument("--episode-artifact")
+    episode_context_validate.add_argument("--portfolio-db")
 
     return parser
 
@@ -346,6 +404,57 @@ def main(argv: list[str] | None = None) -> int:
             )
         elif args.command == "episode-validate":
             _print(validate_episode_collection(load_episode_collection(args.artifact)))
+        elif args.command == "episode-portfolio-context-build":
+            artifact = build_episode_portfolio_context(
+                load_episode_collection(args.episode_artifact),
+                portfolio_db=args.portfolio_db,
+                as_of=args.cutoff_at,
+                knowledge_cutoff=args.knowledge_cutoff,
+                episode_ids=args.episode_id or None,
+            )
+            validation = validate_episode_portfolio_context(artifact)
+            if validation["validation_status"] == "blocked":
+                raise ValueError("P2E-3 artifact failed validation")
+            output = save_episode_portfolio_context(args.output, artifact)
+            _print(
+                {
+                    "status": validation["validation_status"],
+                    "content_id": artifact["content_id"],
+                    "context_count": len(artifact["contexts"]),
+                    "delta_count": len(artifact["deltas"]),
+                    "output": str(output),
+                }
+            )
+        elif args.command == "episode-portfolio-context-show":
+            _print(
+                query_episode_portfolio_context(
+                    load_episode_portfolio_context(args.artifact),
+                    episode_id=args.episode_id,
+                    context_id=args.context_id,
+                    content_id=args.content_id,
+                )
+            )
+        elif args.command == "episode-portfolio-context-validate":
+            context_artifact = load_episode_portfolio_context(args.artifact)
+            if args.source_replay:
+                if not args.episode_artifact or not args.portfolio_db:
+                    raise ValueError(
+                        "--source-replay requires --episode-artifact and --portfolio-db"
+                    )
+                validation = replay_validate_episode_portfolio_context(
+                    context_artifact,
+                    episode_collection=load_episode_collection(
+                        args.episode_artifact
+                    ),
+                    portfolio_db=args.portfolio_db,
+                )
+            else:
+                validation = validate_episode_portfolio_context(
+                    context_artifact
+                )
+            _print(validation)
+            if validation["validation_status"] == "blocked":
+                return 2
         else:
             parser.error(f"Unhandled command: {args.command}")
     except Exception as exc:
