@@ -12,6 +12,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import unicodedata
 from copy import deepcopy
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
@@ -54,6 +55,7 @@ INTERPRETATION_SECTION_NAMES = (
     "counterfactual_options",
     "history_links",
 )
+FINDING_SECTION_NAMES = INTERPRETATION_SECTION_NAMES[:3]
 
 _CONTRACT_SCHEMA_PATH = (
     Path(__file__).resolve().parents[2]
@@ -2621,6 +2623,10 @@ def _validate_episode_review_impl(artifact: Mapping[str, Any]) -> dict[str, Any]
         from .episode_interpretation import interpretation_layer_findings
 
         findings.extend(interpretation_layer_findings(artifact))
+        if generation_mode == "human_authored":
+            from .episode_revision import revision_layer_findings
+
+            findings.extend(revision_layer_findings(artifact))
     elif generation_mode != "facts_only":
         findings.append(
             _finding(
@@ -2760,13 +2766,60 @@ def query_episode_review(
     return [deepcopy(dict(artifact))]
 
 
+def _markdown_clean(value: object) -> str:
+    text = "none" if value is None else str(value)
+    return "".join(
+        " "
+        if character in "\r\n\t"
+        else "�"
+        if unicodedata.category(character).startswith("C")
+        else character
+        for character in text
+    )
+
+
+def _markdown_escape(value: object) -> str:
+    text = _markdown_clean(value)
+    text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    for character in (
+        "\\",
+        "`",
+        "*",
+        "_",
+        "[",
+        "]",
+        "(",
+        ")",
+        "#",
+        "!",
+        "|",
+        "-",
+        "+",
+    ):
+        text = text.replace(character, "\\" + character)
+    return text
+
+
+def _markdown_code(value: object) -> str:
+    text = _markdown_clean(value)
+    longest = max((len(match.group(0)) for match in re.finditer(r"`+", text)), default=0)
+    delimiter = "`" * (longest + 1)
+    padding = " " if text.startswith("`") or text.endswith("`") else ""
+    return f"{delimiter}{padding}{text}{padding}{delimiter}"
+
+
+def _markdown_indented_json(value: object) -> str:
+    rendered = _markdown_clean(canonical_json_bytes(value).decode("utf-8"))
+    return "\n".join("    " + line for line in rendered.splitlines() or [""])
+
+
 def render_episode_review_markdown(artifact: Mapping[str, Any]) -> str:
-    """Render the facts layer only, preserving fact and frozen-source IDs."""
+    """Render one safe, auditable facts/interpretation revision as Markdown."""
 
     validation = validate_episode_review(artifact)
     if validation["validation_status"] == "blocked":
         raise EpisodeReviewError("refusing to render an invalid episode review")
-    titles = {
+    fact_titles = {
         "timeline": "事件时间线",
         "security_context": "标的与记录来源",
         "portfolio_context": "操作前后组合事实",
@@ -2774,27 +2827,129 @@ def render_episode_review_markdown(artifact: Mapping[str, Any]) -> str:
         "outcome_context": "结果上下文",
         "execution_consistency": "计划与执行的可证明比较",
     }
+    interpretation_titles = {
+        "main_tensions": "主要张力",
+        "hypotheses": "假设",
+        "alternative_explanations": "替代解释",
+        "counterfactual_options": "反事实备选（非建议）",
+        "history_links": "历史关联",
+    }
+    governance = artifact["governance"]
+    revision = artifact["revision"]
     lines = [
-        "# 单笔交易事实复盘",
+        "# 单笔交易复盘",
         "",
-        f"- review_id: `{artifact['review_id']}`",
-        f"- content_id: `{artifact['content_id']}`",
-        f"- input_bundle: `{artifact['input_bundle_ref']['content_id']}`",
-        "- generation_mode: `facts_only`",
+        f"- review_id: {_markdown_code(artifact['review_id'])}",
+        f"- content_id: {_markdown_code(artifact['content_id'])}",
+        f"- input_bundle: {_markdown_code(artifact['input_bundle_ref']['content_id'])}",
+        f"- revision_no: {_markdown_code(revision['revision_no'])}",
+        f"- revision_status: {_markdown_code(revision['status'])}",
+        "- supersedes_content_id: "
+        + (
+            _markdown_code(revision["supersedes_content_id"])
+            if revision["supersedes_content_id"] is not None
+            else _markdown_code("none")
+        ),
+        f"- generation_mode: {_markdown_code(governance['generation_mode'])}",
         "",
-        "> 本文只呈现冻结来源可证明的事实与缺口，不包含交易建议、评分或心理归因。",
+        "> 事实与解释严格分区；本文不是交易建议，不提供机械评分或心理归因。",
+        "",
+        "## 修订与生成来源",
     ]
+    if revision["correction_reason"] is not None:
+        lines.append(
+            f"- correction_reason: {_markdown_escape(revision['correction_reason'])}"
+        )
+    model_generation = governance["model_generation"]
+    if isinstance(model_generation, Mapping):
+        for key in (
+            "model_id",
+            "prompt_template_id",
+            "prompt_hash",
+            "input_content_id",
+            "output_hash",
+            "interpretation_engine_version",
+            "interpretation_content_id",
+            "generated_at",
+        ):
+            lines.append(
+                f"- {key}: {_markdown_code(model_generation[key])}"
+            )
+        lines.extend(
+            [
+                "- model_parameters:",
+                "",
+                _markdown_indented_json(model_generation["parameters"]),
+            ]
+        )
+    else:
+        lines.append("- model_generation: `none in this revision`")
+    human_reviews = governance["human_reviews"]
+    if human_reviews:
+        lines.extend(["", "### 人工审核事件"])
+        for event in human_reviews:
+            lines.extend(
+                [
+                    "",
+                    f"- event: {_markdown_code(event['review_event_id'])}",
+                    f"  - action: {_markdown_code(event['action'])}",
+                    f"  - reviewed_at: {_markdown_code(event['reviewed_at'])}",
+                    f"  - actor_ref: {_markdown_escape(event['actor_ref'])}",
+                    f"  - reason: {_markdown_escape(event['reason'])}",
+                    f"  - source_content_id: {_markdown_code(event['source_content_id'])}",
+                    "  - target_ids: "
+                    + ", ".join(_markdown_code(value) for value in event["target_ids"]),
+                    "  - result_target_ids: "
+                    + ", ".join(
+                        _markdown_code(value) for value in event["result_target_ids"]
+                    ),
+                ]
+            )
+    else:
+        lines.append("- human_reviews: `none`")
+
+    lines.extend(["", "## 验证警告与缺口"])
+    if artifact["warnings"]:
+        for warning in artifact["warnings"]:
+            target_ids = warning.get("target_ids", [])
+            lines.append(
+                "- "
+                + _markdown_code(warning.get("severity", ""))
+                + " "
+                + _markdown_code(warning.get("code", ""))
+                + ": "
+                + _markdown_escape(warning.get("message", ""))
+                + (
+                    " | targets: "
+                    + ", ".join(_markdown_code(value) for value in target_ids)
+                    if target_ids
+                    else ""
+                )
+            )
+    else:
+        lines.append("- warnings: `none`")
+
+    lines.extend(["", "# 第一部分：事实层"])
     sections = artifact["fact_sections"]
     for name in FACT_SECTION_NAMES:
         section = sections[name]
         lines.extend(
             [
                 "",
-                f"## {titles[name]}",
+                f"## {fact_titles[name]}",
                 "",
-                f"- status: `{section['status']}`",
-                f"- reason: {section['reason']}",
-                f"- gaps: `{', '.join(section['gap_codes']) or 'none'}`",
+                f"- status: {_markdown_code(section['status'])}",
+                f"- reason: {_markdown_escape(section['reason'])}",
+                "- warnings: "
+                + (
+                    ", ".join(_markdown_code(value) for value in section["warning_codes"])
+                    or _markdown_code("none")
+                ),
+                "- gaps: "
+                + (
+                    ", ".join(_markdown_code(value) for value in section["gap_codes"])
+                    or _markdown_code("none")
+                ),
             ]
         )
         if not section["facts"]:
@@ -2804,22 +2959,97 @@ def render_episode_review_markdown(artifact: Mapping[str, Any]) -> str:
             lines.extend(
                 [
                     "",
-                    f"### `{fact['fact_id']}`",
+                    f"### {_markdown_code(fact['fact_id'])}",
                     "",
-                    fact["statement"],
+                    _markdown_escape(fact["statement"]),
                     "",
-                    f"- kind: `{fact['kind']}`",
-                    f"- availability: `{fact['availability']}`",
-                    f"- temporal_role: `{fact['temporal_role']}`",
-                    f"- data: `{canonical_json_bytes(fact['data']).decode('utf-8')}`",
+                    f"- kind: {_markdown_code(fact['kind'])}",
+                    f"- claim_type: {_markdown_code(fact['claim_type'])}",
+                    f"- availability: {_markdown_code(fact['availability'])}",
+                    f"- temporal_role: {_markdown_code(fact['temporal_role'])}",
+                    f"- effective_at: {_markdown_code(fact['effective_at'])}",
+                    f"- knowledge_at: {_markdown_code(fact['knowledge_at'])}",
+                    "- data:",
+                    "",
+                    _markdown_indented_json(fact["data"]),
                     "- sources:",
                 ]
             )
             for ref in fact["source_refs"]:
                 lines.append(
-                    f"  - `{ref['source_id']}` | `{ref['content_id']}` | "
-                    f"`{ref['frozen_pointer']}` | {ref['locator']}"
+                    f"  - {_markdown_code(ref['source_id'])} | "
+                    f"{_markdown_code(ref['content_id'])} | "
+                    f"{_markdown_code(ref['frozen_pointer'])} | "
+                    f"{_markdown_escape(ref['locator'])}"
                 )
+    lines.extend(["", "# 第二部分：解释层"])
+    interpretations = artifact["interpretation_sections"]
+    if not any(interpretations[name] for name in INTERPRETATION_SECTION_NAMES):
+        lines.extend(["", "当前修订为 facts-only；没有解释条目。"])
+    for section_name in FINDING_SECTION_NAMES:
+        lines.extend(["", f"## {interpretation_titles[section_name]}"])
+        if not interpretations[section_name]:
+            lines.extend(["", "无条目。"])
+            continue
+        for finding in interpretations[section_name]:
+            lines.extend(
+                [
+                    "",
+                    f"### {_markdown_code(finding['finding_id'])}",
+                    "",
+                    _markdown_escape(finding["statement"]),
+                    "",
+                    f"- kind: {_markdown_code(finding['kind'])}",
+                    f"- perspective: {_markdown_code(finding['perspective'])}",
+                    f"- confidence: {_markdown_code(finding['confidence'])}",
+                    f"- review_status: {_markdown_code(finding['review_status'])}",
+                    "- fact_refs: "
+                    + ", ".join(_markdown_code(value) for value in finding["fact_refs"]),
+                    f"- counterevidence_status: {_markdown_code(finding['counterevidence_status'])}",
+                    "- counterevidence_fact_refs: "
+                    + (
+                        ", ".join(
+                            _markdown_code(value)
+                            for value in finding["counterevidence_fact_refs"]
+                        )
+                        or _markdown_code("none")
+                    ),
+                    "- assumptions: "
+                    + (
+                        "; ".join(
+                            _markdown_escape(value) for value in finding["assumptions"]
+                        )
+                        or _markdown_code("none")
+                    ),
+                    f"- uncertainty: {_markdown_escape(finding['uncertainty'])}",
+                ]
+            )
+    lines.extend(["", f"## {interpretation_titles['counterfactual_options']}"])
+    if not interpretations["counterfactual_options"]:
+        lines.extend(["", "无条目。"])
+    for option in interpretations["counterfactual_options"]:
+        lines.extend(
+            [
+                "",
+                f"### {_markdown_code(option['option_id'])}",
+                "",
+                _markdown_escape(option["description"]),
+                "",
+                "- fact_refs: "
+                + ", ".join(_markdown_code(value) for value in option["fact_refs"]),
+                f"- temporal_scope: {_markdown_code(option['temporal_scope'])}",
+                f"- feasibility: {_markdown_code(option['feasibility'])}",
+                "- tradeoffs: "
+                + "; ".join(_markdown_escape(value) for value in option["tradeoffs"]),
+                f"- not_advice: {_markdown_code(str(option['not_advice']).lower())}",
+            ]
+        )
+    lines.extend(["", f"## {interpretation_titles['history_links']}"])
+    if not interpretations["history_links"]:
+        lines.extend(["", "无已类型化的历史关联输入。"])
+    else:
+        for history_link in interpretations["history_links"]:
+            lines.extend(["", _markdown_indented_json(history_link)])
     return "\n".join(lines) + "\n"
 
 

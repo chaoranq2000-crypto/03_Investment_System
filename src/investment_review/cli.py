@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from .artifact_io import atomic_write_bytes
+from .artifact_io import atomic_create_bytes, atomic_write_bytes
 from .episodes import (
     build_episode_collection,
     load_episode_collection,
@@ -40,6 +40,14 @@ from .episode_review import (
     replay_validate_episode_review,
     save_episode_review,
     validate_episode_review,
+)
+from .episode_revision import (
+    apply_human_review,
+    diff_episode_reviews,
+    list_episode_review_revisions,
+    load_human_review_request,
+    save_new_episode_review,
+    validate_revision_chain,
 )
 from .ingest import ingest_csv, ingest_sqlite
 from .introspection import (
@@ -388,6 +396,34 @@ def build_parser() -> argparse.ArgumentParser:
     )
     episode_review_interpret.add_argument("--output", required=True)
     episode_review_interpret.add_argument("--attempt-output", required=True)
+
+    episode_review_correct = sub.add_parser(
+        "episode-review-correct",
+        help="Append one human accept/reject/correct revision without overwriting its source",
+    )
+    episode_review_correct.add_argument("--artifact", required=True)
+    episode_review_correct.add_argument("--request", required=True)
+    episode_review_correct.add_argument("--output", required=True)
+
+    episode_review_render = sub.add_parser(
+        "episode-review-render",
+        help="Render one validated P2F episode-review revision as safe Markdown",
+    )
+    episode_review_render.add_argument("--artifact", required=True)
+    episode_review_render.add_argument("--output", required=True)
+
+    episode_review_diff = sub.add_parser(
+        "episode-review-diff",
+        help="Show a deterministic diff between two P2F review revisions",
+    )
+    episode_review_diff.add_argument("before")
+    episode_review_diff.add_argument("after")
+
+    episode_review_revision_list = sub.add_parser(
+        "episode-review-revision-list",
+        help="Validate and list an append-only P2F review revision chain",
+    )
+    episode_review_revision_list.add_argument("artifact", nargs="+")
 
     return parser
 
@@ -789,6 +825,54 @@ def main(argv: list[str] | None = None) -> int:
                     "attempt_content_id": result.attempt["content_id"],
                     "output": str(output),
                     "attempt_output": str(attempt_output),
+                }
+            )
+        elif args.command == "episode-review-correct":
+            source = load_episode_review(args.artifact)
+            revised = apply_human_review(
+                source, load_human_review_request(args.request)
+            )
+            output = save_new_episode_review(args.output, revised)
+            _print(
+                {
+                    "status": "accepted",
+                    "action": revised["governance"]["human_reviews"][-1]["action"],
+                    "review_id": revised["review_id"],
+                    "revision_no": revised["revision"]["revision_no"],
+                    "content_id": revised["content_id"],
+                    "supersedes_content_id": revised["revision"][
+                        "supersedes_content_id"
+                    ],
+                    "output": str(output),
+                }
+            )
+        elif args.command == "episode-review-render":
+            artifact = load_episode_review(args.artifact)
+            output = atomic_create_bytes(
+                args.output, render_episode_review_markdown(artifact).encode("utf-8")
+            )
+            _print(
+                {
+                    "status": "accepted",
+                    "review_id": artifact["review_id"],
+                    "revision_no": artifact["revision"]["revision_no"],
+                    "content_id": artifact["content_id"],
+                    "output": str(output),
+                }
+            )
+        elif args.command == "episode-review-diff":
+            _print(
+                diff_episode_reviews(
+                    load_episode_review(args.before), load_episode_review(args.after)
+                )
+            )
+        elif args.command == "episode-review-revision-list":
+            artifacts = [load_episode_review(path) for path in args.artifact]
+            validation = validate_revision_chain(artifacts)
+            _print(
+                {
+                    "validation": validation,
+                    "revisions": list_episode_review_revisions(artifacts),
                 }
             )
         else:

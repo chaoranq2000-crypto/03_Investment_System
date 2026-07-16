@@ -81,6 +81,28 @@ def atomic_write_bytes(path: str | Path, data: bytes) -> Path:
             temporary.unlink()
 
 
+def atomic_create_bytes(path: str | Path, data: bytes) -> Path:
+    """Atomically create one new path and refuse to replace an existing artifact."""
+
+    output = Path(path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    temporary: Path | None = None
+    try:
+        descriptor, raw_path = tempfile.mkstemp(
+            prefix=f".{output.name}.", suffix=".tmp", dir=output.parent
+        )
+        temporary = Path(raw_path)
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(temporary, output)
+        return output
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
+
+
 def load_json_object(path: str | Path) -> dict[str, Any]:
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
     if not isinstance(payload, dict):

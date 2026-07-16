@@ -92,7 +92,7 @@ scores, narratives or advice. Same-time events or snapshots without an explicit
 business sequence/revision must remain `ambiguous`. See
 `docs/playbooks/INVESTMENT_REVIEW_P2E_3.md`.
 
-## P2F-1/P2F-3 frozen-input, facts and bounded-interpretation boundary
+## P2F-1/P2F-4 frozen-input, interpretation and revision boundary
 
 After P2C and P2E-3 pass source replay, the implementation may also:
 
@@ -113,6 +113,14 @@ After P2C and P2E-3 pass source replay, the implementation may also:
   hashes and a separate interpretation-attempt receipt;
 - return the exact facts-only artifact when the provider is unavailable or its
   output fails schema, temporal or policy validation.
+- apply a closed human accept/reject/correct request only to existing finding
+  or option IDs, then revalidate the complete artifact;
+- create a new human-authored revision with one appended review event, a
+  sequential revision number and an exact supersedes content ID;
+- keep the prior artifact and all source databases unchanged, derive
+  `superseded` only when listing a validated chain, and refuse output overwrite;
+- render validated JSON as escaped Markdown and expose deterministic diff and
+  revision-list commands without reopening any source database.
 
 P2F facts must not promote free source text into objective claims, infer missing
 investment logic, backfill outcomes as entry reasons, diagnose psychology,
@@ -189,6 +197,15 @@ For an approved P2F facts-only run:
     roles, alternative-explanation, counterevidence and no-advice/no-score gates.
 26. Save the interpretation attempt receipt separately. On provider/output failure,
     require the result review content ID and bytes to remain the facts-only artifact.
+27. Validate a `p2f.human_review_request.v1`; accept/reject findings only, and
+    restrict corrections to explicit fact-link replacement on a finding or option.
+28. Recompute affected interpretation IDs, append one content-derived human review
+    event, set `generation_mode=human_authored`, and bind the new revision to the
+    immediately prior content ID without changing the immutable fact layer.
+29. Validate the whole revision chain: sequential numbers, no cycles, exact event
+    prefix growth, unchanged input/facts/warnings and no undeclared interpretation edits.
+30. Save the new JSON at a non-existing path, render escaped Markdown, and verify
+    diff/revision-list output. Never pass or write a source database in this step.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate

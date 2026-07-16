@@ -186,20 +186,76 @@ revision-chain validation
 
 ## 8. 人工纠正
 
-纠正必须生成新修订，保存：
+人工动作通过闭合的 `p2f.human_review_request.v1` 请求执行。`accept` / `reject`
+只能指向 finding；`correct` 可对 finding 或 counterfactual option 执行
+`replace_fact_refs`，并在使用新事实链接后重新运行 schema、双时间、policy 和
+source-reference 校验。
+
+示例请求：
+
+```json
+{
+  "schema_version": "p2f.human_review_request.v1",
+  "action": "accept",
+  "reviewed_at": "2026-07-15T08:00:00Z",
+  "actor_ref": "reviewer:<id>",
+  "reason": "已逐项核对冻结事实链接。",
+  "target_ids": ["finding:<content-derived-id>"],
+  "corrections": []
+}
+```
+
+执行时必须指定不同于来源 artifact 的新路径：
+
+```powershell
+python -m src.investment_review episode-review-correct `
+  --artifact <revision-1.json> `
+  --request <human-review-request.json> `
+  --output <revision-2.json>
+```
+
+每次接受、拒绝或纠正都生成一个新修订，并保存：
 
 - target IDs；
+- 变更后重新派生的 result target IDs；
 - action；
 - reason；
 - actor reference；
 - reviewed_at；
 - supersedes content ID。
 
-不得覆盖旧文件或修改源交易/组合数据库。
+finding/option ID 包含审核状态或事实链接，因此人工动作后会生成新 ID；human event
+同时保存旧 target 与新 result target，避免丢失映射。`revision_no` 必须连续递增，
+`supersedes_content_id` 必须精确指向前一修订，人工事件历史只能追加一个事件。
+
+人工修订使用 `generation_mode=human_authored`，当前修订的 `model_generation` 为 `null`；
+原始模型 provenance 保留在不可变的前一修订，并由 supersedes/event source content ID
+连接。旧文件不得覆盖；源交易数据库、组合数据库和 sidecar 数据库均不得修改。
+
+完整链校验与查询：
+
+```powershell
+python -m src.investment_review episode-review-revision-list `
+  <revision-1.json> <revision-2.json> [<revision-3.json> ...]
+```
+
+输出中的非末尾修订显示派生的 `effective_status=superseded`，但不会回写其原始
+`stored_status`。任意旧修订仍可直接用 `episode-review-show` 查询。
 
 ## 9. 渲染
 
-建议支持 JSON 与 Markdown。Markdown 必须显示：
+JSON artifact 是规范事实源。Markdown 只能从一个已验证修订生成，并拒绝覆盖现有输出：
+
+```powershell
+python -m src.investment_review episode-review-render `
+  --artifact <revision.json> `
+  --output <revision.md>
+
+python -m src.investment_review episode-review-diff `
+  <earlier-revision.json> <later-revision.json>
+```
+
+Markdown 显示：
 
 - 事实/解释区分；
 - availability；
@@ -208,6 +264,10 @@ revision-chain validation
 - revision 状态；
 - 模型与人工审核 provenance；
 - “非交易建议”边界。
+
+所有自由文本、locator、actor 和 reason 会转义 Markdown/HTML 元字符并替换控制字符；
+fact data 使用缩进 JSON 代码块。diff 明示 facts/input/warnings 是否不变、删除/新增的
+解释 ID 以及 human event 声明的 target/result IDs。
 
 ## 10. 发布门禁
 

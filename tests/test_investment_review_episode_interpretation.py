@@ -442,7 +442,7 @@ def test_history_links_are_rejected_without_typed_history_input(
     assert "MODEL_OUTPUT_SCHEMA_INVALID" in result.attempt["failure_codes"]
 
 
-def test_human_authored_mode_is_not_enabled_before_p2f4(
+def test_human_authored_mode_requires_p2f4_revision_provenance(
     context: dict[str, Any],
 ) -> None:
     result = _build(context["facts"])
@@ -452,7 +452,11 @@ def test_human_authored_mode_is_not_enabled_before_p2f4(
     _rehash(mutated)
     validation = validate_episode_review(mutated)
     assert validation["validation_status"] == "blocked"
-    assert "GENERATION_MODE_NOT_ENABLED" in _finding_codes(validation)
+    assert {
+        "HUMAN_REVIEW_EVENT_MISSING",
+        "HUMAN_REVISION_INVALID",
+        "SUPERSEDES_CONTENT_ID_INVALID",
+    }.issubset(_finding_codes(validation))
 
 
 def test_attempt_replay_rejects_different_raw_text(context: dict[str, Any]) -> None:

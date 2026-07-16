@@ -207,11 +207,17 @@ def _schema_error_codes(value: object) -> list[str]:
 
 
 def facts_only_projection(artifact: Mapping[str, Any]) -> dict[str, Any]:
-    """Reconstruct the immutable P2F-2 projection from a revision-1 review."""
+    """Reconstruct the immutable P2F-2 projection from any later review revision."""
 
     projection = deepcopy(dict(artifact))
     projection["interpretation_sections"] = {
         name: [] for name in INTERPRETATION_SECTION_NAMES
+    }
+    projection["revision"] = {
+        "revision_no": 1,
+        "status": "draft",
+        "supersedes_content_id": None,
+        "correction_reason": None,
     }
     governance = (
         projection.get("governance")
@@ -299,6 +305,20 @@ def _option_id(item: Mapping[str, Any]) -> str:
     material = deepcopy(dict(item))
     material.pop("option_id", None)
     return _stable_id("option", material)
+
+
+def finding_content_id(section_name: str, item: Mapping[str, Any]) -> str:
+    """Return the canonical content-derived ID for one interpretation finding."""
+
+    if section_name not in _SECTION_KIND:
+        raise InterpretationError(f"unsupported finding section: {section_name}")
+    return _finding_id(section_name, item)
+
+
+def option_content_id(item: Mapping[str, Any]) -> str:
+    """Return the canonical content-derived ID for one counterfactual option."""
+
+    return _option_id(item)
 
 
 def _sorted_strings(value: object) -> list[str]:
@@ -419,43 +439,37 @@ def _finding(code: str, message: str) -> dict[str, str]:
 def interpretation_layer_findings(
     artifact: Mapping[str, Any],
 ) -> list[dict[str, str]]:
-    """Return semantic/policy findings for model-assisted P2F-3 content."""
+    """Return shared semantic/policy findings for interpreted P2F content."""
 
     governance = artifact.get("governance")
     if not isinstance(governance, Mapping):
         return [_finding("GOVERNANCE_INVALID", "governance must be an object")]
     mode = governance.get("generation_mode")
-    if mode == "human_authored":
-        return [
-            _finding(
-                "GENERATION_MODE_NOT_ENABLED",
-                "human-authored revisions are not enabled until P2F-4",
-            )
-        ]
-    if mode != "model_assisted":
+    if mode not in {"model_assisted", "human_authored"}:
         return []
 
     findings: list[dict[str, str]] = []
     revision = artifact.get("revision")
-    if revision != {
-        "revision_no": 1,
-        "status": "draft",
-        "supersedes_content_id": None,
-        "correction_reason": None,
-    }:
-        findings.append(
-            _finding(
-                "MODEL_ASSISTED_REVISION_INVALID",
-                "P2F-3 model output must remain revision 1 draft",
+    if mode == "model_assisted":
+        if revision != {
+            "revision_no": 1,
+            "status": "draft",
+            "supersedes_content_id": None,
+            "correction_reason": None,
+        }:
+            findings.append(
+                _finding(
+                    "MODEL_ASSISTED_REVISION_INVALID",
+                    "P2F-3 model output must remain revision 1 draft",
+                )
             )
-        )
-    if governance.get("human_reviews") != []:
-        findings.append(
-            _finding(
-                "MODEL_ASSISTED_HUMAN_REVIEW_INVALID",
-                "P2F-3 cannot contain human review events",
+        if governance.get("human_reviews") != []:
+            findings.append(
+                _finding(
+                    "MODEL_ASSISTED_HUMAN_REVIEW_INVALID",
+                    "P2F-3 cannot contain human review events",
+                )
             )
-        )
     sections = artifact.get("interpretation_sections")
     if not isinstance(sections, Mapping):
         return findings + [
@@ -525,7 +539,7 @@ def interpretation_layer_findings(
                     _finding("DUPLICATE_INTERPRETATION_ID", finding_id)
                 )
             all_ids.add(finding_id)
-            if item.get("review_status") != "draft":
+            if mode == "model_assisted" and item.get("review_status") != "draft":
                 findings.append(
                     _finding(
                         "MODEL_REVIEW_STATUS_INVALID",
@@ -679,6 +693,15 @@ def interpretation_layer_findings(
         findings.append(_finding(code, "interpretation text violates the P2F policy gate"))
 
     model_generation = governance.get("model_generation")
+    if mode == "human_authored":
+        if model_generation is not None:
+            findings.append(
+                _finding(
+                    "HUMAN_MODEL_PROVENANCE_INVALID",
+                    "human-authored revisions must preserve model provenance in prior artifacts",
+                )
+            )
+        return findings
     if not isinstance(model_generation, Mapping):
         findings.append(
             _finding("MODEL_PROVENANCE_INVALID", "model_generation must be an object")
@@ -1076,7 +1099,9 @@ __all__ = [
     "build_interpretation_prompt",
     "build_model_assisted_episode_review",
     "facts_only_projection",
+    "finding_content_id",
     "interpretation_layer_findings",
+    "option_content_id",
     "replay_validate_interpretation_attempt",
     "save_interpretation_attempt",
     "validate_interpretation_attempt",
