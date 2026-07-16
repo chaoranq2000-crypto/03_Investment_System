@@ -2617,6 +2617,18 @@ def _validate_episode_review_impl(artifact: Mapping[str, Any]) -> dict[str, Any]
                     "blocker", "WARNING_ORDER_INVALID", "warnings are not canonical"
                 )
             )
+    if generation_mode in {"model_assisted", "human_authored"}:
+        from .episode_interpretation import interpretation_layer_findings
+
+        findings.extend(interpretation_layer_findings(artifact))
+    elif generation_mode != "facts_only":
+        findings.append(
+            _finding(
+                "blocker",
+                "GENERATION_MODE_INVALID",
+                "unsupported episode-review generation mode",
+            )
+        )
     return _validation(findings)
 
 
@@ -2646,7 +2658,7 @@ def validate_episode_review(artifact: Mapping[str, Any]) -> dict[str, Any]:
 def replay_validate_episode_review(
     artifact: Mapping[str, Any], *, input_bundle: Mapping[str, Any]
 ) -> dict[str, Any]:
-    """Rebuild P2F-2 facts from the frozen P2F-1 input and compare exactly."""
+    """Rebuild P2F-2 facts and verify the immutable layer of later reviews."""
 
     offline = validate_episode_review(artifact)
     findings = list(offline.get("findings", []))
@@ -2663,12 +2675,23 @@ def replay_validate_episode_review(
         result = _validation(findings, mode="source_replay")
         result["source_verification"] = {"status": "blocked"}
         return result
-    if canonical_json_bytes(artifact) != canonical_json_bytes(expected):
+    governance = (
+        artifact.get("governance")
+        if isinstance(artifact.get("governance"), Mapping)
+        else {}
+    )
+    generation_mode = str(governance.get("generation_mode") or "")
+    replay_material: Mapping[str, Any] = artifact
+    if generation_mode != "facts_only":
+        from .episode_interpretation import facts_only_projection
+
+        replay_material = facts_only_projection(artifact)
+    if canonical_json_bytes(replay_material) != canonical_json_bytes(expected):
         findings.append(
             _finding(
                 "blocker",
                 "SOURCE_REPLAY_MISMATCH",
-                "review artifact does not equal deterministic rebuild from P2F-1",
+                "review facts layer does not equal deterministic rebuild from P2F-1",
             )
         )
     result = _validation(findings, mode="source_replay")
@@ -2679,6 +2702,11 @@ def replay_validate_episode_review(
         "input_content_id": str(input_bundle.get("content_id") or ""),
         "verified_content_id": str(artifact.get("content_id") or ""),
         "rebuilt_content_id": expected["content_id"],
+        "facts_content_id": str(replay_material.get("content_id") or ""),
+        "generation_mode": generation_mode,
+        "interpretation_replay": (
+            "not_replayed" if generation_mode != "facts_only" else "not_applicable"
+        ),
         "fact_engine_version": FACT_ENGINE_VERSION,
     }
     return result

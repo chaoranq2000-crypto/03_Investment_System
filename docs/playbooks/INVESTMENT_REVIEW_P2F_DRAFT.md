@@ -125,16 +125,49 @@ facts-only 输出不得包含：
 
 ## 6. 可选解释层
 
-模型解释应消费冻结 input bundle 与 facts artifact，而不是直接查询数据库。必须记录：
+P2F-3 只消费已通过校验和 source replay 的 facts artifact。固定 prompt 只包含
+fact ID、中性 statement、availability、双时间角色和 section gap/warning，不包含原始
+Decision/note/source payload，也不重新查询 input bundle、数据库或网络。
+
+仓库不内置默认联网 provider。模型解释必须通过显式 provider 注入；CLI 只接受已记录的
+UTF-8 provider response，或显式运行 unavailable fallback：
+
+```powershell
+python -m src.investment_review episode-review-interpret `
+  --artifact <facts-review.json> `
+  --model-id <recorded-model-id> `
+  --generated-at <canonical-utc-seconds> `
+  --model-response <recorded-response.json> `
+  --parameters-json '{"temperature":"0"}' `
+  --output <model-assisted-review.json> `
+  --attempt-output <interpretation-attempt.json>
+```
+
+provider response 必须匹配 `p2f.interpretation_output.v1`：每条 finding 具有
+fact refs、`decision_time/retrospective` perspective、assumptions、uncertainty、
+counterevidence status/refs；counterfactual 具有 `decision_time/episode_time`
+scope、可行性、tradeoffs 与 `not_advice=true`。没有 typed history input 时
+`history_links` 必须为空。
+
+解释 artifact 必须记录：
 
 - model ID；
 - prompt template ID/hash；
-- input content ID；
-- output hash；
+- facts-only input content ID；
+- 原始 provider output hash；
+- normalized interpretation content ID；
+- interpretation engine version；
 - 参数；
-- 失败状态。
+- canonical generated time。
 
-模型失败时，facts-only artifact 仍然有效。
+policy/temporal gate 拒绝心理诊断、直接买卖/持有/仓位建议、机械评分、用盈亏判定
+决策质量、把 outcome 写入 decision-time finding，以及使用事后最佳价或 episode 结束后
+信息的 counterfactual。
+
+provider 超时/不可用、非法 JSON、schema 或 policy 校验失败时，输出必须回退为字节完全
+不变的 facts-only artifact；失败原因只进入独立
+`p2f.interpretation_attempt.v1` receipt，不污染事实 artifact。模型成功后的 source replay
+只重放并比对不可变事实层，不重新调用模型；原始响应 hash 通过 attempt receipt 单独复核。
 
 ## 7. 验证
 

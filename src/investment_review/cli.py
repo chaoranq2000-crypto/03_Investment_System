@@ -25,6 +25,12 @@ from .episode_portfolio_context import (
     save_episode_portfolio_context,
     validate_episode_portfolio_context,
 )
+from .episode_interpretation import (
+    RecordedResponseProvider,
+    UnavailableInterpretationProvider,
+    build_model_assisted_episode_review,
+    save_interpretation_attempt,
+)
 from .episode_review import (
     FACT_SECTION_NAMES,
     build_facts_only_episode_review,
@@ -355,6 +361,33 @@ def build_parser() -> argparse.ArgumentParser:
         help="Rebuild facts from the supplied frozen P2F-1 bundle",
     )
     episode_review_validate.add_argument("--input-bundle")
+
+    episode_review_interpret = sub.add_parser(
+        "episode-review-interpret",
+        help="Explicitly add bounded P2F-3 interpretations from a recorded provider response",
+    )
+    episode_review_interpret.add_argument("--artifact", required=True)
+    episode_review_interpret.add_argument("--model-id", required=True)
+    episode_review_interpret.add_argument("--generated-at", required=True)
+    provider_group = episode_review_interpret.add_mutually_exclusive_group(
+        required=True
+    )
+    provider_group.add_argument(
+        "--model-response",
+        help="UTF-8 JSON response already recorded from an explicitly selected provider",
+    )
+    provider_group.add_argument(
+        "--simulate-unavailable",
+        action="store_true",
+        help="Exercise the facts-only fallback without calling any model",
+    )
+    episode_review_interpret.add_argument(
+        "--parameters-json",
+        default="{}",
+        help="Canonical JSON object recorded as model parameters; binary floats are rejected",
+    )
+    episode_review_interpret.add_argument("--output", required=True)
+    episode_review_interpret.add_argument("--attempt-output", required=True)
 
     return parser
 
@@ -725,6 +758,39 @@ def main(argv: list[str] | None = None) -> int:
             _print(validation)
             if validation["validation_status"] == "blocked":
                 return 2
+        elif args.command == "episode-review-interpret":
+            facts_artifact = load_episode_review(args.artifact)
+            parameters = json.loads(args.parameters_json)
+            if not isinstance(parameters, dict):
+                raise ValueError("--parameters-json must decode to an object")
+            provider = (
+                UnavailableInterpretationProvider(args.model_id)
+                if args.simulate_unavailable
+                else RecordedResponseProvider(
+                    args.model_id,
+                    Path(args.model_response).read_text(encoding="utf-8"),
+                )
+            )
+            result = build_model_assisted_episode_review(
+                facts_artifact,
+                provider=provider,
+                attempted_at=args.generated_at,
+                parameters=parameters,
+            )
+            output = save_episode_review(args.output, result.artifact)
+            attempt_output = save_interpretation_attempt(
+                args.attempt_output, result.attempt
+            )
+            _print(
+                {
+                    "status": result.attempt["status"],
+                    "used_fallback": result.used_fallback,
+                    "content_id": result.artifact["content_id"],
+                    "attempt_content_id": result.attempt["content_id"],
+                    "output": str(output),
+                    "attempt_output": str(attempt_output),
+                }
+            )
         else:
             parser.error(f"Unhandled command: {args.command}")
     except Exception as exc:

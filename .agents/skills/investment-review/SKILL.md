@@ -92,7 +92,7 @@ scores, narratives or advice. Same-time events or snapshots without an explicit
 business sequence/revision must remain `ambiguous`. See
 `docs/playbooks/INVESTMENT_REVIEW_P2E_3.md`.
 
-## P2F-1/P2F-2 frozen-input and facts-only boundary
+## P2F-1/P2F-3 frozen-input, facts and bounded-interpretation boundary
 
 After P2C and P2E-3 pass source replay, the implementation may also:
 
@@ -106,6 +106,13 @@ After P2C and P2E-3 pass source replay, the implementation may also:
   using neutral `matches`/`deviates` results;
 - render facts-only JSON/Markdown and source-replay the review against the exact
   input bundle before downstream use.
+- explicitly inject a model provider or recorded provider response to draft
+  bounded interpretations over fact IDs only;
+- preserve assumptions, uncertainty, alternative explanations,
+  counterevidence status/refs, temporal perspective, prompt/model/input/output
+  hashes and a separate interpretation-attempt receipt;
+- return the exact facts-only artifact when the provider is unavailable or its
+  output fails schema, temporal or policy validation.
 
 P2F facts must not promote free source text into objective claims, infer missing
 investment logic, backfill outcomes as entry reasons, diagnose psychology,
@@ -176,6 +183,12 @@ For an approved P2F facts-only run:
     dual-time roles, fact/source IDs, explicit gaps and no-advice/no-score flags.
 23. Source-replay the review from the exact input bundle and require a byte-for-byte
     rebuild before interpretations or publication.
+24. Build the fixed P2F-3 prompt from the validated facts projection only; do not
+    include raw Decision/note/source payload text or query a database/network source.
+25. Validate every proposed finding/counterfactual against known fact IDs, temporal
+    roles, alternative-explanation, counterevidence and no-advice/no-score gates.
+26. Save the interpretation attempt receipt separately. On provider/output failure,
+    require the result review content ID and bytes to remain the facts-only artifact.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate

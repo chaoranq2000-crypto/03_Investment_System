@@ -185,3 +185,21 @@ P2F-2 只从上述冻结 bundle 构建六节可追溯事实复盘；它不再查
 事实 ID、双时间角色、availability 和 P2F-1 source refs 都进入 canonical hash。
 进入解释或发布阶段前，应使用原 bundle 运行 `episode-review-validate --source-replay`；
 盈利/亏损不会自动生成“决策正确/错误”，缺失计划、市场或结果会保留为 gap。
+
+P2F-3 可在不改变事实层的前提下，显式消费一份已记录的模型 JSON 响应：
+
+```powershell
+.\.conda\investment-system\python.exe -m src.investment_review `
+  episode-review-interpret `
+  --artifact data/processed/normalized/episode_review.local.json `
+  --model-id <recorded-model-id> `
+  --generated-at "2026-07-15T07:10:00Z" `
+  --model-response data/processed/normalized/interpretation_response.local.json `
+  --output data/processed/normalized/episode_review.model.local.json `
+  --attempt-output data/processed/normalized/interpretation_attempt.local.json
+```
+
+该入口不会自行联网。所有 finding 必须引用 fact ID 并保留 assumptions、uncertainty、
+counterevidence 和 temporal perspective；心理诊断、交易建议、机械评分、结果倒推和
+事后最佳价会被拒绝。provider 不可用或响应非法时，输出仍是原 facts-only artifact，
+失败只记录在独立 attempt receipt 中。
