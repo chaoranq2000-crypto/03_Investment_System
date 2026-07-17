@@ -1,0 +1,66 @@
+name: R5 Bundle 17R Targeted Backflow
+
+on:
+  push:
+    paths:
+      - '.github/workflows/r5-bundle17r-targeted-backflow.yml'
+      - 'config/r5_bundle17r_backflow_routes.yaml'
+      - 'schemas/r5_bundle17r_backflow_manifest.schema.yaml'
+      - 'scripts/run_r5_bundle17r_targeted_backflow.py'
+      - 'src/research/r5_bundle17r_targeted_backflow.py'
+      - 'templates/r5_bundle17r_backflow_manifest.example.yaml'
+      - 'tests/test_r5_bundle17r_targeted_backflow.py'
+  pull_request:
+    paths:
+      - '.github/workflows/r5-bundle17r-targeted-backflow.yml'
+      - 'config/r5_bundle17r_backflow_routes.yaml'
+      - 'schemas/r5_bundle17r_backflow_manifest.schema.yaml'
+      - 'scripts/run_r5_bundle17r_targeted_backflow.py'
+      - 'src/research/r5_bundle17r_targeted_backflow.py'
+      - 'templates/r5_bundle17r_backflow_manifest.example.yaml'
+      - 'tests/test_r5_bundle17r_targeted_backflow.py'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install focused dependencies
+        run: python -m pip install --upgrade pytest PyYAML jsonschema
+      - name: Compile runtime
+        run: |
+          python -m py_compile \
+            src/research/r5_bundle17r_targeted_backflow.py \
+            scripts/run_r5_bundle17r_targeted_backflow.py
+      - name: Run focused tests
+        run: python -m pytest -q tests/test_r5_bundle17r_targeted_backflow.py -p no:cacheprovider
+      - name: Validate manifest template
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import jsonschema
+          import yaml
+
+          schema = yaml.safe_load(Path('schemas/r5_bundle17r_backflow_manifest.schema.yaml').read_text(encoding='utf-8'))
+          template = yaml.safe_load(Path('templates/r5_bundle17r_backflow_manifest.example.yaml').read_text(encoding='utf-8'))
+          jsonschema.Draft202012Validator(schema).validate(template)
+          policy = yaml.safe_load(Path('config/r5_bundle17r_backflow_routes.yaml').read_text(encoding='utf-8'))
+          assert policy['expected_activation'] == {
+              'decision': 'needs_targeted_backflow',
+              'next_stage': 'R5_bundle17r_targeted_backflow',
+              'case_count': 4,
+              'engineering_pass_count': 0,
+              'blocker_count': 63,
+          }
+          PY
+      - name: Reject issuer-specific tokens in generic runtime
+        run: |
+          ! grep -En "铜冠铜箔|赤峰黄金|药明康德|东阳光|301217|600988|603259|600673" \
+            src/research/r5_bundle17r_targeted_backflow.py \
+            scripts/run_r5_bundle17r_targeted_backflow.py \
+            config/r5_bundle17r_backflow_routes.yaml \
+            schemas/r5_bundle17r_backflow_manifest.schema.yaml

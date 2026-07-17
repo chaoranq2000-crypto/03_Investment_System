@@ -1,0 +1,19 @@
+# Replace every all-zero SHA-256 with the exact physical hash from the d61df6e
+# Bundle 17R run. The policy, not this manifest, owns the expected 0/4 and 63
+# blocker assertions.
+schema_version: r5_bundle17r_backflow_manifest_v1
+baseline_commit: d61df6e457dc9bd02d13f1722a0630c9d6b134ea
+run_id: replace_with_real_bundle17r_backflow_run_id
+activation:
+  receipt:
+    path: reports/p1_6/r5_bundle17r/run/R5_bundle17r_activation_receipt.json
+    sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+  generation_lock:
+    path: reports/p1_6/r5_bundle17r/run/R5_bundle17r_generation_lock.json
+    sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+  backflow_queue:
+    path: reports/p1_6/r5_bundle17r/run/R5_bundle17r_backflow_queue.csv
+    sha256: '0000000000000000000000000000000000000000000000000000000000000000'
+  case_matrix:
+    path: reports/p1_6/r5_bundle17r/run/R5_bundle17r_case_matrix.csv
+    sha256: '0000000000000000000000000000000000000000000000000000000000000000'

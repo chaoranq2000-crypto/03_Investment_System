@@ -1,0 +1,48 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: r5_bundle17r_backflow_manifest_v1
+title: R5 Bundle 17R targeted-backflow manifest
+type: object
+additionalProperties: false
+required:
+  - schema_version
+  - baseline_commit
+  - run_id
+  - activation
+properties:
+  schema_version:
+    const: r5_bundle17r_backflow_manifest_v1
+  baseline_commit:
+    type: string
+    pattern: '^[0-9a-f]{40}$'
+  run_id:
+    type: string
+    minLength: 1
+  activation:
+    type: object
+    additionalProperties: false
+    required:
+      - receipt
+      - generation_lock
+      - backflow_queue
+      - case_matrix
+    properties:
+      receipt:
+        $ref: '#/$defs/artifact_binding'
+      generation_lock:
+        $ref: '#/$defs/artifact_binding'
+      backflow_queue:
+        $ref: '#/$defs/artifact_binding'
+      case_matrix:
+        $ref: '#/$defs/artifact_binding'
+$defs:
+  artifact_binding:
+    type: object
+    additionalProperties: false
+    required: [path, sha256]
+    properties:
+      path:
+        type: string
+        minLength: 1
+      sha256:
+        type: string
+        pattern: '^[0-9a-f]{64}$'

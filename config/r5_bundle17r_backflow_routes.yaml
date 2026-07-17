@@ -1,0 +1,343 @@
+schema_version: r5_bundle17r_backflow_policy_v1
+bundle_id: R5_BUNDLE17R_BF1_TARGETED_BACKFLOW_COMPILER
+required_ancestor_commit: d61df6e457dc9bd02d13f1722a0630c9d6b134ea
+expected_activation:
+  decision: needs_targeted_backflow
+  next_stage: R5_bundle17r_targeted_backflow
+  case_count: 4
+  engineering_pass_count: 0
+  blocker_count: 63
+allowed_artifact_roots:
+  - reports/
+  - bundle14r/
+  - bundle15r/
+  - bundle16r/
+  - bundle17r/
+allowed_artifact_extensions:
+  - .json
+  - .yaml
+  - .yml
+  - .csv
+  - .md
+  - .txt
+forbidden_path_fragments:
+  - 个股研究报告样例
+  - 个股研究案例样例
+  - narrative_sample
+  - sample_report
+  - reports/samples
+  - __pycache__
+  - .pytest_cache
+routes:
+  - route_id: physical_binding_integrity
+    batch_id: B0_PHYSICAL_INTEGRITY
+    owner_skill: research-orchestrator
+    target_stage: R5_bundle17r_targeted_backflow
+    priority: 10
+    match_priority: 100
+    match:
+      owner_skills: [research-orchestrator]
+      code_any: [hash, artifact, binding, pointer, generation, manifest, path, lock, schema]
+      text_any:
+        - hash
+        - sha256
+        - artifact
+        - physical
+        - binding
+        - pointer
+        - generation lock
+        - manifest
+        - file missing
+        - deterministic
+        - 路径
+        - 哈希
+    required_outputs:
+      - corrected_physical_binding_manifest
+      - verified_artifact_hash_inventory
+    acceptance_checks:
+      - every bound path exists under an allowed root
+      - every declared SHA-256 matches the physical file
+      - generation IDs and suite hashes reconcile
+    depends_on_routes: []
+
+  - route_id: official_evidence_acquisition_review
+    batch_id: B1_OFFICIAL_EVIDENCE
+    owner_skill: evidence-ingest
+    target_stage: T1_T2_evidence_ingest_and_review
+    priority: 20
+    match_priority: 90
+    match:
+      owner_skills: [evidence-ingest, evidence-review, source-review]
+      code_any: [source, evidence, official, locator, review, period, freshness]
+      text_any:
+        - official source
+        - reviewed evidence
+        - source request
+        - missing source
+        - locator
+        - document date
+        - period anchor
+        - evidence pack
+        - 证据
+        - 官方
+        - 来源
+        - 审阅
+    required_outputs:
+      - immutable_raw_source
+      - normalized_reviewed_record
+      - source_hash_and_locator
+    acceptance_checks:
+      - source is official or policy-qualified primary evidence
+      - period, unit, definition, locator and review status are explicit
+      - raw evidence remains immutable
+    depends_on_routes: [physical_binding_integrity]
+
+  - route_id: evidence_mapping_qualification
+    batch_id: B2_MAPPING_QUALIFICATION
+    owner_skill: stock-deep-dive
+    target_stage: T3_T5_mapping_and_qualification
+    priority: 30
+    match_priority: 80
+    match:
+      owner_skills: [stock-deep-dive, company-segment-mapping, segment-company-mapping]
+      code_any: [mapping, qualification, candidate, driver_id, question, record, metric]
+      text_any:
+        - mapping
+        - qualification
+        - candidate pack
+        - driver id
+        - question coverage
+        - record binding
+        - metric key
+        - fully mapped
+        - 映射
+        - 资格
+        - 研究问题
+    required_outputs:
+      - reviewer_authored_mapping
+      - qualified_evidence_candidate
+      - conflict_and_rejection_resolution
+    acceptance_checks:
+      - mapping never overrides source values or definitions
+      - conflicting values fail closed or are explicitly reconciled
+      - every required question is proved, range-estimated or blocking
+    depends_on_routes: [official_evidence_acquisition_review]
+
+  - route_id: operating_driver_economics
+    batch_id: B3_OPERATING_ECONOMICS
+    owner_skill: stock-deep-dive
+    target_stage: RP3_RP5_operating_driver_model
+    priority: 40
+    match_priority: 75
+    match:
+      owner_skills: [stock-deep-dive, segment-research]
+      code_any: [driver, economics, segment, coverage, revenue, gross_profit, residual, company_specific]
+      text_any:
+        - economic driver
+        - segment economics
+        - revenue explained
+        - gross profit explained
+        - residual
+        - unit economics
+        - capacity
+        - utilization
+        - volume
+        - price
+        - product mix
+        - backlog
+        - recovery
+        - 经营驱动
+        - 分部
+        - 收入解释
+        - 毛利解释
+    required_outputs:
+      - segment_driver_contract
+      - operating_metric_to_revenue_bridge
+      - revenue_and_gross_profit_reconciliation
+    acceptance_checks:
+      - material segments use explicit economic-driver contracts
+      - revenue and gross-profit explanation meet policy thresholds
+      - residuals and wide proxies remain visible and bounded
+    depends_on_routes: [evidence_mapping_qualification]
+
+  - route_id: overlap_reconciliation
+    batch_id: B3_OPERATING_ECONOMICS
+    owner_skill: stock-deep-dive
+    target_stage: RP5_overlap_and_scope_reconciliation
+    priority: 42
+    match_priority: 95
+    match:
+      owner_skills: [stock-deep-dive, company-segment-mapping]
+      code_any: [overlap, double_count, allocation, reconciliation, scope]
+      text_any:
+        - overlap
+        - double count
+        - allocation rule
+        - scope reconciliation
+        - independent exposure
+        - 重叠
+        - 重复计算
+        - 分摊
+        - 独立暴露
+    required_outputs:
+      - overlap_matrix
+      - allocation_rule
+      - deduplicated_segment_bridge
+    acceptance_checks:
+      - overlapping business scopes are explicitly identified
+      - allocation rules are evidence-backed and deterministic
+      - consolidated totals reconcile without double counting
+    depends_on_routes: [evidence_mapping_qualification, operating_driver_economics]
+
+  - route_id: forecast_bridge
+    batch_id: B4_FORECAST_AND_VALUATION
+    owner_skill: stock-deep-dive
+    target_stage: RP5_RP6_forecast_bridge
+    priority: 50
+    match_priority: 85
+    match:
+      owner_skills: [forecasting, stock-deep-dive]
+      code_any: [forecast, assumption, scenario, sensitivity, traceability, statement_bridge]
+      text_any:
+        - forecast bridge
+        - assumption traceability
+        - base bull bear
+        - sensitivity
+        - financial statement
+        - revenue bridge
+        - margin bridge
+        - 预测
+        - 假设
+        - 情景
+        - 敏感性
+    required_outputs:
+      - operating_driver_forecast_bridge
+      - base_bull_bear_scenarios
+      - assumption_source_map
+    acceptance_checks:
+      - every material assumption maps to a qualified driver or explicit proxy
+      - statements reconcile across revenue, profit, cash flow and capital needs
+      - sensitivity variables are company-specific and falsifiable
+    depends_on_routes: [operating_driver_economics, overlap_reconciliation]
+
+  - route_id: valuation_eligibility
+    batch_id: B4_FORECAST_AND_VALUATION
+    owner_skill: company-valuation
+    target_stage: RP6_valuation_eligibility
+    priority: 55
+    match_priority: 90
+    match:
+      owner_skills: [company-valuation, valuation]
+      code_any: [valuation, peer, dcf, sotp, reverse, multiple, market_value]
+      text_any:
+        - valuation eligible
+        - peer multiple
+        - peer definition
+        - reverse valuation
+        - dcf
+        - sotp
+        - market implied
+        - 估值
+        - 同业
+        - 反向估值
+    required_outputs:
+      - valuation_method_eligibility_pack
+      - qualified_peer_or_fallback_method
+      - market_implied_expectation_bridge
+    acceptance_checks:
+      - each valuation method passes an independent eligibility gate
+      - low-confidence peers are not ranked or used for a multiple conclusion
+      - fallback valuation remains traceable when peer, DCF or SOTP is disabled
+    depends_on_routes: [forecast_bridge]
+
+  - route_id: semantic_reader_traceability
+    batch_id: B5_SEMANTIC_AND_READER
+    owner_skill: quality-review
+    target_stage: RP7_RP8_semantic_reader_quality
+    priority: 60
+    match_priority: 85
+    match:
+      owner_skills: [quality-review, report-writer, reader-review]
+      code_any: [semantic, reader, quality, traceability, citation, novelty, core_section, truthfulness]
+      text_any:
+        - semantic gate
+        - reader
+        - quality scorecard
+        - traceability
+        - citation
+        - section novelty
+        - core section
+        - truthfulness
+        - 语义
+        - 报告
+        - 追溯
+        - 引用
+        - 质量门
+    required_outputs:
+      - reader_candidate
+      - semantic_quality_scorecard
+      - traceability_appendix
+      - reader_generation_lock
+    acceptance_checks:
+      - core sections are company-specific, causal, model-linked and non-repetitive
+      - every material citation resolves to a reviewed evidence item
+      - report and traceability hashes are stable across reruns
+    depends_on_routes: [forecast_bridge, valuation_eligibility]
+
+  - route_id: human_review_handoff
+    batch_id: B6_REACTIVATION
+    owner_skill: research-orchestrator
+    target_stage: R5_bundle18r_exact_hash_human_review
+    priority: 70
+    match_priority: 88
+    match:
+      owner_skills: [human-review]
+      code_any: [human_review, reviewer, acceptance, handoff]
+      text_any:
+        - human review
+        - exact-hash review
+        - reviewer
+        - acceptance
+        - handoff
+        - 人工审核
+        - 精确哈希
+    required_outputs:
+      - pending_exact_hash_human_review_handoff
+    acceptance_checks:
+      - reviewer identity and acceptance are never generated automatically
+      - accepted review binds the exact Reader and generation-lock hashes
+    depends_on_routes: [semantic_reader_traceability]
+
+  - route_id: manual_orchestrator_triage
+    batch_id: B0_ROUTE_REVIEW
+    owner_skill: research-orchestrator
+    target_stage: R5_bundle17r_targeted_backflow_route_review
+    priority: 5
+    fallback: true
+    match: {}
+    required_outputs:
+      - reviewed_route_assignment
+    acceptance_checks:
+      - issue receives a concrete owner, target stage and requested physical output
+      - no blocker is discarded or marked resolved by classification alone
+    depends_on_routes: []
+
+terminal_rerun:
+  route_id: rerun_16r_15r_14r_17r_chain
+  batch_id: B6_REACTIVATION
+  owner_skill: research-orchestrator
+  target_stage: R5_bundle17r_reactivation
+  priority: 1000
+  requested_actions:
+    - rerun Bundle 16R materialization from reviewed physical evidence and mappings
+    - rerun Bundle 15R qualification and selective Bundle 14R regression
+    - rerun Bundle 17R activation twice and compare complete output trees byte-for-byte
+  required_outputs:
+    - bundle16r_materialization_suite_and_lock
+    - bundle15r_qualification_suite_and_lock
+    - bundle14r_regression_suite_and_lock
+    - bundle17r_activation_receipt_and_lock
+  acceptance_checks:
+    - activation reaches 4/4 engineering pass with zero blockers before Bundle 18R
+    - every passing case has a pending exact-hash human-review handoff
+    - sample quality and P2 remain false until separate reviewed authorization
