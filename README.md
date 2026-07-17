@@ -234,3 +234,18 @@ revision，保留前一 `content_id`、actor、reason、reviewed time 和 target
 Markdown 会显示事实/解释分区、来源、availability、warnings、修订与审核 provenance，
 并转义注入字符。完整请求 schema、修订链门禁和限制见
 `docs/playbooks/INVESTMENT_REVIEW_P2F_DRAFT.md`。
+
+P2G-2 可在一份已验证且 `ready/verified` 的 P2G-1 facts-only cohort 上，
+构建四类确定性跨 episode 观察：相邻周期节奏、同标的再进入间隔、可比规模变化和
+持有时长变化。它只输出完整 evaluation ledger 与可追溯事实引用，不读取数据库、
+不调用模型，也不生成心理诊断、评分或交易建议：
+
+```powershell
+.\.conda\investment-system\python.exe -m src.investment_review `
+  behavior-observation-build `
+  --cohort data/processed/normalized/behavior_cohort.local.json `
+  --output data/processed/normalized/behavior_observations.local.json
+```
+
+构建、AND 查询、五态结果、规模可比性与 source replay 规则见
+`docs/playbooks/INVESTMENT_REVIEW_P2G_2.md`。

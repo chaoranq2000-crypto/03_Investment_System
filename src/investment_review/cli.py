@@ -18,6 +18,15 @@ from .behavior_cohort import (
     save_behavior_cohort,
     validate_behavior_cohort,
 )
+from .behavior_observations import (
+    DETECTOR_IDS,
+    build_behavior_observation_set,
+    load_behavior_observation_set,
+    query_behavior_observation_set,
+    replay_validate_behavior_observation_set,
+    save_behavior_observation_set,
+    validate_behavior_observation_set,
+)
 from .episodes import (
     build_episode_collection,
     load_episode_collection,
@@ -478,6 +487,47 @@ def build_parser() -> argparse.ArgumentParser:
     behavior_cohort_validate.add_argument("--source-replay", action="store_true")
     behavior_cohort_validate.add_argument("--episode-review", action="append", default=[])
     behavior_cohort_validate.add_argument("--input-bundle", action="append", default=[])
+
+    behavior_observation_build = sub.add_parser(
+        "behavior-observation-build",
+        help="Build deterministic facts-only P2G-2 observations from one P2G-1 cohort",
+    )
+    behavior_observation_build.add_argument("--cohort", required=True)
+    behavior_observation_build.add_argument(
+        "--detector-config",
+        help="Optional JSON detector config; omitted values are expanded and persisted",
+    )
+    behavior_observation_build.add_argument(
+        "--detector",
+        action="append",
+        choices=list(DETECTOR_IDS),
+        default=[],
+        help="Restrict execution to one detector; may be supplied more than once",
+    )
+    behavior_observation_build.add_argument("--output", required=True)
+
+    behavior_observation_show = sub.add_parser(
+        "behavior-observation-show",
+        help="Query P2G-2 evaluations with AND semantics",
+    )
+    behavior_observation_show.add_argument("artifact")
+    behavior_observation_show.add_argument("--evaluation-id")
+    behavior_observation_show.add_argument("--detector-id", choices=list(DETECTOR_IDS))
+    behavior_observation_show.add_argument("--status")
+    behavior_observation_show.add_argument("--episode-id")
+    behavior_observation_show.add_argument("--review-id")
+    behavior_observation_show.add_argument("--account-id")
+    behavior_observation_show.add_argument("--instrument-id")
+    behavior_observation_show.add_argument("--reason-code")
+    behavior_observation_show.add_argument("--content-id")
+
+    behavior_observation_validate = sub.add_parser(
+        "behavior-observation-validate",
+        help="Validate P2G-2 offline or by exact P2G-1 source replay",
+    )
+    behavior_observation_validate.add_argument("artifact")
+    behavior_observation_validate.add_argument("--source-replay", action="store_true")
+    behavior_observation_validate.add_argument("--cohort")
 
     return parser
 
@@ -987,6 +1037,73 @@ def main(argv: list[str] | None = None) -> int:
                 )
             else:
                 validation = validate_behavior_cohort(artifact)
+            _print(validation)
+            if (
+                validation["validation_status"] == "blocked"
+                or artifact["release_readiness"]["status"] != "ready"
+                or artifact["source_verification"]["status"] != "verified"
+            ):
+                return 2
+        elif args.command == "behavior-observation-build":
+            cohort = load_behavior_cohort(args.cohort)
+            detector_config = None
+            if args.detector_config:
+                detector_config = json.loads(
+                    Path(args.detector_config).read_text(encoding="utf-8")
+                )
+                if not isinstance(detector_config, dict):
+                    raise ValueError("--detector-config must contain one JSON object")
+            artifact = build_behavior_observation_set(
+                cohort,
+                detector_config=detector_config,
+                detectors=args.detector or None,
+            )
+            validation = validate_behavior_observation_set(artifact)
+            if validation["validation_status"] == "blocked":
+                raise ValueError("P2G-2 observation set failed structural validation")
+            output = save_behavior_observation_set(args.output, artifact)
+            _print(
+                {
+                    "status": validation["validation_status"],
+                    "content_id": artifact["content_id"],
+                    "observation_set_id": artifact["observation_set_id"],
+                    "evaluation_count": artifact["counts"]["evaluation_count"],
+                    "release_readiness": artifact["release_readiness"]["status"],
+                    "source_verification": artifact["source_verification"]["status"],
+                    "output": str(output),
+                }
+            )
+            if (
+                artifact["release_readiness"]["status"] != "ready"
+                or artifact["source_verification"]["status"] != "verified"
+            ):
+                return 2
+        elif args.command == "behavior-observation-show":
+            _print(
+                query_behavior_observation_set(
+                    load_behavior_observation_set(args.artifact),
+                    evaluation_id=args.evaluation_id,
+                    detector_id=args.detector_id,
+                    status=args.status,
+                    episode_id=args.episode_id,
+                    review_id=args.review_id,
+                    account_id=args.account_id,
+                    instrument_id=args.instrument_id,
+                    reason_code=args.reason_code,
+                    content_id=args.content_id,
+                )
+            )
+        elif args.command == "behavior-observation-validate":
+            artifact = load_behavior_observation_set(args.artifact)
+            if args.source_replay:
+                if not args.cohort:
+                    raise ValueError("--source-replay requires --cohort")
+                validation = replay_validate_behavior_observation_set(
+                    artifact,
+                    cohort=load_behavior_cohort(args.cohort),
+                )
+            else:
+                validation = validate_behavior_observation_set(artifact)
             _print(validation)
             if (
                 validation["validation_status"] == "blocked"
