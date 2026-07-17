@@ -23,6 +23,8 @@ import yaml
 
 SCHEMA_VERSION = "r5_bundle17r_bf2_execution_v1"
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
+GLOBAL_CASE_ID = "__suite__"
+GLOBAL_CASE_ALIASES = {"", GLOBAL_CASE_ID, "suite"}
 
 WORK_ORDER_ID_KEYS = ("work_order_id", "order_id", "handoff_id")
 CASE_ID_KEYS = ("case_id", "case_key", "research_case_id", "stock_code")
@@ -209,6 +211,10 @@ def row_sha256(row: Mapping[str, Any]) -> str:
     return sha256_object(normalize_row(row))
 
 
+def is_global_case_id(value: str) -> bool:
+    return value.strip().lower() in GLOBAL_CASE_ALIASES
+
+
 def normalize_relpath(value: str) -> str:
     text = value.replace("\\", "/").strip()
     path = PurePosixPath(text)
@@ -250,6 +256,15 @@ def extract_lock_records(value: Any) -> dict[str, str]:
                     pass
             for key, child in node.items():
                 key_text = str(key)
+                if isinstance(child, Mapping):
+                    child_hash = first_value(child, HASH_KEYS).lower()
+                    if HEX64.fullmatch(child_hash) and (
+                        "/" in key_text or "." in PurePosixPath(key_text).name
+                    ):
+                        try:
+                            found[normalize_relpath(key_text)] = child_hash
+                        except BackflowExecutionError:
+                            pass
                 if isinstance(child, str) and HEX64.fullmatch(child.lower()):
                     if "/" in key_text or "." in PurePosixPath(key_text).name:
                         try:
@@ -512,10 +527,10 @@ def build_receipt(
     issue_ids_from_ledger: Sequence[str],
 ) -> WorkOrderReceipt:
     work_order_id = first_value(work_order, WORK_ORDER_ID_KEYS)
-    case_id = first_value(work_order, CASE_ID_KEYS)
+    case_id = first_value(work_order, CASE_ID_KEYS) or GLOBAL_CASE_ID
     route = first_value(work_order, ROUTE_KEYS) or "unspecified"
-    if not work_order_id or not case_id:
-        raise BackflowExecutionError("every work order requires work_order_id and case_id")
+    if not work_order_id:
+        raise BackflowExecutionError("every work order requires work_order_id")
     source_hash = row_sha256(work_order)
     declared_issue_ids: list[str] = []
     for key in BLOCKER_ID_KEYS:
@@ -546,7 +561,7 @@ def build_receipt(
     if str(result.get("work_order_id") or "").strip() != work_order_id:
         reasons.append("work_order_id_mismatch")
     result_case = str(result.get("case_id") or "").strip()
-    if result_case and result_case != case_id:
+    if result_case != case_id:
         reasons.append("case_id_mismatch")
     result_source_hash = str(result.get("source_work_order_sha256") or "").strip().lower()
     if result_source_hash != source_hash:
@@ -832,13 +847,15 @@ def run_execution(
     case_ids: set[str] = set()
     for row in source_case_rows:
         case_id = first_value(row, CASE_ID_KEYS)
-        if case_id:
+        if case_id and not is_global_case_id(case_id):
             case_ids.add(case_id)
     for receipt in receipt_dicts:
-        case_ids.add(str(receipt["case_id"]))
+        receipt_case_id = str(receipt["case_id"])
+        if not is_global_case_id(receipt_case_id):
+            case_ids.add(receipt_case_id)
     for issue in issue_rows:
         case_id = first_value(issue, CASE_ID_KEYS)
-        if case_id:
+        if case_id and not is_global_case_id(case_id):
             case_ids.add(case_id)
     if not case_ids:
         raise BackflowExecutionError("no case IDs were found")
@@ -847,20 +864,33 @@ def run_execution(
         first_value(row, CASE_ID_KEYS): dict(row)
         for row in source_case_rows
         if first_value(row, CASE_ID_KEYS)
+        and not is_global_case_id(first_value(row, CASE_ID_KEYS))
     }
     issues_by_case: dict[str, list[str]] = defaultdict(list)
+    global_issue_ids: list[str] = []
     for issue_id, row in issue_index.items():
         case_id = first_value(row, CASE_ID_KEYS)
-        if case_id:
+        if case_id and not is_global_case_id(case_id):
             issues_by_case[case_id].append(issue_id)
         else:
             work_order_id = first_value(row, WORK_ORDER_ID_KEYS)
             receipt = receipt_by_work_order.get(work_order_id)
-            if receipt:
-                issues_by_case[str(receipt["case_id"])].append(issue_id)
+            receipt_case_id = str(receipt["case_id"]) if receipt else ""
+            if receipt_case_id and not is_global_case_id(receipt_case_id):
+                issues_by_case[receipt_case_id].append(issue_id)
+            else:
+                global_issue_ids.append(issue_id)
     receipts_by_case: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    global_receipts: list[dict[str, Any]] = []
     for receipt in receipt_dicts:
-        receipts_by_case[str(receipt["case_id"])].append(receipt)
+        receipt_case_id = str(receipt["case_id"])
+        if is_global_case_id(receipt_case_id):
+            global_receipts.append(receipt)
+        else:
+            receipts_by_case[receipt_case_id].append(receipt)
+    global_issue_ids = sorted(set(global_issue_ids))
+    global_unresolved = sorted(set(global_issue_ids) - resolved_issue_ids)
+    global_receipts = sorted(global_receipts, key=lambda item: str(item["work_order_id"]))
 
     review_dir_value = str(manifest.get("review_decision_dir") or "").strip()
     review_dir = (
@@ -896,12 +926,18 @@ def run_execution(
         source.setdefault("case_id", case_id)
         issue_ids = sorted(set(issues_by_case.get(case_id, [])))
         unresolved = sorted(set(issue_ids) - resolved_issue_ids)
-        case_receipts = sorted(
+        case_specific_receipts = sorted(
             receipts_by_case.get(case_id, []),
             key=lambda item: str(item["work_order_id"]),
         )
-        engineering_pass = bool(case_receipts) and not unresolved and all(
-            item["receipt_status"] == "engineering_pass" for item in case_receipts
+        case_receipts = case_specific_receipts + global_receipts
+        engineering_pass = (
+            bool(case_specific_receipts)
+            and not unresolved
+            and not global_unresolved
+            and all(
+                item["receipt_status"] == "engineering_pass" for item in case_receipts
+            )
         )
         case_payload = {
             "schema_version": SCHEMA_VERSION,
@@ -909,6 +945,11 @@ def run_execution(
             "source_blocker_occurrence_ids": issue_ids,
             "resolved_blocker_occurrence_ids": sorted(set(issue_ids) & resolved_issue_ids),
             "unresolved_blocker_occurrence_ids": unresolved,
+            "global_source_blocker_occurrence_ids": global_issue_ids,
+            "global_resolved_blocker_occurrence_ids": sorted(
+                set(global_issue_ids) & resolved_issue_ids
+            ),
+            "global_unresolved_blocker_occurrence_ids": global_unresolved,
             "work_order_receipts": [
                 {
                     "work_order_id": item["work_order_id"],
@@ -955,6 +996,10 @@ def run_execution(
                 "bf2_source_blocker_count": len(issue_ids),
                 "bf2_resolved_blocker_count": len(issue_ids) - len(unresolved),
                 "bf2_unresolved_blocker_count": len(unresolved),
+                "bf2_global_source_blocker_count": len(global_issue_ids),
+                "bf2_global_resolved_blocker_count": len(global_issue_ids)
+                - len(global_unresolved),
+                "bf2_global_unresolved_blocker_count": len(global_unresolved),
                 "bf2_work_order_count": len(case_receipts),
                 "bf2_engineering_pass": str(engineering_pass).lower(),
                 "bf2_case_generation_sha256": case_generation_sha,
@@ -969,7 +1014,14 @@ def run_execution(
     unresolved_count = blocker_count - len(resolved_issue_ids)
     engineering_pass_count = sum(row["bf2_engineering_pass"] == "true" for row in case_rows)
     accepted_review_count = sum(status == "accepted" for status in review_statuses.values())
-    if unresolved_count or engineering_pass_count < len(case_rows):
+    all_work_orders_engineering_pass = bool(receipt_dicts) and all(
+        item["receipt_status"] == "engineering_pass" for item in receipt_dicts
+    )
+    if (
+        unresolved_count
+        or engineering_pass_count < len(case_rows)
+        or not all_work_orders_engineering_pass
+    ):
         next_stage = "R5_bundle17r_targeted_backflow"
         decision = "needs_targeted_backflow"
     elif accepted_review_count < len(case_rows):
@@ -1035,6 +1087,9 @@ def run_execution(
         "bf2_source_blocker_count",
         "bf2_resolved_blocker_count",
         "bf2_unresolved_blocker_count",
+        "bf2_global_source_blocker_count",
+        "bf2_global_resolved_blocker_count",
+        "bf2_global_unresolved_blocker_count",
         "bf2_work_order_count",
         "bf2_engineering_pass",
         "bf2_case_generation_sha256",
@@ -1113,6 +1168,18 @@ def run_execution(
         "source_blocker_occurrence_count": blocker_count,
         "resolved_blocker_occurrence_count": len(resolved_issue_ids),
         "unresolved_blocker_occurrence_count": unresolved_count,
+        "work_order_count": len(receipt_dicts),
+        "engineering_pass_work_order_count": sum(
+            item["receipt_status"] == "engineering_pass" for item in receipt_dicts
+        ),
+        "pending_work_order_count": sum(
+            item["receipt_status"] in {"pending", "manual_pending"}
+            for item in receipt_dicts
+        ),
+        "failed_work_order_count": sum(
+            item["receipt_status"] == "failed" for item in receipt_dicts
+        ),
+        "all_work_orders_engineering_pass": all_work_orders_engineering_pass,
         "canonical_state_mutation_allowed": False,
         "sample_quality_allowed": False,
         "p2_allowed": False,
@@ -1132,6 +1199,9 @@ def run_execution(
         f"- Source blocker occurrences: {blocker_count}",
         f"- Resolved blocker occurrences: {len(resolved_issue_ids)}",
         f"- Unresolved blocker occurrences: {unresolved_count}",
+        "- Work orders engineering-pass: "
+        f"{sum(item['receipt_status'] == 'engineering_pass' for item in receipt_dicts)} / "
+        f"{len(receipt_dicts)}",
         f"- Repo-candidate artifacts: {len(promotion_rows)}",
         f"- Archive-only artifacts: {len(archive_rows)}",
         f"- Rejected artifacts: {len(rejected_rows)}",

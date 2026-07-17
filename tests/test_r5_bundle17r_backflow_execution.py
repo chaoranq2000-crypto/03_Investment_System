@@ -6,8 +6,18 @@ from pathlib import Path
 
 import yaml
 
-from src.research.r5_bundle17r_backflow_execution import run_execution
-from tests.r5_bundle17r_bf2_test_support import add_passed_result, build_fixture, write_yaml
+from src.research.r5_bundle17r_backflow_execution import (
+    GLOBAL_CASE_ID,
+    row_sha256,
+    run_execution,
+)
+from tests.r5_bundle17r_bf2_test_support import (
+    add_passed_result,
+    build_fixture,
+    sha256_file,
+    write_csv,
+    write_yaml,
+)
 
 
 def test_passed_result_preserves_occurrence_and_emits_review_handoff(tmp_path: Path) -> None:
@@ -78,3 +88,107 @@ def test_exact_hash_review_can_promote_only_to_reviewed_candidate(tmp_path: Path
     )
     assert lock["sample_quality_allowed"] is False
     assert lock["p2_allowed"] is False
+
+
+def test_real_bf1_lock_shape_and_suite_work_orders_are_supported(tmp_path: Path) -> None:
+    fixture = build_fixture(tmp_path)
+    work_orders = [
+        {
+            "work_order_id": "WO-SUITE",
+            "case_id": "",
+            "execution_route": "auto",
+            "blocker_ids": "BLK-GLOBAL",
+            "owner": "quality-review",
+        },
+        {
+            "work_order_id": "WO-CASE",
+            "case_id": "CASE-A",
+            "execution_route": "auto",
+            "blocker_ids": "BLK-CASE",
+            "owner": "quality-review",
+        },
+        {
+            "work_order_id": "WO-RERUN",
+            "case_id": "",
+            "execution_route": "auto",
+            "blocker_ids": "",
+            "owner": "research-orchestrator",
+        },
+    ]
+    work_orders_path = tmp_path / "reports/bf1/work_orders.csv"
+    write_csv(work_orders_path, list(work_orders[0]), work_orders)
+    issues_path = tmp_path / "reports/bf1/issues.csv"
+    write_csv(
+        issues_path,
+        ["blocker_id", "case_id", "work_order_id", "description"],
+        [
+            {
+                "blocker_id": "BLK-GLOBAL",
+                "case_id": "",
+                "work_order_id": "WO-SUITE",
+                "description": "suite gate failed",
+            },
+            {
+                "blocker_id": "BLK-CASE",
+                "case_id": "",
+                "work_order_id": "WO-CASE",
+                "description": "case gate failed",
+            },
+        ],
+    )
+    cases_path = tmp_path / "reports/bf1/cases.csv"
+    write_csv(
+        cases_path,
+        ["case_id", "company_name", "engineering_pass"],
+        [
+            {"case_id": "CASE-A", "company_name": "Example", "engineering_pass": "false"},
+            {"case_id": "suite", "company_name": "", "engineering_pass": "false"},
+        ],
+    )
+    lock = {
+        "schema_version": "r5_bundle17r_backflow_generation_lock_v1",
+        "output_artifacts": {
+            path.name: {"sha256": sha256_file(path), "size_bytes": path.stat().st_size}
+            for path in (work_orders_path, issues_path, cases_path)
+        },
+    }
+    (tmp_path / "reports/bf1/generation_lock.json").write_text(
+        json.dumps(lock, sort_keys=True), encoding="utf-8"
+    )
+
+    def add_result(order: dict[str, str], blocker_ids: list[str]) -> None:
+        result_dir = tmp_path / ".local/results" / order["work_order_id"]
+        result_dir.mkdir(parents=True, exist_ok=True)
+        write_yaml(
+            result_dir / "result.yaml",
+            {
+                "schema_version": "r5_bundle17r_work_order_result_v1",
+                "work_order_id": order["work_order_id"],
+                "case_id": order["case_id"] or GLOBAL_CASE_ID,
+                "source_work_order_sha256": row_sha256(order),
+                "execution_status": "engineering_pass",
+                "resolved_blocker_ids": blocker_ids,
+                "checks": [{"id": "acceptance", "status": "passed"}],
+                "produced_artifacts": [],
+            },
+        )
+
+    add_result(work_orders[0], ["BLK-GLOBAL"])
+    add_result(work_orders[1], ["BLK-CASE"])
+    pending_terminal = run_execution(tmp_path, fixture["manifest_path"])
+    assert pending_terminal["status_proposal"]["resolved_blocker_occurrence_count"] == 2
+    assert pending_terminal["status_proposal"]["engineering_pass_count"] == 0
+    assert pending_terminal["status_proposal"]["decision"] == "needs_targeted_backflow"
+    assert pending_terminal["status_proposal"]["all_work_orders_engineering_pass"] is False
+    with (pending_terminal["output_dir"] / "R5_bundle17r_bf2_case_matrix.csv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        case_row = next(csv.DictReader(handle))
+    assert case_row["bf2_source_blocker_count"] == "1"
+    assert case_row["bf2_global_source_blocker_count"] == "1"
+
+    add_result(work_orders[2], [])
+    complete = run_execution(tmp_path, fixture["manifest_path"])
+    assert complete["status_proposal"]["engineering_pass_count"] == 1
+    assert complete["status_proposal"]["decision"] == "ready_for_exact_hash_human_review"
+    assert complete["status_proposal"]["all_work_orders_engineering_pass"] is True

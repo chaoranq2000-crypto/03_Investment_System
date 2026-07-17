@@ -44,6 +44,10 @@ Each result package follows `schemas/r5_bundle17r_work_order_result.schema.json`
 candidate stored inside the dropzone must declare a safe `promotion_target`; an archive must declare
 `archive_only` or `local_only`.
 
+BF1 suite-level and terminal rerun work orders have an empty source `case_id`. Their BF2 result
+manifests must use the reserved value `__suite__`. This value is a global scope marker and must not
+be counted as a fifth research case or receive a case-review decision.
+
 ## Command
 
 ```bash
