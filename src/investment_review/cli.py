@@ -9,6 +9,15 @@ from pathlib import Path
 from typing import Any
 
 from .artifact_io import atomic_create_bytes, atomic_write_bytes
+from .behavior_cohort import (
+    EFFECTIVE_ANCHORS,
+    build_behavior_cohort,
+    load_behavior_cohort,
+    query_behavior_cohort,
+    replay_validate_behavior_cohort,
+    save_behavior_cohort,
+    validate_behavior_cohort,
+)
 from .episodes import (
     build_episode_collection,
     load_episode_collection,
@@ -424,6 +433,51 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate and list an append-only P2F review revision chain",
     )
     episode_review_revision_list.add_argument("artifact", nargs="+")
+
+    behavior_cohort_build = sub.add_parser(
+        "behavior-cohort-build",
+        help="Freeze a deterministic facts-only cohort from explicit P2F revisions",
+    )
+    behavior_cohort_build.add_argument(
+        "--episode-review",
+        action="append",
+        required=True,
+        help="P2F review JSON; may be supplied more than once",
+    )
+    behavior_cohort_build.add_argument(
+        "--input-bundle",
+        action="append",
+        required=True,
+        help="P2F review-input bundle JSON; may be supplied more than once",
+    )
+    behavior_cohort_build.add_argument("--effective-from", required=True)
+    behavior_cohort_build.add_argument("--effective-to", required=True)
+    behavior_cohort_build.add_argument("--knowledge-cutoff", required=True)
+    behavior_cohort_build.add_argument(
+        "--effective-anchor", required=True, choices=list(EFFECTIVE_ANCHORS)
+    )
+    behavior_cohort_build.add_argument("--account", action="append", default=[])
+    behavior_cohort_build.add_argument("--instrument", action="append", default=[])
+    behavior_cohort_build.add_argument("--output", required=True)
+
+    behavior_cohort_show = sub.add_parser(
+        "behavior-cohort-show",
+        help="Query a canonical P2G-1 behavior cohort without deriving new facts",
+    )
+    behavior_cohort_show.add_argument("artifact")
+    behavior_cohort_show.add_argument("--episode-id")
+    behavior_cohort_show.add_argument("--review-id")
+    behavior_cohort_show.add_argument("--reason-code")
+    behavior_cohort_show.add_argument("--content-id")
+
+    behavior_cohort_validate = sub.add_parser(
+        "behavior-cohort-validate",
+        help="Validate a P2G-1 cohort, optionally by exact P2F source replay",
+    )
+    behavior_cohort_validate.add_argument("artifact")
+    behavior_cohort_validate.add_argument("--source-replay", action="store_true")
+    behavior_cohort_validate.add_argument("--episode-review", action="append", default=[])
+    behavior_cohort_validate.add_argument("--input-bundle", action="append", default=[])
 
     return parser
 
@@ -875,6 +929,71 @@ def main(argv: list[str] | None = None) -> int:
                     "revisions": list_episode_review_revisions(artifacts),
                 }
             )
+        elif args.command == "behavior-cohort-build":
+            artifact = build_behavior_cohort(
+                _load_json_documents(args.episode_review),
+                _load_json_documents(args.input_bundle),
+                effective_from=args.effective_from,
+                effective_to=args.effective_to,
+                knowledge_cutoff=args.knowledge_cutoff,
+                effective_anchor=args.effective_anchor,
+                filters={
+                    "account_ids": args.account,
+                    "instrument_ids": args.instrument,
+                },
+            )
+            validation = validate_behavior_cohort(artifact)
+            if validation["validation_status"] == "blocked":
+                raise ValueError("P2G-1 behavior cohort failed structural validation")
+            output = save_behavior_cohort(args.output, artifact)
+            _print(
+                {
+                    "status": validation["validation_status"],
+                    "content_id": artifact["content_id"],
+                    "cohort_id": artifact["cohort_id"],
+                    "included_review_count": artifact["counts"]["included_review_count"],
+                    "excluded_candidate_count": artifact["counts"]["excluded_candidate_count"],
+                    "release_readiness": artifact["release_readiness"]["status"],
+                    "source_verification": artifact["source_verification"]["status"],
+                    "output": str(output),
+                }
+            )
+            if (
+                artifact["release_readiness"]["status"] != "ready"
+                or artifact["source_verification"]["status"] != "verified"
+            ):
+                return 2
+        elif args.command == "behavior-cohort-show":
+            _print(
+                query_behavior_cohort(
+                    load_behavior_cohort(args.artifact),
+                    episode_id=args.episode_id,
+                    review_id=args.review_id,
+                    reason_code=args.reason_code,
+                    content_id=args.content_id,
+                )
+            )
+        elif args.command == "behavior-cohort-validate":
+            artifact = load_behavior_cohort(args.artifact)
+            if args.source_replay:
+                if not args.episode_review or not args.input_bundle:
+                    raise ValueError(
+                        "--source-replay requires --episode-review and --input-bundle"
+                    )
+                validation = replay_validate_behavior_cohort(
+                    artifact,
+                    episode_reviews=_load_json_documents(args.episode_review),
+                    input_bundles=_load_json_documents(args.input_bundle),
+                )
+            else:
+                validation = validate_behavior_cohort(artifact)
+            _print(validation)
+            if (
+                validation["validation_status"] == "blocked"
+                or artifact["release_readiness"]["status"] != "ready"
+                or artifact["source_verification"]["status"] != "verified"
+            ):
+                return 2
         else:
             parser.error(f"Unhandled command: {args.command}")
     except Exception as exc:

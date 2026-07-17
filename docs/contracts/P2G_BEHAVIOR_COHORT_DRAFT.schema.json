@@ -1,0 +1,460 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/contracts/p2g.behavior_cohort.v1.schema.json",
+  "title": "P2G-1 Deterministic Behavior Cohort",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "content_id",
+    "cohort_id",
+    "selection_spec",
+    "source_inventory",
+    "included_reviews",
+    "excluded_candidates",
+    "counts",
+    "release_readiness",
+    "source_verification",
+    "canonicalization"
+  ],
+  "properties": {
+    "schema_version": {"const": "p2g.behavior_cohort.v1"},
+    "content_id": {"$ref": "#/$defs/content_id"},
+    "cohort_id": {"type": "string", "pattern": "^cohort:[0-9a-f]{32}$"},
+    "selection_spec": {"$ref": "#/$defs/selection_spec"},
+    "source_inventory": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/source_inventory_item"}
+    },
+    "included_reviews": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/included_review"}
+    },
+    "excluded_candidates": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/excluded_candidate"}
+    },
+    "counts": {"$ref": "#/$defs/counts"},
+    "release_readiness": {"$ref": "#/$defs/release_readiness"},
+    "source_verification": {"$ref": "#/$defs/source_verification"},
+    "canonicalization": {"$ref": "#/$defs/canonicalization"}
+  },
+  "$defs": {
+    "content_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "review_id": {
+      "type": "string",
+      "pattern": "^review:[0-9a-f]{32}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "nonempty_string": {"type": "string", "minLength": 1},
+    "string_set": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "reason_code": {
+      "enum": [
+        "outside_effective_window",
+        "knowledge_after_cutoff",
+        "missing_effective_anchor",
+        "missing_knowledge_time",
+        "schema_invalid",
+        "release_not_ready",
+        "source_not_verified",
+        "source_replay_mismatch",
+        "revision_chain_invalid",
+        "ambiguous_current_revision",
+        "human_rejected",
+        "missing_required_fact_section",
+        "duplicate_logical_episode",
+        "content_id_mismatch",
+        "filter_mismatch",
+        "missing_source",
+        "extra_source",
+        "interpretation_contamination"
+      ]
+    },
+    "selection_spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effective_from",
+        "effective_to",
+        "effective_anchor",
+        "knowledge_cutoff",
+        "filters"
+      ],
+      "properties": {
+        "effective_from": {"$ref": "#/$defs/timestamp"},
+        "effective_to": {"$ref": "#/$defs/timestamp"},
+        "effective_anchor": {
+          "enum": ["episode_opened_at", "episode_closed_at"]
+        },
+        "knowledge_cutoff": {"$ref": "#/$defs/timestamp"},
+        "filters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["account_ids", "instrument_ids"],
+          "properties": {
+            "account_ids": {"$ref": "#/$defs/string_set"},
+            "instrument_ids": {"$ref": "#/$defs/string_set"}
+          }
+        }
+      }
+    },
+    "source_inventory_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_kind",
+        "role",
+        "episode_id",
+        "review_id",
+        "revision_no",
+        "content_id",
+        "knowledge_at"
+      ],
+      "properties": {
+        "source_kind": {"enum": ["episode_review", "review_input_bundle"]},
+        "role": {
+          "enum": ["selected_review", "revision_predecessor", "input_bundle"]
+        },
+        "episode_id": {"$ref": "#/$defs/nonempty_string"},
+        "review_id": {"$ref": "#/$defs/review_id"},
+        "revision_no": {
+          "oneOf": [
+            {"type": "integer", "minimum": 1},
+            {"type": "null"}
+          ]
+        },
+        "content_id": {"$ref": "#/$defs/content_id"},
+        "knowledge_at": {"$ref": "#/$defs/timestamp"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"source_kind": {"const": "episode_review"}}},
+          "then": {
+            "properties": {
+              "revision_no": {"type": "integer", "minimum": 1},
+              "role": {"enum": ["selected_review", "revision_predecessor"]}
+            }
+          },
+          "else": {
+            "properties": {
+              "revision_no": {"type": "null"},
+              "role": {"const": "input_bundle"}
+            }
+          }
+        }
+      ]
+    },
+    "revision_lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision_no", "status", "content_id", "knowledge_at"],
+      "properties": {
+        "revision_no": {"type": "integer", "minimum": 1},
+        "status": {"enum": ["draft", "reviewed", "corrected", "superseded"]},
+        "content_id": {"$ref": "#/$defs/content_id"},
+        "knowledge_at": {"$ref": "#/$defs/timestamp"}
+      }
+    },
+    "fact_section_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "status",
+        "fact_ids",
+        "source_ids",
+        "warning_codes",
+        "gap_codes"
+      ],
+      "properties": {
+        "section": {
+          "enum": [
+            "timeline",
+            "security_context",
+            "portfolio_context",
+            "market_context",
+            "outcome_context",
+            "execution_consistency"
+          ]
+        },
+        "status": {
+          "enum": [
+            "available",
+            "partial",
+            "missing",
+            "unlinked",
+            "ambiguous",
+            "stale",
+            "unpriced",
+            "invalid",
+            "not_applicable",
+            "withheld_by_cutoff"
+          ]
+        },
+        "fact_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^fact:[0-9a-f]{32}$"}
+        },
+        "source_ids": {"$ref": "#/$defs/string_set"},
+        "warning_codes": {"$ref": "#/$defs/string_set"},
+        "gap_codes": {"$ref": "#/$defs/string_set"}
+      }
+    },
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "source_kind",
+        "content_id",
+        "locator",
+        "frozen_pointer"
+      ],
+      "properties": {
+        "source_id": {"$ref": "#/$defs/nonempty_string"},
+        "source_kind": {"$ref": "#/$defs/nonempty_string"},
+        "content_id": {"$ref": "#/$defs/content_id"},
+        "locator": {"type": "string"},
+        "frozen_pointer": {
+          "type": "string",
+          "pattern": "^/frozen_sources/"
+        }
+      }
+    },
+    "included_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "episode_id",
+        "review_id",
+        "revision_no",
+        "selected_review_content_id",
+        "input_bundle_content_id",
+        "input_bundle_knowledge_at",
+        "effective_at",
+        "knowledge_at",
+        "revision_chain",
+        "facts_content_id",
+        "fact_section_refs",
+        "source_refs",
+        "facts_projection"
+      ],
+      "properties": {
+        "episode_id": {"$ref": "#/$defs/nonempty_string"},
+        "review_id": {"$ref": "#/$defs/review_id"},
+        "revision_no": {"type": "integer", "minimum": 1},
+        "selected_review_content_id": {"$ref": "#/$defs/content_id"},
+        "input_bundle_content_id": {"$ref": "#/$defs/content_id"},
+        "input_bundle_knowledge_at": {"$ref": "#/$defs/timestamp"},
+        "effective_at": {"$ref": "#/$defs/timestamp"},
+        "knowledge_at": {"$ref": "#/$defs/timestamp"},
+        "revision_chain": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/revision_lineage"}
+        },
+        "facts_content_id": {"$ref": "#/$defs/content_id"},
+        "fact_section_refs": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/fact_section_ref"}
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/source_ref"}
+        },
+        "facts_projection": {
+          "type": "object",
+          "required": [
+            "schema_version",
+            "content_id",
+            "review_id",
+            "input_bundle_ref",
+            "revision",
+            "fact_sections",
+            "interpretation_sections",
+            "governance",
+            "warnings"
+          ]
+        }
+      }
+    },
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_kind", "content_id", "role"],
+      "properties": {
+        "source_kind": {"enum": ["episode_review", "review_input_bundle"]},
+        "content_id": {"$ref": "#/$defs/content_id"},
+        "role": {"$ref": "#/$defs/nonempty_string"}
+      }
+    },
+    "excluded_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "episode_id",
+        "review_id",
+        "candidate_content_ids",
+        "reason_codes",
+        "evidence_refs",
+        "blocking"
+      ],
+      "properties": {
+        "candidate_id": {"$ref": "#/$defs/nonempty_string"},
+        "episode_id": {
+          "oneOf": [{"$ref": "#/$defs/nonempty_string"}, {"type": "null"}]
+        },
+        "review_id": {
+          "oneOf": [{"$ref": "#/$defs/review_id"}, {"type": "null"}]
+        },
+        "candidate_content_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/content_id"}
+        },
+        "reason_codes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/reason_code"}
+        },
+        "evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/evidence_ref"}
+        },
+        "blocking": {"type": "boolean"}
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_chain_count",
+        "included_review_count",
+        "excluded_candidate_count",
+        "blocking_exclusion_count",
+        "source_count",
+        "fact_count"
+      ],
+      "properties": {
+        "candidate_chain_count": {"type": "integer", "minimum": 0},
+        "included_review_count": {"type": "integer", "minimum": 0},
+        "excluded_candidate_count": {"type": "integer", "minimum": 0},
+        "blocking_exclusion_count": {"type": "integer", "minimum": 0},
+        "source_count": {"type": "integer", "minimum": 0},
+        "fact_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "release_readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "blocker_codes"],
+      "properties": {
+        "status": {"enum": ["ready", "blocked"]},
+        "blocker_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/reason_code"}
+        }
+      }
+    },
+    "source_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "validation_mode",
+        "verified_review_content_ids",
+        "verified_input_bundle_content_ids"
+      ],
+      "properties": {
+        "status": {"enum": ["verified", "blocked"]},
+        "validation_mode": {"const": "p2f_source_replay"},
+        "verified_review_content_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/content_id"}
+        },
+        "verified_input_bundle_content_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/content_id"}
+        }
+      }
+    },
+    "canonicalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "json_profile",
+        "sort_version",
+        "hash_algorithm",
+        "excluded_fields",
+        "exclusion_registry_version",
+        "builder_version",
+        "array_order"
+      ],
+      "properties": {
+        "json_profile": {"const": "utf8-json-sorted-keys-no-float"},
+        "sort_version": {"const": "p2g.behavior_cohort.sort.v1"},
+        "hash_algorithm": {"const": "sha256"},
+        "excluded_fields": {
+          "type": "array",
+          "prefixItems": [{"const": "content_id"}],
+          "items": false
+        },
+        "exclusion_registry_version": {
+          "const": "p2g.behavior_cohort.exclusions.v1"
+        },
+        "builder_version": {"const": "p2g.behavior_cohort.builder.v1"},
+        "array_order": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "selection_spec.filters.account_ids",
+            "selection_spec.filters.instrument_ids",
+            "source_inventory",
+            "included_reviews",
+            "excluded_candidates"
+          ],
+          "properties": {
+            "selection_spec.filters.account_ids": {"const": "lexical"},
+            "selection_spec.filters.instrument_ids": {"const": "lexical"},
+            "source_inventory": {
+              "const": "source_kind,review_id,revision_no,content_id"
+            },
+            "included_reviews": {
+              "const": "effective_at,episode_id,review_id,revision_no,selected_review_content_id"
+            },
+            "excluded_candidates": {
+              "const": "candidate_id,reason_codes,candidate_content_ids"
+            }
+          }
+        }
+      }
+    }
+  }
+}

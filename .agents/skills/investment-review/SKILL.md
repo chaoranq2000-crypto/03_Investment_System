@@ -134,6 +134,28 @@ be promoted to `exact`, and partial endpoints must not publish numeric deltas.
 Incomplete valuation coverage must leave NAV-dependent context metrics absent,
 not derive NAV from only the priced subset.
 
+## P2G-1 deterministic cross-episode fact-cohort boundary
+
+After canonical P2F review inputs and review revision chains are accepted, the
+implementation may also:
+
+- select one unique P2F current leaf per logical review chain under an explicit
+  effective window and knowledge cutoff;
+- freeze the selected leaf's complete P2F `facts_only_projection`, section refs,
+  source refs and cutoff-visible revision lineage into
+  `p2g.behavior_cohort.v1`;
+- preserve missing, partial, ambiguous, stale and unpriced states, warnings,
+  gaps and exact source references without converting them to defaults;
+- save, validate, query and source-replay the cohort through create-only local
+  JSON artifacts.
+
+P2G-1 must not consume interpretation text, infer psychology or motives,
+calculate cross-episode behavior signals, query a database/network/model,
+silently resolve multiple revision leaves, or use cutoff-later revisions.  A
+P2F finding-level `reject` does not reject the immutable facts projection; an
+artifact-level rejection would require a separate explicit contract.  See
+`docs/playbooks/INVESTMENT_REVIEW_P2G_1.md`.
+
 ## Required workflow
 
 1. Run `python -m src.investment_review --db data/db/investment_review.sqlite3 init`.
@@ -206,6 +228,21 @@ For an approved P2F facts-only run:
     prefix growth, unchanged input/facts/warnings and no undeclared interpretation edits.
 30. Save the new JSON at a non-existing path, render escaped Markdown, and verify
     diff/revision-list output. Never pass or write a source database in this step.
+
+For an approved P2G-1 cohort run:
+
+31. Supply every cutoff-visible predecessor revision and each review's exact P2F
+    input bundle; never resolve a chain from only a leaf path or `latest` alias.
+32. Normalize the explicit effective window, knowledge cutoff and account/instrument
+    filters, then require one validated current leaf per logical review chain.
+33. Project the selected leaf through the canonical P2F facts-only projection and
+    preserve all facts, states, gaps, warnings and source refs byte-deterministically.
+34. Require the selected review's P2F source replay plus input-bundle
+    `release_readiness=ready` and `source_verification=verified` before cohort release.
+35. Rebuild after input permutation and after adding cutoff-later corrections; require
+    identical bytes/content ID for the same cutoff-visible logical inputs.
+36. Save create-only, query without derivation, and replay from explicit P2F sources;
+    blocked/not-ready/unverified states must return a non-zero CLI exit code.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate

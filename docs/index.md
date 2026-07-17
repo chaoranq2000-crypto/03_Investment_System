@@ -41,6 +41,7 @@
 - `playbooks/INVESTMENT_REVIEW_P2C.md` — 交易周期确定性重构、时点快照链接和 artifact 查询手册。
 - `playbooks/INVESTMENT_REVIEW_P2E_3.md` — 交易周期事件锚点、双时间组合上下文和指标证据绑定手册。
 - `playbooks/INVESTMENT_REVIEW_P2F_DRAFT.md` — 单笔交易双视角复盘的冻结输入、事实/解释分层和修订门禁手册。
+- `playbooks/INVESTMENT_REVIEW_P2G_1.md` — 跨 Trade Episode facts-only cohort 的双时间、修订、排除原因和 source replay 手册。
 - `playbooks/stock_report_case_study_shengyi_tech.md` — 个股报告案例研究。
 - `playbooks/stock_report_samples/README.md` — 样例报告目录说明。
 
