@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r5_bundle17r_case_review_decision.schema.json",
+  "title": "R5 Bundle 17R-BF2 exact-hash case review decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "case_id",
+    "decision",
+    "reviewer",
+    "reviewed_at",
+    "reviewed_case_generation_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "r5_bundle17r_bf2_case_review_decision_v1"},
+    "case_id": {"type": "string", "minLength": 1},
+    "decision": {"enum": ["accepted", "rejected", "pending"]},
+    "reviewer": {"type": "string"},
+    "reviewed_at": {"type": "string"},
+    "reviewed_case_generation_sha256": {
+      "type": "string",
+      "pattern": "^(REPLACE_WITH_EXACT_HASH_FROM_REVIEW_HANDOFF|[0-9a-f]{64})$"
+    },
+    "notes": {"type": "string"}
+  }
+}

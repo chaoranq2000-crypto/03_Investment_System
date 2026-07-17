@@ -1,0 +1,12 @@
+schema_version: r5_bundle17r_work_order_result_v1
+work_order_id: REPLACE_WITH_WORK_ORDER_ID
+case_id: REPLACE_WITH_CASE_ID
+source_work_order_sha256: REPLACE_WITH_CANONICAL_BF1_WORK_ORDER_ROW_SHA256
+execution_status: manual_pending
+resolved_blocker_ids: []
+checks: []
+produced_artifacts: []
+# For routes designated manual/human_review/evidence_review, a passed result also requires:
+# manual_attestation:
+#   reviewer: REPLACE_WITH_REVIEWER
+#   signed: true

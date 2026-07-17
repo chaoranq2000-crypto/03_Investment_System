@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r5_bundle17r_backflow_execution_manifest.schema.json",
+  "title": "R5 Bundle 17R-BF2 execution manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "bundle_id",
+    "source_baseline_commit",
+    "policy_path",
+    "inputs",
+    "result_dropzone",
+    "output_dir"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "r5_bundle17r_bf2_execution_manifest_v1"
+    },
+    "bundle_id": {"type": "string", "minLength": 1},
+    "source_baseline_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "as_of": {"type": "string", "format": "date"},
+    "policy_path": {"type": "string", "minLength": 1},
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generation_lock", "work_orders", "issue_ledger", "case_matrix"],
+      "properties": {
+        "generation_lock": {"type": "string", "minLength": 1},
+        "work_orders": {"type": "string", "minLength": 1},
+        "issue_ledger": {"type": "string", "minLength": 1},
+        "case_matrix": {"type": "string", "minLength": 1}
+      }
+    },
+    "result_dropzone": {"type": "string", "minLength": 1},
+    "review_decision_dir": {"type": "string", "minLength": 1},
+    "output_dir": {"type": "string", "minLength": 1}
+  }
+}

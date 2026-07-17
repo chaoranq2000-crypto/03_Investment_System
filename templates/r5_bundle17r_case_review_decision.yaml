@@ -1,0 +1,7 @@
+schema_version: r5_bundle17r_bf2_case_review_decision_v1
+case_id: REPLACE_WITH_CASE_ID
+decision: pending
+reviewer: ''
+reviewed_at: ''
+reviewed_case_generation_sha256: REPLACE_WITH_EXACT_HASH_FROM_REVIEW_HANDOFF
+notes: ''

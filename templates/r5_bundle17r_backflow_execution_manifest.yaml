@@ -1,0 +1,13 @@
+schema_version: r5_bundle17r_bf2_execution_manifest_v1
+bundle_id: R5_bundle17r_BF2_execution_receipts
+source_baseline_commit: a345fafb522300831ed4206d35fa17f44570cb1f
+as_of: '2026-07-17'
+policy_path: config/r5_bundle17r_backflow_execution_policy.yaml
+inputs:
+  generation_lock: reports/p1_6/r5_bundle17r/R5_bundle17r_backflow_generation_lock.json
+  work_orders: reports/p1_6/r5_bundle17r/R5_bundle17r_backflow_work_orders.csv
+  issue_ledger: reports/p1_6/r5_bundle17r/R5_bundle17r_backflow_issue_ledger.csv
+  case_matrix: reports/p1_6/r5_bundle17r/R5_bundle17r_backflow_case_matrix.csv
+result_dropzone: .local/r5_bundle17r_backflow_results
+review_decision_dir: .local/r5_bundle17r_backflow_results/reviews
+output_dir: reports/p1_6/r5_bundle17r_bf2

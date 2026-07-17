@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r5_bundle17r_work_order_result.schema.json",
+  "title": "R5 Bundle 17R work-order result",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "work_order_id",
+    "case_id",
+    "source_work_order_sha256",
+    "execution_status",
+    "resolved_blocker_ids",
+    "checks",
+    "produced_artifacts"
+  ],
+  "properties": {
+    "schema_version": {"const": "r5_bundle17r_work_order_result_v1"},
+    "work_order_id": {"type": "string", "minLength": 1},
+    "case_id": {"type": "string", "minLength": 1},
+    "source_work_order_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "execution_status": {
+      "enum": [
+        "passed",
+        "complete",
+        "completed",
+        "engineering_pass",
+        "failed",
+        "rejected",
+        "error",
+        "manual_pending",
+        "pending",
+        "needs_manual_route"
+      ]
+    },
+    "resolved_blocker_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "status"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "status": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "produced_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256", "disposition"],
+        "properties": {
+          "source_root": {"enum": ["repo", "dropzone"]},
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "disposition": {"enum": ["repo_candidate", "archive_only", "local_only"]},
+          "promotion_target": {"type": "string"}
+        }
+      }
+    },
+    "manual_attestation": {
+      "type": "object",
+      "required": ["reviewer", "signed"],
+      "properties": {
+        "reviewer": {"type": "string", "minLength": 1},
+        "signed": {"const": true}
+      }
+    }
+  }
+}
