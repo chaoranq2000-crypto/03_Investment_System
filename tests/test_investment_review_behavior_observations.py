@@ -32,6 +32,7 @@ from src.investment_review.behavior_observations import (
 )
 from src.investment_review.cli import main as review_main
 from src.investment_review.episode_review import build_facts_only_episode_review
+from src.investment_review import behavior_observations as observation_module
 
 
 UTC = timezone.utc
@@ -87,10 +88,12 @@ def _event(
     account_id: str,
     instrument_id: str,
     currency: str,
+    known_at: datetime | None = None,
 ) -> dict[str, Any]:
     row = P2F1._event(
         event_id,
         at=at,
+        known_at=known_at,
         side=side,
         quantity=quantity,
         sequence=sequence,
@@ -148,6 +151,7 @@ def _episode_artifacts(
     instrument_id: str = "600000.SH",
     currency: str = "CNY",
     exact_cursor: bool = True,
+    close_known_at: datetime | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     work = root / name
     work.mkdir(parents=True, exist_ok=True)
@@ -176,6 +180,7 @@ def _episode_artifacts(
                 account_id=account_id,
                 instrument_id=instrument_id,
                 currency=currency,
+                known_at=close_known_at,
             )
         )
     snapshots = [
@@ -212,7 +217,14 @@ def _episode_artifacts(
                 ),
                 _snapshot(
                     f"{name}-post-close",
-                    known_at=closed_at + timedelta(minutes=1),
+                    known_at=max(
+                        closed_at + timedelta(minutes=1),
+                        (
+                            close_known_at + timedelta(minutes=1)
+                            if close_known_at is not None
+                            else closed_at + timedelta(minutes=1)
+                        ),
+                    ),
                     included=(buy_id, sell_id),
                     account_id=account_id,
                     instrument_id=instrument_id,
@@ -342,6 +354,17 @@ def cohorts(tmp_path_factory: pytest.TempPathFactory) -> dict[str, dict[str, Any
             root,
             "zero-duration",
             [_spec(1, duration_minutes=0), _spec(2, duration_minutes=30)],
+        ),
+        "late_known_event": _cohort(
+            root,
+            "late-known-event",
+            [
+                _spec(
+                    1,
+                    close_known_at=datetime(2026, 7, 1, 2, 30, tzinfo=UTC),
+                ),
+                _spec(2),
+            ],
         ),
     }
 
@@ -627,6 +650,19 @@ def test_overlapping_reentry_is_insufficient_not_negative_gap_observation(
     assert item["facts"]["gap_seconds"] == "-3600"
 
 
+def test_reentry_prior_close_known_after_next_open_is_insufficient(
+    cohorts: dict[str, dict[str, Any]],
+) -> None:
+    item = _evaluation(
+        _only(cohorts["late_known_event"], "same_instrument_reentry_gap"),
+        "same_instrument_reentry_gap",
+    )
+    assert item["status"] == "insufficient_evidence"
+    assert item["reason_codes"] == ["fact_known_after_subject_event"]
+    assert item["chronology_checks"]["knowledge_cutoff"] == "valid"
+    assert item["chronology_checks"]["subject_knowledge"] == "late"
+
+
 def test_different_instrument_has_no_same_instrument_followup(
     cohorts: dict[str, dict[str, Any]],
 ) -> None:
@@ -683,6 +719,34 @@ def test_present_partial_high_priority_metric_blocks_fallback(
     assert item["status"] == "not_comparable"
     assert item["facts"]["metric_key"] == "target_position_weight"
     assert item["reason_codes"] == ["partial_or_ambiguous_source"]
+
+
+def test_prior_scale_fact_known_after_current_open_is_insufficient(
+    cohorts: dict[str, dict[str, Any]],
+) -> None:
+    rows = observation_module._episode_rows(cohorts["base"])
+    prior = deepcopy(rows[0])
+    current = rows[1]
+    projection = deepcopy(prior["projection"])
+    prior["projection"] = projection
+    metric = next(
+        fact
+        for fact in projection["fact_sections"]["portfolio_context"]["facts"]
+        if fact["kind"] == "portfolio_metric"
+        and fact["data"]["anchor_kind"] == "episode_open"
+        and fact["data"]["side"] == "post"
+        and fact["data"]["metric_key"] == "target_position_weight"
+    )
+    metric["knowledge_at"] = "2026-07-01T02:30:00Z"
+    state, reason, facts, evidence = observation_module._metric_pair(
+        prior,
+        current,
+        ["target_position_weight", "maximum_absolute_quantity"],
+    )
+    assert state == "insufficient_evidence"
+    assert reason == "fact_known_after_subject_event"
+    assert facts["prior_metric_known_at"] == "2026-07-01T02:30:00Z"
+    assert evidence
 
 
 def test_target_value_currency_mismatch_is_not_comparable(
@@ -782,6 +846,17 @@ def test_zero_prior_duration_is_not_comparable(
     item = _evaluation(_only(cohorts["zero_duration"], "holding_duration_transition"), "holding_duration_transition")
     assert item["status"] == "not_comparable"
     assert item["reason_codes"] == ["zero_denominator"]
+
+
+def test_prior_close_known_after_current_open_blocks_duration_comparison(
+    cohorts: dict[str, dict[str, Any]],
+) -> None:
+    item = _evaluation(
+        _only(cohorts["late_known_event"], "holding_duration_transition"),
+        "holding_duration_transition",
+    )
+    assert item["status"] == "insufficient_evidence"
+    assert item["reason_codes"] == ["fact_known_after_subject_event"]
 
 
 def test_evidence_refs_resolve_to_exact_p2g1_fact_ids(

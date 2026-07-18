@@ -384,6 +384,14 @@ def _episode_rows(cohort: Mapping[str, Any]) -> list[dict[str, Any]]:
         closed_at = str(closed_raw) if closed_raw is not None else None
         if closed_at is not None:
             _timestamp(closed_at, "episode.closed_at")
+        execution_facts: dict[str, Mapping[str, Any]] = {}
+        for fact in _facts(projection, "timeline", "execution_event"):
+            data = fact.get("data")
+            if isinstance(data, Mapping) and str(data.get("event_id") or ""):
+                execution_facts[str(data["event_id"])] = fact
+        opening_event_id = str(lifecycle_data.get("opening_event_id") or "")
+        closing_raw = lifecycle_data.get("closing_event_id")
+        closing_event_id = str(closing_raw) if closing_raw is not None else None
         row = {
             "episode_id": str(included.get("episode_id") or ""),
             "review_id": str(included.get("review_id") or ""),
@@ -396,12 +404,20 @@ def _episode_rows(cohort: Mapping[str, Any]) -> list[dict[str, Any]]:
             "opened_at": opened_at,
             "closed_at": closed_at,
             "status": str(lifecycle_data.get("status") or ""),
+            "opening_event_id": opening_event_id,
+            "closing_event_id": closing_event_id,
             "maximum_absolute_quantity": str(
                 lifecycle_data.get("maximum_absolute_quantity") or ""
             ),
             "projection": projection,
             "lifecycle_fact": lifecycle,
             "identity_fact": identity,
+            "opening_event_fact": execution_facts.get(opening_event_id),
+            "closing_event_fact": (
+                execution_facts.get(closing_event_id)
+                if closing_event_id is not None
+                else None
+            ),
         }
         if not all(row[key] for key in ("episode_id", "review_id", "facts_content_id", "account_id", "instrument_id")):
             raise BehaviorObservationError("episode identity fields must be non-empty")
@@ -476,6 +492,11 @@ def _evaluation(
         temporal_order = "overlap"
     elif "invalid_episode_interval" in reasons:
         temporal_order = "invalid"
+    subject_knowledge = "valid"
+    if "fact_known_after_subject_event" in reasons:
+        subject_knowledge = "late"
+    elif len(episodes) == 1 or status == "not_applicable":
+        subject_knowledge = "not_applicable"
     dimensions = _dimensions(episodes)
     dimensions["instrument_id"] = (
         dimensions["instrument_ids"][0]
@@ -501,6 +522,7 @@ def _evaluation(
         "facts": deepcopy(dict(facts)),
         "chronology_checks": {
             "knowledge_cutoff": "valid",
+            "subject_knowledge": subject_knowledge,
             "temporal_order": temporal_order,
         },
         "evidence_refs": sorted(
@@ -521,6 +543,24 @@ def _base_evidence(episodes: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]
         rows.append(_fact_ref(episode, "timeline", episode["lifecycle_fact"]))
         rows.append(_fact_ref(episode, "security_context", episode["identity_fact"]))
     return rows
+
+
+def _append_event_evidence(
+    evidence: list[dict[str, Any]],
+    episode: Mapping[str, Any],
+    field: str,
+) -> Mapping[str, Any] | None:
+    fact = episode.get(field)
+    if isinstance(fact, Mapping):
+        evidence.append(_fact_ref(episode, "timeline", fact))
+        return fact
+    return None
+
+
+def _fact_known_after(fact: Mapping[str, Any] | None, subject_at: datetime) -> bool | None:
+    if not isinstance(fact, Mapping) or fact.get("knowledge_at") is None:
+        return None
+    return _timestamp(fact["knowledge_at"], "fact.knowledge_at") > subject_at
 
 
 def _adjacent_pairs(rows: Sequence[Mapping[str, Any]]) -> list[list[Mapping[str, Any]]]:
@@ -559,12 +599,32 @@ def _cadence_evaluations(
             )
             continue
         prior, current = episodes
+        prior_open_fact = _append_event_evidence(
+            evidence, prior, "opening_event_fact"
+        )
+        _append_event_evidence(evidence, current, "opening_event_fact")
         prior_open = _timestamp(prior["opened_at"], "prior.opened_at")
         current_open = _timestamp(current["opened_at"], "current.opened_at")
         if prior_open == current_open:
             status, reasons = "insufficient_evidence", ["ambiguous_temporal_order"]
             facts = {
                 "prior_opened_at": prior["opened_at"],
+                "current_opened_at": current["opened_at"],
+            }
+        elif _fact_known_after(prior_open_fact, current_open) is None:
+            status, reasons = "insufficient_evidence", ["missing_required_fact"]
+            facts = {
+                "prior_opened_at": prior["opened_at"],
+                "current_opened_at": current["opened_at"],
+                "required_event_id": prior["opening_event_id"],
+            }
+        elif _fact_known_after(prior_open_fact, current_open):
+            status, reasons = "insufficient_evidence", [
+                "fact_known_after_subject_event"
+            ]
+            facts = {
+                "prior_opened_at": prior["opened_at"],
+                "prior_open_known_at": prior_open_fact["knowledge_at"],
                 "current_opened_at": current["opened_at"],
             }
         else:
@@ -632,6 +692,10 @@ def _reentry_evaluations(
             current = candidates[0]
             episodes = [prior, current]
             evidence = _base_evidence(episodes)
+            prior_close_fact = _append_event_evidence(
+                evidence, prior, "closing_event_fact"
+            )
+            _append_event_evidence(evidence, current, "opening_event_fact")
             prior_open = _timestamp(prior["opened_at"], "prior.opened_at")
             current_open = _timestamp(current["opened_at"], "current.opened_at")
             if prior_open == current_open:
@@ -654,6 +718,18 @@ def _reentry_evaluations(
                 }
                 if gap < 0:
                     status, reasons = "insufficient_evidence", ["overlapping_episodes"]
+                elif _fact_known_after(prior_close_fact, current_open) is None:
+                    status, reasons = "insufficient_evidence", [
+                        "missing_required_fact"
+                    ]
+                    facts["required_event_id"] = prior["closing_event_id"]
+                elif _fact_known_after(prior_close_fact, current_open):
+                    status, reasons = "insufficient_evidence", [
+                        "fact_known_after_subject_event"
+                    ]
+                    facts["prior_close_known_at"] = prior_close_fact[
+                        "knowledge_at"
+                    ]
                 elif gap <= threshold:
                     status, reasons = "observed", []
                 else:
@@ -746,12 +822,27 @@ def _metric_pair(
                 else "partial_or_ambiguous_source"
             )
             return "not_comparable", reason, {"metric_key": metric_key, "availability_states": sorted(states)}, evidence
-        for episode, fact in ((prior, prior_fact), (current, current_fact)):
-            known_at = fact.get("knowledge_at")
-            if known_at is not None and _timestamp(known_at, "metric.knowledge_at") > _timestamp(
-                episode["knowledge_at"], "review.knowledge_at"
-            ):
-                return "insufficient_evidence", "fact_known_after_subject_event", {"metric_key": metric_key}, evidence
+        prior_known_at = prior_fact.get("knowledge_at")
+        current_known_at = current_fact.get("knowledge_at")
+        if prior_known_at is None or current_known_at is None:
+            return "insufficient_evidence", "missing_required_fact", {"metric_key": metric_key}, evidence
+        if _timestamp(prior_known_at, "prior_metric.knowledge_at") > _timestamp(
+            current["opened_at"], "current.opened_at"
+        ):
+            return (
+                "insufficient_evidence",
+                "fact_known_after_subject_event",
+                {
+                    "metric_key": metric_key,
+                    "prior_metric_known_at": prior_known_at,
+                    "current_opened_at": current["opened_at"],
+                },
+                evidence,
+            )
+        if _timestamp(current_known_at, "current_metric.knowledge_at") > _timestamp(
+            current["knowledge_at"], "current_review.knowledge_at"
+        ):
+            return "insufficient_evidence", "fact_known_after_subject_event", {"metric_key": metric_key}, evidence
         if prior_data.get("method") != current_data.get("method"):
             return "not_comparable", "incomparable_metric_definition", {"metric_key": metric_key}, evidence
         if metric_key == "target_position_value" and prior["currency"] != current["currency"]:
@@ -863,6 +954,10 @@ def _duration_evaluations(
             status, reasons, facts = "not_applicable", ["no_adjacent_episode"], {"adjacent_episode_count": 0}
         else:
             prior, current = episodes
+            prior_close_fact = _append_event_evidence(
+                evidence, prior, "closing_event_fact"
+            )
+            _append_event_evidence(evidence, current, "closing_event_fact")
             if _timestamp(prior["opened_at"], "prior.opened_at") == _timestamp(
                 current["opened_at"], "current.opened_at"
             ):
@@ -876,6 +971,26 @@ def _duration_evaluations(
                 status, reasons, facts = "not_applicable", ["open_episode"], {
                     "prior_closed_at": prior.get("closed_at"),
                     "current_closed_at": current.get("closed_at"),
+                }
+            elif _fact_known_after(
+                prior_close_fact,
+                _timestamp(current["opened_at"], "current.opened_at"),
+            ) is None:
+                status, reasons, facts = "insufficient_evidence", [
+                    "missing_required_fact"
+                ], {
+                    "required_event_id": prior["closing_event_id"],
+                    "current_opened_at": current["opened_at"],
+                }
+            elif _fact_known_after(
+                prior_close_fact,
+                _timestamp(current["opened_at"], "current.opened_at"),
+            ):
+                status, reasons, facts = "insufficient_evidence", [
+                    "fact_known_after_subject_event"
+                ], {
+                    "prior_close_known_at": prior_close_fact["knowledge_at"],
+                    "current_opened_at": current["opened_at"],
                 }
             else:
                 prior_duration = _timestamp(prior["closed_at"], "prior.closed_at") - _timestamp(
@@ -1226,10 +1341,13 @@ def _validate_impl(artifact: Mapping[str, Any]) -> dict[str, Any]:
         chronology = evaluation.get("chronology_checks")
         if not isinstance(chronology, Mapping) or set(chronology) != {
             "knowledge_cutoff",
+            "subject_knowledge",
             "temporal_order",
         } or chronology.get("knowledge_cutoff") != "valid" or chronology.get(
             "temporal_order"
-        ) not in {"valid", "ambiguous", "overlap", "invalid"}:
+        ) not in {"valid", "ambiguous", "overlap", "invalid"} or chronology.get(
+            "subject_knowledge"
+        ) not in {"valid", "late", "not_applicable"}:
             findings.append(_finding("blocker", "CHRONOLOGY_CHECKS_MALFORMED", expected_id))
         dimensions = evaluation.get("dimensions")
         if not isinstance(dimensions, Mapping) or set(dimensions) != {

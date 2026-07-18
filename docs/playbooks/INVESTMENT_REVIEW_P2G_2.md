@@ -28,6 +28,15 @@ P2G-2 只消费一份已通过校验且状态为 `ready/verified` 的
 时间不能靠 ID 猜先后，必须返回 `insufficient_evidence / ambiguous_temporal_order`。
 重叠周期会显式记录，负 re-entry gap 不会被当作普通观察。
 
+双时间规则同样 fail-closed。cohort cutoff 合法只证明事实在冻结时点已经可见；
+当 detector 把 prior 事件或 prior 规模事实与 next episode 配对时，还必须证明
+prior fact 的 `knowledge_at <= next opened_at`。若事实是在 next episode 开始后才
+录入，evaluation 返回
+`insufficient_evidence / fact_known_after_subject_event`，并在
+`chronology_checks.subject_knowledge` 标记 `late`，不得把迟到资料当作普通先后观察。
+当前 episode 的 post-open metric 可以在该 episode 开始后形成，但仍不得晚于其
+冻结 review 的 `knowledge_at`。
+
 ## 结果状态
 
 每个 detector subject 都进入完整 evaluation ledger：
