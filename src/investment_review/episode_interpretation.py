@@ -61,9 +61,13 @@ _PSYCHOLOGY_PATTERNS = tuple(
     for pattern in (
         (
             r"\b(?:greed|fear|panic|loss aversion|psychological diagnosis|"
-            r"undisciplined|poor discipline)\b"
+            r"undisciplined|poor discipline|anxiety disorder|gambling addiction|"
+            r"addiction|personality type|revenge trader|impulsive trader)\b"
         ),
-        r"贪婪|恐惧|恐慌|纪律差|损失厌恶|心理诊断",
+        (
+            r"贪婪|恐惧|恐慌|纪律差|损失厌恶|心理诊断|心理疾病|焦虑症|"
+            r"赌博成瘾|成瘾|交易人格|人格类型|冲动型|报复型|报复性交易"
+        ),
     )
 )
 _ADVICE_PATTERNS = tuple(
@@ -75,8 +79,10 @@ _ADVICE_PATTERNS = tuple(
         r"\b(?:allocate|put)\s+\d+(?:\.\d+)?%\s+(?:of\s+)?(?:the\s+)?portfolio\b",
         r"\bposition\s+size\b.{0,12}\d+(?:\.\d+)?%",
         r"(?:建议|应该|应当|必须|立即|现在).{0,8}(?:买入|卖出|持有|加仓|减仓|清仓)",
+        r"(?:下次)?应.{0,4}(?:买入|卖出|持有|加仓|减仓|清仓)",
         r"(?:^|\n|[。！？]\s*)(?:买入|卖出|持有|加仓|减仓|清仓).{0,12}(?:。|！|？|$)",
         r"仓位.{0,6}\d+(?:\.\d+)?%",
+        r"(?:最优处理|建议|应该|应当|必须|立即|现在).{0,10}(?:退出|止损)",
     )
 )
 _SCORE_PATTERNS = tuple(
@@ -84,7 +90,15 @@ _SCORE_PATTERNS = tuple(
     for pattern in (
         r"\b(?:mechanical\s+score|overall\s+score|rating)\b.{0,8}\d",
         r"(?:机械评分|总分|综合评分|评级).{0,8}\d",
+        r"(?:纪律得分|行为得分).{0,8}\d",
         r"\bscore\s*(?::|=|is)?\s*\d+(?:\s*/\s*100)?\b",
+    )
+)
+_NUMERIC_CONFIDENCE_PATTERNS = tuple(
+    re.compile(pattern, re.IGNORECASE)
+    for pattern in (
+        r"\bconfidence(?:\s+score)?\s*(?::|=|is)?\s*\d+(?:\.\d+)?%?\b",
+        r"置信度.{0,8}\d+(?:\.\d+)?%?",
     )
 )
 _OUTCOME_QUALITY_PATTERNS = tuple(
@@ -416,8 +430,10 @@ def _strings(value: object) -> list[str]:
     return values
 
 
-def _policy_codes(sections: Mapping[str, Any]) -> set[str]:
-    material = "\n".join(_strings(sections))
+def interpretation_policy_codes(value: object) -> set[str]:
+    """Return the shared no-diagnosis/advice/score/hindsight policy codes."""
+
+    material = "\n".join(_strings(value))
     codes: set[str] = set()
     if any(pattern.search(material) for pattern in _PSYCHOLOGY_PATTERNS):
         codes.add("POLICY_PSYCHOLOGY_DIAGNOSIS")
@@ -425,11 +441,17 @@ def _policy_codes(sections: Mapping[str, Any]) -> set[str]:
         codes.add("POLICY_DIRECT_ADVICE")
     if any(pattern.search(material) for pattern in _SCORE_PATTERNS):
         codes.add("POLICY_MECHANICAL_SCORE")
+    if any(pattern.search(material) for pattern in _NUMERIC_CONFIDENCE_PATTERNS):
+        codes.add("POLICY_NUMERIC_CONFIDENCE")
     if any(pattern.search(material) for pattern in _OUTCOME_QUALITY_PATTERNS):
         codes.add("POLICY_OUTCOME_QUALITY")
     if any(pattern.search(material) for pattern in _HINDSIGHT_PRICE_PATTERNS):
         codes.add("POLICY_HINDSIGHT_PRICE")
     return codes
+
+
+def _policy_codes(sections: Mapping[str, Any]) -> set[str]:
+    return interpretation_policy_codes(sections)
 
 
 def _finding(code: str, message: str) -> dict[str, str]:
@@ -1101,6 +1123,7 @@ __all__ = [
     "facts_only_projection",
     "finding_content_id",
     "interpretation_layer_findings",
+    "interpretation_policy_codes",
     "option_content_id",
     "replay_validate_interpretation_attempt",
     "save_interpretation_attempt",

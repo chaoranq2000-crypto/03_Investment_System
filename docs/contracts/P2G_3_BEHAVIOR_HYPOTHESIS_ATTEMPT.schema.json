@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/p2g.behavior_hypothesis_attempt.v1.schema.json",
+  "title": "P2G-3 behavior hypothesis interpretation attempt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "content_id",
+    "attempt_id",
+    "status",
+    "source_observation_content_id",
+    "model_id",
+    "generated_at",
+    "raw_response_sha256",
+    "canonical_response_sha256",
+    "output_content_id",
+    "failure_codes",
+    "errors",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "p2g.behavior_hypothesis_attempt.v1"
+    },
+    "content_id": {
+      "$ref": "#/$defs/contentId"
+    },
+    "attempt_id": {
+      "type": "string",
+      "pattern": "^attempt:[0-9a-f]{32}$"
+    },
+    "status": {
+      "enum": [
+        "succeeded",
+        "provider_unavailable",
+        "invalid_response",
+        "guardrail_rejected",
+        "source_validation_failed"
+      ]
+    },
+    "source_observation_content_id": {
+      "$ref": "#/$defs/contentId"
+    },
+    "model_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "raw_response_sha256": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/contentId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "canonical_response_sha256": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/contentId"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "output_content_id": {
+      "$ref": "#/$defs/contentId"
+    },
+    "failure_codes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message",
+          "path"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "contentId": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    }
+  }
+}

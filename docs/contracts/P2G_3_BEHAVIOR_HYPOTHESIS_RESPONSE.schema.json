@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/p2g.behavior_hypothesis_response.v1.schema.json",
+  "title": "P2G-3 recorded behavior hypothesis response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "hypotheses"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "p2g.behavior_hypothesis_response.v1"
+    },
+    "hypotheses": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/hypothesisProposal"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyStringArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 10000
+      }
+    },
+    "evaluationRefArray": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^evaluation:[0-9a-f]{32}$"
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "episode_ids"
+      ],
+      "properties": {
+        "episode_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "start_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "end_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "market_contexts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        }
+      }
+    },
+    "hypothesisProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "scope",
+        "evaluation_refs",
+        "supporting_reasons",
+        "counterevidence_evaluation_refs",
+        "counterevidence_search",
+        "alternative_explanations",
+        "assumptions",
+        "uncertainty_notes",
+        "falsification_conditions",
+        "next_observations_needed",
+        "temporal_perspective"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10000
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "evaluation_refs": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/evaluationRefArray"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        },
+        "supporting_reasons": {
+          "$ref": "#/$defs/nonEmptyStringArray"
+        },
+        "counterevidence_evaluation_refs": {
+          "$ref": "#/$defs/evaluationRefArray"
+        },
+        "counterevidence_search": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 10000
+        },
+        "alternative_explanations": {
+          "$ref": "#/$defs/nonEmptyStringArray"
+        },
+        "assumptions": {
+          "$ref": "#/$defs/nonEmptyStringArray"
+        },
+        "uncertainty_notes": {
+          "$ref": "#/$defs/nonEmptyStringArray"
+        },
+        "falsification_conditions": {
+          "$ref": "#/$defs/nonEmptyStringArray"
+        },
+        "next_observations_needed": {
+          "$ref": "#/$defs/nonEmptyStringArray"
+        },
+        "temporal_perspective": {
+          "const": "retrospective"
+        }
+      }
+    }
+  }
+}

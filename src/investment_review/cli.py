@@ -27,6 +27,13 @@ from .behavior_observations import (
     save_behavior_observation_set,
     validate_behavior_observation_set,
 )
+from .behavior_hypotheses import (
+    build_behavior_hypothesis_set,
+    load_behavior_hypothesis_set,
+    replay_validate_behavior_hypothesis_set,
+    save_behavior_hypothesis_result,
+    validate_behavior_hypothesis_set,
+)
 from .episodes import (
     build_episode_collection,
     load_episode_collection,
@@ -108,6 +115,19 @@ def _load_json_documents(paths: list[str]) -> list[dict[str, Any]]:
             raise ValueError(f"{value} must contain one JSON object or an array of objects")
         documents.extend(rows)
     return documents
+
+
+def _require_distinct_paths(**values: str | None) -> None:
+    seen: dict[str, str] = {}
+    for label, value in values.items():
+        if value is None:
+            continue
+        key = str(Path(value).resolve()).casefold()
+        if key in seen:
+            raise ValueError(
+                f"{label} and {seen[key]} paths must be distinct"
+            )
+        seen[key] = label
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -528,6 +548,36 @@ def build_parser() -> argparse.ArgumentParser:
     behavior_observation_validate.add_argument("artifact")
     behavior_observation_validate.add_argument("--source-replay", action="store_true")
     behavior_observation_validate.add_argument("--cohort")
+
+    behavior_hypothesis_interpret = sub.add_parser(
+        "behavior-hypothesis-interpret",
+        help="Compile a recorded JSON response into proposed P2G-3 hypotheses",
+    )
+    behavior_hypothesis_interpret.add_argument("--artifact", required=True)
+    behavior_hypothesis_interpret.add_argument("--model-id", required=True)
+    behavior_hypothesis_interpret.add_argument("--generated-at", required=True)
+    hypothesis_response = behavior_hypothesis_interpret.add_mutually_exclusive_group(
+        required=True
+    )
+    hypothesis_response.add_argument(
+        "--model-response",
+        help="UTF-8 JSON response already recorded outside this offline command",
+    )
+    hypothesis_response.add_argument(
+        "--simulate-unavailable",
+        action="store_true",
+        help="Exercise source-observation copy-through without calling a model",
+    )
+    behavior_hypothesis_interpret.add_argument("--output", required=True)
+    behavior_hypothesis_interpret.add_argument("--attempt-output", required=True)
+
+    behavior_hypothesis_validate = sub.add_parser(
+        "behavior-hypothesis-validate",
+        help="Validate P2G-3 offline or replay exact P2G-2 evaluation bindings",
+    )
+    behavior_hypothesis_validate.add_argument("artifact")
+    behavior_hypothesis_validate.add_argument("--source-replay", action="store_true")
+    behavior_hypothesis_validate.add_argument("--observation-artifact")
 
     return parser
 
@@ -1109,6 +1159,69 @@ def main(argv: list[str] | None = None) -> int:
                 validation["validation_status"] == "blocked"
                 or artifact["release_readiness"]["status"] != "ready"
                 or artifact["source_verification"]["status"] != "verified"
+            ):
+                return 2
+        elif args.command == "behavior-hypothesis-interpret":
+            _require_distinct_paths(
+                artifact=args.artifact,
+                model_response=args.model_response,
+                output=args.output,
+                attempt_output=args.attempt_output,
+            )
+            observation_artifact = load_behavior_observation_set(args.artifact)
+            response_text = (
+                None
+                if args.simulate_unavailable
+                else Path(args.model_response).read_bytes().decode("utf-8")
+            )
+            result = build_behavior_hypothesis_set(
+                observation_artifact,
+                response_text=response_text,
+                model_id=args.model_id,
+                generated_at=args.generated_at,
+            )
+            output, attempt_output = save_behavior_hypothesis_result(
+                args.output,
+                result.artifact,
+                args.attempt_output,
+                result.attempt,
+            )
+            _print(
+                {
+                    "status": result.attempt["status"],
+                    "used_fallback": result.used_fallback,
+                    "content_id": result.artifact["content_id"],
+                    "attempt_content_id": result.attempt["content_id"],
+                    "hypothesis_count": (
+                        len(result.artifact["hypotheses"])
+                        if not result.used_fallback
+                        else 0
+                    ),
+                    "output": str(output),
+                    "attempt_output": str(attempt_output),
+                }
+            )
+        elif args.command == "behavior-hypothesis-validate":
+            artifact = load_behavior_hypothesis_set(args.artifact)
+            if args.source_replay:
+                if not args.observation_artifact:
+                    raise ValueError(
+                        "--source-replay requires --observation-artifact"
+                    )
+                validation = replay_validate_behavior_hypothesis_set(
+                    artifact,
+                    observation_artifact=load_behavior_observation_set(
+                        args.observation_artifact
+                    ),
+                )
+            else:
+                validation = validate_behavior_hypothesis_set(artifact)
+            _print(validation)
+            if (
+                validation["validation_status"] == "blocked"
+                or (artifact.get("release_readiness") or {}).get("status") != "ready"
+                or (artifact.get("source_verification") or {}).get("status")
+                != "verified"
             ):
                 return 2
         else:

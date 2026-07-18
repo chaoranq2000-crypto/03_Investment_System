@@ -156,6 +156,24 @@ P2F finding-level `reject` does not reject the immutable facts projection; an
 artifact-level rejection would require a separate explicit contract.  See
 `docs/playbooks/INVESTMENT_REVIEW_P2G_1.md`.
 
+## P2G-2/P2G-3 observation and candidate-hypothesis boundary
+
+After a P2G-1 cohort is accepted, the implementation may also:
+
+- build the deterministic `p2g.behavior_observation_set.v1` evaluation ledger;
+- consume one valid, ready and verified P2G-2 artifact plus one explicitly
+  recorded local JSON response;
+- compile only `proposed` candidate hypotheses with closed `evaluation_id`
+  references, alternatives, assumptions, uncertainty and falsification conditions;
+- preserve an independent attempt receipt and exact P2G-2 copy-through on failure;
+- validate the candidate internally and replay its exact P2G-2 evaluation bindings.
+
+P2G-3 must not call a live provider, read a database or network, infer a motive
+from one episode, diagnose psychology or personality, emit a numeric confidence
+or behavior score, produce trade/position advice, use outcome hindsight, or enter
+P2G-4 accept/reject/correct/revision. See
+`docs/playbooks/INVESTMENT_REVIEW_P2G_3.md`.
+
 ## Required workflow
 
 1. Run `python -m src.investment_review --db data/db/investment_review.sqlite3 init`.
@@ -243,6 +261,19 @@ For an approved P2G-1 cohort run:
     identical bytes/content ID for the same cutoff-visible logical inputs.
 36. Save create-only, query without derivation, and replay from explicit P2F sources;
     blocked/not-ready/unverified states must return a non-zero CLI exit code.
+
+For an approved P2G-2/P2G-3 run:
+
+37. Build and validate P2G-2 only from one ready/verified P2G-1 cohort, preserving
+    every observed, not-observed, insufficient, incomparable and inapplicable state.
+38. Supply the exact ready/verified P2G-2 artifact and one strict recorded JSON
+    response; do not call a provider or reopen any source database.
+39. Require support refs to resolve to `observed` evaluations, counterevidence to
+    resolve or have an explicit search note, and scope episodes to match the refs.
+40. Generate content-derived IDs, save the artifact and attempt as a create-only
+    pair, and source-replay every frozen evaluation projection.
+41. On unavailable, invalid or unsafe responses, preserve the P2G-2 object exactly
+    and emit only the attempt receipt; do not publish partial hypotheses or enter P2G-4.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate
