@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r5_bundle17r_bf2_ex1_manifest_v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "bundle_id",
+    "source_baseline_commit",
+    "policy_path",
+    "inputs",
+    "result_specs_dir",
+    "output_dropzone",
+    "output_dir"
+  ],
+  "properties": {
+    "schema_version": {"const": "r5_bundle17r_bf2_ex1_manifest_v1"},
+    "bundle_id": {"type": "string", "minLength": 1},
+    "source_baseline_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "as_of": {"type": "string"},
+    "policy_path": {"type": "string", "minLength": 1},
+    "inputs": {
+      "type": "object",
+      "required": ["generation_lock", "work_orders", "issue_ledger"],
+      "properties": {
+        "generation_lock": {"$ref": "#/$defs/binding"},
+        "work_orders": {"$ref": "#/$defs/binding"},
+        "issue_ledger": {"$ref": "#/$defs/binding"}
+      },
+      "additionalProperties": false
+    },
+    "result_specs_dir": {"type": "string", "minLength": 1},
+    "output_dropzone": {"type": "string", "minLength": 1},
+    "output_dir": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "binding": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

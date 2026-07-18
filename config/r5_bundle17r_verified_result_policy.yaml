@@ -1,0 +1,66 @@
+schema_version: r5_bundle17r_bf2_ex1_policy_v1
+require_generation_lock_coverage: true
+allowed_source_roots:
+  - .local/
+  - data/
+  - reports/
+  - bundle14r/
+  - bundle15r/
+  - bundle16r/
+  - bundle17r/
+  - src/
+  - tests/
+  - docs/
+  - config/
+allowed_repo_prefixes:
+  - .agents/
+  - .github/workflows/
+  - config/
+  - data/
+  - decisions/
+  - docs/
+  - reports/
+  - schemas/
+  - scripts/
+  - src/
+  - templates/
+  - tests/
+repo_candidate_extensions:
+  - .csv
+  - .html
+  - .json
+  - .md
+  - .py
+  - .toml
+  - .txt
+  - .yaml
+  - .yml
+archive_extensions:
+  - .zip
+  - .png
+  - .jpg
+  - .jpeg
+  - .webp
+  - .log
+reject_path_patterns:
+  - '*__pycache__*'
+  - '*.pyc'
+  - '*.pyo'
+  - '*.tmp'
+  - '*.temp'
+  - '*.bak'
+  - '*.orig'
+  - '*.rej'
+  - '*.env*'
+  - '*credentials*'
+  - '*secret*'
+  - '*token*'
+  - '*node_modules*'
+  - '*.DS_Store'
+  - '*个股研究报告样例*'
+  - '*个股研究案例样例*'
+manual_routes:
+  - official_evidence_acquisition_review
+  - evidence_mapping_qualification
+  - human_review_handoff
+  - manual_orchestrator_triage

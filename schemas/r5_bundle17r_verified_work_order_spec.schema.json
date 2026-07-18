@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r5_bundle17r_bf2_ex1_work_order_spec_v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "work_order_id",
+    "execution_status",
+    "resolved_blocker_ids",
+    "checks",
+    "produced_artifacts"
+  ],
+  "properties": {
+    "schema_version": {"const": "r5_bundle17r_bf2_ex1_work_order_spec_v1"},
+    "work_order_id": {"type": "string", "minLength": 1},
+    "case_id": {"type": "string"},
+    "execution_status": {
+      "enum": [
+        "passed",
+        "complete",
+        "completed",
+        "engineering_pass",
+        "failed",
+        "rejected",
+        "error",
+        "pending",
+        "manual_pending",
+        "needs_manual_route"
+      ]
+    },
+    "resolved_blocker_ids": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "acceptance_check", "status", "verifier", "evidence"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "acceptance_check": {"type": "string", "minLength": 1},
+          "status": {"enum": ["passed", "complete", "completed", "engineering_pass"]},
+          "verifier": {"type": "string", "minLength": 1},
+          "evidence": {
+            "type": "object",
+            "required": ["source_root", "path", "sha256", "kind"],
+            "properties": {
+              "source_root": {"enum": ["repo", "spec_dir"]},
+              "path": {"type": "string", "minLength": 1},
+              "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "kind": {"type": "string", "minLength": 1}
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "produced_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_root", "path", "sha256", "disposition"],
+        "properties": {
+          "source_root": {"enum": ["repo", "spec_dir"]},
+          "path": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "disposition": {"enum": ["repo_candidate", "archive_only", "local_only"]},
+          "promotion_target": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "manual_attestation": {
+      "type": "object",
+      "required": ["reviewer", "signed", "source_root", "attestation_path", "attestation_sha256"],
+      "properties": {
+        "reviewer": {"type": "string", "minLength": 1},
+        "signed": {"const": true},
+        "source_root": {"enum": ["repo", "spec_dir"]},
+        "attestation_path": {"type": "string", "minLength": 1},
+        "attestation_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

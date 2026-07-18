@@ -1,0 +1,18 @@
+schema_version: r5_bundle17r_bf2_ex1_manifest_v1
+bundle_id: R5_bundle17r_BF2_EX1_verified_result_materialization
+source_baseline_commit: 07088cf73f031858cc0bae92129ea86a1cd16a93
+as_of: '2026-07-18'
+policy_path: config/r5_bundle17r_verified_result_policy.yaml
+inputs:
+  generation_lock:
+    path: reports/p1_6/r5_bundle17r/R5_bundle17r_backflow_generation_lock.json
+    sha256: REPLACE_WITH_EXACT_SHA256
+  work_orders:
+    path: reports/p1_6/r5_bundle17r/R5_bundle17r_backflow_work_orders.csv
+    sha256: REPLACE_WITH_EXACT_SHA256
+  issue_ledger:
+    path: reports/p1_6/r5_bundle17r/R5_bundle17r_backflow_issue_ledger.csv
+    sha256: REPLACE_WITH_EXACT_SHA256
+result_specs_dir: .local/r5_bundle17r_verified_result_specs
+output_dropzone: .local/r5_bundle17r_backflow_results
+output_dir: reports/p1_6/r5_bundle17r_bf2_ex1

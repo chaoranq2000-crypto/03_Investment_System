@@ -1,0 +1,25 @@
+schema_version: r5_bundle17r_bf2_ex1_work_order_spec_v1
+work_order_id: REPLACE_WITH_EXACT_BF1_WORK_ORDER_ID
+case_id: REPLACE_WITH_EXACT_CASE_ID
+execution_status: pending
+resolved_blocker_ids: []
+checks: []
+produced_artifacts: []
+# A passed check must bind the exact BF1 acceptance-check text and a physical evidence hash:
+# checks:
+#   - id: focused_tests
+#     acceptance_check: REPLACE_WITH_EXACT_ACCEPTANCE_CHECK_TEXT
+#     status: passed
+#     verifier: pytest
+#     evidence:
+#       source_root: repo   # repo | spec_dir
+#       path: reports/path/to/test_report.json
+#       sha256: REPLACE_WITH_EXACT_SHA256
+#       kind: test_report
+# For reviewer-owned routes, a passed spec also requires:
+# manual_attestation:
+#   reviewer: REPLACE_WITH_REAL_REVIEWER
+#   signed: true
+#   source_root: repo
+#   attestation_path: reports/path/to/attestation.yaml
+#   attestation_sha256: REPLACE_WITH_EXACT_SHA256
