@@ -1099,16 +1099,21 @@ def test_cli_rejects_input_output_alias_and_incomplete_source_replay(
     assert "requires --observation-artifact" in capsys.readouterr().err
 
 
-def test_cli_help_exposes_only_p2g3_interpret_and_validate() -> None:
+def test_cli_help_preserves_p2g3_and_exposes_explicit_p2g4_audit_commands() -> None:
     parser = build_parser()
     subparsers = next(
         action for action in parser._actions if action.dest == "command"
     )
     choices = set(subparsers.choices)
-    assert "behavior-hypothesis-interpret" in choices
-    assert "behavior-hypothesis-validate" in choices
+    assert {
+        "behavior-hypothesis-interpret",
+        "behavior-hypothesis-review",
+        "behavior-hypothesis-render",
+        "behavior-hypothesis-diff",
+        "behavior-hypothesis-revision-list",
+        "behavior-hypothesis-validate",
+    }.issubset(choices)
     assert not any("hypothesis-correct" in item for item in choices)
-    assert not any("hypothesis-revision" in item for item in choices)
 
 
 def test_artifact_contains_no_machine_path_or_binary_float(

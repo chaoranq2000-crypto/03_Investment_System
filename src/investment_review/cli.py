@@ -41,6 +41,13 @@ from .behavior_hypothesis_review import (
     replay_validate_behavior_hypothesis_revision,
     save_behavior_hypothesis_revision,
     validate_behavior_hypothesis_revision,
+    validate_behavior_hypothesis_revision_chain,
+)
+from .behavior_hypothesis_audit import (
+    diff_behavior_hypothesis_revisions,
+    list_behavior_hypothesis_revisions,
+    render_behavior_hypothesis_revision_markdown,
+    save_behavior_hypothesis_markdown,
 )
 from .episodes import (
     build_episode_collection,
@@ -587,6 +594,26 @@ def build_parser() -> argparse.ArgumentParser:
     behavior_hypothesis_review.add_argument("--request", required=True)
     behavior_hypothesis_review.add_argument("--observation-artifact", required=True)
     behavior_hypothesis_review.add_argument("--output", required=True)
+
+    behavior_hypothesis_render = sub.add_parser(
+        "behavior-hypothesis-render",
+        help="Render one validated P2G-4 revision as escaped Markdown",
+    )
+    behavior_hypothesis_render.add_argument("--artifact", required=True)
+    behavior_hypothesis_render.add_argument("--output", required=True)
+
+    behavior_hypothesis_diff = sub.add_parser(
+        "behavior-hypothesis-diff",
+        help="Show real field changes between two P2G-4 revisions",
+    )
+    behavior_hypothesis_diff.add_argument("before")
+    behavior_hypothesis_diff.add_argument("after")
+
+    behavior_hypothesis_revision_list = sub.add_parser(
+        "behavior-hypothesis-revision-list",
+        help="Validate and list a complete non-forking P2G-4 revision chain",
+    )
+    behavior_hypothesis_revision_list.add_argument("artifact", nargs="+")
 
     behavior_hypothesis_validate = sub.add_parser(
         "behavior-hypothesis-validate",
@@ -1263,7 +1290,7 @@ def main(argv: list[str] | None = None) -> int:
                     args.observation_artifact
                 ),
             )
-            output = save_behavior_hypothesis_revision(args.output, revised)
+            save_behavior_hypothesis_revision(args.output, revised)
             _print(
                 {
                     "status": "accepted",
@@ -1279,7 +1306,38 @@ def main(argv: list[str] | None = None) -> int:
                             if event["request_id"] == revised["revision"]["request_id"]
                         ]
                     ),
-                    "output": str(output),
+                    "output_created": True,
+                }
+            )
+        elif args.command == "behavior-hypothesis-render":
+            artifact = load_behavior_hypothesis_artifact(args.artifact)
+            rendered = render_behavior_hypothesis_revision_markdown(artifact)
+            save_behavior_hypothesis_markdown(args.output, rendered)
+            _print(
+                {
+                    "status": "accepted",
+                    "content_id": artifact["content_id"],
+                    "revision_no": artifact["revision"]["revision_no"],
+                    "output_created": True,
+                }
+            )
+        elif args.command == "behavior-hypothesis-diff":
+            _print(
+                diff_behavior_hypothesis_revisions(
+                    load_behavior_hypothesis_artifact(args.before),
+                    load_behavior_hypothesis_artifact(args.after),
+                )
+            )
+        elif args.command == "behavior-hypothesis-revision-list":
+            artifacts = [
+                load_behavior_hypothesis_artifact(path) for path in args.artifact
+            ]
+            _print(
+                {
+                    "validation": validate_behavior_hypothesis_revision_chain(
+                        artifacts
+                    ),
+                    "revisions": list_behavior_hypothesis_revisions(artifacts),
                 }
             )
         else:

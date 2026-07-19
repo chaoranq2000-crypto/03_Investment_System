@@ -1395,11 +1395,11 @@ def save_behavior_hypothesis_revision(
         raise BehaviorHypothesisReviewError("refusing to save an invalid revision")
     output = Path(path)
     if output.exists():
-        raise BehaviorHypothesisReviewError(f"output already exists: {output}")
+        raise BehaviorHypothesisReviewError("revision output already exists")
     try:
         return atomic_create_bytes(output, pretty_json_bytes(artifact))
     except (ArtifactIOError, OSError) as exc:
-        raise BehaviorHypothesisReviewError(str(exc)) from exc
+        raise BehaviorHypothesisReviewError("failed to create revision output") from exc
 
 
 def load_behavior_hypothesis_artifact(path: str | Path) -> dict[str, Any]:
