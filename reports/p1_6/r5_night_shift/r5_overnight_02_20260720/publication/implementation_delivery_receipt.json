@@ -1,0 +1,18 @@
+{
+  "ci_portability_fix_run": {
+    "head_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+    "run_id": "29680797150",
+    "status": "success"
+  },
+  "full_regression_receipt_sha256": "5f95c57071ced8d5819477fac855c028b3e3c2c6d176ace4a16ff5c6267689f3",
+  "identity_phase": "pre_publication",
+  "implementation_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+  "implementation_tree_sha": "4738f70e284f954a83fe4f4b629bad1614d04255",
+  "mission_id": "r5_overnight_02_20260720",
+  "passed_task_count": 38,
+  "pending_publication_task_count": 2,
+  "publication_head": null,
+  "schema_version": "r5_night_shift_implementation_delivery_receipt_v1",
+  "stable_receipt_sha256": "f10b5114bb00e4b2de8ef156171648f2819940e6343597d65eb18f0d97aa1def",
+  "task_acceptance_summary_sha256": "bbc3d157a0dc9109d97821957da8572c3299a6ecebf9e5e1d9042c51cb79a838"
+}

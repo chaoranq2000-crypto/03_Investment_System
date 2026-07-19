@@ -1,0 +1,64 @@
+{
+  "attempt": 1,
+  "blocker_occurrences": {
+    "claimed": 0,
+    "resolved": 0,
+    "unchanged": 0
+  },
+  "changed_paths": [
+    "codex_tasks/night_shift/r5_overnight_02_20260720/EXECPLAN.md",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/expansion_receipt.json",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/receipts/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/",
+    "src/maintenance/night_shift/backflow.py",
+    "src/maintenance/night_shift/readout.py",
+    "src/maintenance/night_shift/runner.py",
+    "tests/test_r5_night_shift_readout.py"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_r5_night_shift_outcome.py"
+      ],
+      "command": "python -m pytest -q tests/test_r5_night_shift_outcome.py",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 100,
+      "stdout_sha256": "5b581b8146eb94de21ac38ae754c4decbb7c1318ce5c8295dbbc36c62bd0ed63",
+      "stdout_summary": "...                                                                      [100%]\n3 passed in 0.05s"
+    }
+  ],
+  "cwd": "C:\\Projects\\03_Investment_System_night02",
+  "executor": "codex",
+  "exit_code": 0,
+  "finished_at": "2026-07-19T09:11:47.099257+00:00",
+  "implementation_identity": {
+    "commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+    "publication_head": null,
+    "tree_sha": "4738f70e284f954a83fe4f4b629bad1614d04255"
+  },
+  "local_commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+  "reason": "Night02 final implementation acceptance",
+  "remote_commit_sha": null,
+  "required_artifacts": [
+    {
+      "path": "tests/test_r5_night_shift_outcome.py",
+      "present": true,
+      "sha256": "52aa5a7065f84666de8528a056a99431b4c98347c6a975891c886f714d6e61d4",
+      "size_bytes": 1727
+    }
+  ],
+  "run_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_execution_receipt_v1",
+  "stable_receipt_sha256": "52b0610acc5fea4212337c85aa62677f13aef106a2566246f9b44658be7303fc",
+  "started_at": "2026-07-19T09:11:46.685378+00:00",
+  "task_id": "ns02_t10_mission_outcome_model",
+  "terminal_status": "passed"
+}

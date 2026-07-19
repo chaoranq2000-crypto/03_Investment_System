@@ -1,0 +1,66 @@
+{
+  "attempt": 1,
+  "blocker_occurrences": {
+    "claimed": 0,
+    "resolved": 0,
+    "unchanged": 0
+  },
+  "changed_paths": [
+    "codex_tasks/night_shift/r5_overnight_02_20260720/EXECPLAN.md",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/expansion_receipt.json",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/receipts/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/",
+    "src/maintenance/night_shift/backflow.py",
+    "src/maintenance/night_shift/readout.py",
+    "src/maintenance/night_shift/runner.py",
+    "tests/test_r5_night_shift_readout.py"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_r5_night_shift_crash_recovery.py",
+        "tests/test_r5_night_shift_resume.py",
+        "tests/test_r5_night_shift_lock.py"
+      ],
+      "command": "python -m pytest -q tests/test_r5_night_shift_crash_recovery.py tests/test_r5_night_shift_resume.py tests/test_r5_night_shift_lock.py",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 100,
+      "stdout_sha256": "9093d54793293a7217ce031999c019ff67210264b9533d4bb1e0e217e038ec8a",
+      "stdout_summary": ".......                                                                  [100%]\n7 passed in 0.36s"
+    }
+  ],
+  "cwd": "C:\\Projects\\03_Investment_System_night02",
+  "executor": "codex",
+  "exit_code": 0,
+  "finished_at": "2026-07-19T09:12:34.232775+00:00",
+  "implementation_identity": {
+    "commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+    "publication_head": null,
+    "tree_sha": "4738f70e284f954a83fe4f4b629bad1614d04255"
+  },
+  "local_commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+  "reason": "Night02 final implementation acceptance",
+  "remote_commit_sha": null,
+  "required_artifacts": [
+    {
+      "path": "tests/test_r5_night_shift_crash_recovery.py",
+      "present": true,
+      "sha256": "3f51bb60ff31bc4d42925e8f1db5995f050953612362a20e2e80746864970d56",
+      "size_bytes": 3398
+    }
+  ],
+  "run_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_execution_receipt_v1",
+  "stable_receipt_sha256": "b61410b13f6c18ec62f25db644a24a335f34d50fac4c9fa1ef2421942389f1ae",
+  "started_at": "2026-07-19T09:12:33.500154+00:00",
+  "task_id": "ns02_t41_crash_cutoff_resume_tests",
+  "terminal_status": "passed"
+}

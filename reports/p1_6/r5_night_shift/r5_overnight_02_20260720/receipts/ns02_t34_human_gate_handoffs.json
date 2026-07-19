@@ -1,0 +1,64 @@
+{
+  "attempt": 1,
+  "blocker_occurrences": {
+    "claimed": 0,
+    "resolved": 0,
+    "unchanged": 0
+  },
+  "changed_paths": [
+    "codex_tasks/night_shift/r5_overnight_02_20260720/EXECPLAN.md",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/expansion_receipt.json",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/receipts/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/",
+    "src/maintenance/night_shift/backflow.py",
+    "src/maintenance/night_shift/readout.py",
+    "src/maintenance/night_shift/runner.py",
+    "tests/test_r5_night_shift_readout.py"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_r5_night_shift_human_gate.py"
+      ],
+      "command": "python -m pytest -q tests/test_r5_night_shift_human_gate.py",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 100,
+      "stdout_sha256": "97f5adfb2ec9975df6d998bc11af616286bd89a5feba3be34a12c5039d829f43",
+      "stdout_summary": ".                                                                        [100%]\n1 passed in 0.12s"
+    }
+  ],
+  "cwd": "C:\\Projects\\03_Investment_System_night02",
+  "executor": "codex",
+  "exit_code": 0,
+  "finished_at": "2026-07-19T09:12:20.794439+00:00",
+  "implementation_identity": {
+    "commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+    "publication_head": null,
+    "tree_sha": "4738f70e284f954a83fe4f4b629bad1614d04255"
+  },
+  "local_commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+  "reason": "Night02 final implementation acceptance",
+  "remote_commit_sha": null,
+  "required_artifacts": [
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/human_gate_handoffs.yaml",
+      "present": true,
+      "sha256": "aded8a14c001f1b9daec65d57424a8d05c37ca6d2750458aeb4385d6806d52a6",
+      "size_bytes": 1800
+    }
+  ],
+  "run_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_execution_receipt_v1",
+  "stable_receipt_sha256": "f3b32c71cfb59f928344e9a709c1a2c4774d0704a7dafda53787709eb6f1ba2b",
+  "started_at": "2026-07-19T09:12:20.307134+00:00",
+  "task_id": "ns02_t34_human_gate_handoffs",
+  "terminal_status": "passed"
+}

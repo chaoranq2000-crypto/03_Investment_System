@@ -1,0 +1,64 @@
+{
+  "attempt": 1,
+  "blocker_occurrences": {
+    "claimed": 0,
+    "resolved": 0,
+    "unchanged": 0
+  },
+  "changed_paths": [
+    "codex_tasks/night_shift/r5_overnight_02_20260720/EXECPLAN.md",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/expansion_receipt.json",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/receipts/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/",
+    "src/maintenance/night_shift/backflow.py",
+    "src/maintenance/night_shift/readout.py",
+    "src/maintenance/night_shift/runner.py",
+    "tests/test_r5_night_shift_readout.py"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_r5_night_shift_semantic_fixture_contract.py"
+      ],
+      "command": "python -m pytest -q tests/test_r5_night_shift_semantic_fixture_contract.py",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 100,
+      "stdout_sha256": "8ad57cbc4d8db15412b66082549e8911659560cbb57b5b814b8a722c2227bc6f",
+      "stdout_summary": ".                                                                        [100%]\n1 passed in 0.08s"
+    }
+  ],
+  "cwd": "C:\\Projects\\03_Investment_System_night02",
+  "executor": "codex",
+  "exit_code": 0,
+  "finished_at": "2026-07-19T09:12:44.366212+00:00",
+  "implementation_identity": {
+    "commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+    "publication_head": null,
+    "tree_sha": "4738f70e284f954a83fe4f4b629bad1614d04255"
+  },
+  "local_commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+  "reason": "Night02 final implementation acceptance",
+  "remote_commit_sha": null,
+  "required_artifacts": [
+    {
+      "path": "tests/test_r5_night_shift_semantic_fixture_contract.py",
+      "present": true,
+      "sha256": "6c3672733053a98629e2c108def4e32129d45c9a7db6bb2472d570d430e2b72b",
+      "size_bytes": 642
+    }
+  ],
+  "run_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_execution_receipt_v1",
+  "stable_receipt_sha256": "0ff66868b3e31cfb04a2b2cd6f71aa85c52c1751328753be5b35872c1d5f9c5b",
+  "started_at": "2026-07-19T09:12:43.941573+00:00",
+  "task_id": "ns02_t51_semantic_quality_negative_fixtures",
+  "terminal_status": "passed"
+}

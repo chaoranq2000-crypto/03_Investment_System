@@ -1,0 +1,83 @@
+{
+  "attempt": 1,
+  "blocker_occurrences": {
+    "claimed": 0,
+    "resolved": 0,
+    "unchanged": 0
+  },
+  "changed_paths": [
+    "codex_tasks/night_shift/r5_overnight_02_20260720/EXECPLAN.md",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/expansion_receipt.json",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/receipts/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/",
+    "src/maintenance/night_shift/backflow.py",
+    "src/maintenance/night_shift/readout.py",
+    "src/maintenance/night_shift/runner.py",
+    "tests/test_r5_night_shift_readout.py"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-c",
+        "from pathlib import Path; assert Path('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.md').is_file()"
+      ],
+      "command": "python -c \"from pathlib import Path; assert Path('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.md').is_file()\"",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_summary": ""
+    },
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-c",
+        "import json; d=json.load(open('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.json', encoding='utf-8')); assert d['final_sha'] == '4340945457d661ed62967e949f862ccf2214aff2'; assert d['truth']['resolved_blockers'] == 0"
+      ],
+      "command": "python -c \"import json; d=json.load(open('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.json', encoding='utf-8')); assert d['final_sha'] == '4340945457d661ed62967e949f862ccf2214aff2'; assert d['truth']['resolved_blockers'] == 0\"",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_summary": ""
+    }
+  ],
+  "cwd": "C:\\Projects\\03_Investment_System_night02",
+  "executor": "codex",
+  "exit_code": 0,
+  "finished_at": "2026-07-19T09:11:40.542809+00:00",
+  "implementation_identity": {
+    "commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+    "publication_head": null,
+    "tree_sha": "4738f70e284f954a83fe4f4b629bad1614d04255"
+  },
+  "local_commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+  "reason": "Night02 final implementation acceptance",
+  "remote_commit_sha": null,
+  "required_artifacts": [
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.json",
+      "present": true,
+      "sha256": "06894e6bf2964d7b2b192bf7d8a70049a44e6f41574f342f6a13b88aeba59229",
+      "size_bytes": 1133
+    },
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.md",
+      "present": true,
+      "sha256": "df3f714f74a1351a6c3ed67fc71286fa571ebb5bd4f7baa92496722bf3ba9f09",
+      "size_bytes": 1155
+    }
+  ],
+  "run_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_execution_receipt_v1",
+  "stable_receipt_sha256": "8f4045ffd7becc2a9a0075999dca35fcb6ec4a2cc9964557df80e4f80c21ef2b",
+  "started_at": "2026-07-19T09:11:40.466231+00:00",
+  "task_id": "ns02_t01_night01_completion_audit",
+  "terminal_status": "passed"
+}

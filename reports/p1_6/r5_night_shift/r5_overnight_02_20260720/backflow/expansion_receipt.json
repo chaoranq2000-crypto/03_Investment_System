@@ -1,4 +1,6 @@
 {
+  "blocker_occurrences_resolved": 0,
+  "blocker_occurrences_total": 63,
   "classification_counts": {
     "analysis_required": 24,
     "dependency_blocked": 20,
@@ -15,5 +17,6 @@
   "schema_version": "r5_night_shift_bf2_expansion_receipt_v1",
   "seeded_task_count": 69,
   "source_commit": "4340945457d661ed62967e949f862ccf2214aff2",
-  "stable_receipt_sha256": "e3d5208daa559ee3b97490f1253a76f6ffb39fa2be7d1f07daa7e55c2cb2adc4"
+  "stable_receipt_sha256": "ef5c65962a023f43671b3511292bea2407d88a51ca4d29d40b73bedc8ad8b3a8",
+  "work_orders_pending": 6
 }

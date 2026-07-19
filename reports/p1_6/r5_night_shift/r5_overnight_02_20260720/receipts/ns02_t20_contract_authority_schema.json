@@ -1,0 +1,65 @@
+{
+  "attempt": 1,
+  "blocker_occurrences": {
+    "claimed": 0,
+    "resolved": 0,
+    "unchanged": 0
+  },
+  "changed_paths": [
+    "codex_tasks/night_shift/r5_overnight_02_20260720/EXECPLAN.md",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/expansion_receipt.json",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/receipts/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/",
+    "src/maintenance/night_shift/backflow.py",
+    "src/maintenance/night_shift/readout.py",
+    "src/maintenance/night_shift/runner.py",
+    "tests/test_r5_night_shift_readout.py"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_r5_night_shift_contract.py",
+        "tests/test_r5_night_shift_authority.py"
+      ],
+      "command": "python -m pytest -q tests/test_r5_night_shift_contract.py tests/test_r5_night_shift_authority.py",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 100,
+      "stdout_sha256": "f5819501fcd4acb7045b5a20d944b713e1e37bd63978646949b05211537a2b77",
+      "stdout_summary": ".........                                                                [100%]\n9 passed in 0.24s"
+    }
+  ],
+  "cwd": "C:\\Projects\\03_Investment_System_night02",
+  "executor": "codex",
+  "exit_code": 0,
+  "finished_at": "2026-07-19T09:12:00.124521+00:00",
+  "implementation_identity": {
+    "commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+    "publication_head": null,
+    "tree_sha": "4738f70e284f954a83fe4f4b629bad1614d04255"
+  },
+  "local_commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+  "reason": "Night02 final implementation acceptance",
+  "remote_commit_sha": null,
+  "required_artifacts": [
+    {
+      "path": "tests/test_r5_night_shift_authority.py",
+      "present": true,
+      "sha256": "ec0498d1e6ed7567867e9b5b9794c6c44d7f66139d5e01d9e249ae1482b9e1dc",
+      "size_bytes": 2390
+    }
+  ],
+  "run_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_execution_receipt_v1",
+  "stable_receipt_sha256": "c681eb22cba8a9005d8242a31ef5493c9892e5f9978aab7e73960af028d04509",
+  "started_at": "2026-07-19T09:11:59.527137+00:00",
+  "task_id": "ns02_t20_contract_authority_schema",
+  "terminal_status": "passed"
+}

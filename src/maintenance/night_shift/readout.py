@@ -10,11 +10,12 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .models import ContractError, QueueDocument, Task
+from .outcome import evaluate_mission_outcome
 from .queue import atomic_write, load_queue, queue_bytes, save_queue
 from .receipts import canonical_json_bytes, sha256_bytes, sha256_file
 
 
-MORNING_SCHEMA_VERSION = "r5_night_shift_morning_readout_v1"
+MORNING_SCHEMA_VERSION = "r5_night_shift_morning_readout_v2"
 SCOPE_SCHEMA_VERSION = "r5_night_shift_scope_audit_v1"
 DETERMINISM_SCHEMA_VERSION = "r5_night_shift_determinism_receipt_v1"
 
@@ -152,6 +153,15 @@ def build_next_queue(inventory: Mapping[str, Any], *, source_commit: str) -> Que
         return replace(
             queue,
             mission_id="r5_overnight_03_targeted_backflow",
+            baseline={
+                **queue.baseline,
+                "tracked_implementation_commit": source_commit,
+                "source_commit_policy": "resolve_final_remote_head_from_publication_receipt",
+                "publication_receipt": (
+                    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/"
+                    "publication/remote_delivery_receipt.json"
+                ),
+            },
             program_goal={
                 "id": "r5_bundle17r_bf2_four_case_activation",
                 "state": "open_needs_targeted_backflow",
@@ -333,6 +343,7 @@ def build_morning_payload(
     scope_audit: Mapping[str, Any],
     branch: Mapping[str, Any],
     next_queue: QueueDocument,
+    publication: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     status_counts = Counter(task.status for task in mission_state.tasks)
     validation = [
@@ -356,9 +367,48 @@ def build_morning_payload(
             "stderr_sha256": None,
         }
     )
+    publication_value = dict(publication or {})
+    ci_verified = publication_value.get("ci_status") == "success"
+    remote_verified = bool(publication_value.get("remote_sha_equals_local"))
+    branch_pushed = bool(publication_value.get("publication_head"))
+    mission_outcome = evaluate_mission_outcome(
+        mission_state.tasks,
+        branch_pushed=branch_pushed,
+        remote_sha_matches=remote_verified,
+        ci_verified=ci_verified,
+    ).value
+    goal = dict(
+        mission_state.program_goal
+        or mission_state.long_term_goal
+        or {
+            "id": "r5_bundle17r_bf2_four_case_activation",
+            "close_allowed": False,
+            "this_mission_may_close_goal": False,
+        }
+    )
+    goal.update(
+        {
+            "state": "open_needs_targeted_backflow",
+            "close_allowed": False,
+            "this_mission_may_close_goal": False,
+            "work_orders_pending": 6,
+            "blocker_occurrences_resolved": 0,
+            "blocker_occurrences_total": 63,
+        }
+    )
     payload: dict[str, Any] = {
         "schema_version": MORNING_SCHEMA_VERSION,
         "run_id": run_id,
+        "mission_outcome": mission_outcome,
+        "program_goal": goal,
+        "publication_identity": {
+            **publication_value,
+            "authoritative_receipt_path": (
+                "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/"
+                "publication/remote_delivery_receipt.json"
+            ),
+            "resolution_policy": "authoritative_post_push_receipt_overrides_embedded_snapshot",
+        },
         "baseline": dict(baseline),
         "branch": {key: value for key, value in branch.items() if key != "commits"},
         "task_summary": {
@@ -404,6 +454,9 @@ def build_morning_payload(
     }
     required = {
         "run_id",
+        "mission_outcome",
+        "program_goal",
+        "publication_identity",
         "baseline",
         "branch",
         "task_summary",
@@ -429,6 +482,14 @@ def markdown_bytes(payload: Mapping[str, Any]) -> bytes:
     lines = [
         f"# R5 Night Shift Morning Readout — {payload['run_id']}",
         "",
+        "## 0. Mission outcome 与长期 Goal",
+        "",
+        f"- Night02 mission outcome: `{payload['mission_outcome']}`",
+        f"- Long-term program goal: `{payload['program_goal']['state']}`",
+        f"- Program goal close allowed: `{str(bool(payload['program_goal']['close_allowed'])).lower()}`",
+        "- Research truth: `6 work orders pending; 0/63 blocker occurrences resolved`",
+        "- Final publication identity: `publication/remote_delivery_receipt.json`（post-push 事实源）",
+        "",
         "## 1. Baseline",
         "",
         f"- Source branch: `{payload['baseline'].get('source_branch')}`",
@@ -437,6 +498,7 @@ def markdown_bytes(payload: Mapping[str, Any]) -> bytes:
         f"- Local SHA: `{branch.get('local_sha')}`",
         f"- Remote SHA: `{branch.get('remote_sha') or 'NOT_PUSHED_AT_READOUT_TIME'}`",
         f"- Local/remote SHA equality: `{str(bool(branch.get('remote_sha_equals_local'))).lower()}`",
+        f"- Embedded CI status: `{payload['publication_identity'].get('ci_status') or 'not_verified'}`",
         "",
         "## 2. Completed tasks",
         "",
@@ -516,6 +578,7 @@ def generate_morning_readout(
     output_path: Path,
     output_json_path: Path,
     next_queue_path: Path,
+    publication_receipt_path: Path | None = None,
     assert_idempotent: bool = False,
 ) -> dict[str, Any]:
     baseline = load_json(baseline_path)
@@ -525,6 +588,11 @@ def generate_morning_readout(
     determinism_receipt = load_json(determinism_receipt_path)
     scope = load_json(scope_audit_path)
     inventory = load_json(inventory_path)
+    publication = (
+        load_json(publication_receipt_path)
+        if publication_receipt_path is not None
+        else {}
+    )
     snapshot = branch_snapshot(
         repo_root,
         baseline_sha=str(baseline["expected_source_sha"]),
@@ -541,6 +609,7 @@ def generate_morning_readout(
         scope_audit=scope,
         branch=snapshot,
         next_queue=next_queue,
+        publication=publication,
     )
     readout = markdown_bytes(payload)
     payload_bytes = (
@@ -558,6 +627,7 @@ def generate_morning_readout(
             scope_audit=scope,
             branch=snapshot,
             next_queue=next_queue,
+            publication=publication,
         )
         if markdown_bytes(check_payload) != readout:
             raise ContractError("morning readout double run is not byte-for-byte deterministic")

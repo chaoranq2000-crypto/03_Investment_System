@@ -1,0 +1,58 @@
+schema_version: r5_night_shift_bundle18_precheck_v1
+overall_status: not_ready
+auto_trigger: false
+auto_accept: false
+cases:
+- case_id: golden_copper_foil_product_generation
+  checks:
+    candidate_artifacts_present: true
+    physical_hashes_match: true
+    generation_ids_complete: false
+    candidate_ready_boolean_true: false
+    regression_research_ready_boolean_true: false
+    human_review_pending: true
+    sample_quality_closed: true
+    p2_closed: true
+  eligible_for_exact_hash_review: false
+  status: not_ready
+- case_id: golden_crdmo_backlog_conversion
+  checks:
+    candidate_artifacts_present: true
+    physical_hashes_match: true
+    generation_ids_complete: false
+    candidate_ready_boolean_true: false
+    regression_research_ready_boolean_true: false
+    human_review_pending: true
+    sample_quality_closed: true
+    p2_closed: true
+  eligible_for_exact_hash_review: false
+  status: not_ready
+- case_id: golden_gold_mining_cycle
+  checks:
+    candidate_artifacts_present: true
+    physical_hashes_match: true
+    generation_ids_complete: false
+    candidate_ready_boolean_true: false
+    regression_research_ready_boolean_true: false
+    human_review_pending: true
+    sample_quality_closed: true
+    p2_closed: true
+  eligible_for_exact_hash_review: false
+  status: not_ready
+- case_id: golden_multi_business_ai_infrastructure
+  checks:
+    candidate_artifacts_present: true
+    physical_hashes_match: true
+    generation_ids_complete: false
+    candidate_ready_boolean_true: false
+    regression_research_ready_boolean_true: false
+    human_review_pending: true
+    sample_quality_closed: true
+    p2_closed: true
+  eligible_for_exact_hash_review: false
+  status: not_ready
+ready_case_count: 0
+target_case_count: 4
+research_gate: needs_targeted_backflow
+sample_quality_allowed: false
+p2_allowed: false

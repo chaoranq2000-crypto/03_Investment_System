@@ -1,0 +1,57 @@
+{
+  "acceptance_phase": "pre_package_copy",
+  "changed_paths": [
+    "codex_tasks/night_shift/r5_overnight_02_20260720/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/preflight/"
+  ],
+  "commands": [
+    {
+      "assertion": "source HEAD equals exact Night01 final SHA",
+      "exit_code": 0
+    },
+    {
+      "assertion": "target branch name is separate from worktree path",
+      "exit_code": 0
+    },
+    {
+      "assertion": "worktree clean before package copy",
+      "exit_code": 0
+    },
+    {
+      "assertion": "package verifier passes 40 tasks and 16 payload files",
+      "exit_code": 0
+    }
+  ],
+  "cwd": "C:\\Projects\\03_Investment_System_night02",
+  "executor": "codex-bootstrap",
+  "exit_code": 0,
+  "finished_at": "2026-07-19T16:01:00+08:00",
+  "implementation_identity": {
+    "commit_sha": "4340945457d661ed62967e949f862ccf2214aff2",
+    "publication_head": null,
+    "tree_sha": null
+  },
+  "local_commit_sha": "4340945457d661ed62967e949f862ccf2214aff2",
+  "reason": "bootstrap evidence captured before package copy; not re-run after implementation commits",
+  "remote_commit_sha": "4340945457d661ed62967e949f862ccf2214aff2",
+  "required_artifacts": [
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/preflight/preflight.md",
+      "present": true,
+      "sha256": "16a3079c7563f3120e871fb138bb4eb5a3464e439be7a3e37b116a558ea78e2b",
+      "size_bytes": 785
+    },
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/preflight/source_state.json",
+      "present": true,
+      "sha256": "848c167241162d213350b20ef9b79de4b18d8959e870696d53792a02951a2346",
+      "size_bytes": 907
+    }
+  ],
+  "run_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_preflight_receipt_v1",
+  "stable_receipt_sha256": "160b705e191a8a6d3a276eb0b69c7e14a96e877dcfd596b36496fc00fa21844e",
+  "started_at": "2026-07-19T16:00:00+08:00",
+  "task_id": "ns02_t00_exact_baseline_preflight",
+  "terminal_status": "passed"
+}

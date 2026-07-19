@@ -1,0 +1,68 @@
+{
+  "all_byte_for_byte_equal": true,
+  "comparisons": [
+    {
+      "artifact": "analysis_workbooks.yaml",
+      "byte_for_byte_equal": true,
+      "first_sha256": "0b40e990cb4bb125997dc1797cdfcf706974c66c0b5c79801a1abda66786cde8",
+      "second_sha256": "0b40e990cb4bb125997dc1797cdfcf706974c66c0b5c79801a1abda66786cde8"
+    },
+    {
+      "artifact": "dependency_dag.json",
+      "byte_for_byte_equal": true,
+      "first_sha256": "3e136a52b151c9763724bff6eb7a616672f03ce07742229435e11d6761905f6b",
+      "second_sha256": "3e136a52b151c9763724bff6eb7a616672f03ce07742229435e11d6761905f6b"
+    },
+    {
+      "artifact": "evidence_requests.yaml",
+      "byte_for_byte_equal": true,
+      "first_sha256": "9628c66cb6473827246884c59039071b0e20b899621debc914b1f38ce3ff19c2",
+      "second_sha256": "9628c66cb6473827246884c59039071b0e20b899621debc914b1f38ce3ff19c2"
+    },
+    {
+      "artifact": "expanded_queue.yaml",
+      "byte_for_byte_equal": true,
+      "first_sha256": "abca370252cecdb5c881219c966e3db0875e73ef133204944d986740f1d14cf7",
+      "second_sha256": "abca370252cecdb5c881219c966e3db0875e73ef133204944d986740f1d14cf7"
+    },
+    {
+      "artifact": "fallback_backlog.yaml",
+      "byte_for_byte_equal": true,
+      "first_sha256": "547608cc2a7309a89ddcc49bdb31b47934e7cbda929632896ca90d769a8548a8",
+      "second_sha256": "547608cc2a7309a89ddcc49bdb31b47934e7cbda929632896ca90d769a8548a8"
+    },
+    {
+      "artifact": "human_gate_handoffs.yaml",
+      "byte_for_byte_equal": true,
+      "first_sha256": "aded8a14c001f1b9daec65d57424a8d05c37ca6d2750458aeb4385d6806d52a6",
+      "second_sha256": "aded8a14c001f1b9daec65d57424a8d05c37ca6d2750458aeb4385d6806d52a6"
+    },
+    {
+      "artifact": "morning_readout.md",
+      "byte_for_byte_equal": true,
+      "first_sha256": "efcd1ad8cf1c1c17596a37c8b8ac12bcf881a3df1fa20e21cc85958e607560c1",
+      "second_sha256": "efcd1ad8cf1c1c17596a37c8b8ac12bcf881a3df1fa20e21cc85958e607560c1"
+    },
+    {
+      "artifact": "next_night_queue.yaml",
+      "byte_for_byte_equal": true,
+      "first_sha256": "fa73d2e7d277662eae3dca0e400c02feb2184b1428f3f09d20034a1b0be916c5",
+      "second_sha256": "fa73d2e7d277662eae3dca0e400c02feb2184b1428f3f09d20034a1b0be916c5"
+    },
+    {
+      "artifact": "pointer_contract_proposals.yaml",
+      "byte_for_byte_equal": true,
+      "first_sha256": "56eb39018d85bb3faa9367f305625a44eabad11f58d679eb300b90fd4f81b279",
+      "second_sha256": "56eb39018d85bb3faa9367f305625a44eabad11f58d679eb300b90fd4f81b279"
+    },
+    {
+      "artifact": "queue_metrics.json",
+      "byte_for_byte_equal": true,
+      "first_sha256": "6dfed3e9254a2f1a32cbe9ed2360596d1fe5b55ccbe0cc91334c5bb0206b8094",
+      "second_sha256": "6dfed3e9254a2f1a32cbe9ed2360596d1fe5b55ccbe0cc91334c5bb0206b8094"
+    }
+  ],
+  "schema_version": "r5_night_shift_determinism_receipt_v2",
+  "source_commit": "4340945457d661ed62967e949f862ccf2214aff2",
+  "stable_receipt_sha256": "a1a00fae4fd84e7e1b5d4488e55a5579c3ae64a6e4936de530e6161eadae0751"
+}

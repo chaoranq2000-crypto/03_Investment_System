@@ -54,11 +54,18 @@ def test_morning_readout_and_next_queue_are_deterministic() -> None:
             "commits": [],
         },
         next_queue=next_queue,
+        publication={
+            "publication_head": "a" * 40,
+            "remote_sha_equals_local": True,
+            "ci_status": "success",
+        },
     )
     assert markdown_bytes(payload) == markdown_bytes(payload)
     assert payload["bf2_delta"]["blocker_occurrences_resolved"]["end"] == 0
     assert next_queue.task_map["ns02_t00_review_pointer_contracts"].status == "human_gate"
     assert next_queue.task_map["ns02_t40_resume_bf2_work_orders"].status == "pending"
+    assert payload["mission_outcome"] == "partial"
+    assert payload["program_goal"]["close_allowed"] is False
 
 
 def test_compare_files_writes_deterministic_receipt(tmp_path: Path) -> None:
@@ -85,3 +92,6 @@ def test_real_next_queue_carries_occurrence_sized_work_and_open_goal() -> None:
     assert next_queue.program_goal is not None
     assert next_queue.program_goal["close_allowed"] is False
     assert next_queue.baseline["blocker_occurrences_resolved"] == 0
+    assert next_queue.baseline["source_commit_policy"] == (
+        "resolve_final_remote_head_from_publication_receipt"
+    )

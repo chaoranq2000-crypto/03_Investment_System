@@ -1,0 +1,28 @@
+{
+  "analysis_worksheet_count": 24,
+  "blocker_occurrences_resolved": 0,
+  "classification_counts": {
+    "analysis_required": 24,
+    "dependency_blocked": 20,
+    "engineering_local": 8,
+    "evidence_required": 8,
+    "human_gate": 3
+  },
+  "classification_is_resolution": false,
+  "dependency_edge_count": 532,
+  "evidence_request_count": 8,
+  "historical_inputs_unchanged": true,
+  "historical_mutations": [],
+  "human_handoff_count": 3,
+  "mode": "read_only",
+  "occurrence_count": 63,
+  "p2_allowed": false,
+  "parent_work_order_count": 6,
+  "pointer_proposal_count": 8,
+  "research_gate": "needs_targeted_backflow",
+  "sample_quality_allowed": false,
+  "schema_version": "r5_night_shift_bf2_dry_run_receipt_v1",
+  "seeded_task_count": 69,
+  "source_commit": "4340945457d661ed62967e949f862ccf2214aff2",
+  "stable_receipt_sha256": "bf9490e0c285a0d3d59e6ef794062d5537dea7f2e7067d15555c71b56c5a5f94"
+}

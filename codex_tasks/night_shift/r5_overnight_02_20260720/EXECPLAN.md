@@ -13,7 +13,7 @@ Repair the Night01 early-close semantics and turn Bundle17R backflow into a dura
 - [x] C. Executable contract authority and safety
 - [x] D. Occurrence-level backflow and fallback queue
 - [ ] E. Adversarial tests, deterministic dry run, full regression and publication
-- [ ] F. Optional strategic fallback artifacts
+- [x] F. Optional strategic fallback artifacts
 
 ## Workstream A — baseline and publication defects
 
@@ -55,6 +55,15 @@ T50–T54 are valid engineering/analysis-automation work when the required work 
 - 2026-07-19: 8 个 pointer 缺失均不是拼写别名；四个 `/generation_id`
   路由 upstream generation contract，四个 quality boolean 路由 upstream quality
   contract，历史 Bundle16R artifacts 未修改。
+- 2026-07-19: Windows 不会替 package 的 pytest 参数展开
+  `tests/test_r5_night_shift_*.py`；受信执行器现按 repo-relative、非 symlink、
+  排序后的文件列表展开，不启用 shell。
+- 2026-07-19: BF2 read-only dry run 恢复 63 occurrences + 6 parents，10 类
+  queue/DAG/packet/metrics/readout 双跑逐字节一致，resolved 保持 0。
+- 2026-07-19: GitHub Actions run `29680522343` 在 Linux 上暴露 Windows drive
+  absolute-path 判断顺序问题；`2a25550` 采用跨平台 drive-pattern 检查后，run
+  `29680797150` 的 night-shift 和 full pytest 均通过。Node 20 action deprecation、
+  conda channel 与 conda-pypi 提示保留为非阻断 warning，不在本包内扩大升级范围。
 
 ## Decisions
 
@@ -83,10 +92,16 @@ T50–T54 are valid engineering/analysis-automation work when the required work 
   覆盖 `test_r5_night_shift_backflow_packets.py`、
   `test_r5_night_shift_human_gate.py`、
   `test_r5_night_shift_pointer_proposals.py`。
+- cutoff 后拒绝领取新任务但允许完成在途验收；claimed/running 中断恢复不重复增加
+  attempt，`skipped_cutoff` 可在下一开放窗口恢复。
+- 四案例战略盘点只读取 Bundle14R/Bundle16R：物理 hash 匹配，但 generation ID、
+  Bundle17R quality booleans 与 exact-hash 人审仍未满足，因此 Bundle18 precheck 为
+  `not_ready`，不得自动触发。
 
 ## Remaining Work
 
-- Workstream E/F: `ns02_t40`–`ns02_t54`。
+- Workstream E 仅余 post-push `ns02_t46` 与最终 readout `ns02_t47`；T40–T45
+  已通过，T50–T54 已完成。
 - Research truth remains 6 pending work orders and 0/63 resolved blockers.
 
 ## Acceptance summary

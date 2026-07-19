@@ -615,6 +615,7 @@ def build_parser() -> argparse.ArgumentParser:
     readout.add_argument("--output", type=Path, required=True)
     readout.add_argument("--output-json", type=Path, required=True)
     readout.add_argument("--next-queue", type=Path, required=True)
+    readout.add_argument("--publication-receipt", type=Path)
     readout.add_argument("--assert-idempotent", action="store_true")
     return parser
 
@@ -803,6 +804,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 output_path=args.output,
                 output_json_path=args.output_json,
                 next_queue_path=args.next_queue,
+                publication_receipt_path=args.publication_receipt,
                 assert_idempotent=args.assert_idempotent,
             )
             print(

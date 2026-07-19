@@ -1,0 +1,401 @@
+schema_version: r5_night_shift_golden_case_inventory_v1
+mode: read_only
+case_count: 4
+cases:
+- case_id: golden_copper_foil_product_generation
+  ticker: 301217.SZ
+  company: 铜冠铜箔
+  economic_archetype: product_generation
+  bundle14r_fixture: tests/fixtures/r5_bundle14r/cases/copper_foil.yaml
+  bundle14r_schema_version: r5_bundle14r_case_v1
+  bundle16r_run: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil
+  bundle16r_runtime_case_id: 301217_high_end_copper_foil
+  artifact_lineage:
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/evidence_pack.json
+    present: true
+    physical_sha256: 903e305e29ccec711499847e123f30109977e9eec14f54ae2ca0389ef397ccd4
+    schema_version: 1
+    artifact_type: r5_bundle16r_reviewed_evidence_pack
+    runtime_case_id: 301217_high_end_copper_foil
+    generation_id: null
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/forecast_model.json
+    present: true
+    physical_sha256: d73769d256bb1e4d82f03eeef46f17ca8c6321e4840d51ff2aba307e94a6f3e7
+    schema_version: 1
+    artifact_type: r5_bundle16r_forecast_model
+    runtime_case_id: null
+    generation_id: null
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+    present: true
+    physical_sha256: 02953ca1a4f932e34a1298ab3e883c66daf26fc3cffbac96c4137b764b64f461
+    schema_version: 1
+    artifact_type: r5_bundle16r_generation_lock
+    runtime_case_id: 301217_high_end_copper_foil
+    generation_id: null
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/human_review.yaml
+    present: true
+    physical_sha256: ecaecb83128d3e7ce10b6b375e3ab0768cd7ad0a2b68f0bdb5beedcfa13243a6
+    schema_version: 1
+    artifact_type: null
+    runtime_case_id: 301217_high_end_copper_foil
+    generation_id: null
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/operating_driver_pack.json
+    present: true
+    physical_sha256: d9a8bce553dbae8b39c6d52b179499891c552cc8e41c921c31face3604a0aa65
+    schema_version: 1
+    artifact_type: r5_bundle16r_operating_driver_pack
+    runtime_case_id: null
+    generation_id: null
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+    present: true
+    physical_sha256: 0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67
+    schema_version: 1
+    artifact_type: r5_bundle16r_quality_readout
+    runtime_case_id: 301217_high_end_copper_foil
+    generation_id: null
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/reader_report.md
+    present: true
+    physical_sha256: 102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa
+    schema_version: null
+    artifact_type: null
+    runtime_case_id: null
+    generation_id: null
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/valuation_pack.json
+    present: true
+    physical_sha256: 472460e8215c0e741e104c1fffa5e36233092b1008471b2fd8ec6a570f8f3a36
+    schema_version: 1
+    artifact_type: r5_bundle16r_valuation_pack
+    runtime_case_id: null
+    generation_id: null
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/workflow_state.yaml
+    present: true
+    physical_sha256: f0b1862f64e2269c4fc208c7f969d2957324b22139853d0212d5759878497b82
+    schema_version: 1
+    artifact_type: null
+    runtime_case_id: null
+    generation_id: null
+  compatibility:
+    golden_case_id_equals_runtime_case_id: false
+    generation_id_complete: false
+    missing_generation_id_roles:
+    - evidence_pack
+    - forecast_model
+    - generation_lock
+    - operating_driver_pack
+    - quality_readout
+    - valuation_pack
+    - workflow_state
+    quality_decision: pass
+    candidate_ready_for_exact_hash_review: null
+    regression_research_ready: null
+    sample_quality_allowed: false
+    p2_allowed: false
+    human_review_status: pending
+- case_id: golden_crdmo_backlog_conversion
+  ticker: 603259.SH
+  company: 药明康德
+  economic_archetype: backlog_conversion
+  bundle14r_fixture: tests/fixtures/r5_bundle14r/cases/crdmo.yaml
+  bundle14r_schema_version: r5_bundle14r_case_v1
+  bundle16r_run: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec
+  bundle16r_runtime_case_id: 603259_crdmo_backlog_funnel
+  artifact_lineage:
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/evidence_pack.json
+    present: true
+    physical_sha256: b6b59f9d1a00d1adfc6422563d9226c14e27f3526f74cecfa3e1feb2ebd2e386
+    schema_version: 1
+    artifact_type: r5_bundle16r_reviewed_evidence_pack
+    runtime_case_id: 603259_crdmo_backlog_funnel
+    generation_id: null
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/forecast_model.json
+    present: true
+    physical_sha256: 5279f36cf9ab4ea8fe3055d4f230381016e8a664bbca64df164cf4ba3c94ad9d
+    schema_version: 1
+    artifact_type: r5_bundle16r_forecast_model
+    runtime_case_id: null
+    generation_id: null
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/generation_lock.json
+    present: true
+    physical_sha256: 80d673824269e8a65083e36694d4f64eaed0bd6380362cac9b25c8f6a1e0375f
+    schema_version: 1
+    artifact_type: r5_bundle16r_generation_lock
+    runtime_case_id: 603259_crdmo_backlog_funnel
+    generation_id: null
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/human_review.yaml
+    present: true
+    physical_sha256: 54055f64f3780ddbc08417219f82039a0f20c0b0bccbcc480d2a088f4ae55bb9
+    schema_version: 1
+    artifact_type: null
+    runtime_case_id: 603259_crdmo_backlog_funnel
+    generation_id: null
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/operating_driver_pack.json
+    present: true
+    physical_sha256: e0d2225347b99b688f8a94b34649f8366c5a51cba992ebdaf48ccf0f8b79825d
+    schema_version: 1
+    artifact_type: r5_bundle16r_operating_driver_pack
+    runtime_case_id: null
+    generation_id: null
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+    present: true
+    physical_sha256: a58faa678fa6150799f0ec267c46ada02df1199781ef6e61a1e18c72085bd108
+    schema_version: 1
+    artifact_type: r5_bundle16r_quality_readout
+    runtime_case_id: 603259_crdmo_backlog_funnel
+    generation_id: null
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/reader_report.md
+    present: true
+    physical_sha256: 04ec8a53a023c3678dfdb7682901c5b229b7040c86af216930b0b4eea739f701
+    schema_version: null
+    artifact_type: null
+    runtime_case_id: null
+    generation_id: null
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/valuation_pack.json
+    present: true
+    physical_sha256: 52e28e426d3f49f3016dcee2b85bd3c80f28c67373ae524e52f19df94221b94c
+    schema_version: 1
+    artifact_type: r5_bundle16r_valuation_pack
+    runtime_case_id: null
+    generation_id: null
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/workflow_state.yaml
+    present: true
+    physical_sha256: 6a921191d30d789fee40d818c9e201bcabb108a29ef889e4e20809ae174416aa
+    schema_version: 1
+    artifact_type: null
+    runtime_case_id: null
+    generation_id: null
+  compatibility:
+    golden_case_id_equals_runtime_case_id: false
+    generation_id_complete: false
+    missing_generation_id_roles:
+    - evidence_pack
+    - forecast_model
+    - generation_lock
+    - operating_driver_pack
+    - quality_readout
+    - valuation_pack
+    - workflow_state
+    quality_decision: pass
+    candidate_ready_for_exact_hash_review: null
+    regression_research_ready: null
+    sample_quality_allowed: false
+    p2_allowed: false
+    human_review_status: pending
+- case_id: golden_gold_mining_cycle
+  ticker: 600988.SH
+  company: 赤峰黄金
+  economic_archetype: commodity_cycle
+  bundle14r_fixture: tests/fixtures/r5_bundle14r/cases/gold_mining.yaml
+  bundle14r_schema_version: r5_bundle14r_case_v1
+  bundle16r_run: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold
+  bundle16r_runtime_case_id: 600988_cycle_resource_gold
+  artifact_lineage:
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/evidence_pack.json
+    present: true
+    physical_sha256: 915fb3916e11378306a9cc6d5fd42a48f9cabe9bc8614d2a3ad7be6c70ff54d1
+    schema_version: 1
+    artifact_type: r5_bundle16r_reviewed_evidence_pack
+    runtime_case_id: 600988_cycle_resource_gold
+    generation_id: null
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/forecast_model.json
+    present: true
+    physical_sha256: feadd5a52721c4ae2781e8195524d099fc954d3ad4c8ffa58fd1495336ebe268
+    schema_version: 1
+    artifact_type: r5_bundle16r_forecast_model
+    runtime_case_id: null
+    generation_id: null
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+    present: true
+    physical_sha256: 5cffa5fee240c6bb3c9f7bbf3b07d7cf4c2e8c799e1f07aa839cfb2449a3f0d1
+    schema_version: 1
+    artifact_type: r5_bundle16r_generation_lock
+    runtime_case_id: 600988_cycle_resource_gold
+    generation_id: null
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/human_review.yaml
+    present: true
+    physical_sha256: baea3bbf009af5897f54f53123313f9fb7e739a5c66f7a02433dc68645c0eb3b
+    schema_version: 1
+    artifact_type: null
+    runtime_case_id: 600988_cycle_resource_gold
+    generation_id: null
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/operating_driver_pack.json
+    present: true
+    physical_sha256: dbef5761eac7762a25fc1ea2d42adaa867df739b8fee3395e77cbed45832aa41
+    schema_version: 1
+    artifact_type: r5_bundle16r_operating_driver_pack
+    runtime_case_id: null
+    generation_id: null
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+    present: true
+    physical_sha256: ef5f0513e89e4d9f51f189fcae650e6b5ccbf02a1fe52065fba377c2e5358bf0
+    schema_version: 1
+    artifact_type: r5_bundle16r_quality_readout
+    runtime_case_id: 600988_cycle_resource_gold
+    generation_id: null
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/reader_report.md
+    present: true
+    physical_sha256: edc6e089537e64e4bbcc7578e02465cfa6d0d5c259f575e6f0eeff5e716b6030
+    schema_version: null
+    artifact_type: null
+    runtime_case_id: null
+    generation_id: null
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/valuation_pack.json
+    present: true
+    physical_sha256: dee79360d56010322e665391c0c128a705ed4d36d9d3296f620006e475185d99
+    schema_version: 1
+    artifact_type: r5_bundle16r_valuation_pack
+    runtime_case_id: null
+    generation_id: null
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/workflow_state.yaml
+    present: true
+    physical_sha256: c82c1b121e76abbf0c439a2bcfa464a36097ace52a981b5f6e511227767031dc
+    schema_version: 1
+    artifact_type: null
+    runtime_case_id: null
+    generation_id: null
+  compatibility:
+    golden_case_id_equals_runtime_case_id: false
+    generation_id_complete: false
+    missing_generation_id_roles:
+    - evidence_pack
+    - forecast_model
+    - generation_lock
+    - operating_driver_pack
+    - quality_readout
+    - valuation_pack
+    - workflow_state
+    quality_decision: pass
+    candidate_ready_for_exact_hash_review: null
+    regression_research_ready: null
+    sample_quality_allowed: false
+    p2_allowed: false
+    human_review_status: pending
+- case_id: golden_multi_business_ai_infrastructure
+  ticker: 600673.SH
+  company: 东阳光
+  economic_archetype: multi_business_ma
+  bundle14r_fixture: tests/fixtures/r5_bundle14r/cases/multi_business_ai_infrastructure.yaml
+  bundle14r_schema_version: r5_bundle14r_case_v1
+  bundle16r_run: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech
+  bundle16r_runtime_case_id: 600673_multi_business_ma
+  artifact_lineage:
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/evidence_pack.json
+    present: true
+    physical_sha256: 23486bae3c0f5316de8de82d1e4258c26033f06168fed8be2732d45d17c3e744
+    schema_version: 1
+    artifact_type: r5_bundle16r_reviewed_evidence_pack
+    runtime_case_id: 600673_multi_business_ma
+    generation_id: null
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/forecast_model.json
+    present: true
+    physical_sha256: f87421d658bdd1f288ed74940ff9a349c24076dc251e47d374988adeda2b805e
+    schema_version: 1
+    artifact_type: r5_bundle16r_forecast_model
+    runtime_case_id: null
+    generation_id: null
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/generation_lock.json
+    present: true
+    physical_sha256: cd445f4dade57e60f446dd0c5b747db4c298e4da5d2c0db11f1c4d3f9813c24e
+    schema_version: 1
+    artifact_type: r5_bundle16r_generation_lock
+    runtime_case_id: 600673_multi_business_ma
+    generation_id: null
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/human_review.yaml
+    present: true
+    physical_sha256: f6c30962925558eb398375d16f7cc0af40413d5561bf5fb8ea5cfa3adc520049
+    schema_version: 1
+    artifact_type: null
+    runtime_case_id: 600673_multi_business_ma
+    generation_id: null
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/operating_driver_pack.json
+    present: true
+    physical_sha256: b7e960087861cfd84af479169f372899553e8f804a9a58f47effd3f130f82919
+    schema_version: 1
+    artifact_type: r5_bundle16r_operating_driver_pack
+    runtime_case_id: null
+    generation_id: null
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+    present: true
+    physical_sha256: e4ce4d287c5a426880960eff2436391e82d87c62d66593c9abf633da985611d7
+    schema_version: 1
+    artifact_type: r5_bundle16r_quality_readout
+    runtime_case_id: 600673_multi_business_ma
+    generation_id: null
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/reader_report.md
+    present: true
+    physical_sha256: 2fc4dff78527743b5fa884df4c5329ef4cd014c73686e1b10cef7edff45daed9
+    schema_version: null
+    artifact_type: null
+    runtime_case_id: null
+    generation_id: null
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/valuation_pack.json
+    present: true
+    physical_sha256: 066047366991c7d92132b5fcb145b13fb5b3ba714574efbb11f84c34ec9eb1b4
+    schema_version: 1
+    artifact_type: r5_bundle16r_valuation_pack
+    runtime_case_id: null
+    generation_id: null
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/workflow_state.yaml
+    present: true
+    physical_sha256: c563b4b3106a37bb1517e057cae703a268bf5585b9bab520415b31de92ee45a7
+    schema_version: 1
+    artifact_type: null
+    runtime_case_id: null
+    generation_id: null
+  compatibility:
+    golden_case_id_equals_runtime_case_id: false
+    generation_id_complete: false
+    missing_generation_id_roles:
+    - evidence_pack
+    - forecast_model
+    - generation_lock
+    - operating_driver_pack
+    - quality_readout
+    - valuation_pack
+    - workflow_state
+    quality_decision: pass
+    candidate_ready_for_exact_hash_review: null
+    regression_research_ready: null
+    sample_quality_allowed: false
+    p2_allowed: false
+    human_review_status: pending
+conclusion: generation_and_quality_contract_gap_confirmed
+research_gate: needs_targeted_backflow
+sample_quality_allowed: false
+p2_allowed: false
+stable_inventory_sha256: c5fedd0017740e1192368c2ab3cd00b707ab4b7b3fbebb0d46e91833d83825b5

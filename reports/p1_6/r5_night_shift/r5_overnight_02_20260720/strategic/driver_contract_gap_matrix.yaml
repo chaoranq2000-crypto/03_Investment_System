@@ -1,0 +1,57 @@
+schema_version: r5_night_shift_driver_contract_gap_matrix_v1
+mode: contract_template_audit
+rows:
+- case_id: golden_copper_foil_product_generation
+  economic_archetype: product_generation
+  driver_count: 8
+  drivers_with_source_class: 8
+  drivers_with_unit: 8
+  drivers_with_period_rule: 8
+  drivers_with_financial_mapping: 8
+  explicit_overlap_contract_present: true
+  source_locator_values_present: false
+  period_values_present: false
+  gap_codes:
+  - SOURCE_LOCATOR_VALUES_PENDING
+  - PERIOD_VALUES_PENDING
+- case_id: golden_crdmo_backlog_conversion
+  economic_archetype: backlog_conversion
+  driver_count: 11
+  drivers_with_source_class: 11
+  drivers_with_unit: 11
+  drivers_with_period_rule: 11
+  drivers_with_financial_mapping: 11
+  explicit_overlap_contract_present: true
+  source_locator_values_present: false
+  period_values_present: false
+  gap_codes:
+  - SOURCE_LOCATOR_VALUES_PENDING
+  - PERIOD_VALUES_PENDING
+- case_id: golden_gold_mining_cycle
+  economic_archetype: commodity_cycle
+  driver_count: 9
+  drivers_with_source_class: 9
+  drivers_with_unit: 9
+  drivers_with_period_rule: 9
+  drivers_with_financial_mapping: 9
+  explicit_overlap_contract_present: true
+  source_locator_values_present: false
+  period_values_present: false
+  gap_codes:
+  - SOURCE_LOCATOR_VALUES_PENDING
+  - PERIOD_VALUES_PENDING
+- case_id: golden_multi_business_ai_infrastructure
+  economic_archetype: multi_business_ma
+  driver_count: 18
+  drivers_with_source_class: 18
+  drivers_with_unit: 18
+  drivers_with_period_rule: 18
+  drivers_with_financial_mapping: 18
+  explicit_overlap_contract_present: true
+  source_locator_values_present: false
+  period_values_present: false
+  gap_codes:
+  - SOURCE_LOCATOR_VALUES_PENDING
+  - PERIOD_VALUES_PENDING
+interpretation: The Bundle14R templates declare units, period rules, source classes and model mappings; concrete source locators and period values remain evidence work.
+resolution_claimed: false

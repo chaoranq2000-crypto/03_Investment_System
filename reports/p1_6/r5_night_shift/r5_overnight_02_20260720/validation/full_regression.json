@@ -1,0 +1,27 @@
+{
+  "schema_version": "r5_night_shift_full_regression_v1",
+  "status": "passed",
+  "task_id": "ns02_t45_full_regression_scope_audit",
+  "implementation_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+  "acceptance_receipt": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/receipts/ns02_t45_full_regression_scope_audit.json",
+  "acceptance_receipt_sha256": "5f95c57071ced8d5819477fac855c028b3e3c2c6d176ace4a16ff5c6267689f3",
+  "night_shift_tests": {
+    "passed": 99,
+    "skipped": 0,
+    "stdout_sha256": "06fb8de24527959fe97af6c6707a7a9748239539078e27d3022785c5c409b7c9"
+  },
+  "source_route_gate": {
+    "decision": "pass",
+    "capability_count": 17,
+    "blocking_count": 0,
+    "stdout_sha256": "d5fd2f9da5f03cee4133dfe74f46f0c176dbdaa0b7065cfcb500e82f23226eb3"
+  },
+  "full_pytest": {
+    "passed": 1032,
+    "skipped": 2,
+    "stdout_sha256": "092099ab8745f9eb55ba1d557a14fe01b88262d64667e267cfb25a07d1337c1a"
+  },
+  "git_diff_check": "pass",
+  "tracked_runtime_output_check": "pass",
+  "scope_audit": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/scope_audit.json"
+}

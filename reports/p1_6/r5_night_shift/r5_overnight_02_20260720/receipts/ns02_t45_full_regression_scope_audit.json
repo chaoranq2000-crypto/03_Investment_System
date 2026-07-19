@@ -1,0 +1,170 @@
+{
+  "attempt": 1,
+  "blocker_occurrences": {
+    "claimed": 0,
+    "resolved": 0,
+    "unchanged": 0
+  },
+  "changed_paths": [
+    "codex_tasks/night_shift/r5_overnight_02_20260720/EXECPLAN.md",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/expansion_receipt.json",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/receipts/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/",
+    "reports/quality/ci_source_route_quality_report.yaml",
+    "src/maintenance/night_shift/backflow.py",
+    "src/maintenance/night_shift/readout.py",
+    "src/maintenance/night_shift/runner.py",
+    "tests/test_r5_night_shift_readout.py"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-m",
+        "pytest",
+        "-q",
+        "tests/test_r5_night_shift_adversarial.py",
+        "tests/test_r5_night_shift_authority.py",
+        "tests/test_r5_night_shift_backflow_packets.py",
+        "tests/test_r5_night_shift_bf2_dry_run.py",
+        "tests/test_r5_night_shift_bf2_seed.py",
+        "tests/test_r5_night_shift_bundle18_precheck.py",
+        "tests/test_r5_night_shift_ci_contract.py",
+        "tests/test_r5_night_shift_command_safety.py",
+        "tests/test_r5_night_shift_contract.py",
+        "tests/test_r5_night_shift_contract_lint.py",
+        "tests/test_r5_night_shift_contract_proposals.py",
+        "tests/test_r5_night_shift_crash_recovery.py",
+        "tests/test_r5_night_shift_dependency_dag.py",
+        "tests/test_r5_night_shift_determinism.py",
+        "tests/test_r5_night_shift_digest.py",
+        "tests/test_r5_night_shift_fallback_backlog.py",
+        "tests/test_r5_night_shift_git_targets.py",
+        "tests/test_r5_night_shift_goal_policy.py",
+        "tests/test_r5_night_shift_golden_inventory.py",
+        "tests/test_r5_night_shift_human_gate.py",
+        "tests/test_r5_night_shift_lock.py",
+        "tests/test_r5_night_shift_metrics.py",
+        "tests/test_r5_night_shift_outcome.py",
+        "tests/test_r5_night_shift_pilot_eligibility.py",
+        "tests/test_r5_night_shift_pointer_proposals.py",
+        "tests/test_r5_night_shift_publication.py",
+        "tests/test_r5_night_shift_queue_expansion.py",
+        "tests/test_r5_night_shift_readout.py",
+        "tests/test_r5_night_shift_receipts.py",
+        "tests/test_r5_night_shift_resume.py",
+        "tests/test_r5_night_shift_retry_graph.py",
+        "tests/test_r5_night_shift_review_handoff.py",
+        "tests/test_r5_night_shift_runner.py",
+        "tests/test_r5_night_shift_scope_guard.py",
+        "tests/test_r5_night_shift_semantic_fixture_contract.py",
+        "tests/test_r5_night_shift_semantic_router.py"
+      ],
+      "command": "python -m pytest -q tests/test_r5_night_shift_*.py",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 182,
+      "stdout_sha256": "06fb8de24527959fe97af6c6707a7a9748239539078e27d3022785c5c409b7c9",
+      "stdout_summary": "........................................................................ [ 72%]\n...........................                                              [100%]\n99 passed in 3.74s"
+    },
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "scripts/run_source_route_quality_gate.py",
+        "--import-check",
+        "--output",
+        "reports/quality/ci_source_route_quality_report.yaml"
+      ],
+      "command": "python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 42,
+      "stdout_sha256": "d5fd2f9da5f03cee4133dfe74f46f0c176dbdaa0b7065cfcb500e82f23226eb3",
+      "stdout_summary": "decision=pass capabilities=17 blocking=0"
+    },
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-m",
+        "pytest",
+        "-q"
+      ],
+      "command": "python -m pytest -q",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 1249,
+      "stdout_sha256": "092099ab8745f9eb55ba1d557a14fe01b88262d64667e267cfb25a07d1337c1a",
+      "stdout_summary": "..................................................................ss.... [  6%]\n........................................................................ [ 13%]\n........................................................................ [ 20%]\n........................................................................ [ 27%]\n........................................................................ [ 34%]\n........................................................................ [ 41%]\n........................................................................ [ 48%]\n........................................................................ [ 55%]\n........................................................................ [ 62%]\n........................................................................ [ 69%]\n........................................................................ [ 76%]\n........................................................................ [ 83%]\n........................................................................ [ 90%]\n........................................................................ [ 97%]\n..........................                                               [100%]\n1032 passed, 2 skipped in 49.82s"
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "command": "git diff --check",
+      "exit_code": 0,
+      "stderr_length": 177,
+      "stderr_sha256": "95103bad6b61892b4b906b61847add5d76bbb9819fa4a7347e54b3bcfe3def0b",
+      "stderr_summary": "warning: in the working copy of 'reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/expansion_receipt.json', LF will be replaced by CRLF the next time Git touches it",
+      "stdout_length": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_summary": ""
+    },
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-c",
+        "import subprocess; files=subprocess.check_output(['git','ls-files'], text=True).splitlines(); bad=[p for p in files if p.startswith('.local/') or p.endswith('.pyc') or '/__pycache__/' in p]; assert not bad, bad"
+      ],
+      "command": "python -c \"import subprocess; files=subprocess.check_output(['git','ls-files'], text=True).splitlines(); bad=[p for p in files if p.startswith('.local/') or p.endswith('.pyc') or '/__pycache__/' in p]; assert not bad, bad\"",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_summary": ""
+    }
+  ],
+  "cwd": "C:\\Projects\\03_Investment_System_night02",
+  "executor": "codex",
+  "exit_code": 0,
+  "finished_at": "2026-07-19T09:14:33.092746+00:00",
+  "implementation_identity": {
+    "commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+    "publication_head": null,
+    "tree_sha": "4738f70e284f954a83fe4f4b629bad1614d04255"
+  },
+  "local_commit_sha": "2a25550f480e7b0011497b1bc96feb80f20c08c3",
+  "reason": "Night02 final stabilized-scope full regression",
+  "remote_commit_sha": null,
+  "required_artifacts": [
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/full_regression.json",
+      "present": true,
+      "sha256": "e12cdaa10d58f621871e3c550c37b9fac8231de7aaf23b6187436b2c975434c3",
+      "size_bytes": 1103
+    },
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/scope_audit.json",
+      "present": true,
+      "sha256": "647b4db171eab669a480dd5b8f58c3c3be7427d4d0a205abb4a760fd4cf61b19",
+      "size_bytes": 11179
+    }
+  ],
+  "run_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_execution_receipt_v1",
+  "stable_receipt_sha256": "5f95c57071ced8d5819477fac855c028b3e3c2c6d176ace4a16ff5c6267689f3",
+  "started_at": "2026-07-19T09:13:37.787586+00:00",
+  "task_id": "ns02_t45_full_regression_scope_audit",
+  "terminal_status": "passed"
+}

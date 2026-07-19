@@ -1,0 +1,203 @@
+{
+  "mission_id": "r5_overnight_02_20260720",
+  "packaged_task_count": 40,
+  "passed_task_count": 38,
+  "pending_task_ids": [
+    "ns02_t46_commit_push_remote_ci",
+    "ns02_t47_morning_readout_next_queue"
+  ],
+  "receipts": [
+    {
+      "stable_receipt_sha256": "160b705e191a8a6d3a276eb0b69c7e14a96e877dcfd596b36496fc00fa21844e",
+      "task_id": "ns02_t00_exact_baseline_preflight",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "8f4045ffd7becc2a9a0075999dca35fcb6ec4a2cc9964557df80e4f80c21ef2b",
+      "task_id": "ns02_t01_night01_completion_audit",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "de4329e1ca9bb883c86488c21f3c0308cd0e4729b809ea13ac065e37adfe219f",
+      "task_id": "ns02_t02_windows_path_branch_guard",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "00133c619b14dd2bc76e1a12f9e983d795b83e6212a7eda704efee7b9f26895d",
+      "task_id": "ns02_t03_stale_baseline_detector",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "52b0610acc5fea4212337c85aa62677f13aef106a2566246f9b44658be7303fc",
+      "task_id": "ns02_t10_mission_outcome_model",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "8adff68235c63d3f5051a30f52ab66af410b34d4a8a69d5e809f9b9e5880dae5",
+      "task_id": "ns02_t11_no_safe_pilot_not_success",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "cf1d4c379c31eecf904d6d92d9df1d091653eac1485634f30e758ae6dcedd295",
+      "task_id": "ns02_t12_program_goal_close_policy",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "f4f39e4cfe1eeea8b2fc00af3ea90b61a057dc1ebb01cb8ea32e23df44808e22",
+      "task_id": "ns02_t13_open_mission_resume",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "420d28a71da0ae620010b8eb121e62c4fd4d91942b7786deba8ea3b136ed3c4c",
+      "task_id": "ns02_t14_two_phase_publication",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "d81da3ef701ebd5f11fb7335d9c3a9c4cb880cb3fba1d7396d9544baea927edc",
+      "task_id": "ns02_t15_digest_integrity",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "c681eb22cba8a9005d8242a31ef5493c9892e5f9978aab7e73960af028d04509",
+      "task_id": "ns02_t20_contract_authority_schema",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "dadb8dd71a4bc1e2760121ba8c2f85b20abcde5997c77730a8dd0a22b5b9110b",
+      "task_id": "ns02_t21_contract_lint",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "44b6c30f9ef7ae355cedd70b5c5f024d0c48ddbf4e0ca51b8b8bbffa18939b89",
+      "task_id": "ns02_t22_acceptance_command_safety",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "651d7fe3ef5141739ad78605f727e24c1e14b14fa77d9cfc066201a6e1eef564",
+      "task_id": "ns02_t23_task_diff_scope_guard",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "9837120f184337acd3a43ea98b2687a9ee610efd9e34bc5504fc65de65230a47",
+      "task_id": "ns02_t24_contract_proposal_generator",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "9c2b631ee4d593e335e8cbeefbe0cc72131476459733802fc56065d57e236bd8",
+      "task_id": "ns02_t25_review_packet_hash_lock",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "6e3a10f1abc79029ab0c262c0ceb9c21a7f8627b819dfd7c547d22dc55a17ce4",
+      "task_id": "ns02_t26_semantic_contract_router",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "c36288ca252dca5385474d2e16507ffbc12803267431126b9556c4e33f5e0d71",
+      "task_id": "ns02_t30_occurrence_queue_expander",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "00b966cb152ff23e2c44276e8a45f55d01791e9eac429c2063c71b814f90e3cb",
+      "task_id": "ns02_t31_dependency_dag",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "32fd1280825ffdd3d3898b831e4fa85a56552ae4519429cba5834c57eccffaf1",
+      "task_id": "ns02_t32_evidence_request_packets",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "25b5a813121080438d1a88abcf1f0fefa6ad0ac9bdcd960514782edc058ad71e",
+      "task_id": "ns02_t33_analysis_workbooks",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "f3b32c71cfb59f928344e9a709c1a2c4774d0704a7dafda53787709eb6f1ba2b",
+      "task_id": "ns02_t34_human_gate_handoffs",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "7e4f18a3ffed2748208c22cdcc358ec9e9094d0cbb03e5fcf47f5fd1f7ecc4e9",
+      "task_id": "ns02_t35_pointer_contract_proposals",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "bf9c1b3c19cfb38a1697f167f8527be223ed579a97488298c341cd4797c060ef",
+      "task_id": "ns02_t36_fallback_engineering_backlog",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "c29a02fcb792a2a2a79aef252ab6aa9c71e205e895519cd628c9fc18345707b0",
+      "task_id": "ns02_t37_failure_spawn_retry",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "1a11447d4861c8f91978ff4261165232122ea97f87c8ffd7bb99cb4b88b01466",
+      "task_id": "ns02_t38_queue_metrics_and_capacity",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "2ab0f0e797f682ad7691a639e67e2fd83549281d04e20e6ba19a766f6cb437e6",
+      "task_id": "ns02_t39_pilot_eligibility_gate",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "358cac36129c005d5f86de5d2adc9a37c5b8b9365a1146e968ca9ac977e92493",
+      "task_id": "ns02_t40_adversarial_test_matrix",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "b61410b13f6c18ec62f25db644a24a335f34d50fac4c9fa1ef2421942389f1ae",
+      "task_id": "ns02_t41_crash_cutoff_resume_tests",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "4613e2968252bf508ff9a88e0a84f7cf0e89fc555393a84032dfe09ca857b4ef",
+      "task_id": "ns02_t42_ci_integration",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "6ad582ba2c63bb7d587add755144d82f5d028ba7818f793f67561fe4e45f2c40",
+      "task_id": "ns02_t43_bf2_dry_run_truth_preservation",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "b7f7eee0e6d16bdca8cd0f69c8ed9ca80a8df40f4eb46b079fa1592433a35aaa",
+      "task_id": "ns02_t44_determinism_double_run",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "5f95c57071ced8d5819477fac855c028b3e3c2c6d176ace4a16ff5c6267689f3",
+      "task_id": "ns02_t45_full_regression_scope_audit",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "b8531258de0f216c1331e411a86d03db87428c8895b7b51917ec2d9e5f8c91e4",
+      "task_id": "ns02_t50_golden_case_inventory",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "0ff66868b3e31cfb04a2b2cd6f71aa85c52c1751328753be5b35872c1d5f9c5b",
+      "task_id": "ns02_t51_semantic_quality_negative_fixtures",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "0d8db9c8baa4c631feb3e25aaf8922aa5996008da2c183f5f14373395a0ac6f6",
+      "task_id": "ns02_t52_driver_contract_gap_matrix",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "09bc4b14d13acc034e02eb601878ee78fd4c8d65470d2c0824584ba2744b11fc",
+      "task_id": "ns02_t53_bundle18_readiness_precheck",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "d7c91e01d557f4f10603207e5886860121a5eb0f7050168b093189184837e681",
+      "task_id": "ns02_t54_next_mission_seed",
+      "terminal_status": "passed"
+    }
+  ],
+  "schema_version": "r5_night_shift_task_acceptance_summary_v1",
+  "stable_summary_sha256": "bbc3d157a0dc9109d97821957da8572c3299a6ecebf9e5e1d9042c51cb79a838"
+}
