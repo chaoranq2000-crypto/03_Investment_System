@@ -1,0 +1,1580 @@
+schema_version: r5_night_shift_queue_v3_proposed
+package_id: R5_Overnight_Mission_03_20260720
+mission_id: r5_overnight_03_20260721
+mission_title: Reviewed-decision intake, targeted backflow execution, and immutable candidate closure
+program_goal:
+  id: r5_bundle17r_bf2_four_case_activation
+  description: 四个真实 golden case 完成受审 evidence/materialization/qualification/regression/exact-hash 链，随后才进入 Bundle18
+    人审。
+  state_at_start: open_needs_targeted_backflow
+  close_allowed: false
+  this_mission_may_close_goal: false
+  truth_at_start:
+    work_orders_pending: 6
+    blocker_occurrences_total: 63
+    blocker_occurrences_resolved: 0
+    next_queue_total_items: 69
+    research_gate: needs_targeted_backflow
+    sample_quality_allowed: false
+    p2_allowed: false
+night02_mission:
+  state: complete
+  outcome: delivered
+  tasks_passed: 40
+  tasks_total: 40
+  final_sha: 069da527452def6c59c3772750e933d8611ccadf
+  ci_run_id: 29681505920
+  authority: user_reported_and_runtime_reverified_before_execution
+baseline:
+  repository: chaoranq2000-crypto/03_Investment_System
+  source_branch: codex/r5-night02-contract-recovery
+  source_commit: 069da527452def6c59c3772750e933d8611ccadf
+  night02_start_commit: 4340945457d661ed62967e949f862ccf2214aff2
+  source_commit_policy: exact_remote_hard_gate
+  target_branch: codex/r5-night03-targeted-backflow-intake
+  expected_worktree_root: C:\Projects\03_Investment_System_night03
+  bootstrap_seed_commit_allowed: true
+  seed_commit_scope: codex_tasks/night_shift/r5_overnight_03_20260721/** only
+run_window:
+  timezone: Europe/London
+  start_at: '2026-07-20T23:00:00+01:00'
+  stop_claiming_at: '2026-07-21T06:15:00+01:00'
+  final_readout_at: '2026-07-21T06:30:00+01:00'
+  after_cutoff: finish_in_flight_acceptance_then_emit_partial_readout
+authoritative_research_queue:
+  path: reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml
+  import_mode: read_only_exact_hash
+  expected_total_items: 69
+  expected_occurrence_items: 63
+  expected_parent_aggregators: 6
+  expected_occurrence_taxonomy:
+    engineering_local_pointer: 8
+    evidence_required: 8
+    analysis_required: 24
+    dependency_blocked: 20
+    human_exact_hash_gate: 3
+  taxonomy_sum_must_equal_occurrences: true
+  preserve_ids_and_source_hashes: true
+  fabricate_missing_items: false
+mission_policy:
+  single_integrator: true
+  max_parallel_shared_state_writers: 1
+  continue_claiming_until_cutoff: true
+  continue_after_external_block_using_bounded_fallback: true
+  stop_early_only_when_wrapper_tasks_complete_and_next_queue_ready: true
+  mission_wrapper_task_count: 40
+  minimum_workstream_commits_excluding_seed: 4
+  max_pointer_tasks_per_wave: 2
+  decision_consumption_is_idempotent: true
+  resolution_requires_independent_receipt: true
+  candidate_ready_is_not_resolved: true
+  blocked_external_is_not_resolved: true
+  mission_delivery_does_not_close_program_goal: true
+  allowed_success_outcomes:
+  - delivered_with_resolution_delta
+  - delivered_candidate_ready
+  pr_creation_allowed: false
+  merge_main_allowed: false
+  force_push_allowed: false
+  canonical_workflow_state_mutation_allowed: false
+  automatic_human_review_allowed: false
+  sample_quality_allowed: false
+  p2_allowed: false
+decision_input_policy:
+  directory: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/external_decisions
+  blank_template: codex_tasks/night_shift/r5_overnight_03_20260721/templates/blank_decision_manifest.yaml
+  absence_behavior: do_not_resolve; prepare immutable candidates; continue approved engineering tasks
+  accepted_decision_kinds:
+  - evidence_acceptance
+  - analysis_acceptance
+  - human_exact_hash_review
+  - pointer_contract_approval
+read_only_inputs: &id001
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/mission_completion_receipt.json
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.md
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.json
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/remote_delivery_receipt.json
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/ci_status.md
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/bf2_dry_run_receipt.json
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/determinism_receipt.json
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/**
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/**
+- reports/p1_6/r5_bundle17r/activation_run_a/R5_bundle17r_backflow_queue.csv
+- reports/p1_6/r5_bundle17r/activation_manifest.yaml
+- reports/p1_6/r5_bundle17r/quality_gate_report.md
+- reports/p1_6/r5_bundle17r/quality_issues.json
+task_selection:
+  order:
+  - priority_desc
+  - dependency_ready
+  - task_id_asc
+  failure_spawn_depth_limit: 2
+  carry_forward_all_unresolved_imported_items: true
+tasks:
+- id: ns03_t00_exact_baseline_preflight
+  title: 精确复核 Night02 基线并确认隔离 worktree
+  phase: A_baseline
+  priority: 400
+  estimated_work_units: 3
+  status: ready
+  depends_on: []
+  work_type: preflight
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 以最终 SHA 为硬门，验证 seed commit 仅新增 Night03 任务包、工作区 clean、目标分支正确，任何不一致立即停止。
+  allowed_paths: &id002
+  - codex_tasks/night_shift/r5_overnight_03_20260721/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  read_only_paths: *id001
+  forbidden_paths: &id003
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - .local/** (never git-track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python codex_tasks/night_shift/r5_overnight_03_20260721/tools/inspect_night02_outputs.py --repo . --phase preflight
+  - python codex_tasks/night_shift/r5_overnight_03_20260721/tools/verify_package.py codex_tasks/night_shift/r5_overnight_03_20260721
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/source_state.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/preflight.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Bootstrap seed commit must have source_commit as its first parent.
+  - Do not trust a branch name without verifying the exact remote SHA.
+- id: ns03_t01_night02_completion_receipt_audit
+  title: 审计 Night02 完成收据与晨报
+  phase: A_baseline
+  priority: 395
+  estimated_work_units: 3
+  status: pending
+  depends_on:
+  - ns03_t00_exact_baseline_preflight
+  work_type: audit
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 读取物理收据和晨报，核对 40/40、delivered、最终 SHA、0/63 与 Goal open；缺失或矛盾时 fail closed。
+  allowed_paths: *id002
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python codex_tasks/night_shift/r5_overnight_03_20260721/tools/inspect_night02_outputs.py --repo . --phase receipt
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/night02_receipt_audit.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/night02_receipt_audit.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t02_remote_ci_pr_workspace_reconcile
+  title: 复核远端 SHA、最终 CI、PR 与工作区状态
+  phase: A_baseline
+  priority: 390
+  estimated_work_units: 3
+  status: pending
+  depends_on:
+  - ns03_t00_exact_baseline_preflight
+  work_type: audit
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 用 git/gh 和 Night02 发布凭证交叉核对远端、CI、PR=0、clean；不能仅复述用户输入。
+  allowed_paths: *id002
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python codex_tasks/night_shift/r5_overnight_03_20260721/tools/inspect_night02_outputs.py --repo . --phase remote
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/remote_ci_reconciliation.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/remote_ci_reconciliation.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Live GitHub verification is preferred; a tracked receipt alone is not sufficient when gh is available.
+- id: ns03_t03_night02_output_hash_manifest
+  title: 为 Night02 只读产物建立 SHA-256 清单
+  phase: A_baseline
+  priority: 385
+  estimated_work_units: 4
+  status: pending
+  depends_on:
+  - ns03_t01_night02_completion_receipt_audit
+  - ns03_t02_remote_ci_pr_workspace_reconcile
+  work_type: audit
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 枚举 Night02 receipt/readout/queue/backflow/strategic/validation 产物并建立不可变哈希清单，Night03 不修改这些文件。
+  allowed_paths: &id004
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - tests/fixtures/r5_night_shift/**
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_03_20260721/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  - .github/workflows/**
+  - docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night02_manifest.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/night02_input_manifest.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t04_import_authoritative_69_queue
+  title: 只读导入 Night03 的 69 项权威队列
+  phase: A_baseline
+  priority: 380
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t03_night02_output_hash_manifest
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 按 exact-hash 导入 Night02 next_night_queue，不改 ID、不压缩 occurrence、不生成替代大任务。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_queue_import.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/authoritative_queue_snapshot.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/authoritative_queue_lock.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t05_queue_taxonomy_count_audit
+  title: 核验 63 occurrence + 6 parent 及五类分布
+  phase: A_baseline
+  priority: 375
+  estimated_work_units: 4
+  status: pending
+  depends_on:
+  - ns03_t04_import_authoritative_69_queue
+  work_type: audit
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 验证 69 项、63 occurrence、6 parent，以及 8 pointer/8 evidence/24 analysis/20 dependency/3 human 的分类总和。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_queue_taxonomy.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/taxonomy_audit.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/taxonomy_audit.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t06_lineage_and_stale_source_guard
+  title: 阻断陈旧队列、陈旧哈希与错误代际
+  phase: A_baseline
+  priority: 370
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t04_import_authoritative_69_queue
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 每个任务必须绑定 source queue hash、source commit 和上游 artifact hash；任何重渲染使旧决定失效。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_lineage_guard.py tests/test_r5_night_shift_publication.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/lineage_audit.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t07_truth_snapshot_and_outcome_model
+  title: 固化 Mission 与研究 Goal 双层真值
+  phase: A_baseline
+  priority: 365
+  estimated_work_units: 4
+  status: pending
+  depends_on:
+  - ns03_t05_queue_taxonomy_count_audit
+  - ns03_t06_lineage_and_stale_source_guard
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 建立 delivered_with_resolution_delta / delivered_candidate_ready / partial / blocked / failed / cutoff；Mission
+    完成不得关闭研究 Goal。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_goal_policy.py tests/test_r5_night_shift_outcome.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/truth_snapshot.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t10_decision_manifest_schema
+  title: 建立外部决定 Manifest 合同
+  phase: B_decision_intake
+  priority: 350
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t07_truth_snapshot_and_outcome_model
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 为 evidence、analysis、human exact-hash、pointer contract 四类决定定义统一 schema；自动流程只能读取，不能填写 reviewer 或 accepted。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_manifest.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/decision_manifest_schema.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/blank_decision_manifest.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t11_exact_hash_decision_validator
+  title: 实现 exact-hash 决定验证器
+  phase: B_decision_intake
+  priority: 345
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t10_decision_manifest_schema
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 决定必须绑定 occurrence、候选物、source queue、review packet 和 reviewer handoff 的物理哈希；任一变化即失效。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_hash.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/decision_validation_contract.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t12_authority_reviewer_identity_guard
+  title: 验证决定权限与真实 reviewer 字段
+  phase: B_decision_intake
+  priority: 340
+  estimated_work_units: 4
+  status: pending
+  depends_on:
+  - ns03_t10_decision_manifest_schema
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 拒绝空 reviewer、自动生成身份、未来时间、owner 不匹配、无授权 decision；机器候选不得冒充人工批准。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_authority.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/authority_matrix.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t13_evidence_acceptance_adapter
+  title: 实现 evidence-required 接受决定适配器
+  phase: B_decision_intake
+  priority: 335
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t11_exact_hash_decision_validator
+  - ns03_t12_authority_reviewer_identity_guard
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 只接受已审 evidence_id/source hash/source class/claim boundary；候选来源或搜索结果不能直接解除 8 个 evidence blocker。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_evidence_decisions.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/evidence_adapter_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t14_analysis_decision_adapter
+  title: 实现 analysis-required 研究判断适配器
+  phase: B_decision_intake
+  priority: 330
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t11_exact_hash_decision_validator
+  - ns03_t12_authority_reviewer_identity_guard
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 24 个分析项只有在结论、证据映射、反证、置信度、模型链接和 reviewer 决定齐全时才可转为 accepted。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_analysis_decisions.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/analysis_adapter_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t15_human_exact_hash_adapter
+  title: 实现 3 个 human/exact-hash 门适配器
+  phase: B_decision_intake
+  priority: 325
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t11_exact_hash_decision_validator
+  - ns03_t12_authority_reviewer_identity_guard
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 人审只对精确候选哈希生效，任何报告、generation lock、质量结果变化都会撤销旧审查资格。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_human_decisions.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/human_gate_adapter_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t16_pointer_contract_approval_adapter
+  title: 实现 8 个 pointer 合同批准适配器
+  phase: B_decision_intake
+  priority: 320
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t11_exact_hash_decision_validator
+  - ns03_t12_authority_reviewer_identity_guard
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 只消费 exact paths、exact acceptance commands、scope ceiling 和 review SHA 均匹配的批准合同；proposed 不可执行。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_approvals.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/pointer_approval_adapter_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t17_false_resolution_guard
+  title: 阻断候选、准备就绪或 no-input 冒充 resolved
+  phase: B_decision_intake
+  priority: 315
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t13_evidence_acceptance_adapter
+  - ns03_t14_analysis_decision_adapter
+  - ns03_t15_human_exact_hash_adapter
+  - ns03_t16_pointer_contract_approval_adapter
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: resolution claim 必须同时具有批准决定、实际执行/接受收据、验收通过和 lineage 匹配；否则保持 unresolved。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_resolution_truth.py tests/test_r5_night_shift_no_false_success.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/resolution_policy.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t20_occurrence_state_transition_engine
+  title: 实现 occurrence 级状态转换器
+  phase: C_resolution_engine
+  priority: 300
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t17_false_resolution_guard
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 支持 pending/candidate_ready/blocked_external/approved/running/passed/failed/resolved，并保留尝试、证据和决定链。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_occurrence_transition.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/occurrence_state_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t21_parent_aggregation_engine
+  title: 实现 6 个 parent work-order 聚合器
+  phase: C_resolution_engine
+  priority: 295
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t20_occurrence_state_transition_engine
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 父工单只在所有必需 occurrence 真正 resolved 后关闭；candidate_ready 或 blocked_external 不能被聚合为完成。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_parent_aggregation.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/parent_aggregation_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t22_dependency_unblock_engine
+  title: 实现 20 个 dependency blocker 的可验证解锁
+  phase: C_resolution_engine
+  priority: 290
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t20_occurrence_state_transition_engine
+  - ns03_t21_parent_aggregation_engine
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 仅在真实前置 occurrence receipt 满足时解锁，检测环、孤儿、错误跨 case 依赖和部分完成误解锁。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_dependency_unblock.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/dependency_unblock_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t23_occurrence_diff_sandbox
+  title: 为批准的 pointer occurrence 建立差异沙箱
+  phase: C_resolution_engine
+  priority: 285
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t16_pointer_contract_approval_adapter
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 每个 child task 的变更必须是批准 exact paths 的子集；共享状态由单一 integrator 写入，越界立即回滚并失败。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_occurrence_sandbox.py tests/test_r5_night_shift_scope_guard.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/sandbox_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t24_acceptance_command_safety
+  title: 加强批准命令的安全执行边界
+  phase: C_resolution_engine
+  priority: 280
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t16_pointer_contract_approval_adapter
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 禁止占位、命令拼接、force push、PR/merge、破坏性 git、网络写入和未声明 shell；命令必须来自批准哈希。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_command_safety.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/command_safety_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t25_approved_pointer_pilot_executor
+  title: 实现批准 pointer 的分波执行器
+  phase: C_resolution_engine
+  priority: 275
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns03_t20_occurrence_state_transition_engine
+  - ns03_t23_occurrence_diff_sandbox
+  - ns03_t24_acceptance_command_safety
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: true
+  external_gate_behavior: blocked_external_without_resolution
+  goal: 每波最多 2 个已批准 pointer；逐项提交、验收、生成 receipt 后重算队列。无批准合同则任务状态 blocked_external，不产生 resolution。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_executor.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/pointer_executor_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t26_resolution_receipt_generation_lock
+  title: 建立 resolution receipt 与 generation lock
+  phase: C_resolution_engine
+  priority: 270
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t20_occurrence_state_transition_engine
+  - ns03_t25_approved_pointer_pilot_executor
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 收据绑定输入决定、代码树、命令、输出、测试与 occurrence ID；不能自引用最终 commit，也不能复用旧人审。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_resolution_receipts.py tests/test_r5_night_shift_digest.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/resolution_receipt_schema.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t27_idempotent_resume_and_replay
+  title: 验证决定消费、执行与聚合可幂等续跑
+  phase: C_resolution_engine
+  priority: 265
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t21_parent_aggregation_engine
+  - ns03_t22_dependency_unblock_engine
+  - ns03_t26_resolution_receipt_generation_lock
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 中断重跑不得重复消费决定、重复提交、重复计数或丢失 blocked 状态；相同输入输出字节一致。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_replay.py tests/test_r5_night_shift_resume.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/replay_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t30_consume_available_approved_inputs
+  title: 消费现有已批准决定并执行可解锁项
+  phase: D_targeted_backflow
+  priority: 250
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns03_t13_evidence_acceptance_adapter
+  - ns03_t14_analysis_decision_adapter
+  - ns03_t15_human_exact_hash_adapter
+  - ns03_t16_pointer_contract_approval_adapter
+  - ns03_t20_occurrence_state_transition_engine
+  - ns03_t25_approved_pointer_pilot_executor
+  work_type: resolution_wave
+  delivery_required: false
+  resolution_capable: true
+  external_gate_behavior: blocked_external_without_resolution
+  goal: 扫描外部决定目录；对有效批准逐项执行并生成独立收据。没有批准输入时如实记录 0 个 consumed，保持 imported items unresolved。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python scripts/run_r5_night_shift.py --mission r5_overnight_03_20260721 --mode consume-approved --continue-on-external-block
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/approved_input_consumption.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t31_evidence_candidate_enrichment
+  title: 将 8 个 evidence 请求升级为可审候选包
+  phase: D_targeted_backflow
+  priority: 245
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t05_queue_taxonomy_count_audit
+  - ns03_t13_evidence_acceptance_adapter
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 基于现有受审来源生成候选来源路径、缺口、接受标准、冲突证据与回流命令；不得把候选搜索结果自动接受。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_evidence_candidate_packets.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/evidence_candidates.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/evidence_candidates.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t32_analysis_candidate_enrichment
+  title: 将 24 个 analysis workbook 升级为 exact-hash 候选判断包
+  phase: D_targeted_backflow
+  priority: 240
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns03_t05_queue_taxonomy_count_audit
+  - ns03_t14_analysis_decision_adapter
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 每项给出公司特异问题、证据映射、候选结论、因果链、量化桥、反证、未知项和 reviewer 清单；保持 candidate_pending_review。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_analysis_candidate_packets.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/analysis_candidates.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/analysis_candidates.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - The four case archetypes are product-generation, backlog-conversion, commodity-cycle, and multi-business/M&A.
+  - User samples are density/archetype references, not factual evidence.
+- id: ns03_t33_human_gate_packet_refresh
+  title: 刷新 3 个 human/exact-hash 交接包
+  phase: D_targeted_backflow
+  priority: 235
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t05_queue_taxonomy_count_audit
+  - ns03_t15_human_exact_hash_adapter
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 重新锁定候选物理哈希、generation IDs、质量布尔值和 reviewer 空字段；不得自动触发或通过人审。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_human_packet_refresh.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/human_gate_handoffs.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/human_gate_handoffs.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t34_pointer_proposal_review_index
+  title: 生成 8 个 pointer 提案的统一审查索引
+  phase: D_targeted_backflow
+  priority: 230
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t05_queue_taxonomy_count_audit
+  - ns03_t16_pointer_contract_approval_adapter
+  - ns03_t23_occurrence_diff_sandbox
+  - ns03_t24_acceptance_command_safety
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 列出 exact paths、acceptance commands、diff ceiling、source artifact、proposal hash、风险和批准空字段，禁止修改历史 Bundle 产物。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_review_index.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/pointer_review_index.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/pointer_review_index.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t35_dependency_unlock_matrix
+  title: 生成 20 个依赖项的解锁矩阵
+  phase: D_targeted_backflow
+  priority: 225
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t22_dependency_unblock_engine
+  - ns03_t31_evidence_candidate_enrichment
+  - ns03_t32_analysis_candidate_enrichment
+  - ns03_t33_human_gate_packet_refresh
+  - ns03_t34_pointer_proposal_review_index
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 为每个 dependency occurrence 给出前置 ID、所需决定/收据、当前状态、不可替代条件和最短解锁路径。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_dependency_matrix.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/dependency_unlock_matrix.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/dependency_unlock_matrix.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t36_four_case_progress_dashboard
+  title: 生成四个 golden case 的真实进度面板
+  phase: D_targeted_backflow
+  priority: 220
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t21_parent_aggregation_engine
+  - ns03_t35_dependency_unlock_matrix
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 分别展示铜冠铜箔、药明康德、赤峰黄金、东阳光的 occurrence、候选、批准、resolved、依赖和下一动作，不用汇总分数掩盖缺口。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_four_case_dashboard.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/progress/four_case_dashboard.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/progress/four_case_dashboard.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t37_blocker_delta_unresolved_ledger
+  title: 计算真实 blocker delta 与未解决账本
+  phase: D_targeted_backflow
+  priority: 215
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t30_consume_available_approved_inputs
+  - ns03_t36_four_case_progress_dashboard
+  work_type: audit
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 只有独立 resolution receipts 可增加 resolved；若无批准，必须明确写 0/63 且区分 candidate_ready、blocked_external、dependency_blocked。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_blocker_ledger.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/progress/blocker_ledger.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/progress/blocker_ledger.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t40_adversarial_decision_and_resolution_tests
+  title: 补齐决定伪造与假解决对抗测试
+  phase: E_validation
+  priority: 200
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns03_t17_false_resolution_guard
+  - ns03_t22_dependency_unblock_engine
+  - ns03_t26_resolution_receipt_generation_lock
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 覆盖 hash mismatch、伪 reviewer、proposed 当 approved、candidate 当 resolved、父工单误关闭、依赖误解锁、越界 child diff。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_adversarial.py tests/test_r5_night_shift_resolution_truth.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/adversarial_matrix.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t41_determinism_double_run
+  title: 执行决定导入、候选包、账本与晨报双跑
+  phase: E_validation
+  priority: 195
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t27_idempotent_resume_and_replay
+  - ns03_t37_blocker_delta_unresolved_ledger
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 同一 source queue 和 decision manifest 运行两次，稳定产物字节一致；时间、绝对路径和远端状态进入非稳定 receipt。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night03_determinism.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/determinism_receipt.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t42_crash_cutoff_resume_tests
+  title: 验证崩溃、锁过期、cutoff 与外部门禁续跑
+  phase: E_validation
+  priority: 190
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t27_idempotent_resume_and_replay
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 06:15 后停止领取新任务但完成在途验收；外部决定后续到达时可从原 occurrence 恢复，不重复消费。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night03_crash_resume.py tests/test_r5_night_shift_lock.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/crash_resume_receipt.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t43_full_regression_source_route_scope_audit
+  title: 运行专项、source-route、全量测试与 scope audit
+  phase: E_validation
+  priority: 185
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns03_t40_adversarial_decision_and_resolution_tests
+  - ns03_t41_determinism_double_run
+  - ns03_t42_crash_cutoff_resume_tests
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 所有 Night03 专项、source-route、全仓 pytest、diff check、tracked 临时文件和历史路径变更检查必须通过。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_*.py
+  - python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml
+  - python -m pytest -q
+  - git diff --check
+  - python -c "import subprocess; out=subprocess.check_output(['git','diff','--name-only','069da527452def6c59c3772750e933d8611ccadf..HEAD','--','reports/p1_6/r5_bundle17r','reports/p1_6/r5_night_shift/r5_overnight_02_20260720'],
+    text=True); assert not out.strip(), out"
+  - python -c "import subprocess; files=subprocess.check_output(['git','ls-files'], text=True).splitlines(); bad=[p
+    for p in files if p.startswith('.local/') or p.endswith('.pyc') or '/__pycache__/' in p]; assert not bad, bad"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/full_regression.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/scope_audit.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t44_ci_contract_and_workflow_verification
+  title: 验证 GitHub Actions 覆盖 Night03 回归
+  phase: E_validation
+  priority: 180
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t43_full_regression_source_route_scope_audit
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 确认 CI 运行决定合同、对抗测试、全量回归和历史路径 guard；仅在缺失时做最小修改，不改 branch protection。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night03_ci_contract.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/ci_contract.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t45_workstream_commit_push
+  title: 按工作流提交并推送 Night03 分支
+  phase: E_publication
+  priority: 175
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns03_t44_ci_contract_and_workflow_verification
+  work_type: publication
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 形成不少于 4 个有意义的 workstream commits（不含 seed），推送目标分支；不创建 PR、不合并 main、不 force push。
+  allowed_paths: *id004
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -c "import subprocess; b=subprocess.check_output(['git','branch','--show-current'], text=True).strip();
+    assert b == 'codex/r5-night03-targeted-backflow-intake', b"
+  - python -c "import subprocess; n=int(subprocess.check_output(['git','rev-list','--count','069da527452def6c59c3772750e933d8611ccadf..HEAD'],
+    text=True)); assert n >= 5, n"
+  - git status --short
+  - git diff --check
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/tracked_delivery_receipt.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t46_final_remote_ci_receipt
+  title: 核验最终远端 HEAD 与 CI 并生成非自引用收据
+  phase: E_publication
+  priority: 170
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t45_workstream_commit_push
+  work_type: publication
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 轮询目标分支最终 CI；remote SHA 必须等于 local HEAD。最终 remote/CI receipt 可保持 untracked 或上传为 CI artifact，避免自引用。
+  allowed_paths: *id002
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -c "import subprocess; local=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip();
+    remote=subprocess.check_output(['git','ls-remote','--heads','origin','codex/r5-night03-targeted-backflow-intake'],
+    text=True).split()[0]; assert local == remote, (local, remote)"
+  - gh run list --branch codex/r5-night03-targeted-backflow-intake --limit 5 --json databaseId,headSha,status,conclusion,url
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/remote_delivery_receipt.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/ci_status.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns03_t47_morning_readout_and_night04_queue
+  title: 生成晨报与 Night04 精确续跑队列
+  phase: E_publication
+  priority: 165
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns03_t46_final_remote_ci_receipt
+  - ns03_t37_blocker_delta_unresolved_ledger
+  work_type: publication
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: not_applicable
+  goal: 晨报区分 Mission outcome、candidate readiness 与 research resolution；Night04 原样携带所有 unresolved IDs，并解析最终 remote
+    HEAD。
+  allowed_paths: *id002
+  read_only_paths: *id001
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -c "from pathlib import Path; assert Path('reports/p1_6/r5_night_shift/r5_overnight_03_20260721/morning_readout.md').is_file()"
+  - python -c "import yaml; q=yaml.safe_load(open('reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml',
+    encoding='utf-8')); assert q['program_goal']['close_allowed'] is False; assert q['source_commit_policy'] ==
+    'resolve_final_remote_head_at_bootstrap'; assert len(q['tasks']) >= 12"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/morning_readout.md
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/morning_readout.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - If resolved remains 0, say 0/63 explicitly.
+  - A delivered_candidate_ready mission is not a completed research program.

@@ -1,0 +1,19 @@
+schema_version: r5_night03_outcome_contract_v1
+outcomes:
+  delivered_with_resolution_delta:
+    delivery_tasks_passed: true
+    resolved_delta_min: 1
+    program_goal_auto_close: false
+  delivered_candidate_ready:
+    delivery_tasks_passed: true
+    resolved_delta: 0
+    all_candidate_packets_complete: true
+    program_goal_auto_close: false
+  partial:
+    carry_forward: true
+  blocked:
+    cannot_report_delivered: true
+  failed:
+    cannot_report_delivered: true
+  cutoff:
+    carry_forward: true

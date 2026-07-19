@@ -1,0 +1,330 @@
+schema_version: r5_night03_acceptance_matrix_v1
+mission_id: r5_overnight_03_20260721
+wrapper_tasks:
+- id: ns03_t00_exact_baseline_preflight
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python codex_tasks/night_shift/r5_overnight_03_20260721/tools/inspect_night02_outputs.py --repo . --phase preflight
+  - python codex_tasks/night_shift/r5_overnight_03_20260721/tools/verify_package.py codex_tasks/night_shift/r5_overnight_03_20260721
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/source_state.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/preflight.md
+- id: ns03_t01_night02_completion_receipt_audit
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python codex_tasks/night_shift/r5_overnight_03_20260721/tools/inspect_night02_outputs.py --repo . --phase receipt
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/night02_receipt_audit.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/night02_receipt_audit.md
+- id: ns03_t02_remote_ci_pr_workspace_reconcile
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python codex_tasks/night_shift/r5_overnight_03_20260721/tools/inspect_night02_outputs.py --repo . --phase remote
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/remote_ci_reconciliation.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/remote_ci_reconciliation.md
+- id: ns03_t03_night02_output_hash_manifest
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night02_manifest.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/night02_input_manifest.json
+- id: ns03_t04_import_authoritative_69_queue
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_queue_import.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/authoritative_queue_snapshot.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/authoritative_queue_lock.json
+- id: ns03_t05_queue_taxonomy_count_audit
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_queue_taxonomy.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/taxonomy_audit.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/taxonomy_audit.md
+- id: ns03_t06_lineage_and_stale_source_guard
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_lineage_guard.py tests/test_r5_night_shift_publication.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/lineage_audit.json
+- id: ns03_t07_truth_snapshot_and_outcome_model
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_goal_policy.py tests/test_r5_night_shift_outcome.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/truth_snapshot.json
+- id: ns03_t10_decision_manifest_schema
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_manifest.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/decision_manifest_schema.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/blank_decision_manifest.yaml
+- id: ns03_t11_exact_hash_decision_validator
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_hash.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/decision_validation_contract.md
+- id: ns03_t12_authority_reviewer_identity_guard
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_authority.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/authority_matrix.yaml
+- id: ns03_t13_evidence_acceptance_adapter
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_evidence_decisions.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/evidence_adapter_contract.yaml
+- id: ns03_t14_analysis_decision_adapter
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_analysis_decisions.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/analysis_adapter_contract.yaml
+- id: ns03_t15_human_exact_hash_adapter
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_human_decisions.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/human_gate_adapter_contract.yaml
+- id: ns03_t16_pointer_contract_approval_adapter
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_approvals.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/pointer_approval_adapter_contract.yaml
+- id: ns03_t17_false_resolution_guard
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_resolution_truth.py tests/test_r5_night_shift_no_false_success.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/resolution_policy.yaml
+- id: ns03_t20_occurrence_state_transition_engine
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_occurrence_transition.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/occurrence_state_contract.yaml
+- id: ns03_t21_parent_aggregation_engine
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_parent_aggregation.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/parent_aggregation_contract.yaml
+- id: ns03_t22_dependency_unblock_engine
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_dependency_unblock.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/dependency_unblock_contract.yaml
+- id: ns03_t23_occurrence_diff_sandbox
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_occurrence_sandbox.py tests/test_r5_night_shift_scope_guard.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/sandbox_contract.yaml
+- id: ns03_t24_acceptance_command_safety
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_command_safety.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/command_safety_contract.yaml
+- id: ns03_t25_approved_pointer_pilot_executor
+  delivery_required: true
+  resolution_capable: true
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_executor.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/pointer_executor_contract.yaml
+- id: ns03_t26_resolution_receipt_generation_lock
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_resolution_receipts.py tests/test_r5_night_shift_digest.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/resolution_receipt_schema.json
+- id: ns03_t27_idempotent_resume_and_replay
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_replay.py tests/test_r5_night_shift_resume.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/replay_contract.yaml
+- id: ns03_t30_consume_available_approved_inputs
+  delivery_required: false
+  resolution_capable: true
+  acceptance_commands:
+  - python scripts/run_r5_night_shift.py --mission r5_overnight_03_20260721 --mode consume-approved --continue-on-external-block
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/approved_input_consumption.json
+- id: ns03_t31_evidence_candidate_enrichment
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_evidence_candidate_packets.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/evidence_candidates.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/evidence_candidates.md
+- id: ns03_t32_analysis_candidate_enrichment
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_analysis_candidate_packets.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/analysis_candidates.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/analysis_candidates.md
+- id: ns03_t33_human_gate_packet_refresh
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_human_packet_refresh.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/human_gate_handoffs.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/human_gate_handoffs.md
+- id: ns03_t34_pointer_proposal_review_index
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_review_index.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/pointer_review_index.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/pointer_review_index.md
+- id: ns03_t35_dependency_unlock_matrix
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_dependency_matrix.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/dependency_unlock_matrix.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/dependency_unlock_matrix.md
+- id: ns03_t36_four_case_progress_dashboard
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_four_case_dashboard.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/progress/four_case_dashboard.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/progress/four_case_dashboard.md
+- id: ns03_t37_blocker_delta_unresolved_ledger
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_blocker_ledger.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/progress/blocker_ledger.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/progress/blocker_ledger.md
+- id: ns03_t40_adversarial_decision_and_resolution_tests
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_adversarial.py tests/test_r5_night_shift_resolution_truth.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/adversarial_matrix.json
+- id: ns03_t41_determinism_double_run
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night03_determinism.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/determinism_receipt.json
+- id: ns03_t42_crash_cutoff_resume_tests
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night03_crash_resume.py tests/test_r5_night_shift_lock.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/crash_resume_receipt.json
+- id: ns03_t43_full_regression_source_route_scope_audit
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_*.py
+  - python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml
+  - python -m pytest -q
+  - git diff --check
+  - python -c "import subprocess; out=subprocess.check_output(['git','diff','--name-only','069da527452def6c59c3772750e933d8611ccadf..HEAD','--','reports/p1_6/r5_bundle17r','reports/p1_6/r5_night_shift/r5_overnight_02_20260720'],
+    text=True); assert not out.strip(), out"
+  - python -c "import subprocess; files=subprocess.check_output(['git','ls-files'], text=True).splitlines(); bad=[p
+    for p in files if p.startswith('.local/') or p.endswith('.pyc') or '/__pycache__/' in p]; assert not bad, bad"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/full_regression.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/scope_audit.json
+- id: ns03_t44_ci_contract_and_workflow_verification
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night03_ci_contract.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/ci_contract.json
+- id: ns03_t45_workstream_commit_push
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -c "import subprocess; b=subprocess.check_output(['git','branch','--show-current'], text=True).strip();
+    assert b == 'codex/r5-night03-targeted-backflow-intake', b"
+  - python -c "import subprocess; n=int(subprocess.check_output(['git','rev-list','--count','069da527452def6c59c3772750e933d8611ccadf..HEAD'],
+    text=True)); assert n >= 5, n"
+  - git status --short
+  - git diff --check
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/tracked_delivery_receipt.json
+- id: ns03_t46_final_remote_ci_receipt
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -c "import subprocess; local=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip();
+    remote=subprocess.check_output(['git','ls-remote','--heads','origin','codex/r5-night03-targeted-backflow-intake'],
+    text=True).split()[0]; assert local == remote, (local, remote)"
+  - gh run list --branch codex/r5-night03-targeted-backflow-intake --limit 5 --json databaseId,headSha,status,conclusion,url
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/remote_delivery_receipt.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/ci_status.md
+- id: ns03_t47_morning_readout_and_night04_queue
+  delivery_required: true
+  resolution_capable: false
+  acceptance_commands:
+  - python -c "from pathlib import Path; assert Path('reports/p1_6/r5_night_shift/r5_overnight_03_20260721/morning_readout.md').is_file()"
+  - python -c "import yaml; q=yaml.safe_load(open('reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml',
+    encoding='utf-8')); assert q['program_goal']['close_allowed'] is False; assert q['source_commit_policy'] ==
+    'resolve_final_remote_head_at_bootstrap'; assert len(q['tasks']) >= 12"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/morning_readout.md
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/morning_readout.json
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+mission_release_gates:
+- all delivery_required wrapper tasks passed
+- all failures have bounded failure packets
+- authoritative 69-item queue retained with stable IDs
+- blocker delta backed only by independent resolution receipts
+- full pytest and source-route gate passed
+- historical Bundle17R and Night02 paths unchanged
+- local and remote target SHA equal
+- target-branch CI success
+- morning readout and Night04 queue generated
+- program goal remains open_needs_targeted_backflow unless separately authorized by a future human decision

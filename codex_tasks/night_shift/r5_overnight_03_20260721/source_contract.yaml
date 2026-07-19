@@ -1,0 +1,66 @@
+schema_version: r5_night03_source_contract_v1
+repository: chaoranq2000-crypto/03_Investment_System
+source_branch_default: codex/r5-night02-contract-recovery
+source_commit: 069da527452def6c59c3772750e933d8611ccadf
+source_commit_authority: user_reported_then_runtime_hard_verified
+night02_start_commit: 4340945457d661ed62967e949f862ccf2214aff2
+target_branch_default: codex/r5-night03-targeted-backflow-intake
+expected_worktree_root: C:\Projects\03_Investment_System_night03
+reported_night02_completion:
+  mission_tasks_passed: 40
+  mission_tasks_total: 40
+  mission_outcome: delivered
+  final_sha: 069da527452def6c59c3772750e933d8611ccadf
+  local_remote_equal: true
+  ci_run_id: 29681505920
+  ci_conclusion: success
+  workspace_clean: true
+  open_pr_count: 0
+  historical_bundle_path_change_count: 0
+  next_queue_item_count: 69
+  research_goal_state: open_needs_targeted_backflow
+  resolved_occurrences: 0
+  total_occurrences: 63
+  reported_token_usage: 685286
+  reported_runtime_minutes: 86
+required_runtime_rechecks:
+- source branch remote SHA equals source_commit
+- local source worktree HEAD equals source_commit before bootstrap
+- Night02 mission receipt binds final_sha and delivered outcome
+- Night02 readout reports 40/40 passed
+- Night02 next queue contains exactly 69 task records
+- Night02 research truth remains 0/63 resolved and goal remains open
+- GitHub Actions run conclusion is success and head SHA equals source_commit
+- no open PR exists for source branch
+- git status is clean
+- git diff from Night02 start commit to final SHA changes zero paths under reports/p1_6/r5_bundle17r
+authoritative_night03_queue:
+  path: reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml
+  import_mode: read_only_exact_hash
+  expected_total_items: 69
+  expected_occurrence_items: 63
+  expected_parent_aggregators: 6
+  expected_occurrence_taxonomy:
+    engineering_local_pointer: 8
+    evidence_required: 8
+    analysis_required: 24
+    dependency_blocked: 20
+    human_exact_hash_gate: 3
+  taxonomy_sum_must_equal_occurrences: true
+  preserve_ids_and_source_hashes: true
+  fabricate_missing_items: false
+read_only_inputs:
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/mission_completion_receipt.json
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.md
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.json
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/remote_delivery_receipt.json
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/ci_status.md
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/bf2_dry_run_receipt.json
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/determinism_receipt.json
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/**
+- reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/**
+- reports/p1_6/r5_bundle17r/activation_run_a/R5_bundle17r_backflow_queue.csv
+- reports/p1_6/r5_bundle17r/activation_manifest.yaml
+- reports/p1_6/r5_bundle17r/quality_gate_report.md
+- reports/p1_6/r5_bundle17r/quality_issues.json
