@@ -1,0 +1,16 @@
+schema_version: r5_night_shift_runtime_config_v1
+runtime_root: .local/night_shift
+timezone: Europe/London
+stop_claiming_at: '06:15'
+lock:
+  path: .local/night_shift/run.lock
+  stale_after_seconds: 900
+receipts_dir: .local/night_shift/receipts
+trusted_executables:
+  - python
+  - pytest
+  - git
+release_boundaries:
+  canonical_workflow_state_mutation_allowed: false
+  sample_quality_allowed: false
+  p2_allowed: false
