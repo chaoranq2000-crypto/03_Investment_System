@@ -1,0 +1,43 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -c \"from pathlib import Path; assert Path('reports/p1_6/r5_night_shift/r5_overnight_03_20260721/morning_readout.md').is_file()\"",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    },
+    {
+      "command": "python -c \"import yaml; q=yaml.safe_load(open('reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml', encoding='utf-8')); assert q['program_goal']['close_allowed'] is False; assert q['source_commit_policy'] == 'resolve_final_remote_head_at_bootstrap'; assert len(q['tasks']) >= 12\"",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 680,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/morning_readout.md",
+      "sha256": "e865127ce4526cf9cb643278c672984813c367726e39af75526fb8e39bf470f1"
+    },
+    {
+      "bytes": 5428,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/morning_readout.json",
+      "sha256": "762623c8c0b41bd6719a5d8d3d10207d01310ebd0519816e54578f1b47565478"
+    },
+    {
+      "bytes": 120990,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml",
+      "sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "8bf66b0b8bc82021d99e716c6a304621dbf4e78b78973d4d1a85a0639831b354",
+  "task_id": "ns03_t47_morning_readout_and_night04_queue",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

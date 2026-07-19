@@ -1,0 +1,43 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -c \"import subprocess; b=subprocess.check_output(['git','branch','--show-current'], text=True).strip(); assert b == 'codex/r5-night03-targeted-backflow-intake', b\"",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    },
+    {
+      "command": "python -c \"import subprocess; n=int(subprocess.check_output(['git','rev-list','--count','069da527452def6c59c3772750e933d8611ccadf..HEAD'], text=True)); assert n >= 5, n\"",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    },
+    {
+      "command": "git status --short",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    },
+    {
+      "command": "git diff --check",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 1993,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/tracked_delivery_receipt.json",
+      "sha256": "d3b85bae44e400bb3603b842b85f13fbebcbb25f436e8e7743bb572cc5c5b1a1"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "612fb6fdd62e2ae2c4533a3da2bf6fab3b0e6291a27f8bb15ed2312dc8f2c15b",
+  "task_id": "ns03_t45_workstream_commit_push",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

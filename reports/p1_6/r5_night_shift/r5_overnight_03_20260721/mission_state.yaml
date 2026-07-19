@@ -159,13 +159,13 @@ tasks:
 - id: ns03_t45_workstream_commit_push
   phase: E_publication
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t46_final_remote_ci_receipt
   phase: E_publication
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t47_morning_readout_and_night04_queue
   phase: E_publication
   delivery_required: true
-  status: pending
-stable_receipt_sha256: 955baa09ba73d656b7f37497758f03c51c2aeae2c1cd42699ef12092327bfb4b
+  status: passed
+stable_receipt_sha256: 5d549d52906f1a6300327ac46fdddc8908f16f6dca762b17bf3e53310c68483f
