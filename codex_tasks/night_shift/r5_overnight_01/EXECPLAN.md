@@ -69,6 +69,10 @@
   seed determinism 和 readout determinism 全部通过。
 - T90 可信命令链再次确认全库 `959 passed, 2 skipped`，并在报告层收口前确认
   本地与远端均为 `90172520bb437014240443a34505bc38a7a69c06`。
+- 发布后用 `Get-FileHash` 重新读取原始 ZIP，确认完整 64 位 package SHA-256 为
+  `d19ab2c9bcb811c63523b057f0e503be448e81568d0098917fef2d6e6918cd8c`；初版元数据
+  少了末尾 `c`，已修正 preflight、baseline、delivery receipt 和派生 readout JSON，
+  输入文件与 input-set SHA 未发生变化。
 
 ## Decision Log
 
@@ -81,6 +85,7 @@
 | 2026-07-19 01:40 BST | 对 8 个 pointer occurrence 走 `no_safe_pilot` | category 识别不能替代 allowed-path 与 acceptance 合同 | 生成阻断包，保留 6 pending / 0-of-63 resolved |
 | 2026-07-19 01:54 BST | 关闭 T90 前先推送两个逻辑提交并核对远端 | delivery receipt 需要可验证的非自引用 SHA checkpoint | 本地与远端在 `90172520...` 一致，最终报告层另作普通提交 |
 | 2026-07-19 02:10 BST | 下一夜队列保持 human/evidence/analysis gates 显式关闭 | 本夜没有新证据、研究判断或 exact-hash 人审授权 | 不自动开放 canonical、sample quality 或 P2 |
+| 2026-07-19 02:20 BST | 发布后重算原始 ZIP 哈希并修正末位抄录 | 交付身份必须保留完整 64 位 SHA-256 | 只改元数据与确定性派生读数，重新走普通 push 和 CI |
 
 ## Validation Record
 
@@ -100,8 +105,9 @@
 - 未完成范围：无。后续 next-night 队列中的 human/evidence/analysis gates 不属于本任务包。
 - 真实 blocker 变化：6 work orders 仍 pending；0/63 resolved；0 failed/orphan/rejected。
 - 推送 checkpoint：`3234370782ca8295af8eba746fd597eea9a515e3`、
-  `90172520bb437014240443a34505bc38a7a69c06`；最终报告层提交以目标分支 HEAD 为准，
-  在最终普通 push 后从本地与远端同时核验。
+  `90172520bb437014240443a34505bc38a7a69c06`、
+  `f89a3ab71fa8dbb43d004f01bd19b64111721e80`；最终元数据修正提交以目标分支 HEAD
+  为准，在最终普通 push 后从本地与远端同时核验。
 - Delivery receipt：`reports/p1_6/r5_night_shift/r5_overnight_01_20260719/delivery_receipt.md`。
 - 当前门禁：`needs_targeted_backflow`；sample quality、canonical state、P2 均关闭。
 - 下一夜最高优先级任务：人审 8 个 pointer occurrence 的 exact allowed paths 与

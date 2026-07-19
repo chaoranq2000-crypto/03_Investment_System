@@ -5,8 +5,8 @@
 - Source branch: `codex/r5-bundle17r-bf2-execution-receipts`
 - Source SHA: `36a801efc2bf0af10ad9702b8c6266ebf1935d6f`
 - Target branch: `codex/r5-night01-autonomous-harness`
-- Local SHA: `90172520bb437014240443a34505bc38a7a69c06`
-- Remote SHA: `90172520bb437014240443a34505bc38a7a69c06`
+- Local SHA: `f89a3ab71fa8dbb43d004f01bd19b64111721e80`
+- Remote SHA: `f89a3ab71fa8dbb43d004f01bd19b64111721e80`
 - Local/remote SHA equality: `true`
 
 ## 2. Completed tasks
@@ -18,6 +18,7 @@
 
 - `3234370782ca8295af8eba746fd597eea9a515e3` — feat(night-shift): add queue runtime and recovery
 - `90172520bb437014240443a34505bc38a7a69c06` — feat(night-shift): seed BF2 queue and mission evidence
+- `f89a3ab71fa8dbb43d004f01bd19b64111721e80` — docs(night-shift): finalize delivery readout
 
 ## 4. Validation
 
