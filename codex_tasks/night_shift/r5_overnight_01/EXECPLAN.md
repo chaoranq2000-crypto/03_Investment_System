@@ -37,7 +37,7 @@
 - [x] `ns01_t60_safe_pilot`
 - [x] `ns01_t70_regression_determinism`
 - [x] `ns01_t80_readout_next_queue`
-- [ ] `ns01_t90_commit_push`
+- [x] `ns01_t90_commit_push`
 
 ## Discoveries & Surprises
 
@@ -67,6 +67,8 @@
   acceptance commands，因此本夜 `no_safe_pilot`，真实 blocker 变化仍为 0。
 - source-route gate 为 `pass`（17 capabilities、0 blocking）；专项、全量、scope guard、
   seed determinism 和 readout determinism 全部通过。
+- T90 可信命令链再次确认全库 `959 passed, 2 skipped`，并在报告层收口前确认
+  本地与远端均为 `90172520bb437014240443a34505bc38a7a69c06`。
 
 ## Decision Log
 
@@ -77,6 +79,7 @@
 | 2026-07-19 01:14 BST | 缺失的 work-order allowed paths 保持 unknown | BF1 合同未声明 allowed paths，禁止猜测 | safe pilot 只有在后续发现明确路径和命令时才可领取 |
 | 2026-07-19 01:30 BST | 将 night-shift 通配符验收改为明确文件列表 | Windows 不展开 pytest 路径通配符 | 验收语义不变，命令可在本机和 CI 中复现 |
 | 2026-07-19 01:40 BST | 对 8 个 pointer occurrence 走 `no_safe_pilot` | category 识别不能替代 allowed-path 与 acceptance 合同 | 生成阻断包，保留 6 pending / 0-of-63 resolved |
+| 2026-07-19 01:54 BST | 关闭 T90 前先推送两个逻辑提交并核对远端 | delivery receipt 需要可验证的非自引用 SHA checkpoint | 本地与远端在 `90172520...` 一致，最终报告层另作普通提交 |
 | 2026-07-19 02:10 BST | 下一夜队列保持 human/evidence/analysis gates 显式关闭 | 本夜没有新证据、研究判断或 exact-hash 人审授权 | 不自动开放 canonical、sample quality 或 P2 |
 
 ## Validation Record
@@ -87,16 +90,19 @@
 | Source-route gate | `python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml` | pass; 17 capabilities; 0 blocking | `.github/workflows/ci.yml` |
 | Full pytest | `python -m pytest -q` | 959 passed, 2 skipped | terminal run 2026-07-19 |
 | Deterministic run A/B | `python scripts/run_r5_night_shift.py compare-files ...` | seed queue/inventory/receipt and morning readout/JSON/next queue A/B equal | `.local/night_shift/receipts/determinism.json`; `.local/night_shift/receipts/readout_determinism.json` |
+| T90 delivery acceptance | trusted status/diff/full-pytest/SHA/ls-remote chain | passed; 959 passed, 2 skipped; local=remote | `.local/night_shift/receipts/ns01_t90_commit_push.json`; stable receipt `0e21f4ce39aa54c7e0c70b9c2c939959623cb7535bb9064e3cbf73f5d5aa2b6b` |
 
 ## Outcome
 
-执行结束后填写：
-
 - 完成范围：preflight、BF2 inventory、contract/loader、state/lock/resume、acceptance
-  receipts、BF2 seed、no-safe-pilot、专项/全量/确定性回归、晨报和下一夜队列。
-- 未完成范围：最终 commit/push/delivery receipt（T90）。
+  receipts、BF2 seed、no-safe-pilot、专项/全量/确定性回归、10/10 晨报、下一夜队列、
+  commit、push 和 delivery receipt。
+- 未完成范围：无。后续 next-night 队列中的 human/evidence/analysis gates 不属于本任务包。
 - 真实 blocker 变化：6 work orders 仍 pending；0/63 resolved；0 failed/orphan/rejected。
-- 推送提交：T90 填写。
+- 推送 checkpoint：`3234370782ca8295af8eba746fd597eea9a515e3`、
+  `90172520bb437014240443a34505bc38a7a69c06`；最终报告层提交以目标分支 HEAD 为准，
+  在最终普通 push 后从本地与远端同时核验。
+- Delivery receipt：`reports/p1_6/r5_night_shift/r5_overnight_01_20260719/delivery_receipt.md`。
 - 当前门禁：`needs_targeted_backflow`；sample quality、canonical state、P2 均关闭。
 - 下一夜最高优先级任务：人审 8 个 pointer occurrence 的 exact allowed paths 与
   acceptance commands；未审前不可自动领取。

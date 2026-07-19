@@ -378,8 +378,15 @@ tasks:
   work_type: delivery
   goal: 确认仅声明路径进入提交，清理误跟踪运行产物，创建逻辑提交，推送目标分支，记录本地与远端 SHA 一致。
   allowed_paths:
-  - <all_declared_mission_paths>
-  - codex_tasks/night_shift/r5_overnight_01/EXECPLAN.md
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - templates/night_shift_failure_packet.md
+  - templates/night_shift_morning_readout.md
+  - tests/test_r5_night_shift_*.py
+  - codex_tasks/night_shift/r5_overnight_01/**
   - reports/p1_6/r5_night_shift/**
   forbidden_paths:
   - main

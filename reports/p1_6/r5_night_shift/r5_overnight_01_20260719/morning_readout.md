@@ -5,18 +5,19 @@
 - Source branch: `codex/r5-bundle17r-bf2-execution-receipts`
 - Source SHA: `36a801efc2bf0af10ad9702b8c6266ebf1935d6f`
 - Target branch: `codex/r5-night01-autonomous-harness`
-- Local SHA: `36a801efc2bf0af10ad9702b8c6266ebf1935d6f`
-- Remote SHA: `NOT_PUSHED_AT_READOUT_TIME`
-- Local/remote SHA equality: `false`
+- Local SHA: `90172520bb437014240443a34505bc38a7a69c06`
+- Remote SHA: `90172520bb437014240443a34505bc38a7a69c06`
+- Local/remote SHA equality: `true`
 
 ## 2. Completed tasks
 
-- Passed: `9` / `10`
-- Passed task IDs: `ns01_t00_preflight, ns01_t10_bf2_inventory, ns01_t20_contract_and_loader, ns01_t30_state_lock_resume, ns01_t40_acceptance_receipts, ns01_t50_bf2_seed_adapter, ns01_t60_safe_pilot, ns01_t70_regression_determinism, ns01_t80_readout_next_queue`
+- Passed: `10` / `10`
+- Passed task IDs: `ns01_t00_preflight, ns01_t10_bf2_inventory, ns01_t20_contract_and_loader, ns01_t30_state_lock_resume, ns01_t40_acceptance_receipts, ns01_t50_bf2_seed_adapter, ns01_t60_safe_pilot, ns01_t70_regression_determinism, ns01_t80_readout_next_queue, ns01_t90_commit_push`
 
 ## 3. Commits
 
-- No commit after the source baseline at readout time.
+- `3234370782ca8295af8eba746fd597eea9a515e3` — feat(night-shift): add queue runtime and recovery
+- `90172520bb437014240443a34505bc38a7a69c06` — feat(night-shift): seed BF2 queue and mission evidence
 
 ## 4. Validation
 
