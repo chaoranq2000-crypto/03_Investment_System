@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_occurrence_sandbox.py tests/test_r5_night_shift_scope_guard.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 188,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/sandbox_contract.yaml",
+      "sha256": "3851964de0b56f5d7e157522e6bcc5b7113370e2453c24afe22c1c1720a7f18f"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "0e4232807f6d5a6e13ea87864cdf5a61b150c0d9de394171a4d95823562d3183",
+  "task_id": "ns03_t23_occurrence_diff_sandbox",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

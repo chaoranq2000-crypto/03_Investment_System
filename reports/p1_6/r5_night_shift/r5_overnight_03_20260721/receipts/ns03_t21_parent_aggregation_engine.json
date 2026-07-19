@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_parent_aggregation.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 205,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/parent_aggregation_contract.yaml",
+      "sha256": "a787a65067834e910e6b1515a5f03843987d6ee10361e87137bef2153e9e2e15"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "c76532eeb2f544f1d67e1fae27660ad2c921948ebd160d12bde12798914d4aad",
+  "task_id": "ns03_t21_parent_aggregation_engine",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

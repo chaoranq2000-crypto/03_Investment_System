@@ -1,0 +1,34 @@
+schema_version: r5_night03_occurrence_state_contract_v1
+statuses:
+- approved
+- blocked_external
+- candidate_ready
+- failed
+- passed
+- pending
+- resolved
+- running
+allowed_transitions:
+  pending:
+  - blocked_external
+  - candidate_ready
+  candidate_ready:
+  - approved
+  - blocked_external
+  blocked_external:
+  - approved
+  - candidate_ready
+  approved:
+  - blocked_external
+  - running
+  running:
+  - failed
+  - passed
+  passed:
+  - failed
+  - resolved
+  failed:
+  - approved
+  - blocked_external
+  resolved: []
+resolution_requires_independent_receipt: true

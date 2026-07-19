@@ -1,0 +1,5 @@
+schema_version: r5_night03_parent_aggregation_contract_v1
+parent_count: 6
+close_rule: all_required_occurrences_resolved
+candidate_ready_counts_as_resolved: false
+blocked_external_counts_as_resolved: false

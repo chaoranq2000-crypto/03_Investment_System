@@ -1,0 +1,9 @@
+schema_version: r5_night03_dependency_unblock_contract_v1
+dependency_occurrence_count: 20
+unlock_rule: all_prerequisites_have_independent_resolution_receipts
+graph_audit:
+  task_count: 69
+  orphan_dependencies: []
+  cycle_task_ids: []
+  cross_case_dependencies: []
+  passed: true

@@ -1,0 +1,5 @@
+schema_version: r5_night03_pointer_executor_contract_v1
+max_tasks_per_wave: 2
+approval_required: true
+no_approval_outcome: blocked_external_no_approved_contracts
+no_approval_resolved_delta: 0

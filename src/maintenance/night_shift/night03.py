@@ -559,7 +559,9 @@ def materialize_wrapper_state(repo_root: Path) -> dict[str, Any]:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Materialise deterministic Night03 artifacts")
     parser.add_argument("--repo", default=".")
-    parser.add_argument("--phase", choices=("baseline", "decisions"), default="baseline")
+    parser.add_argument(
+        "--phase", choices=("baseline", "decisions", "execution"), default="baseline"
+    )
     parser.add_argument("--record-task", action="append", default=[])
     return parser
 
@@ -574,13 +576,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             "lineage_verified": result["lineage"]["verified_count"],
             "explicit_unknown": result["lineage"]["explicit_unknown_count"],
         }
-    else:
+    elif args.phase == "decisions":
         from .night03_decisions import materialize_decision_contracts
 
         result = materialize_decision_contracts(repo_root)
         phase_summary = {
             "decision_kinds": len(result["authority"]["decision_authorities"]),
             "resolution_requires_independent_receipt": True,
+        }
+    else:
+        from .night03_execution import materialize_execution_contracts
+
+        result = materialize_execution_contracts(repo_root)
+        phase_summary = {
+            "occurrence_states": len(result["occurrence"]["statuses"]),
+            "dependency_occurrences": result["dependency"]["dependency_occurrence_count"],
+            "parent_work_orders": result["parent"]["parent_count"],
         }
     receipts = [record_completed_task(repo_root, task_id) for task_id in args.record_task]
     state = materialize_wrapper_state(repo_root)

@@ -1,0 +1,25 @@
+schema_version: r5_night03_command_safety_contract_v1
+exact_command_hash_required: true
+trusted_executables:
+- python
+- pytest
+- git
+git_mode: read_only_acceptance_only
+forbidden_fragments:
+- push --force
+- push -f
+- git push
+- gh pr create
+- git merge
+- git reset --hard
+- git clean -f
+- 'curl '
+- invoke-webrequest
+- start-process
+- remove-item
+- 'rm '
+- 'rmdir '
+- 'del '
+- <
+- '{{'
+- todo_path

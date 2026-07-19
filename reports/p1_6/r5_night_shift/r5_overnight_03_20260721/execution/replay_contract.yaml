@@ -1,0 +1,5 @@
+schema_version: r5_night03_replay_contract_v1
+decision_digest_is_idempotency_key: true
+duplicate_decision_consumption_allowed: false
+duplicate_resolution_count_allowed: false
+same_input_same_output_bytes: true

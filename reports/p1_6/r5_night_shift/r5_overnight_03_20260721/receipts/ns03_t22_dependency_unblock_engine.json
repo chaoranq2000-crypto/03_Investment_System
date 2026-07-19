@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_dependency_unblock.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 280,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/dependency_unblock_contract.yaml",
+      "sha256": "c689f9e722404aba37ba832d3f5db5eb3d4af1d8d8e2f8d6a89f71de93360809"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "1aa066360cb59327d47515baaa2c27d9f28a51798ea3bbef7d63d76134a00e22",
+  "task_id": "ns03_t22_dependency_unblock_engine",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

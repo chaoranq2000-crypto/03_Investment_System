@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_resolution_receipts.py tests/test_r5_night_shift_digest.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 1273,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/resolution_receipt_schema.json",
+      "sha256": "f7f9a0219e32dfd3a27104a47f8bd2471d9aa11954490ea87ae6b5a60aab84e0"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "4f401606915bc41e10caa6e9bfd8e91f22e6da4de53489b8169cd31da44633df",
+  "task_id": "ns03_t26_resolution_receipt_generation_lock",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

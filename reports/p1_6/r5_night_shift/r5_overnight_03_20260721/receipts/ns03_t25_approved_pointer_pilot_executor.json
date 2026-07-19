@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_pointer_executor.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 192,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/pointer_executor_contract.yaml",
+      "sha256": "742c2405832b1248575c4581265584f8ab1301f401206d4dd7312d1098ef311f"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "a28b09c4b9a8d2247c0b50787839363d156ca007f779f96b5380e1403c1fd46e",
+  "task_id": "ns03_t25_approved_pointer_pilot_executor",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

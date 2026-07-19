@@ -75,39 +75,39 @@ tasks:
 - id: ns03_t20_occurrence_state_transition_engine
   phase: C_resolution_engine
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t21_parent_aggregation_engine
   phase: C_resolution_engine
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t22_dependency_unblock_engine
   phase: C_resolution_engine
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t23_occurrence_diff_sandbox
   phase: C_resolution_engine
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t24_acceptance_command_safety
   phase: C_resolution_engine
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t25_approved_pointer_pilot_executor
   phase: C_resolution_engine
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t26_resolution_receipt_generation_lock
   phase: C_resolution_engine
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t27_idempotent_resume_and_replay
   phase: C_resolution_engine
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t30_consume_available_approved_inputs
   phase: D_targeted_backflow
   delivery_required: false
-  status: pending
+  status: ready
 - id: ns03_t31_evidence_candidate_enrichment
   phase: D_targeted_backflow
   delivery_required: true
@@ -123,7 +123,7 @@ tasks:
 - id: ns03_t34_pointer_proposal_review_index
   phase: D_targeted_backflow
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t35_dependency_unlock_matrix
   phase: D_targeted_backflow
   delivery_required: true
@@ -139,7 +139,7 @@ tasks:
 - id: ns03_t40_adversarial_decision_and_resolution_tests
   phase: E_validation
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t41_determinism_double_run
   phase: E_validation
   delivery_required: true
@@ -147,7 +147,7 @@ tasks:
 - id: ns03_t42_crash_cutoff_resume_tests
   phase: E_validation
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t43_full_regression_source_route_scope_audit
   phase: E_validation
   delivery_required: true
@@ -168,4 +168,4 @@ tasks:
   phase: E_publication
   delivery_required: true
   status: pending
-stable_receipt_sha256: 1c8f164904b1472fbacb92dd368e58f3aca31d54f79455a7c51d402f891da62b
+stable_receipt_sha256: e7fe4018be3f7dad6c989ff97c4ee20c448b1c5930a654131d59e05a647d8dc9

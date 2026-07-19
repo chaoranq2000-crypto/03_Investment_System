@@ -1,0 +1,4 @@
+schema_version: r5_night03_sandbox_contract_v1
+child_diff_must_be_subset_of_approved_paths: true
+single_shared_state_integrator: true
+scope_violation_outcome: failed_and_rollback_required

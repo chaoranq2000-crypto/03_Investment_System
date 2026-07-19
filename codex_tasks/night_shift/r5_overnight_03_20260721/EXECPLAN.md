@@ -52,7 +52,7 @@
 
 - [x] Phase A
 - [x] Phase B
-- [ ] Phase C
+- [x] Phase C
 - [ ] Phase D
 - [ ] Phase E
 
@@ -69,6 +69,10 @@
   8 个 pointer occurrence 保持显式 `UNKNOWN`。
 - Phase B 建立 `evidence_acceptance`、`analysis_acceptance`、`human_exact_hash`、
   `pointer_contract_approval` 四类 fail-closed intake；候选、review packet、source queue 任一字节变化都会使决定失效。
+- Phase C 验证 69 项依赖图无环、无 orphan、无错误跨 case 依赖；20 个 dependency occurrence 只在全部前置真实 resolved 后解锁，
+  6 个 parent 只在全部必需 occurrence resolved 后关闭。
+- Pointer executor 每波上限 2 项，命令必须精确哈希批准且仅允许安全只读验收；无批准合同返回
+  `blocked_external_no_approved_contracts`，resolved delta 为 0。
 
 ## Decisions
 
@@ -77,12 +81,12 @@
 - 不修改 Night02 历史路径；发布/CI 路径偏差通过 Night03 审计器的已跟踪收据别名修正，并把实际证据路径写入审计产物。
 - Phase A 继续维持 `0/63 resolved`、Goal open、sample quality/P2 false；路径兼容修复不构成研究 resolution。
 - reviewer identity/authority 必须来自外部决定；`approved` 本身不计 resolution，仍需独立 passed receipt、lineage 与 decision digest 一致。
+- Resolution receipt 绑定 occurrence、decision digest、source queue、实现 tree、命令和输出；`publication_head` 保持空，避免自引用最终提交。
 
 ## Remaining work
 
 从 `task_queue.yaml` 自动同步；外部门禁必须保留为 `blocked_external`，
 不能从列表中消失。
 
-- Phase C：occurrence/parent/dependency state engine、sandbox、pointer pilot 与 receipt lock。
 - Phase D：消费真实批准或完成 8/24/3/8 候选包、20 项依赖矩阵与 blocker ledger。
 - Phase E：对抗、双跑、恢复、全回归、范围审计、分批提交、推送、CI、晨报和 Night04 队列。
