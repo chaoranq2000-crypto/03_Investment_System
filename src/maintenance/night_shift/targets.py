@@ -36,7 +36,7 @@ class GitTarget:
                 "must be separate"
             )
         root = Path(root_text)
-        if not root.is_absolute():
+        if not root.is_absolute() and not WINDOWS_DRIVE.match(root_text):
             raise ContractError("git_target.worktree_root: must be an absolute path")
 
         if not branch_text:

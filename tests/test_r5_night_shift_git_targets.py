@@ -17,6 +17,15 @@ def test_windows_worktree_path_and_branch_remain_separate(tmp_path: Path) -> Non
     assert target.push_argv()[-2:] == ("origin", target.branch)
 
 
+def test_windows_absolute_path_remains_valid_on_linux_ci() -> None:
+    target = GitTarget.create(
+        r"C:\Projects\03_Investment_System_night02",
+        "codex/r5-night02-contract-recovery",
+    )
+    assert str(target.worktree_root) == r"C:\Projects\03_Investment_System_night02"
+    assert target.git_argv("status")[2] == str(target.worktree_root)
+
+
 @pytest.mark.parametrize(
     ("root", "branch", "needle"),
     [
