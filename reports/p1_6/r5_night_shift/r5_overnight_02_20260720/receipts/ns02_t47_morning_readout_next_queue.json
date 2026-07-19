@@ -1,0 +1,85 @@
+{
+  "attempt": 1,
+  "blocker_occurrences": {
+    "claimed": 0,
+    "resolved": 0,
+    "unchanged": 0
+  },
+  "changed_paths": [
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/mission_state.yaml",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.json",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.md",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/readout_baseline.json"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-c",
+        "from pathlib import Path; assert Path('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.md').is_file()"
+      ],
+      "command": "python -c \"from pathlib import Path; assert Path('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.md').is_file()\"",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_summary": ""
+    },
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-c",
+        "import yaml; q=yaml.safe_load(open('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml', encoding='utf-8')); assert len(q['tasks']) >= 12; assert q['program_goal']['close_allowed'] is False"
+      ],
+      "command": "python -c \"import yaml; q=yaml.safe_load(open('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml', encoding='utf-8')); assert len(q['tasks']) >= 12; assert q['program_goal']['close_allowed'] is False\"",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_summary": ""
+    }
+  ],
+  "cwd": "C:\\Projects\\03_Investment_System_night02",
+  "executor": "codex",
+  "exit_code": 0,
+  "finished_at": "2026-07-19T09:21:05.016613+00:00",
+  "implementation_identity": {
+    "commit_sha": "ad9b2c2df7049060e093fa08869266a1fdc74366",
+    "publication_head": null,
+    "tree_sha": "490e747abf6ef627a20b1336474b95e85f842402"
+  },
+  "local_commit_sha": "ad9b2c2df7049060e093fa08869266a1fdc74366",
+  "reason": "Night02 final morning readout and 69-task next queue",
+  "remote_commit_sha": null,
+  "required_artifacts": [
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.json",
+      "present": true,
+      "sha256": "10e93403a0f034bc78c4397bded72097906d99dccd86567febd0e262674ed465",
+      "size_bytes": 55321
+    },
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.md",
+      "present": true,
+      "sha256": "04d19d819ef9cb6443f5c4a165e82671acb1c6ea8d89e98ad93a1ae74bff45d5",
+      "size_bytes": 25763
+    },
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml",
+      "present": true,
+      "sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+      "size_bytes": 115020
+    }
+  ],
+  "run_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_execution_receipt_v1",
+  "stable_receipt_sha256": "441c187d1075549a2604899bfd331d8e6c567935c0cbbdb8cca1e89ec5034925",
+  "started_at": "2026-07-19T09:21:04.795412+00:00",
+  "task_id": "ns02_t47_morning_readout_next_queue",
+  "terminal_status": "passed"
+}

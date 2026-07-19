@@ -151,19 +151,19 @@
     {
       "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/full_regression.json",
       "present": true,
-      "sha256": "e12cdaa10d58f621871e3c550c37b9fac8231de7aaf23b6187436b2c975434c3",
-      "size_bytes": 1103
+      "sha256": "f5a03f8f58fbe5634f8a5aa7e5edde2ce7639ae8d7f2de031eee92cd52756c8b",
+      "size_bytes": 1004
     },
     {
       "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/scope_audit.json",
       "present": true,
-      "sha256": "647b4db171eab669a480dd5b8f58c3c3be7427d4d0a205abb4a760fd4cf61b19",
-      "size_bytes": 11179
+      "sha256": "005392dcc0f7bba0c24c9d6f89d467b7a55b74468c1f881c898d3c7f795b6a04",
+      "size_bytes": 11833
     }
   ],
   "run_id": "r5_overnight_02_20260720",
   "schema_version": "r5_night_shift_execution_receipt_v1",
-  "stable_receipt_sha256": "5f95c57071ced8d5819477fac855c028b3e3c2c6d176ace4a16ff5c6267689f3",
+  "stable_receipt_sha256": "6c7df84952b4e858d8441c45ed4facbdc1779d013d25b95682289cc48cf76b39",
   "started_at": "2026-07-19T09:13:37.787586+00:00",
   "task_id": "ns02_t45_full_regression_scope_audit",
   "terminal_status": "passed"

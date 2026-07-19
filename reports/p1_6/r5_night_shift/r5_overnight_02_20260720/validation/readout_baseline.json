@@ -1,0 +1,12 @@
+{
+  "schema_version": "r5_night_shift_readout_baseline_v1",
+  "source_branch": "codex/r5-night01-autonomous-harness",
+  "expected_source_sha": "4340945457d661ed62967e949f862ccf2214aff2",
+  "target_branch": "codex/r5-night02-contract-recovery",
+  "work_orders_pending": 6,
+  "blocker_occurrences_total": 63,
+  "blocker_occurrences_resolved": 0,
+  "research_gate": "needs_targeted_backflow",
+  "sample_quality_allowed": false,
+  "p2_allowed": false
+}

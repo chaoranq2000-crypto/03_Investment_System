@@ -1,0 +1,103 @@
+{
+  "attempt": 1,
+  "blocker_occurrences": {
+    "claimed": 0,
+    "resolved": 0,
+    "unchanged": 0
+  },
+  "changed_paths": [],
+  "commands": [
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-c",
+        "import subprocess; b=subprocess.check_output(['git','branch','--show-current'], text=True).strip(); assert b == 'codex/r5-night02-contract-recovery', b"
+      ],
+      "command": "python -c \"import subprocess; b=subprocess.check_output(['git','branch','--show-current'], text=True).strip(); assert b == 'codex/r5-night02-contract-recovery', b\"",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_summary": ""
+    },
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-c",
+        "import subprocess; s=subprocess.check_output(['git','status','--porcelain'], text=True); assert not s.strip(), s"
+      ],
+      "command": "python -c \"import subprocess; s=subprocess.check_output(['git','status','--porcelain'], text=True); assert not s.strip(), s\"",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_summary": ""
+    },
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-c",
+        "import subprocess; n=int(subprocess.check_output(['git','rev-list','--count','4340945457d661ed62967e949f862ccf2214aff2..HEAD'], text=True)); assert n >= 4, n"
+      ],
+      "command": "python -c \"import subprocess; n=int(subprocess.check_output(['git','rev-list','--count','4340945457d661ed62967e949f862ccf2214aff2..HEAD'], text=True)); assert n >= 4, n\"",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_summary": ""
+    },
+    {
+      "argv": [
+        "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+        "-c",
+        "import subprocess; local=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(); remote=subprocess.check_output(['git','ls-remote','--heads','origin','codex/r5-night02-contract-recovery'], text=True).split()[0]; assert local == remote, (local, remote)"
+      ],
+      "command": "python -c \"import subprocess; local=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(); remote=subprocess.check_output(['git','ls-remote','--heads','origin','codex/r5-night02-contract-recovery'], text=True).split()[0]; assert local == remote, (local, remote)\"",
+      "exit_code": 0,
+      "stderr_length": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_summary": "",
+      "stdout_length": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_summary": ""
+    }
+  ],
+  "cwd": "C:\\Projects\\03_Investment_System_night02",
+  "executor": "codex",
+  "exit_code": 0,
+  "finished_at": "2026-07-19T09:20:10.035989+00:00",
+  "implementation_identity": {
+    "commit_sha": "ad9b2c2df7049060e093fa08869266a1fdc74366",
+    "publication_head": null,
+    "tree_sha": "490e747abf6ef627a20b1336474b95e85f842402"
+  },
+  "local_commit_sha": "ad9b2c2df7049060e093fa08869266a1fdc74366",
+  "reason": "Night02 post-push remote and CI verification",
+  "remote_commit_sha": null,
+  "required_artifacts": [
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/ci_status.md",
+      "present": true,
+      "sha256": "417b4d0103ae8ab1174f56cf76f0faa40ffb6bbd8e6fc6110b6c017782eb8e4b",
+      "size_bytes": 1180
+    },
+    {
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/remote_delivery_receipt.json",
+      "present": true,
+      "sha256": "6f8e251fff9c11ae8ea96246016b18a52a3c3006c362ddfd0ed1602323d03a1e",
+      "size_bytes": 453
+    }
+  ],
+  "run_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_execution_receipt_v1",
+  "stable_receipt_sha256": "a62f068a860e3a3247ea1bb7ede1a8bfebad1b9861b456c062f67f8674fc2619",
+  "started_at": "2026-07-19T09:20:08.599830+00:00",
+  "task_id": "ns02_t46_commit_push_remote_ci",
+  "terminal_status": "passed"
+}

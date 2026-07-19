@@ -12,7 +12,7 @@ Repair the Night01 early-close semantics and turn Bundle17R backflow into a dura
 - [x] B. Mission outcome / Goal-close separation
 - [x] C. Executable contract authority and safety
 - [x] D. Occurrence-level backflow and fallback queue
-- [ ] E. Adversarial tests, deterministic dry run, full regression and publication
+- [x] E. Adversarial tests, deterministic dry run, full regression and publication
 - [x] F. Optional strategic fallback artifacts
 
 ## Workstream A — baseline and publication defects
@@ -100,10 +100,13 @@ T50–T54 are valid engineering/analysis-automation work when the required work 
 
 ## Remaining Work
 
-- Workstream E 仅余 post-push `ns02_t46` 与最终 readout `ns02_t47`；T40–T45
-  已通过，T50–T54 已完成。
-- Research truth remains 6 pending work orders and 0/63 resolved blockers.
+- Night02 packaged tasks: none; `40 / 40` passed.
+- Long-term research work remains open: 6 pending work orders and 0/63 resolved blockers.
+- Night03 carries 69 occurrence-sized/parent tasks and resolves its source commit through
+  the post-push publication receipt.
 
 ## Acceptance summary
 
 The final mission cannot be `delivered` unless all `delivery_required: true` tasks in `task_queue.yaml` passed, the full regression and scope audit passed, the branch was pushed, remote SHA matched local SHA, and the readout preserved 0/63 unless real receipts prove otherwise.
+
+Final result: Night02 mission `delivered`; long-term Goal `open_needs_targeted_backflow`.

@@ -1,0 +1,32 @@
+{
+  "ci_status_path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/ci_status.md",
+  "full_regression": {
+    "full_pytest_passed": 1032,
+    "full_pytest_skipped": 2,
+    "night_shift_passed": 99,
+    "source_route": "pass_17_capabilities_0_blocking"
+  },
+  "implementation_snapshot_sha": "ad9b2c2df7049060e093fa08869266a1fdc74366",
+  "mission_id": "r5_overnight_02_20260720",
+  "mission_outcome": "delivered",
+  "morning_readout_sha256": "04d19d819ef9cb6443f5c4a165e82671acb1c6ea8d89e98ad93a1ae74bff45d5",
+  "next_night_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "next_night_task_count": 69,
+  "p2_allowed": false,
+  "packaged_task_count": 40,
+  "passed_task_count": 40,
+  "program_goal": {
+    "blocker_occurrences_resolved": 0,
+    "blocker_occurrences_total": 63,
+    "close_allowed": false,
+    "state": "open_needs_targeted_backflow",
+    "work_orders_pending": 6
+  },
+  "publication_identity_path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/remote_delivery_receipt.json",
+  "publication_resolution_policy": "authoritative_post_push_receipt",
+  "sample_quality_allowed": false,
+  "schema_version": "r5_night_shift_mission_completion_receipt_v1",
+  "scope_audit_sha256": "550576dff70d3711855df6a510fd26a189314233b3da062c2423d5d792d5103b",
+  "stable_receipt_sha256": "cc053d9b664879d421f9721e4c0fb0ef9141c6df45dde9738552b8ee6e954dcf",
+  "task_acceptance_summary_sha256": "5466f2bde94c6c2ee42587e5f700191ae5a1749b1c17fc5954bed8a8aad2df84"
+}

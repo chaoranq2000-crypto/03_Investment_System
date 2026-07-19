@@ -1,11 +1,8 @@
 {
   "mission_id": "r5_overnight_02_20260720",
   "packaged_task_count": 40,
-  "passed_task_count": 38,
-  "pending_task_ids": [
-    "ns02_t46_commit_push_remote_ci",
-    "ns02_t47_morning_readout_next_queue"
-  ],
+  "passed_task_count": 40,
+  "pending_task_ids": [],
   "receipts": [
     {
       "stable_receipt_sha256": "160b705e191a8a6d3a276eb0b69c7e14a96e877dcfd596b36496fc00fa21844e",
@@ -168,8 +165,18 @@
       "terminal_status": "passed"
     },
     {
-      "stable_receipt_sha256": "5f95c57071ced8d5819477fac855c028b3e3c2c6d176ace4a16ff5c6267689f3",
+      "stable_receipt_sha256": "6c7df84952b4e858d8441c45ed4facbdc1779d013d25b95682289cc48cf76b39",
       "task_id": "ns02_t45_full_regression_scope_audit",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "a62f068a860e3a3247ea1bb7ede1a8bfebad1b9861b456c062f67f8674fc2619",
+      "task_id": "ns02_t46_commit_push_remote_ci",
+      "terminal_status": "passed"
+    },
+    {
+      "stable_receipt_sha256": "441c187d1075549a2604899bfd331d8e6c567935c0cbbdb8cca1e89ec5034925",
+      "task_id": "ns02_t47_morning_readout_next_queue",
       "terminal_status": "passed"
     },
     {
@@ -199,5 +206,5 @@
     }
   ],
   "schema_version": "r5_night_shift_task_acceptance_summary_v1",
-  "stable_summary_sha256": "bbc3d157a0dc9109d97821957da8572c3299a6ecebf9e5e1d9042c51cb79a838"
+  "stable_summary_sha256": "5466f2bde94c6c2ee42587e5f700191ae5a1749b1c17fc5954bed8a8aad2df84"
 }
