@@ -133,12 +133,12 @@
   "schema_version": "r5_night03_morning_readout_v1",
   "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
   "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
-  "stable_receipt_sha256": "f74a41dba252e2cb1358ec96614e9011e0ad49561691c515350e415b0e384008",
+  "stable_receipt_sha256": "81aae539c9522651d931cb233045e6488d5faab97f1868ba76b5e8f385155b87",
   "target_branch": "codex/r5-night03-targeted-backflow-intake",
   "validation": {
-    "full_pytest_passed": 1069,
+    "full_pytest_passed": 1070,
     "full_pytest_skipped": 2,
-    "night_shift_passed": 136,
+    "night_shift_passed": 137,
     "source_route": "pass_17_capabilities_0_blocking"
   },
   "wrapper_delivery": {

@@ -40,18 +40,18 @@
     {
       "bytes": 919,
       "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/full_regression.json",
-      "sha256": "f6121aa69d4ba70b8664b12105df9f1239dbda22f96dc71162477ebb3a8696c7"
+      "sha256": "fe349b2240302346a5a92ee43bbc056a07fb304018b51f6a704e3c10c4dd3ac2"
     },
     {
-      "bytes": 13005,
+      "bytes": 14577,
       "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/scope_audit.json",
-      "sha256": "9960514085e799e9c501829ff8397c29edf63cc3e282a870969ceecb8716451e"
+      "sha256": "954d2e25fc3b37f81e22bde1de23f14bf5898ae517508c725039570e20c3f08f"
     }
   ],
   "schema_version": "r5_night03_wrapper_task_receipt_v1",
   "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
   "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
-  "stable_receipt_sha256": "2fa794ccd958ffbcedde3d4f6567fc20c869836002d6c006754c3bfc082d4539",
+  "stable_receipt_sha256": "c91418ca9a67ddcf3a707ee78b88aa3424e0b45c1c194153ceb3d881458b961c",
   "task_id": "ns03_t43_full_regression_source_route_scope_audit",
   "terminal_status": "passed",
   "verification_mode": "observed_exit_then_artifact_revalidation"

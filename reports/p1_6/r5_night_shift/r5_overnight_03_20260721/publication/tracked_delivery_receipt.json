@@ -3,6 +3,10 @@
   "ci_status": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/ci_status.md",
   "commits": [
     {
+      "sha": "bbe90d1509ef0f5800a6487da73a3f7346458ac0",
+      "subject": "test(night03): validate delivery and seed next queue"
+    },
+    {
       "sha": "70a3c1a11e8d94ed5aa22288d05a7f5709f537c0",
       "subject": "feat(night03): materialize review-ready backflow packets"
     },
@@ -23,13 +27,13 @@
       "subject": "chore(night03): seed reviewed-decision task package"
     }
   ],
-  "commits_after_baseline_before_validation_commit": 5,
+  "commits_after_baseline_before_validation_commit": 6,
   "final_publication_head": null,
   "final_publication_resolution_policy": "authoritative_post_push_remote_receipt",
   "force_push_allowed": false,
   "implementation_snapshot_before_validation_commit": {
-    "commit_sha": "70a3c1a11e8d94ed5aa22288d05a7f5709f537c0",
-    "tree_sha": "0b14e6b884cf819ed70bc0ce1564566c37dd4e6e"
+    "commit_sha": "bbe90d1509ef0f5800a6487da73a3f7346458ac0",
+    "tree_sha": "13901702bc129514c5c3c75619b2901422caadb1"
   },
   "merge_main_allowed": false,
   "minimum_commit_policy_satisfied": true,
@@ -38,7 +42,7 @@
   "pr_creation_allowed": false,
   "remote_delivery_receipt": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/remote_delivery_receipt.json",
   "schema_version": "r5_night03_tracked_delivery_receipt_v1",
-  "stable_receipt_sha256": "e7a4340a877067fd985f7a9528de5f9645d1465bbdc20e75d2db745198ecbad2",
+  "stable_receipt_sha256": "535a1529ba2649e11ad7ec75fccb2bab821ac8befa76055e08aab8d320fa5b64",
   "target_branch": "codex/r5-night03-targeted-backflow-intake",
-  "workstream_commits_excluding_seed": 4
+  "workstream_commits_excluding_seed": 5
 }

@@ -78,13 +78,15 @@
   量化桥、反证和研究结论缺失继续以 `MISSING/UNKNOWN` 可见。
 - 20 个 dependency occurrence 全部保留 blocked；blocker ledger 为 43 candidate-ready + 20 dependency-blocked = 63，resolved 0。
 - Phase E 对抗、确定性、崩溃续跑和 CI 契约专项均通过；项目 conda 环境中的 Night Shift 回归为
-  `136 passed`，source-route 为 `17 capabilities / 0 blocking`，全仓回归为 `1069 passed, 2 skipped`。
+  `137 passed`，source-route 为 `17 capabilities / 0 blocking`，全仓回归为 `1070 passed, 2 skipped`。
 - Windows PowerShell 不展开传给 native pytest 的 `tests/test_r5_night_shift_*.py`；本地验收使用同一 glob 的显式文件列表，
   GitHub Actions 的 bash runner 继续执行任务包原命令。默认 base Python 缺 `pypdf`，因此所有正式回归均改用仓库既有 conda 环境。
 - CI 增加 full-history checkout 与 Bundle17R/Night02 历史路径 guard；本地 scope audit 未发现历史路径改动、tracked `.local`、
   `pyc` 或 `__pycache__`。
 - Night04 队列原样携带 69 个 unresolved ID，并通过
   `resolve_final_remote_head_at_bootstrap` 从非自引用 post-push receipt 解析最终远端 HEAD。
+- 首轮远端 CI 暴露 Night02 的 56 个 JSON 在 Windows checkout 为 CRLF、Linux checkout 为 LF；Night03 清单生成器
+  现将这类 JSON 统一到 Night02 收据使用的 CRLF 表示并新增 EOL 不变性测试，未修改 Night02 历史文件。
 
 ## Decisions
 

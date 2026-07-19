@@ -8,6 +8,7 @@ from src.maintenance.night_shift.night03 import (
     OUTPUT_ROOT,
     SOURCE_COMMIT,
     build_night02_input_manifest,
+    night02_manifest_bytes,
 )
 from src.maintenance.night_shift.receipts import canonical_json_bytes, sha256_bytes
 
@@ -27,3 +28,14 @@ def test_night02_manifest_binds_every_physical_file_and_source_commit() -> None:
     assert any(path.endswith("next_night_queue.yaml") for path in paths)
     supplied = actual.pop("stable_receipt_sha256")
     assert supplied == sha256_bytes(canonical_json_bytes(actual))
+
+
+def test_night02_json_manifest_representation_is_checkout_eol_invariant(
+    tmp_path: Path,
+) -> None:
+    lf = tmp_path / "lf.json"
+    crlf = tmp_path / "crlf.json"
+    lf.write_bytes(b'{\n  "value": true\n}\n')
+    crlf.write_bytes(b'{\r\n  "value": true\r\n}\r\n')
+    assert night02_manifest_bytes(lf) == night02_manifest_bytes(crlf)
+    assert b"\r\n" in night02_manifest_bytes(lf)

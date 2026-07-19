@@ -3,7 +3,7 @@
   "commands": [
     {
       "command": "python -m pytest -q tests/test_r5_night_shift_*.py",
-      "passed": 136,
+      "passed": 137,
       "result": "passed"
     },
     {
@@ -14,7 +14,7 @@
     },
     {
       "command": "python -m pytest -q",
-      "passed": 1069,
+      "passed": 1070,
       "result": "passed",
       "skipped": 2
     },
@@ -32,5 +32,5 @@
     }
   ],
   "schema_version": "r5_night03_full_regression_v1",
-  "stable_receipt_sha256": "f16976da0bfae2f1082f25a5298d67dfe41204f7c98a78d0e4bde7a084f5c90a"
+  "stable_receipt_sha256": "c064f9d19c4203bd1ab51b77782b8912b70314732ee5585ea62a7a0882955f9f"
 }

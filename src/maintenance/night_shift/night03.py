@@ -92,6 +92,24 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def night02_manifest_bytes(path: Path) -> bytes:
+    """Return Night02 bytes in the representation used by its Windows receipts.
+
+    Night02 JSON files were committed before a repository-wide JSON EOL rule
+    existed.  Windows ``core.autocrlf`` therefore checks those blobs out as
+    CRLF while Linux checks them out as LF.  The immutable Night02 physical
+    manifest records the Windows CRLF representation, so normalize JSON only
+    to that recorded representation before hashing.  Other file types already
+    have explicit LF attributes or byte-preserving rules and remain untouched.
+    """
+
+    payload = path.read_bytes()
+    if path.suffix.casefold() == ".json":
+        payload = payload.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        payload = payload.replace(b"\n", b"\r\n")
+    return payload
+
+
 def load_yaml(path: Path) -> dict[str, Any]:
     value = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     if not isinstance(value, dict):
@@ -189,11 +207,12 @@ def build_night02_input_manifest(repo_root: Path) -> dict[str, Any]:
     records: list[dict[str, Any]] = []
     for path in sorted(item for item in root.rglob("*") if item.is_file()):
         relative = path.relative_to(repo_root).as_posix()
+        manifest_bytes = night02_manifest_bytes(path)
         records.append(
             {
                 "path": relative,
-                "sha256": sha256_file(path),
-                "bytes": path.stat().st_size,
+                "sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+                "bytes": len(manifest_bytes),
             }
         )
     required = {
