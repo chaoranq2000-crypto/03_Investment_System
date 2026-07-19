@@ -174,6 +174,30 @@ or behavior score, produce trade/position advice, use outcome hindsight, or ente
 P2G-4 accept/reject/correct/revision. See
 `docs/playbooks/INVESTMENT_REVIEW_P2G_3.md`.
 
+## P2G-4 review and behavior-hypothesis-ledger boundary
+
+After a P2G-3 candidate set and its exact P2G-2 source replay are accepted, the
+implementation may also:
+
+- apply one closed, content-derived human review request atomically as a new
+  `p2g.behavior_hypothesis_revision.v1` artifact;
+- accept or reject only `proposed` candidates, or correct a proposed/accepted/
+  rejected candidate by superseding it and creating a new `proposed` identity;
+- validate and source-replay every revision, render escaped Markdown, compare
+  revisions and list one complete non-forking chain;
+- build one deterministic, artifact-only behavior hypothesis ledger from explicit
+  complete revision chains and their exact P2G-2 observation artifacts;
+- expose only accepted occurrences in the active ledger view while preserving
+  proposed, rejected and superseded occurrences in the audit view.
+
+P2G-4 and the ledger must not overwrite prior artifacts, infer new explanations,
+use a live model, database, network or current time, perform semantic merging,
+ranking, scoring or profiling, or emit trade/position advice. `accepted` means a
+human-confirmed working hypothesis, not a proven fact. The ledger is a functional
+artifact after P2G-4, not a new canonical stage number. See
+`docs/playbooks/INVESTMENT_REVIEW_P2G_4.md` and
+`docs/playbooks/INVESTMENT_REVIEW_BEHAVIOR_HYPOTHESIS_LEDGER.md`.
+
 ## Required workflow
 
 1. Run `python -m src.investment_review --db data/db/investment_review.sqlite3 init`.
@@ -274,6 +298,19 @@ For an approved P2G-2/P2G-3 run:
     pair, and source-replay every frozen evaluation projection.
 41. On unavailable, invalid or unsafe responses, preserve the P2G-2 object exactly
     and emit only the attempt receipt; do not publish partial hypotheses or enter P2G-4.
+
+For an approved P2G-4 and behavior-hypothesis-ledger run:
+
+42. Supply the current P2G-3/P2G-4 artifact, one canonical review request with an
+    exact expected parent, and the exact ready/verified P2G-2 observation artifact.
+43. Preflight every action, then apply the request all-or-nothing; corrections must
+    rerun P2G-3 scope/ref and safety gates and return the new item to `proposed`.
+44. Save create-only, source-replay each revision, and validate the complete chain
+    before rendering, diffing or listing it; reject missing predecessors or forks.
+45. Build a ledger only from explicit complete chains and all referenced P2G-2
+    artifacts; exact canonical fingerprints may deduplicate payloads but never lineage.
+46. Rebuild the ledger after input permutation, require identical canonical bytes and
+    content ID, and keep active/audit status semantics explicit in every query/readout.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate

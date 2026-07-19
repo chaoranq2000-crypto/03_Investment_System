@@ -612,7 +612,20 @@ def test_stage3_close_readout_contract_matches_schemas_docs_and_cli(
     ledger_playbook = Path(
         "docs/playbooks/INVESTMENT_REVIEW_BEHAVIOR_HYPOTHESIS_LEDGER.md"
     ).read_text(encoding="utf-8")
+    close_readout = Path(
+        "reports/investment_review/p2g_stage3/P2G_STAGE3_CLOSE_READOUT.md"
+    ).read_text(encoding="utf-8")
     assert "proposed" in p2g3_playbook and "交易建议" in p2g3_playbook
     for status in ("accepted", "rejected", "superseded"):
         assert status in p2g4_playbook and status in ledger_playbook
     assert "心理画像" in ledger_playbook and "P2G-5" in ledger_playbook
+    for command in expected_commands - {"behavior-hypothesis-interpret"}:
+        assert command in close_readout
+    for marker in (
+        "functional_close_status: `accepted`",
+        "accepted 只是人工确认的工作假设",
+        "active 只含 accepted occurrence",
+        "不把 Behavior Hypothesis Ledger 命名为 `P2G-5`",
+        "当前功能关闭无 blocker",
+    ):
+        assert marker in close_readout

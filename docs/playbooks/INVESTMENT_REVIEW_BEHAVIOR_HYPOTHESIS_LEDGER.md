@@ -2,6 +2,8 @@
 
 Behavior Hypothesis Ledger 位于 P2G-4 人工修订之后、P2G-5 发布门禁之前。它是
 artifact-only 的可追溯台账，不是新的 canonical 阶段编号，不应称为 `P2G-5`。
+路线图中的 P2G-5 仍保留给独立的端到端发布门禁与月度报告能力；本台账不会提前占用
+该编号，也不会启动阶段四干预运行时。
 
 ## 边界
 
@@ -99,3 +101,7 @@ python -m src.investment_review behavior-hypothesis-ledger-render `
 
 Markdown 明示 active/audit 区别和非交易建议边界；自由文本、HTML、表格分隔符、标题
 字符和控制字符会转义或替换。JSON ledger 始终是规范事实源。
+
+阶段三完整功能边界、CLI/schema inventory、真实本地门禁结果和 remaining limitations
+见 `reports/investment_review/p2g_stage3/P2G_STAGE3_CLOSE_READOUT.md`。推送后的 CI URL、
+最终远端 SHA 和交付 ZIP hash 属于发布时回执，不反写 ledger 事实源。

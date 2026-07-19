@@ -267,3 +267,49 @@ P2G-3 可把一份已验证的 P2G-2 observation set 与一份显式记录的本
 该入口不调用 live model，不读取数据库，不进入 P2G-4，也不生成心理诊断、评分或
 交易建议。响应 schema、fallback、护栏与 source replay 见
 `docs/playbooks/INVESTMENT_REVIEW_P2G_3.md`。
+
+P2G-4 通过显式人工作业请求，对 `proposed` 候选执行原子化 `accept`、`reject`
+或 `correct`。每次操作都创建不可变 revision；correct 会 supersede 旧项并生成新的
+`proposed` 候选，必须再次独立审核。`accepted` 仅表示人工确认保留为工作假设，
+不是事实证明、心理诊断或交易建议：
+
+```powershell
+.\.conda\investment-system\python.exe -m src.investment_review `
+  behavior-hypothesis-review `
+  --artifact data/processed/normalized/behavior_hypotheses.model.local.json `
+  --request data/processed/normalized/behavior_hypothesis_review.local.json `
+  --observation-artifact data/processed/normalized/behavior_observations.local.json `
+  --output data/processed/normalized/behavior_hypotheses.rev1.local.json
+
+.\.conda\investment-system\python.exe -m src.investment_review `
+  behavior-hypothesis-validate `
+  data/processed/normalized/behavior_hypotheses.rev1.local.json `
+  --source-replay `
+  --observation-artifact data/processed/normalized/behavior_observations.local.json
+```
+
+revision 的 create-only、状态机、render/diff/revision-list 和 source replay 规则见
+`docs/playbooks/INVESTMENT_REVIEW_P2G_4.md`。
+
+完成审核的 revision chains 可汇总为确定性 Behavior Hypothesis Ledger。台账只做
+exact canonical fingerprint 去重和 AND 过滤；active view 只暴露 accepted
+occurrences，proposed/rejected/superseded 始终保留在 audit view。它不是新的阶段编号，
+也不做语义聚类、心理画像、排名、评分或交易建议：
+
+```powershell
+.\.conda\investment-system\python.exe -m src.investment_review `
+  behavior-hypothesis-ledger-build `
+  --revision data/processed/normalized/behavior_hypotheses.rev1.local.json `
+  --observation-artifact data/processed/normalized/behavior_observations.local.json `
+  --output data/processed/normalized/behavior_hypothesis_ledger.local.json
+
+.\.conda\investment-system\python.exe -m src.investment_review `
+  behavior-hypothesis-ledger-validate `
+  data/processed/normalized/behavior_hypothesis_ledger.local.json `
+  --source-replay `
+  --revision data/processed/normalized/behavior_hypotheses.rev1.local.json `
+  --observation-artifact data/processed/normalized/behavior_observations.local.json
+```
+
+完整构建、查询、渲染和失败关闭规则见
+`docs/playbooks/INVESTMENT_REVIEW_BEHAVIOR_HYPOTHESIS_LEDGER.md`。

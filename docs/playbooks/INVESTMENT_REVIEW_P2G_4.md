@@ -134,7 +134,7 @@ provenance。source replay 还必须用精确 P2G-2 artifact：
 3. 拒绝 source tamper、scope/ref mismatch、心理诊断、评分、交易建议、事后最佳价、
    无证据单 episode 动机推断或未受限的长期结论。
 
-计划 CLI（N2/N3 实现）：
+CLI：
 
 ```powershell
 python -m src.investment_review behavior-hypothesis-review `
@@ -146,6 +146,24 @@ python -m src.investment_review behavior-hypothesis-review `
 python -m src.investment_review behavior-hypothesis-validate `
   <revision.json> --source-replay `
   --observation-artifact <p2g2-observations.json>
+
+python -m src.investment_review behavior-hypothesis-render `
+  --artifact <revision.json> `
+  --output <revision.md>
+
+python -m src.investment_review behavior-hypothesis-diff `
+  <before-revision.json> <after-revision.json>
+
+python -m src.investment_review behavior-hypothesis-revision-list `
+  <revision-1.json> <revision-2.json>
 ```
 
 validate、render、diff 和 revision-list 只审查 artifact，不产生新解释。
+
+## 下游台账
+
+只有完整、无断链、无分叉且逐 revision source replay 通过的 chain 才能进入 Behavior
+Hypothesis Ledger。ledger 的 active view 只包含 `accepted` occurrence；`proposed`、
+`rejected` 和 `superseded` 仍保留在 audit view。ledger 不是心理画像评分器，也不代表
+进入新的 canonical 阶段。完整规则见
+`docs/playbooks/INVESTMENT_REVIEW_BEHAVIOR_HYPOTHESIS_LEDGER.md`。

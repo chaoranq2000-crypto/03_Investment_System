@@ -42,10 +42,18 @@
 - `playbooks/INVESTMENT_REVIEW_P2E_3.md` — 交易周期事件锚点、双时间组合上下文和指标证据绑定手册。
 - `playbooks/INVESTMENT_REVIEW_P2F_DRAFT.md` — 单笔交易双视角复盘的冻结输入、事实/解释分层和修订门禁手册。
 - `playbooks/INVESTMENT_REVIEW_P2G_1.md` — 跨 Trade Episode facts-only cohort 的双时间、修订、排除原因和 source replay 手册。
+- `playbooks/INVESTMENT_REVIEW_P2G_2.md` — 确定性跨 episode observation ledger、五态结果和 detector 门禁手册。
+- `playbooks/INVESTMENT_REVIEW_P2G_3.md` — recorded JSON 候选行为假设、attempt receipt、护栏和 source replay 手册。
+- `playbooks/INVESTMENT_REVIEW_P2G_4.md` — 候选假设 accept/reject/correct、不可变 revision 和审计工具手册。
+- `playbooks/INVESTMENT_REVIEW_BEHAVIOR_HYPOTHESIS_LEDGER.md` — 已审核假设的 active/audit 台账、exact dedup、查询和重放手册。
 - `playbooks/stock_report_case_study_shengyi_tech.md` — 个股报告案例研究。
 - `playbooks/stock_report_samples/README.md` — 样例报告目录说明。
 
 样例报告可作为表达风格参考，但不定义 workflow、gate 或 skill 路由。
+
+## Investment review readouts
+
+- `../reports/investment_review/p2g_stage3/P2G_STAGE3_CLOSE_READOUT.md` — P2G 阶段三行为假设闭环的 canonical 功能关闭回执。
 
 ## Skill references
 
