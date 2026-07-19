@@ -73,6 +73,7 @@ QUEUE_FIELDS = (
     "task_selection",
     "package_id",
     "long_term_goal",
+    "program_goal",
     "mission_policy",
     "read_only_inputs",
     "tasks",
@@ -348,6 +349,7 @@ class QueueDocument:
     tasks: tuple[Task, ...]
     package_id: str | None = None
     long_term_goal: dict[str, Any] | None = None
+    program_goal: dict[str, Any] | None = None
     mission_policy: dict[str, Any] | None = None
     read_only_inputs: tuple[str, ...] = ()
 
@@ -413,6 +415,11 @@ class QueueDocument:
             long_term_goal=(
                 _mapping(payload["long_term_goal"], f"{path}.long_term_goal")
                 if payload.get("long_term_goal") is not None
+                else None
+            ),
+            program_goal=(
+                _mapping(payload["program_goal"], f"{path}.program_goal")
+                if payload.get("program_goal") is not None
                 else None
             ),
             mission_policy=(
@@ -491,6 +498,8 @@ class QueueDocument:
         value["mission_id"] = self.mission_id
         if self.long_term_goal is not None:
             value["long_term_goal"] = dict(self.long_term_goal)
+        if self.program_goal is not None:
+            value["program_goal"] = dict(self.program_goal)
         value["baseline"] = dict(self.baseline)
         value["run_window"] = dict(self.run_window)
         if self.mission_policy is not None:

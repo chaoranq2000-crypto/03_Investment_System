@@ -148,6 +148,44 @@ def parse_trusted_command(command: str) -> list[str]:
     return tokens
 
 
+def expand_repository_globs(argv: Sequence[str], *, cwd: Path) -> list[str]:
+    """Expand pytest path globs deterministically without invoking a shell.
+
+    Package acceptance commands are authored with POSIX-style file globs.  Windows
+    does not expand those arguments before ``subprocess.run``.  Expansion is kept
+    inside the trusted runner, limited to repository-relative pytest path
+    arguments, and fail-closed when a pattern escapes the repository.
+    """
+
+    expanded = list(argv)
+    if len(expanded) < 3 or expanded[1:3] != ["-m", "pytest"]:
+        return expanded
+
+    root = cwd.resolve()
+    result = expanded[:3]
+    for token in expanded[3:]:
+        if token.startswith("-") or not any(character in token for character in "*?["):
+            result.append(token)
+            continue
+        normalized = token.replace("\\", "/")
+        pattern = Path(normalized)
+        if pattern.is_absolute() or ".." in pattern.parts:
+            raise ContractError(f"pytest glob must be repository-relative: {token}")
+        matches: list[str] = []
+        for candidate in sorted(root.glob(normalized), key=lambda item: item.as_posix()):
+            resolved = candidate.resolve()
+            try:
+                relative = resolved.relative_to(root)
+            except ValueError as exc:
+                raise ContractError(f"pytest glob escapes repository: {token}") from exc
+            if resolved.is_file() and not resolved.is_symlink():
+                matches.append(relative.as_posix())
+        if not matches:
+            raise ContractError(f"pytest glob matched no repository files: {token}")
+        result.extend(matches)
+    return result
+
+
 @dataclass(frozen=True)
 class CommandReceipt:
     command: str
@@ -191,7 +229,7 @@ def run_acceptance_commands(
     if environment:
         run_environment.update(environment)
     for command in commands:
-        argv = parse_trusted_command(command)
+        argv = expand_repository_globs(parse_trusted_command(command), cwd=cwd)
         completed = subprocess.run(
             argv,
             cwd=cwd,

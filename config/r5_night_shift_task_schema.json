@@ -38,6 +38,9 @@
     "long_term_goal": {
       "type": "object"
     },
+    "program_goal": {
+      "type": "object"
+    },
     "mission_policy": {
       "type": "object"
     },

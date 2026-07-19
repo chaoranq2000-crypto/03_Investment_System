@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from src.maintenance.night_shift.bf2_seed import build_seed_queue
@@ -69,3 +70,18 @@ def test_compare_files_writes_deterministic_receipt(tmp_path: Path) -> None:
     receipt = compare_files([(left, right)], receipt_path)
     assert receipt["all_byte_for_byte_equal"] is True
     assert receipt_path.is_file()
+
+
+def test_real_next_queue_carries_occurrence_sized_work_and_open_goal() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    inventory = json.loads(
+        (
+            repo_root
+            / "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/occurrence_inventory.json"
+        ).read_text(encoding="utf-8")
+    )
+    next_queue = build_next_queue(inventory, source_commit="a" * 40)
+    assert len(next_queue.tasks) == 69
+    assert next_queue.program_goal is not None
+    assert next_queue.program_goal["close_allowed"] is False
+    assert next_queue.baseline["blocker_occurrences_resolved"] == 0

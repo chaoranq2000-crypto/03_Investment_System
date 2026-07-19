@@ -24,5 +24,7 @@ jobs:
         run: python -m py_compile $(git ls-files '*.py')
       - name: Validate source routes and operational adapters
         run: python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml
+      - name: Run night-shift contract and recovery regression
+        run: python -m pytest -q tests/test_r5_night_shift_*.py
       - name: Run pytest
         run: python -m pytest -q

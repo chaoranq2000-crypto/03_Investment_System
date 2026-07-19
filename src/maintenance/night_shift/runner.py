@@ -43,6 +43,8 @@ from .readout import (
     generate_morning_readout,
     write_json as write_readout_json,
 )
+from .validation import build_bf2_dry_run_receipt, build_determinism_receipt
+from .strategic import generate_strategic_artifacts
 
 
 STATE_METADATA_SCHEMA_VERSION = "r5_night_shift_state_metadata_v1"
@@ -133,6 +135,49 @@ def initialize_state(source_queue: Path, state_path: Path, *, run_id: str) -> Qu
     return queue
 
 
+def recover_interrupted_state(
+    state_path: Path,
+    *,
+    run_id: str,
+    actor: str,
+    at: datetime | None = None,
+    reason: str = "interrupted worker recovery",
+) -> tuple[QueueDocument, tuple[str, ...]]:
+    """Return claimed/running tasks to a retryable state exactly once.
+
+    Attempts are incremented only by ``claim``.  Recovery therefore preserves the
+    attempt count and appends one explicit history record.  Re-running recovery is
+    a no-op, which makes a restart after a second crash safe.
+    """
+
+    now = _iso_now(at)
+    queue = load_queue(state_path)
+    metadata = load_metadata(state_path, run_id=run_id)
+    recovered: list[str] = []
+    for task in queue.tasks:
+        if task.status not in {"claimed", "running"}:
+            continue
+        entry = metadata["tasks"].setdefault(task.id, {"attempts": 0, "history": []})
+        if not isinstance(entry, dict) or not isinstance(entry.get("history"), list):
+            raise ContractError(f"state metadata task[{task.id}] is malformed")
+        entry["history"].append(
+            {
+                "action": "recover_interrupted",
+                "actor": actor,
+                "at": now.astimezone(timezone.utc).isoformat(),
+                "from": task.status,
+                "reason": reason,
+                "to": "failed_retryable",
+            }
+        )
+        queue = queue.replace_task(task.with_status("failed_retryable"))
+        recovered.append(task.id)
+    if recovered:
+        save_queue(state_path, queue)
+        save_metadata(state_path, metadata)
+    return queue, tuple(sorted(recovered))
+
+
 def _iso_now(value: datetime | None) -> datetime:
     current = value or datetime.now(tz=timezone.utc)
     if current.tzinfo is None:
@@ -196,9 +241,10 @@ def _transition_target(
             )
         return str(block_status)
     if action == "resume":
-        if task.status not in {"failed_retryable", "dependency_blocked"}:
+        if task.status not in {"failed_retryable", "dependency_blocked", "skipped_cutoff"}:
             raise ContractError(
-                f"task[{task.id}]: resume requires failed_retryable/dependency_blocked, "
+                f"task[{task.id}]: resume requires failed_retryable/dependency_blocked/"
+                "skipped_cutoff, "
                 f"got {task.status}"
             )
         if not dependencies_passed(task, queue):
@@ -460,6 +506,15 @@ def build_parser() -> argparse.ArgumentParser:
     release.add_argument("--lock", type=Path, required=True)
     release.add_argument("--run-id", required=True)
 
+    recover = commands.add_parser(
+        "recover-interrupted", help="return claimed/running tasks to failed_retryable"
+    )
+    recover.add_argument("--state", type=Path, required=True)
+    recover.add_argument("--run-id", required=True)
+    recover.add_argument("--actor", default="codex-recovery")
+    recover.add_argument("--at")
+    recover.add_argument("--reason", default="interrupted worker recovery")
+
     acceptance = commands.add_parser(
         "run-acceptance", help="execute trusted task acceptance commands and write a receipt"
     )
@@ -510,6 +565,28 @@ def build_parser() -> argparse.ArgumentParser:
     backflow.add_argument("--repo-root", type=Path, required=True)
     backflow.add_argument("--output-dir", type=Path, required=True)
     backflow.add_argument("--source-commit", required=True)
+
+    dry_run = commands.add_parser(
+        "bf2-dry-run", help="validate the 63+6 BF2 graph without mutating historical inputs"
+    )
+    dry_run.add_argument("--repo-root", type=Path, required=True)
+    dry_run.add_argument("--source-commit", required=True)
+    dry_run.add_argument("--output", type=Path, required=True)
+
+    determinism = commands.add_parser(
+        "determinism-check", help="double-build Night02 artifacts and compare exact bytes"
+    )
+    determinism.add_argument("--repo-root", type=Path, required=True)
+    determinism.add_argument("--source-commit", required=True)
+    determinism.add_argument("--output", type=Path, required=True)
+
+    strategic = commands.add_parser(
+        "build-strategic", help="build read-only four-case audits and the Night03 seed"
+    )
+    strategic.add_argument("--repo-root", type=Path, required=True)
+    strategic.add_argument("--output-dir", type=Path, required=True)
+    strategic.add_argument("--inventory", type=Path, required=True)
+    strategic.add_argument("--source-commit", required=True)
 
     scope = commands.add_parser("scope-audit", help="audit changed and tracked mission paths")
     scope.add_argument("--repo-root", type=Path, required=True)
@@ -568,6 +645,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "release-lock":
             RunLock(args.lock).release(args.run_id)
             print(f"OK: released {args.lock}")
+            return 0
+        if args.command == "recover-interrupted":
+            _, recovered = recover_interrupted_state(
+                args.state,
+                run_id=args.run_id,
+                actor=args.actor,
+                at=_parse_datetime(args.at),
+                reason=args.reason,
+            )
+            print(f"OK: recovered={len(recovered)} tasks={','.join(recovered) or 'none'}")
             return 0
         if args.command == "run-acceptance":
             queue = load_queue(args.queue)
@@ -646,6 +733,42 @@ def main(argv: Sequence[str] | None = None) -> int:
                 f"OK: occurrences={receipt['occurrence_task_count']} "
                 f"parents={receipt['parent_work_order_count']} "
                 f"resolved={receipt['resolved_blocker_count']}"
+            )
+            return 0
+        if args.command == "bf2-dry-run":
+            receipt = build_bf2_dry_run_receipt(
+                repo_root=args.repo_root,
+                source_commit=args.source_commit,
+                output_path=args.output,
+            )
+            print(
+                f"OK: occurrences={receipt['occurrence_count']} "
+                f"tasks={receipt['seeded_task_count']} "
+                f"resolved={receipt['blocker_occurrences_resolved']}"
+            )
+            return 0
+        if args.command == "determinism-check":
+            receipt = build_determinism_receipt(
+                repo_root=args.repo_root,
+                source_commit=args.source_commit,
+                output_path=args.output,
+            )
+            print(
+                f"OK: comparisons={len(receipt['comparisons'])} "
+                f"equal={receipt['all_byte_for_byte_equal']}"
+            )
+            return 0
+        if args.command == "build-strategic":
+            summary = generate_strategic_artifacts(
+                repo_root=args.repo_root,
+                output_dir=args.output_dir,
+                occurrence_inventory_path=args.inventory,
+                source_commit=args.source_commit,
+            )
+            print(
+                f"OK: cases={summary['case_count']} "
+                f"bundle18={summary['bundle18_status']} "
+                f"night03_tasks={summary['night03_task_count']}"
             )
             return 0
         if args.command == "scope-audit":

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import subprocess
 from collections import Counter
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -143,6 +144,21 @@ def build_next_queue(inventory: Mapping[str, Any], *, source_commit: str) -> Que
     counts = inventory.get("classification_counts")
     if not isinstance(counts, Mapping):
         raise ContractError("BF2 inventory is missing classification_counts")
+    occurrences = inventory.get("occurrences")
+    if isinstance(occurrences, list) and occurrences:
+        from .backflow import build_occurrence_queue
+
+        queue = build_occurrence_queue(occurrences, source_commit=source_commit)
+        return replace(
+            queue,
+            mission_id="r5_overnight_03_targeted_backflow",
+            program_goal={
+                "id": "r5_bundle17r_bf2_four_case_activation",
+                "state": "open_needs_targeted_backflow",
+                "close_allowed": False,
+                "this_mission_may_close_goal": False,
+            },
+        )
     contract_task = Task(
         id="ns02_t00_review_pointer_contracts",
         title="审核 8 个 pointer occurrence 的工程合同",
@@ -245,6 +261,12 @@ def build_next_queue(inventory: Mapping[str, Any], *, source_commit: str) -> Que
         {
             "schema_version": "r5_night_shift_queue_v1",
             "mission_id": "r5_overnight_02_targeted_backflow_execution",
+            "program_goal": {
+                "id": "r5_bundle17r_bf2_four_case_activation",
+                "state": "open_needs_targeted_backflow",
+                "close_allowed": False,
+                "this_mission_may_close_goal": False,
+            },
             "baseline": {
                 "source_branch": "codex/r5-night01-autonomous-harness",
                 "source_commit": source_commit,
