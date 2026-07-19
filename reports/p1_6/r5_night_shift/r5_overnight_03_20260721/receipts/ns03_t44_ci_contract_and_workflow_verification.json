@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_night03_ci_contract.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 612,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/ci_contract.json",
+      "sha256": "cb4d15375604d57ab2042845773d188bd066d9bce5fb4cde98548b3d7cf711d7"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "2b7d3ef78186546d2e85a6b81af652c6f59b624176e9af1535ba2a172ed69a2b",
+  "task_id": "ns03_t44_ci_contract_and_workflow_verification",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

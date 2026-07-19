@@ -1,0 +1,14 @@
+{
+  "attempt_count_after_replay": 1,
+  "cutoff_policies": {
+    "in_flight_after_cutoff": "finish_in_flight",
+    "new_task_after_cutoff": "do_not_claim_new_task"
+  },
+  "external_gate_preserved": true,
+  "late_decision_resume_status": "resolved",
+  "replay_byte_equivalent": true,
+  "schema_version": "r5_night03_crash_resume_receipt_v1",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "1e7a6ebb0c0c1fa5ce5ea7143858ad18cbec54859590f6a30ad4fa0db67f2056",
+  "stale_lock_validation": "covered_by_tests/test_r5_night_shift_lock.py"
+}

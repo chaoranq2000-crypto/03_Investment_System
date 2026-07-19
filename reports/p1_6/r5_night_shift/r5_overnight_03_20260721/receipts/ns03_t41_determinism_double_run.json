@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_night03_determinism.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 3005,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/determinism_receipt.json",
+      "sha256": "f19297d377c567be720be6f61af3e575bb7452ee710373b980cc554e3ef03b32"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "06925239adf7009c2dddcb7872bed6a12fdb5f4dc0fdbb4ae8a0cbeb8dd2d56c",
+  "task_id": "ns03_t41_determinism_double_run",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

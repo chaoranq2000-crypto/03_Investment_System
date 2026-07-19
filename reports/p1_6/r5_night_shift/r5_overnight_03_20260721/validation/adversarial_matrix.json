@@ -1,0 +1,46 @@
+{
+  "all_fail_closed": true,
+  "case_count": 7,
+  "cases": [
+    {
+      "case": "acceptance_command_hash_mismatch",
+      "reason": "acceptance command exact-hash mismatch",
+      "result": "rejected"
+    },
+    {
+      "case": "machine_generated_reviewer_identity",
+      "reason": "machine reviewer regex",
+      "result": "rejected"
+    },
+    {
+      "case": "proposed_pointer_as_approved",
+      "reason": "blocked_external_no_approved_contracts",
+      "result": "rejected"
+    },
+    {
+      "case": "candidate_as_resolved",
+      "reason": "missing_validated_decision,missing_independent_receipt",
+      "result": "rejected"
+    },
+    {
+      "case": "parent_false_close",
+      "reason": "pending",
+      "result": "rejected"
+    },
+    {
+      "case": "dependency_false_unlock",
+      "reason": "unresolved_prerequisites_present",
+      "result": "rejected"
+    },
+    {
+      "case": "child_diff_scope_escape",
+      "reason": "pointer child diff escaped approved scope: {'changed_paths': ['data/raw/fabricated.json', 'src/maintenance/night_shift/night03.py'], 'outside_approved_paths': ['data/raw/fabricated.json'], 'forbidden_paths_changed': ['data/raw/fabricated.json'], 'passed': False}",
+      "result": "rejected"
+    }
+  ],
+  "mission_id": "r5_overnight_03_20260721",
+  "resolved_delta": 0,
+  "schema_version": "r5_night03_adversarial_matrix_v1",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "39d4a59980885f7b89e0505e53f6ef14204ff88e815c4287acec20738a01a8ac"
+}

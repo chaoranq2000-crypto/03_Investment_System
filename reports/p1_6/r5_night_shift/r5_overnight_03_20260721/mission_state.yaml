@@ -139,27 +139,27 @@ tasks:
 - id: ns03_t40_adversarial_decision_and_resolution_tests
   phase: E_validation
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t41_determinism_double_run
   phase: E_validation
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t42_crash_cutoff_resume_tests
   phase: E_validation
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t43_full_regression_source_route_scope_audit
   phase: E_validation
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t44_ci_contract_and_workflow_verification
   phase: E_validation
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t45_workstream_commit_push
   phase: E_publication
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t46_final_remote_ci_receipt
   phase: E_publication
   delivery_required: true
@@ -168,4 +168,4 @@ tasks:
   phase: E_publication
   delivery_required: true
   status: pending
-stable_receipt_sha256: 8fb218e56ab9e2e1c120d05fb25ca8ab5d1243a9c71daff8bbe9e6ea3a39eb24
+stable_receipt_sha256: 955baa09ba73d656b7f37497758f03c51c2aeae2c1cd42699ef12092327bfb4b

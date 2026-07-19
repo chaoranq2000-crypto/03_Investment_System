@@ -1,0 +1,44 @@
+{
+  "baseline_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "ci_status": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/ci_status.md",
+  "commits": [
+    {
+      "sha": "70a3c1a11e8d94ed5aa22288d05a7f5709f537c0",
+      "subject": "feat(night03): materialize review-ready backflow packets"
+    },
+    {
+      "sha": "ece76b0b548d4e8b37428b43867042d5c57b8fbe",
+      "subject": "feat(night03): add occurrence resolution engine"
+    },
+    {
+      "sha": "3626ea39c19a0de56e5231389d28eba1cd796da1",
+      "subject": "feat(night03): enforce exact-hash external decisions"
+    },
+    {
+      "sha": "6f3df78d0ac99c85ad6d00a09ce29b6bac1730ce",
+      "subject": "feat(night03): lock exact Night02 baseline and queue"
+    },
+    {
+      "sha": "77b46244c05724dc8158d25cec6f01f935ebcd8b",
+      "subject": "chore(night03): seed reviewed-decision task package"
+    }
+  ],
+  "commits_after_baseline_before_validation_commit": 5,
+  "final_publication_head": null,
+  "final_publication_resolution_policy": "authoritative_post_push_remote_receipt",
+  "force_push_allowed": false,
+  "implementation_snapshot_before_validation_commit": {
+    "commit_sha": "70a3c1a11e8d94ed5aa22288d05a7f5709f537c0",
+    "tree_sha": "0b14e6b884cf819ed70bc0ce1564566c37dd4e6e"
+  },
+  "merge_main_allowed": false,
+  "minimum_commit_policy_satisfied": true,
+  "minimum_workstream_commits": 4,
+  "mission_id": "r5_overnight_03_20260721",
+  "pr_creation_allowed": false,
+  "remote_delivery_receipt": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/remote_delivery_receipt.json",
+  "schema_version": "r5_night03_tracked_delivery_receipt_v1",
+  "stable_receipt_sha256": "e7a4340a877067fd985f7a9528de5f9645d1465bbdc20e75d2db745198ecbad2",
+  "target_branch": "codex/r5-night03-targeted-backflow-intake",
+  "workstream_commits_excluding_seed": 4
+}

@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_night03_crash_resume.py tests/test_r5_night_shift_lock.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 604,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/crash_resume_receipt.json",
+      "sha256": "f93ed2d58314f84654e8a73cc4c7ac6066e2a41e3654e75c36540799e4424272"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "094b70e77efc2a015be884b2042a36044920e70a686e83e9d10cf607e28fcd32",
+  "task_id": "ns03_t42_crash_cutoff_resume_tests",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

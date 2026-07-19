@@ -1,0 +1,58 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_*.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    },
+    {
+      "command": "python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    },
+    {
+      "command": "python -m pytest -q",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    },
+    {
+      "command": "git diff --check",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    },
+    {
+      "command": "python -c \"import subprocess; out=subprocess.check_output(['git','diff','--name-only','069da527452def6c59c3772750e933d8611ccadf..HEAD','--','reports/p1_6/r5_bundle17r','reports/p1_6/r5_night_shift/r5_overnight_02_20260720'], text=True); assert not out.strip(), out\"",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    },
+    {
+      "command": "python -c \"import subprocess; files=subprocess.check_output(['git','ls-files'], text=True).splitlines(); bad=[p for p in files if p.startswith('.local/') or p.endswith('.pyc') or '/__pycache__/' in p]; assert not bad, bad\"",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 919,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/full_regression.json",
+      "sha256": "f6121aa69d4ba70b8664b12105df9f1239dbda22f96dc71162477ebb3a8696c7"
+    },
+    {
+      "bytes": 13005,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/validation/scope_audit.json",
+      "sha256": "9960514085e799e9c501829ff8397c29edf63cc3e282a870969ceecb8716451e"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "2fa794ccd958ffbcedde3d4f6567fc20c869836002d6c006754c3bfc082d4539",
+  "task_id": "ns03_t43_full_regression_source_route_scope_audit",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}
