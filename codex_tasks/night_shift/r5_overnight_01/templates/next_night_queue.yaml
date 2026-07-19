@@ -1,0 +1,12 @@
+schema_version: r5_night_shift_queue_v1
+mission_id: r5_overnight_02_targeted_backflow_execution
+baseline:
+  source_branch: codex/r5-night01-autonomous-harness
+  source_commit: TO_BE_FILLED_FROM_DELIVERY_RECEIPT
+  research_gate: needs_targeted_backflow
+run_window:
+  timezone: Europe/London
+  start_at: '23:00'
+  stop_claiming_at: '06:15'
+  final_readout_at: '06:30'
+tasks: []

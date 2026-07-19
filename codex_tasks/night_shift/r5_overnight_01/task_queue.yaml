@@ -1,0 +1,411 @@
+schema_version: r5_night_shift_queue_v1
+mission_id: r5_overnight_01_autonomous_harness_and_bf2_activation
+baseline:
+  source_branch: codex/r5-bundle17r-bf2-execution-receipts
+  source_commit: 36a801efc2bf0af10ad9702b8c6266ebf1935d6f
+  target_branch: codex/r5-night01-autonomous-harness
+  research_gate: needs_targeted_backflow
+  bf2_work_orders_total: 6
+  blocker_occurrences_total: 63
+run_window:
+  timezone: Europe/London
+  start_at: '23:00'
+  stop_claiming_at: 06:15
+  final_readout_at: 06:30
+task_selection:
+  order:
+  - priority_desc
+  - dependency_ready
+  - task_id_asc
+  single_integrator: true
+  max_parallel_shared_state_writers: 1
+tasks:
+- id: ns01_t00_preflight
+  title: 精确基线、隔离 worktree 与只读输入盘点
+  priority: 100
+  status: ready
+  depends_on: []
+  work_type: preflight
+  goal: 核验远端/本地 SHA，创建隔离 worktree，确认脏 main 未被触碰，并对本地 BF2 未跟踪产物建立只读 SHA-256 manifest。
+  allowed_paths:
+  - codex_tasks/night_shift/r5_overnight_01/**
+  - .local/night_shift/**
+  - reports/p1_6/r5_night_shift/**
+  forbidden_paths:
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - .local/** (git tracked)
+  - reports/p1_6/r5_bundle17r_bf2* (git tracked)
+  acceptance_commands:
+  - git rev-parse HEAD
+  - git status --short
+  - python codex_tasks/night_shift/r5_overnight_01/tools/verify_package.py codex_tasks/night_shift/r5_overnight_01
+  required_artifacts:
+  - .local/night_shift/input_manifest.json
+  - .local/night_shift/baseline.json
+  - reports/p1_6/r5_night_shift/<run_id>/preflight.md
+  retry_limit: 1
+  on_success:
+    unlock:
+    - ns01_t10_bf2_inventory
+  on_failure:
+    set_status: failed_terminal
+    emit_failure_packet: true
+    stop_mission: true
+  human_gate: false
+  notes:
+  - SHA mismatch is a hard stop.
+  - Do not copy untracked BF2 files into git-tracked paths.
+- id: ns01_t10_bf2_inventory
+  title: 盘点六工作单、63 blocker 与兼容性表面
+  priority: 95
+  status: pending
+  depends_on:
+  - ns01_t00_preflight
+  work_type: inspection
+  goal: 识别真实 BF2 输入路径和结构，建立 work_order/blocker/source-generation 字段映射，确认 __suite__ 与 BF1 generation-lock 兼容要求。
+  allowed_paths:
+  - .local/night_shift/**
+  - reports/p1_6/r5_night_shift/**
+  - codex_tasks/night_shift/r5_overnight_01/EXECPLAN.md
+  forbidden_paths:
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - .local/** (git tracked)
+  - reports/p1_6/r5_bundle17r_bf2* (git tracked)
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle17r_backflow_execution.py tests/test_r5_bundle17r_backflow_execution_cli.py tests/test_r5_bundle17r_backflow_execution_determinism.py tests/test_r5_bundle17r_backflow_execution_fail_closed.py tests/test_r5_bundle17r_verified_result_materializer.py tests/test_r5_bundle17r_verified_result_materializer_cli.py
+  required_artifacts:
+  - .local/night_shift/bf2_inventory.json
+  - reports/p1_6/r5_night_shift/<run_id>/bf2_compatibility_map.md
+  retry_limit: 1
+  on_success:
+    unlock:
+    - ns01_t20_contract_and_loader
+  on_failure:
+    set_status: failed_terminal
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - Inventory must report exactly 6 work orders and 63 blocker occurrences or fail.
+- id: ns01_t20_contract_and_loader
+  title: 实现任务合同、Schema 验证与队列加载器
+  priority: 90
+  status: pending
+  depends_on:
+  - ns01_t10_bf2_inventory
+  work_type: implementation
+  goal: 实现无第三方强依赖的任务模型、队列验证、依赖解析和 deterministic serialization。
+  allowed_paths:
+  - src/maintenance/night_shift/**
+  - scripts/run_r5_night_shift.py
+  - config/r5_night_shift*.yaml
+  - config/r5_night_shift*.json
+  - tests/test_r5_night_shift*.py
+  - tests/fixtures/r5_night_shift/**
+  - codex_tasks/night_shift/r5_overnight_01/EXECPLAN.md
+  forbidden_paths:
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - .local/** (git tracked)
+  - reports/p1_6/r5_bundle17r_bf2* (git tracked)
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_contract.py tests/test_r5_night_shift_runner.py
+  required_artifacts:
+  - src/maintenance/night_shift/models.py
+  - src/maintenance/night_shift/queue.py
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  retry_limit: 2
+  on_success:
+    unlock:
+    - ns01_t30_state_lock_resume
+  on_failure:
+    set_status: failed_terminal
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - Do not build a Codex-spawning meta-agent; current Codex session is the executor.
+- id: ns01_t30_state_lock_resume
+  title: 实现原子状态机、运行锁、过期锁恢复与 cutoff
+  priority: 85
+  status: pending
+  depends_on:
+  - ns01_t20_contract_and_loader
+  work_type: implementation
+  goal: 实现 claim/start/pass/fail/block/resume 状态转换，单写者锁，原子文件替换和 Europe/London cutoff。
+  allowed_paths:
+  - src/maintenance/night_shift/**
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - tests/test_r5_night_shift*.py
+  - tests/fixtures/r5_night_shift/**
+  - codex_tasks/night_shift/r5_overnight_01/EXECPLAN.md
+  forbidden_paths:
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - .local/** (git tracked)
+  - reports/p1_6/r5_bundle17r_bf2* (git tracked)
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_lock.py tests/test_r5_night_shift_runner.py
+  required_artifacts:
+  - src/maintenance/night_shift/lock.py
+  - src/maintenance/night_shift/runner.py
+  - scripts/run_r5_night_shift.ps1
+  retry_limit: 2
+  on_success:
+    unlock:
+    - ns01_t40_acceptance_receipts
+  on_failure:
+    set_status: failed_terminal
+    emit_failure_packet: true
+  human_gate: false
+  notes: []
+- id: ns01_t40_acceptance_receipts
+  title: 实现验收命令、回执、产物哈希与失败包
+  priority: 80
+  status: pending
+  depends_on:
+  - ns01_t30_state_lock_resume
+  work_type: implementation
+  goal: 执行受信任 acceptance commands，记录退出码、stdout/stderr 摘要和哈希，生成 passed/failed/evidence_required/human_gate 回执。
+  allowed_paths:
+  - src/maintenance/night_shift/**
+  - scripts/run_r5_night_shift.py
+  - tests/test_r5_night_shift*.py
+  - tests/fixtures/r5_night_shift/**
+  - templates/night_shift_failure_packet.md
+  - templates/night_shift_morning_readout.md
+  - codex_tasks/night_shift/r5_overnight_01/EXECPLAN.md
+  forbidden_paths:
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - .local/** (git tracked)
+  - reports/p1_6/r5_bundle17r_bf2* (git tracked)
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_receipts.py tests/test_r5_night_shift_runner.py
+  required_artifacts:
+  - src/maintenance/night_shift/receipts.py
+  - templates/night_shift_failure_packet.md
+  retry_limit: 2
+  on_success:
+    unlock:
+    - ns01_t50_bf2_seed_adapter
+  on_failure:
+    set_status: failed_terminal
+    emit_failure_packet: true
+  human_gate: false
+  notes: []
+- id: ns01_t50_bf2_seed_adapter
+  title: 实现 BF2 六工作单 / 63 blocker 幂等导入适配器
+  priority: 75
+  status: pending
+  depends_on:
+  - ns01_t40_acceptance_receipts
+  work_type: implementation
+  goal: 读取只读 BF2 输入，保留所有原始身份和 generation-lock，分类为 engineering_local、evidence_required、analysis_required 或 human_gate，不改变真实解决计数。
+  allowed_paths:
+  - src/maintenance/night_shift/**
+  - scripts/run_r5_night_shift.py
+  - tests/test_r5_night_shift*.py
+  - tests/fixtures/r5_night_shift/**
+  - .local/night_shift/**
+  - reports/p1_6/r5_night_shift/**
+  - codex_tasks/night_shift/r5_overnight_01/EXECPLAN.md
+  forbidden_paths:
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - .local/** (git tracked)
+  - reports/p1_6/r5_bundle17r_bf2* (git tracked)
+  acceptance_commands:
+  - python scripts/run_r5_night_shift.py seed-bf2 --input-manifest .local/night_shift/input_manifest.json --repo-root . --output .local/night_shift/seeded_queue.yaml --inventory-output .local/night_shift/bf2_inventory.json --receipt-output .local/night_shift/bf2_seed_receipt.json --summary-output reports/p1_6/r5_night_shift/r5_overnight_01_20260719/bf2_seed_summary.md --compatibility-output reports/p1_6/r5_night_shift/r5_overnight_01_20260719/bf2_compatibility_map.md --assert-idempotent
+  - python -m pytest -q tests/test_r5_night_shift_bf2_seed.py tests/test_r5_night_shift_determinism.py
+  required_artifacts:
+  - src/maintenance/night_shift/bf2_seed.py
+  - .local/night_shift/seeded_queue.yaml
+  - reports/p1_6/r5_night_shift/<run_id>/bf2_seed_summary.md
+  retry_limit: 2
+  on_success:
+    unlock:
+    - ns01_t60_safe_pilot
+  on_failure:
+    set_status: failed_terminal
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - Repeated import must be byte-for-byte deterministic.
+  - case_id=__suite__ is valid.
+  - Do not mark research blockers resolved merely because tasks were generated.
+- id: ns01_t60_safe_pilot
+  title: 执行一个工程安全型 pilot 或证明无安全任务
+  priority: 70
+  status: pending
+  depends_on:
+  - ns01_t50_bf2_seed_adapter
+  work_type: execution
+  goal: 从 seeded queue 选择最高优先级 engineering_local 任务并完成闭环；若不存在，生成 no_safe_pilot 记录和下一步阻断包。
+  allowed_paths:
+  - .local/night_shift/**
+  - reports/p1_6/r5_night_shift/**
+  - codex_tasks/night_shift/r5_overnight_01/EXECPLAN.md
+  forbidden_paths:
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - .local/** (git tracked)
+  - reports/p1_6/r5_bundle17r_bf2* (git tracked)
+  acceptance_commands:
+  - python scripts/run_r5_night_shift.py safe-pilot --queue .local/night_shift/seeded_queue.yaml --inventory .local/night_shift/bf2_inventory.json --run-id r5_overnight_01_20260719 --repo-root . --receipts-dir .local/night_shift/receipts --report reports/p1_6/r5_night_shift/r5_overnight_01_20260719/pilot_result.md --backflow reports/p1_6/r5_night_shift/r5_overnight_01_20260719/no_safe_pilot_backflow.md
+  - python -m pytest -q tests/test_r5_night_shift_bf2_seed.py tests/test_r5_night_shift_determinism.py
+  required_artifacts:
+  - .local/night_shift/receipts/<task_id>.json
+  - reports/p1_6/r5_night_shift/<run_id>/pilot_result.md
+  retry_limit: 1
+  on_success:
+    unlock:
+    - ns01_t70_regression_determinism
+  on_failure:
+    set_status: failed_retryable
+    emit_failure_packet: true
+    unlock:
+    - ns01_t70_regression_determinism
+  human_gate: false
+  notes:
+  - Evidence/human tasks are not eligible.
+  - A truthful no_safe_pilot result satisfies this task.
+- id: ns01_t70_regression_determinism
+  title: 运行专项、source-route、全量和确定性双跑
+  priority: 60
+  status: pending
+  depends_on:
+  - ns01_t60_safe_pilot
+  work_type: validation
+  goal: 从 GitHub Actions workflow 和现有测试解析准确命令，运行全部门禁，并对 queue/readout/seed outputs 做独立双跑逐字节比较。
+  allowed_paths:
+  - src/maintenance/night_shift/**
+  - scripts/**
+  - tests/**
+  - config/r5_night_shift*
+  - .local/night_shift/**
+  - reports/p1_6/r5_night_shift/**
+  - codex_tasks/night_shift/r5_overnight_01/EXECPLAN.md
+  forbidden_paths:
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - .local/** (git tracked)
+  - reports/p1_6/r5_bundle17r_bf2* (git tracked)
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle17r_backflow_execution.py tests/test_r5_bundle17r_backflow_execution_cli.py tests/test_r5_bundle17r_backflow_execution_determinism.py tests/test_r5_bundle17r_backflow_execution_fail_closed.py
+  - python -m pytest -q tests/test_r5_bundle17r_verified_result_materializer.py tests/test_r5_bundle17r_verified_result_materializer_cli.py
+  - python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml
+  - python -m pytest -q tests/test_r5_night_shift_contract.py tests/test_r5_night_shift_runner.py tests/test_r5_night_shift_lock.py tests/test_r5_night_shift_receipts.py tests/test_r5_night_shift_bf2_seed.py tests/test_r5_night_shift_determinism.py tests/test_r5_night_shift_readout.py
+  - git diff --check
+  - python -m pytest -q
+  - python scripts/run_r5_night_shift.py compare-files --pair .local/night_shift/seeded_queue.yaml .local/night_shift/seeded_queue_run_b.yaml --pair .local/night_shift/bf2_inventory.json .local/night_shift/bf2_inventory_run_b.json --pair .local/night_shift/bf2_seed_receipt.json .local/night_shift/bf2_seed_receipt_run_b.json --receipt .local/night_shift/receipts/determinism.json
+  required_artifacts:
+  - .local/night_shift/receipts/full_regression.json
+  - .local/night_shift/receipts/determinism.json
+  - reports/p1_6/r5_night_shift/<run_id>/validation.md
+  retry_limit: 1
+  on_success:
+    unlock:
+    - ns01_t80_readout_next_queue
+  on_failure:
+    set_status: failed_terminal
+    emit_failure_packet: true
+    stop_new_implementation: true
+    unlock:
+    - ns01_t80_readout_next_queue
+  human_gate: false
+  notes: []
+- id: ns01_t80_readout_next_queue
+  title: 生成确定性晨报与下一夜任务队列
+  priority: 50
+  status: pending
+  depends_on:
+  - ns01_t70_regression_determinism
+  work_type: reporting
+  goal: 根据 receipts 和 queue state 生成晨报，列出提交、测试、blocker 真实变化、门禁和下一夜 ready tasks；不得人工润色成虚假成功。
+  allowed_paths:
+  - src/maintenance/night_shift/**
+  - scripts/run_r5_night_shift.py
+  - tests/test_r5_night_shift*.py
+  - .local/night_shift/**
+  - reports/p1_6/r5_night_shift/**
+  - codex_tasks/night_shift/r5_overnight_01/EXECPLAN.md
+  forbidden_paths:
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - .local/** (git tracked)
+  - reports/p1_6/r5_bundle17r_bf2* (git tracked)
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_readout.py tests/test_r5_night_shift_determinism.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/<run_id>/morning_readout.md
+  - reports/p1_6/r5_night_shift/<run_id>/next_night_queue.yaml
+  retry_limit: 1
+  on_success:
+    unlock:
+    - ns01_t90_commit_push
+  on_failure:
+    set_status: failed_terminal
+    emit_failure_packet: true
+  human_gate: false
+  notes: []
+- id: ns01_t90_commit_push
+  title: 检查范围、提交、推送并记录远端 SHA
+  priority: 40
+  status: pending
+  depends_on:
+  - ns01_t80_readout_next_queue
+  work_type: delivery
+  goal: 确认仅声明路径进入提交，清理误跟踪运行产物，创建逻辑提交，推送目标分支，记录本地与远端 SHA 一致。
+  allowed_paths:
+  - <all_declared_mission_paths>
+  - codex_tasks/night_shift/r5_overnight_01/EXECPLAN.md
+  - reports/p1_6/r5_night_shift/**
+  forbidden_paths:
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - .local/** (git tracked)
+  - reports/p1_6/r5_bundle17r_bf2* (git tracked)
+  - .github/pull_request_template*
+  - remote main
+  acceptance_commands:
+  - git status --short
+  - git diff --check
+  - python -m pytest -q
+  - git rev-parse HEAD
+  - git ls-remote origin refs/heads/codex/r5-night01-autonomous-harness
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/<run_id>/delivery_receipt.md
+  retry_limit: 1
+  on_success:
+    mission_status: engineering_complete_or_truthfully_blocked
+  on_failure:
+    set_status: failed_terminal
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - Do not create a PR.
+  - Do not merge main.
+  - Do not force push.

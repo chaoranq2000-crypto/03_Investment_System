@@ -1,0 +1,87 @@
+schema_version: r5_overnight_mission_package_v1
+package_id: r5_overnight_01_autonomous_harness_and_bf2_activation
+created_at: '2026-07-18'
+language: zh-CN
+package_mode: codex_night_mission_seed
+package_mutates_runtime: false
+mission_must_mutate_runtime: true
+repository:
+  owner: chaoranq2000-crypto
+  name: 03_Investment_System
+  source_branch: codex/r5-bundle17r-bf2-execution-receipts
+  source_commit: 36a801efc2bf0af10ad9702b8c6266ebf1935d6f
+  source_commit_authority: user_reported_and_requires_runtime_reverification
+  local_source_worktree: 'C:\Projects\03_Investment_System_bf2'
+  recommended_isolated_worktree: 'C:\Projects\03_Investment_System_night01'
+  target_branch: codex/r5-night01-autonomous-harness
+current_truth:
+  research_gate: needs_targeted_backflow
+  bf2_work_orders_total: 6
+  bf2_work_orders_pending: 6
+  blocker_occurrences_total: 63
+  blocker_occurrences_resolved: 0
+  failed_results: 0
+  orphan_results: 0
+  rejected_artifacts: 0
+  sample_quality_allowed: false
+  p2_allowed: false
+  canonical_state_allowed: false
+baseline_regressions_to_preserve:
+  - bf1_generation_lock_shape_compatibility
+  - suite_case_id___suite___support
+  - ex1_byte_for_byte_determinism
+  - source_route_gate
+  - full_pytest_regression
+run_window_defaults:
+  timezone: Europe/London
+  start_at: '23:00'
+  stop_claiming_at: '06:15'
+  final_readout_at: '06:30'
+safety:
+  touch_dirty_main: false
+  force_push: false
+  create_pr: false
+  merge_main: false
+  auto_human_review: false
+  auto_advance_research_gate: false
+  commit_local_runtime_outputs: false
+expected_runtime_surface:
+  preferred:
+    - src/maintenance/night_shift/**
+    - scripts/run_r5_night_shift.py
+    - scripts/run_r5_night_shift.ps1
+    - config/r5_night_shift*.yaml
+    - config/r5_night_shift*.json
+    - tests/test_r5_night_shift*.py
+    - tests/fixtures/r5_night_shift/**
+    - codex_tasks/night_shift/r5_overnight_01/**
+    - reports/p1_6/r5_night_shift/**
+  forbidden_without_explicit_task_override:
+    - data/raw/**
+    - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+    - config/r5_readout_canonical_index.yaml
+    - main
+required_outputs:
+  - runtime_cli
+  - task_contract_validation
+  - atomic_queue_state_transitions
+  - run_lock_and_stale_lock_recovery
+  - acceptance_receipts
+  - bf2_seed_adapter
+  - deterministic_morning_readout
+  - next_night_queue
+  - pushed_branch
+contents:
+  - START_HERE.md
+  - CODEX_SCHEDULED_TASK_PROMPT.md
+  - OVERNIGHT_MISSION.md
+  - EXECPLAN.md
+  - task_queue.yaml
+  - acceptance_matrix.yaml
+  - SAFETY_AND_GIT_POLICY.md
+  - BF2_INPUT_HANDOFF.md
+  - task_cards/
+  - contracts/
+  - templates/
+  - tools/
+  - PATCHES/

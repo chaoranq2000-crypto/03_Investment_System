@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r5_night_shift_morning_readout_v1",
+  "title": "R5 Night Shift Morning Readout",
+  "type": "object",
+  "required": [
+    "run_id",
+    "baseline",
+    "branch",
+    "task_summary",
+    "commits",
+    "validation",
+    "bf2_delta",
+    "scope_audit",
+    "research_gate",
+    "next_queue",
+    "human_decisions"
+  ],
+  "properties": {
+    "run_id": {
+      "type": "string"
+    },
+    "baseline": {
+      "type": "object"
+    },
+    "branch": {
+      "type": "object"
+    },
+    "task_summary": {
+      "type": "object"
+    },
+    "commits": {
+      "type": "array"
+    },
+    "validation": {
+      "type": "array"
+    },
+    "bf2_delta": {
+      "type": "object"
+    },
+    "scope_audit": {
+      "type": "object"
+    },
+    "research_gate": {
+      "type": "string"
+    },
+    "next_queue": {
+      "type": "array"
+    },
+    "human_decisions": {
+      "type": "array"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,77 @@
+schema_version: r5_overnight_acceptance_matrix_v1
+source_of_truth_order:
+  - repository_AGENTS_md
+  - github_actions_workflows_on_source_commit
+  - existing_bundle17r_tests
+  - this_mission_package
+resolution_rule: >-
+  Static placeholders beginning with <resolved_ must be replaced during preflight with exact commands
+  found in the source commit. Record the resolved command and source file in EXECPLAN.md.
+gates:
+  - id: baseline_sha
+    level: hard
+    expected: 36a801efc2bf0af10ad9702b8c6266ebf1935d6f
+    evidence: .local/night_shift/baseline.json
+  - id: isolated_worktree
+    level: hard
+    expected: true
+    evidence: .local/night_shift/baseline.json
+  - id: bf2_input_count
+    level: hard
+    expected:
+      work_orders: 6
+      blocker_occurrences: 63
+    evidence: .local/night_shift/bf2_inventory.json
+  - id: bf2_seed_idempotency
+    level: hard
+    expected: byte_for_byte_equal
+    command: python scripts/run_r5_night_shift.py seed-bf2 --input-manifest .local/night_shift/input_manifest.json --repo-root . --output .local/night_shift/seeded_queue.yaml --inventory-output .local/night_shift/bf2_inventory.json --receipt-output .local/night_shift/bf2_seed_receipt.json --summary-output reports/p1_6/r5_night_shift/r5_overnight_01_20260719/bf2_seed_summary.md --compatibility-output reports/p1_6/r5_night_shift/r5_overnight_01_20260719/bf2_compatibility_map.md --assert-idempotent
+  - id: suite_case_compatibility
+    level: hard
+    expected: case_id___suite___accepted
+    command: python -m pytest -q tests/test_r5_bundle17r_backflow_execution.py tests/test_r5_bundle17r_backflow_execution_cli.py tests/test_r5_bundle17r_backflow_execution_determinism.py tests/test_r5_bundle17r_backflow_execution_fail_closed.py
+  - id: bf1_generation_lock_compatibility
+    level: hard
+    expected: accepted
+    command: python -m pytest -q tests/test_r5_bundle17r_backflow_execution.py tests/test_r5_bundle17r_backflow_execution_cli.py tests/test_r5_bundle17r_backflow_execution_determinism.py tests/test_r5_bundle17r_backflow_execution_fail_closed.py
+  - id: ex1_determinism
+    level: hard
+    expected: byte_for_byte_equal
+    command: python -m pytest -q tests/test_r5_bundle17r_verified_result_materializer.py tests/test_r5_bundle17r_verified_result_materializer_cli.py
+  - id: source_route_gate
+    level: hard
+    expected: pass
+    command: python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml
+  - id: night_shift_targeted_tests
+    level: hard
+    expected: pass
+    command: python -m pytest -q tests/test_r5_night_shift_contract.py tests/test_r5_night_shift_runner.py tests/test_r5_night_shift_lock.py tests/test_r5_night_shift_receipts.py tests/test_r5_night_shift_bf2_seed.py tests/test_r5_night_shift_determinism.py tests/test_r5_night_shift_readout.py
+  - id: full_pytest
+    level: hard
+    expected: pass
+    command: python -m pytest -q
+  - id: diff_check
+    level: hard
+    expected: clean
+    command: git diff --check
+  - id: scope_guard
+    level: hard
+    expected:
+      tracked_local_runtime_outputs: 0
+      tracked_bf2_run_outputs: 0
+      forbidden_paths_changed: 0
+  - id: research_truthfulness
+    level: hard
+    expected:
+      initial_pending_work_orders: 6
+      initial_resolved_blockers: 0
+      sample_quality_auto_opened: false
+      p2_auto_opened: false
+      canonical_auto_opened: false
+  - id: delivery
+    level: hard
+    expected:
+      branch: codex/r5-night01-autonomous-harness
+      remote_sha_equals_local: true
+      pr_created: false
+      main_merged: false

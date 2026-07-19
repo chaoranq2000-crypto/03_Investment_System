@@ -1,0 +1,127 @@
+schema_version: r5_night_shift_queue_v1
+mission_id: r5_overnight_02_targeted_backflow_execution
+baseline:
+  source_branch: codex/r5-night01-autonomous-harness
+  source_commit: 36a801efc2bf0af10ad9702b8c6266ebf1935d6f
+  research_gate: needs_targeted_backflow
+  blocker_occurrences_resolved: 0
+  sample_quality_allowed: false
+  p2_allowed: false
+run_window:
+  timezone: Europe/London
+  start_at: '23:00'
+  stop_claiming_at: 06:15
+  final_readout_at: 06:30
+task_selection:
+  order:
+  - priority_desc
+  - dependency_ready
+  - task_id_asc
+  single_integrator: true
+  max_parallel_shared_state_writers: 1
+tasks:
+- id: ns02_t00_review_pointer_contracts
+  title: 审核 8 个 pointer occurrence 的工程合同
+  priority: 100
+  status: human_gate
+  depends_on: []
+  work_type: contract_review
+  goal: 为 8 个 pointer occurrence 提供 exact allowed_paths、acceptance_commands 和 owner approval
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - main
+  - canonical/sample-quality/P2
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success: {}
+  on_failure:
+    emit_failure_packet: true
+  human_gate: true
+  notes:
+  - No automation until exact paths and commands are reviewed.
+- id: ns02_t10_acquire_reviewed_evidence
+  title: 补齐 evidence-required blocker
+  priority: 90
+  status: evidence_required
+  depends_on: []
+  work_type: evidence_required
+  goal: 处理 8 个需要新证据的 occurrence
+  allowed_paths: []
+  forbidden_paths:
+  - main
+  - canonical/sample-quality/P2
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success: {}
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - Route evidence acquisition through evidence-ingest.
+- id: ns02_t20_complete_analysis_backflow
+  title: 完成人工研究分析回流
+  priority: 80
+  status: human_gate
+  depends_on: []
+  work_type: analysis_required
+  goal: 处理 24 个需要研究判断的 occurrence
+  allowed_paths: []
+  forbidden_paths:
+  - main
+  - canonical/sample-quality/P2
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success: {}
+  on_failure:
+    emit_failure_packet: true
+  human_gate: true
+  notes:
+  - Do not rewrite analyst judgment as fact.
+- id: ns02_t30_exact_hash_review
+  title: 执行 exact-hash 人审
+  priority: 70
+  status: human_gate
+  depends_on: []
+  work_type: human_gate
+  goal: 处理 3 个 exact-hash/human-gate occurrence
+  allowed_paths: []
+  forbidden_paths:
+  - main
+  - canonical/sample-quality/P2
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success: {}
+  on_failure:
+    emit_failure_packet: true
+  human_gate: true
+  notes:
+  - Review acceptance cannot be generated automatically.
+- id: ns02_t40_resume_bf2_work_orders
+  title: 重跑 BF2 work-order acceptance
+  priority: 60
+  status: pending
+  depends_on:
+  - ns02_t00_review_pointer_contracts
+  - ns02_t10_acquire_reviewed_evidence
+  - ns02_t20_complete_analysis_backflow
+  - ns02_t30_exact_hash_review
+  work_type: dependency_blocked
+  goal: 仅在前置证据、分析、工程合同和人审全部真实通过后重跑六个 work order
+  allowed_paths: []
+  forbidden_paths:
+  - main
+  - canonical/sample-quality/P2
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success: {}
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - Preserve 6 pending and 0/63 resolved until receipts prove otherwise.
