@@ -31,6 +31,11 @@ from .receipts import (
     write_validation_report,
 )
 from .bf2_seed import seed_bf2
+from .contracts import (
+    authorize_packaged_queue,
+    lint_queue_contracts,
+    write_contract_lint,
+)
 from .readout import (
     build_scope_audit,
     compare_files,
@@ -421,6 +426,15 @@ def build_parser() -> argparse.ArgumentParser:
     canonicalize.add_argument("--queue", type=Path, required=True)
     canonicalize.add_argument("--output", type=Path, required=True)
 
+    authorize = commands.add_parser(
+        "authorize-queue",
+        help="bind a verified package digest to every executable task contract",
+    )
+    authorize.add_argument("--queue", type=Path, required=True)
+    authorize.add_argument("--package-digest", required=True)
+    authorize.add_argument("--output", type=Path, required=True)
+    authorize.add_argument("--report", type=Path, required=True)
+
     initialize = commands.add_parser("init", help="initialize an atomic runtime state")
     initialize.add_argument("--queue", type=Path, required=True)
     initialize.add_argument("--state", type=Path, required=True)
@@ -682,6 +696,23 @@ def main(argv: Sequence[str] | None = None) -> int:
             if args.output.read_bytes() != queue_bytes(queue):
                 raise ContractError("canonical queue write did not round-trip byte-for-byte")
             print(f"OK: wrote {args.output}")
+            return 0
+        if args.command == "authorize-queue":
+            authorized = authorize_packaged_queue(
+                queue,
+                package_digest_sha256=args.package_digest,
+            )
+            report = lint_queue_contracts(authorized)
+            if report["failed_task_count"]:
+                raise ContractError(
+                    f"authorized queue has {report['failed_task_count']} contract lint failure(s)"
+                )
+            save_queue(args.output, authorized)
+            write_contract_lint(args.report, report)
+            print(
+                f"OK: authorized={report['executable_task_count']} "
+                f"failed={report['failed_task_count']} output={args.output}"
+            )
             return 0
     except (ContractError, LockError, OSError, ValueError) as exc:
         print(f"ERROR: {exc}")

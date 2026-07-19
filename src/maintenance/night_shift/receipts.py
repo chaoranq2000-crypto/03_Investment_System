@@ -29,8 +29,20 @@ TRUSTED_GIT_SUBCOMMANDS = {
     "ls-remote",
     "show",
 }
-SHELL_CONTROL = re.compile(r"(?:&&|\|\||[|;&<>`\r\n])")
+PLACEHOLDER = re.compile(r"<[A-Za-z_][^>]{0,120}>")
 SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
+PYTHON_FORBIDDEN = (
+    "http://",
+    "https://",
+    "urllib",
+    "requests",
+    "socket",
+    "pip install",
+    "os.system",
+    "shutil.rmtree",
+    "remove-item",
+    "rm -rf",
+)
 
 
 def sha256_bytes(payload: bytes) -> str:
@@ -54,12 +66,63 @@ def canonical_json_bytes(value: Any) -> bytes:
     ).encode("utf-8")
 
 
+def _contains_unquoted_shell_control(command: str) -> bool:
+    quote: str | None = None
+    escaped = False
+    index = 0
+    while index < len(command):
+        character = command[index]
+        if escaped:
+            escaped = False
+            index += 1
+            continue
+        if character == "\\" and quote is not None:
+            escaped = True
+            index += 1
+            continue
+        if character in {"'", '"'}:
+            if quote is None:
+                quote = character
+            elif quote == character:
+                quote = None
+            index += 1
+            continue
+        if quote is None:
+            if character in "|;&<>`\r\n":
+                return True
+            if command[index : index + 2] in {"&&", "||"}:
+                return True
+        index += 1
+    return quote is not None
+
+
+def _validate_python_argv(tokens: Sequence[str], *, command: str) -> None:
+    if len(tokens) < 2:
+        raise ContractError("python acceptance command must name a module, script, or -c body")
+    if tokens[1] == "-m":
+        if len(tokens) < 3 or tokens[2] != "pytest":
+            raise ContractError("python -m acceptance is limited to pytest")
+        return
+    if tokens[1] == "-c":
+        if len(tokens) < 3 or not tokens[2].strip():
+            raise ContractError("python -c acceptance body must not be empty")
+        lowered = tokens[2].casefold()
+        if any(item in lowered for item in PYTHON_FORBIDDEN):
+            raise ContractError(f"python acceptance body contains a forbidden capability: {command}")
+        return
+    script = tokens[1].replace("\\", "/")
+    if script.startswith(("/", "../")) or re.match(r"^[A-Za-z]:", script):
+        raise ContractError("python acceptance script must be repository-relative")
+    if not script.endswith(".py"):
+        raise ContractError("python acceptance command must execute a .py script")
+
+
 def parse_trusted_command(command: str) -> list[str]:
     if not command.strip():
         raise ContractError("acceptance command must not be empty")
-    if "<" in command and ">" in command:
+    if PLACEHOLDER.search(command):
         raise ContractError(f"acceptance command contains an unresolved placeholder: {command}")
-    if SHELL_CONTROL.search(command):
+    if _contains_unquoted_shell_control(command):
         raise ContractError(f"acceptance command contains shell control syntax: {command}")
     try:
         tokens = shlex.split(command, posix=True)
@@ -73,6 +136,7 @@ def parse_trusted_command(command: str) -> list[str]:
     if executable not in TRUSTED_EXECUTABLES:
         raise ContractError(f"acceptance executable is not trusted: {tokens[0]}")
     if executable in {"python", "python3"}:
+        _validate_python_argv(tokens, command=command)
         tokens[0] = sys.executable
     elif executable == "pytest":
         tokens = [sys.executable, "-m", "pytest", *tokens[1:]]

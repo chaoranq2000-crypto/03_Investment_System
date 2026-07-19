@@ -12,7 +12,15 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "r5_night_shift_queue_v1"
+      "enum": [
+        "r5_night_shift_queue_v1",
+        "r5_night_shift_queue_v2_proposed",
+        "r5_night_shift_queue_v2"
+      ]
+    },
+    "package_id": {
+      "type": "string",
+      "minLength": 1
     },
     "mission_id": {
       "type": "string",
@@ -27,6 +35,19 @@
     "task_selection": {
       "type": "object"
     },
+    "long_term_goal": {
+      "type": "object"
+    },
+    "mission_policy": {
+      "type": "object"
+    },
+    "read_only_inputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
     "tasks": {
       "type": "array",
       "items": {
@@ -35,6 +56,36 @@
     }
   },
   "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "r5_night_shift_queue_v2"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "tasks": {
+            "items": {
+              "required": [
+                "phase",
+                "estimated_work_units",
+                "delivery_required",
+                "contract_origin",
+                "path_authority",
+                "acceptance_authority",
+                "review_state",
+                "review_sha",
+                "resolution_claims"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "task": {
       "type": "object",
@@ -68,7 +119,7 @@
         "priority": {
           "type": "integer",
           "minimum": 0,
-          "maximum": 100
+          "maximum": 1000
         },
         "status": {
           "enum": [
@@ -82,7 +133,8 @@
             "dependency_blocked",
             "evidence_required",
             "human_gate",
-            "skipped_cutoff"
+            "skipped_cutoff",
+            "blocked_external"
           ]
         },
         "depends_on": {
@@ -142,6 +194,61 @@
           "items": {
             "type": "string"
           }
+        },
+        "phase": {
+          "type": "string"
+        },
+        "estimated_work_units": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "delivery_required": {
+          "type": "boolean"
+        },
+        "commit_policy": {
+          "type": "string"
+        },
+        "contract_origin": {
+          "type": "string"
+        },
+        "path_authority": {
+          "type": "string"
+        },
+        "acceptance_authority": {
+          "type": "string"
+        },
+        "review_state": {
+          "enum": [
+            "legacy",
+            "proposed",
+            "approved",
+            "rejected"
+          ]
+        },
+        "review_sha": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resolution_claims": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "spawn_depth": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "parent_task_id": {
+          "type": [
+            "string",
+            "null"
+          ]
         }
       },
       "additionalProperties": false

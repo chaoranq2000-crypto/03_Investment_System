@@ -1,0 +1,250 @@
+{
+  "executable_task_count": 40,
+  "failed_task_count": 0,
+  "mission_id": "r5_overnight_02_20260720",
+  "schema_version": "r5_night_shift_contract_lint_v1",
+  "stable_receipt_sha256": "7336e607a5089abbb38b67a39e586e2c978346fc4646c28a084b21266c4ec14c",
+  "task_count": 40,
+  "tasks": [
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t00_exact_baseline_preflight"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t01_night01_completion_audit"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t02_windows_path_branch_guard"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t03_stale_baseline_detector"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t10_mission_outcome_model"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t11_no_safe_pilot_not_success"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t12_program_goal_close_policy"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t13_open_mission_resume"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t14_two_phase_publication"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t15_digest_integrity"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t20_contract_authority_schema"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t21_contract_lint"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t22_acceptance_command_safety"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t23_task_diff_scope_guard"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t24_contract_proposal_generator"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t25_review_packet_hash_lock"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t26_semantic_contract_router"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t30_occurrence_queue_expander"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t31_dependency_dag"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t32_evidence_request_packets"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t33_analysis_workbooks"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t34_human_gate_handoffs"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t35_pointer_contract_proposals"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t36_fallback_engineering_backlog"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t37_failure_spawn_retry"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t38_queue_metrics_and_capacity"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t39_pilot_eligibility_gate"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t40_adversarial_test_matrix"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t41_crash_cutoff_resume_tests"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t42_ci_integration"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t43_bf2_dry_run_truth_preservation"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t44_determinism_double_run"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t45_full_regression_scope_audit"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t46_commit_push_remote_ci"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t47_morning_readout_next_queue"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t50_golden_case_inventory"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t51_semantic_quality_negative_fixtures"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t52_driver_contract_gap_matrix"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t53_bundle18_readiness_precheck"
+    },
+    {
+      "errors": [],
+      "executable": true,
+      "passed": true,
+      "task_id": "ns02_t54_next_mission_seed"
+    }
+  ]
+}

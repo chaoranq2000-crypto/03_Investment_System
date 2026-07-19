@@ -1,0 +1,2341 @@
+schema_version: r5_night_shift_queue_v2
+package_id: R5_Overnight_Mission_02_20260719
+mission_id: r5_overnight_02_20260720
+long_term_goal:
+  id: r5_bundle17r_bf2_four_case_activation
+  description: 四个真实 golden case 完成受审 evidence/materialization/qualification/regression/exact-hash 链，随后才进入 Bundle18 人审。
+  state_at_start: open_needs_targeted_backflow
+  close_allowed: false
+  this_mission_may_close_goal: false
+  truth_at_start:
+    work_orders_pending: 6
+    blocker_occurrences_total: 63
+    blocker_occurrences_resolved: 0
+    materialized_case_count: 0
+    target_case_count: 4
+    research_gate: needs_targeted_backflow
+    sample_quality_allowed: false
+    p2_allowed: false
+baseline:
+  repository: chaoranq2000-crypto/03_Investment_System
+  repository_url: https://github.com/chaoranq2000-crypto/03_Investment_System
+  source_branch: codex/r5-night01-autonomous-harness
+  source_commit: 4340945457d661ed62967e949f862ccf2214aff2
+  source_commit_policy: exact_at_bootstrap_then_resolve_final_remote_head_for_next_queue
+  target_branch: codex/r5-night02-contract-recovery
+  expected_worktree_root: C:\Projects\03_Investment_System_night02
+  path_and_branch_are_distinct_fields: true
+run_window:
+  timezone: Europe/London
+  start_at: '23:00'
+  stop_claiming_at: 06:15
+  final_readout_at: 06:30
+  after_cutoff: finish_in_flight_acceptance_then_emit_partial_readout
+mission_policy:
+  single_integrator: true
+  max_parallel_shared_state_writers: 1
+  continue_claiming_until_cutoff: true
+  continue_claiming_after_delivery_until_cutoff_if_ready: true
+  stop_early_only_when_all_tasks_complete_and_next_queue_ready: true
+  no_ready_research_task_uses_fallback_backlog: true
+  no_safe_pilot_is_success: false
+  blocked_is_delivered: false
+  mission_delivered_requires_all_delivery_required_tasks: true
+  next_queue_required: true
+  next_queue_minimum_tasks: 12
+  minimum_workstream_commits: 4
+  pr_creation_allowed: false
+  merge_main_allowed: false
+  force_push_allowed: false
+  canonical_workflow_state_mutation_allowed: false
+  sample_quality_allowed: false
+  p2_allowed: false
+task_selection:
+  order:
+  - priority_desc
+  - dependency_ready
+  - task_id_asc
+  minimum_ready_after_preflight: 6
+  failure_spawn_depth_limit: 2
+read_only_inputs:
+- reports/p1_6/r5_bundle17r/activation_run_a/R5_bundle17r_backflow_queue.csv
+- reports/p1_6/r5_bundle17r/activation_manifest.yaml
+- reports/p1_6/r5_bundle17r/quality_gate_report.md
+- reports/p1_6/r5_bundle17r/quality_issues.csv
+- reports/p1_6/r5_night_shift/r5_overnight_01_20260719/**
+- reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/**
+- reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/**
+- reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/**
+- reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/**
+tasks:
+- id: ns02_t00_exact_baseline_preflight
+  title: 精确基线、分支与干净工作区预检
+  priority: 300
+  status: pending
+  depends_on: []
+  work_type: engineering
+  goal: 从 Night01 最终远端 SHA 创建独立 Night02 分支；路径与分支必须作为独立参数处理。
+  allowed_paths:
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/preflight/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -c "import subprocess; s=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(); assert s == '4340945457d661ed62967e949f862ccf2214aff2', s"
+  - python -c "import subprocess; b=subprocess.check_output(['git','branch','--show-current'], text=True).strip(); assert b == 'codex/r5-night02-contract-recovery', b"
+  - python -c "import subprocess; s=subprocess.check_output(['git','status','--porcelain'], text=True); assert not s.strip(), s"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/preflight/source_state.json
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/preflight/preflight.md
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Source SHA is immutable for this mission.
+  - Do not start from f89a3ab; that checkpoint predates the final metadata correction.
+  phase: A_baseline
+  estimated_work_units: 2
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t01_night01_completion_audit
+  title: 固化 Night01 完成审计与差异结论
+  priority: 295
+  status: pending
+  depends_on:
+  - ns02_t00_exact_baseline_preflight
+  work_type: audit
+  goal: 把远端分支、四个提交、CI、测试、0/63 真值、下一队列过早收敛等事实写入可机读审计。
+  allowed_paths:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.*
+  - codex_tasks/night_shift/r5_overnight_02_20260720/SOURCE_STATE.*
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -c "from pathlib import Path; assert Path('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.md').is_file()"
+  - python -c "import json; d=json.load(open('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.json', encoding='utf-8')); assert d['final_sha'] == '4340945457d661ed62967e949f862ccf2214aff2'; assert d['truth']['resolved_blockers'] == 0"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.md
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/completion_audit.json
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: A_baseline
+  estimated_work_units: 2
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t02_windows_path_branch_guard
+  title: 修复并测试 Windows worktree 路径与分支粘连
+  priority: 290
+  status: pending
+  depends_on:
+  - ns02_t00_exact_baseline_preflight
+  work_type: engineering
+  goal: 拒绝把 C:\...worktree 与 codex/...branch 串成一个参数；所有 Git 操作使用结构化 cwd/ref 字段。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_git_targets.py
+  required_artifacts:
+  - tests/test_r5_night_shift_git_targets.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Cover drive letters, backslashes, spaces, Unicode paths, and branch refs.
+  - A malformed target must fail before any git commit or push command runs.
+  phase: A_baseline
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t03_stale_baseline_detector
+  title: 检测下一夜队列的陈旧 source_commit
+  priority: 285
+  status: pending
+  depends_on:
+  - ns02_t00_exact_baseline_preflight
+  work_type: engineering
+  goal: 当 tracked readout/queue 引用的 source_commit 不是最终远端 HEAD 时，明确标记 stale 并在下一次启动时解析远端 HEAD。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_publication.py
+  required_artifacts:
+  - tests/test_r5_night_shift_publication.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Night01 next_night_queue referenced f89a3ab while final remote HEAD became 4340945.
+  - Never silently trust a pre-publication SHA as the next mission baseline.
+  phase: A_baseline
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t10_mission_outcome_model
+  title: 新增 mission outcome 状态机
+  priority: 280
+  status: pending
+  depends_on:
+  - ns02_t00_exact_baseline_preflight
+  work_type: engineering
+  goal: 实现 delivered / partial / blocked / failed / cutoff 五类终态，分离任务运行结束与长期 Goal 成功关闭。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_outcome.py
+  required_artifacts:
+  - tests/test_r5_night_shift_outcome.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: B_outcome
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t11_no_safe_pilot_not_success
+  title: 禁止 no_safe_pilot 计为 passed
+  priority: 275
+  status: pending
+  depends_on:
+  - ns02_t10_mission_outcome_model
+  work_type: engineering
+  goal: '`no_safe_pilot` 只能产生 blocked/partial 证据，不能满足 delivery_required 任务，也不能触发成功关闭。'
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_outcome.py tests/test_r5_night_shift_pilot_eligibility.py
+  required_artifacts:
+  - tests/test_r5_night_shift_pilot_eligibility.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: B_outcome
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t12_program_goal_close_policy
+  title: 实现长期 Goal 与夜班 Mission 双层关闭策略
+  priority: 270
+  status: pending
+  depends_on:
+  - ns02_t10_mission_outcome_model
+  - ns02_t11_no_safe_pilot_not_success
+  work_type: engineering
+  goal: Night02 允许结束本次运行，但不得关闭 R5 4/4 激活长期 Goal；只有显式人工/上层动作可以关闭长期 Goal。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_goal_policy.py
+  required_artifacts:
+  - tests/test_r5_night_shift_goal_policy.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Program goal close_allowed=false for this mission.
+  - A scheduled run completing is not equivalent to research goal completion.
+  phase: B_outcome
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t13_open_mission_resume
+  title: 支持 partial/blocked mission 跨夜恢复
+  priority: 265
+  status: pending
+  depends_on:
+  - ns02_t10_mission_outcome_model
+  - ns02_t12_program_goal_close_policy
+  work_type: engineering
+  goal: partial、blocked、cutoff 均保留未完成任务、尝试次数、依赖状态和下一次可领取队列。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_resume.py tests/test_r5_night_shift_lock.py
+  required_artifacts:
+  - tests/test_r5_night_shift_resume.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: B_outcome
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t14_two_phase_publication
+  title: 实现非自引用的两阶段发布凭证
+  priority: 260
+  status: pending
+  depends_on:
+  - ns02_t03_stale_baseline_detector
+  - ns02_t10_mission_outcome_model
+  work_type: engineering
+  goal: tracked receipt 绑定 implementation SHA/content tree；推送后 untracked/CI artifact 绑定最终 remote HEAD，避免为修正 SHA 再产生陈旧队列。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_publication.py tests/test_r5_night_shift_receipts.py
+  required_artifacts:
+  - tests/test_r5_night_shift_publication.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Do not attempt to place a commit SHA inside the same commit it identifies.
+  - Store implementation_sha and publication_head as different identities.
+  phase: B_outcome
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t15_digest_integrity
+  title: 强化 package/receipt SHA-256 完整性
+  priority: 255
+  status: pending
+  depends_on:
+  - ns02_t14_two_phase_publication
+  work_type: engineering
+  goal: 所有摘要必须重算、严格为 64 位十六进制，并在写入后再次验证；手抄摘要不得通过。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_digest.py tests/test_r5_night_shift_receipts.py
+  required_artifacts:
+  - tests/test_r5_night_shift_digest.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: B_outcome
+  estimated_work_units: 3
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t20_contract_authority_schema
+  title: 扩展任务合同的路径与验收授权字段
+  priority: 250
+  status: pending
+  depends_on:
+  - ns02_t00_exact_baseline_preflight
+  work_type: engineering
+  goal: 加入 contract_origin、path_authority、acceptance_authority、review_state、review_sha、resolution_claims 等字段并 fail closed。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_contract.py tests/test_r5_night_shift_authority.py
+  required_artifacts:
+  - tests/test_r5_night_shift_authority.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: C_contract
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t21_contract_lint
+  title: 实现 executable contract lint
+  priority: 245
+  status: pending
+  depends_on:
+  - ns02_t20_contract_authority_schema
+  work_type: engineering
+  goal: 非人工且可执行任务必须拥有非空 exact allowed_paths 与可执行 acceptance_commands；占位符、目录根过宽和空命令失败。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_contract_lint.py
+  required_artifacts:
+  - tests/test_r5_night_shift_contract_lint.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: C_contract
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t22_acceptance_command_safety
+  title: 验收命令安全解析与 allowlist
+  priority: 240
+  status: pending
+  depends_on:
+  - ns02_t20_contract_authority_schema
+  work_type: engineering
+  goal: 结构化解析 python/pytest/git 的受信子命令，拒绝 shell 链、网络下载、force push、merge main 与隐式 cwd。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_command_safety.py
+  required_artifacts:
+  - tests/test_r5_night_shift_command_safety.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: C_contract
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t23_task_diff_scope_guard
+  title: 实现每任务前后 diff 范围门
+  priority: 235
+  status: pending
+  depends_on:
+  - ns02_t20_contract_authority_schema
+  work_type: engineering
+  goal: 任务开始记录树状态；完成时任何超出 allowed_paths 的新增、修改、删除都拒绝验收并回滚/生成失败包。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_scope_guard.py
+  required_artifacts:
+  - tests/test_r5_night_shift_scope_guard.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: C_contract
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t24_contract_proposal_generator
+  title: 生成合同提案而不伪装审批
+  priority: 230
+  status: pending
+  depends_on:
+  - ns02_t20_contract_authority_schema
+  - ns02_t21_contract_lint
+  work_type: engineering
+  goal: 基于 source_artifact、owner_skill、requested_action 和仓库测试索引生成候选路径/命令，状态必须为 proposed，不能自动 approved。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_contract_proposals.py
+  required_artifacts:
+  - tests/test_r5_night_shift_contract_proposals.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: C_contract
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t25_review_packet_hash_lock
+  title: 为合同审批包建立 exact-hash 锁
+  priority: 225
+  status: pending
+  depends_on:
+  - ns02_t24_contract_proposal_generator
+  - ns02_t15_digest_integrity
+  work_type: engineering
+  goal: review packet 绑定任务、候选路径、命令、来源、生成器版本与 SHA；任何内容变更使旧审批失效。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_review_handoff.py
+  required_artifacts:
+  - tests/test_r5_night_shift_review_handoff.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: C_contract
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t26_semantic_contract_router
+  title: 区分 pointer 拼写错与上游字段缺失
+  priority: 220
+  status: pending
+  depends_on:
+  - ns02_t20_contract_authority_schema
+  - ns02_t24_contract_proposal_generator
+  work_type: engineering
+  goal: 若目标字段根本未由上游 artifact 发出，必须路由到上游 generation contract，不得把 pointer 改到语义不等价字段以假通过。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_semantic_router.py
+  required_artifacts:
+  - tests/test_r5_night_shift_semantic_router.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - The four legacy generation_lock files have no generation_id.
+  - The four legacy quality_readout files have decision=pass but no candidate_ready_for_exact_hash_review boolean.
+  phase: C_contract
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occurrence_queue_expander
+  title: 把 63 个 blocker 展开为 occurrence 级任务图
+  priority: 215
+  status: pending
+  depends_on:
+  - ns02_t20_contract_authority_schema
+  - ns02_t21_contract_lint
+  work_type: engineering
+  goal: 从 Bundle17R backflow queue 生成 63 occurrence tasks + 6 work-order aggregators，保留 case/stage/field/owner/source 行级标识。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_queue_expansion.py tests/test_r5_night_shift_bf2_seed.py
+  required_artifacts:
+  - tests/test_r5_night_shift_queue_expansion.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: D_backflow
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t31_dependency_dag
+  title: 重建 20 个 dependency blocker 的 DAG 与解除条件
+  priority: 210
+  status: pending
+  depends_on:
+  - ns02_t30_occurrence_queue_expander
+  work_type: engineering
+  goal: 把 dependency_blocked occurrence 映射到真正前置工单和可验证解除条件，检测环与孤儿。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_dependency_dag.py
+  required_artifacts:
+  - tests/test_r5_night_shift_dependency_dag.py
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/dependency_dag.json
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: D_backflow
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t32_evidence_request_packets
+  title: 生成 8 个 evidence-required 请求包
+  priority: 205
+  status: pending
+  depends_on:
+  - ns02_t30_occurrence_queue_expander
+  work_type: engineering
+  goal: 每个请求包包含 case、缺失 source class/driver/question、需要的 reviewer 动作、禁止自动接受边界和回流命令。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_backflow_packets.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/evidence_requests.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/evidence_requests.md
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Generate requests only; do not invent or auto-accept evidence.
+  phase: D_backflow
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t33_analysis_workbooks
+  title: 生成 24 个 analysis-required 分析工作表
+  priority: 200
+  status: pending
+  depends_on:
+  - ns02_t30_occurrence_queue_expander
+  work_type: engineering
+  goal: 按四个 golden case 与经济驱动分组，给出待回答问题、模型链接、证伪条件和所需证据，不代替分析师结论。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_backflow_packets.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/analysis_workbooks.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/analysis_workbooks.md
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: D_backflow
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t34_human_gate_handoffs
+  title: 生成 3 个 human/exact-hash 门禁交接包
+  priority: 195
+  status: pending
+  depends_on:
+  - ns02_t25_review_packet_hash_lock
+  - ns02_t30_occurrence_queue_expander
+  work_type: engineering
+  goal: 输出不可变候选哈希、reviewer 空字段、decision 空字段、验证清单；自动流程不得填写通过结论。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_human_gate.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/human_gate_handoffs.yaml
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Reviewer, reviewed_at, decision and notes remain empty.
+  phase: D_backflow
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t35_pointer_contract_proposals
+  title: 为 8 个 pointer occurrence 生成语义正确的实施提案
+  priority: 190
+  status: pending
+  depends_on:
+  - ns02_t24_contract_proposal_generator
+  - ns02_t26_semantic_contract_router
+  - ns02_t30_occurrence_queue_expander
+  work_type: engineering
+  goal: 定位四案例 generation/quality 生成器与测试；提案应要求新代际发出 generation_id 和 candidate_ready_for_exact_hash_review，而不是篡改历史 artifact。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_proposals.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/pointer_contract_proposals.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/pointer_contract_proposals.md
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - All eight proposals remain review_state=proposed unless an external exact-hash approval exists.
+  phase: D_backflow
+  estimated_work_units: 6
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t36_fallback_engineering_backlog
+  title: 实现门禁受阻时的受限工程 fallback 队列
+  priority: 185
+  status: pending
+  depends_on:
+  - ns02_t11_no_safe_pilot_not_success
+  - ns02_t30_occurrence_queue_expander
+  work_type: engineering
+  goal: 当 research queue 只剩 evidence/human gates 时，继续领取预先批准的 runner/test/doc hardening 任务，不以 no_ready 立即退出。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_fallback_backlog.py
+  required_artifacts:
+  - tests/test_r5_night_shift_fallback_backlog.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: D_backflow
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t37_failure_spawn_retry
+  title: 实现失败派生任务与有限重试
+  priority: 180
+  status: pending
+  depends_on:
+  - ns02_t36_fallback_engineering_backlog
+  work_type: engineering
+  goal: 验收失败可派生 path-bounded 修复任务，继承范围与证据，深度/次数有限，安全失败不可重试。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_retry_graph.py
+  required_artifacts:
+  - tests/test_r5_night_shift_retry_graph.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: D_backflow
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t38_queue_metrics_and_capacity
+  title: 新增 ready/blocked/work-unit 队列指标
+  priority: 175
+  status: pending
+  depends_on:
+  - ns02_t30_occurrence_queue_expander
+  - ns02_t36_fallback_engineering_backlog
+  work_type: engineering
+  goal: 输出 ready_count、blocked_by_type、remaining_work_units、delivery_required_remaining 和 fallback_ready_count，晨报不能只写任务总数。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_metrics.py
+  required_artifacts:
+  - tests/test_r5_night_shift_metrics.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: D_backflow
+  estimated_work_units: 4
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t39_pilot_eligibility_gate
+  title: 实现 reviewed-contract 才可执行的 pilot 门
+  priority: 170
+  status: pending
+  depends_on:
+  - ns02_t21_contract_lint
+  - ns02_t22_acceptance_command_safety
+  - ns02_t23_task_diff_scope_guard
+  - ns02_t25_review_packet_hash_lock
+  - ns02_t35_pointer_contract_proposals
+  work_type: engineering
+  goal: 只有 exact-hash approved 合同同时通过 path/command/scope lint 才能执行；否则输出 blocked_external 并继续其他 ready 任务。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pilot_eligibility.py
+  required_artifacts:
+  - tests/test_r5_night_shift_pilot_eligibility.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - This mission does not auto-approve the eight pointer proposals.
+  - A blocked pilot is truthful but is not a successful resolution claim.
+  phase: D_backflow
+  estimated_work_units: 5
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t40_adversarial_test_matrix
+  title: 补齐夜班运行时对抗测试矩阵
+  priority: 165
+  status: pending
+  depends_on:
+  - ns02_t02_windows_path_branch_guard
+  - ns02_t03_stale_baseline_detector
+  - ns02_t11_no_safe_pilot_not_success
+  - ns02_t15_digest_integrity
+  - ns02_t21_contract_lint
+  - ns02_t23_task_diff_scope_guard
+  - ns02_t26_semantic_contract_router
+  work_type: engineering
+  goal: 覆盖空路径、占位命令、no_safe_pilot 假成功、stale baseline、41位摘要、路径分支粘连、越界 diff、伪人审、旧字段假映射。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_adversarial.py tests/test_r5_night_shift_git_targets.py tests/test_r5_night_shift_digest.py tests/test_r5_night_shift_semantic_router.py
+  required_artifacts:
+  - tests/test_r5_night_shift_adversarial.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: E_validation
+  estimated_work_units: 7
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t41_crash_cutoff_resume_tests
+  title: 验证崩溃、锁过期、cutoff 与续跑
+  priority: 160
+  status: pending
+  depends_on:
+  - ns02_t13_open_mission_resume
+  - ns02_t37_failure_spawn_retry
+  work_type: engineering
+  goal: 模拟中断后不得重复提交或丢任务；06:15 后停止领取新任务但完成在途验收并写 partial readout。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_crash_recovery.py tests/test_r5_night_shift_resume.py tests/test_r5_night_shift_lock.py
+  required_artifacts:
+  - tests/test_r5_night_shift_crash_recovery.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: E_validation
+  estimated_work_units: 6
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t42_ci_integration
+  title: 把新增夜班回归纳入 GitHub Actions
+  priority: 155
+  status: pending
+  depends_on:
+  - ns02_t40_adversarial_test_matrix
+  - ns02_t41_crash_cutoff_resume_tests
+  work_type: engineering
+  goal: 在现有 CI 中运行夜班专项、合同安全、发布与对抗测试；保留全仓测试并输出警告清单。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - .github/workflows/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_ci_contract.py
+  required_artifacts:
+  - tests/test_r5_night_shift_ci_contract.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Do not change branch protection or create a PR.
+  - Action-version warning cleanup may be documented if it cannot be safely changed.
+  phase: E_validation
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t43_bf2_dry_run_truth_preservation
+  title: 对 69 个 BF2 seed tasks 做只读干跑
+  priority: 150
+  status: pending
+  depends_on:
+  - ns02_t31_dependency_dag
+  - ns02_t32_evidence_request_packets
+  - ns02_t33_analysis_workbooks
+  - ns02_t34_human_gate_handoffs
+  - ns02_t35_pointer_contract_proposals
+  work_type: engineering
+  goal: 重建 63 occurrences + 6 parents，验证分类、依赖、提案包和门禁；未经真实收据 resolved 必须保持 0。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_bf2_dry_run.py tests/test_r5_night_shift_bf2_seed.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/bf2_dry_run_receipt.json
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - No historical Bundle17R artifact may be edited.
+  - Resolved blocker count remains zero unless an independently approved implementation receipt exists.
+  phase: E_validation
+  estimated_work_units: 6
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t44_determinism_double_run
+  title: 执行新队列与报告双跑确定性检查
+  priority: 145
+  status: pending
+  depends_on:
+  - ns02_t43_bf2_dry_run_truth_preservation
+  - ns02_t38_queue_metrics_and_capacity
+  work_type: engineering
+  goal: 同一输入运行两次，expanded queue、DAG、packets、metrics、readout 全部字节一致；时间/绝对路径放入非稳定 receipt。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_determinism.py tests/test_r5_night_shift_readout.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/determinism_receipt.json
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: E_validation
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t45_full_regression_scope_audit
+  title: 运行专项、source-route、全量测试与 scope audit
+  priority: 140
+  status: pending
+  depends_on:
+  - ns02_t42_ci_integration
+  - ns02_t44_determinism_double_run
+  work_type: engineering
+  goal: 所有专项测试、source-route quality、全仓 pytest、git diff --check、tracked .local/pyc/forbidden paths 检查必须通过。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - .github/workflows/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_*.py
+  - python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml
+  - python -m pytest -q
+  - git diff --check
+  - python -c "import subprocess; files=subprocess.check_output(['git','ls-files'], text=True).splitlines(); bad=[p for p in files if p.startswith('.local/') or p.endswith('.pyc') or '/__pycache__/' in p]; assert not bad, bad"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/full_regression.json
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/validation/scope_audit.json
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: E_validation
+  estimated_work_units: 7
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t46_commit_push_remote_ci
+  title: 按工作流提交、推送并核验远端/CI
+  priority: 135
+  status: pending
+  depends_on:
+  - ns02_t45_full_regression_scope_audit
+  work_type: engineering
+  goal: 形成不少于四个有意义的 workstream commits，推送 Night02 分支，核验 remote SHA；不创建 PR、不合并 main、不 force push。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - .github/workflows/**
+  - docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -c "import subprocess; b=subprocess.check_output(['git','branch','--show-current'], text=True).strip(); assert b == 'codex/r5-night02-contract-recovery', b"
+  - python -c "import subprocess; s=subprocess.check_output(['git','status','--porcelain'], text=True); assert not s.strip(), s"
+  - python -c "import subprocess; n=int(subprocess.check_output(['git','rev-list','--count','4340945457d661ed62967e949f862ccf2214aff2..HEAD'], text=True)); assert n >= 4, n"
+  - python -c "import subprocess; local=subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip(); remote=subprocess.check_output(['git','ls-remote','--heads','origin','codex/r5-night02-contract-recovery'], text=True).split()[0]; assert local == remote, (local, remote)"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/remote_delivery_receipt.json
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/publication/ci_status.md
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - The final remote/CI receipt may be an untracked or CI artifact so it can identify final HEAD without self-reference.
+  phase: E_validation
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t47_morning_readout_next_queue
+  title: 生成晨报和至少 12 项下一夜 ready backlog
+  priority: 130
+  status: pending
+  depends_on:
+  - ns02_t46_commit_push_remote_ci
+  work_type: engineering
+  goal: 晨报区分 mission outcome 与 program goal；报告真实 blocker delta、提交、测试、CI、blocked gates；下一队列解析最终 remote HEAD。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -c "from pathlib import Path; assert Path('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.md').is_file()"
+  - python -c "import yaml; q=yaml.safe_load(open('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml', encoding='utf-8')); assert len(q['tasks']) >= 12; assert q['program_goal']['close_allowed'] is False"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.md
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/morning_readout.json
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - If delivery-required tasks remain, outcome is partial and all unfinished tasks carry forward.
+  - Never report program goal closed.
+  phase: E_validation
+  estimated_work_units: 5
+  delivery_required: true
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t50_golden_case_inventory
+  title: 盘点四个 golden case 的运行时代际与字段缺口
+  priority: 125
+  status: pending
+  depends_on:
+  - ns02_t00_exact_baseline_preflight
+  work_type: analysis_automation
+  goal: 为铜冠铜箔、药明康德、赤峰黄金、东阳光生成 artifact lineage、case_id、generation/quality 字段兼容矩阵。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_golden_inventory.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/golden_case_inventory.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/golden_case_inventory.md
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: F_strategic_fallback
+  estimated_work_units: 5
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t51_semantic_quality_negative_fixtures
+  title: 设计长而空、同义重复等语义负向 fixture
+  priority: 120
+  status: pending
+  depends_on:
+  - ns02_t50_golden_case_inventory
+  work_type: engineering
+  goal: 增加长篇空泛、字段非空但无公司特异指标、预测无经营桥、低置信同业凑数、观察点不可证伪等 fixture。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - tests/fixtures/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_semantic_fixture_contract.py
+  required_artifacts:
+  - tests/test_r5_night_shift_semantic_fixture_contract.py
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: F_strategic_fallback
+  estimated_work_units: 6
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t52_driver_contract_gap_matrix
+  title: 生成四类经济驱动合同差距矩阵
+  priority: 115
+  status: pending
+  depends_on:
+  - ns02_t50_golden_case_inventory
+  work_type: analysis_automation
+  goal: 比较 product-generation、backlog-conversion、commodity-cycle、multi-business/M&A 四类驱动的来源、单位、期间、重叠与财务映射缺口。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -c "from pathlib import Path; assert Path('reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/driver_contract_gap_matrix.yaml').is_file()"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/driver_contract_gap_matrix.yaml
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/driver_contract_gap_matrix.md
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: F_strategic_fallback
+  estimated_work_units: 5
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t53_bundle18_readiness_precheck
+  title: 生成 Bundle18 exact-hash 人审前置检查
+  priority: 110
+  status: pending
+  depends_on:
+  - ns02_t34_human_gate_handoffs
+  - ns02_t43_bf2_dry_run_truth_preservation
+  work_type: engineering
+  goal: 仅检查 candidate artifacts、generation IDs、physical hashes、quality booleans 和 reviewer handoff 资格；不得自动触发或通过人审。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_bundle18_precheck.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/bundle18_precheck.yaml
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+  phase: F_strategic_fallback
+  estimated_work_units: 4
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t54_next_mission_seed
+  title: 依据实际剩余工作生成 Night03 多任务种子
+  priority: 105
+  status: pending
+  depends_on:
+  - ns02_t38_queue_metrics_and_capacity
+  - ns02_t50_golden_case_inventory
+  work_type: engineering
+  goal: 从未完成任务、外部门禁、测试发现与四案例差距生成 Night03 队列；不得只生成四个大门禁加一个汇总任务。
+  allowed_paths:
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/** (read-only; never mutate)
+  - .local/** (never track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_readout.py tests/test_r5_night_shift_fallback_backlog.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/strategic/night03_seed.yaml
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes:
+  - Seed at least 12 occurrence-sized or engineering-sized tasks with exact paths and commands where authority exists.
+  phase: F_strategic_fallback
+  estimated_work_units: 4
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: human_reviewed_package:R5_Overnight_Mission_02_20260719
+  path_authority: package:task_queue.yaml#allowed_paths
+  acceptance_authority: package:ACCEPTANCE_MATRIX.md
+  review_state: approved
+  review_sha: 236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null

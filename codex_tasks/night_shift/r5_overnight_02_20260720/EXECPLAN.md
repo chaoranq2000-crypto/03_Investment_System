@@ -10,7 +10,7 @@ Repair the Night01 early-close semantics and turn Bundle17R backflow into a dura
 
 - [x] A. Exact baseline and Night01 audit
 - [x] B. Mission outcome / Goal-close separation
-- [ ] C. Executable contract authority and safety
+- [x] C. Executable contract authority and safety
 - [ ] D. Occurrence-level backflow and fallback queue
 - [ ] E. Adversarial tests, deterministic dry run, full regression and publication
 - [ ] F. Optional strategic fallback artifacts
@@ -46,6 +46,9 @@ T50–T54 are valid engineering/analysis-automation work when the required work 
   bootstrap 前置检查为证据，不能在首个提交之后伪造重跑。
 - 2026-07-19: Night01 tracked next queue 的 `f89a3ab...` 确实落后最终远端
   `4340945...` 一笔提交；Night02 使用 final remote HEAD 作为下一次基线解析源。
+- 2026-07-19: 原始 Night02 queue 是 `v2_proposed`，不含逐任务 authority 字段；
+  verified package digest 可为这 40 个包内任务生成独立 `v2` runtime queue，
+  但不能替代后续自动生成 proposal 的 exact-hash 人审。
 
 ## Decisions
 
@@ -57,10 +60,18 @@ T50–T54 are valid engineering/analysis-automation work when the required work 
 - tracked receipt 绑定 implementation commit/tree，post-push receipt 才绑定
   final remote HEAD；覆盖 `test_r5_night_shift_publication.py`、
   `test_r5_night_shift_digest.py`、`test_r5_night_shift_receipts.py`。
+- v2 executable contract 采用 `contract_origin / path_authority /
+  acceptance_authority / review_state / review_sha / resolution_claims` 并 fail
+  closed；覆盖 `test_r5_night_shift_authority.py`、
+  `test_r5_night_shift_contract_lint.py`。
+- 命令不经 shell 执行，parser 允许引号内 Python 语句分号，但拒绝 shell chain、
+  下载/网络能力和 mutating Git；覆盖 `test_r5_night_shift_command_safety.py`。
+- proposal hash 只绑定候选合同正文，审批字段独立；内容变化立即使审批失效；覆盖
+  `test_r5_night_shift_contract_proposals.py`、
+  `test_r5_night_shift_review_handoff.py`。
 
 ## Remaining Work
 
-- Workstream C: `ns02_t20`–`ns02_t26`。
 - Workstream D: `ns02_t30`–`ns02_t39`。
 - Workstream E/F: `ns02_t40`–`ns02_t54`。
 - Research truth remains 6 pending work orders and 0/63 resolved blockers.
