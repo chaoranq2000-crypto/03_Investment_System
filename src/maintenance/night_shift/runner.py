@@ -31,6 +31,7 @@ from .receipts import (
     write_validation_report,
 )
 from .bf2_seed import seed_bf2
+from .backflow import compile_backflow
 from .contracts import (
     authorize_packaged_queue,
     lint_queue_contracts,
@@ -502,6 +503,14 @@ def build_parser() -> argparse.ArgumentParser:
     pilot.add_argument("--report", type=Path, required=True)
     pilot.add_argument("--backflow", type=Path, required=True)
 
+    backflow = commands.add_parser(
+        "compile-backflow",
+        help="expand 63 Bundle17R occurrences into a deterministic owner-packet DAG",
+    )
+    backflow.add_argument("--repo-root", type=Path, required=True)
+    backflow.add_argument("--output-dir", type=Path, required=True)
+    backflow.add_argument("--source-commit", required=True)
+
     scope = commands.add_parser("scope-audit", help="audit changed and tracked mission paths")
     scope.add_argument("--repo-root", type=Path, required=True)
     scope.add_argument("--baseline-sha", required=True)
@@ -627,6 +636,18 @@ def main(argv: Sequence[str] | None = None) -> int:
                 f"resolved={outcome['blocker_occurrences_resolved']}"
             )
             return 0 if outcome.get("delivery_task_satisfied") else 1
+        if args.command == "compile-backflow":
+            receipt = compile_backflow(
+                repo_root=args.repo_root,
+                output_dir=args.output_dir,
+                source_commit=args.source_commit,
+            )
+            print(
+                f"OK: occurrences={receipt['occurrence_task_count']} "
+                f"parents={receipt['parent_work_order_count']} "
+                f"resolved={receipt['resolved_blocker_count']}"
+            )
+            return 0
         if args.command == "scope-audit":
             audit = build_scope_audit(args.repo_root, baseline_sha=args.baseline_sha)
             write_readout_json(args.output, audit)

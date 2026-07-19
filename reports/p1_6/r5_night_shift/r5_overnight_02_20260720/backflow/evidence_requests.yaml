@@ -1,0 +1,107 @@
+schema_version: r5_night_shift_evidence_requests_v1
+request_count: 8
+requests:
+- request_id: ER-2c030a28f863
+  blocker_occurrence_id: BF17R-I-8d86221a11a48f9e
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  field: assertions.qualification_evidence_complete
+  missing_source_class_or_driver: qualification_evidence_complete
+  research_question: route the failed upstream gate to its owning stage; do not edit the expected value
+  owner_skill: evidence-ingest
+  reviewer_action: locate, archive, register, and explicitly accept or reject physical official evidence
+  review_state: requested
+  evidence_acceptance: null
+  auto_accept_allowed: false
+  backflow_command: rerun occurrence contract after reviewed evidence receipt exists
+- request_id: ER-6870f1ec5d10
+  blocker_occurrence_id: BF17R-I-f8371fe04c02e574
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  field: assertions.qualification_official_sources_present
+  missing_source_class_or_driver: qualification_official_sources_present
+  research_question: route the failed upstream gate to its owning stage; do not edit the expected value
+  owner_skill: evidence-ingest
+  reviewer_action: locate, archive, register, and explicitly accept or reject physical official evidence
+  review_state: requested
+  evidence_acceptance: null
+  auto_accept_allowed: false
+  backflow_command: rerun occurrence contract after reviewed evidence receipt exists
+- request_id: ER-6d2b87d81881
+  blocker_occurrence_id: BF17R-I-2e66df220c4392d1
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  field: assertions.qualification_evidence_complete
+  missing_source_class_or_driver: qualification_evidence_complete
+  research_question: route the failed upstream gate to its owning stage; do not edit the expected value
+  owner_skill: evidence-ingest
+  reviewer_action: locate, archive, register, and explicitly accept or reject physical official evidence
+  review_state: requested
+  evidence_acceptance: null
+  auto_accept_allowed: false
+  backflow_command: rerun occurrence contract after reviewed evidence receipt exists
+- request_id: ER-7a3640d70206
+  blocker_occurrence_id: BF17R-I-4608b127b8ffefd6
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  field: assertions.qualification_evidence_complete
+  missing_source_class_or_driver: qualification_evidence_complete
+  research_question: route the failed upstream gate to its owning stage; do not edit the expected value
+  owner_skill: evidence-ingest
+  reviewer_action: locate, archive, register, and explicitly accept or reject physical official evidence
+  review_state: requested
+  evidence_acceptance: null
+  auto_accept_allowed: false
+  backflow_command: rerun occurrence contract after reviewed evidence receipt exists
+- request_id: ER-97d3e4a3c038
+  blocker_occurrence_id: BF17R-I-0c8dc5c57d7ca13c
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  field: assertions.qualification_evidence_complete
+  missing_source_class_or_driver: qualification_evidence_complete
+  research_question: route the failed upstream gate to its owning stage; do not edit the expected value
+  owner_skill: evidence-ingest
+  reviewer_action: locate, archive, register, and explicitly accept or reject physical official evidence
+  review_state: requested
+  evidence_acceptance: null
+  auto_accept_allowed: false
+  backflow_command: rerun occurrence contract after reviewed evidence receipt exists
+- request_id: ER-9fe0bbfe8ab9
+  blocker_occurrence_id: BF17R-I-944d59f2149764c7
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  field: assertions.qualification_official_sources_present
+  missing_source_class_or_driver: qualification_official_sources_present
+  research_question: route the failed upstream gate to its owning stage; do not edit the expected value
+  owner_skill: evidence-ingest
+  reviewer_action: locate, archive, register, and explicitly accept or reject physical official evidence
+  review_state: requested
+  evidence_acceptance: null
+  auto_accept_allowed: false
+  backflow_command: rerun occurrence contract after reviewed evidence receipt exists
+- request_id: ER-a88a58ab2685
+  blocker_occurrence_id: BF17R-I-ebb296cf2c5a0339
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  field: assertions.qualification_official_sources_present
+  missing_source_class_or_driver: qualification_official_sources_present
+  research_question: route the failed upstream gate to its owning stage; do not edit the expected value
+  owner_skill: evidence-ingest
+  reviewer_action: locate, archive, register, and explicitly accept or reject physical official evidence
+  review_state: requested
+  evidence_acceptance: null
+  auto_accept_allowed: false
+  backflow_command: rerun occurrence contract after reviewed evidence receipt exists
+- request_id: ER-e95d9ae85fb2
+  blocker_occurrence_id: BF17R-I-54f3fce046afe029
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  field: assertions.qualification_official_sources_present
+  missing_source_class_or_driver: qualification_official_sources_present
+  research_question: route the failed upstream gate to its owning stage; do not edit the expected value
+  owner_skill: evidence-ingest
+  reviewer_action: locate, archive, register, and explicitly accept or reject physical official evidence
+  review_state: requested
+  evidence_acceptance: null
+  auto_accept_allowed: false
+  backflow_command: rerun occurrence contract after reviewed evidence receipt exists

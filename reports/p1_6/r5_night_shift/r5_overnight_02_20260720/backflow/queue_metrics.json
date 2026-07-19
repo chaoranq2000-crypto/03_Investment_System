@@ -1,0 +1,31 @@
+{
+  "blocked_by_type": {
+    "blocked_external": 32,
+    "dependency_blocked": 20,
+    "evidence_required": 8,
+    "human_gate": 3
+  },
+  "blocker_occurrences_resolved": 0,
+  "blocker_occurrences_total": 63,
+  "classification_counts": {
+    "analysis_required": 24,
+    "dependency_blocked": 20,
+    "engineering_local": 8,
+    "evidence_required": 8,
+    "human_gate": 3
+  },
+  "delivery_required_remaining": 0,
+  "fallback_ready_count": 1,
+  "ready_count": 0,
+  "remaining_work_units": 69,
+  "schema_version": "r5_night_shift_queue_metrics_v1",
+  "status_counts": {
+    "blocked_external": 32,
+    "dependency_blocked": 20,
+    "evidence_required": 8,
+    "human_gate": 3,
+    "pending": 6
+  },
+  "total_count": 69,
+  "work_orders_pending": 6
+}

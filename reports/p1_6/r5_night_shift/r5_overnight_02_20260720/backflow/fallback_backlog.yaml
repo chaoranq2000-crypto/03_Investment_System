@@ -1,0 +1,26 @@
+schema_version: r5_night_shift_fallback_backlog_v1
+fallback_task_count: 5
+no_ready_research_task_causes_exit: false
+tasks:
+- task_id: ns02_t50_golden_case_inventory
+  work_type: analysis_automation
+  ready_when:
+  - ns02_t00_exact_baseline_preflight:passed
+- task_id: ns02_t51_semantic_quality_negative_fixtures
+  work_type: engineering
+  ready_when:
+  - ns02_t50_golden_case_inventory:passed
+- task_id: ns02_t52_driver_contract_gap_matrix
+  work_type: analysis_automation
+  ready_when:
+  - ns02_t50_golden_case_inventory:passed
+- task_id: ns02_t53_bundle18_readiness_precheck
+  work_type: engineering
+  ready_when:
+  - ns02_t34_human_gate_handoffs:passed
+  - ns02_t43_bf2_dry_run_truth_preservation:passed
+- task_id: ns02_t54_next_mission_seed
+  work_type: engineering
+  ready_when:
+  - ns02_t38_queue_metrics_and_capacity:passed
+  - ns02_t50_golden_case_inventory:passed

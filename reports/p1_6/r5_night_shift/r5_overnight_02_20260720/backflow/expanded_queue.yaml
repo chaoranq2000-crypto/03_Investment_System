@@ -1,0 +1,3574 @@
+schema_version: r5_night_shift_queue_v2
+package_id: R5_Overnight_Mission_02_20260719
+mission_id: r5_overnight_02_bf2_occurrence_queue
+long_term_goal:
+  id: r5_bundle17r_bf2_four_case_activation
+  close_allowed: false
+  this_mission_may_close_goal: false
+baseline:
+  source_commit: 4340945457d661ed62967e949f862ccf2214aff2
+  work_orders_pending: 6
+  blocker_occurrences_total: 63
+  blocker_occurrences_resolved: 0
+  research_gate: needs_targeted_backflow
+  sample_quality_allowed: false
+  p2_allowed: false
+run_window:
+  timezone: Europe/London
+  start_at: '23:00'
+  stop_claiming_at: 06:15
+mission_policy:
+  no_safe_pilot_is_success: false
+  resolution_requires_independent_receipt: true
+task_selection:
+  order:
+  - priority_desc
+  - dependency_ready
+  - task_id_asc
+read_only_inputs:
+- reports/p1_6/r5_bundle17r/activation_run_a/R5_bundle17r_backflow_queue.csv
+tasks:
+- id: ns02_t30_occ_04343acd916afae4
+  title: Bundle17R blocker BF17R-I-4be0172232cc9200
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.qualification_valuation_eligible
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  - source_artifact_sha256=e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_07e49c037427403b
+  title: Bundle17R blocker BF17R-I-68375633c445a400
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.candidate_ready_count
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_suite_result.json
+  - source_artifact_sha256=b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_101f0195f0c5cf37
+  title: Bundle17R blocker BF17R-I-5f40a2298952b731
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.qualification_valuation_eligible
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  - source_artifact_sha256=1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_10e1e793011ee907
+  title: Bundle17R blocker BF17R-I-b81a93ae63b0b0a1
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_ee055856e18cd3f4
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.regression_candidate_ready
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_suite_result.json
+  - source_artifact_sha256=b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_139f375db9714f27
+  title: Bundle17R blocker BF17R-I-0e810f2da864e64b
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.regression_research_ready
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_suite_result.json
+  - source_artifact_sha256=b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_1842382e6647f17d
+  title: Bundle17R blocker BF17R-I-1573dad15a6a32fe
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.qualification_semantic_gate_passed
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  - source_artifact_sha256=5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_1977687ea7bce884
+  title: Bundle17R blocker BF17R-I-1c2f5d615dfec482
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.quality_case_id
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+  - source_artifact_sha256=0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_1a742ef3d6224c6a
+  title: Bundle17R blocker BF17R-I-bb5c337faff1dfa8
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.regression_candidate_ready
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_suite_result.json
+  - source_artifact_sha256=b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_23259d462e4ca0f3
+  title: Bundle17R blocker BF17R-I-1433b6ad6fc3ba50
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.qualification_semantic_gate_passed
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  - source_artifact_sha256=e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_2a2ab71eced6e937
+  title: Bundle17R blocker BF17R-I-a03d6ffcb1666093
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.regression_research_ready
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_suite_result.json
+  - source_artifact_sha256=b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_2b0567ebbd443da5
+  title: Bundle17R blocker BF17R-I-627830c62bd3567a
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.regression_candidate_ready
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_suite_result.json
+  - source_artifact_sha256=b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_2c030a28f8631544
+  title: Bundle17R blocker BF17R-I-8d86221a11a48f9e
+  priority: 200
+  status: evidence_required
+  depends_on: []
+  work_type: evidence_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.qualification_evidence_complete
+  - classification=evidence_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  - source_artifact_sha256=e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_3139481aee5c01e0
+  title: Bundle17R blocker BF17R-I-089dd9210b3ca01f
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.quality_case_id
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+  - source_artifact_sha256=e4ce4d287c5a426880960eff2436391e82d87c62d66593c9abf633da985611d7
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_3b0dd1527f9e0144
+  title: Bundle17R blocker BF17R-I-d3dcd6e60a4225ac
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.research_ready_count
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_suite_result.json
+  - source_artifact_sha256=b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_3caf2ad00e1b6285
+  title: Bundle17R blocker BF17R-I-ffa18c8742ea01c3
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: engineering_local
+  goal: bind the assertion to the exact field emitted by the upstream artifact
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.generation_id_present.pointer
+  - classification=engineering_local
+  - classification_is_resolution=false
+  - source_artifact_path=UNKNOWN
+  - source_artifact_sha256=UNKNOWN
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_3d282b4ad0ca31e2
+  title: Bundle17R blocker BF17R-I-cb490c68d8fbf6f4
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.qualification_semantic_gate_passed
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  - source_artifact_sha256=1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_4177e7d48f374473
+  title: Bundle17R blocker BF17R-I-954edbd0d3cc55a1
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.regression_research_ready
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_suite_result.json
+  - source_artifact_sha256=b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_60f5539e2d72463f
+  title: Bundle17R blocker BF17R-I-ea2ca1691ce7c04f
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_ee055856e18cd3f4
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.qualification_deterministic_rerun
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  - source_artifact_sha256=1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_6491a19059d9ec6c
+  title: Bundle17R blocker BF17R-I-63d902b423e7e8a0
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.qualification_drivers_present
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  - source_artifact_sha256=e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_6870f1ec5d1048be
+  title: Bundle17R blocker BF17R-I-f8371fe04c02e574
+  priority: 200
+  status: evidence_required
+  depends_on: []
+  work_type: evidence_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.qualification_official_sources_present
+  - classification=evidence_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  - source_artifact_sha256=e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_6b198842cf80755a
+  title: Bundle17R blocker BF17R-I-5bca9af8085588c4
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: engineering_local
+  goal: bind the assertion to the exact field emitted by the upstream artifact
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.generation_id_present.pointer
+  - classification=engineering_local
+  - classification_is_resolution=false
+  - source_artifact_path=UNKNOWN
+  - source_artifact_sha256=UNKNOWN
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_6cd0e0bd57166a21
+  title: Bundle17R blocker BF17R-I-f5b138eb51cf7139
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.qualification_forecast_bridge_complete
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  - source_artifact_sha256=e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_6d2b87d81881062e
+  title: Bundle17R blocker BF17R-I-2e66df220c4392d1
+  priority: 200
+  status: evidence_required
+  depends_on: []
+  work_type: evidence_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.qualification_evidence_complete
+  - classification=evidence_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  - source_artifact_sha256=1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_6e5fb996533eab2b
+  title: Bundle17R blocker BF17R-I-09f291e1b9cc8a08
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_ee055856e18cd3f4
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.regression_research_ready
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_suite_result.json
+  - source_artifact_sha256=b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_6ff83cb834d7176d
+  title: Bundle17R blocker BF17R-I-8e8976d3b16d6b11
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.qualification_forecast_bridge_complete
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  - source_artifact_sha256=5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_7213df41458cf67d
+  title: Bundle17R blocker BF17R-I-7300d6a7bb2b11ce
+  priority: 200
+  status: human_gate
+  depends_on: []
+  work_type: human_gate
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: true
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.suite_hash_bound
+  - classification=human_gate
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/R5_bundle15r_generation_lock.json
+  - source_artifact_sha256=1e8d82a893a144c70b25fde8210119353a04bb0f515053dc1ff072a61b8321c9
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_76d9fbbac37b50a6
+  title: Bundle17R blocker BF17R-I-28d509b690f02b7d
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.qualification_drivers_present
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  - source_artifact_sha256=1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_7745e52b12c07f1c
+  title: Bundle17R blocker BF17R-I-1ff6b307dfab5261
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.qualification_overlap_resolved
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  - source_artifact_sha256=5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_7a3640d70206502d
+  title: Bundle17R blocker BF17R-I-4608b127b8ffefd6
+  priority: 200
+  status: evidence_required
+  depends_on: []
+  work_type: evidence_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.qualification_evidence_complete
+  - classification=evidence_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  - source_artifact_sha256=5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_86fb71b6c845c94f
+  title: Bundle17R blocker BF17R-I-775a6c5de9d6ab88
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.qualification_drivers_present
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  - source_artifact_sha256=e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_8e3768557d6f2dde
+  title: Bundle17R blocker BF17R-I-3e906d62728d323c
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.bundle14_ready
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/R5_bundle15r_qualification_suite.json
+  - source_artifact_sha256=a72b5bc114fa40a552f81670f55c0411b392942e03b42a5937c2ca941f8c4c63
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_950802f6c70d5036
+  title: Bundle17R blocker BF17R-I-17a603b213f30cd0
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.regression_candidate_ready
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_suite_result.json
+  - source_artifact_sha256=b42a47581950611c0a7383aa86cd55c9144ac0d7ff55713f75b86e5deb2902d1
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_97d3e4a3c0388529
+  title: Bundle17R blocker BF17R-I-0c8dc5c57d7ca13c
+  priority: 200
+  status: evidence_required
+  depends_on: []
+  work_type: evidence_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.qualification_evidence_complete
+  - classification=evidence_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  - source_artifact_sha256=e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_99e77539490b01ad
+  title: Bundle17R blocker BF17R-I-857f459fcaf6ed04
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: engineering_local
+  goal: bind the assertion to the exact field emitted by the upstream artifact
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.quality_gate_pass.pointer
+  - classification=engineering_local
+  - classification_is_resolution=false
+  - source_artifact_path=UNKNOWN
+  - source_artifact_sha256=UNKNOWN
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+  title: Bundle17R blocker BF17R-I-944d59f2149764c7
+  priority: 200
+  status: evidence_required
+  depends_on: []
+  work_type: evidence_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.qualification_official_sources_present
+  - classification=evidence_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  - source_artifact_sha256=1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_a88a58ab2685ee6e
+  title: Bundle17R blocker BF17R-I-ebb296cf2c5a0339
+  priority: 200
+  status: evidence_required
+  depends_on: []
+  work_type: evidence_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.qualification_official_sources_present
+  - classification=evidence_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  - source_artifact_sha256=5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_a9673677adb3ef8a
+  title: Bundle17R blocker BF17R-I-75433860c673c7e9
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.qualification_valuation_eligible
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  - source_artifact_sha256=e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_ab0f8aac8f21f0db
+  title: Bundle17R blocker BF17R-I-face100c70855495
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.quality_case_id
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+  - source_artifact_sha256=ef5f0513e89e4d9f51f189fcae650e6b5ccbf02a1fe52065fba377c2e5358bf0
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_ab6b62516df0a0f1
+  title: Bundle17R blocker BF17R-I-a9dd1a762387aec7
+  priority: 200
+  status: human_gate
+  depends_on: []
+  work_type: human_gate
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: true
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.suite_hash_bound
+  - classification=human_gate
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/materialization/R5_bundle16r_generation_lock.yaml
+  - source_artifact_sha256=c0bea5a689003c7e50dff86c37657b3709463ffdc4976eb941d73511f7fb7ba7
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_ae4ebd1d82c2bd03
+  title: Bundle17R blocker BF17R-I-0cd635a2eb846f5f
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.blockers_zero
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/R5_bundle15r_qualification_suite.json
+  - source_artifact_sha256=a72b5bc114fa40a552f81670f55c0411b392942e03b42a5937c2ca941f8c4c63
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_b52cbf88aff2c105
+  title: Bundle17R blocker BF17R-I-296537a66ccafe3c
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.qualification_overlap_resolved
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  - source_artifact_sha256=e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_b531d3c48931ba58
+  title: Bundle17R blocker BF17R-I-6692a34319e7dba9
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.qualification_deterministic_rerun
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  - source_artifact_sha256=5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_b7467ff5401814aa
+  title: Bundle17R blocker BF17R-I-d997eee58100c229
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.qualification_deterministic_rerun
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  - source_artifact_sha256=e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_be4e0eb69d196ff7
+  title: Bundle17R blocker BF17R-I-28436c48f16d6faf
+  priority: 200
+  status: human_gate
+  depends_on: []
+  work_type: human_gate
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: true
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.suite_hash_bound
+  - classification=human_gate
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_generation_lock.json
+  - source_artifact_sha256=c98d5cc13469f8e65cf9199b3912f0a903bb2f505a04408120274ca65b2d7257
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_becffa9c7cb6d886
+  title: Bundle17R blocker BF17R-I-99f9a72c12eec10a
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.qualification_overlap_resolved
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  - source_artifact_sha256=e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_c03007a138e83e9b
+  title: Bundle17R blocker BF17R-I-44b8abfbbac4bf3b
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.packs_materialized
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/materialization/R5_bundle16r_materialization_suite.json
+  - source_artifact_sha256=167bc67074643fb4654b9d3cf4f0c0a95b943e79d579686fe19a251c39800d12
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_c7f5c80f4b2e7a9c
+  title: Bundle17R blocker BF17R-I-2a0b648b9932cc99
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: engineering_local
+  goal: bind the assertion to the exact field emitted by the upstream artifact
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.generation_id_present.pointer
+  - classification=engineering_local
+  - classification_is_resolution=false
+  - source_artifact_path=UNKNOWN
+  - source_artifact_sha256=UNKNOWN
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_c8af30bbe2f10e8a
+  title: Bundle17R blocker BF17R-I-b18d701929df7909
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: engineering_local
+  goal: bind the assertion to the exact field emitted by the upstream artifact
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.generation_id_present.pointer
+  - classification=engineering_local
+  - classification_is_resolution=false
+  - source_artifact_path=UNKNOWN
+  - source_artifact_sha256=UNKNOWN
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_cdf02c368ebec0a7
+  title: Bundle17R blocker BF17R-I-0ed938d0a6004984
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.qualification_forecast_bridge_complete
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  - source_artifact_sha256=1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_d19d9b744d7aff4a
+  title: Bundle17R blocker BF17R-I-89316fa8394654d3
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.blockers_zero
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/materialization/R5_bundle16r_materialization_suite.json
+  - source_artifact_sha256=167bc67074643fb4654b9d3cf4f0c0a95b943e79d579686fe19a251c39800d12
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_d2ef6aeae1113c9c
+  title: Bundle17R blocker BF17R-I-6c46f0a018878644
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: engineering_local
+  goal: bind the assertion to the exact field emitted by the upstream artifact
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.quality_gate_pass.pointer
+  - classification=engineering_local
+  - classification_is_resolution=false
+  - source_artifact_path=UNKNOWN
+  - source_artifact_sha256=UNKNOWN
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_d705e67d4c161924
+  title: Bundle17R blocker BF17R-I-62576090e17d1881
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.fully_mapped
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/materialization/R5_bundle16r_materialization_suite.json
+  - source_artifact_sha256=167bc67074643fb4654b9d3cf4f0c0a95b943e79d579686fe19a251c39800d12
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_db819651b1640db8
+  title: Bundle17R blocker BF17R-I-4aefd94d717d90d3
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: engineering_local
+  goal: bind the assertion to the exact field emitted by the upstream artifact
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.quality_gate_pass.pointer
+  - classification=engineering_local
+  - classification_is_resolution=false
+  - source_artifact_path=UNKNOWN
+  - source_artifact_sha256=UNKNOWN
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_dc67ef1afb1051ef
+  title: Bundle17R blocker BF17R-I-7b7b29e64a22c8bd
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.qualification_forecast_bridge_complete
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  - source_artifact_sha256=e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_e3fefccd3e77fd5a
+  title: Bundle17R blocker BF17R-I-ebe22dc23f0cbc66
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: engineering_local
+  goal: bind the assertion to the exact field emitted by the upstream artifact
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.quality_gate_pass.pointer
+  - classification=engineering_local
+  - classification_is_resolution=false
+  - source_artifact_path=UNKNOWN
+  - source_artifact_sha256=UNKNOWN
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_e48b0cd43634c242
+  title: Bundle17R blocker BF17R-I-c452b50461838d46
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.quality_case_id
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+  - source_artifact_sha256=a58faa678fa6150799f0ec267c46ada02df1199781ef6e61a1e18c72085bd108
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_e7027bc57e1dc7a7
+  title: Bundle17R blocker BF17R-I-b0a3803c6ee9da0f
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - field=assertions.packs_complete
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/R5_bundle15r_qualification_suite.json
+  - source_artifact_sha256=a72b5bc114fa40a552f81670f55c0411b392942e03b42a5937c2ca941f8c4c63
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_e855cd5fb843f9bf
+  title: Bundle17R blocker BF17R-I-aba790d186f24901
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.qualification_valuation_eligible
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  - source_artifact_sha256=5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_e95d9ae85fb2fba0
+  title: Bundle17R blocker BF17R-I-54f3fce046afe029
+  priority: 200
+  status: evidence_required
+  depends_on: []
+  work_type: evidence_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.qualification_official_sources_present
+  - classification=evidence_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  - source_artifact_sha256=e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_eb221be0020f7038
+  title: Bundle17R blocker BF17R-I-a6dd3caf383e6eeb
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - field=assertions.qualification_semantic_gate_passed
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  - source_artifact_sha256=e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_ee055856e18cd3f4
+  title: Bundle17R blocker BF17R-I-3d3d2c56ef094519
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - field=assertions.qualification_overlap_resolved
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  - source_artifact_sha256=1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_f9fff3f413f6c43c
+  title: Bundle17R blocker BF17R-I-029e5beb35496343
+  priority: 200
+  status: blocked_external
+  depends_on: []
+  work_type: analysis_required
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - field=assertions.qualification_drivers_present
+  - classification=analysis_required
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  - source_artifact_sha256=5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_occ_fc4fc2c77ab26f2d
+  title: Bundle17R blocker BF17R-I-ee6752d022e2fca8
+  priority: 200
+  status: dependency_blocked
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  work_type: dependency_blocked
+  goal: route the failed upstream gate to its owning stage; do not edit the expected value
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - field=assertions.qualification_deterministic_rerun
+  - classification=dependency_blocked
+  - classification_is_resolution=false
+  - source_artifact_path=reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  - source_artifact_sha256=e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: source_occurrence_classification
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_wo_554708d47fac02bc
+  title: Bundle17R work order BF17R-WO-29d90bec175ab7
+  priority: 120
+  status: pending
+  depends_on:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  work_type: bf2_work_order
+  goal: Close every occurrence with independently accepted receipts
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - source_work_order_id=BF17R-WO-29d90bec175ab7
+  - case_id=__suite__
+  - resolved_count_requires_independent_receipts=true
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: night01_verified_work_order_inventory
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_wo_bc7d70d0bd2786f8
+  title: Bundle17R work order BF17R-WO-5ce21a3390be8b
+  priority: 120
+  status: pending
+  depends_on:
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  work_type: bf2_work_order
+  goal: Close every occurrence with independently accepted receipts
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - source_work_order_id=BF17R-WO-5ce21a3390be8b
+  - case_id=golden_multi_business_ai_infrastructure
+  - resolved_count_requires_independent_receipts=true
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: night01_verified_work_order_inventory
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_wo_db304e8553027647
+  title: Bundle17R work order BF17R-WO-df7ea35a97ead0
+  priority: 120
+  status: pending
+  depends_on:
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_f9fff3f413f6c43c
+  work_type: bf2_work_order
+  goal: Close every occurrence with independently accepted receipts
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - source_work_order_id=BF17R-WO-df7ea35a97ead0
+  - case_id=golden_crdmo_backlog_conversion
+  - resolved_count_requires_independent_receipts=true
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: night01_verified_work_order_inventory
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_wo_e205ce3a49c56b7e
+  title: Bundle17R work order BF17R-WO-ca803d73d4b2b1
+  priority: 120
+  status: pending
+  depends_on:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  work_type: bf2_work_order
+  goal: Close every occurrence with independently accepted receipts
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - source_work_order_id=BF17R-WO-ca803d73d4b2b1
+  - case_id=golden_copper_foil_product_generation
+  - resolved_count_requires_independent_receipts=true
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: night01_verified_work_order_inventory
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_wo_f9d03098e6d0feba
+  title: Bundle17R work order BF17R-WO-dd409a4bffcd9d
+  priority: 120
+  status: pending
+  depends_on:
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_ee055856e18cd3f4
+  work_type: bf2_work_order
+  goal: Close every occurrence with independently accepted receipts
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - source_work_order_id=BF17R-WO-dd409a4bffcd9d
+  - case_id=golden_gold_mining_cycle
+  - resolved_count_requires_independent_receipts=true
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: night01_verified_work_order_inventory
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null
+- id: ns02_t30_wo_fba4b40642ae1dd4
+  title: Bundle17R work order BF17R-WO-67f7a4ec1b0f54
+  priority: 100
+  status: pending
+  depends_on:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_f9d03098e6d0feba
+  work_type: bf2_work_order
+  goal: Rerun the 16R→15R→14R→17R chain only after five source work orders pass
+  allowed_paths: []
+  forbidden_paths:
+  - data/raw/**
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - reports/p1_6/r5_bundle17r/**
+  - .local/**
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands: []
+  required_artifacts: []
+  retry_limit: 0
+  on_success:
+    record_receipt: true
+  on_failure:
+    emit_failure_packet: true
+  human_gate: false
+  notes:
+  - source_work_order_id=BF17R-WO-67f7a4ec1b0f54
+  - research_gate=needs_targeted_backflow
+  - resolved_count_requires_independent_receipts=true
+  phase: D_backflow
+  estimated_work_units: 1
+  delivery_required: false
+  commit_policy: workstream
+  contract_origin: night01_verified_work_order_inventory
+  path_authority: not_granted
+  acceptance_authority: not_granted
+  review_state: proposed
+  review_sha: null
+  resolution_claims: []
+  spawn_depth: 0
+  parent_task_id: null

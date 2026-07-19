@@ -1,0 +1,252 @@
+schema_version: r5_night_shift_pointer_contract_proposals_v1
+proposal_count: 8
+resolved_blocker_count: 0
+proposals:
+- schema_version: r5_night_shift_contract_proposal_v1
+  task_id: ns02_t35_pointer_01_c36b7468
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+  owner_skill: quality-review
+  requested_action: make a new Bundle16R quality generation emit candidate_ready_for_exact_hash_review after its gates
+  candidate_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  contract_origin: repository_owned_deterministic_generator
+  generator_version: r5_night02_pointer_contract_v1
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  decision_notes: null
+  resolution_claim_allowed: false
+  proposal_sha256: 31604162d0d118cdbded9d5c33889e7835309337ea292074ff462459a716fe1e
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  legacy_case_id: 301217_high_end_copper_foil
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  observed_legacy_fields:
+  - /decision
+  - /gate_issues
+  - /metrics
+  semantic_route: upstream_quality_contract
+  historical_artifact_read_only: true
+  legacy_pointer_substitution_allowed: false
+- schema_version: r5_night_shift_contract_proposal_v1
+  task_id: ns02_t35_pointer_00_c36b7468
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+  owner_skill: quality-review
+  requested_action: make a new Bundle16R generation emit generation_id and bind it in a new lock
+  candidate_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  contract_origin: repository_owned_deterministic_generator
+  generator_version: r5_night02_pointer_contract_v1
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  decision_notes: null
+  resolution_claim_allowed: false
+  proposal_sha256: 17ad9eece4828b1acba9ff5f4cf77bd1fe1dbfc7387612f19bc92a033642036a
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  legacy_case_id: 301217_high_end_copper_foil
+  missing_pointer: /generation_id
+  observed_legacy_fields:
+  - /artifact_type
+  - /case_id
+  - /schema_version
+  semantic_route: upstream_generation_contract
+  historical_artifact_read_only: true
+  legacy_pointer_substitution_allowed: false
+- schema_version: r5_night_shift_contract_proposal_v1
+  task_id: ns02_t35_pointer_03_62c56fb2
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+  owner_skill: quality-review
+  requested_action: make a new Bundle16R quality generation emit candidate_ready_for_exact_hash_review after its gates
+  candidate_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  contract_origin: repository_owned_deterministic_generator
+  generator_version: r5_night02_pointer_contract_v1
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  decision_notes: null
+  resolution_claim_allowed: false
+  proposal_sha256: 905eaa0a544a2e91e267c8621ecaeaecb532a666eab29b114795930b8603e119
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  legacy_case_id: 603259_crdmo_backlog_funnel
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  observed_legacy_fields:
+  - /decision
+  - /gate_issues
+  - /metrics
+  semantic_route: upstream_quality_contract
+  historical_artifact_read_only: true
+  legacy_pointer_substitution_allowed: false
+- schema_version: r5_night_shift_contract_proposal_v1
+  task_id: ns02_t35_pointer_02_62c56fb2
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/generation_lock.json
+  owner_skill: quality-review
+  requested_action: make a new Bundle16R generation emit generation_id and bind it in a new lock
+  candidate_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  contract_origin: repository_owned_deterministic_generator
+  generator_version: r5_night02_pointer_contract_v1
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  decision_notes: null
+  resolution_claim_allowed: false
+  proposal_sha256: 414aa760669f591c56ea51affb795e77ecdc04f44b5461e90f44100422fe69cb
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  legacy_case_id: 603259_crdmo_backlog_funnel
+  missing_pointer: /generation_id
+  observed_legacy_fields:
+  - /artifact_type
+  - /case_id
+  - /schema_version
+  semantic_route: upstream_generation_contract
+  historical_artifact_read_only: true
+  legacy_pointer_substitution_allowed: false
+- schema_version: r5_night_shift_contract_proposal_v1
+  task_id: ns02_t35_pointer_05_76cdd8ff
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+  owner_skill: quality-review
+  requested_action: make a new Bundle16R quality generation emit candidate_ready_for_exact_hash_review after its gates
+  candidate_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  contract_origin: repository_owned_deterministic_generator
+  generator_version: r5_night02_pointer_contract_v1
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  decision_notes: null
+  resolution_claim_allowed: false
+  proposal_sha256: 4c25b860a8996fecc61f4ae257ca4e8a0ed0883568bfd3b9a72f7d976055a9bb
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  legacy_case_id: 600988_cycle_resource_gold
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  observed_legacy_fields:
+  - /decision
+  - /gate_issues
+  - /metrics
+  semantic_route: upstream_quality_contract
+  historical_artifact_read_only: true
+  legacy_pointer_substitution_allowed: false
+- schema_version: r5_night_shift_contract_proposal_v1
+  task_id: ns02_t35_pointer_04_76cdd8ff
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+  owner_skill: quality-review
+  requested_action: make a new Bundle16R generation emit generation_id and bind it in a new lock
+  candidate_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  contract_origin: repository_owned_deterministic_generator
+  generator_version: r5_night02_pointer_contract_v1
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  decision_notes: null
+  resolution_claim_allowed: false
+  proposal_sha256: 71a691a9c518213e21d6ac39bd49eb7659725672e2a2826f1280de7dfbebde14
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  legacy_case_id: 600988_cycle_resource_gold
+  missing_pointer: /generation_id
+  observed_legacy_fields:
+  - /artifact_type
+  - /case_id
+  - /schema_version
+  semantic_route: upstream_generation_contract
+  historical_artifact_read_only: true
+  legacy_pointer_substitution_allowed: false
+- schema_version: r5_night_shift_contract_proposal_v1
+  task_id: ns02_t35_pointer_07_29f5679a
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+  owner_skill: quality-review
+  requested_action: make a new Bundle16R quality generation emit candidate_ready_for_exact_hash_review after its gates
+  candidate_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  contract_origin: repository_owned_deterministic_generator
+  generator_version: r5_night02_pointer_contract_v1
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  decision_notes: null
+  resolution_claim_allowed: false
+  proposal_sha256: 72eb78d0cadd785842a83d3d2ebce496e856b34fdf5f8d4eb8cf8e7584e58fc9
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  legacy_case_id: 600673_multi_business_ma
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  observed_legacy_fields:
+  - /decision
+  - /gate_issues
+  - /metrics
+  semantic_route: upstream_quality_contract
+  historical_artifact_read_only: true
+  legacy_pointer_substitution_allowed: false
+- schema_version: r5_night_shift_contract_proposal_v1
+  task_id: ns02_t35_pointer_06_29f5679a
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/generation_lock.json
+  owner_skill: quality-review
+  requested_action: make a new Bundle16R generation emit generation_id and bind it in a new lock
+  candidate_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  contract_origin: repository_owned_deterministic_generator
+  generator_version: r5_night02_pointer_contract_v1
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  decision_notes: null
+  resolution_claim_allowed: false
+  proposal_sha256: ea82b4339ea4c7b156d520dad1b6ea08b6b0c8313b547716cd050f6d315aa230
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  legacy_case_id: 600673_multi_business_ma
+  missing_pointer: /generation_id
+  observed_legacy_fields:
+  - /artifact_type
+  - /case_id
+  - /schema_version
+  semantic_route: upstream_generation_contract
+  historical_artifact_read_only: true
+  legacy_pointer_substitution_allowed: false

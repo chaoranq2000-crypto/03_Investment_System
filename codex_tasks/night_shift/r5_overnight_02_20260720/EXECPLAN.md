@@ -11,7 +11,7 @@ Repair the Night01 early-close semantics and turn Bundle17R backflow into a dura
 - [x] A. Exact baseline and Night01 audit
 - [x] B. Mission outcome / Goal-close separation
 - [x] C. Executable contract authority and safety
-- [ ] D. Occurrence-level backflow and fallback queue
+- [x] D. Occurrence-level backflow and fallback queue
 - [ ] E. Adversarial tests, deterministic dry run, full regression and publication
 - [ ] F. Optional strategic fallback artifacts
 
@@ -49,6 +49,12 @@ T50–T54 are valid engineering/analysis-automation work when the required work 
 - 2026-07-19: 原始 Night02 queue 是 `v2_proposed`，不含逐任务 authority 字段；
   verified package digest 可为这 40 个包内任务生成独立 `v2` runtime queue，
   但不能替代后续自动生成 proposal 的 exact-hash 人审。
+- 2026-07-19: tracked activation backflow CSV 可无损恢复为 63 个 occurrence；
+  分类精确为 24 analysis、20 dependency、8 engineering、8 evidence、3 human，
+  再加 5 个 occurrence parent 与 1 个 chain-rerun parent，共 69 个 seed tasks。
+- 2026-07-19: 8 个 pointer 缺失均不是拼写别名；四个 `/generation_id`
+  路由 upstream generation contract，四个 quality boolean 路由 upstream quality
+  contract，历史 Bundle16R artifacts 未修改。
 
 ## Decisions
 
@@ -69,10 +75,17 @@ T50–T54 are valid engineering/analysis-automation work when the required work 
 - proposal hash 只绑定候选合同正文，审批字段独立；内容变化立即使审批失效；覆盖
   `test_r5_night_shift_contract_proposals.py`、
   `test_r5_night_shift_review_handoff.py`。
+- occurrence dependency DAG 只从非 dependency owner tasks 指向 dependency tasks，
+  parent work order 再聚合 occurrence，最终 rerun parent 聚合 5 个 source parents；
+  覆盖 `test_r5_night_shift_queue_expansion.py`、
+  `test_r5_night_shift_dependency_dag.py`。
+- evidence/analysis/human/pointer packets 全部保留空决策与 no-auto-accept 边界；
+  覆盖 `test_r5_night_shift_backflow_packets.py`、
+  `test_r5_night_shift_human_gate.py`、
+  `test_r5_night_shift_pointer_proposals.py`。
 
 ## Remaining Work
 
-- Workstream D: `ns02_t30`–`ns02_t39`。
 - Workstream E/F: `ns02_t40`–`ns02_t54`。
 - Research truth remains 6 pending work orders and 0/63 resolved blockers.
 

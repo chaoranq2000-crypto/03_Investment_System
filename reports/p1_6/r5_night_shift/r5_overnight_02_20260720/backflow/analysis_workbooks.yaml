@@ -1,0 +1,267 @@
+schema_version: r5_night_shift_analysis_workbooks_v1
+worksheet_count: 24
+worksheets:
+- worksheet_id: AW-04343acd916a
+  blocker_occurrence_id: BF17R-I-4be0172232cc9200
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  field: assertions.qualification_valuation_eligible
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-101f0195f0c5
+  blocker_occurrence_id: BF17R-I-5f40a2298952b731
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  field: assertions.qualification_valuation_eligible
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-1842382e6647
+  blocker_occurrence_id: BF17R-I-1573dad15a6a32fe
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  field: assertions.qualification_semantic_gate_passed
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-1977687ea7bc
+  blocker_occurrence_id: BF17R-I-1c2f5d615dfec482
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  field: assertions.quality_case_id
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-23259d462e4c
+  blocker_occurrence_id: BF17R-I-1433b6ad6fc3ba50
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  field: assertions.qualification_semantic_gate_passed
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-3139481aee5c
+  blocker_occurrence_id: BF17R-I-089dd9210b3ca01f
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  field: assertions.quality_case_id
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-3d282b4ad0ca
+  blocker_occurrence_id: BF17R-I-cb490c68d8fbf6f4
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  field: assertions.qualification_semantic_gate_passed
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-6491a19059d9
+  blocker_occurrence_id: BF17R-I-63d902b423e7e8a0
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  field: assertions.qualification_drivers_present
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-6cd0e0bd5716
+  blocker_occurrence_id: BF17R-I-f5b138eb51cf7139
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  field: assertions.qualification_forecast_bridge_complete
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-6ff83cb834d7
+  blocker_occurrence_id: BF17R-I-8e8976d3b16d6b11
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  field: assertions.qualification_forecast_bridge_complete
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-76d9fbbac37b
+  blocker_occurrence_id: BF17R-I-28d509b690f02b7d
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  field: assertions.qualification_drivers_present
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-7745e52b12c0
+  blocker_occurrence_id: BF17R-I-1ff6b307dfab5261
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  field: assertions.qualification_overlap_resolved
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-86fb71b6c845
+  blocker_occurrence_id: BF17R-I-775a6c5de9d6ab88
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  field: assertions.qualification_drivers_present
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-a9673677adb3
+  blocker_occurrence_id: BF17R-I-75433860c673c7e9
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  field: assertions.qualification_valuation_eligible
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-ab0f8aac8f21
+  blocker_occurrence_id: BF17R-I-face100c70855495
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  field: assertions.quality_case_id
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-b52cbf88aff2
+  blocker_occurrence_id: BF17R-I-296537a66ccafe3c
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  field: assertions.qualification_overlap_resolved
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-becffa9c7cb6
+  blocker_occurrence_id: BF17R-I-99f9a72c12eec10a
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  field: assertions.qualification_overlap_resolved
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-cdf02c368ebe
+  blocker_occurrence_id: BF17R-I-0ed938d0a6004984
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  field: assertions.qualification_forecast_bridge_complete
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-dc67ef1afb10
+  blocker_occurrence_id: BF17R-I-7b7b29e64a22c8bd
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  field: assertions.qualification_forecast_bridge_complete
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-e48b0cd43634
+  blocker_occurrence_id: BF17R-I-c452b50461838d46
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  field: assertions.quality_case_id
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-e855cd5fb843
+  blocker_occurrence_id: BF17R-I-aba790d186f24901
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  field: assertions.qualification_valuation_eligible
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-eb221be0020f
+  blocker_occurrence_id: BF17R-I-a6dd3caf383e6eeb
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  field: assertions.qualification_semantic_gate_passed
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-ee055856e18c
+  blocker_occurrence_id: BF17R-I-3d3d2c56ef094519
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  field: assertions.qualification_overlap_resolved
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
+- worksheet_id: AW-f9fff3f413f6
+  blocker_occurrence_id: BF17R-I-029e5beb35496343
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  field: assertions.qualification_drivers_present
+  question: route the failed upstream gate to its owning stage; do not edit the expected value
+  model_link: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  falsification_condition: reviewed evidence or a deterministic rerun contradicts the proposed operating relation
+  required_evidence: locator-bound reviewed evidence with period, unit, source class, and calculation method
+  analyst_conclusion: null
+  auto_judgment_allowed: false
