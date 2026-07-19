@@ -14,3 +14,13 @@ release_boundaries:
   canonical_workflow_state_mutation_allowed: false
   sample_quality_allowed: false
   p2_allowed: false
+mission_outcomes:
+  - delivered
+  - partial
+  - blocked
+  - failed
+  - cutoff
+program_goal:
+  id: r5_bundle17r_bf2_four_case_activation
+  close_allowed: false
+  this_mission_may_close_goal: false

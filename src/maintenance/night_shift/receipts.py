@@ -30,6 +30,7 @@ TRUSTED_GIT_SUBCOMMANDS = {
     "show",
 }
 SHELL_CONTROL = re.compile(r"(?:&&|\|\||[|;&<>`\r\n])")
+SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
 
 def sha256_bytes(payload: bytes) -> str:
@@ -246,6 +247,8 @@ def build_receipt(
 ) -> dict[str, Any]:
     if blocker_resolved > blocker_claimed:
         raise ContractError("resolved blocker count cannot exceed claimed blocker count")
+    local_commit_sha = git_value(cwd, "rev-parse", "HEAD")
+    local_tree_sha = git_value(cwd, "rev-parse", "HEAD^{tree}")
     receipt: dict[str, Any] = {
         "schema_version": RECEIPT_SCHEMA_VERSION,
         "run_id": run_id,
@@ -259,8 +262,13 @@ def build_receipt(
         "exit_code": exit_code,
         "changed_paths": changed_paths(cwd),
         "required_artifacts": artifact_records(cwd, artifacts),
-        "local_commit_sha": git_value(cwd, "rev-parse", "HEAD"),
+        "local_commit_sha": local_commit_sha,
         "remote_commit_sha": remote_sha,
+        "implementation_identity": {
+            "commit_sha": local_commit_sha,
+            "tree_sha": local_tree_sha,
+            "publication_head": None,
+        },
         "blocker_occurrences": {
             "claimed": blocker_claimed,
             "resolved": blocker_resolved,
@@ -276,10 +284,33 @@ def build_receipt(
 
 
 def write_receipt(path: Path, receipt: dict[str, Any]) -> None:
+    supplied = str(receipt.get("stable_receipt_sha256") or "").casefold()
+    if not SHA256_PATTERN.fullmatch(supplied):
+        raise ContractError(
+            "receipt.stable_receipt_sha256: expected 64 hexadecimal characters"
+        )
+    calculated = sha256_bytes(
+        canonical_json_bytes(stable_receipt_projection(receipt))
+    )
+    if supplied != calculated:
+        raise ContractError(
+            "receipt.stable_receipt_sha256 does not match the recomputed payload"
+        )
     payload = (
         json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
     ).encode("utf-8")
     atomic_write(path, payload)
+    try:
+        written = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ContractError(f"receipt[{path}]: cannot verify written JSON: {exc}") from exc
+    verified = sha256_bytes(
+        canonical_json_bytes(stable_receipt_projection(written))
+    )
+    if verified != supplied:
+        raise ContractError(
+            f"receipt[{path}]: digest changed after write; expected {supplied}, got {verified}"
+        )
 
 
 def write_validation_report(

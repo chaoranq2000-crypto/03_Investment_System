@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from .models import ContractError
+from .outcome import outcome_for_pilot_evidence
 from .lock import LockError, RunLock
 from .models import QueueDocument, Task
 from .queue import (
@@ -324,6 +325,10 @@ def run_safe_pilot(
             "research_gate": "needs_targeted_backflow",
             "sample_quality_allowed": False,
             "p2_allowed": False,
+            "delivery_task_satisfied": receipt["terminal_status"] == "passed",
+            "mission_outcome": outcome_for_pilot_evidence(
+                "pilot_acceptance_executed"
+            ).value,
         }
     else:
         reasons = Counter()
@@ -349,6 +354,8 @@ def run_safe_pilot(
             "sample_quality_allowed": False,
             "p2_allowed": False,
             "canonical_state_allowed": False,
+            "delivery_task_satisfied": False,
+            "mission_outcome": outcome_for_pilot_evidence("no_safe_pilot").value,
         }
         outcome["stable_receipt_sha256"] = sha256_bytes(canonical_json_bytes(outcome))
         write_receipt(receipts_dir / "no_safe_pilot.json", outcome)
@@ -599,11 +606,13 @@ def main(argv: Sequence[str] | None = None) -> int:
                 report_path=args.report,
                 backflow_path=args.backflow,
             )
+            prefix = "OK" if outcome.get("delivery_task_satisfied") else "BLOCKED"
             print(
-                f"OK: outcome={outcome['outcome']} "
+                f"{prefix}: outcome={outcome['outcome']} "
+                f"mission_outcome={outcome['mission_outcome']} "
                 f"resolved={outcome['blocker_occurrences_resolved']}"
             )
-            return 0
+            return 0 if outcome.get("delivery_task_satisfied") else 1
         if args.command == "scope-audit":
             audit = build_scope_audit(args.repo_root, baseline_sha=args.baseline_sha)
             write_readout_json(args.output, audit)

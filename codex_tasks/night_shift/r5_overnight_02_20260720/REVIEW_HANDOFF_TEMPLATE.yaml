@@ -1,0 +1,10 @@
+schema_version: r5_contract_review_decision_v1
+packet_sha256: ''
+task_id: ''
+reviewer: ''
+reviewed_at: ''
+decision: ''
+decision_notes: ''
+approved_allowed_paths: []
+approved_acceptance_commands: []
+scope_exceptions: []

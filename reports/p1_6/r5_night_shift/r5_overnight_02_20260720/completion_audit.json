@@ -1,0 +1,36 @@
+{
+  "ci": {
+    "run_id": "29667949569",
+    "run_number": 104,
+    "status": "success"
+  },
+  "commits": [
+    "3234370782ca8295af8eba746fd597eea9a515e3",
+    "90172520bb437014240443a34505bc38a7a69c06",
+    "f89a3ab71fa8dbb43d004f01bd19b64111721e80",
+    "4340945457d661ed62967e949f862ccf2214aff2"
+  ],
+  "final_sha": "4340945457d661ed62967e949f862ccf2214aff2",
+  "next_queue_baseline": {
+    "actual_final_remote_head": "4340945457d661ed62967e949f862ccf2214aff2",
+    "stale": true,
+    "tracked_source_commit": "f89a3ab71fa8dbb43d004f01bd19b64111721e80"
+  },
+  "night01_engineering_delivery": "delivered",
+  "program_goal": "open_needs_targeted_backflow",
+  "schema_version": "r5_night01_completion_audit_v1",
+  "source_branch": "codex/r5-night01-autonomous-harness",
+  "tests": {
+    "bf2_ex1": "12 passed",
+    "bf2_specialised": "9 passed",
+    "full_suite": "959 passed, 2 skipped",
+    "night_shift": "26 passed",
+    "source_route": "pass; 17 capabilities; 0 blocking"
+  },
+  "truth": {
+    "research_gate": "needs_targeted_backflow",
+    "resolved_blockers": 0,
+    "total_blockers": 63,
+    "work_orders_pending": 6
+  }
+}

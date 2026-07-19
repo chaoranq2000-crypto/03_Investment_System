@@ -1,0 +1,24 @@
+{
+  "branch_and_path_are_distinct": true,
+  "expected_worktree_root": "C:\\Projects\\03_Investment_System_night02",
+  "mission_id": "r5_overnight_02_20260720",
+  "package_payload_digest_sha256": "236de0bccd04b327f7056bcb79a3c6536c9d5f652d1944c346ceefc3b84420ad",
+  "package_validation": {
+    "payload_file_count": 16,
+    "status": "pass",
+    "task_count": 40
+  },
+  "package_zip_sha256": "c1600ef13593c675d363f189131fd973c6a59e52e5a92a424269a3a0245f47ca",
+  "schema_version": "r5_night02_preflight_v1",
+  "source_branch": "codex/r5-night01-autonomous-harness",
+  "source_sha": "4340945457d661ed62967e949f862ccf2214aff2",
+  "target_branch": "codex/r5-night02-contract-recovery",
+  "truth_at_start": {
+    "blocker_occurrences_resolved": 0,
+    "blocker_occurrences_total": 63,
+    "p2_allowed": false,
+    "sample_quality_allowed": false,
+    "work_orders_pending": 6
+  },
+  "verified_on": "2026-07-19"
+}

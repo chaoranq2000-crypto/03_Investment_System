@@ -1,0 +1,49 @@
+verified_on: '2026-07-19'
+repository: chaoranq2000-crypto/03_Investment_System
+night01:
+  actual_branch: codex/r5-night01-autonomous-harness
+  final_sha: 4340945457d661ed62967e949f862ccf2214aff2
+  final_commit_subject: 'docs(night-shift): correct package digest metadata'
+  commits:
+  - sha: 3234370782ca8295af8eba746fd597eea9a515e3
+    subject: 'feat(night-shift): add queue runtime and recovery'
+  - sha: 90172520bb437014240443a34505bc38a7a69c06
+    subject: 'feat(night-shift): seed BF2 queue and mission evidence'
+  - sha: f89a3ab71fa8dbb43d004f01bd19b64111721e80
+    subject: 'docs(night-shift): finalize delivery readout'
+  - sha: 4340945457d661ed62967e949f862ccf2214aff2
+    subject: 'docs(night-shift): correct package digest metadata'
+  ci:
+    run_number: 104
+    run_id: '29667949569'
+    status: success
+    duration: 2m15s
+  tests:
+    night_shift: 26 passed
+    full_suite: 959 passed, 2 skipped
+    bf2_specialised: 9 passed
+    bf2_ex1: 12 passed
+    source_route: pass; 17 capabilities; 0 blocking
+  truth:
+    work_orders_pending: 6
+    blockers_resolved: 0
+    blockers_total: 63
+    failed_results: 0
+    orphans: 0
+    rejected_artifacts: 0
+    research_gate: needs_targeted_backflow
+  classification:
+    analysis_required: 24
+    dependency_blocked: 20
+    engineering_local: 8
+    evidence_required: 8
+    human_gate: 3
+  early_close_causes:
+  - Night01 mission contract explicitly allowed safe pilot OR no_safe_pilot evidence to satisfy the pilot task.
+  - The next queue collapsed 63 occurrences into four non-executable gates plus one aggregate resume task.
+  - No fallback engineering backlog was available after research/human gates blocked execution.
+  - Mission/run completion was not cleanly separated from long-term Goal closure.
+  known_publication_issue:
+    next_queue_source_commit: f89a3ab71fa8dbb43d004f01bd19b64111721e80
+    actual_final_remote_head: 4340945457d661ed62967e949f862ccf2214aff2
+    assessment: tracked next queue baseline is stale by one final metadata-correction commit

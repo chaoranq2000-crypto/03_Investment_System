@@ -1,0 +1,119 @@
+schema_version: r5_pointer_occurrence_seed_v1
+source_queue: reports/p1_6/r5_bundle17r/activation_run_a/R5_bundle17r_backflow_queue.csv
+review_state: unreviewed_seed
+semantic_policy:
+  historical_artifacts_are_read_only: true
+  missing_field_is_not_a_pointer_typo: true
+  do_not_bind_to_semantically_different_legacy_field: true
+  required_new_fields:
+    generation_lock:
+      pointer: /generation_id
+      type: nonempty string
+    quality_readout:
+      pointer: /candidate_ready_for_exact_hash_review
+      type: boolean
+occurrences:
+- case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  legacy_case_id: 301217_high_end_copper_foil
+  code: ASSERTION_POINTER_UNRESOLVED
+  assertion: generation_id_present
+  artifact: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+  missing_pointer: /generation_id
+  observed_legacy_fields:
+  - /artifact_type
+  - /case_id
+  - /schema_version
+  proposed_resolution_class: upstream_generation_contract
+  resolution_claim_allowed: false
+- case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  legacy_case_id: 301217_high_end_copper_foil
+  code: ASSERTION_POINTER_UNRESOLVED
+  assertion: quality_gate_pass
+  artifact: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  observed_legacy_fields:
+  - /decision
+  - /gate_issues
+  - /metrics
+  proposed_resolution_class: upstream_quality_contract
+  resolution_claim_allowed: false
+- case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  legacy_case_id: 603259_crdmo_backlog_funnel
+  code: ASSERTION_POINTER_UNRESOLVED
+  assertion: generation_id_present
+  artifact: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/generation_lock.json
+  missing_pointer: /generation_id
+  observed_legacy_fields:
+  - /artifact_type
+  - /case_id
+  - /schema_version
+  proposed_resolution_class: upstream_generation_contract
+  resolution_claim_allowed: false
+- case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  legacy_case_id: 603259_crdmo_backlog_funnel
+  code: ASSERTION_POINTER_UNRESOLVED
+  assertion: quality_gate_pass
+  artifact: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  observed_legacy_fields:
+  - /decision
+  - /gate_issues
+  - /metrics
+  proposed_resolution_class: upstream_quality_contract
+  resolution_claim_allowed: false
+- case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  legacy_case_id: 600988_cycle_resource_gold
+  code: ASSERTION_POINTER_UNRESOLVED
+  assertion: generation_id_present
+  artifact: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+  missing_pointer: /generation_id
+  observed_legacy_fields:
+  - /artifact_type
+  - /case_id
+  - /schema_version
+  proposed_resolution_class: upstream_generation_contract
+  resolution_claim_allowed: false
+- case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  legacy_case_id: 600988_cycle_resource_gold
+  code: ASSERTION_POINTER_UNRESOLVED
+  assertion: quality_gate_pass
+  artifact: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  observed_legacy_fields:
+  - /decision
+  - /gate_issues
+  - /metrics
+  proposed_resolution_class: upstream_quality_contract
+  resolution_claim_allowed: false
+- case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  legacy_case_id: 600673_multi_business_ma
+  code: ASSERTION_POINTER_UNRESOLVED
+  assertion: generation_id_present
+  artifact: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/generation_lock.json
+  missing_pointer: /generation_id
+  observed_legacy_fields:
+  - /artifact_type
+  - /case_id
+  - /schema_version
+  proposed_resolution_class: upstream_generation_contract
+  resolution_claim_allowed: false
+- case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  legacy_case_id: 600673_multi_business_ma
+  code: ASSERTION_POINTER_UNRESOLVED
+  assertion: quality_gate_pass
+  artifact: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  observed_legacy_fields:
+  - /decision
+  - /gate_issues
+  - /metrics
+  proposed_resolution_class: upstream_quality_contract
+  resolution_claim_allowed: false

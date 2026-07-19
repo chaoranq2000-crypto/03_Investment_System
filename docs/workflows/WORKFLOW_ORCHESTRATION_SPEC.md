@@ -214,3 +214,20 @@ overlap and independent-exposure gaps to `T2/stock-deep-dive`, and peer/DCF/SOTP
 eligibility gaps to `RP6/company-valuation`. The local gate may not set
 `sample_quality_allowed` or `p2_allowed` to true.
 <!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+
+<!-- BEGIN R5_NIGHT_SHIFT_MISSION_GOAL_POLICY -->
+## 10. Night-shift Mission 与长期 Goal 分层
+
+夜间运行的终止状态使用 `delivered / partial / blocked / failed / cutoff`，
+不得把 runner 退出、`no_safe_pilot`、外部门禁阻塞或 claim cutoff 解释为长期
+研究 Goal 已完成。
+
+Night02 的长期 Goal `r5_bundle17r_bf2_four_case_activation` 必须保持 open。
+只有同时存在上层显式关闭授权、`close_allowed: true`、
+`this_mission_may_close_goal: true` 且 Mission 为 `delivered` 时，编排器才可提出
+Goal 关闭；自动化流程不得自行补齐这些授权。
+
+发布凭证采用两阶段身份：tracked 实现凭证绑定 implementation commit/tree，
+推送后的独立凭证绑定最终 remote HEAD 与 CI。不得试图在一个提交内写入该提交
+自己的 SHA，也不得把预发布 SHA 当作下一夜最终基线。
+<!-- END R5_NIGHT_SHIFT_MISSION_GOAL_POLICY -->
