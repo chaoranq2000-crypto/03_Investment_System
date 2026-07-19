@@ -517,12 +517,15 @@ def _compile_replacement(
     source_scope = p2g3._source_temporal_scope(  # noqa: SLF001
         observation_artifact.get("scope")
     )
-    compiled = p2g3._compile_hypotheses(  # noqa: SLF001
-        [replacement],
-        source_content_id=str(observation_artifact.get("content_id") or ""),
-        evaluation_index=_observation_index(observation_artifact),
-        source_scope=source_scope,
-    )
+    try:
+        compiled = p2g3._compile_hypotheses(  # noqa: SLF001
+            [replacement],
+            source_content_id=str(observation_artifact.get("content_id") or ""),
+            evaluation_index=_observation_index(observation_artifact),
+            source_scope=source_scope,
+        )
+    except Exception as exc:
+        raise BehaviorHypothesisReviewError(str(exc)) from exc
     if len(compiled) != 1:
         raise BehaviorHypothesisReviewError("correction did not produce one hypothesis")
     return compiled[0]
