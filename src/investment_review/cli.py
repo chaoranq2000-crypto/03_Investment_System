@@ -29,10 +29,18 @@ from .behavior_observations import (
 )
 from .behavior_hypotheses import (
     build_behavior_hypothesis_set,
-    load_behavior_hypothesis_set,
     replay_validate_behavior_hypothesis_set,
     save_behavior_hypothesis_result,
     validate_behavior_hypothesis_set,
+)
+from .behavior_hypothesis_review import (
+    REVISION_SCHEMA_VERSION as HYPOTHESIS_REVISION_SCHEMA_VERSION,
+    apply_behavior_hypothesis_review,
+    load_behavior_hypothesis_artifact,
+    load_behavior_hypothesis_review_request,
+    replay_validate_behavior_hypothesis_revision,
+    save_behavior_hypothesis_revision,
+    validate_behavior_hypothesis_revision,
 )
 from .episodes import (
     build_episode_collection,
@@ -570,6 +578,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     behavior_hypothesis_interpret.add_argument("--output", required=True)
     behavior_hypothesis_interpret.add_argument("--attempt-output", required=True)
+
+    behavior_hypothesis_review = sub.add_parser(
+        "behavior-hypothesis-review",
+        help="Apply one atomic P2G-4 accept/reject/correct request as a new revision",
+    )
+    behavior_hypothesis_review.add_argument("--artifact", required=True)
+    behavior_hypothesis_review.add_argument("--request", required=True)
+    behavior_hypothesis_review.add_argument("--observation-artifact", required=True)
+    behavior_hypothesis_review.add_argument("--output", required=True)
 
     behavior_hypothesis_validate = sub.add_parser(
         "behavior-hypothesis-validate",
@@ -1202,12 +1219,20 @@ def main(argv: list[str] | None = None) -> int:
                 }
             )
         elif args.command == "behavior-hypothesis-validate":
-            artifact = load_behavior_hypothesis_set(args.artifact)
-            if args.source_replay:
-                if not args.observation_artifact:
-                    raise ValueError(
-                        "--source-replay requires --observation-artifact"
-                    )
+            artifact = load_behavior_hypothesis_artifact(args.artifact)
+            is_revision = artifact.get("schema_version") == HYPOTHESIS_REVISION_SCHEMA_VERSION
+            if args.source_replay and not args.observation_artifact:
+                raise ValueError("--source-replay requires --observation-artifact")
+            if is_revision and args.source_replay:
+                validation = replay_validate_behavior_hypothesis_revision(
+                    artifact,
+                    observation_artifact=load_behavior_observation_set(
+                        args.observation_artifact
+                    ),
+                )
+            elif is_revision:
+                validation = validate_behavior_hypothesis_revision(artifact)
+            elif args.source_replay:
                 validation = replay_validate_behavior_hypothesis_set(
                     artifact,
                     observation_artifact=load_behavior_observation_set(
@@ -1224,6 +1249,39 @@ def main(argv: list[str] | None = None) -> int:
                 != "verified"
             ):
                 return 2
+        elif args.command == "behavior-hypothesis-review":
+            _require_distinct_paths(
+                artifact=args.artifact,
+                request=args.request,
+                observation_artifact=args.observation_artifact,
+                output=args.output,
+            )
+            revised = apply_behavior_hypothesis_review(
+                load_behavior_hypothesis_artifact(args.artifact),
+                load_behavior_hypothesis_review_request(args.request),
+                observation_artifact=load_behavior_observation_set(
+                    args.observation_artifact
+                ),
+            )
+            output = save_behavior_hypothesis_revision(args.output, revised)
+            _print(
+                {
+                    "status": "accepted",
+                    "schema_version": revised["schema_version"],
+                    "revision_no": revised["revision"]["revision_no"],
+                    "content_id": revised["content_id"],
+                    "parent_content_id": revised["revision"]["parent_content_id"],
+                    "request_id": revised["revision"]["request_id"],
+                    "action_count": len(
+                        [
+                            event
+                            for event in revised["review_events"]
+                            if event["request_id"] == revised["revision"]["request_id"]
+                        ]
+                    ),
+                    "output": str(output),
+                }
+            )
         else:
             parser.error(f"Unhandled command: {args.command}")
     except Exception as exc:
