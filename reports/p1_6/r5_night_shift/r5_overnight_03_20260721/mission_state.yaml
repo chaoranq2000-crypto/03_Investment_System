@@ -107,35 +107,35 @@ tasks:
 - id: ns03_t30_consume_available_approved_inputs
   phase: D_targeted_backflow
   delivery_required: false
-  status: ready
+  status: passed
 - id: ns03_t31_evidence_candidate_enrichment
   phase: D_targeted_backflow
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t32_analysis_candidate_enrichment
   phase: D_targeted_backflow
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t33_human_gate_packet_refresh
   phase: D_targeted_backflow
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t34_pointer_proposal_review_index
   phase: D_targeted_backflow
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t35_dependency_unlock_matrix
   phase: D_targeted_backflow
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t36_four_case_progress_dashboard
   phase: D_targeted_backflow
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t37_blocker_delta_unresolved_ledger
   phase: D_targeted_backflow
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t40_adversarial_decision_and_resolution_tests
   phase: E_validation
   delivery_required: true
@@ -143,7 +143,7 @@ tasks:
 - id: ns03_t41_determinism_double_run
   phase: E_validation
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t42_crash_cutoff_resume_tests
   phase: E_validation
   delivery_required: true
@@ -168,4 +168,4 @@ tasks:
   phase: E_publication
   delivery_required: true
   status: pending
-stable_receipt_sha256: e7fe4018be3f7dad6c989ff97c4ee20c448b1c5930a654131d59e05a647d8dc9
+stable_receipt_sha256: 8fb218e56ab9e2e1c120d05fb25ca8ab5d1243a9c71daff8bbe9e6ea3a39eb24

@@ -1,0 +1,72 @@
+schema_version: r5_night03_human_gate_handoffs_v1
+source_queue_sha256: dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1
+handoff_count: 3
+approved_count: 0
+resolved_count: 0
+handoffs:
+- schema_version: r5_night03_human_gate_handoff_v1
+  occurrence_id: ns02_t30_occ_7213df41458cf67d
+  blocker_occurrence_id: BF17R-I-7300d6a7bb2b11ce
+  case_id: __suite__
+  status: candidate_pending_review
+  candidate_artifact_path: reports/p1_6/r5_bundle17r/chain_a/qualification/R5_bundle15r_generation_lock.json
+  candidate_artifact_sha256: 1e8d82a893a144c70b25fde8210119353a04bb0f515053dc1ff072a61b8321c9
+  generation_ids:
+  - evidence_qualification_gen_r5_bundle15r_4f6962ea1c57ac98
+  quality_booleans:
+    p2_allowed: false
+    sample_quality_allowed: false
+    workflow_state_mutation_allowed: false
+  validation_checklist:
+  - candidate artifact path and physical hash match
+  - generation IDs and upstream suite hashes match
+  - reviewer decision is independently recorded
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  auto_accept_allowed: false
+  packet_sha256: 339db06c347f804885690dc7bc5bf97618d9a239cc582540c6230cedb1dc5aa6
+- schema_version: r5_night03_human_gate_handoff_v1
+  occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+  blocker_occurrence_id: BF17R-I-a9dd1a762387aec7
+  case_id: __suite__
+  status: candidate_pending_review
+  candidate_artifact_path: reports/p1_6/r5_bundle17r/chain_a/materialization/R5_bundle16r_generation_lock.yaml
+  candidate_artifact_sha256: c0bea5a689003c7e50dff86c37657b3709463ffdc4976eb941d73511f7fb7ba7
+  generation_ids:
+  - pack_materialization_gen_7b50d5bfb9ae5c92
+  quality_booleans:
+    canonical_workflow_state_mutation_allowed: false
+    p2_allowed: false
+    sample_quality_allowed: false
+  validation_checklist:
+  - candidate artifact path and physical hash match
+  - generation IDs and upstream suite hashes match
+  - reviewer decision is independently recorded
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  auto_accept_allowed: false
+  packet_sha256: bc3b30634faeff857ba999ed780fcbfdf2cfe5a5b3d0c3ff3fc07c5086e572ea
+- schema_version: r5_night03_human_gate_handoff_v1
+  occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+  blocker_occurrence_id: BF17R-I-28436c48f16d6faf
+  case_id: __suite__
+  status: candidate_pending_review
+  candidate_artifact_path: reports/p1_6/r5_bundle17r/chain_a/golden_regression/R5_bundle14r_generation_lock.json
+  candidate_artifact_sha256: c98d5cc13469f8e65cf9199b3912f0a903bb2f505a04408120274ca65b2d7257
+  generation_ids:
+  - golden_regression_gen_3673ac6df27ae144
+  quality_booleans:
+    p2_allowed: false
+    sample_quality_allowed: false
+    workflow_state_mutation_allowed: false
+  validation_checklist:
+  - candidate artifact path and physical hash match
+  - generation IDs and upstream suite hashes match
+  - reviewer decision is independently recorded
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  auto_accept_allowed: false
+  packet_sha256: 31cf5ee68c6db833235aaf07633e7688e3de2f1138c50def5a4660d9f9f7045d

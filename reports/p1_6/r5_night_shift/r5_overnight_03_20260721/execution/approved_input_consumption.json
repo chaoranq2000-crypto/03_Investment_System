@@ -1,0 +1,15 @@
+{
+  "approved_decision_count": 0,
+  "consumed_count": 0,
+  "continue_on_external_block": true,
+  "manifests": [],
+  "mission_id": "r5_overnight_03_20260721",
+  "outcome": "no_approved_inputs",
+  "program_goal_state": "open_needs_targeted_backflow",
+  "resolved_delta": 0,
+  "scanned_manifest_count": 0,
+  "schema_version": "r5_night03_approved_input_consumption_v1",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "0b3f8e344854edb454e86a0e266e09d1be9bfe3b74504f6d6621bcf19efe15db",
+  "validated_decision_count": 0
+}

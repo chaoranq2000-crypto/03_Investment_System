@@ -560,7 +560,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Materialise deterministic Night03 artifacts")
     parser.add_argument("--repo", default=".")
     parser.add_argument(
-        "--phase", choices=("baseline", "decisions", "execution"), default="baseline"
+        "--phase",
+        choices=("baseline", "decisions", "execution", "candidates"),
+        default="baseline",
     )
     parser.add_argument("--record-task", action="append", default=[])
     return parser
@@ -584,7 +586,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             "decision_kinds": len(result["authority"]["decision_authorities"]),
             "resolution_requires_independent_receipt": True,
         }
-    else:
+    elif args.phase == "execution":
         from .night03_execution import materialize_execution_contracts
 
         result = materialize_execution_contracts(repo_root)
@@ -592,6 +594,17 @@ def main(argv: Sequence[str] | None = None) -> int:
             "occurrence_states": len(result["occurrence"]["statuses"]),
             "dependency_occurrences": result["dependency"]["dependency_occurrence_count"],
             "parent_work_orders": result["parent"]["parent_count"],
+        }
+    else:
+        from .night03_backflow import materialize_candidate_closure
+
+        result = materialize_candidate_closure(repo_root)
+        phase_summary = {
+            "evidence_candidates": result["evidence"]["candidate_count"],
+            "analysis_candidates": result["analysis"]["candidate_count"],
+            "human_handoffs": result["human"]["handoff_count"],
+            "pointer_proposals": result["pointer"]["proposal_count"],
+            "resolved_delta": result["ledger"]["resolved_delta"],
         }
     receipts = [record_completed_task(repo_root, task_id) for task_id in args.record_task]
     state = materialize_wrapper_state(repo_root)

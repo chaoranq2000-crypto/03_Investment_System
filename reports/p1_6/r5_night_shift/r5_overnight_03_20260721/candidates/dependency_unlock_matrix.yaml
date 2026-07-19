@@ -1,0 +1,3009 @@
+schema_version: r5_night03_dependency_unlock_matrix_v1
+source_queue_sha256: dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1
+dependency_count: 20
+unlocked_count: 0
+dependencies:
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_07e49c037427403b
+  blocker_occurrence_id: BF17R-I-68375633c445a400
+  case_id: __suite__
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7213df41458cf67d
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 43
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: 0bccbb47901114058b68461b8dc4a03cd0ee918c8e78b7bf00b6bf712374a171
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_10e1e793011ee907
+  blocker_occurrence_id: BF17R-I-b81a93ae63b0b0a1
+  case_id: golden_gold_mining_cycle
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_ee055856e18cd3f4
+  unlocked: false
+  packet_sha256: 4b81e58419b5b113619b3a1bd3d4a2475cb399bd3dda761e4dfe08d7194a303f
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_139f375db9714f27
+  blocker_occurrence_id: BF17R-I-0e810f2da864e64b
+  case_id: golden_copper_foil_product_generation
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  unlocked: false
+  packet_sha256: 9f996fffe59d335ec73ed59a56ce3502e3145c4551ad3473e9fb0dd5edf2fcd1
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_1a742ef3d6224c6a
+  blocker_occurrence_id: BF17R-I-bb5c337faff1dfa8
+  case_id: golden_crdmo_backlog_conversion
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: 50eaeca5d67ebb6013ca882faf78cf21eb6640026d5f028a54522a792cc2a386
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_2a2ab71eced6e937
+  blocker_occurrence_id: BF17R-I-a03d6ffcb1666093
+  case_id: golden_crdmo_backlog_conversion
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: be2310a814c013a871304da34f7cb38e7c9a87fabe8a4a8d9fe0e28a6bada308
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_2b0567ebbd443da5
+  blocker_occurrence_id: BF17R-I-627830c62bd3567a
+  case_id: golden_multi_business_ai_infrastructure
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  unlocked: false
+  packet_sha256: a133b74799a5e958a885cb8f582ece83d28e8918bd0318ad23bc673111d24eec
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_3b0dd1527f9e0144
+  blocker_occurrence_id: BF17R-I-d3dcd6e60a4225ac
+  case_id: __suite__
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7213df41458cf67d
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 43
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: dd61d85d4529079760250872336e82bfa863fb72a2ffd7bb40bff786c7a86586
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_4177e7d48f374473
+  blocker_occurrence_id: BF17R-I-954edbd0d3cc55a1
+  case_id: golden_multi_business_ai_infrastructure
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  unlocked: false
+  packet_sha256: 2998d04e5b0dca75e9c36d84328749cbdf881b6d310547a0e724cf39008b0cf7
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_60f5539e2d72463f
+  blocker_occurrence_id: BF17R-I-ea2ca1691ce7c04f
+  case_id: golden_gold_mining_cycle
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_ee055856e18cd3f4
+  unlocked: false
+  packet_sha256: aac9395eb0310a89e210c69b1a7004f5948a94c44bb59f69581498327238be08
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_6e5fb996533eab2b
+  blocker_occurrence_id: BF17R-I-09f291e1b9cc8a08
+  case_id: golden_gold_mining_cycle
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_ee055856e18cd3f4
+  unlocked: false
+  packet_sha256: 2054a2aaf22c32c356ba43f9f38deb4536ea55a48d1d7c6f47826bad0bb5f180
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_8e3768557d6f2dde
+  blocker_occurrence_id: BF17R-I-3e906d62728d323c
+  case_id: __suite__
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7213df41458cf67d
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 43
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: 813354d734353bfa8757cfd24106b1111564301bd98aac83a6d1154eb56f7980
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_950802f6c70d5036
+  blocker_occurrence_id: BF17R-I-17a603b213f30cd0
+  case_id: golden_copper_foil_product_generation
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  unlocked: false
+  packet_sha256: b56064024660d2d50b34fc5eadb74a8898e4e982a31d9d9b5204938fd4bf66a6
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_ae4ebd1d82c2bd03
+  blocker_occurrence_id: BF17R-I-0cd635a2eb846f5f
+  case_id: __suite__
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7213df41458cf67d
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 43
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: d8d8a19dd82172882033a85b9ddac1c9b82e72c05cfc125a49040c113e308670
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_b531d3c48931ba58
+  blocker_occurrence_id: BF17R-I-6692a34319e7dba9
+  case_id: golden_crdmo_backlog_conversion
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: b0bbbf29ee2c48df7638eacdaff3bc638b2571ca2d1b8db57092855f43967870
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_b7467ff5401814aa
+  blocker_occurrence_id: BF17R-I-d997eee58100c229
+  case_id: golden_multi_business_ai_infrastructure
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  unlocked: false
+  packet_sha256: 7030a164aabc0b0fb7d8122896bf74fb942455f37fbdbb3a749dae6db445d167
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_c03007a138e83e9b
+  blocker_occurrence_id: BF17R-I-44b8abfbbac4bf3b
+  case_id: __suite__
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7213df41458cf67d
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 43
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: 982b9c02c99d6adf32c55f833f112192340111bafa1884849a79e917a2aba459
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_d19d9b744d7aff4a
+  blocker_occurrence_id: BF17R-I-89316fa8394654d3
+  case_id: __suite__
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7213df41458cf67d
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 43
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: de2c63e03896ef668ba528c9556b798db64fa695f23095a02f28212bcd6a1bad
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_d705e67d4c161924
+  blocker_occurrence_id: BF17R-I-62576090e17d1881
+  case_id: __suite__
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7213df41458cf67d
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 43
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: 49da4754b8ee7a318a225e279510bfada80171c3915da81bdabb0d5fca54acbc
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_e7027bc57e1dc7a7
+  blocker_occurrence_id: BF17R-I-b0a3803c6ee9da0f
+  case_id: __suite__
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1842382e6647f17d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3139481aee5c01e0
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6b198842cf80755a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6d2b87d81881062e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7213df41458cf67d
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_7a3640d70206502d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_99e77539490b01ad
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+    work_type: human_gate
+    required_decision_or_receipt: human_exact_hash + acceptance_receipt
+    current_status: human_gate
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_db819651b1640db8
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e48b0cd43634c242
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_eb221be0020f7038
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 43
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7213df41458cf67d
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_ab6b62516df0a0f1
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_be4e0eb69d196ff7
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+  - ns02_t30_occ_ee055856e18cd3f4
+  - ns02_t30_occ_f9fff3f413f6c43c
+  unlocked: false
+  packet_sha256: 03eddf3eac927da2697c9b5a2844a75389f5bfd26c14762f9415269f44ea9d5a
+- schema_version: r5_night03_dependency_unlock_item_v1
+  occurrence_id: ns02_t30_occ_fc4fc2c77ab26f2d
+  blocker_occurrence_id: BF17R-I-ee6752d022e2fca8
+  case_id: golden_copper_foil_product_generation
+  current_status: dependency_blocked
+  prerequisites:
+  - occurrence_id: ns02_t30_occ_04343acd916afae4
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_1977687ea7bce884
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_2c030a28f8631544
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+    work_type: evidence_required
+    required_decision_or_receipt: evidence_acceptance + acceptance_receipt
+    current_status: evidence_required
+    resolved: false
+  - occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+    work_type: analysis_required
+    required_decision_or_receipt: analysis_acceptance + acceptance_receipt
+    current_status: blocked_external
+    resolved: false
+  - occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+    work_type: engineering_local
+    required_decision_or_receipt: pointer_contract_approval + execution_receipt
+    current_status: blocked_external
+    resolved: false
+  unresolved_prerequisite_count: 10
+  non_substitutable_condition: every prerequisite needs an independent lineage-matched resolution receipt
+  shortest_unlock_path:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  unlocked: false
+  packet_sha256: 12794e5ad912948ccd626bd85091345564235abf0c9cbcd107e7f6bf4facf407

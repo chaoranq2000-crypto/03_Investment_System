@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python scripts/run_r5_night_shift.py --mission r5_overnight_03_20260721 --mode consume-approved --continue-on-external-block",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 589,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/execution/approved_input_consumption.json",
+      "sha256": "03bb8cfc6cc2d6fdd65830da8d8d1ac1408ec3ce3e13050a1ca72674d49a678f"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "1b6396e79e16cfba182e976b0d35bc3fd4b457ad7eca6365fa57e1f8da0ea9cb",
+  "task_id": "ns03_t30_consume_available_approved_inputs",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

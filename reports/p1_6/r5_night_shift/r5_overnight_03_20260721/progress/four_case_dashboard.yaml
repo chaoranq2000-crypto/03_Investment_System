@@ -1,0 +1,86 @@
+schema_version: r5_night03_four_case_dashboard_v1
+source_queue_sha256: dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1
+case_count: 4
+score_aggregation_used: false
+cases:
+- case_id: golden_copper_foil_product_generation
+  ticker: 301217.SZ
+  company: 铜冠铜箔
+  economic_archetype: product_generation
+  occurrence_count: 13
+  candidate_ready_count: 10
+  approved_count: 0
+  resolved_count: 0
+  dependency_blocked_count: 3
+  work_type_counts:
+    analysis_required: 6
+    dependency_blocked: 3
+    engineering_local: 2
+    evidence_required: 2
+  parent_work_order_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  next_actions:
+  - external reviewers decide exact-hash candidate packets
+  - independent acceptance receipts resolve occurrences
+  - dependency matrix recomputes only after real receipts
+- case_id: golden_crdmo_backlog_conversion
+  ticker: 603259.SH
+  company: 药明康德
+  economic_archetype: backlog_conversion
+  occurrence_count: 13
+  candidate_ready_count: 10
+  approved_count: 0
+  resolved_count: 0
+  dependency_blocked_count: 3
+  work_type_counts:
+    analysis_required: 6
+    dependency_blocked: 3
+    engineering_local: 2
+    evidence_required: 2
+  parent_work_order_ids:
+  - ns02_t30_wo_db304e8553027647
+  next_actions:
+  - external reviewers decide exact-hash candidate packets
+  - independent acceptance receipts resolve occurrences
+  - dependency matrix recomputes only after real receipts
+- case_id: golden_gold_mining_cycle
+  ticker: 600988.SH
+  company: 赤峰黄金
+  economic_archetype: commodity_cycle
+  occurrence_count: 13
+  candidate_ready_count: 10
+  approved_count: 0
+  resolved_count: 0
+  dependency_blocked_count: 3
+  work_type_counts:
+    analysis_required: 6
+    dependency_blocked: 3
+    engineering_local: 2
+    evidence_required: 2
+  parent_work_order_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  next_actions:
+  - external reviewers decide exact-hash candidate packets
+  - independent acceptance receipts resolve occurrences
+  - dependency matrix recomputes only after real receipts
+- case_id: golden_multi_business_ai_infrastructure
+  ticker: 600673.SH
+  company: 东阳光
+  economic_archetype: multi_business_ma
+  occurrence_count: 13
+  candidate_ready_count: 10
+  approved_count: 0
+  resolved_count: 0
+  dependency_blocked_count: 3
+  work_type_counts:
+    analysis_required: 6
+    dependency_blocked: 3
+    engineering_local: 2
+    evidence_required: 2
+  parent_work_order_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  next_actions:
+  - external reviewers decide exact-hash candidate packets
+  - independent acceptance receipts resolve occurrences
+  - dependency matrix recomputes only after real receipts
+suite_level_occurrences: 11

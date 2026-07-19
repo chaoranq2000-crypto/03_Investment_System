@@ -53,7 +53,7 @@
 - [x] Phase A
 - [x] Phase B
 - [x] Phase C
-- [ ] Phase D
+- [x] Phase D
 - [ ] Phase E
 
 ## Discoveries
@@ -73,6 +73,10 @@
   6 个 parent 只在全部必需 occurrence resolved 后关闭。
 - Pointer executor 每波上限 2 项，命令必须精确哈希批准且仅允许安全只读验收；无批准合同返回
   `blocked_external_no_approved_contracts`，resolved delta 为 0。
+- 外部决定目录当前没有 manifest：扫描 0、validated 0、consumed 0、resolved delta 0；没有用候选包或 no-input 冒充批准。
+- 已生成 8 个 evidence、24 个 analysis、3 个人审、8 个 pointer 的 exact-hash 候选/交接包；所有 reviewer/decision 字段保持空，
+  量化桥、反证和研究结论缺失继续以 `MISSING/UNKNOWN` 可见。
+- 20 个 dependency occurrence 全部保留 blocked；blocker ledger 为 43 candidate-ready + 20 dependency-blocked = 63，resolved 0。
 
 ## Decisions
 
@@ -82,11 +86,11 @@
 - Phase A 继续维持 `0/63 resolved`、Goal open、sample quality/P2 false；路径兼容修复不构成研究 resolution。
 - reviewer identity/authority 必须来自外部决定；`approved` 本身不计 resolution，仍需独立 passed receipt、lineage 与 decision digest 一致。
 - Resolution receipt 绑定 occurrence、decision digest、source queue、实现 tree、命令和输出；`publication_head` 保持空，避免自引用最终提交。
+- Phase D 的工程交付状态不改变研究真值：Goal 继续 `open_needs_targeted_backflow`，sample quality/P2 继续 false。
 
 ## Remaining work
 
 从 `task_queue.yaml` 自动同步；外部门禁必须保留为 `blocked_external`，
 不能从列表中消失。
 
-- Phase D：消费真实批准或完成 8/24/3/8 候选包、20 项依赖矩阵与 blocker ledger。
 - Phase E：对抗、双跑、恢复、全回归、范围审计、分批提交、推送、CI、晨报和 Night04 队列。

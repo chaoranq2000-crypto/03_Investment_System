@@ -1,0 +1,247 @@
+schema_version: r5_night03_pointer_review_index_v1
+source_queue_sha256: dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1
+proposal_count: 8
+approved_count: 0
+resolved_count: 0
+max_tasks_per_wave: 2
+proposals:
+- schema_version: r5_night03_pointer_review_index_item_v1
+  occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+  blocker_occurrence_id: BF17R-I-ffa18c8742ea01c3
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  missing_pointer: /generation_id
+  status: candidate_pending_review
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+  source_proposal_sha256: 17ad9eece4828b1acba9ff5f4cf77bd1fe1dbfc7387612f19bc92a033642036a
+  exact_paths: &id001
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_command_sha256:
+    python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+  diff_ceiling:
+    allowed_paths: *id001
+    max_changed_paths: 2
+  risks:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  resolution_claim_allowed: false
+  packet_sha256: dab6a36299bc6b2a6f21bb5f3a479ca4a113c797c758d325c1b739582e9cf1a0
+- schema_version: r5_night03_pointer_review_index_item_v1
+  occurrence_id: ns02_t30_occ_6b198842cf80755a
+  blocker_occurrence_id: BF17R-I-5bca9af8085588c4
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  missing_pointer: /generation_id
+  status: candidate_pending_review
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/generation_lock.json
+  source_proposal_sha256: 414aa760669f591c56ea51affb795e77ecdc04f44b5461e90f44100422fe69cb
+  exact_paths: &id002
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_command_sha256:
+    python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+  diff_ceiling:
+    allowed_paths: *id002
+    max_changed_paths: 2
+  risks:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  resolution_claim_allowed: false
+  packet_sha256: 47e2d4df76e259050f7e8282f31a5e3898743feda3f2d6c891f910ddb954be61
+- schema_version: r5_night03_pointer_review_index_item_v1
+  occurrence_id: ns02_t30_occ_99e77539490b01ad
+  blocker_occurrence_id: BF17R-I-857f459fcaf6ed04
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  status: candidate_pending_review
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+  source_proposal_sha256: 72eb78d0cadd785842a83d3d2ebce496e856b34fdf5f8d4eb8cf8e7584e58fc9
+  exact_paths: &id003
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_command_sha256:
+    python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+  diff_ceiling:
+    allowed_paths: *id003
+    max_changed_paths: 2
+  risks:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  resolution_claim_allowed: false
+  packet_sha256: 1b7acae56075c1d08139bc9c92755e3b536d3430ffccb3019f527ee9715d6d7c
+- schema_version: r5_night03_pointer_review_index_item_v1
+  occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+  blocker_occurrence_id: BF17R-I-2a0b648b9932cc99
+  case_id: golden_multi_business_ai_infrastructure
+  issuer_ticker: 600673.SH
+  missing_pointer: /generation_id
+  status: candidate_pending_review
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/generation_lock.json
+  source_proposal_sha256: ea82b4339ea4c7b156d520dad1b6ea08b6b0c8313b547716cd050f6d315aa230
+  exact_paths: &id004
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_command_sha256:
+    python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+  diff_ceiling:
+    allowed_paths: *id004
+    max_changed_paths: 2
+  risks:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  resolution_claim_allowed: false
+  packet_sha256: 7d7378e14fa95449bca71af5cb8b9183aa9cd649d010e4d2b4125d5c04abe662
+- schema_version: r5_night03_pointer_review_index_item_v1
+  occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+  blocker_occurrence_id: BF17R-I-b18d701929df7909
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  missing_pointer: /generation_id
+  status: candidate_pending_review
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+  source_proposal_sha256: 71a691a9c518213e21d6ac39bd49eb7659725672e2a2826f1280de7dfbebde14
+  exact_paths: &id005
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_command_sha256:
+    python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+  diff_ceiling:
+    allowed_paths: *id005
+    max_changed_paths: 2
+  risks:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  resolution_claim_allowed: false
+  packet_sha256: ea551aa4e7ad314550f6de86049bb54f771117a64ab1791d8954c52c39b8cfb6
+- schema_version: r5_night03_pointer_review_index_item_v1
+  occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+  blocker_occurrence_id: BF17R-I-6c46f0a018878644
+  case_id: golden_copper_foil_product_generation
+  issuer_ticker: 301217.SZ
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  status: candidate_pending_review
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+  source_proposal_sha256: 31604162d0d118cdbded9d5c33889e7835309337ea292074ff462459a716fe1e
+  exact_paths: &id006
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_command_sha256:
+    python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+  diff_ceiling:
+    allowed_paths: *id006
+    max_changed_paths: 2
+  risks:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  resolution_claim_allowed: false
+  packet_sha256: c74980f30502e4ff657029b4264b0c7996cb7bf59432d969bfeb2d5d37bd0b5a
+- schema_version: r5_night03_pointer_review_index_item_v1
+  occurrence_id: ns02_t30_occ_db819651b1640db8
+  blocker_occurrence_id: BF17R-I-4aefd94d717d90d3
+  case_id: golden_crdmo_backlog_conversion
+  issuer_ticker: 603259.SH
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  status: candidate_pending_review
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+  source_proposal_sha256: 905eaa0a544a2e91e267c8621ecaeaecb532a666eab29b114795930b8603e119
+  exact_paths: &id007
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_command_sha256:
+    python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+  diff_ceiling:
+    allowed_paths: *id007
+    max_changed_paths: 2
+  risks:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  resolution_claim_allowed: false
+  packet_sha256: c2fc59331b7a97ed9dd2b2b0cd4547abcb3487a30f3e70e503f5b995bcccd9fb
+- schema_version: r5_night03_pointer_review_index_item_v1
+  occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+  blocker_occurrence_id: BF17R-I-ebe22dc23f0cbc66
+  case_id: golden_gold_mining_cycle
+  issuer_ticker: 600988.SH
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  status: candidate_pending_review
+  source_artifact: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+  source_proposal_sha256: 4c25b860a8996fecc61f4ae257ca4e8a0ed0883568bfd3b9a72f7d976055a9bb
+  exact_paths: &id008
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+  acceptance_command_sha256:
+    python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+  diff_ceiling:
+    allowed_paths: *id008
+    max_changed_paths: 2
+  risks:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  review_state: proposed
+  review_sha: null
+  reviewer: null
+  reviewed_at: null
+  decision: null
+  resolution_claim_allowed: false
+  packet_sha256: 65776e3f7217055876c62bb8282e6980c6c6d82cf95de82da5684295d90a9a6e
