@@ -1,0 +1,9 @@
+# Source State
+
+- **source_commit**: `069da527452def6c59c3772750e933d8611ccadf`
+- **seed_commit**: `77b46244c05724dc8158d25cec6f01f935ebcd8b`
+- **seed_parent**: `069da527452def6c59c3772750e933d8611ccadf`
+- **target_branch**: `codex/r5-night03-targeted-backflow-intake`
+- **worktree_clean**: `True`
+- **seed_changed_path_count**: `24`
+- **seed_scope_ok**: `True`

@@ -163,23 +163,38 @@ def audit_receipt(repo: Path) -> dict[str, Any]:
         raise AuditError(f"expected 69 tasks in next queue, got {None if task_list is None else len(task_list)}")
     scalar_text = "\n".join(str(x) for x in all_scalars(receipt))
     combined = scalar_text + "\n" + readout
+    goal = receipt.get("program_goal") or {}
+    passed_count = receipt.get("passed_task_count")
+    packaged_count = receipt.get("packaged_task_count")
     checks = {
-        "final_sha_present": SOURCE_COMMIT in combined,
-        "delivered_present": "delivered" in combined.lower(),
-        "forty_of_forty_present": "40/40" in combined.replace(" ", "") or (
-            '"passed": 40' in combined and '"total": 40' in combined
+        # A receipt committed before the publication-record commit cannot
+        # self-contain that later commit SHA.  T02 hard-verifies SOURCE_COMMIT
+        # against the remote branch and CI; retain the absence here visibly.
+        "final_sha_present_in_prepublication_receipt": SOURCE_COMMIT in combined,
+        "final_sha_verification_deferred_to_remote_phase": True,
+        "delivered_present": receipt.get("mission_outcome") == "delivered",
+        "forty_of_forty_present": passed_count == 40 and packaged_count == 40,
+        "zero_of_sixty_three_present": (
+            goal.get("blocker_occurrences_resolved") == 0
+            and goal.get("blocker_occurrences_total") == 63
         ),
-        "zero_of_sixty_three_present": "0/63" in combined.replace(" ", "") or (
-            "resolved" in combined.lower() and "63" in combined and "0" in combined
-        ),
-        "goal_open_present": "open_needs_targeted_backflow" in combined,
+        "goal_open_present": goal.get("state") == "open_needs_targeted_backflow",
         "queue_count": len(task_list),
     }
-    failed = [k for k, v in checks.items() if k != "queue_count" and not v]
+    required_checks = (
+        "final_sha_verification_deferred_to_remote_phase",
+        "delivered_present",
+        "forty_of_forty_present",
+        "zero_of_sixty_three_present",
+        "goal_open_present",
+    )
+    failed = [key for key in required_checks if not checks[key]]
     if failed:
         raise AuditError(f"Night02 receipt/readout checks failed: {failed}")
     payload = {
         **checks,
+        "expected_final_source_sha": SOURCE_COMMIT,
+        "implementation_snapshot_sha": receipt.get("implementation_snapshot_sha"),
         "receipt_sha256": sha256(paths["receipt"]),
         "readout_sha256": sha256(paths["readout"]),
         "queue_sha256": sha256(paths["queue"]),

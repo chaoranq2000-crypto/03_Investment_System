@@ -1,0 +1,33 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python codex_tasks/night_shift/r5_overnight_03_20260721/tools/inspect_night02_outputs.py --repo . --phase remote",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 820,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/remote_ci_reconciliation.json",
+      "sha256": "0c24b579dda71903fa2d32151900709ca1bcdeea4df0b7e5be7d2c428f6a6bb6"
+    },
+    {
+      "bytes": 804,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/remote_ci_reconciliation.md",
+      "sha256": "402d18f3c51c0e48ee72ab081964b2538e6350a1c32097e988bbddbb653349f6"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "134877f9dacc84d9af2b226678d973d9b9c79cf9572f7b4b8deb0c88ecc25066",
+  "task_id": "ns03_t02_remote_ci_pr_workspace_reconcile",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

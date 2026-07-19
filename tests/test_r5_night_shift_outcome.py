@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from src.maintenance.night_shift.night03 import (
+    Night03Outcome,
+    evaluate_night03_outcome,
+)
 from src.maintenance.night_shift.outcome import (
     MissionOutcome,
     evaluate_mission_outcome,
@@ -54,3 +58,21 @@ def test_no_safe_pilot_never_maps_to_success() -> None:
     assert outcome_for_pilot_evidence(
         "no_safe_pilot", delivery_work_already_passed=True
     ) is MissionOutcome.PARTIAL
+
+
+def test_night03_distinguishes_resolution_delta_from_candidate_ready_delivery() -> None:
+    assert evaluate_night03_outcome(
+        delivery_tasks_passed=True,
+        resolved_delta=1,
+        candidate_packets_complete=True,
+    ) is Night03Outcome.DELIVERED_WITH_RESOLUTION_DELTA
+    assert evaluate_night03_outcome(
+        delivery_tasks_passed=True,
+        resolved_delta=0,
+        candidate_packets_complete=True,
+    ) is Night03Outcome.DELIVERED_CANDIDATE_READY
+    assert evaluate_night03_outcome(
+        delivery_tasks_passed=True,
+        resolved_delta=0,
+        candidate_packets_complete=False,
+    ) is Night03Outcome.PARTIAL

@@ -14,8 +14,8 @@ files:
   sha256: 4ba8166427ae9185e7c10d551b014d86e17c0fb497ee42b255899cd38ccd43aa
   bytes: 2417
 - path: EXECPLAN.md
-  sha256: 338f319dee35f86b1447dfd7261d04d0ba360a5bb18da7c7d02ad196880fd197
-  bytes: 2032
+  sha256: 460727c50627d455abccd4a47572190852c8e6e04b71bd7909a9bc38e3234833
+  bytes: 3483
 - path: OVERNIGHT_MISSION.md
   sha256: 578603a0074b3c132a50a314039f87c37d22dd3c0e9cbc6a29a76541e878deed
   bytes: 2673
@@ -71,8 +71,8 @@ files:
   sha256: d7cf708b2b243fe17d4e15556508931faf38fe6ee71c680fcec4c19d9c203765
   bytes: 529
 - path: tools/inspect_night02_outputs.py
-  sha256: dd5d284867813e59e1586c4d28eb9963f86861b356729dfac7848a368f900821
-  bytes: 10828
+  sha256: 36943d3188ebc8e25a86de5a0b1ee950037e4314c9643d8fb13827f33c83bd2f
+  bytes: 11587
 - path: tools/verify_package.py
   sha256: 3bbffbd36106fa99d79aa5c73ff27a66d7bbf1e2d7e02c1a6ca9ffd10eae9597
   bytes: 6044

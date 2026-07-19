@@ -50,7 +50,7 @@
 
 ## Progress
 
-- [ ] Phase A
+- [x] Phase A
 - [ ] Phase B
 - [ ] Phase C
 - [ ] Phase D
@@ -60,11 +60,27 @@
 
 执行中追加，不删除历史记录。
 
+- Bootstrap seed `77b46244c05724dc8158d25cec6f01f935ebcd8b` 的父提交、分支和 24 个包内路径通过硬门禁；
+  原 bootstrap 脚本生成未跟踪 `.local/night_shift/night03_bootstrap.json` 后又要求 clean，已仅删除该明确本地文件。
+- Night02 精确基线未跟踪完成收据中预告的 `publication/remote_delivery_receipt.json` 和 `publication/ci_status.md`；
+  live GitHub 与已跟踪 `receipts/ns02_t46_commit_push_remote_ci.json` 共同证明远端 SHA/CI，未向 Night02 历史补造文件。
+- Night02 物理产物为 78 个；69 项队列 SHA-256 为
+  `dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1`，55 个 occurrence 来源哈希已验证，
+  8 个 pointer occurrence 保持显式 `UNKNOWN`。
+
 ## Decisions
 
 执行中追加。任何放宽门禁的决定必须引用明确的人类授权和 exact hash。
+
+- 不修改 Night02 历史路径；发布/CI 路径偏差通过 Night03 审计器的已跟踪收据别名修正，并把实际证据路径写入审计产物。
+- Phase A 继续维持 `0/63 resolved`、Goal open、sample quality/P2 false；路径兼容修复不构成研究 resolution。
 
 ## Remaining work
 
 从 `task_queue.yaml` 自动同步；外部门禁必须保留为 `blocked_external`，
 不能从列表中消失。
+
+- Phase B：四类 exact-hash decision intake 与 false-resolution guard。
+- Phase C：occurrence/parent/dependency state engine、sandbox、pointer pilot 与 receipt lock。
+- Phase D：消费真实批准或完成 8/24/3/8 候选包、20 项依赖矩阵与 blocker ledger。
+- Phase E：对抗、双跑、恢复、全回归、范围审计、分批提交、推送、CI、晨报和 Night04 队列。

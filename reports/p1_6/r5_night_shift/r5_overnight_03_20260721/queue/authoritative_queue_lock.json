@@ -1,0 +1,12 @@
+{
+  "import_mode": "read_only_exact_hash",
+  "mission_id": "r5_overnight_03_20260721",
+  "schema_version": "r5_night03_authoritative_queue_lock_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_path": "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml",
+  "source_queue_bytes": 115020,
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "f978a6451e38f7d58654b67b78e4b4f4a40aa6e0818980f38bcf133dae0d69da",
+  "task_count": 69,
+  "task_ids_sha256": "dbdc09988d11fd0af74d36d62d90036d7eec1d16ad6298683803fd7a4ad3b206"
+}

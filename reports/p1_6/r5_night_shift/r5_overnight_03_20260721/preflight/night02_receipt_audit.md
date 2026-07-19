@@ -1,0 +1,14 @@
+# Night02 Receipt Audit
+
+- **final_sha_present_in_prepublication_receipt**: `False`
+- **final_sha_verification_deferred_to_remote_phase**: `True`
+- **delivered_present**: `True`
+- **forty_of_forty_present**: `True`
+- **zero_of_sixty_three_present**: `True`
+- **goal_open_present**: `True`
+- **queue_count**: `69`
+- **expected_final_source_sha**: `069da527452def6c59c3772750e933d8611ccadf`
+- **implementation_snapshot_sha**: `ad9b2c2df7049060e093fa08869266a1fdc74366`
+- **receipt_sha256**: `9ca4561c61cdd6d3b4a945b4b7e986f3e1c4526b7af070b9a51032b5c276c382`
+- **readout_sha256**: `04d19d819ef9cb6443f5c4a165e82671acb1c6ea8d89e98ad93a1ae74bff45d5`
+- **queue_sha256**: `dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1`

@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+from src.maintenance.night_shift.night03 import OUTPUT_ROOT, build_truth_snapshot
 from src.maintenance.night_shift.outcome import MissionOutcome, ProgramGoalPolicy
 
 
@@ -34,3 +38,16 @@ def test_goal_close_requires_all_three_authority_conditions() -> None:
         mission_outcome=MissionOutcome.DELIVERED,
         explicit_human_authority=True,
     )
+
+
+def test_night03_truth_snapshot_keeps_goal_and_downstream_gates_closed() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    expected = build_truth_snapshot(repo_root)
+    path = repo_root / OUTPUT_ROOT / "queue/truth_snapshot.json"
+    actual = json.loads(path.read_text(encoding="utf-8"))
+    assert actual == expected
+    assert actual["starting_truth"]["goal_state"] == "open_needs_targeted_backflow"
+    assert actual["starting_truth"]["goal_close_allowed"] is False
+    assert actual["starting_truth"]["sample_quality_allowed"] is False
+    assert actual["starting_truth"]["p2_allowed"] is False
+    assert actual["mission_delivery_may_close_program_goal"] is False

@@ -1,0 +1,33 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_queue_taxonomy.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 597,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/taxonomy_audit.json",
+      "sha256": "895f2f05dd615a343238487c6659f793e60b80b4347314ae2e06663a27e036e1"
+    },
+    {
+      "bytes": 303,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/taxonomy_audit.md",
+      "sha256": "17ce46cf97e343e7be3b9b946fe6fb49c97feba0e5c7edf7436356603d583da7"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "510c9b07c08424a37cea5b800136ad726dc8688ee3617d4bb53b9d9b7332d057",
+  "task_id": "ns03_t05_queue_taxonomy_count_audit",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

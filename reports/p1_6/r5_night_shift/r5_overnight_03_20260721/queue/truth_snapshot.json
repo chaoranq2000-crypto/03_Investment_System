@@ -1,0 +1,26 @@
+{
+  "allowed_delivery_outcomes": [
+    "delivered_with_resolution_delta",
+    "delivered_candidate_ready",
+    "partial",
+    "blocked",
+    "failed",
+    "cutoff"
+  ],
+  "mission_delivery_may_close_program_goal": false,
+  "mission_id": "r5_overnight_03_20260721",
+  "passed": true,
+  "schema_version": "r5_night03_truth_snapshot_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "333c51b63ea57a0ba8913e4b4811c23f5c0a41066e6f0d0c91f4f1ffcca5f84e",
+  "starting_truth": {
+    "blocker_occurrences_resolved": 0,
+    "blocker_occurrences_total": 63,
+    "goal_close_allowed": false,
+    "goal_state": "open_needs_targeted_backflow",
+    "p2_allowed": false,
+    "sample_quality_allowed": false,
+    "work_orders_pending": 6
+  }
+}

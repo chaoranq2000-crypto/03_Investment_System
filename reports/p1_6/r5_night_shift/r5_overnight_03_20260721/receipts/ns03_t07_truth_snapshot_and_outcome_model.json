@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_goal_policy.py tests/test_r5_night_shift_outcome.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 864,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/queue/truth_snapshot.json",
+      "sha256": "69037e9cfb7bc5817743704f8327be803122aac850bf06ef7ecca9cd702ce8e6"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "d16aa935df959f6b35f8b00d4f637a1eaff110f92f851018b9fe86d560111ba0",
+  "task_id": "ns03_t07_truth_snapshot_and_outcome_model",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

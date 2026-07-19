@@ -1,0 +1,18 @@
+{
+  "mission_id": "r5_overnight_03_20260721",
+  "occurrence_items": 63,
+  "occurrence_taxonomy": {
+    "analysis_required": 24,
+    "dependency_blocked": 20,
+    "engineering_local_pointer": 8,
+    "evidence_required": 8,
+    "human_exact_hash_gate": 3
+  },
+  "parent_aggregators": 6,
+  "passed": true,
+  "schema_version": "r5_night03_taxonomy_audit_v1",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "44bd07680a96a4a1bc4c06dfa4bd332800b50051ee7383970a688683cf26b01a",
+  "total_items": 69,
+  "unknown_occurrence_ids": []
+}

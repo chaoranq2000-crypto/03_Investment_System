@@ -1,0 +1,38 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python codex_tasks/night_shift/r5_overnight_03_20260721/tools/inspect_night02_outputs.py --repo . --phase preflight",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    },
+    {
+      "command": "python codex_tasks/night_shift/r5_overnight_03_20260721/tools/verify_package.py codex_tasks/night_shift/r5_overnight_03_20260721",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 345,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/source_state.json",
+      "sha256": "9d8075808e901334b2ebf1123b5c3ce673f3b4c8f71931503517987c47d7056d"
+    },
+    {
+      "bytes": 67,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/preflight.md",
+      "sha256": "4ceba909136fc61c963b758126fe77eb2c086df1cd65ddd8ca62c9c10bc03e9e"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "c151f8170d757b436b4bf9521b265541354b78a878469d921b3b3dfa559fb01b",
+  "task_id": "ns03_t00_exact_baseline_preflight",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

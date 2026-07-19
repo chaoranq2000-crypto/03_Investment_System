@@ -1,0 +1,33 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python codex_tasks/night_shift/r5_overnight_03_20260721/tools/inspect_night02_outputs.py --repo . --phase receipt",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 698,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/night02_receipt_audit.json",
+      "sha256": "e66d45db2237016927ff4407b242ccdf7650e0cc1aebc65a24a7567ec547199f"
+    },
+    {
+      "bytes": 746,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/preflight/night02_receipt_audit.md",
+      "sha256": "26284c4b0d3b01f5844a0cd2b286d6d03da35a8d34c8e9ce10ab7682bbc3c35e"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "7f6ff5635c063e8990434c6fbe9fffaf4cfc17b5ebd8e783725378ddb9975913",
+  "task_id": "ns03_t01_night02_completion_receipt_audit",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}
