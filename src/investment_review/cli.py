@@ -49,6 +49,16 @@ from .behavior_hypothesis_audit import (
     render_behavior_hypothesis_revision_markdown,
     save_behavior_hypothesis_markdown,
 )
+from .behavior_hypothesis_ledger import (
+    build_behavior_hypothesis_ledger,
+    load_behavior_hypothesis_ledger,
+    query_behavior_hypothesis_ledger,
+    render_behavior_hypothesis_ledger_markdown,
+    replay_validate_behavior_hypothesis_ledger,
+    save_behavior_hypothesis_ledger,
+    save_behavior_hypothesis_ledger_markdown,
+    validate_behavior_hypothesis_ledger,
+)
 from .episodes import (
     build_episode_collection,
     load_episode_collection,
@@ -614,6 +624,62 @@ def build_parser() -> argparse.ArgumentParser:
         help="Validate and list a complete non-forking P2G-4 revision chain",
     )
     behavior_hypothesis_revision_list.add_argument("artifact", nargs="+")
+
+    behavior_hypothesis_ledger_build = sub.add_parser(
+        "behavior-hypothesis-ledger-build",
+        help="Build a deterministic ledger from complete P2G-4 revision chains",
+    )
+    behavior_hypothesis_ledger_build.add_argument(
+        "--revision", action="append", required=True
+    )
+    behavior_hypothesis_ledger_build.add_argument(
+        "--observation-artifact", action="append", required=True
+    )
+    behavior_hypothesis_ledger_build.add_argument("--output", required=True)
+
+    behavior_hypothesis_ledger_validate = sub.add_parser(
+        "behavior-hypothesis-ledger-validate",
+        help="Validate a ledger offline or rebuild it from explicit sources",
+    )
+    behavior_hypothesis_ledger_validate.add_argument("artifact")
+    behavior_hypothesis_ledger_validate.add_argument(
+        "--source-replay", action="store_true"
+    )
+    behavior_hypothesis_ledger_validate.add_argument(
+        "--revision", action="append", default=[]
+    )
+    behavior_hypothesis_ledger_validate.add_argument(
+        "--observation-artifact", action="append", default=[]
+    )
+
+    behavior_hypothesis_ledger_query = sub.add_parser(
+        "behavior-hypothesis-ledger-query",
+        help="Query active or audit ledger occurrences with AND semantics",
+    )
+    behavior_hypothesis_ledger_query.add_argument("artifact")
+    behavior_hypothesis_ledger_query.add_argument(
+        "--view", choices=["active", "audit"], default="active"
+    )
+    behavior_hypothesis_ledger_query.add_argument(
+        "--status", choices=["proposed", "accepted", "rejected", "superseded"]
+    )
+    behavior_hypothesis_ledger_query.add_argument("--hypothesis-id")
+    behavior_hypothesis_ledger_query.add_argument("--episode-id")
+    behavior_hypothesis_ledger_query.add_argument("--market-context")
+    behavior_hypothesis_ledger_query.add_argument("--evaluation-id")
+    behavior_hypothesis_ledger_query.add_argument(
+        "--source-observation-content-id"
+    )
+    behavior_hypothesis_ledger_query.add_argument("--actor")
+    behavior_hypothesis_ledger_query.add_argument("--reviewed-from")
+    behavior_hypothesis_ledger_query.add_argument("--reviewed-to")
+
+    behavior_hypothesis_ledger_render = sub.add_parser(
+        "behavior-hypothesis-ledger-render",
+        help="Render validated active and audit ledger views as escaped Markdown",
+    )
+    behavior_hypothesis_ledger_render.add_argument("--artifact", required=True)
+    behavior_hypothesis_ledger_render.add_argument("--output", required=True)
 
     behavior_hypothesis_validate = sub.add_parser(
         "behavior-hypothesis-validate",
@@ -1338,6 +1404,82 @@ def main(argv: list[str] | None = None) -> int:
                         artifacts
                     ),
                     "revisions": list_behavior_hypothesis_revisions(artifacts),
+                }
+            )
+        elif args.command == "behavior-hypothesis-ledger-build":
+            ledger = build_behavior_hypothesis_ledger(
+                _load_json_documents(args.revision),
+                _load_json_documents(args.observation_artifact),
+            )
+            save_behavior_hypothesis_ledger(args.output, ledger)
+            _print(
+                {
+                    "status": "accepted",
+                    "schema_version": ledger["schema_version"],
+                    "content_id": ledger["content_id"],
+                    "source_chain_count": ledger["counts"]["source_chain_count"],
+                    "fingerprint_count": ledger["counts"]["fingerprint_count"],
+                    "active_fingerprint_count": ledger["counts"][
+                        "active_fingerprint_count"
+                    ],
+                    "output_created": True,
+                }
+            )
+        elif args.command == "behavior-hypothesis-ledger-validate":
+            ledger = load_behavior_hypothesis_ledger(args.artifact)
+            if args.source_replay:
+                if not args.revision or not args.observation_artifact:
+                    raise ValueError(
+                        "--source-replay requires --revision and "
+                        "--observation-artifact"
+                    )
+                validation = replay_validate_behavior_hypothesis_ledger(
+                    ledger,
+                    revisions=_load_json_documents(args.revision),
+                    observation_artifacts=_load_json_documents(
+                        args.observation_artifact
+                    ),
+                )
+            else:
+                validation = validate_behavior_hypothesis_ledger(ledger)
+            _print(validation)
+            if (
+                validation["validation_status"] == "blocked"
+                or (ledger.get("release_readiness") or {}).get("status") != "ready"
+                or (ledger.get("source_verification") or {}).get("status")
+                != "verified"
+            ):
+                return 2
+        elif args.command == "behavior-hypothesis-ledger-query":
+            _print(
+                query_behavior_hypothesis_ledger(
+                    load_behavior_hypothesis_ledger(args.artifact),
+                    view=args.view,
+                    status=args.status,
+                    hypothesis_id=args.hypothesis_id,
+                    episode_id=args.episode_id,
+                    market_context=args.market_context,
+                    evaluation_id=args.evaluation_id,
+                    source_observation_content_id=(
+                        args.source_observation_content_id
+                    ),
+                    actor=args.actor,
+                    reviewed_from=args.reviewed_from,
+                    reviewed_to=args.reviewed_to,
+                )
+            )
+        elif args.command == "behavior-hypothesis-ledger-render":
+            ledger = load_behavior_hypothesis_ledger(args.artifact)
+            rendered = render_behavior_hypothesis_ledger_markdown(ledger)
+            save_behavior_hypothesis_ledger_markdown(args.output, rendered)
+            _print(
+                {
+                    "status": "accepted",
+                    "content_id": ledger["content_id"],
+                    "active_fingerprint_count": ledger["counts"][
+                        "active_fingerprint_count"
+                    ],
+                    "output_created": True,
                 }
             )
         else:
