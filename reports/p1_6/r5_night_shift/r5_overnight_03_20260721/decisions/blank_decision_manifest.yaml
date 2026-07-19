@@ -1,0 +1,18 @@
+schema_version: r5_night03_external_decision_manifest_v1
+source_queue_path: reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml
+source_queue_sha256: null
+created_by: null
+created_at: null
+decisions:
+- occurrence_id: null
+  decision_kind: null
+  decision: null
+  candidate_artifact_path: null
+  candidate_artifact_sha256: null
+  review_packet_path: null
+  review_packet_sha256: null
+  reviewer: null
+  reviewer_authority: null
+  reviewed_at: null
+  notes: []
+machine_must_not_populate_reviewer_fields: true

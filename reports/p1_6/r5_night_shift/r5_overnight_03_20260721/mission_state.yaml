@@ -43,39 +43,39 @@ tasks:
 - id: ns03_t10_decision_manifest_schema
   phase: B_decision_intake
   delivery_required: true
-  status: ready
+  status: passed
 - id: ns03_t11_exact_hash_decision_validator
   phase: B_decision_intake
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t12_authority_reviewer_identity_guard
   phase: B_decision_intake
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t13_evidence_acceptance_adapter
   phase: B_decision_intake
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t14_analysis_decision_adapter
   phase: B_decision_intake
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t15_human_exact_hash_adapter
   phase: B_decision_intake
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t16_pointer_contract_approval_adapter
   phase: B_decision_intake
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t17_false_resolution_guard
   phase: B_decision_intake
   delivery_required: true
-  status: pending
+  status: passed
 - id: ns03_t20_occurrence_state_transition_engine
   phase: C_resolution_engine
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t21_parent_aggregation_engine
   phase: C_resolution_engine
   delivery_required: true
@@ -87,11 +87,11 @@ tasks:
 - id: ns03_t23_occurrence_diff_sandbox
   phase: C_resolution_engine
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t24_acceptance_command_safety
   phase: C_resolution_engine
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t25_approved_pointer_pilot_executor
   phase: C_resolution_engine
   delivery_required: true
@@ -111,15 +111,15 @@ tasks:
 - id: ns03_t31_evidence_candidate_enrichment
   phase: D_targeted_backflow
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t32_analysis_candidate_enrichment
   phase: D_targeted_backflow
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t33_human_gate_packet_refresh
   phase: D_targeted_backflow
   delivery_required: true
-  status: pending
+  status: ready
 - id: ns03_t34_pointer_proposal_review_index
   phase: D_targeted_backflow
   delivery_required: true
@@ -168,4 +168,4 @@ tasks:
   phase: E_publication
   delivery_required: true
   status: pending
-stable_receipt_sha256: 8823668be0088b47b6c1e213f4b3ffe450efe28135018d24c34cecbf37fc90eb
+stable_receipt_sha256: 1c8f164904b1472fbacb92dd368e58f3aca31d54f79455a7c51d402f891da62b

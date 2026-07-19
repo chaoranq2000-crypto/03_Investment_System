@@ -1,0 +1,14 @@
+schema_version: r5_night03_resolution_policy_v1
+candidate_ready_is_resolved: false
+packet_generated_is_resolved: false
+no_input_is_resolved: false
+approved_decision_is_resolved: false
+required_for_resolution:
+- validated_approved_decision
+- independent_execution_or_acceptance_receipt
+- acceptance_passed
+- source_queue_lineage_match
+- candidate_and_review_hash_match
+program_goal_auto_close_allowed: false
+sample_quality_allowed: false
+p2_allowed: false

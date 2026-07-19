@@ -1,0 +1,10 @@
+schema_version: r5_night03_human_adapter_contract_v1
+exact_candidate_hash_required: true
+exact_review_packet_hash_required: true
+source_queue_hash_required: dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1
+decision_alone_resolves_occurrence: false
+required_fields:
+- gate_id
+- candidate_artifact_sha256
+- generation_lock_sha256
+rerender_invalidates_review: true

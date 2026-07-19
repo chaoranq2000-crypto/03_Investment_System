@@ -1,0 +1,20 @@
+schema_version: r5_night03_authority_matrix_v1
+machine_populated_reviewer_allowed: false
+future_review_timestamp_allowed: false
+decision_authorities:
+  evidence_acceptance:
+    required_work_type: evidence_required
+    required_reviewer_authority: evidence_reviewer
+    approved_is_resolution: false
+  analysis_acceptance:
+    required_work_type: analysis_required
+    required_reviewer_authority: research_reviewer
+    approved_is_resolution: false
+  human_exact_hash:
+    required_work_type: human_gate
+    required_reviewer_authority: human_gate_reviewer
+    approved_is_resolution: false
+  pointer_contract_approval:
+    required_work_type: engineering_local
+    required_reviewer_authority: engineering_contract_reviewer
+    approved_is_resolution: false

@@ -1,0 +1,33 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_decision_manifest.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 2810,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/decision_manifest_schema.json",
+      "sha256": "83c8e2e1f9773852e88dc26f167a4bb7c09bf51a5920dc8b47710eb08fc17edf"
+    },
+    {
+      "bytes": 529,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/blank_decision_manifest.yaml",
+      "sha256": "d7cf708b2b243fe17d4e15556508931faf38fe6ee71c680fcec4c19d9c203765"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "de1b2a2a00dd4193b10373bea9b1c7ec6dca49d38a116c2413fa16e538d8ca9a",
+  "task_id": "ns03_t10_decision_manifest_schema",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

@@ -1,0 +1,16 @@
+schema_version: r5_night03_evidence_adapter_contract_v1
+exact_candidate_hash_required: true
+exact_review_packet_hash_required: true
+source_queue_hash_required: dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1
+decision_alone_resolves_occurrence: false
+required_fields:
+- evidence_id
+- source_hash
+- source_class
+- claim_boundary
+- counter_evidence
+allowed_source_classes:
+- official_disclosure
+- official_report
+- regulatory_source
+- reviewed_dataset

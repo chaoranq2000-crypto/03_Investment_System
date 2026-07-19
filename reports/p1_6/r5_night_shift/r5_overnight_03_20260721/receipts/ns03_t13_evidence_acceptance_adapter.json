@@ -1,0 +1,28 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_evidence_decisions.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "blocker_occurrences": {
+    "resolution_claimed": false,
+    "resolved": 0
+  },
+  "mission_id": "r5_overnight_03_20260721",
+  "required_artifacts": [
+    {
+      "bytes": 466,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/decisions/evidence_adapter_contract.yaml",
+      "sha256": "ee4fd99dd38529f27c60c5938bf2ef7bb8eb5835f6d5f9309286bed4974ec83e"
+    }
+  ],
+  "schema_version": "r5_night03_wrapper_task_receipt_v1",
+  "source_commit": "069da527452def6c59c3772750e933d8611ccadf",
+  "source_queue_sha256": "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1",
+  "stable_receipt_sha256": "2f77ccac07678e0a0202ba6a333e7b3952c3f12c025b9511c20cfd769fd89066",
+  "task_id": "ns03_t13_evidence_acceptance_adapter",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

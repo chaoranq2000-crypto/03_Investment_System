@@ -559,7 +559,7 @@ def materialize_wrapper_state(repo_root: Path) -> dict[str, Any]:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Materialise deterministic Night03 artifacts")
     parser.add_argument("--repo", default=".")
-    parser.add_argument("--phase", choices=("baseline",), default="baseline")
+    parser.add_argument("--phase", choices=("baseline", "decisions"), default="baseline")
     parser.add_argument("--record-task", action="append", default=[])
     return parser
 
@@ -567,7 +567,21 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     repo_root = Path(args.repo).resolve()
-    result = materialize_phase_a(repo_root)
+    if args.phase == "baseline":
+        result = materialize_phase_a(repo_root)
+        phase_summary = {
+            "task_count": result["queue_lock"]["task_count"],
+            "lineage_verified": result["lineage"]["verified_count"],
+            "explicit_unknown": result["lineage"]["explicit_unknown_count"],
+        }
+    else:
+        from .night03_decisions import materialize_decision_contracts
+
+        result = materialize_decision_contracts(repo_root)
+        phase_summary = {
+            "decision_kinds": len(result["authority"]["decision_authorities"]),
+            "resolution_requires_independent_receipt": True,
+        }
     receipts = [record_completed_task(repo_root, task_id) for task_id in args.record_task]
     state = materialize_wrapper_state(repo_root)
     print(
@@ -576,9 +590,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 "mission_id": MISSION_ID,
                 "phase": args.phase,
                 "status": "passed",
-                "task_count": result["queue_lock"]["task_count"],
-                "lineage_verified": result["lineage"]["verified_count"],
-                "explicit_unknown": result["lineage"]["explicit_unknown_count"],
+                **phase_summary,
                 "receipts_recorded": [item["task_id"] for item in receipts],
                 "wrapper_tasks_passed": sum(
                     item["status"] == "passed" for item in state["tasks"]
