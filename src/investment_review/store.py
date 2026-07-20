@@ -8,14 +8,21 @@ import uuid
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterator, Sequence
+from typing import Any, Iterator, Mapping, Sequence
 
+from .artifact_io import canonical_json_bytes
+from .behavior_hypothesis_candidates import (
+    _canonical_timestamp,
+    replay_validate_behavior_hypothesis_candidate,
+    validate_behavior_hypothesis_review_event,
+)
 from .models import CanonicalTradeEvent, DecisionRecord, SourceDefinition, canonical_json
 from .portfolio_context import PortfolioContext, PortfolioSnapshot, calculate_portfolio_metrics
 
 
 SCHEMA_VERSION = 2
 APPLICATION_ID = 0x49525657  # ASCII "IRVW"
+P2H_STAGE1_SCHEMA_VERSION = 1
 
 class ReviewStoreError(RuntimeError):
     """Base error for the review store."""
@@ -160,6 +167,38 @@ CREATE TABLE IF NOT EXISTS position_snapshot_items (
     PRIMARY KEY (snapshot_id, symbol, market)
 );
 
+CREATE TABLE IF NOT EXISTS behavior_hypothesis_candidates (
+    candidate_id TEXT PRIMARY KEY,
+    canonical_hash TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL,
+    effective_at TEXT NOT NULL,
+    knowledge_at TEXT NOT NULL,
+    subject_scope_kind TEXT NOT NULL,
+    subject_scope_refs_json TEXT NOT NULL,
+    pattern_family TEXT NOT NULL,
+    source_verification_status TEXT NOT NULL CHECK (
+        source_verification_status = 'verified'
+    ),
+    payload_json TEXT NOT NULL,
+    inserted_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS behavior_hypothesis_review_events (
+    review_event_id TEXT PRIMARY KEY,
+    canonical_hash TEXT NOT NULL UNIQUE,
+    candidate_id TEXT NOT NULL REFERENCES behavior_hypothesis_candidates(candidate_id),
+    event_type TEXT NOT NULL,
+    reviewed_at TEXT NOT NULL,
+    effective_at TEXT NOT NULL,
+    knowledge_at TEXT NOT NULL,
+    evidence_cutoff TEXT NOT NULL,
+    reviewer_ref TEXT NOT NULL,
+    supersedes_event_id TEXT REFERENCES behavior_hypothesis_review_events(review_event_id),
+    supersedes_candidate_id TEXT REFERENCES behavior_hypothesis_candidates(candidate_id),
+    payload_json TEXT NOT NULL,
+    inserted_at TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_trade_events_symbol_time
     ON trade_events(symbol, occurred_at);
 CREATE INDEX IF NOT EXISTS idx_trade_events_known_at
@@ -172,6 +211,14 @@ CREATE INDEX IF NOT EXISTS idx_decisions_symbol_time
     ON decisions(symbol, occurred_at);
 CREATE INDEX IF NOT EXISTS idx_snapshots_observed_at
     ON portfolio_snapshots(observed_at);
+CREATE INDEX IF NOT EXISTS idx_behavior_candidates_scope
+    ON behavior_hypothesis_candidates(subject_scope_kind, pattern_family);
+CREATE INDEX IF NOT EXISTS idx_behavior_candidates_dual_time
+    ON behavior_hypothesis_candidates(effective_at, knowledge_at, created_at);
+CREATE INDEX IF NOT EXISTS idx_behavior_review_events_candidate_time
+    ON behavior_hypothesis_review_events(
+        candidate_id, effective_at, knowledge_at, reviewed_at, review_event_id
+    );
 """
 
 
@@ -236,6 +283,18 @@ class ReviewStore:
                         f"(schema_version={schema_version}, user_version={user_version}). "
                         f"Create a new v{SCHEMA_VERSION} sidecar and reimport."
                     )
+                feature_row = conn.execute(
+                    "SELECT value FROM schema_meta "
+                    "WHERE key='p2h_stage1_schema_version'"
+                ).fetchone()
+                if (
+                    feature_row is not None
+                    and int(feature_row[0]) != P2H_STAGE1_SCHEMA_VERSION
+                ):
+                    raise ReviewStoreError(
+                        "Unsupported P2H Stage 1 feature schema: "
+                        f"{feature_row[0]}"
+                    )
 
             conn.execute("PRAGMA journal_mode = WAL")
             conn.executescript(_SCHEMA_SQL)
@@ -252,6 +311,12 @@ class ReviewStore:
                 "INSERT INTO schema_meta(key, value) VALUES('initialized_at', ?) "
                 "ON CONFLICT(key) DO NOTHING",
                 (now,),
+            )
+            conn.execute(
+                "INSERT INTO schema_meta(key, value) "
+                "VALUES('p2h_stage1_schema_version', ?) "
+                "ON CONFLICT(key) DO NOTHING",
+                (str(P2H_STAGE1_SCHEMA_VERSION),),
             )
             conn.commit()
         finally:
@@ -279,6 +344,32 @@ class ReviewStore:
                     f"Review database schema_version={version}; create a new v{SCHEMA_VERSION} "
                     "sidecar and reimport."
                 )
+
+    def _ensure_p2h_stage1_initialized(self) -> None:
+        self._ensure_initialized()
+        with self.connection(read_only=True) as conn:
+            feature_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='p2h_stage1_schema_version'"
+            ).fetchone()
+            tables = {
+                str(row[0])
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+        required = {
+            "behavior_hypothesis_candidates",
+            "behavior_hypothesis_review_events",
+        }
+        if (
+            feature_row is None
+            or int(feature_row[0]) != P2H_STAGE1_SCHEMA_VERSION
+            or not required.issubset(tables)
+        ):
+            raise ReviewStoreError(
+                "P2H Stage 1 tables are not initialized; run the init command first."
+            )
 
     @staticmethod
     def _upsert_source(conn: sqlite3.Connection, source: SourceDefinition) -> None:
@@ -808,6 +899,404 @@ class ReviewStore:
             result.append(item)
         return result
 
+    @staticmethod
+    def _p2h_payload_json(value: Mapping[str, Any]) -> str:
+        return canonical_json_bytes(value).decode("utf-8")
+
+    def save_behavior_hypothesis_candidate(
+        self,
+        candidate: Mapping[str, Any],
+        *,
+        source_artifacts: Sequence[Mapping[str, Any]],
+    ) -> dict[str, Any]:
+        """Create one source-verified candidate or idempotently replay it."""
+
+        self._ensure_p2h_stage1_initialized()
+        candidate_id = str(candidate.get("candidate_id") or "")
+        canonical_hash = str(candidate.get("canonical_hash") or "")
+        payload_json = self._p2h_payload_json(candidate)
+        with self.connection() as conn:
+            with conn:
+                existing = conn.execute(
+                    "SELECT canonical_hash, payload_json "
+                    "FROM behavior_hypothesis_candidates WHERE candidate_id = ?",
+                    (candidate_id,),
+                ).fetchone()
+                if existing is not None:
+                    if (
+                        existing["canonical_hash"] == canonical_hash
+                        and existing["payload_json"] == payload_json
+                    ):
+                        return {
+                            "candidate_id": candidate_id,
+                            "canonical_hash": canonical_hash,
+                            "status": "SKIPPED",
+                            "source_verification": "verified",
+                        }
+                    raise DataConflictError(
+                        "Behavior hypothesis candidate changed after creation: "
+                        f"candidate_id={candidate_id}"
+                    )
+
+                validation = replay_validate_behavior_hypothesis_candidate(
+                    candidate,
+                    source_artifacts=source_artifacts,
+                )
+                if (
+                    validation["validation_status"] != "accepted"
+                    or validation["source_verification"]["status"] != "verified"
+                ):
+                    raise ReviewStoreError(
+                        "Behavior hypothesis candidate failed source replay: "
+                        + ", ".join(validation["finding_codes"])
+                    )
+                hash_owner = conn.execute(
+                    "SELECT candidate_id FROM behavior_hypothesis_candidates "
+                    "WHERE canonical_hash = ?",
+                    (canonical_hash,),
+                ).fetchone()
+                if hash_owner is not None:
+                    raise DataConflictError(
+                        "Behavior hypothesis canonical hash already belongs to "
+                        f"candidate_id={hash_owner['candidate_id']}"
+                    )
+                scope = candidate["subject_scope"]
+                conn.execute(
+                    """
+                    INSERT INTO behavior_hypothesis_candidates(
+                        candidate_id, canonical_hash, created_at, effective_at,
+                        knowledge_at, subject_scope_kind, subject_scope_refs_json,
+                        pattern_family, source_verification_status, payload_json,
+                        inserted_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'verified', ?, ?)
+                    """,
+                    (
+                        candidate_id,
+                        canonical_hash,
+                        candidate["created_at"],
+                        candidate["effective_at"],
+                        candidate["knowledge_at"],
+                        scope["kind"],
+                        canonical_json(scope["refs"]),
+                        candidate["pattern_family"],
+                        payload_json,
+                        _now(),
+                    ),
+                )
+        return {
+            "candidate_id": candidate_id,
+            "canonical_hash": canonical_hash,
+            "status": "INSERTED",
+            "source_verification": "verified",
+        }
+
+    def save_behavior_hypothesis_review_event(
+        self, event: Mapping[str, Any]
+    ) -> dict[str, Any]:
+        """Create one immutable review event or idempotently replay it."""
+
+        self._ensure_p2h_stage1_initialized()
+        event_id = str(event.get("review_event_id") or "")
+        canonical_hash = str(event.get("canonical_hash") or "")
+        candidate_id = str(event.get("candidate_id") or "")
+        payload_json = self._p2h_payload_json(event)
+        with self.connection() as conn:
+            with conn:
+                existing = conn.execute(
+                    "SELECT canonical_hash, payload_json "
+                    "FROM behavior_hypothesis_review_events "
+                    "WHERE review_event_id = ?",
+                    (event_id,),
+                ).fetchone()
+                if existing is not None:
+                    if (
+                        existing["canonical_hash"] == canonical_hash
+                        and existing["payload_json"] == payload_json
+                    ):
+                        return {
+                            "review_event_id": event_id,
+                            "candidate_id": candidate_id,
+                            "canonical_hash": canonical_hash,
+                            "status": "SKIPPED",
+                        }
+                    raise DataConflictError(
+                        "Behavior hypothesis review event changed after creation: "
+                        f"review_event_id={event_id}"
+                    )
+
+                validation = validate_behavior_hypothesis_review_event(event)
+                if validation["validation_status"] != "accepted":
+                    raise ReviewStoreError(
+                        "Behavior hypothesis review event failed validation: "
+                        + ", ".join(validation["finding_codes"])
+                    )
+                candidate_row = conn.execute(
+                    "SELECT knowledge_at FROM behavior_hypothesis_candidates "
+                    "WHERE candidate_id = ?",
+                    (candidate_id,),
+                ).fetchone()
+                if candidate_row is None:
+                    raise ReviewStoreError(
+                        f"Behavior hypothesis candidate not found: {candidate_id}"
+                    )
+                if event["evidence_cutoff"] < candidate_row["knowledge_at"]:
+                    raise ReviewStoreError(
+                        "Review evidence_cutoff cannot precede candidate knowledge_at"
+                    )
+                supersedes_event_id = event.get("supersedes_event_id")
+                if supersedes_event_id is not None:
+                    parent_event = conn.execute(
+                        "SELECT candidate_id FROM behavior_hypothesis_review_events "
+                        "WHERE review_event_id = ?",
+                        (supersedes_event_id,),
+                    ).fetchone()
+                    if parent_event is None:
+                        raise ReviewStoreError(
+                            "Superseded review event not found: "
+                            f"{supersedes_event_id}"
+                        )
+                supersedes_candidate_id = event.get("supersedes_candidate_id")
+                if supersedes_candidate_id is not None:
+                    parent_candidate = conn.execute(
+                        "SELECT 1 FROM behavior_hypothesis_candidates "
+                        "WHERE candidate_id = ?",
+                        (supersedes_candidate_id,),
+                    ).fetchone()
+                    if parent_candidate is None:
+                        raise ReviewStoreError(
+                            "Superseded candidate not found: "
+                            f"{supersedes_candidate_id}"
+                        )
+                hash_owner = conn.execute(
+                    "SELECT review_event_id "
+                    "FROM behavior_hypothesis_review_events "
+                    "WHERE canonical_hash = ?",
+                    (canonical_hash,),
+                ).fetchone()
+                if hash_owner is not None:
+                    raise DataConflictError(
+                        "Behavior hypothesis event canonical hash already belongs to "
+                        f"review_event_id={hash_owner['review_event_id']}"
+                    )
+                conn.execute(
+                    """
+                    INSERT INTO behavior_hypothesis_review_events(
+                        review_event_id, canonical_hash, candidate_id, event_type,
+                        reviewed_at, effective_at, knowledge_at, evidence_cutoff,
+                        reviewer_ref, supersedes_event_id, supersedes_candidate_id,
+                        payload_json, inserted_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        event_id,
+                        canonical_hash,
+                        candidate_id,
+                        event["event_type"],
+                        event["reviewed_at"],
+                        event["effective_at"],
+                        event["knowledge_at"],
+                        event["evidence_cutoff"],
+                        event["reviewer_ref"],
+                        supersedes_event_id,
+                        supersedes_candidate_id,
+                        payload_json,
+                        _now(),
+                    ),
+                )
+        return {
+            "review_event_id": event_id,
+            "candidate_id": candidate_id,
+            "canonical_hash": canonical_hash,
+            "status": "INSERTED",
+        }
+
+    def get_behavior_hypothesis_candidate(
+        self, candidate_id: str
+    ) -> dict[str, Any]:
+        self._ensure_p2h_stage1_initialized()
+        with self.connection(read_only=True) as conn:
+            row = conn.execute(
+                "SELECT payload_json FROM behavior_hypothesis_candidates "
+                "WHERE candidate_id = ?",
+                (candidate_id,),
+            ).fetchone()
+        if row is None:
+            raise ReviewStoreError(
+                f"Behavior hypothesis candidate not found: {candidate_id}"
+            )
+        return json.loads(row["payload_json"])
+
+    def list_behavior_hypothesis_review_events(
+        self,
+        *,
+        candidate_id: str | None = None,
+        event_type: str | None = None,
+        as_of: str | None = None,
+        knowledge_cutoff: str | None = None,
+        reviewed_from: str | None = None,
+        reviewed_to: str | None = None,
+    ) -> list[dict[str, Any]]:
+        self._ensure_p2h_stage1_initialized()
+        filters: list[str] = []
+        params: list[Any] = []
+        values = {
+            "effective_at": (
+                _canonical_timestamp(as_of, "as_of") if as_of is not None else None
+            ),
+            "knowledge_at": (
+                _canonical_timestamp(knowledge_cutoff, "knowledge_cutoff")
+                if knowledge_cutoff is not None
+                else None
+            ),
+            "reviewed_from": (
+                _canonical_timestamp(reviewed_from, "reviewed_from")
+                if reviewed_from is not None
+                else None
+            ),
+            "reviewed_to": (
+                _canonical_timestamp(reviewed_to, "reviewed_to")
+                if reviewed_to is not None
+                else None
+            ),
+        }
+        if candidate_id is not None:
+            filters.append("candidate_id = ?")
+            params.append(candidate_id)
+        if event_type is not None:
+            filters.append("event_type = ?")
+            params.append(event_type)
+        if values["effective_at"] is not None:
+            filters.append("effective_at <= ?")
+            params.append(values["effective_at"])
+        if values["knowledge_at"] is not None:
+            filters.append("knowledge_at <= ?")
+            params.append(values["knowledge_at"])
+        if values["reviewed_from"] is not None:
+            filters.append("reviewed_at >= ?")
+            params.append(values["reviewed_from"])
+        if values["reviewed_to"] is not None:
+            filters.append("reviewed_at <= ?")
+            params.append(values["reviewed_to"])
+        where = " WHERE " + " AND ".join(filters) if filters else ""
+        with self.connection(read_only=True) as conn:
+            rows = conn.execute(
+                "SELECT payload_json FROM behavior_hypothesis_review_events"
+                + where
+                + " ORDER BY effective_at, knowledge_at, reviewed_at, review_event_id",
+                params,
+            ).fetchall()
+        return [json.loads(row["payload_json"]) for row in rows]
+
+    @staticmethod
+    def _provisional_candidate_status(events: Sequence[Mapping[str, Any]]) -> str:
+        status = "candidate"
+        for event in events:
+            event_type = str(event.get("event_type") or "")
+            if event_type != "note_added":
+                status = event_type
+        return status
+
+    def list_behavior_hypothesis_candidates(
+        self,
+        *,
+        candidate_id: str | None = None,
+        status: str | None = None,
+        pattern_family: str | None = None,
+        scope_kind: str | None = None,
+        scope_ref: str | None = None,
+        as_of: str | None = None,
+        knowledge_cutoff: str | None = None,
+        created_from: str | None = None,
+        created_to: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Query candidates; N4 replaces the provisional status with strict projection."""
+
+        self._ensure_p2h_stage1_initialized()
+        filters: list[str] = []
+        params: list[Any] = []
+        temporal = {
+            "effective_at": (
+                _canonical_timestamp(as_of, "as_of") if as_of is not None else None
+            ),
+            "knowledge_at": (
+                _canonical_timestamp(knowledge_cutoff, "knowledge_cutoff")
+                if knowledge_cutoff is not None
+                else None
+            ),
+            "created_from": (
+                _canonical_timestamp(created_from, "created_from")
+                if created_from is not None
+                else None
+            ),
+            "created_to": (
+                _canonical_timestamp(created_to, "created_to")
+                if created_to is not None
+                else None
+            ),
+        }
+        for column, value in (
+            ("candidate_id", candidate_id),
+            ("pattern_family", pattern_family),
+            ("subject_scope_kind", scope_kind),
+        ):
+            if value is not None:
+                filters.append(f"{column} = ?")
+                params.append(value)
+        if temporal["effective_at"] is not None:
+            filters.append("effective_at <= ?")
+            params.append(temporal["effective_at"])
+        if temporal["knowledge_at"] is not None:
+            filters.append("knowledge_at <= ?")
+            params.append(temporal["knowledge_at"])
+        if temporal["created_from"] is not None:
+            filters.append("created_at >= ?")
+            params.append(temporal["created_from"])
+        if temporal["created_to"] is not None:
+            filters.append("created_at <= ?")
+            params.append(temporal["created_to"])
+        where = " WHERE " + " AND ".join(filters) if filters else ""
+        with self.connection(read_only=True) as conn:
+            rows = conn.execute(
+                "SELECT payload_json FROM behavior_hypothesis_candidates"
+                + where
+                + " ORDER BY created_at, candidate_id",
+                params,
+            ).fetchall()
+        result: list[dict[str, Any]] = []
+        for row in rows:
+            candidate = json.loads(row["payload_json"])
+            if scope_ref is not None and scope_ref not in candidate["subject_scope"]["refs"]:
+                continue
+            events = self.list_behavior_hypothesis_review_events(
+                candidate_id=candidate["candidate_id"],
+                as_of=temporal["effective_at"],
+                knowledge_cutoff=temporal["knowledge_at"],
+            )
+            projected_status = self._provisional_candidate_status(events)
+            if status is not None and status != projected_status:
+                continue
+            result.append(
+                {
+                    "candidate": candidate,
+                    "projected_status": projected_status,
+                    "visible_review_event_ids": [
+                        event["review_event_id"] for event in events
+                    ],
+                }
+            )
+        return result
+
+    def replay_behavior_hypothesis_candidate(
+        self,
+        candidate_id: str,
+        *,
+        source_artifacts: Sequence[Mapping[str, Any]],
+    ) -> dict[str, Any]:
+        return replay_validate_behavior_hypothesis_candidate(
+            self.get_behavior_hypothesis_candidate(candidate_id),
+            source_artifacts=source_artifacts,
+        )
+
     def status(self) -> dict[str, Any]:
         self._ensure_initialized()
         with self.connection(read_only=True) as conn:
@@ -823,15 +1312,22 @@ class ReviewStore:
                     "decision_event_links",
                     "portfolio_snapshots",
                     "position_snapshot_items",
+                    "behavior_hypothesis_candidates",
+                    "behavior_hypothesis_review_events",
                 )
             }
             integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]
             version_row = conn.execute(
                 "SELECT value FROM schema_meta WHERE key='schema_version'"
             ).fetchone()
+            p2h_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='p2h_stage1_schema_version'"
+            ).fetchone()
         return {
             "database": str(self.path),
             "schema_version": int(version_row[0]) if version_row else None,
+            "p2h_stage1_schema_version": int(p2h_row[0]) if p2h_row else None,
             "integrity_check": integrity,
             "counts": counts,
         }
