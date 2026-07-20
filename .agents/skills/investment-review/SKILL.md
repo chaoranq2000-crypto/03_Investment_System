@@ -198,6 +198,28 @@ artifact after P2G-4, not a new canonical stage number. See
 `docs/playbooks/INVESTMENT_REVIEW_P2G_4.md` and
 `docs/playbooks/INVESTMENT_REVIEW_BEHAVIOR_HYPOTHESIS_LEDGER.md`.
 
+## P2H Stage 1 candidate and human-review-ledger boundary
+
+After explicit P2G/P2F source artifacts are accepted and replayable, the
+implementation may also:
+
+- canonicalize one explicitly submitted `p2h.behavior_hypothesis_candidate.v1`
+  with stable candidate ID/hash, dual time, exact evidence refs, alternatives,
+  disconfirming observations and an observation-only plan;
+- require counterevidence or an explicit source gap and replay every referenced
+  artifact ID/hash before create-only sidecar ingest;
+- append immutable `p2h.behavior_hypothesis_review_event.v1` human events;
+- project candidate status deterministically at explicit `as_of` and
+  `knowledge_cutoff` values, rejecting invalid transitions and concurrent state
+  events rather than hiding them with an ID tie-break;
+- query, show and source-replay candidates without modifying their P2G/P2F sources.
+
+P2H Stage 1 must not infer or generate a candidate automatically, diagnose
+psychology, emit advice or numeric scores/confidence, treat
+`accepted_for_observation` as proven truth, update a profile or PersonalPlaybook,
+create an intervention/experiment, open a UI path, or read/write the portfolio
+database. See `docs/playbooks/INVESTMENT_REVIEW_P2H_STAGE1.md`.
+
 ## Required workflow
 
 1. Run `python -m src.investment_review --db data/db/investment_review.sqlite3 init`.
@@ -311,6 +333,19 @@ For an approved P2G-4 and behavior-hypothesis-ledger run:
     artifacts; exact canonical fingerprints may deduplicate payloads but never lineage.
 46. Rebuild the ledger after input permutation, require identical canonical bytes and
     content ID, and keep active/audit status semantics explicit in every query/readout.
+
+For an approved P2H Stage 1 candidate/review-ledger run:
+
+47. Build a candidate only from an explicit draft; require exact evidence IDs/hashes,
+    alternatives, disconfirming observations and counterevidence or a source gap.
+48. Validate deterministic identity, UTC whole-second dual time, semantic list order,
+    no-diagnosis/no-advice/no-score rules and exact source replay before sidecar ingest.
+49. Save candidates and human events create-only; identical replay is `SKIPPED`, while
+    same-ID content drift, orphan events and missing supersession refs fail explicitly.
+50. Project only from the explicit immutable event ledger at `as_of` and
+    `knowledge_cutoff`; preserve out-of-order ingest determinism and historical states.
+51. Treat `accepted_for_observation` as continued observation only, never proof, and
+    stop before profile/playbook writes, intervention, experiment, UI or model generation.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate

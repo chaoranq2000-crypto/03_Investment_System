@@ -193,6 +193,10 @@ _UNCERTAINTY_RE = re.compile(
     r"|可能|或许|似乎|有待|尚不能|相关",
     re.IGNORECASE,
 )
+_NUMERIC_CONFIDENCE_RE = re.compile(
+    r"\b\d+(?:\.\d+)?%\s+confidence\b|置信度.{0,8}\d+(?:\.\d+)?%?",
+    re.IGNORECASE,
+)
 
 _CANDIDATE_FIELDS = {
     "schema_version",
@@ -717,7 +721,10 @@ def _candidate_policy_findings(candidate: Mapping[str, Any]) -> list[dict[str, s
                 "$.hypothesis_statement",
             )
         )
-    for code in sorted(interpretation_policy_codes(authored)):
+    policy_codes = interpretation_policy_codes(authored)
+    if _NUMERIC_CONFIDENCE_RE.search("\n".join(_walk_text(authored))):
+        policy_codes.add("POLICY_NUMERIC_CONFIDENCE")
+    for code in sorted(policy_codes):
         findings.append(
             _finding(
                 code,
@@ -726,6 +733,19 @@ def _candidate_policy_findings(candidate: Mapping[str, Any]) -> list[dict[str, s
             )
         )
     return findings
+
+
+def _walk_text(value: object) -> list[str]:
+    values: list[str] = []
+    if isinstance(value, str):
+        values.append(value)
+    elif isinstance(value, Mapping):
+        for child in value.values():
+            values.extend(_walk_text(child))
+    elif isinstance(value, list):
+        for child in value:
+            values.extend(_walk_text(child))
+    return values
 
 
 def validate_behavior_hypothesis_candidate(
