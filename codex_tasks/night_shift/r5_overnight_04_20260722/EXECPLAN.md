@@ -55,7 +55,7 @@ crossing human or research gates.
 
 - [x] Phase A
 - [x] Phase B
-- [ ] Phase C
+- [x] Phase C
 - [ ] Phase D
 - [ ] Phase E
 - [ ] Phase F
@@ -72,6 +72,8 @@ Append; do not erase historical entries.
   completed manually without cleanup or scope expansion.
 - All 43 Night03 packet hashes validate against their canonical payloads.  The unified registry
   contains 8 evidence, 24 analysis, 3 human-gate, and 8 pointer candidates with no duplicate ID.
+- All 43 candidates participate in the leverage ranking.  Membership analysis covers all 20
+  dependency blockers, while the dashboard continues to report zero actual unlocks and 0/63 resolved.
 
 ## Decisions
 

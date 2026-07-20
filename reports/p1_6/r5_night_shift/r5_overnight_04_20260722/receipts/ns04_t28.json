@@ -1,0 +1,25 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_review_diff_summaries.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "mission_id": "r5_overnight_04_20260722",
+  "required_artifacts": [
+    {
+      "bytes": 160667,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/evidence_claim_diff_index.yaml",
+      "sha256": "1b915382b5a9dcd8caf0f8df80d72309ca86acd68827afe6ab9e2b924ce21c58"
+    }
+  ],
+  "research_resolution_claimed": false,
+  "schema_version": "r5_night04_wrapper_task_receipt_v1",
+  "source_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "f78ca243eb6beb14ff64a91ad1ac62deac3d751f14fc442ab43810dfade42dbb",
+  "task_id": "ns04_t28",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

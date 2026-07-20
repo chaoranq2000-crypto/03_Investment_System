@@ -1,0 +1,25 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_reviewer_dashboard.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "mission_id": "r5_overnight_04_20260722",
+  "required_artifacts": [
+    {
+      "bytes": 7312,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/reviewer_dashboard.html",
+      "sha256": "69b86591caf07e39414afc862c56dc47b43a1f5aadd9a08945e1cc1051319b52"
+    }
+  ],
+  "research_resolution_claimed": false,
+  "schema_version": "r5_night04_wrapper_task_receipt_v1",
+  "source_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "c29fb95e91579e8c61d200924bb9ba12aa01926b8839c6db8249f72a36089c87",
+  "task_id": "ns04_t31",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

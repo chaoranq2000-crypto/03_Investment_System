@@ -1,0 +1,287 @@
+schema_version: r5_night04_counterevidence_index_v1
+record_count: 43
+records:
+- occurrence_id: ns02_t30_occ_04343acd916afae4
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_1842382e6647f17d
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_1977687ea7bce884
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_2c030a28f8631544
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+- occurrence_id: ns02_t30_occ_3139481aee5c01e0
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+  counterevidence:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  uncertainties:
+  - pointer_semantics_require_external_approval
+  - dry_run_is_not_resolution
+- occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+- occurrence_id: ns02_t30_occ_6b198842cf80755a
+  counterevidence:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  uncertainties:
+  - pointer_semantics_require_external_approval
+  - dry_run_is_not_resolution
+- occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_6d2b87d81881062e
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+- occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_7213df41458cf67d
+  counterevidence:
+  - quality_booleans:
+      p2_allowed: false
+      sample_quality_allowed: false
+      workflow_state_mutation_allowed: false
+  uncertainties:
+  - external_exact_hash_review_required
+  - approval_is_not_resolution
+- occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_7a3640d70206502d
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+- occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+- occurrence_id: ns02_t30_occ_99e77539490b01ad
+  counterevidence:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  uncertainties:
+  - pointer_semantics_require_external_approval
+  - dry_run_is_not_resolution
+- occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+- occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+- occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+  counterevidence:
+  - quality_booleans:
+      canonical_workflow_state_mutation_allowed: false
+      p2_allowed: false
+      sample_quality_allowed: false
+  uncertainties:
+  - external_exact_hash_review_required
+  - approval_is_not_resolution
+- occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+  counterevidence:
+  - quality_booleans:
+      p2_allowed: false
+      sample_quality_allowed: false
+      workflow_state_mutation_allowed: false
+  uncertainties:
+  - external_exact_hash_review_required
+  - approval_is_not_resolution
+- occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+  counterevidence:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  uncertainties:
+  - pointer_semantics_require_external_approval
+  - dry_run_is_not_resolution
+- occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+  counterevidence:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  uncertainties:
+  - pointer_semantics_require_external_approval
+  - dry_run_is_not_resolution
+- occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+  counterevidence:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  uncertainties:
+  - pointer_semantics_require_external_approval
+  - dry_run_is_not_resolution
+- occurrence_id: ns02_t30_occ_db819651b1640db8
+  counterevidence:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  uncertainties:
+  - pointer_semantics_require_external_approval
+  - dry_run_is_not_resolution
+- occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+  counterevidence:
+  - pointer alias can hide an upstream semantic contract gap
+  - approved child diff must remain a strict subset of exact paths
+  - historical Bundle17R artifacts remain read-only
+  uncertainties:
+  - pointer_semantics_require_external_approval
+  - dry_run_is_not_resolution
+- occurrence_id: ns02_t30_occ_e48b0cd43634c242
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+- occurrence_id: ns02_t30_occ_eb221be0020f7038
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+- occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+  counterevidence:
+  - MISSING_REVIEWED_COUNTER_EVIDENCE
+  uncertainties:
+  - locator-bound reviewed evidence with period, unit, source class, and calculation method
+  - MISSING_REVIEWED_ANALYST_CONCLUSION
+stable_receipt_sha256: 66f52899111c5c690575aa25c84795869826c81e7fc53e818f83e7dbd4d38352

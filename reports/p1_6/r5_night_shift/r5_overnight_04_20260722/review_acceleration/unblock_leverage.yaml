@@ -1,0 +1,1069 @@
+schema_version: r5_night04_unblock_leverage_v1
+candidate_count: 43
+score_formula: 100*dependency_memberships + 25*reachable_parents + 10*direct_parents
+resolution_effect: none_without_external_decision_and_independent_receipt
+rankings:
+- occurrence_id: ns02_t30_occ_04343acd916afae4
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  direct_parent_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 1
+- occurrence_id: ns02_t30_occ_101f0195f0c5cf37
+  case_id: golden_gold_mining_cycle
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_f9d03098e6d0feba
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 2
+- occurrence_id: ns02_t30_occ_1842382e6647f17d
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_db304e8553027647
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 3
+- occurrence_id: ns02_t30_occ_1977687ea7bce884
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  direct_parent_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 4
+- occurrence_id: ns02_t30_occ_23259d462e4ca0f3
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  direct_parent_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 5
+- occurrence_id: ns02_t30_occ_2c030a28f8631544
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: evidence_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  direct_parent_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 6
+- occurrence_id: ns02_t30_occ_3139481aee5c01e0
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 7
+- occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: engineering_local_pointer
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  direct_parent_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 8
+- occurrence_id: ns02_t30_occ_3d282b4ad0ca31e2
+  case_id: golden_gold_mining_cycle
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_f9d03098e6d0feba
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 9
+- occurrence_id: ns02_t30_occ_6491a19059d9ec6c
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 10
+- occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: evidence_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  direct_parent_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 11
+- occurrence_id: ns02_t30_occ_6b198842cf80755a
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: engineering_local_pointer
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_db304e8553027647
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 12
+- occurrence_id: ns02_t30_occ_6cd0e0bd57166a21
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  direct_parent_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 13
+- occurrence_id: ns02_t30_occ_6d2b87d81881062e
+  case_id: golden_gold_mining_cycle
+  candidate_kind: evidence_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_f9d03098e6d0feba
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 14
+- occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_db304e8553027647
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 15
+- occurrence_id: ns02_t30_occ_76d9fbbac37b50a6
+  case_id: golden_gold_mining_cycle
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_f9d03098e6d0feba
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 16
+- occurrence_id: ns02_t30_occ_7745e52b12c07f1c
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_db304e8553027647
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 17
+- occurrence_id: ns02_t30_occ_7a3640d70206502d
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: evidence_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_db304e8553027647
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 18
+- occurrence_id: ns02_t30_occ_86fb71b6c845c94f
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  direct_parent_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 19
+- occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: evidence_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 20
+- occurrence_id: ns02_t30_occ_99e77539490b01ad
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: engineering_local_pointer
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 21
+- occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+  case_id: golden_gold_mining_cycle
+  candidate_kind: evidence_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_f9d03098e6d0feba
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 22
+- occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: evidence_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_db304e8553027647
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 23
+- occurrence_id: ns02_t30_occ_a9673677adb3ef8a
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 24
+- occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+  case_id: golden_gold_mining_cycle
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_f9d03098e6d0feba
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 25
+- occurrence_id: ns02_t30_occ_b52cbf88aff2c105
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 26
+- occurrence_id: ns02_t30_occ_becffa9c7cb6d886
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  direct_parent_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 27
+- occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: engineering_local_pointer
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 28
+- occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+  case_id: golden_gold_mining_cycle
+  candidate_kind: engineering_local_pointer
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_f9d03098e6d0feba
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 29
+- occurrence_id: ns02_t30_occ_cdf02c368ebec0a7
+  case_id: golden_gold_mining_cycle
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_f9d03098e6d0feba
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 30
+- occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: engineering_local_pointer
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  direct_parent_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_e205ce3a49c56b7e
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 31
+- occurrence_id: ns02_t30_occ_db819651b1640db8
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: engineering_local_pointer
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_db304e8553027647
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 32
+- occurrence_id: ns02_t30_occ_dc67ef1afb1051ef
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 33
+- occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+  case_id: golden_gold_mining_cycle
+  candidate_kind: engineering_local_pointer
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_f9d03098e6d0feba
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 34
+- occurrence_id: ns02_t30_occ_e48b0cd43634c242
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_db304e8553027647
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 35
+- occurrence_id: ns02_t30_occ_e855cd5fb843f9bf
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_db304e8553027647
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 36
+- occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: evidence_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 37
+- occurrence_id: ns02_t30_occ_eb221be0020f7038
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 38
+- occurrence_id: ns02_t30_occ_ee055856e18cd3f4
+  case_id: golden_gold_mining_cycle
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_f9d03098e6d0feba
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 39
+- occurrence_id: ns02_t30_occ_f9fff3f413f6c43c
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: analysis_required
+  unblock_leverage_score: 1185
+  dependency_membership_count: 11
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_db304e8553027647
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_db304e8553027647
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 40
+- occurrence_id: ns02_t30_occ_7213df41458cf67d
+  case_id: __suite__
+  candidate_kind: human_exact_hash_gate
+  unblock_leverage_score: 860
+  dependency_membership_count: 8
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 41
+- occurrence_id: ns02_t30_occ_ab6b62516df0a0f1
+  case_id: __suite__
+  candidate_kind: human_exact_hash_gate
+  unblock_leverage_score: 860
+  dependency_membership_count: 8
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 42
+- occurrence_id: ns02_t30_occ_be4e0eb69d196ff7
+  case_id: __suite__
+  candidate_kind: human_exact_hash_gate
+  unblock_leverage_score: 860
+  dependency_membership_count: 8
+  dependency_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  direct_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  reachable_parent_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  - ns02_t30_wo_fba4b40642ae1dd4
+  interpretation: engineering_review_priority_only_not_research_confidence
+  rank: 43
+stable_receipt_sha256: d2acf979f622996b1f7bdb50ea8e59f42373a96bb127cf3680895405a2f3308b

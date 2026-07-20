@@ -1,0 +1,67 @@
+schema_version: r5_night04_first_parent_path_v1
+selected_parent: &id001
+  parent_id: ns02_t30_wo_e205ce3a49c56b7e
+  source_work_order_id: BF17R-WO-ca803d73d4b2b1
+  case_id: golden_copper_foil_product_generation
+  candidate_count: 10
+  candidate_ids:
+  - ns02_t30_occ_04343acd916afae4
+  - ns02_t30_occ_1977687ea7bce884
+  - ns02_t30_occ_23259d462e4ca0f3
+  - ns02_t30_occ_2c030a28f8631544
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_6870f1ec5d1048be
+  - ns02_t30_occ_6cd0e0bd57166a21
+  - ns02_t30_occ_86fb71b6c845c94f
+  - ns02_t30_occ_becffa9c7cb6d886
+  - ns02_t30_occ_d2ef6aeae1113c9c
+parent_options:
+- *id001
+- parent_id: ns02_t30_wo_f9d03098e6d0feba
+  source_work_order_id: BF17R-WO-dd409a4bffcd9d
+  case_id: golden_gold_mining_cycle
+  candidate_count: 10
+  candidate_ids:
+  - ns02_t30_occ_101f0195f0c5cf37
+  - ns02_t30_occ_3d282b4ad0ca31e2
+  - ns02_t30_occ_6d2b87d81881062e
+  - ns02_t30_occ_76d9fbbac37b50a6
+  - ns02_t30_occ_9fe0bbfe8ab9bb7d
+  - ns02_t30_occ_ab0f8aac8f21f0db
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_cdf02c368ebec0a7
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  - ns02_t30_occ_ee055856e18cd3f4
+- parent_id: ns02_t30_wo_db304e8553027647
+  source_work_order_id: BF17R-WO-df7ea35a97ead0
+  case_id: golden_crdmo_backlog_conversion
+  candidate_count: 10
+  candidate_ids:
+  - ns02_t30_occ_1842382e6647f17d
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_6ff83cb834d7176d
+  - ns02_t30_occ_7745e52b12c07f1c
+  - ns02_t30_occ_7a3640d70206502d
+  - ns02_t30_occ_a88a58ab2685ee6e
+  - ns02_t30_occ_db819651b1640db8
+  - ns02_t30_occ_e48b0cd43634c242
+  - ns02_t30_occ_e855cd5fb843f9bf
+  - ns02_t30_occ_f9fff3f413f6c43c
+- parent_id: ns02_t30_wo_bc7d70d0bd2786f8
+  source_work_order_id: BF17R-WO-5ce21a3390be8b
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_count: 10
+  candidate_ids:
+  - ns02_t30_occ_3139481aee5c01e0
+  - ns02_t30_occ_6491a19059d9ec6c
+  - ns02_t30_occ_97d3e4a3c0388529
+  - ns02_t30_occ_99e77539490b01ad
+  - ns02_t30_occ_a9673677adb3ef8a
+  - ns02_t30_occ_b52cbf88aff2c105
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_dc67ef1afb1051ef
+  - ns02_t30_occ_e95d9ae85fb2fba0
+  - ns02_t30_occ_eb221be0020f7038
+completion_rule: all_atomic_occurrences_require_independent_passed_receipts
+simulation_only: true
+stable_receipt_sha256: 651415ca3b45cf68731dbde510a5806c70ca8814222e44315f5d402a1041af6a

@@ -1,0 +1,1149 @@
+schema_version: r5_night04_evidence_required_review_briefs_v1
+candidate_kind: evidence_required
+brief_count: 8
+briefs:
+- occurrence_id: ns02_t30_occ_2c030a28f8631544
+  parent_id: BF17R-WO-ca803d73d4b2b1
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: evidence_required
+  candidate_sha256: c343cf2c68ca994fb94dc1f8d8f51beabdb8aac24d6ec3d6ccbed07f4a570e1c
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_2c030a28f8631544.yaml
+  review_packet_sha256: dda6fc8dee5572e47856bee561edb4b54262d074ab613d7f2a6cab8ea5929a01
+  rank: 6
+  unblock_leverage_score: 1185
+  source_lineage:
+  - role: bound_failure_source
+    path: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+    sha256: e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/evidence_pack.json
+    physical_sha256: 903e305e29ccec711499847e123f30109977e9eec14f54ae2ca0389ef397ccd4
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/forecast_model.json
+    physical_sha256: d73769d256bb1e4d82f03eeef46f17ca8c6321e4840d51ff2aba307e94a6f3e7
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+    physical_sha256: 02953ca1a4f932e34a1298ab3e883c66daf26fc3cffbac96c4137b764b64f461
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/human_review.yaml
+    physical_sha256: ecaecb83128d3e7ce10b6b375e3ab0768cd7ad0a2b68f0bdb5beedcfa13243a6
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/operating_driver_pack.json
+    physical_sha256: d9a8bce553dbae8b39c6d52b179499891c552cc8e41c921c31face3604a0aa65
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+    physical_sha256: 0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/reader_report.md
+    physical_sha256: 102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/valuation_pack.json
+    physical_sha256: 472460e8215c0e741e104c1fffa5e36233092b1008471b2fd8ec6a570f8f3a36
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/workflow_state.yaml
+    physical_sha256: f0b1862f64e2269c4fc208c7f969d2957324b22139853d0212d5759878497b82
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  subject_summary:
+    subject: assertions.qualification_evidence_complete
+    evidence_links:
+    - role: evidence_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/evidence_pack.json
+      physical_sha256: 903e305e29ccec711499847e123f30109977e9eec14f54ae2ca0389ef397ccd4
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: forecast_model
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/forecast_model.json
+      physical_sha256: d73769d256bb1e4d82f03eeef46f17ca8c6321e4840d51ff2aba307e94a6f3e7
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: generation_lock
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+      physical_sha256: 02953ca1a4f932e34a1298ab3e883c66daf26fc3cffbac96c4137b764b64f461
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: human_review
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/human_review.yaml
+      physical_sha256: ecaecb83128d3e7ce10b6b375e3ab0768cd7ad0a2b68f0bdb5beedcfa13243a6
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: operating_driver_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/operating_driver_pack.json
+      physical_sha256: d9a8bce553dbae8b39c6d52b179499891c552cc8e41c921c31face3604a0aa65
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: quality_readout
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+      physical_sha256: 0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: reader_report
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/reader_report.md
+      physical_sha256: 102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: valuation_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/valuation_pack.json
+      physical_sha256: 472460e8215c0e741e104c1fffa5e36233092b1008471b2fd8ec6a570f8f3a36
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: workflow_state
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/workflow_state.yaml
+      physical_sha256: f0b1862f64e2269c4fc208c7f969d2957324b22139853d0212d5759878497b82
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    proposed_review:
+    - physical source hash verified
+    - evidence_id registered
+    - source class reviewed
+    - period unit and claim boundary explicit
+    - counter-evidence reviewed
+    - external reviewer decision exact-hash bound
+    automatic_change: none
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+  downstream_impact:
+    direct_dependent_ids:
+    - ns02_t30_occ_07e49c037427403b
+    - ns02_t30_occ_139f375db9714f27
+    - ns02_t30_occ_3b0dd1527f9e0144
+    - ns02_t30_occ_8e3768557d6f2dde
+    - ns02_t30_occ_950802f6c70d5036
+    - ns02_t30_occ_ae4ebd1d82c2bd03
+    - ns02_t30_occ_c03007a138e83e9b
+    - ns02_t30_occ_d19d9b744d7aff4a
+    - ns02_t30_occ_d705e67d4c161924
+    - ns02_t30_occ_e7027bc57e1dc7a7
+    - ns02_t30_occ_fc4fc2c77ab26f2d
+    - ns02_t30_wo_e205ce3a49c56b7e
+    direct_dependency_count: 12
+    parent_work_order_ids:
+    - ns02_t30_wo_e205ce3a49c56b7e
+    resolution_effect: recompute_from_independent_receipt_only
+  decision_options:
+  - approve
+  - reject
+  - defer
+  - request_changes
+  reviewer_fields_machine_empty: true
+- occurrence_id: ns02_t30_occ_6870f1ec5d1048be
+  parent_id: BF17R-WO-ca803d73d4b2b1
+  case_id: golden_copper_foil_product_generation
+  candidate_kind: evidence_required
+  candidate_sha256: 8e09b9307a311cbdf5c9c61924d95c256c828045b9786b2c9e2fab055166aba3
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_6870f1ec5d1048be.yaml
+  review_packet_sha256: 64957838963582ed00861cf571c5dbbbe83381aefa1bb5a8461b18a788ef7e81
+  rank: 11
+  unblock_leverage_score: 1185
+  source_lineage:
+  - role: bound_failure_source
+    path: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_copper_foil_product_generation.yaml
+    sha256: e9b6c961cb9a2b2ca767276d9fc476c46b93becd8e7ba934cb15d37145aafcfa
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/evidence_pack.json
+    physical_sha256: 903e305e29ccec711499847e123f30109977e9eec14f54ae2ca0389ef397ccd4
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/forecast_model.json
+    physical_sha256: d73769d256bb1e4d82f03eeef46f17ca8c6321e4840d51ff2aba307e94a6f3e7
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+    physical_sha256: 02953ca1a4f932e34a1298ab3e883c66daf26fc3cffbac96c4137b764b64f461
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/human_review.yaml
+    physical_sha256: ecaecb83128d3e7ce10b6b375e3ab0768cd7ad0a2b68f0bdb5beedcfa13243a6
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/operating_driver_pack.json
+    physical_sha256: d9a8bce553dbae8b39c6d52b179499891c552cc8e41c921c31face3604a0aa65
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+    physical_sha256: 0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/reader_report.md
+    physical_sha256: 102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/valuation_pack.json
+    physical_sha256: 472460e8215c0e741e104c1fffa5e36233092b1008471b2fd8ec6a570f8f3a36
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/workflow_state.yaml
+    physical_sha256: f0b1862f64e2269c4fc208c7f969d2957324b22139853d0212d5759878497b82
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  subject_summary:
+    subject: assertions.qualification_official_sources_present
+    evidence_links:
+    - role: evidence_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/evidence_pack.json
+      physical_sha256: 903e305e29ccec711499847e123f30109977e9eec14f54ae2ca0389ef397ccd4
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: forecast_model
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/forecast_model.json
+      physical_sha256: d73769d256bb1e4d82f03eeef46f17ca8c6321e4840d51ff2aba307e94a6f3e7
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: generation_lock
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+      physical_sha256: 02953ca1a4f932e34a1298ab3e883c66daf26fc3cffbac96c4137b764b64f461
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: human_review
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/human_review.yaml
+      physical_sha256: ecaecb83128d3e7ce10b6b375e3ab0768cd7ad0a2b68f0bdb5beedcfa13243a6
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: operating_driver_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/operating_driver_pack.json
+      physical_sha256: d9a8bce553dbae8b39c6d52b179499891c552cc8e41c921c31face3604a0aa65
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: quality_readout
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+      physical_sha256: 0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: reader_report
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/reader_report.md
+      physical_sha256: 102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: valuation_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/valuation_pack.json
+      physical_sha256: 472460e8215c0e741e104c1fffa5e36233092b1008471b2fd8ec6a570f8f3a36
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: workflow_state
+      path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/workflow_state.yaml
+      physical_sha256: f0b1862f64e2269c4fc208c7f969d2957324b22139853d0212d5759878497b82
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    proposed_review:
+    - physical source hash verified
+    - evidence_id registered
+    - source class reviewed
+    - period unit and claim boundary explicit
+    - counter-evidence reviewed
+    - external reviewer decision exact-hash bound
+    automatic_change: none
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+  downstream_impact:
+    direct_dependent_ids:
+    - ns02_t30_occ_07e49c037427403b
+    - ns02_t30_occ_139f375db9714f27
+    - ns02_t30_occ_3b0dd1527f9e0144
+    - ns02_t30_occ_8e3768557d6f2dde
+    - ns02_t30_occ_950802f6c70d5036
+    - ns02_t30_occ_ae4ebd1d82c2bd03
+    - ns02_t30_occ_c03007a138e83e9b
+    - ns02_t30_occ_d19d9b744d7aff4a
+    - ns02_t30_occ_d705e67d4c161924
+    - ns02_t30_occ_e7027bc57e1dc7a7
+    - ns02_t30_occ_fc4fc2c77ab26f2d
+    - ns02_t30_wo_e205ce3a49c56b7e
+    direct_dependency_count: 12
+    parent_work_order_ids:
+    - ns02_t30_wo_e205ce3a49c56b7e
+    resolution_effect: recompute_from_independent_receipt_only
+  decision_options:
+  - approve
+  - reject
+  - defer
+  - request_changes
+  reviewer_fields_machine_empty: true
+- occurrence_id: ns02_t30_occ_6d2b87d81881062e
+  parent_id: BF17R-WO-dd409a4bffcd9d
+  case_id: golden_gold_mining_cycle
+  candidate_kind: evidence_required
+  candidate_sha256: 763db552311e2207872260a5ca1e07da8cd444a2e4e0f8f92c512e46d70ea71f
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_6d2b87d81881062e.yaml
+  review_packet_sha256: 156186cad0f97210bbbeb8a73ec6b2ced94541a0be043fee7f9fece0a005b6db
+  rank: 14
+  unblock_leverage_score: 1185
+  source_lineage:
+  - role: bound_failure_source
+    path: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+    sha256: 1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/evidence_pack.json
+    physical_sha256: 915fb3916e11378306a9cc6d5fd42a48f9cabe9bc8614d2a3ad7be6c70ff54d1
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/forecast_model.json
+    physical_sha256: feadd5a52721c4ae2781e8195524d099fc954d3ad4c8ffa58fd1495336ebe268
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+    physical_sha256: 5cffa5fee240c6bb3c9f7bbf3b07d7cf4c2e8c799e1f07aa839cfb2449a3f0d1
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/human_review.yaml
+    physical_sha256: baea3bbf009af5897f54f53123313f9fb7e739a5c66f7a02433dc68645c0eb3b
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/operating_driver_pack.json
+    physical_sha256: dbef5761eac7762a25fc1ea2d42adaa867df739b8fee3395e77cbed45832aa41
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+    physical_sha256: ef5f0513e89e4d9f51f189fcae650e6b5ccbf02a1fe52065fba377c2e5358bf0
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/reader_report.md
+    physical_sha256: edc6e089537e64e4bbcc7578e02465cfa6d0d5c259f575e6f0eeff5e716b6030
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/valuation_pack.json
+    physical_sha256: dee79360d56010322e665391c0c128a705ed4d36d9d3296f620006e475185d99
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/workflow_state.yaml
+    physical_sha256: c82c1b121e76abbf0c439a2bcfa464a36097ace52a981b5f6e511227767031dc
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  subject_summary:
+    subject: assertions.qualification_evidence_complete
+    evidence_links:
+    - role: evidence_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/evidence_pack.json
+      physical_sha256: 915fb3916e11378306a9cc6d5fd42a48f9cabe9bc8614d2a3ad7be6c70ff54d1
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: forecast_model
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/forecast_model.json
+      physical_sha256: feadd5a52721c4ae2781e8195524d099fc954d3ad4c8ffa58fd1495336ebe268
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: generation_lock
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+      physical_sha256: 5cffa5fee240c6bb3c9f7bbf3b07d7cf4c2e8c799e1f07aa839cfb2449a3f0d1
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: human_review
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/human_review.yaml
+      physical_sha256: baea3bbf009af5897f54f53123313f9fb7e739a5c66f7a02433dc68645c0eb3b
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: operating_driver_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/operating_driver_pack.json
+      physical_sha256: dbef5761eac7762a25fc1ea2d42adaa867df739b8fee3395e77cbed45832aa41
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: quality_readout
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+      physical_sha256: ef5f0513e89e4d9f51f189fcae650e6b5ccbf02a1fe52065fba377c2e5358bf0
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: reader_report
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/reader_report.md
+      physical_sha256: edc6e089537e64e4bbcc7578e02465cfa6d0d5c259f575e6f0eeff5e716b6030
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: valuation_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/valuation_pack.json
+      physical_sha256: dee79360d56010322e665391c0c128a705ed4d36d9d3296f620006e475185d99
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: workflow_state
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/workflow_state.yaml
+      physical_sha256: c82c1b121e76abbf0c439a2bcfa464a36097ace52a981b5f6e511227767031dc
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    proposed_review:
+    - physical source hash verified
+    - evidence_id registered
+    - source class reviewed
+    - period unit and claim boundary explicit
+    - counter-evidence reviewed
+    - external reviewer decision exact-hash bound
+    automatic_change: none
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+  downstream_impact:
+    direct_dependent_ids:
+    - ns02_t30_occ_07e49c037427403b
+    - ns02_t30_occ_10e1e793011ee907
+    - ns02_t30_occ_3b0dd1527f9e0144
+    - ns02_t30_occ_60f5539e2d72463f
+    - ns02_t30_occ_6e5fb996533eab2b
+    - ns02_t30_occ_8e3768557d6f2dde
+    - ns02_t30_occ_ae4ebd1d82c2bd03
+    - ns02_t30_occ_c03007a138e83e9b
+    - ns02_t30_occ_d19d9b744d7aff4a
+    - ns02_t30_occ_d705e67d4c161924
+    - ns02_t30_occ_e7027bc57e1dc7a7
+    - ns02_t30_wo_f9d03098e6d0feba
+    direct_dependency_count: 12
+    parent_work_order_ids:
+    - ns02_t30_wo_f9d03098e6d0feba
+    resolution_effect: recompute_from_independent_receipt_only
+  decision_options:
+  - approve
+  - reject
+  - defer
+  - request_changes
+  reviewer_fields_machine_empty: true
+- occurrence_id: ns02_t30_occ_7a3640d70206502d
+  parent_id: BF17R-WO-df7ea35a97ead0
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: evidence_required
+  candidate_sha256: ea63d72f132045e71cd8307ffc44e38336651af292d0ef9972bb0c1d23ec4783
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_7a3640d70206502d.yaml
+  review_packet_sha256: 86ca3592e7cb76e88286096468ad11b5950cab4eab807ac57e386f4acd35c413
+  rank: 18
+  unblock_leverage_score: 1185
+  source_lineage:
+  - role: bound_failure_source
+    path: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+    sha256: 5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/evidence_pack.json
+    physical_sha256: b6b59f9d1a00d1adfc6422563d9226c14e27f3526f74cecfa3e1feb2ebd2e386
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/forecast_model.json
+    physical_sha256: 5279f36cf9ab4ea8fe3055d4f230381016e8a664bbca64df164cf4ba3c94ad9d
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/generation_lock.json
+    physical_sha256: 80d673824269e8a65083e36694d4f64eaed0bd6380362cac9b25c8f6a1e0375f
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/human_review.yaml
+    physical_sha256: 54055f64f3780ddbc08417219f82039a0f20c0b0bccbcc480d2a088f4ae55bb9
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/operating_driver_pack.json
+    physical_sha256: e0d2225347b99b688f8a94b34649f8366c5a51cba992ebdaf48ccf0f8b79825d
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+    physical_sha256: a58faa678fa6150799f0ec267c46ada02df1199781ef6e61a1e18c72085bd108
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/reader_report.md
+    physical_sha256: 04ec8a53a023c3678dfdb7682901c5b229b7040c86af216930b0b4eea739f701
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/valuation_pack.json
+    physical_sha256: 52e28e426d3f49f3016dcee2b85bd3c80f28c67373ae524e52f19df94221b94c
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/workflow_state.yaml
+    physical_sha256: 6a921191d30d789fee40d818c9e201bcabb108a29ef889e4e20809ae174416aa
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  subject_summary:
+    subject: assertions.qualification_evidence_complete
+    evidence_links:
+    - role: evidence_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/evidence_pack.json
+      physical_sha256: b6b59f9d1a00d1adfc6422563d9226c14e27f3526f74cecfa3e1feb2ebd2e386
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: forecast_model
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/forecast_model.json
+      physical_sha256: 5279f36cf9ab4ea8fe3055d4f230381016e8a664bbca64df164cf4ba3c94ad9d
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: generation_lock
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/generation_lock.json
+      physical_sha256: 80d673824269e8a65083e36694d4f64eaed0bd6380362cac9b25c8f6a1e0375f
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: human_review
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/human_review.yaml
+      physical_sha256: 54055f64f3780ddbc08417219f82039a0f20c0b0bccbcc480d2a088f4ae55bb9
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: operating_driver_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/operating_driver_pack.json
+      physical_sha256: e0d2225347b99b688f8a94b34649f8366c5a51cba992ebdaf48ccf0f8b79825d
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: quality_readout
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+      physical_sha256: a58faa678fa6150799f0ec267c46ada02df1199781ef6e61a1e18c72085bd108
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: reader_report
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/reader_report.md
+      physical_sha256: 04ec8a53a023c3678dfdb7682901c5b229b7040c86af216930b0b4eea739f701
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: valuation_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/valuation_pack.json
+      physical_sha256: 52e28e426d3f49f3016dcee2b85bd3c80f28c67373ae524e52f19df94221b94c
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: workflow_state
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/workflow_state.yaml
+      physical_sha256: 6a921191d30d789fee40d818c9e201bcabb108a29ef889e4e20809ae174416aa
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    proposed_review:
+    - physical source hash verified
+    - evidence_id registered
+    - source class reviewed
+    - period unit and claim boundary explicit
+    - counter-evidence reviewed
+    - external reviewer decision exact-hash bound
+    automatic_change: none
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+  downstream_impact:
+    direct_dependent_ids:
+    - ns02_t30_occ_07e49c037427403b
+    - ns02_t30_occ_1a742ef3d6224c6a
+    - ns02_t30_occ_2a2ab71eced6e937
+    - ns02_t30_occ_3b0dd1527f9e0144
+    - ns02_t30_occ_8e3768557d6f2dde
+    - ns02_t30_occ_ae4ebd1d82c2bd03
+    - ns02_t30_occ_b531d3c48931ba58
+    - ns02_t30_occ_c03007a138e83e9b
+    - ns02_t30_occ_d19d9b744d7aff4a
+    - ns02_t30_occ_d705e67d4c161924
+    - ns02_t30_occ_e7027bc57e1dc7a7
+    - ns02_t30_wo_db304e8553027647
+    direct_dependency_count: 12
+    parent_work_order_ids:
+    - ns02_t30_wo_db304e8553027647
+    resolution_effect: recompute_from_independent_receipt_only
+  decision_options:
+  - approve
+  - reject
+  - defer
+  - request_changes
+  reviewer_fields_machine_empty: true
+- occurrence_id: ns02_t30_occ_97d3e4a3c0388529
+  parent_id: BF17R-WO-5ce21a3390be8b
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: evidence_required
+  candidate_sha256: d506d4c1ee8ff9b6e812010fb8649445b83a89b695d73dbe07c15095fb898366
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_97d3e4a3c0388529.yaml
+  review_packet_sha256: 342c5e9b4be3a799dfdc99c2da358f318c99f4be3d094be7b8fbd826f463da96
+  rank: 20
+  unblock_leverage_score: 1185
+  source_lineage:
+  - role: bound_failure_source
+    path: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+    sha256: e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/evidence_pack.json
+    physical_sha256: 23486bae3c0f5316de8de82d1e4258c26033f06168fed8be2732d45d17c3e744
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/forecast_model.json
+    physical_sha256: f87421d658bdd1f288ed74940ff9a349c24076dc251e47d374988adeda2b805e
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/generation_lock.json
+    physical_sha256: cd445f4dade57e60f446dd0c5b747db4c298e4da5d2c0db11f1c4d3f9813c24e
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/human_review.yaml
+    physical_sha256: f6c30962925558eb398375d16f7cc0af40413d5561bf5fb8ea5cfa3adc520049
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/operating_driver_pack.json
+    physical_sha256: b7e960087861cfd84af479169f372899553e8f804a9a58f47effd3f130f82919
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+    physical_sha256: e4ce4d287c5a426880960eff2436391e82d87c62d66593c9abf633da985611d7
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/reader_report.md
+    physical_sha256: 2fc4dff78527743b5fa884df4c5329ef4cd014c73686e1b10cef7edff45daed9
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/valuation_pack.json
+    physical_sha256: 066047366991c7d92132b5fcb145b13fb5b3ba714574efbb11f84c34ec9eb1b4
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/workflow_state.yaml
+    physical_sha256: c563b4b3106a37bb1517e057cae703a268bf5585b9bab520415b31de92ee45a7
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  subject_summary:
+    subject: assertions.qualification_evidence_complete
+    evidence_links:
+    - role: evidence_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/evidence_pack.json
+      physical_sha256: 23486bae3c0f5316de8de82d1e4258c26033f06168fed8be2732d45d17c3e744
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: forecast_model
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/forecast_model.json
+      physical_sha256: f87421d658bdd1f288ed74940ff9a349c24076dc251e47d374988adeda2b805e
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: generation_lock
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/generation_lock.json
+      physical_sha256: cd445f4dade57e60f446dd0c5b747db4c298e4da5d2c0db11f1c4d3f9813c24e
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: human_review
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/human_review.yaml
+      physical_sha256: f6c30962925558eb398375d16f7cc0af40413d5561bf5fb8ea5cfa3adc520049
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: operating_driver_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/operating_driver_pack.json
+      physical_sha256: b7e960087861cfd84af479169f372899553e8f804a9a58f47effd3f130f82919
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: quality_readout
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+      physical_sha256: e4ce4d287c5a426880960eff2436391e82d87c62d66593c9abf633da985611d7
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: reader_report
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/reader_report.md
+      physical_sha256: 2fc4dff78527743b5fa884df4c5329ef4cd014c73686e1b10cef7edff45daed9
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: valuation_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/valuation_pack.json
+      physical_sha256: 066047366991c7d92132b5fcb145b13fb5b3ba714574efbb11f84c34ec9eb1b4
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: workflow_state
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/workflow_state.yaml
+      physical_sha256: c563b4b3106a37bb1517e057cae703a268bf5585b9bab520415b31de92ee45a7
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    proposed_review:
+    - physical source hash verified
+    - evidence_id registered
+    - source class reviewed
+    - period unit and claim boundary explicit
+    - counter-evidence reviewed
+    - external reviewer decision exact-hash bound
+    automatic_change: none
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+  downstream_impact:
+    direct_dependent_ids:
+    - ns02_t30_occ_07e49c037427403b
+    - ns02_t30_occ_2b0567ebbd443da5
+    - ns02_t30_occ_3b0dd1527f9e0144
+    - ns02_t30_occ_4177e7d48f374473
+    - ns02_t30_occ_8e3768557d6f2dde
+    - ns02_t30_occ_ae4ebd1d82c2bd03
+    - ns02_t30_occ_b7467ff5401814aa
+    - ns02_t30_occ_c03007a138e83e9b
+    - ns02_t30_occ_d19d9b744d7aff4a
+    - ns02_t30_occ_d705e67d4c161924
+    - ns02_t30_occ_e7027bc57e1dc7a7
+    - ns02_t30_wo_bc7d70d0bd2786f8
+    direct_dependency_count: 12
+    parent_work_order_ids:
+    - ns02_t30_wo_bc7d70d0bd2786f8
+    resolution_effect: recompute_from_independent_receipt_only
+  decision_options:
+  - approve
+  - reject
+  - defer
+  - request_changes
+  reviewer_fields_machine_empty: true
+- occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+  parent_id: BF17R-WO-dd409a4bffcd9d
+  case_id: golden_gold_mining_cycle
+  candidate_kind: evidence_required
+  candidate_sha256: 893d699df13991a3bde1fa18a6391395ac3aa7f407c617e0c074beca550de066
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_9fe0bbfe8ab9bb7d.yaml
+  review_packet_sha256: bd2e42b8153f7b768f77affc54883fb17b1e00ad9e2c76ef35e2f4678d509076
+  rank: 22
+  unblock_leverage_score: 1185
+  source_lineage:
+  - role: bound_failure_source
+    path: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_gold_mining_cycle.yaml
+    sha256: 1eeca00f4a0a6dd61f5c5c4f0c6915dcaf19a8399e7afcf51654d30fe591fb1b
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/evidence_pack.json
+    physical_sha256: 915fb3916e11378306a9cc6d5fd42a48f9cabe9bc8614d2a3ad7be6c70ff54d1
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/forecast_model.json
+    physical_sha256: feadd5a52721c4ae2781e8195524d099fc954d3ad4c8ffa58fd1495336ebe268
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+    physical_sha256: 5cffa5fee240c6bb3c9f7bbf3b07d7cf4c2e8c799e1f07aa839cfb2449a3f0d1
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/human_review.yaml
+    physical_sha256: baea3bbf009af5897f54f53123313f9fb7e739a5c66f7a02433dc68645c0eb3b
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/operating_driver_pack.json
+    physical_sha256: dbef5761eac7762a25fc1ea2d42adaa867df739b8fee3395e77cbed45832aa41
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+    physical_sha256: ef5f0513e89e4d9f51f189fcae650e6b5ccbf02a1fe52065fba377c2e5358bf0
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/reader_report.md
+    physical_sha256: edc6e089537e64e4bbcc7578e02465cfa6d0d5c259f575e6f0eeff5e716b6030
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/valuation_pack.json
+    physical_sha256: dee79360d56010322e665391c0c128a705ed4d36d9d3296f620006e475185d99
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/workflow_state.yaml
+    physical_sha256: c82c1b121e76abbf0c439a2bcfa464a36097ace52a981b5f6e511227767031dc
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  subject_summary:
+    subject: assertions.qualification_official_sources_present
+    evidence_links:
+    - role: evidence_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/evidence_pack.json
+      physical_sha256: 915fb3916e11378306a9cc6d5fd42a48f9cabe9bc8614d2a3ad7be6c70ff54d1
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: forecast_model
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/forecast_model.json
+      physical_sha256: feadd5a52721c4ae2781e8195524d099fc954d3ad4c8ffa58fd1495336ebe268
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: generation_lock
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+      physical_sha256: 5cffa5fee240c6bb3c9f7bbf3b07d7cf4c2e8c799e1f07aa839cfb2449a3f0d1
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: human_review
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/human_review.yaml
+      physical_sha256: baea3bbf009af5897f54f53123313f9fb7e739a5c66f7a02433dc68645c0eb3b
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: operating_driver_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/operating_driver_pack.json
+      physical_sha256: dbef5761eac7762a25fc1ea2d42adaa867df739b8fee3395e77cbed45832aa41
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: quality_readout
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+      physical_sha256: ef5f0513e89e4d9f51f189fcae650e6b5ccbf02a1fe52065fba377c2e5358bf0
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: reader_report
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/reader_report.md
+      physical_sha256: edc6e089537e64e4bbcc7578e02465cfa6d0d5c259f575e6f0eeff5e716b6030
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: valuation_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/valuation_pack.json
+      physical_sha256: dee79360d56010322e665391c0c128a705ed4d36d9d3296f620006e475185d99
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: workflow_state
+      path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/workflow_state.yaml
+      physical_sha256: c82c1b121e76abbf0c439a2bcfa464a36097ace52a981b5f6e511227767031dc
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    proposed_review:
+    - physical source hash verified
+    - evidence_id registered
+    - source class reviewed
+    - period unit and claim boundary explicit
+    - counter-evidence reviewed
+    - external reviewer decision exact-hash bound
+    automatic_change: none
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+  downstream_impact:
+    direct_dependent_ids:
+    - ns02_t30_occ_07e49c037427403b
+    - ns02_t30_occ_10e1e793011ee907
+    - ns02_t30_occ_3b0dd1527f9e0144
+    - ns02_t30_occ_60f5539e2d72463f
+    - ns02_t30_occ_6e5fb996533eab2b
+    - ns02_t30_occ_8e3768557d6f2dde
+    - ns02_t30_occ_ae4ebd1d82c2bd03
+    - ns02_t30_occ_c03007a138e83e9b
+    - ns02_t30_occ_d19d9b744d7aff4a
+    - ns02_t30_occ_d705e67d4c161924
+    - ns02_t30_occ_e7027bc57e1dc7a7
+    - ns02_t30_wo_f9d03098e6d0feba
+    direct_dependency_count: 12
+    parent_work_order_ids:
+    - ns02_t30_wo_f9d03098e6d0feba
+    resolution_effect: recompute_from_independent_receipt_only
+  decision_options:
+  - approve
+  - reject
+  - defer
+  - request_changes
+  reviewer_fields_machine_empty: true
+- occurrence_id: ns02_t30_occ_a88a58ab2685ee6e
+  parent_id: BF17R-WO-df7ea35a97ead0
+  case_id: golden_crdmo_backlog_conversion
+  candidate_kind: evidence_required
+  candidate_sha256: 42dbc8f2eebc5d7d0a32305a69e1f8d5f60415222106649004ce059cf93d0336
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_a88a58ab2685ee6e.yaml
+  review_packet_sha256: 23bba80eadd62e87f2e1bd55e0279e231f8e69e9e28de5b4617ed40df2131088
+  rank: 23
+  unblock_leverage_score: 1185
+  source_lineage:
+  - role: bound_failure_source
+    path: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+    sha256: 5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/evidence_pack.json
+    physical_sha256: b6b59f9d1a00d1adfc6422563d9226c14e27f3526f74cecfa3e1feb2ebd2e386
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/forecast_model.json
+    physical_sha256: 5279f36cf9ab4ea8fe3055d4f230381016e8a664bbca64df164cf4ba3c94ad9d
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/generation_lock.json
+    physical_sha256: 80d673824269e8a65083e36694d4f64eaed0bd6380362cac9b25c8f6a1e0375f
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/human_review.yaml
+    physical_sha256: 54055f64f3780ddbc08417219f82039a0f20c0b0bccbcc480d2a088f4ae55bb9
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/operating_driver_pack.json
+    physical_sha256: e0d2225347b99b688f8a94b34649f8366c5a51cba992ebdaf48ccf0f8b79825d
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+    physical_sha256: a58faa678fa6150799f0ec267c46ada02df1199781ef6e61a1e18c72085bd108
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/reader_report.md
+    physical_sha256: 04ec8a53a023c3678dfdb7682901c5b229b7040c86af216930b0b4eea739f701
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/valuation_pack.json
+    physical_sha256: 52e28e426d3f49f3016dcee2b85bd3c80f28c67373ae524e52f19df94221b94c
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/workflow_state.yaml
+    physical_sha256: 6a921191d30d789fee40d818c9e201bcabb108a29ef889e4e20809ae174416aa
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  subject_summary:
+    subject: assertions.qualification_official_sources_present
+    evidence_links:
+    - role: evidence_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/evidence_pack.json
+      physical_sha256: b6b59f9d1a00d1adfc6422563d9226c14e27f3526f74cecfa3e1feb2ebd2e386
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: forecast_model
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/forecast_model.json
+      physical_sha256: 5279f36cf9ab4ea8fe3055d4f230381016e8a664bbca64df164cf4ba3c94ad9d
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: generation_lock
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/generation_lock.json
+      physical_sha256: 80d673824269e8a65083e36694d4f64eaed0bd6380362cac9b25c8f6a1e0375f
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: human_review
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/human_review.yaml
+      physical_sha256: 54055f64f3780ddbc08417219f82039a0f20c0b0bccbcc480d2a088f4ae55bb9
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: operating_driver_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/operating_driver_pack.json
+      physical_sha256: e0d2225347b99b688f8a94b34649f8366c5a51cba992ebdaf48ccf0f8b79825d
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: quality_readout
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+      physical_sha256: a58faa678fa6150799f0ec267c46ada02df1199781ef6e61a1e18c72085bd108
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: reader_report
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/reader_report.md
+      physical_sha256: 04ec8a53a023c3678dfdb7682901c5b229b7040c86af216930b0b4eea739f701
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: valuation_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/valuation_pack.json
+      physical_sha256: 52e28e426d3f49f3016dcee2b85bd3c80f28c67373ae524e52f19df94221b94c
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: workflow_state
+      path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/workflow_state.yaml
+      physical_sha256: 6a921191d30d789fee40d818c9e201bcabb108a29ef889e4e20809ae174416aa
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    proposed_review:
+    - physical source hash verified
+    - evidence_id registered
+    - source class reviewed
+    - period unit and claim boundary explicit
+    - counter-evidence reviewed
+    - external reviewer decision exact-hash bound
+    automatic_change: none
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+  downstream_impact:
+    direct_dependent_ids:
+    - ns02_t30_occ_07e49c037427403b
+    - ns02_t30_occ_1a742ef3d6224c6a
+    - ns02_t30_occ_2a2ab71eced6e937
+    - ns02_t30_occ_3b0dd1527f9e0144
+    - ns02_t30_occ_8e3768557d6f2dde
+    - ns02_t30_occ_ae4ebd1d82c2bd03
+    - ns02_t30_occ_b531d3c48931ba58
+    - ns02_t30_occ_c03007a138e83e9b
+    - ns02_t30_occ_d19d9b744d7aff4a
+    - ns02_t30_occ_d705e67d4c161924
+    - ns02_t30_occ_e7027bc57e1dc7a7
+    - ns02_t30_wo_db304e8553027647
+    direct_dependency_count: 12
+    parent_work_order_ids:
+    - ns02_t30_wo_db304e8553027647
+    resolution_effect: recompute_from_independent_receipt_only
+  decision_options:
+  - approve
+  - reject
+  - defer
+  - request_changes
+  reviewer_fields_machine_empty: true
+- occurrence_id: ns02_t30_occ_e95d9ae85fb2fba0
+  parent_id: BF17R-WO-5ce21a3390be8b
+  case_id: golden_multi_business_ai_infrastructure
+  candidate_kind: evidence_required
+  candidate_sha256: 95c078f5af4e75bed531739f396e5a55f384b28945c209bd89f69bc7519a0717
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_e95d9ae85fb2fba0.yaml
+  review_packet_sha256: 92517cb669d79225eaecef7d4283e1c49c50826764cb95dbfd57b8241a69f6e8
+  rank: 37
+  unblock_leverage_score: 1185
+  source_lineage:
+  - role: bound_failure_source
+    path: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_multi_business_ai_infrastructure.yaml
+    sha256: e2d1d70274771f2ca62b476da0791d8053a1c170b78a9178e798da13e4726042
+  - role: evidence_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/evidence_pack.json
+    physical_sha256: 23486bae3c0f5316de8de82d1e4258c26033f06168fed8be2732d45d17c3e744
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: forecast_model
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/forecast_model.json
+    physical_sha256: f87421d658bdd1f288ed74940ff9a349c24076dc251e47d374988adeda2b805e
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: generation_lock
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/generation_lock.json
+    physical_sha256: cd445f4dade57e60f446dd0c5b747db4c298e4da5d2c0db11f1c4d3f9813c24e
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: human_review
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/human_review.yaml
+    physical_sha256: f6c30962925558eb398375d16f7cc0af40413d5561bf5fb8ea5cfa3adc520049
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: operating_driver_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/operating_driver_pack.json
+    physical_sha256: b7e960087861cfd84af479169f372899553e8f804a9a58f47effd3f130f82919
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: quality_readout
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+    physical_sha256: e4ce4d287c5a426880960eff2436391e82d87c62d66593c9abf633da985611d7
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: reader_report
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/reader_report.md
+    physical_sha256: 2fc4dff78527743b5fa884df4c5329ef4cd014c73686e1b10cef7edff45daed9
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: valuation_pack
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/valuation_pack.json
+    physical_sha256: 066047366991c7d92132b5fcb145b13fb5b3ba714574efbb11f84c34ec9eb1b4
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  - role: workflow_state
+    path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/workflow_state.yaml
+    physical_sha256: c563b4b3106a37bb1517e057cae703a268bf5585b9bab520415b31de92ee45a7
+    hash_verified: true
+    claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+  subject_summary:
+    subject: assertions.qualification_official_sources_present
+    evidence_links:
+    - role: evidence_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/evidence_pack.json
+      physical_sha256: 23486bae3c0f5316de8de82d1e4258c26033f06168fed8be2732d45d17c3e744
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: forecast_model
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/forecast_model.json
+      physical_sha256: f87421d658bdd1f288ed74940ff9a349c24076dc251e47d374988adeda2b805e
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: generation_lock
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/generation_lock.json
+      physical_sha256: cd445f4dade57e60f446dd0c5b747db4c298e4da5d2c0db11f1c4d3f9813c24e
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: human_review
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/human_review.yaml
+      physical_sha256: f6c30962925558eb398375d16f7cc0af40413d5561bf5fb8ea5cfa3adc520049
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: operating_driver_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/operating_driver_pack.json
+      physical_sha256: b7e960087861cfd84af479169f372899553e8f804a9a58f47effd3f130f82919
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: quality_readout
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+      physical_sha256: e4ce4d287c5a426880960eff2436391e82d87c62d66593c9abf633da985611d7
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: reader_report
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/reader_report.md
+      physical_sha256: 2fc4dff78527743b5fa884df4c5329ef4cd014c73686e1b10cef7edff45daed9
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: valuation_pack
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/valuation_pack.json
+      physical_sha256: 066047366991c7d92132b5fcb145b13fb5b3ba714574efbb11f84c34ec9eb1b4
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    - role: workflow_state
+      path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/workflow_state.yaml
+      physical_sha256: c563b4b3106a37bb1517e057cae703a268bf5585b9bab520415b31de92ee45a7
+      hash_verified: true
+      claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+    proposed_review:
+    - physical source hash verified
+    - evidence_id registered
+    - source class reviewed
+    - period unit and claim boundary explicit
+    - counter-evidence reviewed
+    - external reviewer decision exact-hash bound
+    automatic_change: none
+  counterevidence:
+  - UNKNOWN_NOT_REVIEWED
+  uncertainties:
+  - MISSING_REVIEWED_EVIDENCE_ACCEPTANCE
+  - MISSING_PERIOD_UNIT_SOURCE_CLASS_AND_CLAIM_BOUNDARY_REVIEW
+  downstream_impact:
+    direct_dependent_ids:
+    - ns02_t30_occ_07e49c037427403b
+    - ns02_t30_occ_2b0567ebbd443da5
+    - ns02_t30_occ_3b0dd1527f9e0144
+    - ns02_t30_occ_4177e7d48f374473
+    - ns02_t30_occ_8e3768557d6f2dde
+    - ns02_t30_occ_ae4ebd1d82c2bd03
+    - ns02_t30_occ_b7467ff5401814aa
+    - ns02_t30_occ_c03007a138e83e9b
+    - ns02_t30_occ_d19d9b744d7aff4a
+    - ns02_t30_occ_d705e67d4c161924
+    - ns02_t30_occ_e7027bc57e1dc7a7
+    - ns02_t30_wo_bc7d70d0bd2786f8
+    direct_dependency_count: 12
+    parent_work_order_ids:
+    - ns02_t30_wo_bc7d70d0bd2786f8
+    resolution_effect: recompute_from_independent_receipt_only
+  decision_options:
+  - approve
+  - reject
+  - defer
+  - request_changes
+  reviewer_fields_machine_empty: true
+stable_receipt_sha256: 4612454831c6cba5792b9e23dfffb37349657cf4afc4b29c08f149f81fe4d608

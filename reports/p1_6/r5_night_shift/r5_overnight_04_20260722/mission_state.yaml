@@ -69,43 +69,43 @@ tasks:
   status: passed
 - id: ns04_t20
   phase: C_review_acceleration
-  status: ready
+  status: passed
 - id: ns04_t21
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t22
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t23
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t24
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t25
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t26
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t27
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t28
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t29
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t30
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t31
   phase: C_review_acceleration
-  status: pending
+  status: passed
 - id: ns04_t32
   phase: D_pointer_prevalidation
-  status: pending
+  status: ready
 - id: ns04_t33
   phase: D_pointer_prevalidation
   status: pending
@@ -187,4 +187,4 @@ tasks:
 - id: ns04_t59
   phase: F_validation_publication
   status: pending
-stable_receipt_sha256: 41f2560dcba093d1b5a67134523c4b3dea62cb132a6b4eee12ade813f88fcd7e
+stable_receipt_sha256: 80625d4141f675a70d64cd5e6075702526e3d20e1cdde898ed2cfd60499a78ac
