@@ -1,0 +1,56 @@
+{
+  "baseline_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "ci_status": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/publication/ci_status.md",
+  "commits": [
+    {
+      "sha": "9474800b28874afbe5b5553dd24d64f64169df06",
+      "subject": "chore(night04): seed review-acceleration task package"
+    },
+    {
+      "sha": "49ba09b8e108f864c77e3894aba694501b662fc4",
+      "subject": "feat(night04): lock exact Night03 baseline and truth"
+    },
+    {
+      "sha": "3dfcad8d5cd97433174746c8d56361b20537d055",
+      "subject": "feat(night04): add exact-hash review control plane"
+    },
+    {
+      "sha": "828202b1104bf2d7face81379e79bda707f85d55",
+      "subject": "feat(night04): rank review leverage and publish dashboard"
+    },
+    {
+      "sha": "68d715b190fc10cc1117c8b6111af4e816519f4d",
+      "subject": "feat(night04): prevalidate pointer proposals in sandboxes"
+    },
+    {
+      "sha": "028ff0a303ed1a6fa65f2505a01298aa5f8552a9",
+      "subject": "feat(night04): consume decisions and recompute truth"
+    },
+    {
+      "sha": "e0b3c7933489a4a2741bc62b3c0226074c1de526",
+      "subject": "test(night04): harden validation and recovery gates"
+    },
+    {
+      "sha": "842bacc843ff0914ac6f997ca949d7c494802576",
+      "subject": "test(night04): record full regression and CI contract"
+    }
+  ],
+  "commits_after_baseline_before_publication_commit": 8,
+  "final_publication_head": null,
+  "final_publication_resolution_policy": "authoritative_post_push_remote_receipt",
+  "force_push_allowed": false,
+  "implementation_snapshot_before_publication_commit": {
+    "commit_sha": "842bacc843ff0914ac6f997ca949d7c494802576",
+    "tree_sha": "9f63d038382cbc2a2c07bbd4ff6630ff69856247"
+  },
+  "merge_main_allowed": false,
+  "minimum_commit_policy_satisfied": true,
+  "minimum_workstream_commits": 6,
+  "mission_id": "r5_overnight_04_20260722",
+  "pr_creation_allowed": false,
+  "remote_delivery_receipt": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/publication/remote_delivery_receipt.json",
+  "schema_version": "r5_night04_tracked_delivery_receipt_v1",
+  "stable_receipt_sha256": "f5e965bc02dc784d011872e5e168d46a02d42d042cfd1d945eedab0ccab91492",
+  "target_branch": "codex/r5-night04-review-acceleration-and-unlock",
+  "workstream_commits_excluding_seed": 7
+}
