@@ -28,7 +28,7 @@ jobs:
         run: python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml
       - name: Run night-shift contract and recovery regression
         run: python -m pytest -q tests/test_r5_night_shift_*.py
-      - name: Guard Bundle17R and Night02 historical outputs
-        run: python -c "import subprocess; baseline='069da527452def6c59c3772750e933d8611ccadf'; paths=['reports/p1_6/r5_bundle17r','reports/p1_6/r5_night_shift/r5_overnight_02_20260720']; out=subprocess.check_output(['git','diff','--name-only',f'{baseline}..HEAD','--',*paths], text=True); assert not out.strip(), out"
+      - name: Guard Bundle17R, Night02, and Night03 historical outputs
+        run: python -c "import subprocess; baseline='758ab7557d9de9eea42a5aeb5df95e3d68c26f0c'; paths=['reports/p1_6/r5_bundle17r','reports/p1_6/r5_night_shift/r5_overnight_02_20260720','reports/p1_6/r5_night_shift/r5_overnight_03_20260721']; out=subprocess.check_output(['git','diff','--name-only',f'{baseline}..HEAD','--',*paths], text=True); assert not out.strip(), out"
       - name: Run pytest
         run: python -m pytest -q

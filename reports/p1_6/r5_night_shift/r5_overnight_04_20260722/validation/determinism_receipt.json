@@ -1,0 +1,43 @@
+{
+  "all_bytes_equal": true,
+  "comparison_count": 3,
+  "comparisons": [
+    {
+      "artifact": "reviewer_dashboard_materialized",
+      "bytes_equal": true,
+      "first_hashes": {
+        "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/reviewer_dashboard.html": "69b86591caf07e39414afc862c56dc47b43a1f5aadd9a08945e1cc1051319b52",
+        "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/reviewer_dashboard.md": "601f646574a2693606fd9a467cb4dea3c8021a610a870eaa34c356d6a053552c",
+        "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/reviewer_dashboard.yaml": "1360df5db9e71a79e86f71fe7ae7b90ce64d626353e062d83213370571c2612f"
+      },
+      "second_hashes": {
+        "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/reviewer_dashboard.html": "69b86591caf07e39414afc862c56dc47b43a1f5aadd9a08945e1cc1051319b52",
+        "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/reviewer_dashboard.md": "601f646574a2693606fd9a467cb4dea3c8021a610a870eaa34c356d6a053552c",
+        "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/reviewer_dashboard.yaml": "1360df5db9e71a79e86f71fe7ae7b90ce64d626353e062d83213370571c2612f"
+      }
+    },
+    {
+      "artifact": "blocker_ledger",
+      "bytes_equal": true,
+      "first_sha256": "c38601fb149f5c27c597d7f20e94750761473bdbf84c2e7b69b6e21598176d4c",
+      "second_sha256": "c38601fb149f5c27c597d7f20e94750761473bdbf84c2e7b69b6e21598176d4c",
+      "size_bytes": 23289
+    },
+    {
+      "artifact": "next_night_queue",
+      "bytes_equal": true,
+      "first_sha256": "57bef7dd3969d8b5405fdf9570e7792d11dd5b33f9a061f8664b513250f60700",
+      "second_sha256": "57bef7dd3969d8b5405fdf9570e7792d11dd5b33f9a061f8664b513250f60700",
+      "size_bytes": 125858
+    }
+  ],
+  "mission_id": "r5_overnight_04_20260722",
+  "schema_version": "r5_night04_determinism_receipt_v1",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "949bb2f329a203a655f4de2daf578bb7d52080babc1213aee6978e53c5737d9c",
+  "unstable_fields_excluded": [
+    "wall_clock_time",
+    "absolute_worktree_path",
+    "post_push_remote_state"
+  ]
+}

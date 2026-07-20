@@ -79,6 +79,9 @@ Append; do not erase historical entries.
 - The external decision inbox contained only its README: zero decision manifests and no external
   reviewer-authority registry.  Startup intake therefore executed zero adapters, retained 0/63
   resolved, unlocked 0/20 dependencies, completed 0/6 parents, and carried all 69 IDs forward.
+- Eleven adversarial decision and resolution cases failed closed.  Dashboard, blocker ledger, and
+  Night05 queue were byte-stable across double runs; checkpoint replay consumed a synthetic decision
+  exactly once and resumed it as a replay without duplicating state.
 
 ## Decisions
 

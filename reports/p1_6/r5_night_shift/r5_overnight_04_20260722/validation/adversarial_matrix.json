@@ -1,0 +1,66 @@
+{
+  "all_fail_closed": true,
+  "case_count": 11,
+  "cases": [
+    {
+      "case": "forged_machine_reviewer",
+      "reason": "reviewer_identity_invalid",
+      "result": "rejected"
+    },
+    {
+      "case": "stale_candidate_hash",
+      "reason": "stale_candidate_hash",
+      "result": "rejected"
+    },
+    {
+      "case": "stale_review_packet_hash",
+      "reason": "stale_review_packet_hash",
+      "result": "rejected"
+    },
+    {
+      "case": "missing_external_authority",
+      "reason": "reviewer_authority_not_externally_verified",
+      "result": "rejected"
+    },
+    {
+      "case": "conflicting_duplicate",
+      "reason": "conflicting_duplicate",
+      "result": "rejected"
+    },
+    {
+      "case": "partial_batch_isolation",
+      "reason": "stale_record_isolated",
+      "result": "rejected"
+    },
+    {
+      "case": "approval_without_receipt",
+      "reason": "missing_independent_receipt",
+      "result": "rejected"
+    },
+    {
+      "case": "mismatched_receipt_digest",
+      "reason": "decision_digest_mismatch",
+      "result": "rejected"
+    },
+    {
+      "case": "pointer_target_branch_escape",
+      "reason": "sandbox_boundary",
+      "result": "rejected"
+    },
+    {
+      "case": "candidate_false_parent_close",
+      "reason": "parent_pending",
+      "result": "rejected"
+    },
+    {
+      "case": "candidate_false_dependency_unlock",
+      "reason": "unresolved_prerequisites",
+      "result": "rejected"
+    }
+  ],
+  "mission_id": "r5_overnight_04_20260722",
+  "resolved_delta": 0,
+  "schema_version": "r5_night04_adversarial_matrix_v1",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "28b826f66ec2cbec56b1e2522cd7e9c60cf7853b1077925c9ee4843a0ecfd86a"
+}
