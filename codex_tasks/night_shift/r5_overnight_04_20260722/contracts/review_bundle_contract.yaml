@@ -1,0 +1,39 @@
+schema_version: r5_night04_review_bundle_contract_v1
+candidate_count: 43
+candidate_taxonomy:
+  evidence_required: 8
+  analysis_required: 24
+  human_exact_hash_gate: 3
+  engineering_local_pointer: 8
+required_fields:
+- occurrence_id
+- parent_id
+- case_id
+- candidate_kind
+- candidate_artifact_path
+- candidate_sha256
+- review_packet_path
+- review_packet_sha256
+- source_lineage
+- decision_options
+- unblock_leverage
+- critical_path_rank
+- downstream_impact
+- counterevidence
+- uncertainties
+- reviewer
+- reviewer_authority
+- reviewed_at
+- decision
+machine_must_leave_empty:
+- reviewer
+- reviewer_authority
+- reviewed_at
+- decision
+allowed_external_decisions:
+- approve
+- reject
+- defer
+- request_changes
+stale_hash_policy: reject_entire_decision_record
+partial_batch_policy: accept_only_individually_valid_records_and_report_invalid_records

@@ -1,0 +1,13 @@
+Execute the Night04 mission in this repository.
+
+1. Read `codex_tasks/night_shift/r5_overnight_04_20260722/START_HERE.md`, `OVERNIGHT_MISSION.md`, `EXECPLAN.md`, `SAFETY_AND_GIT_POLICY.md`, `source_contract.yaml`, and `task_queue.yaml`.
+2. Before implementation, independently verify remote `codex/r5-night03-targeted-backflow-intake` equals `758ab7557d9de9eea42a5aeb5df95e3d68c26f0c`, GitHub Actions run `29693876604` is successful for that SHA, and the tracked Night03 outputs match 40/40, `delivered_candidate_ready`, 43 candidate-ready, 20 dependency-blocked, 6 parents and 0/63 resolved.
+3. If any hard baseline differs, stop with a failure packet; do not repair history or reinterpret counts.
+4. Keep `EXECPLAN.md` live. Continue claiming ready wrapper tasks until 06:15 Europe/London or all 60 delivery tasks are complete.
+5. Do not regenerate the same candidates as the main objective. Build the review control plane, exact-hash review bundles, unlock ranking, reviewer dashboard, and 8 pointer dry-runs.
+6. Poll the external decision inbox at startup and phase boundaries. Accept only authentic, exact-hash, authority-valid records. Never populate reviewer fields or manufacture approval.
+7. Dry-run pointer changes only in child sandboxes. Apply to the target branch only after a valid external approval and all scoped tests pass.
+8. Resolved counts may increase only from independent resolution receipts. Candidate-ready, dry-run success, or dependency simulation are not resolution.
+9. Do not modify Bundle17R, Night02, Night03, raw evidence, canonical indexes, workflow state, or main. Do not create a PR, merge main, or force push.
+10. Produce at least six meaningful workstream commits after the seed, push `codex/r5-night04-review-acceleration-and-unlock`, verify final remote SHA and CI, and generate the morning readout plus exact Night05 carry-forward queue.
+11. The final readout must distinguish mission delivery, review readiness, resolution delta, dependency unlocks, parent completion, tests, commits, CI, historical path diff and program-goal state.

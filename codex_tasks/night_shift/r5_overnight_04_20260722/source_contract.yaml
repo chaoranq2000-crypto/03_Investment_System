@@ -1,0 +1,47 @@
+schema_version: r5_night04_source_contract_v1
+repository: chaoranq2000-crypto/03_Investment_System
+source_branch_default: codex/r5-night03-targeted-backflow-intake
+source_commit: 758ab7557d9de9eea42a5aeb5df95e3d68c26f0c
+source_commit_authority: user_reported_then_runtime_hard_verified
+source_ci_run_id: 29693876604
+target_branch_default: codex/r5-night04-review-acceleration-and-unlock
+expected_worktree_root: C:\Projects\03_Investment_System_night04
+reported_night03_completion:
+  mission_tasks_passed: 40
+  mission_tasks_total: 40
+  mission_outcome: delivered_candidate_ready
+  final_sha: 758ab7557d9de9eea42a5aeb5df95e3d68c26f0c
+  ci_run_id: 29693876604
+  ci_conclusion: success
+  night_shift_tests_passed: 137
+  full_repo_passed: 1070
+  full_repo_skipped: 2
+  source_route_passed: 17
+  source_route_blocking: 0
+  candidate_ready: 43
+  dependency_blocked: 20
+  parent_pending: 6
+  resolved_occurrences: 0
+  total_occurrences: 63
+  next_queue_total_items: 69
+  historical_path_change_count: 0
+  open_pr_count: 0
+  original_zip_sha256: 71e709238fea94148fccda3206394b5fab3d1c59f48fe10004f9fc3d0a3ef13c
+required_runtime_rechecks:
+- remote source branch SHA equals source_commit
+- local source worktree HEAD equals source_commit before bootstrap
+- GitHub Actions run conclusion is success and head SHA equals source_commit
+- no open PR exists for source branch
+- Night03 tracked morning readout reports 40/40 and delivered_candidate_ready
+- Night03 authoritative queue has exactly 69 stable IDs
+- taxonomy is exactly 43 candidate-ready + 20 dependency-blocked + 6 parent records
+- research truth is 0/63 resolved unless independent receipts prove a delta
+- Night02, Night03 and Bundle17R historical paths remain unchanged
+authoritative_night04_queue:
+  path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+  import_mode: read_only_exact_hash
+  expected_total_items: 69
+  expected_occurrence_items: 63
+  expected_parent_items: 6
+  expected_candidate_ready_items: 43
+  expected_dependency_blocked_items: 20

@@ -1,0 +1,19 @@
+schema_version: r5_night04_outcome_contract_v1
+outcomes:
+  delivered_with_resolution_delta:
+    delivery_tasks_passed: true
+    resolved_delta_min: 1
+    resolution_receipts_required: true
+    program_goal_auto_close: false
+  delivered_review_acceleration_ready:
+    delivery_tasks_passed: true
+    resolved_delta: 0
+    review_bundles_complete: 43
+    pointer_dry_runs_complete: 8
+    program_goal_auto_close: false
+  partial:
+    carry_forward_all_unresolved: true
+  blocked:
+    cannot_report_delivered: true
+  failed:
+    cannot_report_delivered: true

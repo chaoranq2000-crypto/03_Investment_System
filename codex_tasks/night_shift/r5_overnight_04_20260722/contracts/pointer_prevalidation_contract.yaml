@@ -1,0 +1,17 @@
+schema_version: r5_night04_pointer_prevalidation_contract_v1
+pointer_count: 8
+dry_run_only_without_approval: true
+required_per_pointer:
+- proposal_sha256
+- exact_allowed_paths
+- forbidden_paths
+- acceptance_commands
+- diff_ceiling
+- sandbox_patch
+- targeted_test_receipt
+- shared_file_conflicts
+- rollback_plan
+- generation_lock_preview
+- external_approval_record
+execution_gate: valid external exact-hash approval + clean sandbox + all targeted tests pass
+historical_artifact_mutation: forbidden

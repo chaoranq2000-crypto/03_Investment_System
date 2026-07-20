@@ -1,0 +1,2189 @@
+schema_version: r5_night_shift_queue_v4_proposed
+package_id: R5_Overnight_Mission_04_20260721
+mission_id: r5_overnight_04_20260722
+mission_title: Exact-hash review acceleration, pointer prevalidation, and conditional dependency unlock
+program_goal:
+  id: r5_bundle17r_bf2_four_case_activation
+  description: Four real golden cases must complete reviewed evidence/materialization/qualification/regression/exact-hash
+    chains before Bundle18 human review.
+  state_at_start: open_needs_targeted_backflow
+  close_allowed: false
+  this_mission_may_close_goal: false
+  truth_at_start:
+    blocker_occurrences_total: 63
+    blocker_occurrences_resolved: 0
+    candidate_ready: 43
+    dependency_blocked: 20
+    parent_pending: 6
+    next_queue_total_items: 69
+    sample_quality_allowed: false
+    p2_allowed: false
+night03_mission:
+  state: complete
+  outcome: delivered_candidate_ready
+  tasks_passed: 40
+  tasks_total: 40
+  final_sha: 758ab7557d9de9eea42a5aeb5df95e3d68c26f0c
+  ci_run_id: 29693876604
+  authority: user_reported_and_runtime_reverified_before_execution
+baseline:
+  repository: chaoranq2000-crypto/03_Investment_System
+  source_branch: codex/r5-night03-targeted-backflow-intake
+  source_commit: 758ab7557d9de9eea42a5aeb5df95e3d68c26f0c
+  source_commit_policy: exact_remote_hard_gate
+  target_branch: codex/r5-night04-review-acceleration-and-unlock
+  expected_worktree_root: C:\Projects\03_Investment_System_night04
+  bootstrap_seed_commit_allowed: true
+  seed_commit_scope: codex_tasks/night_shift/r5_overnight_04_20260722/** only
+run_window:
+  timezone: Europe/London
+  start_at: '2026-07-21T23:00:00+01:00'
+  stop_claiming_at: '2026-07-22T06:15:00+01:00'
+  final_readout_at: '2026-07-22T06:30:00+01:00'
+  after_cutoff: finish_in_flight_acceptance_then_emit_partial_readout
+authoritative_research_queue:
+  path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+  import_mode: read_only_exact_hash
+  expected_total_items: 69
+  expected_occurrence_items: 63
+  expected_parent_aggregators: 6
+  expected_candidate_ready_items: 43
+  expected_dependency_blocked_items: 20
+  preserve_ids_and_source_hashes: true
+  fabricate_missing_items: false
+mission_policy:
+  single_integrator: true
+  max_parallel_shared_state_writers: 1
+  continue_claiming_until_cutoff: true
+  continue_after_external_block_using_bounded_fallback: true
+  poll_decision_inbox_at_phase_boundaries: true
+  mission_wrapper_task_count: 60
+  minimum_workstream_commits_after_seed: 6
+tasks:
+- id: ns04_t00
+  title: Exact source SHA preflight
+  phase: A_baseline
+  priority: 600
+  estimated_work_units: 4
+  status: pending
+  depends_on: []
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Exact source SHA preflight
+  allowed_paths: &id001
+  - config/r5_night_shift.yaml
+  - config/r5_night_shift_task_schema.json
+  - scripts/run_r5_night_shift.py
+  - scripts/run_r5_night_shift.ps1
+  - src/maintenance/night_shift/**
+  - tests/test_r5_night_shift_*.py
+  - tests/fixtures/r5_night_shift/**
+  - templates/night_shift_*.md
+  - codex_tasks/night_shift/r5_overnight_04_20260722/**
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/**
+  - .github/workflows/**
+  - docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
+  read_only_paths: &id002
+  - reports/p1_6/r5_bundle17r/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  forbidden_paths: &id003
+  - main
+  - data/raw/**
+  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+  - config/r5_readout_canonical_index.yaml
+  - reports/workflow_runs/**/workflow_state.yaml
+  - .local/** (never git-track)
+  - '**/__pycache__/**'
+  - '**/*.pyc'
+  acceptance_commands:
+  - python codex_tasks/night_shift/r5_overnight_04_20260722/tools/inspect_night03_outputs.py --repo . --phase preflight
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/preflight/source_state.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t01
+  title: Audit Night03 completion receipt and readout
+  phase: A_baseline
+  priority: 595
+  estimated_work_units: 4
+  status: pending
+  depends_on:
+  - ns04_t00
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Audit Night03 completion receipt and readout
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python codex_tasks/night_shift/r5_overnight_04_20260722/tools/inspect_night03_outputs.py --repo . --phase receipt
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/preflight/night03_receipt_audit.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t02
+  title: Reconcile remote SHA, CI, PR and workspace
+  phase: A_baseline
+  priority: 590
+  estimated_work_units: 4
+  status: pending
+  depends_on:
+  - ns04_t00
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Reconcile remote SHA, CI, PR and workspace
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python codex_tasks/night_shift/r5_overnight_04_20260722/tools/inspect_night03_outputs.py --repo . --phase remote
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/preflight/remote_ci_reconciliation.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t03
+  title: Lock Night03 tracked input hashes
+  phase: A_baseline
+  priority: 585
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns04_t01
+  - ns04_t02
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Lock Night03 tracked input hashes
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night03_manifest.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/preflight/night03_input_manifest.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t04
+  title: Import authoritative 69-item Night04 queue
+  phase: A_baseline
+  priority: 580
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns04_t03
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Import authoritative 69-item Night04 queue
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_queue_import.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/queue/authoritative_queue_snapshot.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t05
+  title: Audit 43/20/6/0 taxonomy and stable IDs
+  phase: A_baseline
+  priority: 575
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns04_t04
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Audit 43/20/6/0 taxonomy and stable IDs
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night04_taxonomy.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/queue/taxonomy_audit.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t06
+  title: Lineage and historical immutability guard
+  phase: A_baseline
+  priority: 570
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns04_t03
+  - ns04_t05
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Lineage and historical immutability guard
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_lineage_guard.py tests/test_r5_night_shift_scope_guard.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/queue/lineage_audit.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t07
+  title: Truth snapshot and Night04 outcome model
+  phase: A_baseline
+  priority: 565
+  estimated_work_units: 4
+  status: pending
+  depends_on:
+  - ns04_t05
+  - ns04_t06
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Truth snapshot and Night04 outcome model
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_goal_policy.py tests/test_r5_night_shift_night04_outcome.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/queue/truth_snapshot.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t08
+  title: Verify original Night03 package ZIP integrity
+  phase: A_baseline
+  priority: 560
+  estimated_work_units: 4
+  status: pending
+  depends_on:
+  - ns04_t01
+  - ns04_t03
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Verify original Night03 package ZIP integrity
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night03_package_integrity.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/preflight/night03_package_integrity.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t09
+  title: Audit non-self-referential final receipt policy
+  phase: A_baseline
+  priority: 555
+  estimated_work_units: 4
+  status: pending
+  depends_on:
+  - ns04_t02
+  - ns04_t03
+  - ns04_t08
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Audit non-self-referential final receipt policy
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_non_self_referential_receipts.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/preflight/non_self_reference_audit.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t10
+  title: Batch exact-hash decision schema v2
+  phase: B_review_control
+  priority: 550
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns04_t07
+  - ns04_t08
+  - ns04_t09
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Batch exact-hash decision schema v2
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_batch_decision_manifest.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/batch_decision_schema.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t11
+  title: Build immutable 43-candidate registry
+  phase: B_review_control
+  priority: 545
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns04_t10
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Build immutable 43-candidate registry
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_candidate_registry.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/candidate_registry.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t12
+  title: Normalize candidate review packet envelope
+  phase: B_review_control
+  priority: 540
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns04_t11
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Normalize candidate review packet envelope
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_review_packet_normalization.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packet_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t13
+  title: Generate blank approve-reject-defer bundles
+  phase: B_review_control
+  priority: 535
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns04_t11
+  - ns04_t12
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Generate blank approve-reject-defer bundles
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_blank_decision_bundles.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/blank_decision_bundles/index.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t14
+  title: Enforce empty machine-owned reviewer fields
+  phase: B_review_control
+  priority: 530
+  estimated_work_units: 5
+  status: pending
+  depends_on:
+  - ns04_t13
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Enforce empty machine-owned reviewer fields
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_human_field_integrity.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/human_field_integrity.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t15
+  title: Detect conflicting duplicate decisions
+  phase: B_review_control
+  priority: 525
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns04_t10
+  - ns04_t11
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Detect conflicting duplicate decisions
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_conflicts.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/conflict_policy.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t16
+  title: Reject stale or rebased candidate hashes
+  phase: B_review_control
+  priority: 520
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns04_t11
+  - ns04_t15
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Reject stale or rebased candidate hashes
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_stale_decision_hashes.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/stale_hash_policy.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t17
+  title: Implement partial batch acceptance with error ledger
+  phase: B_review_control
+  priority: 515
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns04_t15
+  - ns04_t16
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Implement partial batch acceptance with error ledger
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_partial_batch_decisions.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/partial_acceptance_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t18
+  title: External reviewer authority adapter
+  phase: B_review_control
+  priority: 510
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns04_t14
+  - ns04_t17
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: External reviewer authority adapter
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_reviewer_authority.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/reviewer_authority_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t19
+  title: Idempotent decision inbox polling and replay
+  phase: B_review_control
+  priority: 505
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t17
+  - ns04_t18
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Idempotent decision inbox polling and replay
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_inbox.py tests/test_r5_night_shift_decision_replay.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/inbox_polling_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t20
+  title: Compute unblock-leverage score for all candidates
+  phase: C_review_acceleration
+  priority: 500
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t11
+  - ns04_t19
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Compute unblock-leverage score for all candidates
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_unblock_leverage.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/unblock_leverage.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t21
+  title: Rank critical path to first parent completion
+  phase: C_review_acceleration
+  priority: 495
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns04_t20
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Rank critical path to first parent completion
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_parent_critical_path.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/first_parent_path.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t22
+  title: Rank critical path to maximum dependency unlock
+  phase: C_review_acceleration
+  priority: 490
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns04_t20
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Rank critical path to maximum dependency unlock
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_dependency_critical_path.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/max_unlock_path.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t23
+  title: Group review queue by golden case and archetype
+  phase: C_review_acceleration
+  priority: 485
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns04_t20
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Group review queue by golden case and archetype
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_review_groups.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/review_groups.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t24
+  title: Audit eight evidence candidate briefs
+  phase: C_review_acceleration
+  priority: 480
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t12
+  - ns04_t23
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Audit eight evidence candidate briefs
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_evidence_review_briefs.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/evidence_review_briefs.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t25
+  title: Audit twenty-four analysis candidate briefs
+  phase: C_review_acceleration
+  priority: 475
+  estimated_work_units: 10
+  status: pending
+  depends_on:
+  - ns04_t12
+  - ns04_t23
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Audit twenty-four analysis candidate briefs
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_analysis_review_briefs.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/analysis_review_briefs.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t26
+  title: Audit three human exact-hash handoffs
+  phase: C_review_acceleration
+  priority: 470
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns04_t12
+  - ns04_t23
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Audit three human exact-hash handoffs
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_human_review_briefs.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/human_review_briefs.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t27
+  title: Audit eight pointer review briefs
+  phase: C_review_acceleration
+  priority: 465
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t12
+  - ns04_t23
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Audit eight pointer review briefs
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_review_briefs.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/pointer_review_briefs.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t28
+  title: Attach evidence-claim-diff summaries
+  phase: C_review_acceleration
+  priority: 460
+  estimated_work_units: 9
+  status: pending
+  depends_on:
+  - ns04_t24
+  - ns04_t25
+  - ns04_t26
+  - ns04_t27
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Attach evidence-claim-diff summaries
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_review_diff_summaries.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/evidence_claim_diff_index.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t29
+  title: Attach counterevidence and uncertainty summaries
+  phase: C_review_acceleration
+  priority: 455
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t28
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Attach counterevidence and uncertainty summaries
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_review_counterevidence.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/counterevidence_index.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t30
+  title: Attach downstream model and gate impact
+  phase: C_review_acceleration
+  priority: 450
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t28
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Attach downstream model and gate impact
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_review_downstream_impact.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/downstream_impact.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t31
+  title: Publish reviewer dashboard YAML Markdown HTML
+  phase: C_review_acceleration
+  priority: 445
+  estimated_work_units: 10
+  status: pending
+  depends_on:
+  - ns04_t21
+  - ns04_t22
+  - ns04_t29
+  - ns04_t30
+  work_type: analysis_automation
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Publish reviewer dashboard YAML Markdown HTML
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_reviewer_dashboard.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_acceleration/reviewer_dashboard.html
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t32
+  title: Resolve exact implementation paths for eight pointers
+  phase: D_pointer_prevalidation
+  priority: 440
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t27
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Resolve exact implementation paths for eight pointers
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_path_resolution.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/path_resolution.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t33
+  title: Revalidate pointer acceptance command safety
+  phase: D_pointer_prevalidation
+  priority: 435
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns04_t32
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Revalidate pointer acceptance command safety
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_command_safety.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/command_safety.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t34
+  title: Build isolated child-worktree sandbox manager
+  phase: D_pointer_prevalidation
+  priority: 430
+  estimated_work_units: 10
+  status: pending
+  depends_on:
+  - ns04_t32
+  - ns04_t33
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Build isolated child-worktree sandbox manager
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_sandbox_manager.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/sandbox_manager_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t35
+  title: Generate eight dry-run pointer patches
+  phase: D_pointer_prevalidation
+  priority: 425
+  estimated_work_units: 12
+  status: pending
+  depends_on:
+  - ns04_t34
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Generate eight dry-run pointer patches
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_dry_run_patches.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/dry_run_patch_index.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t36
+  title: Enforce per-pointer diff ceilings
+  phase: D_pointer_prevalidation
+  priority: 420
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns04_t35
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Enforce per-pointer diff ceilings
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_diff_ceiling.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/diff_ceiling_receipt.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t37
+  title: Run targeted tests for each pointer dry-run
+  phase: D_pointer_prevalidation
+  priority: 415
+  estimated_work_units: 12
+  status: pending
+  depends_on:
+  - ns04_t35
+  - ns04_t36
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Run targeted tests for each pointer dry-run
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_targeted_tests.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/targeted_test_receipts.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t38
+  title: Simulate non-overlapping pointer batches
+  phase: D_pointer_prevalidation
+  priority: 410
+  estimated_work_units: 10
+  status: pending
+  depends_on:
+  - ns04_t35
+  - ns04_t37
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Simulate non-overlapping pointer batches
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_batch_simulation.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/batch_simulation.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t39
+  title: Detect shared-file and semantic conflicts
+  phase: D_pointer_prevalidation
+  priority: 405
+  estimated_work_units: 9
+  status: pending
+  depends_on:
+  - ns04_t35
+  - ns04_t38
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Detect shared-file and semantic conflicts
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_conflicts.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/conflict_matrix.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t40
+  title: Validate rollback and crash recovery
+  phase: D_pointer_prevalidation
+  priority: 400
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t34
+  - ns04_t37
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Validate rollback and crash recovery
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_rollback.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/rollback_receipt.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t41
+  title: Preview generation locks and receipts
+  phase: D_pointer_prevalidation
+  priority: 395
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t37
+  - ns04_t39
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Preview generation locks and receipts
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_receipt_preview.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/generation_lock_previews.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t42
+  title: Conditional pointer execution after approval
+  phase: D_pointer_prevalidation
+  priority: 390
+  estimated_work_units: 10
+  status: pending
+  depends_on:
+  - ns04_t19
+  - ns04_t39
+  - ns04_t40
+  - ns04_t41
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: true
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Conditional pointer execution after approval
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_conditional_execution.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/conditional_execution_contract.yaml
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t43
+  title: Prove dry-runs cannot resolve or mutate history
+  phase: D_pointer_prevalidation
+  priority: 385
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t35
+  - ns04_t42
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Prove dry-runs cannot resolve or mutate history
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_dry_run_truth.py tests/test_r5_night_shift_historical_immutability.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/dry_run_truth_receipt.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t44
+  title: Consume authentic decisions at startup checkpoint
+  phase: E_conditional_execution
+  priority: 380
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns04_t19
+  - ns04_t31
+  - ns04_t43
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: true
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Consume authentic decisions at startup checkpoint
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python scripts/run_r5_night_shift.py --mission r5_overnight_04_20260722 --mode consume-approved --checkpoint
+    startup --continue-on-external-block
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/execution/startup_decision_consumption.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t45
+  title: Apply approved evidence decisions through typed adapter
+  phase: E_conditional_execution
+  priority: 375
+  estimated_work_units: 9
+  status: pending
+  depends_on:
+  - ns04_t44
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: true
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Apply approved evidence decisions through typed adapter
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_evidence_decision_execution.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/execution/evidence_execution_receipts.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t46
+  title: Apply approved analysis decisions through typed adapter
+  phase: E_conditional_execution
+  priority: 370
+  estimated_work_units: 10
+  status: pending
+  depends_on:
+  - ns04_t44
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: true
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Apply approved analysis decisions through typed adapter
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_analysis_decision_execution.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/execution/analysis_execution_receipts.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t47
+  title: Apply approved human exact-hash gates safely
+  phase: E_conditional_execution
+  priority: 365
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t44
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: true
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Apply approved human exact-hash gates safely
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_human_gate_execution.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/execution/human_gate_receipts.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t48
+  title: Apply approved pointer decisions in sandboxes
+  phase: E_conditional_execution
+  priority: 360
+  estimated_work_units: 12
+  status: pending
+  depends_on:
+  - ns04_t42
+  - ns04_t44
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: true
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Apply approved pointer decisions in sandboxes
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_pointer_execution.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/execution/pointer_execution_receipts.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t49
+  title: Recompute parent state after every receipt
+  phase: E_conditional_execution
+  priority: 355
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns04_t45
+  - ns04_t46
+  - ns04_t47
+  - ns04_t48
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Recompute parent state after every receipt
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_parent_aggregation.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/execution/parent_recompute.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t50
+  title: Unlock twenty dependencies from receipts only
+  phase: E_conditional_execution
+  priority: 350
+  estimated_work_units: 9
+  status: pending
+  depends_on:
+  - ns04_t49
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: true
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Unlock twenty dependencies from receipts only
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_dependency_unblock.py tests/test_r5_night_shift_resolution_truth.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/execution/dependency_recompute.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t51
+  title: Emit blocker ledger and exact unresolved carry-forward
+  phase: E_conditional_execution
+  priority: 345
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t49
+  - ns04_t50
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Emit blocker ledger and exact unresolved carry-forward
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_blocker_ledger.py tests/test_r5_night_shift_carry_forward.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/progress/blocker_ledger.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t52
+  title: Adversarial forged stale conflicting partial decisions
+  phase: F_validation_publication
+  priority: 340
+  estimated_work_units: 10
+  status: pending
+  depends_on:
+  - ns04_t17
+  - ns04_t18
+  - ns04_t43
+  - ns04_t51
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Adversarial forged stale conflicting partial decisions
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_decision_adversarial.py tests/test_r5_night_shift_resolution_truth.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/validation/adversarial_matrix.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t53
+  title: Determinism double-run for dashboard and ledger
+  phase: F_validation_publication
+  priority: 335
+  estimated_work_units: 9
+  status: pending
+  depends_on:
+  - ns04_t31
+  - ns04_t51
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Determinism double-run for dashboard and ledger
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night04_determinism.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/validation/determinism_receipt.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t54
+  title: Crash resume and run-lock validation
+  phase: F_validation_publication
+  priority: 330
+  estimated_work_units: 9
+  status: pending
+  depends_on:
+  - ns04_t44
+  - ns04_t51
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Crash resume and run-lock validation
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night04_crash_resume.py tests/test_r5_night_shift_lock.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/validation/crash_resume_receipt.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t55
+  title: Full regression source-route and scope audit
+  phase: F_validation_publication
+  priority: 325
+  estimated_work_units: 14
+  status: pending
+  depends_on:
+  - ns04_t52
+  - ns04_t53
+  - ns04_t54
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Full regression source-route and scope audit
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_*.py && python scripts/run_source_route_quality_gate.py --import-check
+    --output reports/quality/ci_source_route_quality_report.yaml && python -m pytest -q && git diff --check
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/validation/full_regression.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t56
+  title: Verify target-branch CI contract
+  phase: F_validation_publication
+  priority: 320
+  estimated_work_units: 6
+  status: pending
+  depends_on:
+  - ns04_t55
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Verify target-branch CI contract
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night04_ci_contract.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/validation/ci_contract.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t57
+  title: Create at least six workstream commits and push
+  phase: F_validation_publication
+  priority: 315
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t56
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Create at least six workstream commits and push
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -c "import subprocess; b=subprocess.check_output(['git','branch','--show-current'],text=True).strip();
+    assert b=='codex/r5-night04-review-acceleration-and-unlock',b"
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/publication/tracked_delivery_receipt.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t58
+  title: Verify final remote SHA and successful CI
+  phase: F_validation_publication
+  priority: 310
+  estimated_work_units: 7
+  status: pending
+  depends_on:
+  - ns04_t57
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Verify final remote SHA and successful CI
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - gh run list --branch codex/r5-night04-review-acceleration-and-unlock --limit 5 --json databaseId,headSha,status,conclusion,url
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/publication/remote_delivery_receipt.json
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+- id: ns04_t59
+  title: Publish morning readout and Night05 queue
+  phase: F_validation_publication
+  priority: 305
+  estimated_work_units: 8
+  status: pending
+  depends_on:
+  - ns04_t51
+  - ns04_t58
+  work_type: engineering
+  delivery_required: true
+  resolution_capable: false
+  external_gate_behavior: consume_if_present_else_continue_bounded_work
+  goal: Publish morning readout and Night05 queue
+  allowed_paths: *id001
+  read_only_paths: *id002
+  forbidden_paths: *id003
+  acceptance_commands:
+  - python -m pytest -q tests/test_r5_night_shift_night04_publication.py
+  required_artifacts:
+  - reports/p1_6/r5_night_shift/r5_overnight_04_20260722/morning_readout.md
+  commit_policy: workstream
+  retry_limit: 2
+  on_success:
+    record_receipt: true
+    recompute_ready_queue: true
+    continue_claiming: true
+  on_failure:
+    emit_failure_packet: true
+    spawn_bounded_fix_task: true
+    inherit_allowed_paths: true
+    max_spawn_depth: 2
+    do_not_mark_mission_delivered: true
+  human_gate: false
+  notes: []
+mission_release_gates:
+- all 60 delivery-required wrapper tasks passed or have bounded failure packets only under partial outcome
+- all 69 authoritative IDs retained with stable source hashes
+- all 43 review bundles generated and exact-hash bound
+- all 8 pointer proposals have dry-run patches and targeted test receipts
+- resolved delta backed only by independent resolution receipts
+- 20 dependencies and 6 parents recomputed from atomic receipts only
+- full Night Shift tests, source-route, full pytest and scope audit passed
+- Bundle17R, Night02 and Night03 historical paths unchanged
+- local and remote target SHA equal and target-branch CI success
+- morning readout and Night05 queue generated
+- program goal remains open unless separately authorized by future human decisions

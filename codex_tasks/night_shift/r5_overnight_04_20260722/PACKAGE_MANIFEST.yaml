@@ -1,0 +1,80 @@
+schema_version: r5_night04_package_manifest_v1
+package_id: R5_Overnight_Mission_04_20260721
+mission_id: r5_overnight_04_20260722
+source_commit: 758ab7557d9de9eea42a5aeb5df95e3d68c26f0c
+target_branch: codex/r5-night04-review-acceleration-and-unlock
+wrapper_tasks: 60
+imported_research_items_expected: 69
+candidate_ready_expected: 43
+dependency_blocked_expected: 20
+parent_items_expected: 6
+files:
+- path: EXECPLAN.md
+  sha256: ce0dee879a200e2ce5b0f53dca7d1c0cd58d6abcf5800afd3ffd5d7f50d8ef9b
+  bytes: 2480
+- path: OVERNIGHT_MISSION.md
+  sha256: b7c0eab4bb939eb0058664d549165718d14ed5400d0731caba6b00d053bd91c3
+  bytes: 1662
+- path: README.md
+  sha256: 703b1dedf49a58de3d26e3855f54bd5ebf3399f2edb8480d1ccd23cdf659e4ee
+  bytes: 1047
+- path: SAFETY_AND_GIT_POLICY.md
+  sha256: a19852a44fe8dfa1f689841a1ff9ddd3691a41f00b97ae67a980b64a3bb4b28f
+  bytes: 1449
+- path: START_HERE.md
+  sha256: c2bd77a3029024febda6869ab2e5ddd86906905d8fe5ce42cdb52348c7c6b22b
+  bytes: 1279
+- path: WINDOWS_RUNBOOK.md
+  sha256: 207d3bad63183aea3ff0432c81103fb765bd0912fd9c3b248d84acaa59298a52
+  bytes: 1554
+- path: bootstrap_worktree.ps1
+  sha256: da265659bb49b9802152bc33dc800b248904778801eef9c79c50294a4fb2b68e
+  bytes: 3093
+- path: contracts/outcome_contract.yaml
+  sha256: c0e3b6dc3ee042cabf7004f61a3cf9f565522c33eeaea00e8cf805787c9c6217
+  bytes: 556
+- path: contracts/pointer_prevalidation_contract.yaml
+  sha256: 23a4b6e554c59330c40d74e22fefa4bf11a4cebf7948a05c41fc2491f7f8ca83
+  bytes: 497
+- path: contracts/review_bundle_contract.yaml
+  sha256: 8aadb707ef1d1b2f3b45a596ab31110712c379d21ce4faac867c2674ae100da6
+  bytes: 839
+- path: scheduled_task_prompt.txt
+  sha256: c22bf3d89c544d3a33110b8f2c9b1a909726624f9cda90b3096404dea6ae35d6
+  bytes: 2075
+- path: source_contract.yaml
+  sha256: 3211d4441cb0f9a1bd0807e1b898e2038f49fc240281de1c373f7f292f64654a
+  bytes: 2032
+- path: task_cards/T00_T09_BASELINE.md
+  sha256: 511c4dbd78e9f2a5b19655035d34da6106e56713149950f5bcd21e586aa8fd4c
+  bytes: 119
+- path: task_cards/T10_T19_REVIEW_CONTROL.md
+  sha256: eaff30228b47db2d94062f6b4b46209638ce41a8264e423006db860268de5eaa
+  bytes: 123
+- path: task_cards/T20_T31_REVIEW_ACCELERATION.md
+  sha256: 65f2772f7a2585c07f06c8c582f0b90eb8ab7d995ec5ab4f98f6fcef86052f92
+  bytes: 121
+- path: task_cards/T32_T43_POINTER_PREVALIDATION.md
+  sha256: f643905081dc1383f92d714191d8c214f55ca561fbcef0355b9ee02b98cb8ade
+  bytes: 123
+- path: task_cards/T44_T51_CONDITIONAL_EXECUTION.md
+  sha256: 62814ad08f8caecfe2e0e92b394b9011a4403255f5d709f8c1e61e54eadb7bb5
+  bytes: 139
+- path: task_cards/T52_T59_VALIDATION_PUBLICATION.md
+  sha256: a2b764d8e164ab425359ae03cf551f0d06e1906647fbbd5b3bd7f1a7dfd747cb
+  bytes: 121
+- path: task_queue.yaml
+  sha256: 242878433c7026201346525ab9d0e5a280250258a7c2229d0a85964f00759448
+  bytes: 67388
+- path: templates/blank_batch_decision_manifest.yaml
+  sha256: c9a905e648c9c560cc8dfc42068858d80a63ff8fba3058c0d28114cc28475773
+  bytes: 500
+- path: templates/reviewer_decision_sheet.md
+  sha256: c7ea2e1f0bc1c8f7d5e6fee1f997443c7795ac8ac0cb3396dc310520365d739d
+  bytes: 431
+- path: tools/inspect_night03_outputs.py
+  sha256: f17f97c07fabca699b858d54f3a02db73cc727fccb8b79e65e5c5c4bff027857
+  bytes: 4077
+- path: tools/verify_package.py
+  sha256: bf8c0137bbcea10ec83534303215c4bb3e2694e1efe46b46b7c596bd8a63a87a
+  bytes: 1797
