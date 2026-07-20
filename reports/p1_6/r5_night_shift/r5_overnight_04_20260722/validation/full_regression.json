@@ -1,0 +1,37 @@
+{
+  "all_passed": true,
+  "commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_*.py",
+      "passed": 200,
+      "result": "passed"
+    },
+    {
+      "blocking": 0,
+      "capabilities": 17,
+      "command": "python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml",
+      "result": "passed"
+    },
+    {
+      "command": "python -m pytest -q",
+      "passed": 1133,
+      "result": "passed",
+      "skipped": 2
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    },
+    {
+      "command": "historical path diff guard",
+      "result": "passed"
+    },
+    {
+      "command": "tracked temporary file guard",
+      "result": "passed"
+    }
+  ],
+  "mission_id": "r5_overnight_04_20260722",
+  "schema_version": "r5_night04_full_regression_v1",
+  "stable_receipt_sha256": "f7f249b2ec9a38191a82a6acdffc17d5956f1020fcc7266f7ab9e99d3b99bb55"
+}

@@ -82,6 +82,9 @@ Append; do not erase historical entries.
 - Eleven adversarial decision and resolution cases failed closed.  Dashboard, blocker ledger, and
   Night05 queue were byte-stable across double runs; checkpoint replay consumed a synthetic decision
   exactly once and resumed it as a replay without duplicating state.
+- The final local gate passed 200 Night Shift tests, 17 source-route capabilities with zero blocking
+  findings, and 1,133 full-repository tests with 2 skips.  Historical Bundle17R/Night02/Night03 paths
+  remained unchanged and the CI contract now preserves both prior and current baseline audit markers.
 
 ## Decisions
 

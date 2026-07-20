@@ -1,0 +1,19 @@
+{
+  "audited_head_before_validation_commit": "e0b3c7933489a4a2741bc62b3c0226074c1de526",
+  "baseline_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "force_push_used": false,
+  "git_diff_check": "passed",
+  "historical_changed_paths": [],
+  "historical_paths": [
+    "reports/p1_6/r5_bundle17r",
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720",
+    "reports/p1_6/r5_night_shift/r5_overnight_03_20260721"
+  ],
+  "main_merged": false,
+  "mission_id": "r5_overnight_04_20260722",
+  "passed": true,
+  "pr_created": false,
+  "schema_version": "r5_night04_scope_audit_v1",
+  "stable_receipt_sha256": "b6a9f0ec1f4f27de6da0a4dc0114e6b9812b4acd86a62d69039ed4f7115ab89b",
+  "tracked_local_or_bytecode_paths": []
+}
