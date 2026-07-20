@@ -8,7 +8,19 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from .artifact_io import atomic_create_bytes, atomic_write_bytes
+from .artifact_io import (
+    atomic_create_bytes,
+    atomic_write_bytes,
+    load_json_object,
+    pretty_json_bytes,
+)
+from .behavior_hypothesis_candidates import (
+    ProjectedStatus,
+    build_behavior_hypothesis_candidate,
+    build_behavior_hypothesis_review_event,
+    replay_validate_behavior_hypothesis_candidate,
+    validate_behavior_hypothesis_candidate,
+)
 from .behavior_cohort import (
     EFFECTIVE_ANCHORS,
     build_behavior_cohort,
@@ -689,6 +701,77 @@ def build_parser() -> argparse.ArgumentParser:
     behavior_hypothesis_validate.add_argument("--source-replay", action="store_true")
     behavior_hypothesis_validate.add_argument("--observation-artifact")
 
+    behavior_candidate_build = sub.add_parser(
+        "behavior-candidate-build",
+        help="Build one deterministic P2H Stage 1 candidate from an explicit draft",
+    )
+    behavior_candidate_build.add_argument("--input", required=True)
+    behavior_candidate_build.add_argument("--output", required=True)
+
+    behavior_candidate_validate = sub.add_parser(
+        "behavior-candidate-validate",
+        help="Validate a P2H candidate offline or replay explicit source artifacts",
+    )
+    behavior_candidate_validate.add_argument("artifact")
+    behavior_candidate_validate.add_argument("--source-replay", action="store_true")
+    behavior_candidate_validate.add_argument(
+        "--source-artifact", action="append", default=[]
+    )
+
+    behavior_candidate_ingest = sub.add_parser(
+        "behavior-candidate-ingest",
+        help="Create-only ingest a source-verified P2H candidate into the sidecar",
+    )
+    behavior_candidate_ingest.add_argument("artifact")
+    behavior_candidate_ingest.add_argument(
+        "--source-artifact", action="append", required=True
+    )
+
+    behavior_candidate_list = sub.add_parser(
+        "behavior-candidate-list",
+        help="Query P2H candidates with strict projected status and dual time",
+    )
+    behavior_candidate_list.add_argument("--candidate-id")
+    behavior_candidate_list.add_argument(
+        "--status", choices=[item.value for item in ProjectedStatus]
+    )
+    behavior_candidate_list.add_argument("--pattern-family")
+    behavior_candidate_list.add_argument("--scope-kind")
+    behavior_candidate_list.add_argument("--scope-ref")
+    behavior_candidate_list.add_argument("--as-of")
+    behavior_candidate_list.add_argument("--knowledge-cutoff")
+    behavior_candidate_list.add_argument("--created-from")
+    behavior_candidate_list.add_argument("--created-to")
+
+    behavior_candidate_show = sub.add_parser(
+        "behavior-candidate-show",
+        help="Show one immutable P2H candidate by deterministic ID",
+    )
+    behavior_candidate_show.add_argument("candidate_id")
+
+    behavior_review_event_record = sub.add_parser(
+        "behavior-review-event-record",
+        help="Build and create-only record one explicit human review event",
+    )
+    behavior_review_event_record.add_argument("--input", required=True)
+
+    behavior_candidate_status = sub.add_parser(
+        "behavior-candidate-status",
+        help="Project one candidate status at explicit business and knowledge cutoffs",
+    )
+    behavior_candidate_status.add_argument("candidate_id")
+    behavior_candidate_status.add_argument("--as-of", required=True)
+    behavior_candidate_status.add_argument("--knowledge-cutoff", required=True)
+
+    behavior_candidate_replay = sub.add_parser(
+        "behavior-candidate-replay",
+        help="Replay a stored candidate from explicit immutable source artifacts",
+    )
+    behavior_candidate_replay.add_argument("candidate_id")
+    behavior_candidate_replay.add_argument(
+        "--source-artifact", action="append", required=True
+    )
+
     return parser
 
 
@@ -1270,6 +1353,93 @@ def main(argv: list[str] | None = None) -> int:
                 or artifact["release_readiness"]["status"] != "ready"
                 or artifact["source_verification"]["status"] != "verified"
             ):
+                return 2
+        elif args.command == "behavior-candidate-build":
+            _require_distinct_paths(input=args.input, output=args.output)
+            candidate = build_behavior_hypothesis_candidate(
+                load_json_object(args.input)
+            )
+            validation = validate_behavior_hypothesis_candidate(candidate)
+            if validation["validation_status"] != "accepted":
+                raise ValueError(
+                    "P2H candidate failed validation: "
+                    + ", ".join(validation["finding_codes"])
+                )
+            output = atomic_create_bytes(args.output, pretty_json_bytes(candidate))
+            _print(
+                {
+                    "status": "CREATED",
+                    "candidate_id": candidate["candidate_id"],
+                    "canonical_hash": candidate["canonical_hash"],
+                    "output": str(output),
+                }
+            )
+        elif args.command == "behavior-candidate-validate":
+            candidate = load_json_object(args.artifact)
+            if args.source_replay:
+                if not args.source_artifact:
+                    raise ValueError(
+                        "--source-replay requires at least one --source-artifact"
+                    )
+                validation = replay_validate_behavior_hypothesis_candidate(
+                    candidate,
+                    source_artifacts=_load_json_documents(args.source_artifact),
+                )
+            else:
+                validation = validate_behavior_hypothesis_candidate(candidate)
+            _print(validation)
+            if validation["validation_status"] != "accepted":
+                return 2
+        elif args.command == "behavior-candidate-ingest":
+            candidate = load_json_object(args.artifact)
+            _print(
+                store.save_behavior_hypothesis_candidate(
+                    candidate,
+                    source_artifacts=_load_json_documents(args.source_artifact),
+                )
+            )
+        elif args.command == "behavior-candidate-list":
+            items = store.list_behavior_hypothesis_candidates(
+                candidate_id=args.candidate_id,
+                status=args.status,
+                pattern_family=args.pattern_family,
+                scope_kind=args.scope_kind,
+                scope_ref=args.scope_ref,
+                as_of=args.as_of,
+                knowledge_cutoff=args.knowledge_cutoff,
+                created_from=args.created_from,
+                created_to=args.created_to,
+            )
+            _print({"status": "OK", "count": len(items), "items": items})
+        elif args.command == "behavior-candidate-show":
+            _print(store.get_behavior_hypothesis_candidate(args.candidate_id))
+        elif args.command == "behavior-review-event-record":
+            event = build_behavior_hypothesis_review_event(
+                load_json_object(args.input)
+            )
+            result = store.save_behavior_hypothesis_review_event(event)
+            _print(
+                {
+                    **result,
+                    "event_type": event["event_type"],
+                    "reviewed_at": event["reviewed_at"],
+                }
+            )
+        elif args.command == "behavior-candidate-status":
+            _print(
+                store.project_behavior_hypothesis_candidate(
+                    args.candidate_id,
+                    as_of=args.as_of,
+                    knowledge_cutoff=args.knowledge_cutoff,
+                )
+            )
+        elif args.command == "behavior-candidate-replay":
+            validation = store.replay_behavior_hypothesis_candidate(
+                args.candidate_id,
+                source_artifacts=_load_json_documents(args.source_artifact),
+            )
+            _print(validation)
+            if validation["validation_status"] != "accepted":
                 return 2
         elif args.command == "behavior-hypothesis-interpret":
             _require_distinct_paths(

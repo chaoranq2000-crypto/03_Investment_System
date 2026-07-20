@@ -1,0 +1,15 @@
+{
+  "schema_version": "p2h.synthetic_source.v1",
+  "artifact_type": "synthetic_evidence_set",
+  "content_id": "sha256:40088780b90475875439e722e4fa1e55fddc98720e1e7f142a77917a8808cfcf",
+  "evaluations": [
+    {
+      "evaluation_id": "evaluation:11111111111111111111111111111111",
+      "status": "observed"
+    },
+    {
+      "evaluation_id": "evaluation:22222222222222222222222222222222",
+      "status": "not_observed"
+    }
+  ]
+}
