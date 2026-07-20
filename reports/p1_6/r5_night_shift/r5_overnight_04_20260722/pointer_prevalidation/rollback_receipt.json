@@ -1,0 +1,56 @@
+{
+  "all_reverse_checks_passed": true,
+  "pointer_count": 8,
+  "records": [
+    {
+      "occurrence_id": "ns02_t30_occ_3caf2ad00e1b6285",
+      "patch_sha256": "1b549be69b46e6e24f13cf5d2cde4dc9b7562fa9809039fa014d0f9e1e7cdbd2",
+      "reverse_check_passed": true,
+      "strategy": "git_apply_reverse_exact_patch"
+    },
+    {
+      "occurrence_id": "ns02_t30_occ_6b198842cf80755a",
+      "patch_sha256": "1b549be69b46e6e24f13cf5d2cde4dc9b7562fa9809039fa014d0f9e1e7cdbd2",
+      "reverse_check_passed": true,
+      "strategy": "git_apply_reverse_exact_patch"
+    },
+    {
+      "occurrence_id": "ns02_t30_occ_99e77539490b01ad",
+      "patch_sha256": "a130f127e8cbd5aace4f686e4d689760c4090f5aaa76e599a6e5e27f07e43f85",
+      "reverse_check_passed": true,
+      "strategy": "git_apply_reverse_exact_patch"
+    },
+    {
+      "occurrence_id": "ns02_t30_occ_c7f5c80f4b2e7a9c",
+      "patch_sha256": "1b549be69b46e6e24f13cf5d2cde4dc9b7562fa9809039fa014d0f9e1e7cdbd2",
+      "reverse_check_passed": true,
+      "strategy": "git_apply_reverse_exact_patch"
+    },
+    {
+      "occurrence_id": "ns02_t30_occ_c8af30bbe2f10e8a",
+      "patch_sha256": "1b549be69b46e6e24f13cf5d2cde4dc9b7562fa9809039fa014d0f9e1e7cdbd2",
+      "reverse_check_passed": true,
+      "strategy": "git_apply_reverse_exact_patch"
+    },
+    {
+      "occurrence_id": "ns02_t30_occ_d2ef6aeae1113c9c",
+      "patch_sha256": "a130f127e8cbd5aace4f686e4d689760c4090f5aaa76e599a6e5e27f07e43f85",
+      "reverse_check_passed": true,
+      "strategy": "git_apply_reverse_exact_patch"
+    },
+    {
+      "occurrence_id": "ns02_t30_occ_db819651b1640db8",
+      "patch_sha256": "a130f127e8cbd5aace4f686e4d689760c4090f5aaa76e599a6e5e27f07e43f85",
+      "reverse_check_passed": true,
+      "strategy": "git_apply_reverse_exact_patch"
+    },
+    {
+      "occurrence_id": "ns02_t30_occ_e3fefccd3e77fd5a",
+      "patch_sha256": "a130f127e8cbd5aace4f686e4d689760c4090f5aaa76e599a6e5e27f07e43f85",
+      "reverse_check_passed": true,
+      "strategy": "git_apply_reverse_exact_patch"
+    }
+  ],
+  "schema_version": "r5_night04_pointer_rollback_v1",
+  "stable_receipt_sha256": "f1e12d78300be061a5fa4e05bda2f3a2a239086588f75f52c5ca2af0a3e84450"
+}

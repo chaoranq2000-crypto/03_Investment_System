@@ -1,0 +1,80 @@
+{
+  "all_passed": true,
+  "pointer_count": 8,
+  "receipts": [
+    {
+      "command": "python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py",
+      "command_sha256": "4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d",
+      "exit_code": 0,
+      "occurrence_id": "ns02_t30_occ_3caf2ad00e1b6285",
+      "passed_tests": 4,
+      "sandbox_patch_sha256": "1b549be69b46e6e24f13cf5d2cde4dc9b7562fa9809039fa014d0f9e1e7cdbd2",
+      "terminal_status": "passed"
+    },
+    {
+      "command": "python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py",
+      "command_sha256": "4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d",
+      "exit_code": 0,
+      "occurrence_id": "ns02_t30_occ_6b198842cf80755a",
+      "passed_tests": 4,
+      "sandbox_patch_sha256": "1b549be69b46e6e24f13cf5d2cde4dc9b7562fa9809039fa014d0f9e1e7cdbd2",
+      "terminal_status": "passed"
+    },
+    {
+      "command": "python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py",
+      "command_sha256": "4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d",
+      "exit_code": 0,
+      "occurrence_id": "ns02_t30_occ_99e77539490b01ad",
+      "passed_tests": 4,
+      "sandbox_patch_sha256": "a130f127e8cbd5aace4f686e4d689760c4090f5aaa76e599a6e5e27f07e43f85",
+      "terminal_status": "passed"
+    },
+    {
+      "command": "python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py",
+      "command_sha256": "4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d",
+      "exit_code": 0,
+      "occurrence_id": "ns02_t30_occ_c7f5c80f4b2e7a9c",
+      "passed_tests": 4,
+      "sandbox_patch_sha256": "1b549be69b46e6e24f13cf5d2cde4dc9b7562fa9809039fa014d0f9e1e7cdbd2",
+      "terminal_status": "passed"
+    },
+    {
+      "command": "python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py",
+      "command_sha256": "4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d",
+      "exit_code": 0,
+      "occurrence_id": "ns02_t30_occ_c8af30bbe2f10e8a",
+      "passed_tests": 4,
+      "sandbox_patch_sha256": "1b549be69b46e6e24f13cf5d2cde4dc9b7562fa9809039fa014d0f9e1e7cdbd2",
+      "terminal_status": "passed"
+    },
+    {
+      "command": "python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py",
+      "command_sha256": "4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d",
+      "exit_code": 0,
+      "occurrence_id": "ns02_t30_occ_d2ef6aeae1113c9c",
+      "passed_tests": 4,
+      "sandbox_patch_sha256": "a130f127e8cbd5aace4f686e4d689760c4090f5aaa76e599a6e5e27f07e43f85",
+      "terminal_status": "passed"
+    },
+    {
+      "command": "python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py",
+      "command_sha256": "4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d",
+      "exit_code": 0,
+      "occurrence_id": "ns02_t30_occ_db819651b1640db8",
+      "passed_tests": 4,
+      "sandbox_patch_sha256": "a130f127e8cbd5aace4f686e4d689760c4090f5aaa76e599a6e5e27f07e43f85",
+      "terminal_status": "passed"
+    },
+    {
+      "command": "python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py",
+      "command_sha256": "4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d",
+      "exit_code": 0,
+      "occurrence_id": "ns02_t30_occ_e3fefccd3e77fd5a",
+      "passed_tests": 4,
+      "sandbox_patch_sha256": "a130f127e8cbd5aace4f686e4d689760c4090f5aaa76e599a6e5e27f07e43f85",
+      "terminal_status": "passed"
+    }
+  ],
+  "schema_version": "r5_night04_pointer_targeted_tests_v1",
+  "stable_receipt_sha256": "f3170054e33bc4c2818c669dcdafd53f998d69aca0b53c290d7d965b3e54bfe5"
+}

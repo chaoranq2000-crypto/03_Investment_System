@@ -1,0 +1,10 @@
+schema_version: r5_night04_pointer_conditional_execution_v1
+required_gates:
+- authentic_external_exact_hash_approval
+- candidate_and_review_packet_hashes_current
+- clean_scoped_sandbox
+- targeted_tests_pass
+- conflict_recheck_pass
+external_approvals_present: 0
+target_branch_executions: 0
+dry_run_is_resolution: false

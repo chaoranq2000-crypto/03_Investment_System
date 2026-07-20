@@ -1,0 +1,164 @@
+schema_version: r5_night04_pointer_path_resolution_v1
+pointer_count: 8
+records:
+- occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+  case_id: golden_copper_foil_product_generation
+  missing_pointer: /generation_id
+  proposal_sha256: 17ad9eece4828b1acba9ff5f4cf77bd1fe1dbfc7387612f19bc92a033642036a
+  exact_allowed_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  forbidden_paths:
+  - data/raw/**
+  - reports/p1_6/r5_bundle17r/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  - reports/workflow_runs/**/workflow_state.yaml
+  - config/r5_readout_canonical_index.yaml
+  diff_ceiling:
+    allowed_paths:
+    - scripts/build_r5_bundle16r_case_pack.py
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    max_changed_paths: 2
+  passed: true
+- occurrence_id: ns02_t30_occ_6b198842cf80755a
+  case_id: golden_crdmo_backlog_conversion
+  missing_pointer: /generation_id
+  proposal_sha256: 414aa760669f591c56ea51affb795e77ecdc04f44b5461e90f44100422fe69cb
+  exact_allowed_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  forbidden_paths:
+  - data/raw/**
+  - reports/p1_6/r5_bundle17r/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  - reports/workflow_runs/**/workflow_state.yaml
+  - config/r5_readout_canonical_index.yaml
+  diff_ceiling:
+    allowed_paths:
+    - scripts/build_r5_bundle16r_case_pack.py
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    max_changed_paths: 2
+  passed: true
+- occurrence_id: ns02_t30_occ_99e77539490b01ad
+  case_id: golden_multi_business_ai_infrastructure
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  proposal_sha256: 72eb78d0cadd785842a83d3d2ebce496e856b34fdf5f8d4eb8cf8e7584e58fc9
+  exact_allowed_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  forbidden_paths:
+  - data/raw/**
+  - reports/p1_6/r5_bundle17r/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  - reports/workflow_runs/**/workflow_state.yaml
+  - config/r5_readout_canonical_index.yaml
+  diff_ceiling:
+    allowed_paths:
+    - scripts/build_r5_bundle16r_case_pack.py
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    max_changed_paths: 2
+  passed: true
+- occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+  case_id: golden_multi_business_ai_infrastructure
+  missing_pointer: /generation_id
+  proposal_sha256: ea82b4339ea4c7b156d520dad1b6ea08b6b0c8313b547716cd050f6d315aa230
+  exact_allowed_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  forbidden_paths:
+  - data/raw/**
+  - reports/p1_6/r5_bundle17r/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  - reports/workflow_runs/**/workflow_state.yaml
+  - config/r5_readout_canonical_index.yaml
+  diff_ceiling:
+    allowed_paths:
+    - scripts/build_r5_bundle16r_case_pack.py
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    max_changed_paths: 2
+  passed: true
+- occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+  case_id: golden_gold_mining_cycle
+  missing_pointer: /generation_id
+  proposal_sha256: 71a691a9c518213e21d6ac39bd49eb7659725672e2a2826f1280de7dfbebde14
+  exact_allowed_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  forbidden_paths:
+  - data/raw/**
+  - reports/p1_6/r5_bundle17r/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  - reports/workflow_runs/**/workflow_state.yaml
+  - config/r5_readout_canonical_index.yaml
+  diff_ceiling:
+    allowed_paths:
+    - scripts/build_r5_bundle16r_case_pack.py
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    max_changed_paths: 2
+  passed: true
+- occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+  case_id: golden_copper_foil_product_generation
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  proposal_sha256: 31604162d0d118cdbded9d5c33889e7835309337ea292074ff462459a716fe1e
+  exact_allowed_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  forbidden_paths:
+  - data/raw/**
+  - reports/p1_6/r5_bundle17r/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  - reports/workflow_runs/**/workflow_state.yaml
+  - config/r5_readout_canonical_index.yaml
+  diff_ceiling:
+    allowed_paths:
+    - scripts/build_r5_bundle16r_case_pack.py
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    max_changed_paths: 2
+  passed: true
+- occurrence_id: ns02_t30_occ_db819651b1640db8
+  case_id: golden_crdmo_backlog_conversion
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  proposal_sha256: 905eaa0a544a2e91e267c8621ecaeaecb532a666eab29b114795930b8603e119
+  exact_allowed_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  forbidden_paths:
+  - data/raw/**
+  - reports/p1_6/r5_bundle17r/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  - reports/workflow_runs/**/workflow_state.yaml
+  - config/r5_readout_canonical_index.yaml
+  diff_ceiling:
+    allowed_paths:
+    - scripts/build_r5_bundle16r_case_pack.py
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    max_changed_paths: 2
+  passed: true
+- occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+  case_id: golden_gold_mining_cycle
+  missing_pointer: /candidate_ready_for_exact_hash_review
+  proposal_sha256: 4c25b860a8996fecc61f4ae257ca4e8a0ed0883568bfd3b9a72f7d976055a9bb
+  exact_allowed_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  forbidden_paths:
+  - data/raw/**
+  - reports/p1_6/r5_bundle17r/**
+  - reports/p1_6/r5_night_shift/r5_overnight_02_20260720/**
+  - reports/p1_6/r5_night_shift/r5_overnight_03_20260721/**
+  - reports/workflow_runs/**/workflow_state.yaml
+  - config/r5_readout_canonical_index.yaml
+  diff_ceiling:
+    allowed_paths:
+    - scripts/build_r5_bundle16r_case_pack.py
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    max_changed_paths: 2
+  passed: true
+stable_receipt_sha256: e9ee788c1b3694d493ef7c9b3a6564fcc93c29bd0a1c0cd4ea44104363507bca

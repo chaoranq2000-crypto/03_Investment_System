@@ -1,0 +1,41 @@
+diff --git a/scripts/build_r5_bundle16r_case_pack.py b/scripts/build_r5_bundle16r_case_pack.py
+index 8c9f200..1b641f3 100644
+--- a/scripts/build_r5_bundle16r_case_pack.py
++++ b/scripts/build_r5_bundle16r_case_pack.py
+@@ -689,0 +690,11 @@ def build_case(
++    generation_seed = json.dumps(
++        {
++            "case_id": case_id,
++            "input_sha256": sha256_file(input_path),
++            "artifact_hashes": pre_lock_hashes,
++        },
++        ensure_ascii=False,
++        sort_keys=True,
++        separators=(",", ":"),
++    ).encode("utf-8")
++    generation_id = "bundle16r_case_pack_" + hashlib.sha256(generation_seed).hexdigest()[:16]
+@@ -693,0 +705 @@ def build_case(
++        "generation_id": generation_id,
+diff --git a/tests/test_r5_bundle16r_case_pack_builder.py b/tests/test_r5_bundle16r_case_pack_builder.py
+index 576dde8..a196eea 100644
+--- a/tests/test_r5_bundle16r_case_pack_builder.py
++++ b/tests/test_r5_bundle16r_case_pack_builder.py
+@@ -202,0 +203,18 @@ def test_case_builder_derives_metrics_and_is_deterministic(tmp_path: Path) -> No
++def test_generation_lock_exposes_deterministic_generation_id(tmp_path: Path) -> None:
++    input_path, registry_path = _fixture(tmp_path)
++    kwargs = {
++        "repo_root": tmp_path,
++        "input_path": input_path,
++        "registry_path": registry_path,
++        "output_dir": tmp_path / "reports/output",
++        "case_results_dir": tmp_path / "bundle16r/generated/case_results",
++    }
++    result = build_case(**kwargs)
++    lock_path = tmp_path / result["output_dir"] / "generation_lock.json"
++    first = __import__("json").loads(lock_path.read_text(encoding="utf-8"))["generation_id"]
++    build_case(**kwargs)
++    second = __import__("json").loads(lock_path.read_text(encoding="utf-8"))["generation_id"]
++    assert first == second
++    assert first.startswith("bundle16r_case_pack_")
++
++

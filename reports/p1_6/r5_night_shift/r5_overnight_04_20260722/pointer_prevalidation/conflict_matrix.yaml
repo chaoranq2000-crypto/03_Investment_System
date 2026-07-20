@@ -1,0 +1,228 @@
+schema_version: r5_night04_pointer_conflict_matrix_v1
+pair_count: 28
+pairs:
+- left: ns02_t30_occ_3caf2ad00e1b6285
+  right: ns02_t30_occ_6b198842cf80755a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_3caf2ad00e1b6285
+  right: ns02_t30_occ_99e77539490b01ad
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_3caf2ad00e1b6285
+  right: ns02_t30_occ_c7f5c80f4b2e7a9c
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_3caf2ad00e1b6285
+  right: ns02_t30_occ_c8af30bbe2f10e8a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_3caf2ad00e1b6285
+  right: ns02_t30_occ_d2ef6aeae1113c9c
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_3caf2ad00e1b6285
+  right: ns02_t30_occ_db819651b1640db8
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_3caf2ad00e1b6285
+  right: ns02_t30_occ_e3fefccd3e77fd5a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_6b198842cf80755a
+  right: ns02_t30_occ_99e77539490b01ad
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_6b198842cf80755a
+  right: ns02_t30_occ_c7f5c80f4b2e7a9c
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_6b198842cf80755a
+  right: ns02_t30_occ_c8af30bbe2f10e8a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_6b198842cf80755a
+  right: ns02_t30_occ_d2ef6aeae1113c9c
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_6b198842cf80755a
+  right: ns02_t30_occ_db819651b1640db8
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_6b198842cf80755a
+  right: ns02_t30_occ_e3fefccd3e77fd5a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_99e77539490b01ad
+  right: ns02_t30_occ_c7f5c80f4b2e7a9c
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_99e77539490b01ad
+  right: ns02_t30_occ_c8af30bbe2f10e8a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_99e77539490b01ad
+  right: ns02_t30_occ_d2ef6aeae1113c9c
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_99e77539490b01ad
+  right: ns02_t30_occ_db819651b1640db8
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_99e77539490b01ad
+  right: ns02_t30_occ_e3fefccd3e77fd5a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_c7f5c80f4b2e7a9c
+  right: ns02_t30_occ_c8af30bbe2f10e8a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_c7f5c80f4b2e7a9c
+  right: ns02_t30_occ_d2ef6aeae1113c9c
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_c7f5c80f4b2e7a9c
+  right: ns02_t30_occ_db819651b1640db8
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_c7f5c80f4b2e7a9c
+  right: ns02_t30_occ_e3fefccd3e77fd5a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_c8af30bbe2f10e8a
+  right: ns02_t30_occ_d2ef6aeae1113c9c
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_c8af30bbe2f10e8a
+  right: ns02_t30_occ_db819651b1640db8
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_c8af30bbe2f10e8a
+  right: ns02_t30_occ_e3fefccd3e77fd5a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: false
+  combined_apply_check_passed: true
+  conflict_type: shared_files_non_overlapping_hunks
+- left: ns02_t30_occ_d2ef6aeae1113c9c
+  right: ns02_t30_occ_db819651b1640db8
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_d2ef6aeae1113c9c
+  right: ns02_t30_occ_e3fefccd3e77fd5a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+- left: ns02_t30_occ_db819651b1640db8
+  right: ns02_t30_occ_e3fefccd3e77fd5a
+  shared_paths:
+  - scripts/build_r5_bundle16r_case_pack.py
+  - tests/test_r5_bundle16r_case_pack_builder.py
+  same_patch: true
+  combined_apply_check_passed: false
+  conflict_type: duplicate_semantic_change
+stable_receipt_sha256: 3a748e7b18dd9d3e4b6627bb1f4958fa497014e21a517b921436d4035a672fd1

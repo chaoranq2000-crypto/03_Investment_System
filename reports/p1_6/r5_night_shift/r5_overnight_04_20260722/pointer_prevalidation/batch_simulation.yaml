@@ -1,0 +1,27 @@
+schema_version: r5_night04_pointer_batch_simulation_v1
+pointer_count: 8
+batch_count: 4
+max_batch_size: 2
+batches:
+- batch_id: 1
+  occurrence_ids:
+  - ns02_t30_occ_3caf2ad00e1b6285
+  - ns02_t30_occ_99e77539490b01ad
+  execution_performed: false
+- batch_id: 2
+  occurrence_ids:
+  - ns02_t30_occ_6b198842cf80755a
+  - ns02_t30_occ_d2ef6aeae1113c9c
+  execution_performed: false
+- batch_id: 3
+  occurrence_ids:
+  - ns02_t30_occ_c7f5c80f4b2e7a9c
+  - ns02_t30_occ_db819651b1640db8
+  execution_performed: false
+- batch_id: 4
+  occurrence_ids:
+  - ns02_t30_occ_c8af30bbe2f10e8a
+  - ns02_t30_occ_e3fefccd3e77fd5a
+  execution_performed: false
+simulation_only: true
+stable_receipt_sha256: f25a6284ceb8ca4b45f1fe465424aa3701e83f4a9f7c4fea76cdba0b1d19f7de

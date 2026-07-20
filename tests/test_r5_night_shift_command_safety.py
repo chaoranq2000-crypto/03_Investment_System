@@ -4,6 +4,7 @@ import hashlib
 from pathlib import Path
 
 import pytest
+import yaml
 
 from src.maintenance.night_shift.night03 import Night03Error
 from src.maintenance.night_shift.night03_execution import validate_approved_command
@@ -49,3 +50,13 @@ def test_night03_requires_exact_command_hash_and_read_only_execution_boundary() 
             push,
             approved_command_sha256=hashlib.sha256(push.encode("utf-8")).hexdigest(),
         )
+
+
+def test_night04_revalidates_all_eight_pointer_commands() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    path = repo_root / "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/command_safety.yaml"
+    payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    assert payload["pointer_count"] == len(payload["records"]) == 8
+    assert payload["network_allowed"] is False
+    assert payload["mutating_git_allowed"] is False
+    assert all(record["commands"][0]["passed"] is True for record in payload["records"])

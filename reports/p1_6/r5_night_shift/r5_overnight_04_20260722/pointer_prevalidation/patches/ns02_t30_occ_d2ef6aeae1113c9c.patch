@@ -1,0 +1,27 @@
+diff --git a/scripts/build_r5_bundle16r_case_pack.py b/scripts/build_r5_bundle16r_case_pack.py
+index 8c9f200..f6e9610 100644
+--- a/scripts/build_r5_bundle16r_case_pack.py
++++ b/scripts/build_r5_bundle16r_case_pack.py
+@@ -641,0 +642 @@ def build_case(
++        "candidate_ready_for_exact_hash_review": not gate_issues,
+diff --git a/tests/test_r5_bundle16r_case_pack_builder.py b/tests/test_r5_bundle16r_case_pack_builder.py
+index 576dde8..4443d9a 100644
+--- a/tests/test_r5_bundle16r_case_pack_builder.py
++++ b/tests/test_r5_bundle16r_case_pack_builder.py
+@@ -231,0 +232,16 @@ def test_gate_failures_route_to_owning_stage() -> None:
++
++
++def test_quality_readout_exposes_exact_hash_review_readiness(tmp_path: Path) -> None:
++    input_path, registry_path = _fixture(tmp_path)
++    result = build_case(
++        repo_root=tmp_path,
++        input_path=input_path,
++        registry_path=registry_path,
++        output_dir=tmp_path / "reports/output",
++        case_results_dir=tmp_path / "bundle16r/generated/case_results",
++    )
++    quality_path = tmp_path / result["output_dir"] / "quality_readout.json"
++    quality = __import__("json").loads(quality_path.read_text(encoding="utf-8"))
++    assert quality["candidate_ready_for_exact_hash_review"] is True
++    assert quality["sample_quality_allowed"] is False
++    assert quality["p2_allowed"] is False

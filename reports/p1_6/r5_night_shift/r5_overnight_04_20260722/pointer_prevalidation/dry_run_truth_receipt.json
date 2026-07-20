@@ -1,0 +1,11 @@
+{
+  "external_approvals_consumed": 0,
+  "historical_path_changes": [],
+  "passed": true,
+  "pointer_dry_runs": 8,
+  "resolution_receipts_emitted": 0,
+  "resolved_delta": 0,
+  "schema_version": "r5_night04_pointer_dry_run_truth_v1",
+  "stable_receipt_sha256": "d895b4aecef4591e7d2cbcb2152c40dff1c914ea18b2a897a6aeb371fd6bf12d",
+  "target_branch_pointer_changes": []
+}

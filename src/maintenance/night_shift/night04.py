@@ -462,11 +462,14 @@ def materialize_wrapper_state(repo_root: Path) -> dict[str, Any]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Materialise Night04 mission artifacts")
     parser.add_argument("--repo", default=".")
-    parser.add_argument("--phase", choices=("baseline", "review", "acceleration"), default="baseline")
+    parser.add_argument("--phase", choices=("baseline", "review", "acceleration", "pointer"), default="baseline")
     parser.add_argument("--record-task", action="append", default=[])
+    parser.add_argument("--record-only", action="store_true")
     args = parser.parse_args(argv)
     repo_root = Path(args.repo).resolve()
-    if args.phase == "baseline":
+    if args.record_only:
+        summary = {"materialization": "skipped_record_only"}
+    elif args.phase == "baseline":
         result = materialize_phase_a(repo_root)
         summary = {"queue_items": result["taxonomy"]["total_items"]}
     elif args.phase == "review":
@@ -474,11 +477,16 @@ def main(argv: Sequence[str] | None = None) -> int:
 
         result = materialize_phase_b(repo_root)
         summary = {"candidate_count": result["registry"]["candidate_count"]}
-    else:
+    elif args.phase == "acceleration":
         from .night04_acceleration import materialize_phase_c
 
         result = materialize_phase_c(repo_root)
         summary = {"candidate_count": result["dashboard"]["review_candidates"]}
+    else:
+        from .night04_pointer import materialize_phase_d
+
+        result = materialize_phase_d(repo_root)
+        summary = {"pointer_dry_runs": result["patch_index"]["pointer_count"]}
     receipts = [record_completed_task(repo_root, task_id) for task_id in args.record_task]
     state = materialize_wrapper_state(repo_root)
     print(

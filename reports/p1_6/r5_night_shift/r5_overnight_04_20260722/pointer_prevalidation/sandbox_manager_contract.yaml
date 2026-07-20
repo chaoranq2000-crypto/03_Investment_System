@@ -1,0 +1,23 @@
+schema_version: r5_night04_pointer_sandbox_manager_v1
+base_commit: 828202b1104bf2d7face81379e79bda707f85d55
+sandbox_root: C:/Projects/03_Investment_System_night04_pointer_sandboxes
+sandbox_count: 8
+mode: detached_child_worktrees
+target_branch_mutation_without_approval: false
+sandboxes:
+- occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+  path: C:/Projects/03_Investment_System_night04_pointer_sandboxes/3caf2ad00e1b6285
+- occurrence_id: ns02_t30_occ_6b198842cf80755a
+  path: C:/Projects/03_Investment_System_night04_pointer_sandboxes/6b198842cf80755a
+- occurrence_id: ns02_t30_occ_99e77539490b01ad
+  path: C:/Projects/03_Investment_System_night04_pointer_sandboxes/99e77539490b01ad
+- occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+  path: C:/Projects/03_Investment_System_night04_pointer_sandboxes/c7f5c80f4b2e7a9c
+- occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+  path: C:/Projects/03_Investment_System_night04_pointer_sandboxes/c8af30bbe2f10e8a
+- occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+  path: C:/Projects/03_Investment_System_night04_pointer_sandboxes/d2ef6aeae1113c9c
+- occurrence_id: ns02_t30_occ_db819651b1640db8
+  path: C:/Projects/03_Investment_System_night04_pointer_sandboxes/db819651b1640db8
+- occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+  path: C:/Projects/03_Investment_System_night04_pointer_sandboxes/e3fefccd3e77fd5a

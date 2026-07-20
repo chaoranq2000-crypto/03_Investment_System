@@ -1,0 +1,95 @@
+schema_version: r5_night04_pointer_command_safety_v1
+pointer_count: 8
+network_allowed: false
+mutating_git_allowed: false
+records:
+- occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+  commands:
+  - command: python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+    sha256: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+    argv:
+    - C:\Projects\03_Investment_System\.conda\investment-system\python.exe
+    - -m
+    - pytest
+    - -q
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    passed: true
+- occurrence_id: ns02_t30_occ_6b198842cf80755a
+  commands:
+  - command: python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+    sha256: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+    argv:
+    - C:\Projects\03_Investment_System\.conda\investment-system\python.exe
+    - -m
+    - pytest
+    - -q
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    passed: true
+- occurrence_id: ns02_t30_occ_99e77539490b01ad
+  commands:
+  - command: python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+    sha256: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+    argv:
+    - C:\Projects\03_Investment_System\.conda\investment-system\python.exe
+    - -m
+    - pytest
+    - -q
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    passed: true
+- occurrence_id: ns02_t30_occ_c7f5c80f4b2e7a9c
+  commands:
+  - command: python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+    sha256: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+    argv:
+    - C:\Projects\03_Investment_System\.conda\investment-system\python.exe
+    - -m
+    - pytest
+    - -q
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    passed: true
+- occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+  commands:
+  - command: python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+    sha256: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+    argv:
+    - C:\Projects\03_Investment_System\.conda\investment-system\python.exe
+    - -m
+    - pytest
+    - -q
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    passed: true
+- occurrence_id: ns02_t30_occ_d2ef6aeae1113c9c
+  commands:
+  - command: python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+    sha256: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+    argv:
+    - C:\Projects\03_Investment_System\.conda\investment-system\python.exe
+    - -m
+    - pytest
+    - -q
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    passed: true
+- occurrence_id: ns02_t30_occ_db819651b1640db8
+  commands:
+  - command: python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+    sha256: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+    argv:
+    - C:\Projects\03_Investment_System\.conda\investment-system\python.exe
+    - -m
+    - pytest
+    - -q
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    passed: true
+- occurrence_id: ns02_t30_occ_e3fefccd3e77fd5a
+  commands:
+  - command: python -m pytest -q tests/test_r5_bundle16r_case_pack_builder.py
+    sha256: 4d68cfc86bc19b489fa3717a741929896c583ada4610224ccea8faca909bc53d
+    argv:
+    - C:\Projects\03_Investment_System\.conda\investment-system\python.exe
+    - -m
+    - pytest
+    - -q
+    - tests/test_r5_bundle16r_case_pack_builder.py
+    passed: true
+passed: true
+stable_receipt_sha256: 808ad070ad023aca6c51e4ec95e21d37876929bcc6642256c322d97b9b333dfb

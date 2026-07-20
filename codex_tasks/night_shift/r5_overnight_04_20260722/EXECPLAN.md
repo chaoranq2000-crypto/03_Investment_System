@@ -56,7 +56,7 @@ crossing human or research gates.
 - [x] Phase A
 - [x] Phase B
 - [x] Phase C
-- [ ] Phase D
+- [x] Phase D
 - [ ] Phase E
 - [ ] Phase F
 
@@ -74,6 +74,8 @@ Append; do not erase historical entries.
   contains 8 evidence, 24 analysis, 3 human-gate, and 8 pointer candidates with no duplicate ID.
 - All 43 candidates participate in the leverage ranking.  Membership analysis covers all 20
   dependency blockers, while the dashboard continues to report zero actual unlocks and 0/63 resolved.
+- Eight detached child worktrees produced eight hash-bound patches.  They collapse to two unique
+  semantic variants; each sandbox passed four targeted Bundle16R tests and an exact reverse-patch check.
 
 ## Decisions
 
@@ -84,6 +86,8 @@ Only record engineering decisions here. Human review decisions must originate ex
   into the delivery branch.
 - Treat conflicting duplicates as invalid for that occurrence, permit independent valid records in a partial
   batch, and require an external authority registry before any record enters conditional execution.
+- Retain the eight dirty dry-run worktrees through final validation.  Do not recursively clean them; the target
+  branch contains only patch and test receipts, and no pointer proposal is applied without external approval.
 
 ## Remaining Work
 
