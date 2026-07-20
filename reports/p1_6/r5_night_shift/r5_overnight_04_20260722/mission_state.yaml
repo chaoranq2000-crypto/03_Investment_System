@@ -141,37 +141,37 @@ tasks:
   status: passed
 - id: ns04_t44
   phase: E_conditional_execution
-  status: ready
+  status: passed
 - id: ns04_t45
   phase: E_conditional_execution
-  status: pending
+  status: passed
 - id: ns04_t46
   phase: E_conditional_execution
-  status: pending
+  status: passed
 - id: ns04_t47
   phase: E_conditional_execution
-  status: pending
+  status: passed
 - id: ns04_t48
   phase: E_conditional_execution
-  status: pending
+  status: passed
 - id: ns04_t49
   phase: E_conditional_execution
-  status: pending
+  status: passed
 - id: ns04_t50
   phase: E_conditional_execution
-  status: pending
+  status: passed
 - id: ns04_t51
   phase: E_conditional_execution
-  status: pending
+  status: passed
 - id: ns04_t52
   phase: F_validation_publication
-  status: pending
+  status: ready
 - id: ns04_t53
   phase: F_validation_publication
-  status: pending
+  status: ready
 - id: ns04_t54
   phase: F_validation_publication
-  status: pending
+  status: ready
 - id: ns04_t55
   phase: F_validation_publication
   status: pending
@@ -187,4 +187,4 @@ tasks:
 - id: ns04_t59
   phase: F_validation_publication
   status: pending
-stable_receipt_sha256: 75a519fef6f90368d3c77467f71191a08852f966d08d94bd3168ed55ff5d31a9
+stable_receipt_sha256: 11dd9166999ac76672efa62e0a897b7b682f743d0dedde167c7fb4bbb9cc1dd7

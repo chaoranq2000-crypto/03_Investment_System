@@ -1,0 +1,653 @@
+{
+  "blocker_occurrences_resolved_end": 0,
+  "blocker_occurrences_resolved_start": 0,
+  "blocker_occurrences_total": 63,
+  "dependency_unlocked_count": 0,
+  "external_decision_pending_count": 43,
+  "mission_id": "r5_overnight_04_20260722",
+  "occurrences": [
+    {
+      "blocker_occurrence_id": "BF17R-I-4be0172232cc9200",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_04343acd916afae4",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-68375633c445a400",
+      "case_id": "__suite__",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_07e49c037427403b",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-5f40a2298952b731",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_101f0195f0c5cf37",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-b81a93ae63b0b0a1",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_10e1e793011ee907",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-0e810f2da864e64b",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_139f375db9714f27",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-1573dad15a6a32fe",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_1842382e6647f17d",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-1c2f5d615dfec482",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_1977687ea7bce884",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-bb5c337faff1dfa8",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_1a742ef3d6224c6a",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-1433b6ad6fc3ba50",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_23259d462e4ca0f3",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-a03d6ffcb1666093",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_2a2ab71eced6e937",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-627830c62bd3567a",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_2b0567ebbd443da5",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-8d86221a11a48f9e",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_2c030a28f8631544",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "evidence_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-089dd9210b3ca01f",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_3139481aee5c01e0",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-d3dcd6e60a4225ac",
+      "case_id": "__suite__",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_3b0dd1527f9e0144",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-ffa18c8742ea01c3",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_3caf2ad00e1b6285",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "engineering_local"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-cb490c68d8fbf6f4",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_3d282b4ad0ca31e2",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-954edbd0d3cc55a1",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_4177e7d48f374473",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-ea2ca1691ce7c04f",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_60f5539e2d72463f",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-63d902b423e7e8a0",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_6491a19059d9ec6c",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-f8371fe04c02e574",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_6870f1ec5d1048be",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "evidence_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-5bca9af8085588c4",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_6b198842cf80755a",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "engineering_local"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-f5b138eb51cf7139",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_6cd0e0bd57166a21",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-2e66df220c4392d1",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_6d2b87d81881062e",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "evidence_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-09f291e1b9cc8a08",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_6e5fb996533eab2b",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-8e8976d3b16d6b11",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_6ff83cb834d7176d",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-7300d6a7bb2b11ce",
+      "case_id": "__suite__",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_7213df41458cf67d",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "human_gate"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-28d509b690f02b7d",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_76d9fbbac37b50a6",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-1ff6b307dfab5261",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_7745e52b12c07f1c",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-4608b127b8ffefd6",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_7a3640d70206502d",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "evidence_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-775a6c5de9d6ab88",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_86fb71b6c845c94f",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-3e906d62728d323c",
+      "case_id": "__suite__",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_8e3768557d6f2dde",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-17a603b213f30cd0",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_950802f6c70d5036",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-0c8dc5c57d7ca13c",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_97d3e4a3c0388529",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "evidence_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-857f459fcaf6ed04",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_99e77539490b01ad",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "engineering_local"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-944d59f2149764c7",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_9fe0bbfe8ab9bb7d",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "evidence_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-ebb296cf2c5a0339",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_a88a58ab2685ee6e",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "evidence_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-75433860c673c7e9",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_a9673677adb3ef8a",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-face100c70855495",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_ab0f8aac8f21f0db",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-a9dd1a762387aec7",
+      "case_id": "__suite__",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_ab6b62516df0a0f1",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "human_gate"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-0cd635a2eb846f5f",
+      "case_id": "__suite__",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_ae4ebd1d82c2bd03",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-296537a66ccafe3c",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_b52cbf88aff2c105",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-6692a34319e7dba9",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_b531d3c48931ba58",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-d997eee58100c229",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_b7467ff5401814aa",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-28436c48f16d6faf",
+      "case_id": "__suite__",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_be4e0eb69d196ff7",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "human_gate"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-99f9a72c12eec10a",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_becffa9c7cb6d886",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-44b8abfbbac4bf3b",
+      "case_id": "__suite__",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_c03007a138e83e9b",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-2a0b648b9932cc99",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_c7f5c80f4b2e7a9c",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "engineering_local"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-b18d701929df7909",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_c8af30bbe2f10e8a",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "engineering_local"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-0ed938d0a6004984",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_cdf02c368ebec0a7",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-89316fa8394654d3",
+      "case_id": "__suite__",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_d19d9b744d7aff4a",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-6c46f0a018878644",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_d2ef6aeae1113c9c",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "engineering_local"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-62576090e17d1881",
+      "case_id": "__suite__",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_d705e67d4c161924",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-4aefd94d717d90d3",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_db819651b1640db8",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "engineering_local"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-7b7b29e64a22c8bd",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_dc67ef1afb1051ef",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-ebe22dc23f0cbc66",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_e3fefccd3e77fd5a",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "engineering_local"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-c452b50461838d46",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_e48b0cd43634c242",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-b0a3803c6ee9da0f",
+      "case_id": "__suite__",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_e7027bc57e1dc7a7",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-aba790d186f24901",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_e855cd5fb843f9bf",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-54f3fce046afe029",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_e95d9ae85fb2fba0",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "evidence_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-a6dd3caf383e6eeb",
+      "case_id": "golden_multi_business_ai_infrastructure",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_eb221be0020f7038",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-3d3d2c56ef094519",
+      "case_id": "golden_gold_mining_cycle",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_ee055856e18cd3f4",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-029e5beb35496343",
+      "case_id": "golden_crdmo_backlog_conversion",
+      "external_gate": "blocked_external",
+      "occurrence_id": "ns02_t30_occ_f9fff3f413f6c43c",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "candidate_ready",
+      "work_type": "analysis_required"
+    },
+    {
+      "blocker_occurrence_id": "BF17R-I-ee6752d022e2fca8",
+      "case_id": "golden_copper_foil_product_generation",
+      "external_gate": null,
+      "occurrence_id": "ns02_t30_occ_fc4fc2c77ab26f2d",
+      "resolution_receipt_sha256": null,
+      "resolved": false,
+      "status": "dependency_blocked",
+      "work_type": "dependency_blocked"
+    }
+  ],
+  "p2_allowed": false,
+  "parent_work_orders_resolved": 0,
+  "parent_work_orders_total": 6,
+  "program_goal_state": "open_needs_targeted_backflow",
+  "resolved_delta": 0,
+  "sample_quality_allowed": false,
+  "schema_version": "r5_night04_blocker_ledger_v1",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "902586ee891171f15e96d6aa453d7263ee879317a882a601c584d758b3441dc6",
+  "status_counts": {
+    "candidate_ready": 43,
+    "dependency_blocked": 20
+  }
+}

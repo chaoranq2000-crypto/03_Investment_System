@@ -1,0 +1,16 @@
+{
+  "approved_input_count": 0,
+  "candidate_kind": "human_exact_hash_gate",
+  "executed_count": 0,
+  "independent_resolution_receipt_count": 0,
+  "mission_id": "r5_overnight_04_20260722",
+  "outcome": "blocked_external_no_approved_decisions",
+  "passed_execution_count": 0,
+  "pending_explicit_executor_count": 0,
+  "pending_occurrence_ids": [],
+  "receipts": [],
+  "resolved_count": 0,
+  "schema_version": "r5_night04_typed_execution_receipts_v1",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "77d0c69312a7ec7bc2261d69101071d6604c41b69c927549b335d3e9c7800160"
+}

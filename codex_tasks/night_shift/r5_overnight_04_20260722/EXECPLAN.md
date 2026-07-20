@@ -57,7 +57,7 @@ crossing human or research gates.
 - [x] Phase B
 - [x] Phase C
 - [x] Phase D
-- [ ] Phase E
+- [x] Phase E
 - [ ] Phase F
 
 ## Discoveries
@@ -76,6 +76,9 @@ Append; do not erase historical entries.
   dependency blockers, while the dashboard continues to report zero actual unlocks and 0/63 resolved.
 - Eight detached child worktrees produced eight hash-bound patches.  They collapse to two unique
   semantic variants; each sandbox passed four targeted Bundle16R tests and an exact reverse-patch check.
+- The external decision inbox contained only its README: zero decision manifests and no external
+  reviewer-authority registry.  Startup intake therefore executed zero adapters, retained 0/63
+  resolved, unlocked 0/20 dependencies, completed 0/6 parents, and carried all 69 IDs forward.
 
 ## Decisions
 
@@ -88,6 +91,8 @@ Only record engineering decisions here. Human review decisions must originate ex
   batch, and require an external authority registry before any record enters conditional execution.
 - Retain the eight dirty dry-run worktrees through final validation.  Do not recursively clean them; the target
   branch contains only patch and test receipts, and no pointer proposal is applied without external approval.
+- Keep approval consumption and independent execution receipts as separate gates.  Missing approvals are a
+  truthful `blocked_external` condition for research resolution, while bounded engineering delivery continues.
 
 ## Remaining Work
 
