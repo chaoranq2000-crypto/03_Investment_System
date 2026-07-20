@@ -13,6 +13,7 @@ from typing import Any, Iterator, Mapping, Sequence
 from .artifact_io import canonical_json_bytes
 from .behavior_hypothesis_candidates import (
     _canonical_timestamp,
+    project_behavior_hypothesis_state,
     replay_validate_behavior_hypothesis_candidate,
     validate_behavior_hypothesis_review_event,
 )
@@ -1187,15 +1188,6 @@ class ReviewStore:
             ).fetchall()
         return [json.loads(row["payload_json"]) for row in rows]
 
-    @staticmethod
-    def _provisional_candidate_status(events: Sequence[Mapping[str, Any]]) -> str:
-        status = "candidate"
-        for event in events:
-            event_type = str(event.get("event_type") or "")
-            if event_type != "note_added":
-                status = event_type
-        return status
-
     def list_behavior_hypothesis_candidates(
         self,
         *,
@@ -1209,7 +1201,7 @@ class ReviewStore:
         created_from: str | None = None,
         created_to: str | None = None,
     ) -> list[dict[str, Any]]:
-        """Query candidates; N4 replaces the provisional status with strict projection."""
+        """Query candidates with strict deterministic event-ledger projection."""
 
         self._ensure_p2h_stage1_initialized()
         filters: list[str] = []
@@ -1272,19 +1264,48 @@ class ReviewStore:
                 as_of=temporal["effective_at"],
                 knowledge_cutoff=temporal["knowledge_at"],
             )
-            projected_status = self._provisional_candidate_status(events)
+            projection = project_behavior_hypothesis_state(
+                candidate,
+                events,
+                as_of=temporal["effective_at"] or "9999-12-31T23:59:59Z",
+                knowledge_cutoff=(
+                    temporal["knowledge_at"] or "9999-12-31T23:59:59Z"
+                ),
+            )
+            projected_status = projection["status"]
             if status is not None and status != projected_status:
                 continue
             result.append(
                 {
                     "candidate": candidate,
                     "projected_status": projected_status,
+                    "projection": projection,
                     "visible_review_event_ids": [
                         event["review_event_id"] for event in events
                     ],
                 }
             )
         return result
+
+    def project_behavior_hypothesis_candidate(
+        self,
+        candidate_id: str,
+        *,
+        as_of: str,
+        knowledge_cutoff: str,
+    ) -> dict[str, Any]:
+        candidate = self.get_behavior_hypothesis_candidate(candidate_id)
+        events = self.list_behavior_hypothesis_review_events(
+            candidate_id=candidate_id,
+            as_of=as_of,
+            knowledge_cutoff=knowledge_cutoff,
+        )
+        return project_behavior_hypothesis_state(
+            candidate,
+            events,
+            as_of=as_of,
+            knowledge_cutoff=knowledge_cutoff,
+        )
 
     def replay_behavior_hypothesis_candidate(
         self,

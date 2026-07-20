@@ -38,6 +38,9 @@ CANDIDATE_VALIDATION_SCHEMA_VERSION = (
 REVIEW_EVENT_VALIDATION_SCHEMA_VERSION = (
     "p2h.behavior_hypothesis_review_event.validation.v1"
 )
+REVIEW_LEDGER_VALIDATION_SCHEMA_VERSION = (
+    "p2h.behavior_hypothesis_review_ledger.validation.v1"
+)
 CANDIDATE_BUILDER_VERSION = "p2h.behavior_hypothesis_candidate.builder.v1"
 REVIEW_EVENT_BUILDER_VERSION = "p2h.behavior_hypothesis_review_event.builder.v1"
 CANONICAL_SORT_VERSION = "p2h.behavior_hypothesis_candidate_sort.v1"
@@ -70,6 +73,14 @@ PROJECTION_SCHEMA_PATH = (
 
 class BehaviorHypothesisCandidateError(ValueError):
     """Raised when a P2H Stage 1 public contract is violated."""
+
+
+class BehaviorHypothesisProjectionError(BehaviorHypothesisCandidateError):
+    """Raised when immutable review events cannot form one valid projection."""
+
+    def __init__(self, code: str, message: str) -> None:
+        self.code = code
+        super().__init__(f"{code}: {message}")
 
 
 class SubjectScopeKind(str, Enum):
@@ -1027,3 +1038,265 @@ def replay_validate_behavior_hypothesis_candidate(
         },
         source_status="blocked" if normalized else "verified",
     )
+
+
+_STATE_TRANSITIONS: dict[str, set[str]] = {
+    "candidate": {"submitted"},
+    "submitted": {
+        "accepted_for_observation",
+        "revision_requested",
+        "rejected",
+        "superseded",
+    },
+    "accepted_for_observation": {"superseded"},
+    "revision_requested": {"superseded"},
+    "rejected": {"superseded"},
+    "superseded": set(),
+}
+
+
+def behavior_hypothesis_review_event_sort_key(
+    event: Mapping[str, Any],
+) -> tuple[str, str, str, str]:
+    """Return the frozen business/knowledge/review/identity event order."""
+
+    return (
+        str(event.get("effective_at") or ""),
+        str(event.get("knowledge_at") or ""),
+        str(event.get("reviewed_at") or ""),
+        str(event.get("review_event_id") or ""),
+    )
+
+
+def _projection_error(code: str, message: str) -> None:
+    raise BehaviorHypothesisProjectionError(code, message)
+
+
+def _prepare_review_events(
+    candidate: Mapping[str, Any],
+    review_events: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    candidate_id = str(candidate.get("candidate_id") or "")
+    by_id: dict[str, tuple[bytes, dict[str, Any]]] = {}
+    for raw in review_events:
+        if not isinstance(raw, Mapping):
+            _projection_error(
+                "REVIEW_EVENT_INVALID", "review event must be an object"
+            )
+        event = deepcopy(dict(raw))
+        event_id = str(event.get("review_event_id") or "")
+        serialized = canonical_json_bytes(event)
+        existing = by_id.get(event_id)
+        if existing is not None:
+            if existing[0] != serialized:
+                _projection_error(
+                    "REVIEW_EVENT_ID_CONFLICT",
+                    f"review event {event_id} has divergent payloads",
+                )
+            continue
+        validation = validate_behavior_hypothesis_review_event(event)
+        if validation["validation_status"] != "accepted":
+            _projection_error(
+                "REVIEW_EVENT_INVALID",
+                ", ".join(validation["finding_codes"]),
+            )
+        if event["candidate_id"] != candidate_id:
+            _projection_error(
+                "ORPHAN_REVIEW_EVENT",
+                f"event {event['review_event_id']} targets another candidate",
+            )
+        by_id[event_id] = (serialized, event)
+    return sorted(
+        (value[1] for value in by_id.values()),
+        key=behavior_hypothesis_review_event_sort_key,
+    )
+
+
+def project_behavior_hypothesis_state(
+    candidate: Mapping[str, Any],
+    review_events: Sequence[Mapping[str, Any]],
+    *,
+    as_of: str,
+    knowledge_cutoff: str,
+) -> dict[str, Any]:
+    """Project one deterministic state from an explicit immutable event ledger."""
+
+    candidate_validation = validate_behavior_hypothesis_candidate(candidate)
+    if candidate_validation["validation_status"] != "accepted":
+        _projection_error(
+            "CANDIDATE_INVALID",
+            ", ".join(candidate_validation["finding_codes"]),
+        )
+    normalized_as_of = _canonical_timestamp(as_of, "as_of")
+    normalized_cutoff = _canonical_timestamp(
+        knowledge_cutoff, "knowledge_cutoff"
+    )
+    if str(candidate["effective_at"]) > normalized_as_of:
+        _projection_error(
+            "CANDIDATE_NOT_EFFECTIVE",
+            "candidate is not effective at the requested as_of",
+        )
+    if str(candidate["knowledge_at"]) > normalized_cutoff:
+        _projection_error(
+            "CANDIDATE_NOT_KNOWN",
+            "candidate is not known at the requested knowledge_cutoff",
+        )
+
+    prepared = _prepare_review_events(candidate, review_events)
+    visible = [
+        event
+        for event in prepared
+        if event["effective_at"] <= normalized_as_of
+        and event["knowledge_at"] <= normalized_cutoff
+    ]
+    state_groups: dict[tuple[str, str, str], list[str]] = {}
+    for event in visible:
+        if event["event_type"] == "note_added":
+            continue
+        group_key = (
+            event["effective_at"],
+            event["knowledge_at"],
+            event["reviewed_at"],
+        )
+        state_groups.setdefault(group_key, []).append(event["review_event_id"])
+    conflicts = [ids for ids in state_groups.values() if len(ids) > 1]
+    if conflicts:
+        _projection_error(
+            "CONCURRENT_STATE_EVENTS",
+            "multiple state-changing events share the same semantic time",
+        )
+
+    status = "candidate"
+    applied_event_ids: list[str] = []
+    applied_id_set: set[str] = set()
+    candidate_created_at = str(candidate["created_at"])
+    candidate_effective_at = str(candidate["effective_at"])
+    candidate_knowledge_at = str(candidate["knowledge_at"])
+    for event in visible:
+        event_id = str(event["review_event_id"])
+        if event["effective_at"] < candidate_effective_at:
+            _projection_error(
+                "EVENT_EFFECTIVE_BEFORE_CANDIDATE",
+                f"event {event_id} is effective before its candidate",
+            )
+        if event["knowledge_at"] < candidate_knowledge_at:
+            _projection_error(
+                "EVENT_KNOWN_BEFORE_CANDIDATE",
+                f"event {event_id} is known before its candidate",
+            )
+        if event["reviewed_at"] < candidate_created_at:
+            _projection_error(
+                "EVENT_REVIEWED_BEFORE_CANDIDATE",
+                f"event {event_id} was reviewed before candidate creation",
+            )
+        if event["evidence_cutoff"] < candidate_knowledge_at:
+            _projection_error(
+                "EVIDENCE_CUTOFF_BEFORE_CANDIDATE",
+                f"event {event_id} excludes candidate-visible evidence",
+            )
+
+        event_type = str(event["event_type"])
+        supersedes_event_id = event.get("supersedes_event_id")
+        supersedes_candidate_id = event.get("supersedes_candidate_id")
+        if event_type == "note_added":
+            if status == "candidate":
+                _projection_error(
+                    "INVALID_REVIEW_TRANSITION",
+                    "note_added requires a submitted candidate",
+                )
+            if supersedes_event_id is not None or supersedes_candidate_id is not None:
+                _projection_error(
+                    "UNEXPECTED_SUPERSESSION_REFERENCE",
+                    "note_added cannot carry supersession references",
+                )
+        else:
+            if event_type not in _STATE_TRANSITIONS[status]:
+                _projection_error(
+                    "INVALID_REVIEW_TRANSITION",
+                    f"{status} cannot transition to {event_type}",
+                )
+            if event_type == "superseded":
+                if (
+                    supersedes_event_id is not None
+                    and supersedes_event_id not in applied_id_set
+                ):
+                    _projection_error(
+                        "SUPERSESSION_EVENT_NOT_VISIBLE",
+                        "supersedes_event_id must reference an earlier visible event",
+                    )
+                if supersedes_candidate_id == candidate["candidate_id"]:
+                    _projection_error(
+                        "SELF_SUPERSESSION_INVALID",
+                        "a candidate cannot supersede itself",
+                    )
+            elif supersedes_event_id is not None or supersedes_candidate_id is not None:
+                _projection_error(
+                    "UNEXPECTED_SUPERSESSION_REFERENCE",
+                    f"{event_type} cannot carry supersession references",
+                )
+            status = event_type
+        applied_event_ids.append(event_id)
+        applied_id_set.add(event_id)
+
+    projection = {
+        "schema_version": PROJECTION_SCHEMA_VERSION,
+        "artifact_type": "behavior_hypothesis_projection",
+        "candidate_id": candidate["candidate_id"],
+        "status": status,
+        "as_of": normalized_as_of,
+        "knowledge_cutoff": normalized_cutoff,
+        "applied_event_ids": applied_event_ids,
+        "last_event_id": applied_event_ids[-1] if applied_event_ids else None,
+        "state_semantics": ACCEPTED_FOR_OBSERVATION_SEMANTICS,
+    }
+    schema_errors = _schema_findings(
+        projection, PROJECTION_SCHEMA_PATH, "PROJECTION_SCHEMA_INVALID"
+    )
+    if schema_errors:
+        _projection_error(
+            "PROJECTION_SCHEMA_INVALID",
+            ", ".join(item["message"] for item in schema_errors),
+        )
+    return projection
+
+
+def validate_behavior_hypothesis_review_ledger(
+    candidate: Mapping[str, Any],
+    review_events: Sequence[Mapping[str, Any]],
+    *,
+    as_of: str,
+    knowledge_cutoff: str,
+) -> dict[str, Any]:
+    """Return a stable validation envelope for a candidate plus event ledger."""
+
+    try:
+        projection = project_behavior_hypothesis_state(
+            candidate,
+            review_events,
+            as_of=as_of,
+            knowledge_cutoff=knowledge_cutoff,
+        )
+    except BehaviorHypothesisProjectionError as exc:
+        return {
+            "schema_version": REVIEW_LEDGER_VALIDATION_SCHEMA_VERSION,
+            "validation_status": "blocked",
+            "candidate_id": str(candidate.get("candidate_id") or ""),
+            "projection": None,
+            "findings": [
+                {
+                    "severity": "blocker",
+                    "code": exc.code,
+                    "message": str(exc),
+                    "path": "$.review_events",
+                }
+            ],
+            "finding_codes": [exc.code],
+        }
+    return {
+        "schema_version": REVIEW_LEDGER_VALIDATION_SCHEMA_VERSION,
+        "validation_status": "accepted",
+        "candidate_id": candidate["candidate_id"],
+        "projection": projection,
+        "findings": [],
+        "finding_codes": [],
+    }
