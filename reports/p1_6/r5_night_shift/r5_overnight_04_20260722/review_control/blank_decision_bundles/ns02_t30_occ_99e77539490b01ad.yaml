@@ -1,0 +1,14 @@
+schema_version: r5_night04_batch_decision_manifest_v2
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+records:
+- occurrence_id: ns02_t30_occ_99e77539490b01ad
+  candidate_kind: engineering_local_pointer
+  candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/pointer_review_index.yaml
+  candidate_sha256: 1b7acae56075c1d08139bc9c92755e3b536d3430ffccb3019f527ee9715d6d7c
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_99e77539490b01ad.yaml
+  review_packet_sha256: 57f9b6364f6691d03952b68fdce6d7a2dec5d27148a129c338e8bc9a74257bff
+  reviewer: null
+  reviewer_authority: null
+  reviewed_at: null
+  decision: null
+  notes: []

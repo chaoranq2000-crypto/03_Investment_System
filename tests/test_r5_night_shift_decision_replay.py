@@ -8,6 +8,9 @@ from src.maintenance.night_shift.night03_execution import (
     initial_occurrence_state,
     replay_decisions,
 )
+from src.maintenance.night_shift.night04_review import apply_replay_guard, validate_decision_batch
+
+from tests.night04_test_support import FIXTURE_NOW, REPO_ROOT as NIGHT04_REPO_ROOT, valid_manifest
 
 
 def test_decision_replay_is_idempotent_and_does_not_double_count_resolution() -> None:
@@ -39,3 +42,19 @@ def test_decision_replay_is_idempotent_and_does_not_double_count_resolution() ->
     assert first["processed_decision_digests"] == ["d" * 64]
     assert first["occurrences"][task["id"]]["status"] == "resolved"
     assert first["occurrences"][task["id"]]["attempts"] == 1
+
+
+def test_night04_replay_guard_accepts_digest_once() -> None:
+    manifest, authorities = valid_manifest()
+    validated = validate_decision_batch(
+        NIGHT04_REPO_ROOT,
+        manifest,
+        authority_registry=authorities,
+        now=FIXTURE_NOW,
+    )
+    seen: set[str] = set()
+    first = apply_replay_guard(validated["accepted_records"], seen)
+    second = apply_replay_guard(validated["accepted_records"], seen)
+    assert len(first["new_records"]) == 1
+    assert second["new_records"] == []
+    assert len(second["replayed_digests"]) == 1

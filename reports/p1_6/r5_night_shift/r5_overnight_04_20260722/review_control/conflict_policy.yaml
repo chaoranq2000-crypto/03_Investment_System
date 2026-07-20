@@ -1,0 +1,4 @@
+schema_version: r5_night04_conflict_policy_v1
+conflicting_duplicates: reject_all_records_for_occurrence
+identical_duplicates: accept_first_and_record_replay
+decision_alone_resolves_occurrence: false

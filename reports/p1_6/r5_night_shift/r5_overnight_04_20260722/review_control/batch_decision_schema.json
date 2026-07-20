@@ -1,0 +1,75 @@
+{
+  "$id": "r5_night04_batch_decision_manifest_v2",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "records": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "candidate_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "decision": {
+            "enum": [
+              "approve",
+              "reject",
+              "defer",
+              "request_changes"
+            ]
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "occurrence_id": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "review_packet_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reviewer": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "reviewer_authority": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "occurrence_id",
+          "candidate_sha256",
+          "review_packet_sha256",
+          "reviewer",
+          "reviewer_authority",
+          "reviewed_at",
+          "decision"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "r5_night04_batch_decision_manifest_v2"
+    },
+    "source_queue_sha256": {
+      "const": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68"
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_queue_sha256",
+    "records"
+  ],
+  "type": "object"
+}

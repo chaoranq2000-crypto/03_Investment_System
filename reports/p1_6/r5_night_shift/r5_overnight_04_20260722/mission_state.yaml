@@ -39,37 +39,37 @@ tasks:
   status: passed
 - id: ns04_t10
   phase: B_review_control
-  status: ready
+  status: passed
 - id: ns04_t11
   phase: B_review_control
-  status: pending
+  status: passed
 - id: ns04_t12
   phase: B_review_control
-  status: pending
+  status: passed
 - id: ns04_t13
   phase: B_review_control
-  status: pending
+  status: passed
 - id: ns04_t14
   phase: B_review_control
-  status: pending
+  status: passed
 - id: ns04_t15
   phase: B_review_control
-  status: pending
+  status: passed
 - id: ns04_t16
   phase: B_review_control
-  status: pending
+  status: passed
 - id: ns04_t17
   phase: B_review_control
-  status: pending
+  status: passed
 - id: ns04_t18
   phase: B_review_control
-  status: pending
+  status: passed
 - id: ns04_t19
   phase: B_review_control
-  status: pending
+  status: passed
 - id: ns04_t20
   phase: C_review_acceleration
-  status: pending
+  status: ready
 - id: ns04_t21
   phase: C_review_acceleration
   status: pending
@@ -187,4 +187,4 @@ tasks:
 - id: ns04_t59
   phase: F_validation_publication
   status: pending
-stable_receipt_sha256: bca47811c6e873c43bed3d32bcb25e42a2d2d26523d084366ddb2c7af7ca13f2
+stable_receipt_sha256: 41f2560dcba093d1b5a67134523c4b3dea62cb132a6b4eee12ade813f88fcd7e

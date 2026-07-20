@@ -1,0 +1,48 @@
+schema_version: r5_night04_review_packet_v1
+mission_id: r5_overnight_04_20260722
+occurrence_id: ns02_t30_occ_7213df41458cf67d
+parent_id: BF17R-WO-29d90bec175ab7
+case_id: __suite__
+candidate_kind: human_exact_hash_gate
+required_reviewer_authority: human_gate_reviewer
+candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/human_gate_handoffs.yaml
+candidate_sha256: 339db06c347f804885690dc7bc5bf97618d9a239cc582540c6230cedb1dc5aa6
+source_queue_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+source_lineage:
+- role: human_gate_candidate
+  path: reports/p1_6/r5_bundle17r/chain_a/qualification/R5_bundle15r_generation_lock.json
+  sha256: 1e8d82a893a144c70b25fde8210119353a04bb0f515053dc1ff072a61b8321c9
+decision_options:
+- approve
+- reject
+- defer
+- request_changes
+downstream_impact:
+  direct_dependent_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_wo_554708d47fac02bc
+  direct_dependency_count: 9
+  parent_work_order_ids:
+  - ns02_t30_wo_554708d47fac02bc
+  resolution_effect: recompute_from_independent_receipt_only
+counterevidence:
+- quality_booleans:
+    p2_allowed: false
+    sample_quality_allowed: false
+    workflow_state_mutation_allowed: false
+uncertainties:
+- external_exact_hash_review_required
+- approval_is_not_resolution
+reviewer: null
+reviewer_authority: null
+reviewed_at: null
+decision: null
+packet_sha256: 4f7579fc4d80c012e1d06033eae8ea3abd4bb66802a4592d995112e14518f151

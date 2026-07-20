@@ -1,0 +1,94 @@
+schema_version: r5_night04_review_packet_v1
+mission_id: r5_overnight_04_20260722
+occurrence_id: ns02_t30_occ_ab0f8aac8f21f0db
+parent_id: BF17R-WO-dd409a4bffcd9d
+case_id: golden_gold_mining_cycle
+candidate_kind: analysis_required
+required_reviewer_authority: research_reviewer
+candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/analysis_candidates.yaml
+candidate_sha256: 22f621ae4bd0033b11193aabc21ead630f811f4e87f54b2925ed38d7dfceea14
+source_queue_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+source_lineage:
+- role: bound_failure_source
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+  sha256: ef5f0513e89e4d9f51f189fcae650e6b5ccbf02a1fe52065fba377c2e5358bf0
+  status: verified_lineage_not_accepted_conclusion_evidence
+- role: evidence_pack
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/evidence_pack.json
+  physical_sha256: 915fb3916e11378306a9cc6d5fd42a48f9cabe9bc8614d2a3ad7be6c70ff54d1
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: forecast_model
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/forecast_model.json
+  physical_sha256: feadd5a52721c4ae2781e8195524d099fc954d3ad4c8ffa58fd1495336ebe268
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: generation_lock
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+  physical_sha256: 5cffa5fee240c6bb3c9f7bbf3b07d7cf4c2e8c799e1f07aa839cfb2449a3f0d1
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: human_review
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/human_review.yaml
+  physical_sha256: baea3bbf009af5897f54f53123313f9fb7e739a5c66f7a02433dc68645c0eb3b
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: operating_driver_pack
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/operating_driver_pack.json
+  physical_sha256: dbef5761eac7762a25fc1ea2d42adaa867df739b8fee3395e77cbed45832aa41
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: quality_readout
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/quality_readout.json
+  physical_sha256: ef5f0513e89e4d9f51f189fcae650e6b5ccbf02a1fe52065fba377c2e5358bf0
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: reader_report
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/reader_report.md
+  physical_sha256: edc6e089537e64e4bbcc7578e02465cfa6d0d5c259f575e6f0eeff5e716b6030
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: valuation_pack
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/valuation_pack.json
+  physical_sha256: dee79360d56010322e665391c0c128a705ed4d36d9d3296f620006e475185d99
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: workflow_state
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/workflow_state.yaml
+  physical_sha256: c82c1b121e76abbf0c439a2bcfa464a36097ace52a981b5f6e511227767031dc
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+decision_options:
+- approve
+- reject
+- defer
+- request_changes
+downstream_impact:
+  direct_dependent_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_wo_f9d03098e6d0feba
+  direct_dependency_count: 12
+  parent_work_order_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  resolution_effect: recompute_from_independent_receipt_only
+counterevidence:
+- MISSING_REVIEWED_COUNTER_EVIDENCE
+uncertainties:
+- locator-bound reviewed evidence with period, unit, source class, and calculation method
+- MISSING_REVIEWED_ANALYST_CONCLUSION
+reviewer: null
+reviewer_authority: null
+reviewed_at: null
+decision: null
+packet_sha256: c2750d88894c03e36339dda764315da257b91ad70362b0d22633176b69df16fa

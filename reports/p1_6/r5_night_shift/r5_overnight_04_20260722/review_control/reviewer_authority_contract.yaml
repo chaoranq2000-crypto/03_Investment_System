@@ -1,0 +1,8 @@
+schema_version: r5_night04_reviewer_authority_contract_v1
+authority_source: external_registry_only
+machine_may_create_reviewer_identity: false
+required_by_kind:
+  evidence_required: evidence_reviewer
+  analysis_required: research_reviewer
+  human_exact_hash_gate: human_gate_reviewer
+  engineering_local_pointer: engineering_contract_reviewer

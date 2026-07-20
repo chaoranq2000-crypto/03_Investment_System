@@ -1,0 +1,14 @@
+schema_version: r5_night04_batch_decision_manifest_v2
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+records:
+- occurrence_id: ns02_t30_occ_1842382e6647f17d
+  candidate_kind: analysis_required
+  candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/analysis_candidates.yaml
+  candidate_sha256: 5cb59aac511d4919a2dfa2f6b10b398dedaedae4a5b3de44d6910c4c769d7f31
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_1842382e6647f17d.yaml
+  review_packet_sha256: 0b429ae01aa5ecc420ad3f9ebfe743b3c031229947407d8540aba9145167f995
+  reviewer: null
+  reviewer_authority: null
+  reviewed_at: null
+  decision: null
+  notes: []

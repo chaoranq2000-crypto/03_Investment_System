@@ -1,0 +1,94 @@
+schema_version: r5_night04_review_packet_v1
+mission_id: r5_overnight_04_20260722
+occurrence_id: ns02_t30_occ_6ff83cb834d7176d
+parent_id: BF17R-WO-df7ea35a97ead0
+case_id: golden_crdmo_backlog_conversion
+candidate_kind: analysis_required
+required_reviewer_authority: research_reviewer
+candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/analysis_candidates.yaml
+candidate_sha256: da547191076b851f201d58ba10ade1e1900755be7fcbdde040c96b766e26d43c
+source_queue_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+source_lineage:
+- role: bound_failure_source
+  path: reports/p1_6/r5_bundle17r/chain_a/qualification/qualification/golden_crdmo_backlog_conversion.yaml
+  sha256: 5e0b8b98b01a0e3207a57a9d0ea8c865dbdfd80da0e48beab59330ff76e58a72
+  status: verified_lineage_not_accepted_conclusion_evidence
+- role: evidence_pack
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/evidence_pack.json
+  physical_sha256: b6b59f9d1a00d1adfc6422563d9226c14e27f3526f74cecfa3e1feb2ebd2e386
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: forecast_model
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/forecast_model.json
+  physical_sha256: 5279f36cf9ab4ea8fe3055d4f230381016e8a664bbca64df164cf4ba3c94ad9d
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: generation_lock
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/generation_lock.json
+  physical_sha256: 80d673824269e8a65083e36694d4f64eaed0bd6380362cac9b25c8f6a1e0375f
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: human_review
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/human_review.yaml
+  physical_sha256: 54055f64f3780ddbc08417219f82039a0f20c0b0bccbcc480d2a088f4ae55bb9
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: operating_driver_pack
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/operating_driver_pack.json
+  physical_sha256: e0d2225347b99b688f8a94b34649f8366c5a51cba992ebdaf48ccf0f8b79825d
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: quality_readout
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+  physical_sha256: a58faa678fa6150799f0ec267c46ada02df1199781ef6e61a1e18c72085bd108
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: reader_report
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/reader_report.md
+  physical_sha256: 04ec8a53a023c3678dfdb7682901c5b229b7040c86af216930b0b4eea739f701
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: valuation_pack
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/valuation_pack.json
+  physical_sha256: 52e28e426d3f49f3016dcee2b85bd3c80f28c67373ae524e52f19df94221b94c
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: workflow_state
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/workflow_state.yaml
+  physical_sha256: 6a921191d30d789fee40d818c9e201bcabb108a29ef889e4e20809ae174416aa
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+decision_options:
+- approve
+- reject
+- defer
+- request_changes
+downstream_impact:
+  direct_dependent_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_wo_db304e8553027647
+  direct_dependency_count: 12
+  parent_work_order_ids:
+  - ns02_t30_wo_db304e8553027647
+  resolution_effect: recompute_from_independent_receipt_only
+counterevidence:
+- MISSING_REVIEWED_COUNTER_EVIDENCE
+uncertainties:
+- locator-bound reviewed evidence with period, unit, source class, and calculation method
+- MISSING_REVIEWED_ANALYST_CONCLUSION
+reviewer: null
+reviewer_authority: null
+reviewed_at: null
+decision: null
+packet_sha256: 05dfffcec0fc61dcc25955db9deeb91be5140b96804257003946793cffd03a83

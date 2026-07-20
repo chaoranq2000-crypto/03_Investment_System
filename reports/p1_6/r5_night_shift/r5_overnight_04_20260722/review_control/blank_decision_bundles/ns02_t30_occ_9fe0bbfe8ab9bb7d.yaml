@@ -1,0 +1,14 @@
+schema_version: r5_night04_batch_decision_manifest_v2
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+records:
+- occurrence_id: ns02_t30_occ_9fe0bbfe8ab9bb7d
+  candidate_kind: evidence_required
+  candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/evidence_candidates.yaml
+  candidate_sha256: 893d699df13991a3bde1fa18a6391395ac3aa7f407c617e0c074beca550de066
+  review_packet_path: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/review_packets/ns02_t30_occ_9fe0bbfe8ab9bb7d.yaml
+  review_packet_sha256: bd2e42b8153f7b768f77affc54883fb17b1e00ad9e2c76ef35e2f4678d509076
+  reviewer: null
+  reviewer_authority: null
+  reviewed_at: null
+  decision: null
+  notes: []

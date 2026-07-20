@@ -54,7 +54,7 @@ crossing human or research gates.
 ## Progress
 
 - [x] Phase A
-- [ ] Phase B
+- [x] Phase B
 - [ ] Phase C
 - [ ] Phase D
 - [ ] Phase E
@@ -70,6 +70,8 @@ Append; do not erase historical entries.
 - The packaged bootstrap treats normal Git stderr messages as terminating PowerShell errors.  The
   worktree and package copy were inspected at each boundary and the declared seed steps were
   completed manually without cleanup or scope expansion.
+- All 43 Night03 packet hashes validate against their canonical payloads.  The unified registry
+  contains 8 evidence, 24 analysis, 3 human-gate, and 8 pointer candidates with no duplicate ID.
 
 ## Decisions
 
@@ -78,6 +80,8 @@ Only record engineering decisions here. Human review decisions must originate ex
 - Bind the 97 tracked Night03 inputs using Git blob bytes so the baseline manifest is checkout-EOL invariant.
 - Keep the original Night03 ZIP verification in a separate runtime receipt; do not copy the untracked archive
   into the delivery branch.
+- Treat conflicting duplicates as invalid for that occurrence, permit independent valid records in a partial
+  batch, and require an external authority registry before any record enters conditional execution.
 
 ## Remaining Work
 

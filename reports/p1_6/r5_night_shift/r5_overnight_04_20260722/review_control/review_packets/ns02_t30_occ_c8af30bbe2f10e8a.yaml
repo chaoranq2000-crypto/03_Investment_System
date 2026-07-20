@@ -1,0 +1,50 @@
+schema_version: r5_night04_review_packet_v1
+mission_id: r5_overnight_04_20260722
+occurrence_id: ns02_t30_occ_c8af30bbe2f10e8a
+parent_id: BF17R-WO-dd409a4bffcd9d
+case_id: golden_gold_mining_cycle
+candidate_kind: engineering_local_pointer
+required_reviewer_authority: engineering_contract_reviewer
+candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/pointer_review_index.yaml
+candidate_sha256: ea551aa4e7ad314550f6de86049bb54f771117a64ab1791d8954c52c39b8cfb6
+source_queue_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+source_lineage:
+- role: pointer_source
+  path: reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/generation_lock.json
+  proposal_sha256: 71a691a9c518213e21d6ac39bd49eb7659725672e2a2826f1280de7dfbebde14
+decision_options:
+- approve
+- reject
+- defer
+- request_changes
+downstream_impact:
+  direct_dependent_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_10e1e793011ee907
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_60f5539e2d72463f
+  - ns02_t30_occ_6e5fb996533eab2b
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_wo_f9d03098e6d0feba
+  direct_dependency_count: 12
+  parent_work_order_ids:
+  - ns02_t30_wo_f9d03098e6d0feba
+  resolution_effect: recompute_from_independent_receipt_only
+counterevidence:
+- pointer alias can hide an upstream semantic contract gap
+- approved child diff must remain a strict subset of exact paths
+- historical Bundle17R artifacts remain read-only
+uncertainties:
+- pointer_semantics_require_external_approval
+- dry_run_is_not_resolution
+reviewer: null
+reviewer_authority: null
+reviewed_at: null
+decision: null
+packet_sha256: 7651fca9e3e33aeadee151c4f08d7bd8804103416719c6faa5476dc90c433ca7

@@ -1,0 +1,24 @@
+schema_version: r5_night04_review_packet_contract_v1
+candidate_count: 43
+required_fields:
+- occurrence_id
+- parent_id
+- case_id
+- candidate_kind
+- candidate_artifact_path
+- candidate_sha256
+- source_lineage
+- decision_options
+- downstream_impact
+- counterevidence
+- uncertainties
+- reviewer
+- reviewer_authority
+- reviewed_at
+- decision
+machine_must_leave_empty:
+- reviewer
+- reviewer_authority
+- reviewed_at
+- decision
+candidate_ready_is_resolution: false

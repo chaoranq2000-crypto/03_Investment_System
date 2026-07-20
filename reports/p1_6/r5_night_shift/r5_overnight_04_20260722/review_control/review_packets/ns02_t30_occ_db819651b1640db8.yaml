@@ -1,0 +1,50 @@
+schema_version: r5_night04_review_packet_v1
+mission_id: r5_overnight_04_20260722
+occurrence_id: ns02_t30_occ_db819651b1640db8
+parent_id: BF17R-WO-df7ea35a97ead0
+case_id: golden_crdmo_backlog_conversion
+candidate_kind: engineering_local_pointer
+required_reviewer_authority: engineering_contract_reviewer
+candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/pointer_review_index.yaml
+candidate_sha256: c2fc59331b7a97ed9dd2b2b0cd4547abcb3487a30f3e70e503f5b995bcccd9fb
+source_queue_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+source_lineage:
+- role: pointer_source
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/quality_readout.json
+  proposal_sha256: 905eaa0a544a2e91e267c8621ecaeaecb532a666eab29b114795930b8603e119
+decision_options:
+- approve
+- reject
+- defer
+- request_changes
+downstream_impact:
+  direct_dependent_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_wo_db304e8553027647
+  direct_dependency_count: 12
+  parent_work_order_ids:
+  - ns02_t30_wo_db304e8553027647
+  resolution_effect: recompute_from_independent_receipt_only
+counterevidence:
+- pointer alias can hide an upstream semantic contract gap
+- approved child diff must remain a strict subset of exact paths
+- historical Bundle17R artifacts remain read-only
+uncertainties:
+- pointer_semantics_require_external_approval
+- dry_run_is_not_resolution
+reviewer: null
+reviewer_authority: null
+reviewed_at: null
+decision: null
+packet_sha256: 11de61ee0a888fea71eda6bdb68a0aa78470a3638275823d421856631540cc77

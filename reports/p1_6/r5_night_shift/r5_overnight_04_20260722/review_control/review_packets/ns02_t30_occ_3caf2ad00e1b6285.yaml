@@ -1,0 +1,50 @@
+schema_version: r5_night04_review_packet_v1
+mission_id: r5_overnight_04_20260722
+occurrence_id: ns02_t30_occ_3caf2ad00e1b6285
+parent_id: BF17R-WO-ca803d73d4b2b1
+case_id: golden_copper_foil_product_generation
+candidate_kind: engineering_local_pointer
+required_reviewer_authority: engineering_contract_reviewer
+candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/pointer_review_index.yaml
+candidate_sha256: dab6a36299bc6b2a6f21bb5f3a479ca4a113c797c758d325c1b739582e9cf1a0
+source_queue_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+source_lineage:
+- role: pointer_source
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+  proposal_sha256: 17ad9eece4828b1acba9ff5f4cf77bd1fe1dbfc7387612f19bc92a033642036a
+decision_options:
+- approve
+- reject
+- defer
+- request_changes
+downstream_impact:
+  direct_dependent_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  - ns02_t30_wo_e205ce3a49c56b7e
+  direct_dependency_count: 12
+  parent_work_order_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  resolution_effect: recompute_from_independent_receipt_only
+counterevidence:
+- pointer alias can hide an upstream semantic contract gap
+- approved child diff must remain a strict subset of exact paths
+- historical Bundle17R artifacts remain read-only
+uncertainties:
+- pointer_semantics_require_external_approval
+- dry_run_is_not_resolution
+reviewer: null
+reviewer_authority: null
+reviewed_at: null
+decision: null
+packet_sha256: 2468418b233bfde9c29c563525bf7c2e6c7656c3d9c3939181e15c728aeb6f2d

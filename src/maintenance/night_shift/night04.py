@@ -460,13 +460,20 @@ def materialize_wrapper_state(repo_root: Path) -> dict[str, Any]:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Materialise Night04 baseline artifacts")
+    parser = argparse.ArgumentParser(description="Materialise Night04 mission artifacts")
     parser.add_argument("--repo", default=".")
-    parser.add_argument("--phase", choices=("baseline",), default="baseline")
+    parser.add_argument("--phase", choices=("baseline", "review"), default="baseline")
     parser.add_argument("--record-task", action="append", default=[])
     args = parser.parse_args(argv)
     repo_root = Path(args.repo).resolve()
-    result = materialize_phase_a(repo_root)
+    if args.phase == "baseline":
+        result = materialize_phase_a(repo_root)
+        summary = {"queue_items": result["taxonomy"]["total_items"]}
+    else:
+        from .night04_review import materialize_phase_b
+
+        result = materialize_phase_b(repo_root)
+        summary = {"candidate_count": result["registry"]["candidate_count"]}
     receipts = [record_completed_task(repo_root, task_id) for task_id in args.record_task]
     state = materialize_wrapper_state(repo_root)
     print(
@@ -474,7 +481,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             {
                 "mission_id": MISSION_ID,
                 "status": "passed",
-                "queue_items": result["taxonomy"]["total_items"],
+                "phase": args.phase,
+                **summary,
                 "receipts_recorded": [item["task_id"] for item in receipts],
                 "wrapper_tasks_passed": sum(item["status"] == "passed" for item in state["tasks"]),
             },

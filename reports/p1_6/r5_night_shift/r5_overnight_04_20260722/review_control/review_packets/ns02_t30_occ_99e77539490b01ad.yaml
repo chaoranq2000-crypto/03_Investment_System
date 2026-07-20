@@ -1,0 +1,50 @@
+schema_version: r5_night04_review_packet_v1
+mission_id: r5_overnight_04_20260722
+occurrence_id: ns02_t30_occ_99e77539490b01ad
+parent_id: BF17R-WO-5ce21a3390be8b
+case_id: golden_multi_business_ai_infrastructure
+candidate_kind: engineering_local_pointer
+required_reviewer_authority: engineering_contract_reviewer
+candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/pointer_review_index.yaml
+candidate_sha256: 1b7acae56075c1d08139bc9c92755e3b536d3430ffccb3019f527ee9715d6d7c
+source_queue_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+source_lineage:
+- role: pointer_source
+  path: reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/quality_readout.json
+  proposal_sha256: 72eb78d0cadd785842a83d3d2ebce496e856b34fdf5f8d4eb8cf8e7584e58fc9
+decision_options:
+- approve
+- reject
+- defer
+- request_changes
+downstream_impact:
+  direct_dependent_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_2b0567ebbd443da5
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_4177e7d48f374473
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b7467ff5401814aa
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  direct_dependency_count: 12
+  parent_work_order_ids:
+  - ns02_t30_wo_bc7d70d0bd2786f8
+  resolution_effect: recompute_from_independent_receipt_only
+counterevidence:
+- pointer alias can hide an upstream semantic contract gap
+- approved child diff must remain a strict subset of exact paths
+- historical Bundle17R artifacts remain read-only
+uncertainties:
+- pointer_semantics_require_external_approval
+- dry_run_is_not_resolution
+reviewer: null
+reviewer_authority: null
+reviewed_at: null
+decision: null
+packet_sha256: de9e595ad55be3f53fa7def779bbd45a6d6a34ff479ca1b1aa14e0e3257f036f

@@ -1,0 +1,11 @@
+schema_version: r5_night04_inbox_polling_contract_v1
+inbox: reports/p1_6/r5_night_shift/r5_overnight_04_20260722/external_decisions
+poll_checkpoints:
+- startup
+- phase_b
+- phase_c
+- phase_d
+- phase_e
+idempotency_key: decision_digest_sha256
+missing_external_decisions: continue_bounded_work
+manufacture_decisions: false

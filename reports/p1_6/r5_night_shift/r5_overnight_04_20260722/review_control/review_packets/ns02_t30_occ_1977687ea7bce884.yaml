@@ -1,0 +1,94 @@
+schema_version: r5_night04_review_packet_v1
+mission_id: r5_overnight_04_20260722
+occurrence_id: ns02_t30_occ_1977687ea7bce884
+parent_id: BF17R-WO-ca803d73d4b2b1
+case_id: golden_copper_foil_product_generation
+candidate_kind: analysis_required
+required_reviewer_authority: research_reviewer
+candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/analysis_candidates.yaml
+candidate_sha256: c211e60252c1fe14afc7e0b0d9c0ec97ca6e1ae2c4a3d80c830dd1ac2d2ea866
+source_queue_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+source_lineage:
+- role: bound_failure_source
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+  sha256: 0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67
+  status: verified_lineage_not_accepted_conclusion_evidence
+- role: evidence_pack
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/evidence_pack.json
+  physical_sha256: 903e305e29ccec711499847e123f30109977e9eec14f54ae2ca0389ef397ccd4
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: forecast_model
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/forecast_model.json
+  physical_sha256: d73769d256bb1e4d82f03eeef46f17ca8c6321e4840d51ff2aba307e94a6f3e7
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: generation_lock
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/generation_lock.json
+  physical_sha256: 02953ca1a4f932e34a1298ab3e883c66daf26fc3cffbac96c4137b764b64f461
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: human_review
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/human_review.yaml
+  physical_sha256: ecaecb83128d3e7ce10b6b375e3ab0768cd7ad0a2b68f0bdb5beedcfa13243a6
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: operating_driver_pack
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/operating_driver_pack.json
+  physical_sha256: d9a8bce553dbae8b39c6d52b179499891c552cc8e41c921c31face3604a0aa65
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: quality_readout
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/quality_readout.json
+  physical_sha256: 0131dc5e9e3eccb233d7e6daf8edcf0e64c33396f503e28dfb502454ecad2c67
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: reader_report
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/reader_report.md
+  physical_sha256: 102fa201d16d980a5c813e095928c725e9b9cfc22cc342c5ef71e3eaf28981fa
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: valuation_pack
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/valuation_pack.json
+  physical_sha256: 472460e8215c0e741e104c1fffa5e36233092b1008471b2fd8ec6a570f8f3a36
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+- role: workflow_state
+  path: reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/workflow_state.yaml
+  physical_sha256: f0b1862f64e2269c4fc208c7f969d2957324b22139853d0212d5759878497b82
+  hash_verified: true
+  claim_evidence_status: lineage_candidate_not_accepted_for_occurrence
+decision_options:
+- approve
+- reject
+- defer
+- request_changes
+downstream_impact:
+  direct_dependent_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_139f375db9714f27
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_950802f6c70d5036
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_occ_fc4fc2c77ab26f2d
+  - ns02_t30_wo_e205ce3a49c56b7e
+  direct_dependency_count: 12
+  parent_work_order_ids:
+  - ns02_t30_wo_e205ce3a49c56b7e
+  resolution_effect: recompute_from_independent_receipt_only
+counterevidence:
+- MISSING_REVIEWED_COUNTER_EVIDENCE
+uncertainties:
+- locator-bound reviewed evidence with period, unit, source class, and calculation method
+- MISSING_REVIEWED_ANALYST_CONCLUSION
+reviewer: null
+reviewer_authority: null
+reviewed_at: null
+decision: null
+packet_sha256: e2d6d0de3bfa1b8b45f2b2c8ac8f070a27f4a79eb8386fc3e25ed30bfe4941b2

@@ -1,0 +1,13 @@
+{
+  "bundle_count": 43,
+  "machine_owned_fields": [
+    "reviewer",
+    "reviewer_authority",
+    "reviewed_at",
+    "decision"
+  ],
+  "passed": true,
+  "schema_version": "r5_night04_human_field_integrity_v1",
+  "stable_receipt_sha256": "3aa3010213ca16ae897eb1a10d6ff2760e8316adce8dfd80809b814e11aa6e3b",
+  "violations": []
+}

@@ -1,0 +1,4 @@
+schema_version: r5_night04_stale_hash_policy_v1
+candidate_hash_mismatch: reject_entire_record
+review_packet_hash_mismatch: reject_entire_record
+rebase_or_regeneration_requires_new_external_decision: true

@@ -1,0 +1,4 @@
+schema_version: r5_night04_partial_acceptance_contract_v1
+batch_envelope_failure: reject_batch
+record_failure: reject_record_and_continue_independent_records
+error_ledger_required: true

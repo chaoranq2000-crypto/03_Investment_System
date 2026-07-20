@@ -1,0 +1,50 @@
+schema_version: r5_night04_review_packet_v1
+mission_id: r5_overnight_04_20260722
+occurrence_id: ns02_t30_occ_6b198842cf80755a
+parent_id: BF17R-WO-df7ea35a97ead0
+case_id: golden_crdmo_backlog_conversion
+candidate_kind: engineering_local_pointer
+required_reviewer_authority: engineering_contract_reviewer
+candidate_artifact_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/candidates/pointer_review_index.yaml
+candidate_sha256: 47e2d4df76e259050f7e8282f31a5e3898743feda3f2d6c891f910ddb954be61
+source_queue_path: reports/p1_6/r5_night_shift/r5_overnight_03_20260721/next_night_queue.yaml
+source_queue_sha256: daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68
+source_lineage:
+- role: pointer_source
+  path: reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/generation_lock.json
+  proposal_sha256: 414aa760669f591c56ea51affb795e77ecdc04f44b5461e90f44100422fe69cb
+decision_options:
+- approve
+- reject
+- defer
+- request_changes
+downstream_impact:
+  direct_dependent_ids:
+  - ns02_t30_occ_07e49c037427403b
+  - ns02_t30_occ_1a742ef3d6224c6a
+  - ns02_t30_occ_2a2ab71eced6e937
+  - ns02_t30_occ_3b0dd1527f9e0144
+  - ns02_t30_occ_8e3768557d6f2dde
+  - ns02_t30_occ_ae4ebd1d82c2bd03
+  - ns02_t30_occ_b531d3c48931ba58
+  - ns02_t30_occ_c03007a138e83e9b
+  - ns02_t30_occ_d19d9b744d7aff4a
+  - ns02_t30_occ_d705e67d4c161924
+  - ns02_t30_occ_e7027bc57e1dc7a7
+  - ns02_t30_wo_db304e8553027647
+  direct_dependency_count: 12
+  parent_work_order_ids:
+  - ns02_t30_wo_db304e8553027647
+  resolution_effect: recompute_from_independent_receipt_only
+counterevidence:
+- pointer alias can hide an upstream semantic contract gap
+- approved child diff must remain a strict subset of exact paths
+- historical Bundle17R artifacts remain read-only
+uncertainties:
+- pointer_semantics_require_external_approval
+- dry_run_is_not_resolution
+reviewer: null
+reviewer_authority: null
+reviewed_at: null
+decision: null
+packet_sha256: 24c13397497b1bd4cf550ed85f796c2272a153d99c3481052ddb00589506c8ec
