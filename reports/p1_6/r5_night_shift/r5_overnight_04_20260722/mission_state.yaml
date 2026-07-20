@@ -180,11 +180,11 @@ tasks:
   status: passed
 - id: ns04_t57
   phase: F_validation_publication
-  status: ready
+  status: passed
 - id: ns04_t58
   phase: F_validation_publication
-  status: pending
+  status: ready
 - id: ns04_t59
   phase: F_validation_publication
   status: pending
-stable_receipt_sha256: 02080d38750dd087f60f55cca72dcd79b61b2c842e81a937e2226c03e99a2b23
+stable_receipt_sha256: 5fd607db1ea84830ea84dd96a3c7762631be35cd068da81a421f785ea9a11293

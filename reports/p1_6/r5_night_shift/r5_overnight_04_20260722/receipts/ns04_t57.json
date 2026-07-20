@@ -1,0 +1,25 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -c \"import subprocess; b=subprocess.check_output(['git','branch','--show-current'],text=True).strip(); assert b=='codex/r5-night04-review-acceleration-and-unlock',b\"",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "mission_id": "r5_overnight_04_20260722",
+  "required_artifacts": [
+    {
+      "bytes": 2296,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/publication/tracked_delivery_receipt.json",
+      "sha256": "a8c057de7f52f3d421a56fa8029cd254ab975ba33c85f4f7001e8fa3a86185fc"
+    }
+  ],
+  "research_resolution_claimed": false,
+  "schema_version": "r5_night04_wrapper_task_receipt_v1",
+  "source_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "86be29ed546fc85d8fe14c2cff81a97cf8040feb2793f8d07ff3f8b98f237858",
+  "task_id": "ns04_t57",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

@@ -58,7 +58,7 @@ crossing human or research gates.
 - [x] Phase C
 - [x] Phase D
 - [x] Phase E
-- [ ] Phase F
+- [x] Phase F
 
 ## Discoveries
 
@@ -85,6 +85,9 @@ Append; do not erase historical entries.
 - The final local gate passed 200 Night Shift tests, 17 source-route capabilities with zero blocking
   findings, and 1,133 full-repository tests with 2 skips.  Historical Bundle17R/Night02/Night03 paths
   remained unchanged and the CI contract now preserves both prior and current baseline audit markers.
+- The first exact-head publication run succeeded for `64b325beddba4708c03ea4a0218d1860f85e758a`
+  (GitHub Actions run `29763801068`).  Morning artifacts remain non-self-referential; the authoritative
+  remote receipt is regenerated after the final publication commit and is intentionally untracked.
 
 ## Decisions
 
@@ -102,4 +105,5 @@ Only record engineering decisions here. Human review decisions must originate ex
 
 ## Remaining Work
 
-Synchronize from `task_queue.yaml`; external gates remain visible as `blocked_external`.
+No Night04 engineering work remains.  The 43 authentic reviewer decisions and their independent
+execution receipts remain external follow-up inputs and are carried to Night05 without compression.

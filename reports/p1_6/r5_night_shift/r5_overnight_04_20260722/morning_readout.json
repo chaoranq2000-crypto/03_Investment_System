@@ -1,0 +1,60 @@
+{
+  "ci_status": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/publication/ci_status.md",
+  "delivery": {
+    "final_remote_identity_deferred_to_post_push_receipt": true,
+    "force_push_used": false,
+    "historical_path_diff": 0,
+    "main_merged": false,
+    "minimum_commit_policy_satisfied": true,
+    "pr_created": false,
+    "workstream_commits_excluding_seed": 7
+  },
+  "mission_id": "r5_overnight_04_20260722",
+  "mission_outcome": "delivered_review_acceleration_ready",
+  "next_actions": [
+    "obtain authentic external exact-hash reviewer decisions",
+    "run explicit typed executors and issue independent passed receipts",
+    "recompute dependencies and parents only from those atomic receipts"
+  ],
+  "next_night_queue": {
+    "path": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/next_night_queue.yaml",
+    "source_commit_policy": "resolve_final_remote_head_at_bootstrap",
+    "task_count": 69
+  },
+  "outcome_meaning": "engineering_delivery_complete_research_program_still_open",
+  "publication_receipt": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/publication/remote_delivery_receipt.json",
+  "publication_resolution_policy": "matching_post_push_remote_receipt_and_successful_ci",
+  "research_truth": {
+    "blocker_occurrences_resolved": 0,
+    "blocker_occurrences_total": 63,
+    "candidate_ready": 43,
+    "dependency_blocked": 20,
+    "dependency_unlocked": 0,
+    "p2_allowed": false,
+    "program_goal": "open_needs_targeted_backflow",
+    "resolved_delta": 0,
+    "sample_quality_allowed": false,
+    "work_orders_pending": 6,
+    "work_orders_resolved": 0
+  },
+  "review_readiness": {
+    "approved_decisions": 0,
+    "automatic_reviewer_used": false,
+    "external_decision_manifests": 0,
+    "pointer_dry_runs_complete": 8,
+    "review_bundles_complete": 43
+  },
+  "schema_version": "r5_night04_morning_readout_v1",
+  "source_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "d3c0d7ceb3ed1f06e57fc4155d00cc399b7c6025f90f20700bff105bc0eeab2e",
+  "target_branch": "codex/r5-night04-review-acceleration-and-unlock",
+  "validation": {
+    "adversarial": true,
+    "ci_contract": true,
+    "crash_resume": true,
+    "determinism": true,
+    "full_regression": true,
+    "scope_audit": true
+  }
+}
