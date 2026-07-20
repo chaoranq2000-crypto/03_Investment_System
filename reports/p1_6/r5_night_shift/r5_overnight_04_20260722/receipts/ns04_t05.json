@@ -1,0 +1,25 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_night04_taxonomy.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "mission_id": "r5_overnight_04_20260722",
+  "required_artifacts": [
+    {
+      "bytes": 839,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/queue/taxonomy_audit.json",
+      "sha256": "c1164b2a9360cfa6849b419d58f4eaf594f31c17d4f7edd5d964cf5f76769711"
+    }
+  ],
+  "research_resolution_claimed": false,
+  "schema_version": "r5_night04_wrapper_task_receipt_v1",
+  "source_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "6f3cfcd319c90508d212900c5a007257f9621e2bba09606706feedd1827e7ea2",
+  "task_id": "ns04_t05",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

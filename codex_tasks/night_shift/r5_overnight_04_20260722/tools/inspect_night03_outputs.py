@@ -60,8 +60,16 @@ def main() -> int:
         r = load_json(readout_json)
         q = load_yaml(queue_path)
         text = json.dumps(r, ensure_ascii=False).lower()
+        truth = r.get("research_truth") or {}
         ensure("delivered_candidate_ready" in text, "Night03 outcome mismatch")
-        ensure("0/63" in text or (r.get("resolved_occurrences") == 0 and r.get("total_occurrences") == 63), "resolution truth mismatch")
+        ensure(
+            "0/63" in text
+            or (
+                truth.get("blocker_occurrences_resolved") == 0
+                and truth.get("blocker_occurrences_total") == 63
+            ),
+            "resolution truth mismatch",
+        )
         tasks = q.get("tasks") or q.get("items") or []
         ensure(len(tasks) == 69, f"Night04 queue count mismatch: {len(tasks)}")
         payload = {"outcome": "delivered_candidate_ready", "queue_items": len(tasks), "status": "passed"}

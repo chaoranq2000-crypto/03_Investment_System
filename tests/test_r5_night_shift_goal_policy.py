@@ -4,6 +4,10 @@ import json
 from pathlib import Path
 
 from src.maintenance.night_shift.night03 import OUTPUT_ROOT, build_truth_snapshot
+from src.maintenance.night_shift.night04 import (
+    OUTPUT_ROOT as NIGHT04_OUTPUT_ROOT,
+    build_truth_snapshot as build_night04_truth_snapshot,
+)
 from src.maintenance.night_shift.outcome import MissionOutcome, ProgramGoalPolicy
 
 
@@ -51,3 +55,14 @@ def test_night03_truth_snapshot_keeps_goal_and_downstream_gates_closed() -> None
     assert actual["starting_truth"]["sample_quality_allowed"] is False
     assert actual["starting_truth"]["p2_allowed"] is False
     assert actual["mission_delivery_may_close_program_goal"] is False
+
+
+def test_night04_truth_snapshot_keeps_research_goal_open() -> None:
+    repo_root = Path(__file__).resolve().parents[1]
+    expected = build_night04_truth_snapshot(repo_root)
+    actual = json.loads((repo_root / NIGHT04_OUTPUT_ROOT / "queue/truth_snapshot.json").read_text(encoding="utf-8"))
+    assert actual == expected
+    assert actual["starting_truth"]["blocker_occurrences_resolved"] == 0
+    assert actual["starting_truth"]["program_goal"] == "open_needs_targeted_backflow"
+    assert actual["mission_delivery_may_close_program_goal"] is False
+    assert actual["dry_run_is_resolution"] is False

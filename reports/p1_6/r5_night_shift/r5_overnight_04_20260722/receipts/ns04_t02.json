@@ -1,0 +1,25 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python codex_tasks/night_shift/r5_overnight_04_20260722/tools/inspect_night03_outputs.py --repo . --phase remote",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "mission_id": "r5_overnight_04_20260722",
+  "required_artifacts": [
+    {
+      "bytes": 341,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/preflight/remote_ci_reconciliation.json",
+      "sha256": "7a31bd61e4ca6ac05debd911e574e0a62d87fc7a0fcbad73c4ea5f1eeeecaa3b"
+    }
+  ],
+  "research_resolution_claimed": false,
+  "schema_version": "r5_night04_wrapper_task_receipt_v1",
+  "source_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "dd0a2a8836241f310b14b3adf8de8a2474a09c9b80303db86fc8ee1f6eb05fa0",
+  "task_id": "ns04_t02",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

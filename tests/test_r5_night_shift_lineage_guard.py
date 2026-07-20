@@ -9,6 +9,10 @@ from src.maintenance.night_shift.night03 import (
     SOURCE_COMMIT,
     build_lineage_audit,
 )
+from src.maintenance.night_shift.night04 import (
+    OUTPUT_ROOT as NIGHT04_OUTPUT_ROOT,
+    build_lineage_audit as build_night04_lineage_audit,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -28,3 +32,12 @@ def test_lineage_guard_verifies_bound_hashes_and_keeps_unknowns_visible() -> Non
     assert actual["mismatch_task_ids"] == []
     assert actual["stale_decision_policy"] == "invalidate_on_any_bound_hash_change"
     assert actual["passed"] is True
+
+
+def test_night04_lineage_guard_rechecks_all_69_stable_items() -> None:
+    expected = build_night04_lineage_audit(REPO_ROOT)
+    actual = json.loads((REPO_ROOT / NIGHT04_OUTPUT_ROOT / "queue/lineage_audit.json").read_text(encoding="utf-8"))
+    assert actual == expected
+    assert actual["task_count"] == 69
+    assert actual["mismatch_task_ids"] == []
+    assert actual["historical_paths_mutable"] is False

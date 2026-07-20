@@ -1,0 +1,10 @@
+{
+  "bytes": 38830,
+  "expected_sha256": "71e709238fea94148fccda3206394b5fab3d1c59f48fe10004f9fc3d0a3ef13c",
+  "package_name": "R5_Overnight_Mission_03_20260720.zip",
+  "passed": true,
+  "schema_version": "r5_night04_night03_package_integrity_v1",
+  "sha256": "71e709238fea94148fccda3206394b5fab3d1c59f48fe10004f9fc3d0a3ef13c",
+  "stable_receipt_sha256": "810c45620b1eced3975597cd6692909688a2dab3618559d51b3c8366431494cc",
+  "verification_mode": "runtime_original_archive_sha256"
+}

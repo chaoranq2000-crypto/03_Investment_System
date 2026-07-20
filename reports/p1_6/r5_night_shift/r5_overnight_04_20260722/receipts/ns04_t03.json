@@ -1,0 +1,25 @@
+{
+  "acceptance_commands": [
+    {
+      "command": "python -m pytest -q tests/test_r5_night_shift_night03_manifest.py",
+      "observed_exit_code": 0,
+      "stdout_reproduced": false
+    }
+  ],
+  "mission_id": "r5_overnight_04_20260722",
+  "required_artifacts": [
+    {
+      "bytes": 32201,
+      "path": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/preflight/night03_input_manifest.json",
+      "sha256": "282097ed0c2de3a31dead1215bb23aa7865b3c5860f8eb58b745cc380dfe0334"
+    }
+  ],
+  "research_resolution_claimed": false,
+  "schema_version": "r5_night04_wrapper_task_receipt_v1",
+  "source_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "186df26c87a4eccadab3483de09342c87355dcab10010450b38f778f156f550d",
+  "task_id": "ns04_t03",
+  "terminal_status": "passed",
+  "verification_mode": "observed_exit_then_artifact_revalidation"
+}

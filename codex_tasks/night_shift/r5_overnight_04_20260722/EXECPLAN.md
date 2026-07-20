@@ -53,7 +53,7 @@ crossing human or research gates.
 
 ## Progress
 
-- [ ] Phase A
+- [x] Phase A
 - [ ] Phase B
 - [ ] Phase C
 - [ ] Phase D
@@ -64,9 +64,20 @@ crossing human or research gates.
 
 Append; do not erase historical entries.
 
+- The packaged Night03 receipt inspector assumed flat resolution fields, while the authoritative
+  Night03 readout stores them under `research_truth`; the copied task tool now accepts that exact
+  nested schema without relaxing the required 0/63 values.
+- The packaged bootstrap treats normal Git stderr messages as terminating PowerShell errors.  The
+  worktree and package copy were inspected at each boundary and the declared seed steps were
+  completed manually without cleanup or scope expansion.
+
 ## Decisions
 
 Only record engineering decisions here. Human review decisions must originate externally and bind exact hashes.
+
+- Bind the 97 tracked Night03 inputs using Git blob bytes so the baseline manifest is checkout-EOL invariant.
+- Keep the original Night03 ZIP verification in a separate runtime receipt; do not copy the untracked archive
+  into the delivery branch.
 
 ## Remaining Work
 

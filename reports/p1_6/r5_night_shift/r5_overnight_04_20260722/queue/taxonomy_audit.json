@@ -1,0 +1,25 @@
+{
+  "mission_id": "r5_overnight_04_20260722",
+  "night03_state_counts": {
+    "candidate_ready": 43,
+    "dependency_blocked": 20,
+    "parent_pending": 6
+  },
+  "occurrence_items": 63,
+  "parent_aggregators": 6,
+  "passed": true,
+  "schema_version": "r5_night04_taxonomy_audit_v1",
+  "source_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_id_set_sha256": "dbdc09988d11fd0af74d36d62d90036d7eec1d16ad6298683803fd7a4ad3b206",
+  "stable_receipt_sha256": "8d3ff55221a2996720cb3dc544bdb6ecfa4bfa9cd65cfda667305c03cc2748be",
+  "total_items": 69,
+  "work_type_counts": {
+    "analysis_required": 24,
+    "bf2_work_order": 6,
+    "dependency_blocked": 20,
+    "engineering_local": 8,
+    "evidence_required": 8,
+    "human_gate": 3
+  }
+}

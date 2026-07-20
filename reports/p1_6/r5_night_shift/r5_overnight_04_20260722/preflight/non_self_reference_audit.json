@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "policy": "final_remote_head_must_live_outside_the_commit_it_identifies",
+  "post_push_remote_receipt": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/remote_delivery_receipt.json",
+  "post_push_remote_receipt_tracked": false,
+  "schema_version": "r5_night04_non_self_reference_audit_v1",
+  "source_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "stable_receipt_sha256": "a713faee6525f52c2f7771efc5ae273bc467602a01bc614e4a0ea2e38ff26e32",
+  "tracked_delivery_receipt": "reports/p1_6/r5_night_shift/r5_overnight_03_20260721/publication/tracked_delivery_receipt.json",
+  "tracked_receipt_final_head": null
+}

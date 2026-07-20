@@ -1,0 +1,22 @@
+{
+  "dry_run_is_resolution": false,
+  "mission_delivery_may_close_program_goal": false,
+  "mission_id": "r5_overnight_04_20260722",
+  "passed": true,
+  "resolution_requires": "accepted_exact_hash_decision_plus_independent_passed_receipt",
+  "schema_version": "r5_night04_truth_snapshot_v1",
+  "source_commit": "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+  "stable_receipt_sha256": "4bd786bfb88349b1048894213808afb469c7c7ca652bd1d1385fc60bee95d23e",
+  "starting_truth": {
+    "blocker_occurrences_resolved": 0,
+    "blocker_occurrences_total": 63,
+    "candidate_ready": 43,
+    "dependency_blocked": 20,
+    "mission_outcome": "delivered_candidate_ready",
+    "p2_allowed": false,
+    "parent_pending": 6,
+    "program_goal": "open_needs_targeted_backflow",
+    "queue_items": 69,
+    "sample_quality_allowed": false
+  }
+}
