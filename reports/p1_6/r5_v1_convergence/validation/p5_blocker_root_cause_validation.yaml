@@ -1,0 +1,112 @@
+schema_version: 1
+artifact_type: r5_v1_convergence_p5_blocker_root_cause_validation
+task_id: r5_v1_convergence
+phase: P5
+validated_at: '2026-07-23T05:07:12+08:00'
+decision: pass
+contract:
+  path: docs/codex_tasks/r5_v1_convergence/CONTRACT.md
+  sha256: 5e4a52f8eff0792810a8b0255089a01359a47bafc549edb0bffacb1f4335d163
+  package_validation:
+    ok: true
+    state: running
+    phases:
+    - P1
+    - P2
+    - P3
+    - P4
+    - P5
+    errors: []
+    warnings: []
+root_map:
+  path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
+  schema_path: schemas/r5_v1_blocker_root_cause_map.schema.json
+  source_binding_count: 19
+  root_cause_count: 7
+  category_root_counts:
+    engineering_defect: 3
+    obtainable_evidence_gap: 1
+    issuer_not_disclosed: 0
+    human_judgment_pending: 3
+  primary_occurrence_counts:
+    external_approval_and_independent_receipts_absent: 20
+    analyst_conclusions_pending: 20
+    reviewed_evidence_acceptance_absent: 8
+    suite_exact_hash_review_pending: 3
+    legacy_quality_case_id_contract_gap: 4
+    legacy_generation_id_pointer_contract_gap: 4
+    legacy_quality_ready_pointer_contract_gap: 4
+  relationship_graph:
+    node_count: 69
+    edge_count: 532
+    duplicate_of_count: 6
+    orphan_reference_count: 0
+    cycle_count: 0
+  open_active_v1_engineering_root_count: 0
+  open_historical_engineering_root_count: 3
+  engineering_disposition: open historical Bundle16R/17R compatibility gaps are isolated from the canonical orchestrator and P4 run-scoped replay; none is marked resolved
+truth_reconciliation:
+  occurrence_count: 63
+  dependency_blocked_occurrence_count: 20
+  parent_work_order_count: 6
+  carry_forward_task_count: 69
+  candidate_ready_count: 43
+  baseline_resolved_occurrence_count: 0
+  candidate_ready_is_resolution: false
+  dry_run_is_resolution: false
+  issuer_not_disclosed_claimed: false
+  program_goal_state: open_needs_targeted_backflow
+  sample_quality_ready: false
+  p2_ready: false
+tests:
+  v007_root_map:
+    command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q -p no:cacheprovider tests\test_r5_v1_blocker_root_cause_map.py
+    passed: 7
+    failed: 0
+    duration_seconds: 1.13
+  v001_doc_drift:
+    command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B scripts\check_doc_drift.py
+    result: Doc drift check passed.
+  p5_source_route:
+    command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B scripts\run_source_route_quality_gate.py --import-check --repo-root . --output reports\p1_6\r5_v1_convergence\validation\p5_source_route_quality_report.yaml
+    decision: pass
+    capability_count: 17
+    blocking_issue_count: 0
+  v003_night:
+    selection: all tests/test_r5_night_shift_*.py
+    passed: 210
+    failed: 0
+    duration_seconds: 43.93
+  v004_bundle:
+    selection: all tests matching ^test_r5_bundle(14r|15r|16r|17r).*\.py$
+    passed: 160
+    failed: 0
+    duration_seconds: 14.96
+  v005_002837:
+    selection: 14 exact contract paths
+    passed: 37
+    failed: 0
+    duration_seconds: 4.17
+  v006_canonical_state:
+    command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B .agents\skills\research-orchestrator\scripts\validate_workflow_state.py reports\workflow_runs\wf_20260723_stock_first_002837_v1_replay\workflow_state.yaml
+    result: OK
+  full_repository_p5:
+    command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q -p no:cacheprovider
+    passed: 1183
+    skipped: 2
+    failed: 0
+    errors: 0
+    duration_seconds: 94.05
+guards:
+  source_baseline_is_ancestor: true
+  v008_checkpoint_diff_check: pass
+  v009_protected_path_diff: empty
+  protected_worktree_status: empty
+  exact_phase_allowlist: pass
+  contract_hash_unchanged: true
+phase_truths:
+  system_v1_complete: false
+  system_v1_complete_reason: P5 engineering work is complete, but final local validation checkpoint and exact-head CI are still pending
+  sample_quality_ready: false
+  p2_ready: false
+  release_ready: false

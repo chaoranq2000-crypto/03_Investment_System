@@ -1,0 +1,322 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r5_v1_blocker_root_cause_map.schema.json",
+  "title": "R5 V1 blocker root-cause map",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "source_baseline",
+    "source_bindings",
+    "truth_boundary",
+    "reconciliation",
+    "dependency_groups",
+    "root_causes",
+    "occurrences",
+    "parent_work_orders"
+  ],
+  "properties": {
+    "schema_version": {"const": "r5_v1_blocker_root_cause_map_v1"},
+    "task_id": {"const": "r5_v1_convergence"},
+    "source_baseline": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_bindings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/source_binding"}
+    },
+    "truth_boundary": {"$ref": "#/$defs/truth_boundary"},
+    "reconciliation": {"$ref": "#/$defs/reconciliation"},
+    "dependency_groups": {"$ref": "#/$defs/dependency_groups"},
+    "root_causes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/root_cause"}
+    },
+    "occurrences": {
+      "type": "array",
+      "minItems": 63,
+      "items": {"$ref": "#/$defs/occurrence"}
+    },
+    "parent_work_orders": {
+      "type": "array",
+      "minItems": 6,
+      "items": {"$ref": "#/$defs/parent_work_order"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "path": {"type": "string", "minLength": 1},
+    "node_id": {"type": "string", "pattern": "^ns02_t30_(occ|wo)_[0-9a-f]{16}$"},
+    "root_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]+$"},
+    "source_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "path", "sha256"],
+      "properties": {
+        "role": {"type": "string", "minLength": 1},
+        "path": {"$ref": "#/$defs/path"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "truth_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "program_goal_id",
+        "program_goal_state",
+        "program_goal_closed_by_stage",
+        "sample_quality_ready",
+        "p2_ready",
+        "candidate_ready_is_resolution",
+        "classification_is_resolution",
+        "dry_run_is_resolution",
+        "machine_generated_decisions",
+        "issuer_not_disclosed_claimed"
+      ],
+      "properties": {
+        "program_goal_id": {"const": "r5_bundle17r_bf2_four_case_activation"},
+        "program_goal_state": {"const": "open_needs_targeted_backflow"},
+        "program_goal_closed_by_stage": {"const": false},
+        "sample_quality_ready": {"const": false},
+        "p2_ready": {"const": false},
+        "candidate_ready_is_resolution": {"const": false},
+        "classification_is_resolution": {"const": false},
+        "dry_run_is_resolution": {"const": false},
+        "machine_generated_decisions": {"const": 0},
+        "issuer_not_disclosed_claimed": {"const": false}
+      }
+    },
+    "category_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engineering_defect",
+        "obtainable_evidence_gap",
+        "issuer_not_disclosed",
+        "human_judgment_pending"
+      ],
+      "properties": {
+        "engineering_defect": {"const": 3},
+        "obtainable_evidence_gap": {"const": 1},
+        "issuer_not_disclosed": {"const": 0},
+        "human_judgment_pending": {"const": 3}
+      }
+    },
+    "taxonomy_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analysis_required",
+        "dependency_blocked",
+        "engineering_local",
+        "evidence_required",
+        "human_gate"
+      ],
+      "properties": {
+        "analysis_required": {"const": 24},
+        "dependency_blocked": {"const": 20},
+        "engineering_local": {"const": 8},
+        "evidence_required": {"const": 8},
+        "human_gate": {"const": 3}
+      }
+    },
+    "reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "occurrence_count",
+        "dependency_blocked_occurrence_count",
+        "parent_work_order_count",
+        "carry_forward_task_count",
+        "candidate_ready_count",
+        "baseline_resolved_occurrence_count",
+        "source_node_count",
+        "source_edge_count",
+        "duplicate_reference_count",
+        "root_cause_count",
+        "open_active_v1_engineering_root_count",
+        "open_historical_engineering_root_count",
+        "root_category_counts",
+        "source_taxonomy_counts",
+        "night04_stable_id_set_sha256",
+        "night05_task_id_set_sha256",
+        "night05_source_hash_set_sha256"
+      ],
+      "properties": {
+        "occurrence_count": {"const": 63},
+        "dependency_blocked_occurrence_count": {"const": 20},
+        "parent_work_order_count": {"const": 6},
+        "carry_forward_task_count": {"const": 69},
+        "candidate_ready_count": {"const": 43},
+        "baseline_resolved_occurrence_count": {"const": 0},
+        "source_node_count": {"const": 69},
+        "source_edge_count": {"const": 532},
+        "duplicate_reference_count": {"const": 6},
+        "root_cause_count": {"const": 7},
+        "open_active_v1_engineering_root_count": {"const": 0},
+        "open_historical_engineering_root_count": {"const": 3},
+        "root_category_counts": {"$ref": "#/$defs/category_counts"},
+        "source_taxonomy_counts": {"$ref": "#/$defs/taxonomy_counts"},
+        "night04_stable_id_set_sha256": {"const": "dbdc09988d11fd0af74d36d62d90036d7eec1d16ad6298683803fd7a4ad3b206"},
+        "night05_task_id_set_sha256": {"const": "e56604f4a553405dba1cbeac54256673a58aaa88227158857bf3e71951288b7a"},
+        "night05_source_hash_set_sha256": {"const": "2238bd09da9fcddc58758c56ac71503453b4857bee2db366a18cd69c1f06a610"}
+      }
+    },
+    "dependency_groups": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "golden_copper_foil_product_generation",
+        "golden_crdmo_backlog_conversion",
+        "golden_gold_mining_cycle",
+        "golden_multi_business_ai_infrastructure",
+        "suite"
+      ],
+      "properties": {
+        "golden_copper_foil_product_generation": {"$ref": "#/$defs/node_id_array"},
+        "golden_crdmo_backlog_conversion": {"$ref": "#/$defs/node_id_array"},
+        "golden_gold_mining_cycle": {"$ref": "#/$defs/node_id_array"},
+        "golden_multi_business_ai_infrastructure": {"$ref": "#/$defs/node_id_array"},
+        "suite": {"$ref": "#/$defs/node_id_array"}
+      }
+    },
+    "node_id_array": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/node_id"}
+    },
+    "path_array": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/path"}
+    },
+    "root_cause": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root_cause_id",
+        "category",
+        "title",
+        "status",
+        "confidence",
+        "affects_system_v1",
+        "system_v1_rationale",
+        "impact_scope",
+        "owner",
+        "severity",
+        "next_step",
+        "primary_occurrence_count",
+        "source_blocker_ids",
+        "evidence_paths",
+        "active_v1_evidence_paths",
+        "resolution_evidence_paths"
+      ],
+      "properties": {
+        "root_cause_id": {"$ref": "#/$defs/root_id"},
+        "category": {
+          "enum": [
+            "engineering_defect",
+            "obtainable_evidence_gap",
+            "issuer_not_disclosed",
+            "human_judgment_pending"
+          ]
+        },
+        "title": {"type": "string", "minLength": 1},
+        "status": {"enum": ["open", "resolved"]},
+        "confidence": {"enum": ["HIGH_CONFIDENCE", "MEDIUM_CONFIDENCE", "LOW_CONFIDENCE"]},
+        "affects_system_v1": {"type": "boolean"},
+        "system_v1_rationale": {"type": "string", "minLength": 1},
+        "impact_scope": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "owner": {"type": "string", "minLength": 1},
+        "severity": {"enum": ["high", "medium", "low"]},
+        "next_step": {"type": "string", "minLength": 1},
+        "primary_occurrence_count": {"type": "integer", "minimum": 0},
+        "source_blocker_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "evidence_paths": {"$ref": "#/$defs/path_array"},
+        "active_v1_evidence_paths": {"$ref": "#/$defs/path_array"},
+        "resolution_evidence_paths": {"$ref": "#/$defs/path_array"}
+      }
+    },
+    "occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "carry_forward_id",
+        "source_occurrence_id",
+        "source_work_order_id",
+        "case_id",
+        "issuer_ticker",
+        "source_classification",
+        "field",
+        "baseline_state",
+        "baseline_resolved",
+        "resolution_receipt_sha256",
+        "primary_root_id",
+        "mapping_confidence",
+        "duplicate_of",
+        "blocked_by",
+        "source_artifact_path",
+        "source_artifact_sha256"
+      ],
+      "properties": {
+        "carry_forward_id": {"$ref": "#/$defs/node_id"},
+        "source_occurrence_id": {"type": "string", "pattern": "^BF17R-I-[0-9a-f]{16}$"},
+        "source_work_order_id": {"type": "string", "pattern": "^BF17R-WO-[0-9a-f]{14}$"},
+        "case_id": {"type": "string", "minLength": 1},
+        "issuer_ticker": {"type": ["string", "null"]},
+        "source_classification": {
+          "enum": [
+            "analysis_required",
+            "dependency_blocked",
+            "engineering_local",
+            "evidence_required",
+            "human_gate"
+          ]
+        },
+        "field": {"type": "string", "minLength": 1},
+        "baseline_state": {"enum": ["candidate_ready", "dependency_blocked"]},
+        "baseline_resolved": {"const": false},
+        "resolution_receipt_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "primary_root_id": {"$ref": "#/$defs/root_id"},
+        "mapping_confidence": {"enum": ["HIGH_CONFIDENCE", "MEDIUM_CONFIDENCE", "LOW_CONFIDENCE"]},
+        "duplicate_of": {"type": ["string", "null"], "pattern": "^ns02_t30_occ_[0-9a-f]{16}$"},
+        "blocked_by": {"$ref": "#/$defs/node_id_array"},
+        "source_artifact_path": {"type": ["string", "null"]},
+        "source_artifact_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "parent_work_order": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "carry_forward_id",
+        "source_work_order_id",
+        "case_id",
+        "baseline_state",
+        "baseline_resolved",
+        "resolution_receipt_sha256",
+        "blocked_by"
+      ],
+      "properties": {
+        "carry_forward_id": {"$ref": "#/$defs/node_id"},
+        "source_work_order_id": {"type": "string", "pattern": "^BF17R-WO-[0-9a-f]{14}$"},
+        "case_id": {"type": ["string", "null"]},
+        "baseline_state": {"const": "parent_pending"},
+        "baseline_resolved": {"const": false},
+        "resolution_receipt_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "blocked_by": {"$ref": "#/$defs/node_id_array"}
+      }
+    }
+  }
+}

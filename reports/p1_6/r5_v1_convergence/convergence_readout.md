@@ -15,7 +15,7 @@
 
 | fact | current value | authority | evidence / unresolved condition |
 |---|---:|---|---|
-| `system_v1_complete` | false | engineering validation | P1–P4 are complete; P5 and final validation are still pending. |
+| `system_v1_complete` | false | engineering validation | P1–P5 engineering work is complete; the separate final local-validation checkpoint and exact-head CI are still pending. |
 | `sample_quality_ready` | false | current sample evidence and required human review | The canonical 002837 material gaps remain external truth; no value is fabricated. |
 | `p2_ready` | false | `comparison_readiness_gate` | P2 is outside this stage and is not entered. |
 | `release_ready` | false | exact-head remote and CI evidence | Candidate branch has not been pushed or verified yet. |
@@ -110,6 +110,28 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 - determinism: each command performs two internal materializations with zero drift. Two independent command invocations also produced an identical 16-file tree without timestamp normalization; semantic digest `afc8ed3b96dd47c6d58c8dd0f3cb6912cfc7a89d538fe8b041b7fbc587e110ae`.
 - validation: replay contract 6 passed; exact V-005 14-path selection 37 passed; V-006 returned `OK`; package integrity, old-run no-diff, V-009 and `git diff --check` passed. Machine summary: `reports/p1_6/r5_v1_convergence/validation/p4_replay_validation.yaml`.
 
+### P5 — Consolidate 63 blocker occurrences into actionable roots
+
+- status: `complete`
+- immutable baseline: Night02 has 63 unique unresolved occurrence IDs, 20 dependency-blocked occurrence nodes, six parent work orders, 69 DAG nodes and 532 edges. Night04/Night05 preserve 43 candidate-ready, 20 dependency-blocked, six parent-pending and zero resolved; candidate classification, review packets and pointer dry-runs remain non-resolution evidence.
+- root result: every occurrence has exactly one primary root while all original `BF17R-I-*`, `BF17R-WO-*` and `ns02_t30_*` IDs remain present. Seven roots replace occurrence counting: three human-judgment roots, one obtainable-evidence root and three historical engineering roots. The `issuer_not_disclosed` root count is zero because zero reviewed official sources cannot prove issuer non-disclosure.
+- relationship result: the 20 dependency occurrences remain downstream nodes with their exact 10/43 prerequisites; the six parents remain separate aggregators. All 532 `blocked_by` edges match the frozen DAG and are acyclic. Six `duplicate_of` edges capture the two pointer semantic variants proven by Night04 without dropping any occurrence.
+- engineering result: the quality-case alias mismatch and the two pointer-contract variants remain openly recorded, not falsely resolved. Their source artifacts are historical unmarked Bundle16R/17R compatibility outputs; P3 active-control tests and the isolated P4 replay prove `affects_system_v1=false`. Therefore open active-V1 engineering root count is zero while open historical engineering root count is three.
+- external truth: authority/accepted decisions/independent receipts, case analysis, reviewed evidence and suite exact-hash review remain open with explicit owners and next steps. The long-term Goal remains `open_needs_targeted_backflow`; sample quality and P2 remain false.
+- validation: strict dependency-free schema and V-007 passed 7; doc drift passed; source-route passed with 17 capabilities and zero blocking; V-003 passed 210; V-004 passed 160; V-005 passed 37; V-006 returned `OK`; full repository pytest passed 1183 with two existing skips and zero failures/errors. All protected-path, ancestry, whitespace, contract-hash and phase-allowlist guards passed. Machine summary: `reports/p1_6/r5_v1_convergence/validation/p5_blocker_root_cause_validation.yaml`.
+
+### Open root causes retained after P5
+
+| root | category | owner | severity | active V1 impact | next step |
+|---|---|---|---|---:|---|
+| `external_approval_and_independent_receipts_absent` | `human_judgment_pending` | `external_review_lead` | high | false | Register real authority, obtain exact-hash decisions for 43 candidates, then execute and independently receipt accepted records. |
+| `analyst_conclusions_pending` | `human_judgment_pending` | `research_owner` | high | false | Complete the four case-specific driver, forecast, overlap, semantic and valuation analyses after evidence review. |
+| `reviewed_evidence_acceptance_absent` | `obtainable_evidence_gap` | `evidence-ingest` | high | false | Acquire/review missing official source classes, then distinguish obtainable facts from genuinely undisclosed data. |
+| `suite_exact_hash_review_pending` | `human_judgment_pending` | `typed_external_reviewers` | high | false | Record separate real decisions for the three historical stage locks. |
+| `legacy_quality_case_id_contract_gap` | `engineering_defect` | `quality-review` | medium | false | If the long-term Goal resumes, regenerate a new run with explicit case aliases; do not rewrite history. |
+| `legacy_generation_id_pointer_contract_gap` | `engineering_defect` | `engineering_executor` | medium | false | If historical execution resumes, apply one run-scoped semantic repair and validate all four occurrences. |
+| `legacy_quality_ready_pointer_contract_gap` | `engineering_defect` | `engineering_executor` | medium | false | If historical execution resumes, apply one run-scoped semantic repair and validate all four occurrences. |
+
 ## Validation summary
 
 | validation | result | evidence |
@@ -136,11 +158,17 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 | V-005 002837 focused selection | pass | All 14 exact contract paths existed and passed: 37 passed in 4.09s. |
 | V-006 replay canonical state | pass | Strict validator returned `OK`; state is `needs_fix`, with unique G0–G10 rows and four open high G3/G6 issues. |
 | P4 second replay / scope | pass | Two independent invocations produced the same semantic digest and identical 16-file tree; old-run worktree/baseline diffs and V-009 were empty; `git diff --check` passed. |
+| V-007 blocker root map | pass | Dependency-free strict schema and seven tests validate 63/20/6/69/43/0, 69 nodes, 532 exact edges, six proven duplicate references, source hashes, no cycles/orphans/fake resolutions and zero open active-V1 engineering roots. |
+| P5 source route | pass | Distinct P5 report: decision `pass`, 17 capabilities and zero blocking issues. |
+| V-003/V-004/V-005 P5 | pass | Night 210, Bundle14R–17R 160, and exact 14-path 002837 selection 37 passed with zero failures/errors. |
+| V-001/V-006 P5 | pass | Doc drift passed and the isolated replay canonical state returned `OK`. |
+| P5 full repository | pass | 1183 passed, two existing skips, zero failures/errors in 94.05 seconds. |
+| P5 scope and integrity | pass | Baseline ancestry, V-008, V-009, protected worktree status, contract hash, package validation and exact P5 allowlist passed. |
 
 ## Scope and historical immutability
 
-No `data/raw/**`, Night/Bundle17R history, old 002837 run, `AGENTS.md`, `.github/**`, dependency file or other worktree is authorized for mutation. P4 introduced only the exact recorded script, test, isolated replay run, phase validation, readout and checkpoint update; old-run and V-009 diffs are empty. Four ignored test-created bytecode files remain outside the checkpoint because the contract forbids deletion; subsequent validation proved they were not rewritten. Final scope audit remains pending.
+No `data/raw/**`, Night/Bundle17R history, old 002837 run, `AGENTS.md`, `.github/**`, dependency file or other worktree is authorized for mutation. P5 added only the root map, its strict schema/test, distinct phase validation/source-route evidence, this readout and the checkpoint update; protected worktree and baseline diffs are empty. Four ignored test-created bytecode files remain outside the checkpoint because the contract forbids deletion; subsequent validation proved they were not rewritten. Final scope audit remains pending.
 
 ## External truth and publication
 
-No reviewer identity, reviewer authority, human decision, issuer-undisclosed metric or acceptance state has been generated. Publication has not started; PR, main merge, tag, release and deployment remain forbidden.
+No reviewer identity, reviewer authority, human decision, issuer-undisclosed metric or acceptance state has been generated. The evidence supports zero `issuer_not_disclosed` roots at this stage, not a claim that issuers disclosed the missing fields. Publication has not started; PR, main merge, tag, release and deployment remain forbidden.
