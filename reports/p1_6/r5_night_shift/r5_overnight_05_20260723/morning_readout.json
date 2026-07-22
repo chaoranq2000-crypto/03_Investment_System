@@ -10,8 +10,8 @@
     "force_push_used": false,
     "main_merged": false,
     "pr_created": false,
-    "publication_resolution_policy": null,
-    "tracked_delivery_ready": false
+    "publication_resolution_policy": "authoritative_post_push_remote_receipt",
+    "tracked_delivery_ready": true
   },
   "mission_id": "r5_overnight_05_20260723",
   "mission_outcome": "review_intake_ready",
@@ -45,7 +45,7 @@
   "schema_version": "r5_night05_morning_readout_v1",
   "source_ci_run_id": 29764207418,
   "source_commit": "d0fc0fb735f0f581619e330b3fa6f1ef1914a276",
-  "stable_receipt_sha256": "7e85eeae1a4c720642fbdbf80544ff064563bae8bdc5645a9f611863ef3b0892",
+  "stable_receipt_sha256": "cd0982fb6d7a73a533c74fa1a315497f189dc8268098fee22143fb704689a200",
   "target_branch": "codex/r5-night05-external-review-intake",
   "validation": {
     "ci_contract": true,

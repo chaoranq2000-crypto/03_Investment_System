@@ -32,6 +32,7 @@
     "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/preflight/source_preflight.json",
     "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/progress/blocker_ledger.json",
     "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/progress/change_log.json",
+    "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/publication/tracked_delivery_receipt.json",
     "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/review/review_wave_plan.yaml",
     "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/validation/ci_contract.json",
     "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/validation/full_regression.json",
@@ -47,6 +48,6 @@
   "passed": true,
   "pr_created": false,
   "schema_version": "r5_night05_scope_audit_v1",
-  "stable_receipt_sha256": "ef50c5fa814382ba4817083cc0e8138a4a11694eed202c38ca91aa39978774eb",
+  "stable_receipt_sha256": "1ae6fcd1c07644999ea8b4c1f202c64c5dd0c40935904377180d77438d70013f",
   "temporary_paths": []
 }
