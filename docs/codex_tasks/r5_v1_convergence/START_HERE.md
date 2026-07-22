@@ -9,7 +9,7 @@ source_baseline: "a96c1b717bf15905d72fd142efd946fa01bce666"
 last_completed_phase: "P5"
 next_phase: "final_validation"
 last_validation: "pass"
-updated_at: "2026-07-23T05:08:34+08:00"
+updated_at: "2026-07-23T05:18:13+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -36,15 +36,17 @@ Validate package integrity and repository preflight, then resume from the earlie
 
 - **State:** `running`
 - **Last completed phase:** `P5`
-- **Next phase:** `final_validation`
-- **Latest validation:** `pass` — V-007 passed 7 and reconciled 63/20/6/69/43/0 with 532 exact acyclic edges; source-route passed 17/0; Night passed 210, Bundle passed 160, exact 002837 passed 37, canonical state returned `OK`, and full pytest passed 1183 with two existing skips and zero failures/errors.
+- **Next phase:** `final_validation` (local checks complete; candidate CI is the remaining control)
+- **Latest validation:** `pass` — final V-001–V-010 passed: source-route 17/0, Night 210, Bundle 160, exact 002837 37, root map 7, canonical state `OK`, full pytest 1183 plus two existing skips, and zero protected-path/whitespace errors; V-012 `--require-ready` also passed.
 - **Current blocker:** none
-- **Next safe action:** Create checkpoint `docs(v1): classify blockers and close convergence`, prove the worktree clean, then run the frozen final V-001–V-010 matrix and scope audit before recording the final-validation control commit.
+- **Next safe action:** Create `chore(v1): record final validation checkpoint`, require a clean worktree, push `codex/r5-v1-convergence` normally, and wait for every workflow on that exact HEAD; do not write a CI receipt back into Git.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
 ## Checkpoint history
 
+- 2026-07-23T05:18:13+08:00 — Final local validation completed. V-001 through V-010 all passed: doc drift; source-route 17 capabilities/zero blocking; Night 210; Bundle 160; exact 002837 37; canonical state `OK`; root-map 7; zero whitespace/protected-path findings; full repository 1183 passed, two existing skips and zero failures/errors. V-012 `--require-ready` passed with the frozen hash and no warnings. All engineering/scope criteria now pass, so `system_v1_complete=true`; sample quality and P2 remain false, release remains false pending exact-head CI, and the long-term Goal remains open. Next safe action: create the final-validation control checkpoint, confirm empty status, then perform only the authorized ordinary push and CI wait.
+- 2026-07-23T05:11:09+08:00 — Final validation started from clean P5 checkpoint `7598801a291b288d1c0d9e78f3b9037a629ed17e`. Exact mutation allowlist: `reports/p1_6/r5_v1_convergence/validation/final_source_route_quality_report.yaml`, `reports/p1_6/r5_v1_convergence/validation/final_validation_summary.yaml`, `reports/p1_6/r5_v1_convergence/convergence_readout.md`, and this `START_HERE.md`. Validation commands may create only test-managed system-temporary files; no code, schema, test, replay, raw, historical or CI-workflow mutation is authorized. Next safe action: execute V-001 through V-010 exactly, audit baseline-to-HEAD scope and commit lineage, then write the two final local evidence files without claiming a CI receipt.
 - 2026-07-23T05:08:34+08:00 — P5 completed. All 63 original occurrences map exactly once to seven evidence-backed roots while 20 dependency nodes retain their exact prerequisites, six parent work orders remain separate, all 69 carry-forward IDs remain present, and six pointer duplicates are recorded without reducing counts. The baseline remains 43 candidate-ready and zero resolved. Three historical engineering roots remain openly recorded but are isolated from active V1, so open active-V1 engineering root count is zero; external authority, decisions, receipts, analysis, evidence and exact-hash review remain open with owners/next steps. Validation: V-007 7 passed; doc drift passed; source-route 17 capabilities/zero blocking; Night 210, Bundle 160, exact 002837 37 and full repository 1183 passed with two existing skips; V-006 returned `OK`; ancestry, protected paths, whitespace, package and exact allowlist passed. Next safe action: create the specified P5 checkpoint, confirm clean state, then execute final validation.
 - 2026-07-23T05:02:24+08:00 — P5 allowlist extended before writing to include `reports/p1_6/r5_v1_convergence/validation/p5_source_route_quality_report.yaml`. The phase contract requires a current source-route run; this distinct output prevents either overwriting the P2/P3 evidence or prematurely creating the final-validation report. Next safe action: run the import-check gate to this exact path and include its result in the P5 machine summary.
 - 2026-07-23T04:45:05+08:00 — P5 started from clean checkpoint `a256d6e1afed85642f96a4427a55d7492bb62cd4`. Exact mutation allowlist: `reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml`, `schemas/r5_v1_blocker_root_cause_map.schema.json`, `tests/test_r5_v1_blocker_root_cause_map.py`, `reports/p1_6/r5_v1_convergence/validation/p5_blocker_root_cause_validation.yaml`, `reports/p1_6/r5_v1_convergence/convergence_readout.md`, and this `START_HERE.md`. Read-only evidence is restricted to the frozen Night02 occurrence/dependency/queue metrics, Night04 taxonomy/truth, Night05 verbatim carry-forward/ledger/state/readout, existing protected Bundle artifacts, and the P1–P4 active-control proofs. Baseline reconciliation is 63 occurrences, 20 dependency-blocked occurrences, 6 parent work orders, 69 carried IDs, 43 candidate-ready and 0 resolved; every original ID remains mandatory. Next safe action: encode the evidence-backed root graph and schema, then prove exact ID/count/reference/cycle/resolution truth and zero open active-V1 engineering roots before any additional mutation.

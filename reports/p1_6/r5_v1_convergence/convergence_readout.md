@@ -15,7 +15,7 @@
 
 | fact | current value | authority | evidence / unresolved condition |
 |---|---:|---|---|
-| `system_v1_complete` | false | engineering validation | P1–P5 engineering work is complete; the separate final local-validation checkpoint and exact-head CI are still pending. |
+| `system_v1_complete` | true | engineering validation | P1–P5, final V-001–V-010, scope and active-root criteria pass; this does not imply sample, P2 or release readiness. |
 | `sample_quality_ready` | false | current sample evidence and required human review | The canonical 002837 material gaps remain external truth; no value is fabricated. |
 | `p2_ready` | false | `comparison_readiness_gate` | P2 is outside this stage and is not entered. |
 | `release_ready` | false | exact-head remote and CI evidence | Candidate branch has not been pushed or verified yet. |
@@ -86,6 +86,7 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 - historical-write result: Night04 determinism and Night05 bootstrap validation now build and compare bytes in memory. Tests assert the checked-in historical dashboard bytes are unchanged before and after validation.
 - child-process isolation result: four Bundle CLI tests now invoke child Python with explicit `-B`; the corrected V-004 rerun left the four previously created, ignored `.pyc` timestamps unchanged. They remain untracked because the frozen contract prohibits deletion.
 - validation: targeted controls 18 passed; V-002 source-route quality passed with 17 capabilities, 20 sources and zero blocking issues; V-003 210 passed; V-004 160 passed; canonical 002837 state validation passed; ancestry, V-009, whitespace and exact phase-scope checks passed.
+- checkpoint: `c30152eb5efffbcc2a5b951b0a6c6f030b8852b9` (`refactor(v1): converge Night05 implementation baseline`).
 
 ### P3 — Simplify active workflow controls
 
@@ -98,6 +99,7 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 - compatibility guard: the Bundle7 reconciliation CLI has no default run, requires an explicit run plus `--legacy-compatibility`, rejects marked V1 states, maps its local reader check to G7/G9, uses canonical status values and leaves its auxiliary readout non-current.
 - control boundaries: exact-hash is limited to frozen human-review inputs; rollback to mutable non-idempotent writes; remote receipts to publication and `release_ready`.
 - validation: P3 control/quality targeted selections passed 45 and 27 tests; V-001 passed; V-002 passed with 17 capabilities and zero blocking issues; V-003 passed 210; V-004 passed 160; strict template and legacy 002837 validators passed; V-009, whitespace, package integrity and exact allowlist review passed.
+- checkpoint: `b64b83b5f3c15bd1c3c7d9a6777fc24d5828f685` (`refactor(v1): simplify active workflow controls`).
 
 ### P4 — Replay the real 002837 stock-first closed loop
 
@@ -109,6 +111,7 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 - control plane: the standard six files plus run-scoped provenance, research, exposure, backflow and validation artifacts are indexed in a 16-row manifest. Every non-self-recursive artifact has a verifiable hash.
 - determinism: each command performs two internal materializations with zero drift. Two independent command invocations also produced an identical 16-file tree without timestamp normalization; semantic digest `afc8ed3b96dd47c6d58c8dd0f3cb6912cfc7a89d538fe8b041b7fbc587e110ae`.
 - validation: replay contract 6 passed; exact V-005 14-path selection 37 passed; V-006 returned `OK`; package integrity, old-run no-diff, V-009 and `git diff --check` passed. Machine summary: `reports/p1_6/r5_v1_convergence/validation/p4_replay_validation.yaml`.
+- checkpoint: `a256d6e1afed85642f96a4427a55d7492bb62cd4` (`test(v1): replay 002837 closed loop`).
 
 ### P5 — Consolidate 63 blocker occurrences into actionable roots
 
@@ -119,6 +122,7 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 - engineering result: the quality-case alias mismatch and the two pointer-contract variants remain openly recorded, not falsely resolved. Their source artifacts are historical unmarked Bundle16R/17R compatibility outputs; P3 active-control tests and the isolated P4 replay prove `affects_system_v1=false`. Therefore open active-V1 engineering root count is zero while open historical engineering root count is three.
 - external truth: authority/accepted decisions/independent receipts, case analysis, reviewed evidence and suite exact-hash review remain open with explicit owners and next steps. The long-term Goal remains `open_needs_targeted_backflow`; sample quality and P2 remain false.
 - validation: strict dependency-free schema and V-007 passed 7; doc drift passed; source-route passed with 17 capabilities and zero blocking; V-003 passed 210; V-004 passed 160; V-005 passed 37; V-006 returned `OK`; full repository pytest passed 1183 with two existing skips and zero failures/errors. All protected-path, ancestry, whitespace, contract-hash and phase-allowlist guards passed. Machine summary: `reports/p1_6/r5_v1_convergence/validation/p5_blocker_root_cause_validation.yaml`.
+- checkpoint: `7598801a291b288d1c0d9e78f3b9037a629ed17e` (`docs(v1): classify blockers and close convergence`).
 
 ### Open root causes retained after P5
 
@@ -131,6 +135,16 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 | `legacy_quality_case_id_contract_gap` | `engineering_defect` | `quality-review` | medium | false | If the long-term Goal resumes, regenerate a new run with explicit case aliases; do not rewrite history. |
 | `legacy_generation_id_pointer_contract_gap` | `engineering_defect` | `engineering_executor` | medium | false | If historical execution resumes, apply one run-scoped semantic repair and validate all four occurrences. |
 | `legacy_quality_ready_pointer_contract_gap` | `engineering_defect` | `engineering_executor` | medium | false | If historical execution resumes, apply one run-scoped semantic repair and validate all four occurrences. |
+
+## Final local validation
+
+- decision: `pass`
+- exact matrix: V-001 doc drift passed; V-002 final source-route passed with 17 capabilities and zero blocking issues; V-003 Night passed 210; V-004 Bundle14R–17R passed 160; V-005 exact 14-path 002837 selection passed 37; V-006 returned `OK`; V-007 passed 7; V-008 and V-009 are empty/pass; V-010 passed 1183 with two existing skips and zero failures/errors.
+- lineage and scope: Night05 baseline remains an ancestor. The six pre-validation commits after it are exactly setup plus P1–P5. Protected history, raw data, old 002837 state, AGENTS, CI workflows and dependencies have no diff or worktree change.
+- engineering completion: all C-ENG and C-SCOPE criteria pass; the root map has zero open active-V1 engineering defects. Therefore `system_v1_complete=true` independently of the external facts.
+- external facts: `sample_quality_ready=false`, `p2_ready=false`, and the long-term four-case Goal remains open. These are truthful retained states, not validation failures.
+- release boundary: `release_ready=false` until the candidate checkpoint and completion-only checkpoint both pass exact-head GitHub CI. CI receipts and the final remote SHA are deliberately kept out of Git and will be reported in the external handoff.
+- machine summary: `reports/p1_6/r5_v1_convergence/validation/final_validation_summary.yaml`.
 
 ## Validation summary
 
@@ -164,11 +178,16 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 | V-001/V-006 P5 | pass | Doc drift passed and the isolated replay canonical state returned `OK`. |
 | P5 full repository | pass | 1183 passed, two existing skips, zero failures/errors in 94.05 seconds. |
 | P5 scope and integrity | pass | Baseline ancestry, V-008, V-009, protected worktree status, contract hash, package validation and exact P5 allowlist passed. |
+| V-001–V-002 final | pass | Doc drift passed; final source-route report passed with 17 capabilities and zero blocking issues. |
+| V-003–V-007 final | pass | Night 210, Bundle 160, exact 002837 37 and root-map 7 passed; canonical replay state returned `OK`. |
+| V-008–V-010 final | pass | Baseline whitespace/protected-path audits are empty; full pytest passed 1183 with two existing skips and zero failures/errors in 93.46 seconds. |
+| V-012 final package | pass | `--require-ready` returned `ok: true`, state `running`, expected contract hash, P1–P5 and no warnings/errors. |
+| V-011 release | pending | Candidate branch has not yet been pushed; exact-head CI evidence is intentionally external to this readout. |
 
 ## Scope and historical immutability
 
-No `data/raw/**`, Night/Bundle17R history, old 002837 run, `AGENTS.md`, `.github/**`, dependency file or other worktree is authorized for mutation. P5 added only the root map, its strict schema/test, distinct phase validation/source-route evidence, this readout and the checkpoint update; protected worktree and baseline diffs are empty. Four ignored test-created bytecode files remain outside the checkpoint because the contract forbids deletion; subsequent validation proved they were not rewritten. Final scope audit remains pending.
+No `data/raw/**`, Night/Bundle17R history, old 002837 run, `AGENTS.md`, `.github/**`, dependency file or other worktree was modified. Final baseline-to-HEAD and worktree audits are empty for every protected path. Four ignored test-created bytecode files remain outside all checkpoints because deletion is forbidden; bytecode-suppressed validation did not rewrite them.
 
 ## External truth and publication
 
-No reviewer identity, reviewer authority, human decision, issuer-undisclosed metric or acceptance state has been generated. The evidence supports zero `issuer_not_disclosed` roots at this stage, not a claim that issuers disclosed the missing fields. Publication has not started; PR, main merge, tag, release and deployment remain forbidden.
+No reviewer identity, reviewer authority, human decision, issuer-undisclosed metric or acceptance state has been generated. The evidence supports zero `issuer_not_disclosed` roots at this stage, not a claim that issuers disclosed the missing fields. Ordinary candidate-branch publication is the only next authorized write; PR, main merge, tag, release and deployment remain forbidden.

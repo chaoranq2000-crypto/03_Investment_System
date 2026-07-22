@@ -1,0 +1,124 @@
+schema_version: 1
+artifact_type: r5_v1_convergence_final_local_validation
+task_id: r5_v1_convergence
+validated_at: '2026-07-23T05:16:46+08:00'
+decision: pass
+source_baseline: a96c1b717bf15905d72fd142efd946fa01bce666
+p5_checkpoint: 7598801a291b288d1c0d9e78f3b9037a629ed17e
+execution_branch: codex/r5-v1-convergence
+contract:
+  path: docs/codex_tasks/r5_v1_convergence/CONTRACT.md
+  sha256: 5e4a52f8eff0792810a8b0255089a01359a47bafc549edb0bffacb1f4335d163
+  require_ready_validation:
+    ok: true
+    state: running
+    phases:
+    - P1
+    - P2
+    - P3
+    - P4
+    - P5
+    errors: []
+    warnings: []
+phase_checkpoints:
+  setup: bb5514ba390a90b5426719ab1b14d6bf5afc20c7
+  P1: 9789c6ebedae4d71247a7d9b68b33523788e0add
+  P2: c30152eb5efffbcc2a5b951b0a6c6f030b8852b9
+  P3: b64b83b5f3c15bd1c3c7d9a6777fc24d5828f685
+  P4: a256d6e1afed85642f96a4427a55d7492bb62cd4
+  P5: 7598801a291b288d1c0d9e78f3b9037a629ed17e
+validation_matrix:
+  V-001:
+    result: pass
+    evidence: Doc drift check passed.
+  V-002:
+    result: pass
+    evidence_path: reports/p1_6/r5_v1_convergence/validation/final_source_route_quality_report.yaml
+    decision: pass
+    capability_count: 17
+    blocking_issue_count: 0
+  V-003:
+    result: pass
+    passed: 210
+    failed: 0
+    errors: 0
+    duration_seconds: 44.09
+  V-004:
+    result: pass
+    passed: 160
+    failed: 0
+    errors: 0
+    duration_seconds: 14.14
+  V-005:
+    result: pass
+    exact_path_count: 14
+    passed: 37
+    failed: 0
+    errors: 0
+    duration_seconds: 4.12
+  V-006:
+    result: pass
+    evidence: OK
+    state_path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/workflow_state.yaml
+  V-007:
+    result: pass
+    passed: 7
+    failed: 0
+    errors: 0
+    duration_seconds: 1.10
+  V-008:
+    result: pass
+    baseline: a96c1b717bf15905d72fd142efd946fa01bce666
+    whitespace_error_count: 0
+  V-009:
+    result: pass
+    protected_path_diff: []
+    protected_worktree_status: []
+  V-010:
+    result: pass
+    passed: 1183
+    skipped: 2
+    failed: 0
+    errors: 0
+    duration_seconds: 93.46
+    checkpoint_worktree_status_expected: empty
+  V-011:
+    result: pending
+    evidence_policy: exact-head GitHub URLs and remote SHA are recorded only in the external final handoff
+  V-012:
+    result: pass
+    require_ready: true
+    contract_hash_unchanged: true
+completion_criteria:
+  C-ENG-01: pass
+  C-ENG-02: pass
+  C-ENG-03: pass
+  C-ENG-04: pass
+  C-ENG-05: pass
+  C-ENG-06: pass
+  C-ENG-07: pass
+  C-DATA-01: pass
+  C-HUMAN-01: pass
+  C-P2-01: pass
+  C-REL-01: pending
+  C-SCOPE-01: pass
+scope:
+  source_baseline_is_ancestor: true
+  pre_validation_commits_after_baseline: 6
+  expected_commits_after_validation_checkpoint: 7
+  protected_path_diff: []
+  other_worktree_writes: false
+  pr_created: false
+  main_merged: false
+  force_push_used: false
+local_truths:
+  system_v1_complete: true
+  sample_quality_ready: false
+  p2_ready: false
+  release_ready: false
+  long_term_goal_state: open_needs_targeted_backflow
+publication:
+  candidate_push_allowed: true
+  exact_head_ci_required: true
+  ci_receipt_written_to_git: false
+  next_action: create the final-validation checkpoint, require a clean worktree, push normally, and wait for every exact-head run
