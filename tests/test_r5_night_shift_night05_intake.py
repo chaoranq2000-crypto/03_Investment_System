@@ -11,6 +11,7 @@ from src.maintenance.night_shift.night05 import (
     EXPECTED_DEPENDENCIES,
     EXPECTED_OCCURRENCES,
     EXPECTED_PARENTS,
+    EXPECTED_SOURCE_HASHES,
     EXPECTED_TOTAL_ITEMS,
     HISTORICAL_PATHS,
     MISSION_ID,
@@ -50,6 +51,14 @@ def test_night05_locks_exact_night04_delivery_and_truth() -> None:
     assert preflight["source_delivery_receipt"]["ci_conclusion"] == "success"
     assert preflight["queue_task_count"] == EXPECTED_TOTAL_ITEMS
     assert preflight["candidate_count"] == EXPECTED_CANDIDATES
+    assert preflight["source_hash_representation"] == "git_blob_bytes"
+    morning = next(
+        item
+        for item in preflight["key_files"]
+        if item["path"].endswith("/morning_readout.json")
+    )
+    assert morning["sha256"] == EXPECTED_SOURCE_HASHES["morning_readout.json"]
+    assert morning["bytes"] == 2372
     assert preflight["starting_truth"] == {
         "resolved": 0,
         "total": EXPECTED_OCCURRENCES,

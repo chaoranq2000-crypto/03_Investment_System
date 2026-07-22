@@ -48,9 +48,9 @@
       "sha256": "ac1b65be239531a8d0bf2d46c2f89183d9c7f6f90d5c9b3332e31ec4f749be3f"
     },
     {
-      "bytes": 2432,
+      "bytes": 2372,
       "path": "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/morning_readout.json",
-      "sha256": "028941fbc3d62c6650878ccd26f9089b1f1c38f9c235a9d9de71b46188b967f1"
+      "sha256": "a8f88020abef269a56f3aeb392d60ab00d887c917e0ceb1124e11c532264e9b3"
     }
   ],
   "mission_id": "r5_overnight_05_20260723",
@@ -67,9 +67,10 @@
     "physical_sha256": "5cafc0188630552535eeae6a80c63bc179eaa3ca1f46683dd7925f75dee7da95",
     "stable_receipt_sha256": "9536dc994fa6b57e22ee5686583373b0b0f48271a2a2bf7a29d40f7bcda08bcb"
   },
+  "source_hash_representation": "git_blob_bytes",
   "source_hashes_reproducible": true,
   "source_mission_id": "r5_overnight_04_20260722",
-  "stable_receipt_sha256": "df851bf13d312a6369847a36214a7d571803422f3d4d96fd902d29a4a65875cb",
+  "stable_receipt_sha256": "57a7b8e8031b1e7fa38dfd3fa8da540619cc7cb487b3efa84320951941261409",
   "starting_truth": {
     "candidate_ready": 43,
     "dependency_blocked": 20,

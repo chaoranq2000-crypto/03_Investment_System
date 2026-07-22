@@ -79,7 +79,7 @@ EXPECTED_SOURCE_HASHES = {
         "ac1b65be239531a8d0bf2d46c2f89183d9c7f6f90d5c9b3332e31ec4f749be3f"
     ),
     "morning_readout.json": (
-        "028941fbc3d62c6650878ccd26f9089b1f1c38f9c235a9d9de71b46188b967f1"
+        "a8f88020abef269a56f3aeb392d60ab00d887c917e0ceb1124e11c532264e9b3"
     ),
 }
 EXPECTED_KIND_COUNTS = {
@@ -132,6 +132,7 @@ ALLOWED_SCOPE_PREFIXES = (
     "src/maintenance/night_shift/night05.py",
     "tests/test_r5_night_shift_pointer_dry_run_patches.py",
     "tests/test_r5_night_shift_night05",
+    "reports/quality/ci_source_route_quality_report.yaml",
 )
 
 
@@ -182,6 +183,11 @@ def _git(repo_root: Path, *args: str, check: bool = True) -> str:
     return _git_bytes(repo_root, *args, check=check).decode(
         "utf-8", errors="replace"
     ).strip()
+
+
+def _source_blob(repo_root: Path, relative: str) -> bytes:
+    path = (SOURCE_ROOT / relative).as_posix()
+    return _git_bytes(repo_root, "show", f"{SOURCE_COMMIT}:{path}")
 
 
 def _verify_stable_receipt(value: Mapping[str, Any], *, label: str) -> None:
@@ -322,8 +328,8 @@ def build_source_preflight(repo_root: Path) -> dict[str, Any]:
     queue = authoritative_queue(repo_root)
     key_files: list[dict[str, Any]] = []
     for relative, expected in EXPECTED_SOURCE_HASHES.items():
-        path = repo_root / SOURCE_ROOT / relative
-        actual = sha256_file(path) if path.is_file() else None
+        payload = _source_blob(repo_root, relative)
+        actual = hashlib.sha256(payload).hexdigest()
         if actual != expected:
             raise Night05Error(
                 f"Night04 source hash drifted for {relative}: {actual} != {expected}"
@@ -332,7 +338,7 @@ def build_source_preflight(repo_root: Path) -> dict[str, Any]:
             {
                 "path": (SOURCE_ROOT / relative).as_posix(),
                 "sha256": actual,
-                "bytes": path.stat().st_size,
+                "bytes": len(payload),
             }
         )
 
@@ -413,6 +419,7 @@ def build_source_preflight(repo_root: Path) -> dict[str, Any]:
             "candidate_kind_counts": observed_kinds,
             "starting_truth": observed_truth,
             "key_files": key_files,
+            "source_hash_representation": "git_blob_bytes",
             "source_hashes_reproducible": True,
             "passed": True,
         }
