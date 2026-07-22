@@ -20,11 +20,14 @@
 | global `stage_id` | `docs/workflows/RESEARCH_WORKFLOW.md` | 下层 skill 可定义 `SDD-*`、`DL-*`、`QR-*`、`RP-*` 局部步骤。 |
 | global `gate_id` G0-G10 | `docs/workflows/RESEARCH_WORKFLOW.md` | 其他文件只能引用 gate id，不得定义完整全局 gate 表。 |
 | `backflow_decision` enum | `docs/workflows/RESEARCH_WORKFLOW.md` | `stock-deep-dive` 和 mapping 只能消费或输出该 enum。 |
+| V1 completion truth semantics | `docs/workflows/RESEARCH_WORKFLOW.md` | `system_v1_complete`、`sample_quality_ready`、`p2_ready`、`release_ready` 只能分别引用和附证据，不得互相替代。 |
 | workflow state fields | `research-orchestrator/references/workflow_state_schema.md` | 必须使用 canonical `workflow_type`。 |
+| active-run current asset ownership | `docs/workflows/RESEARCH_WORKFLOW.md` + `WORKFLOW_ORCHESTRATION_SPEC.md` | 每个活动 run 只保留一份当前 state、TODO、quality 和 readout；历史产物只读。 |
 | handoff packet format | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | skill 可补充本 skill 的 handoff 要求。 |
 | source rank / citation principle | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | evidence-ingest references 承担字段级执行契约。 |
 | quality issue schema | `.agents/skills/quality-review/SKILL.md` 或其 references | 不得创造全局 gate id。 |
 | stock report production profile | `.agents/skills/stock-deep-dive/references/report_production_profile.md` | 不得作为平级 workflow。 |
+| local check to global gate mapping | `docs/workflows/RESEARCH_WORKFLOW.md` | 局部检查保留局部 ID，并映射到 G0–G10；不得产生第二套 global gate。 |
 
 ## 职责矩阵
 

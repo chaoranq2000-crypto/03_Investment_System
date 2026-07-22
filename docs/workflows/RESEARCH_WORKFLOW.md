@@ -161,6 +161,52 @@ canonical `workflow_type`、global `stage_id`、global `gate_id`
 Detailed workflow_state schema is owned by
 `.agents/skills/research-orchestrator/references/workflow_state_schema.md`.
 
+### 6.1 V1 四类完成事实
+
+V1 必须同时报告四个互不替代的布尔事实。四者的语义只在本 kernel 定义；
+运行时、局部 profile、Bundle、Night mission 和 readout 只能消费并附证据，
+不得改变定义或用一个事实推导另一个事实。
+
+| fact | canonical meaning | evidence boundary |
+|---|---|---|
+| `system_v1_complete` | 工程接口、活动控制面、隔离真实重放、根因归并和工程验证均已闭环，且活动 V1 路径没有 open `engineering_defect`。 | 由版本化实现、测试、scope audit、历史不可变检查和可复跑工件证明。 |
+| `sample_quality_ready` | 当前研究样本的证据、模型、报告和必要人工审查达到样例质量要求。 | 由当前样本的 research pack、质量结论、缺口和真实 reviewer 输入证明；工程测试不得自动提升。 |
+| `p2_ready` | canonical comparison-readiness 决定已经独立通过。 | 只能由 `comparison_readiness_gate` 按本文件第 13 节判定；工程完成或样例质量不能代替。 |
+| `release_ready` | 候选版本已按获批发布边界发布，且最终精确 HEAD 的必需 CI/验证成功。 | 由 remote SHA、exact-head CI 和发布凭证证明；本地测试或预发布提交不得代替。 |
+
+`system_v1_complete=true` 至少要求：
+
+1. 本文件的 canonical interface 和 G0–G10 保持唯一 owner；
+2. 活动 run 只有一套当前状态、TODO、质量结论和 readout；
+3. 真实归档输入可以在隔离 run 中可追溯、可重复地完成自动化闭环；
+4. 影响活动 V1 路径的 open `engineering_defect` 为零；
+5. 合同要求的 targeted/full tests、文档漂移、scope 和历史不可变检查全部通过。
+
+以下事实不得抬高或否定 `system_v1_complete`：发行人未披露数据、待处理的真实
+reviewer 决定、`sample_quality_ready=false`、`p2_ready=false`，或尚未授权的发布。
+这些外部事实必须保留为显式缺口，但不得被工程自动化补造。反过来，
+`system_v1_complete=true` 也不得自动把后三项改为 true。
+
+Night mission outcome `review_intake_ready` 只描述评审接收链路，不能写入 canonical
+`workflow_state.status`，也不证明 occurrence、dependency 或 parent work order 已解决。
+长期 Goal `r5_bundle17r_bf2_four_case_activation` 在独立的人类关闭授权出现前保持 open；
+V1 工程收敛不得自动关闭它。
+
+### 6.2 活动 run 的单一当前控制面
+
+每个活动 `reports/workflow_runs/<workflow_id>/` 只维护以下一套当前资产：
+
+```text
+workflow_state.yaml
+open_todos.csv
+quality_gate_report.md
+workflow_readout.md
+```
+
+`run_log.md` 和 `artifact_manifest.csv` 记录执行与追溯，但不得形成第二套当前状态或质量结论。
+Bundle、Night、旧 close readout、历史 quality report 和 generation snapshot 可以保留为只读证据，
+不得覆盖或支配上述当前资产。新一轮输出必须写入新的 run-scoped 路径，不能覆盖历史 run。
+
 ## 7. Skill 角色分工
 
 | skill | 主要职责 |
@@ -357,6 +403,19 @@ Detailed workflow_state schema is owned by
 | G10 Close Gate | readout 说明成果、TODO、质量状态和下一步 |
 
 任何 skill-local gate 不得使用新的全局 `G` 编号。
+
+### 11.1 局部检查与兼容别名
+
+R5、Bundle、Night、data-layer、report-production 和 skill-local 检查必须使用明确的局部
+前缀或兼容别名，并映射到 G0–G10 中的一个或多个 owner gate。局部检查可以保留更严格的
+输入哈希、回滚或发布凭证要求，但不得：
+
+1. 写入新的全局 `G` 编号；
+2. 作为 `workflow_state.quality_gates[].gate_id` 的 canonical 值；
+3. 重定义工程完成、样例质量、P2 或发布事实；
+4. 因历史 Bundle/Night 任务仍 open 而移动活动 V1 的工程终点。
+
+兼容层必须记录 `local_check_id`、`mapped_global_gate_ids`、owner、适用边界和失败回流目标。
 
 ## 12. 固化产物清单
 

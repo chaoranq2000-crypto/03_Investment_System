@@ -179,6 +179,33 @@ fix loop 不新增 `workflow_type`、global `stage_id` 或 global `gate_id`。
 | unresolved TODOs | owner、severity、next action。 |
 | P2 readiness | 仅在 readiness 任务中判断，不直接进入 P2。 |
 
+### 8.1 V1 truth reporting
+
+编排器消费 `RESEARCH_WORKFLOW.md` 定义的四类完成事实，不在本文件或 runtime 中重定义：
+
+```text
+system_v1_complete
+sample_quality_ready
+p2_ready
+release_ready
+```
+
+系统级 readout 必须分别给出四个布尔值、证据路径、未满足条件和判定 owner。
+不得用 `accepted`、`accepted_with_todos`、`review_intake_ready`、本地测试通过或某个
+Bundle/Night mission outcome 代替其中任一事实。只有
+`comparison_readiness_gate` 可以形成 `p2_ready` 决定；只有最终 exact-head 发布证据
+可以形成 `release_ready` 决定。
+
+### 8.2 Current-run singleton assets
+
+编排器对一个活动 run 只维护一份当前 `workflow_state.yaml`、`open_todos.csv`、
+`quality_gate_report.md` 和 `workflow_readout.md`。历史 Bundle/Night 产物、旧 readout 和
+旧质量报告只作为 manifest 中的只读来源，不得成为平行 current state。
+
+局部检查或兼容 gate 必须把 `local_check_id` 映射到 `RESEARCH_WORKFLOW.md` 的 G0–G10；
+只有 canonical gate id 可以写入 `workflow_state.quality_gates[].gate_id`。精确输入哈希、
+回滚和 remote receipt 等控制只在各自风险边界生效，不能成为所有阶段的通用门禁。
+
 ## 9. 禁止事项
 
 `research-orchestrator` 不得：
