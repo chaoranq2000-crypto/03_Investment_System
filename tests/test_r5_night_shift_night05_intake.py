@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
+from typing import Mapping
 
 import yaml
 
 from src.maintenance.night_shift.night05 import (
     EXPECTED_CANDIDATES,
+    DELIVERY_COMMIT,
     EXPECTED_DEPENDENCIES,
     EXPECTED_OCCURRENCES,
     EXPECTED_PARENTS,
@@ -23,10 +25,13 @@ from src.maintenance.night_shift.night05 import (
     Night05Outcome,
     authoritative_queue,
     build_review_wave_plan,
+    build_change_log,
+    build_next_queue,
+    build_recompute_summary,
     build_scope_audit,
     build_source_preflight,
+    consume_external_decisions,
     evaluate_night05_outcome,
-    materialize_bootstrap,
 )
 
 
@@ -41,6 +46,18 @@ def _notes(task: dict[str, object]) -> dict[str, str]:
             key, value = text.split("=", 1)
             result[key] = value
     return result
+
+
+def _json_bytes(value: Mapping[str, object]) -> bytes:
+    return (
+        json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2) + "\n"
+    ).encode("utf-8")
+
+
+def _yaml_bytes(value: Mapping[str, object]) -> bytes:
+    return yaml.safe_dump(
+        dict(value), allow_unicode=True, sort_keys=False, width=120
+    ).encode("utf-8")
 
 
 def test_night05_locks_exact_night04_delivery_and_truth() -> None:
@@ -169,12 +186,14 @@ def test_night05_scope_audit_covers_committed_and_working_changes() -> None:
     observed = set(audit["observed_changed_paths"])
     assert ".gitattributes" in observed
     assert "src/maintenance/night_shift/night05.py" in observed
+    assert audit["scope_head"] == DELIVERY_COMMIT
+    assert audit["scope_mode"] == "frozen_delivery_snapshot"
     assert not audit["historical_changed_paths"]
     assert not audit["out_of_scope_paths"]
     assert audit["passed"] is True
 
 
-def test_night05_bootstrap_materialization_is_byte_deterministic() -> None:
+def test_night05_bootstrap_builders_match_frozen_bytes_without_writes() -> None:
     paths = [
         OUTPUT_ROOT / "preflight/source_preflight.json",
         OUTPUT_ROOT / "review/review_wave_plan.yaml",
@@ -186,11 +205,31 @@ def test_night05_bootstrap_materialization_is_byte_deterministic() -> None:
     before = {
         path.as_posix(): (REPO_ROOT / path).read_bytes() for path in paths
     }
-    result = materialize_bootstrap(REPO_ROOT)
+    intake = consume_external_decisions(REPO_ROOT, persist=False)
+    generated = {
+        (OUTPUT_ROOT / "preflight/source_preflight.json").as_posix(): _json_bytes(
+            build_source_preflight(REPO_ROOT)
+        ),
+        (OUTPUT_ROOT / "review/review_wave_plan.yaml").as_posix(): _yaml_bytes(
+            build_review_wave_plan(REPO_ROOT)
+        ),
+        (OUTPUT_ROOT / "execution/decision_intake.json").as_posix(): _json_bytes(
+            intake
+        ),
+        (OUTPUT_ROOT / "execution/recompute_summary.json").as_posix(): _json_bytes(
+            build_recompute_summary(REPO_ROOT)
+        ),
+        (OUTPUT_ROOT / "next_night_queue.yaml").as_posix(): _yaml_bytes(
+            build_next_queue(REPO_ROOT)
+        ),
+        (OUTPUT_ROOT / "progress/change_log.json").as_posix(): _json_bytes(
+            build_change_log()
+        ),
+    }
     after = {
         path.as_posix(): (REPO_ROOT / path).read_bytes() for path in paths
     }
-    assert result["outcome"] == "review_intake_ready"
+    assert before == generated
     assert before == after
     historical = REPO_ROOT / SOURCE_ROOT
     assert historical.is_dir()

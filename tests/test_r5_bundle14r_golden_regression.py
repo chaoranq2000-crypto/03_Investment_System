@@ -254,6 +254,7 @@ def test_cli_writes_only_external_output_directory(tmp_path: Path):
     completed = subprocess.run(
         [
             sys.executable,
+            "-B",
             str(REPO_ROOT / "scripts" / "run_r5_bundle14r_golden_regression.py"),
             "--repo-root",
             str(REPO_ROOT),

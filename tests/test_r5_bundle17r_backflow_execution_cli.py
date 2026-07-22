@@ -20,6 +20,7 @@ def test_cli_runs_from_repo_root(tmp_path: Path) -> None:
     completed = subprocess.run(
         [
             sys.executable,
+            "-B",
             "-m",
             "src.research.r5_bundle17r_backflow_execution",
             "--repo-root",

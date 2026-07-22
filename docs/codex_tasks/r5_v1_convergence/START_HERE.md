@@ -6,10 +6,10 @@ contract_sha256: "5e4a52f8eff0792810a8b0255089a01359a47bafc549edb0bffacb1f4335d1
 state: "running"
 execution_branch: "codex/r5-v1-convergence"
 source_baseline: "a96c1b717bf15905d72fd142efd946fa01bce666"
-last_completed_phase: "P1"
-next_phase: "P2"
+last_completed_phase: "P2"
+next_phase: "P3"
 last_validation: "pass"
-updated_at: "2026-07-23T03:02:46+08:00"
+updated_at: "2026-07-23T03:24:32+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -35,16 +35,19 @@ Validate package integrity and repository preflight, then resume from the earlie
 ## Current checkpoint
 
 - **State:** `running`
-- **Last completed phase:** `P1`
-- **Next phase:** `P2`
-- **Latest validation:** `p1_pass` — doc drift passed; V1 semantics 5/5 passed; combined compatibility selection 16/16 passed; whitespace and phase-scope checks passed.
+- **Last completed phase:** `P2`
+- **Next phase:** `P3`
+- **Latest validation:** `pass` — P2 targeted controls passed 18 tests, V-002 passed with 17 capabilities and no blocking issues, V-003 passed 210 tests, V-004 passed 160 tests, canonical 002837 state validation passed, and ancestry/scope/whitespace guards passed.
 - **Current blocker:** none
-- **Next safe action:** Commit the verified P1 allowlist with the contract message, require a clean checkpoint, then read P2 implementation/guard sources and record the exact P2 mutation allowlist before editing.
+- **Next safe action:** Create checkpoint `refactor(v1): converge Night05 implementation baseline`, prove the worktree clean, then inventory and simplify the active workflow controls under the P3 allowlist.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
 ## Checkpoint history
 
+- 2026-07-23T03:24:32+08:00 — P2 completed. Night05 mission scope is frozen at its delivered checkpoint while protected historical roots remain audited through current HEAD; Night04 determinism and Night05 bootstrap checks render in memory; child validators use explicit bytecode suppression. Validation: targeted controls 18 passed; V-002 passed with 17 capabilities and zero blocking issues; V-003 210 passed; V-004 160 passed; canonical 002837 state validator, ancestry, V-009, `git diff --check`, package integrity and exact allowlist review passed. Four ignored `.pyc` files created by the first V-004 attempt remain untracked because deletion is forbidden; the corrected rerun left their timestamps unchanged. Next safe action: create the specified P2 checkpoint, confirm clean state, then start P3.
+- 2026-07-23T03:21:21+08:00 — P2 allowlist extended before editing to include four validator-isolation tests: `tests/test_r5_bundle14r_golden_regression.py`, `tests/test_r5_bundle16r_evidence_pack_materializer.py`, `tests/test_r5_bundle17r_backflow_execution_cli.py`, and `tests/test_r5_bundle17r_verified_result_materializer_cli.py`. Evidence: their child Python commands did not inherit parent `-B` and created ignored bytecode under `src/research/__pycache__`. Next safe action: add explicit child `-B`, rerun V-004 with `PYTHONDONTWRITEBYTECODE=1`, and confirm no tracked or protected-path change.
+- 2026-07-23T03:12:48+08:00 — P2 started from clean checkpoint `9789c6ebedae4d71247a7d9b68b33523788e0add`. Exact mutation allowlist: `src/maintenance/night_shift/night05.py`, `src/maintenance/night_shift/night04_validation.py`, `tests/test_r5_night_shift_night05_intake.py`, `tests/test_r5_night_shift_night04_determinism.py`, `tests/test_r5_v1_active_control_plane.py`, `reports/p1_6/r5_v1_convergence/convergence_readout.md`, `reports/p1_6/r5_v1_convergence/validation/p2_source_route_quality_report.yaml`, and `docs/codex_tasks/r5_v1_convergence/START_HERE.md`. Baseline evidence: the Night05 scope test treated seven legitimate setup/P1 paths as Night05 mission drift; Night04 determinism validation rewrote a historical HTML during testing while preserving its normalized Git blob. The stat-only dirty marker was cleared after hash equality was proven. Next safe action: repair those two guard defects without widening Night05's allowlist or changing historical artifacts.
 - 2026-07-23T03:02:46+08:00 — P1 completed. Four independent truth semantics, active-run singleton assets, long-term Goal boundary and local-check ownership were added to the authoritative workflow documents. Validation: doc drift pass; V1 semantics 5 passed; compatibility selection 16 passed; `git diff --check` and allowlist review pass. Next safe action: create `docs(v1): freeze engineering completion semantics`, confirm a clean worktree, then start P2.
 - 2026-07-23T02:58:11+08:00 — P1 started after clean preflight. Exact mutation allowlist: `docs/workflows/RESEARCH_WORKFLOW.md`, `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md`, `docs/meta/DOC_OWNERSHIP_MATRIX.md`, `tests/test_r5_v1_completion_semantics.py`, `reports/p1_6/r5_v1_convergence/convergence_readout.md`, and `docs/codex_tasks/r5_v1_convergence/START_HERE.md`. Next safe action: define the four independent V1 truths and their ownership without changing code behavior or historical artifacts.
 - 2026-07-23T02:34:56+08:00 — Package drafted from Night05 exact baseline after read-only ancestry, workflow-authority, validation-path, dirty-worktree, and historical-boundary audits; not yet safe for unattended execution.

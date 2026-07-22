@@ -38,6 +38,7 @@ MISSION_ID = "r5_overnight_05_20260723"
 PACKAGE_ID = "R5_Overnight_Mission_05_20260723"
 SOURCE_MISSION_ID = "r5_overnight_04_20260722"
 SOURCE_COMMIT = "d0fc0fb735f0f581619e330b3fa6f1ef1914a276"
+DELIVERY_COMMIT = "a96c1b717bf15905d72fd142efd946fa01bce666"
 SOURCE_BRANCH = "codex/r5-night04-review-acceleration-and-unlock"
 TARGET_BRANCH = "codex/r5-night05-external-review-intake"
 SOURCE_ROOT = Path("reports/p1_6/r5_night_shift/r5_overnight_04_20260722")
@@ -565,7 +566,9 @@ def _existing_decision_ledger(repo_root: Path) -> dict[str, Any]:
     return value
 
 
-def consume_external_decisions(repo_root: Path) -> dict[str, Any]:
+def consume_external_decisions(
+    repo_root: Path, *, persist: bool = True
+) -> dict[str, Any]:
     authorities, authority_receipt = load_external_authorities(repo_root)
     files = _decision_files(repo_root)
     manifests: list[dict[str, Any]] = []
@@ -656,7 +659,8 @@ def consume_external_decisions(repo_root: Path) -> dict[str, Any]:
             "records": ledger_records,
         }
     )
-    write_json(repo_root / DECISION_LEDGER, ledger)
+    if persist:
+        write_json(repo_root / DECISION_LEDGER, ledger)
     approved = [item for item in ledger_records if item.get("decision") == "approve"]
     outcome = (
         "no_external_decisions"
@@ -688,9 +692,10 @@ def consume_external_decisions(repo_root: Path) -> dict[str, Any]:
             "outcome": outcome,
         }
     )
-    write_json(
-        repo_root / OUTPUT_ROOT / "execution/decision_intake.json", payload
-    )
+    if persist:
+        write_json(
+            repo_root / OUTPUT_ROOT / "execution/decision_intake.json", payload
+        )
     return payload
 
 
@@ -915,7 +920,35 @@ def _status_paths(repo_root: Path) -> list[str]:
     return sorted(set(paths))
 
 
+def _night05_scope_head(repo_root: Path) -> tuple[str, str]:
+    """Keep the legacy Night05 allowlist bound to its delivered snapshot."""
+
+    result = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo_root),
+            "merge-base",
+            "--is-ancestor",
+            DELIVERY_COMMIT,
+            "HEAD",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode == 0:
+        return DELIVERY_COMMIT, "frozen_delivery_snapshot"
+    if result.returncode == 1:
+        return "HEAD", "active_mission_head"
+    raise Night05Error(
+        "cannot resolve Night05 delivery ancestry: "
+        f"{result.stdout}{result.stderr}"
+    )
+
+
 def build_scope_audit(repo_root: Path) -> dict[str, Any]:
+    scope_head, scope_mode = _night05_scope_head(repo_root)
     historical_changed: set[str] = set()
     for historical in HISTORICAL_PATHS:
         committed = _git(
@@ -945,11 +978,16 @@ def build_scope_audit(repo_root: Path) -> dict[str, Any]:
             repo_root,
             "diff",
             "--name-only",
-            f"{SOURCE_COMMIT}..HEAD",
+            f"{SOURCE_COMMIT}..{scope_head}",
         ).splitlines()
         if item
     }
-    changed = sorted(committed_changed | set(_status_paths(repo_root)))
+    working_scope_paths = (
+        set(_status_paths(repo_root))
+        if scope_mode == "active_mission_head"
+        else set()
+    )
+    changed = sorted(committed_changed | working_scope_paths)
     out_of_scope = [
         path
         for path in changed
@@ -965,15 +1003,13 @@ def build_scope_audit(repo_root: Path) -> dict[str, Any]:
         or path.endswith(".pyc")
         or "/.local/" in f"/{path}/"
     ]
+    diff_target = (
+        SOURCE_COMMIT
+        if scope_mode == "active_mission_head"
+        else f"{SOURCE_COMMIT}..{scope_head}"
+    )
     diff_check = subprocess.run(
-        [
-            "git",
-            "-C",
-            str(repo_root),
-            "diff",
-            "--check",
-            SOURCE_COMMIT,
-        ],
+        ["git", "-C", str(repo_root), "diff", "--check", diff_target],
         capture_output=True,
         text=True,
         check=False,
@@ -996,6 +1032,9 @@ def build_scope_audit(repo_root: Path) -> dict[str, Any]:
             "schema_version": "r5_night05_scope_audit_v1",
             "mission_id": MISSION_ID,
             "baseline_commit": SOURCE_COMMIT,
+            "scope_head": scope_head,
+            "scope_mode": scope_mode,
+            "current_head_observed": _git(repo_root, "rev-parse", "HEAD"),
             "historical_paths": [path.as_posix() for path in HISTORICAL_PATHS],
             "historical_changed_paths": sorted(historical_changed),
             "observed_changed_paths": changed,

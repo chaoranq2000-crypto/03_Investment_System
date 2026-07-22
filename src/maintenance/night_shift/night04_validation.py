@@ -24,7 +24,15 @@ from .night04 import (
     Night04Error,
     authoritative_queue,
 )
-from .night04_acceleration import materialize_phase_c
+from .night04_acceleration import (
+    build_first_parent_path,
+    build_max_unlock_path,
+    build_review_groups,
+    build_reviewer_dashboard,
+    build_unblock_leverage,
+    dashboard_html,
+    dashboard_markdown,
+)
 from .night04_execution import (
     Night04ExecutionError,
     build_blocker_ledger,
@@ -75,6 +83,22 @@ def _yaml_bytes(value: Mapping[str, Any]) -> bytes:
     return yaml.safe_dump(
         dict(value), allow_unicode=True, sort_keys=False, width=120, line_break="\n"
     ).encode("utf-8")
+
+
+def _reviewer_dashboard_bytes(repo_root: Path) -> dict[Path, bytes]:
+    """Render the deterministic dashboard without touching Night04 history."""
+
+    leverage = build_unblock_leverage(repo_root)
+    first_parent = build_first_parent_path(repo_root, leverage)
+    max_unlock = build_max_unlock_path(repo_root, leverage)
+    groups = build_review_groups(repo_root)
+    dashboard = build_reviewer_dashboard(leverage, first_parent, max_unlock, groups)
+    root = OUTPUT_ROOT / "review_acceleration"
+    return {
+        root / "reviewer_dashboard.yaml": _yaml_bytes(dashboard),
+        root / "reviewer_dashboard.md": dashboard_markdown(dashboard).encode("utf-8"),
+        root / "reviewer_dashboard.html": dashboard_html(dashboard).encode("utf-8"),
+    }
 
 
 def _decision_manifest(entry: Mapping[str, Any], *, decision: str = "approve") -> tuple[dict[str, Any], set[tuple[str, str]]]:
@@ -274,15 +298,11 @@ def build_adversarial_matrix(repo_root: Path) -> dict[str, Any]:
 
 
 def build_determinism_receipt(repo_root: Path) -> dict[str, Any]:
-    dashboard_paths = [
-        OUTPUT_ROOT / "review_acceleration/reviewer_dashboard.yaml",
-        OUTPUT_ROOT / "review_acceleration/reviewer_dashboard.md",
-        OUTPUT_ROOT / "review_acceleration/reviewer_dashboard.html",
-    ]
-
     def materialized_hashes() -> dict[str, str]:
-        materialize_phase_c(repo_root)
-        return {path.as_posix(): sha256_file(repo_root / path) for path in dashboard_paths}
+        return {
+            path.as_posix(): sha256_bytes(payload)
+            for path, payload in _reviewer_dashboard_bytes(repo_root).items()
+        }
 
     first_dashboard = materialized_hashes()
     second_dashboard = materialized_hashes()

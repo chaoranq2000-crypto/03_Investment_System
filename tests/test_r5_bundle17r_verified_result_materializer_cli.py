@@ -13,6 +13,7 @@ def test_cli_runs_from_repository_script(tmp_path: Path) -> None:
     completed = subprocess.run(
         [
             sys.executable,
+            "-B",
             str(script),
             "--repo-root",
             str(tmp_path),

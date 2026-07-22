@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import json
 import subprocess
+import sys
 from copy import deepcopy
 from pathlib import Path
 
@@ -583,7 +584,8 @@ def test_cli_rejects_wrong_exact_baseline(tmp_path: Path) -> None:
     script = Path(__file__).resolve().parents[1] / "scripts/run_r5_bundle16r_evidence_pack_materializer.py"
     completed = subprocess.run(
         [
-            "python",
+            sys.executable,
+            "-B",
             str(script),
             "--repo-root",
             str(repo),
