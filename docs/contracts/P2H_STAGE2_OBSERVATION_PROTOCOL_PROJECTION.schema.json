@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/contracts/P2H_STAGE2_OBSERVATION_PROTOCOL_PROJECTION.schema.json",
+  "title": "P2H Stage 2 Slice A Observation Protocol Projected State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "canonical_hash",
+    "protocol_id",
+    "candidate_id",
+    "status",
+    "expiry_state",
+    "as_of",
+    "knowledge_cutoff",
+    "applied_event_ids",
+    "last_event_id",
+    "state_semantics"
+  ],
+  "properties": {
+    "schema_version": {"const": "p2h.observation_protocol_projection.v1"},
+    "artifact_type": {"const": "observation_protocol_projection"},
+    "canonical_hash": {"$ref": "#/$defs/sha256"},
+    "protocol_id": {"$ref": "#/$defs/protocol_id"},
+    "candidate_id": {"$ref": "#/$defs/candidate_id"},
+    "status": {
+      "enum": [
+        "draft",
+        "submitted",
+        "approved_for_observation",
+        "active",
+        "paused",
+        "completed",
+        "abandoned",
+        "superseded"
+      ]
+    },
+    "expiry_state": {"enum": ["not_expired", "expired"]},
+    "as_of": {"$ref": "#/$defs/timestamp"},
+    "knowledge_cutoff": {"$ref": "#/$defs/timestamp"},
+    "applied_event_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/protocol_review_event_id"}
+    },
+    "last_event_id": {
+      "oneOf": [
+        {"$ref": "#/$defs/protocol_review_event_id"},
+        {"type": "null"}
+      ]
+    },
+    "state_semantics": {
+      "const": "Lifecycle state only; completed or expired does not prove or disprove the hypothesis, diagnose a person, score behavior, update a profile, or provide trading advice."
+    }
+  },
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "protocol_id": {"type": "string", "pattern": "^protocol:[0-9a-f]{32}$"},
+    "candidate_id": {"type": "string", "pattern": "^candidate:[0-9a-f]{32}$"},
+    "protocol_review_event_id": {
+      "type": "string",
+      "pattern": "^protocol_review_event:[0-9a-f]{32}$"
+    }
+  }
+}
