@@ -175,6 +175,16 @@ _INTERVENTION_TEXT_RE = re.compile(
     r"\b(?:intervention|experiment action)\b|干预方案|实验动作",
     re.IGNORECASE,
 )
+_SCORE_TEXT_RE = re.compile(
+    r"\bscore(?:\s+of)?\s*(?::|=|is)?\s*\d+(?:\.\d+)?\b|评分.{0,8}\d",
+    re.IGNORECASE,
+)
+_NUMERIC_CONFIDENCE_TEXT_RE = re.compile(
+    r"(?:\b\d+(?:\.\d+)?%\s+confidence\b|"
+    r"\bconfidence(?:\s+score)?\s*(?::|=|is)?\s*\d+(?:\.\d+)?%?\b|"
+    r"置信度.{0,8}\d+(?:\.\d+)?%?)",
+    re.IGNORECASE,
+)
 
 _PROTOCOL_FIELDS = {
     "schema_version",
@@ -1125,6 +1135,22 @@ def _protocol_policy_findings(protocol: Mapping[str, Any]) -> list[dict[str, str
             )
         )
     authored_text = "\n".join(_walk_text(authored))
+    if _SCORE_TEXT_RE.search(authored_text):
+        findings.append(
+            _finding(
+                "POLICY_MECHANICAL_SCORE",
+                "protocol content cannot assign a mechanical score",
+                "$.question",
+            )
+        )
+    if _NUMERIC_CONFIDENCE_TEXT_RE.search(authored_text):
+        findings.append(
+            _finding(
+                "POLICY_NUMERIC_CONFIDENCE",
+                "protocol content cannot assign numeric confidence",
+                "$.question",
+            )
+        )
     if _PROFILE_TEXT_RE.search(authored_text):
         findings.append(
             _finding(

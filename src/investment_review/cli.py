@@ -21,6 +21,13 @@ from .behavior_hypothesis_candidates import (
     replay_validate_behavior_hypothesis_candidate,
     validate_behavior_hypothesis_candidate,
 )
+from .behavior_observation_protocols import (
+    ProtocolProjectedStatus,
+    build_observation_protocol,
+    build_observation_protocol_review_event,
+    replay_validate_observation_protocol,
+    validate_observation_protocol,
+)
 from .behavior_cohort import (
     EFFECTIVE_ANCHORS,
     build_behavior_cohort,
@@ -772,6 +779,86 @@ def build_parser() -> argparse.ArgumentParser:
         "--source-artifact", action="append", required=True
     )
 
+    observation_protocol_build = sub.add_parser(
+        "observation-protocol-build",
+        help="Build one explicit source-bound P2H Stage 2 observation protocol",
+    )
+    observation_protocol_build.add_argument("--input", required=True)
+    observation_protocol_build.add_argument("--candidate-artifact", required=True)
+    observation_protocol_build.add_argument(
+        "--review-event", action="append", required=True
+    )
+    observation_protocol_build.add_argument(
+        "--candidate-source-artifact", action="append", required=True
+    )
+    observation_protocol_build.add_argument("--output", required=True)
+
+    observation_protocol_validate = sub.add_parser(
+        "observation-protocol-validate",
+        help="Validate a protocol offline or replay exact Stage 1 inputs",
+    )
+    observation_protocol_validate.add_argument("artifact")
+    observation_protocol_validate.add_argument("--source-replay", action="store_true")
+    observation_protocol_validate.add_argument("--candidate-artifact")
+    observation_protocol_validate.add_argument(
+        "--review-event", action="append", default=[]
+    )
+    observation_protocol_validate.add_argument(
+        "--candidate-source-artifact", action="append", default=[]
+    )
+
+    observation_protocol_ingest = sub.add_parser(
+        "observation-protocol-ingest",
+        help="Create-only ingest a source-replayed observation protocol",
+    )
+    observation_protocol_ingest.add_argument("artifact")
+    observation_protocol_ingest.add_argument(
+        "--candidate-source-artifact", action="append", required=True
+    )
+
+    observation_protocol_event_record = sub.add_parser(
+        "observation-protocol-event-record",
+        help="Build and create-only record one explicit human protocol event",
+    )
+    observation_protocol_event_record.add_argument("--input", required=True)
+
+    observation_protocol_list = sub.add_parser(
+        "observation-protocol-list",
+        help="Query protocols with strict lifecycle projection and dual time",
+    )
+    observation_protocol_list.add_argument("--protocol-id")
+    observation_protocol_list.add_argument("--candidate-id")
+    observation_protocol_list.add_argument(
+        "--status", choices=[item.value for item in ProtocolProjectedStatus]
+    )
+    observation_protocol_list.add_argument("--as-of")
+    observation_protocol_list.add_argument("--knowledge-cutoff")
+    observation_protocol_list.add_argument("--created-from")
+    observation_protocol_list.add_argument("--created-to")
+
+    observation_protocol_show = sub.add_parser(
+        "observation-protocol-show",
+        help="Show one immutable observation protocol by deterministic ID",
+    )
+    observation_protocol_show.add_argument("protocol_id")
+
+    observation_protocol_status = sub.add_parser(
+        "observation-protocol-status",
+        help="Project protocol lifecycle at explicit business and knowledge cutoffs",
+    )
+    observation_protocol_status.add_argument("protocol_id")
+    observation_protocol_status.add_argument("--as-of", required=True)
+    observation_protocol_status.add_argument("--knowledge-cutoff", required=True)
+
+    observation_protocol_replay = sub.add_parser(
+        "observation-protocol-replay",
+        help="Replay a stored protocol from exact Stage 1 and source inputs",
+    )
+    observation_protocol_replay.add_argument("protocol_id")
+    observation_protocol_replay.add_argument(
+        "--candidate-source-artifact", action="append", required=True
+    )
+
     return parser
 
 
@@ -1437,6 +1524,112 @@ def main(argv: list[str] | None = None) -> int:
             validation = store.replay_behavior_hypothesis_candidate(
                 args.candidate_id,
                 source_artifacts=_load_json_documents(args.source_artifact),
+            )
+            _print(validation)
+            if validation["validation_status"] != "accepted":
+                return 2
+        elif args.command == "observation-protocol-build":
+            _require_distinct_paths(
+                input=args.input,
+                candidate_artifact=args.candidate_artifact,
+                output=args.output,
+            )
+            protocol = build_observation_protocol(
+                load_json_object(args.input),
+                candidate=load_json_object(args.candidate_artifact),
+                review_events=_load_json_documents(args.review_event),
+                candidate_source_artifacts=_load_json_documents(
+                    args.candidate_source_artifact
+                ),
+            )
+            validation = validate_observation_protocol(protocol)
+            if validation["validation_status"] != "accepted":
+                raise ValueError(
+                    "Observation protocol failed validation: "
+                    + ", ".join(validation["finding_codes"])
+                )
+            output = atomic_create_bytes(args.output, pretty_json_bytes(protocol))
+            _print(
+                {
+                    "status": "CREATED",
+                    "protocol_id": protocol["protocol_id"],
+                    "canonical_hash": protocol["canonical_hash"],
+                    "output": str(output),
+                }
+            )
+        elif args.command == "observation-protocol-validate":
+            protocol = load_json_object(args.artifact)
+            if args.source_replay:
+                if (
+                    not args.candidate_artifact
+                    or not args.review_event
+                    or not args.candidate_source_artifact
+                ):
+                    raise ValueError(
+                        "--source-replay requires --candidate-artifact, "
+                        "--review-event, and --candidate-source-artifact"
+                    )
+                validation = replay_validate_observation_protocol(
+                    protocol,
+                    candidate=load_json_object(args.candidate_artifact),
+                    review_events=_load_json_documents(args.review_event),
+                    candidate_source_artifacts=_load_json_documents(
+                        args.candidate_source_artifact
+                    ),
+                )
+            else:
+                validation = validate_observation_protocol(protocol)
+            _print(validation)
+            if validation["validation_status"] != "accepted":
+                return 2
+        elif args.command == "observation-protocol-ingest":
+            _print(
+                store.save_observation_protocol(
+                    load_json_object(args.artifact),
+                    candidate_source_artifacts=_load_json_documents(
+                        args.candidate_source_artifact
+                    ),
+                )
+            )
+        elif args.command == "observation-protocol-event-record":
+            event = build_observation_protocol_review_event(
+                load_json_object(args.input)
+            )
+            result = store.save_observation_protocol_review_event(event)
+            _print(
+                {
+                    **result,
+                    "event_type": event["event_type"],
+                    "reviewed_at": event["reviewed_at"],
+                }
+            )
+        elif args.command == "observation-protocol-list":
+            items = store.list_observation_protocols(
+                protocol_id=args.protocol_id,
+                candidate_id=args.candidate_id,
+                status=args.status,
+                as_of=args.as_of,
+                knowledge_cutoff=args.knowledge_cutoff,
+                created_from=args.created_from,
+                created_to=args.created_to,
+            )
+            _print({"status": "OK", "count": len(items), "items": items})
+        elif args.command == "observation-protocol-show":
+            _print(store.get_observation_protocol(args.protocol_id))
+        elif args.command == "observation-protocol-status":
+            _print(
+                store.project_observation_protocol(
+                    args.protocol_id,
+                    as_of=args.as_of,
+                    knowledge_cutoff=args.knowledge_cutoff,
+                )
+            )
+        elif args.command == "observation-protocol-replay":
+            validation = store.replay_observation_protocol(
+                args.protocol_id,
+                candidate_source_artifacts=_load_json_documents(
+                    args.candidate_source_artifact
+                ),
             )
             _print(validation)
             if validation["validation_status"] != "accepted":
