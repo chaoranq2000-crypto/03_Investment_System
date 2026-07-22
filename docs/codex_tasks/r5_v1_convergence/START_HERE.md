@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "r5_v1_convergence"
 contract_path: "docs/codex_tasks/r5_v1_convergence/CONTRACT.md"
 contract_sha256: "5e4a52f8eff0792810a8b0255089a01359a47bafc549edb0bffacb1f4335d163"
-state: "running"
+state: "complete"
 execution_branch: "codex/r5-v1-convergence"
 source_baseline: "a96c1b717bf15905d72fd142efd946fa01bce666"
 last_completed_phase: "P5"
-next_phase: "final_validation"
+next_phase: "none"
 last_validation: "pass"
-updated_at: "2026-07-23T05:53:34+08:00"
+updated_at: "2026-07-22T22:00:45+00:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -34,12 +34,12 @@ Validate package integrity and repository preflight, then resume from the earlie
 
 ## Current checkpoint
 
-- **State:** `running`
+- **State:** `complete`
 - **Last completed phase:** `P5`
-- **Next phase:** `final_validation` (local repair, semantic-binding review and complete revalidation passed; a new exact-head candidate CI is the remaining control)
-- **Latest validation:** `pass` — the replay digest now binds both hash values and scopes, the P5 schema binds the exact frozen baseline, and final V-001–V-010 passed: source-route 17/0, Night 210, Bundle 160, exact 002837 38, root map 7, canonical state `OK`, full pytest 1184 plus two existing skips, and zero protected-path/whitespace errors; V-012 also passed.
+- **Next phase:** `none` (candidate exact-head CI passed; the required START-only completion checkpoint and its exact-head CI are the remaining controls)
+- **Latest validation:** `pass` — the replay digest binds both hash values and scopes, the P5 schema binds the exact frozen baseline, V-001–V-010 and V-012 passed, the candidate branch matched the tested SHA, and every workflow actually triggered for that exact candidate HEAD succeeded. CI URLs and SHA remain external to Git.
 - **Current blocker:** none
-- **Next safe action:** Create `fix(v1): stabilize evidence hashes across checkouts`, require a clean worktree, push `codex/r5-v1-convergence` normally, and wait for every workflow on that exact HEAD; do not write a CI receipt back into Git.
+- **Next safe action:** Create `chore(v1): mark verified candidate complete` with only this file, require a clean worktree, ordinary-push `codex/r5-v1-convergence`, then require every completion-only exact-head workflow to succeed; make no further Git writes afterward.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
@@ -65,3 +65,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-23T02:58:11+08:00 — P1 started after clean preflight. Exact mutation allowlist: `docs/workflows/RESEARCH_WORKFLOW.md`, `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md`, `docs/meta/DOC_OWNERSHIP_MATRIX.md`, `tests/test_r5_v1_completion_semantics.py`, `reports/p1_6/r5_v1_convergence/convergence_readout.md`, and `docs/codex_tasks/r5_v1_convergence/START_HERE.md`. Next safe action: define the four independent V1 truths and their ownership without changing code behavior or historical artifacts.
 - 2026-07-23T02:34:56+08:00 — Package drafted from Night05 exact baseline after read-only ancestry, workflow-authority, validation-path, dirty-worktree, and historical-boundary audits; not yet safe for unattended execution.
 - 2026-07-22T18:46:41+00:00 — Package finalized; contract frozen at SHA-256 `5e4a52f8eff0792810a8b0255089a01359a47bafc549edb0bffacb1f4335d163`; ready-package validation and context-independence audit passed with no warnings or blockers.
+- 2026-07-22T22:00:45+00:00 — state=complete; completed=P5; next=none; validation=pass; Candidate exact-head publication controls passed; external CI URLs and SHA remain out of Git; sample quality and P2 remain false; long-term Goal remains open.
