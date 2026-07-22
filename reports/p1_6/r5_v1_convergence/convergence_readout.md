@@ -15,7 +15,7 @@
 
 | fact | current value | authority | evidence / unresolved condition |
 |---|---:|---|---|
-| `system_v1_complete` | false | engineering validation | P1–P5 and final validation are not yet complete. |
+| `system_v1_complete` | false | engineering validation | P1–P4 are complete; P5 and final validation are still pending. |
 | `sample_quality_ready` | false | current sample evidence and required human review | The canonical 002837 material gaps remain external truth; no value is fabricated. |
 | `p2_ready` | false | `comparison_readiness_gate` | P2 is outside this stage and is not entered. |
 | `release_ready` | false | exact-head remote and CI evidence | Candidate branch has not been pushed or verified yet. |
@@ -31,6 +31,7 @@ The long-term Goal `r5_bundle17r_bf2_four_case_activation` remains open. Night m
 | Runtime orchestration | `.agents/skills/research-orchestrator/SKILL.md` | canonical execution entry | Creates/updates one run, routes lower skills and closes the current readout. |
 | Current state fields and validation | `.agents/skills/research-orchestrator/references/workflow_state_schema.md` and `scripts/validate_workflow_state.py` beneath that skill | canonical state owner | Marked `r5_v1` states strictly enforce canonical G0–G10 IDs/statuses and mapped local checks; unmarked protected states remain read-only legacy compatibility. |
 | Operating-research inner loop | `scripts/run_r5_bundle11r_runtime.py` → `src/research/r5_bundle11r_runtime.py` | active local runtime | Used only after the orchestrator reaches the local post-10R profile; it is not a second workflow entrypoint. |
+| Isolated 002837 V1 replay | `scripts/run_r5_v1_replay_002837.py` | run-scoped proof entry | Requires the frozen old source run and new target run explicitly, reuses only Bundle13R pure computation, and cannot target the protected source workflow. |
 | Night mission CLI | `scripts/run_r5_night_shift.py` | historical compatibility entry | Retained for Night03–Night05 replay/verification; it does not own current V1 workflow state. |
 | Bundle/Night reports and mission states | existing `reports/p1_6/r5_bundle17r/**` and `reports/p1_6/r5_night_shift/**` | historical read-only evidence | They may prove lineage and behavior but never become current V1 state. |
 
@@ -98,6 +99,17 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 - control boundaries: exact-hash is limited to frozen human-review inputs; rollback to mutable non-idempotent writes; remote receipts to publication and `release_ready`.
 - validation: P3 control/quality targeted selections passed 45 and 27 tests; V-001 passed; V-002 passed with 17 capabilities and zero blocking issues; V-003 passed 210; V-004 passed 160; strict template and legacy 002837 validators passed; V-009, whitespace, package integrity and exact allowlist review passed.
 
+### P4 — Replay the real 002837 stock-first closed loop
+
+- status: `complete`
+- isolation: the explicit source is `reports/workflow_runs/wf_20260703_stock_first_002837_invic/`; the only write target is `reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/`. The hardcoded Bundle11R close, legacy backflow writer, live adapters, raw copies and historical human-review artifacts were not used.
+- real inputs: two reviewed official disclosures and two real Tushare structured snapshots are bound by raw and processed paths/hashes. The structured rows remain `draft` and `metric_only`; 136 candidates are copied run-locally and none is promoted.
+- recomputation: the Bundle13R pure chain revalidated the Bundle12R context, rebuilt the 21-item queue, validated the reviewed backfill and exactly matched the archived result: `backflow_execution_in_progress`, 6 resolved, 11 unresolved, validation issue/blocker count 0.
+- research truth: the new canonical state is `needs_fix`; G3 and G6 fail non-compensating checks. The exact four source high issues remain open with owners and next steps. No old reviewer decision, Reader acceptance, sample-quality or P2 state is inherited.
+- control plane: the standard six files plus run-scoped provenance, research, exposure, backflow and validation artifacts are indexed in a 16-row manifest. Every non-self-recursive artifact has a verifiable hash.
+- determinism: each command performs two internal materializations with zero drift. Two independent command invocations also produced an identical 16-file tree without timestamp normalization; semantic digest `afc8ed3b96dd47c6d58c8dd0f3cb6912cfc7a89d538fe8b041b7fbc587e110ae`.
+- validation: replay contract 6 passed; exact V-005 14-path selection 37 passed; V-006 returned `OK`; package integrity, old-run no-diff, V-009 and `git diff --check` passed. Machine summary: `reports/p1_6/r5_v1_convergence/validation/p4_replay_validation.yaml`.
+
 ## Validation summary
 
 | validation | result | evidence |
@@ -120,10 +132,14 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 | V-003 P3 Night baseline | pass | Full Night/Baseline suite: 210 passed in 44.25 seconds. One approval attempt timed out before launch; the retry completed with zero failures. |
 | V-004 P3 Bundle baseline | pass | Full Bundle14R–17R suite: 160 passed in 14.50 seconds. |
 | P3 state / scope | pass | Strict V1 template returned OK; protected 002837 state returned OK in legacy compatibility mode with identical hash; V-009, `git diff --check`, package integrity and exact phase allowlist passed. |
+| P4 replay contract | pass | New replay tests: 6 passed in 1.50s; source hashes, six-piece control plane, honest gaps, manifest completeness, source isolation and checked-in determinism were proven. |
+| V-005 002837 focused selection | pass | All 14 exact contract paths existed and passed: 37 passed in 4.09s. |
+| V-006 replay canonical state | pass | Strict validator returned `OK`; state is `needs_fix`, with unique G0–G10 rows and four open high G3/G6 issues. |
+| P4 second replay / scope | pass | Two independent invocations produced the same semantic digest and identical 16-file tree; old-run worktree/baseline diffs and V-009 were empty; `git diff --check` passed. |
 
 ## Scope and historical immutability
 
-No `data/raw/**`, Night/Bundle17R history, old 002837 run, `AGENTS.md`, `.github/**`, dependency file or other worktree is authorized for mutation. P2 has no tracked change in any protected path. Four ignored test-created bytecode files remain outside the checkpoint because the contract forbids deletion; subsequent validation proved they were not rewritten. Final scope audit remains pending.
+No `data/raw/**`, Night/Bundle17R history, old 002837 run, `AGENTS.md`, `.github/**`, dependency file or other worktree is authorized for mutation. P4 introduced only the exact recorded script, test, isolated replay run, phase validation, readout and checkpoint update; old-run and V-009 diffs are empty. Four ignored test-created bytecode files remain outside the checkpoint because the contract forbids deletion; subsequent validation proved they were not rewritten. Final scope audit remains pending.
 
 ## External truth and publication
 

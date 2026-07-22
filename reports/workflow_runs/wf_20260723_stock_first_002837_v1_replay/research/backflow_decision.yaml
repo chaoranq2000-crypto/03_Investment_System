@@ -1,0 +1,29 @@
+schema_version: 1
+artifact_type: r5_v1_replay_backflow_decision
+workflow_id: wf_20260723_stock_first_002837_v1_replay
+source_workflow_id: wf_20260703_stock_first_002837_invic
+as_of_date: '2026-07-23'
+backflow_decision: blocked
+global_state_updated: false
+reason: same-period operating drivers and numeric overlap adjustments remain missing
+issues:
+- issue_id: R5B13R-G3-001
+  gate_id: G3
+  owner: evidence-ingest
+  next_step: source_local_check=QR-B13R-DRIVER-ROOM-CABINET; next_step=等待发行人定期报告、IR或产品附注披露；公司级销量和混合单价不得替代。
+- issue_id: R5B13R-G3-002
+  gate_id: G3
+  owner: evidence-ingest
+  next_step: source_local_check=QR-B13R-DRIVER-LIQUID; next_step=等待合同/招标、验收会计口径和独立毛利披露；累计1.2GW及2024A约3亿元不能推导这些驱动。
+- issue_id: R5B13R-G6-001
+  gate_id: G6
+  owner: stock-deep-dive
+  next_step: source_local_check=QR-B13R-OVERLAP-ROOM-LIQUID; next_step=先由evidence-ingest取得同期间可核验分配证据，再由stock-deep-dive更新allocation；当前禁止相加。
+- issue_id: R5B13R-G6-002
+  gate_id: G6
+  owner: stock-deep-dive
+  next_step: source_local_check=QR-B13R-OVERLAP-CABINET-LIQUID; next_step=先由evidence-ingest取得同期间可核验分配证据，再由stock-deep-dive更新allocation；当前禁止相加。
+required_next_skill: evidence-ingest
+next_stage: T1
+sample_quality_ready: false
+p2_ready: false

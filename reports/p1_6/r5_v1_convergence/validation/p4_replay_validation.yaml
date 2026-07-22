@@ -1,0 +1,98 @@
+schema_version: 1
+artifact_type: r5_v1_convergence_p4_replay_validation
+task_id: r5_v1_convergence
+phase: P4
+validated_at: '2026-07-23T04:31:33+08:00'
+decision: pass
+contract:
+  path: docs/codex_tasks/r5_v1_convergence/CONTRACT.md
+  sha256: 5e4a52f8eff0792810a8b0255089a01359a47bafc549edb0bffacb1f4335d163
+  package_validation:
+    ok: true
+    state: running
+    phases:
+    - P1
+    - P2
+    - P3
+    - P4
+    - P5
+    errors: []
+    warnings: []
+replay:
+  command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B scripts\run_r5_v1_replay_002837.py --repo-root . --source-run reports\workflow_runs\wf_20260703_stock_first_002837_invic --output-run reports\workflow_runs\wf_20260723_stock_first_002837_v1_replay
+  source_workflow_id: wf_20260703_stock_first_002837_invic
+  target_workflow_id: wf_20260723_stock_first_002837_v1_replay
+  first_invocation:
+    exit_code: 0
+    terminal_research_status: needs_fix
+    recomputed_result: backflow_execution_in_progress
+    evidence_count: 4
+    metric_candidate_count: 136
+    semantic_content_sha256: afc8ed3b96dd47c6d58c8dd0f3cb6912cfc7a89d538fe8b041b7fbc587e110ae
+    internal_semantic_drift_count: 0
+  second_invocation:
+    exit_code: 0
+    terminal_research_status: needs_fix
+    recomputed_result: backflow_execution_in_progress
+    evidence_count: 4
+    metric_candidate_count: 136
+    semantic_content_sha256: afc8ed3b96dd47c6d58c8dd0f3cb6912cfc7a89d538fe8b041b7fbc587e110ae
+    internal_semantic_drift_count: 0
+  external_tree_comparison:
+    compared_file_count: 16
+    allowed_normalizations: []
+    hash_drift_count: 0
+    decision: pass
+  recomputation:
+    archived_result_match: true
+    queue_item_count: 21
+    resolved_t1_t2_item_count: 6
+    unresolved_t1_t2_item_count: 11
+    validation_issue_count: 0
+    validation_blocker_count: 0
+  source_boundary:
+    offline: true
+    live_network_used: false
+    synthetic_inputs_used: false
+    old_workflow_written: false
+    historical_human_review_transferred: false
+    selected_raw_hashes_match_manifest: true
+canonical_state:
+  command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B .agents\skills\research-orchestrator\scripts\validate_workflow_state.py reports\workflow_runs\wf_20260723_stock_first_002837_v1_replay\workflow_state.yaml
+  exit_code: 0
+  result: OK
+  status: needs_fix
+  open_high_issue_count: 4
+  failed_non_compensating_gates:
+  - G3
+  - G6
+tests:
+  replay_contract:
+    command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q -p no:cacheprovider tests\test_r5_v1_replay_002837.py
+    passed: 6
+    failed: 0
+    duration_seconds: 1.50
+  v005_exact_14_paths:
+    command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q -p no:cacheprovider <14 exact contract paths>
+    path_count: 14
+    passed: 37
+    failed: 0
+    duration_seconds: 4.09
+manifest:
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/artifact_manifest.csv
+  artifact_count: 16
+  required_missing_count: 0
+  duplicate_path_count: 0
+  singleton_control_count: 4
+  self_hash_policy: artifact_manifest excludes only its recursive self-hash
+guards:
+  old_workflow_worktree_diff: empty
+  old_workflow_baseline_diff: empty
+  v009_protected_path_diff: empty
+  git_diff_check: pass
+  contract_hash_unchanged: true
+truths_after_p4:
+  system_v1_complete: false
+  sample_quality_ready: false
+  p2_ready: false
+  release_ready: false

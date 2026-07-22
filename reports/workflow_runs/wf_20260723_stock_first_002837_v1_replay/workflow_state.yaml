@@ -1,0 +1,279 @@
+state_schema_version: r5_v1
+workflow_id: wf_20260723_stock_first_002837_v1_replay
+source_workflow_id: wf_20260703_stock_first_002837_invic
+workflow_type: stock_first_closed_loop
+run_mode: normal
+status: needs_fix
+created_at: '2026-07-23'
+updated_at: '2026-07-23'
+owner: codex
+active_segment_id: ai_server_liquid_cooling
+active_company_id: cn_002837_invic
+current_stage: T10
+completed_stages:
+- T0
+- T1
+- T2
+- T3
+- T4
+- T5
+- T6
+- T7
+- T8
+- T9
+- T10
+next_stage: T1
+active_skill: research-orchestrator
+required_next_skill: evidence-ingest
+system_v1_complete: false
+sample_quality_ready: false
+p2_ready: false
+release_ready: false
+sample_quality_allowed: false
+p2_allowed: false
+human_review_status: not_triggered_no_new_reader
+evidence_snapshot:
+  manifest_path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/inputs/input_provenance.csv
+  evidence_count: 4
+  notes: offline hash-verified selection; historical sources remain read-only
+claims_snapshot:
+  draft_path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/inputs/claim_snapshot.csv
+  registry_path: data/manifests/claims_registry.csv
+  claim_count: 0
+  notes: no new claim promotion; no source hash substitution
+metrics_snapshot:
+  draft_path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/inputs/metric_candidates.csv
+  registry_path: null
+  metric_count: 0
+  candidate_count: 136
+  notes: real structured candidates remain draft and metric-only
+artifacts:
+- artifact_type: workflow_state
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/workflow_state.yaml
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: canonical V1 state
+- artifact_type: run_log
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/run_log.md
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: exact offline replay command and stage log
+- artifact_type: manifest
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/artifact_manifest.csv
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: current run artifact index
+- artifact_type: open_todos
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/open_todos.csv
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: four source-preserved high research gaps
+- artifact_type: quality_gate_report
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/quality_gate_report.md
+  created_by_skill: quality-review
+  stage: T9
+  status: current
+  required: true
+  notes: canonical G0-G10 quality snapshot
+- artifact_type: readout
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/workflow_readout.md
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: canonical replay close readout
+- artifact_type: input_provenance
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/inputs/input_provenance.csv
+  created_by_skill: evidence-ingest
+  stage: T1
+  status: current
+  required: true
+  notes: hash-bound read-only inputs
+- artifact_type: claim_snapshot
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/inputs/claim_snapshot.csv
+  created_by_skill: evidence-ingest
+  stage: T2
+  status: current
+  required: false
+  notes: no new claim promotion in replay
+- artifact_type: metric_candidates
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/inputs/metric_candidates.csv
+  created_by_skill: evidence-ingest
+  stage: T2
+  status: current
+  required: true
+  notes: draft metric-only structured candidates
+- artifact_type: stock_research_pack
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/stock_research_pack.yaml
+  created_by_skill: stock-deep-dive
+  stage: T7
+  status: needs_fix
+  required: true
+  notes: run-scoped research projection with explicit gaps
+- artifact_type: segment_exposure
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/segment_exposure.yaml
+  created_by_skill: segment-company-mapping
+  stage: T6
+  status: needs_fix
+  required: true
+  notes: product-line clue only; percentages missing
+- artifact_type: report
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/stock_report_draft.md
+  created_by_skill: stock-deep-dive
+  stage: T7
+  status: needs_fix
+  required: true
+  notes: gap-visible replay report
+- artifact_type: backflow_decision
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/backflow_decision.yaml
+  created_by_skill: segment-company-mapping
+  stage: T8
+  status: current
+  required: true
+  notes: isolated backflow routing; no global update
+- artifact_type: artifact_hashes
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/validation/artifact_hashes.csv
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: non-recursive output hash index
+- artifact_type: replay_receipt
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/validation/replay_receipt.yaml
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: offline source and semantic receipt
+- artifact_type: idempotence_report
+  path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/validation/idempotence_report.yaml
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: two-pass byte comparison
+open_todos:
+- issue_id: R5B13R-G3-001
+  severity: high
+  stage: T9
+  gate_id: G3
+  target_artifact: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/stock_research_pack.yaml
+  description: room_cooling 与 cabinet_cooling 的 volume、unit_price、product_mix 共六项缺少同期间同口径量化证据。
+  fix_owner_skill: evidence-ingest
+  status: open
+  created_at: '2026-07-15'
+  resolved_at: ''
+  notes: source_local_check=QR-B13R-DRIVER-ROOM-CABINET; next_step=等待发行人定期报告、IR或产品附注披露；公司级销量和混合单价不得替代。
+- issue_id: R5B13R-G3-002
+  severity: high
+  stage: T9
+  gate_id: G3
+  target_artifact: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/stock_research_pack.yaml
+  description: data_center_liquid_cooling_related 的 unit_value、acceptance_rate、gross_margin
+    共三项缺失。
+  fix_owner_skill: evidence-ingest
+  status: open
+  created_at: '2026-07-15'
+  resolved_at: ''
+  notes: source_local_check=QR-B13R-DRIVER-LIQUID; next_step=等待合同/招标、验收会计口径和独立毛利披露；累计1.2GW及2024A约3亿元不能推导这些驱动。
+- issue_id: R5B13R-G6-001
+  severity: high
+  stage: T9
+  gate_id: G6
+  target_artifact: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/segment_exposure.yaml
+  description: room_cooling 与 data_center_liquid_cooling_related 已分类为 overlaps，但收入和毛利扣减均为
+    missing。
+  fix_owner_skill: stock-deep-dive
+  status: open
+  created_at: '2026-07-15'
+  resolved_at: ''
+  notes: source_local_check=QR-B13R-OVERLAP-ROOM-LIQUID; next_step=先由evidence-ingest取得同期间可核验分配证据，再由stock-deep-dive更新allocation；当前禁止相加。
+- issue_id: R5B13R-G6-002
+  severity: high
+  stage: T9
+  gate_id: G6
+  target_artifact: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/segment_exposure.yaml
+  description: cabinet_cooling 与 data_center_liquid_cooling_related 已分类为 overlaps，但收入和毛利扣减均为
+    missing。
+  fix_owner_skill: stock-deep-dive
+  status: open
+  created_at: '2026-07-15'
+  resolved_at: ''
+  notes: source_local_check=QR-B13R-OVERLAP-CABINET-LIQUID; next_step=先由evidence-ingest取得同期间可核验分配证据，再由stock-deep-dive更新allocation；当前禁止相加。
+quality_gates:
+- gate_id: G0
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: stock, scope, source run, target run and offline boundary are explicit
+- gate_id: G1
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: two official and two structured sources exist and match frozen hashes
+- gate_id: G2
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: no new claim is promoted; claim-type boundary remains explicit
+- gate_id: G3
+  status: fail
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: nine operating drivers remain unqualified; structured candidates remain draft
+- gate_id: G4
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: existing ai_server_liquid_cooling segment definition is hash-bound
+- gate_id: G5
+  status: not_applicable
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: stock-first replay does not rebuild the company universe
+- gate_id: G6
+  status: fail
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: two liquid-cooling overlap adjustments remain missing
+- gate_id: G7
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: the run-scoped report exposes gaps and source boundaries without unsupported
+    conclusions
+- gate_id: G8
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: all high gaps have owner, target and next step; no global state is changed
+- gate_id: G9
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: no trading instruction, position sizing or certainty claim is present
+- gate_id: G10
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-23'
+  notes: canonical state, TODOs, manifest, quality report and readout are materialized
+entry_criteria:
+- P3 checkpoint passed
+- source and target runs differ
+- all frozen source hashes match
+- no live network access
+exit_criteria:
+- standard six-piece control plane exists
+- canonical state validates
+- two materialization passes have zero byte drift
+- old workflow remains read-only
+notes: Engineering replay closed honestly at needs_fix because G3 and G6 retain four
+  open high research gaps.

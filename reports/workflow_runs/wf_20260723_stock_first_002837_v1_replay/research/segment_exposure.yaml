@@ -1,0 +1,27 @@
+schema_version: 1
+workflow_id: wf_20260723_stock_first_002837_v1_replay
+source_workflow_id: wf_20260703_stock_first_002837_invic
+company_id: cn_002837_invic
+stock_code: 002837
+company_name: 英维克
+as_of_date: '2026-07-23'
+exposures:
+- segment_id: ai_server_liquid_cooling
+  segment_name: AI服务器液冷
+  exposure_type: product_line_clue
+  exposure_score: 2
+  confidence: low
+  revenue_pct: MISSING_DISCLOSURE
+  profit_pct: MISSING_DISCLOSURE
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_quarterly_report_002837_20260421_2f00c7
+  claim_ids: []
+  metric_ids: []
+  missing_reason: MISSING_DISCLOSURE
+  backflow_decision: blocked
+  next_action: evidence-ingest must obtain same-period operating disclosure before
+    exposure allocation
+global_exposure_updated: false
+sample_quality_ready: false
+p2_ready: false
