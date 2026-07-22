@@ -26,6 +26,11 @@ R5 sample-quality checks use local `R5-G1` to `R5-G11` IDs from
 `references/r5_quality_gate.md`; they do not extend the global workflow gate
 table.
 
+In active issue records, `gate_id` is always a canonical `G0`–`G10` owner gate.
+Put the R5/QR/compatibility identifier in `local_check_id` and record every owner
+gate in `mapped_global_gate_ids`. Historical compact CSV files without those
+columns remain compatibility inputs only.
+
 ## When to use
 
 - Before delivering segment report, stock report, comparison, memo or refresh log.
@@ -77,11 +82,11 @@ Every issue must use:
 issue_id,severity,gate_id,local_check_id,stage,target_artifact,description,fix_owner_skill,status,created_at,resolved_at,notes
 ```
 
-For R5 issue-list validation, use the compact CSV schema in
+For R5 issue-list validation, use the active compact CSV schema in
 `references/issue_schema.md`:
 
 ```csv
-issue_id,severity,gate_id,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
+issue_id,severity,gate_id,local_check_id,mapped_global_gate_ids,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
 ```
 
 Severity:
@@ -176,6 +181,23 @@ Use these subchecks when a report uses data-layer packs:
 | `QR-DL-5` | Official disclosure evidence exists before business exposure is written as fact; otherwise `MISSING_DISCLOSURE` is visible. |
 | `QR-DL-6` | Tushare / Baostock / market context snapshots do not support customer order, capacity or segment revenue facts by themselves. |
 
+The data-layer quality adapter uses implementation-local `DLQ-*` checks. They
+remain supporting checks and map as follows:
+
+| local_check_id | mapped_global_gate_ids | applicable_boundary | failure_backflow |
+|---|---|---|---|
+| `DLQ-1` | `G1` | source permission | `evidence-ingest` |
+| `DLQ-2` | `G1` | raw archive and hash presence | `evidence-ingest` |
+| `DLQ-3` | `G1\|G3` | structured snapshot reproducibility | `evidence-ingest` |
+| `DLQ-4` | `G3` | normalized field schema | `evidence-ingest` |
+| `DLQ-5` | `G2\|G3\|G9` | metric-only and no-advice boundary | source or text owner |
+| `DLQ-6` | `G3\|G7` | dated market snapshot | `evidence-ingest` |
+| `DLQ-7` | `G1\|G10` | source-license and secret hygiene | `evidence-ingest` |
+| `DLQ-8` | `G7\|G10` | supporting-pack and visible-TODO completeness | artifact owner |
+
+`data_layer_quality_report.md` is a supporting quality artifact. The active
+run's single current decision remains `quality_gate_report.md`.
+
 ### QR-VAL Valuation Sub-skill Subchecks
 
 Use these checks when a stock report consumes `company-valuation` outputs.
@@ -225,6 +247,9 @@ R5-G9 Narrative Coherence Gate
 R5-G10 No-Advice Gate
 R5-G11 Sample Benchmark Gate
 ```
+
+The same reference contains the mandatory local-to-global mapping. R5 local
+checks never appear in active `workflow_state.quality_gates[].gate_id`.
 
 Validate issue lists with:
 

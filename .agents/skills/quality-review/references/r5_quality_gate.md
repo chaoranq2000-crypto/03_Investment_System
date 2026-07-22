@@ -20,6 +20,28 @@ R5-G10 No-Advice Gate
 R5-G11 Sample Benchmark Gate
 ```
 
+## Canonical owner mapping
+
+Each active issue row records the local id in `local_check_id`, the first owner
+gate in `gate_id`, and the complete list in `mapped_global_gate_ids`.
+
+| local_check_id | mapped_global_gate_ids | owner | applicable_boundary | failure_backflow |
+|---|---|---|---|---|
+| `R5-G1` | `G1` | `quality-review` | evidence completeness | `evidence-ingest` |
+| `R5-G2` | `G3\|G7` | `quality-review` | financial model used by a stock report | `stock-deep-dive` |
+| `R5-G3` | `G2\|G3\|G7` | `quality-review` | business breakdown and its report claims | `stock-deep-dive` |
+| `R5-G4` | `G4\|G7` | `quality-review` | segment context consumed by a stock report | `segment-research` |
+| `R5-G5` | `G3\|G7` | `quality-review` | forecast model | `stock-deep-dive` |
+| `R5-G6` | `G3\|G7` | `quality-review` | valuation context | `company-valuation` |
+| `R5-G7` | `G3\|G7` | `quality-review` | dated market and technical context | `stock-deep-dive` |
+| `R5-G8` | `G1\|G2\|G7` | `quality-review` | sentiment and event evidence/claims | `evidence-ingest` |
+| `R5-G9` | `G2\|G7` | `quality-review` | narrative coherence and claim typing | `stock-deep-dive` |
+| `R5-G10` | `G9` | `quality-review` | no-advice review | text owner skill |
+| `R5-G11` | `G7` | `quality-review` | local sample benchmark | blocking issue owner |
+
+This mapping does not create additional global gates or change sample quality,
+P2 readiness, human authority, or engineering completion.
+
 ## Outcome rules
 
 ```text

@@ -4,12 +4,14 @@
 
 `quality_issues.csv` records review findings that decide whether an artifact is accepted, accepted with visible TODOs, needs fixes, or blocked.
 
-For R5-MVP, the same structure is used by `r5_quality_issues.example.csv`.
+The active V1 structure is used by `r5_quality_issues.example.csv`. Historical
+compact files without mapping columns remain readable in compatibility mode but
+must not be copied into a new run.
 
 ## Required fields
 
 ```csv
-issue_id,severity,gate_id,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
+issue_id,severity,gate_id,local_check_id,mapped_global_gate_ids,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
 ```
 
 ## severity enum
@@ -28,6 +30,7 @@ low
 Global workflow gates:
 
 ```text
+G0
 G1
 G2
 G3
@@ -40,15 +43,15 @@ G9
 G10
 ```
 
-Quality-review local checks:
+`gate_id` accepts only this canonical set. For a local check, it is the primary
+owner gate and must also appear in `mapped_global_gate_ids`.
+
+## Local check values
+
+`local_check_id` records compatibility and skill-local identifiers. Examples:
 
 ```text
 QR-*
-```
-
-R5 local gates:
-
-```text
 R5-G1
 R5-G2
 R5-G3
@@ -62,7 +65,13 @@ R5-G10
 R5-G11
 ```
 
-R5 gate IDs are local to the R5 quality rubric. They do not extend the global workflow gate table.
+R5 gate IDs are local to the R5 quality rubric. They do not extend the global
+workflow gate table and never occupy `gate_id` in an active V1 row. The complete
+R5 mapping, owner, boundary and failure route are defined in `r5_quality_gate.md`.
+
+`mapped_global_gate_ids` is a pipe-separated, non-empty list of canonical gates
+when `local_check_id` is present. Every listed value must be G0–G10 and the
+primary `gate_id` must be included.
 
 ## blocking_decision values
 

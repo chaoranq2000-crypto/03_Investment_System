@@ -25,7 +25,7 @@ The current validator is:
 |---|---|---|
 | canonical workflow type | `workflow_type` | Owned by `RESEARCH_WORKFLOW.md`; validator checks the same five values. |
 | workflow_status | `status` | This schema and validator use the values listed below. |
-| gate_status | `quality_gates[].status` | Listed below; validator currently checks only list type. |
+| gate_status | `quality_gates[].status` | Active V1 states accept only the four values below. |
 | todo_severity | `open_todos[].severity` | Uses `high`, `medium`, `low`; open `high` TODOs block acceptance. |
 | review_status | artifact-specific fields | Local scripts and manifests own artifact-specific values. |
 
@@ -53,11 +53,23 @@ The current validator is:
 
 ## Validator-enforced required fields
 
-These fields are required by the current validator:
+Every new or updated active V1 run must set:
+
+```yaml
+state_schema_version: r5_v1
+run_mode: normal
+```
+
+The marker activates strict control-plane validation. An unmarked state is accepted only
+through read-only legacy compatibility so protected historical runs can still be inspected;
+it is not a template for new execution. Any unknown version fails validation.
+
+These fields are required by the validator:
 
 ```yaml
 workflow_id: wf_YYYYMMDD_<workflow_type>_<slug>
 workflow_type: <canonical value from RESEARCH_WORKFLOW.md>
+run_mode: normal
 status: planned
 created_at: YYYY-MM-DD
 updated_at: YYYY-MM-DD
@@ -80,7 +92,6 @@ These fields are part of the runtime contract even when older validators
 do not enforce every one of them:
 
 ```yaml
-run_mode: normal | diagnostic
 owner: human | codex | mixed
 active_segment_id: null
 active_company_id: null
@@ -138,11 +149,33 @@ Use this schema for `workflow_state.yaml` `quality_gates[]` entries:
 
 | field | required | allowed values / notes |
 |---|---:|---|
-| `gate_id` | true | Canonical gate id from `RESEARCH_WORKFLOW.md`. |
+| `gate_id` | true | Canonical `G0`–`G10` id from `RESEARCH_WORKFLOW.md`; unique within the state. |
 | `status` | true | `pass`, `fail`, `not_checked`, `not_applicable`. |
 | `checked_by` | false | Usually `quality-review` or `research-orchestrator`. |
 | `checked_at` | false | ISO date or datetime. |
 | `notes` | false | Gate-specific notes or TODO pointer. |
+| `local_check_id` | false | Compatibility or skill-local check id; never replaces `gate_id`. |
+| `mapped_global_gate_ids` | conditional | Non-empty list of canonical gates when `local_check_id` is present; must include `gate_id`. |
+
+Local R5, Bundle, Night, data-layer and report-production IDs may appear only in
+`local_check_id`. Active V1 state rejects gates outside G0–G10, combined IDs such as
+`G6_G7`, local IDs in `gate_id`, duplicate canonical gates, and local statuses such as
+`fail_needs_fix`.
+
+## Current-run singleton assets
+
+An active run has exactly one current copy of each control asset:
+
+```text
+workflow_state.yaml
+open_todos.csv
+quality_gate_report.md
+workflow_readout.md
+```
+
+Bundle/Night readouts, local scorecards and data-layer quality reports are supporting or
+historical artifacts in `artifact_manifest.csv`; they are not parallel current state or
+quality conclusions.
 
 ## Artifact manifest CSV schema
 

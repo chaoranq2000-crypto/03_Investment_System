@@ -134,6 +134,10 @@ Create or update `reports/workflow_runs/<workflow_id>/workflow_state.yaml`
 when the run requires persisted state. Use `workflow_state_schema.md`
 and the runtime rules in `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
+New or updated active runs must set `state_schema_version: r5_v1`. The retained
+`references/orchestration_contract.md` path is a compatibility pointer, not a second
+runtime contract or a template for active state.
+
 ### ORCH-4 Select next stage and target skill
 
 Use canonical stages from `RESEARCH_WORKFLOW.md`; use

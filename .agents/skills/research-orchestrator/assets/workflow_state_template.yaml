@@ -1,14 +1,16 @@
+state_schema_version: r5_v1
 workflow_id: wf_YYYYMMDD_stock_first_closed_loop_object_id
 workflow_type: stock_first_closed_loop
+run_mode: normal
 status: planned
 created_at: YYYY-MM-DD
 updated_at: YYYY-MM-DD
 owner: mixed
 active_segment_id: null
 active_company_id: null
-current_stage: intake
+current_stage: T0
 completed_stages: []
-next_stage: scope_gate
+next_stage: T1
 active_skill: research-orchestrator
 required_next_skill: null
 

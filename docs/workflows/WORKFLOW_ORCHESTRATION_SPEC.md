@@ -203,8 +203,10 @@ Bundle/Night mission outcome 代替其中任一事实。只有
 旧质量报告只作为 manifest 中的只读来源，不得成为平行 current state。
 
 局部检查或兼容 gate 必须把 `local_check_id` 映射到 `RESEARCH_WORKFLOW.md` 的 G0–G10；
-只有 canonical gate id 可以写入 `workflow_state.quality_gates[].gate_id`。精确输入哈希、
-回滚和 remote receipt 等控制只在各自风险边界生效，不能成为所有阶段的通用门禁。
+只有 canonical gate id 可以写入 `workflow_state.quality_gates[].gate_id`。exact-hash 只用于
+冻结的人审输入，不能把普通中间产物变成人工授权对象；rollback 只用于可变、非幂等写入，
+不要求只读检查或幂等生成预设回滚；remote receipt 只用于 publication 与 `release_ready`
+边界，不得写成普通研究阶段或质量 gate 的通过条件。
 
 ## 9. 禁止事项
 

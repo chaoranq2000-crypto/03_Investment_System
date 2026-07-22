@@ -79,3 +79,57 @@ def test_legacy_night05_scope_is_frozen_at_delivery_snapshot() -> None:
     assert audit["scope_mode"] == "frozen_delivery_snapshot"
     assert audit["historical_changed_paths"] == []
     assert audit["out_of_scope_paths"] == []
+
+
+def test_orchestration_contract_is_only_a_compatibility_pointer() -> None:
+    compatibility = read(
+        ".agents/skills/research-orchestrator/references/orchestration_contract.md"
+    )
+    assert "compatibility pointer" in compatibility
+    assert "WORKFLOW_ORCHESTRATION_SPEC.md" in compatibility
+    assert "state_schema_version: r5_v1" in compatibility
+    assert "ready_for_limited_p2" not in compatibility
+    assert "## Workflow run directory" not in compatibility
+    assert "## Readout format" not in compatibility
+
+
+def test_r5_and_data_layer_checks_have_explicit_global_gate_mappings() -> None:
+    quality_skill = read(".agents/skills/quality-review/SKILL.md")
+    r5_mapping = read(".agents/skills/quality-review/references/r5_quality_gate.md")
+    data_layer = read("src/qa/data_layer_quality_review.py")
+    for field in (
+        "local_check_id",
+        "mapped_global_gate_ids",
+        "applicable_boundary",
+        "failure_backflow",
+    ):
+        assert field in quality_skill or field in r5_mapping
+    assert "| `R5-G10` | `G9` |" in r5_mapping
+    assert "| `R5-G11` | `G7` |" in r5_mapping
+    assert '"DLQ-1": ("G1",)' in data_layer
+    assert '"gate_id": mapped_gate_ids[0]' in data_layer
+    assert '"local_check_id": local_check_id' in data_layer
+
+
+def test_high_cost_controls_are_bound_to_their_real_risk_boundaries() -> None:
+    kernel = " ".join(read("docs/workflows/RESEARCH_WORKFLOW.md").split())
+    orchestration = " ".join(
+        read("docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md").split()
+    )
+    assert "exact-hash 只绑定已经冻结、即将交给人的 review 输入" in kernel
+    assert "rollback 只保护可变且非幂等的" in kernel
+    assert "写入事务" in kernel
+    assert "remote receipt 只证明 publication 边界" in kernel
+    assert "exact-hash 只用于" in orchestration
+    assert "rollback 只用于可变、非幂等写入" in orchestration
+    assert "remote receipt 只用于 publication" in orchestration
+
+
+def test_bundle7_backflow_is_an_explicit_legacy_compatibility_tool() -> None:
+    backflow = read("scripts/reconcile_r5_quality_backflow.py")
+    assert "DEFAULT_RUN" not in backflow
+    assert 'parser.add_argument("--workflow-run", required=True)' in backflow
+    assert "--legacy-compatibility" in backflow
+    assert "cannot update an active r5_v1 state" in backflow
+    assert '"local_check_id": LOCAL_CHECK_ID' in backflow
+    assert '"status": "historical_compatibility"' in backflow

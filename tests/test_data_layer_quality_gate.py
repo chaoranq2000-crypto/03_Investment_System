@@ -208,6 +208,14 @@ def test_data_layer_quality_gate_accepts_with_visible_todos(tmp_path: Path) -> N
     assert "DL-GAP-003" in report
     assert "issue_class" in issue_list
     assert "accepted_todo" in issue_list
+    with (run_dir / "data_layer_issue_list.csv").open(
+        encoding="utf-8", newline=""
+    ) as handle:
+        issue_rows = list(csv.DictReader(handle))
+    assert {row["gate_id"] for row in issue_rows} <= {f"G{i}" for i in range(11)}
+    assert {row["local_check_id"] for row in issue_rows} == {"DLQ-8"}
+    assert all(row["mapped_global_gate_ids"] == "G7|G10" for row in issue_rows)
+    assert "| DLQ-8 | G7, G10 | accepted_todo |" in report
 
 
 def test_data_layer_quality_gate_flags_token_value_field(tmp_path: Path) -> None:

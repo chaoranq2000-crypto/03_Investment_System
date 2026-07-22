@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 import sys
 from pathlib import Path
 
@@ -21,8 +22,21 @@ REQUIRED_FIELDS = [
     "status",
 ]
 SEVERITIES = {"critical", "high", "medium", "low"}
-GLOBAL_GATES = {f"G{i}" for i in range(1, 11)}
+GLOBAL_GATES = {f"G{i}" for i in range(11)}
 R5_GATES = {f"R5-G{i}" for i in range(1, 12)}
+R5_GATE_MAPPINGS = {
+    "R5-G1": ("G1",),
+    "R5-G2": ("G3", "G7"),
+    "R5-G3": ("G2", "G3", "G7"),
+    "R5-G4": ("G4", "G7"),
+    "R5-G5": ("G3", "G7"),
+    "R5-G6": ("G3", "G7"),
+    "R5-G7": ("G3", "G7"),
+    "R5-G8": ("G1", "G2", "G7"),
+    "R5-G9": ("G2", "G7"),
+    "R5-G10": ("G9",),
+    "R5-G11": ("G7",),
+}
 ACTIVE_STATUSES = {"open"}
 TERMINAL_STATUSES = {"resolved", "waived_with_reason"}
 STATUSES = {"open", "resolved", "accepted_todo", "waived_with_reason"}
@@ -48,7 +62,19 @@ def load_issues(path: Path) -> list[dict[str, str]]:
 
 
 def _valid_gate_id(gate_id: str) -> bool:
-    return gate_id in GLOBAL_GATES or gate_id in R5_GATES or gate_id.startswith("QR-")
+    return gate_id in GLOBAL_GATES
+
+
+def _valid_legacy_gate_id(gate_id: str) -> bool:
+    return _valid_gate_id(gate_id) or gate_id in R5_GATES or gate_id.startswith("QR-")
+
+
+def _valid_local_check_id(local_check_id: str) -> bool:
+    return bool(re.fullmatch(r"(?:R5-G\d+|QR-[A-Z0-9-]+|DLQ-\d+)", local_check_id))
+
+
+def _mapped_gate_ids(value: str) -> tuple[str, ...]:
+    return tuple(part.strip() for part in value.split("|") if part.strip())
 
 
 def _row_text(row: dict[str, str]) -> str:
@@ -61,12 +87,22 @@ def _is_active(row: dict[str, str]) -> bool:
 
 def validate_quality_issues(rows: list[dict[str, str]], expected_outcome: str | None = None) -> list[str]:
     errors: list[str] = []
-    represented_gates = {row.get("gate_id", "").strip() for row in rows}
-    missing_r5_gates = sorted(R5_GATES - represented_gates)
-    if missing_r5_gates:
-        errors.append(f"missing R5 gates: {', '.join(missing_r5_gates)}")
-    if "R5-G10" not in represented_gates:
-        errors.append("R5-G10 No-Advice Gate must be represented")
+    has_local_column = bool(rows) and all("local_check_id" in row for row in rows)
+    has_mapping_column = bool(rows) and all("mapped_global_gate_ids" in row for row in rows)
+    active_mapping_schema = has_local_column and has_mapping_column
+    if has_local_column != has_mapping_column:
+        errors.append("local_check_id and mapped_global_gate_ids columns must appear together")
+
+    represented_r5_gates = {
+        row.get("local_check_id", "").strip() if active_mapping_schema else row.get("gate_id", "").strip()
+        for row in rows
+    } & R5_GATES
+    if represented_r5_gates:
+        missing_r5_gates = sorted(R5_GATES - represented_r5_gates)
+        if missing_r5_gates:
+            errors.append(f"missing R5 gates: {', '.join(missing_r5_gates)}")
+        if "R5-G10" not in represented_r5_gates:
+            errors.append("R5-G10 No-Advice Gate must be represented")
 
     for idx, row in enumerate(rows):
         for field in REQUIRED_FIELDS:
@@ -82,8 +118,37 @@ def validate_quality_issues(rows: list[dict[str, str]], expected_outcome: str | 
             errors.append(f"row {idx}: status is invalid: {status}")
 
         gate_id = row.get("gate_id", "").strip()
-        if not _valid_gate_id(gate_id):
+        gate_is_valid = _valid_gate_id(gate_id) if active_mapping_schema else _valid_legacy_gate_id(gate_id)
+        if not gate_is_valid:
             errors.append(f"row {idx}: gate_id is invalid: {gate_id}")
+
+        if active_mapping_schema:
+            local_check_id = row.get("local_check_id", "").strip()
+            mapped_gate_ids = _mapped_gate_ids(row.get("mapped_global_gate_ids", ""))
+            if local_check_id and not _valid_local_check_id(local_check_id):
+                errors.append(f"row {idx}: local_check_id is invalid: {local_check_id}")
+            if local_check_id and not mapped_gate_ids:
+                errors.append(f"row {idx}: mapped_global_gate_ids is required for a local check")
+            invalid_mapped = [gate for gate in mapped_gate_ids if gate not in GLOBAL_GATES]
+            if invalid_mapped:
+                errors.append(
+                    f"row {idx}: mapped_global_gate_ids contains invalid gates: "
+                    + ", ".join(invalid_mapped)
+                )
+            if mapped_gate_ids and gate_id not in mapped_gate_ids:
+                errors.append(f"row {idx}: gate_id must be included in mapped_global_gate_ids")
+            if local_check_id in R5_GATE_MAPPINGS:
+                expected_mapping = R5_GATE_MAPPINGS[local_check_id]
+                if mapped_gate_ids != expected_mapping:
+                    errors.append(
+                        f"row {idx}: {local_check_id} mapping must be "
+                        + "|".join(expected_mapping)
+                    )
+                if gate_id != expected_mapping[0]:
+                    errors.append(
+                        f"row {idx}: {local_check_id} primary gate_id must be "
+                        f"{expected_mapping[0]}"
+                    )
 
         if row.get("blocking_decision") not in OUTCOMES:
             errors.append(f"row {idx}: blocking_decision is invalid: {row.get('blocking_decision')}")

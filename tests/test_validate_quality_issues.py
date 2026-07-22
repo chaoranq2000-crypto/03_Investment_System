@@ -79,27 +79,58 @@ def test_critical_severity_is_valid_and_blocks_accepted():
 def test_invalid_gate_id_is_reported():
     validator = load_validator()
     rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
-    rows[0]["gate_id"] = "R5-G99"
+    rows[0]["gate_id"] = "G11"
     assert any("gate_id is invalid" in error for error in validator.validate_quality_issues(rows))
 
 
 def test_missing_r5_no_advice_gate_is_reported():
     validator = load_validator()
-    rows = [row for row in validator.load_issues(EXAMPLE_PATH) if row["gate_id"] != "R5-G10"]
+    rows = [
+        row
+        for row in validator.load_issues(EXAMPLE_PATH)
+        if row["local_check_id"] != "R5-G10"
+    ]
     assert any("R5-G10 No-Advice Gate" in error for error in validator.validate_quality_issues(rows))
 
 
 def test_all_r5_gates_must_be_represented():
     validator = load_validator()
-    rows = [row for row in validator.load_issues(EXAMPLE_PATH) if row["gate_id"] != "R5-G1"]
+    rows = [
+        row
+        for row in validator.load_issues(EXAMPLE_PATH)
+        if row["local_check_id"] != "R5-G1"
+    ]
     assert any("missing R5 gates" in error for error in validator.validate_quality_issues(rows))
 
 
-def test_gate_id_supports_global_qr_and_r5_ids():
+def test_active_gate_id_is_canonical_and_local_ids_are_separate():
     validator = load_validator()
+    assert validator._valid_gate_id("G0")
     assert validator._valid_gate_id("G1")
-    assert validator._valid_gate_id("QR-DL-1")
-    assert validator._valid_gate_id("R5-G11")
+    assert validator._valid_gate_id("G10")
+    assert not validator._valid_gate_id("G11")
+    assert not validator._valid_gate_id("QR-DL-1")
+    assert not validator._valid_gate_id("R5-G11")
+    assert validator._valid_local_check_id("QR-DL-1")
+    assert validator._valid_local_check_id("R5-G11")
+
+
+def test_global_only_issue_list_does_not_require_the_r5_rubric():
+    validator = load_validator()
+    row = copy.deepcopy(validator.load_issues(EXAMPLE_PATH)[0])
+    row["gate_id"] = "G0"
+    row["local_check_id"] = ""
+    row["mapped_global_gate_ids"] = ""
+    errors = validator.validate_quality_issues([row])
+    assert errors == []
+
+
+def test_r5_mapping_drift_is_rejected():
+    validator = load_validator()
+    rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
+    rows[0]["mapped_global_gate_ids"] = "G7"
+    errors = validator.validate_quality_issues(rows)
+    assert any("R5-G1 mapping must be G1" in error for error in errors)
 
 
 def test_cli_validates_example(capsys):

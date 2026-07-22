@@ -2,9 +2,14 @@ import csv
 import shutil
 from pathlib import Path
 
+import pytest
 import yaml
 
-from scripts.reconcile_r5_quality_backflow import apply_reconciliation, build_reconciliation_plan
+from scripts.reconcile_r5_quality_backflow import (
+    apply_reconciliation,
+    build_reconciliation_plan,
+    main,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,7 +69,13 @@ def test_apply_updates_state_todos_manifest_and_supersedes_historical_readout(tm
     assert state["required_next_skill"] == "evidence-ingest"
     assert state["quality_backflow"]["score"] == plan["score"]
     assert state["quality_backflow"]["historical_acceptance_superseded"] is True
-    assert any(gate["gate_id"] == "R5_READER_QUALITY_V2" and gate["status"] == "fail_needs_fix" for gate in state["quality_gates"])
+    assert any(
+        gate["gate_id"] == "G7"
+        and gate["local_check_id"] == "R5_READER_QUALITY_V2"
+        and gate["mapped_global_gate_ids"] == ["G7", "G9"]
+        and gate["status"] == "fail"
+        for gate in state["quality_gates"]
+    )
     assert any(item["issue_id"].startswith("R5Q-B7-") for item in state["open_todos"])
 
     with (run / "open_todos.csv").open(encoding="utf-8", newline="") as handle:
@@ -79,8 +90,9 @@ def test_apply_updates_state_todos_manifest_and_supersedes_historical_readout(tm
     assert str(readout_path.relative_to(root)).replace("\\", "/") in paths
 
     historical = (run / "workflow_readout.md").read_text(encoding="utf-8")
-    assert "historical_snapshot_superseded_by_bundle7_quality_rebaseline" in historical
-    assert "Current-state notice" in historical
+    assert "## Status needs_fix" in historical
+    assert "v1_current_control_notice" in historical
+    assert "historical_snapshot_superseded_by_bundle7_quality_rebaseline" not in historical
 
     readout = readout_path.read_text(encoding="utf-8")
     for token in (
@@ -120,3 +132,28 @@ def test_apply_updates_state_todos_manifest_and_supersedes_historical_readout(tm
     assert state_2["quality_backflow"]["prior_state"] == prior_state
     assert state_2["quality_backflow"]["prior_exit_criteria"] == prior_exit_criteria
     assert (run / "workflow_state.yaml").read_text(encoding="utf-8") == state_before_second_apply
+
+
+def test_cli_requires_explicit_legacy_compatibility_run() -> None:
+    with pytest.raises(SystemExit) as exc_info:
+        main([])
+    assert exc_info.value.code == 2
+
+
+def test_cli_rejects_active_v1_state(tmp_path: Path) -> None:
+    run = tmp_path / "reports/workflow_runs/wf_v1"
+    run.mkdir(parents=True)
+    (run / "workflow_state.yaml").write_text(
+        "state_schema_version: r5_v1\n", encoding="utf-8"
+    )
+    with pytest.raises(SystemExit) as exc_info:
+        main(
+            [
+                "--repo-root",
+                str(tmp_path),
+                "--workflow-run",
+                str(run.relative_to(tmp_path)),
+                "--legacy-compatibility",
+            ]
+        )
+    assert exc_info.value.code == 2

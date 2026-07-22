@@ -407,8 +407,12 @@ Bundle、Night、旧 close readout、历史 quality report 和 generation snapsh
 ### 11.1 局部检查与兼容别名
 
 R5、Bundle、Night、data-layer、report-production 和 skill-local 检查必须使用明确的局部
-前缀或兼容别名，并映射到 G0–G10 中的一个或多个 owner gate。局部检查可以保留更严格的
-输入哈希、回滚或发布凭证要求，但不得：
+前缀或兼容别名，并映射到 G0–G10 中的一个或多个 owner gate。局部控制只在对应风险边界
+生效：exact-hash 只绑定已经冻结、即将交给人的 review 输入；rollback 只保护可变且非幂等的
+写入事务；remote receipt 只证明 publication 边界。普通读取、幂等生成和本地质量检查不得
+因此获得新的通用门禁。
+
+局部检查不得：
 
 1. 写入新的全局 `G` 编号；
 2. 作为 `workflow_state.quality_gates[].gate_id` 的 canonical 值；
