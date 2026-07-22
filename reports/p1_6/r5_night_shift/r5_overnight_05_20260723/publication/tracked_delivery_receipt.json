@@ -13,21 +13,29 @@
     {
       "sha": "e3665ec05de792dc6da5ba2cb438917938af2fc5",
       "subject": "test(night05): record full validation receipts"
+    },
+    {
+      "sha": "3ed6a5c8f5b3a5d45388ba6cd485fcb0e030078d",
+      "subject": "docs(night05): add tracked delivery handoff"
+    },
+    {
+      "sha": "2061725cd054913b8358661e766e0cc97c553670",
+      "subject": "fix(night05): make source hashes cross-platform"
     }
   ],
-  "commits_after_baseline_before_publication_commit": 3,
+  "commits_after_baseline_before_publication_commit": 5,
   "final_publication_head": null,
   "final_publication_resolution_policy": "authoritative_post_push_remote_receipt",
   "force_push_allowed": false,
   "implementation_snapshot_before_publication_commit": {
-    "commit_sha": "e3665ec05de792dc6da5ba2cb438917938af2fc5",
-    "tree_sha": "ab61ec22b1a26d992bf45a381ff7f538e9cc6746"
+    "commit_sha": "2061725cd054913b8358661e766e0cc97c553670",
+    "tree_sha": "365d5ca4885b286200262c0500b6deb0b7a66c2d"
   },
   "merge_main_allowed": false,
   "mission_id": "r5_overnight_05_20260723",
   "pr_creation_allowed": false,
   "remote_delivery_receipt": "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/publication/remote_delivery_receipt.json",
   "schema_version": "r5_night05_tracked_delivery_receipt_v1",
-  "stable_receipt_sha256": "fd7f395d030a96759bc78e12f3ccabefd77ecc1543b3dc6cb3c08eb909dcc6ca",
+  "stable_receipt_sha256": "ac883c1c144a4d1d99386ca9d630ec49e8e1d21ff8c89b2c72620c32ee537813",
   "target_branch": "codex/r5-night05-external-review-intake"
 }
