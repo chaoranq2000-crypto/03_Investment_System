@@ -22,6 +22,7 @@ from src.maintenance.night_shift.night05 import (
     Night05Outcome,
     authoritative_queue,
     build_review_wave_plan,
+    build_scope_audit,
     build_source_preflight,
     evaluate_night05_outcome,
     materialize_bootstrap,
@@ -152,6 +153,16 @@ def test_night05_historical_roots_remain_unchanged() -> None:
     )
     assert not committed.strip()
     assert not working.strip()
+
+
+def test_night05_scope_audit_covers_committed_and_working_changes() -> None:
+    audit = build_scope_audit(REPO_ROOT)
+    observed = set(audit["observed_changed_paths"])
+    assert ".gitattributes" in observed
+    assert "src/maintenance/night_shift/night05.py" in observed
+    assert not audit["historical_changed_paths"]
+    assert not audit["out_of_scope_paths"]
+    assert audit["passed"] is True
 
 
 def test_night05_bootstrap_materialization_is_byte_deterministic() -> None:

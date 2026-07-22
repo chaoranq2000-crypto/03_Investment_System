@@ -45,11 +45,11 @@
   "schema_version": "r5_night05_morning_readout_v1",
   "source_ci_run_id": 29764207418,
   "source_commit": "d0fc0fb735f0f581619e330b3fa6f1ef1914a276",
-  "stable_receipt_sha256": "c7028ebdabb1b2aa7eec948e8ff4b77d2321d647b234de5f1408cfdc7ebe768c",
+  "stable_receipt_sha256": "7e85eeae1a4c720642fbdbf80544ff064563bae8bdc5645a9f611863ef3b0892",
   "target_branch": "codex/r5-night05-external-review-intake",
   "validation": {
-    "ci_contract": false,
-    "full_regression": false,
-    "scope_audit": false
+    "ci_contract": true,
+    "full_regression": true,
+    "scope_audit": true
   }
 }

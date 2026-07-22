@@ -7,7 +7,7 @@
 - 阻塞项已解决：0/63
 - 依赖解除：0/20
 - 父任务完成：0/6
-- 回归 / scope / CI contract：False / False / False
+- 回归 / scope / CI contract：True / True / True
 - Program Goal：open_needs_targeted_backflow
 - Sample quality / P2：false / false
 

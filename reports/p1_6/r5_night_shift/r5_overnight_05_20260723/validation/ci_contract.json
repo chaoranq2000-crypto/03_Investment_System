@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "full_history_checkout": true,
+    "full_pytest": true,
+    "night04_historical_guard": true,
+    "night05_baseline_guard": true,
+    "night_shift_suite": true,
+    "no_publication_mutation": true,
+    "source_route_gate": true
+  },
+  "mission_id": "r5_overnight_05_20260723",
+  "passed": true,
+  "schema_version": "r5_night05_ci_contract_v1",
+  "stable_receipt_sha256": "5dc481082e888bc606224de55be042f94841fd4e6aea94c4bf63d659eabd98a9",
+  "workflow": ".github/workflows/ci.yml",
+  "workflow_sha256": "f7ee566d4c1ac1257200feca32f758c15ed37c7ad80b7e4daf7325351ffb4394"
+}

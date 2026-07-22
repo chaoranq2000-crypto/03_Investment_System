@@ -932,7 +932,17 @@ def build_scope_audit(repo_root: Path) -> dict[str, Any]:
             for item in (committed + "\n" + working).splitlines()
             if item
         )
-    changed = _status_paths(repo_root)
+    committed_changed = {
+        item
+        for item in _git(
+            repo_root,
+            "diff",
+            "--name-only",
+            f"{SOURCE_COMMIT}..HEAD",
+        ).splitlines()
+        if item
+    }
+    changed = sorted(committed_changed | set(_status_paths(repo_root)))
     out_of_scope = [
         path
         for path in changed
@@ -949,7 +959,14 @@ def build_scope_audit(repo_root: Path) -> dict[str, Any]:
         or "/.local/" in f"/{path}/"
     ]
     diff_check = subprocess.run(
-        ["git", "-C", str(repo_root), "diff", "--check"],
+        [
+            "git",
+            "-C",
+            str(repo_root),
+            "diff",
+            "--check",
+            SOURCE_COMMIT,
+        ],
         capture_output=True,
         text=True,
         check=False,
