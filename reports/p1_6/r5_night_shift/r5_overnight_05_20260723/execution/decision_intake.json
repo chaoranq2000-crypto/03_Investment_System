@@ -1,0 +1,28 @@
+{
+  "approved_decision_count": 0,
+  "approved_records": [],
+  "authority_registry": {
+    "authority_binding_count": 0,
+    "path": "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/external_decisions/external_authority_registry.yaml",
+    "reviewer_count": 0,
+    "sha256": null,
+    "status": "missing_external_registry"
+  },
+  "cross_manifest_conflicts": [],
+  "external_gate_state": "blocked_external",
+  "invalid_record_count": 0,
+  "invalid_records": [],
+  "ledger_decision_count": 0,
+  "machine_generated_decisions": 0,
+  "manifests": [],
+  "mission_id": "r5_overnight_05_20260723",
+  "newly_consumed_count": 0,
+  "outcome": "no_external_decisions",
+  "replayed_decision_count": 0,
+  "scanned_manifest_count": 0,
+  "schema_version": "r5_night05_external_decision_intake_v1",
+  "source_commit": "d0fc0fb735f0f581619e330b3fa6f1ef1914a276",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "2828882f302358195e9b90969f45be507cd89906bc4a8c51ef149284cbe45145",
+  "validated_decision_count": 0
+}

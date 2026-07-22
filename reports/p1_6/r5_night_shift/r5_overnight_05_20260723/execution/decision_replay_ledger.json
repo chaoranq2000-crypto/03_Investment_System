@@ -1,0 +1,7 @@
+{
+  "mission_id": "r5_overnight_05_20260723",
+  "records": [],
+  "schema_version": "r5_night05_decision_replay_ledger_v1",
+  "source_queue_sha256": "daaf3a9a9b37fa4c23c75e8bda401e41c41149917a1bf02419f89107ea9abe68",
+  "stable_receipt_sha256": "263586b40193beceb3bb6dd17e59a78a5db1792416025a320e97d7272edfceba"
+}

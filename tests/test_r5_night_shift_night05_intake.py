@@ -1,0 +1,152 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import yaml
+
+from src.maintenance.night_shift.night05 import (
+    EXPECTED_CANDIDATES,
+    EXPECTED_DEPENDENCIES,
+    EXPECTED_OCCURRENCES,
+    EXPECTED_PARENTS,
+    EXPECTED_TOTAL_ITEMS,
+    MISSION_ID,
+    OUTPUT_ROOT,
+    SOURCE_COMMIT,
+    SOURCE_ROOT,
+    WAVE_A_IDS,
+    WAVE_B_IDS,
+    Night05Outcome,
+    authoritative_queue,
+    build_review_wave_plan,
+    build_source_preflight,
+    evaluate_night05_outcome,
+    materialize_bootstrap,
+)
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _notes(task: dict[str, object]) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for note in task.get("notes") or []:
+        text = str(note)
+        if "=" in text:
+            key, value = text.split("=", 1)
+            result[key] = value
+    return result
+
+
+def test_night05_locks_exact_night04_delivery_and_truth() -> None:
+    preflight = build_source_preflight(REPO_ROOT)
+    assert preflight["passed"] is True
+    assert preflight["source_commit"] == SOURCE_COMMIT
+    assert preflight["source_delivery_receipt"]["ci_run_id"] == 29764207418
+    assert preflight["source_delivery_receipt"]["ci_conclusion"] == "success"
+    assert preflight["queue_task_count"] == EXPECTED_TOTAL_ITEMS
+    assert preflight["candidate_count"] == EXPECTED_CANDIDATES
+    assert preflight["starting_truth"] == {
+        "resolved": 0,
+        "total": EXPECTED_OCCURRENCES,
+        "candidate_ready": EXPECTED_CANDIDATES,
+        "dependency_blocked": EXPECTED_DEPENDENCIES,
+        "dependency_unlocked": 0,
+        "parents_resolved": 0,
+        "program_goal": "open_needs_targeted_backflow",
+        "sample_quality": False,
+        "p2": False,
+    }
+
+
+def test_night05_review_waves_cover_all_43_candidates_without_unlock_claim() -> None:
+    plan = build_review_wave_plan(REPO_ROOT)
+    waves = plan["waves"]
+    assert [item["candidate_count"] for item in waves] == [7, 6, 30]
+    assert tuple(waves[0]["candidate_ids"]) == WAVE_A_IDS
+    assert tuple(waves[1]["candidate_ids"]) == WAVE_B_IDS
+    assert waves[0]["dependency_membership_coverage"] == EXPECTED_DEPENDENCIES
+    assert waves[0]["actual_dependency_unlock"] == 0
+    assert plan["machine_may_populate_decision_fields"] is False
+
+
+def test_zero_external_input_closes_only_as_review_intake_ready() -> None:
+    outcome = evaluate_night05_outcome(
+        valid_external_decisions=0,
+        independent_passed_receipts=0,
+        resolved_delta=0,
+    )
+    assert outcome is Night05Outcome.REVIEW_INTAKE_READY
+    intake = json.loads(
+        (REPO_ROOT / OUTPUT_ROOT / "execution/decision_intake.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert intake["scanned_manifest_count"] == 0
+    assert intake["approved_decision_count"] == 0
+    assert intake["machine_generated_decisions"] == 0
+    assert intake["external_gate_state"] == "blocked_external"
+
+
+def test_night05_carries_all_ids_and_source_hashes_verbatim() -> None:
+    source = authoritative_queue(REPO_ROOT)
+    carried = yaml.safe_load(
+        (REPO_ROOT / OUTPUT_ROOT / "next_night_queue.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert carried["mission_id"] == MISSION_ID
+    assert carried["source_commit"] == SOURCE_COMMIT
+    assert len(carried["tasks"]) == EXPECTED_TOTAL_ITEMS
+    assert [item["id"] for item in carried["tasks"]] == [
+        item["id"] for item in source["tasks"]
+    ]
+    for before, after in zip(source["tasks"], carried["tasks"], strict=True):
+        before_notes = _notes(before)
+        after_notes = _notes(after)
+        assert before_notes.get("source_artifact_path") == after_notes.get(
+            "source_artifact_path"
+        )
+        assert before_notes.get("source_artifact_sha256") == after_notes.get(
+            "source_artifact_sha256"
+        )
+
+
+def test_night05_readout_preserves_research_boundaries() -> None:
+    readout = json.loads(
+        (REPO_ROOT / OUTPUT_ROOT / "morning_readout.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    truth = readout["research_truth"]
+    assert readout["mission_outcome"] == "review_intake_ready"
+    assert truth["blocker_occurrences_resolved"] == 0
+    assert truth["dependency_unlocked"] == 0
+    assert truth["work_orders_resolved"] == 0
+    assert truth["program_goal"] == "open_needs_targeted_backflow"
+    assert truth["sample_quality_allowed"] is False
+    assert truth["p2_allowed"] is False
+
+
+def test_night05_bootstrap_materialization_is_byte_deterministic() -> None:
+    paths = [
+        OUTPUT_ROOT / "preflight/source_preflight.json",
+        OUTPUT_ROOT / "review/review_wave_plan.yaml",
+        OUTPUT_ROOT / "execution/decision_intake.json",
+        OUTPUT_ROOT / "execution/recompute_summary.json",
+        OUTPUT_ROOT / "next_night_queue.yaml",
+        OUTPUT_ROOT / "progress/change_log.json",
+    ]
+    before = {
+        path.as_posix(): (REPO_ROOT / path).read_bytes() for path in paths
+    }
+    result = materialize_bootstrap(REPO_ROOT)
+    after = {
+        path.as_posix(): (REPO_ROOT / path).read_bytes() for path in paths
+    }
+    assert result["outcome"] == "review_intake_ready"
+    assert before == after
+    historical = REPO_ROOT / SOURCE_ROOT
+    assert historical.is_dir()
+

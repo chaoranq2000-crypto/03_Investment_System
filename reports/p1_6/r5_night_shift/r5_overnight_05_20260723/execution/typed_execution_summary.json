@@ -1,0 +1,12 @@
+{
+  "approved_input_count": 0,
+  "automatic_execution_used": false,
+  "independent_passed_receipt_count": 0,
+  "mission_id": "r5_overnight_05_20260723",
+  "outcome": "blocked_external_no_approved_decisions",
+  "pending_explicit_executor_count": 0,
+  "pending_occurrence_ids": [],
+  "resolved_delta": 0,
+  "schema_version": "r5_night05_typed_execution_summary_v1",
+  "stable_receipt_sha256": "b6c9fdab2019d698519d1e573331bdeb964ba2f28a407253938cb74cbcbd9540"
+}

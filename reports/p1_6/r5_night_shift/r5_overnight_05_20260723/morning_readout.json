@@ -1,0 +1,55 @@
+{
+  "blockers": [
+    {
+      "next_step": "register real reviewer-authority pairs and complete the seven Wave A exact-hash manifests",
+      "owner": "external_review_lead",
+      "severity": "high"
+    }
+  ],
+  "delivery": {
+    "force_push_used": false,
+    "main_merged": false,
+    "pr_created": false,
+    "publication_resolution_policy": null,
+    "tracked_delivery_ready": false
+  },
+  "mission_id": "r5_overnight_05_20260723",
+  "mission_outcome": "review_intake_ready",
+  "next_queue": {
+    "ids_and_source_hashes_preserved": true,
+    "path": "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/next_night_queue.yaml",
+    "task_count": 69
+  },
+  "outcome_meaning": "external_review_intake_prepared_research_program_still_open",
+  "research_truth": {
+    "blocker_occurrences_resolved": 0,
+    "blocker_occurrences_total": 63,
+    "candidate_ready": 43,
+    "dependency_blocked": 20,
+    "dependency_unlocked": 0,
+    "p2_allowed": false,
+    "program_goal": "open_needs_targeted_backflow",
+    "resolved_delta": 0,
+    "sample_quality_allowed": false,
+    "work_orders_pending": 6,
+    "work_orders_resolved": 0
+  },
+  "review_intake": {
+    "approved_decisions": 0,
+    "candidate_count": 43,
+    "external_authority_bindings": 0,
+    "machine_generated_decisions": 0,
+    "scanned_manifests": 0,
+    "validated_decisions": 0
+  },
+  "schema_version": "r5_night05_morning_readout_v1",
+  "source_ci_run_id": 29764207418,
+  "source_commit": "d0fc0fb735f0f581619e330b3fa6f1ef1914a276",
+  "stable_receipt_sha256": "c7028ebdabb1b2aa7eec948e8ff4b77d2321d647b234de5f1408cfdc7ebe768c",
+  "target_branch": "codex/r5-night05-external-review-intake",
+  "validation": {
+    "ci_contract": false,
+    "full_regression": false,
+    "scope_audit": false
+  }
+}

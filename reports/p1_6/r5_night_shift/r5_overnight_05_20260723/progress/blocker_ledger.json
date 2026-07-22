@@ -1,0 +1,41 @@
+{
+  "blocker_occurrences_resolved": 0,
+  "blocker_occurrences_total": 63,
+  "blockers": [
+    {
+      "blocker_id": "external_authority_registry_missing",
+      "next_step": "register_real_reviewer_authority_pairs",
+      "owner": "external_review_lead",
+      "severity": "high",
+      "status": "open"
+    },
+    {
+      "blocker_id": "external_decisions_zero_of_43",
+      "next_step": "complete_wave_a_exact_hash_decision_manifests",
+      "owner": "typed_external_reviewers",
+      "severity": "high",
+      "status": "open"
+    },
+    {
+      "blocker_id": "independent_execution_receipts_missing",
+      "next_step": "execute_valid_approved_records_by_candidate_kind",
+      "owner": "night05_executor",
+      "severity": "high",
+      "status": "open"
+    },
+    {
+      "blocker_id": "pointer_duplicate_semantics_and_shared_files",
+      "next_step": "deduplicate_by_semantic_variant_and_validate_each_occurrence",
+      "owner": "engineering_executor",
+      "severity": "medium",
+      "status": "open"
+    }
+  ],
+  "candidate_ready_count": 43,
+  "dependency_blocked_count": 20,
+  "mission_id": "r5_overnight_05_20260723",
+  "parent_blocked_count": 6,
+  "program_goal": "open_needs_targeted_backflow",
+  "schema_version": "r5_night05_blocker_ledger_v1",
+  "stable_receipt_sha256": "dc05c4b567452afc9ad08a20c1228d10fd6caaabb0c42819e2d6ba72c4eba273"
+}

@@ -1,0 +1,28 @@
+schema_version: r5_night05_wrapper_queue_v1
+mission_id: r5_overnight_05_20260723
+tasks:
+  - id: n5_00_isolated_bootstrap
+    depends_on: []
+    owner: night05_executor
+    completion_gate: source_commit_queue_and_review_hashes_reproducible
+  - id: n5_01_external_decision_intake
+    depends_on: [n5_00_isolated_bootstrap]
+    owner: external_review_lead
+    completion_gate: at_least_one_valid_external_decision_or_close_as_review_intake_ready
+  - id: n5_02_wave_a_review
+    depends_on: [n5_01_external_decision_intake]
+    owner: typed_external_reviewers
+    completion_gate: decisions_validated_per_occurrence
+  - id: n5_03_wave_b_first_parent
+    depends_on: [n5_02_wave_a_review]
+    owner: typed_external_reviewers_and_executor
+    completion_gate: ten_atomic_occurrences_have_independent_passed_receipts
+  - id: n5_04_wave_c_remaining_review
+    depends_on: [n5_03_wave_b_first_parent]
+    owner: typed_external_reviewers
+    completion_gate: received_decisions_consumed_without_overstatement
+  - id: n5_05_recompute_and_close
+    depends_on: [n5_01_external_decision_intake]
+    owner: night05_executor
+    completion_gate: every_state_change_is_receipt_backed_and_reproducible
+

@@ -1,0 +1,12 @@
+{
+  "candidate_count": 43,
+  "machine_generated_decisions": 0,
+  "mission_id": "r5_overnight_05_20260723",
+  "passed": true,
+  "queue_task_count": 69,
+  "resolved_delta": 0,
+  "schema_version": "r5_night05_structural_gate_v1",
+  "source_file_count": 228,
+  "source_preflight_passed": true,
+  "stable_receipt_sha256": "1e5a63248a1af8af0764d3b6eb50d66124230f227f1206f9678e0847e0e1c622"
+}

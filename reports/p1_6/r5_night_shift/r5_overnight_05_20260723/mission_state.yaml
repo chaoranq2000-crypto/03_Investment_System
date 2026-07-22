@@ -1,0 +1,30 @@
+schema_version: r5_night05_mission_state_v1
+mission_id: r5_overnight_05_20260723
+source_commit: d0fc0fb735f0f581619e330b3fa6f1ef1914a276
+target_branch: codex/r5-night05-external-review-intake
+mission_outcome: review_intake_ready
+program_goal:
+  state: open_needs_targeted_backflow
+  close_allowed: false
+  blocker_occurrences_total: 63
+  blocker_occurrences_resolved: 0
+phases:
+- id: n5_00_isolated_bootstrap
+  status: passed
+- id: n5_01_external_decision_intake
+  status: closed_review_intake_ready
+- id: n5_02_wave_a_review
+  status: blocked_external
+- id: n5_03_wave_b_first_parent
+  status: blocked_external
+- id: n5_04_wave_c_remaining_review
+  status: blocked_external
+- id: n5_05_recompute_and_close
+  status: passed_zero_input_close
+truth_boundary:
+  candidate_is_not_resolution: true
+  approval_is_not_passed_receipt: true
+  machine_generated_decisions: 0
+  sample_quality_passed: false
+  p2_ready: false
+stable_receipt_sha256: 7aca76c85f9e0b198501048223512bebe3c83fcd538f6775e25ad06d5396d330

@@ -19,6 +19,10 @@ from src.maintenance.night_shift.night03_backflow import (  # noqa: E402
 )
 from src.maintenance.night_shift.night04 import MISSION_ID as NIGHT04_MISSION_ID  # noqa: E402
 from src.maintenance.night_shift.night04_execution import materialize_phase_e  # noqa: E402
+from src.maintenance.night_shift.night05 import (  # noqa: E402
+    MISSION_ID as NIGHT05_MISSION_ID,
+    materialize_bootstrap as materialize_night05_bootstrap,
+)
 from src.maintenance.night_shift.runner import main as runtime_main  # noqa: E402
 
 
@@ -43,6 +47,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             checkpoint=args.checkpoint,
             continue_on_external_block=args.continue_on_external_block,
         )
+    elif args.mission == NIGHT05_MISSION_ID:
+        result = materialize_night05_bootstrap(REPO_ROOT)
     else:
         parser.error(f"unsupported mission: {args.mission}")
     print(json.dumps(result, ensure_ascii=False, indent=2))

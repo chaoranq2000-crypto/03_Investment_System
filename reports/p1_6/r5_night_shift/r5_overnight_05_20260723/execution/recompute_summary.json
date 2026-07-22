@@ -1,0 +1,15 @@
+{
+  "dependency_blocked_count": 20,
+  "dependency_count": 20,
+  "dependency_unlocked_count": 0,
+  "mission_id": "r5_overnight_05_20260723",
+  "parent_count": 6,
+  "parent_pending_count": 6,
+  "parent_resolved_count": 0,
+  "schema_version": "r5_night05_recompute_summary_v1",
+  "source_dependency_receipt_sha256": "32bde0cce64f0b3a5389462c922103456aa733d342b0770e2dee6a8768ef3488",
+  "source_parent_receipt_sha256": "9c9d42129bba88ae8f1a465090aeda6fd3670a3bfc0be92eafb83a8b71cadcb0",
+  "stable_receipt_sha256": "df841cdfeff7772653bb8f9f605a3a07cae47e3efff1ded07523eb937648dfa3",
+  "state_change_allowed": false,
+  "trigger": "no_independent_passed_execution_receipts"
+}

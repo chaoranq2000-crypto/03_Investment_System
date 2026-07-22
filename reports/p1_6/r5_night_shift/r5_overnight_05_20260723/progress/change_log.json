@@ -1,0 +1,13 @@
+{
+  "changed_dependency_ids": [],
+  "changed_occurrence_ids": [],
+  "changed_parent_ids": [],
+  "ending_resolved": 0,
+  "mission_id": "r5_overnight_05_20260723",
+  "reason": "no_valid_external_decision_and_no_independent_passed_receipt",
+  "resolved_delta": 0,
+  "schema_version": "r5_night05_change_log_v1",
+  "silent_rewrite_used": false,
+  "stable_receipt_sha256": "4d18837a1950ac709a162c5b8d3fc45bc9922bd4bd387dc87ae5ac4320433659",
+  "starting_resolved": 0
+}

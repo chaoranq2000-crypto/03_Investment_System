@@ -1,0 +1,26 @@
+schema_version: r5_night05_execution_package_manifest_v1
+package_id: R5_Overnight_Mission_05_20260723
+mission_id: r5_overnight_05_20260723
+source:
+  mission_id: r5_overnight_04_20260722
+  commit: d0fc0fb735f0f581619e330b3fa6f1ef1914a276
+  branch: codex/r5-night04-review-acceleration-and-unlock
+  ci_run_id: 29764207418
+  ci_conclusion: success
+  original_seed_plan_yaml_sha256: 2b799c96892620a1c0c598cffbc99142665799aa965093d9263d22786dd5b603
+  original_seed_plan_md_sha256: 29ede29c6add3330dcd1588fba1cbbdf864d76a2b1dbd0d109b3a4dfdba56119
+  original_remote_delivery_receipt_sha256: 5cafc0188630552535eeae6a80c63bc179eaa3ca1f46683dd7925f75dee7da95
+target:
+  branch: codex/r5-night05-external-review-intake
+  worktree: C:/Projects/03_Investment_System_night05
+publication:
+  push_target_branch_only: true
+  create_pr: false
+  merge_main: false
+  force_push: false
+truth_boundary:
+  candidate_is_not_resolution: true
+  approval_is_not_passed_receipt: true
+  machine_may_populate_human_decision_fields: false
+  zero_input_outcome: review_intake_ready
+
