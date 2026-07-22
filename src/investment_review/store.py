@@ -18,6 +18,7 @@ from .behavior_hypothesis_candidates import (
     validate_behavior_hypothesis_review_event,
 )
 from .behavior_observation_protocols import (
+    project_observation_protocol_state,
     replay_validate_observation_protocol,
     validate_observation_protocol_review_event,
 )
@@ -1543,6 +1544,9 @@ class ReviewStore:
         *,
         protocol_id: str | None = None,
         candidate_id: str | None = None,
+        status: str | None = None,
+        as_of: str | None = None,
+        knowledge_cutoff: str | None = None,
         created_from: str | None = None,
         created_to: str | None = None,
     ) -> list[dict[str, Any]]:
@@ -1556,6 +1560,20 @@ class ReviewStore:
             if value is not None:
                 filters.append(f"{column} = ?")
                 params.append(value)
+        normalized_as_of = (
+            _canonical_timestamp(as_of, "as_of") if as_of is not None else None
+        )
+        normalized_cutoff = (
+            _canonical_timestamp(knowledge_cutoff, "knowledge_cutoff")
+            if knowledge_cutoff is not None
+            else None
+        )
+        if normalized_as_of is not None:
+            filters.append("effective_at <= ?")
+            params.append(normalized_as_of)
+        if normalized_cutoff is not None:
+            filters.append("knowledge_at <= ?")
+            params.append(normalized_cutoff)
         if created_from is not None:
             filters.append("created_at >= ?")
             params.append(_canonical_timestamp(created_from, "created_from"))
@@ -1570,7 +1588,33 @@ class ReviewStore:
                 + " ORDER BY created_at, protocol_id",
                 params,
             ).fetchall()
-        return [json.loads(row["payload_json"]) for row in rows]
+        result: list[dict[str, Any]] = []
+        for row in rows:
+            protocol = json.loads(row["payload_json"])
+            events = self.list_observation_protocol_review_events(
+                protocol_id=protocol["protocol_id"],
+                as_of=normalized_as_of,
+                knowledge_cutoff=normalized_cutoff,
+            )
+            projection = project_observation_protocol_state(
+                protocol,
+                events,
+                as_of=normalized_as_of or "9999-12-31T23:59:59Z",
+                knowledge_cutoff=normalized_cutoff or "9999-12-31T23:59:59Z",
+            )
+            if status is not None and projection["status"] != status:
+                continue
+            result.append(
+                {
+                    "protocol": protocol,
+                    "projected_status": projection["status"],
+                    "projection": projection,
+                    "visible_review_event_ids": [
+                        event["protocol_review_event_id"] for event in events
+                    ],
+                }
+            )
+        return result
 
     def save_observation_protocol_review_event(
         self, event: Mapping[str, Any]
@@ -1643,6 +1687,24 @@ class ReviewStore:
                     raise ReviewStoreError(
                         "Protocol event knowledge_at cannot precede the protocol"
                     )
+                if event["event_type"] != "note_added":
+                    concurrent = conn.execute(
+                        "SELECT protocol_review_event_id "
+                        "FROM behavior_observation_protocol_review_events "
+                        "WHERE protocol_id = ? AND event_type != 'note_added' "
+                        "AND effective_at = ? AND knowledge_at = ? AND reviewed_at = ?",
+                        (
+                            protocol_id,
+                            event["effective_at"],
+                            event["knowledge_at"],
+                            event["reviewed_at"],
+                        ),
+                    ).fetchone()
+                    if concurrent is not None:
+                        raise ReviewStoreError(
+                            "CONCURRENT_PROTOCOL_STATE_EVENTS: another state event "
+                            "already uses the same semantic time"
+                        )
                 supersedes_event_id = event.get("supersedes_event_id")
                 if supersedes_event_id is not None:
                     prior = conn.execute(
@@ -1773,6 +1835,43 @@ class ReviewStore:
                 params,
             ).fetchall()
         return [json.loads(row["payload_json"]) for row in rows]
+
+    def project_observation_protocol(
+        self,
+        protocol_id: str,
+        *,
+        as_of: str,
+        knowledge_cutoff: str,
+    ) -> dict[str, Any]:
+        protocol = self.get_observation_protocol(protocol_id)
+        events = self.list_observation_protocol_review_events(
+            protocol_id=protocol_id,
+            as_of=as_of,
+            knowledge_cutoff=knowledge_cutoff,
+        )
+        return project_observation_protocol_state(
+            protocol,
+            events,
+            as_of=as_of,
+            knowledge_cutoff=knowledge_cutoff,
+        )
+
+    def replay_observation_protocol(
+        self,
+        protocol_id: str,
+        *,
+        candidate_source_artifacts: Sequence[Mapping[str, Any]],
+    ) -> dict[str, Any]:
+        protocol = self.get_observation_protocol(protocol_id)
+        candidate_id = protocol["candidate_binding"]["candidate_id"]
+        return replay_validate_observation_protocol(
+            protocol,
+            candidate=self.get_behavior_hypothesis_candidate(candidate_id),
+            review_events=self.list_behavior_hypothesis_review_events(
+                candidate_id=candidate_id
+            ),
+            candidate_source_artifacts=candidate_source_artifacts,
+        )
 
     def status(self) -> dict[str, Any]:
         self._ensure_initialized()

@@ -244,12 +244,17 @@ def test_protocol_ingest_is_source_replayed_create_only_and_queryable(tmp_path: 
     assert first["status"] == "INSERTED"
     assert second["status"] == "SKIPPED"
     assert store.get_observation_protocol(protocol["protocol_id"]) == protocol
-    assert store.list_observation_protocols(
+    listed = store.list_observation_protocols(
         protocol_id=protocol["protocol_id"],
         candidate_id=candidate["candidate_id"],
+        status="draft",
+        as_of="2026-07-20T15:00:00Z",
+        knowledge_cutoff="2026-07-20T15:00:00Z",
         created_from="2026-07-20T15:00:00Z",
         created_to="2026-07-20T15:00:00Z",
-    ) == [protocol]
+    )
+    assert listed[0]["protocol"] == protocol
+    assert listed[0]["projected_status"] == "draft"
     assert canonical_json_bytes(store.get_behavior_hypothesis_candidate(candidate["candidate_id"])) == candidate_before
     assert canonical_json_bytes(source) == source_before
 

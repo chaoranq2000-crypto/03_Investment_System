@@ -1481,3 +1481,314 @@ def validate_observation_protocol_review_event(
         },
     )
 
+
+_PROTOCOL_STATE_TRANSITIONS: dict[str, dict[str, str]] = {
+    "draft": {"submitted": "submitted"},
+    "submitted": {
+        "approved_for_observation": "approved_for_observation",
+        "abandoned": "abandoned",
+        "superseded": "superseded",
+    },
+    "approved_for_observation": {
+        "activated": "active",
+        "abandoned": "abandoned",
+        "superseded": "superseded",
+    },
+    "active": {
+        "paused": "paused",
+        "completed": "completed",
+        "abandoned": "abandoned",
+        "superseded": "superseded",
+    },
+    "paused": {
+        "activated": "active",
+        "completed": "completed",
+        "abandoned": "abandoned",
+        "superseded": "superseded",
+    },
+    "completed": {"superseded": "superseded"},
+    "abandoned": {"superseded": "superseded"},
+    "superseded": {},
+}
+
+
+def observation_protocol_review_event_sort_key(
+    event: Mapping[str, Any],
+) -> tuple[str, str, str, str]:
+    """Return the frozen effective/knowledge/review/identity event order."""
+
+    return (
+        str(event.get("effective_at") or ""),
+        str(event.get("knowledge_at") or ""),
+        str(event.get("reviewed_at") or ""),
+        str(event.get("protocol_review_event_id") or ""),
+    )
+
+
+def _projection_error(code: str, message: str) -> None:
+    raise ObservationProtocolProjectionError(code, message)
+
+
+def _prepare_protocol_events(
+    protocol: Mapping[str, Any],
+    review_events: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    protocol_id = str(protocol.get("protocol_id") or "")
+    by_id: dict[str, tuple[bytes, dict[str, Any]]] = {}
+    for raw in review_events:
+        if not isinstance(raw, Mapping):
+            _projection_error(
+                "PROTOCOL_REVIEW_EVENT_INVALID", "review event must be an object"
+            )
+        event = deepcopy(dict(raw))
+        event_id = str(event.get("protocol_review_event_id") or "")
+        serialized = canonical_json_bytes(event)
+        existing = by_id.get(event_id)
+        if existing is not None:
+            if existing[0] != serialized:
+                _projection_error(
+                    "PROTOCOL_REVIEW_EVENT_ID_CONFLICT",
+                    f"protocol review event {event_id} has divergent payloads",
+                )
+            continue
+        validation = validate_observation_protocol_review_event(event)
+        if validation["validation_status"] != "accepted":
+            _projection_error(
+                "PROTOCOL_REVIEW_EVENT_INVALID",
+                ", ".join(validation["finding_codes"]),
+            )
+        if event["protocol_id"] != protocol_id:
+            _projection_error(
+                "ORPHAN_PROTOCOL_REVIEW_EVENT",
+                f"event {event_id} targets another protocol",
+            )
+        by_id[event_id] = (serialized, event)
+    return sorted(
+        (item[1] for item in by_id.values()),
+        key=observation_protocol_review_event_sort_key,
+    )
+
+
+def project_observation_protocol_state(
+    protocol: Mapping[str, Any],
+    review_events: Sequence[Mapping[str, Any]],
+    *,
+    as_of: str,
+    knowledge_cutoff: str,
+) -> dict[str, Any]:
+    """Project one deterministic lifecycle state from the immutable event set."""
+
+    protocol_validation = validate_observation_protocol(protocol)
+    if protocol_validation["validation_status"] != "accepted":
+        _projection_error(
+            "PROTOCOL_INVALID", ", ".join(protocol_validation["finding_codes"])
+        )
+    normalized_as_of = _canonical_timestamp(as_of, "as_of")
+    normalized_cutoff = _canonical_timestamp(knowledge_cutoff, "knowledge_cutoff")
+    if str(protocol["effective_at"]) > normalized_as_of:
+        _projection_error(
+            "PROTOCOL_NOT_EFFECTIVE",
+            "protocol is not effective at the requested as_of",
+        )
+    if str(protocol["knowledge_at"]) > normalized_cutoff:
+        _projection_error(
+            "PROTOCOL_NOT_KNOWN",
+            "protocol is not known at the requested knowledge_cutoff",
+        )
+
+    prepared = _prepare_protocol_events(protocol, review_events)
+    visible = [
+        event
+        for event in prepared
+        if event["effective_at"] <= normalized_as_of
+        and event["knowledge_at"] <= normalized_cutoff
+    ]
+    state_groups: dict[tuple[str, str, str], list[str]] = {}
+    for event in visible:
+        if event["event_type"] == "note_added":
+            continue
+        group_key = (
+            event["effective_at"],
+            event["knowledge_at"],
+            event["reviewed_at"],
+        )
+        state_groups.setdefault(group_key, []).append(
+            event["protocol_review_event_id"]
+        )
+    if any(len(ids) > 1 for ids in state_groups.values()):
+        _projection_error(
+            "CONCURRENT_PROTOCOL_STATE_EVENTS",
+            "multiple state-changing events share the same semantic time",
+        )
+
+    status = "draft"
+    applied_event_ids: list[str] = []
+    applied_id_set: set[str] = set()
+    protocol_effective_at = str(protocol["effective_at"])
+    protocol_knowledge_at = str(protocol["knowledge_at"])
+    protocol_created_at = str(protocol["created_at"])
+    expiry_at = str(protocol["expiry_at"])
+    for event in visible:
+        event_id = str(event["protocol_review_event_id"])
+        if event["effective_at"] < protocol_effective_at:
+            _projection_error(
+                "EVENT_EFFECTIVE_BEFORE_PROTOCOL",
+                f"event {event_id} is effective before its protocol",
+            )
+        if event["knowledge_at"] < protocol_knowledge_at:
+            _projection_error(
+                "EVENT_KNOWN_BEFORE_PROTOCOL",
+                f"event {event_id} is known before its protocol",
+            )
+        if event["reviewed_at"] < protocol_created_at:
+            _projection_error(
+                "EVENT_REVIEWED_BEFORE_PROTOCOL",
+                f"event {event_id} was reviewed before protocol creation",
+            )
+        if event["evidence_cutoff"] < protocol_knowledge_at:
+            _projection_error(
+                "EVIDENCE_CUTOFF_BEFORE_PROTOCOL",
+                f"event {event_id} excludes protocol-visible evidence",
+            )
+
+        event_type = str(event["event_type"])
+        if (
+            event["effective_at"] >= expiry_at
+            and event_type
+            in {"approved_for_observation", "activated", "paused"}
+        ):
+            _projection_error(
+                "PROTOCOL_EXPIRED",
+                f"{event_type} cannot become effective at or after expiry",
+            )
+        if event_type == "note_added":
+            if status == "draft":
+                _projection_error(
+                    "INVALID_PROTOCOL_TRANSITION",
+                    "note_added requires a submitted protocol",
+                )
+        else:
+            next_status = _PROTOCOL_STATE_TRANSITIONS.get(status, {}).get(event_type)
+            if next_status is None:
+                _projection_error(
+                    "INVALID_PROTOCOL_TRANSITION",
+                    f"{status} cannot transition through {event_type}",
+                )
+            if event_type == "superseded":
+                supersedes_event_id = event.get("supersedes_event_id")
+                if supersedes_event_id not in applied_id_set:
+                    _projection_error(
+                        "PROTOCOL_SUPERSESSION_EVENT_NOT_VISIBLE",
+                        "supersedes_event_id must reference an earlier visible event",
+                    )
+                if event.get("superseded_by_protocol_id") == protocol["protocol_id"]:
+                    _projection_error(
+                        "PROTOCOL_SELF_SUPERSESSION_INVALID",
+                        "a protocol cannot supersede itself",
+                    )
+            status = next_status
+        applied_event_ids.append(event_id)
+        applied_id_set.add(event_id)
+
+    material = {
+        "schema_version": PROTOCOL_PROJECTION_SCHEMA_VERSION,
+        "artifact_type": "observation_protocol_projection",
+        "protocol_id": protocol["protocol_id"],
+        "candidate_id": protocol["candidate_binding"]["candidate_id"],
+        "status": status,
+        "expiry_state": (
+            "expired" if normalized_as_of >= expiry_at else "not_expired"
+        ),
+        "as_of": normalized_as_of,
+        "knowledge_cutoff": normalized_cutoff,
+        "applied_event_ids": applied_event_ids,
+        "last_event_id": applied_event_ids[-1] if applied_event_ids else None,
+        "state_semantics": PROTOCOL_STATE_SEMANTICS,
+    }
+    projection = {**material, "canonical_hash": _canonical_hash(material)}
+    schema_findings = _schema_findings(
+        projection,
+        PROTOCOL_PROJECTION_SCHEMA_PATH,
+        "PROTOCOL_PROJECTION_SCHEMA_INVALID",
+    )
+    if schema_findings:
+        _projection_error(
+            "PROTOCOL_PROJECTION_SCHEMA_INVALID",
+            ", ".join(item["message"] for item in schema_findings),
+        )
+    return projection
+
+
+def validate_observation_protocol_projection(
+    projection: Mapping[str, Any],
+) -> dict[str, Any]:
+    findings = _schema_findings(
+        projection,
+        PROTOCOL_PROJECTION_SCHEMA_PATH,
+        "PROTOCOL_PROJECTION_SCHEMA_INVALID",
+    )
+    material = deepcopy(dict(projection))
+    declared = material.pop("canonical_hash", None)
+    try:
+        actual = _canonical_hash(material)
+    except Exception as exc:
+        findings.append(_finding("PROTOCOL_PROJECTION_CANONICALIZATION_FAILED", str(exc)))
+    else:
+        if actual != declared:
+            findings.append(
+                _finding(
+                    "PROTOCOL_PROJECTION_HASH_MISMATCH",
+                    "projection hash does not match canonical content",
+                    "$.canonical_hash",
+                )
+            )
+    return _validation(
+        PROTOCOL_LEDGER_VALIDATION_SCHEMA_VERSION,
+        findings,
+        identity={
+            "protocol_id": str(projection.get("protocol_id") or ""),
+            "canonical_hash": str(projection.get("canonical_hash") or ""),
+        },
+    )
+
+
+def validate_observation_protocol_ledger(
+    protocol: Mapping[str, Any],
+    review_events: Sequence[Mapping[str, Any]],
+    *,
+    as_of: str,
+    knowledge_cutoff: str,
+) -> dict[str, Any]:
+    """Return a stable validation envelope for a protocol lifecycle ledger."""
+
+    try:
+        projection = project_observation_protocol_state(
+            protocol,
+            review_events,
+            as_of=as_of,
+            knowledge_cutoff=knowledge_cutoff,
+        )
+    except ObservationProtocolProjectionError as exc:
+        return {
+            "schema_version": PROTOCOL_LEDGER_VALIDATION_SCHEMA_VERSION,
+            "validation_status": "blocked",
+            "protocol_id": str(protocol.get("protocol_id") or ""),
+            "projection": None,
+            "findings": [
+                {
+                    "severity": "blocker",
+                    "code": exc.code,
+                    "message": str(exc),
+                    "path": "$.review_events",
+                }
+            ],
+            "finding_codes": [exc.code],
+        }
+    return {
+        "schema_version": PROTOCOL_LEDGER_VALIDATION_SCHEMA_VERSION,
+        "validation_status": "accepted",
+        "protocol_id": protocol["protocol_id"],
+        "projection": projection,
+        "findings": [],
+        "finding_codes": [],
+    }
