@@ -18,7 +18,7 @@
 | `system_v1_complete` | true | engineering validation | P1–P5, final V-001–V-010, scope and active-root criteria pass; this does not imply sample, P2 or release readiness. |
 | `sample_quality_ready` | false | current sample evidence and required human review | The canonical 002837 material gaps remain external truth; no value is fabricated. |
 | `p2_ready` | false | `comparison_readiness_gate` | P2 is outside this stage and is not entered. |
-| `release_ready` | false | exact-head remote and CI evidence | Candidate branch has not been pushed or verified yet. |
+| `release_ready` | false | exact-head remote and CI evidence | The first candidate failed standard CI on checkout-dependent hashes; the repaired candidate has not yet been pushed or verified. |
 
 The long-term Goal `r5_bundle17r_bf2_four_case_activation` remains open. Night mission outcome
 `review_intake_ready` is historical mission evidence only and is not a canonical workflow status.
@@ -105,23 +105,23 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 
 - status: `complete`
 - isolation: the explicit source is `reports/workflow_runs/wf_20260703_stock_first_002837_invic/`; the only write target is `reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/`. The hardcoded Bundle11R close, legacy backflow writer, live adapters, raw copies and historical human-review artifacts were not used.
-- real inputs: two reviewed official disclosures and two real Tushare structured snapshots are bound by raw and processed paths/hashes. The structured rows remain `draft` and `metric_only`; 136 candidates are copied run-locally and none is promoted.
+- real inputs: two reviewed official disclosures and two real Tushare structured snapshots are bound by raw and processed paths/hashes. Raw and structured files use `file_bytes`; processed text uses `canonical_lf_text_bytes`, so equivalent LF/CRLF checkouts retain one explicit content hash. The structured rows remain `draft` and `metric_only`; 136 candidates are copied run-locally and none is promoted.
 - recomputation: the Bundle13R pure chain revalidated the Bundle12R context, rebuilt the 21-item queue, validated the reviewed backfill and exactly matched the archived result: `backflow_execution_in_progress`, 6 resolved, 11 unresolved, validation issue/blocker count 0.
 - research truth: the new canonical state is `needs_fix`; G3 and G6 fail non-compensating checks. The exact four source high issues remain open with owners and next steps. No old reviewer decision, Reader acceptance, sample-quality or P2 state is inherited.
 - control plane: the standard six files plus run-scoped provenance, research, exposure, backflow and validation artifacts are indexed in a 16-row manifest. Every non-self-recursive artifact has a verifiable hash.
-- determinism: each command performs two internal materializations with zero drift. Two independent command invocations also produced an identical 16-file tree without timestamp normalization; semantic digest `afc8ed3b96dd47c6d58c8dd0f3cb6912cfc7a89d538fe8b041b7fbc587e110ae`.
-- validation: replay contract 6 passed; exact V-005 14-path selection 37 passed; V-006 returned `OK`; package integrity, old-run no-diff, V-009 and `git diff --check` passed. Machine summary: `reports/p1_6/r5_v1_convergence/validation/p4_replay_validation.yaml`.
+- determinism: each command performs two internal materializations with zero drift. Two independent command invocations also produced an identical 16-file tree without timestamp normalization; the digest binds both hash values and their declared scopes and is `100b45bcac21f1bbcb12bce0028f9c46635fddd579eadd4ad85f32a639beb9ba`.
+- validation: replay contract 7 passed, including explicit LF/CRLF equivalence; exact V-005 14-path selection 38 passed; V-006 returned `OK`; package integrity, old-run no-diff, V-009 and `git diff --check` passed. Machine summary: `reports/p1_6/r5_v1_convergence/validation/p4_replay_validation.yaml`.
 - checkpoint: `a256d6e1afed85642f96a4427a55d7492bb62cd4` (`test(v1): replay 002837 closed loop`).
 
 ### P5 — Consolidate 63 blocker occurrences into actionable roots
 
 - status: `complete`
-- immutable baseline: Night02 has 63 unique unresolved occurrence IDs, 20 dependency-blocked occurrence nodes, six parent work orders, 69 DAG nodes and 532 edges. Night04/Night05 preserve 43 candidate-ready, 20 dependency-blocked, six parent-pending and zero resolved; candidate classification, review packets and pointer dry-runs remain non-resolution evidence.
+- immutable baseline: Night02 has 63 unique unresolved occurrence IDs, 20 dependency-blocked occurrence nodes, six parent work orders, 69 DAG nodes and 532 edges. The 19 historical source bindings are SHA-256 values of `source_baseline:path` Git blob bytes, independent of checkout EOL conversion. Night04/Night05 preserve 43 candidate-ready, 20 dependency-blocked, six parent-pending and zero resolved; candidate classification, review packets and pointer dry-runs remain non-resolution evidence.
 - root result: every occurrence has exactly one primary root while all original `BF17R-I-*`, `BF17R-WO-*` and `ns02_t30_*` IDs remain present. Seven roots replace occurrence counting: three human-judgment roots, one obtainable-evidence root and three historical engineering roots. The `issuer_not_disclosed` root count is zero because zero reviewed official sources cannot prove issuer non-disclosure.
 - relationship result: the 20 dependency occurrences remain downstream nodes with their exact 10/43 prerequisites; the six parents remain separate aggregators. All 532 `blocked_by` edges match the frozen DAG and are acyclic. Six `duplicate_of` edges capture the two pointer semantic variants proven by Night04 without dropping any occurrence.
 - engineering result: the quality-case alias mismatch and the two pointer-contract variants remain openly recorded, not falsely resolved. Their source artifacts are historical unmarked Bundle16R/17R compatibility outputs; P3 active-control tests and the isolated P4 replay prove `affects_system_v1=false`. Therefore open active-V1 engineering root count is zero while open historical engineering root count is three.
 - external truth: authority/accepted decisions/independent receipts, case analysis, reviewed evidence and suite exact-hash review remain open with explicit owners and next steps. The long-term Goal remains `open_needs_targeted_backflow`; sample quality and P2 remain false.
-- validation: strict dependency-free schema and V-007 passed 7; doc drift passed; source-route passed with 17 capabilities and zero blocking; V-003 passed 210; V-004 passed 160; V-005 passed 37; V-006 returned `OK`; full repository pytest passed 1183 with two existing skips and zero failures/errors. All protected-path, ancestry, whitespace, contract-hash and phase-allowlist guards passed. Machine summary: `reports/p1_6/r5_v1_convergence/validation/p5_blocker_root_cause_validation.yaml`.
+- validation: strict dependency-free schema and V-007 passed 7; doc drift passed; source-route passed with 17 capabilities and zero blocking; V-003 passed 210; V-004 passed 160; V-005 passed 38; V-006 returned `OK`; full repository pytest passed 1184 with two existing skips and zero failures/errors. All protected-path, ancestry, whitespace, contract-hash and phase-allowlist guards passed. Machine summary: `reports/p1_6/r5_v1_convergence/validation/p5_blocker_root_cause_validation.yaml`.
 - checkpoint: `7598801a291b288d1c0d9e78f3b9037a629ed17e` (`docs(v1): classify blockers and close convergence`).
 
 ### Open root causes retained after P5
@@ -139,8 +139,8 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 ## Final local validation
 
 - decision: `pass`
-- exact matrix: V-001 doc drift passed; V-002 final source-route passed with 17 capabilities and zero blocking issues; V-003 Night passed 210; V-004 Bundle14R–17R passed 160; V-005 exact 14-path 002837 selection passed 37; V-006 returned `OK`; V-007 passed 7; V-008 and V-009 are empty/pass; V-010 passed 1183 with two existing skips and zero failures/errors.
-- lineage and scope: Night05 baseline remains an ancestor. The six pre-validation commits after it are exactly setup plus P1–P5. Protected history, raw data, old 002837 state, AGENTS, CI workflows and dependencies have no diff or worktree change.
+- exact matrix after the cross-platform repair: V-001 doc drift passed; V-002 final source-route passed with 17 capabilities and zero blocking issues; V-003 Night passed 210; V-004 Bundle14R–17R passed 160; V-005 exact 14-path 002837 selection passed 38; V-006 returned `OK`; V-007 passed 7; V-008 and V-009 are empty/pass; V-010 passed 1184 with two existing skips and zero failures/errors.
+- lineage and scope: Night05 baseline remains an ancestor. The seven commits currently after it are setup, P1–P5 and the first final-validation checkpoint; the pending repair checkpoint will be the eighth. Protected history, raw data, old 002837 state, AGENTS, CI workflows and dependencies have no diff or worktree change.
 - engineering completion: all C-ENG and C-SCOPE criteria pass; the root map has zero open active-V1 engineering defects. Therefore `system_v1_complete=true` independently of the external facts.
 - external facts: `sample_quality_ready=false`, `p2_ready=false`, and the long-term four-case Goal remains open. These are truthful retained states, not validation failures.
 - release boundary: `release_ready=false` until the candidate checkpoint and completion-only checkpoint both pass exact-head GitHub CI. CI receipts and the final remote SHA are deliberately kept out of Git and will be reported in the external handoff.
@@ -168,21 +168,21 @@ Active issue rows now keep the canonical owner in `gate_id`, the local id in
 | V-003 P3 Night baseline | pass | Full Night/Baseline suite: 210 passed in 44.25 seconds. One approval attempt timed out before launch; the retry completed with zero failures. |
 | V-004 P3 Bundle baseline | pass | Full Bundle14R–17R suite: 160 passed in 14.50 seconds. |
 | P3 state / scope | pass | Strict V1 template returned OK; protected 002837 state returned OK in legacy compatibility mode with identical hash; V-009, `git diff --check`, package integrity and exact phase allowlist passed. |
-| P4 replay contract | pass | New replay tests: 6 passed in 1.50s; source hashes, six-piece control plane, honest gaps, manifest completeness, source isolation and checked-in determinism were proven. |
-| V-005 002837 focused selection | pass | All 14 exact contract paths existed and passed: 37 passed in 4.09s. |
+| P4 replay contract | pass | Replay tests: 7 passed in 1.58s; source hash scopes, scope-bound semantic digest, LF/CRLF equivalence, six-piece control plane, honest gaps, manifest completeness, source isolation and checked-in determinism were proven. |
+| V-005 002837 focused selection | pass | All 14 exact contract paths existed and passed: 38 passed in 4.13s. |
 | V-006 replay canonical state | pass | Strict validator returned `OK`; state is `needs_fix`, with unique G0–G10 rows and four open high G3/G6 issues. |
 | P4 second replay / scope | pass | Two independent invocations produced the same semantic digest and identical 16-file tree; old-run worktree/baseline diffs and V-009 were empty; `git diff --check` passed. |
-| V-007 blocker root map | pass | Dependency-free strict schema and seven tests validate 63/20/6/69/43/0, 69 nodes, 532 exact edges, six proven duplicate references, source hashes, no cycles/orphans/fake resolutions and zero open active-V1 engineering roots. |
+| V-007 blocker root map | pass | Dependency-free strict schema and seven tests validate 63/20/6/69/43/0, 69 nodes, 532 exact edges, six proven duplicate references, frozen-baseline Git-blob source hashes, no cycles/orphans/fake resolutions and zero open active-V1 engineering roots. |
 | P5 source route | pass | Distinct P5 report: decision `pass`, 17 capabilities and zero blocking issues. |
-| V-003/V-004/V-005 P5 | pass | Night 210, Bundle14R–17R 160, and exact 14-path 002837 selection 37 passed with zero failures/errors. |
+| V-003/V-004/V-005 P5 | pass | Night 210, Bundle14R–17R 160, and exact 14-path 002837 selection 38 passed with zero failures/errors. |
 | V-001/V-006 P5 | pass | Doc drift passed and the isolated replay canonical state returned `OK`. |
-| P5 full repository | pass | 1183 passed, two existing skips, zero failures/errors in 94.05 seconds. |
+| P5 full repository | pass | 1184 passed, two existing skips, zero failures/errors in 94.42 seconds. |
 | P5 scope and integrity | pass | Baseline ancestry, V-008, V-009, protected worktree status, contract hash, package validation and exact P5 allowlist passed. |
 | V-001–V-002 final | pass | Doc drift passed; final source-route report passed with 17 capabilities and zero blocking issues. |
-| V-003–V-007 final | pass | Night 210, Bundle 160, exact 002837 37 and root-map 7 passed; canonical replay state returned `OK`. |
-| V-008–V-010 final | pass | Baseline whitespace/protected-path audits are empty; full pytest passed 1183 with two existing skips and zero failures/errors in 93.46 seconds. |
+| V-003–V-007 final | pass | Night 210, Bundle 160, exact 002837 38 and root-map 7 passed; canonical replay state returned `OK`. |
+| V-008–V-010 final | pass | Baseline whitespace/protected-path audits are empty; full pytest passed 1184 with two existing skips and zero failures/errors in 94.42 seconds. |
 | V-012 final package | pass | `--require-ready` returned `ok: true`, state `running`, expected contract hash, P1–P5 and no warnings/errors. |
-| V-011 release | pending | Candidate branch has not yet been pushed; exact-head CI evidence is intentionally external to this readout. |
+| V-011 release | pending | First exact-head candidate `a7da7fcf70fae3cf5a25454b91043590792b8f7b` had three successful focused workflows but standard CI exposed two CRLF/LF hash defects (1181 passed, two failed, two skipped). That failure was not rerun; the repaired candidate still requires an ordinary push and fresh exact-head CI. URLs remain external to this readout. |
 
 ## Scope and historical immutability
 

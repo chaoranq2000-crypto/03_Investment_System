@@ -2,7 +2,7 @@ schema_version: 1
 artifact_type: r5_v1_convergence_p5_blocker_root_cause_validation
 task_id: r5_v1_convergence
 phase: P5
-validated_at: '2026-07-23T05:07:12+08:00'
+validated_at: '2026-07-23T05:53:34+08:00'
 decision: pass
 contract:
   path: docs/codex_tasks/r5_v1_convergence/CONTRACT.md
@@ -21,6 +21,8 @@ contract:
 root_map:
   path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
   schema_path: schemas/r5_v1_blocker_root_cause_map.schema.json
+  source_baseline: a96c1b717bf15905d72fd142efd946fa01bce666
+  source_hash_representation: git_blob_bytes
   source_binding_count: 19
   root_cause_count: 7
   category_root_counts:
@@ -63,7 +65,7 @@ tests:
     command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q -p no:cacheprovider tests\test_r5_v1_blocker_root_cause_map.py
     passed: 7
     failed: 0
-    duration_seconds: 1.13
+    duration_seconds: 2.18
   v001_doc_drift:
     command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B scripts\check_doc_drift.py
     result: Doc drift check passed.
@@ -76,27 +78,27 @@ tests:
     selection: all tests/test_r5_night_shift_*.py
     passed: 210
     failed: 0
-    duration_seconds: 43.93
+    duration_seconds: 44.25
   v004_bundle:
     selection: all tests matching ^test_r5_bundle(14r|15r|16r|17r).*\.py$
     passed: 160
     failed: 0
-    duration_seconds: 14.96
+    duration_seconds: 14.24
   v005_002837:
     selection: 14 exact contract paths
-    passed: 37
+    passed: 38
     failed: 0
-    duration_seconds: 4.17
+    duration_seconds: 4.13
   v006_canonical_state:
     command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B .agents\skills\research-orchestrator\scripts\validate_workflow_state.py reports\workflow_runs\wf_20260723_stock_first_002837_v1_replay\workflow_state.yaml
     result: OK
   full_repository_p5:
     command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q -p no:cacheprovider
-    passed: 1183
+    passed: 1184
     skipped: 2
     failed: 0
     errors: 0
-    duration_seconds: 94.05
+    duration_seconds: 94.42
 guards:
   source_baseline_is_ancestor: true
   v008_checkpoint_diff_check: pass

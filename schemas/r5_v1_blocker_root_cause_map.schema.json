@@ -8,6 +8,7 @@
     "schema_version",
     "task_id",
     "source_baseline",
+    "source_hash_representation",
     "source_bindings",
     "truth_boundary",
     "reconciliation",
@@ -19,7 +20,8 @@
   "properties": {
     "schema_version": {"const": "r5_v1_blocker_root_cause_map_v1"},
     "task_id": {"const": "r5_v1_convergence"},
-    "source_baseline": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_baseline": {"const": "a96c1b717bf15905d72fd142efd946fa01bce666"},
+    "source_hash_representation": {"const": "git_blob_bytes"},
     "source_bindings": {
       "type": "array",
       "minItems": 1,

@@ -2,7 +2,7 @@ schema_version: 1
 artifact_type: r5_v1_convergence_p4_replay_validation
 task_id: r5_v1_convergence
 phase: P4
-validated_at: '2026-07-23T04:31:33+08:00'
+validated_at: '2026-07-23T05:53:34+08:00'
 decision: pass
 contract:
   path: docs/codex_tasks/r5_v1_convergence/CONTRACT.md
@@ -28,7 +28,7 @@ replay:
     recomputed_result: backflow_execution_in_progress
     evidence_count: 4
     metric_candidate_count: 136
-    semantic_content_sha256: afc8ed3b96dd47c6d58c8dd0f3cb6912cfc7a89d538fe8b041b7fbc587e110ae
+    semantic_content_sha256: 100b45bcac21f1bbcb12bce0028f9c46635fddd579eadd4ad85f32a639beb9ba
     internal_semantic_drift_count: 0
   second_invocation:
     exit_code: 0
@@ -36,7 +36,7 @@ replay:
     recomputed_result: backflow_execution_in_progress
     evidence_count: 4
     metric_candidate_count: 136
-    semantic_content_sha256: afc8ed3b96dd47c6d58c8dd0f3cb6912cfc7a89d538fe8b041b7fbc587e110ae
+    semantic_content_sha256: 100b45bcac21f1bbcb12bce0028f9c46635fddd579eadd4ad85f32a639beb9ba
     internal_semantic_drift_count: 0
   external_tree_comparison:
     compared_file_count: 16
@@ -57,6 +57,11 @@ replay:
     old_workflow_written: false
     historical_human_review_transferred: false
     selected_raw_hashes_match_manifest: true
+    raw_hash_scope: file_bytes
+    processed_text_hash_scope: canonical_lf_text_bytes
+    processed_structured_hash_scope: file_bytes
+    cross_platform_line_ending_equivalence_proven: true
+    semantic_digest_binds_hash_scopes: true
 canonical_state:
   command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B .agents\skills\research-orchestrator\scripts\validate_workflow_state.py reports\workflow_runs\wf_20260723_stock_first_002837_v1_replay\workflow_state.yaml
   exit_code: 0
@@ -69,15 +74,15 @@ canonical_state:
 tests:
   replay_contract:
     command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q -p no:cacheprovider tests\test_r5_v1_replay_002837.py
-    passed: 6
+    passed: 7
     failed: 0
-    duration_seconds: 1.50
+    duration_seconds: 1.58
   v005_exact_14_paths:
     command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q -p no:cacheprovider <14 exact contract paths>
     path_count: 14
-    passed: 37
+    passed: 38
     failed: 0
-    duration_seconds: 4.09
+    duration_seconds: 4.13
 manifest:
   path: reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/artifact_manifest.csv
   artifact_count: 16

@@ -67,6 +67,15 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def sha256_for_scope(path: Path, scope: str) -> str:
+    if scope == "file_bytes":
+        return sha256_file(path)
+    if scope == "canonical_lf_text_bytes":
+        payload = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        return hashlib.sha256(payload).hexdigest()
+    raise AssertionError(f"unexpected hash scope: {scope!r}")
+
+
 def read_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
@@ -138,11 +147,40 @@ def test_replay_uses_real_hash_bound_read_only_sources(built_replay) -> None:
         assert "fixture" not in source_text
         source = ROOT / row["source_path"]
         assert source.is_file()
-        assert sha256_file(source) == row["expected_sha256"] == row["observed_sha256"]
+        assert row["source_hash_scope"] == "file_bytes"
+        assert (
+            sha256_for_scope(source, row["source_hash_scope"])
+            == row["expected_sha256"]
+            == row["observed_sha256"]
+        )
         if row["processed_path"]:
             processed = ROOT / row["processed_path"]
             assert processed.is_file()
-            assert sha256_file(processed) == row["processed_sha256"]
+            assert (
+                sha256_for_scope(processed, row["processed_hash_scope"])
+                == row["processed_sha256"]
+            )
+        else:
+            assert row["processed_hash_scope"] == ""
+            assert row["processed_sha256"] == ""
+
+    processed_by_evidence = {row["evidence_id"]: row for row in evidence_rows}
+    annual = processed_by_evidence["ev_annual_report_002837_20260421_2cbfc5"]
+    quarterly = processed_by_evidence["ev_quarterly_report_002837_20260421_2f00c7"]
+    assert annual["processed_hash_scope"] == "canonical_lf_text_bytes"
+    assert annual["processed_sha256"] == (
+        "503b62a47363ca5c985a22980e4eb36fe883821db92d1d9febe0fffb74224876"
+    )
+    assert quarterly["processed_hash_scope"] == "canonical_lf_text_bytes"
+    assert quarterly["processed_sha256"] == (
+        "884beb31af91df96dddf8383b157dcde95a3b348272d5f8883ed3f14c6a62f53"
+    )
+    structured_scopes = {
+        row["processed_hash_scope"]
+        for row in evidence_rows
+        if row["source_group"] == "structured_database"
+    }
+    assert structured_scopes == {"file_bytes"}
 
     expected_start = {
         "R5_bundle13r_close_readout.md": "b62e64cafcd93bf164c4f4ff76adde1f0d107510a0e39807411d082515f92e5c",
@@ -164,6 +202,48 @@ def test_replay_uses_real_hash_bound_read_only_sources(built_replay) -> None:
     assert pack["metric_boundary"]["promoted_metric_count"] == 0
     assert pack["metric_boundary"]["review_status"] == "draft"
     assert pack["bundle13r_replay"]["archived_result_match"] is True
+
+
+def test_processed_text_hash_is_stable_across_line_endings(tmp_path: Path) -> None:
+    runner = load_runner()
+    lf_path = tmp_path / "lf.txt"
+    crlf_path = tmp_path / "crlf.txt"
+    lf_path.write_bytes(b"alpha\nbeta\n")
+    crlf_path.write_bytes(b"alpha\r\nbeta\r\n")
+
+    lf_hash, lf_scope = runner.processed_input_hash(lf_path)
+    crlf_hash, crlf_scope = runner.processed_input_hash(crlf_path)
+
+    assert lf_scope == crlf_scope == "canonical_lf_text_bytes"
+    assert lf_hash == crlf_hash == hashlib.sha256(b"alpha\nbeta\n").hexdigest()
+
+    semantic_payload = runner.build_semantic_payload(
+        {},
+        [
+            {
+                "source_path": "raw.bin",
+                "source_hash_scope": "file_bytes",
+                "observed_sha256": "a" * 64,
+                "processed_path": "processed.txt",
+                "processed_hash_scope": "canonical_lf_text_bytes",
+                "processed_sha256": "b" * 64,
+            }
+        ],
+        {},
+        {},
+        {},
+        {},
+    )
+    assert semantic_payload["source_hashes"] == [
+        {
+            "path": "raw.bin",
+            "source_hash_scope": "file_bytes",
+            "sha256": "a" * 64,
+            "processed_path": "processed.txt",
+            "processed_hash_scope": "canonical_lf_text_bytes",
+            "processed_sha256": "b" * 64,
+        }
+    ]
 
 
 def test_replay_preserves_honest_research_gaps(built_replay) -> None:

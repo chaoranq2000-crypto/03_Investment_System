@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 import re
+import subprocess
 from collections import Counter, defaultdict, deque
 from pathlib import Path
 from typing import Any
@@ -39,27 +40,27 @@ EXPECTED_BINDINGS = {
     ),
     "night02_occurrence_inventory": (
         "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/occurrence_inventory.json",
-        "aa57d84ffae7798803c8604cc4150b79ee0b3fa5d0d59a9ef4559c34dff42ba6",
+        "839afc855ad77188468f4bbada7742cb7445759136cf4d6b8abc237ff5e27213",
     ),
     "night02_dependency_dag": (
         "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/dependency_dag.json",
-        "23ff698741c90de20c29aa0e425aaa3f50f1259569e5b5362c70540635490859",
+        "3e136a52b151c9763724bff6eb7a616672f03ce07742229435e11d6761905f6b",
     ),
     "night02_queue_metrics": (
         "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/backflow/queue_metrics.json",
-        "4d97d4251224f4050d8e1efd4dd2bdd2f75a495b42cec72a062d0b3f95bfa868",
+        "b5255f459c1ddd04e5906eec932a89b07b1cb794c024b952abc89dd97a5d6981",
     ),
     "night04_taxonomy_audit": (
         "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/queue/taxonomy_audit.json",
-        "ea626394ec7e1c9ae94f70359127ca81f02122e5aa3bab43263a6f63ed5f20a9",
+        "c1164b2a9360cfa6849b419d58f4eaf594f31c17d4f7edd5d964cf5f76769711",
     ),
     "night04_truth_snapshot": (
         "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/queue/truth_snapshot.json",
-        "139c6a30c67affdde6e49c12ef9f287fe3b72b28864dfc85f9a060bcb3993b18",
+        "e3213f17b14e4372e0f4a725e15b9ca331121579d842f05aed296eb11919990d",
     ),
     "night04_blocker_ledger": (
         "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/progress/blocker_ledger.json",
-        "221cfd76fdeac2163be1817ab5574af36e813d26021e52669d2d8235466b677d",
+        "c38601fb149f5c27c597d7f20e94750761473bdbf84c2e7b69b6e21598176d4c",
     ),
     "night04_candidate_registry": (
         "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/review_control/candidate_registry.yaml",
@@ -67,11 +68,11 @@ EXPECTED_BINDINGS = {
     ),
     "night04_dependency_recompute": (
         "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/execution/dependency_recompute.json",
-        "7e8b3b224e0a9be8f5185e8050e23b76570baa02d1155df6b174e35649cedac3",
+        "16dd2e9dd2819bb1e1edca85e3dbdf8de5615042318e7765e7ff4b45ca05a13a",
     ),
     "night04_parent_recompute": (
         "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/execution/parent_recompute.json",
-        "5506683b4e9a98e9c79570ac62cb0945768838410393592a121a23a1d3d8f2d4",
+        "b5f15cf264fc8c2d8a087ed1a3eb91fa3b91eec4466ec4c5bc2c507da455e3b8",
     ),
     "night04_pointer_conflict_matrix": (
         "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/conflict_matrix.yaml",
@@ -79,7 +80,7 @@ EXPECTED_BINDINGS = {
     ),
     "night04_pointer_dry_run_truth": (
         "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/dry_run_truth_receipt.json",
-        "a99818f7fdc64fb6e53c452bb2cf80cbc4a73dc146f2fa2e181d6e5901bff1bd",
+        "81aeaa4e4f326ab4e41ef7bb73a632dfbaaeaea6de5bdf9962c1fa9ad3354631",
     ),
     "night04_carry_forward_queue": (
         "reports/p1_6/r5_night_shift/r5_overnight_04_20260722/next_night_queue.yaml",
@@ -122,6 +123,14 @@ def load_json(path: Path) -> dict[str, Any]:
 
 def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def sha256_git_blob(revision: str, relative_path: str) -> str:
+    payload = subprocess.check_output(
+        ["git", "cat-file", "blob", f"{revision}:{relative_path}"],
+        cwd=ROOT,
+    )
+    return hashlib.sha256(payload).hexdigest()
 
 
 def canonical_json_bytes(value: Any) -> bytes:
@@ -248,17 +257,21 @@ def test_map_conforms_to_its_strict_dependency_free_schema() -> None:
         validate_schema(invalid, schema, schema)
 
 
-def test_all_source_bindings_are_exact_and_physically_hash_bound() -> None:
+def test_all_source_bindings_are_exact_and_frozen_baseline_blob_bound() -> None:
     document = load_yaml(MAP_PATH)
+    assert document["source_baseline"] == "a96c1b717bf15905d72fd142efd946fa01bce666"
+    assert document["source_hash_representation"] == "git_blob_bytes"
     bindings = {
         item["role"]: (item["path"], item["sha256"])
         for item in document["source_bindings"]
     }
     assert bindings == EXPECTED_BINDINGS
+    baseline = document["source_baseline"]
     for relative, expected_hash in bindings.values():
         source = ROOT / relative
         assert source.is_file(), relative
-        assert sha256_file(source) == expected_hash, relative
+        assert sha256_git_blob(baseline, relative) == expected_hash, relative
+        assert sha256_git_blob("HEAD", relative) == expected_hash, relative
 
 
 def test_occurrences_and_parents_preserve_all_69_ids_and_532_edges() -> None:

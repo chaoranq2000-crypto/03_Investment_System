@@ -1,7 +1,7 @@
 schema_version: 1
 artifact_type: r5_v1_convergence_final_local_validation
 task_id: r5_v1_convergence
-validated_at: '2026-07-23T05:16:46+08:00'
+validated_at: '2026-07-23T05:53:34+08:00'
 decision: pass
 source_baseline: a96c1b717bf15905d72fd142efd946fa01bce666
 p5_checkpoint: 7598801a291b288d1c0d9e78f3b9037a629ed17e
@@ -27,6 +27,17 @@ phase_checkpoints:
   P3: b64b83b5f3c15bd1c3c7d9a6777fc24d5828f685
   P4: a256d6e1afed85642f96a4427a55d7492bb62cd4
   P5: 7598801a291b288d1c0d9e78f3b9037a629ed17e
+cross_platform_repair:
+  failed_candidate_sha: a7da7fcf70fae3cf5a25454b91043590792b8f7b
+  failed_candidate_standard_ci: 2 failed, 1181 passed, 2 skipped
+  focused_workflows_succeeded: 3
+  failed_candidate_rerun: false
+  replay_processed_text_hash_scope: canonical_lf_text_bytes
+  replay_other_input_hash_scope: file_bytes
+  replay_semantic_digest_binds_hash_scopes: true
+  blocker_map_source_hash_representation: git_blob_bytes
+  blocker_map_schema_binds_exact_source_baseline: true
+  targeted_repair_tests_passed: 14
 validation_matrix:
   V-001:
     result: pass
@@ -42,20 +53,20 @@ validation_matrix:
     passed: 210
     failed: 0
     errors: 0
-    duration_seconds: 44.09
+    duration_seconds: 44.25
   V-004:
     result: pass
     passed: 160
     failed: 0
     errors: 0
-    duration_seconds: 14.14
+    duration_seconds: 14.24
   V-005:
     result: pass
     exact_path_count: 14
-    passed: 37
+    passed: 38
     failed: 0
     errors: 0
-    duration_seconds: 4.12
+    duration_seconds: 4.13
   V-006:
     result: pass
     evidence: OK
@@ -65,7 +76,7 @@ validation_matrix:
     passed: 7
     failed: 0
     errors: 0
-    duration_seconds: 1.10
+    duration_seconds: 2.18
   V-008:
     result: pass
     baseline: a96c1b717bf15905d72fd142efd946fa01bce666
@@ -76,11 +87,11 @@ validation_matrix:
     protected_worktree_status: []
   V-010:
     result: pass
-    passed: 1183
+    passed: 1184
     skipped: 2
     failed: 0
     errors: 0
-    duration_seconds: 93.46
+    duration_seconds: 94.42
     checkpoint_worktree_status_expected: empty
   V-011:
     result: pending
@@ -104,8 +115,8 @@ completion_criteria:
   C-SCOPE-01: pass
 scope:
   source_baseline_is_ancestor: true
-  pre_validation_commits_after_baseline: 6
-  expected_commits_after_validation_checkpoint: 7
+  pre_repair_commits_after_baseline: 7
+  expected_commits_after_repair_checkpoint: 8
   protected_path_diff: []
   other_worktree_writes: false
   pr_created: false
@@ -121,4 +132,4 @@ publication:
   candidate_push_allowed: true
   exact_head_ci_required: true
   ci_receipt_written_to_git: false
-  next_action: create the final-validation checkpoint, require a clean worktree, push normally, and wait for every exact-head run
+  next_action: create the cross-platform final-validation repair checkpoint, require a clean worktree, push normally, and wait for every exact-head run

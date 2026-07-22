@@ -99,9 +99,11 @@ PROVENANCE_FIELDS = [
     "source_group",
     "review_status",
     "source_path",
+    "source_hash_scope",
     "expected_sha256",
     "observed_sha256",
     "processed_path",
+    "processed_hash_scope",
     "processed_sha256",
     "source_workflow_id",
     "usage_boundary",
@@ -201,6 +203,17 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def sha256_canonical_lf_text(path: Path) -> str:
+    payload = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def processed_input_hash(path: Path) -> tuple[str, str]:
+    if path.suffix.lower() == ".txt":
+        return sha256_canonical_lf_text(path), "canonical_lf_text_bytes"
+    return sha256_file(path), "file_bytes"
 
 
 def canonical_sha256(payload: Any) -> str:
@@ -307,9 +320,11 @@ def verify_expected_sources(repo_root: Path) -> list[dict[str, str]]:
                 "source_group": "archived_repository_input",
                 "review_status": "hash_verified",
                 "source_path": rel,
+                "source_hash_scope": "file_bytes",
                 "expected_sha256": expected,
                 "observed_sha256": actual,
                 "processed_path": "",
+                "processed_hash_scope": "",
                 "processed_sha256": "",
                 "source_workflow_id": SOURCE_WORKFLOW_ID if rel.startswith(SOURCE_RUN_REL.as_posix()) else "",
                 "usage_boundary": "read-only provenance or deterministic replay input; no historical state transfer",
@@ -354,6 +369,7 @@ def select_real_evidence(repo_root: Path) -> tuple[list[dict[str, str]], list[di
             if source_group != "official_disclosure" or review_status != "reviewed":
                 raise ReplayContractError(f"official evidence boundary changed: {evidence_id}")
             boundary = "reviewed official source; only locator-backed claims may be material"
+        processed_sha256, processed_hash_scope = processed_input_hash(processed_path)
         selected.append(dict(row))
         provenance.append(
             {
@@ -365,10 +381,12 @@ def select_real_evidence(repo_root: Path) -> tuple[list[dict[str, str]], list[di
                 "source_group": source_group,
                 "review_status": review_status,
                 "source_path": raw_rel,
+                "source_hash_scope": "file_bytes",
                 "expected_sha256": expected_raw,
                 "observed_sha256": observed_raw,
                 "processed_path": processed_rel,
-                "processed_sha256": sha256_file(processed_path),
+                "processed_hash_scope": processed_hash_scope,
+                "processed_sha256": processed_sha256,
                 "source_workflow_id": "",
                 "usage_boundary": boundary,
             }
@@ -909,8 +927,10 @@ def build_semantic_payload(
         "source_hashes": [
             {
                 "path": row.get("source_path"),
+                "source_hash_scope": row.get("source_hash_scope"),
                 "sha256": row.get("observed_sha256"),
                 "processed_path": row.get("processed_path"),
+                "processed_hash_scope": row.get("processed_hash_scope"),
                 "processed_sha256": row.get("processed_sha256"),
             }
             for row in provenance
