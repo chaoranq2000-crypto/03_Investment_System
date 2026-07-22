@@ -5,6 +5,9 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.toml text eol=lf
+codex_tasks/night_shift/r5_overnight_05_20260723/**/*.json text eol=lf
+reports/p1_6/r5_night_shift/r5_overnight_05_20260723/**/*.json text eol=lf
+reports/p1_6/r5_night_shift/r5_overnight_04_20260722/pointer_prevalidation/patches/** text eol=lf
 
 # Bundle 13R evidence files carry SHA256-bound source bytes or are derived
 # receipts for those sources. Keep their checkout representation stable.

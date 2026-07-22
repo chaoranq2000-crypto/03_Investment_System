@@ -25,4 +25,3 @@ tasks:
     depends_on: [n5_01_external_decision_intake]
     owner: night05_executor
     completion_gate: every_state_change_is_receipt_backed_and_reproducible
-

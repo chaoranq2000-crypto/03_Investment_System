@@ -64,12 +64,12 @@
     "ci_conclusion": "success",
     "ci_run_id": 29764207418,
     "path": "codex_tasks/night_shift/r5_overnight_05_20260723/inputs/night04_remote_delivery_receipt.json",
-    "physical_sha256": "267b8b0bcb89f756222781c681d4c000f498c863df8be4f41374ad9eb29d0f47",
+    "physical_sha256": "5cafc0188630552535eeae6a80c63bc179eaa3ca1f46683dd7925f75dee7da95",
     "stable_receipt_sha256": "9536dc994fa6b57e22ee5686583373b0b0f48271a2a2bf7a29d40f7bcda08bcb"
   },
   "source_hashes_reproducible": true,
   "source_mission_id": "r5_overnight_04_20260722",
-  "stable_receipt_sha256": "c7ac163a0771cd3fe893f433d8119469a3116a2c7e90e9602014b666a1d3e01f",
+  "stable_receipt_sha256": "df851bf13d312a6369847a36214a7d571803422f3d4d96fd902d29a4a65875cb",
   "starting_truth": {
     "candidate_ready": 43,
     "dependency_blocked": 20,

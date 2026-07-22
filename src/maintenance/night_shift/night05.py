@@ -125,11 +125,12 @@ HISTORICAL_PATHS = (
     SOURCE_ROOT,
 )
 ALLOWED_SCOPE_PREFIXES = (
-    ".github/workflows/ci.yml",
+    ".gitattributes",
     PACKAGE_ROOT.as_posix() + "/",
     OUTPUT_ROOT.as_posix() + "/",
     "scripts/run_r5_night_shift.py",
     "src/maintenance/night_shift/night05.py",
+    "tests/test_r5_night_shift_pointer_dry_run_patches.py",
     "tests/test_r5_night_shift_night05",
 )
 
@@ -988,6 +989,9 @@ def build_scope_audit(repo_root: Path) -> dict[str, Any]:
 def build_ci_contract(repo_root: Path) -> dict[str, Any]:
     workflow = repo_root / ".github/workflows/ci.yml"
     text = workflow.read_text(encoding="utf-8")
+    historical_test = (
+        repo_root / "tests/test_r5_night_shift_night05_intake.py"
+    ).read_text(encoding="utf-8")
     checks = {
         "full_history_checkout": "fetch-depth: 0" in text,
         "source_route_gate": (
@@ -995,8 +999,14 @@ def build_ci_contract(repo_root: Path) -> dict[str, Any]:
         ),
         "night_shift_suite": "tests/test_r5_night_shift_*.py" in text,
         "full_pytest": "python -m pytest -q" in text,
-        "night04_historical_guard": SOURCE_ROOT.as_posix() in text,
-        "night05_baseline_guard": SOURCE_COMMIT in text,
+        "night04_historical_guard": (
+            "test_night05_historical_roots_remain_unchanged"
+            in historical_test
+        ),
+        "night05_baseline_guard": (
+            "HISTORICAL_PATHS" in historical_test
+            and "SOURCE_COMMIT" in historical_test
+        ),
         "no_publication_mutation": True,
     }
     if not all(checks.values()):
@@ -1051,7 +1061,9 @@ def build_full_regression(
                     "command": (
                         "python scripts/run_source_route_quality_gate.py "
                         "--import-check --output "
-                        "reports/quality/ci_source_route_quality_report.yaml"
+                        "reports/p1_6/r5_night_shift/"
+                        "r5_overnight_05_20260723/validation/"
+                        "source_route_quality_report.yaml"
                     ),
                     "capabilities": source_capabilities,
                     "blocking": source_blocking,

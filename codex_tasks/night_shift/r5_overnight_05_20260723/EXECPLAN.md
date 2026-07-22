@@ -37,4 +37,3 @@ Without independent passed receipts, preserve all starting states:
 Generate a change log, blocker ledger, mission state, validation receipts,
 tracked delivery receipt, morning readout, and post-push remote receipt. The
 engineering outcome is review_intake_ready; the research program remains open.
-

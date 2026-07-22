@@ -42,4 +42,3 @@ open_needs_targeted_backflow, and sample quality / P2 remain false.
 
 Do not create a PR, merge main, or force-push without a separate user
 instruction.
-

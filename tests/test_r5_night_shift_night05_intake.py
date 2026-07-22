@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 import yaml
@@ -11,6 +12,7 @@ from src.maintenance.night_shift.night05 import (
     EXPECTED_OCCURRENCES,
     EXPECTED_PARENTS,
     EXPECTED_TOTAL_ITEMS,
+    HISTORICAL_PATHS,
     MISSION_ID,
     OUTPUT_ROOT,
     SOURCE_COMMIT,
@@ -129,6 +131,29 @@ def test_night05_readout_preserves_research_boundaries() -> None:
     assert truth["p2_allowed"] is False
 
 
+def test_night05_historical_roots_remain_unchanged() -> None:
+    paths = [path.as_posix() for path in HISTORICAL_PATHS]
+    committed = subprocess.check_output(
+        [
+            "git",
+            "diff",
+            "--name-only",
+            f"{SOURCE_COMMIT}..HEAD",
+            "--",
+            *paths,
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+    )
+    working = subprocess.check_output(
+        ["git", "diff", "--name-only", SOURCE_COMMIT, "--", *paths],
+        cwd=REPO_ROOT,
+        text=True,
+    )
+    assert not committed.strip()
+    assert not working.strip()
+
+
 def test_night05_bootstrap_materialization_is_byte_deterministic() -> None:
     paths = [
         OUTPUT_ROOT / "preflight/source_preflight.json",
@@ -149,4 +174,3 @@ def test_night05_bootstrap_materialization_is_byte_deterministic() -> None:
     assert before == after
     historical = REPO_ROOT / SOURCE_ROOT
     assert historical.is_dir()
-
