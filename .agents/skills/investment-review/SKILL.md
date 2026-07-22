@@ -220,6 +220,33 @@ psychology, emit advice or numeric scores/confidence, treat
 create an intervention/experiment, open a UI path, or read/write the portfolio
 database. See `docs/playbooks/INVESTMENT_REVIEW_P2H_STAGE1.md`.
 
+## P2H Stage 2 Slice A observation-protocol boundary
+
+After one canonical P2H Stage 1 candidate is explicitly
+`accepted_for_observation`, the implementation may also:
+
+- build one explicit, human-confirmed `p2h.observation_protocol.v1` bound to
+  the exact candidate/hash, source artifacts, complete Stage 1 review-event set
+  and an accepted historical projection at explicit dual-time cutoffs;
+- preserve stable required-fact keys, an observation window and checkpoints,
+  applicability, disconfirming and stop conditions, expiry, missing-evidence
+  policy and privacy scope without collecting new facts automatically;
+- create-only ingest protocols and immutable human
+  `p2h.observation_protocol_review_event.v1` lifecycle events into additive v2
+  sidecar tables;
+- project `draft`, `submitted`, `approved_for_observation`, `active`, `paused`,
+  `completed`, `abandoned` and `superseded` deterministically at explicit
+  `as_of` and `knowledge_cutoff` values;
+- source-replay the stored protocol through the formal Stage 1 candidate/event
+  interfaces without modifying any Stage 1 row or source artifact.
+
+Slice A must not auto-create or auto-activate a protocol from candidate status,
+treat completion or expiry as proof, generate an intervention/experiment action,
+record an attempt/outcome, update a profile or PersonalPlaybook, emit advice,
+scores or numeric confidence, access portfolio SQLite/broker data/credentials, or
+add UI/Web/API/order-execution paths. See
+`docs/playbooks/INVESTMENT_REVIEW_P2H_STAGE2_OBSERVATION_PROTOCOL.md`.
+
 ## Required workflow
 
 1. Run `python -m src.investment_review --db data/db/investment_review.sqlite3 init`.
@@ -346,6 +373,28 @@ For an approved P2H Stage 1 candidate/review-ledger run:
     `knowledge_cutoff`; preserve out-of-order ingest determinism and historical states.
 51. Treat `accepted_for_observation` as continued observation only, never proof, and
     stop before profile/playbook writes, intervention, experiment, UI or model generation.
+
+For an approved P2H Stage 2 Slice A observation-protocol run:
+
+52. Require an explicit human-confirmed protocol draft plus the exact Stage 1
+    candidate, source artifacts and complete human-review event set; never build
+    from candidate ID, latest status or a free-text summary alone.
+53. Recompute the Stage 1 projection at the draft's explicit `as_of` and
+    `knowledge_cutoff`, require `accepted_for_observation`, and bind the candidate,
+    source, event-set and projection hashes into the protocol identity.
+54. Validate UTC whole-second dual time, observation window/checkpoints/expiry,
+    stable fact keys, missing-state preservation, privacy scope and the
+    no-advice/no-score/no-profile/no-intervention boundary before ingest.
+55. Save protocols and human lifecycle events create-only in the existing v2
+    sidecar; exact replay is `SKIPPED`, while same-ID drift, orphan refs and
+    supersession errors fail explicitly. Do not modify Stage 1 rows.
+56. Project lifecycle only from the complete immutable event set at explicit
+    cutoffs; preserve input-order determinism, reject concurrent semantic-time
+    state events, and keep `note_added` state-neutral.
+57. Project expiry separately from human state and keep `completed` governance-only;
+    neither value proves or disproves the underlying hypothesis.
+58. Source-replay through the formal Stage 1 store interfaces, then stop before
+    Slice B, attempt/outcome, profile/playbook, UI/Web/API or any real-data run.
 
 Generated SQLite mappings are dry-run only. A real import must use
 `review.status=reviewed`, and any post-review mapping edit must invalidate

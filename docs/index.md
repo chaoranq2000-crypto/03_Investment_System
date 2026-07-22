@@ -47,6 +47,7 @@
 - `playbooks/INVESTMENT_REVIEW_P2G_4.md` — 候选假设 accept/reject/correct、不可变 revision 和审计工具手册。
 - `playbooks/INVESTMENT_REVIEW_BEHAVIOR_HYPOTHESIS_LEDGER.md` — 已审核假设的 active/audit 台账、exact dedup、查询和重放手册。
 - `playbooks/INVESTMENT_REVIEW_P2H_STAGE1.md` — evidence-bound 行为假设候选、人工复核事件、双时间投影与 sidecar 操作手册。
+- `playbooks/INVESTMENT_REVIEW_P2H_STAGE2_OBSERVATION_PROTOCOL.md` — Stage 1 accepted candidate 到显式 observation protocol、人工生命周期事件、expiry 与双时间重放手册。
 - `playbooks/stock_report_case_study_shengyi_tech.md` — 个股报告案例研究。
 - `playbooks/stock_report_samples/README.md` — 样例报告目录说明。
 
@@ -56,6 +57,7 @@
 
 - `../reports/investment_review/p2g_stage3/P2G_STAGE3_CLOSE_READOUT.md` — P2G 阶段三行为假设闭环的 canonical 功能关闭回执。
 - `../reports/investment_review/p2h_stage1/P2H_STAGE1_CLOSE_READOUT.md` — P2H Stage 1 候选与人工复核事件账本的 canonical 功能关闭回执。
+- `../reports/investment_review/p2h_stage2/P2H_STAGE2_SLICE_A_CLOSE_READOUT.md` — P2H Stage 2 Slice A observation protocol 与人工生命周期账本的 canonical 功能关闭回执。
 
 ## Skill references
 
