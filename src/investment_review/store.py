@@ -17,6 +17,10 @@ from .behavior_hypothesis_candidates import (
     replay_validate_behavior_hypothesis_candidate,
     validate_behavior_hypothesis_review_event,
 )
+from .behavior_observation_protocols import (
+    replay_validate_observation_protocol,
+    validate_observation_protocol_review_event,
+)
 from .models import CanonicalTradeEvent, DecisionRecord, SourceDefinition, canonical_json
 from .portfolio_context import PortfolioContext, PortfolioSnapshot, calculate_portfolio_metrics
 
@@ -24,6 +28,7 @@ from .portfolio_context import PortfolioContext, PortfolioSnapshot, calculate_po
 SCHEMA_VERSION = 2
 APPLICATION_ID = 0x49525657  # ASCII "IRVW"
 P2H_STAGE1_SCHEMA_VERSION = 1
+P2H_STAGE2_SLICE_A_SCHEMA_VERSION = 1
 
 class ReviewStoreError(RuntimeError):
     """Base error for the review store."""
@@ -200,6 +205,41 @@ CREATE TABLE IF NOT EXISTS behavior_hypothesis_review_events (
     inserted_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS behavior_observation_protocols (
+    protocol_id TEXT PRIMARY KEY,
+    canonical_hash TEXT NOT NULL UNIQUE,
+    candidate_id TEXT NOT NULL REFERENCES behavior_hypothesis_candidates(candidate_id),
+    created_at TEXT NOT NULL,
+    effective_at TEXT NOT NULL,
+    knowledge_at TEXT NOT NULL,
+    expiry_at TEXT NOT NULL,
+    stage1_event_set_hash TEXT NOT NULL,
+    stage1_projection_hash TEXT NOT NULL,
+    source_verification_status TEXT NOT NULL CHECK (
+        source_verification_status = 'verified'
+    ),
+    payload_json TEXT NOT NULL,
+    inserted_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS behavior_observation_protocol_review_events (
+    protocol_review_event_id TEXT PRIMARY KEY,
+    canonical_hash TEXT NOT NULL UNIQUE,
+    protocol_id TEXT NOT NULL REFERENCES behavior_observation_protocols(protocol_id),
+    event_type TEXT NOT NULL,
+    reviewed_at TEXT NOT NULL,
+    effective_at TEXT NOT NULL,
+    knowledge_at TEXT NOT NULL,
+    evidence_cutoff TEXT NOT NULL,
+    reviewer_ref TEXT NOT NULL,
+    supersedes_event_id TEXT REFERENCES behavior_observation_protocol_review_events(
+        protocol_review_event_id
+    ),
+    superseded_by_protocol_id TEXT REFERENCES behavior_observation_protocols(protocol_id),
+    payload_json TEXT NOT NULL,
+    inserted_at TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_trade_events_symbol_time
     ON trade_events(symbol, occurred_at);
 CREATE INDEX IF NOT EXISTS idx_trade_events_known_at
@@ -219,6 +259,15 @@ CREATE INDEX IF NOT EXISTS idx_behavior_candidates_dual_time
 CREATE INDEX IF NOT EXISTS idx_behavior_review_events_candidate_time
     ON behavior_hypothesis_review_events(
         candidate_id, effective_at, knowledge_at, reviewed_at, review_event_id
+    );
+CREATE INDEX IF NOT EXISTS idx_observation_protocols_candidate_time
+    ON behavior_observation_protocols(
+        candidate_id, effective_at, knowledge_at, created_at, protocol_id
+    );
+CREATE INDEX IF NOT EXISTS idx_observation_protocol_events_protocol_time
+    ON behavior_observation_protocol_review_events(
+        protocol_id, effective_at, knowledge_at, reviewed_at,
+        protocol_review_event_id
     );
 """
 
@@ -296,6 +345,18 @@ class ReviewStore:
                         "Unsupported P2H Stage 1 feature schema: "
                         f"{feature_row[0]}"
                     )
+                stage2_row = conn.execute(
+                    "SELECT value FROM schema_meta "
+                    "WHERE key='p2h_stage2_slice_a_schema_version'"
+                ).fetchone()
+                if (
+                    stage2_row is not None
+                    and int(stage2_row[0]) != P2H_STAGE2_SLICE_A_SCHEMA_VERSION
+                ):
+                    raise ReviewStoreError(
+                        "Unsupported P2H Stage 2 Slice A feature schema: "
+                        f"{stage2_row[0]}"
+                    )
 
             conn.execute("PRAGMA journal_mode = WAL")
             conn.executescript(_SCHEMA_SQL)
@@ -318,6 +379,12 @@ class ReviewStore:
                 "VALUES('p2h_stage1_schema_version', ?) "
                 "ON CONFLICT(key) DO NOTHING",
                 (str(P2H_STAGE1_SCHEMA_VERSION),),
+            )
+            conn.execute(
+                "INSERT INTO schema_meta(key, value) "
+                "VALUES('p2h_stage2_slice_a_schema_version', ?) "
+                "ON CONFLICT(key) DO NOTHING",
+                (str(P2H_STAGE2_SLICE_A_SCHEMA_VERSION),),
             )
             conn.commit()
         finally:
@@ -370,6 +437,33 @@ class ReviewStore:
         ):
             raise ReviewStoreError(
                 "P2H Stage 1 tables are not initialized; run the init command first."
+            )
+
+    def _ensure_p2h_stage2_slice_a_initialized(self) -> None:
+        self._ensure_p2h_stage1_initialized()
+        with self.connection(read_only=True) as conn:
+            feature_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='p2h_stage2_slice_a_schema_version'"
+            ).fetchone()
+            tables = {
+                str(row[0])
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+        required = {
+            "behavior_observation_protocols",
+            "behavior_observation_protocol_review_events",
+        }
+        if (
+            feature_row is None
+            or int(feature_row[0]) != P2H_STAGE2_SLICE_A_SCHEMA_VERSION
+            or not required.issubset(tables)
+        ):
+            raise ReviewStoreError(
+                "P2H Stage 2 Slice A tables are not initialized; run the init "
+                "command first."
             )
 
     @staticmethod
@@ -1318,6 +1412,368 @@ class ReviewStore:
             source_artifacts=source_artifacts,
         )
 
+    def save_observation_protocol(
+        self,
+        protocol: Mapping[str, Any],
+        *,
+        candidate_source_artifacts: Sequence[Mapping[str, Any]],
+    ) -> dict[str, Any]:
+        """Create one source-replayed protocol or idempotently replay it."""
+
+        self._ensure_p2h_stage2_slice_a_initialized()
+        protocol_id = str(protocol.get("protocol_id") or "")
+        canonical_hash = str(protocol.get("canonical_hash") or "")
+        binding = protocol.get("candidate_binding")
+        if not isinstance(binding, Mapping):
+            raise ReviewStoreError("Observation protocol candidate_binding is required")
+        candidate_id = str(binding.get("candidate_id") or "")
+        payload_json = self._p2h_payload_json(protocol)
+        with self.connection(read_only=True) as conn:
+            existing_before_replay = conn.execute(
+                "SELECT canonical_hash, payload_json "
+                "FROM behavior_observation_protocols WHERE protocol_id = ?",
+                (protocol_id,),
+            ).fetchone()
+        if existing_before_replay is not None and (
+            existing_before_replay["canonical_hash"] != canonical_hash
+            or existing_before_replay["payload_json"] != payload_json
+        ):
+            raise DataConflictError(
+                "Observation protocol changed after creation: "
+                f"protocol_id={protocol_id}"
+            )
+        candidate = self.get_behavior_hypothesis_candidate(candidate_id)
+        complete_events = self.list_behavior_hypothesis_review_events(
+            candidate_id=candidate_id
+        )
+        validation = replay_validate_observation_protocol(
+            protocol,
+            candidate=candidate,
+            review_events=complete_events,
+            candidate_source_artifacts=candidate_source_artifacts,
+        )
+        if (
+            validation["validation_status"] != "accepted"
+            or validation["source_verification"]["status"] != "verified"
+        ):
+            raise ReviewStoreError(
+                "Observation protocol failed Stage 1 source replay: "
+                + ", ".join(validation["finding_codes"])
+            )
+
+        accepted_projection = binding["accepted_projection"]
+        with self.connection() as conn:
+            with conn:
+                existing = conn.execute(
+                    "SELECT canonical_hash, payload_json "
+                    "FROM behavior_observation_protocols WHERE protocol_id = ?",
+                    (protocol_id,),
+                ).fetchone()
+                if existing is not None:
+                    if (
+                        existing["canonical_hash"] == canonical_hash
+                        and existing["payload_json"] == payload_json
+                    ):
+                        return {
+                            "protocol_id": protocol_id,
+                            "candidate_id": candidate_id,
+                            "canonical_hash": canonical_hash,
+                            "status": "SKIPPED",
+                            "source_verification": "verified",
+                        }
+                    raise DataConflictError(
+                        "Observation protocol changed after creation: "
+                        f"protocol_id={protocol_id}"
+                    )
+                hash_owner = conn.execute(
+                    "SELECT protocol_id FROM behavior_observation_protocols "
+                    "WHERE canonical_hash = ?",
+                    (canonical_hash,),
+                ).fetchone()
+                if hash_owner is not None:
+                    raise DataConflictError(
+                        "Observation protocol canonical hash already belongs to "
+                        f"protocol_id={hash_owner['protocol_id']}"
+                    )
+                conn.execute(
+                    """
+                    INSERT INTO behavior_observation_protocols(
+                        protocol_id, canonical_hash, candidate_id, created_at,
+                        effective_at, knowledge_at, expiry_at,
+                        stage1_event_set_hash, stage1_projection_hash,
+                        source_verification_status, payload_json, inserted_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'verified', ?, ?)
+                    """,
+                    (
+                        protocol_id,
+                        canonical_hash,
+                        candidate_id,
+                        protocol["created_at"],
+                        protocol["effective_at"],
+                        protocol["knowledge_at"],
+                        protocol["expiry_at"],
+                        binding["review_event_set_hash"],
+                        accepted_projection["projection_hash"],
+                        payload_json,
+                        _now(),
+                    ),
+                )
+        return {
+            "protocol_id": protocol_id,
+            "candidate_id": candidate_id,
+            "canonical_hash": canonical_hash,
+            "status": "INSERTED",
+            "source_verification": "verified",
+        }
+
+    def get_observation_protocol(self, protocol_id: str) -> dict[str, Any]:
+        self._ensure_p2h_stage2_slice_a_initialized()
+        with self.connection(read_only=True) as conn:
+            row = conn.execute(
+                "SELECT payload_json FROM behavior_observation_protocols "
+                "WHERE protocol_id = ?",
+                (protocol_id,),
+            ).fetchone()
+        if row is None:
+            raise ReviewStoreError(f"Observation protocol not found: {protocol_id}")
+        return json.loads(row["payload_json"])
+
+    def list_observation_protocols(
+        self,
+        *,
+        protocol_id: str | None = None,
+        candidate_id: str | None = None,
+        created_from: str | None = None,
+        created_to: str | None = None,
+    ) -> list[dict[str, Any]]:
+        self._ensure_p2h_stage2_slice_a_initialized()
+        filters: list[str] = []
+        params: list[Any] = []
+        for column, value in (
+            ("protocol_id", protocol_id),
+            ("candidate_id", candidate_id),
+        ):
+            if value is not None:
+                filters.append(f"{column} = ?")
+                params.append(value)
+        if created_from is not None:
+            filters.append("created_at >= ?")
+            params.append(_canonical_timestamp(created_from, "created_from"))
+        if created_to is not None:
+            filters.append("created_at <= ?")
+            params.append(_canonical_timestamp(created_to, "created_to"))
+        where = " WHERE " + " AND ".join(filters) if filters else ""
+        with self.connection(read_only=True) as conn:
+            rows = conn.execute(
+                "SELECT payload_json FROM behavior_observation_protocols"
+                + where
+                + " ORDER BY created_at, protocol_id",
+                params,
+            ).fetchall()
+        return [json.loads(row["payload_json"]) for row in rows]
+
+    def save_observation_protocol_review_event(
+        self, event: Mapping[str, Any]
+    ) -> dict[str, Any]:
+        """Create one immutable human protocol-lifecycle event."""
+
+        self._ensure_p2h_stage2_slice_a_initialized()
+        event_id = str(event.get("protocol_review_event_id") or "")
+        canonical_hash = str(event.get("canonical_hash") or "")
+        protocol_id = str(event.get("protocol_id") or "")
+        payload_json = self._p2h_payload_json(event)
+        with self.connection(read_only=True) as conn:
+            existing_before_validation = conn.execute(
+                "SELECT canonical_hash, payload_json "
+                "FROM behavior_observation_protocol_review_events "
+                "WHERE protocol_review_event_id = ?",
+                (event_id,),
+            ).fetchone()
+        if existing_before_validation is not None and (
+            existing_before_validation["canonical_hash"] != canonical_hash
+            or existing_before_validation["payload_json"] != payload_json
+        ):
+            raise DataConflictError(
+                "Observation protocol review event changed after creation: "
+                f"protocol_review_event_id={event_id}"
+            )
+        validation = validate_observation_protocol_review_event(event)
+        if validation["validation_status"] != "accepted":
+            raise ReviewStoreError(
+                "Observation protocol review event failed validation: "
+                + ", ".join(validation["finding_codes"])
+            )
+        with self.connection() as conn:
+            with conn:
+                existing = conn.execute(
+                    "SELECT canonical_hash, payload_json "
+                    "FROM behavior_observation_protocol_review_events "
+                    "WHERE protocol_review_event_id = ?",
+                    (event_id,),
+                ).fetchone()
+                if existing is not None:
+                    if (
+                        existing["canonical_hash"] == canonical_hash
+                        and existing["payload_json"] == payload_json
+                    ):
+                        return {
+                            "protocol_review_event_id": event_id,
+                            "protocol_id": protocol_id,
+                            "canonical_hash": canonical_hash,
+                            "status": "SKIPPED",
+                        }
+                    raise DataConflictError(
+                        "Observation protocol review event changed after creation: "
+                        f"protocol_review_event_id={event_id}"
+                    )
+                protocol_row = conn.execute(
+                    "SELECT effective_at, knowledge_at "
+                    "FROM behavior_observation_protocols WHERE protocol_id = ?",
+                    (protocol_id,),
+                ).fetchone()
+                if protocol_row is None:
+                    raise ReviewStoreError(
+                        f"Observation protocol not found: {protocol_id}"
+                    )
+                if event["effective_at"] < protocol_row["effective_at"]:
+                    raise ReviewStoreError(
+                        "Protocol event effective_at cannot precede the protocol"
+                    )
+                if event["knowledge_at"] < protocol_row["knowledge_at"]:
+                    raise ReviewStoreError(
+                        "Protocol event knowledge_at cannot precede the protocol"
+                    )
+                supersedes_event_id = event.get("supersedes_event_id")
+                if supersedes_event_id is not None:
+                    prior = conn.execute(
+                        "SELECT protocol_id "
+                        "FROM behavior_observation_protocol_review_events "
+                        "WHERE protocol_review_event_id = ?",
+                        (supersedes_event_id,),
+                    ).fetchone()
+                    if prior is None or prior["protocol_id"] != protocol_id:
+                        raise ReviewStoreError(
+                            "Superseded protocol event is missing or belongs to "
+                            "another protocol"
+                        )
+                replacement_id = event.get("superseded_by_protocol_id")
+                if replacement_id is not None:
+                    replacement = conn.execute(
+                        "SELECT 1 FROM behavior_observation_protocols "
+                        "WHERE protocol_id = ?",
+                        (replacement_id,),
+                    ).fetchone()
+                    if replacement is None:
+                        raise ReviewStoreError(
+                            "Replacement observation protocol not found: "
+                            f"{replacement_id}"
+                        )
+                hash_owner = conn.execute(
+                    "SELECT protocol_review_event_id "
+                    "FROM behavior_observation_protocol_review_events "
+                    "WHERE canonical_hash = ?",
+                    (canonical_hash,),
+                ).fetchone()
+                if hash_owner is not None:
+                    raise DataConflictError(
+                        "Observation protocol event canonical hash already belongs to "
+                        f"protocol_review_event_id={hash_owner['protocol_review_event_id']}"
+                    )
+                conn.execute(
+                    """
+                    INSERT INTO behavior_observation_protocol_review_events(
+                        protocol_review_event_id, canonical_hash, protocol_id,
+                        event_type, reviewed_at, effective_at, knowledge_at,
+                        evidence_cutoff, reviewer_ref, supersedes_event_id,
+                        superseded_by_protocol_id, payload_json, inserted_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        event_id,
+                        canonical_hash,
+                        protocol_id,
+                        event["event_type"],
+                        event["reviewed_at"],
+                        event["effective_at"],
+                        event["knowledge_at"],
+                        event["evidence_cutoff"],
+                        event["reviewer_ref"],
+                        supersedes_event_id,
+                        replacement_id,
+                        payload_json,
+                        _now(),
+                    ),
+                )
+        return {
+            "protocol_review_event_id": event_id,
+            "protocol_id": protocol_id,
+            "canonical_hash": canonical_hash,
+            "status": "INSERTED",
+        }
+
+    def list_observation_protocol_review_events(
+        self,
+        *,
+        protocol_id: str | None = None,
+        event_type: str | None = None,
+        as_of: str | None = None,
+        knowledge_cutoff: str | None = None,
+        reviewed_from: str | None = None,
+        reviewed_to: str | None = None,
+    ) -> list[dict[str, Any]]:
+        self._ensure_p2h_stage2_slice_a_initialized()
+        filters: list[str] = []
+        params: list[Any] = []
+        values = {
+            "effective_at": (
+                _canonical_timestamp(as_of, "as_of") if as_of is not None else None
+            ),
+            "knowledge_at": (
+                _canonical_timestamp(knowledge_cutoff, "knowledge_cutoff")
+                if knowledge_cutoff is not None
+                else None
+            ),
+            "reviewed_from": (
+                _canonical_timestamp(reviewed_from, "reviewed_from")
+                if reviewed_from is not None
+                else None
+            ),
+            "reviewed_to": (
+                _canonical_timestamp(reviewed_to, "reviewed_to")
+                if reviewed_to is not None
+                else None
+            ),
+        }
+        if protocol_id is not None:
+            filters.append("protocol_id = ?")
+            params.append(protocol_id)
+        if event_type is not None:
+            filters.append("event_type = ?")
+            params.append(event_type)
+        if values["effective_at"] is not None:
+            filters.append("effective_at <= ?")
+            params.append(values["effective_at"])
+        if values["knowledge_at"] is not None:
+            filters.append("knowledge_at <= ?")
+            params.append(values["knowledge_at"])
+        if values["reviewed_from"] is not None:
+            filters.append("reviewed_at >= ?")
+            params.append(values["reviewed_from"])
+        if values["reviewed_to"] is not None:
+            filters.append("reviewed_at <= ?")
+            params.append(values["reviewed_to"])
+        where = " WHERE " + " AND ".join(filters) if filters else ""
+        with self.connection(read_only=True) as conn:
+            rows = conn.execute(
+                "SELECT payload_json "
+                "FROM behavior_observation_protocol_review_events"
+                + where
+                + " ORDER BY effective_at, knowledge_at, reviewed_at, "
+                "protocol_review_event_id",
+                params,
+            ).fetchall()
+        return [json.loads(row["payload_json"]) for row in rows]
+
     def status(self) -> dict[str, Any]:
         self._ensure_initialized()
         with self.connection(read_only=True) as conn:
@@ -1335,6 +1791,8 @@ class ReviewStore:
                     "position_snapshot_items",
                     "behavior_hypothesis_candidates",
                     "behavior_hypothesis_review_events",
+                    "behavior_observation_protocols",
+                    "behavior_observation_protocol_review_events",
                 )
             }
             integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]
@@ -1345,10 +1803,17 @@ class ReviewStore:
                 "SELECT value FROM schema_meta "
                 "WHERE key='p2h_stage1_schema_version'"
             ).fetchone()
+            p2h_stage2_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='p2h_stage2_slice_a_schema_version'"
+            ).fetchone()
         return {
             "database": str(self.path),
             "schema_version": int(version_row[0]) if version_row else None,
             "p2h_stage1_schema_version": int(p2h_row[0]) if p2h_row else None,
+            "p2h_stage2_slice_a_schema_version": (
+                int(p2h_stage2_row[0]) if p2h_stage2_row else None
+            ),
             "integrity_check": integrity,
             "counts": counts,
         }
