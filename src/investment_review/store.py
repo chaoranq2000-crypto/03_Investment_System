@@ -22,14 +22,27 @@ from .behavior_observation_protocols import (
     replay_validate_observation_protocol,
     validate_observation_protocol_review_event,
 )
-from .models import CanonicalTradeEvent, DecisionRecord, SourceDefinition, canonical_json
+from .models import (
+    CanonicalTradeEvent,
+    DecisionRecord,
+    FeeCorrectionRecord,
+    FeeProfileRecord,
+    FeeProjectionRecord,
+    ReviewRunRecord,
+    ReviewRunStatusEvent,
+    SourceDefinition,
+    canonical_json,
+    sha256_text,
+)
 from .portfolio_context import PortfolioContext, PortfolioSnapshot, calculate_portfolio_metrics
+from .time_utils import utc_iso
 
 
 SCHEMA_VERSION = 2
 APPLICATION_ID = 0x49525657  # ASCII "IRVW"
 P2H_STAGE1_SCHEMA_VERSION = 1
 P2H_STAGE2_SLICE_A_SCHEMA_VERSION = 1
+PRODUCT_COMPLETION_SCHEMA_VERSION = 1
 
 class ReviewStoreError(RuntimeError):
     """Base error for the review store."""
@@ -273,6 +286,154 @@ CREATE INDEX IF NOT EXISTS idx_observation_protocol_events_protocol_time
 """
 
 
+_PRODUCT_COMPLETION_SCHEMA_SQL = """
+CREATE TABLE IF NOT EXISTS fee_profiles (
+    profile_id TEXT PRIMARY KEY,
+    profile_key TEXT NOT NULL,
+    method TEXT NOT NULL,
+    method_version TEXT NOT NULL,
+    sample_count INTEGER NOT NULL CHECK (sample_count >= 0),
+    rate TEXT,
+    currency TEXT NOT NULL,
+    fallback_level TEXT NOT NULL,
+    computed_at TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    payload_sha256 TEXT NOT NULL,
+    inserted_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS fee_projections (
+    projection_id TEXT PRIMARY KEY,
+    event_id TEXT NOT NULL REFERENCES trade_events(event_id),
+    status TEXT NOT NULL CHECK (status IN ('actual', 'estimated', 'unknown')),
+    amount TEXT,
+    currency TEXT NOT NULL,
+    source_fees TEXT,
+    method TEXT,
+    method_version TEXT,
+    sample_count INTEGER NOT NULL CHECK (sample_count >= 0),
+    profile_id TEXT REFERENCES fee_profiles(profile_id),
+    reason_code TEXT,
+    projected_at TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    payload_sha256 TEXT NOT NULL,
+    inserted_at TEXT NOT NULL,
+    UNIQUE (event_id, projected_at)
+);
+
+CREATE TABLE IF NOT EXISTS fee_corrections (
+    correction_id TEXT PRIMARY KEY,
+    event_id TEXT NOT NULL REFERENCES trade_events(event_id),
+    status TEXT NOT NULL CHECK (status IN ('actual', 'unknown')),
+    amount TEXT,
+    currency TEXT NOT NULL,
+    effective_at TEXT NOT NULL,
+    known_at TEXT NOT NULL,
+    reviewer_ref TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    supersedes_correction_id TEXT REFERENCES fee_corrections(correction_id),
+    payload_json TEXT NOT NULL,
+    payload_sha256 TEXT NOT NULL,
+    inserted_at TEXT NOT NULL,
+    UNIQUE (event_id, effective_at, known_at)
+);
+
+CREATE TABLE IF NOT EXISTS review_runs (
+    run_id TEXT PRIMARY KEY,
+    run_key TEXT NOT NULL UNIQUE,
+    scope TEXT NOT NULL CHECK (
+        scope IN ('sync', 'catch_up', 'single', 'weekly', 'monthly')
+    ),
+    requested_at TEXT NOT NULL,
+    source_cutoff TEXT,
+    trigger TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    payload_sha256 TEXT NOT NULL,
+    inserted_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS review_run_status_events (
+    run_event_id TEXT PRIMARY KEY,
+    run_id TEXT NOT NULL REFERENCES review_runs(run_id),
+    status TEXT NOT NULL CHECK (
+        status IN ('queued', 'running', 'succeeded', 'partial', 'blocked', 'failed')
+    ),
+    occurred_at TEXT NOT NULL,
+    known_at TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    payload_sha256 TEXT NOT NULL,
+    inserted_at TEXT NOT NULL,
+    UNIQUE (run_id, occurred_at, known_at)
+);
+
+CREATE INDEX IF NOT EXISTS idx_fee_profiles_key_time
+    ON fee_profiles(profile_key, computed_at, profile_id);
+CREATE INDEX IF NOT EXISTS idx_fee_projections_event_time
+    ON fee_projections(event_id, projected_at, projection_id);
+CREATE INDEX IF NOT EXISTS idx_fee_corrections_event_time
+    ON fee_corrections(event_id, effective_at, known_at, correction_id);
+CREATE INDEX IF NOT EXISTS idx_review_runs_scope_time
+    ON review_runs(scope, requested_at, run_id);
+CREATE INDEX IF NOT EXISTS idx_review_run_events_run_time
+    ON review_run_status_events(run_id, occurred_at, known_at, run_event_id);
+"""
+
+_CORE_TABLES = frozenset(
+    {
+        "schema_meta",
+        "data_sources",
+        "source_config_versions",
+        "decisions",
+        "ingest_runs",
+        "trade_events",
+        "ingest_run_events",
+        "decision_event_links",
+        "portfolio_snapshots",
+        "position_snapshot_items",
+        "behavior_hypothesis_candidates",
+        "behavior_hypothesis_review_events",
+        "behavior_observation_protocols",
+        "behavior_observation_protocol_review_events",
+    }
+)
+
+_CORE_INDEXES = frozenset(
+    {
+        "idx_trade_events_symbol_time",
+        "idx_trade_events_known_at",
+        "idx_trade_events_source_record",
+        "idx_ingest_run_events_event",
+        "idx_decisions_symbol_time",
+        "idx_snapshots_observed_at",
+        "idx_behavior_candidates_scope",
+        "idx_behavior_candidates_dual_time",
+        "idx_behavior_review_events_candidate_time",
+        "idx_observation_protocols_candidate_time",
+        "idx_observation_protocol_events_protocol_time",
+    }
+)
+
+_PRODUCT_COMPLETION_TABLES = frozenset(
+    {
+        "fee_profiles",
+        "fee_projections",
+        "fee_corrections",
+        "review_runs",
+        "review_run_status_events",
+    }
+)
+
+_PRODUCT_COMPLETION_INDEXES = frozenset(
+    {
+        "idx_fee_profiles_key_time",
+        "idx_fee_projections_event_time",
+        "idx_fee_corrections_event_time",
+        "idx_review_runs_scope_time",
+        "idx_review_run_events_run_time",
+    }
+)
+
+
 class ReviewStore:
     def __init__(self, path: str | Path = "data/db/investment_review.sqlite3") -> None:
         self.path = Path(path)
@@ -358,7 +519,26 @@ class ReviewStore:
                         "Unsupported P2H Stage 2 Slice A feature schema: "
                         f"{stage2_row[0]}"
                     )
-
+                indexes = {
+                    str(row[0])
+                    for row in conn.execute(
+                        "SELECT name FROM sqlite_master "
+                        "WHERE type='index' AND name NOT LIKE 'sqlite_%'"
+                    ).fetchall()
+                }
+                journal_mode = str(
+                    conn.execute("PRAGMA journal_mode").fetchone()[0]
+                ).lower()
+                if (
+                    _CORE_TABLES.issubset(tables)
+                    and _CORE_INDEXES.issubset(indexes)
+                    and feature_row is not None
+                    and int(feature_row[0]) == P2H_STAGE1_SCHEMA_VERSION
+                    and stage2_row is not None
+                    and int(stage2_row[0]) == P2H_STAGE2_SLICE_A_SCHEMA_VERSION
+                    and journal_mode == "wal"
+                ):
+                    return {"database": str(self.path), "schema_version": SCHEMA_VERSION}
             conn.execute("PRAGMA journal_mode = WAL")
             conn.executescript(_SCHEMA_SQL)
 
@@ -391,6 +571,85 @@ class ReviewStore:
         finally:
             conn.close()
         return {"database": str(self.path), "schema_version": SCHEMA_VERSION}
+
+    def initialize_product_completion(self) -> dict[str, Any]:
+        """Explicitly opt an initialized v2 candidate into additive product tables.
+
+        Core ``initialize`` intentionally never enables this feature. Callers must
+        select the candidate sidecar first and then invoke this method explicitly;
+        legacy v1 stores remain rejected by the normal v2 boundary.
+        """
+
+        self._ensure_initialized()
+        with self.connection() as conn:
+            feature_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='product_completion_schema_version'"
+            ).fetchone()
+            if (
+                feature_row is not None
+                and int(feature_row[0]) != PRODUCT_COMPLETION_SCHEMA_VERSION
+            ):
+                raise ReviewStoreError(
+                    "Unsupported product-completion feature schema: "
+                    f"{feature_row[0]}"
+                )
+            tables = {
+                str(row[0])
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+            indexes = {
+                str(row[0])
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master "
+                    "WHERE type='index' AND name NOT LIKE 'sqlite_%'"
+                ).fetchall()
+            }
+            if feature_row is not None:
+                if not _PRODUCT_COMPLETION_TABLES.issubset(tables) or not (
+                    _PRODUCT_COMPLETION_INDEXES.issubset(indexes)
+                ):
+                    raise ReviewStoreError(
+                        "Product-completion feature marker exists but its additive "
+                        "schema is incomplete; refusing silent repair."
+                    )
+                return {
+                    "database": str(self.path),
+                    "schema_version": SCHEMA_VERSION,
+                    "product_completion_schema_version": (
+                        PRODUCT_COMPLETION_SCHEMA_VERSION
+                    ),
+                }
+            if _PRODUCT_COMPLETION_TABLES.intersection(tables):
+                raise ReviewStoreError(
+                    "Unmarked product-completion tables already exist; refusing "
+                    "to adopt or modify them."
+                )
+            marker_sql = (
+                "INSERT INTO schema_meta(key, value) "
+                "VALUES('product_completion_schema_version', "
+                f"'{PRODUCT_COMPLETION_SCHEMA_VERSION}') "
+                "ON CONFLICT(key) DO NOTHING;"
+            )
+            try:
+                conn.executescript(
+                    "BEGIN IMMEDIATE;\n"
+                    + _PRODUCT_COMPLETION_SCHEMA_SQL
+                    + "\n"
+                    + marker_sql
+                    + "\nCOMMIT;"
+                )
+            except Exception:
+                if conn.in_transaction:
+                    conn.rollback()
+                raise
+        return {
+            "database": str(self.path),
+            "schema_version": SCHEMA_VERSION,
+            "product_completion_schema_version": PRODUCT_COMPLETION_SCHEMA_VERSION,
+        }
 
     def _ensure_initialized(self) -> None:
         if not self.path.is_file():
@@ -464,6 +723,36 @@ class ReviewStore:
         ):
             raise ReviewStoreError(
                 "P2H Stage 2 Slice A tables are not initialized; run the init "
+                "command first."
+            )
+
+    def _ensure_product_completion_initialized(self) -> None:
+        self._ensure_initialized()
+        with self.connection(read_only=True) as conn:
+            feature_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='product_completion_schema_version'"
+            ).fetchone()
+            tables = {
+                str(row[0])
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+        required = {
+            "fee_profiles",
+            "fee_projections",
+            "fee_corrections",
+            "review_runs",
+            "review_run_status_events",
+        }
+        if (
+            feature_row is None
+            or int(feature_row[0]) != PRODUCT_COMPLETION_SCHEMA_VERSION
+            or not required.issubset(tables)
+        ):
+            raise ReviewStoreError(
+                "Product-completion tables are not initialized; run the init "
                 "command first."
             )
 
@@ -993,6 +1282,631 @@ class ReviewStore:
             item["raw_payload"] = json.loads(item.pop("raw_payload_json"))
             item["decision_refs"] = links[str(item["event_id"])]
             result.append(item)
+        return result
+
+    @staticmethod
+    def _product_payload(value: object, record_type: type[Any]) -> dict[str, Any]:
+        if isinstance(value, record_type):
+            record = value
+        else:
+            candidate = value
+            if not isinstance(candidate, Mapping) and hasattr(candidate, "to_dict"):
+                candidate = candidate.to_dict()
+            if not isinstance(candidate, Mapping):
+                raise ReviewStoreError(
+                    f"Expected {record_type.__name__} or a mapping payload"
+                )
+            record = record_type.from_mapping(candidate)
+        return record.to_dict()
+
+    def save_fee_profile(
+        self, profile: FeeProfileRecord | Mapping[str, Any] | object
+    ) -> dict[str, Any]:
+        """Create one immutable fee profile or idempotently replay it."""
+
+        self._ensure_product_completion_initialized()
+        payload = self._product_payload(profile, FeeProfileRecord)
+        payload_json = canonical_json(payload)
+        payload_sha256 = sha256_text(payload_json)
+        profile_id = payload["profile_id"]
+        with self.connection() as conn:
+            with conn:
+                existing = conn.execute(
+                    "SELECT payload_json, payload_sha256 FROM fee_profiles "
+                    "WHERE profile_id = ?",
+                    (profile_id,),
+                ).fetchone()
+                if existing is not None:
+                    if (
+                        existing["payload_json"] == payload_json
+                        and existing["payload_sha256"] == payload_sha256
+                    ):
+                        return {
+                            "profile_id": profile_id,
+                            "payload_sha256": payload_sha256,
+                            "status": "SKIPPED",
+                        }
+                    raise DataConflictError(
+                        "Fee profile changed after creation: "
+                        f"profile_id={profile_id}"
+                    )
+                conn.execute(
+                    """
+                    INSERT INTO fee_profiles(
+                        profile_id, profile_key, method, method_version,
+                        sample_count, rate, currency, fallback_level,
+                        computed_at, payload_json, payload_sha256, inserted_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        profile_id,
+                        payload["profile_key"],
+                        payload["method"],
+                        payload["method_version"],
+                        payload["sample_count"],
+                        payload["rate"],
+                        payload["currency"],
+                        payload["fallback_level"],
+                        payload["computed_at"],
+                        payload_json,
+                        payload_sha256,
+                        _now(),
+                    ),
+                )
+        return {
+            "profile_id": profile_id,
+            "payload_sha256": payload_sha256,
+            "status": "INSERTED",
+        }
+
+    def list_fee_profiles(
+        self, *, profile_key: str | None = None
+    ) -> list[dict[str, Any]]:
+        self._ensure_product_completion_initialized()
+        where = " WHERE profile_key = ?" if profile_key is not None else ""
+        params: Sequence[Any] = (profile_key,) if profile_key is not None else ()
+        with self.connection(read_only=True) as conn:
+            rows = conn.execute(
+                "SELECT payload_json FROM fee_profiles"
+                + where
+                + " ORDER BY computed_at, profile_id",
+                params,
+            ).fetchall()
+        return [json.loads(row["payload_json"]) for row in rows]
+
+    def save_fee_projection(
+        self, projection: FeeProjectionRecord | Mapping[str, Any] | object
+    ) -> dict[str, Any]:
+        """Create one immutable actual/estimated/unknown fee projection."""
+
+        self._ensure_product_completion_initialized()
+        payload = self._product_payload(projection, FeeProjectionRecord)
+        payload_json = canonical_json(payload)
+        payload_sha256 = sha256_text(payload_json)
+        projection_id = payload["projection_id"]
+        event_id = payload["event_id"]
+        with self.connection() as conn:
+            with conn:
+                existing = conn.execute(
+                    "SELECT payload_json, payload_sha256 FROM fee_projections "
+                    "WHERE projection_id = ?",
+                    (projection_id,),
+                ).fetchone()
+                if existing is not None:
+                    if (
+                        existing["payload_json"] == payload_json
+                        and existing["payload_sha256"] == payload_sha256
+                    ):
+                        return {
+                            "projection_id": projection_id,
+                            "event_id": event_id,
+                            "payload_sha256": payload_sha256,
+                            "status": "SKIPPED",
+                        }
+                    raise DataConflictError(
+                        "Fee projection changed after creation: "
+                        f"projection_id={projection_id}"
+                    )
+                if conn.execute(
+                    "SELECT 1 FROM trade_events WHERE event_id = ?", (event_id,)
+                ).fetchone() is None:
+                    raise ReviewStoreError(f"Trade event not found: {event_id}")
+                profile_id = payload["profile_id"]
+                profile_row = None
+                if profile_id is not None:
+                    profile_row = conn.execute(
+                        "SELECT payload_json FROM fee_profiles WHERE profile_id = ?",
+                        (profile_id,),
+                    ).fetchone()
+                    if profile_row is None:
+                        raise ReviewStoreError(f"Fee profile not found: {profile_id}")
+                if payload["status"] == "estimated":
+                    profile_payload = json.loads(profile_row["payload_json"])
+                    compared_fields = (
+                        "method",
+                        "method_version",
+                        "sample_count",
+                        "currency",
+                    )
+                    mismatches = [
+                        field
+                        for field in compared_fields
+                        if profile_payload[field] != payload[field]
+                    ]
+                    if mismatches:
+                        raise ReviewStoreError(
+                            "FEE_PROFILE_PROJECTION_MISMATCH: "
+                            + ", ".join(mismatches)
+                        )
+                concurrent = conn.execute(
+                    "SELECT projection_id FROM fee_projections "
+                    "WHERE event_id = ? AND projected_at = ?",
+                    (event_id, payload["projected_at"]),
+                ).fetchone()
+                if concurrent is not None:
+                    raise ReviewStoreError(
+                        "AMBIGUOUS_FEE_PROJECTION_TIME: another projection already "
+                        f"exists for event_id={event_id} at {payload['projected_at']}"
+                    )
+                conn.execute(
+                    """
+                    INSERT INTO fee_projections(
+                        projection_id, event_id, status, amount, currency,
+                        source_fees, method, method_version, sample_count,
+                        profile_id, reason_code, projected_at, payload_json,
+                        payload_sha256, inserted_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        projection_id,
+                        event_id,
+                        payload["status"],
+                        payload["amount"],
+                        payload["currency"],
+                        payload["source_fees"],
+                        payload["method"],
+                        payload["method_version"],
+                        payload["sample_count"],
+                        profile_id,
+                        payload["reason_code"],
+                        payload["projected_at"],
+                        payload_json,
+                        payload_sha256,
+                        _now(),
+                    ),
+                )
+        return {
+            "projection_id": projection_id,
+            "event_id": event_id,
+            "payload_sha256": payload_sha256,
+            "status": "INSERTED",
+        }
+
+    def list_fee_projections(
+        self, *, event_id: str | None = None
+    ) -> list[dict[str, Any]]:
+        self._ensure_product_completion_initialized()
+        where = " WHERE event_id = ?" if event_id is not None else ""
+        params: Sequence[Any] = (event_id,) if event_id is not None else ()
+        with self.connection(read_only=True) as conn:
+            rows = conn.execute(
+                "SELECT payload_json FROM fee_projections"
+                + where
+                + " ORDER BY event_id, projected_at, projection_id",
+                params,
+            ).fetchall()
+        return [json.loads(row["payload_json"]) for row in rows]
+
+    def append_fee_correction(
+        self, correction: FeeCorrectionRecord | Mapping[str, Any] | object
+    ) -> dict[str, Any]:
+        """Append a human fee correction without replacing any prior row."""
+
+        self._ensure_product_completion_initialized()
+        payload = self._product_payload(correction, FeeCorrectionRecord)
+        payload_json = canonical_json(payload)
+        payload_sha256 = sha256_text(payload_json)
+        correction_id = payload["correction_id"]
+        event_id = payload["event_id"]
+        with self.connection() as conn:
+            with conn:
+                existing = conn.execute(
+                    "SELECT payload_json, payload_sha256 FROM fee_corrections "
+                    "WHERE correction_id = ?",
+                    (correction_id,),
+                ).fetchone()
+                if existing is not None:
+                    if (
+                        existing["payload_json"] == payload_json
+                        and existing["payload_sha256"] == payload_sha256
+                    ):
+                        return {
+                            "correction_id": correction_id,
+                            "event_id": event_id,
+                            "payload_sha256": payload_sha256,
+                            "status": "SKIPPED",
+                        }
+                    raise DataConflictError(
+                        "Fee correction changed after creation: "
+                        f"correction_id={correction_id}"
+                    )
+                if conn.execute(
+                    "SELECT 1 FROM trade_events WHERE event_id = ?", (event_id,)
+                ).fetchone() is None:
+                    raise ReviewStoreError(f"Trade event not found: {event_id}")
+                current = conn.execute(
+                    "SELECT correction_id, effective_at, known_at "
+                    "FROM fee_corrections WHERE event_id = ? "
+                    "ORDER BY effective_at DESC, known_at DESC, correction_id DESC "
+                    "LIMIT 1",
+                    (event_id,),
+                ).fetchone()
+                supersedes_id = payload["supersedes_correction_id"]
+                if current is None and supersedes_id is not None:
+                    raise ReviewStoreError(
+                        "Cannot supersede a missing fee correction: "
+                        f"correction_id={supersedes_id}"
+                    )
+                if current is not None:
+                    if supersedes_id != current["correction_id"]:
+                        raise ReviewStoreError(
+                            "A new fee correction must supersede the current correction "
+                            f"{current['correction_id']}"
+                        )
+                    if (
+                        payload["effective_at"] < current["effective_at"]
+                        or payload["known_at"] < current["known_at"]
+                    ):
+                        raise ReviewStoreError(
+                            "A superseding fee correction cannot precede its parent"
+                        )
+                concurrent = conn.execute(
+                    "SELECT correction_id FROM fee_corrections "
+                    "WHERE event_id = ? AND effective_at = ? AND known_at = ?",
+                    (event_id, payload["effective_at"], payload["known_at"]),
+                ).fetchone()
+                if concurrent is not None:
+                    raise ReviewStoreError(
+                        "AMBIGUOUS_FEE_CORRECTION_TIME: another correction already "
+                        f"exists for event_id={event_id} at the same dual time"
+                    )
+                conn.execute(
+                    """
+                    INSERT INTO fee_corrections(
+                        correction_id, event_id, status, amount, currency,
+                        effective_at, known_at, reviewer_ref, reason,
+                        supersedes_correction_id, payload_json, payload_sha256,
+                        inserted_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        correction_id,
+                        event_id,
+                        payload["status"],
+                        payload["amount"],
+                        payload["currency"],
+                        payload["effective_at"],
+                        payload["known_at"],
+                        payload["reviewer_ref"],
+                        payload["reason"],
+                        supersedes_id,
+                        payload_json,
+                        payload_sha256,
+                        _now(),
+                    ),
+                )
+        return {
+            "correction_id": correction_id,
+            "event_id": event_id,
+            "payload_sha256": payload_sha256,
+            "status": "INSERTED",
+        }
+
+    def list_fee_corrections(
+        self, *, event_id: str | None = None
+    ) -> list[dict[str, Any]]:
+        self._ensure_product_completion_initialized()
+        where = " WHERE event_id = ?" if event_id is not None else ""
+        params: Sequence[Any] = (event_id,) if event_id is not None else ()
+        with self.connection(read_only=True) as conn:
+            rows = conn.execute(
+                "SELECT payload_json FROM fee_corrections"
+                + where
+                + " ORDER BY event_id, effective_at, known_at, correction_id",
+                params,
+            ).fetchall()
+        return [json.loads(row["payload_json"]) for row in rows]
+
+    def get_effective_fee(
+        self,
+        event_id: str,
+        *,
+        as_of: str | None = None,
+        knowledge_cutoff: str | None = None,
+    ) -> dict[str, Any]:
+        """Project the visible fee without mutating source or derived history."""
+
+        self._ensure_product_completion_initialized()
+        normalized_as_of = utc_iso(as_of, "UTC") if as_of is not None else None
+        normalized_cutoff = (
+            utc_iso(knowledge_cutoff, "UTC")
+            if knowledge_cutoff is not None
+            else None
+        )
+        with self.connection(read_only=True) as conn:
+            if conn.execute(
+                "SELECT 1 FROM trade_events WHERE event_id = ?", (event_id,)
+            ).fetchone() is None:
+                raise ReviewStoreError(f"Trade event not found: {event_id}")
+            projection_filters = ["event_id = ?"]
+            projection_params: list[Any] = [event_id]
+            if normalized_as_of is not None:
+                projection_filters.append("projected_at <= ?")
+                projection_params.append(normalized_as_of)
+            if normalized_cutoff is not None:
+                projection_filters.append("projected_at <= ?")
+                projection_params.append(normalized_cutoff)
+            projection_row = conn.execute(
+                "SELECT payload_json FROM fee_projections WHERE "
+                + " AND ".join(projection_filters)
+                + " ORDER BY projected_at DESC, projection_id DESC LIMIT 1",
+                projection_params,
+            ).fetchone()
+            correction_filters = ["event_id = ?"]
+            correction_params: list[Any] = [event_id]
+            if normalized_as_of is not None:
+                correction_filters.append("effective_at <= ?")
+                correction_params.append(normalized_as_of)
+            if normalized_cutoff is not None:
+                correction_filters.append("known_at <= ?")
+                correction_params.append(normalized_cutoff)
+            correction_row = conn.execute(
+                "SELECT payload_json FROM fee_corrections WHERE "
+                + " AND ".join(correction_filters)
+                + " ORDER BY effective_at DESC, known_at DESC, correction_id DESC LIMIT 1",
+                correction_params,
+            ).fetchone()
+        projection = (
+            json.loads(projection_row["payload_json"])
+            if projection_row is not None
+            else None
+        )
+        if correction_row is not None:
+            correction = json.loads(correction_row["payload_json"])
+            return {
+                **correction,
+                "source": "correction",
+                "base_projection_id": (
+                    projection["projection_id"] if projection is not None else None
+                ),
+            }
+        if projection is not None:
+            return {**projection, "source": "projection"}
+        return {
+            "event_id": event_id,
+            "status": "unknown",
+            "amount": None,
+            "currency": "CNY",
+            "reason_code": "no_fee_projection",
+            "source": "missing",
+        }
+
+    def save_review_run(
+        self, run: ReviewRunRecord | Mapping[str, Any] | object
+    ) -> dict[str, Any]:
+        """Create deterministic review-run request metadata."""
+
+        self._ensure_product_completion_initialized()
+        payload = self._product_payload(run, ReviewRunRecord)
+        payload_json = canonical_json(payload)
+        payload_sha256 = sha256_text(payload_json)
+        run_id = payload["run_id"]
+        run_key = payload["run_key"]
+        with self.connection() as conn:
+            with conn:
+                existing = conn.execute(
+                    "SELECT run_key, payload_json, payload_sha256 FROM review_runs "
+                    "WHERE run_id = ?",
+                    (run_id,),
+                ).fetchone()
+                if existing is not None:
+                    if (
+                        existing["payload_json"] == payload_json
+                        and existing["payload_sha256"] == payload_sha256
+                    ):
+                        return {
+                            "run_id": run_id,
+                            "run_key": run_key,
+                            "payload_sha256": payload_sha256,
+                            "status": "SKIPPED",
+                        }
+                    raise DataConflictError(
+                        f"Review run changed after creation: run_id={run_id}"
+                    )
+                key_owner = conn.execute(
+                    "SELECT run_id FROM review_runs WHERE run_key = ?", (run_key,)
+                ).fetchone()
+                if key_owner is not None:
+                    raise DataConflictError(
+                        "Review run key already belongs to "
+                        f"run_id={key_owner['run_id']}"
+                    )
+                conn.execute(
+                    """
+                    INSERT INTO review_runs(
+                        run_id, run_key, scope, requested_at, source_cutoff,
+                        trigger, payload_json, payload_sha256, inserted_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        run_id,
+                        run_key,
+                        payload["scope"],
+                        payload["requested_at"],
+                        payload["source_cutoff"],
+                        payload["trigger"],
+                        payload_json,
+                        payload_sha256,
+                        _now(),
+                    ),
+                )
+        return {
+            "run_id": run_id,
+            "run_key": run_key,
+            "payload_sha256": payload_sha256,
+            "status": "INSERTED",
+        }
+
+    def append_review_run_status(
+        self, event: ReviewRunStatusEvent | Mapping[str, Any] | object
+    ) -> dict[str, Any]:
+        """Append one status event; no run row or prior event is overwritten."""
+
+        self._ensure_product_completion_initialized()
+        payload = self._product_payload(event, ReviewRunStatusEvent)
+        payload_json = canonical_json(payload)
+        payload_sha256 = sha256_text(payload_json)
+        run_event_id = payload["run_event_id"]
+        run_id = payload["run_id"]
+        with self.connection() as conn:
+            with conn:
+                existing = conn.execute(
+                    "SELECT payload_json, payload_sha256 "
+                    "FROM review_run_status_events WHERE run_event_id = ?",
+                    (run_event_id,),
+                ).fetchone()
+                if existing is not None:
+                    if (
+                        existing["payload_json"] == payload_json
+                        and existing["payload_sha256"] == payload_sha256
+                    ):
+                        return {
+                            "run_event_id": run_event_id,
+                            "run_id": run_id,
+                            "payload_sha256": payload_sha256,
+                            "status": "SKIPPED",
+                        }
+                    raise DataConflictError(
+                        "Review run status event changed after creation: "
+                        f"run_event_id={run_event_id}"
+                    )
+                if conn.execute(
+                    "SELECT 1 FROM review_runs WHERE run_id = ?", (run_id,)
+                ).fetchone() is None:
+                    raise ReviewStoreError(f"Review run not found: {run_id}")
+                concurrent = conn.execute(
+                    "SELECT run_event_id FROM review_run_status_events "
+                    "WHERE run_id = ? AND occurred_at = ? AND known_at = ?",
+                    (run_id, payload["occurred_at"], payload["known_at"]),
+                ).fetchone()
+                if concurrent is not None:
+                    raise ReviewStoreError(
+                        "AMBIGUOUS_REVIEW_RUN_STATUS_TIME: another status event "
+                        "already uses the same dual time"
+                    )
+                conn.execute(
+                    """
+                    INSERT INTO review_run_status_events(
+                        run_event_id, run_id, status, occurred_at, known_at,
+                        payload_json, payload_sha256, inserted_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        run_event_id,
+                        run_id,
+                        payload["status"],
+                        payload["occurred_at"],
+                        payload["known_at"],
+                        payload_json,
+                        payload_sha256,
+                        _now(),
+                    ),
+                )
+        return {
+            "run_event_id": run_event_id,
+            "run_id": run_id,
+            "payload_sha256": payload_sha256,
+            "status": "INSERTED",
+        }
+
+    def get_review_run(
+        self,
+        run_ref: str,
+        *,
+        as_of: str | None = None,
+        knowledge_cutoff: str | None = None,
+    ) -> dict[str, Any]:
+        """Return run metadata plus a cutoff-safe status-ledger projection."""
+
+        self._ensure_product_completion_initialized()
+        normalized_as_of = utc_iso(as_of, "UTC") if as_of is not None else None
+        normalized_cutoff = (
+            utc_iso(knowledge_cutoff, "UTC")
+            if knowledge_cutoff is not None
+            else None
+        )
+        with self.connection(read_only=True) as conn:
+            run_rows = conn.execute(
+                "SELECT payload_json FROM review_runs "
+                "WHERE run_id = ? OR run_key = ? ORDER BY run_id",
+                (run_ref, run_ref),
+            ).fetchall()
+            if not run_rows:
+                raise ReviewStoreError(f"Review run not found: {run_ref}")
+            if len(run_rows) != 1:
+                raise ReviewStoreError(f"Ambiguous review run reference: {run_ref}")
+            run = json.loads(run_rows[0]["payload_json"])
+            filters = ["run_id = ?"]
+            params: list[Any] = [run["run_id"]]
+            if normalized_as_of is not None:
+                filters.append("occurred_at <= ?")
+                params.append(normalized_as_of)
+            if normalized_cutoff is not None:
+                filters.append("known_at <= ?")
+                params.append(normalized_cutoff)
+            event_rows = conn.execute(
+                "SELECT payload_json FROM review_run_status_events WHERE "
+                + " AND ".join(filters)
+                + " ORDER BY occurred_at, known_at, run_event_id",
+                params,
+            ).fetchall()
+        history = [json.loads(row["payload_json"]) for row in event_rows]
+        current = history[-1] if history else None
+        return {
+            "run": run,
+            "status": current["status"] if current is not None else "unknown",
+            "status_event": current,
+            "history": history,
+        }
+
+    def list_review_runs(
+        self,
+        *,
+        scope: str | None = None,
+        status: str | None = None,
+        as_of: str | None = None,
+        knowledge_cutoff: str | None = None,
+    ) -> list[dict[str, Any]]:
+        self._ensure_product_completion_initialized()
+        where = " WHERE scope = ?" if scope is not None else ""
+        params: Sequence[Any] = (scope,) if scope is not None else ()
+        with self.connection(read_only=True) as conn:
+            rows = conn.execute(
+                "SELECT run_id FROM review_runs"
+                + where
+                + " ORDER BY requested_at, run_id",
+                params,
+            ).fetchall()
+        result = [
+            self.get_review_run(
+                str(row["run_id"]),
+                as_of=as_of,
+                knowledge_cutoff=knowledge_cutoff,
+            )
+            for row in rows
+        ]
+        if status is not None:
+            result = [item for item in result if item["status"] == status]
         return result
 
     @staticmethod
@@ -1876,23 +2790,38 @@ class ReviewStore:
     def status(self) -> dict[str, Any]:
         self._ensure_initialized()
         with self.connection(read_only=True) as conn:
+            tables = {
+                str(row[0])
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+            count_tables = [
+                "data_sources",
+                "source_config_versions",
+                "ingest_runs",
+                "ingest_run_events",
+                "trade_events",
+                "decisions",
+                "decision_event_links",
+                "portfolio_snapshots",
+                "position_snapshot_items",
+                "behavior_hypothesis_candidates",
+                "behavior_hypothesis_review_events",
+                "behavior_observation_protocols",
+                "behavior_observation_protocol_review_events",
+            ]
+            product_tables = [
+                "fee_profiles",
+                "fee_projections",
+                "fee_corrections",
+                "review_runs",
+                "review_run_status_events",
+            ]
+            count_tables.extend(table for table in product_tables if table in tables)
             counts = {
                 table: conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
-                for table in (
-                    "data_sources",
-                    "source_config_versions",
-                    "ingest_runs",
-                    "ingest_run_events",
-                    "trade_events",
-                    "decisions",
-                    "decision_event_links",
-                    "portfolio_snapshots",
-                    "position_snapshot_items",
-                    "behavior_hypothesis_candidates",
-                    "behavior_hypothesis_review_events",
-                    "behavior_observation_protocols",
-                    "behavior_observation_protocol_review_events",
-                )
+                for table in count_tables
             }
             integrity = conn.execute("PRAGMA integrity_check").fetchone()[0]
             version_row = conn.execute(
@@ -1906,12 +2835,19 @@ class ReviewStore:
                 "SELECT value FROM schema_meta "
                 "WHERE key='p2h_stage2_slice_a_schema_version'"
             ).fetchone()
+            product_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='product_completion_schema_version'"
+            ).fetchone()
         return {
             "database": str(self.path),
             "schema_version": int(version_row[0]) if version_row else None,
             "p2h_stage1_schema_version": int(p2h_row[0]) if p2h_row else None,
             "p2h_stage2_slice_a_schema_version": (
                 int(p2h_stage2_row[0]) if p2h_stage2_row else None
+            ),
+            "product_completion_schema_version": (
+                int(product_row[0]) if product_row else None
             ),
             "integrity_check": integrity,
             "counts": counts,

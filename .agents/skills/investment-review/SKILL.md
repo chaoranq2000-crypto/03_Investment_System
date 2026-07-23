@@ -28,6 +28,62 @@ It must not:
 - collapse evidence into one mechanical score;
 - use information whose `known_at` is later than the decision being reviewed.
 
+## Product-completion system-integration boundary
+
+The product-completion stage is a separately authorized local systems-integration
+overlay. It is not a new canonical P2 stage and is specifically **not P2H Stage 2
+Slice B**. It does not weaken any Phase 1, P2A, P2C, P2E-3, P2F, P2G or P2H
+boundary below. Its permissions are released only by its own verified phase gates:
+
+- P1 may refresh mapping provenance through SQLite `mode=ro`, preserve the
+  separately reviewed mapping, and add only the fee-state, append-only correction
+  and run-metadata contracts to a new candidate sidecar schema. P1 must not run a
+  real sidecar sync or add runner, Web/API/UI or automatic-execution behavior.
+- P2 may add idempotent, full-table read-only source sync, sync-health CLI and the
+  fee projection/correction workflow after the P1 checkpoint and strict mapping
+  validator pass. A review failure must not roll back a committed portfolio import.
+- P3 may add a stable single/weekly/monthly facts-only runner after P2 reconciliation
+  proves `unsynced=0`; it must preserve canonical P2E-3/P2F source-replay gates.
+- P4 may add the local review API and UI after the runner service contract is stable.
+  Those surfaces may expose only validated review objects and append-only human
+  inputs in the candidate review sidecar; they do not authorize a P2H UI path.
+- P5 may add disableable in-process catch-up and periodic automatic runs after P4
+  validation. It must use idempotent run keys, expose lag/failure health, and must
+  not install an OS scheduler or service.
+
+For BUY/SELL fee presentation, exactly one state must remain visible:
+
+- `actual`: a source fee is explicitly present and greater than zero;
+- `estimated`: `historical_median_rate_v1` produced a value from an eligible,
+  traceable sample set and records method version and sample count;
+- `unknown`: the source fee is not actual and the estimation gate cannot be proven.
+
+Zero or missing source fees must never be relabeled as actual. A human correction
+must append a new immutable correction record with provenance and supersession
+lineage; it must not update the source event, source fee or prior correction. A
+current projection may be derived only from a validated, non-forking correction
+chain.
+
+The portfolio SQLite database remains read-only throughout product completion.
+All new state belongs in the explicitly selected candidate review sidecar; a legacy
+or user sidecar must not be silently upgraded or modified. Effective/knowledge-time
+cutoffs still apply to every snapshot, event and revision. Future-known data must
+not enter historical context, and `unknown`, `missing`, `partial`, `ambiguous`,
+`stale`, `unpriced`, `blocked` and `failed` states must remain visible rather than
+being converted to zero, success or canonical readiness.
+
+If no model is configured, unavailable, or rejected by validation, the product must
+return the exact validated facts-only artifact and an explicit attempt/failure state.
+It must not synthesize missing interpretations, human decisions or readiness.
+
+Product completion must not create or update a profile or PersonalPlaybook, create
+an intervention/experiment or attempt/outcome, diagnose psychology/personality,
+score behavior, emit numeric confidence, produce trade or position advice, execute
+orders, write to a broker, use broker credentials, or write the portfolio source
+database. Its API/UI/automation authority applies only to the product-completion
+review workflow described in
+`docs/playbooks/INVESTMENT_REVIEW_PRODUCT_COMPLETION.md`.
+
 ## P2A portfolio-context boundary
 
 After the Phase 1 evidence layer is accepted, the implementation may also:

@@ -286,3 +286,411 @@ class DecisionRecord:
         )
         decision.validate()
         return decision
+
+
+FEE_STATUSES = frozenset({"actual", "estimated", "unknown"})
+FEE_ESTIMATION_METHOD = "historical_median_rate"
+FEE_ESTIMATION_METHOD_VERSION = "historical_median_rate_v1"
+SOURCE_ACTUAL_FEE_METHOD = "source_fee"
+SOURCE_ACTUAL_FEE_METHOD_VERSION = "source_fee_actual_v1"
+REVIEW_RUN_SCOPES = frozenset({"sync", "catch_up", "single", "weekly", "monthly"})
+REVIEW_RUN_STATUSES = frozenset(
+    {"queued", "running", "succeeded", "partial", "blocked", "failed"}
+)
+
+
+def _required_text(value: object, field_name: str) -> str:
+    text = str(value or "").strip()
+    if not text:
+        raise ModelValidationError(f"{field_name} is required")
+    return text
+
+
+def _mapping(value: object, field_name: str) -> dict[str, Any]:
+    if value is None:
+        return {}
+    if not isinstance(value, Mapping):
+        raise ModelValidationError(f"{field_name} must be an object")
+    return dict(value)
+
+
+@dataclass(frozen=True)
+class FeeProfileRecord:
+    """Immutable metadata for one reproducible fee-estimation sample set."""
+
+    profile_id: str
+    profile_key: str
+    method: str
+    method_version: str
+    sample_count: int
+    computed_at: str
+    rate: Decimal | None = None
+    currency: str = "CNY"
+    fallback_level: str = "none"
+    provenance: Mapping[str, Any] = field(default_factory=dict)
+
+    def validate(self) -> None:
+        _required_text(self.profile_id, "profile_id")
+        _required_text(self.profile_key, "profile_key")
+        _required_text(self.method, "method")
+        _required_text(self.method_version, "method_version")
+        _required_text(self.computed_at, "computed_at")
+        _required_text(self.currency, "currency")
+        _required_text(self.fallback_level, "fallback_level")
+        if self.sample_count < 0:
+            raise ModelValidationError("sample_count must be non-negative")
+        if self.rate is not None and self.rate < 0:
+            raise ModelValidationError("rate must be non-negative")
+        if (self.method, self.method_version) != (
+            FEE_ESTIMATION_METHOD,
+            FEE_ESTIMATION_METHOD_VERSION,
+        ):
+            raise ModelValidationError(
+                "fee profile must use historical_median_rate_v1"
+            )
+        if self.sample_count < 5:
+            raise ModelValidationError(
+                "historical_median_rate_v1 requires at least 5 samples"
+            )
+        if self.rate is None or self.rate <= 0:
+            raise ModelValidationError(
+                "historical_median_rate_v1 requires a positive rate"
+            )
+        utc_iso(self.computed_at, "UTC")
+
+    def to_dict(self) -> dict[str, Any]:
+        self.validate()
+        return {
+            "profile_id": self.profile_id,
+            "profile_key": self.profile_key,
+            "method": self.method,
+            "method_version": self.method_version,
+            "sample_count": self.sample_count,
+            "computed_at": utc_iso(self.computed_at, "UTC"),
+            "rate": str(self.rate) if self.rate is not None else None,
+            "currency": self.currency.strip().upper(),
+            "fallback_level": self.fallback_level,
+            "provenance": dict(self.provenance),
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "FeeProfileRecord":
+        try:
+            sample_count = int(value.get("sample_count", 0))
+        except (TypeError, ValueError) as exc:
+            raise ModelValidationError("sample_count must be an integer") from exc
+        record = cls(
+            profile_id=_required_text(value.get("profile_id"), "profile_id"),
+            profile_key=_required_text(value.get("profile_key"), "profile_key"),
+            method=_required_text(value.get("method"), "method"),
+            method_version=_required_text(
+                value.get("method_version", value.get("version")), "method_version"
+            ),
+            sample_count=sample_count,
+            computed_at=utc_iso(value.get("computed_at"), "UTC"),
+            rate=parse_decimal(value.get("rate"), field_name="rate"),
+            currency=_required_text(value.get("currency", "CNY"), "currency").upper(),
+            fallback_level=_required_text(
+                value.get("fallback_level", "none"), "fallback_level"
+            ),
+            provenance=_mapping(value.get("provenance"), "provenance"),
+        )
+        record.validate()
+        return record
+
+
+@dataclass(frozen=True)
+class FeeProjectionRecord:
+    """Immutable fee state for one canonical trade event at one projection time."""
+
+    projection_id: str
+    event_id: str
+    status: str
+    amount: Decimal | None
+    currency: str
+    projected_at: str
+    source_fees: Decimal | None = None
+    method: str | None = None
+    method_version: str | None = None
+    sample_count: int = 0
+    profile_id: str | None = None
+    reason_code: str | None = None
+    provenance: Mapping[str, Any] = field(default_factory=dict)
+
+    def validate(self) -> None:
+        _required_text(self.projection_id, "projection_id")
+        _required_text(self.event_id, "event_id")
+        if self.status not in FEE_STATUSES:
+            raise ModelValidationError(f"Unsupported fee status: {self.status!r}")
+        _required_text(self.currency, "currency")
+        utc_iso(self.projected_at, "UTC")
+        if self.amount is not None and self.amount < 0:
+            raise ModelValidationError("fee amount must be non-negative")
+        if self.source_fees is not None and self.source_fees < 0:
+            raise ModelValidationError("source_fees must be non-negative")
+        if self.sample_count < 0:
+            raise ModelValidationError("sample_count must be non-negative")
+        if self.status == "actual":
+            if self.amount is None or self.amount <= 0:
+                raise ModelValidationError("actual fee requires a positive amount")
+            if self.source_fees is None or self.source_fees <= 0:
+                raise ModelValidationError(
+                    "actual fee requires a positive, explicitly confirmed source_fees value"
+                )
+            if self.amount != self.source_fees:
+                raise ModelValidationError("actual fee amount must equal source_fees")
+            if dict(self.provenance).get("source_fee_actual") is not True:
+                raise ModelValidationError(
+                    "actual fee requires provenance.source_fee_actual=true"
+                )
+            if (self.method, self.method_version) != (
+                SOURCE_ACTUAL_FEE_METHOD,
+                SOURCE_ACTUAL_FEE_METHOD_VERSION,
+            ):
+                raise ModelValidationError(
+                    "actual fee must use source_fee_actual_v1"
+                )
+            if self.sample_count != 0 or self.profile_id is not None:
+                raise ModelValidationError(
+                    "actual fee must not reference estimation samples or a profile"
+                )
+        elif self.status == "estimated":
+            if self.amount is None:
+                raise ModelValidationError("estimated fee requires amount")
+            if self.sample_count < 5:
+                raise ModelValidationError("estimated fee requires at least 5 samples")
+            if (self.method, self.method_version) != (
+                FEE_ESTIMATION_METHOD,
+                FEE_ESTIMATION_METHOD_VERSION,
+            ):
+                raise ModelValidationError(
+                    "estimated fee must use historical_median_rate_v1"
+                )
+            _required_text(self.profile_id, "profile_id")
+        elif self.amount is not None:
+            raise ModelValidationError("unknown fee must preserve amount as missing")
+        if self.status == "unknown":
+            _required_text(self.reason_code, "reason_code")
+            if self.profile_id is not None:
+                raise ModelValidationError("unknown fee must not reference a fee profile")
+
+    def to_dict(self) -> dict[str, Any]:
+        self.validate()
+        return {
+            "projection_id": self.projection_id,
+            "event_id": self.event_id,
+            "status": self.status,
+            "amount": str(self.amount) if self.amount is not None else None,
+            "currency": self.currency.strip().upper(),
+            "source_fees": str(self.source_fees) if self.source_fees is not None else None,
+            "method": self.method,
+            "method_version": self.method_version,
+            "sample_count": self.sample_count,
+            "profile_id": self.profile_id,
+            "reason_code": self.reason_code,
+            "projected_at": utc_iso(self.projected_at, "UTC"),
+            "provenance": dict(self.provenance),
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "FeeProjectionRecord":
+        try:
+            sample_count = int(value.get("sample_count", 0))
+        except (TypeError, ValueError) as exc:
+            raise ModelValidationError("sample_count must be an integer") from exc
+        record = cls(
+            projection_id=_required_text(value.get("projection_id"), "projection_id"),
+            event_id=_required_text(value.get("event_id"), "event_id"),
+            status=_required_text(value.get("status"), "status").lower(),
+            amount=parse_decimal(value.get("amount"), field_name="fee amount"),
+            currency=_required_text(value.get("currency", "CNY"), "currency").upper(),
+            projected_at=utc_iso(value.get("projected_at"), "UTC"),
+            source_fees=parse_decimal(value.get("source_fees"), field_name="source_fees"),
+            method=(str(value["method"]).strip() if value.get("method") else None),
+            method_version=(
+                str(value.get("method_version", value.get("version"))).strip()
+                if value.get("method_version", value.get("version"))
+                else None
+            ),
+            sample_count=sample_count,
+            profile_id=(
+                str(value["profile_id"]).strip() if value.get("profile_id") else None
+            ),
+            reason_code=(
+                str(value["reason_code"]).strip() if value.get("reason_code") else None
+            ),
+            provenance=_mapping(value.get("provenance"), "provenance"),
+        )
+        record.validate()
+        return record
+
+
+@dataclass(frozen=True)
+class FeeCorrectionRecord:
+    """Append-only human correction of a projected fee state."""
+
+    correction_id: str
+    event_id: str
+    status: str
+    amount: Decimal | None
+    currency: str
+    effective_at: str
+    known_at: str
+    reviewer_ref: str
+    reason: str
+    supersedes_correction_id: str | None = None
+    provenance: Mapping[str, Any] = field(default_factory=dict)
+
+    def validate(self) -> None:
+        _required_text(self.correction_id, "correction_id")
+        _required_text(self.event_id, "event_id")
+        if self.status not in {"actual", "unknown"}:
+            raise ModelValidationError(
+                "fee correction status must be 'actual' or 'unknown'"
+            )
+        _required_text(self.currency, "currency")
+        _required_text(self.reviewer_ref, "reviewer_ref")
+        _required_text(self.reason, "reason")
+        ensure_known_not_before_occurred(self.effective_at, self.known_at)
+        if self.status == "actual" and (self.amount is None or self.amount <= 0):
+            raise ModelValidationError("actual fee correction requires a positive amount")
+        if self.status == "unknown" and self.amount is not None:
+            raise ModelValidationError("unknown fee correction must preserve amount as missing")
+
+    def to_dict(self) -> dict[str, Any]:
+        self.validate()
+        return {
+            "correction_id": self.correction_id,
+            "event_id": self.event_id,
+            "status": self.status,
+            "amount": str(self.amount) if self.amount is not None else None,
+            "currency": self.currency.strip().upper(),
+            "effective_at": utc_iso(self.effective_at, "UTC"),
+            "known_at": utc_iso(self.known_at, "UTC"),
+            "reviewer_ref": self.reviewer_ref,
+            "reason": self.reason,
+            "supersedes_correction_id": self.supersedes_correction_id,
+            "provenance": dict(self.provenance),
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "FeeCorrectionRecord":
+        record = cls(
+            correction_id=_required_text(value.get("correction_id"), "correction_id"),
+            event_id=_required_text(value.get("event_id"), "event_id"),
+            status=_required_text(value.get("status"), "status").lower(),
+            amount=parse_decimal(value.get("amount"), field_name="fee amount"),
+            currency=_required_text(value.get("currency", "CNY"), "currency").upper(),
+            effective_at=utc_iso(value.get("effective_at"), "UTC"),
+            known_at=utc_iso(value.get("known_at"), "UTC"),
+            reviewer_ref=_required_text(value.get("reviewer_ref"), "reviewer_ref"),
+            reason=_required_text(value.get("reason"), "reason"),
+            supersedes_correction_id=(
+                str(value["supersedes_correction_id"]).strip()
+                if value.get("supersedes_correction_id")
+                else None
+            ),
+            provenance=_mapping(value.get("provenance"), "provenance"),
+        )
+        record.validate()
+        return record
+
+
+@dataclass(frozen=True)
+class ReviewRunRecord:
+    """Create-only request metadata for one product review run."""
+
+    run_id: str
+    run_key: str
+    scope: str
+    requested_at: str
+    source_cutoff: str | None = None
+    trigger: str = "manual"
+    parameters: Mapping[str, Any] = field(default_factory=dict)
+
+    def validate(self) -> None:
+        _required_text(self.run_id, "run_id")
+        _required_text(self.run_key, "run_key")
+        if self.scope not in REVIEW_RUN_SCOPES:
+            raise ModelValidationError(f"Unsupported review run scope: {self.scope!r}")
+        utc_iso(self.requested_at, "UTC")
+        if self.source_cutoff is not None:
+            utc_iso(self.source_cutoff, "UTC")
+        _required_text(self.trigger, "trigger")
+
+    def to_dict(self) -> dict[str, Any]:
+        self.validate()
+        return {
+            "run_id": self.run_id,
+            "run_key": self.run_key,
+            "scope": self.scope,
+            "requested_at": utc_iso(self.requested_at, "UTC"),
+            "source_cutoff": (
+                utc_iso(self.source_cutoff, "UTC")
+                if self.source_cutoff is not None
+                else None
+            ),
+            "trigger": self.trigger,
+            "parameters": dict(self.parameters),
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "ReviewRunRecord":
+        record = cls(
+            run_id=_required_text(value.get("run_id"), "run_id"),
+            run_key=_required_text(value.get("run_key"), "run_key"),
+            scope=_required_text(value.get("scope"), "scope").lower(),
+            requested_at=utc_iso(value.get("requested_at"), "UTC"),
+            source_cutoff=(
+                utc_iso(value["source_cutoff"], "UTC")
+                if value.get("source_cutoff")
+                else None
+            ),
+            trigger=_required_text(value.get("trigger", "manual"), "trigger"),
+            parameters=_mapping(value.get("parameters"), "parameters"),
+        )
+        record.validate()
+        return record
+
+
+@dataclass(frozen=True)
+class ReviewRunStatusEvent:
+    """Immutable status event used to project retry-safe run state."""
+
+    run_event_id: str
+    run_id: str
+    status: str
+    occurred_at: str
+    known_at: str
+    details: Mapping[str, Any] = field(default_factory=dict)
+
+    def validate(self) -> None:
+        _required_text(self.run_event_id, "run_event_id")
+        _required_text(self.run_id, "run_id")
+        if self.status not in REVIEW_RUN_STATUSES:
+            raise ModelValidationError(f"Unsupported review run status: {self.status!r}")
+        ensure_known_not_before_occurred(self.occurred_at, self.known_at)
+
+    def to_dict(self) -> dict[str, Any]:
+        self.validate()
+        return {
+            "run_event_id": self.run_event_id,
+            "run_id": self.run_id,
+            "status": self.status,
+            "occurred_at": utc_iso(self.occurred_at, "UTC"),
+            "known_at": utc_iso(self.known_at, "UTC"),
+            "details": dict(self.details),
+        }
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "ReviewRunStatusEvent":
+        record = cls(
+            run_event_id=_required_text(value.get("run_event_id"), "run_event_id"),
+            run_id=_required_text(value.get("run_id"), "run_id"),
+            status=_required_text(value.get("status"), "status").lower(),
+            occurred_at=utc_iso(value.get("occurred_at"), "UTC"),
+            known_at=utc_iso(value.get("known_at"), "UTC"),
+            details=_mapping(value.get("details"), "details"),
+        )
+        record.validate()
+        return record
