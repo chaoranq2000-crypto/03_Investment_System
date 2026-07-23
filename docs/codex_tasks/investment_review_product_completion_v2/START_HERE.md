@@ -9,7 +9,7 @@ source_baseline: "5a5f02a71ddbdfe8c3327c49ab45ee67e777b79b"
 last_completed_phase: "none"
 next_phase: "P1"
 last_validation: "pass"
-updated_at: "2026-07-23T07:44:05+00:00"
+updated_at: "2026-07-23T15:50:00+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -22,7 +22,7 @@ Use $autonomous-stage-runner in execute mode.
 
 Task package: docs/codex_tasks/investment_review_product_completion_v2
 Frozen contract: docs/codex_tasks/investment_review_product_completion_v2/CONTRACT.md
-Expected contract SHA-256: PENDING
+Expected contract SHA-256: 96973061c04b2cdb1f86b2140efba475e35b623dd45b939d609a0914d1ea922f
 Execution worktree: C:\Projects\03_Investment_System_investment_review_completion
 Execution branch: codex/investment-review-product-completion
 Source baseline: 5a5f02a71ddbdfe8c3327c49ab45ee67e777b79b
@@ -39,7 +39,7 @@ Validate package integrity and repository preflight, confirm the v2 setup commit
 - **Next phase:** `P1`
 - **Latest validation:** `pass`
 - **Current blocker:** none; the v1 provenance mismatch is an explicit P1 amendment target, not a waived validator.
-- **Next safe action:** Finalize and validate this v2 package, create a package-only setup commit, then execute P1.
+- **Next safe action:** Re-run package/repository preflight and execute P1 within its bounded mutation scope.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
@@ -47,4 +47,5 @@ The v1 source proof recorded portfolio SHA-256 `752e3b87966f23d2e6f3db89cd3a8d5d
 
 ## Checkpoint history
 
+- 2026-07-23T15:50:00+08:00 — Package finalized and validated with contract SHA-256 `96973061c04b2cdb1f86b2140efba475e35b623dd45b939d609a0914d1ea922f`; package-only setup commit is `0b98806`. The mutable launch block was corrected to carry the frozen hash before execution.
 - 2026-07-23T15:37:46+08:00 — v2 amendment drafted from source baseline `5a5f02a71ddbdfe8c3327c49ab45ee67e777b79b`. It preserves the v1 objective and five phases while adding one bounded P1 mapping-provenance regeneration based on explicit user-confirmed semantics. Not safe to execute until finalized and validated.
