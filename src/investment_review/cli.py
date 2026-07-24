@@ -151,8 +151,16 @@ from .time_utils import utc_iso
 DEFAULT_DB = "data/db/investment_review.sqlite3"
 
 
-def _print(payload: Any, *, out: str | None = None) -> None:
-    rendered = json.dumps(payload, ensure_ascii=False, indent=2, default=str)
+def _print(
+    payload: Any, *, out: str | None = None, sort_keys: bool = False
+) -> None:
+    rendered = json.dumps(
+        payload,
+        ensure_ascii=False,
+        indent=2,
+        default=str,
+        sort_keys=sort_keys,
+    )
     if out:
         atomic_write_bytes(out, (rendered + "\n").encode("utf-8"))
     print(rendered)
@@ -305,6 +313,27 @@ def _fee_correct(args: argparse.Namespace, store: ReviewStore) -> int:
     return 0
 
 
+def _review_run(args: argparse.Namespace) -> int:
+    from .review_runner import ReviewRunner
+
+    runner = ReviewRunner(
+        review_db=args.db,
+        portfolio_db=args.portfolio_db,
+        mapping_path=args.mapping,
+        artifact_root=args.artifact_root,
+    )
+    payload = runner.run(
+        scope=args.scope,
+        as_of=args.as_of,
+        knowledge_cutoff=args.knowledge_cutoff,
+        episode_id=args.episode_id,
+        dry_run=args.dry_run,
+        trigger=args.trigger,
+    )
+    _print(payload, out=args.out, sort_keys=True)
+    return 0 if payload["status"] in {"ready", "partial"} else 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m src.investment_review",
@@ -384,6 +413,53 @@ def build_parser() -> argparse.ArgumentParser:
     fee_correct.add_argument("--reason", required=True)
     fee_correct.add_argument("--supersedes-correction-id")
     fee_correct.add_argument("--out", help="Optional JSON receipt path")
+
+    review_run = sub.add_parser(
+        "review-run",
+        help=(
+            "Run deterministic sync, fee, portfolio-context and facts-only "
+            "review stages"
+        ),
+    )
+    review_run.add_argument("--portfolio-db", required=True)
+    review_run.add_argument(
+        "--mapping",
+        help=(
+            "Reviewed SQLite mapping; defaults to the checkout's canonical "
+            "reviewed mapping"
+        ),
+    )
+    review_run.add_argument(
+        "--scope",
+        required=True,
+        choices=("single", "weekly", "monthly"),
+    )
+    review_run.add_argument(
+        "--as-of",
+        required=True,
+        help="Latest effective time visible to portfolio context",
+    )
+    review_run.add_argument(
+        "--knowledge-cutoff",
+        required=True,
+        help="Latest source knowledge time visible to this run",
+    )
+    review_run.add_argument(
+        "--episode-id",
+        help="Explicit canonical episode ID; valid only with --scope single",
+    )
+    review_run.add_argument(
+        "--artifact-root",
+        help=(
+            "Checkout-local immutable run artifact directory; defaults to "
+            ".codex_tmp/investment_review_runs"
+        ),
+    )
+    review_run.add_argument("--trigger", default="cli")
+    review_run_mode = review_run.add_mutually_exclusive_group(required=True)
+    review_run_mode.add_argument("--dry-run", action="store_true")
+    review_run_mode.add_argument("--apply", action="store_true")
+    review_run.add_argument("--out", help="Optional JSON receipt path")
 
     doctor = sub.add_parser(
         "doctor", help="Inspect existing portfolio SQLite files in read-only mode"
@@ -1107,6 +1183,7 @@ def main(argv: list[str] | None = None) -> int:
         "fee-project",
         "fee-status",
         "fee-correct",
+        "review-run",
     }
     if args.command in product_commands:
         from .sync_service import resolve_review_db
@@ -1139,6 +1216,8 @@ def main(argv: list[str] | None = None) -> int:
             return _fee_status(args, store)
         elif args.command == "fee-correct":
             return _fee_correct(args, store)
+        elif args.command == "review-run":
+            return _review_run(args)
         elif args.command == "doctor":
             return _doctor(args)
         elif args.command == "ingest-csv":
