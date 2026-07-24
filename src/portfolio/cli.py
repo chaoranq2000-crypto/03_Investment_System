@@ -771,6 +771,7 @@ def command_web(args: argparse.Namespace, store: PortfolioStore) -> int:
         host=args.host,
         port=args.port,
         open_browser=not args.no_open,
+        review_automation=not args.no_review_automation,
     )
     return 0
 
@@ -944,6 +945,11 @@ def build_parser() -> argparse.ArgumentParser:
     web_parser.add_argument("--port", type=int, default=8765, help="本地服务端口")
     web_parser.add_argument("--env-file", default=default_env_file, help="Tushare 本地配置")
     web_parser.add_argument("--no-open", action="store_true", help="启动后不自动打开浏览器")
+    web_parser.add_argument(
+        "--no-review-automation",
+        action="store_true",
+        help="关闭本次进程内复盘启动补偿与周期检查",
+    )
     web_parser.set_defaults(handler=command_web)
     return parser
 

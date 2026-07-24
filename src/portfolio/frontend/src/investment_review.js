@@ -456,6 +456,7 @@ export function mountInvestmentReview({ request, notify = () => {} } = {}) {
     const lag = object(health.lag);
     const fees = object(health.fees);
     const reviews = object(health.reviews);
+    const automation = object(health.automation);
     healthLine.replaceChildren();
     healthLine.append(
       element("span", "", `source ${text(counts.source_seen ?? counts.source, "unknown")}`),
@@ -463,6 +464,10 @@ export function mountInvestmentReview({ request, notify = () => {} } = {}) {
       element("span", "", `unsynced ${text(lag.unsynced ?? counts.unsynced, "unknown")}`),
       element("span", "", `fees actual ${text(fees.actual, "0")} / estimated ${text(fees.estimated, "0")} / unknown ${text(fees.unknown, "0")}`),
       element("span", "", `reviews ${text(reviews.count ?? reviews.review_count, state.reviews.length)}`),
+      element("span", "", `automation ${text(automation.state, "disabled")}`),
+      element("span", "", `auto_completed ${projectedTime(automation.last_completed)}`),
+      element("span", "", `auto_success ${projectedTime(automation.last_success)}`),
+      element("span", "", `auto_failure ${projectedTime(automation.last_failure)}`),
       element("span", "", `last_success ${projectedTime(health.last_success)}`),
       element("span", "", `last_failure ${projectedTime(health.last_failure)}`),
       element("span", "", `boundary ${boundaryText(health.boundary)}`),

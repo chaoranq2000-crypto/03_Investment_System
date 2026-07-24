@@ -28,7 +28,11 @@ from .kline import (
 from .models import decimal_to_text
 from .prices import PriceFetchError, TushareCloseProvider
 from .realtime import FallbackRealtimeProvider, RealtimeQuote
-from .review_integration import configured_review_database
+from .review_integration import (
+    ReviewAutomationCoordinator,
+    configured_review_database,
+    review_automation_config,
+)
 from .runtime import repository_root
 from .store import PortfolioStore
 from .investment_review_service import (
@@ -1439,7 +1443,9 @@ def serve_dashboard(
     port: int = 8765,
     open_browser: bool = True,
     investment_review_service: InvestmentReviewWebService | None = None,
+    review_automation: bool | None = None,
 ) -> None:
+    service_was_injected = investment_review_service is not None
     server = create_dashboard_server(
         store,
         account_id=account_id,
@@ -1448,6 +1454,63 @@ def serve_dashboard(
         port=port,
         investment_review_service=investment_review_service,
     )
+    automation: ReviewAutomationCoordinator | None = None
+    review_service = server.dashboard_app.investment_review_service
+    configure_automation = (
+        review_service is not None
+        and (
+            not service_was_injected
+            or review_automation is not None
+        )
+    )
+    if configure_automation and review_service is not None:
+        try:
+            values = {**load_env_file(env_file), **os.environ}
+            config = review_automation_config(
+                environ=values,
+                enabled_override=(
+                    False if review_automation is False else None
+                ),
+            )
+            sync_service = review_service.sync_service
+            automation = ReviewAutomationCoordinator(
+                portfolio_db=store.path,
+                review_db=review_service.store.path,
+                mapping_path=(
+                    sync_service.mapping_path
+                    if sync_service is not None
+                    else None
+                ),
+                artifact_root=review_service.catalog.runner.artifact_root,
+                repo_root=repository_root(),
+                config=config,
+                sync_service=sync_service,
+                store=review_service.store,
+            )
+            review_service.set_automation_status_provider(automation.status)
+            automation.start()
+        except Exception as exc:
+            error_type = type(exc).__name__
+            failed_at = datetime.now(timezone.utc).isoformat(
+                timespec="seconds"
+            ).replace("+00:00", "Z")
+            review_service.set_automation_status_provider(
+                lambda: {
+                    "enabled": review_automation is not False,
+                    "state": "failed",
+                    "worker_alive": False,
+                    "queue_depth": 0,
+                    "run_count": 0,
+                    "latest": None,
+                    "last_success": None,
+                    "last_failure": {
+                        "status": "failed",
+                        "error_type": error_type,
+                        "status_occurred_at": failed_at,
+                    },
+                }
+            )
+            print("复盘自动运行未启动；健康页已记录配置或启动失败。")
     actual_host, actual_port = server.server_address[:2]
     url = f"http://{actual_host}:{actual_port}/"
     print(f"持仓可视化页面: {url}")
@@ -1459,4 +1522,10 @@ def serve_dashboard(
     except KeyboardInterrupt:
         pass
     finally:
+        if automation is not None:
+            stopped = automation.stop(timeout=30.0)
+            if stopped.get("worker_alive") is True:
+                print(
+                    "复盘自动运行仍在完成当前原子步骤；进程退出后不会安装或保留系统任务。"
+                )
         server.server_close()

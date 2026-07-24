@@ -14,6 +14,7 @@ import re
 import stat
 import threading
 from collections import Counter
+from collections.abc import Callable
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -670,6 +671,9 @@ class InvestmentReviewWebService:
         catalog: Any | None = None,
         store: ReviewStore | None = None,
         sync_service: ReviewSyncService | None = None,
+        automation_status_provider: (
+            Callable[[], Mapping[str, Any]] | None
+        ) = None,
     ) -> None:
         root = (
             Path(repo_root).resolve()
@@ -759,6 +763,7 @@ class InvestmentReviewWebService:
                 mapping_path=mapping_path,
                 repo_root=root,
             )
+        self.automation_status_provider = automation_status_provider
 
         configured_revision_root = (
             Path(revision_root)
@@ -788,6 +793,14 @@ class InvestmentReviewWebService:
         self._lock_guard = threading.Lock()
         self._revision_locks: dict[str, threading.Lock] = {}
         self._decision_locks: dict[str, threading.Lock] = {}
+
+    def set_automation_status_provider(
+        self,
+        provider: Callable[[], Mapping[str, Any]] | None,
+    ) -> None:
+        """Attach a process-local status source without changing the sidecar."""
+
+        self.automation_status_provider = provider
 
     @staticmethod
     def _ref(bundle: Mapping[str, Any]) -> dict[str, Any]:
@@ -1887,6 +1900,80 @@ class InvestmentReviewWebService:
             ),
         }
 
+    @staticmethod
+    def _automation_health_projection(value: object) -> dict[str, Any]:
+        if not isinstance(value, Mapping):
+            return {
+                "enabled": False,
+                "state": "failed",
+                "worker_alive": False,
+                "queue_depth": 0,
+                "run_count": 0,
+                "latest": None,
+                "last_success": None,
+                "last_completed": None,
+                "last_failure": {
+                    "status": "failed",
+                    "error_type": "AutomationHealthUnavailable",
+                },
+            }
+
+        def count(item: object) -> int:
+            try:
+                return max(0, int(item or 0))
+            except (TypeError, ValueError):
+                return 0
+
+        def project_run(item: object) -> dict[str, Any] | None:
+            if not isinstance(item, Mapping):
+                return None
+            scopes: list[dict[str, Any]] = []
+            raw_scopes = item.get("scope_runs")
+            if isinstance(raw_scopes, list):
+                for scope in raw_scopes:
+                    if not isinstance(scope, Mapping):
+                        continue
+                    scopes.append(
+                        {
+                            key: scope.get(key)
+                            for key in (
+                                "scope",
+                                "run_id",
+                                "run_key",
+                                "status",
+                                "content_id",
+                            )
+                        }
+                    )
+            return {
+                key: item.get(key)
+                for key in (
+                    "run_id",
+                    "run_key",
+                    "status",
+                    "requested_at",
+                    "source_cutoff",
+                    "status_occurred_at",
+                    "source_cutoff_id",
+                    "projection_sha256",
+                    "attempt",
+                    "retryable",
+                    "error_type",
+                )
+            } | {"scope_runs": scopes}
+
+        return {
+            "enabled": value.get("enabled") is True,
+            "state": str(value.get("state") or "unknown"),
+            "worker_alive": value.get("worker_alive") is True,
+            "queue_depth": count(value.get("queue_depth")),
+            "run_count": count(value.get("run_count")),
+            "latest": project_run(value.get("latest")),
+            "last_success": project_run(value.get("last_success")),
+            "last_completed": project_run(value.get("last_completed")),
+            "last_failure": project_run(value.get("last_failure")),
+        }
+
     def get_health(self) -> dict[str, Any]:
         if self.sync_service is None:
             sync = {
@@ -1958,6 +2045,26 @@ class InvestmentReviewWebService:
                 None,
             ),
         }
+        try:
+            if self.automation_status_provider is not None:
+                raw_automation = self.automation_status_provider()
+            else:
+                from .review_integration import review_automation_health
+
+                raw_automation = review_automation_health(
+                    self.store,
+                    enabled=False,
+                )
+        except Exception:
+            raw_automation = {
+                "enabled": True,
+                "state": "failed",
+                "last_failure": {
+                    "status": "failed",
+                    "error_type": "AutomationHealthUnavailable",
+                },
+            }
+        automation = self._automation_health_projection(raw_automation)
         status = str(sync["status"])
         latest_run_status = (
             str(runs[-1].get("status") or "unknown") if runs else None
@@ -1969,6 +2076,44 @@ class InvestmentReviewWebService:
             "running",
         }:
             status = latest_run_status
+        automation_state = str(automation.get("state") or "unknown")
+        severity = {
+            "healthy": 0,
+            "ready": 0,
+            "complete": 0,
+            "available": 0,
+            "unknown": 1,
+            "missing": 2,
+            "missing_sidecar": 3,
+            "schema_not_initialized": 3,
+            "unavailable": 3,
+            "queued": 4,
+            "running": 4,
+            "partial": 5,
+            "lagging": 5,
+            "blocked": 6,
+            "invalid_sidecar": 7,
+            "failed": 8,
+        }
+        if automation.get("enabled") is True and automation_state in {
+            "failed",
+            "blocked",
+            "queued",
+            "running",
+            "partial",
+        } and severity.get(automation_state, 1) > severity.get(status, 1):
+            status = automation_state
+        health_gaps: list[str] = []
+        if sync["lag"].get("unsynced"):
+            health_gaps.append("REVIEW_SYNC_LAG")
+        if automation.get("enabled") is True and automation_state in {
+            "failed",
+            "blocked",
+            "partial",
+        }:
+            health_gaps.append(
+                "REVIEW_AUTOMATION_" + automation_state.upper()
+            )
         return _envelope(
             status=_current_status(status),
             data={
@@ -1979,13 +2124,10 @@ class InvestmentReviewWebService:
                 "last_success": sync["last_success"],
                 "last_failure": sync["last_failure"],
                 "reviews": review_health,
+                "automation": automation,
                 "boundary": dict(API_BOUNDARY),
             },
-            gaps=(
-                ["REVIEW_SYNC_LAG"]
-                if sync["lag"].get("unsynced")
-                else []
-            ),
+            gaps=health_gaps,
         )
 
     def _event_for_command(

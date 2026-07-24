@@ -1,0 +1,442 @@
+{
+  "schema_version": "investment_review.product_completion_validation.v1",
+  "task": {
+    "task_id": "investment_review_product_completion_v2",
+    "package_path": "docs/codex_tasks/investment_review_product_completion_v2",
+    "contract_sha256": "96973061c04b2cdb1f86b2140efba475e35b623dd45b939d609a0914d1ea922f",
+    "source_baseline": "5a5f02a71ddbdfe8c3327c49ab45ee67e777b79b",
+    "execution_branch": "codex/investment-review-product-completion",
+    "execution_worktree": "C:\\Projects\\03_Investment_System_investment_review_completion",
+    "generated_at": "2026-07-24T18:11:05+08:00"
+  },
+  "release_truth": {
+    "engineering_complete": true,
+    "data_ready_at_recorded_cutoff": true,
+    "human_context_complete": false,
+    "human_product_acceptance": false,
+    "production_released": false,
+    "published": false,
+    "deployed": false,
+    "os_scheduler_installed": false
+  },
+  "amendment": {
+    "v1_package": "docs/codex_tasks/investment_review_product_completion_v1",
+    "v1_contract_sha256": "86d6ba6f4f4365fac03c5ed8797f381d1b888563d84239e3a933be2473e130c6",
+    "v1_blocker": "review.generated_mapping_sha256 expected a707064ba00cc8795e7e6164b5b7240b4c86a55f7a9aaa4433af3b26cd498b9e while the formal-schema regeneration produced bbe59f0dd126933e89c8580a2281893078e3b76baa5c61cac98355da0986d4f3",
+    "v2_authorized_change": "Regenerate the machine mapping read-only, preserve the user-confirmed D-010 business semantics, and register the regenerated provenance hashes before resuming the unchanged five product-completion phases.",
+    "v2_setup_commits": [
+      "0b98806 docs(task): prepare investment review product completion v2",
+      "a597b94 docs(task): correct v2 launch checkpoint"
+    ]
+  },
+  "mapping_provenance": {
+    "source": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+    "table": "ledger_entries",
+    "generated_mapping_registered_sha256_before": "a707064ba00cc8795e7e6164b5b7240b4c86a55f7a9aaa4433af3b26cd498b9e",
+    "generated_mapping_sha256_after": "bbe59f0dd126933e89c8580a2281893078e3b76baa5c61cac98355da0986d4f3",
+    "schema_manifest_sha256": "a4e23bf8d6bfe8b0cd15d2241e65fca1fe0305b7ffb3495fd57abaee9c4b34f0",
+    "reviewed_mapping_content_sha256_before": "a3a89c8c728ab37b08f32fc394120dd34318f037f00f4be968a916909b69cb46",
+    "reviewed_mapping_content_sha256_after": "2eddc1c2aafe221fcd94c2c51d84c646174df5489b73bfcf1c171f55988c1c8a",
+    "reviewed_mapping_file_sha256_after": "8529ea00a4f9b2c3dd9518ad8039bf479e5c81c48964be74edc49c0539a3b15e",
+    "reviewed_by": "workspace_user",
+    "reviewed_at": "2026-07-23T15:49:28+08:00",
+    "strict_validator": "pass",
+    "table_schema_sha256": "26a979d503a276afa0e42957c90878eb479ab63bcd7d59374366525c959c79bf",
+    "d_010_semantics_changed": false,
+    "d_010": {
+      "record_id": "account_id + '::' + external_id",
+      "occurred_at": "event_date + ' ' + event_time",
+      "known_at": "occurred_at fallback with known_at_fallback=true",
+      "created_at_is_historical_known_at": false,
+      "trade_sides": {
+        "BUY": "BUY",
+        "SELL": "SELL"
+      },
+      "non_trade_sides": {
+        "DIVIDEND": "OTHER",
+        "CASH_FEE": "OTHER"
+      },
+      "currency": "CNY"
+    }
+  },
+  "database_proof": {
+    "formal_source": {
+      "path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+      "mode": "ro",
+      "quick_check": "ok",
+      "ledger_entries": 983,
+      "sha256_before": "752e3b87966f23d2e6f3db89cd3a8d5df0ab893504ee4e7e83de793e4aa52f53",
+      "sha256_after": "752e3b87966f23d2e6f3db89cd3a8d5df0ab893504ee4e7e83de793e4aa52f53",
+      "unchanged": true
+    },
+    "candidate_sidecar": {
+      "path": "C:\\Projects\\03_Investment_System_investment_review_completion\\data\\db\\investment_review.sqlite3",
+      "git_ignored": true,
+      "quick_check": "ok",
+      "sha256_final": "3d996f7a0493e1dd63b3883609f0494fc47d0e9a4939debb0bca63b82d353564",
+      "trade_events": 983,
+      "decisions": 0,
+      "decision_event_links": 0,
+      "portfolio_snapshots": 0,
+      "position_snapshot_items": 0,
+      "fee_profiles": 75,
+      "fee_projections": 915,
+      "review_runs": 15,
+      "current_run_statuses": {
+        "catch_up_partial": 1,
+        "monthly_partial": 3,
+        "single_partial": 4,
+        "sync_succeeded": 4,
+        "weekly_partial": 3
+      },
+      "historical_failed_status_events": 3
+    },
+    "protected_user_sidecar": {
+      "path": "C:\\Projects\\03_Investment_System_portfolio\\data\\db\\investment_review.sqlite3",
+      "sha256_before": "4eb58f12e2888d3761107e2d23f06efd69096e3525b955a1e96d4bcc092dae38",
+      "sha256_after": "4eb58f12e2888d3761107e2d23f06efd69096e3525b955a1e96d4bcc092dae38",
+      "unchanged": true
+    }
+  },
+  "execution_cutoff": {
+    "source_cutoff_id": "sync_cutoff_3d178827a8baa26f37fb050c",
+    "max_occurred_at": "2026-07-17T05:55:28Z",
+    "max_known_at": "2026-07-17T05:55:28Z",
+    "source_seen": 983,
+    "sidecar_seen": 983,
+    "unsynced": 0,
+    "repeat_sync_inserted": 0,
+    "repeat_sync_skipped": 983,
+    "fee_status": {
+      "actual": 192,
+      "estimated": 693,
+      "unknown": 30
+    },
+    "runner_scopes": {
+      "single": {
+        "status": "partial",
+        "selected_episodes": 1,
+        "facts": 23,
+        "reviews": 1,
+        "run_id": "reviewrun_a51358cdc2c480fddec79926c0b77a5b",
+        "run_key": "review:6db917f94519cef658012786689de053e36eef61cc27dc8cea8c45ad07bc70f3"
+      },
+      "weekly": {
+        "status": "partial",
+        "selected_episodes": 22,
+        "facts": 485,
+        "reviews": 22,
+        "run_id": "reviewrun_99636e25ca7f1a088bd174d079912bbc",
+        "run_key": "review:124aeac6f070b3681efc2e115e23421cab6c41cda66af0b586a25cec17961840"
+      },
+      "monthly": {
+        "status": "partial",
+        "selected_episodes": 25,
+        "facts": 629,
+        "reviews": 25,
+        "run_id": "reviewrun_f14e1fb413cb204f89cd766db4c8e8bd",
+        "run_key": "review:e03c34e180486caa135882a3008c9c662bb3446168229f212d9f4d84b5877db0"
+      }
+    },
+    "unique_episode_ids_across_scopes": 25,
+    "unique_review_ids_across_scopes": 25,
+    "source_replay": "ready",
+    "governance": {
+      "facts_only": true,
+      "historical_decisions_inferred": false,
+      "model_called": false,
+      "no_advice": true,
+      "portfolio_source_written": false
+    }
+  },
+  "automation": {
+    "kind": "disableable in-process catch-up; no OS scheduler",
+    "first_cycle_status": "partial",
+    "run_id": "reviewrun_49e211b834a87a77d769b4d1856c968e",
+    "run_key": "catch_up:49e211b834a87a77d769b4d1856c968e317e24554d8f108aed9d1e4edd7a8b94",
+    "scope_order": [
+      "single",
+      "weekly",
+      "monthly"
+    ],
+    "replay_status": "deduplicated",
+    "sidecar_unchanged_on_replay": true,
+    "startup_catch_up_settled": "partial",
+    "worker_stopped": true,
+    "disabled_mode_inert": true,
+    "health_path_free": true,
+    "post_commit_non_blocking_enqueue": true,
+    "portfolio_import_rollback_on_review_failure": false,
+    "evidence": ".codex_tmp/investment_review_product_completion_v2/p5_automation/candidate_automation_smoke.json"
+  },
+  "browser_and_api": {
+    "formal_episode": {
+      "run_id": "reviewrun_901b380cf6f2e5cee7772d349f7d36e6",
+      "review_id": "review:61ce0f537dfb7bce24f1fb4393455716",
+      "episode_id": "te_92f0638df6c3ba18b798b3d7379c7278",
+      "read_only": true,
+      "facts_only": true,
+      "status": "partial",
+      "automation_state_visible": "partial",
+      "forms_submitted": 0
+    },
+    "synthetic_only": {
+      "historical_human_content": false,
+      "note_saved": true,
+      "correction_revision": 2,
+      "persisted_after_refresh": true,
+      "evidence_drawer_path_leak": false,
+      "formal_candidate_written": false
+    },
+    "api_routes_200": 6,
+    "invalid_run_id_rejected": true,
+    "hostile_host_rejected": true,
+    "page_originated_errors": 0,
+    "external_browser_plugin_telemetry_timeout": true,
+    "evidence": [
+      ".codex_tmp/investment_review_product_completion_v2/browser_smoke/p5_steps.json",
+      ".codex_tmp/investment_review_product_completion_v2/browser_smoke/p5_api_smoke.json",
+      ".codex_tmp/investment_review_product_completion_v2/browser_smoke/p5_formal_automation.jpg"
+    ]
+  },
+  "checkpoints": [
+    "1f7372e feat(review): define product completion data semantics",
+    "53560d0 feat(review): add safe automatic trade sync and fee estimates",
+    "523eac6 feat(review): orchestrate real facts-only review runs",
+    "ef99cd9 feat(review): add traceable review web workflow",
+    "SELF test(review): close product completion candidate"
+  ],
+  "changed_paths": [
+    ".agents/skills/investment-review/SKILL.md",
+    "config/investment_review.portfolio.reviewed.json",
+    "docs/codex_tasks/investment_review_product_completion_v2/CONTRACT.md",
+    "docs/codex_tasks/investment_review_product_completion_v2/START_HERE.md",
+    "docs/playbooks/INVESTMENT_REVIEW_PRODUCT_COMPLETION.md",
+    "reports/investment_review/product_completion/PRODUCT_COMPLETION_READOUT.md",
+    "reports/investment_review/product_completion/validation_summary.json",
+    "src/investment_review/cli.py",
+    "src/investment_review/fee_estimation.py",
+    "src/investment_review/models.py",
+    "src/investment_review/portfolio_snapshot_adapter.py",
+    "src/investment_review/review_runner.py",
+    "src/investment_review/store.py",
+    "src/investment_review/sync_service.py",
+    "src/portfolio/cli.py",
+    "src/portfolio/frontend/src/app.css",
+    "src/portfolio/frontend/src/investment_review.js",
+    "src/portfolio/frontend/src/investment_review.test.js",
+    "src/portfolio/frontend/src/main.js",
+    "src/portfolio/investment_review_service.py",
+    "src/portfolio/review_integration.py",
+    "src/portfolio/web.py",
+    "src/portfolio/web_assets/app.css",
+    "src/portfolio/web_assets/app.js",
+    "tests/test_investment_review_fee_estimation.py",
+    "tests/test_investment_review_portfolio_snapshot_adapter.py",
+    "tests/test_investment_review_product_api.py",
+    "tests/test_investment_review_product_automation.py",
+    "tests/test_investment_review_product_e2e.py",
+    "tests/test_investment_review_product_store.py",
+    "tests/test_investment_review_review_runner.py",
+    "tests/test_investment_review_sync_service.py",
+    "tests/test_portfolio_tracker.py"
+  ],
+  "validation_commands": {
+    "python": "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe",
+    "V-001": [
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe C:\\Users\\Q\\.codex\\skills\\autonomous-stage-runner\\scripts\\task_package.py validate docs\\codex_tasks\\investment_review_product_completion_v2 --require-ready"
+    ],
+    "V-002": [
+      "Get-FileHash C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3 -Algorithm SHA256",
+      "Open C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3 with SQLite URI mode=ro, set PRAGMA query_only=ON, then execute PRAGMA quick_check"
+    ],
+    "V-003": [
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m src.investment_review doctor --portfolio-db C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3 --out .codex_tmp\\investment_review_product_completion_v2\\p5_mapping_recheck_schema.json --mapping-out .codex_tmp\\investment_review_product_completion_v2\\p5_mapping_recheck.generated.json --table ledger_entries --include-counts",
+      "Load config\\investment_review.portfolio.reviewed.json and call src.investment_review.ingest._require_reviewed_sqlite_mapping(config, source_db=Path('C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3'), table='ledger_entries'), then recompute reviewed_mapping_content_sha256",
+      "Get-FileHash config\\investment_review.portfolio.generated.json,.codex_tmp\\investment_review_product_completion_v2\\p5_mapping_recheck.generated.json -Algorithm SHA256"
+    ],
+    "V-101": [
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m pytest -q -p no:cacheprovider tests/test_investment_review_fee_estimation.py tests/test_investment_review_product_store.py tests/test_investment_review_phase1.py"
+    ],
+    "V-201": [
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m pytest -q -p no:cacheprovider tests/test_investment_review_sync_service.py tests/test_investment_review_fee_estimation.py tests/test_portfolio_tracker.py"
+    ],
+    "V-202": [
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m src.investment_review --db data\\db\\investment_review.sqlite3 review-sync --portfolio-db C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3 --mapping config\\investment_review.portfolio.reviewed.json --dry-run --out .codex_tmp\\investment_review_product_completion_v2\\p5_final_sync\\01_dry_run.json",
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m src.investment_review --db data\\db\\investment_review.sqlite3 review-sync --portfolio-db C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3 --mapping config\\investment_review.portfolio.reviewed.json --apply --out .codex_tmp\\investment_review_product_completion_v2\\p5_final_sync\\02_apply.json",
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m src.investment_review --db data\\db\\investment_review.sqlite3 review-sync --portfolio-db C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3 --mapping config\\investment_review.portfolio.reviewed.json --apply --out .codex_tmp\\investment_review_product_completion_v2\\p5_final_sync\\03_repeat_apply.json",
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m src.investment_review --db data\\db\\investment_review.sqlite3 review-sync-status --portfolio-db C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3 --mapping config\\investment_review.portfolio.reviewed.json --out .codex_tmp\\investment_review_product_completion_v2\\p5_final_sync\\04_status.json"
+    ],
+    "V-301": [
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m pytest -q -p no:cacheprovider tests/test_investment_review_review_runner.py tests/test_investment_review_trade_episodes.py tests/test_investment_review_episode_portfolio_context.py tests/test_investment_review_review_input_bundle.py tests/test_investment_review_episode_review.py tests/test_investment_review_p2f_e2e.py"
+    ],
+    "V-302": [
+      "For each scope in single,weekly,monthly and mode in dry,apply,repeat, run: C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m src.investment_review --db data\\db\\investment_review.sqlite3 review-run --portfolio-db C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3 --mapping config\\investment_review.portfolio.reviewed.json --as-of 2026-07-17T05:55:28Z --knowledge-cutoff 2026-07-17T05:55:28Z --artifact-root .codex_tmp\\investment_review_product_completion_v2\\p5_final_runs\\artifacts --trigger p5_final_v302 --scope <scope> <--dry-run for dry, otherwise --apply> --out .codex_tmp\\investment_review_product_completion_v2\\p5_final_runs\\<scope>_<mode>.json"
+    ],
+    "V-401": [
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m pytest -q -p no:cacheprovider tests/test_investment_review_product_api.py tests/test_investment_review_product_e2e.py tests/test_portfolio_web.py"
+    ],
+    "V-402": [
+      "cd src\\portfolio\\frontend; npm test -- --run",
+      "cd src\\portfolio\\frontend; npm run build"
+    ],
+    "V-403": [
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe .codex_tmp\\investment_review_product_completion_v2\\browser_smoke\\server_harness.py",
+      "Browser method: open both non-conflicting localhost URLs; inspect formal list/detail/health read-only; add only a SYNTHETIC note and correction in the isolated fixture; reload and verify persistence; inspect evidence drawer; save screenshot; then create the exact stop.signal consumed by the harness",
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe .codex_tmp\\investment_review_product_completion_v2\\browser_smoke\\p5_api_smoke.py"
+    ],
+    "V-501": [
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m pytest -q -p no:cacheprovider"
+    ],
+    "V-502": [
+      "git diff --check",
+      "git status --short",
+      "git log --oneline 5a5f02a71ddbdfe8c3327c49ab45ee67e777b79b..HEAD",
+      "git diff --name-status 5a5f02a71ddbdfe8c3327c49ab45ee67e777b79b..HEAD",
+      "git diff --name-only 5a5f02a71ddbdfe8c3327c49ab45ee67e777b79b a597b94a4e01a9c1ac220f9e9220997288734deb"
+    ],
+    "V-999": [
+      "Re-run V-002, V-003, V-202, V-302, V-401, V-402, V-501 and V-502 with the commands above, then review C-MAP-001 and C-ENG-001 through C-REL-001 against their recorded evidence and confirm production_released=false"
+    ],
+    "additional_P5_automation": [
+      "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -m pytest -q -p no:cacheprovider tests/test_investment_review_product_automation.py",
+      "Set PYTHONPATH to the repository root, then run C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe .codex_tmp\\investment_review_product_completion_v2\\p5_automation\\run_candidate_smoke.py"
+    ]
+  },
+  "validations": {
+    "V-001": {
+      "status": "pass",
+      "result": "package valid/ready and contract hash matched"
+    },
+    "V-002": {
+      "status": "pass",
+      "result": "quick_check=ok; source SHA-256 unchanged"
+    },
+    "V-003": {
+      "status": "pass",
+      "result": "doctor regeneration matched bbe59f0d...d4f3; strict validator and D-010 semantic assertions passed"
+    },
+    "V-101": {
+      "status": "pass",
+      "passed": 30,
+      "skipped": 0,
+      "seconds": 5.06
+    },
+    "V-201": {
+      "status": "pass",
+      "passed": 84,
+      "seconds": 15.24
+    },
+    "V-202": {
+      "status": "pass",
+      "result": "dry/apply/repeat/status: 983/983, unsynced=0, both final applies inserted=0"
+    },
+    "V-301": {
+      "status": "pass",
+      "passed": 267,
+      "seconds": 102.53
+    },
+    "V-302": {
+      "status": "pass",
+      "result": "single/weekly/monthly dry/apply/repeat deterministic; all source-replay stages ready"
+    },
+    "V-401": {
+      "status": "pass",
+      "passed": 49,
+      "seconds": 51.51
+    },
+    "V-402": {
+      "status": "pass",
+      "vitest_files": 3,
+      "vitest_passed": 16,
+      "vite_modules_built": 9
+    },
+    "V-403": {
+      "status": "pass",
+      "result": "formal real episode read-only; synthetic note/correction persisted; API and browser boundaries passed"
+    },
+    "V-501": {
+      "status": "pass",
+      "passed": 1524,
+      "skipped": 2,
+      "seconds": 445.05,
+      "baseline_passed": 1401,
+      "baseline_skipped": 2
+    },
+    "V-502": {
+      "status": "pass_after_checkpoint",
+      "result": "diff check and exact scope audit pass; clean tracked tree and final log are recorded after the self checkpoint",
+      "post_checkpoint_evidence": ".codex_tmp/investment_review_product_completion_v2/final_git_proof.json"
+    },
+    "V-999": {
+      "status": "pass_after_checkpoint",
+      "result": "all criteria below have located evidence; final clean-tree proof is external to the self-referential checkpoint"
+    },
+    "additional_P5_automation": {
+      "status": "pass",
+      "passed": 17,
+      "seconds": 24.57
+    }
+  },
+  "criteria": {
+    "C-MAP-001": "pass",
+    "C-ENG-001": "pass",
+    "C-DATA-001": "pass",
+    "C-DATA-002": "pass",
+    "C-DATA-003": "pass",
+    "C-DATA-004": "pass",
+    "C-FLOW-001": "pass",
+    "C-FLOW-002": "pass",
+    "C-UI-001": "pass",
+    "C-SAFE-001": "pass",
+    "C-AUTO-001": "pass",
+    "C-QA-001": "pass",
+    "C-REL-001": "pass_after_checkpoint"
+  },
+  "known_gaps": [
+    {
+      "code": "HISTORICAL_DECISIONS_MISSING",
+      "status": "unknown",
+      "count": 0,
+      "field": "candidate_sidecar.decisions",
+      "effect": "Real reviews remain facts_only/partial; no motive was inferred."
+    },
+    {
+      "code": "PORTFOLIO_SNAPSHOTS_MISSING",
+      "status": "missing",
+      "count": 0,
+      "field": "candidate_sidecar.portfolio_snapshots",
+      "effect": "Historical portfolio context remains explicitly partial."
+    },
+    {
+      "code": "FEE_UNKNOWN",
+      "status": "unknown",
+      "count": 30,
+      "field": "fee_projections",
+      "effect": "No amount was fabricated; the rows remain correctable."
+    },
+    {
+      "code": "RECOVERED_WINDOWS_PATH_LENGTH_FAILURES",
+      "status": "historical_recovered",
+      "count": 3,
+      "field": "review_run_status_events.failed",
+      "effect": "Failed attempts are preserved; all current run heads are terminal partial/succeeded."
+    },
+    {
+      "code": "HUMAN_PRODUCT_ACCEPTANCE_PENDING",
+      "status": "pending",
+      "count": 1,
+      "field": "release_truth.human_product_acceptance",
+      "effect": "The branch is a verified local candidate, not a published product."
+    }
+  ],
+  "next_step": "Human-review the local candidate and its explicit partial/unknown states; if accepted, provide separate authorization for publication.",
+  "publication": {
+    "production_released": false,
+    "push_performed": false,
+    "pull_request_created": false,
+    "merge_performed": false,
+    "tag_created": false,
+    "deployment_performed": false
+  }
+}
