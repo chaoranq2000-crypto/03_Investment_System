@@ -4,6 +4,7 @@ import { dispose, init, registerIndicator, registerOverlay } from "klinecharts";
 
 import "./app.css";
 import { selectContributionPositions } from "./contribution.js";
+import { mountInvestmentReview } from "./investment_review.js";
 import {
   DEFAULT_TECHNICAL_INDICATORS,
   TECHNICAL_INDICATOR_GROUPS,
@@ -2704,3 +2705,4 @@ initializeStickyTableHeaders();
 bindEvents();
 startRealtimeTimer();
 loadPortfolio();
+mountInvestmentReview({ request: api, notify: showToast });

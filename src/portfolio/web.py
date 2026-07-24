@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import threading
 import time
 import webbrowser
@@ -13,7 +14,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
-from src.utils.tushare_client import get_tushare_pro
+from src.utils.tushare_client import get_tushare_pro, load_env_file
 
 from .industries import IndustryFetchError, TushareIndustryProvider
 from .intraday import IntradayFetchError, IntradayService, build_intraday_provider
@@ -27,7 +28,13 @@ from .kline import (
 from .models import decimal_to_text
 from .prices import PriceFetchError, TushareCloseProvider
 from .realtime import FallbackRealtimeProvider, RealtimeQuote
+from .review_integration import configured_review_database
+from .runtime import repository_root
 from .store import PortfolioStore
+from .investment_review_service import (
+    InvestmentReviewServiceError,
+    InvestmentReviewWebService,
+)
 
 
 WEB_ASSET_DIR = Path(__file__).with_name("web_assets")
@@ -66,6 +73,36 @@ def _parse_iso_date(value: str | None, field: str) -> date | None:
         raise ValueError(f"{field}必须是 YYYY-MM-DD: {value!r}") from exc
 
 
+class ReviewHTTPError(ValueError):
+    """Bounded HTTP failure for the local investment-review API."""
+
+    def __init__(self, status: int, code: str, message: str) -> None:
+        super().__init__(message)
+        self.status = int(status)
+        self.code = code
+
+
+def _unique_json_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "duplicate_json_key",
+                f"JSON 字段重复: {key}",
+            )
+        result[key] = value
+    return result
+
+
+def _reject_json_constant(value: str) -> None:
+    raise ReviewHTTPError(
+        HTTPStatus.BAD_REQUEST,
+        "invalid_json_number",
+        f"JSON 不允许非有限数值: {value}",
+    )
+
+
 class DashboardApplication:
     def __init__(
         self,
@@ -75,6 +112,8 @@ class DashboardApplication:
         env_file: str | Path = ".env.local",
         realtime_provider: FallbackRealtimeProvider | None = None,
         realtime_cache_seconds: int = 55,
+        investment_review_service: InvestmentReviewWebService | None = None,
+        investment_review_error: ReviewHTTPError | None = None,
     ) -> None:
         self.store = store
         self.account_id = account_id
@@ -83,6 +122,8 @@ class DashboardApplication:
         self.realtime_lock = threading.Lock()
         self.realtime_provider = realtime_provider or FallbackRealtimeProvider()
         self.realtime_cache_seconds = realtime_cache_seconds
+        self.investment_review_service = investment_review_service
+        self.investment_review_error = investment_review_error
         self._realtime_cache: tuple[float, dict[str, Any]] | None = None
         self._performance_cache: tuple[tuple[Any, ...], dict[str, Any]] | None = None
 
@@ -831,9 +872,285 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _send_review_error(
+        self,
+        error: ReviewHTTPError | InvestmentReviewServiceError,
+    ) -> None:
+        self._send_json(
+            int(error.status),
+            {
+                "error": str(error),
+                "code": error.code,
+            },
+        )
+
+    def _review_service(self) -> InvestmentReviewWebService:
+        service = self.server.dashboard_app.investment_review_service
+        if service is None:
+            configured_error = (
+                self.server.dashboard_app.investment_review_error
+            )
+            if configured_error is not None:
+                raise configured_error
+            raise ReviewHTTPError(
+                HTTPStatus.SERVICE_UNAVAILABLE,
+                "investment_review_unavailable",
+                "本地投资复盘服务未配置",
+            )
+        return service
+
+    @staticmethod
+    def _review_query(
+        query_text: str,
+        *,
+        allowed: set[str],
+        required: set[str] = frozenset(),
+    ) -> dict[str, str]:
+        query = parse_qs(query_text, keep_blank_values=True)
+        unknown = sorted(set(query) - allowed)
+        if unknown:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "unexpected_query_field",
+                "不支持的查询字段: " + ", ".join(unknown),
+            )
+        duplicate = sorted(key for key, values in query.items() if len(values) != 1)
+        if duplicate:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "duplicate_query_field",
+                "查询字段必须且只能出现一次: " + ", ".join(duplicate),
+            )
+        result = {key: values[0] for key, values in query.items()}
+        missing = sorted(key for key in required if not result.get(key))
+        if missing:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "missing_query_field",
+                "缺少查询字段: " + ", ".join(missing),
+            )
+        return result
+
+    def _review_get(self, parsed: Any) -> bool:
+        routes = {
+            "/api/investment-review/reviews",
+            "/api/investment-review/review",
+            "/api/investment-review/timeline",
+            "/api/investment-review/context",
+            "/api/investment-review/evidence",
+            "/api/investment-review/health",
+        }
+        if parsed.path not in routes:
+            return False
+        self._validate_review_host()
+        service = self._review_service()
+        if parsed.path == "/api/investment-review/health":
+            if parsed.query:
+                self._review_query(parsed.query, allowed=set())
+            payload = service.get_health()
+        elif parsed.path == "/api/investment-review/reviews":
+            query = self._review_query(
+                parsed.query,
+                allowed={"scope", "status", "limit"},
+            )
+            try:
+                limit = int(query.get("limit", "100"))
+            except ValueError as exc:
+                raise ReviewHTTPError(
+                    HTTPStatus.BAD_REQUEST,
+                    "invalid_limit",
+                    "limit 必须是整数",
+                ) from exc
+            payload = service.list_reviews(
+                scope=query.get("scope"),
+                status=query.get("status"),
+                limit=limit,
+            )
+        else:
+            query = self._review_query(
+                parsed.query,
+                allowed={"run_id", "review_id"},
+                required={"run_id", "review_id"},
+            )
+            arguments = (query["run_id"], query["review_id"])
+            method = {
+                "/api/investment-review/review": service.get_review_detail,
+                "/api/investment-review/timeline": service.get_timeline,
+                "/api/investment-review/context": service.get_context,
+                "/api/investment-review/evidence": service.get_evidence,
+            }[parsed.path]
+            payload = method(*arguments)
+        self._send_json(HTTPStatus.OK, payload)
+        return True
+
+    def _read_review_json(self) -> dict[str, Any]:
+        transfer_encoding = self.headers.get("Transfer-Encoding")
+        if transfer_encoding and transfer_encoding.lower() != "identity":
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "unsupported_transfer_encoding",
+                "复盘接口不接受分块请求体",
+            )
+        content_type = self.headers.get("Content-Type", "")
+        media_type = content_type.split(";", 1)[0].strip().lower()
+        if media_type != "application/json":
+            raise ReviewHTTPError(
+                HTTPStatus.UNSUPPORTED_MEDIA_TYPE,
+                "unsupported_media_type",
+                "复盘接口只接受 application/json",
+            )
+        raw_length = self.headers.get("Content-Length")
+        if raw_length is None:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "content_length_required",
+                "复盘接口要求 Content-Length",
+            )
+        try:
+            content_length = int(raw_length)
+        except ValueError as exc:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "invalid_content_length",
+                "Content-Length 必须是非负整数",
+            ) from exc
+        if content_length < 0:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "invalid_content_length",
+                "Content-Length 必须是非负整数",
+            )
+        if content_length > 65536:
+            raise ReviewHTTPError(
+                HTTPStatus.REQUEST_ENTITY_TOO_LARGE,
+                "request_body_too_large",
+                "复盘请求体不能超过 65536 字节",
+            )
+        raw = self.rfile.read(content_length)
+        if len(raw) != content_length:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "incomplete_request_body",
+                "复盘请求体长度不完整",
+            )
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "invalid_utf8",
+                "复盘请求体必须是 UTF-8",
+            ) from exc
+        try:
+            payload = json.loads(
+                text,
+                object_pairs_hook=_unique_json_object,
+                parse_constant=_reject_json_constant,
+            )
+        except ReviewHTTPError:
+            raise
+        except json.JSONDecodeError as exc:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "invalid_json",
+                "复盘请求体不是有效 JSON",
+            ) from exc
+        if not isinstance(payload, dict):
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "json_object_required",
+                "复盘请求体必须是 JSON 对象",
+            )
+        return payload
+
+    def _validate_review_host(self) -> None:
+        raw_host = self.headers.get("Host", "").strip()
+        try:
+            parsed = urlparse("//" + raw_host)
+            hostname = (parsed.hostname or "").lower()
+            _ = parsed.port
+        except ValueError as exc:
+            raise ReviewHTTPError(
+                HTTPStatus.FORBIDDEN,
+                "host_not_allowed",
+                "复盘接口只接受本机回环 Host",
+            ) from exc
+        if (
+            not raw_host
+            or parsed.username is not None
+            or parsed.password is not None
+            or hostname not in {"127.0.0.1", "localhost", "::1"}
+        ):
+            raise ReviewHTTPError(
+                HTTPStatus.FORBIDDEN,
+                "host_not_allowed",
+                "复盘接口只接受本机回环 Host",
+            )
+
+    def _validate_review_origin(self) -> None:
+        origin = self.headers.get("Origin")
+        if not origin:
+            return
+        parsed = urlparse(origin)
+        host = self.headers.get("Host", "")
+        if (
+            parsed.scheme != "http"
+            or not parsed.netloc
+            or parsed.netloc.lower() != host.lower()
+        ):
+            raise ReviewHTTPError(
+                HTTPStatus.FORBIDDEN,
+                "origin_not_allowed",
+                "复盘写入只接受同源本地请求",
+            )
+
+    def _review_post(self, parsed: Any) -> bool:
+        actions = {
+            "/api/investment-review/decision": (
+                "decision",
+                "create_decision",
+            ),
+            "/api/investment-review/link": (
+                "link",
+                "link_decision",
+            ),
+            "/api/investment-review/fee-correction": (
+                "fee-correction",
+                "correct_fee",
+            ),
+            "/api/investment-review/review-correction": (
+                "review-correction",
+                "correct_review",
+            ),
+        }
+        route = actions.get(parsed.path)
+        if route is None:
+            return False
+        self._validate_review_host()
+        if parsed.query or parsed.fragment:
+            raise ReviewHTTPError(
+                HTTPStatus.BAD_REQUEST,
+                "unexpected_route_parameters",
+                "复盘写入接口不接受查询参数或片段",
+            )
+        expected_action, method_name = route
+        if self.headers.get("X-Investment-Review-Action") != expected_action:
+            raise ReviewHTTPError(
+                HTTPStatus.FORBIDDEN,
+                "review_action_required",
+                "缺少本地复盘写入确认头",
+            )
+        self._validate_review_origin()
+        payload = self._read_review_json()
+        result = getattr(self._review_service(), method_name)(payload)
+        self._send_json(HTTPStatus.OK, result)
+        return True
+
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
         parsed = urlparse(self.path)
         try:
+            if self._review_get(parsed):
+                return
             if parsed.path == "/health":
                 self._send_json(
                     HTTPStatus.OK,
@@ -916,11 +1233,50 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                 self._send_json(HTTPStatus.OK, {"rows": rows})
                 return
             self._send_asset(parsed.path)
+        except (ReviewHTTPError, InvestmentReviewServiceError) as exc:
+            self._send_review_error(exc)
         except (ValueError, RuntimeError) as exc:
+            if parsed.path.startswith("/api/investment-review"):
+                self._send_review_error(
+                    ReviewHTTPError(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        "investment_review_internal_error",
+                        "本地投资复盘服务暂时不可用",
+                    )
+                )
+                return
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
+        except Exception:
+            if parsed.path.startswith("/api/investment-review"):
+                self._send_review_error(
+                    ReviewHTTPError(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        "investment_review_internal_error",
+                        "本地投资复盘服务暂时不可用",
+                    )
+                )
+                return
+            raise
 
     def do_POST(self) -> None:  # noqa: N802 - stdlib handler API
         parsed = urlparse(self.path)
+        try:
+            if self._review_post(parsed):
+                return
+        except (ReviewHTTPError, InvestmentReviewServiceError) as exc:
+            self._send_review_error(exc)
+            return
+        except Exception:
+            if parsed.path.startswith("/api/investment-review"):
+                self._send_review_error(
+                    ReviewHTTPError(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        "investment_review_internal_error",
+                        "本地投资复盘服务暂时不可用",
+                    )
+                )
+                return
+            raise
         actions = {
             "/api/refresh-prices": "refresh-prices",
             "/api/refresh-performance": "refresh-performance",
@@ -1005,6 +1361,45 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": str(exc)})
 
 
+def _configured_investment_review_service(
+    store: PortfolioStore,
+    *,
+    env_file: str | Path,
+) -> tuple[InvestmentReviewWebService | None, ReviewHTTPError | None]:
+    """Build the opt-in review service without creating or upgrading a sidecar."""
+
+    try:
+        values = {**load_env_file(env_file), **os.environ}
+        review_db = configured_review_database(environ=values)
+    except (OSError, UnicodeError, ValueError):
+        return None, ReviewHTTPError(
+            HTTPStatus.SERVICE_UNAVAILABLE,
+            "investment_review_configuration_invalid",
+            "本地投资复盘配置无效",
+        )
+    if review_db is None:
+        return None, None
+    try:
+        if not review_db.is_file():
+            return None, ReviewHTTPError(
+                HTTPStatus.SERVICE_UNAVAILABLE,
+                "investment_review_configuration_invalid",
+                "本地投资复盘配置无效",
+            )
+        service = InvestmentReviewWebService(
+            review_db=review_db,
+            portfolio_db=store.path,
+            repo_root=repository_root(),
+        )
+    except Exception:  # review configuration must not prevent the portfolio page
+        return None, ReviewHTTPError(
+            HTTPStatus.SERVICE_UNAVAILABLE,
+            "investment_review_configuration_invalid",
+            "本地投资复盘配置无效",
+        )
+    return service, None
+
+
 def create_dashboard_server(
     store: PortfolioStore,
     *,
@@ -1012,10 +1407,26 @@ def create_dashboard_server(
     env_file: str | Path = ".env.local",
     host: str = "127.0.0.1",
     port: int = 8765,
+    investment_review_service: InvestmentReviewWebService | None = None,
 ) -> DashboardHTTPServer:
     if host not in {"127.0.0.1", "localhost", "::1"}:
         raise ValueError("Dashboard 只允许绑定本机回环地址")
-    app = DashboardApplication(store, account_id=account_id, env_file=env_file)
+    investment_review_error: ReviewHTTPError | None = None
+    if investment_review_service is None:
+        (
+            investment_review_service,
+            investment_review_error,
+        ) = _configured_investment_review_service(
+            store,
+            env_file=env_file,
+        )
+    app = DashboardApplication(
+        store,
+        account_id=account_id,
+        env_file=env_file,
+        investment_review_service=investment_review_service,
+        investment_review_error=investment_review_error,
+    )
     return DashboardHTTPServer((host, port), app)
 
 
@@ -1027,6 +1438,7 @@ def serve_dashboard(
     host: str = "127.0.0.1",
     port: int = 8765,
     open_browser: bool = True,
+    investment_review_service: InvestmentReviewWebService | None = None,
 ) -> None:
     server = create_dashboard_server(
         store,
@@ -1034,6 +1446,7 @@ def serve_dashboard(
         env_file=env_file,
         host=host,
         port=port,
+        investment_review_service=investment_review_service,
     )
     actual_host, actual_port = server.server_address[:2]
     url = f"http://{actual_host}:{actual_port}/"
