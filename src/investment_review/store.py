@@ -1299,65 +1299,72 @@ class ReviewStore:
             record = record_type.from_mapping(candidate)
         return record.to_dict()
 
+    def _save_fee_profile_conn(
+        self,
+        conn: sqlite3.Connection,
+        profile: FeeProfileRecord | Mapping[str, Any] | object,
+    ) -> dict[str, Any]:
+        payload = self._product_payload(profile, FeeProfileRecord)
+        payload_json = canonical_json(payload)
+        payload_sha256 = sha256_text(payload_json)
+        profile_id = payload["profile_id"]
+        existing = conn.execute(
+            "SELECT payload_json, payload_sha256 FROM fee_profiles "
+            "WHERE profile_id = ?",
+            (profile_id,),
+        ).fetchone()
+        if existing is not None:
+            if (
+                existing["payload_json"] == payload_json
+                and existing["payload_sha256"] == payload_sha256
+            ):
+                return {
+                    "profile_id": profile_id,
+                    "payload_sha256": payload_sha256,
+                    "status": "SKIPPED",
+                }
+            raise DataConflictError(
+                "Fee profile changed after creation: "
+                f"profile_id={profile_id}"
+            )
+        conn.execute(
+            """
+            INSERT INTO fee_profiles(
+                profile_id, profile_key, method, method_version,
+                sample_count, rate, currency, fallback_level,
+                computed_at, payload_json, payload_sha256, inserted_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                profile_id,
+                payload["profile_key"],
+                payload["method"],
+                payload["method_version"],
+                payload["sample_count"],
+                payload["rate"],
+                payload["currency"],
+                payload["fallback_level"],
+                payload["computed_at"],
+                payload_json,
+                payload_sha256,
+                _now(),
+            ),
+        )
+        return {
+            "profile_id": profile_id,
+            "payload_sha256": payload_sha256,
+            "status": "INSERTED",
+        }
+
     def save_fee_profile(
         self, profile: FeeProfileRecord | Mapping[str, Any] | object
     ) -> dict[str, Any]:
         """Create one immutable fee profile or idempotently replay it."""
 
         self._ensure_product_completion_initialized()
-        payload = self._product_payload(profile, FeeProfileRecord)
-        payload_json = canonical_json(payload)
-        payload_sha256 = sha256_text(payload_json)
-        profile_id = payload["profile_id"]
         with self.connection() as conn:
             with conn:
-                existing = conn.execute(
-                    "SELECT payload_json, payload_sha256 FROM fee_profiles "
-                    "WHERE profile_id = ?",
-                    (profile_id,),
-                ).fetchone()
-                if existing is not None:
-                    if (
-                        existing["payload_json"] == payload_json
-                        and existing["payload_sha256"] == payload_sha256
-                    ):
-                        return {
-                            "profile_id": profile_id,
-                            "payload_sha256": payload_sha256,
-                            "status": "SKIPPED",
-                        }
-                    raise DataConflictError(
-                        "Fee profile changed after creation: "
-                        f"profile_id={profile_id}"
-                    )
-                conn.execute(
-                    """
-                    INSERT INTO fee_profiles(
-                        profile_id, profile_key, method, method_version,
-                        sample_count, rate, currency, fallback_level,
-                        computed_at, payload_json, payload_sha256, inserted_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (
-                        profile_id,
-                        payload["profile_key"],
-                        payload["method"],
-                        payload["method_version"],
-                        payload["sample_count"],
-                        payload["rate"],
-                        payload["currency"],
-                        payload["fallback_level"],
-                        payload["computed_at"],
-                        payload_json,
-                        payload_sha256,
-                        _now(),
-                    ),
-                )
-        return {
-            "profile_id": profile_id,
-            "payload_sha256": payload_sha256,
-            "status": "INSERTED",
-        }
+                return self._save_fee_profile_conn(conn, profile)
 
     def list_fee_profiles(
         self, *, profile_key: str | None = None
@@ -1374,112 +1381,141 @@ class ReviewStore:
             ).fetchall()
         return [json.loads(row["payload_json"]) for row in rows]
 
+    def _save_fee_projection_conn(
+        self,
+        conn: sqlite3.Connection,
+        projection: FeeProjectionRecord | Mapping[str, Any] | object,
+    ) -> dict[str, Any]:
+        payload = self._product_payload(projection, FeeProjectionRecord)
+        payload_json = canonical_json(payload)
+        payload_sha256 = sha256_text(payload_json)
+        projection_id = payload["projection_id"]
+        event_id = payload["event_id"]
+        existing = conn.execute(
+            "SELECT payload_json, payload_sha256 FROM fee_projections "
+            "WHERE projection_id = ?",
+            (projection_id,),
+        ).fetchone()
+        if existing is not None:
+            if (
+                existing["payload_json"] == payload_json
+                and existing["payload_sha256"] == payload_sha256
+            ):
+                return {
+                    "projection_id": projection_id,
+                    "event_id": event_id,
+                    "payload_sha256": payload_sha256,
+                    "status": "SKIPPED",
+                }
+            raise DataConflictError(
+                "Fee projection changed after creation: "
+                f"projection_id={projection_id}"
+            )
+        if conn.execute(
+            "SELECT 1 FROM trade_events WHERE event_id = ?", (event_id,)
+        ).fetchone() is None:
+            raise ReviewStoreError(f"Trade event not found: {event_id}")
+        profile_id = payload["profile_id"]
+        profile_row = None
+        if profile_id is not None:
+            profile_row = conn.execute(
+                "SELECT payload_json FROM fee_profiles WHERE profile_id = ?",
+                (profile_id,),
+            ).fetchone()
+            if profile_row is None:
+                raise ReviewStoreError(f"Fee profile not found: {profile_id}")
+        if payload["status"] == "estimated":
+            profile_payload = json.loads(profile_row["payload_json"])
+            compared_fields = (
+                "method",
+                "method_version",
+                "sample_count",
+                "currency",
+            )
+            mismatches = [
+                field
+                for field in compared_fields
+                if profile_payload[field] != payload[field]
+            ]
+            if mismatches:
+                raise ReviewStoreError(
+                    "FEE_PROFILE_PROJECTION_MISMATCH: "
+                    + ", ".join(mismatches)
+                )
+        concurrent = conn.execute(
+            "SELECT projection_id FROM fee_projections "
+            "WHERE event_id = ? AND projected_at = ?",
+            (event_id, payload["projected_at"]),
+        ).fetchone()
+        if concurrent is not None:
+            raise ReviewStoreError(
+                "AMBIGUOUS_FEE_PROJECTION_TIME: another projection already "
+                f"exists for event_id={event_id} at {payload['projected_at']}"
+            )
+        conn.execute(
+            """
+            INSERT INTO fee_projections(
+                projection_id, event_id, status, amount, currency,
+                source_fees, method, method_version, sample_count,
+                profile_id, reason_code, projected_at, payload_json,
+                payload_sha256, inserted_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                projection_id,
+                event_id,
+                payload["status"],
+                payload["amount"],
+                payload["currency"],
+                payload["source_fees"],
+                payload["method"],
+                payload["method_version"],
+                payload["sample_count"],
+                profile_id,
+                payload["reason_code"],
+                payload["projected_at"],
+                payload_json,
+                payload_sha256,
+                _now(),
+            ),
+        )
+        return {
+            "projection_id": projection_id,
+            "event_id": event_id,
+            "payload_sha256": payload_sha256,
+            "status": "INSERTED",
+        }
+
     def save_fee_projection(
         self, projection: FeeProjectionRecord | Mapping[str, Any] | object
     ) -> dict[str, Any]:
         """Create one immutable actual/estimated/unknown fee projection."""
 
         self._ensure_product_completion_initialized()
-        payload = self._product_payload(projection, FeeProjectionRecord)
-        payload_json = canonical_json(payload)
-        payload_sha256 = sha256_text(payload_json)
-        projection_id = payload["projection_id"]
-        event_id = payload["event_id"]
         with self.connection() as conn:
             with conn:
-                existing = conn.execute(
-                    "SELECT payload_json, payload_sha256 FROM fee_projections "
-                    "WHERE projection_id = ?",
-                    (projection_id,),
-                ).fetchone()
-                if existing is not None:
-                    if (
-                        existing["payload_json"] == payload_json
-                        and existing["payload_sha256"] == payload_sha256
-                    ):
-                        return {
-                            "projection_id": projection_id,
-                            "event_id": event_id,
-                            "payload_sha256": payload_sha256,
-                            "status": "SKIPPED",
-                        }
-                    raise DataConflictError(
-                        "Fee projection changed after creation: "
-                        f"projection_id={projection_id}"
-                    )
-                if conn.execute(
-                    "SELECT 1 FROM trade_events WHERE event_id = ?", (event_id,)
-                ).fetchone() is None:
-                    raise ReviewStoreError(f"Trade event not found: {event_id}")
-                profile_id = payload["profile_id"]
-                profile_row = None
-                if profile_id is not None:
-                    profile_row = conn.execute(
-                        "SELECT payload_json FROM fee_profiles WHERE profile_id = ?",
-                        (profile_id,),
-                    ).fetchone()
-                    if profile_row is None:
-                        raise ReviewStoreError(f"Fee profile not found: {profile_id}")
-                if payload["status"] == "estimated":
-                    profile_payload = json.loads(profile_row["payload_json"])
-                    compared_fields = (
-                        "method",
-                        "method_version",
-                        "sample_count",
-                        "currency",
-                    )
-                    mismatches = [
-                        field
-                        for field in compared_fields
-                        if profile_payload[field] != payload[field]
-                    ]
-                    if mismatches:
-                        raise ReviewStoreError(
-                            "FEE_PROFILE_PROJECTION_MISMATCH: "
-                            + ", ".join(mismatches)
-                        )
-                concurrent = conn.execute(
-                    "SELECT projection_id FROM fee_projections "
-                    "WHERE event_id = ? AND projected_at = ?",
-                    (event_id, payload["projected_at"]),
-                ).fetchone()
-                if concurrent is not None:
-                    raise ReviewStoreError(
-                        "AMBIGUOUS_FEE_PROJECTION_TIME: another projection already "
-                        f"exists for event_id={event_id} at {payload['projected_at']}"
-                    )
-                conn.execute(
-                    """
-                    INSERT INTO fee_projections(
-                        projection_id, event_id, status, amount, currency,
-                        source_fees, method, method_version, sample_count,
-                        profile_id, reason_code, projected_at, payload_json,
-                        payload_sha256, inserted_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (
-                        projection_id,
-                        event_id,
-                        payload["status"],
-                        payload["amount"],
-                        payload["currency"],
-                        payload["source_fees"],
-                        payload["method"],
-                        payload["method_version"],
-                        payload["sample_count"],
-                        profile_id,
-                        payload["reason_code"],
-                        payload["projected_at"],
-                        payload_json,
-                        payload_sha256,
-                        _now(),
-                    ),
-                )
+                return self._save_fee_projection_conn(conn, projection)
+
+    def save_fee_plan(
+        self,
+        profiles: Sequence[FeeProfileRecord | Mapping[str, Any] | object],
+        projections: Sequence[FeeProjectionRecord | Mapping[str, Any] | object],
+    ) -> dict[str, list[dict[str, Any]]]:
+        """Atomically create or replay one complete deterministic fee plan."""
+
+        self._ensure_product_completion_initialized()
+        with self.connection() as conn:
+            with conn:
+                profile_results = [
+                    self._save_fee_profile_conn(conn, profile) for profile in profiles
+                ]
+                projection_results = [
+                    self._save_fee_projection_conn(conn, projection)
+                    for projection in projections
+                ]
         return {
-            "projection_id": projection_id,
-            "event_id": event_id,
-            "payload_sha256": payload_sha256,
-            "status": "INSERTED",
+            "profiles": profile_results,
+            "projections": projection_results,
         }
 
     def list_fee_projections(

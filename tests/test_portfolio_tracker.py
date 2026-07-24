@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from decimal import Decimal
+import json
 from pathlib import Path
 import sqlite3
 from zoneinfo import ZoneInfo
@@ -14,7 +15,7 @@ from src.portfolio.accounting import (
     build_ledger_cycles,
     build_position_states,
 )
-from src.portfolio.cli import build_parser
+from src.portfolio.cli import build_parser, command_import_statement
 from src.portfolio.importer import parse_opening_snapshot, parse_statement
 from src.portfolio.industries import TushareIndustryProvider
 from src.portfolio.intraday import (
@@ -47,6 +48,7 @@ from src.portfolio.runtime import (
     default_database_path,
     default_env_file_path,
 )
+from src.portfolio import review_integration
 from src.portfolio.store import SCHEMA_VERSION, PortfolioStore
 
 
@@ -72,6 +74,266 @@ def test_normal_checkout_keeps_private_runtime_in_its_own_root(tmp_path):
     (root / ".git").mkdir(parents=True)
 
     assert default_database_path(root) == root / "data" / "db" / "portfolio.sqlite3"
+
+
+def _portfolio_store_with_opening(tmp_path: Path) -> PortfolioStore:
+    opening_path = tmp_path / "review_hook_opening.csv"
+    opening_path.write_text(
+        "as_of_date,ts_code,name,quantity,total_cost,last_close\n"
+        "2026-07-10,600000,浦发银行,100,1000,12\n",
+        encoding="utf-8",
+    )
+    store = PortfolioStore(tmp_path / "portfolio.sqlite3")
+    store.initialize()
+    opening = parse_opening_snapshot(opening_path, account_id="default")
+    store.apply_opening_snapshot(
+        account_id="default",
+        instruments=opening.instruments.values(),
+        entries=opening.entries,
+        prices=opening.prices,
+        source_name=opening.source_name,
+        source_sha256=opening.source_sha256,
+        total_rows=opening.total_rows,
+    )
+    return store
+
+
+@pytest.mark.parametrize(
+    ("mode_args", "rows", "expected_kind", "expected_count", "outcome_key"),
+    [
+        (
+            [],
+            "2026-07-11,600000,浦发银行,买入,11,10,110,1,post-commit-normal\n",
+            "broker_statement",
+            1,
+            "inserted_entries",
+        ),
+        (
+            ["--included-in-opening"],
+            "2026-07-09,600000,浦发银行,买入,9,10,90,1,post-commit-included\n",
+            "statement_reconciliation",
+            1,
+            "recorded_entries",
+        ),
+        (
+            ["--historical-closed"],
+            "2026-06-01,000001,平安银行,买入,10,10,100,1,post-commit-hist-buy\n"
+            "2026-06-02,000001,平安银行,卖出,12,10,120,1,post-commit-hist-sell\n",
+            "historical_closed_statement",
+            2,
+            "inserted_entries",
+        ),
+    ],
+)
+def test_statement_apply_review_hook_runs_after_all_three_commit_paths(
+    tmp_path,
+    monkeypatch,
+    capsys,
+    mode_args,
+    rows,
+    expected_kind,
+    expected_count,
+    outcome_key,
+):
+    store = _portfolio_store_with_opening(tmp_path)
+    statement_path = tmp_path / f"{expected_kind}.csv"
+    statement_path.write_text(
+        "成交日期,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费,资金流水号\n"
+        + rows,
+        encoding="utf-8",
+    )
+    review_db = (tmp_path / "review.sqlite3").resolve()
+    sqlite3.connect(review_db).close()
+    monkeypatch.setenv(review_integration.REVIEW_DATABASE_ENV, str(review_db))
+    observed: list[tuple[str, int]] = []
+
+    def committed_state_hook(*, portfolio_db, review_db, trigger):
+        uri = f"file:{portfolio_db.as_posix()}?mode=ro"
+        connection = sqlite3.connect(uri, uri=True)
+        try:
+            row = connection.execute(
+                "SELECT accepted_rows FROM import_batches "
+                "WHERE import_kind = ? ORDER BY rowid DESC LIMIT 1",
+                (expected_kind,),
+            ).fetchone()
+        finally:
+            connection.close()
+        assert row is not None
+        assert row[0] == expected_count
+        assert trigger == "portfolio_statement_post_commit"
+        observed.append((expected_kind, row[0]))
+        return {"status": "succeeded", "committed_rows_seen": row[0]}
+
+    monkeypatch.setattr(
+        review_integration, "POST_COMMIT_SYNC_HOOK", committed_state_hook
+    )
+    args = build_parser().parse_args(
+        [
+            "import-statement",
+            "--input",
+            str(statement_path),
+            "--broker",
+            "synthetic-test",
+            *mode_args,
+            "--apply",
+        ]
+    )
+
+    assert command_import_statement(args, store) == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert observed == [(expected_kind, expected_count)]
+    assert payload[outcome_key] == expected_count
+    assert payload["review_sync"]["status"] == "succeeded"
+    assert payload["review_sync"]["committed_rows_seen"] == expected_count
+    # Existing machine-readable output remains intact; review status is additive.
+    assert {
+        "mode",
+        "disposition",
+        "source",
+        "source_sha256",
+        "data_rows",
+        "accepted_entries",
+        "duplicate_entries",
+        "skipped_rows",
+        "cash_preview",
+        "batch_id",
+    }.issubset(payload)
+
+
+def test_statement_preview_and_portfolio_failure_do_not_trigger_review_sync(
+    tmp_path, monkeypatch, capsys
+):
+    store = _portfolio_store_with_opening(tmp_path)
+    statement_path = tmp_path / "preview-only.csv"
+    statement_path.write_text(
+        "成交日期,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费,资金流水号\n"
+        "2026-07-11,600000,浦发银行,买入,11,10,110,1,preview-only\n",
+        encoding="utf-8",
+    )
+    review_db = (tmp_path / "review.sqlite3").resolve()
+    sqlite3.connect(review_db).close()
+    monkeypatch.setenv(review_integration.REVIEW_DATABASE_ENV, str(review_db))
+    calls: list[str] = []
+
+    def must_not_run(**_kwargs):
+        calls.append("called")
+        raise AssertionError("review hook must not run")
+
+    monkeypatch.setattr(review_integration, "POST_COMMIT_SYNC_HOOK", must_not_run)
+    preview_args = build_parser().parse_args(
+        ["import-statement", "--input", str(statement_path)]
+    )
+    assert command_import_statement(preview_args, store) == 0
+    assert calls == []
+    capsys.readouterr()
+
+    apply_args = build_parser().parse_args(
+        ["import-statement", "--input", str(statement_path), "--apply"]
+    )
+
+    def portfolio_failure(**_kwargs):
+        raise RuntimeError("synthetic portfolio write failure")
+
+    monkeypatch.setattr(store, "apply_statement", portfolio_failure)
+    with pytest.raises(RuntimeError, match="portfolio write failure"):
+        command_import_statement(apply_args, store)
+    assert calls == []
+
+
+def test_review_sync_disabled_not_initialized_and_failed_are_visible_and_isolated(
+    tmp_path, monkeypatch, capsys
+):
+    store = _portfolio_store_with_opening(tmp_path)
+    statement_path = tmp_path / "review-status.csv"
+    statement_path.write_text(
+        "成交日期,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费,资金流水号\n"
+        "2026-07-11,600000,浦发银行,买入,11,10,110,1,status-visible\n",
+        encoding="utf-8",
+    )
+    args = build_parser().parse_args(
+        ["import-statement", "--input", str(statement_path), "--apply"]
+    )
+
+    monkeypatch.delenv(review_integration.REVIEW_DATABASE_ENV, raising=False)
+    assert command_import_statement(args, store) == 0
+    disabled = json.loads(capsys.readouterr().out)
+    assert disabled["review_sync"]["status"] == "disabled"
+    assert disabled["inserted_entries"] == 1
+
+    missing_review_db = (tmp_path / "missing-review.sqlite3").resolve()
+    monkeypatch.setenv(
+        review_integration.REVIEW_DATABASE_ENV, str(missing_review_db)
+    )
+    assert command_import_statement(args, store) == 0
+    not_initialized = json.loads(capsys.readouterr().out)
+    assert not_initialized["review_sync"]["status"] == "not_initialized"
+    assert not_initialized["duplicate_entries"] == 1
+
+    sqlite3.connect(missing_review_db).close()
+    failed_calls: list[Path] = []
+
+    def failed_review_hook(*, portfolio_db, **_kwargs):
+        failed_calls.append(portfolio_db)
+        raise RuntimeError("synthetic review failure")
+
+    statement_path.write_text(
+        "成交日期,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费,资金流水号\n"
+        "2026-07-12,600000,浦发银行,买入,12,10,120,1,status-visible-new\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        review_integration, "POST_COMMIT_SYNC_HOOK", failed_review_hook
+    )
+    assert command_import_statement(args, store) == 0
+    failed = json.loads(capsys.readouterr().out)
+    assert failed["review_sync"]["status"] == "failed"
+    assert failed["review_sync"]["reason"] == "review_sync_failed"
+    assert failed["inserted_entries"] == 1
+    assert failed_calls == [store.path.resolve()]
+
+    connection = sqlite3.connect(store.path)
+    try:
+        committed = connection.execute(
+            "SELECT COUNT(*) FROM ledger_entries WHERE event_type='BUY'"
+        ).fetchone()[0]
+    finally:
+        connection.close()
+    assert committed == 2
+
+
+def test_review_database_selection_never_falls_back_to_current_directory(
+    tmp_path, monkeypatch
+):
+    implicit = tmp_path / "data" / "db" / "investment_review.sqlite3"
+    implicit.parent.mkdir(parents=True)
+    sqlite3.connect(implicit).close()
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.delenv(review_integration.REVIEW_DATABASE_ENV, raising=False)
+
+    assert review_integration.configured_review_database() is None
+    monkeypatch.setenv(review_integration.REVIEW_DATABASE_ENV, "data/db/review.sqlite3")
+    result = review_integration.trigger_post_commit_review_sync(
+        tmp_path / "portfolio.sqlite3"
+    )
+    assert result["status"] == "failed"
+    assert result["reason"] == "invalid_review_database_configuration"
+
+    foreign_checkout = tmp_path / "other-checkout"
+    foreign_checkout.mkdir()
+    (foreign_checkout / ".git").write_text("gitdir: synthetic\n", encoding="utf-8")
+    foreign_review = foreign_checkout / "data" / "db" / "investment_review.sqlite3"
+    foreign_review.parent.mkdir(parents=True)
+    sqlite3.connect(foreign_review).close()
+    monkeypatch.setenv(
+        review_integration.REVIEW_DATABASE_ENV, str(foreign_review.resolve())
+    )
+    foreign_result = review_integration.trigger_post_commit_review_sync(
+        tmp_path / "portfolio.sqlite3"
+    )
+    assert foreign_result["status"] == "failed"
+    assert foreign_result["reason"] == "invalid_review_database_configuration"
+    assert "different checkout" in foreign_result["error"]
 
 
 def _row(

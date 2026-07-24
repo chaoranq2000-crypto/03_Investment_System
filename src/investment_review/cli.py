@@ -125,7 +125,12 @@ from .introspection import (
     suggest_trade_mapping,
     write_json,
 )
-from .models import DecisionRecord
+from .models import (
+    DecisionRecord,
+    FeeCorrectionRecord,
+    canonical_json,
+    sha256_text,
+)
 from .portfolio_context import (
     PortfolioContext,
     load_snapshot_document,
@@ -146,8 +151,11 @@ from .time_utils import utc_iso
 DEFAULT_DB = "data/db/investment_review.sqlite3"
 
 
-def _print(payload: Any) -> None:
-    print(json.dumps(payload, ensure_ascii=False, indent=2, default=str))
+def _print(payload: Any, *, out: str | None = None) -> None:
+    rendered = json.dumps(payload, ensure_ascii=False, indent=2, default=str)
+    if out:
+        atomic_write_bytes(out, (rendered + "\n").encode("utf-8"))
+    print(rendered)
 
 
 def _load_json_documents(paths: list[str]) -> list[dict[str, Any]]:
@@ -174,6 +182,129 @@ def _require_distinct_paths(**values: str | None) -> None:
         seen[key] = label
 
 
+def _product_init(args: argparse.Namespace, store: ReviewStore) -> int:
+    store.initialize()
+    _print(store.initialize_product_completion(), out=args.out)
+    return 0
+
+
+def _review_sync(args: argparse.Namespace) -> int:
+    from .sync_service import sync_review_events
+
+    payload = sync_review_events(
+        args.portfolio_db,
+        review_db=args.db,
+        mapping_path=args.mapping,
+        dry_run=args.dry_run,
+        trigger="cli",
+    )
+    _print(payload, out=args.out)
+    return 0
+
+
+def _review_sync_status(args: argparse.Namespace) -> int:
+    from .sync_service import review_sync_status
+
+    payload = review_sync_status(
+        args.portfolio_db,
+        review_db=args.db,
+        mapping_path=args.mapping,
+    )
+    _print(payload, out=args.out)
+    return 0
+
+
+def _fee_project(args: argparse.Namespace) -> int:
+    from .sync_service import project_review_fees
+
+    payload = project_review_fees(
+        args.portfolio_db,
+        review_db=args.db,
+        mapping_path=args.mapping,
+        dry_run=args.dry_run,
+    )
+    _print(payload, out=args.out)
+    return 0
+
+
+def _fee_status(args: argparse.Namespace, store: ReviewStore) -> int:
+    knowledge_cutoff = args.knowledge_cutoff or args.as_of
+    if args.event_id:
+        payload: dict[str, Any] = {
+            "database": str(store.path.resolve()),
+            "event_id": args.event_id,
+            "as_of": args.as_of,
+            "knowledge_cutoff": knowledge_cutoff,
+            "effective_fee": store.get_effective_fee(
+                args.event_id,
+                as_of=args.as_of,
+                knowledge_cutoff=knowledge_cutoff,
+            ),
+        }
+    else:
+        events = [
+            event
+            for event in store.list_events(limit=args.limit)
+            if event.get("side") in {"BUY", "SELL"}
+        ]
+        items = [
+            store.get_effective_fee(
+                str(event["event_id"]),
+                as_of=args.as_of,
+                knowledge_cutoff=knowledge_cutoff,
+            )
+            for event in events
+        ]
+        counts = {"actual": 0, "estimated": 0, "unknown": 0}
+        for item in items:
+            status = str(item.get("status") or "unknown")
+            counts[status if status in counts else "unknown"] += 1
+        payload = {
+            "database": str(store.path.resolve()),
+            "as_of": args.as_of,
+            "knowledge_cutoff": knowledge_cutoff,
+            "status_counts": counts,
+            "item_count": len(items),
+            "items": items,
+        }
+    _print(payload, out=args.out)
+    return 0
+
+
+def _fee_correct(args: argparse.Namespace, store: ReviewStore) -> int:
+    correction_payload: dict[str, Any] = {
+        "event_id": args.event_id,
+        "status": args.status,
+        "amount": args.amount,
+        "currency": args.currency,
+        "effective_at": args.effective_at,
+        "known_at": args.known_at,
+        "reviewer_ref": args.reviewer_ref,
+        "reason": args.reason,
+        "supersedes_correction_id": args.supersedes_correction_id,
+        "provenance": {
+            "adapter": "investment_review_cli",
+            "input_kind": "human_fee_correction",
+            "source_event_id": args.event_id,
+        },
+    }
+    correction_id = args.correction_id or (
+        "feecorr_" + sha256_text(canonical_json(correction_payload))[:32]
+    )
+    correction = FeeCorrectionRecord.from_mapping(
+        {"correction_id": correction_id, **correction_payload}
+    )
+    write_result = store.append_fee_correction(correction)
+    payload = {
+        "database": str(store.path.resolve()),
+        "write": write_result,
+        "correction": correction.to_dict(),
+        "effective_fee": store.get_effective_fee(args.event_id),
+    }
+    _print(payload, out=args.out)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m src.investment_review",
@@ -182,12 +313,77 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--db",
         default=DEFAULT_DB,
-        help=f"Sidecar review SQLite database (default: {DEFAULT_DB})",
+        help=(
+            "Sidecar review SQLite database; product commands also honor "
+            f"INVESTMENT_REVIEW_DB (legacy command default: {DEFAULT_DB})"
+        ),
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
     sub.add_parser("init", help="Create or verify the v2 sidecar review database")
     sub.add_parser("status", help="Show schema, integrity and row counts")
+
+    product_init = sub.add_parser(
+        "product-init",
+        help="Explicitly initialize additive product-completion tables in the selected sidecar",
+    )
+    product_init.add_argument("--out", help="Optional JSON receipt path")
+
+    review_sync = sub.add_parser(
+        "review-sync",
+        help="Reconcile the reviewed portfolio ledger into the selected sidecar",
+    )
+    review_sync.add_argument("--portfolio-db", required=True)
+    review_sync.add_argument("--mapping", required=True)
+    review_sync_mode = review_sync.add_mutually_exclusive_group(required=True)
+    review_sync_mode.add_argument("--dry-run", action="store_true")
+    review_sync_mode.add_argument("--apply", action="store_true")
+    review_sync.add_argument("--out", help="Optional JSON receipt path")
+
+    review_sync_status = sub.add_parser(
+        "review-sync-status",
+        help="Read current source/sidecar reconciliation and last-run health",
+    )
+    review_sync_status.add_argument("--portfolio-db", required=True)
+    review_sync_status.add_argument("--mapping", required=True)
+    review_sync_status.add_argument("--out", help="Optional JSON receipt path")
+
+    fee_project = sub.add_parser(
+        "fee-project",
+        help="Project actual, estimated or unknown fee states without changing source fees",
+    )
+    fee_project.add_argument("--portfolio-db", required=True)
+    fee_project.add_argument("--mapping")
+    fee_project_mode = fee_project.add_mutually_exclusive_group(required=True)
+    fee_project_mode.add_argument("--dry-run", action="store_true")
+    fee_project_mode.add_argument("--apply", action="store_true")
+    fee_project.add_argument("--out", help="Optional JSON receipt path")
+
+    fee_status = sub.add_parser(
+        "fee-status",
+        help="Show effective actual, estimated or unknown fee state",
+    )
+    fee_status.add_argument("--event-id")
+    fee_status.add_argument("--as-of")
+    fee_status.add_argument("--knowledge-cutoff")
+    fee_status.add_argument("--limit", type=int, default=100)
+    fee_status.add_argument("--out", help="Optional JSON receipt path")
+
+    fee_correct = sub.add_parser(
+        "fee-correct",
+        help="Append an immutable human fee correction in the selected sidecar",
+    )
+    fee_correct.add_argument("--correction-id")
+    fee_correct.add_argument("--event-id", required=True)
+    fee_correct.add_argument("--status", choices=("actual", "unknown"), required=True)
+    fee_correct.add_argument("--amount")
+    fee_correct.add_argument("--currency", default="CNY")
+    fee_correct.add_argument("--effective-at", required=True)
+    fee_correct.add_argument("--known-at", required=True)
+    fee_correct.add_argument("--reviewer-ref", required=True)
+    fee_correct.add_argument("--reason", required=True)
+    fee_correct.add_argument("--supersedes-correction-id")
+    fee_correct.add_argument("--out", help="Optional JSON receipt path")
 
     doctor = sub.add_parser(
         "doctor", help="Inspect existing portfolio SQLite files in read-only mode"
@@ -902,14 +1098,47 @@ def _doctor(args: argparse.Namespace) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
-    args = parser.parse_args(argv)
-    store = ReviewStore(args.db)
+    raw_argv = list(argv) if argv is not None else sys.argv[1:]
+    args = parser.parse_args(raw_argv)
+    product_commands = {
+        "product-init",
+        "review-sync",
+        "review-sync-status",
+        "fee-project",
+        "fee-status",
+        "fee-correct",
+    }
+    if args.command in product_commands:
+        from .sync_service import resolve_review_db
+
+        db_was_explicit = any(
+            token == "--db" or token.startswith("--db=") for token in raw_argv
+        )
+        resolved_review_db = resolve_review_db(
+            explicit=args.db if db_was_explicit else None
+        )
+        args.db = str(resolved_review_db)
+        store = ReviewStore(resolved_review_db)
+    else:
+        store = ReviewStore(args.db)
 
     try:
         if args.command == "init":
             _print(store.initialize())
         elif args.command == "status":
             _print(store.status())
+        elif args.command == "product-init":
+            return _product_init(args, store)
+        elif args.command == "review-sync":
+            return _review_sync(args)
+        elif args.command == "review-sync-status":
+            return _review_sync_status(args)
+        elif args.command == "fee-project":
+            return _fee_project(args)
+        elif args.command == "fee-status":
+            return _fee_status(args, store)
+        elif args.command == "fee-correct":
+            return _fee_correct(args, store)
         elif args.command == "doctor":
             return _doctor(args)
         elif args.command == "ingest-csv":
@@ -1848,13 +2077,19 @@ def main(argv: list[str] | None = None) -> int:
         else:
             parser.error(f"Unhandled command: {args.command}")
     except Exception as exc:
-        print(
-            json.dumps(
-                {"status": "ERROR", "error_type": type(exc).__name__, "error": str(exc)},
-                ensure_ascii=False,
-                indent=2,
-            ),
-            file=sys.stderr,
+        error_payload = {
+            "status": "ERROR",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+        }
+        rendered = json.dumps(
+            error_payload,
+            ensure_ascii=False,
+            indent=2,
         )
+        output = getattr(args, "out", None)
+        if output and args.command in product_commands:
+            atomic_write_bytes(output, (rendered + "\n").encode("utf-8"))
+        print(rendered, file=sys.stderr)
         return 2
     return 0

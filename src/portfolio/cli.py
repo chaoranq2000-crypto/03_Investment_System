@@ -227,6 +227,21 @@ def command_import_statement(args: argparse.Namespace, store: PortfolioStore) ->
             skipped_rows=parsed.skipped_rows,
         )
     summary.update(outcome)
+    # The three apply methods commit internally.  Import lazily here so review
+    # integration can only run after a successful portfolio commit and can
+    # never interfere with preview or portfolio failure paths.
+    try:
+        from .review_integration import trigger_post_commit_review_sync
+
+        summary["review_sync"] = trigger_post_commit_review_sync(store.path)
+    except Exception as exc:  # the committed portfolio result remains authoritative
+        summary["review_sync"] = {
+            "status": "failed",
+            "trigger": "portfolio_statement_post_commit",
+            "reason": "review_integration_unavailable",
+            "error_type": type(exc).__name__,
+            "error": str(exc),
+        }
     print(json.dumps(_raw(summary), ensure_ascii=False, indent=2))
     return 0
 
