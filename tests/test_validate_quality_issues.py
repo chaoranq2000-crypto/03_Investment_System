@@ -4,6 +4,8 @@ import copy
 import importlib.util
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / ".agents/skills/quality-review/scripts/validate_quality_issues.py"
 EXAMPLE_PATH = REPO_ROOT / ".agents/skills/quality-review/assets/r5_quality_issues.example.csv"
@@ -25,23 +27,27 @@ def test_example_quality_issues_are_valid():
     assert validator.derive_outcome(rows, errors) == "accepted_with_todos"
 
 
-def test_active_high_issue_blocks_accepted_outcome():
+def test_visible_unused_high_unknown_allows_accepted_with_todos():
     validator = load_validator()
     rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
     rows[0]["severity"] = "high"
     rows[0]["status"] = "open"
-    errors = validator.validate_quality_issues(rows, expected_outcome="accepted")
-    assert any("active high or critical severity" in error for error in errors)
-    assert validator.derive_outcome(rows, []) == "needs_fix"
+    rows[0]["impact_scope"] = "claim"
+    rows[0]["active_disposition"] = "unknown"
+    rows[0]["affected_capabilities"] = "unused_unit_economics"
+    rows[0]["blocks_current_goal"] = "false"
+    rows[0]["blocking_decision"] = "accepted_with_todos"
+    errors = validator.validate_quality_issues(rows)
+    assert errors == []
+    assert validator.derive_outcome(rows, errors) == "accepted_with_todos"
 
 
-def test_high_issue_row_cannot_have_accepted_blocking_decision():
+def test_scoped_blocking_decision_must_match_truth_table():
     validator = load_validator()
     rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
-    rows[0]["severity"] = "high"
     rows[0]["blocking_decision"] = "accepted"
     errors = validator.validate_quality_issues(rows)
-    assert any("high or critical severity cannot have accepted" in error for error in errors)
+    assert any("blocking_decision must be accepted_with_todos" in error for error in errors)
 
 
 def test_trading_instruction_issue_must_be_high():
@@ -67,13 +73,14 @@ def test_invalid_severity_is_reported():
     assert any("severity is invalid" in error for error in validator.validate_quality_issues(rows))
 
 
-def test_critical_severity_is_valid_and_blocks_accepted():
+def test_critical_severity_is_descriptive_not_a_blocker():
     validator = load_validator()
     rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
     rows[0]["severity"] = "critical"
     rows[0]["status"] = "open"
-    errors = validator.validate_quality_issues(rows, expected_outcome="accepted")
-    assert any("high or critical" in error for error in errors)
+    errors = validator.validate_quality_issues(rows)
+    assert errors == []
+    assert validator.derive_outcome(rows, errors) == "accepted_with_todos"
 
 
 def test_invalid_gate_id_is_reported():
@@ -135,6 +142,117 @@ def test_r5_mapping_drift_is_rejected():
 
 def test_cli_validates_example(capsys):
     validator = load_validator()
-    assert validator.main([str(EXAMPLE_PATH), "--expected-decision", "accepted_with_todos"]) == 0
+    assert (
+        validator.main(
+            [
+                str(EXAMPLE_PATH),
+                "--require-current-goal",
+                "--expected-decision",
+                "accepted_with_todos",
+            ]
+        )
+        == 0
+    )
     captured = capsys.readouterr()
     assert "outcome: accepted_with_todos" in captured.out
+
+
+@pytest.mark.parametrize(
+    "description",
+    [
+        "unsupported number is used by the report",
+        "real double-count is present in the calculation",
+        "hidden TODO is omitted from the report",
+        "direct trading instruction appears in the report",
+        "no-advice violation appears in the report",
+    ],
+)
+def test_used_integrity_defects_require_needs_fix(description: str):
+    validator = load_validator()
+    rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
+    rows[0].update(
+        {
+            "severity": "high",
+            "status": "open",
+            "description": description,
+            "impact_scope": "report",
+            "active_disposition": "active_defect",
+            "affected_capabilities": "current_report",
+            "blocks_current_goal": "true",
+            "blocking_decision": "needs_fix",
+        }
+    )
+    errors = validator.validate_quality_issues(rows)
+    assert errors == []
+    assert validator.derive_outcome(rows, errors) == "needs_fix"
+
+
+@pytest.mark.parametrize(
+    "description",
+    [
+        "identity failure prevents any honest target output",
+        "path failure prevents any honest target output",
+        "parse failure prevents any honest target output",
+        "source failure prevents any honest target output",
+    ],
+)
+def test_workflow_integrity_failure_is_blocked(description: str):
+    validator = load_validator()
+    rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
+    rows[0].update(
+        {
+            "severity": "critical",
+            "status": "open",
+            "description": description,
+            "impact_scope": "workflow",
+            "active_disposition": "active_defect",
+            "affected_capabilities": "honest_target_output",
+            "blocks_current_goal": "true",
+            "blocking_decision": "blocked",
+        }
+    )
+    errors = validator.validate_quality_issues(rows)
+    assert errors == []
+    assert validator.derive_outcome(rows, errors) == "blocked"
+
+
+def test_required_unavailable_method_is_blocked():
+    validator = load_validator()
+    rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
+    rows[0].update(
+        {
+            "severity": "high",
+            "status": "open",
+            "impact_scope": "method",
+            "active_disposition": "method_unavailable",
+            "affected_capabilities": "contract_required_method",
+            "blocks_current_goal": "true",
+            "blocking_decision": "blocked",
+        }
+    )
+    errors = validator.validate_quality_issues(rows)
+    assert errors == []
+    assert validator.derive_outcome(rows, errors) == "blocked"
+
+
+def test_legacy_rows_remain_read_only_compatible():
+    validator = load_validator()
+    rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
+    for row in rows:
+        for field in validator.CURRENT_GOAL_FIELDS:
+            row.pop(field)
+    rows[0]["severity"] = "high"
+    rows[0]["status"] = "open"
+    rows[0]["blocking_decision"] = "needs_fix"
+    errors = validator.validate_quality_issues(rows)
+    assert errors == []
+    assert validator.derive_outcome(rows, errors) == "needs_fix"
+
+
+def test_partial_current_goal_schema_is_rejected():
+    validator = load_validator()
+    rows = copy.deepcopy(validator.load_issues(EXAMPLE_PATH))
+    for row in rows:
+        row.pop("blocks_current_goal")
+    errors = validator.validate_quality_issues(rows)
+    assert any("columns must appear together" in error for error in errors)

@@ -1,0 +1,50 @@
+schema_version: r5_v1_governance_cleanup_validation_v1
+validation_id: V-009
+phase: P1
+checked_at: "2026-07-25T13:25:09+08:00"
+decision: pass
+phase_parent: f41d99dc3685da6b1317da58b73beb23fc95135c
+changed_path_count_before_receipts: 25
+final_changed_path_count: 29
+unexpected_path_count: 0
+changed_paths:
+  - .agents/skills/quality-review/SKILL.md
+  - .agents/skills/quality-review/assets/r5_quality_issues.example.csv
+  - .agents/skills/quality-review/references/issue_schema.md
+  - .agents/skills/quality-review/references/r5_quality_gate.md
+  - .agents/skills/quality-review/scripts/validate_quality_issues.py
+  - .agents/skills/research-orchestrator/SKILL.md
+  - .agents/skills/research-orchestrator/assets/workflow_state_template.yaml
+  - .agents/skills/research-orchestrator/references/workflow_state_schema.md
+  - .agents/skills/research-orchestrator/scripts/validate_workflow_state.py
+  - .agents/skills/stock-deep-dive/SKILL.md
+  - .agents/skills/stock-deep-dive/references/r5_stock_research_pack_contract.md
+  - .agents/skills/stock-deep-dive/references/report_production_profile.md
+  - docs/codex_tasks/v1_governance_integration_cleanup_v2/START_HERE.md
+  - docs/meta/DOC_OWNERSHIP_MATRIX.md
+  - docs/policies/QUALITY_GUARDRAILS.md
+  - docs/workflows/R5_REAL_COMPANY_REGRESSION_CONTRACT.md
+  - docs/workflows/R5_SAMPLE_QUALITY_STOCK_REPORT_SPEC.md
+  - docs/workflows/RESEARCH_WORKFLOW.md
+  - docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
+  - reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md
+  - reports/p1_6/r5_v1_governance_cleanup/validation/active_routing_audit.yaml
+  - reports/p1_6/r5_v1_governance_cleanup/validation/doc_drift.txt
+  - reports/p1_6/r5_v1_governance_cleanup/validation/governance_targeted.txt
+  - reports/p1_6/r5_v1_governance_cleanup/validation/preflight.yaml
+  - reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml
+  - tests/test_r5_v1_active_control_plane.py
+  - tests/test_r5_v1_completion_semantics.py
+  - tests/test_r5_v1_workflow_state_validator.py
+  - tests/test_validate_quality_issues.py
+protected_checks:
+  frozen_contract_changed: false
+  prior_v1_package_changed: false
+  data_raw_changed: false
+  original_root_map_changed: false
+  v1_replay_changed: false
+  github_workflow_changed: false
+  agents_md_changed: false
+  pyproject_changed: false
+  user_main_worktree_written: false
+git_diff_check: pass

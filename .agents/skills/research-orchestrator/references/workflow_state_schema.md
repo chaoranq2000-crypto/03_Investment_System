@@ -26,7 +26,7 @@ The current validator is:
 | canonical workflow type | `workflow_type` | Owned by `RESEARCH_WORKFLOW.md`; validator checks the same five values. |
 | workflow_status | `status` | This schema and validator use the values listed below. |
 | gate_status | `quality_gates[].status` | Active V1 states accept only the four values below. |
-| todo_severity | `open_todos[].severity` | Uses `high`, `medium`, `low`; open `high` TODOs block acceptance. |
+| todo_severity | `open_todos[].severity` | Uses `high`, `medium`, `low`; severity describes risk but does not by itself decide the workflow outcome. |
 | review_status | artifact-specific fields | Local scripts and manifests own artifact-specific values. |
 
 `workflow_status` values:
@@ -35,11 +35,11 @@ The current validator is:
 |---|---|
 | `planned` | 工作流已定义，尚未开始。 |
 | `in_progress` | 正在执行某一步。 |
-| `blocked` | 缺关键输入、证据、配置或路径，无法继续。 |
-| `needs_fix` | 产物存在质量问题，需要回到具体 stage 修复。 |
+| `blocked` | 身份、路径、解析、证据源或必要方法输入损坏，使任何诚实目标产物都无法生成。 |
+| `needs_fix` | 当前产物实际使用了无证据结论、错误计算、真实重复计数、断裂引用、隐藏缺口，或违反 no-advice，需要回到具体 stage 修复。 |
 | `ready_for_review` | 主要产物完成，等待质量审查或人工复核。 |
-| `accepted` | 关键门禁通过，无 open high severity issue。 |
-| `accepted_with_todos` | 无 open high severity issue，但保留 medium / low TODO。 |
+| `accepted` | 自动质量通过且没有活动限制或 TODO。 |
+| `accepted_with_todos` | 自动质量通过；未使用的 unknown、不可用方法或可见限制保留为 TODO，不论其描述性 severity。 |
 | `archived` | 历史运行，保留但不作为当前状态。 |
 
 `gate_status` values:
@@ -57,12 +57,15 @@ Every new or updated active V1 run must set:
 
 ```yaml
 state_schema_version: r5_v1
+decision_semantics_version: current_goal_v1
 run_mode: normal
 ```
 
-The marker activates strict control-plane validation. An unmarked state is accepted only
-through read-only legacy compatibility so protected historical runs can still be inspected;
-it is not a template for new execution. Any unknown version fails validation.
+`state_schema_version` activates canonical G0–G10 control-plane validation.
+`decision_semantics_version` activates the current-goal truth table below. A protected
+historical state without `decision_semantics_version` is accepted only through an explicit
+read-only compatibility result; it is not a template for new execution and must not be
+rewritten merely to satisfy the new schema. Any unknown version fails validation.
 
 These fields are required by the validator:
 
@@ -124,10 +127,49 @@ metrics_snapshot:
 
 ## State transition rules
 
-- `accepted` requires no open high severity issue.
-- `accepted_with_todos` allows medium / low TODOs only if explicitly listed.
-- `blocked` requires `blocked_by` in `notes` or `open_todos`.
-- `needs_fix` requires `required_next_skill` and target `next_stage`.
+- `severity` is descriptive. It never decides status without the current-goal fields.
+- `accepted` requires no active current-goal limitation or defect.
+- `accepted_with_todos` requires every active issue to derive
+  `blocks_current_goal: false`; high-severity visible unused unknowns are allowed.
+- `needs_fix` requires at least one active row that derives `needs_fix`, plus
+  `required_next_skill` and target `next_stage`.
+- `blocked` requires at least one active row whose workflow identity/path/parse/source
+  integrity failure or required unavailable method makes any honest target output
+  impossible.
+- A canonical gate or local Bundle/R5 check cannot bypass this issue-level derivation.
+
+## Current-goal issue semantics
+
+Every `open_todos[]` row in a new or updated active state separates:
+
+```yaml
+impact_scope: workflow | report | section | claim | method | none
+active_disposition: active_defect | unknown | method_unavailable | report_limitation | historical_backlog | policy_retired | not_required_for_active_v1
+affected_capabilities: []
+blocks_current_goal: false
+```
+
+`affected_capabilities` is a unique YAML list of explicit capability IDs. It is empty
+only when `impact_scope: none`. For all other scopes it names the unavailable or affected
+claim, section, method, report, or workflow capability.
+
+The validator applies this table row by row:
+
+| active_disposition | scope / dependency | blocks_current_goal | row outcome |
+|---|---|---:|---|
+| `active_defect` | workflow identity/path/parse/source failure prevents any honest target output | `true` | `blocked` |
+| `active_defect` | current report/section/claim/method has unsupported use, wrong calculation, real double-count, broken citation, hidden TODO, or no-advice failure | `true` | `needs_fix` |
+| `unknown` | current claim/section/calculation uses the missing field | `true` | `needs_fix` |
+| `unknown` | missing field is visible and unused | `false` | `accepted_with_todos` |
+| `method_unavailable` | frozen goal requires the method and no approved fallback exists | `true` | `blocked` |
+| `method_unavailable` | method is not required or a visible fallback/unknown/omit is used | `false` | `accepted_with_todos` |
+| `report_limitation` | limitation is visible and unsupported use is absent | `false` | `accepted_with_todos` |
+| `historical_backlog`, `policy_retired`, `not_required_for_active_v1` | `impact_scope: none` | `false` | no canonical impact |
+
+Coherence constraints are strict: `active_defect` always blocks; `unknown` cannot use
+workflow scope; `method_unavailable` uses method scope; a visible
+`report_limitation` does not block; and the three history/policy dispositions require
+`impact_scope: none`, no affected capability, and `blocks_current_goal: false`.
 
 ## Artifact item schema
 
@@ -218,3 +260,7 @@ reports/workflow_runs/<workflow_id>/open_todos.csv
 | `created_at` | false | ISO date or datetime. |
 | `resolved_at` | false | ISO date or datetime. |
 | `notes` | false | Next action, owner, or explicit TODO. |
+| `impact_scope` | true for `current_goal_v1` | `workflow`, `report`, `section`, `claim`, `method`, or `none`. |
+| `active_disposition` | true for `current_goal_v1` | One of the seven dispositions in the current-goal truth table. |
+| `affected_capabilities` | true for `current_goal_v1` | Unique YAML list; non-empty unless scope is `none`. |
+| `blocks_current_goal` | true for `current_goal_v1` | Boolean validated against scope and disposition; never inferred from severity alone. |

@@ -26,7 +26,7 @@
 | 证据引用 | 关键结论有 `evidence_id` 或 `claim_id` |
 | claim 类型 | 事实、估计、推断、管理层表述、第三方观点分开 |
 | 数据口径 | 指标定义、单位、周期、来源明确 |
-| 缺失数据 | 缺失项标记 `TODO` / `MISSING` / `LOW_CONFIDENCE` |
+| 缺失数据 | 缺失项标记 `TODO` / `MISSING` / `UNKNOWN` / `LOW_CONFIDENCE` |
 | 反证 | 重要结论配套风险或反证 |
 | 过期证据 | 可能过期的证据标记 `stale` |
 | 多对多映射 | 个股与细分关系使用 exposure 记录 |
@@ -35,9 +35,52 @@
 
 ---
 
-## 3. 事实、估计、推断、观点分离
+## 3. 当前目标范围与 outcome
 
-### 3.1 允许标签
+质量 issue 必须把风险描述与工作流决定分开。活动 issue 至少记录：
+
+```text
+severity
+impact_scope: workflow | report | section | claim | method | none
+active_disposition: active_defect | unknown | method_unavailable |
+                    report_limitation | historical_backlog |
+                    policy_retired | not_required_for_active_v1
+affected_capabilities
+blocks_current_goal
+```
+
+`severity` 只描述风险大小和处理优先级。它不能单独决定
+`blocks_current_goal`，也不能仅因 `high` 就把整个 workflow 置为
+`needs_fix` 或 `blocked`。
+
+具体 outcome truth table 的唯一 owner 是
+`docs/workflows/RESEARCH_WORKFLOW.md`。本政策执行以下边界：
+
+- visible 且未被当前产物使用的 unknown 可以保留为
+  `accepted_with_todos`；
+- unsupported-used number、错误计算、真实 double-count、引用断裂、
+  hidden TODO 和 no-advice 违规必须为 `needs_fix`；
+- identity、path、parse、source identity 或不可替代必要输入失败，导致
+  任何诚实目标产物都无法生成时，才使用 `blocked`；
+- 自动质量通过且没有活动限制或 TODO 时，才使用 `accepted`。
+
+### 3.1 缺失信息降级阶梯
+
+```text
+发行人直接披露
+→ 经审计的聚合口径
+→ 明示假设、边界和不确定性的有界估计 / 情景
+→ unknown 或省略依赖该字段的结论
+```
+
+低一级不得被写成高一级。进入 `unknown` / omit 后，只关闭真正依赖该
+字段的 claim、section、calculation 或 method；其他可诚实完成的产物继续。
+
+---
+
+## 4. 事实、估计、推断、观点分离
+
+### 4.1 允许标签
 
 ```text
 fact
@@ -49,7 +92,7 @@ opinion
 unknown
 ```
 
-### 3.2 常见错误
+### 4.2 常见错误
 
 | 错误 | 正确做法 |
 |---|---|
@@ -61,9 +104,9 @@ unknown
 
 ---
 
-## 4. 证据质量检查
+## 5. 证据质量检查
 
-### 4.1 来源等级
+### 5.1 来源等级
 
 | 等级 | 可靠性 | 使用限制 |
 |---|---|---|
@@ -72,7 +115,7 @@ unknown
 | C | 中 | 需说明口径和限制 |
 | D | 低 | 只能作线索，不能单独支撑关键结论 |
 
-### 4.2 检查问题
+### 5.2 检查问题
 
 - 证据是否来自原始披露？
 - 证据是否有日期？
@@ -84,7 +127,7 @@ unknown
 
 ---
 
-## 5. 指标口径检查
+## 6. 指标口径检查
 
 任何指标都需要回答：
 
@@ -115,7 +158,7 @@ unknown
 
 ---
 
-## 6. Segment-company exposure 检查
+## 7. Segment-company exposure 检查
 
 每条 exposure 记录必须检查：
 
@@ -140,9 +183,9 @@ valid_from / valid_to 是否需要？
 
 ---
 
-## 7. 报告交付检查
+## 8. 报告交付检查
 
-### 7.1 细分报告
+### 8.1 细分报告
 
 必须包含：
 
@@ -161,7 +204,7 @@ valid_from / valid_to 是否需要？
 - 后续跟踪清单
 - 证据地图
 
-### 7.2 个股报告
+### 8.2 个股报告
 
 必须包含：
 
@@ -178,7 +221,7 @@ valid_from / valid_to 是否需要？
 - 跟踪指标
 - 证据地图
 
-### 7.3 对比报告
+### 8.3 对比报告
 
 必须包含：
 
@@ -192,7 +235,7 @@ valid_from / valid_to 是否需要？
 
 ---
 
-## 8. 更新质量检查
+## 9. 更新质量检查
 
 刷新研究时不能只新增材料，必须判断对旧结论的影响。
 
@@ -212,7 +255,7 @@ watchlist 是否变化？
 
 ---
 
-## 9. 反证要求
+## 10. 反证要求
 
 重要结论至少配套一种反证视角：
 
@@ -230,7 +273,7 @@ watchlist 是否变化？
 
 ---
 
-## 10. 不构成投资建议
+## 11. 不构成投资建议
 
 所有产出都应默认包含研究边界：
 

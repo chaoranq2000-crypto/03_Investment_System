@@ -11,8 +11,13 @@ must not be copied into a new run.
 ## Required fields
 
 ```csv
-issue_id,severity,gate_id,local_check_id,mapped_global_gate_ids,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
+issue_id,severity,gate_id,local_check_id,mapped_global_gate_ids,stage,target_artifact,section,description,fix_owner_skill,impact_scope,active_disposition,affected_capabilities,blocks_current_goal,blocking_decision,next_action,status
 ```
+
+Protected historical CSVs without the four current-goal fields remain readable only in
+legacy compatibility mode. New or updated active V1 issue lists must include all four
+fields and should validate with `--require-current-goal`. A partial four-field header is
+invalid.
 
 ## severity enum
 
@@ -23,7 +28,10 @@ medium
 low
 ```
 
-`critical` and `high` mean the artifact cannot be accepted while the issue is active.
+Severity describes the potential research risk. It does not by itself decide whether the
+current workflow goal is blocked. A visible, unused `unknown` can remain high severity and
+still support `accepted_with_todos`; an actually used unsupported number remains an active
+defect and requires `needs_fix`.
 
 ## gate_id values
 
@@ -82,6 +90,34 @@ needs_fix
 blocked
 ```
 
+`blocking_decision` is a compatibility/readout projection. For current-goal rows the
+validator derives and verifies it from the following four fields; it cannot override them:
+
+| field | values / format |
+|---|---|
+| `impact_scope` | `workflow`, `report`, `section`, `claim`, `method`, `none` |
+| `active_disposition` | `active_defect`, `unknown`, `method_unavailable`, `report_limitation`, `historical_backlog`, `policy_retired`, `not_required_for_active_v1` |
+| `affected_capabilities` | Pipe-separated capability IDs; empty only for `impact_scope=none`. |
+| `blocks_current_goal` | Literal `true` or `false`. |
+
+## Deterministic current-goal truth table
+
+| active_disposition | scope / dependency | blocks_current_goal | derived decision |
+|---|---|---:|---|
+| `active_defect` | workflow identity/path/parse/source failure prevents any honest target output | `true` | `blocked` |
+| `active_defect` | current artifact contains unsupported use, wrong calculation, real double-count, broken citation, hidden TODO, or no-advice violation | `true` | `needs_fix` |
+| `unknown` | current claim, section, or calculation uses the field | `true` | `needs_fix` |
+| `unknown` | field is visible and unused | `false` | `accepted_with_todos` |
+| `method_unavailable` | the frozen goal requires the method and has no approved fallback | `true` | `blocked` |
+| `method_unavailable` | method is not required or a visible fallback/unknown/omit is used | `false` | `accepted_with_todos` |
+| `report_limitation` | visible with no unsupported use | `false` | `accepted_with_todos` |
+| `historical_backlog`, `policy_retired`, `not_required_for_active_v1` | `impact_scope=none`, no affected capability | `false` | `accepted` |
+
+`active_defect` always blocks the current goal. Workflow scope is reserved for failures
+that prevent any honest target output and therefore derives `blocked`; defects scoped to
+report/section/claim/method derive `needs_fix`. `method_unavailable` uses method scope.
+The three history/policy dispositions have no canonical impact.
+
 ## status values
 
 ```text
@@ -91,7 +127,9 @@ accepted_todo
 waived_with_reason
 ```
 
-`open` is active. `accepted_todo` remains visible but does not block accepted-with-TODOs when severity is medium or low. `waived_with_reason` requires a visible reason in `next_action` or notes.
+`open` is active. `accepted_todo` remains visible and requires
+`blocks_current_goal=false`; severity does not change that result.
+`waived_with_reason` requires a visible reason in `next_action` or notes.
 
 ## Mandatory high severity patterns
 
@@ -101,6 +139,10 @@ These issue classes must be `high`:
 direct trading instruction
 hidden TODO
 unsupported number
+real double-count
+no-advice violation
 ```
 
-They may be fixed later, but their recorded severity should still reflect the original risk.
+They must also use `active_disposition=active_defect` and
+`blocks_current_goal=true`. They may be fixed later, but their recorded severity should
+still reflect the original risk.

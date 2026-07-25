@@ -1,0 +1,40 @@
+schema_version: r5_v1_governance_cleanup_validation_v1
+validation_id: V-001
+phase: P1
+checked_at: "2026-07-25T13:10:43+08:00"
+decision: pass
+task_package:
+  path: docs/codex_tasks/v1_governance_integration_cleanup_v2
+  contract_sha256: c160ea2d676d5ba9a9893070be1a6e4418193cc508db07e71dd48cd0394a642f
+  validator_ok: true
+  state: ready
+git:
+  package_setup_commit: f41d99dc3685da6b1317da58b73beb23fc95135c
+  package_setup_parent: 23fcd3b6b5ce3574661c4cfd306dadd782ad0717
+  package_setup_paths:
+    - docs/codex_tasks/v1_governance_integration_cleanup_v2/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v2/START_HERE.md
+  engineering_source_candidate: f60f220ae252262a537c612ce193fc779901984b
+  package_baseline_is_ancestor: true
+  engineering_source_is_ancestor: true
+  branch: codex/v1-governance-integration-cleanup
+  dedicated_worktree_clean_before_phase_start: true
+remote:
+  origin: https://github.com/chaoranq2000-crypto/03_Investment_System.git
+  main: a345fafb522300831ed4206d35fa17f44570cb1f
+  night05: a96c1b717bf15905d72fd142efd946fa01bce666
+  v1_source: f60f220ae252262a537c612ce193fc779901984b
+  execution_ref_present: false
+user_main_worktree:
+  path: C:/Projects/03_Investment_System
+  head: a345fafb522300831ed4206d35fa17f44570cb1f
+  status_rows: 130
+  tracked_status_rows: 20
+  status_porcelain_v1_uall_bytes: 9156
+  status_porcelain_v1_uall_sha256: 0cc3779c1d4c8f91101526f2952b4b60c1ba1afd3d683c2cefdf127996070cb2
+  tracked_status_porcelain_sha256: b2d3c77f464c3c7fd23fdcdfe3f0583ea81c1f8af1f84492e3073ca7aa46ac02
+  handling: read_only
+baseline_targeted:
+  command_set: V-003_P1_seven_tests
+  result: 61_passed
+  failures: 0

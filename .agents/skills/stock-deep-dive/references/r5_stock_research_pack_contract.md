@@ -125,7 +125,11 @@ sample_quality_ready
 blocked
 ```
 
-`sample_quality_ready` is forbidden unless `forecast_model_pack`, `valuation_pack`, and `business_breakdown_pack` are all `ready`, `high_issue_count == 0`, and `no_advice_gate_passed == true`.
+`sample_quality_ready` is forbidden unless `forecast_model_pack`,
+`valuation_pack`, and `business_breakdown_pack` are all `ready`, there is no
+active defect or report limitation for the sample-quality capability, and
+`no_advice_gate_passed == true`. Severity counts remain descriptive and cannot
+decide readiness or canonical status by themselves.
 
 Canonical external output labels:
 
@@ -140,10 +144,15 @@ Mapping from pack state to external label:
 
 | Condition | External label |
 |---|---|
-| all required subpacks ready, no high issues, no-advice passed | `R5_sample_quality_ready` |
+| all required subpacks ready, no active defect/limitation for sample-quality, no-advice passed | `R5_sample_quality_ready` |
 | core identity/evidence are present but forecast/valuation/market gaps remain | `R5_research_draft` |
 | key financial/business/evidence fields are missing but visible | `R5_source_gapped_draft` |
-| identity/evidence/no-advice/source-gap visibility fails | `blocked` |
+| identity/path/parse/source identity failure prevents any honest report output | `blocked` |
+
+These external labels describe the report capability. They do not directly
+write canonical `workflow_state.status`. A no-advice violation, hidden source
+gap or unsupported-used value is `needs_fix`, not `blocked`; a visible unused
+unknown may coexist with canonical `accepted_with_todos`.
 
 ## Source-gap policy
 
@@ -160,6 +169,18 @@ LOW_CONFIDENCE_CLUE_ONLY
 ```
 
 If a metric value is `null`, the nearby object must carry `missing_reason`, `missing_items`, or another explicit source-gap explanation.
+
+Missing information follows:
+
+```text
+direct issuer disclosure
+→ audited aggregate
+→ bounded estimate / scenario with explicit assumptions
+→ unknown or omit the dependent conclusion
+```
+
+Lower tiers must not be promoted to higher tiers. An unknown closes only the
+claim, section, calculation or method that actually depends on it.
 
 `source_gap_register` should include:
 
@@ -190,6 +211,10 @@ allowed_report_level
 r5_external_state
 high_issue_count
 medium_issue_count
+impact_scope
+active_disposition
+affected_capabilities
+blocks_current_goal
 source_gap_register
 known_blockers
 forecast_gap_status
@@ -200,7 +225,11 @@ no_advice_gate_input
 owner_next_actions
 ```
 
-The handoff must say whether the run is `R5_sample_quality_ready`, `R5_research_draft`, `R5_source_gapped_draft`, or `blocked`. A high severity issue blocks `R5_sample_quality_ready`.
+The handoff must say whether the report capability is
+`R5_sample_quality_ready`, `R5_research_draft`, `R5_source_gapped_draft`, or
+`blocked`. It must also provide scoped issue rows so `quality-review` can
+derive the canonical outcome from actual current-goal dependency. Severity
+alone never sets `blocks_current_goal`.
 
 ## Validation
 
@@ -219,3 +248,13 @@ accepted_with_todos
 needs_fix
 blocked
 ```
+
+Outcome boundaries:
+
+- `accepted`: automatic quality passes and no active limitation remains;
+- `accepted_with_todos`: visible unknowns or unavailable non-required methods
+  remain but are not used without support;
+- `needs_fix`: unsupported-used values, errors, true double-counting, broken
+  citations, hidden TODOs or no-advice violations exist;
+- `blocked`: identity/path/parse/source identity or an irreplaceable required
+  input failure prevents any honest target output.

@@ -2,6 +2,10 @@
 
 > R5 是在 R4 内部草稿之上的“样例质量个股深度报告”目标层。本文件定义 R5 的输入、输出、章节、质量门和降级规则。
 
+R5 是显式请求时才启用的 report-capability profile，不是 canonical workflow 的
+默认 routing，也不直接决定 `workflow_state.status`。canonical outcome 以
+`RESEARCH_WORKFLOW.md` 的当前目标范围 truth table 为准。
+
 ## 1. 核心定义
 
 ```text
@@ -155,17 +159,28 @@ R5 report note 固定章节：
 
 ## 7. 降级规则
 
+任何 capability 的输入不足都按同一阶梯降级：
+
 ```text
-缺 company_identity_pack：blocked。
-缺 evidence_snapshot_pack：blocked。
-缺 financial_history_pack：只能 source-gapped draft。
-缺 business_breakdown_pack：只能 research draft。
-缺 forecast_model_pack：不得标记 sample-quality。
-缺 valuation_pack 或 market_snapshot：不得标记 sample-quality。
-缺 technical_market_pack 的 as_of_date：不能写交易状态判断。
-缺 sentiment_event_pack：可以写基本面报告，但不得写情绪或催化强判断。
-缺 risk_counterevidence_pack：不得通过 R5 quality gate。
+发行人直接披露
+→ 经审计的聚合口径
+→ 明示假设、边界和不确定性的有界估计 / 情景
+→ unknown 或省略依赖该字段的结论
 ```
+
+| gap | capability-local effect | canonical effect |
+|---|---|---|
+| company identity、source identity、path 或 parse 失败，导致任何诚实报告都无法生成 | report capability unavailable | `blocked` |
+| financial history 不完整但缺口可见且未被无依据使用 | 只能 source-gapped draft | `accepted_with_todos` 可用 |
+| business breakdown 不完整但缺口可见 | 关闭依赖业务拆分的结论和 sample-quality | `accepted_with_todos` 可用 |
+| forecast model 不可用 | 省略盈利预测强结论和依赖该模型的方法 | 若当前目标不要求该方法，`accepted_with_todos` 可用 |
+| valuation / market snapshot 不可用 | 省略估值或市场状态强结论 | 若当前目标不要求该方法，`accepted_with_todos` 可用 |
+| technical `as_of_date` 缺失 | 不能写交易状态判断 | 非必需 capability limitation |
+| sentiment / event pack 缺失 | 不写情绪或催化强判断 | 非必需 capability limitation |
+| risk / counterevidence 被隐藏，或 unsupported number 实际进入报告 | 当前报告 defect | `needs_fix` |
+
+unknown 必须显式展示。低一级证据不得伪装成高一级；仅关闭实际依赖该字段的
+claim、section、calculation 或 method。severity 只描述风险，不能单独提升为全局 blocker。
 
 ## 8. No-advice 边界
 
@@ -191,7 +206,7 @@ R5 不输出：
 
 如样例文本中存在交易化表达，R5 只学习其“研究结构和信息密度”，不复制其交易指令表达。
 
-## 9. R5 quality gate 最小项
+## 9. Legacy R5 capability evaluators
 
 ```text
 R5-G1 Evidence Completeness Gate
@@ -207,18 +222,46 @@ R5-G10 No-Advice Gate
 R5-G11 Sample Benchmark Gate
 ```
 
-每个 gate 输出：
+`R5-G1`–`R5-G11` 已退出普通 stock workflow 的默认 routing。只有调用方明确请求
+R5 report capability check 时才能运行；它们保留 local ID，并使用以下既有
+G0–G10 owner 映射：
+
+| local_check_id | mapped_global_gate_ids |
+|---|---|
+| `R5-G1` | `G1` |
+| `R5-G2` | `G3\|G7` |
+| `R5-G3` | `G2\|G3\|G7` |
+| `R5-G4` | `G4\|G7` |
+| `R5-G5` | `G3\|G7` |
+| `R5-G6` | `G3\|G7` |
+| `R5-G7` | `G3\|G7` |
+| `R5-G8` | `G1\|G2\|G7` |
+| `R5-G9` | `G2\|G7` |
+| `R5-G10` | `G9` |
+| `R5-G11` | `G7` |
+
+每个 evaluator 输出至少包含：
 
 ```text
 issue_id
 severity
+impact_scope
+active_disposition
+affected_capabilities
+blocks_current_goal
+gate_id
+local_check_id
+mapped_global_gate_ids
 section
 artifact
 description
 fix_owner_skill
-blocking_decision
 next_action
 ```
+
+local evaluator 只能说明某个 capability 是否可用、受限或有 defect。它不得直接
+写 canonical status，也不得让 Bundle/R5 local pass 覆盖 unsupported-used、
+double-count、hidden TODO 或 no-advice defect。
 
 ## 10. Writer 原则
 

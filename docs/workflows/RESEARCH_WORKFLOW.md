@@ -207,6 +207,55 @@ workflow_readout.md
 Bundle、Night、旧 close readout、历史 quality report 和 generation snapshot 可以保留为只读证据，
 不得覆盖或支配上述当前资产。新一轮输出必须写入新的 run-scoped 路径，不能覆盖历史 run。
 
+### 6.3 当前目标范围内的 issue 与 outcome
+
+活动 issue 必须把风险描述和工作流决定分开。每条 issue 至少记录：
+
+| field | canonical meaning |
+|---|---|
+| `impact_scope` | `workflow`、`report`、`section`、`claim`、`method` 或 `none`。 |
+| `active_disposition` | `active_defect`、`unknown`、`method_unavailable`、`report_limitation`、`historical_backlog`、`policy_retired` 或 `not_required_for_active_v1`。 |
+| `affected_capabilities` | 被该 issue 关闭或降级的具体结论、章节、计算或方法；无影响时为空列表。 |
+| `blocks_current_goal` | 是否阻断当前 run 明确要求的目标；必须由 disposition、impact scope 和实际依赖推导。 |
+
+`severity` 只描述风险和修复优先级，不能单独决定 `blocks_current_goal` 或
+canonical `workflow_state.status`。历史 `blocking_decision`、Bundle gate 或 R5
+local check 也不能覆盖当前目标依赖判断。
+
+确定性状态推导如下：
+
+| active_disposition | 当前目标依赖 | `blocks_current_goal` | canonical outcome |
+|---|---|---:|---|
+| `active_defect` | 当前产物使用 unsupported number、存在错误计算、真实 double-count、引用断裂、hidden TODO 或 no-advice 违规 | `true` | `needs_fix` |
+| `active_defect` | identity、path、parse、source identity 或必要输入损坏，导致任何诚实目标产物都无法生成 | `true` | `blocked` |
+| `unknown` | 当前 material claim、section 或 calculation 实际使用该未知字段 | `true` | `needs_fix`，先降级、移除或取得证据 |
+| `unknown` | 未被当前产物使用且显式可见 | `false` | `accepted_with_todos` 可用 |
+| `method_unavailable` | 当前目标明确要求该方法，必要输入不可获得，且没有获准 fallback | `true` | `blocked` |
+| `method_unavailable` | 当前目标不要求该方法，或已采用可见 fallback / unknown / omit | `false` | `accepted_with_todos` 可用 |
+| `report_limitation` | 限制显式可见，且没有无依据使用 | `false` | `accepted_with_todos` 可用 |
+| `historical_backlog`、`policy_retired`、`not_required_for_active_v1` | `impact_scope=none` | `false` | 不影响 canonical outcome |
+
+四个 canonical workflow outcome 的边界是：
+
+| outcome | meaning |
+|---|---|
+| `accepted` | 自动质量通过，且没有活动限制或 TODO。 |
+| `accepted_with_todos` | 自动研究和质量检查完成；未使用的 unknown、不可用的非必需方法或可见限制仍在。 |
+| `needs_fix` | 当前产物存在可修复的活动缺陷，或实际使用了没有证据的未知字段。 |
+| `blocked` | identity、path、parse、source identity 或当前目标不可替代的必要输入失败，导致任何诚实目标产物都无法生成。 |
+
+缺失信息必须按以下降级阶梯处理：
+
+```text
+发行人直接披露
+→ 经审计的聚合口径
+→ 明示假设、边界和不确定性的有界估计 / 情景
+→ unknown 或省略依赖该字段的结论
+```
+
+低一级不得伪装成高一级。走到 `unknown` 或 omit 时，只关闭真正依赖该字段的
+claim、section、calculation 或 method；不得把一个 capability 的缺口提升为全局 blocker。
+
 ## 7. Skill 角色分工
 
 | skill | 主要职责 |
@@ -358,7 +407,7 @@ Bundle、Night、旧 close readout、历史 quality report 和 generation snapsh
 | `update_segment_taxonomy` | 发现新细分、相邻细分或边界问题 | 更新 `segment_taxonomy.yaml` 或新增 candidate。 |
 | `update_scorecard` | 个股发现影响细分评分 | 更新 scorecard 或 scorecard TODO。 |
 | `no_backflow_needed` | 个股研究没有改变细分状态 | 写明原因，不默默跳过。 |
-| `blocked` | 证据不足，无法判断是否回写 | 进入 TODO / quality issue。 |
+| `blocked` | identity、path、parse 或 source identity 损坏，导致任何诚实的回写决定都无法生成 | 修复基础输入后重跑。证据不足但仍能诚实输出限制时，使用可见 TODO，而不是 `blocked`。 |
 
 ### 10.3 冲突处理
 
@@ -404,7 +453,7 @@ Bundle、Night、旧 close readout、历史 quality report 和 generation snapsh
 
 任何 skill-local gate 不得使用新的全局 `G` 编号。
 
-### 11.1 局部检查与兼容别名
+### 11.1 显式 capability-local 检查与兼容别名
 
 R5、Bundle、Night、data-layer、report-production 和 skill-local 检查必须使用明确的局部
 前缀或兼容别名，并映射到 G0–G10 中的一个或多个 owner gate。局部控制只在对应风险边界
@@ -420,6 +469,19 @@ R5、Bundle、Night、data-layer、report-production 和 skill-local 检查必�
 4. 因历史 Bundle/Night 任务仍 open 而移动活动 V1 的工程终点。
 
 兼容层必须记录 `local_check_id`、`mapped_global_gate_ids`、owner、适用边界和失败回流目标。
+
+Bundle11R–16R 与 legacy R5 sample-quality local checks 已退出普通 orchestrator 的默认 routing。
+它们只能在调用方明确请求某个 capability 时作为局部 evaluator 运行，并且必须：
+
+1. 声明被检查的 `affected_capabilities`；
+2. 使用既有 local ID，并映射到 G0–G10；
+3. 只返回该 capability 的 pass、limitation 或 defect；
+4. 由第 6.3 节按当前目标依赖推导 canonical outcome；
+5. 不直接写 `workflow_state.status`，也不设置工程完成、样例质量或 P2 事实。
+
+普通 `stock_first_closed_loop`、报告生成、close 和 quality dispatch 不得默认调用这些
+Bundle pipeline。仍有通用价值的算法可以保留为显式 evaluator；专用 routing、配置和
+实现属于历史兼容资产，不是 canonical 前置条件。
 
 ## 12. 固化产物清单
 
@@ -474,34 +536,20 @@ config/segment_taxonomy.yaml 更新或新增 candidate 说明
    适合脚本化的 skill 至少有一个 `scripts/` 校验或 helper。
 7. 至少一次 workflow run 的 readout 能说明：使用了哪些 skill、
    读取了哪些输入、产出了哪些文件、哪些 TODO 未解决。
-8. quality-review 无 high severity issue；medium TODO 已明确不会阻塞 limited P2 pilot。
+8. quality-review 没有 `blocks_current_goal=true` 的活动缺陷；severity 只描述风险，
+   可见且未被使用的 unknown / limitation 不得仅因 high 而阻断 readiness 判断。
 
 阶段性建设顺序属于 `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md`，
 不在本 kernel 中维护。
 
-<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
-## R5 Bundle 11R operating-research inner loop
+## 14. Legacy Bundle / R5 evaluator boundary
 
-This extension preserves the global T0–T10 workflow. Inside stock-deep-dive report production, execute the following non-optional loop before Reader rendering:
+Bundle11R–16R and the legacy R5 sample-quality local-check set are capability evaluators, not a
+mandatory operating-research inner loop. A caller may explicitly request a
+business-line driver, operating-evidence, peer-eligibility, model-link or
+sample-benchmark check. The resulting issue rows must carry
+`impact_scope`、`active_disposition`、`affected_capabilities` and
+`blocks_current_goal`, and must use the existing local-to-G0–G10 mapping.
 
-1. assign one or more economic archetypes to every material business line;
-2. generate a research-question matrix from required operating drivers;
-3. acquire or explicitly bound each thesis-critical driver;
-4. calculate segment economics and reconcile them to consolidated statements;
-5. qualify peers by operating definition before using peer multiples;
-6. run the semantic research gate;
-7. route every failed issue to its owning stage and skill;
-8. render only after high/critical research blockers are cleared or visibly retained as a non-sample-quality limitation.
-
-The runtime entrypoint is `scripts/run_r5_bundle11r_runtime.py`. Automation never sets human review, sample quality, or P2 to true.
-<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
-
-<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
-### R5 Bundle 12R local operating-evidence profile
-
-For stock workflows that need operating-evidence qualification, use
-`docs/workflows/R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE.md` and local gate
-`RP-12R-OE`. This profile does not add a global `G` gate and does not replace
-the canonical T0–T10 workflow. A failed local gate must preserve Bundle 11R's
-exact-hash review and route issues through the generated backflow plan.
-<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+No Bundle or R5 evaluator may become a default step between T0 and T10, require
+historical Bundle generations, or directly decide the canonical outcome.

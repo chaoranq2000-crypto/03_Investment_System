@@ -159,6 +159,23 @@ Build the 12 R5 subpacks: company identity, evidence snapshot, financial history
 
 Allowed R5 states are `R5_sample_quality_ready`, `R5_research_draft`, `R5_source_gapped_draft`, and `blocked`. Missing business, forecast, valuation, market, technical, sentiment, or event inputs must downgrade the state rather than being filled from memory or prose.
 
+These are report-capability labels, not canonical workflow outcomes. Apply the
+degradation ladder before choosing a label:
+
+```text
+direct issuer disclosure
+→ audited aggregate
+→ bounded estimate / scenario with explicit assumptions
+→ unknown or omit the dependent conclusion
+```
+
+Visible unused unknowns and unavailable non-required methods may coexist with
+canonical `accepted_with_todos`. Unsupported-used values, calculation errors,
+true double-counting, broken citations, hidden TODOs or no-advice violations
+are `needs_fix`. Use canonical `blocked` only when identity/path/parse/source
+identity or an irreplaceable required input failure prevents any honest target
+output.
+
 ### SDD-R5-4 Upstream and sub-skill boundary
 
 Do not acquire evidence, call live APIs, calculate real forecast values, or calculate real valuation outputs inside `stock-deep-dive`. Evidence comes from `evidence-ingest`; valuation context comes from `company-valuation` or reviewed valuation assets.
@@ -266,14 +283,18 @@ Hand off to `quality-review` for relevant global gates from `RESEARCH_WORKFLOW.m
 - G8 Backflow Gate
 - G9 No Advice Gate
 
-The final gate status must be one of:
+The stock-report capability label must be one of:
 
 - `bridge_only`
 - `publishable_ready_with_disclosure_todos`
 - `publishable_ready`
 - `blocked`
 
-Any high severity issue blocks acceptance. Medium TODOs may be accepted only if they remain visible and do not alter the report's truthfulness.
+This label does not write canonical `workflow_state.status`. Each issue must
+carry `impact_scope`、`active_disposition`、`affected_capabilities` and
+`blocks_current_goal`; severity alone never blocks acceptance. Visible TODOs
+may be accepted only when they are not used as facts and do not alter the
+report's truthfulness.
 
 ## Must-read references
 
@@ -339,22 +360,26 @@ Before closing a run, confirm:
 - `segment_exposure.yaml` exists or a blocked / no_backflow explanation is written.
 - `backflow_decision` is explicit.
 - `MISSING_DISCLOSURE` and `TODO_SOURCE_REQUIRED` are visible.
+- No issue decision is derived from severity alone; current-goal scope and
+  actual dependency are recorded.
 - Valuation section either consumes `company-valuation` outputs or shows visible valuation TODOs.
 - No valuation output contains direct buy/sell/hold, target-price instruction, position sizing or guaranteed return.
 - There is no buy/sell/hold, rating instruction, position sizing, or direct trading instruction.
 - Quality-review status is recorded.
 
-<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
-## Bundle 11R business-line operating contract
+## Explicit legacy capability evaluators
 
-Before forecasting, assign each material business line an economic archetype from `config/economic_archetype_registry.yaml`. A company may use several archetypes. Each thesis-critical assumption must carry source, unit, period, scenario, confidence, overlap treatment, and financial-statement mapping. A broad revenue-growth proxy is allowed only when labelled, bounded, and below the configured company-level proxy-share ceiling.
-<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+Bundle11R–16R and `R5-G1`–`R5-G11` are retired from this skill's default route. Invoke
+a retained evaluator only when the handoff explicitly names a capability such
+as business-line archetype assignment, operating-evidence qualification,
+overlap reconciliation, model linking, peer eligibility or sample benchmarking.
 
-<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
-## Bundle 12R operating-evidence profile
+When explicitly invoked, every thesis-critical assumption still carries source,
+unit, period, scenario, confidence, overlap treatment and financial-statement
+mapping. A broad proxy must be labelled and bounded. The evaluator result must
+retain its local ID, map to G0–G10, declare `affected_capabilities`, and return
+the scoped issue fields used by `quality-review`.
 
-For material segment modeling, read `references/operating_evidence_profile.md`.
-Bind every material segment to a registered archetype, reconcile overlaps and
-residuals, and run `scripts/run_r5_bundle12r_operating_evidence_gate.py` before
-claiming independent segment economics or handing valuation inputs downstream.
-<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+No local Bundle/R5 pass or failure may directly change the canonical outcome.
+If the explicit evaluator is not requested, ordinary stock research proceeds
+through SDD-0–SDD-5 and the canonical G0–G10 owners.

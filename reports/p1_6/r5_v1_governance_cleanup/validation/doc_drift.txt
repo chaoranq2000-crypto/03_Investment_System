@@ -1,0 +1,6 @@
+validation_id: V-002
+phase: P1
+command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B scripts/check_doc_drift.py
+exit_code: 0
+output:
+Doc drift check passed.

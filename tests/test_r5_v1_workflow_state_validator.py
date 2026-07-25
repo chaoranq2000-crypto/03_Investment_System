@@ -68,8 +68,31 @@ def template_state() -> dict:
     return yaml.safe_load(TEMPLATE_PATH.read_text(encoding="utf-8"))
 
 
+def scoped_todo(**overrides) -> dict:
+    todo = {
+        "issue_id": "ISSUE-001",
+        "severity": "high",
+        "stage": "T9",
+        "gate_id": "G7",
+        "target_artifact": "reports/workflow_runs/example/report.md",
+        "description": "Visible current-goal issue.",
+        "fix_owner_skill": "stock-deep-dive",
+        "status": "open",
+        "impact_scope": "claim",
+        "active_disposition": "unknown",
+        "affected_capabilities": ["unused_driver"],
+        "blocks_current_goal": False,
+    }
+    todo.update(overrides)
+    return todo
+
+
 def test_versioned_template_and_singleton_names_are_canonical() -> None:
     validator = load_validator()
+    assert (
+        template_state()["decision_semantics_version"]
+        == validator.GOAL_SCOPED_SEMANTICS_VERSION
+    )
     assert validator.CURRENT_ASSET_NAMES == (
         "workflow_state.yaml",
         "open_todos.csv",
@@ -149,3 +172,153 @@ def test_unknown_state_schema_version_fails(tmp_path: Path) -> None:
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 1
     assert "unsupported state_schema_version" in result.stderr
+
+
+def test_unmarked_r5_v1_state_is_explicit_read_only_compatibility(
+    tmp_path: Path,
+) -> None:
+    state = template_state()
+    state.pop("decision_semantics_version")
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+    assert "legacy r5_v1 compatibility; read-only" in result.stdout
+
+
+def test_current_goal_state_requires_scoped_issue_fields(tmp_path: Path) -> None:
+    state = template_state()
+    todo = scoped_todo()
+    todo.pop("impact_scope")
+    state["open_todos"] = [todo]
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert "impact_scope is required for current_goal_v1" in result.stderr
+
+
+def test_visible_unused_high_unknown_allows_accepted_with_todos(
+    tmp_path: Path,
+) -> None:
+    state = template_state()
+    state["status"] = "accepted_with_todos"
+    state["open_todos"] = [scoped_todo(severity="high")]
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize(
+    "description",
+    [
+        "unsupported number used by the report",
+        "real double-count in a calculation",
+        "hidden TODO in a material section",
+        "no-advice violation in the report",
+    ],
+)
+def test_current_output_defects_require_needs_fix(
+    tmp_path: Path, description: str
+) -> None:
+    state = template_state()
+    state.update(
+        {
+            "status": "needs_fix",
+            "next_stage": "T7",
+            "required_next_skill": "stock-deep-dive",
+            "open_todos": [
+                scoped_todo(
+                    description=description,
+                    impact_scope="report",
+                    active_disposition="active_defect",
+                    affected_capabilities=["current_report"],
+                    blocks_current_goal=True,
+                )
+            ],
+        }
+    )
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+
+    state["status"] = "accepted_with_todos"
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert "expected needs_fix" in result.stderr
+
+
+@pytest.mark.parametrize("failure_kind", ["identity", "path", "parse", "source"])
+def test_failure_preventing_any_honest_output_is_blocked(
+    tmp_path: Path, failure_kind: str
+) -> None:
+    state = template_state()
+    state["status"] = "blocked"
+    state["open_todos"] = [
+        scoped_todo(
+            description=f"{failure_kind} failure prevents any honest target output",
+            impact_scope="workflow",
+            active_disposition="active_defect",
+            affected_capabilities=["honest_target_output"],
+            blocks_current_goal=True,
+        )
+    ]
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+
+
+def test_required_method_unavailable_is_blocked(tmp_path: Path) -> None:
+    state = template_state()
+    state["status"] = "blocked"
+    state["open_todos"] = [
+        scoped_todo(
+            impact_scope="method",
+            active_disposition="method_unavailable",
+            affected_capabilities=["contract_required_method"],
+            blocks_current_goal=True,
+        )
+    ]
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+
+
+def test_optional_method_unavailable_allows_accepted_with_todos(
+    tmp_path: Path,
+) -> None:
+    state = template_state()
+    state["status"] = "accepted_with_todos"
+    state["open_todos"] = [
+        scoped_todo(
+            impact_scope="method",
+            active_disposition="method_unavailable",
+            affected_capabilities=["optional_valuation_method"],
+            blocks_current_goal=False,
+        )
+    ]
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+
+
+def test_policy_retired_has_no_canonical_impact(tmp_path: Path) -> None:
+    state = template_state()
+    state["status"] = "accepted"
+    state["open_todos"] = [
+        scoped_todo(
+            impact_scope="none",
+            active_disposition="policy_retired",
+            affected_capabilities=[],
+            blocks_current_goal=False,
+        )
+    ]
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+
+
+def test_active_defect_cannot_be_nonblocking(tmp_path: Path) -> None:
+    state = template_state()
+    state["status"] = "accepted_with_todos"
+    state["open_todos"] = [
+        scoped_todo(
+            impact_scope="report",
+            active_disposition="active_defect",
+            affected_capabilities=["current_report"],
+            blocks_current_goal=False,
+        )
+    ]
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert "active_defect must block the current goal" in result.stderr

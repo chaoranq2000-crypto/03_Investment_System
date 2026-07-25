@@ -147,8 +147,19 @@ reports/workflow_runs/<workflow_id>/handoffs/<nn>_to_<skill>.md
 | 执行证据、claim、metric、报告、回写等质量检查 | `quality-review` |
 | 记录 gate status 和 open TODO | `research-orchestrator` 或 `quality-review` |
 
-只要存在 open high severity issue，workflow 不得标记为 `accepted`
-或 `accepted_with_todos`。
+每条活动 issue 必须携带 `impact_scope`、`active_disposition`、
+`affected_capabilities` 和 `blocks_current_goal`。`severity` 只描述风险与
+修复优先级；open high issue 不得仅凭 severity 阻止 `accepted_with_todos`。
+canonical outcome 必须按 `RESEARCH_WORKFLOW.md` 第 6.3 节的当前目标依赖表推导。
+
+典型结果：
+
+- 显式可见且未被产物使用的 unknown 可以得到 `accepted_with_todos`；
+- unsupported-used number、错误计算、真实 double-count、引用断裂、hidden TODO
+  或 no-advice 违规必须得到 `needs_fix`；
+- 只有 identity、path、parse、source identity 或不可替代必要输入失败，导致任何
+  诚实目标产物都无法生成时，才使用 `blocked`；
+- `accepted` 只用于自动质量通过且没有活动限制或 TODO。
 
 ## 7. Fix loop 规则
 
@@ -161,6 +172,11 @@ reports/workflow_runs/<workflow_id>/handoffs/<nn>_to_<skill>.md
 | `next_stage` | 需要返回修复的 canonical stage。 |
 | `required_next_skill` | 修复 owner skill。 |
 | `open_todos` | 记录 issue、severity、target artifact 和 next action。 |
+
+`needs_fix` 只接收可修复的当前产物 defect，或实际使用 unknown 的 scope。
+`blocked` 不是更高一级的 severity；它只表示基础身份/路径/解析/来源或不可替代输入
+失败，使任何诚实目标产物都无法生成。非必需方法不可用、可见限制或未使用 unknown
+保留在 TODO 和 `affected_capabilities` 中，不进入永久 fix loop。
 
 fix loop 不新增 `workflow_type`、global `stage_id` 或 global `gate_id`。
 
@@ -208,6 +224,11 @@ Bundle/Night mission outcome 代替其中任一事实。只有
 不要求只读检查或幂等生成预设回滚；remote receipt 只用于 publication 与 `release_ready`
 边界，不得写成普通研究阶段或质量 gate 的通过条件。
 
+Bundle11R–16R 与 `R5-G1`–`R5-G11` 不在普通 orchestration 的默认 dispatch 图中。
+只有 handoff 明确列出待评估 capability 时，才可调用相应 local evaluator。其输出必须
+声明 `affected_capabilities` 并映射到 G0–G10；编排器随后按当前目标依赖推导 outcome，
+不得消费 Bundle-local pass/fail 直接覆盖 canonical state。
+
 ## 9. 禁止事项
 
 `research-orchestrator` 不得：
@@ -218,11 +239,14 @@ Bundle/Night mission outcome 代替其中任一事实。只有
 4. 直接写长篇研究结论替代下层 skill。
 5. 跳过 `quality-review` 直接 accepted。
 6. 将 scorecard / watchlist / memo 写成交易建议。
+7. 默认调用 Bundle11R–16R、`R5-G1`–`R5-G11` 或用其 local result 直接决定 canonical outcome。
 
-<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
-## R5 Bundle 11R issue backflow contract
+## 10. Legacy capability-evaluator routing
 
-The orchestrator consumes `r5_bundle11r_backflow_plan` and must set `next_stage` and `required_next_skill` from the highest-severity blocking task. Typical routes are:
+Legacy Bundle11R–16R evaluators may be used only through an explicit capability
+handoff. They are not a post-10R default stage. If invoked, the orchestrator
+may consume their backflow suggestions only after converting each local issue
+to the active scoped issue contract. Typical owner routes remain:
 
 - missing operating drivers or excessive proxy share → `RP2_operating_evidence` / `evidence-ingest`;
 - broken operating equation or missing model link → `RP4_operating_model` / `stock-deep-dive`;
@@ -232,20 +256,13 @@ The orchestrator consumes `r5_bundle11r_backflow_plan` and must set `next_stage`
 - direct trading language → `RP8_quality_review` / `quality-review`;
 - generation mismatch → `T0_orchestration` / `research-orchestrator`.
 
-A passing structure score cannot offset a high/critical research blocker.
-<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
-
-<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
-### Bundle 12R issue routing
-
-`RP-12R-OE` routes source/metric gaps to `T1/evidence-ingest`, business-boundary,
-overlap and independent-exposure gaps to `T2/stock-deep-dive`, and peer/DCF/SOTP
-eligibility gaps to `RP6/company-valuation`. The local gate may not set
-`sample_quality_allowed` or `p2_allowed` to true.
-<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+Routing priority comes from `blocks_current_goal` and the affected capability,
+not from highest severity alone. A passing structure score cannot offset an
+active defect, while a high-severity visible unknown that is not used by the
+current output does not become a global blocker.
 
 <!-- BEGIN R5_NIGHT_SHIFT_MISSION_GOAL_POLICY -->
-## 10. Night-shift Mission 与长期 Goal 分层
+## 11. Night-shift Mission 与长期 Goal 分层
 
 夜间运行的终止状态使用 `delivered / partial / blocked / failed / cutoff`，
 不得把 runner 退出、`no_safe_pilot`、外部门禁阻塞或 claim cutoff 解释为长期

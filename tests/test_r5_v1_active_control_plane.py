@@ -47,12 +47,36 @@ def test_canonical_entrypoint_and_state_owner_are_explicit() -> None:
     assert '"review_intake_ready"' not in validator
 
 
-def test_local_and_historical_runtimes_do_not_replace_the_orchestrator() -> None:
+def test_bundle_runtimes_are_explicit_local_evaluators_only() -> None:
+    kernel = read("docs/workflows/RESEARCH_WORKFLOW.md")
     skill = read(".agents/skills/research-orchestrator/SKILL.md")
-    bundle_cli = read("scripts/run_r5_bundle11r_runtime.py")
+    bundle11_cli = read("scripts/run_r5_bundle11r_runtime.py")
+    bundle12_cli = read("scripts/run_r5_bundle12r_operating_evidence_gate.py")
+    bundle13_cli = read("scripts/run_r5_bundle13r_evidence_backflow.py")
+    bundle_sources = "\n".join(
+        read(path)
+        for path in (
+            "src/research/r5_bundle11r_runtime.py",
+            "src/research/r5_bundle12r_operating_evidence.py",
+            "src/research/r5_bundle13r_evidence_backflow.py",
+        )
+    )
     night_cli = read("scripts/run_r5_night_shift.py")
-    assert "post-10R research-depth stage" in skill
-    assert "src.research.r5_bundle11r_runtime" in bundle_cli
+
+    assert "退出普通 orchestrator 的默认 routing" in kernel
+    assert "调用方明确请求某个 capability" in kernel
+    assert "不直接写 `workflow_state.status`" in kernel
+    assert "post-10R research-depth stage" not in skill
+    assert "src.research.r5_bundle11r_runtime" in bundle11_cli
+    assert 'parser.add_argument("--segment-plan", required=True)' in bundle11_cli
+    assert 'parser.add_argument("--output", required=True)' in bundle11_cli
+    assert 'parser.add_argument("--input", required=True' in bundle12_cli
+    assert 'parser.add_argument("--output-dir", required=True' in bundle12_cli
+    assert 'parser.add_argument("--bundle12r-context-dir", required=True)' in bundle13_cli
+    assert 'parser.add_argument("--reviewed-backfill", required=True)' in bundle13_cli
+    assert 'parser.add_argument("--output-dir", required=True)' in bundle13_cli
+    assert "workflow_state.yaml" not in bundle_sources
+    assert "validate_workflow_state" not in bundle_sources
     assert "night-shift mission dispatcher" in night_cli
     assert "return runtime_main(arguments)" in night_cli
 

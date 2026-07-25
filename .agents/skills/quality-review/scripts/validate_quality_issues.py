@@ -21,6 +21,12 @@ REQUIRED_FIELDS = [
     "next_action",
     "status",
 ]
+CURRENT_GOAL_FIELDS = [
+    "impact_scope",
+    "active_disposition",
+    "affected_capabilities",
+    "blocks_current_goal",
+]
 SEVERITIES = {"critical", "high", "medium", "low"}
 GLOBAL_GATES = {f"G{i}" for i in range(11)}
 R5_GATES = {f"R5-G{i}" for i in range(1, 12)}
@@ -40,12 +46,29 @@ R5_GATE_MAPPINGS = {
 ACTIVE_STATUSES = {"open"}
 TERMINAL_STATUSES = {"resolved", "waived_with_reason"}
 STATUSES = {"open", "resolved", "accepted_todo", "waived_with_reason"}
-HIGH_RISK_PATTERNS = {
+IMPACT_SCOPES = {"workflow", "report", "section", "claim", "method", "none"}
+ACTIVE_DISPOSITIONS = {
+    "active_defect",
+    "unknown",
+    "method_unavailable",
+    "report_limitation",
+    "historical_backlog",
+    "policy_retired",
+    "not_required_for_active_v1",
+}
+NON_ACTIVE_DISPOSITIONS = {
+    "historical_backlog",
+    "policy_retired",
+    "not_required_for_active_v1",
+}
+ACTIVE_DEFECT_PATTERNS = {
     "direct trading instruction",
-    "hidden TODO",
     "hidden todo",
     "unsupported number",
     "unsupported numbers",
+    "real double-count",
+    "real double count",
+    "no-advice violation",
 }
 OUTCOMES = {"accepted", "accepted_with_todos", "needs_fix", "blocked"}
 
@@ -85,13 +108,124 @@ def _is_active(row: dict[str, str]) -> bool:
     return row.get("status", "").strip() in ACTIVE_STATUSES
 
 
-def validate_quality_issues(rows: list[dict[str, str]], expected_outcome: str | None = None) -> list[str]:
+def _uses_current_goal_schema(rows: list[dict[str, str]]) -> bool:
+    return bool(rows) and all(
+        all(field in row for field in CURRENT_GOAL_FIELDS) for row in rows
+    )
+
+
+def _parse_bool(value: str) -> bool | None:
+    normalized = value.strip().lower()
+    if normalized == "true":
+        return True
+    if normalized == "false":
+        return False
+    return None
+
+
+def _capabilities(value: str) -> tuple[str, ...]:
+    return tuple(part.strip() for part in value.split("|") if part.strip())
+
+
+def _scoped_row_outcome(
+    row: dict[str, str], idx: int, errors: list[str]
+) -> str | None:
+    for field in CURRENT_GOAL_FIELDS:
+        if field != "affected_capabilities" and row.get(field, "") == "":
+            errors.append(f"row {idx}: {field} is required")
+
+    scope = row.get("impact_scope", "").strip()
+    disposition = row.get("active_disposition", "").strip()
+    capabilities = _capabilities(row.get("affected_capabilities", ""))
+    blocks = _parse_bool(row.get("blocks_current_goal", ""))
+
+    if scope not in IMPACT_SCOPES:
+        errors.append(f"row {idx}: impact_scope is invalid: {scope}")
+    if disposition not in ACTIVE_DISPOSITIONS:
+        errors.append(f"row {idx}: active_disposition is invalid: {disposition}")
+    if blocks is None:
+        errors.append(
+            f"row {idx}: blocks_current_goal must be true or false: "
+            f"{row.get('blocks_current_goal', '')}"
+        )
+    if len(capabilities) != len(set(capabilities)):
+        errors.append(f"row {idx}: affected_capabilities must not contain duplicates")
+
+    if (
+        scope not in IMPACT_SCOPES
+        or disposition not in ACTIVE_DISPOSITIONS
+        or blocks is None
+    ):
+        return None
+
+    if disposition in NON_ACTIVE_DISPOSITIONS:
+        if scope != "none" or capabilities or blocks:
+            errors.append(
+                f"row {idx}: {disposition} requires impact_scope=none, "
+                "empty affected_capabilities, and blocks_current_goal=false"
+            )
+        return "accepted"
+
+    if scope == "none":
+        errors.append(f"row {idx}: {disposition} cannot use impact_scope=none")
+    if not capabilities:
+        errors.append(f"row {idx}: {disposition} requires affected_capabilities")
+
+    if disposition == "active_defect":
+        if not blocks:
+            errors.append(f"row {idx}: active_defect must block the current goal")
+        return "blocked" if scope == "workflow" else "needs_fix"
+
+    if disposition == "unknown":
+        if scope == "workflow":
+            errors.append(f"row {idx}: unknown must be scoped below workflow")
+        return "needs_fix" if blocks else "accepted_with_todos"
+
+    if disposition == "method_unavailable":
+        if scope != "method":
+            errors.append(
+                f"row {idx}: method_unavailable requires impact_scope=method"
+            )
+        return "blocked" if blocks else "accepted_with_todos"
+
+    if disposition == "report_limitation":
+        if blocks:
+            errors.append(
+                f"row {idx}: a visible report_limitation cannot block the current goal"
+            )
+        if scope == "workflow":
+            errors.append(
+                f"row {idx}: report_limitation must be scoped below workflow"
+            )
+        return "accepted_with_todos"
+
+    raise AssertionError(f"unhandled active disposition: {disposition}")
+
+
+def validate_quality_issues(
+    rows: list[dict[str, str]],
+    expected_outcome: str | None = None,
+    *,
+    require_current_goal: bool = False,
+) -> list[str]:
     errors: list[str] = []
     has_local_column = bool(rows) and all("local_check_id" in row for row in rows)
     has_mapping_column = bool(rows) and all("mapped_global_gate_ids" in row for row in rows)
     active_mapping_schema = has_local_column and has_mapping_column
     if has_local_column != has_mapping_column:
         errors.append("local_check_id and mapped_global_gate_ids columns must appear together")
+
+    has_any_current_goal_column = bool(rows) and any(
+        any(field in row for field in CURRENT_GOAL_FIELDS) for row in rows
+    )
+    current_goal_schema = _uses_current_goal_schema(rows)
+    if has_any_current_goal_column and not current_goal_schema:
+        errors.append(
+            "impact_scope, active_disposition, affected_capabilities, and "
+            "blocks_current_goal columns must appear together"
+        )
+    if require_current_goal and not current_goal_schema:
+        errors.append("current-goal issue fields are required for an active V1 issue list")
 
     represented_r5_gates = {
         row.get("local_check_id", "").strip() if active_mapping_schema else row.get("gate_id", "").strip()
@@ -152,24 +286,51 @@ def validate_quality_issues(rows: list[dict[str, str]], expected_outcome: str | 
 
         if row.get("blocking_decision") not in OUTCOMES:
             errors.append(f"row {idx}: blocking_decision is invalid: {row.get('blocking_decision')}")
-        elif severity in {"critical", "high"} and row.get("blocking_decision") == "accepted":
+        elif (
+            not current_goal_schema
+            and severity in {"critical", "high"}
+            and row.get("blocking_decision") == "accepted"
+        ):
             errors.append(f"row {idx}: high or critical severity cannot have accepted blocking_decision")
 
         if status == "waived_with_reason" and len(row.get("next_action", "")) < 8:
             errors.append(f"row {idx}: waived_with_reason requires visible reason in next_action")
 
-        text = _row_text(row)
-        for pattern in HIGH_RISK_PATTERNS:
+        scoped_outcome = (
+            _scoped_row_outcome(row, idx, errors) if current_goal_schema else None
+        )
+        if (
+            current_goal_schema
+            and scoped_outcome is not None
+            and row.get("blocking_decision") in OUTCOMES
+            and row.get("blocking_decision") != scoped_outcome
+        ):
+            errors.append(
+                f"row {idx}: blocking_decision must be {scoped_outcome} "
+                "for the current-goal fields"
+            )
+        if (
+            current_goal_schema
+            and status == "accepted_todo"
+            and _parse_bool(row.get("blocks_current_goal", "")) is True
+        ):
+            errors.append(
+                f"row {idx}: accepted_todo cannot have blocks_current_goal=true"
+            )
+
+        text = _row_text(row).lower()
+        for pattern in ACTIVE_DEFECT_PATTERNS:
             if pattern in text and severity not in {"critical", "high"}:
                 errors.append(f"row {idx}: {pattern} issues must be high or critical severity")
-
-    active_blockers = [
-        row
-        for row in rows
-        if row.get("severity") in {"critical", "high"} and row.get("status") not in TERMINAL_STATUSES
-    ]
-    if expected_outcome == "accepted" and active_blockers:
-        errors.append("accepted outcome is blocked by active high or critical severity issues")
+            if pattern in text and current_goal_schema:
+                if row.get("active_disposition") != "active_defect":
+                    errors.append(
+                        f"row {idx}: {pattern} must use active_disposition=active_defect"
+                    )
+                if _parse_bool(row.get("blocks_current_goal", "")) is not True:
+                    errors.append(
+                        f"row {idx}: {pattern} must block the current goal"
+                    )
 
     return errors
 
@@ -177,6 +338,25 @@ def validate_quality_issues(rows: list[dict[str, str]], expected_outcome: str | 
 def derive_outcome(rows: list[dict[str, str]], errors: list[str]) -> str:
     if errors:
         return "blocked"
+    if _uses_current_goal_schema(rows):
+        row_outcomes: list[str] = []
+        for idx, row in enumerate(rows):
+            if not _is_active(row):
+                continue
+            outcome = _scoped_row_outcome(row, idx, [])
+            if outcome:
+                row_outcomes.append(outcome)
+        if "blocked" in row_outcomes:
+            return "blocked"
+        if "needs_fix" in row_outcomes:
+            return "needs_fix"
+        if (
+            "accepted_with_todos" in row_outcomes
+            or any(row.get("status") == "accepted_todo" for row in rows)
+        ):
+            return "accepted_with_todos"
+        return "accepted"
+
     active_rows = [row for row in rows if _is_active(row)]
     if any(row.get("severity") == "critical" for row in active_rows):
         return "blocked"
@@ -198,6 +378,11 @@ def main(argv: list[str] | None = None) -> int:
         choices=sorted(OUTCOMES),
         help="Expected decision to enforce",
     )
+    parser.add_argument(
+        "--require-current-goal",
+        action="store_true",
+        help="Reject legacy compatibility rows that omit current-goal issue fields",
+    )
     args = parser.parse_args(argv)
     issues_path = args.issues_path or args.path
     if issues_path is None:
@@ -205,7 +390,11 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         rows = load_issues(issues_path)
-        errors = validate_quality_issues(rows, args.expected_decision)
+        errors = validate_quality_issues(
+            rows,
+            args.expected_decision,
+            require_current_goal=args.require_current_goal,
+        )
     except Exception as exc:  # noqa: BLE001
         print("outcome: blocked")
         print(f"ERROR: {exc}", file=sys.stderr)

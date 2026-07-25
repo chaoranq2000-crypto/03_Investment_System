@@ -42,39 +42,50 @@ gate in `gate_id`, and the complete list in `mapped_global_gate_ids`.
 This mapping does not create additional global gates or change sample quality,
 P2 readiness, human authority, or engineering completion.
 
+R5-G1–R5-G11 are explicit capability-local checks. A failed or incomplete local
+check records `affected_capabilities` and maps to G0–G10, but it cannot directly
+set canonical workflow status. Canonical status is derived from
+`impact_scope`, `active_disposition`, actual current-goal dependency, and
+`blocks_current_goal`.
+
 ## Outcome rules
 
 ```text
-accepted: no active critical, high, medium or low issue.
-accepted_with_todos: no active critical/high issue; medium or low TODO remains visible.
-needs_fix: at least one active high issue that can be fixed.
-blocked: identity, evidence, parse, path, or source problem prevents review.
+accepted: automatic quality passes and no active limitation remains.
+accepted_with_todos: visible unused unknown, unavailable optional method, or report limitation remains.
+needs_fix: current output actually uses unsupported data, has a wrong calculation or real double-count, hides a TODO, breaks a citation, or violates no-advice.
+blocked: identity, path, parse, source integrity, or a required unavailable method prevents any honest target output.
 ```
+
+Severity remains descriptive and cannot replace this derivation.
 
 ## Sample-quality blockers
 
-Sample-quality cannot pass when any of these are active:
+The `sample_quality_ready` capability cannot pass when any of these are active:
 
 ```text
-unsupported number
-hidden TODO or missing disclosure
+unsupported number used by the report
+hidden TODO
 direct trading instruction
-forecast model missing
-valuation market snapshot missing
-business breakdown missing
+real double-count
+forecast model required by the frozen sample target but unavailable
+valuation market snapshot required by a used valuation method but missing
+business breakdown used by a material conclusion but missing
 technical as_of_date missing for market-state language
 no-advice gate missing or failed
 ```
 
-Critical/high issues block `accepted`. Medium/low issues may lead to
-`accepted_with_todos` only when TODO/source gaps remain visible.
+Visible missing disclosure that is not used by the current output affects only the
+named claim/section/method or `sample_quality_ready` capability. It can coexist with
+canonical `accepted_with_todos`, even when severity is high. A local gate never
+expands that limitation to the whole workflow.
 
 ## Validation
 
 Run:
 
 ```bash
-python .agents/skills/quality-review/scripts/validate_quality_issues.py .agents/skills/quality-review/assets/r5_quality_issues.example.csv --expected-decision accepted_with_todos
+python .agents/skills/quality-review/scripts/validate_quality_issues.py .agents/skills/quality-review/assets/r5_quality_issues.example.csv --require-current-goal --expected-decision accepted_with_todos
 ```
 
 The validator reports one of:

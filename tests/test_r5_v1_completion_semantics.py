@@ -70,3 +70,37 @@ def test_runtime_consumes_but_does_not_redefine_completion_truths() -> None:
     for truth in TRUTHS:
         assert truth in orchestration
         assert truth in ownership
+
+
+def test_kernel_owns_current_goal_issue_and_outcome_semantics() -> None:
+    kernel = read(KERNEL)
+    for field in (
+        "impact_scope",
+        "active_disposition",
+        "affected_capabilities",
+        "blocks_current_goal",
+    ):
+        assert field in kernel
+    for outcome in (
+        "accepted",
+        "accepted_with_todos",
+        "needs_fix",
+        "blocked",
+    ):
+        assert f"| `{outcome}` |" in kernel
+    assert "severity" in kernel
+    assert "不能单独决定 `blocks_current_goal`" in kernel
+    assert "发行人直接披露" in kernel
+    assert "经审计的聚合口径" in kernel
+    assert "有界估计 / 情景" in kernel
+    assert "unknown 或省略依赖该字段的结论" in kernel
+
+
+def test_bundle_and_r5_local_checks_are_explicit_capability_evaluators() -> None:
+    kernel = read(KERNEL)
+    orchestration = read(ORCHESTRATION)
+    assert "Bundle11R–16R" in kernel
+    assert "退出普通 orchestrator 的默认 routing" in kernel
+    assert "不直接写 `workflow_state.status`" in kernel
+    assert "不在普通 orchestration 的默认 dispatch 图中" in orchestration
+    assert "不得消费 Bundle-local pass/fail 直接覆盖 canonical state" in orchestration

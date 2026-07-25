@@ -153,13 +153,25 @@ by `WORKFLOW_ORCHESTRATION_SPEC.md`.
 ### ORCH-6 Dispatch quality gate
 
 Dispatch the next canonical gate from `RESEARCH_WORKFLOW.md`.
-`quality-review` owns issue finding and severity; dispatch rules live in
+`quality-review` owns issue finding, severity and scoped issue fields; dispatch rules live in
 `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
 ### ORCH-7 Route fix loop if needed
 
-If review finds blocking issues, update state to `needs_fix` or `blocked`
-and route to the owner skill. Fix loop rules live in
+For each active issue, consume `impact_scope`、`active_disposition`、
+`affected_capabilities` and `blocks_current_goal`. Derive the canonical outcome
+from the current-goal truth table in `RESEARCH_WORKFLOW.md`; severity alone is
+never a workflow decision.
+
+- visible unknowns that are not used by the current output may remain
+  `accepted_with_todos`;
+- unsupported-used numbers, calculation errors, true double-counting, broken
+  citations, hidden TODOs and no-advice violations are `needs_fix`;
+- only identity/path/parse/source identity or required-input failures that
+  prevent any honest target output are `blocked`.
+
+Route `needs_fix` to the owner skill and keep non-blocking limitations in TODOs.
+Fix loop rules live in
 `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
 ### ORCH-8 Close with workflow_readout
@@ -195,6 +207,9 @@ Do not write long investment opinions from this skill.
 - Separate fact、estimate、inference、management_comment、analyst_view、opinion。
 - Record uncertainty、missing data and TODO。
 - Do not output buy/sell/hold advice.
+- Do not default-route Bundle11R–16R or `R5-G1`–`R5-G11`.
+- Do not let a local evaluator, historical `blocking_decision`, or severity
+  overwrite the canonical current-goal outcome.
 
 ## Minimal close checklist
 
@@ -208,22 +223,20 @@ This checklist is an operational close check, not a second global gate table.
 [ ] quality_gate_report.md exists for complete runs
 [ ] lower-level skill handoffs are recorded or explicitly skipped
 [ ] segment-company exposure is updated or no-update reason is recorded
-[ ] no high-severity quality issues remain
+[ ] no issue has `blocks_current_goal=true` unless status is `needs_fix` or `blocked`
+[ ] visible unused unknowns and capability limitations remain explicit
 [ ] workflow_readout.md states accepted / accepted_with_todos / needs_fix / blocked
 ```
 
-<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
-## Bundle 11R runtime routing
+## Explicit legacy capability-evaluator routing
 
-For a stock research workflow that has reached the post-10R research-depth stage, invoke `scripts/run_r5_bundle11r_runtime.py` with the business-line driver plan, evidence status, peer pack, and semantic payload. Persist its question matrix, driver pack, peer eligibility, semantic scorecard, and backflow plan under the workflow-run directory. Route the next action from `backflow_plan.tasks`; do not replace a failed operating-research gate by asking the Writer to add prose.
-<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+Bundle11R–16R and `R5-G1`–`R5-G11` are retired from ordinary orchestrator routing.
+Invoke a retained evaluator only when the handoff explicitly names a capability,
+such as business-line drivers, operating evidence, overlap reconciliation,
+peer eligibility or sample benchmarking.
 
-<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
-## Bundle 12R operating-evidence orchestration
-
-When operating evidence, overlap reconciliation or valuation-method eligibility
-is in scope, read `references/bundle12r_backflow_profile.md` and
-`docs/workflows/R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE.md`. Run the local gate,
-consume its backflow plan, and do not transfer Bundle 11R human review to a new
-Bundle 12R generation.
-<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+The evaluator output must keep its local ID, map to G0–G10, and return
+`impact_scope`、`active_disposition`、`affected_capabilities` and
+`blocks_current_goal`. Route only the affected capability. Never copy the
+evaluator's local pass/fail or highest severity directly into
+`workflow_state.status`.

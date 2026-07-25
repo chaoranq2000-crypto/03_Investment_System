@@ -3,6 +3,8 @@
 本文件定义 `stock-deep-dive` 内部如何把 reviewed evidence、reviewed metrics、data-layer packs 和 analysis pack 转成接近样例质量的个股报告草稿。
 
 它是 skill-local profile，不是平级 workflow。
+它只在调用方明确请求该 report capability 时使用，不默认调用
+Bundle11R–16R 或 `R5-G1`–`R5-G11` evaluator，也不直接决定 canonical workflow outcome。
 
 ```yaml
 profile_id: stock_report_production
@@ -89,6 +91,10 @@ evidence_gap_request:
   blocking_level: high | medium | low
   owner_skill: evidence-ingest
 ```
+
+`blocking_level` 是 gap 风险提示，不是 canonical `blocks_current_goal`。
+只有结合 actual dependency、`impact_scope` 和 `active_disposition` 后才能
+形成工作流决定。
 
 ## RP2 Evidence Acquire & Parse
 
@@ -308,14 +314,33 @@ quality_gate_report.md
 stock_report_acceptance_checklist.yaml
 ```
 
-判定：
+每条 issue 必须包含：
 
 ```text
-accepted_sample_quality
-accepted_with_todos
-needs_fix
-blocked
+impact_scope
+active_disposition
+affected_capabilities
+blocks_current_goal
+local_check_id
+mapped_global_gate_ids
 ```
+
+判定使用 `RESEARCH_WORKFLOW.md` 的四个 canonical outcomes：
+
+| outcome | report-production interpretation |
+|---|---|
+| `accepted` | 自动质量通过，没有活动限制或 TODO。 |
+| `accepted_with_todos` | unknown / limitation 可见且没有被当前报告无依据使用。 |
+| `needs_fix` | unsupported-used、错误计算、真实 double-count、引用断裂、hidden TODO 或 no-advice 违规。 |
+| `blocked` | identity/path/parse/source identity 或不可替代必要输入失败，导致任何诚实报告都无法生成。 |
+
+Severity 只描述风险，不单独决定 outcome。缺失数据按 direct disclosure →
+audited aggregate → bounded estimate/scenario → unknown/omit 降级，并只关闭
+实际依赖它的 section、claim、calculation 或 method。
+
+R5-G1–R5-G11 and Bundle11R–16R are explicit capability-local evaluators only.
+When explicitly invoked, their local IDs map to G0–G10 and may update only
+`affected_capabilities`; their local result cannot overwrite the canonical status.
 
 ## RP10 Backflow & Maintenance
 
@@ -352,6 +377,8 @@ reviewed_metrics:
 open_gaps:
 high_issues:
 medium_issues:
+blocks_current_goal_count:
+affected_capabilities:
 backflow_decision:
 next_run_recommendation:
 ```

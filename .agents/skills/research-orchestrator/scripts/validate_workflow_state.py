@@ -60,6 +60,22 @@ VALID_GATE_IDS = {f"G{i}" for i in range(11)}
 VALID_GATE_STATUSES = {"pass", "fail", "not_checked", "not_applicable"}
 VALID_TODO_SEVERITIES = {"high", "medium", "low"}
 VALID_TODO_STATUSES = {"open", "in_progress", "blocked", "closed"}
+GOAL_SCOPED_SEMANTICS_VERSION = "current_goal_v1"
+VALID_IMPACT_SCOPES = {"workflow", "report", "section", "claim", "method", "none"}
+VALID_ACTIVE_DISPOSITIONS = {
+    "active_defect",
+    "unknown",
+    "method_unavailable",
+    "report_limitation",
+    "historical_backlog",
+    "policy_retired",
+    "not_required_for_active_v1",
+}
+NON_ACTIVE_DISPOSITIONS = {
+    "historical_backlog",
+    "policy_retired",
+    "not_required_for_active_v1",
+}
 CURRENT_ASSET_NAMES = (
     "workflow_state.yaml",
     "open_todos.csv",
@@ -82,7 +98,90 @@ def load_yaml(path: Path) -> dict[str, Any]:
     return data
 
 
-def validate_v1_controls(data: dict[str, Any]) -> None:
+def _validate_scoped_issue(item: dict[str, Any], label: str) -> str:
+    """Validate one current-goal issue and return its row-level outcome."""
+
+    for field in (
+        "impact_scope",
+        "active_disposition",
+        "affected_capabilities",
+        "blocks_current_goal",
+    ):
+        if field not in item:
+            fail(f"{label}.{field} is required for current_goal_v1")
+
+    impact_scope = item["impact_scope"]
+    disposition = item["active_disposition"]
+    capabilities = item["affected_capabilities"]
+    blocks = item["blocks_current_goal"]
+
+    if impact_scope not in VALID_IMPACT_SCOPES:
+        fail(f"{label}.impact_scope is invalid: {impact_scope}")
+    if disposition not in VALID_ACTIVE_DISPOSITIONS:
+        fail(f"{label}.active_disposition is invalid: {disposition}")
+    if (
+        not isinstance(capabilities, list)
+        or any(not isinstance(value, str) or not value.strip() for value in capabilities)
+        or len(capabilities) != len(set(capabilities))
+    ):
+        fail(f"{label}.affected_capabilities must be a unique list of non-empty strings")
+    if not isinstance(blocks, bool):
+        fail(f"{label}.blocks_current_goal must be a boolean")
+
+    if disposition in NON_ACTIVE_DISPOSITIONS:
+        if impact_scope != "none" or capabilities or blocks:
+            fail(
+                f"{label}: {disposition} requires impact_scope=none, "
+                "no affected_capabilities, and blocks_current_goal=false"
+            )
+        return "accepted"
+
+    if impact_scope == "none":
+        fail(f"{label}: {disposition} cannot use impact_scope=none")
+    if not capabilities:
+        fail(f"{label}: {disposition} requires affected_capabilities")
+
+    if disposition == "active_defect":
+        if not blocks:
+            fail(f"{label}: active_defect must block the current goal")
+        return "blocked" if impact_scope == "workflow" else "needs_fix"
+
+    if disposition == "unknown":
+        if impact_scope == "workflow":
+            fail(f"{label}: unknown must be scoped below workflow")
+        return "needs_fix" if blocks else "accepted_with_todos"
+
+    if disposition == "method_unavailable":
+        if impact_scope != "method":
+            fail(f"{label}: method_unavailable requires impact_scope=method")
+        return "blocked" if blocks else "accepted_with_todos"
+
+    if disposition == "report_limitation":
+        if blocks:
+            fail(f"{label}: a visible report_limitation cannot block the current goal")
+        if impact_scope == "workflow":
+            fail(f"{label}: report_limitation must be scoped below workflow")
+        return "accepted_with_todos"
+
+    raise AssertionError(f"unhandled active disposition: {disposition}")
+
+
+def _derive_scoped_outcome(items: list[dict[str, Any]]) -> str:
+    outcomes = [
+        _validate_scoped_issue(item, f"open_todos[{index}]")
+        for index, item in enumerate(items)
+        if item.get("status") != "closed"
+    ]
+    if "blocked" in outcomes:
+        return "blocked"
+    if "needs_fix" in outcomes:
+        return "needs_fix"
+    if "accepted_with_todos" in outcomes:
+        return "accepted_with_todos"
+    return "accepted"
+
+
+def validate_v1_controls(data: dict[str, Any], *, goal_scoped: bool) -> None:
     """Validate the active V1 control plane without rewriting legacy states."""
 
     if data.get("run_mode") not in VALID_RUN_MODES:
@@ -137,6 +236,24 @@ def validate_v1_controls(data: dict[str, Any]) -> None:
         if todo_gate_id and todo_gate_id not in VALID_GATE_IDS:
             fail(f"open_todos[{index}].gate_id is not canonical G0-G10: {todo_gate_id}")
 
+        if goal_scoped:
+            _validate_scoped_issue(item, f"open_todos[{index}]")
+
+    if not goal_scoped:
+        return
+
+    status = data["status"]
+    if status in {"accepted", "accepted_with_todos", "needs_fix", "blocked"}:
+        derived = _derive_scoped_outcome(data.get("open_todos", []))
+        if status != derived:
+            fail(
+                f"workflow status {status} is inconsistent with current-goal "
+                f"issue semantics; expected {derived}"
+            )
+    if status == "needs_fix":
+        if not data.get("required_next_skill") or not data.get("next_stage"):
+            fail("needs_fix requires required_next_skill and next_stage")
+
 
 def main(argv: list[str]) -> int:
     if len(argv) != 2:
@@ -168,18 +285,36 @@ def main(argv: list[str]) -> int:
     schema_version = data.get("state_schema_version")
     if schema_version is not None and schema_version != V1_STATE_SCHEMA_VERSION:
         fail(f"unsupported state_schema_version: {schema_version}")
+    semantics_version = data.get("decision_semantics_version")
+    if semantics_version is not None and semantics_version != GOAL_SCOPED_SEMANTICS_VERSION:
+        fail(f"unsupported decision_semantics_version: {semantics_version}")
+    goal_scoped = semantics_version == GOAL_SCOPED_SEMANTICS_VERSION
     if schema_version == V1_STATE_SCHEMA_VERSION:
-        validate_v1_controls(data)
+        validate_v1_controls(data, goal_scoped=goal_scoped)
 
-    high_open = []
-    for item in data.get("open_todos", []):
-        if isinstance(item, dict) and item.get("severity") == "high" and item.get("status") != "closed":
-            high_open.append(item.get("issue_id", "<unknown>"))
+    if not goal_scoped:
+        high_open = []
+        for item in data.get("open_todos", []):
+            if (
+                isinstance(item, dict)
+                and item.get("severity") == "high"
+                and item.get("status") != "closed"
+            ):
+                high_open.append(item.get("issue_id", "<unknown>"))
 
-    if high_open and data["status"] in {"accepted", "accepted_with_todos"}:
-        fail("accepted status is not allowed while high severity issues remain open: " + ", ".join(high_open))
+        if high_open and data["status"] in {"accepted", "accepted_with_todos"}:
+            fail(
+                "accepted status is not allowed while high severity issues remain "
+                "open in legacy compatibility: "
+                + ", ".join(high_open)
+            )
 
-    compatibility = "" if schema_version == V1_STATE_SCHEMA_VERSION else " (legacy compatibility)"
+    if schema_version != V1_STATE_SCHEMA_VERSION:
+        compatibility = " (legacy compatibility)"
+    elif not goal_scoped:
+        compatibility = " (legacy r5_v1 compatibility; read-only)"
+    else:
+        compatibility = ""
     print(f"OK{compatibility}: {path}")
     return 0
 

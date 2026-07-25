@@ -1,4 +1,5 @@
 state_schema_version: r5_v1
+decision_semantics_version: current_goal_v1
 workflow_id: wf_YYYYMMDD_stock_first_closed_loop_object_id
 workflow_type: stock_first_closed_loop
 run_mode: normal

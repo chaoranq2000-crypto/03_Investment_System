@@ -2,13 +2,19 @@
 
 ## 1. Purpose
 
-Bundle 16R introduces the first release gate that is evaluated on four real companies with materially different economic models. It does not add a new global workflow and does not replace `RESEARCH_WORKFLOW.md`. It consumes the existing T0–T10 workflow, Bundle 11R–15R runtime outputs, model packs, Reader artifacts and quality readouts.
+Bundle 16R is a retained legacy capability evaluator for four real companies
+with materially different economic models. It is not a release gate, is not
+part of ordinary T0–T10 routing, and does not replace
+`RESEARCH_WORKFLOW.md`. It may be invoked only when the caller explicitly asks
+for this four-case regression capability and supplies the required local inputs.
 
 The contract answers one question:
 
 > Can one issuer-neutral research runtime produce decision-useful, traceable and economically grounded research across four different business-model families without promoting sample prose into evidence?
 
-An engineering pass is not a sample-quality pass. P2 is never authorized by this contract.
+An engineering pass is not a sample-quality pass. P2 is never authorized by
+this contract, and a Bundle16R-local result never writes canonical
+`workflow_state.status`.
 
 ## 2. Golden regression cases
 
@@ -35,7 +41,11 @@ Each case result must bind the following roles to physical, repository-relative 
 8. `generation_lock`
 9. `human_review`
 
-A missing file, path escape, duplicate role or hash mismatch is a hard failure.
+A missing file, path escape, duplicate role or hash mismatch is a hard failure
+for the explicitly requested Bundle16R capability. It becomes canonical
+`blocked` only if an identity/path/parse/source failure prevents any honest
+current-goal output; otherwise it limits the affected capability and is routed
+through the canonical truth table.
 
 ## 4. Case-result manifest
 
@@ -106,7 +116,12 @@ A case cannot pass by filling sections with generic prose. The minimum release f
 - at least 2 future event-to-model links;
 - zero unresolved critical research questions.
 
-A critical question may be explicitly unresolved during research, but the case must then remain blocked rather than pass with a generic proxy.
+A critical question may be explicitly unresolved during research. The
+evaluator must preserve it as `unknown` or `method_unavailable` rather than
+pass with a generic proxy. If the current case actually uses that missing input,
+the affected case result is `needs_fix`; if it remains visible and unused, the
+canonical workflow may be `accepted_with_todos`. Severity alone does not decide
+either result.
 
 ## 6. Peer and valuation behavior
 
@@ -140,16 +155,38 @@ Human review starts as `pending`. An `accepted` review is valid only when it con
 
 Any report rerender or lock change invalidates the previous acceptance. Automated jobs must never synthesize reviewer identity or acceptance.
 
-## 9. Release semantics
+This section remains a Bundle16R-local sample-quality rule for an explicitly
+requested regression. It is not a default intermediate approval requirement
+and does not control the canonical automatic workflow outcome.
 
-| State | Meaning |
+## 9. Legacy evaluator semantics
+
+| Local state | Meaning |
 |---|---|
 | `engineering_pass=false` | one or more physical, truthfulness, model, semantic or hardcoding gates failed |
 | `engineering_pass=true`, `sample_quality_allowed=false` | the harness and four cases pass automated gates, but at least one exact-hash human review is pending or rejected |
 | `sample_quality_allowed=true` | all four cases pass automated gates and all four exact-hash human reviews are accepted |
 | `p2_allowed=false` | always false in Bundle 16R; a separate canonical decision is required |
 
-Bundle 16R must not edit canonical state to claim sample-quality or P2 merely because the evaluator is installed.
+Bundle 16R must not edit canonical state to claim sample-quality or P2 merely
+because the evaluator is installed. Each local finding must be converted to an
+active issue with:
+
+```text
+impact_scope
+active_disposition
+affected_capabilities
+blocks_current_goal
+local_check_id
+mapped_global_gate_ids
+```
+
+Bundle16R checks map only to the existing G0–G10 owners for the capability they
+inspect. They do not create a new global gate. Unsupported-used numbers,
+calculation errors, true double-counting, hidden TODOs and no-advice failures
+are `needs_fix`; visible unused unknowns may remain
+`accepted_with_todos`; only failures that prevent any honest target output are
+`blocked`.
 
 ## 10. Determinism and generated files
 

@@ -9,7 +9,9 @@ description: Use when checking evidence traceability, claim types, stale evidenc
 
 Check that research artifacts are traceable, correctly typed, comparable, uncertainty-aware, counter-evidence-aware, updateable and free of direct trading instructions.
 
-This skill owns issue detection and severity assignment. It does not own global workflow gate IDs.
+This skill owns issue detection, severity assignment and scoped issue
+classification. It does not own global workflow gate IDs or canonical outcome
+semantics.
 
 ## Canonical boundary
 
@@ -79,24 +81,43 @@ source_gap_report.md
 Every issue must use:
 
 ```csv
-issue_id,severity,gate_id,local_check_id,stage,target_artifact,description,fix_owner_skill,status,created_at,resolved_at,notes
+issue_id,severity,impact_scope,active_disposition,affected_capabilities,blocks_current_goal,gate_id,local_check_id,mapped_global_gate_ids,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
 ```
 
-For R5 issue-list validation, use the active compact CSV schema in
+For active R5 issue-list validation, use the same scoped CSV contract in
 `references/issue_schema.md`:
 
 ```csv
-issue_id,severity,gate_id,local_check_id,mapped_global_gate_ids,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
+issue_id,severity,impact_scope,active_disposition,affected_capabilities,blocks_current_goal,gate_id,local_check_id,mapped_global_gate_ids,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
+```
+
+For active rows, `blocking_decision` is a derived readout projection that must
+match the four scoped fields; it is not an independent decision input.
+Historical compact CSV rows that have `blocking_decision` but lack the scoped
+fields are compatibility inputs only. An adapter must classify them against the
+current goal and must not copy the historical decision into active state.
+
+Allowed scoped values:
+
+```text
+impact_scope:
+  workflow | report | section | claim | method | none
+
+active_disposition:
+  active_defect | unknown | method_unavailable | report_limitation |
+  historical_backlog | policy_retired | not_required_for_active_v1
 ```
 
 Severity:
 
 | severity | Meaning |
 |---|---|
-| critical | Blocks accepted status; indicates no-advice failure, identity failure, or impossible review state. |
-| high | Blocks accepted status; affects evidence traceability, identity, exposure, material claims, or no-advice boundary. |
-| medium | Does not block limited pilot if disclosed; affects completeness, comparability, confidence or important TODOs. |
+| critical | Highest risk or urgency; often identity, no-advice or material truthfulness risk. |
+| high | Material evidence, calculation, exposure, claim or report risk. |
+| medium | Completeness, comparability, confidence or important TODO risk. |
 | low | Formatting, naming, minor clarity or non-blocking improvements. |
+
+Severity is descriptive only. It never sets `blocks_current_goal` by itself.
 
 Status:
 
@@ -229,10 +250,11 @@ Reference:
 .agents/skills/stock-deep-dive/references/publishable_stock_report_gate.md
 ```
 
-### QR-R5 Sample-Quality Gate Subchecks
+### QR-R5 Legacy sample-quality capability evaluators
 
-Use `references/r5_quality_gate.md` when reviewing R5 research packs or R5
-report notes. The R5 local gates are:
+R5-G1–R5-G11 are not default checks for ordinary workflow completion. Use
+`references/r5_quality_gate.md` only when the handoff explicitly requests an
+R5 report capability evaluation. The retained local evaluators are:
 
 ```text
 R5-G1 Evidence Completeness Gate
@@ -249,7 +271,9 @@ R5-G11 Sample Benchmark Gate
 ```
 
 The same reference contains the mandatory local-to-global mapping. R5 local
-checks never appear in active `workflow_state.quality_gates[].gate_id`.
+checks never appear in active `workflow_state.quality_gates[].gate_id`, never
+write canonical status directly, and only affect their declared
+`affected_capabilities`.
 
 Validate issue lists with:
 
@@ -259,12 +283,31 @@ python .agents/skills/quality-review/scripts/validate_quality_issues.py --issues
 
 ## Outcome rules
 
+The canonical truth table is owned by `RESEARCH_WORKFLOW.md`. This skill applies
+it row by row:
+
 | outcome | Conditions |
 |---|---|
-| `accepted` | No high / medium blocking issue. |
-| `accepted_with_todos` | No high issue; medium / low TODOs documented. |
-| `needs_fix` | At least one fixable high issue. |
-| `blocked` | Identity / evidence / path / source problem prevents review. |
+| `accepted` | Automated quality passes and no active limitation or TODO remains. |
+| `accepted_with_todos` | Visible unknown, unavailable non-required method or report limitation remains, but the current output does not use it without support. |
+| `needs_fix` | Current output contains an unsupported-used number, calculation error, true double-count, broken citation, hidden TODO, no-advice violation, or uses an unknown field. |
+| `blocked` | Identity, path, parse, source identity or an irreplaceable required input fails so that no honest target output can be generated. |
+
+`unknown` that is visible and unused sets `blocks_current_goal=false` even if
+its severity is high. `method_unavailable` is blocking only when the frozen
+current goal requires that method and no approved fallback exists.
+
+Apply missing information through this degradation ladder:
+
+```text
+direct issuer disclosure
+→ audited aggregate
+→ bounded estimate / scenario with explicit assumptions
+→ unknown or omit the dependent conclusion
+```
+
+Lower tiers must not be presented as higher tiers. Closing one capability does
+not close unrelated report sections or the whole workflow.
 
 ## Outputs
 
@@ -282,6 +325,8 @@ required_fixes.md
 - Unsupported conclusions must become TODO / MISSING / LOW_CONFIDENCE / UNVERIFIED.
 - Management comments, analyst predictions and media narratives must be labeled.
 - Scores, memos and watchlists are not trading signals.
+- Local Bundle/R5 results and historical `blocking_decision` values cannot
+  override the scoped current-goal derivation.
 
 ## Quality checklist
 
@@ -297,8 +342,15 @@ required_fixes.md
 10. Is direct trading advice avoided?
 11. Are missing data-layer packs represented as TODO / MISSING rather than unsupported conclusions?
 
-<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
-## Bundle 11R semantic research gate
+## Explicit legacy semantic evaluators
 
-Review both truthfulness and decision usefulness. Fail a candidate when a core section lacks issuer-specific metrics, an economic section lacks a model link, peer multiples use an ineligible peer set, watchpoints are not falsifiable, the same insight is repeated across sections, proxy share exceeds the contract, or direct trading/target-price language appears. Extra length, citations, technical indicators, or unrelated passing sections cannot compensate for these failures.
-<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+Bundle11R–16R semantic checks may be retained only as explicitly invoked
+capability-local evaluators mapped to G0–G10. They may flag missing
+issuer-specific metrics, model links, peer eligibility, falsifiability,
+duplication, proxy use or no-advice failures, but each finding must carry the
+scoped fields above.
+
+An unavailable optional model becomes a visible capability limitation. An
+unsupported model result actually used in the report, a true double-count or a
+direct trading instruction is an active defect and `needs_fix`. Extra length,
+citations or unrelated passing sections cannot offset an active defect.
