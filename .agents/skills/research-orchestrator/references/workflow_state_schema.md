@@ -37,7 +37,7 @@ The current validator is:
 | `in_progress` | 正在执行某一步。 |
 | `blocked` | 身份、路径、解析、证据源或必要方法输入损坏，使任何诚实目标产物都无法生成。 |
 | `needs_fix` | 当前产物实际使用了无证据结论、错误计算、真实重复计数、断裂引用、隐藏缺口，或违反 no-advice，需要回到具体 stage 修复。 |
-| `ready_for_review` | 主要产物完成，等待质量审查或人工复核。 |
+| `ready_for_review` | 主要产物完成，等待机器质量审查或自动 gate；最终报告审核 `pending` 只写入 `final_report_review_status`，不得改变 canonical `status`。 |
 | `accepted` | 自动质量通过且没有活动限制或 TODO。 |
 | `accepted_with_todos` | 自动质量通过；未使用的 unknown、不可用方法或可见限制保留为 TODO，不论其描述性 severity。 |
 | `archived` | 历史运行，保留但不作为当前状态。 |
@@ -58,6 +58,7 @@ Every new or updated active V1 run must set:
 ```yaml
 state_schema_version: r5_v1
 decision_semantics_version: current_goal_v1
+final_report_review_semantics_version: final_report_review_v1
 run_mode: normal
 ```
 
@@ -66,6 +67,11 @@ run_mode: normal
 historical state without `decision_semantics_version` is accepted only through an explicit
 read-only compatibility result; it is not a template for new execution and must not be
 rewritten merely to satisfy the new schema. Any unknown version fails validation.
+`final_report_review_semantics_version` activates the sole active human-review boundary.
+It is bidirectionally required with `decision_semantics_version: current_goal_v1`;
+removing the final-review marker is a schema downgrade and fails. P1-era content remains
+recoverable from Git history, but it is not accepted as a current state or copied as a new
+active template.
 
 These fields are required by the validator:
 
@@ -88,6 +94,79 @@ artifacts: []
 open_todos: []
 quality_gates: []
 ```
+
+## Final report review and sample-quality fields
+
+The only active human-review status is:
+
+```yaml
+final_report_review_status: not_requested # not_requested | pending | approved | changes_requested
+```
+
+Marked active states also require:
+
+```yaml
+final_report_review_semantics_version: final_report_review_v1
+automated_report_quality_passed: false
+system_v1_complete: false
+sample_quality_ready: false
+p2_ready: false
+release_ready: false
+final_report_review:
+  report_path: null
+  report_sha256: null
+  reviewer: null
+  reviewed_at: null
+  decision: not_requested
+  notes: null
+  change_scope: null
+```
+
+The structural schema is `schemas/r5_final_report_review.schema.json`. Runtime validation
+adds repository and byte-integrity checks:
+
+- `final_report_review.decision` always equals `final_report_review_status`.
+- `not_requested` keeps the report binding, reviewer, time, notes and `change_scope`
+  null.
+- `pending` binds one existing final-report path under the canonical
+  `reports/stocks/<id>/` or `reports/segments/<id>/` root and its
+  machine-computed lowercase SHA-256. The same path must appear exactly once in
+  `artifacts[]` as a required, current `artifact_type: final_report`. It has no reviewer,
+  reviewed time or notes yet.
+- `approved` binds the same current report bytes and also requires a non-machine
+  reviewer identity, timezone-qualified ISO datetime and non-empty notes.
+- `changes_requested` has the same human and byte binding, plus
+  `change_scope: automated_quality_defect | report_revision`.
+- A report-byte change makes the stored hash stale and validation fails; only the final
+  report hash binds human review. Evidence, claim, metric, candidate and generation-lock
+  hashes remain machine-integrity controls.
+- If a committed `approved|changes_requested` record changes its report path, hash,
+  decision, reviewer, notes or `change_scope`, the replacement must be a new human review
+  event with a strictly later `reviewed_at`. Updating only the stored hash cannot migrate
+  the old decision to new bytes. Resetting to `not_requested|pending` explicitly
+  invalidates the prior human decision; any later return to a human decision must also be
+  later than the most recent committed human-review event.
+- `automated_report_quality_passed: true` requires all canonical G0–G10 entries to be
+  present and each to be `pass` or `not_applicable`, plus a completed automatic
+  workflow status: `accepted` or `accepted_with_todos`.
+- `sample_quality_ready: true` is allowed only when automated report quality passed and
+  the current-byte final report is `approved`. Approval does not force sample quality to
+  true because other sample-level conditions may remain.
+- `system_v1_complete: true` and `sample_quality_ready: true` also require a completed
+  automatic workflow status: `accepted` or `accepted_with_todos`.
+- `not_requested` and `pending` do not change `status` or
+  `system_v1_complete`. They keep `sample_quality_ready: false`.
+- `changes_requested` with `automated_quality_defect` requires canonical
+  `status: needs_fix` and the normal scoped issue/fix-loop evidence.
+  `change_scope: report_revision` does not itself change the machine-derived workflow
+  outcome.
+
+Marked states reject parallel or intermediate human-approval fields, including
+`human_review*`, reviewer-authority, independent-receipt and candidate-decision fields.
+Unmarked historical states remain read-only compatibility inputs and must not be rewritten
+or treated as active templates. A validator can reject obvious machine/placeholder
+reviewer identities, but a real reviewer identity and decision remain external human truth
+and must never be synthesized.
 
 ## Orchestration fields
 
@@ -177,7 +256,7 @@ Use this schema for `workflow_state.yaml` `artifacts[]` entries:
 
 | field | required | allowed values / notes |
 |---|---:|---|
-| `artifact_type` | true | `workflow_state`, `report`, `manifest`, `handoff`, `readout`, or local type. |
+| `artifact_type` | true | `workflow_state`, `report`, `final_report`, `manifest`, `handoff`, `readout`, or local type. A bound human-review target uses `final_report`. |
 | `path` | true | Repo-relative path. |
 | `created_by_skill` | true | Skill id or `human`. |
 | `stage` | true | Canonical stage or local stage label. |

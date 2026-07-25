@@ -1,25 +1,22 @@
 schema_version: r5_v1_governance_cleanup_validation_v1
 validation_id: V-009
-phase: P1
-checked_at: "2026-07-25T13:25:09+08:00"
+phase: P2
+checked_at: "2026-07-25T14:26:06+08:00"
 decision: pass
-phase_parent: f41d99dc3685da6b1317da58b73beb23fc95135c
-changed_path_count_before_receipts: 25
-final_changed_path_count: 29
+phase_parent: 0906a5fa8c785da1a74326aa19dbf0abc58ddd2e
+changed_path_count_before_receipts: 22
+final_changed_path_count: 26
 unexpected_path_count: 0
 changed_paths:
-  - .agents/skills/quality-review/SKILL.md
-  - .agents/skills/quality-review/assets/r5_quality_issues.example.csv
-  - .agents/skills/quality-review/references/issue_schema.md
   - .agents/skills/quality-review/references/r5_quality_gate.md
-  - .agents/skills/quality-review/scripts/validate_quality_issues.py
-  - .agents/skills/research-orchestrator/SKILL.md
+  - .agents/skills/quality-review/SKILL.md
   - .agents/skills/research-orchestrator/assets/workflow_state_template.yaml
   - .agents/skills/research-orchestrator/references/workflow_state_schema.md
   - .agents/skills/research-orchestrator/scripts/validate_workflow_state.py
-  - .agents/skills/stock-deep-dive/SKILL.md
+  - .agents/skills/research-orchestrator/SKILL.md
   - .agents/skills/stock-deep-dive/references/r5_stock_research_pack_contract.md
   - .agents/skills/stock-deep-dive/references/report_production_profile.md
+  - .agents/skills/stock-deep-dive/SKILL.md
   - docs/codex_tasks/v1_governance_integration_cleanup_v2/START_HERE.md
   - docs/meta/DOC_OWNERSHIP_MATRIX.md
   - docs/policies/QUALITY_GUARDRAILS.md
@@ -28,15 +25,15 @@ changed_paths:
   - docs/workflows/RESEARCH_WORKFLOW.md
   - docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
   - reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md
-  - reports/p1_6/r5_v1_governance_cleanup/validation/active_routing_audit.yaml
   - reports/p1_6/r5_v1_governance_cleanup/validation/doc_drift.txt
+  - reports/p1_6/r5_v1_governance_cleanup/validation/final_report_review_audit.yaml
   - reports/p1_6/r5_v1_governance_cleanup/validation/governance_targeted.txt
-  - reports/p1_6/r5_v1_governance_cleanup/validation/preflight.yaml
   - reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml
+  - schemas/r5_final_report_review.schema.json
+  - tests/test_r5_final_report_review_semantics.py
   - tests/test_r5_v1_active_control_plane.py
   - tests/test_r5_v1_completion_semantics.py
   - tests/test_r5_v1_workflow_state_validator.py
-  - tests/test_validate_quality_issues.py
 protected_checks:
   frozen_contract_changed: false
   prior_v1_package_changed: false
@@ -48,3 +45,12 @@ protected_checks:
   pyproject_changed: false
   user_main_worktree_written: false
 git_diff_check: pass
+user_main_worktree:
+  head: a345fafb522300831ed4206d35fa17f44570cb1f
+  status_rows: 130
+  tracked_status_rows: 20
+  status_porcelain_v1_uall_bytes: 9156
+  status_porcelain_v1_uall_sha256: 0cc3779c1d4c8f91101526f2952b4b60c1ba1afd3d683c2cefdf127996070cb2
+  tracked_status_porcelain_bytes: 1025
+  tracked_status_porcelain_sha256: b2d3c77f464c3c7fd23fdcdfe3f0583ea81c1f8af1f84492e3073ca7aa46ac02
+  matches_preflight_vector: true

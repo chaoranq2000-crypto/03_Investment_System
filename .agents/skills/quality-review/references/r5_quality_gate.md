@@ -2,7 +2,10 @@
 
 ## Purpose
 
-The R5 quality gate checks whether a stock research pack and its future note can reach sample quality. It does not generate report prose or investment advice.
+The R5 quality gate is an automated capability evaluator. It checks whether a
+stock research pack and its future note meet machine-verifiable prerequisites
+for sample quality. It does not generate report prose, investment advice or a
+human approval.
 
 ## R5 local gate set
 
@@ -79,6 +82,24 @@ Visible missing disclosure that is not used by the current output affects only t
 named claim/section/method or `sample_quality_ready` capability. It can coexist with
 canonical `accepted_with_todos`, even when severity is high. A local gate never
 expands that limitation to the whole workflow.
+
+Passing these local checks is necessary but not sufficient for
+`sample_quality_ready=true`. The current final report must also have
+`final_report_review_status=approved`, a valid real non-machine reviewer, and
+a machine-recomputed SHA-256 matching the reviewed bytes, plus every other
+applicable sample-quality condition. `not_requested|pending` does not change
+the automatic workflow outcome or block `system_v1_complete`, but keeps
+`sample_quality_ready=false`.
+
+Evidence, claim, metric, field, candidate, calculation, pack and
+generation-lock checks are machine validation. Their hashes are integrity
+evidence and do not bind human review. Only the final report hash binds the one
+active human decision. Historical Bundle/Night exact-hash reviews, authorities
+and independent receipts remain read-only and are not active R5 inputs.
+
+For `changes_requested`, `change_scope=automated_quality_defect` routes the
+workflow to `needs_fix`; `change_scope=report_revision` requests only final
+report revision and does not overwrite the automated outcome.
 
 ## Validation
 

@@ -140,11 +140,13 @@ def test_high_cost_controls_are_bound_to_their_real_risk_boundaries() -> None:
     orchestration = " ".join(
         read("docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md").split()
     )
-    assert "exact-hash 只绑定已经冻结、即将交给人的 review 输入" in kernel
+    assert "活动人审只绑定一次最终报告的当前字节 SHA-256" in kernel
+    assert "其他 exact-hash、generation lock" in kernel
     assert "rollback 只保护可变且非幂等的" in kernel
     assert "写入事务" in kernel
     assert "remote receipt 只证明 publication 边界" in kernel
-    assert "exact-hash 只用于" in orchestration
+    assert "活动人工审核只" in orchestration
+    assert "绑定最终报告当前字节的 SHA-256" in orchestration
     assert "rollback 只用于可变、非幂等写入" in orchestration
     assert "remote receipt 只用于 publication" in orchestration
 

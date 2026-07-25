@@ -76,6 +76,37 @@ blocks_current_goal
 低一级不得被写成高一级。进入 `unknown` / omit 后，只关闭真正依赖该
 字段的 claim、section、calculation 或 method；其他可诚实完成的产物继续。
 
+### 3.2 机器验证与最终报告人工审核
+
+活动 V1 的 evidence、claim、metric、字段、candidate、research pack、计算、
+generation lock 和 receipt 通过机器 provenance、schema、claim-type、metric、
+citation、hash 和 no-advice 检查。`reviewed` 在这些中间对象上表示
+machine-qualified，不表示人工批准，也不要求 reviewer authority、签名或逐项决定。
+
+唯一活动人工边界是最终报告质量审核：
+
+```text
+final_report_review_status:
+  not_requested | pending | approved | changes_requested
+```
+
+`pending` 绑定 repo-relative 最终报告路径和机器计算的当前字节 SHA-256。
+`approved|changes_requested` 还要求真实非机器 reviewer、ISO 时间和非空备注；
+review record 的 `decision` 必须等于顶层 status。`change_scope` 只在
+`changes_requested` 中取 `automated_quality_defect|report_revision`。
+
+报告字节变化立即使旧决定失效。`not_requested|pending` 不阻止自动 workflow
+或 `system_v1_complete`，但 `sample_quality_ready=false`。只有全部必要自动
+质量条件通过、最终报告 `approved` 且 hash 仍匹配，并满足其他适用条件时，
+`sample_quality_ready` 才允许为 true；这些是必要条件，不是自动充分条件。
+
+人工审核不能批准伪造数据或绕过自动质量失败。`changes_requested` 揭示自动质量
+缺陷时路由 `needs_fix`；若 `change_scope=report_revision`，只修订最终报告，
+不改写已推导的自动 outcome。
+
+除最终报告 SHA-256 外，其他 hash 只用于机器完整性和重放。历史 Bundle/Night
+的人审、authority、独立 receipt 和 candidate decision 只读，不进入活动 routing。
+
 ---
 
 ## 4. 事实、估计、推断、观点分离
@@ -250,7 +281,7 @@ valid_from / valid_to 是否需要？
 scorecard 是否变化？
 watchlist 是否变化？
 哪些报告需要重跑？
-是否需要人工复核？
+最终报告是否已形成；如需样例质量，是否已请求唯一最终报告审核？
 ```
 
 ---

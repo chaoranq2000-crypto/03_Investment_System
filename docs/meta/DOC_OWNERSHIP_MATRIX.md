@@ -24,6 +24,8 @@
 | canonical workflow outcomes | `docs/workflows/RESEARCH_WORKFLOW.md` | `accepted`、`accepted_with_todos`、`needs_fix`、`blocked` 的当前目标范围 truth table 只能引用，不得按 severity 重定义。 |
 | issue scope / disposition semantics | `docs/workflows/RESEARCH_WORKFLOW.md` | `impact_scope`、`active_disposition`、`affected_capabilities`、`blocks_current_goal` 由 schema/quality skill 实现，但语义不得漂移。 |
 | missing-data degradation ladder | `docs/workflows/RESEARCH_WORKFLOW.md` | 其他文档可解释本地降级，不得把局部缺口提升为新的全局 blocker。 |
+| final-report human-review semantics | `docs/workflows/RESEARCH_WORKFLOW.md` | 唯一活动人工边界、`sample_quality_ready` 必要条件和 hash 边界只能引用；字段级约束由 workflow-state / final-review schema 实现。 |
+| intermediate machine-qualification semantics | `docs/workflows/RESEARCH_WORKFLOW.md` + `quality-review` | evidence、claim、metric、candidate、计算、generation lock 和 receipt 的 `reviewed` 只表示机器验证，不得改成并行人工 approval。 |
 | workflow state fields | `research-orchestrator/references/workflow_state_schema.md` | 必须使用 canonical `workflow_type`。 |
 | active-run current asset ownership | `docs/workflows/RESEARCH_WORKFLOW.md` + `WORKFLOW_ORCHESTRATION_SPEC.md` | 每个活动 run 只保留一份当前 state、TODO、quality 和 readout；历史产物只读。 |
 | handoff packet format | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | skill 可补充本 skill 的 handoff 要求。 |
@@ -50,7 +52,7 @@
 | `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层 source adapter、manifest、candidate、data pack、局部 DL checks | 投研结论、报告写作风格、全局 gate id 定义 | `RESEARCH_WORKFLOW.md` |
 | `docs/workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` | 兼容性指针 | active profile、workflow_type 定义 | `RESEARCH_WORKFLOW.md` |
 | `docs/workflows/R5_SAMPLE_QUALITY_STOCK_REPORT_SPEC.md` | 显式 R5 report-capability profile、局部降级和 legacy evaluator 说明 | canonical outcome 重定义、默认 Bundle/R5 routing | `RESEARCH_WORKFLOW.md` |
-| `docs/workflows/R5_REAL_COMPANY_REGRESSION_CONTRACT.md` | 显式调用的 legacy four-case capability evaluator | release gate、canonical status owner、普通 T0–T10 前置条件 | `RESEARCH_WORKFLOW.md` |
+| `docs/workflows/R5_REAL_COMPANY_REGRESSION_CONTRACT.md` | 显式调用的 automated legacy four-case capability evaluator；历史 per-case 人审只读 | 活动 reviewer authority、release gate、canonical status owner、普通 T0–T10 前置条件 | `RESEARCH_WORKFLOW.md` |
 | `docs/reporting/` | 个股报告质量标准、证据到叙事契约、表达指南 | 编排路由、run 状态、source adapter 规则 | `stock-deep-dive` profile |
 | `docs/playbooks/` | 日常操作提示和命令入口 | 永久事实定义、阶段验收标准 | workflow docs |
 | `docs/plans/` | 建设计划和验收清单 | 当前事实源定义 | project / workflow docs |
@@ -70,6 +72,7 @@
 | orchestrator run / handoff | `WORKFLOW_ORCHESTRATION_SPEC.md` + orchestrator references | skill docs 只写本 skill 交接点。 |
 | 数据下载 / source adapter | `DATA_LAYER_WORKFLOW.md` + evidence-ingest references | stock-deep-dive 不直接定义下载器。 |
 | 个股报告 production profile | `stock-deep-dive/references/report_production_profile.md` | workflow docs 只指针，不复制阶段表。 |
+| 最终报告人工审核 | `RESEARCH_WORKFLOW.md` + workflow-state / final-review schema | R5、Reader、Bundle、Night 和 skill docs 只引用，不得要求中间人审或迁移历史 reviewer。 |
 | 阶段计划 | `docs/plans/` | README 只写当前阶段一句话。 |
 
 ## 个股 skill 合并状态

@@ -1,5 +1,6 @@
 state_schema_version: r5_v1
 decision_semantics_version: current_goal_v1
+final_report_review_semantics_version: final_report_review_v1
 workflow_id: wf_YYYYMMDD_stock_first_closed_loop_object_id
 workflow_type: stock_first_closed_loop
 run_mode: normal
@@ -14,6 +15,22 @@ completed_stages: []
 next_stage: T1
 active_skill: research-orchestrator
 required_next_skill: null
+
+automated_report_quality_passed: false
+system_v1_complete: false
+sample_quality_ready: false
+p2_ready: false
+release_ready: false
+
+final_report_review_status: not_requested
+final_report_review:
+  report_path: null
+  report_sha256: null
+  reviewer: null
+  reviewed_at: null
+  decision: not_requested
+  notes: null
+  change_scope: null
 
 evidence_snapshot:
   manifest_path: data/manifests/evidence_manifest.csv

@@ -35,6 +35,23 @@ LEGACY_STATE_PATH = (
     / "wf_20260703_stock_first_002837_invic"
     / "workflow_state.yaml"
 )
+PROTECTED_V1_REPLAY_STATE_PATH = (
+    ROOT
+    / "reports"
+    / "workflow_runs"
+    / "wf_20260723_stock_first_002837_v1_replay"
+    / "workflow_state.yaml"
+)
+FINAL_REVIEW_STATE_FIELDS = {
+    "final_report_review_semantics_version",
+    "automated_report_quality_passed",
+    "system_v1_complete",
+    "sample_quality_ready",
+    "p2_ready",
+    "release_ready",
+    "final_report_review_status",
+    "final_report_review",
+}
 
 
 def load_validator():
@@ -68,6 +85,11 @@ def template_state() -> dict:
     return yaml.safe_load(TEMPLATE_PATH.read_text(encoding="utf-8"))
 
 
+def strip_final_review_semantics(state: dict) -> None:
+    for field in FINAL_REVIEW_STATE_FIELDS:
+        state.pop(field, None)
+
+
 def scoped_todo(**overrides) -> dict:
     todo = {
         "issue_id": "ISSUE-001",
@@ -92,6 +114,10 @@ def test_versioned_template_and_singleton_names_are_canonical() -> None:
     assert (
         template_state()["decision_semantics_version"]
         == validator.GOAL_SCOPED_SEMANTICS_VERSION
+    )
+    assert (
+        template_state()["final_report_review_semantics_version"]
+        == validator.FINAL_REPORT_REVIEW_SEMANTICS_VERSION
     )
     assert validator.CURRENT_ASSET_NAMES == (
         "workflow_state.yaml",
@@ -166,6 +192,38 @@ def test_protected_legacy_state_remains_read_only_compatible() -> None:
     assert after == before
 
 
+def test_protected_v1_replay_state_remains_read_only_compatible() -> None:
+    before = hashlib.sha256(PROTECTED_V1_REPLAY_STATE_PATH.read_bytes()).hexdigest()
+    result = run_validator(PROTECTED_V1_REPLAY_STATE_PATH)
+    after = hashlib.sha256(PROTECTED_V1_REPLAY_STATE_PATH.read_bytes()).hexdigest()
+    assert result.returncode == 0, result.stderr
+    assert "legacy r5_v1 compatibility; read-only" in result.stdout
+    assert after == before
+
+
+@pytest.mark.parametrize(
+    "truth_field",
+    [
+        "automated_report_quality_passed",
+        "system_v1_complete",
+        "sample_quality_ready",
+        "p2_ready",
+        "release_ready",
+    ],
+)
+def test_protected_v1_replay_cannot_claim_truth_without_final_review_marker(
+    tmp_path: Path,
+    truth_field: str,
+) -> None:
+    state = yaml.safe_load(
+        PROTECTED_V1_REPLAY_STATE_PATH.read_text(encoding="utf-8")
+    )
+    state[truth_field] = True
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert "legacy final-report truth claims require" in result.stderr
+
+
 def test_unknown_state_schema_version_fails(tmp_path: Path) -> None:
     state = copy.deepcopy(template_state())
     state["state_schema_version"] = "r5_v2"
@@ -179,9 +237,60 @@ def test_unmarked_r5_v1_state_is_explicit_read_only_compatibility(
 ) -> None:
     state = template_state()
     state.pop("decision_semantics_version")
+    strip_final_review_semantics(state)
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 0, result.stderr
     assert "legacy r5_v1 compatibility; read-only" in result.stdout
+
+
+def test_current_goal_state_cannot_downgrade_away_final_review_semantics(
+    tmp_path: Path,
+) -> None:
+    state = template_state()
+    strip_final_review_semantics(state)
+    state["human_review_status"] = "historical_pending"
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert "current_goal_v1 requires" in result.stderr
+
+
+def test_unknown_final_report_review_semantics_version_fails(tmp_path: Path) -> None:
+    state = template_state()
+    state["final_report_review_semantics_version"] = "final_report_review_v2"
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert "unsupported final_report_review_semantics_version" in result.stderr
+
+
+def test_partial_final_report_review_schema_cannot_bypass_marker(
+    tmp_path: Path,
+) -> None:
+    state = template_state()
+    state.pop("final_report_review_semantics_version")
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert "final-report review fields require" in result.stderr
+
+
+@pytest.mark.parametrize(
+    "truth_field",
+    [
+        "system_v1_complete",
+        "sample_quality_ready",
+        "p2_ready",
+        "release_ready",
+    ],
+)
+def test_final_review_truth_fields_cannot_bypass_marker(
+    tmp_path: Path,
+    truth_field: str,
+) -> None:
+    state = template_state()
+    strip_final_review_semantics(state)
+    state[truth_field] = True
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert "final-report review fields require" in result.stderr
 
 
 def test_current_goal_state_requires_scoped_issue_fields(tmp_path: Path) -> None:

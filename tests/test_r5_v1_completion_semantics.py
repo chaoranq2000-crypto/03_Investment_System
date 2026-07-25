@@ -104,3 +104,37 @@ def test_bundle_and_r5_local_checks_are_explicit_capability_evaluators() -> None
     assert "不直接写 `workflow_state.status`" in kernel
     assert "不在普通 orchestration 的默认 dispatch 图中" in orchestration
     assert "不得消费 Bundle-local pass/fail 直接覆盖 canonical state" in orchestration
+
+
+def test_kernel_owns_the_only_active_final_report_human_review_boundary() -> None:
+    kernel = read(KERNEL)
+    orchestration = read(ORCHESTRATION)
+    ownership = read(OWNERSHIP)
+    for field in (
+        "final_report_review_semantics_version",
+        "automated_report_quality_passed",
+        "final_report_review_status",
+        "final_report_review.report_sha256",
+        "final_report_review.change_scope",
+    ):
+        assert field in kernel or field in orchestration
+    assert "机器验证与唯一最终报告人工审核" in kernel
+    assert "只有最终报告的 SHA-256 绑定人工审核" in kernel
+    assert "不得转化为并行人审" in kernel
+    assert "not_requested" in orchestration
+    assert "pending" in orchestration
+    assert "不得阻止自动 workflow close" in orchestration
+    assert "final-report human-review semantics" in ownership
+
+
+def test_final_review_pending_does_not_become_canonical_ready_for_review() -> None:
+    schema = read(
+        ROOT
+        / ".agents"
+        / "skills"
+        / "research-orchestrator"
+        / "references"
+        / "workflow_state_schema.md"
+    )
+    assert "等待机器质量审查或自动 gate" in schema
+    assert "最终报告审核 `pending` 只写入" in schema

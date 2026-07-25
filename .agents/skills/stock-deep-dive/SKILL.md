@@ -9,7 +9,8 @@ description: A股个股深度研究统一入口；当用户要求个股研究、
 
 `stock-deep-dive` is the single active stock research entry point.
 
-It turns reviewed evidence, reviewed metrics and data-layer outputs into:
+It turns machine-qualified evidence, machine-qualified metrics and data-layer
+outputs into:
 
 - `stock_analysis_pack.yaml`
 - `R5_stock_research_pack.yaml` when running the R5-MVP research-pack path
@@ -102,6 +103,8 @@ Rules:
 - Do not infer customer, order, capacity, revenue exposure, or profit exposure from company-level financial metrics alone.
 - Preserve `MISSING_DISCLOSURE`, `TODO_SOURCE_REQUIRED`, and source gaps.
 - Material claims must carry `evidence_id`, `claim_id`, `metric_id`, or explicit TODO / missing reason.
+- `reviewed`, `reviewed_claims` and `reviewed_metrics` in retained field or
+  filename conventions mean machine-qualified; they never imply human approval.
 
 ### SDD-2 Analysis pack build
 
@@ -149,7 +152,11 @@ Use the R5 path only when the run explicitly asks for an R5 research pack or sam
 
 ### SDD-R5-1 R4 to R5 mapping
 
-Map reviewed `stock_analysis_pack.yaml` fields into `R5_stock_research_pack.yaml` according to `references/r5_stock_research_pack_contract.md`. If a source R4 field is absent or unreviewed, keep the R5 field present with `missing_reason`, `source_gap_register`, or a visible TODO.
+Map machine-qualified `stock_analysis_pack.yaml` fields into
+`R5_stock_research_pack.yaml` according to
+`references/r5_stock_research_pack_contract.md`. If a source R4 field is
+absent or has not passed machine validation, keep the R5 field present with
+`missing_reason`, `source_gap_register`, or a visible TODO.
 
 ### SDD-R5-2 Twelve subpack build
 
@@ -158,6 +165,11 @@ Build the 12 R5 subpacks: company identity, evidence snapshot, financial history
 ### SDD-R5-3 Source-gap and downgrade handling
 
 Allowed R5 states are `R5_sample_quality_ready`, `R5_research_draft`, `R5_source_gapped_draft`, and `blocked`. Missing business, forecast, valuation, market, technical, sentiment, or event inputs must downgrade the state rather than being filled from memory or prose.
+
+`R5_sample_quality_ready` additionally requires a valid current final-report
+`approved` review and every applicable sample-quality condition. Automatic
+subpack readiness and final approval are necessary conditions, not an
+automatic sufficiency rule.
 
 These are report-capability labels, not canonical workflow outcomes. Apply the
 degradation ladder before choosing a label:
@@ -178,11 +190,18 @@ output.
 
 ### SDD-R5-4 Upstream and sub-skill boundary
 
-Do not acquire evidence, call live APIs, calculate real forecast values, or calculate real valuation outputs inside `stock-deep-dive`. Evidence comes from `evidence-ingest`; valuation context comes from `company-valuation` or reviewed valuation assets.
+Do not acquire evidence, call live APIs, calculate real forecast values, or
+calculate real valuation outputs inside `stock-deep-dive`. Evidence comes
+from `evidence-ingest`; valuation context comes from `company-valuation` or
+machine-qualified valuation assets.
 
 ### SDD-R5-5 Quality-review handoff
 
-Before any R5 report composition, hand off the pack, `source_gap_register`, open questions, no-advice scan status, and downgrade reason to `quality-review`. Composer/writer layers may translate only reviewed pack content and must not create new facts.
+Before any R5 report composition, hand off the pack, `source_gap_register`,
+open questions, no-advice scan status, and downgrade reason to
+`quality-review`. Composer/writer layers may translate only machine-qualified
+pack content and must not create new facts. This is automated qualification,
+not a human approval step.
 
 ### SDD-2.5 Valuation subagent handoff
 
@@ -190,7 +209,8 @@ When the stock report requires a valuation section, create `valuation_request.ya
 
 Rules:
 
-- `company-valuation` may only consume reviewed evidence, reviewed claims, reviewed metrics, forecast_model and data-layer market / peer snapshots.
+- `company-valuation` may only consume machine-qualified evidence, claims and
+  metrics, plus `forecast_model` and data-layer market / peer snapshots.
 - It must not acquire new evidence, fetch live data, promote claims or write direct trading advice.
 - Missing market, peer, forecast or official metric inputs must become `TODO_MARKET_DATA`, `TODO_PEER_DATA`, `TODO_FORECAST_MODEL` or `official_missing`.
 - `stock-deep-dive` may use `valuation_section_draft.md` to assemble the report, but must not introduce new valuation facts during report writing.
@@ -251,6 +271,35 @@ Rules:
 - For valuation writing, consume `valuation_section_draft.md` and `valuation_model.yaml` produced by `company-valuation`; do not create new valuation facts in the prose layer.
 - No buy/sell/hold, no position sizing, no direct trading instruction.
 
+### SDD-3.5 Final-report review handoff
+
+After the final report bytes are written and automatic report quality has been
+computed, hand the report path and machine SHA-256 to the orchestrator. The
+only active human boundary is:
+
+```text
+final_report_review_status:
+  not_requested | pending | approved | changes_requested
+```
+
+`pending` binds a repo-relative report path and current machine SHA-256 without
+reviewer, time, notes or `change_scope`. `approved|changes_requested` require a
+real non-machine reviewer, ISO time and non-empty notes; `decision` equals the
+top-level status. `change_scope` is
+`automated_quality_defect|report_revision` only for `changes_requested`.
+
+Report byte changes invalidate the old decision. `not_requested|pending` does
+not block the automatic workflow or `system_v1_complete`, but
+`sample_quality_ready=false`. A valid current `approved` review and all
+necessary automated quality conditions are required, but not by themselves
+automatically sufficient, for `sample_quality_ready=true`.
+
+Do not request or record human approval for evidence, claims, metrics, fields,
+candidates, calculations, research packs, generation locks or receipts. Their
+hashes are machine-integrity checks. Historical Bundle/Night/Reader reviewer
+authority and exact-hash decisions are read-only and cannot approve this
+report.
+
 ### SDD-4 Segment exposure and backflow
 
 Produce or update `segment_exposure.yaml`.
@@ -268,8 +317,10 @@ Exposure rules:
 
 - `product_line_clue` may update product exposure only.
 - `product_line_clue` must not be promoted into revenue exposure or profit exposure.
-- `revenue_pct` and `profit_pct` must be `MISSING_DISCLOSURE` unless directly disclosed or accepted by quality-review from an official source.
-- Customer, order, capacity, or project clues must remain clue-level unless the source and review status allow a stronger claim.
+- `revenue_pct` and `profit_pct` must be `MISSING_DISCLOSURE` unless directly
+  disclosed or machine-qualified by `quality-review` from an official source.
+- Customer, order, capacity, or project clues must remain clue-level unless
+  the source and machine-validation status allow a stronger claim.
 
 ### SDD-5 Quality-review handoff
 
@@ -295,6 +346,12 @@ carry `impact_scope`、`active_disposition`、`affected_capabilities` and
 `blocks_current_goal`; severity alone never blocks acceptance. Visible TODOs
 may be accepted only when they are not used as facts and do not alter the
 report's truthfulness.
+
+These labels describe automatic report-production capability and remain
+separate from final human review. None of them, including
+`publishable_ready`, can by itself yield `R5_sample_quality_ready`.
+`not_requested|pending` may leave the automatic workflow accepted or
+accepted-with-todos, but sample quality remains false.
 
 ## Must-read references
 
@@ -366,6 +423,9 @@ Before closing a run, confirm:
 - No valuation output contains direct buy/sell/hold, target-price instruction, position sizing or guaranteed return.
 - There is no buy/sell/hold, rating instruction, position sizing, or direct trading instruction.
 - Quality-review status is recorded.
+- Intermediate `reviewed` objects are machine-qualified, not human-approved.
+- Final report review state and hash binding are valid; pending/not requested
+  leaves `sample_quality_ready=false` without blocking automatic close.
 
 ## Explicit legacy capability evaluators
 
@@ -383,3 +443,7 @@ the scoped issue fields used by `quality-review`.
 No local Bundle/R5 pass or failure may directly change the canonical outcome.
 If the explicit evaluator is not requested, ordinary stock research proceeds
 through SDD-0–SDD-5 and the canonical G0–G10 owners.
+
+Any historical Bundle per-case human review, reviewer-authored mapping,
+independent receipt or generation-lock approval remains read-only and is not
+part of this skill's active route.

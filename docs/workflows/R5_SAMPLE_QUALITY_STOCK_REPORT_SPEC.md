@@ -6,6 +6,10 @@ R5 是显式请求时才启用的 report-capability profile，不是 canonical w
 默认 routing，也不直接决定 `workflow_state.status`。canonical outcome 以
 `RESEARCH_WORKFLOW.md` 的当前目标范围 truth table 为准。
 
+本文件中的 evidence / claim / metric / research pack “已审查”只表示通过机器
+provenance、schema、claim-type、metric、citation、hash 和 no-advice 验证。
+中间产物不需要 reviewer 身份或人工批准；唯一活动人工边界是最终报告质量审核。
+
 ## 1. 核心定义
 
 ```text
@@ -18,10 +22,14 @@ R5_sample_quality_stock_note =
 + valuation context complete enough
 + market / sentiment / event data current enough
 + narrative layer coherent enough
-+ quality gate passed
++ automated quality gate passed
++ one valid final-report human review
 ```
 
-R5 不等于“更长的报告”。R5 是一套结构化研究资产经过质量门审查后，被转译成样例风格报告。
+R5 不等于“更长的报告”。R5 是一套结构化研究资产经过机器质量门后，
+被转译成样例风格报告。
+报告可以在 `not_requested|pending` 时作为自动研究产物存在，但不能标记
+`sample_quality_ready`。
 
 ## 2. R4 与 R5 的区别
 
@@ -33,7 +41,7 @@ R5 不等于“更长的报告”。R5 是一套结构化研究资产经过质�
 | 业务拆分 | 可存在 MISSING_DISCLOSURE | 必须支撑收入、毛利、利润池或明确缺口 |
 | 盈利预测 | 可缺失 | 必须至少有 base case |
 | 估值 | 可缺市场数据 | 必须有市场快照与同业语境 |
-| writer 角色 | 汇总证据 | 转译已审查研究资产 |
+| writer 角色 | 汇总证据 | 转译机器验证通过的研究资产 |
 
 ## 3. R5 事实源
 
@@ -49,7 +57,9 @@ R5_stock_research_pack.yaml
 R5_stock_research_note.md
 ```
 
-任何正文中的数字、判断、风险、事件或估值锚，都必须能回到 research pack 中的 evidence、metric、assumption、scenario 或 source_gap。
+任何正文中的数字、判断、风险、事件或估值锚，都必须能回到 research pack 中的
+evidence、metric、assumption、scenario 或 source_gap。research pack 的机器验证
+不能替代最终报告人审。
 
 ## 4. R5 研究包结构
 
@@ -131,7 +141,7 @@ R5 report note 固定章节：
   9.4 后续跟踪清单
 ```
 
-## 6. 样例质量要求
+## 6. 自动报告质量要求
 
 样例质量至少要求每章满足：
 
@@ -143,7 +153,7 @@ R5 report note 固定章节：
 来源：能回到 evidence / metric / assumption / source_gap。
 ```
 
-特别要求：
+这些要求先由机器 gate 检查。特别要求：
 
 ```text
 财务概览：必须讨论利润质量、现金流、异常项、ROE/ROIC 或周转效率。
@@ -263,13 +273,47 @@ local evaluator 只能说明某个 capability 是否可用、受限或有 defect
 写 canonical status，也不得让 Bundle/R5 local pass 覆盖 unsupported-used、
 double-count、hidden TODO 或 no-advice defect。
 
-## 10. Writer 原则
+## 10. 唯一最终报告审核
+
+活动状态使用：
+
+```text
+final_report_review_semantics_version: final_report_review_v1
+automated_report_quality_passed: true | false
+final_report_review_status: not_requested | pending | approved | changes_requested
+final_report_review:
+  report_path
+  report_sha256
+  reviewer
+  reviewed_at
+  decision
+  notes
+  change_scope
+```
+
+`pending` 由机器绑定 repo-relative 最终报告路径和当前字节 SHA-256；
+`approved|changes_requested` 还必须有真实非机器 reviewer、ISO 时间和非空备注。
+`decision` 必须等于顶层 status。`change_scope` 只在 `changes_requested` 中取
+`automated_quality_defect|report_revision`，其他状态为空。
+
+报告字节变化后，旧审核立即失效。`not_requested|pending` 不改变自动 workflow
+outcome，也不阻止 `system_v1_complete`，但 `sample_quality_ready=false`。
+`sample_quality_ready=true` 的必要条件包括全部必要自动质量检查通过、最终报告
+`approved` 且当前 hash 匹配，以及其他适用样例质量条件；这些必要条件不得解释为
+自动充分。`changes_requested` 揭示自动质量缺陷时进入 `needs_fix`，只要求报告
+修订时不改变自动 outcome。
+
+只有最终报告 hash 绑定人工审核。research pack、evidence、claim、metric、
+candidate、计算、generation lock 和 receipt 的 hash 只用于机器完整性。
+历史 Bundle 多份 exact-hash 人审保持只读，不能满足当前最终报告审核。
+
+## 11. Writer 原则
 
 Report writer / composer 只能做三件事：
 
 ```text
 1. 组织结构；
-2. 转译已审查的研究资产；
+2. 转译机器验证通过的研究资产；
 3. 显式展示 source gap。
 ```
 

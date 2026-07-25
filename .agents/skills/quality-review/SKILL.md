@@ -1,13 +1,15 @@
 ---
 name: quality-review
-description: Use when checking evidence traceability, claim types, stale evidence, metric definitions, counter-evidence, missing data, update logs, exposure mapping, stock-led backflow, and investment-safety boundaries. Do not use to generate new unreviewed claims or trade instructions.
+description: Use when checking evidence traceability, claim types, stale evidence, metric definitions, counter-evidence, missing data, update logs, exposure mapping, stock-led backflow, and investment-safety boundaries. Do not use to generate new machine-unvalidated claims or trade instructions.
 ---
 
 # Quality Review
 
 ## Purpose
 
-Check that research artifacts are traceable, correctly typed, comparable, uncertainty-aware, counter-evidence-aware, updateable and free of direct trading instructions.
+Machine-check that research artifacts are traceable, correctly typed,
+comparable, uncertainty-aware, counter-evidence-aware, updateable and free of
+direct trading instructions.
 
 This skill owns issue detection, severity assignment and scoped issue
 classification. It does not own global workflow gate IDs or canonical outcome
@@ -67,14 +69,19 @@ source_gap_report.md
 - Check exposure mapping and backflow decisions.
 - Check report path and output boundary.
 - Output issue list, severity and fix owner.
+- Compute or recompute final-report SHA-256 and validate the review record
+  without creating reviewer identity or a human decision.
 
 ## Out of scope
 
-- Do not generate new unreviewed conclusions.
+- Do not generate new machine-unvalidated conclusions.
 - Do not replace `evidence-ingest`.
 - Do not replace segment or stock research.
 - Do not output buy/sell/hold instructions.
 - Do not silently modify reports; list required fixes.
+- Do not approve evidence, claims, metrics, fields, candidates, calculations,
+  generation locks or intermediate receipts on behalf of a human.
+- Do not synthesize a final-report reviewer, timestamp, approval or change request.
 
 ## Issue schema
 
@@ -128,6 +135,60 @@ accepted_todo
 waived_with_reason
 ```
 
+## Machine qualification and final-report human review
+
+Active V1 intermediate validation is automated. `reviewed evidence`,
+`reviewed_claims`, `reviewed_metrics`, promoted candidates and similar names
+mean that the objects passed applicable provenance, schema, claim-type,
+metric, citation, hash and no-advice checks. They do not mean human approval
+and do not require reviewer authority, signatures, independent receipts or
+per-candidate decisions.
+
+The only active human boundary is the final report. New or updated active
+states use:
+
+```text
+final_report_review_semantics_version: final_report_review_v1
+automated_report_quality_passed
+final_report_review_status:
+  not_requested | pending | approved | changes_requested
+final_report_review:
+  report_path
+  report_sha256
+  reviewer
+  reviewed_at
+  decision
+  notes
+  change_scope
+```
+
+This skill owns the automated report-quality checks and machine hash
+verification, not the human decision. `not_requested` leaves all binding,
+person, note and `change_scope` fields empty. `pending` binds the repo-relative
+final report path and current machine SHA-256 while reviewer, time, notes and
+`change_scope` remain empty. `approved|changes_requested` require a real
+non-machine reviewer, ISO time and non-empty notes; `decision` equals the
+top-level status. `change_scope` is
+`automated_quality_defect|report_revision` only for `changes_requested`.
+
+Any report-byte change invalidates the prior decision. `not_requested|pending`
+does not change the automatic workflow outcome or block
+`system_v1_complete`, but `sample_quality_ready=false`.
+`sample_quality_ready=true` requires all necessary automated quality
+conditions, a valid `approved` decision for current report bytes and all other
+applicable sample-quality conditions; these are necessary conditions and are
+not automatically sufficient.
+
+An `approved` review cannot override an automatic failure. A
+`changes_requested` review routes to `needs_fix` only when
+`change_scope=automated_quality_defect`; `report_revision` affects only the
+final report revision. Historical Bundle/Night/Reader reviewer authority,
+independent receipts, candidate decisions and exact-hash reviews are read-only
+and never satisfy the active final-report review.
+
+Only the final report hash binds human review. All other hashes, including
+generation locks, remain machine-integrity and reproducibility evidence.
+
 ## Global gate checks consumed by this skill
 
 ### G1 Evidence Gate
@@ -152,7 +213,8 @@ Pass conditions:
 Pass conditions:
 
 - Each metric has period, value, unit / currency, source evidence id and calculation method.
-- Metric candidates from structured API are draft unless promoted.
+- Metric candidates from structured API are draft unless machine-qualified
+  and promoted.
 
 ### G6 Exposure Gate
 
@@ -319,6 +381,10 @@ stale_or_contradicted_claims.csv
 required_fixes.md
 ```
 
+When a final report exists, the automated report-quality result and
+machine-computed report hash may also be recorded in `workflow_state.yaml`.
+This skill must not populate human-only fields.
+
 ## Guardrails
 
 - Quality review should surface problems, not hide gaps.
@@ -341,6 +407,10 @@ required_fixes.md
 9. Is update / backflow logging required?
 10. Is direct trading advice avoided?
 11. Are missing data-layer packs represented as TODO / MISSING rather than unsupported conclusions?
+12. Are intermediate `reviewed` objects machine-qualified without human-authority fields?
+13. If a final report review is bound, do its current bytes match the recorded SHA-256?
+14. Does `sample_quality_ready` remain false for `not_requested|pending`,
+    stale approval, or failed automated quality?
 
 ## Explicit legacy semantic evaluators
 
@@ -354,3 +424,7 @@ An unavailable optional model becomes a visible capability limitation. An
 unsupported model result actually used in the report, a true double-count or a
 direct trading instruction is an active defect and `needs_fix`. Extra length,
 citations or unrelated passing sections cannot offset an active defect.
+
+Legacy evaluator human-review, authority, receipt and candidate-decision
+artifacts remain read-only. Explicit capability evaluation is automatic and
+does not create another human boundary.

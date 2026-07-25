@@ -170,7 +170,7 @@ V1 必须同时报告四个互不替代的布尔事实。四者的语义只在�
 | fact | canonical meaning | evidence boundary |
 |---|---|---|
 | `system_v1_complete` | 工程接口、活动控制面、隔离真实重放、根因归并和工程验证均已闭环，且活动 V1 路径没有 open `engineering_defect`。 | 由版本化实现、测试、scope audit、历史不可变检查和可复跑工件证明。 |
-| `sample_quality_ready` | 当前研究样本的证据、模型、报告和必要人工审查达到样例质量要求。 | 由当前样本的 research pack、质量结论、缺口和真实 reviewer 输入证明；工程测试不得自动提升。 |
+| `sample_quality_ready` | 当前研究样本已通过全部必要自动质量条件，且唯一最终报告通过真实 reviewer 的有效审核；这些是必要条件，不表示任何单项条件自动充分。 | 由当前样本的 research pack、自动质量结论、最终报告当前字节的机器 SHA-256 和真实 reviewer 决定共同证明；工程测试或中间产物状态不得自动提升。 |
 | `p2_ready` | canonical comparison-readiness 决定已经独立通过。 | 只能由 `comparison_readiness_gate` 按本文件第 13 节判定；工程完成或样例质量不能代替。 |
 | `release_ready` | 候选版本已按获批发布边界发布，且最终精确 HEAD 的必需 CI/验证成功。 | 由 remote SHA、exact-head CI 和发布凭证证明；本地测试或预发布提交不得代替。 |
 
@@ -182,15 +182,17 @@ V1 必须同时报告四个互不替代的布尔事实。四者的语义只在�
 4. 影响活动 V1 路径的 open `engineering_defect` 为零；
 5. 合同要求的 targeted/full tests、文档漂移、scope 和历史不可变检查全部通过。
 
-以下事实不得抬高或否定 `system_v1_complete`：发行人未披露数据、待处理的真实
-reviewer 决定、`sample_quality_ready=false`、`p2_ready=false`，或尚未授权的发布。
+以下事实不得抬高或否定 `system_v1_complete`：发行人未披露数据、最终报告审核
+`not_requested` / `pending`、`sample_quality_ready=false`、`p2_ready=false`，
+或尚未授权的发布。
 这些外部事实必须保留为显式缺口，但不得被工程自动化补造。反过来，
 `system_v1_complete=true` 也不得自动把后三项改为 true。
 
-Night mission outcome `review_intake_ready` 只描述评审接收链路，不能写入 canonical
-`workflow_state.status`，也不证明 occurrence、dependency 或 parent work order 已解决。
-长期 Goal `r5_bundle17r_bf2_four_case_activation` 在独立的人类关闭授权出现前保持 open；
-V1 工程收敛不得自动关闭它。
+历史 Night mission outcome `review_intake_ready` 与长期 Goal
+`r5_bundle17r_bf2_four_case_activation` 只作为原运行的只读追溯事实保留；原长期
+Goal 记录在历史快照中保持 open。它们不能写入 canonical `workflow_state.status`，
+不能参与当前 dispatch、当前 Goal 的关闭条件或 V1 完成判定，也不得形成最终报告审核
+之外的活动人工授权边界。
 
 ### 6.2 活动 run 的单一当前控制面
 
@@ -256,6 +258,56 @@ local check 也不能覆盖当前目标依赖判断。
 低一级不得伪装成高一级。走到 `unknown` 或 omit 时，只关闭真正依赖该字段的
 claim、section、calculation 或 method；不得把一个 capability 的缺口提升为全局 blocker。
 
+### 6.4 机器验证与唯一最终报告人工审核
+
+活动 V1 的 evidence、claim、metric、字段、候选、计算、research pack、
+generation lock 和中间 receipt 全部由机器验证，不是人工审批对象。文档或字段名中
+保留的 `reviewed` 只表示已通过适用的 provenance、schema、claim-type、metric、
+citation、hash 和 no-advice 机器检查；它不表示 reviewer 已逐项批准。
+
+每个新建或更新的活动 run 使用：
+
+```yaml
+final_report_review_semantics_version: final_report_review_v1
+automated_report_quality_passed: false
+final_report_review_status: not_requested
+final_report_review:
+  report_path: null
+  report_sha256: null
+  reviewer: null
+  reviewed_at: null
+  decision: not_requested
+  notes: null
+  change_scope: null
+```
+
+字段级约束由
+`.agents/skills/research-orchestrator/references/workflow_state_schema.md`
+和 `schemas/r5_final_report_review.schema.json` 实现。canonical 行为是：
+
+`automated_report_quality_passed=true` 只在活动状态列出 G0–G10 全部
+canonical gates，且每项均为 `pass` 或 `not_applicable` 时成立。
+局部 Bundle/R5 pass、最终人工决定或历史 accepted 记录都不能代替该全集。
+
+| `final_report_review_status` | record requirement | automatic workflow effect | sample-quality effect |
+|---|---|---|---|
+| `not_requested` | 路径、hash、reviewer、时间、备注和 `change_scope` 均为空；`decision` 必须同值。 | 不改变自动 outcome，也不阻止 `system_v1_complete`。 | 必须为 false。 |
+| `pending` | 绑定 `reports/stocks/<id>/` 或 `reports/segments/<id>/` 下的最终报告路径和机器计算 SHA-256；该路径必须与 `artifacts[]` 中唯一 required/current `artifact_type: final_report` 一致；reviewer、时间、备注、`change_scope` 为空；`decision` 必须同值。 | 不改变自动 outcome，也不阻止 `system_v1_complete`。 | 必须为 false。 |
+| `approved` | 绑定当前最终报告路径与当前字节 SHA-256；包含真实非机器 reviewer、ISO 时间、非空备注；`decision` 必须同值，`change_scope` 为空。 | 不得覆盖自动质量 failure。 | 只有全部必要自动质量条件也通过时才允许为 true；仍须满足其他样例质量条件。 |
+| `changes_requested` | 与 `approved` 使用相同身份、时间、路径、hash 和备注约束；`change_scope` 只能为 `automated_quality_defect` 或 `report_revision`。 | 前者把 workflow 路由为 `needs_fix`；后者只进入最终报告修订，不改变已推导的自动 outcome。 | 必须为 false。 |
+
+`final_report_review.decision` 必须等于顶层 status。最终报告字节变化后，
+机器重算 hash 必须使旧 `approved` / `changes_requested` 失效，不能把旧 reviewer
+决定迁移到新报告。若替换已提交的人审记录，新的有效人审事件必须使用严格更晚的
+`reviewed_at`；只更新 hash 不能迁移旧决定。机器不得生成 reviewer 身份、审核时间、批准或修改决定。
+人工审核也不能批准伪造数据、绕过自动质量失败或把 unsupported-used 变成可接受事实。
+
+只有最终报告的 SHA-256 绑定人工审核。evidence、claim、metric、pack、计算、
+generation lock、candidate 和 receipt 的 hash 继续用于机器完整性与重放，
+不得转化为并行人审、authority 或逐项 candidate decision。历史 Bundle/Night 的
+多份 exact-hash 人审和 reviewer-authority 记录保持只读兼容证据，退出活动 routing，
+也不能满足当前最终报告审核。
+
 ## 7. Skill 角色分工
 
 | skill | 主要职责 |
@@ -267,7 +319,7 @@ claim、section、calculation 或 method；不得把一个 capability 的缺口�
 | `segment-company-mapping` | 维护 `segment_company_exposure`，管理暴露类型、评分、置信度、证据和有效期 |
 | `stock-deep-dive` | 个股业务、财务、linked_segments、风险、反证、估值场景和 evidence map |
 | `quality-review` | 检查证据追溯、claim 类型、指标口径、过期证据、风险反证和禁止事项 |
-| `memo-writer` | 将已通过审查的研究转为 memo、watchlist note 或 thesis note |
+| `memo-writer` | 将已通过机器质量审查的研究转为 memo、watchlist note 或 thesis note |
 | `refresh-research` | 新证据驱动旧结论更新，输出 refresh log、stale claims、reports_to_regenerate |
 | `compare-segments` | P2 以后多细分横向比较 |
 | `compare-stocks` | P2 以后同细分个股横向比较 |
@@ -307,7 +359,7 @@ claim、section、calculation 或 method；不得把一个 capability 的缺口�
 | S8 Stock Deep Dive | 生成个股深度样本 | G7 |
 | S9 Backflow | 个股发现回写细分、公司池和 exposure | G8 |
 | S10 Scorecard & Watchlist Draft | 形成评分和观察项 | G9 |
-| S11 Quality Review | 总审查 | G1-G9 |
+| S11 Quality Review | 自动总审查 | G1-G9 |
 | S12 Fix Loop | 根据质量问题回到对应阶段 | target gate |
 | S13 Close Readout | 固化成果、TODO 和状态 | G10 |
 
@@ -357,7 +409,7 @@ claim、section、calculation 或 method；不得把一个 capability 的缺口�
 | T6 Exposure Mapping | 更新该公司在多个细分中的 exposure | G6 |
 | T7 Stock Report Draft | 写个股深度报告 | G7 |
 | T8 Backflow | 回写 segment taxonomy / company universe / exposure | G8 |
-| T9 Quality Review | 审查个股报告和映射 | G1-G9 |
+| T9 Quality Review | 自动审查个股报告和映射 | G1-G9 |
 | T10 Close Readout | 输出个股闭环 readout | G10 |
 
 | stage_id | 主 skill | 关键输出 |
@@ -457,9 +509,10 @@ claim、section、calculation 或 method；不得把一个 capability 的缺口�
 
 R5、Bundle、Night、data-layer、report-production 和 skill-local 检查必须使用明确的局部
 前缀或兼容别名，并映射到 G0–G10 中的一个或多个 owner gate。局部控制只在对应风险边界
-生效：exact-hash 只绑定已经冻结、即将交给人的 review 输入；rollback 只保护可变且非幂等的
-写入事务；remote receipt 只证明 publication 边界。普通读取、幂等生成和本地质量检查不得
-因此获得新的通用门禁。
+生效：活动人审只绑定一次最终报告的当前字节 SHA-256；其他 exact-hash、generation lock、
+candidate 和 receipt 只保护机器完整性与可重放性；rollback 只保护可变且非幂等的写入事务；
+remote receipt 只证明 publication 边界。普通读取、幂等生成和本地质量检查不得因此获得新的
+通用门禁。
 
 局部检查不得：
 

@@ -1,11 +1,11 @@
 validation_id: V-003
-phase: P1
-command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q tests/test_r5_v1_completion_semantics.py tests/test_r5_v1_active_control_plane.py tests/test_r5_v1_workflow_state_validator.py tests/test_r5_v1_replay_002837.py tests/test_validate_quality_issues.py tests/test_r5_reader_report_contract.py tests/test_r5_reader_quality_gate.py
+phase: P2
+command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q tests/test_r5_v1_completion_semantics.py tests/test_r5_v1_active_control_plane.py tests/test_r5_v1_workflow_state_validator.py tests/test_r5_v1_replay_002837.py tests/test_validate_quality_issues.py tests/test_r5_reader_report_contract.py tests/test_r5_reader_quality_gate.py tests/test_r5_final_report_review_semantics.py
 exit_code: 0
-result: 90 passed in 5.03s
+result: 178 passed in 13.47s
 
 Additional compatibility validation:
-- 15 passed: foundation assets, minimal R5 fixture, and stock-led smoke.
-- 48 passed: Bundle11 runtime, Bundle12 operating-evidence, and Bundle13 backflow tests.
-- Current-goal quality issue CLI: accepted_with_todos, exit 0.
+- 75 passed: historical Bundle9/10 review and generation locks, foundation assets, minimal R5 fixture, stock-led smoke, Bundle11 runtime, Bundle12 operating-evidence, and Bundle13 backflow.
+- Protected 20260723 V1 replay CLI: OK (legacy r5_v1 compatibility; read-only), exit 0.
 - Current-goal workflow state template CLI: OK, exit 0.
+- Adversarial review: NO BLOCKER after hash-transition, path, alias, marker-downgrade, legacy-truth, Night-boundary, routing, and protected-replay checks.
