@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r5_v1_root_policy_migration.schema.json",
+  "title": "R5 V1 root-level policy migration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "decision_semantics_version",
+    "final_report_review_semantics_version",
+    "migration_is_historical_resolution",
+    "source_root_map",
+    "migration_roots"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "r5_v1_root_policy_migration_v1"
+    },
+    "task_id": {
+      "const": "v1_governance_integration_cleanup_v2"
+    },
+    "decision_semantics_version": {
+      "const": "current_goal_v1"
+    },
+    "final_report_review_semantics_version": {
+      "const": "final_report_review_v1"
+    },
+    "migration_is_historical_resolution": {
+      "const": false
+    },
+    "source_root_map": {
+      "$ref": "#/$defs/source_root_map"
+    },
+    "migration_roots": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "$ref": "#/$defs/migration_root"
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "git_oid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 320,
+      "pattern": "^(?![A-Za-z]:)(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"
+    },
+    "root_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]+$"
+    },
+    "capability_array": {
+      "type": "array",
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96
+      }
+    },
+    "path_array": {
+      "type": "array",
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/relative_path"
+      }
+    },
+    "source_root_map": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "engineering_source_revision",
+        "git_blob_oid"
+      ],
+      "properties": {
+        "path": {
+          "const": "reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml"
+        },
+        "sha256": {
+          "const": "39aadff44cf51d1ad5607d8ec8481bbab42650723eaf5a981415df0ee3facacf"
+        },
+        "engineering_source_revision": {
+          "const": "f60f220ae252262a537c612ce193fc779901984b"
+        },
+        "git_blob_oid": {
+          "const": "526d9964a95ddc866fa960a1b9556e720ca80178"
+        }
+      }
+    },
+    "evidence_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "path",
+        "selector"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "historical_root",
+            "active_policy",
+            "current_limitation_example"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/relative_path"
+        },
+        "selector": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "migration_root": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root_cause_id",
+        "historical_category",
+        "historical_root_status",
+        "historical_resolved",
+        "primary_occurrence_count",
+        "active_disposition",
+        "impact_scope",
+        "active_v1_impact",
+        "blocks_current_goal",
+        "owner",
+        "next_step",
+        "affected_capabilities",
+        "evidence_references",
+        "current_limitation_references",
+        "rationale"
+      ],
+      "properties": {
+        "root_cause_id": {
+          "$ref": "#/$defs/root_id"
+        },
+        "historical_category": {
+          "enum": [
+            "engineering_defect",
+            "obtainable_evidence_gap",
+            "issuer_not_disclosed",
+            "human_judgment_pending"
+          ]
+        },
+        "historical_root_status": {
+          "const": "open"
+        },
+        "historical_resolved": {
+          "const": false
+        },
+        "primary_occurrence_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "active_disposition": {
+          "enum": [
+            "active_defect",
+            "unknown",
+            "report_limitation",
+            "historical_backlog",
+            "policy_retired",
+            "not_required_for_active_v1"
+          ]
+        },
+        "impact_scope": {
+          "enum": [
+            "workflow",
+            "report",
+            "section",
+            "claim",
+            "method",
+            "none"
+          ]
+        },
+        "active_v1_impact": {
+          "enum": [
+            "no_canonical_impact",
+            "visible_nonblocking_report_limitation",
+            "visible_unused_claim_unknown",
+            "current_goal_blocking"
+          ]
+        },
+        "blocks_current_goal": {
+          "type": "boolean"
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        },
+        "next_step": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "affected_capabilities": {
+          "$ref": "#/$defs/capability_array"
+        },
+        "evidence_references": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/evidence_reference"
+          }
+        },
+        "current_limitation_references": {
+          "$ref": "#/$defs/path_array"
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        }
+      }
+    }
+  }
+}

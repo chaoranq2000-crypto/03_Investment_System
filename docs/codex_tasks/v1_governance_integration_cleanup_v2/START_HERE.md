@@ -6,10 +6,10 @@ contract_sha256: "c160ea2d676d5ba9a9893070be1a6e4418193cc508db07e71dd48cd0394a64
 state: "running"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "23fcd3b6b5ce3574661c4cfd306dadd782ad0717"
-last_completed_phase: "P3"
-next_phase: "P4"
+last_completed_phase: "P4"
+next_phase: "P5"
 last_validation: "pass"
-updated_at: "2026-07-25T15:30:31+08:00"
+updated_at: "2026-07-25T15:55:38+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -40,11 +40,32 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 ## Current checkpoint
 
 - **State:** `running`
-- **Last completed phase:** `P3`
-- **Next phase:** `P4`
-- **Latest validation:** `pass`（V-003 P3 194 passed、V-004 双目录 17 文件字节一致且 policy tests 16 passed、V-008、V-009）
+- **Last completed phase:** `P4`
+- **Next phase:** `P5`
+- **Latest validation:** `pass`（V-005 18 passed、额外 canonical-index compatibility 27 passed、V-009、task-package integrity）
 - **Current blocker:** none。旧 v1 的 V-003 阶段依赖冲突已由本 amendment 明确解除；旧包及其 blocker checkpoint 保持只读。
-- **Next safe action:** 创建指定 P3 checkpoint 后，从 clean checkpoint 完整读取 7 roots、63 occurrence、依赖/parent/carry-forward reconciliation 与 P4 validator 现状；先把 O-003/O-004 和测试/receipt 的精确路径写入本文件，再开始 P4 mutation。
+- **Next safe action:** 创建指定 P4 checkpoint 后，从 clean checkpoint 完整读取 P5 exact control files、tracked reference graph、retain/parameterize/retire 分类入口、删除 allowlist/denylist 与发布协议；先把 P5 初始精确变更路径写入本文件，再开始 P5 mutation。
+
+### P4 completion scope
+
+- `reports/p1_6/r5_v1_governance_cleanup/root_policy_migration.yaml`
+- `schemas/r5_v1_root_policy_migration.schema.json`
+- `scripts/validate_r5_v1_root_policy_migration.py`
+- `tests/test_r5_v1_root_policy_migration.py`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml`
+- `config/r5_readout_canonical_index.yaml`
+- `reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml`
+- `docs/codex_tasks/v1_governance_integration_cleanup_v2/START_HERE.md`
+
+### P4 completion evidence
+
+- Seven-root migration with no occurrence/candidate overlay: `reports/p1_6/r5_v1_governance_cleanup/root_policy_migration.yaml`.
+- Strict schema, dynamic validator and adversarial tests: `schemas/r5_v1_root_policy_migration.schema.json`, `scripts/validate_r5_v1_root_policy_migration.py`, `tests/test_r5_v1_root_policy_migration.py`.
+- Dynamic 63/20/6/69/43/0, 532-edge, six-duplicate reconciliation and zero active defects: `reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml`.
+- Active pointer: `config/r5_readout_canonical_index.yaml` → `policy_migrations.blocker_root_policy`.
+- V-009, unchanged protected root map and user-main vector: `reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml`.
+- Required P5 follow-up: before Night/Bundle deletion, decouple `tests/test_r5_v1_blocker_root_cause_map.py` from physical historical paths while preserving V-005 behavior through durable baseline/blob reads.
 
 ### P3 completion scope
 
@@ -102,3 +123,5 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-25T14:23:39+08:00 — P2 最终报告唯一人审边界、当前字节 hash 失效、truth 分离、`changes_requested` 路由与历史 review 只读兼容已实现；V-002、V-003 P2（178 passed）、兼容回归（75 passed）、对抗复核、V-009 和 task-package integrity 通过，等待指定 P2 checkpoint。
 - 2026-07-25T14:33:04+08:00 — P2 指定 checkpoint `aa73859ddf8dbef2ad94b8c72dbf0ffc3931b851` 已创建且工作树 clean；P3 点名的四个 skills 及其适用必读 references、旧 replay 实现/测试和固定官方输入已完整读取，按上述精确路径开始 P3。
 - 2026-07-25T15:30:31+08:00 — P3 独立 002837 policy refresh 已生成 17 件 canonical 产物；正式披露 hash/page、四 issue 动态处置、unknown 非数值使用、毛利率与未披露毛利贡献字段语义隔离、双临时目录重放、V-003 P3（194 passed）、V-004（16 passed）、V-008 和 V-009 均通过，等待指定 P3 checkpoint。
+- 2026-07-25T15:37:32+08:00 — P3 指定 checkpoint `6c7fc2a35942bb04f5ef0ecfa2c6ccbd10e0a069` 已创建且工作树 clean；原 root map 与 engineering source 的 Git blob 相同（worktree SHA-256 `39aadff44cf51d1ad5607d8ec8481bbab42650723eaf5a981415df0ee3facacf`），7 roots、63 occurrence、20 dependency-blocked、6 parent、69 carry-forward、43 candidate-ready、0 historical resolved 和 532 dependency edges 已完整读取，V-005 既有基线 7 passed，按上述 9 条精确路径开始 P4。
+- 2026-07-25T15:55:38+08:00 — P4 七 root 活动处置迁移已实现：1 `policy_retired`、1 `not_required_for_active_v1`、1 `report_limitation`、1 visible unused `unknown`、3 open `historical_backlog`、0 `active_defect`；动态证明 63/20/6/69/43/0、532 edges、6 duplicate references，未复制 occurrence/candidate 决定或声称历史 resolution/system completion。V-005（18 passed）、额外索引兼容回归（27 passed）、对抗复核、V-009 和 task-package integrity 通过，等待指定 P4 checkpoint。

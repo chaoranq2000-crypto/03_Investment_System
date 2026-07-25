@@ -1,39 +1,22 @@
 schema_version: r5_v1_governance_cleanup_validation_v1
 validation_id: V-009
-phase: P3
-checked_at: "2026-07-25T15:30:31+08:00"
+phase: P4
+checked_at: "2026-07-25T15:53:48+08:00"
 decision: pass
-phase_parent: aa73859ddf8dbef2ad94b8c72dbf0ffc3931b851
-changed_path_count_before_scope_receipt: 25
-final_changed_path_count: 26
+phase_parent: 6c7fc2a35942bb04f5ef0ecfa2c6ccbd10e0a069
+changed_path_count_before_scope_receipt: 8
+final_changed_path_count: 9
 unexpected_path_count: 0
 changed_paths:
   - config/r5_readout_canonical_index.yaml
   - docs/codex_tasks/v1_governance_integration_cleanup_v2/START_HERE.md
   - reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md
-  - reports/p1_6/r5_v1_governance_cleanup/validation/governance_targeted.txt
-  - reports/p1_6/r5_v1_governance_cleanup/validation/refresh_002837.yaml
+  - reports/p1_6/r5_v1_governance_cleanup/root_policy_migration.yaml
+  - reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml
   - reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml
-  - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/artifact_manifest.csv
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/inputs/input_provenance.csv
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/open_todos.csv
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/quality_gate_report.md
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/backflow_decision.yaml
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/disclosed_facts.yaml
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/issue_change_log.csv
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/limitations.yaml
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/segment_exposure.yaml
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/stock_report_draft.md
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/stock_research_pack.yaml
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/run_log.md
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/validation/artifact_hashes.csv
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/validation/idempotence_report.yaml
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/validation/replay_receipt.yaml
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_readout.md
-  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml
-  - scripts/run_r5_v1_policy_refresh_002837.py
-  - tests/test_r5_v1_policy_refresh_002837.py
+  - schemas/r5_v1_root_policy_migration.schema.json
+  - scripts/validate_r5_v1_root_policy_migration.py
+  - tests/test_r5_v1_root_policy_migration.py
 protected_checks:
   frozen_contract_changed: false
   prior_v1_package_changed: false
@@ -46,7 +29,8 @@ protected_checks:
   pyproject_changed: false
   user_main_worktree_written: false
 canonical_index_change:
-  scope: current_runs.stock_002837
+  scope: policy_migrations.blocker_root_policy
+  current_runs_changed: false
   historical_readout_rows_changed: false
 git_diff_check: pass
 user_main_worktree:

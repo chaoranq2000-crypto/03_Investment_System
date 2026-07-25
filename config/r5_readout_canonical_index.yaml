@@ -6,6 +6,12 @@ current_runs:
     state_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml
     readout_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_readout.md
     status: accepted_with_todos
+policy_migrations:
+  blocker_root_policy:
+    path: reports/p1_6/r5_v1_governance_cleanup/root_policy_migration.yaml
+    reconciliation_path: reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml
+    source_root_map_path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
+    decision: pass
 readouts:
 - path: reports/p1_6/R5_PATCH_0A_REPAIR_READOUT.md
   canonical_status: legacy_noncanonical

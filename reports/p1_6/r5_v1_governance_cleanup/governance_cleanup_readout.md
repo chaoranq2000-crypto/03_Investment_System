@@ -38,7 +38,7 @@
 
 ## P3 — 002837 official-disclosure policy refresh
 
-- State: implementation and required validators pass; awaiting the specified P3 checkpoint commit.
+- State: complete at checkpoint `6c7fc2a35942bb04f5ef0ecfa2c6ccbd10e0a069`.
 - Phase parent: `aa73859ddf8dbef2ad94b8c72dbf0ffc3931b851`.
 - New canonical run: `reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh`.
 - The standalone runner reads only `data/manifests/evidence_manifest.csv` and the fixed annual/interim PDF plus processed-text pairs. It does not import the old replay, read a historical workflow directory, use network access, or overwrite raw data.
@@ -53,5 +53,22 @@
 - V-004: 16 passed; two unique temp outputs have semantic digest `2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6` and byte-identical 17-file trees.
 - V-008: pass; 17 capabilities, 20 sources, zero blocking issues.
 - V-009: pass; 26 phase paths, all authorized, with frozen sources and the user main worktree unchanged.
+
+## P4 — Historical blocker policy migration
+
+- State: implementation and required validators pass; awaiting the specified P4 checkpoint commit.
+- Phase parent: `6c7fc2a35942bb04f5ef0ecfa2c6ccbd10e0a069`.
+- The protected source root map remains byte-identical to engineering source `f60f220ae252262a537c612ce193fc779901984b`: Git blob `526d9964a95ddc866fa960a1b9556e720ca80178`, content SHA-256 `39aadff44cf51d1ad5607d8ec8481bbab42650723eaf5a981415df0ee3facacf`.
+- The active migration contains exactly seven root rows and no occurrence, parent, carry-forward or candidate-decision overlay. It preserves every historical root as open and all 63 historical occurrences as unresolved.
+- `external_approval_and_independent_receipts_absent` is `policy_retired`; only the old intermediate human approval/decision/independent-receipt gate is retired. Current machine provenance, hashes and replay receipts remain required.
+- `suite_exact_hash_review_pending` is `not_required_for_active_v1`; intermediate human hash decisions are not required, while hashes remain machine-integrity controls and only the final report hash may bind human review.
+- `analyst_conclusions_pending` is a visible nonblocking section-level `report_limitation`; `reviewed_evidence_acceptance_absent` is a visible unused claim-level `unknown`. Their P3 references are current-policy examples, not historical-case resolution evidence.
+- The three legacy Bundle16R–Bundle17R compatibility roots remain open `historical_backlog` with no canonical impact. They are not relabeled as repaired.
+- Dynamic row reconciliation proves 63 occurrences, 20 dependency-blocked occurrences, 6 parents, 69 unique carry-forward nodes, 43 candidate-ready rows, 0 historical resolutions, 532 dependency edges and 6 valid duplicate references. All seven roots are covered once, with no orphan, duplicate ID or cycle.
+- The disposition distribution is one `policy_retired`, one `not_required_for_active_v1`, one `report_limitation`, one `unknown`, three `historical_backlog` and zero `active_defect`. All seven have `blocks_current_goal=false`.
+- P4 does not claim `system_v1_complete`; later engineering, cleanup and publication gates remain.
+- P5 must decouple `tests/test_r5_v1_blocker_root_cause_map.py` from physical Night/Bundle files before those paths are manually deleted. The new P4 validator already reads only the retained root map, its durable Git blob, permanent policy files and retained P3 artifacts.
+- V-005: 18 passed.
+- V-009: pass; 9 phase paths, all authorized, with the original root map, frozen sources and user main worktree unchanged.
 
 Later phases append their own sections. Publication evidence is never written here after the sealed candidate commit.
