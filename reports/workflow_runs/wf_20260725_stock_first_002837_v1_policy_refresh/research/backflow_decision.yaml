@@ -1,0 +1,13 @@
+schema_version: 1
+artifact_type: r5_v1_policy_refresh_backflow_decision
+workflow_id: wf_20260725_stock_first_002837_v1_policy_refresh
+as_of_date: '2026-07-25'
+backflow_decision: update_exposure
+run_scoped_update_recorded: true
+run_scoped_exposure_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/segment_exposure.yaml
+global_state_updated: false
+global_update_required_for_current_goal: false
+reason: P3 authorizes a canonical run-scoped refresh only. The official liquid-revenue lower bound and overlap boundary are captured in the run; no global exposure artifact is mutated.
+unresolved_limitations_visible: true
+required_next_skill: null
+next_stage: null

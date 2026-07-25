@@ -6,10 +6,10 @@ contract_sha256: "c160ea2d676d5ba9a9893070be1a6e4418193cc508db07e71dd48cd0394a64
 state: "running"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "23fcd3b6b5ce3574661c4cfd306dadd782ad0717"
-last_completed_phase: "P2"
-next_phase: "P3"
+last_completed_phase: "P3"
+next_phase: "P4"
 last_validation: "pass"
-updated_at: "2026-07-25T14:23:39+08:00"
+updated_at: "2026-07-25T15:30:31+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -40,11 +40,29 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 ## Current checkpoint
 
 - **State:** `running`
-- **Last completed phase:** `P2`
-- **Next phase:** `P3`
-- **Latest validation:** `pass`（V-002、V-003 P2 178 passed、兼容回归 75 passed、对抗复核无 blocker、V-009）
+- **Last completed phase:** `P3`
+- **Next phase:** `P4`
+- **Latest validation:** `pass`（V-003 P3 194 passed、V-004 双目录 17 文件字节一致且 policy tests 16 passed、V-008、V-009）
 - **Current blocker:** none。旧 v1 的 V-003 阶段依赖冲突已由本 amendment 明确解除；旧包及其 blocker checkpoint 保持只读。
-- **Next safe action:** 创建指定 P2 checkpoint 后，从 clean checkpoint 完整读取 P3 点名的 002837 evidence-ingest、stock-deep-dive、quality-review 和 replay 资料，按 P3 allowlist 实现独立 policy-refresh replay。
+- **Next safe action:** 创建指定 P3 checkpoint 后，从 clean checkpoint 完整读取 7 roots、63 occurrence、依赖/parent/carry-forward reconciliation 与 P4 validator 现状；先把 O-003/O-004 和测试/receipt 的精确路径写入本文件，再开始 P4 mutation。
+
+### P3 completion scope
+
+- Runner and tests: `scripts/run_r5_v1_policy_refresh_002837.py`, `tests/test_r5_v1_policy_refresh_002837.py`.
+- Canonical pointer: `config/r5_readout_canonical_index.yaml`.
+- New run control plane: `reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml`, `artifact_manifest.csv`, `open_todos.csv`, `quality_gate_report.md`, `run_log.md`, `workflow_readout.md`.
+- New run evidence/research: `reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/inputs/input_provenance.csv`, `research/disclosed_facts.yaml`, `research/limitations.yaml`, `research/issue_change_log.csv`, `research/stock_research_pack.yaml`, `research/segment_exposure.yaml`, `research/stock_report_draft.md`, `research/backflow_decision.yaml`.
+- New run validation: `reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/validation/artifact_hashes.csv`, `replay_receipt.yaml`, `idempotence_report.yaml`.
+- Phase evidence/checkpoint: `reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md`, `validation/refresh_002837.yaml`, `validation/governance_targeted.txt`, `validation/source_route_quality_report.yaml`, `validation/scope_audit.yaml`, and this `START_HERE.md`.
+
+### P3 completion evidence
+
+- Canonical state and six-piece control plane: `reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/`.
+- Fixed official provenance, page locators, facts and visible limitations: new run `inputs/` and `research/` artifacts.
+- Two-pass and two-directory replay: new run `validation/` plus `reports/p1_6/r5_v1_governance_cleanup/validation/refresh_002837.yaml`.
+- V-003 P3: `reports/p1_6/r5_v1_governance_cleanup/validation/governance_targeted.txt`.
+- V-008: `reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml`.
+- V-009 and unchanged protected assets: `reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml`.
 
 ### P2 completion scope
 
@@ -82,3 +100,5 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-25T13:25:09+08:00 — P1 scope-aware blocker/outcome、降级阶梯和 explicit capability-evaluator routing 已实现；V-002、V-003 P1（90 passed）、额外兼容测试（63 passed）、V-009 和 task-package integrity 通过，等待指定 P1 checkpoint。
 - 2026-07-25T13:31:22+08:00 — P1 指定 checkpoint `0906a5fa8c785da1a74326aa19dbf0abc58ddd2e` 已创建且工作树 clean；完整读取 P2 点名的人审、sample-quality、real-company regression、Reader 与 generation-lock 契约/测试后，按上述精确路径开始 P2。
 - 2026-07-25T14:23:39+08:00 — P2 最终报告唯一人审边界、当前字节 hash 失效、truth 分离、`changes_requested` 路由与历史 review 只读兼容已实现；V-002、V-003 P2（178 passed）、兼容回归（75 passed）、对抗复核、V-009 和 task-package integrity 通过，等待指定 P2 checkpoint。
+- 2026-07-25T14:33:04+08:00 — P2 指定 checkpoint `aa73859ddf8dbef2ad94b8c72dbf0ffc3931b851` 已创建且工作树 clean；P3 点名的四个 skills 及其适用必读 references、旧 replay 实现/测试和固定官方输入已完整读取，按上述精确路径开始 P3。
+- 2026-07-25T15:30:31+08:00 — P3 独立 002837 policy refresh 已生成 17 件 canonical 产物；正式披露 hash/page、四 issue 动态处置、unknown 非数值使用、毛利率与未披露毛利贡献字段语义隔离、双临时目录重放、V-003 P3（194 passed）、V-004（16 passed）、V-008 和 V-009 均通过，等待指定 P3 checkpoint。

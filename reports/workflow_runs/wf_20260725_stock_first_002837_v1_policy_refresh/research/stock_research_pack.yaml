@@ -1,0 +1,310 @@
+schema_version: r5_mvp_v0.3
+artifact_type: R5_stock_research_pack
+status: draft
+pack_status: research_draft
+metadata:
+  workflow_id: wf_20260725_stock_first_002837_v1_policy_refresh
+  generated_at: '2026-07-25'
+  source_pack: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/disclosed_facts.yaml
+  generation_mode: offline_official_disclosure_policy_refresh
+stock:
+  company_id: cn_002837_invic
+  company_name: 英维克
+  stock_code: 002837
+  exchange: SZSE
+  currency: CNY
+quality_status:
+  r5_gate_status: pass
+  allowed_report_level: research_draft
+  r5_external_state: R5_research_draft
+  high_issue_count: 0
+  high_issue_count_semantics: active_machine_validation_defects_only
+  medium_issue_count: 0
+  descriptive_high_limitation_count: 4
+  active_defect_count: 0
+  source_gap_visible: true
+  no_advice_gate_passed: true
+  current_goal_status: accepted_with_todos
+  final_report_review_status: not_requested
+source_gap_policy:
+  missing_value_tokens:
+  - MISSING_DISCLOSURE
+  - TODO_SOURCE_REQUIRED
+  - TODO_MODEL_INPUT
+  - TODO_MARKET_DATA
+  - TODO_PEER_DATA
+  - LOW_CONFIDENCE_CLUE_ONLY
+  rule: Keep every gap visible and never convert a missing value into a factual claim.
+company_identity_pack:
+  status: ready
+  company_id: cn_002837_invic
+  legal_name: 深圳市英维克科技股份有限公司
+  stock_code: 002837
+  exchange: SZSE
+  identity_evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_interim_report_002837_20250819_47054e
+evidence_snapshot_pack:
+  status: ready
+  as_of_date: '2026-07-25'
+  evidence_manifest_path: data/manifests/evidence_manifest.csv
+  evidence_ids:
+  - ev_annual_report_002837_20260421_2cbfc5
+  - ev_interim_report_002837_20250819_47054e
+  evidence_count: 2
+  official_filings_status: ready
+  critical_missing_sources: []
+financial_history_pack:
+  status: partial
+  periods:
+  - 2025A
+  - 2025H1
+  metrics:
+  - metric_name: room_cooling_revenue
+    period: 2025A
+    value: '3448477492.62'
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  - metric_name: cabinet_cooling_revenue
+    period: 2025A
+    value: '1977423139.19'
+    unit: CNY
+    evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  - metric_name: liquid_cooling_related_revenue
+    period: 2025H1
+    operator: greater_than
+    value: '200000000'
+    unit: CNY
+    evidence_id: ev_interim_report_002837_20250819_47054e
+  non_recurring_items: []
+  adjusted_profit_bridge: []
+  cashflow_quality:
+    claim_type: unknown
+    summary: null
+    missing_reason: TODO_SOURCE_REQUIRED
+business_breakdown_pack:
+  status: partial
+  business_lines:
+  - business_name: 机房温控节能产品
+    revenue:
+      value: '3448477492.62'
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    revenue_pct:
+      value: '56.83'
+      unit: percent
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    gross_margin:
+      value: '28.36'
+      unit: percent
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    gross_profit:
+      value: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit_pct:
+      value: null
+      missing_reason: MISSING_DISCLOSURE
+    cost:
+      value: '2470650226.09'
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    volume:
+      value: null
+      missing_reason: MISSING_DISCLOSURE
+    unit_price:
+      value: null
+      missing_reason: MISSING_DISCLOSURE
+    product_mix:
+      value: null
+      missing_reason: MISSING_DISCLOSURE
+    confidence: high
+  - business_name: 机柜温控节能产品
+    revenue:
+      value: '1977423139.19'
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    revenue_pct:
+      value: '32.59'
+      unit: percent
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    gross_margin:
+      value: '27.24'
+      unit: percent
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    gross_profit:
+      value: null
+      missing_reason: MISSING_DISCLOSURE
+    gross_profit_pct:
+      value: null
+      missing_reason: MISSING_DISCLOSURE
+    cost:
+      value: '1438783613.25'
+      unit: CNY
+      evidence_id: ev_annual_report_002837_20260421_2cbfc5
+    volume:
+      value: null
+      missing_reason: MISSING_DISCLOSURE
+    unit_price:
+      value: null
+      missing_reason: MISSING_DISCLOSURE
+    product_mix:
+      value: null
+      missing_reason: MISSING_DISCLOSURE
+    confidence: high
+  profit_pool_summary:
+    status: omitted
+    missing_reason: MISSING_DISCLOSURE
+  missing_items:
+  - 'MISSING_DISCLOSURE: line-level volume, unit price, product mix'
+  - 'MISSING_DISCLOSURE: directly disclosed gross-profit amount'
+segment_exposure_pack:
+  status: partial
+  exposures:
+  - segment_id: ai_server_liquid_cooling
+    exposure_type: revenue
+    exposure_score: 4
+    confidence: high
+    revenue_pct: MISSING_DISCLOSURE
+    profit_pct: MISSING_DISCLOSURE
+    evidence_ids:
+    - ev_interim_report_002837_20250819_47054e
+    missing_reason: 'MISSING_DISCLOSURE: revenue share and exact allocation'
+    exposure_score_rationale: issuer-disclosed positive revenue lower bound confirms business exposure; undisclosed share prevents score 5
+    backflow_decision: update_exposure
+industry_context_pack:
+  status: TODO
+  industry_cards: []
+  missing_reason: TODO_SOURCE_REQUIRED
+peer_comparison_pack:
+  status: TODO
+  peer_set: []
+  missing_reason: TODO_PEER_DATA
+forecast_model_pack:
+  status: TODO
+  forecast_years:
+  - 2026E
+  - 2027E
+  - 2028E
+  required_metrics:
+  - revenue
+  - gross_margin
+  - net_profit_attributable
+  - eps
+  scenarios: {}
+  missing_reason: TODO_MODEL_INPUT
+valuation_pack:
+  status: TODO
+  market_snapshot:
+    as_of_date: null
+    current_price: null
+    missing_reason: TODO_MARKET_DATA
+  peer_context:
+    missing_reason: TODO_PEER_DATA
+technical_market_pack:
+  status: TODO
+  as_of_date: null
+  missing_reason: TODO_MARKET_DATA
+sentiment_event_pack:
+  status: TODO
+  as_of_date: null
+  missing_reason: TODO_SOURCE_REQUIRED
+risk_counterevidence_pack:
+  status: partial
+  risks:
+  - risk_name: liquid allocation remains undisclosed
+    missing_reason: MISSING_DISCLOSURE
+  - risk_name: cabinet-liquid relationship remains unknown
+    missing_reason: MISSING_DISCLOSURE
+  counterevidence:
+  - claim_type: fact
+    summary: 2025H1 liquid-related revenue is above CNY 200m and partly classified under room cooling and other.
+    evidence_id: ev_interim_report_002837_20250819_47054e
+source_gap_register:
+- gap_id: R5P3_GAP_DISCLOSURE
+  section: business_and_exposure
+  missing_data: MISSING_DISCLOSURE
+  impact_on_conclusion: line drivers and exact overlap allocation are omitted
+  fix_owner_skill: evidence-ingest
+  next_action: keep the disclosed gaps visible
+- gap_id: R5P3_GAP_SOURCE
+  section: industry_sentiment_cashflow
+  missing_data: TODO_SOURCE_REQUIRED
+  impact_on_conclusion: no unsupported context or cashflow claim
+  fix_owner_skill: evidence-ingest
+  next_action: register an official source before use
+- gap_id: R5P3_GAP_MODEL
+  section: forecast
+  missing_data: TODO_MODEL_INPUT
+  impact_on_conclusion: forecast model omitted
+  fix_owner_skill: stock-deep-dive
+  next_action: add reviewed assumptions before modeling
+- gap_id: R5P3_GAP_MARKET
+  section: valuation_and_technical
+  missing_data: TODO_MARKET_DATA
+  impact_on_conclusion: market and valuation language omitted
+  fix_owner_skill: evidence-ingest
+  next_action: register a machine-qualified market snapshot
+- gap_id: R5P3_GAP_PEER
+  section: peer_and_valuation
+  missing_data: TODO_PEER_DATA
+  impact_on_conclusion: peer comparison omitted
+  fix_owner_skill: company-valuation
+  next_action: register a reviewed peer snapshot
+report_composition_pack:
+  status: partial
+  allowed_report_level: research_draft
+  source_gap_report_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/limitations.yaml
+  open_questions_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/open_todos.csv
+  composer_may_create_new_facts: false
+policy_refresh_extension:
+  periods:
+  - 2025A
+  - 2025H1
+  disclosed_metric_fact_ids:
+  - fact_002837_2025_room_revenue
+  - fact_002837_2025_room_revenue_share
+  - fact_002837_2025_cabinet_revenue
+  - fact_002837_2025_cabinet_revenue_share
+  - fact_002837_2025_room_cost
+  - fact_002837_2025_room_gross_margin
+  - fact_002837_2025_cabinet_cost
+  - fact_002837_2025_cabinet_gross_margin
+  - fact_002837_2025_industry_sales_volume
+  - fact_002837_2025h1_liquid_revenue_lower_bound
+  relationship_inference_fact_ids:
+  - fact_002837_2025h1_room_liquid_partial_overlap
+  industry_sales_volume:
+    period: 2025A
+    value: '324058'
+    unit: unit
+    scope: precision_temperature_control_energy_saving_equipment_industry_total
+    allocation_allowed: false
+    numeric_use: display_only
+  liquid_cooling_related:
+    revenue_2025h1_cny:
+      operator: greater_than
+      value: '200000000'
+      evidence_id: ev_interim_report_002837_20250819_47054e
+    classification:
+      room_cooling: partial_overlap_confirmed
+      other: partial_overlap_confirmed
+      cabinet_cooling: UNKNOWN_NOT_DISCLOSED
+    unit_value: UNKNOWN_NOT_DISCLOSED
+    acceptance_rate: UNKNOWN_NOT_DISCLOSED
+    standalone_gross_margin: UNKNOWN_NOT_DISCLOSED
+    exact_allocation: UNKNOWN_NOT_DISCLOSED
+  calculation_policy:
+    calculations: []
+    cross_line_aggregation_allowed: false
+    unknown_values_used: false
+    lower_bound_treated_as_exact: false
+  current_issue_ids:
+  - R5V1P3-G3-001
+  - R5V1P3-G3-002
+  - R5V1P3-G6-001
+  - R5V1P3-G6-002
+workflow_controls:
+  automatic_quality_status: pass
+  final_report_review_status: not_requested
+  sample_quality_ready: false
+  p2_ready: false

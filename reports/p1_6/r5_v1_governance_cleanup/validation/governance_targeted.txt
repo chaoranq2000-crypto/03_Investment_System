@@ -1,11 +1,15 @@
 validation_id: V-003
-phase: P2
-command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q tests/test_r5_v1_completion_semantics.py tests/test_r5_v1_active_control_plane.py tests/test_r5_v1_workflow_state_validator.py tests/test_r5_v1_replay_002837.py tests/test_validate_quality_issues.py tests/test_r5_reader_report_contract.py tests/test_r5_reader_quality_gate.py tests/test_r5_final_report_review_semantics.py
+phase: P3
+command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q tests/test_r5_v1_completion_semantics.py tests/test_r5_v1_active_control_plane.py tests/test_r5_v1_workflow_state_validator.py tests/test_r5_v1_replay_002837.py tests/test_validate_quality_issues.py tests/test_r5_reader_report_contract.py tests/test_r5_reader_quality_gate.py tests/test_r5_final_report_review_semantics.py tests/test_r5_v1_policy_refresh_002837.py
 exit_code: 0
-result: 178 passed in 13.47s
+result: 194 passed in 15.08s
 
-Additional compatibility validation:
-- 75 passed: historical Bundle9/10 review and generation locks, foundation assets, minimal R5 fixture, stock-led smoke, Bundle11 runtime, Bundle12 operating-evidence, and Bundle13 backflow.
-- Protected 20260723 V1 replay CLI: OK (legacy r5_v1 compatibility; read-only), exit 0.
-- Current-goal workflow state template CLI: OK, exit 0.
-- Adversarial review: NO BLOCKER after hash-transition, path, alias, marker-downgrade, legacy-truth, Night-boundary, routing, and protected-replay checks.
+P3 policy-refresh validation:
+- 16 passed in the contract-fixed V-004 rerun.
+- Two unique temporary outputs have semantic digest 2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6 and byte-identical 17-file trees.
+- Minimal-repository replay requires only evidence_manifest.csv and the four fixed official inputs.
+- The new runner contains no historical workflow ID or old replay import.
+- The protected V1 replay and historical workflow directories remain unmodified.
+- Workflow state validator: OK with current_goal_v1 and final_report_review_v1.
+- Active segment-exposure and R5 stock-pack validators: accepted_with_todos with no machine-validation defects.
+- Source-route quality gate: decision=pass, capabilities=17, blocking=0.

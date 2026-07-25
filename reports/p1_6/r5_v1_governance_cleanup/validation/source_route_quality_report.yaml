@@ -1,0 +1,9 @@
+schema_version: 1
+decision: pass
+capability_count: 17
+source_count: 20
+adapter_operational_gate_included: true
+adapter_import_check: true
+issue_counts: {}
+blocking_issue_count: 0
+issues: []

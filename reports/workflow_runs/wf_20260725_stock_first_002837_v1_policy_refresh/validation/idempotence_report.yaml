@@ -1,0 +1,16 @@
+schema_version: 1
+artifact_type: r5_v1_policy_refresh_idempotence_report
+workflow_id: wf_20260725_stock_first_002837_v1_policy_refresh
+as_of_date: '2026-07-25'
+pass_count: 2
+compare_path_count: 15
+first_pass_tree_sha256: 1d0bcfb8f59bbf58774bb8419685c23c5c8e68d1d296cf45777aee59273289b4
+second_pass_tree_sha256: 1d0bcfb8f59bbf58774bb8419685c23c5c8e68d1d296cf45777aee59273289b4
+semantic_digest: 2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6
+first_semantic_digest: 2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6
+second_semantic_digest: 2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6
+semantic_drift_count: 0
+allowed_normalizations: []
+byte_drift_count: 0
+byte_drift: []
+decision: pass

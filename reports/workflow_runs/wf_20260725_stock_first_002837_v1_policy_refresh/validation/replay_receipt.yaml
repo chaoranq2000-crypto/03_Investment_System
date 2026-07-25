@@ -1,0 +1,21 @@
+schema_version: 1
+artifact_type: r5_v1_policy_refresh_replay_receipt
+workflow_id: wf_20260725_stock_first_002837_v1_policy_refresh
+as_of_date: '2026-07-25'
+mode: offline
+network_access: false
+historical_workflow_reads: false
+raw_overwrite: false
+manifest_path: data/manifests/evidence_manifest.csv
+evidence_ids:
+- ev_annual_report_002837_20260421_2cbfc5
+- ev_interim_report_002837_20250819_47054e
+input_file_count: 4
+printed_pages_verified:
+- 9
+- 15
+- 16
+derived_status: accepted_with_todos
+semantic_digest: 2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6
+generated_artifact_digest: 36251c9251bb54802f03bb30ecb59029a62109f6e491687a87bd929ac1773595
+canonical_command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B scripts\run_r5_v1_policy_refresh_002837.py --repo-root . --output-dir reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh

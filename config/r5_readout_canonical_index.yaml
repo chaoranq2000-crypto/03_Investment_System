@@ -1,5 +1,11 @@
 schema_version: r5_readout_canonical_index_v0.1
 status: canonical_index_defined
+current_runs:
+  stock_002837:
+    workflow_id: wf_20260725_stock_first_002837_v1_policy_refresh
+    state_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml
+    readout_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_readout.md
+    status: accepted_with_todos
 readouts:
 - path: reports/p1_6/R5_PATCH_0A_REPAIR_READOUT.md
   canonical_status: legacy_noncanonical

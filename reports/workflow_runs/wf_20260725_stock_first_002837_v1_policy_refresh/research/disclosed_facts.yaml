@@ -1,0 +1,166 @@
+schema_version: 1
+artifact_type: r5_v1_policy_refresh_disclosed_facts
+workflow_id: wf_20260725_stock_first_002837_v1_policy_refresh
+as_of_date: '2026-07-25'
+source_policy: hash_verified_official_disclosures_only
+facts:
+- fact_id: fact_002837_2025_room_revenue
+  claim_type: fact
+  metric: room_cooling_revenue
+  period: 2025A
+  value: '3448477492.62'
+  comparison_operator: equal
+  unit: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  page_no: 15
+  locator: 机房温控节能产品 3,448,477,492.62 56.83%
+  calculation_method: direct_disclosure_no_calculation
+  numeric_use: display_only
+- fact_id: fact_002837_2025_room_revenue_share
+  claim_type: fact
+  metric: room_cooling_revenue_share
+  period: 2025A
+  value: '56.83'
+  comparison_operator: equal
+  unit: percent
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  page_no: 15
+  locator: 机房温控节能产品 3,448,477,492.62 56.83%
+  calculation_method: direct_disclosure_no_calculation
+  numeric_use: display_only
+- fact_id: fact_002837_2025_cabinet_revenue
+  claim_type: fact
+  metric: cabinet_cooling_revenue
+  period: 2025A
+  value: '1977423139.19'
+  comparison_operator: equal
+  unit: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  page_no: 15
+  locator: 机柜温控节能产品 1,977,423,139.19 32.59%
+  calculation_method: direct_disclosure_no_calculation
+  numeric_use: display_only
+- fact_id: fact_002837_2025_cabinet_revenue_share
+  claim_type: fact
+  metric: cabinet_cooling_revenue_share
+  period: 2025A
+  value: '32.59'
+  comparison_operator: equal
+  unit: percent
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  page_no: 15
+  locator: 机柜温控节能产品 1,977,423,139.19 32.59%
+  calculation_method: direct_disclosure_no_calculation
+  numeric_use: display_only
+- fact_id: fact_002837_2025_room_cost
+  claim_type: fact
+  metric: room_cooling_cost
+  period: 2025A
+  value: '2470650226.09'
+  comparison_operator: equal
+  unit: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  page_no: 16
+  locator: 机房温控节能产品 3,448,477,492.62 2,470,650,226.09 28.36%
+  calculation_method: direct_disclosure_no_calculation
+  numeric_use: display_only
+- fact_id: fact_002837_2025_room_gross_margin
+  claim_type: fact
+  metric: room_cooling_gross_margin
+  period: 2025A
+  value: '28.36'
+  comparison_operator: equal
+  unit: percent
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  page_no: 16
+  locator: 机房温控节能产品 3,448,477,492.62 2,470,650,226.09 28.36%
+  calculation_method: direct_disclosure_no_calculation
+  numeric_use: display_only
+- fact_id: fact_002837_2025_cabinet_cost
+  claim_type: fact
+  metric: cabinet_cooling_cost
+  period: 2025A
+  value: '1438783613.25'
+  comparison_operator: equal
+  unit: CNY
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  page_no: 16
+  locator: 机柜温控节能产品 1,977,423,139.19 1,438,783,613.25 27.24%
+  calculation_method: direct_disclosure_no_calculation
+  numeric_use: display_only
+- fact_id: fact_002837_2025_cabinet_gross_margin
+  claim_type: fact
+  metric: cabinet_cooling_gross_margin
+  period: 2025A
+  value: '27.24'
+  comparison_operator: equal
+  unit: percent
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  page_no: 16
+  locator: 机柜温控节能产品 1,977,423,139.19 1,438,783,613.25 27.24%
+  calculation_method: direct_disclosure_no_calculation
+  numeric_use: display_only
+- fact_id: fact_002837_2025_industry_sales_volume
+  claim_type: fact
+  metric: precision_temperature_control_industry_sales_volume
+  period: 2025A
+  value: '324058'
+  comparison_operator: equal
+  unit: unit
+  aggregation_scope: precision_temperature_control_energy_saving_equipment_industry_total
+  allocation_allowed: false
+  evidence_id: ev_annual_report_002837_20260421_2cbfc5
+  source_path: data/raw/annual_reports/cninfo_2025_annual_report_full_002837_2026-04-21.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt
+  page_no: 16
+  locator: 销售量 台 324,058 257,932 25.64%
+  calculation_method: direct_disclosure_no_calculation
+  numeric_use: display_only
+- fact_id: fact_002837_2025h1_liquid_revenue_lower_bound
+  claim_type: fact
+  metric: liquid_cooling_related_revenue
+  period: 2025H1
+  value: '200000000'
+  comparison_operator: greater_than
+  unit: CNY
+  evidence_id: ev_interim_report_002837_20250819_47054e
+  source_path: data/raw/announcements/cninfo_2025_interim_report_full_002837_2025-08-19.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_interim_report_full_002837_2025-08-19.txt
+  page_no: 9
+  locator: 液冷相关营业收入超过 2 亿元
+  calculation_method: direct_disclosure_no_calculation
+  numeric_use: display_only
+- fact_id: fact_002837_2025h1_room_liquid_partial_overlap
+  claim_type: inference
+  metric: room_liquid_classification_relationship
+  period: 2025H1
+  value: partial_overlap_confirmed
+  comparison_operator: not_applicable
+  unit: not_applicable
+  overlap_amount: UNKNOWN_NOT_DISCLOSED
+  cabinet_relationship: UNKNOWN_NOT_DISCLOSED
+  evidence_id: ev_interim_report_002837_20250819_47054e
+  source_path: data/raw/announcements/cninfo_2025_interim_report_full_002837_2025-08-19.pdf
+  processed_text_path: data/processed/text/002837/cninfo_2025_interim_report_full_002837_2025-08-19.txt
+  page_no: 9
+  locator: '相关营业收入部分计入“机房温控
+
+    节能产品”，部分计入“其他”'
+  calculation_method: bounded_inference_from_explicit_disclosure_classification
+  numeric_use: prohibited

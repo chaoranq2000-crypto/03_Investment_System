@@ -1,49 +1,53 @@
 schema_version: r5_v1_governance_cleanup_validation_v1
 validation_id: V-009
-phase: P2
-checked_at: "2026-07-25T14:26:06+08:00"
+phase: P3
+checked_at: "2026-07-25T15:30:31+08:00"
 decision: pass
-phase_parent: 0906a5fa8c785da1a74326aa19dbf0abc58ddd2e
-changed_path_count_before_receipts: 22
+phase_parent: aa73859ddf8dbef2ad94b8c72dbf0ffc3931b851
+changed_path_count_before_scope_receipt: 25
 final_changed_path_count: 26
 unexpected_path_count: 0
 changed_paths:
-  - .agents/skills/quality-review/references/r5_quality_gate.md
-  - .agents/skills/quality-review/SKILL.md
-  - .agents/skills/research-orchestrator/assets/workflow_state_template.yaml
-  - .agents/skills/research-orchestrator/references/workflow_state_schema.md
-  - .agents/skills/research-orchestrator/scripts/validate_workflow_state.py
-  - .agents/skills/research-orchestrator/SKILL.md
-  - .agents/skills/stock-deep-dive/references/r5_stock_research_pack_contract.md
-  - .agents/skills/stock-deep-dive/references/report_production_profile.md
-  - .agents/skills/stock-deep-dive/SKILL.md
+  - config/r5_readout_canonical_index.yaml
   - docs/codex_tasks/v1_governance_integration_cleanup_v2/START_HERE.md
-  - docs/meta/DOC_OWNERSHIP_MATRIX.md
-  - docs/policies/QUALITY_GUARDRAILS.md
-  - docs/workflows/R5_REAL_COMPANY_REGRESSION_CONTRACT.md
-  - docs/workflows/R5_SAMPLE_QUALITY_STOCK_REPORT_SPEC.md
-  - docs/workflows/RESEARCH_WORKFLOW.md
-  - docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
   - reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md
-  - reports/p1_6/r5_v1_governance_cleanup/validation/doc_drift.txt
-  - reports/p1_6/r5_v1_governance_cleanup/validation/final_report_review_audit.yaml
   - reports/p1_6/r5_v1_governance_cleanup/validation/governance_targeted.txt
+  - reports/p1_6/r5_v1_governance_cleanup/validation/refresh_002837.yaml
   - reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml
-  - schemas/r5_final_report_review.schema.json
-  - tests/test_r5_final_report_review_semantics.py
-  - tests/test_r5_v1_active_control_plane.py
-  - tests/test_r5_v1_completion_semantics.py
-  - tests/test_r5_v1_workflow_state_validator.py
+  - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/artifact_manifest.csv
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/inputs/input_provenance.csv
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/open_todos.csv
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/quality_gate_report.md
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/backflow_decision.yaml
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/disclosed_facts.yaml
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/issue_change_log.csv
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/limitations.yaml
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/segment_exposure.yaml
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/stock_report_draft.md
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/stock_research_pack.yaml
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/run_log.md
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/validation/artifact_hashes.csv
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/validation/idempotence_report.yaml
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/validation/replay_receipt.yaml
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_readout.md
+  - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml
+  - scripts/run_r5_v1_policy_refresh_002837.py
+  - tests/test_r5_v1_policy_refresh_002837.py
 protected_checks:
   frozen_contract_changed: false
   prior_v1_package_changed: false
   data_raw_changed: false
   original_root_map_changed: false
   v1_replay_changed: false
+  historical_workflow_changed: false
   github_workflow_changed: false
   agents_md_changed: false
   pyproject_changed: false
   user_main_worktree_written: false
+canonical_index_change:
+  scope: current_runs.stock_002837
+  historical_readout_rows_changed: false
 git_diff_check: pass
 user_main_worktree:
   head: a345fafb522300831ed4206d35fa17f44570cb1f
