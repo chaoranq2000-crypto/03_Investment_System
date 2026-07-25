@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v2"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v2/CONTRACT.md"
 contract_sha256: "c160ea2d676d5ba9a9893070be1a6e4418193cc508db07e71dd48cd0394a642f"
-state: "running"
+state: "blocked"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "23fcd3b6b5ce3574661c4cfd306dadd782ad0717"
 last_completed_phase: "P4"
 next_phase: "P5"
-last_validation: "pass"
-updated_at: "2026-07-25T15:55:38+08:00"
+last_validation: "fail"
+updated_at: "2026-07-25T16:34:47+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -39,12 +39,14 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `running`
+- **State:** `blocked`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`（V-005 18 passed、额外 canonical-index compatibility 27 passed、V-009、task-package integrity）
-- **Current blocker:** none。旧 v1 的 V-003 阶段依赖冲突已由本 amendment 明确解除；旧包及其 blocker checkpoint 保持只读。
-- **Next safe action:** 创建指定 P4 checkpoint 后，从 clean checkpoint 完整读取 P5 exact control files、tracked reference graph、retain/parameterize/retire 分类入口、删除 allowlist/denylist 与发布协议；先把 P5 初始精确变更路径写入本文件，再开始 P5 mutation。
+- **Latest validation:** P4 checkpoint `3741c807ae1d9859e8cb72d5e587a5bb74f2082e` 保持 clean，V-005、V-009 与 task-package integrity 的 P4 evidence 仍有效。P5 的静态引用图和 filtered-tree 诊断证明：若按合同删除 Night 与 old 002837，`tests/conftest.py`、V-003/V-005 点名测试及其他 full-pytest 测试会失败；修复这些路径又超出 P5 exact mutation set。
+- **Current blocker:** 冻结合同同时要求：P5 只能修改五个 exact control files、O-005–O-008 新产物、readout/validation 和 `START_HERE.md`（第 180、207、214、301 行）；删除后 active code/tests/CI 对候选树物理读取为 0 且 full pytest 通过（第 299、305–315、331–354 行）。但 `tests/conftest.py` 直接导入待退役 Night03，`tests/test_r5_v1_blocker_root_cause_map.py` 与 `tests/test_r5_v1_active_control_plane.py` 直接读取 Night/Bundle，至少 56 个既有 tests 需要从 old 002837 物理解耦，其中 `tests/test_valuation_input_contract.py` 还会重新创建旧目录。这些既有路径不在 P5 exact mutation set，且不能通过 retain、skip、弱化测试或扩大 allowlist 合法解决。受影响阶段为 P5；受影响标准为 C-008、C-010、V-003、V-005、V-010；stop class 为 conflicting instructions / unverifiable completion criterion。没有 arm 任何删除波次。
+- **Hard-stop recording paths:** `reports/p1_6/r5_v1_governance_cleanup/validation/p5_authority_conflict.yaml` 与本 `START_HERE.md`；没有其他 P5 mutation。
+- **Recovery note:** filtered-tree 诊断错误继承了共享 Git 元数据，产生 12 个仅本地 fixture commits，并临时写入共享 `.git/config` 的 `core.worktree`/测试身份。执行分支和索引已精确恢复到 P4；三项测试配置已移除。用户主工作树的完整 preflight 向量再次精确匹配 130 行、9156 bytes、SHA-256 `0cc3779c1d4c8f91101526f2952b4b60c1ba1afd3d683c2cefdf127996070cb2`，tracked 向量精确匹配 20 行、1025 bytes、SHA-256 `b2d3c77f464c3c7fd23fdcdfe3f0583ea81c1f8af1f84492e3073ca7aa46ac02`；远端无 execution ref，`main` 未变化。
+- **Next safe action:** 保留本 v2 冻结合同和 P4 checkpoint，准备并冻结 amended v3，逐项授权 P5 为满足 D-011/C-008/C-010 所必需修改的既有 tests/scripts/fixtures，并澄清 `test_r5_bundle*.py` 是否属于 Bundle basename allowlist；不得原地修改 v2 合同。精确 unblock 问题：用户是否授权准备上述 amended v3 task package？
 
 ### P4 completion scope
 
@@ -125,3 +127,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-25T15:30:31+08:00 — P3 独立 002837 policy refresh 已生成 17 件 canonical 产物；正式披露 hash/page、四 issue 动态处置、unknown 非数值使用、毛利率与未披露毛利贡献字段语义隔离、双临时目录重放、V-003 P3（194 passed）、V-004（16 passed）、V-008 和 V-009 均通过，等待指定 P3 checkpoint。
 - 2026-07-25T15:37:32+08:00 — P3 指定 checkpoint `6c7fc2a35942bb04f5ef0ecfa2c6ccbd10e0a069` 已创建且工作树 clean；原 root map 与 engineering source 的 Git blob 相同（worktree SHA-256 `39aadff44cf51d1ad5607d8ec8481bbab42650723eaf5a981415df0ee3facacf`），7 roots、63 occurrence、20 dependency-blocked、6 parent、69 carry-forward、43 candidate-ready、0 historical resolved 和 532 dependency edges 已完整读取，V-005 既有基线 7 passed，按上述 9 条精确路径开始 P4。
 - 2026-07-25T15:55:38+08:00 — P4 七 root 活动处置迁移已实现：1 `policy_retired`、1 `not_required_for_active_v1`、1 `report_limitation`、1 visible unused `unknown`、3 open `historical_backlog`、0 `active_defect`；动态证明 63/20/6/69/43/0、532 edges、6 duplicate references，未复制 occurrence/candidate 决定或声称历史 resolution/system completion。V-005（18 passed）、额外索引兼容回归（27 passed）、对抗复核、V-009 和 task-package integrity 通过，等待指定 P4 checkpoint。
+- 2026-07-25T16:34:47+08:00 — P4 指定 checkpoint `3741c807ae1d9859e8cb72d5e587a5bb74f2082e` 已创建且 clean。P5 三种实质不同方法（retain 分类、静态引用图、filtered-tree full-pytest 诊断）均指向同一授权冲突：冻结 exact mutation set 不允许修改删除后必然失败的既有 tests/scripts/fixtures。诊断造成的 12 个本地 fixture commits、索引和共享 Git 配置副作用已完整恢复，专用树 clean，用户主工作树完整状态向量与 preflight 逐字节相同，远端未写入。P5 在任何删除 arm 前硬停止，等待 amended v3。

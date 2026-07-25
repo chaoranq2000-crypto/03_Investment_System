@@ -1,0 +1,167 @@
+schema_version: r5_v1_governance_cleanup_validation_v1
+validation_id: P5_AUTHORITY_CONFLICT
+phase: P5
+checked_at: "2026-07-25T16:34:47+08:00"
+decision: hard_stop
+stop_class:
+  - conflicting_instructions
+  - unverifiable_completion_criterion
+task:
+  task_id: v1_governance_integration_cleanup_v2
+  contract_path: docs/codex_tasks/v1_governance_integration_cleanup_v2/CONTRACT.md
+  contract_sha256: c160ea2d676d5ba9a9893070be1a6e4418193cc508db07e71dd48cd0394a642f
+  last_verified_checkpoint: 3741c807ae1d9859e8cb72d5e587a5bb74f2082e
+  last_completed_phase: P4
+  blocked_phase: P5
+contract_conflict:
+  exact_write_boundary:
+    contract_lines:
+      - 180
+      - 207
+      - 214
+      - 301
+    allowed_existing_control_files:
+      - .github/workflows/ci.yml
+      - .gitattributes
+      - config/r5_readout_canonical_index.yaml
+      - config/a_stock_data_capability_catalog.yaml
+      - config/adapter_contract_registry.yaml
+    rule: paths outside the exact mutation set and maximum deletion allowlist require stop
+  required_postconditions:
+    contract_lines:
+      - 89
+      - 299
+      - 305
+      - 306
+      - 312
+      - 315
+      - 331
+      - 333
+      - 347
+      - 349
+      - 354
+    rules:
+      - active code, tests, and CI must have zero physical reads of Night, Bundle11R-17R, and old 002837 candidates
+      - replay, root-map, active-control-plane, and CI must be decoupled
+      - old dedicated workflow IDs must become explicit parameters or their implementation and tests must retire
+      - final targeted tests, V-005, and full pytest must pass after deletion
+  contradiction: >-
+    Existing tests and scripts that must change to satisfy the required postconditions are not in the P5 exact mutation set
+    and are not deletable under the maximum deletion allowlist. Retaining their historical physical dependencies violates
+    C-008; skipping or weakening them violates C-010 and the no-weaken rule.
+blocking_examples:
+  - path: tests/conftest.py
+    dependency: src.maintenance.night_shift.night03
+    effect_after_candidate_deletion: pytest collection import failure
+    p5_write_authorized: false
+    p5_delete_authorized: false
+  - path: tests/test_r5_v1_active_control_plane.py
+    dependency: Night05 import plus physical Night and Bundle CLI/history paths
+    effect_after_candidate_deletion: V-003 final failure
+    p5_write_authorized: false
+    p5_delete_authorized: false
+  - path: tests/test_r5_v1_blocker_root_cause_map.py
+    dependency: physical Night and Bundle history
+    effect_after_candidate_deletion: V-005 failure
+    p5_write_authorized: false
+    p5_delete_authorized: false
+  - path: scripts/run_r5_v1_replay_002837.py
+    dependency: old workflow ID and physical old run
+    effect_after_candidate_deletion: replay failure
+    p5_write_authorized: false
+    p5_delete_authorized: false
+  - path: tests/test_r5_v1_replay_002837.py
+    dependency: physical old run
+    effect_after_candidate_deletion: V-003 final failure
+    p5_write_authorized: false
+    p5_delete_authorized: false
+  - path: tests/test_r5_v1_workflow_state_validator.py
+    dependency: physical old workflow state
+    effect_after_candidate_deletion: V-003 final failure
+    p5_write_authorized: false
+    p5_delete_authorized: false
+  - path: tests/test_valuation_input_contract.py
+    dependency: old workflow run temporary-output path
+    effect_after_candidate_deletion: recreates the retired old directory and violates the exact deletion vector
+    p5_write_authorized: false
+    p5_delete_authorized: false
+reference_audit:
+  old_run_tracked_file_count: 501
+  tracked_files_outside_old_run_containing_old_workflow_id: 272
+  tests_containing_old_workflow_id: 79
+  scripts_or_src_containing_old_workflow_id: 47
+  high_confidence_tests_requiring_physical_decoupling: 56
+  note: >-
+    Identifier occurrence counts include historical metadata and therefore are not deletion decisions. The 56-test set was
+    classified by direct path reads, default-run resolution, or directory recreation; one unauthorized failing path is
+    sufficient to prove the contract conflict.
+attempts:
+  - id: retain_parameterize_retire_classification
+    method: classify candidate dependencies as retain, parameterize, retire, or manual-delete
+    result: failed
+    reason: >-
+      Retaining Night or old-run dependencies leaves active physical references; parameterizing the consumers requires
+      edits outside the exact P5 mutation set; retiring generic tests is outside the deletion allowlist and would weaken
+      required validation.
+  - id: static_reference_graph
+    method: inspect tracked Git references and direct imports without mutating candidate trees
+    result: failed
+    reason: >-
+      tests/conftest.py alone proves that Night retirement breaks full-pytest collection unless an unauthorized existing
+      test path is changed. V-003 and V-005 named tests add independent mandatory failures.
+  - id: filtered_tree_diagnostic
+    method: run targeted and full pytest against a temporary filtered checkout with the old 002837 files absent
+    result: failed
+    accepted_as_validator: false
+    targeted_summary:
+      passed: 170
+      failed: 3
+      errors: 21
+    full_pytest_summary:
+      passed: 1170
+      failed: 137
+      skipped: 2
+      errors: 21
+    caveat: >-
+      The temporary test process inherited shared Git metadata and therefore is diagnostic only. It created local fixture
+      commits and test Git configuration; all repository and configuration side effects were subsequently recovered and
+      verified. The failing dependency behavior agrees with the independent static graph.
+recovery_verification:
+  accidental_fixture_commit_count: 12
+  accidental_tip: 5fb7db7a4ab09d423a96ceafd8802a9e049402ef
+  restored_execution_head: 3741c807ae1d9859e8cb72d5e587a5bb74f2082e
+  dedicated_worktree_clean_after_recovery: true
+  contract_sha256_unchanged: true
+  v005_recovery_sanity: 18 passed
+  shared_git_config_test_values_removed:
+    - core.worktree
+    - user.name
+    - user.email
+  user_main_worktree:
+    head: a345fafb522300831ed4206d35fa17f44570cb1f
+    status_rows: 130
+    status_bytes: 9156
+    status_sha256: 0cc3779c1d4c8f91101526f2952b4b60c1ba1afd3d683c2cefdf127996070cb2
+    tracked_status_rows: 20
+    tracked_status_bytes: 1025
+    tracked_status_sha256: b2d3c77f464c3c7fd23fdcdfe3f0583ea81c1f8af1f84492e3073ca7aa46ac02
+    matches_preflight_vector: true
+  remote:
+    main: a345fafb522300831ed4206d35fa17f44570cb1f
+    execution_ref_present: false
+deletion_state:
+  night_wave_armed: false
+  bundle_wave_armed: false
+  old_002837_wave_armed: false
+  files_deleted_by_codex: 0
+unblock:
+  requires_amended_contract: true
+  forbidden_recovery:
+    - edit the frozen v2 contract in place
+    - infer omitted write authority
+    - weaken, skip, or change required validator expectations
+    - arm a partial or ambiguous deletion wave
+  precise_question: >-
+    Does the user authorize preparation of an amended v3 task package that explicitly enumerates the existing tests,
+    scripts, and fixtures P5 may modify to satisfy D-011, C-008, and C-010, and clarifies whether test_r5_bundle*.py files
+    are included in the Bundle basename deletion allowlist?
