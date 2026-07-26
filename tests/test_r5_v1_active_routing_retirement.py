@@ -51,6 +51,10 @@ def test_transition_tests_and_retained_ci_are_equal_strength() -> None:
     assert transition["path_count"] == 3
     assert set(transition["paths"]) == tool.EXPECTED_A7
     assert all(
+        row["source_commit"] == tool.DECOUPLING_CHECKPOINT
+        for row in transition["tests"]
+    )
+    assert all(
         row["equal_strength_retirement_assertions"] is True
         for row in transition["tests"]
     )

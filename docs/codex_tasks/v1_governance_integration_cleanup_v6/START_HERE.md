@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v6"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v6/CONTRACT.md"
 contract_sha256: "f5326c3c322fa3e0a319e36c032be4e169ede44acf57cce19bf63cf97b7ce3ec"
-state: "ready"
+state: "blocked"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "46a55d17f120496b6114c55e1d79e96adaef8378"
 last_completed_phase: "P4"
 next_phase: "P5"
-last_validation: "pass"
-updated_at: "2026-07-26T14:54:05+00:00"
+last_validation: "fail"
+updated_at: "2026-07-27T00:09:50+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -40,14 +40,14 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `ready`
+- **State:** `blocked`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`。v6 标准 finalizer 已完成；冻结 contract raw/canonical SHA-256 均为 `f5326c3c322fa3e0a319e36c032be4e169ede44acf57cce19bf63cf97b7ce3ec`，`--require-ready` 返回 `ok: true`、P1–P5 连续、无 error；唯一 warning 是继承 `last_completed_phase=P4` 的预期提示。v5 setup `ce4f9554...`、decoupling `805b8e3...`、old manual arm `82f7d37...` and policy checkpoint `46a55d17...` are proven historical ancestors; no wave has been deleted.
-- **Current blocker:** package 无冻结阻断；但在 package-only setup、A.2/A.1 actor rebinding、V-006/full restore/full pytest、actor checkpoint 和新 clean Night arm 完成前，现有 v5-bound cleanup manifest/tests/receipt 仍禁止执行 Night。
+- **Latest validation:** `fail`。v6 contract 与 package integrity、A.2 actor/tool/manifest 静态审计、Night 680 项存在性/普通文件/非 reparse 校验、全量 1,386-file byte-for-byte restore 和 V-006 `26 passed in 638.56s` 均通过；但随后完整 pytest 为 `1 failed, 1353 passed, 2 skipped in 800.63s`。唯一失败是 `tests/test_r5_v1_root_policy_migration.py::test_receipt_is_deterministic_aggregate_only_and_checked_in`：`805b8e3...` 曾把 checked-in `blocker_root_reconciliation.yaml` 改成 `P5_pre_delete`/2026-07-26 并追加非派生 `final_revalidation`，却未同步仍确定性渲染 `P4`/2026-07-25 的 validator。此前 `1349 passed, 2 skipped` 发生在该回执写入之前，不能证明当前 checkpoint。没有 wave 被删除。
+- **Current blocker:** frozen v6 的 exact amendment 和 D-017 只允许 A.2 identity/actor rebinding，以及 A.1 `governance_cleanup_readout.md` 的 actor/checkpoint metadata；不授权修复 `validation/blocker_root_reconciliation.yaml`。所需修复超出 v6 mutation semantics，按 P5/required-validator stop 条款 hard stop；不得创建 actor migration checkpoint 或新 Night arm。
 - **Prior hard-stop evidence:** v4 checkpoints `0f582599...` 与 `f1dafeb...` 保留历史冲突证据；v5 已修复三项 A.7 冲突以及 A.2 retained-dependency/unknown-classification 缺陷。旧 `82f7d37...` arm 因其后存在 policy/v6 commits 已失去 current-wave-parent 资格。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；批准的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`，tracked-only 为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。v6 准备时补丁工具的两份未跟踪草稿曾误落该树，已按两个明确文件路径逐一撤销；HEAD 与两组 raw NUL 向量随后精确恢复。不得再写入、清理、修复、吸收或提交其中内容。
-- **Next safe action:** 创建只含本包 `CONTRACT.md` 与 `START_HERE.md`、直接父为 `46a55d17...` 的 package-only setup checkpoint；确认 clean 后从 P5 的 A.2/A.1 actor rebinding 继续。本步骤不删除任何文件。
+- **Next safe action:** 用户已于 2026-07-27 明确批准最小 v7 修订包；先把本 v6 blocked 状态与 A.2 actor 重绑工作保存为干净 checkpoint，再以该 commit 为 v7 source baseline。v7 只授权把 `reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml` 重渲染为现有 validator 的精确确定性输出（`phase=P4`、`checked_at=2026-07-25`、移除非派生 `final_revalidation`），不修改 validator/test、不降低断言；随后重跑 V-005、V-006、full restore 和 full pytest。新 v7 验证与 clean arm 前不得删除 Night。
 
 ### P5 pre-delete completion evidence
 
@@ -1015,3 +1015,5 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-26T22:25:00+08:00 — 用户明确授权项目根删除规则最小修订；policy checkpoint `46a55d17f120496b6114c55e1d79e96adaef8378` 直接父为旧 arm、只改 `AGENTS.md`，文件 SHA-256 `1717636c2e2dd7c92c9ac35ef66ef6231d471d398f28c681ad99e8a110174cbf`。独立审计 PASS，同时确认 v5 manifest/tests/receipt 仍禁止 Codex 删除，因此必须先建 v6、重绑 actor 并重新 arm。
 - 2026-07-26T22:38:25+08:00 — v6 draft 以 `46a55d17...` 为 source baseline，只拟将 Night actor 改为 Codex exact-manifest one-file-at-a-time；Bundle/old002837 手工边界和三波全部 path sets/hashes 不变。补丁工具曾把两份未跟踪草稿误落用户主树，已逐文件撤销并复核主树 HEAD/full/tracked NUL 向量精确恢复；专用树当前只新增 v6 `CONTRACT.md` 与 `START_HERE.md`，等待 finalize/setup。
 - 2026-07-26T22:54:05+08:00 — 两项独立只读审计均返回 `SAFE TO FINALIZE`。标准 finalizer 冻结 v6 contract，raw/canonical SHA-256=`f5326c3c322fa3e0a319e36c032be4e169ede44acf57cce19bf63cf97b7ce3ec`；`--require-ready` 返回 `ok: true`，仅有继承 P4 的预期 warning。等待 package-only setup checkpoint；Night 仍未授权执行，须先完成 actor rebinding 与新 arm。
+- 2026-07-26T23:50:08+08:00 — v6 A.2 actor/tool/manifest 重绑静态审计、1,386-file full restore 和 V-006 `26 passed` 均通过；但完整 pytest 复现 `1 failed, 1353 passed, 2 skipped`。唯一失败证明 `805b8e3...` 在旧成功测试后把 deterministic V-005 checked-in receipt 改写为非渲染输出；独立 frozen-authority 审计确认 v6 不授权修复该 A.1 回执，故在任何 actor checkpoint、Night arm 或删除前 hard stop。已向协调任务报告；等待用户批准仅机械重渲染该回执的最小 v7。
+- 2026-07-27T00:09:50+08:00 — 用户明确批准最小 v7：“仅授权重新生成 `blocker_root_reconciliation.yaml`，其他 v6 标准、Night/Bundle/旧 002837 三波边界均不变。”当前 user-main HEAD/full/tracked NUL 向量和远端 main/Night05/V1 refs 再次精确匹配，execution ref 仍不存在；先保存本 blocked checkpoint，再创建 v7 package-only amendment。

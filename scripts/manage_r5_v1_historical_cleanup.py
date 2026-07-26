@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Build and validate the R5 V1 historical-cleanup control plane.
 
-This module is deliberately incapable of deleting, staging, or committing files.
-It inventories the frozen source tree, binds every proposed deletion to a durable
-Git blob, restores blobs into a caller-owned temporary directory, scans active
-routes, and validates the NUL-delimited vectors produced after a user performs
-one contract-authorized manual deletion wave.
+This module inventories the frozen source tree, binds every proposed deletion to
+a durable Git blob, restores blobs into a caller-owned temporary directory, and
+validates NUL-delimited deletion vectors.  Its only destructive surface is the
+v6-authorized Night ``delete-wave`` command: that command unlinks one validated
+literal regular file per call and cannot stage or commit changes.  Bundle and
+old002837 remain user-manual waves.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ import ast
 import hashlib
 import os
 import re
+import stat
 import subprocess
 import sys
 from collections import defaultdict
@@ -25,8 +27,12 @@ import yaml
 
 
 CONTRACT_REL = Path(
-    "docs/codex_tasks/v1_governance_integration_cleanup_v5/CONTRACT.md"
+    "docs/codex_tasks/v1_governance_integration_cleanup_v6/CONTRACT.md"
 )
+START_HERE_REL = Path(
+    "docs/codex_tasks/v1_governance_integration_cleanup_v6/START_HERE.md"
+)
+AGENTS_REL = Path("AGENTS.md")
 BASELINE_MANIFEST_REL = Path(
     "reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml"
 )
@@ -52,9 +58,18 @@ WAVE_RECEIPT_RELS = {
 }
 
 EXPECTED_CONTRACT_SHA256 = (
-    "7a02675ea94dd9ef83f40df42889720998cbea0d8db26992d158bf3c78135ef4"
+    "f5326c3c322fa3e0a319e36c032be4e169ede44acf57cce19bf63cf97b7ce3ec"
 )
-PACKAGE_SOURCE_BASELINE = "f1dafeb32b08d24a6960f31d4a0f6d8820b95839"
+PACKAGE_SOURCE_BASELINE = "46a55d17f120496b6114c55e1d79e96adaef8378"
+DECOUPLING_CHECKPOINT = "805b8e3e9624e4e93057aa950cba4db1b3010cb3"
+OLD_NIGHT_ARM_COMMIT = "82f7d37a10a9677af631c1a5863661a64df3270b"
+NIGHT_ARM_COMMIT_SUBJECT = "chore(v1): arm night codex exact-file deletion checkpoint"
+NIGHT_ARM_STATE_MARKER = "- Arm state: `armed_clean_checkpoint`"
+EXPECTED_AGENTS_BLOB_OID = "0a57c3f9f624f5645f52a056ed1a62991271f632"
+EXPECTED_AGENTS_BYTE_COUNT = 7661
+EXPECTED_AGENTS_SHA256 = (
+    "1717636c2e2dd7c92c9ac35ef66ef6231d471d398f28c681ad99e8a110174cbf"
+)
 HISTORICAL_SOURCE_SNAPSHOT = "312adc73821706b0b7ca6aa00e80ee608bd10b32"
 ENGINEERING_SOURCE = "f60f220ae252262a537c612ce193fc779901984b"
 NIGHT_SOURCE = "a96c1b717bf15905d72fd142efd946fa01bce666"
@@ -96,6 +111,58 @@ ACTIVE_ROOTS = (
     ".agents/skills/",
 )
 WAVE_ORDER = ("night", "bundle", "old002837")
+WAVE_ACTORS = {
+    "night": {
+        "deletion_actor": "codex_exact_manifest_one_file_at_a_time",
+        "codex_delete_authorized": True,
+    },
+    "bundle": {
+        "deletion_actor": "user_manual_only",
+        "codex_delete_authorized": False,
+    },
+    "old002837": {
+        "deletion_actor": "user_manual_only",
+        "codex_delete_authorized": False,
+    },
+}
+EXPECTED_CLEANUP_AGGREGATE = {
+    "file_count": 1386,
+    "content_byte_count": 9787412,
+    "path_vector_encoding": "ordinal_utf8_nul",
+    "path_vector_byte_count": 121264,
+    "path_vector_sha256": (
+        "974d45610144d616f69c3c368d9ea1a0a27d66601a24f748aa8148e2ee702f33"
+    ),
+}
+EXPECTED_WAVE_AGGREGATES = {
+    "night": {
+        "file_count": 680,
+        "content_byte_count": 4480614,
+        "path_vector_encoding": "ordinal_utf8_nul",
+        "path_vector_byte_count": 55881,
+        "path_vector_sha256": (
+            "1ec2f42b84c1078f6b26caa377e9c1fb3efff9221196bc2e02bd819588a59c59"
+        ),
+    },
+    "bundle": {
+        "file_count": 205,
+        "content_byte_count": 1770109,
+        "path_vector_encoding": "ordinal_utf8_nul",
+        "path_vector_byte_count": 13852,
+        "path_vector_sha256": (
+            "fc8912dfe6d20d92bd8fe907d4400ae90b724826a7c468ba5286232dc3b3363a"
+        ),
+    },
+    "old002837": {
+        "file_count": 501,
+        "content_byte_count": 3536689,
+        "path_vector_encoding": "ordinal_utf8_nul",
+        "path_vector_byte_count": 51531,
+        "path_vector_sha256": (
+            "73d0a405b928fa3fa615d5b0d527f16f7c1182bb16239fb9ef89266d9868862f"
+        ),
+    },
+}
 RETAINED_EVALUATOR_DEPENDENCIES = {
     "tests/fixtures/r5_bundle12r/ready_manufacturing.yaml",
     "tests/fixtures/r5_bundle12r/invic_gap_template.yaml",
@@ -246,6 +313,11 @@ def canonical_text_sha256(path: Path) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def canonical_payload_sha256(payload: bytes) -> str:
+    normalized = payload.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(normalized).hexdigest()
+
+
 def path_vector(paths: Iterable[str]) -> tuple[int, str]:
     payload = b"".join(
         path.encode("utf-8") + b"\0" for path in sorted(set(paths))
@@ -311,6 +383,45 @@ def git_blob_oid(repo_root: Path, revision: str, path: str) -> str:
     return oid
 
 
+def _git_hash_object(repo_root: Path, payload: bytes) -> str:
+    return _git(repo_root, "hash-object", "--stdin", input_bytes=payload).stdout.decode(
+        "ascii", errors="strict"
+    ).strip()
+
+
+def _agents_identity(repo_root: Path, payload: bytes) -> dict[str, Any]:
+    identity = {
+        "path": AGENTS_REL.as_posix(),
+        "blob_oid": _git_hash_object(repo_root, payload),
+        "byte_count": len(payload),
+        "sha256": hashlib.sha256(payload).hexdigest(),
+    }
+    require(
+        identity["blob_oid"] == EXPECTED_AGENTS_BLOB_OID,
+        f"root AGENTS blob drift: {identity['blob_oid']}",
+    )
+    require(
+        identity["byte_count"] == EXPECTED_AGENTS_BYTE_COUNT,
+        f"root AGENTS byte count drift: {identity['byte_count']}",
+    )
+    require(
+        identity["sha256"] == EXPECTED_AGENTS_SHA256,
+        f"root AGENTS SHA-256 drift: {identity['sha256']}",
+    )
+    return identity
+
+
+def verify_root_agents(
+    repo_root: Path, *, revision: str | None = None
+) -> dict[str, Any]:
+    payload = (
+        git_blob(repo_root, revision, AGENTS_REL.as_posix())
+        if revision is not None
+        else (repo_root / AGENTS_REL).read_bytes()
+    )
+    return _agents_identity(repo_root, payload)
+
+
 def verify_contract(repo_root: Path) -> dict[str, str]:
     contract = repo_root / CONTRACT_REL
     require(contract.is_file(), f"missing frozen contract: {CONTRACT_REL.as_posix()}")
@@ -324,6 +435,27 @@ def verify_contract(repo_root: Path) -> dict[str, str]:
     require(
         f'source_baseline: "{PACKAGE_SOURCE_BASELINE}"' in text,
         "contract package baseline drift",
+    )
+    return {
+        "path": CONTRACT_REL.as_posix(),
+        "canonical_sha256": observed,
+        "status": "frozen",
+        "source_baseline": PACKAGE_SOURCE_BASELINE,
+    }
+
+
+def verify_committed_contract(repo_root: Path, revision: str) -> dict[str, str]:
+    payload = git_blob(repo_root, revision, CONTRACT_REL.as_posix())
+    observed = canonical_payload_sha256(payload)
+    require(
+        observed == EXPECTED_CONTRACT_SHA256,
+        f"committed frozen contract SHA-256 drift: {observed}",
+    )
+    text = payload.decode("utf-8", errors="strict")
+    require('status: "frozen"' in text, "committed contract is not frozen")
+    require(
+        f'source_baseline: "{PACKAGE_SOURCE_BASELINE}"' in text,
+        "committed contract package baseline drift",
     )
     return {
         "path": CONTRACT_REL.as_posix(),
@@ -1141,9 +1273,9 @@ def validate_transition_contract(
     )
     test_rows: list[dict[str, Any]] = []
     for relative in sorted(authority["a7"]):
-        path = repo_root / relative
-        require(path.is_file(), f"missing A7 transition test: {relative}")
-        source = path.read_text(encoding="utf-8")
+        source = git_blob(repo_root, DECOUPLING_CHECKPOINT, relative).decode(
+            "utf-8", errors="strict"
+        )
         lowered = source.casefold()
         missing_literals = sorted(
             literal for literal in required_source_literals if literal not in lowered
@@ -1186,6 +1318,7 @@ def validate_transition_contract(
         test_rows.append(
             {
                 "path": relative,
+                "source_commit": DECOUPLING_CHECKPOINT,
                 "test_function_count": len(test_functions),
                 "assertion_count": sum(
                     isinstance(node, ast.Assert) for node in ast.walk(tree)
@@ -1224,6 +1357,7 @@ def _reference_applies(reference: Mapping[str, Any], path: str, wave: str) -> bo
 
 def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     contract = verify_contract(repo_root)
+    agents_identity = verify_root_agents(repo_root)
     authority = parse_authority(repo_root)
     a6 = expand_a6(repo_root)
     inventory = build_candidate_inventory(repo_root, authority, a6)
@@ -1245,8 +1379,11 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
     }
 
     cleanup_rows: list[dict[str, Any]] = []
+    wave_ordinals: defaultdict[str, int] = defaultdict(int)
     for path, wave in inventory.items():
         baseline = by_path[path]
+        wave_ordinals[wave] += 1
+        actor = WAVE_ACTORS[wave]
         reference_count = sum(
             _reference_applies(reference, path, wave)
             for reference in active_scan["references"]
@@ -1255,6 +1392,8 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
             {
                 "path": path,
                 "wave": wave,
+                "wave_ordinal": wave_ordinals[wave],
+                **actor,
                 "artifact_kind": (
                     "night_history"
                     if wave == "night"
@@ -1279,7 +1418,11 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
                     "active_reference_count_equals_zero",
                     "baseline_blob_and_full_restore_verified",
                     "current_wave_armed_in_start_here",
-                    "user_manually_deletes_only_this_exact_path",
+                    (
+                        "codex_unlinks_only_this_exact_literal_regular_file"
+                        if actor["codex_delete_authorized"]
+                        else "user_manually_deletes_only_this_exact_path"
+                    ),
                 ],
                 "restore_command": baseline["restore_command"],
             }
@@ -1291,6 +1434,7 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
             {
                 "wave": wave,
                 "order": WAVE_ORDER.index(wave) + 1,
+                **WAVE_ACTORS[wave],
                 "aggregate": _aggregate(wave_rows),
                 "paths": [str(row["path"]) for row in wave_rows],
             }
@@ -1299,8 +1443,9 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
         "schema_version": "r5_v1_historical_cleanup_manifest_v1",
         "contract": contract,
         "source_snapshot": HISTORICAL_SOURCE_SNAPSHOT,
-        "deletion_actor": "user_manual_only",
+        "deletion_actor": "wave_specific",
         "codex_delete_authorized": False,
+        "authorization_scope": "wave_specific_only",
         "wave_order": list(WAVE_ORDER),
         "aggregate": _aggregate(cleanup_rows),
         "waves": wave_documents,
@@ -1371,6 +1516,19 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
         },
         "transition_validation": transition,
         "active_reference_scan": active_scan,
+        "deletion_control": {
+            "root_agents": agents_identity,
+            "wave_actors": {
+                wave: dict(WAVE_ACTORS[wave]) for wave in WAVE_ORDER
+            },
+            "night_delete_surface": {
+                "command": "delete-wave",
+                "single_literal_path_per_unlink": True,
+                "ordinal_prefix_resume_only": True,
+                "rejects_stage_and_commit": True,
+                "writes_receipt_only_after_complete_vector_validation": True,
+            },
+        },
         "restore_verification": {
             "cat_file_e_verified": False,
             "content_hash_verified": False,
@@ -1378,7 +1536,7 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
             "note": "Set by validate/verify-restore; build does not claim a restore run.",
         },
         "guards": {
-            "codex_delete_command_exists": False,
+            "codex_delete_command_exists": True,
             "actual_manifest_uses_wildcards": False,
             "actual_manifest_paths_are_repo_relative": True,
             "actual_manifest_disjoint_from_retained_and_protected": not (
@@ -1397,6 +1555,357 @@ def load_yaml(path: Path) -> dict[str, Any]:
     value = yaml.safe_load(path.read_text(encoding="utf-8"))
     require(isinstance(value, dict), f"{path}: YAML root must be an object")
     return value
+
+
+def load_yaml_payload(payload: bytes, label: str) -> dict[str, Any]:
+    value = yaml.safe_load(payload.decode("utf-8", errors="strict"))
+    require(isinstance(value, dict), f"{label}: YAML root must be an object")
+    return value
+
+
+def load_committed_yaml(repo_root: Path, revision: str, relative: Path) -> dict[str, Any]:
+    return load_yaml_payload(
+        git_blob(repo_root, revision, relative.as_posix()),
+        f"{revision}:{relative.as_posix()}",
+    )
+
+
+def validate_actor_bindings(cleanup_manifest: Mapping[str, Any]) -> None:
+    require(
+        cleanup_manifest.get("deletion_actor") == "wave_specific",
+        "cleanup manifest deletion actor is not wave-specific",
+    )
+    require(
+        cleanup_manifest.get("codex_delete_authorized") is False,
+        "cleanup manifest grants blanket Codex deletion authority",
+    )
+    require(
+        cleanup_manifest.get("authorization_scope") == "wave_specific_only",
+        "cleanup manifest authorization scope drift",
+    )
+    waves = list(cleanup_manifest.get("waves", []))
+    require(
+        [wave.get("wave") for wave in waves] == list(WAVE_ORDER),
+        "cleanup wave order drift",
+    )
+    for wave_document in waves:
+        wave = str(wave_document["wave"])
+        expected_actor = WAVE_ACTORS[wave]
+        for key, value in expected_actor.items():
+            require(
+                wave_document.get(key) == value,
+                f"{wave}: wave actor/authorization drift for {key}",
+            )
+
+    ordinal_by_wave: defaultdict[str, int] = defaultdict(int)
+    for row in cleanup_manifest.get("files", []):
+        wave = str(row.get("wave"))
+        require(wave in WAVE_ORDER, f"unknown cleanup row wave: {wave}")
+        ordinal_by_wave[wave] += 1
+        require(
+            row.get("wave_ordinal") == ordinal_by_wave[wave],
+            f"{row.get('path')}: non-contiguous wave ordinal",
+        )
+        expected_actor = WAVE_ACTORS[wave]
+        for key, value in expected_actor.items():
+            require(
+                row.get(key) == value,
+                f"{row.get('path')}: row actor/authorization drift for {key}",
+            )
+        expected_last_precondition = (
+            "codex_unlinks_only_this_exact_literal_regular_file"
+            if expected_actor["codex_delete_authorized"]
+            else "user_manually_deletes_only_this_exact_path"
+        )
+        require(
+            row.get("deletion_preconditions")
+            == [
+                "active_reference_count_equals_zero",
+                "baseline_blob_and_full_restore_verified",
+                "current_wave_armed_in_start_here",
+                expected_last_precondition,
+            ],
+            f"{row.get('path')}: deletion preconditions drift",
+        )
+
+
+def validate_fixed_cleanup_aggregates(cleanup_manifest: Mapping[str, Any]) -> None:
+    require(
+        cleanup_manifest.get("aggregate") == EXPECTED_CLEANUP_AGGREGATE,
+        "cleanup aggregate differs from the frozen v6 aggregate",
+    )
+    waves = list(cleanup_manifest.get("waves", []))
+    require(len(waves) == len(WAVE_ORDER), "cleanup wave document count drift")
+    for order, (wave, wave_document) in enumerate(zip(WAVE_ORDER, waves), start=1):
+        require(wave_document.get("wave") == wave, f"{wave}: wave name drift")
+        require(wave_document.get("order") == order, f"{wave}: wave order drift")
+        require(
+            wave_document.get("aggregate") == EXPECTED_WAVE_AGGREGATES[wave],
+            f"{wave}: frozen aggregate drift",
+        )
+
+
+def _validate_repo_relative_literal(path: str) -> PurePosixPath:
+    pure = PurePosixPath(path)
+    require(path == pure.as_posix(), f"non-canonical repo-relative path: {path}")
+    require(not pure.is_absolute(), f"absolute manifest path: {path}")
+    require(".." not in pure.parts, f"escaping manifest path: {path}")
+    require("\\" not in path, f"backslash in manifest path: {path}")
+    require(
+        not any(token in path for token in ("*", "?", "[", "]", "{", "}")),
+        f"wildcard token in manifest path: {path}",
+    )
+    return pure
+
+
+def _validate_baseline_row(repo_root: Path, row: Mapping[str, Any]) -> None:
+    path = str(row["path"])
+    _validate_repo_relative_literal(path)
+    revision = str(row["baseline_commit"])
+    require(
+        revision in {NIGHT_SOURCE, ENGINEERING_SOURCE},
+        f"{path}: unapproved durable baseline",
+    )
+    require(
+        row.get("cat_file_spec") == f"{revision}:{path}",
+        f"{path}: cat-file spec drift",
+    )
+    require(
+        row.get("restore_command") == _restore_command(revision, path),
+        f"{path}: restore command drift",
+    )
+    payload = git_blob(repo_root, revision, path)
+    require(len(payload) == row.get("byte_count"), f"{path}: byte count mismatch")
+    require(
+        hashlib.sha256(payload).hexdigest() == row.get("content_sha256"),
+        f"{path}: content SHA-256 mismatch",
+    )
+    require(
+        git_blob_oid(repo_root, revision, path) == row.get("blob_oid"),
+        f"{path}: blob OID mismatch",
+    )
+
+
+def validate_night_arm_identity(
+    repo_root: Path, revision: str, expected_paths: Sequence[str]
+) -> dict[str, Any]:
+    subject = git_text(repo_root, "show", "-s", "--format=%s", revision)
+    require(
+        subject == NIGHT_ARM_COMMIT_SUBJECT,
+        f"Night wave parent commit subject is not the exact arm checkpoint: {subject}",
+    )
+    payload = git_blob(repo_root, revision, START_HERE_REL.as_posix())
+    text = payload.decode("utf-8", errors="strict")
+    required_literals = (
+        'task_id: "v1_governance_integration_cleanup_v6"',
+        f'contract_sha256: "{EXPECTED_CONTRACT_SHA256}"',
+        f'source_baseline: "{PACKAGE_SOURCE_BASELINE}"',
+        NIGHT_ARM_STATE_MARKER,
+        "- Deletion actor: `codex_exact_manifest_one_file_at_a_time`",
+        "- Codex deletion authorization: `true` for Night only",
+        "- Expected deletion count: 680",
+        EXPECTED_WAVE_AGGREGATES["night"]["path_vector_sha256"],
+    )
+    for literal in required_literals:
+        require(literal in text, f"committed v6 START lacks Night arm marker: {literal}")
+    require(
+        "candidate (not armed under v6)" not in text.lower(),
+        "committed v6 START still declares Night not armed",
+    )
+
+    root = repo_root.resolve(strict=True)
+    absolute_values = [
+        match.group(1)
+        for line in text.splitlines()
+        if (match := re.fullmatch(r"\d+\. `([^`]+)`", line))
+    ]
+    require(len(absolute_values) == 680, "committed v6 START Night list is not 680 rows")
+    relative_values: list[str] = []
+    for value in absolute_values:
+        absolute = Path(value)
+        require(absolute.is_absolute(), f"START Night path is not absolute: {value}")
+        resolved = absolute.resolve(strict=False)
+        require(resolved.is_relative_to(root), f"START Night path escapes worktree: {value}")
+        relative_values.append(resolved.relative_to(root).as_posix())
+    require(
+        relative_values == list(expected_paths),
+        "committed v6 START Night list differs from the ordinal cleanup manifest",
+    )
+    vector_bytes, vector_sha = path_vector(relative_values)
+    require(
+        vector_bytes
+        == EXPECTED_WAVE_AGGREGATES["night"]["path_vector_byte_count"],
+        "committed v6 START Night path-vector byte count drift",
+    )
+    require(
+        vector_sha == EXPECTED_WAVE_AGGREGATES["night"]["path_vector_sha256"],
+        "committed v6 START Night path-vector SHA-256 drift",
+    )
+    return {
+        "path": START_HERE_REL.as_posix(),
+        "commit_subject": subject,
+        "arm_state": "armed_clean_checkpoint",
+        "path_count": len(relative_values),
+        "path_vector_byte_count": vector_bytes,
+        "path_vector_sha256": vector_sha,
+    }
+
+
+def validate_committed_control_plane(
+    repo_root: Path, wave_parent: str
+) -> dict[str, Any]:
+    head = git_text(repo_root, "rev-parse", "HEAD")
+    require(head == wave_parent, "current HEAD is not the supplied wave parent")
+    require(head != OLD_NIGHT_ARM_COMMIT, "the superseded v5 Night arm cannot be reused")
+    subject = git_text(repo_root, "show", "-s", "--format=%s", head)
+    require(
+        subject == NIGHT_ARM_COMMIT_SUBJECT,
+        f"Night wave parent commit subject is not the exact arm checkpoint: {subject}",
+    )
+    require(
+        _git(
+            repo_root,
+            "merge-base",
+            "--is-ancestor",
+            PACKAGE_SOURCE_BASELINE,
+            head,
+            check=False,
+        ).returncode
+        == 0,
+        "v6 package source baseline is not an ancestor of the wave parent",
+    )
+    require(
+        _git(
+            repo_root,
+            "merge-base",
+            "--is-ancestor",
+            DECOUPLING_CHECKPOINT,
+            head,
+            check=False,
+        ).returncode
+        == 0,
+        "historical decoupling checkpoint is not an ancestor of the wave parent",
+    )
+    contract = verify_committed_contract(repo_root, head)
+    agents_identity = verify_root_agents(repo_root, revision=head)
+    baseline = load_committed_yaml(repo_root, head, BASELINE_MANIFEST_REL)
+    cleanup = load_committed_yaml(repo_root, head, CLEANUP_MANIFEST_REL)
+    receipt = load_committed_yaml(repo_root, head, DECOUPLING_RECEIPT_REL)
+
+    for document, label in ((baseline, "baseline"), (cleanup, "cleanup")):
+        require(document.get("contract") == contract, f"{label} contract identity drift")
+        require(
+            document.get("source_snapshot") == HISTORICAL_SOURCE_SNAPSHOT,
+            f"{label} historical source snapshot drift",
+        )
+    require(
+        baseline.get("aggregate") == EXPECTED_CLEANUP_AGGREGATE,
+        "baseline aggregate differs from the frozen v6 aggregate",
+    )
+    validate_fixed_cleanup_aggregates(cleanup)
+    validate_actor_bindings(cleanup)
+
+    baseline_rows = list(baseline.get("files", []))
+    cleanup_rows = list(cleanup.get("files", []))
+    baseline_paths = [str(row["path"]) for row in baseline_rows]
+    cleanup_paths = [str(row["path"]) for row in cleanup_rows]
+    require(baseline_paths == sorted(baseline_paths), "baseline rows are not ordinal")
+    require(cleanup_paths == sorted(cleanup_paths), "cleanup rows are not ordinal")
+    require(
+        len(baseline_paths) == len(set(baseline_paths)) == 1386,
+        "baseline path count/uniqueness drift",
+    )
+    require(baseline_paths == cleanup_paths, "baseline/cleanup path vectors differ")
+    baseline_by_path = {str(row["path"]): row for row in baseline_rows}
+    night_rows = [row for row in cleanup_rows if row.get("wave") == "night"]
+    require(len(night_rows) == 680, "Night row count drift")
+    night_arm = validate_night_arm_identity(
+        repo_root,
+        head,
+        [str(row["path"]) for row in night_rows],
+    )
+    for cleanup_row in cleanup_rows:
+        path = str(cleanup_row["path"])
+        _validate_repo_relative_literal(path)
+        baseline_row = baseline_by_path[path]
+        for key in (
+            "baseline_commit",
+            "blob_oid",
+            "byte_count",
+            "content_sha256",
+            "restore_command",
+        ):
+            require(
+                cleanup_row.get(key) == baseline_row.get(key),
+                f"{path}: cleanup/baseline {key} drift",
+            )
+        require(
+            cleanup_row.get("active_reference_count") == 0,
+            f"{path}: active references are not zero",
+        )
+    for cleanup_row in night_rows:
+        _validate_baseline_row(repo_root, baseline_by_path[str(cleanup_row["path"])])
+
+    require(receipt.get("contract") == contract, "decoupling receipt contract drift")
+    require(receipt.get("decision") == "pass", "decoupling receipt is not pass")
+    require(
+        {
+            key: receipt.get("cleanup_inventory", {}).get(key)
+            for key in EXPECTED_CLEANUP_AGGREGATE
+        }
+        == EXPECTED_CLEANUP_AGGREGATE,
+        "decoupling receipt cleanup aggregate drift",
+    )
+    active_scan = receipt.get("active_reference_scan", {})
+    require(active_scan.get("reference_count") == 0, "receipt active references remain")
+    require(
+        active_scan.get("unknown_classification_count") == 0,
+        "receipt unknown classifications remain",
+    )
+    restore = receipt.get("restore_verification", {})
+    for key in (
+        "cat_file_e_verified",
+        "content_hash_verified",
+        "full_restore_verified",
+        "byte_for_byte_match",
+    ):
+        require(restore.get(key) is True, f"receipt restore guard is not true: {key}")
+    require(restore.get("file_count") == 1386, "receipt restore file count drift")
+    require(
+        restore.get("content_byte_count") == 9787412,
+        "receipt restore content byte count drift",
+    )
+    deletion_control = receipt.get("deletion_control", {})
+    require(
+        deletion_control.get("root_agents") == agents_identity,
+        "receipt root AGENTS identity drift",
+    )
+    require(
+        deletion_control.get("wave_actors")
+        == {wave: dict(WAVE_ACTORS[wave]) for wave in WAVE_ORDER},
+        "receipt wave actor bindings drift",
+    )
+    surface = deletion_control.get("night_delete_surface", {})
+    require(
+        surface
+        == {
+            "command": "delete-wave",
+            "single_literal_path_per_unlink": True,
+            "ordinal_prefix_resume_only": True,
+            "rejects_stage_and_commit": True,
+            "writes_receipt_only_after_complete_vector_validation": True,
+        },
+        "receipt Night delete-surface guards drift",
+    )
+    return {
+        "contract": contract,
+        "root_agents": agents_identity,
+        "night_arm": night_arm,
+        "baseline": baseline,
+        "cleanup": cleanup,
+        "receipt": receipt,
+        "night_rows": night_rows,
+    }
 
 
 def render_yaml(value: Mapping[str, Any]) -> str:
@@ -1444,6 +1953,9 @@ def validate_documents(
         cleanup_manifest == expected_cleanup,
         "historical cleanup manifest is not the deterministic expected document",
     )
+    verify_root_agents(repo_root)
+    validate_fixed_cleanup_aggregates(cleanup_manifest)
+    validate_actor_bindings(cleanup_manifest)
     baseline_rows = list(baseline_manifest["files"])
     cleanup_rows = list(cleanup_manifest["files"])
     require(
@@ -1623,6 +2135,201 @@ def parse_name_status_z(payload: bytes) -> list[dict[str, str]]:
     return records
 
 
+def capture_deletion_vectors(
+    repo_root: Path, wave_parent: str
+) -> tuple[bytes, bytes, bytes]:
+    status_bytes = _git(
+        repo_root, "status", "--porcelain=v1", "-z", "-uall"
+    ).stdout
+    diff_bytes = _git(
+        repo_root,
+        "diff",
+        "--name-status",
+        "-z",
+        "--no-renames",
+        wave_parent,
+        "--",
+    ).stdout
+    cached_bytes = _git(
+        repo_root,
+        "diff",
+        "--cached",
+        "--name-status",
+        "-z",
+        "--no-renames",
+        wave_parent,
+        "--",
+    ).stdout
+    return status_bytes, diff_bytes, cached_bytes
+
+
+def validate_deletion_prefix_vectors(
+    status_bytes: bytes,
+    diff_bytes: bytes,
+    cached_bytes: bytes,
+    expected_paths: Sequence[str],
+    *,
+    require_complete: bool = False,
+) -> dict[str, Any]:
+    expected = [str(path) for path in expected_paths]
+    require(expected == sorted(expected), "expected deletion vector is not ordinal")
+    require(len(expected) == len(set(expected)), "expected deletion vector has duplicates")
+    require(not cached_bytes, "index contains staged changes")
+    status_rows = parse_porcelain_v1_z(status_bytes)
+    diff_rows = parse_name_status_z(diff_bytes)
+    require(
+        all(row["status"] == " D" for row in status_rows),
+        "status vector contains a non-worktree-deletion record",
+    )
+    require(
+        all(row["status"] == "D" for row in diff_rows),
+        "name-status vector contains a non-deletion record",
+    )
+    status_paths = sorted(str(row["path"]) for row in status_rows)
+    diff_paths = sorted(str(row["path"]) for row in diff_rows)
+    require(
+        len(status_paths) == len(set(status_paths)),
+        "status deletion vector contains duplicates",
+    )
+    require(
+        len(diff_paths) == len(set(diff_paths)),
+        "name-status deletion vector contains duplicates",
+    )
+    require(status_paths == diff_paths, "status/name-status deletion vectors differ")
+    expected_prefix = expected[: len(status_paths)]
+    require(
+        status_paths == expected_prefix,
+        "current deletion set is not an exact ordinal manifest prefix",
+    )
+    if require_complete:
+        require(
+            len(status_paths) == len(expected),
+            "deletion vector is not the complete wave manifest",
+        )
+    vector_bytes, vector_sha = path_vector(status_paths)
+    return {
+        "prefix_count": len(status_paths),
+        "complete": len(status_paths) == len(expected),
+        "status_rows": status_rows,
+        "diff_rows": diff_rows,
+        "path_vector_byte_count": vector_bytes,
+        "path_vector_sha256": vector_sha,
+        "status_raw_byte_count": len(status_bytes),
+        "status_raw_sha256": hashlib.sha256(status_bytes).hexdigest(),
+        "name_status_raw_byte_count": len(diff_bytes),
+        "name_status_raw_sha256": hashlib.sha256(diff_bytes).hexdigest(),
+    }
+
+
+def _is_reparse_stat(value: Any) -> bool:
+    reparse_flag = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+    return bool(getattr(value, "st_file_attributes", 0) & reparse_flag)
+
+
+def validate_literal_tracked_file(
+    repo_root: Path, relative_path: str
+) -> Path:
+    pure = _validate_repo_relative_literal(relative_path)
+    root = repo_root.resolve(strict=True)
+    target = root.joinpath(*pure.parts)
+    require(target != root, "repository root is not a file target")
+    try:
+        metadata = target.lstat()
+    except FileNotFoundError as exc:
+        raise CleanupValidationError(f"missing deletion target: {relative_path}") from exc
+    require(not target.is_symlink(), f"symlink deletion target: {relative_path}")
+    require(not _is_reparse_stat(metadata), f"reparse deletion target: {relative_path}")
+    require(stat.S_ISREG(metadata.st_mode), f"non-regular deletion target: {relative_path}")
+    resolved = target.resolve(strict=True)
+    require(resolved.is_relative_to(root), f"deletion target escapes repository: {relative_path}")
+
+    parent = target.parent
+    while parent != root:
+        parent_metadata = parent.lstat()
+        require(
+            not parent.is_symlink() and not _is_reparse_stat(parent_metadata),
+            f"deletion target traverses a symlink/reparse point: {relative_path}",
+        )
+        parent = parent.parent
+
+    stage = _git(
+        repo_root,
+        "ls-files",
+        "--stage",
+        "-z",
+        "--",
+        relative_path,
+        check=False,
+    )
+    require(stage.returncode == 0 and stage.stdout, f"untracked deletion target: {relative_path}")
+    records = [field for field in stage.stdout.split(b"\0") if field]
+    require(len(records) == 1, f"ambiguous tracked target: {relative_path}")
+    prefix, separator, encoded_path = records[0].partition(b"\t")
+    require(separator == b"\t", f"malformed index entry: {relative_path}")
+    mode = prefix.split(b" ", 1)[0]
+    require(mode in {b"100644", b"100755"}, f"non-regular index mode: {relative_path}")
+    require(
+        encoded_path.decode("utf-8", errors="surrogateescape") == relative_path,
+        f"index path identity drift: {relative_path}",
+    )
+    return target
+
+
+def _unlink_one_literal(target: Path) -> None:
+    metadata = target.lstat()
+    require(not target.is_symlink(), f"refusing symlink unlink: {target}")
+    require(not _is_reparse_stat(metadata), f"refusing reparse unlink: {target}")
+    require(stat.S_ISREG(metadata.st_mode), f"refusing non-regular unlink: {target}")
+    target.unlink()
+
+
+def _wave_validation_receipt(
+    wave: str,
+    wave_parent: str,
+    expected_paths: Sequence[str],
+    status_bytes: bytes,
+    diff_bytes: bytes,
+    validation: Mapping[str, Any],
+) -> dict[str, Any]:
+    actor = WAVE_ACTORS[wave]
+    return {
+        "schema_version": "r5_v1_deletion_wave_validation_v2",
+        "validation_id": "V-007",
+        "decision": "pass",
+        "wave": wave,
+        "wave_parent_commit": wave_parent,
+        **actor,
+        "expected_file_count": len(expected_paths),
+        "status": {
+            "raw_byte_count": len(status_bytes),
+            "raw_sha256": hashlib.sha256(status_bytes).hexdigest(),
+            "record_count": len(validation["status_rows"]),
+            "path_vector_byte_count": validation["path_vector_byte_count"],
+            "path_vector_sha256": validation["path_vector_sha256"],
+            "all_status_codes": [" D"],
+        },
+        "name_status": {
+            "raw_byte_count": len(diff_bytes),
+            "raw_sha256": hashlib.sha256(diff_bytes).hexdigest(),
+            "record_count": len(validation["diff_rows"]),
+            "path_vector_byte_count": validation["path_vector_byte_count"],
+            "path_vector_sha256": validation["path_vector_sha256"],
+            "all_status_codes": ["D"],
+        },
+        "guards": {
+            "complete_vector_validated_in_memory_before_receipt_write": True,
+            "index_clean_before_receipt_write": True,
+            "ordinal_prefix_resume_only": True,
+            "rename_present": False,
+            "untracked_present": False,
+            "modification_present": False,
+            "type_change_present": False,
+            "unexpected_path_present": False,
+            "stage_or_commit_performed": False,
+        },
+    }
+
+
 def verify_wave(
     repo_root: Path,
     cleanup_manifest: Mapping[str, Any],
@@ -1634,77 +2341,109 @@ def verify_wave(
         git_text(repo_root, "rev-parse", "HEAD") == wave_parent,
         "current HEAD is not the clean arm-wave parent",
     )
-    expected = {
-        str(row["path"])
-        for row in cleanup_manifest["files"]
-        if row["wave"] == wave
-    }
-    status_bytes = _git(
-        repo_root, "status", "--porcelain=v1", "-z", "-uall"
-    ).stdout
-    diff_bytes = _git(
-        repo_root,
-        "diff",
-        "--name-status",
-        "-z",
-        "--no-renames",
+    validate_fixed_cleanup_aggregates(cleanup_manifest)
+    validate_actor_bindings(cleanup_manifest)
+    committed_cleanup = load_committed_yaml(
+        repo_root, wave_parent, CLEANUP_MANIFEST_REL
+    )
+    require(
+        dict(cleanup_manifest) == committed_cleanup,
+        "worktree cleanup manifest differs from the committed wave parent",
+    )
+    expected = next(
+        list(document["paths"])
+        for document in cleanup_manifest["waves"]
+        if document["wave"] == wave
+    )
+    status_bytes, diff_bytes, cached_bytes = capture_deletion_vectors(
+        repo_root, wave_parent
+    )
+    validation = validate_deletion_prefix_vectors(
+        status_bytes,
+        diff_bytes,
+        cached_bytes,
+        expected,
+        require_complete=True,
+    )
+    return _wave_validation_receipt(
+        wave, wave_parent, expected, status_bytes, diff_bytes, validation
+    )
+
+
+def delete_night_wave(repo_root: Path, wave_parent: str) -> dict[str, Any]:
+    control = validate_committed_control_plane(repo_root, wave_parent)
+    cleanup = control["cleanup"]
+    night_document = next(
+        document for document in cleanup["waves"] if document["wave"] == "night"
+    )
+    expected = [str(path) for path in night_document["paths"]]
+    require(
+        night_document.get("deletion_actor")
+        == "codex_exact_manifest_one_file_at_a_time"
+        and night_document.get("codex_delete_authorized") is True,
+        "Night is not authorized for Codex exact-file deletion",
+    )
+
+    status_bytes, diff_bytes, cached_bytes = capture_deletion_vectors(
+        repo_root, wave_parent
+    )
+    validation = validate_deletion_prefix_vectors(
+        status_bytes, diff_bytes, cached_bytes, expected
+    )
+    prefix_count = int(validation["prefix_count"])
+    root = repo_root.resolve(strict=True)
+    for path in expected[:prefix_count]:
+        target = root.joinpath(*PurePosixPath(path).parts)
+        require(
+            not os.path.lexists(target),
+            f"deleted ordinal prefix target still exists: {path}",
+        )
+
+    remaining_targets = [
+        validate_literal_tracked_file(repo_root, path)
+        for path in expected[prefix_count:]
+    ]
+    require(
+        len(remaining_targets) == len(expected) - prefix_count,
+        "remaining Night target materialization drift",
+    )
+
+    for index in range(prefix_count, len(expected)):
+        status_bytes, diff_bytes, cached_bytes = capture_deletion_vectors(
+            repo_root, wave_parent
+        )
+        current = validate_deletion_prefix_vectors(
+            status_bytes, diff_bytes, cached_bytes, expected
+        )
+        require(
+            current["prefix_count"] == index,
+            "Night deletion prefix changed between literal unlink operations",
+        )
+        path = expected[index]
+        target = validate_literal_tracked_file(repo_root, path)
+        _unlink_one_literal(target)
+        require(not os.path.lexists(target), f"literal unlink did not remove: {path}")
+
+    status_bytes, diff_bytes, cached_bytes = capture_deletion_vectors(
+        repo_root, wave_parent
+    )
+    final_validation = validate_deletion_prefix_vectors(
+        status_bytes,
+        diff_bytes,
+        cached_bytes,
+        expected,
+        require_complete=True,
+    )
+    receipt = _wave_validation_receipt(
+        "night",
         wave_parent,
-    ).stdout
-    status_rows = parse_porcelain_v1_z(status_bytes)
-    diff_rows = parse_name_status_z(diff_bytes)
-    require(
-        all(row["status"] == " D" for row in status_rows),
-        "status vector contains a non-worktree-deletion record",
+        expected,
+        status_bytes,
+        diff_bytes,
+        final_validation,
     )
-    require(
-        all(row["status"] == "D" for row in diff_rows),
-        "name-status vector contains a non-deletion record",
-    )
-    require(
-        {row["path"] for row in status_rows} == expected,
-        "status deletion set differs from current wave manifest",
-    )
-    require(
-        {row["path"] for row in diff_rows} == expected,
-        "name-status deletion set differs from current wave manifest",
-    )
-    status_vector_bytes, status_vector_sha = path_vector(
-        row["path"] for row in status_rows
-    )
-    diff_vector_bytes, diff_vector_sha = path_vector(
-        row["path"] for row in diff_rows
-    )
-    return {
-        "schema_version": "r5_v1_manual_deletion_wave_validation_v1",
-        "validation_id": "V-007",
-        "decision": "pass",
-        "wave": wave,
-        "wave_parent_commit": wave_parent,
-        "expected_file_count": len(expected),
-        "status": {
-            "raw_byte_count": len(status_bytes),
-            "raw_sha256": hashlib.sha256(status_bytes).hexdigest(),
-            "record_count": len(status_rows),
-            "path_vector_byte_count": status_vector_bytes,
-            "path_vector_sha256": status_vector_sha,
-            "all_status_codes": [" D"],
-        },
-        "name_status": {
-            "raw_byte_count": len(diff_bytes),
-            "raw_sha256": hashlib.sha256(diff_bytes).hexdigest(),
-            "record_count": len(diff_rows),
-            "path_vector_byte_count": diff_vector_bytes,
-            "path_vector_sha256": diff_vector_sha,
-            "all_status_codes": ["D"],
-        },
-        "guards": {
-            "rename_present": False,
-            "untracked_present": False,
-            "modification_present": False,
-            "type_change_present": False,
-            "unexpected_path_present": False,
-        },
-    }
+    write_yaml_exact(repo_root, WAVE_RECEIPT_RELS["night"], receipt)
+    return receipt
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1720,6 +2459,9 @@ def build_parser() -> argparse.ArgumentParser:
     wave = subparsers.add_parser("verify-wave")
     wave.add_argument("--wave", choices=WAVE_ORDER, required=True)
     wave.add_argument("--wave-parent", required=True)
+    delete = subparsers.add_parser("delete-wave")
+    delete.add_argument("--wave", choices=("night",), required=True)
+    delete.add_argument("--wave-parent", required=True)
     return parser
 
 
@@ -1757,12 +2499,21 @@ def main(argv: Sequence[str] | None = None) -> int:
             cleanup = load_yaml(root / CLEANUP_MANIFEST_REL)
             receipt = verify_wave(root, cleanup, args.wave, args.wave_parent)
             write_yaml_exact(root, WAVE_RECEIPT_RELS[args.wave], receipt)
+        elif args.command == "delete-wave":
+            require(args.wave == "night", "only the Night wave permits Codex deletion")
+            receipt = delete_night_wave(root, args.wave_parent)
         else:  # pragma: no cover
             raise CleanupValidationError(f"unsupported command: {args.command}")
-    except (CleanupValidationError, OSError, ValueError, yaml.YAMLError) as exc:
+    except (
+        CleanupValidationError,
+        OSError,
+        ValueError,
+        yaml.YAMLError,
+        subprocess.CalledProcessError,
+    ) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 1
-    if args.command == "verify-wave":
+    if args.command in {"verify-wave", "delete-wave"}:
         print(f"decision=pass wave={args.wave}")
     elif args.command == "verify-restore":
         print(

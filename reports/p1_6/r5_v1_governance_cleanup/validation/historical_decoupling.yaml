@@ -3,10 +3,10 @@ validation_id: V-006
 phase: P5
 decision: pass
 contract:
-  path: docs/codex_tasks/v1_governance_integration_cleanup_v5/CONTRACT.md
-  canonical_sha256: 7a02675ea94dd9ef83f40df42889720998cbea0d8db26992d158bf3c78135ef4
+  path: docs/codex_tasks/v1_governance_integration_cleanup_v6/CONTRACT.md
+  canonical_sha256: f5326c3c322fa3e0a319e36c032be4e169ede44acf57cce19bf63cf97b7ce3ec
   status: frozen
-  source_baseline: f1dafeb32b08d24a6960f31d4a0f6d8820b95839
+  source_baseline: 46a55d17f120496b6114c55e1d79e96adaef8378
 authority:
   a1_modify_existing_exact_count: 120
   a2_add_exact_count: 13
@@ -61,14 +61,17 @@ transition_validation:
   - tests/test_r5_night_shift_night04_ci_contract.py
   tests:
   - path: tests/test_r5_night_shift_ci_contract.py
+    source_commit: 805b8e3e9624e4e93057aa950cba4db1b3010cb3
     test_function_count: 2
     assertion_count: 13
     equal_strength_retirement_assertions: true
   - path: tests/test_r5_night_shift_night03_ci_contract.py
+    source_commit: 805b8e3e9624e4e93057aa950cba4db1b3010cb3
     test_function_count: 1
     assertion_count: 13
     equal_strength_retirement_assertions: true
   - path: tests/test_r5_night_shift_night04_ci_contract.py
+    source_commit: 805b8e3e9624e4e93057aa950cba4db1b3010cb3
     test_function_count: 1
     assertion_count: 13
     equal_strength_retirement_assertions: true
@@ -198,16 +201,38 @@ active_reference_scan:
   - path: tests/test_validate_r5_reviewed_evidence_registry.py
     classification: a4_metadata_literal
   references: []
+deletion_control:
+  root_agents:
+    path: AGENTS.md
+    blob_oid: 0a57c3f9f624f5645f52a056ed1a62991271f632
+    byte_count: 7661
+    sha256: 1717636c2e2dd7c92c9ac35ef66ef6231d471d398f28c681ad99e8a110174cbf
+  wave_actors:
+    night:
+      deletion_actor: codex_exact_manifest_one_file_at_a_time
+      codex_delete_authorized: true
+    bundle:
+      deletion_actor: user_manual_only
+      codex_delete_authorized: false
+    old002837:
+      deletion_actor: user_manual_only
+      codex_delete_authorized: false
+  night_delete_surface:
+    command: delete-wave
+    single_literal_path_per_unlink: true
+    ordinal_prefix_resume_only: true
+    rejects_stage_and_commit: true
+    writes_receipt_only_after_complete_vector_validation: true
 restore_verification:
   file_count: 1386
   content_byte_count: 9787412
-  restore_root: C:\Users\Q\AppData\Local\Temp\r5_v1_historical_restore_final_a5b1d2db3a3b4eb78631eba15a2ef2a8
+  restore_root: C:\Users\Q\AppData\Local\Temp\v6_v1_historical_restore_7f3a91c2
   cat_file_e_verified: true
   content_hash_verified: true
   full_restore_verified: true
   byte_for_byte_match: true
 guards:
-  codex_delete_command_exists: false
+  codex_delete_command_exists: true
   actual_manifest_uses_wildcards: false
   actual_manifest_paths_are_repo_relative: true
   actual_manifest_disjoint_from_retained_and_protected: true

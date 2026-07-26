@@ -1,9 +1,9 @@
 schema_version: r5_v1_historical_baseline_manifest_v1
 contract:
-  path: docs/codex_tasks/v1_governance_integration_cleanup_v5/CONTRACT.md
-  canonical_sha256: 7a02675ea94dd9ef83f40df42889720998cbea0d8db26992d158bf3c78135ef4
+  path: docs/codex_tasks/v1_governance_integration_cleanup_v6/CONTRACT.md
+  canonical_sha256: f5326c3c322fa3e0a319e36c032be4e169ede44acf57cce19bf63cf97b7ce3ec
   status: frozen
-  source_baseline: f1dafeb32b08d24a6960f31d4a0f6d8820b95839
+  source_baseline: 46a55d17f120496b6114c55e1d79e96adaef8378
 source_snapshot: 312adc73821706b0b7ca6aa00e80ee608bd10b32
 durable_restore_refs:
   night_source: a96c1b717bf15905d72fd142efd946fa01bce666

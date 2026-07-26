@@ -26,3 +26,16 @@ wave_state:
   completed_wave_count: 0
   absence_assertion_applicable: false
   clean_checkout_smoke: pending_after_all_three_deletion_waves
+v6_actor_rebinding_revalidation:
+  checked_at: 2026-07-26T23:42:00+08:00
+  command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -m pytest -q
+  exit_code: 1
+  result: 1 failed, 1353 passed, 2 skipped in 800.63s
+  failed_test: tests/test_r5_v1_root_policy_migration.py::test_receipt_is_deterministic_aggregate_only_and_checked_in
+  root_cause:
+    introduced_at: 805b8e3e9624e4e93057aa950cba4db1b3010cb3
+    detail: checked-in blocker_root_reconciliation.yaml was changed after the prior successful full pytest and no longer equals the deterministic validator rendering
+    v6_actor_rebinding_touched_failure_paths: false
+  authority_decision: hard_stop_requires_minimal_new_revision
+  night_arm_created: false
+  deletion_performed: false

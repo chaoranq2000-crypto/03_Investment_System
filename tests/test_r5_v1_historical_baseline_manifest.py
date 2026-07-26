@@ -41,6 +41,12 @@ def test_frozen_contract_authority_and_a6_inventory_are_exact(tool) -> None:
         "status": "frozen",
         "source_baseline": tool.PACKAGE_SOURCE_BASELINE,
     }
+    assert tool.verify_root_agents(ROOT) == {
+        "path": "AGENTS.md",
+        "blob_oid": tool.EXPECTED_AGENTS_BLOB_OID,
+        "byte_count": tool.EXPECTED_AGENTS_BYTE_COUNT,
+        "sha256": tool.EXPECTED_AGENTS_SHA256,
+    }
     authority = tool.parse_authority(ROOT)
     assert {key: len(value) for key, value in authority.items()} == {
         "a1": 120,
