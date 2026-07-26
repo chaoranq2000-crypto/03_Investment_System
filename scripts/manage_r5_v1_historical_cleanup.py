@@ -4,7 +4,7 @@
 This module inventories the frozen source tree, binds every proposed deletion to
 a durable Git blob, restores blobs into a caller-owned temporary directory, and
 validates NUL-delimited deletion vectors.  Its only destructive surface is the
-v6-authorized Night ``delete-wave`` command: that command unlinks one validated
+    v7-authorized Night ``delete-wave`` command: that command unlinks one validated
 literal regular file per call and cannot stage or commit changes.  Bundle and
 old002837 remain user-manual waves.
 """
@@ -27,10 +27,10 @@ import yaml
 
 
 CONTRACT_REL = Path(
-    "docs/codex_tasks/v1_governance_integration_cleanup_v6/CONTRACT.md"
+    "docs/codex_tasks/v1_governance_integration_cleanup_v7/CONTRACT.md"
 )
 START_HERE_REL = Path(
-    "docs/codex_tasks/v1_governance_integration_cleanup_v6/START_HERE.md"
+    "docs/codex_tasks/v1_governance_integration_cleanup_v7/START_HERE.md"
 )
 AGENTS_REL = Path("AGENTS.md")
 BASELINE_MANIFEST_REL = Path(
@@ -58,9 +58,9 @@ WAVE_RECEIPT_RELS = {
 }
 
 EXPECTED_CONTRACT_SHA256 = (
-    "f5326c3c322fa3e0a319e36c032be4e169ede44acf57cce19bf63cf97b7ce3ec"
+    "69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97"
 )
-PACKAGE_SOURCE_BASELINE = "46a55d17f120496b6114c55e1d79e96adaef8378"
+PACKAGE_SOURCE_BASELINE = "d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74"
 DECOUPLING_CHECKPOINT = "805b8e3e9624e4e93057aa950cba4db1b3010cb3"
 OLD_NIGHT_ARM_COMMIT = "82f7d37a10a9677af631c1a5863661a64df3270b"
 NIGHT_ARM_COMMIT_SUBJECT = "chore(v1): arm night codex exact-file deletion checkpoint"
@@ -1632,7 +1632,7 @@ def validate_actor_bindings(cleanup_manifest: Mapping[str, Any]) -> None:
 def validate_fixed_cleanup_aggregates(cleanup_manifest: Mapping[str, Any]) -> None:
     require(
         cleanup_manifest.get("aggregate") == EXPECTED_CLEANUP_AGGREGATE,
-        "cleanup aggregate differs from the frozen v6 aggregate",
+        "cleanup aggregate differs from the frozen v7 aggregate",
     )
     waves = list(cleanup_manifest.get("waves", []))
     require(len(waves) == len(WAVE_ORDER), "cleanup wave document count drift")
@@ -1697,7 +1697,7 @@ def validate_night_arm_identity(
     payload = git_blob(repo_root, revision, START_HERE_REL.as_posix())
     text = payload.decode("utf-8", errors="strict")
     required_literals = (
-        'task_id: "v1_governance_integration_cleanup_v6"',
+        'task_id: "v1_governance_integration_cleanup_v7"',
         f'contract_sha256: "{EXPECTED_CONTRACT_SHA256}"',
         f'source_baseline: "{PACKAGE_SOURCE_BASELINE}"',
         NIGHT_ARM_STATE_MARKER,
@@ -1707,10 +1707,10 @@ def validate_night_arm_identity(
         EXPECTED_WAVE_AGGREGATES["night"]["path_vector_sha256"],
     )
     for literal in required_literals:
-        require(literal in text, f"committed v6 START lacks Night arm marker: {literal}")
+        require(literal in text, f"committed v7 START lacks Night arm marker: {literal}")
     require(
-        "candidate (not armed under v6)" not in text.lower(),
-        "committed v6 START still declares Night not armed",
+        "candidate (not armed under v7)" not in text.lower(),
+        "committed v7 START still declares Night not armed",
     )
 
     root = repo_root.resolve(strict=True)
@@ -1719,7 +1719,7 @@ def validate_night_arm_identity(
         for line in text.splitlines()
         if (match := re.fullmatch(r"\d+\. `([^`]+)`", line))
     ]
-    require(len(absolute_values) == 680, "committed v6 START Night list is not 680 rows")
+    require(len(absolute_values) == 680, "committed v7 START Night list is not 680 rows")
     relative_values: list[str] = []
     for value in absolute_values:
         absolute = Path(value)
@@ -1729,17 +1729,17 @@ def validate_night_arm_identity(
         relative_values.append(resolved.relative_to(root).as_posix())
     require(
         relative_values == list(expected_paths),
-        "committed v6 START Night list differs from the ordinal cleanup manifest",
+        "committed v7 START Night list differs from the ordinal cleanup manifest",
     )
     vector_bytes, vector_sha = path_vector(relative_values)
     require(
         vector_bytes
         == EXPECTED_WAVE_AGGREGATES["night"]["path_vector_byte_count"],
-        "committed v6 START Night path-vector byte count drift",
+        "committed v7 START Night path-vector byte count drift",
     )
     require(
         vector_sha == EXPECTED_WAVE_AGGREGATES["night"]["path_vector_sha256"],
-        "committed v6 START Night path-vector SHA-256 drift",
+        "committed v7 START Night path-vector SHA-256 drift",
     )
     return {
         "path": START_HERE_REL.as_posix(),
@@ -1772,7 +1772,7 @@ def validate_committed_control_plane(
             check=False,
         ).returncode
         == 0,
-        "v6 package source baseline is not an ancestor of the wave parent",
+        "v7 package source baseline is not an ancestor of the wave parent",
     )
     require(
         _git(
@@ -1800,7 +1800,7 @@ def validate_committed_control_plane(
         )
     require(
         baseline.get("aggregate") == EXPECTED_CLEANUP_AGGREGATE,
-        "baseline aggregate differs from the frozen v6 aggregate",
+        "baseline aggregate differs from the frozen v7 aggregate",
     )
     validate_fixed_cleanup_aggregates(cleanup)
     validate_actor_bindings(cleanup)

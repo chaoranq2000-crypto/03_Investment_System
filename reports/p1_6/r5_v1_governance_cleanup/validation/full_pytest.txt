@@ -39,3 +39,35 @@ v6_actor_rebinding_revalidation:
   authority_decision: hard_stop_requires_minimal_new_revision
   night_arm_created: false
   deletion_performed: false
+v7_receipt_reconciliation_revalidation:
+  checked_at: 2026-07-27T01:06:50+08:00
+  contract_path: docs/codex_tasks/v1_governance_integration_cleanup_v7/CONTRACT.md
+  contract_sha256: 69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97
+  package_setup_commit: 0edcf12ce791fbfdc76e647d99885186716d0045
+  source_baseline: d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74
+  authorized_receipt:
+    path: reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml
+    exact_validator_render_sha256: f81fd3bf40bfc953e90df585188510f2d8382fd2a8b364fece93d6ae7190e5e4
+    exact_validator_render_bytes: 4013
+    phase: P4
+    checked_at: 2026-07-25
+    validator_modified: false
+    equality_test_modified: false
+  v005:
+    command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q tests/test_r5_v1_root_policy_migration.py tests/test_r5_v1_blocker_root_cause_map.py
+    result: 18 passed in 18.79s
+  v006:
+    command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q tests/test_r5_v1_historical_baseline_manifest.py tests/test_r5_v1_historical_cleanup_manifest.py tests/test_r5_v1_active_routing_retirement.py
+    result: 26 passed in 666.15s
+    control_plane_validate: decision=pass files=1386 active_references=0
+    full_restore: decision=pass files=1386 bytes=9787412
+    restore_root: C:\Users\Q\AppData\Local\Temp\v7_v1_historical_restore_bfac086c247a468e84b001c2b52eca5d
+  full_repository:
+    command: $env:PYTHONDONTWRITEBYTECODE='1'; C:\Projects\03_Investment_System\.conda\investment-system\python.exe -m pytest -q -p no:cacheprovider
+    exit_code: 0
+    result: 1354 passed, 2 skipped in 811.32s
+    failures: 0
+    errors: 0
+    added_silent_skips: 0
+  night_arm_created: false
+  deletion_performed: false

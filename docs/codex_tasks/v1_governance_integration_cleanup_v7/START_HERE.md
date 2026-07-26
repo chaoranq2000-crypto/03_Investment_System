@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v7"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v7/CONTRACT.md"
 contract_sha256: "69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97"
-state: "ready"
+state: "running"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74"
 last_completed_phase: "P4"
 next_phase: "P5"
 last_validation: "pass"
-updated_at: "2026-07-26T16:23:48+00:00"
+updated_at: "2026-07-27T01:06:50+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -24,7 +24,7 @@ Use $autonomous-stage-runner in execute mode.
 
 Task package: docs/codex_tasks/v1_governance_integration_cleanup_v7
 Frozen contract: docs/codex_tasks/v1_governance_integration_cleanup_v7/CONTRACT.md
-Expected contract SHA-256: PENDING
+Expected contract SHA-256: 69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97
 Execution branch: codex/v1-governance-integration-cleanup
 Source baseline: d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74
 Historical cleanup snapshot: 312adc73821706b0b7ca6aa00e80ee608bd10b32
@@ -40,14 +40,14 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `ready`
+- **State:** `running`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`。v7 尚未冻结或执行。继承证据为：v6 package integrity、A.2 actor/tool/manifest 静态审计、Night 680 项普通文件/非 reparse 校验、1,386-file byte-for-byte restore 和 V-006 `26 passed in 638.56s` 通过；随后 full pytest `1 failed, 1353 passed, 2 skipped in 800.63s`，唯一失败是确定性 checked-in receipt 与未修改 validator 输出不相等。没有 wave 被删除。
-- **Current blocker:** none for drafting/finalizing v7。冻结前不得执行收据重生成、Night arm 或删除。
+- **Latest validation:** `pass`。v7 package frozen hash 与 integrity 通过；唯一授权收据逐字节等于未修改 validator 输出（4,013 bytes、SHA-256 `f81fd3bf40bfc953e90df585188510f2d8382fd2a8b364fece93d6ae7190e5e4`）；V-005 `18 passed in 18.79s`；V-006 `26 passed in 666.15s`；control-plane `decision=pass files=1386 active_references=0`；full restore `1386 files/9,787,412 bytes`；完整 pytest `1354 passed, 2 skipped in 811.32s`。没有 wave 被删除。
+- **Current blocker:** none。v7 reconciliation checkpoint 尚未提交，Night 尚未 arm。
 - **Prior hard-stop evidence:** v4 checkpoints `0f582599...` 与 `f1dafeb...` 保留历史冲突证据；v5 已修复三项 A.7 冲突以及 A.2 retained-dependency/unknown-classification 缺陷。旧 `82f7d37...` arm 因其后存在 policy/v6 commits 已失去 current-wave-parent 资格。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；批准的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`，tracked-only 为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。v6 准备时补丁工具的两份未跟踪草稿曾误落该树，已按两个明确文件路径逐一撤销；HEAD 与两组 raw NUL 向量随后精确恢复。不得再写入、清理、修复、吸收或提交其中内容。
-- **Next safe action:** 审计本 v7 草稿只含用户批准的单点收据例外与机械 package identity plumbing；用标准工具 finalize、`--require-ready` 校验，并创建以 `d89e3a2...` 为直接父的 package-only setup checkpoint。
+- **Next safe action:** 审计本轮 changed paths、manifest/actor/用户主树状态与 package hash；显式提交合同指定的 `chore(v1): reconcile deterministic root receipt for v7` checkpoint。提交 clean 后仅更新本文件 arm metadata，再创建新的 clean Night arm checkpoint并报告 readiness。
 
 ### P5 pre-delete completion evidence
 
@@ -55,10 +55,10 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - Historical cleanup inventory: 1,386 files / 9,787,412 content bytes / 121,264 path-vector bytes / SHA-256 `974d45610144d616f69c3c368d9ea1a0a27d66601a24f748aa8148e2ee702f33`.
 - Wave aggregates: Night 680 / 4,480,614 / `1ec2f42b84c1078f6b26caa377e9c1fb3efff9221196bc2e02bd819588a59c59`; Bundle 205 / 1,770,109 / `fc8912dfe6d20d92bd8fe907d4400ae90b724826a7c468ba5286232dc3b3363a`; old002837 501 / 3,536,689 / `73d0a405b928fa3fa615d5b0d527f16f7c1182bb16239fb9ef89266d9868862f`.
 - Reference graph: `reference_count=0`, `unknown_classification_count=0`, A.7 overlap exact and all Night, retained/protected overlap 0.
-- Restore proof: all 1,386 Git blobs recovered byte-for-byte; final root `C:\Users\Q\AppData\Local\Temp\r5_v1_historical_restore_final_a5b1d2db3a3b4eb78631eba15a2ef2a8`; `cat_file_e_verified`, `content_hash_verified`, `full_restore_verified` and `byte_for_byte_match` all true.
-- Prior green focused validators: V-003 194 passed; V-004 16 passed with equal digests; V-005 18 passed; v6 V-006 26 passed; A.7 4 passed; source route `decision=pass`, blocking 0.
-- Current baseline full repository pytest: `1 failed, 1353 passed, 2 skipped in 800.63s`; the one deterministic receipt mismatch is the sole v7-authorized repair and must return to zero failures before arm.
-- Scope: only A.1/A.2/A.7 paths changed; no deletion, untracked path, frozen-contract change, raw-data change or user-main write.
+- Restore proof: all 1,386 Git blobs recovered byte-for-byte; v7 root `C:\Users\Q\AppData\Local\Temp\v7_v1_historical_restore_bfac086c247a468e84b001c2b52eca5d`; `cat_file_e_verified`, `content_hash_verified`, `full_restore_verified` and `byte_for_byte_match` all true.
+- Current validators: V-005 18 passed; V-006 26 passed; A.7/actor/path authority and full restore covered by V-006; inherited untouched V-003/V-004/V-008 evidence remains green.
+- Current full repository pytest: `1354 passed, 2 skipped in 811.32s`; zero failures/errors and no added skip/xfail/mock/collection-ignore.
+- Scope: only the D-017 receipt/readout paths, A.2 identity/control receipts/tool/manifest/test and this v7 START changed; no deletion, untracked path, frozen-contract change, raw-data change or user-main write.
 
 ### P5 Night exact-manifest candidate (not armed under v7)
 
@@ -73,7 +73,7 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - Manifest source: `reports/p1_6/r5_v1_governance_cleanup/historical_cleanup_manifest.yaml`
 - Restore source: each manifest row's exact `baseline_commit:path`, `blob_oid`, byte count and content SHA-256; final full-restore receipt is `reports/p1_6/r5_v1_governance_cleanup/validation/historical_decoupling.yaml`.
 - Codex rule: 仅在新 v7 arm、contract/AGENTS/manifest/recovery/status 全部预检通过后，按下列 ordinal manifest 每次删除一个已经解析的 literal regular file；任何错误或漂移立即停止。禁止 wildcard、recursive、directory、symlink/reparse、collection、Git clean/reset/checkout 或清单外删除。
-- Readiness rule: actor migration 与新 arm 完成后先向协调任务报告；真正删除时不得提前 stage/commit，680 项全部缺失且完整 raw NUL status/name-status vectors 精确等于 manifest 后才可显式 stage。
+- Readiness rule: v7 reconciliation checkpoint 与新 arm 完成后先向协调任务报告；真正删除时不得提前 stage/commit，680 项全部缺失且完整 raw NUL status/name-status vectors 精确等于 manifest 后才可显式 stage。
 
 #### Night exact absolute per-file manifest
 
@@ -1018,3 +1018,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-26T23:50:08+08:00 — v6 A.2 actor/tool/manifest 重绑静态审计、1,386-file full restore 和 V-006 `26 passed` 均通过；但完整 pytest 复现 `1 failed, 1353 passed, 2 skipped`。唯一失败证明 `805b8e3...` 在旧成功测试后把 deterministic V-005 checked-in receipt 改写为非渲染输出；独立 frozen-authority 审计确认 v6 不授权修复该 A.1 回执，故在任何 actor checkpoint、Night arm 或删除前 hard stop。已向协调任务报告；等待用户批准仅机械重渲染该回执的最小 v7。
 - 2026-07-27T00:09:50+08:00 — 用户明确批准最小 v7：“仅授权重新生成 `blocker_root_reconciliation.yaml`，其他 v6 标准、Night/Bundle/旧 002837 三波边界均不变。”当前 user-main HEAD/full/tracked NUL 向量和远端 main/Night05/V1 refs 再次精确匹配，execution ref 仍不存在；先保存本 blocked checkpoint，再创建 v7 package-only amendment。
 - 2026-07-27T00:13:38+08:00 — v6 blocker 状态与 A.2 actor/identity 工作已保存为 clean checkpoint `d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74`，其直接父为 v6 setup `bb489a195d3ffeb439ea31a23a52b5ffb2abd48f`。v7 draft 只新增 `blocker_root_reconciliation.yaml` 的一次确定性重生成授权及不可避免的 v6→v7 package identity plumbing；其余 v6 标准、三波 actor/顺序/清单/聚合和恢复边界不变。尚未 finalize、重生成收据、arm 或删除。
+- 2026-07-27T01:06:50+08:00 — v7 frozen contract SHA-256=`69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97`，package-only setup=`0edcf12ce791fbfdc76e647d99885186716d0045`、直接父=`d89e3a2...`。唯一授权收据已精确重生成；V-005 18 passed、V-006 26 passed、control-plane pass/1386/active_references=0、full restore 1,386 files/9,787,412 bytes、full pytest 1354 passed/2 skipped。等待 scope audit 与 v7 reconciliation checkpoint；Night 未 arm、未删除。

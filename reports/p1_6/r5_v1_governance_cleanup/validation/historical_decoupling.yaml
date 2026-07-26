@@ -3,10 +3,10 @@ validation_id: V-006
 phase: P5
 decision: pass
 contract:
-  path: docs/codex_tasks/v1_governance_integration_cleanup_v6/CONTRACT.md
-  canonical_sha256: f5326c3c322fa3e0a319e36c032be4e169ede44acf57cce19bf63cf97b7ce3ec
+  path: docs/codex_tasks/v1_governance_integration_cleanup_v7/CONTRACT.md
+  canonical_sha256: 69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97
   status: frozen
-  source_baseline: 46a55d17f120496b6114c55e1d79e96adaef8378
+  source_baseline: d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74
 authority:
   a1_modify_existing_exact_count: 120
   a2_add_exact_count: 13
@@ -226,7 +226,7 @@ deletion_control:
 restore_verification:
   file_count: 1386
   content_byte_count: 9787412
-  restore_root: C:\Users\Q\AppData\Local\Temp\v6_v1_historical_restore_7f3a91c2
+  restore_root: C:\Users\Q\AppData\Local\Temp\v7_v1_historical_restore_bfac086c247a468e84b001c2b52eca5d
   cat_file_e_verified: true
   content_hash_verified: true
   full_restore_verified: true

@@ -301,7 +301,7 @@ def test_night_vector_accepts_only_an_exact_ordinal_prefix(tool) -> None:
         tool.validate_deletion_prefix_vectors(b"", b"", b"M\0a.txt\0", expected)
 
 
-def test_v6_actor_generation_and_tampering_fail_closed(tool) -> None:
+def test_v7_actor_generation_and_tampering_fail_closed(tool) -> None:
     _, cleanup, receipt = tool.build_documents(ROOT)
     tool.validate_fixed_cleanup_aggregates(cleanup)
     tool.validate_actor_bindings(cleanup)
@@ -347,7 +347,7 @@ def test_night_arm_requires_exact_new_checkpoint_subject_and_committed_start(
     start.parent.mkdir(parents=True)
     lines = [
         "---",
-        'task_id: "v1_governance_integration_cleanup_v6"',
+        'task_id: "v1_governance_integration_cleanup_v7"',
         f'contract_sha256: "{tool.EXPECTED_CONTRACT_SHA256}"',
         f'source_baseline: "{tool.PACKAGE_SOURCE_BASELINE}"',
         "---",

@@ -1,8 +1,8 @@
 schema_version: r5_v1_blocker_root_reconciliation_v1
 validation_id: V-005
-phase: P5_pre_delete
+phase: P4
 decision: pass
-checked_at: '2026-07-26T15:10:00+08:00'
+checked_at: '2026-07-25'
 source_root_map:
   path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
   sha256: 39aadff44cf51d1ad5607d8ec8481bbab42650723eaf5a981415df0ee3facacf
@@ -107,10 +107,3 @@ guards:
   second_occurrence_ledger_created: false
   active_v1_engineering_defect_count: 0
   system_v1_complete_claimed: false
-final_revalidation:
-  command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q tests/test_r5_v1_root_policy_migration.py tests/test_r5_v1_blocker_root_cause_map.py
-  result: 18 passed in 18.98s
-  blocker_map_reader: fixed_git_blobs
-  fixed_blob_triplet_count: 37
-  validates_blob_oid_bytes_and_content_sha256: true
-  candidate_worktree_read_used: false
