@@ -9,7 +9,7 @@ source_baseline: "d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74"
 last_completed_phase: "P4"
 next_phase: "P5"
 last_validation: "pass"
-updated_at: "2026-07-27T01:13:47+08:00"
+updated_at: "2026-07-27T01:36:01+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -43,11 +43,11 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - **State:** `running`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`。v7 package frozen hash 与 integrity 通过；唯一授权收据逐字节等于未修改 validator 输出（4,013 bytes、SHA-256 `f81fd3bf40bfc953e90df585188510f2d8382fd2a8b364fece93d6ae7190e5e4`）；V-005 `18 passed in 18.79s`；V-006 `26 passed in 666.15s`；control-plane `decision=pass files=1386 active_references=0`；full restore `1386 files/9,787,412 bytes`；完整 pytest `1354 passed, 2 skipped in 811.32s`。没有 wave 被删除。
-- **Current blocker:** none。当前仅待本文件形成新的 clean Night arm commit；尚未执行删除。
+- **Latest validation:** `pass`。v7 pre-delete V-005/V-006/full restore/full pytest 全通过；Night clean arm=`e3b7ac48...`，deletion commit=`be42857b...` 精确包含 680 个 manifest `D` 与 1 个 Night receipt `A`。删除前 status raw=57,921 bytes/SHA `be11b572...`，name-status raw=57,241 bytes/SHA `a85643ca...`；post-wave V-006 `26 passed in 663.32s`，V-003 final `194 passed in 24.28s`。Bundle 205 与 old002837 501 路径全部仍存在。
+- **Current blocker:** none before Bundle arm。Bundle arm 后必须切换为 `blocked` 等待用户手工删除。
 - **Prior hard-stop evidence:** v4 checkpoints `0f582599...` 与 `f1dafeb...` 保留历史冲突证据；v5 已修复三项 A.7 冲突以及 A.2 retained-dependency/unknown-classification 缺陷。旧 `82f7d37...` arm 因其后存在 policy/v6 commits 已失去 current-wave-parent 资格。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；批准的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`，tracked-only 为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。v6 准备时补丁工具的两份未跟踪草稿曾误落该树，已按两个明确文件路径逐一撤销；HEAD 与两组 raw NUL 向量随后精确恢复。不得再写入、清理、修复、吸收或提交其中内容。
-- **Next safe action:** 把仅含本文件的变更提交为 `chore(v1): arm night codex exact-file deletion checkpoint`；提交后只读验证 current HEAD/subject/contract/AGENTS/manifest/680 paths/restore/status，并先报告 readiness。报告前不得删除。
+- **Next safe action:** 提交本 post-Night validation metadata；工作树 clean 后把 Bundle 的 205 个绝对路径和恢复方式写入本文件，创建 `chore(v1): arm bundle manual deletion checkpoint`，然后停止等待用户手工删除该波。
 
 ### P5 pre-delete completion evidence
 
@@ -60,21 +60,22 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - Current full repository pytest: `1354 passed, 2 skipped in 811.32s`; zero failures/errors and no added skip/xfail/mock/collection-ignore.
 - Scope: only the D-017 receipt/readout paths, A.2 identity/control receipts/tool/manifest/test and this v7 START changed; no deletion, untracked path, frozen-contract change, raw-data change or user-main write.
 
-### P5 Night exact-manifest arm
+### P5 Night exact-manifest completed
 
 - Wave: `night`（顺序 1/3）
-- Arm state: `armed_clean_checkpoint`
+- Arm state: `completed_committed`
 - Deletion actor: `codex_exact_manifest_one_file_at_a_time`
 - Codex deletion authorization: `true` for Night only; Bundle/old002837 remain `false`
-- `wave_parent_commit`: 本文件所在的 clean arm commit；提交后以 `git rev-parse HEAD` 取得并作为 `delete-wave --wave-parent` 参数及最终 deletion receipt 值，不把提交自身 SHA 写回本文件。旧 `82f7d37a10a9677af631c1a5863661a64df3270b` 与全部 v6 前 arm 不得复用。
+- `wave_parent_commit`: `e3b7ac48b784749e32252faf543c8d9ab796d830`
+- Deletion commit: `be42857bf88223e01c71e4a4dfbac8e3a47080aa`
+- Validation receipt: `reports/p1_6/r5_v1_governance_cleanup/validation/manual_deletion_wave_night.yaml`
 - Expected deletion count: 680
 - Expected content bytes: 4,480,614
 - Expected ordinal UTF-8 NUL path-vector bytes: 55,881
 - Expected ordinal UTF-8 NUL path-vector SHA-256: `1ec2f42b84c1078f6b26caa377e9c1fb3efff9221196bc2e02bd819588a59c59`
 - Manifest source: `reports/p1_6/r5_v1_governance_cleanup/historical_cleanup_manifest.yaml`
 - Restore source: each manifest row's exact `baseline_commit:path`, `blob_oid`, byte count and content SHA-256; final full-restore receipt is `reports/p1_6/r5_v1_governance_cleanup/validation/historical_decoupling.yaml`.
-- Codex rule: 仅在新 v7 arm、contract/AGENTS/manifest/recovery/status 全部预检通过后，按下列 ordinal manifest 每次删除一个已经解析的 literal regular file；任何错误或漂移立即停止。禁止 wildcard、recursive、directory、symlink/reparse、collection、Git clean/reset/checkout 或清单外删除。
-- Readiness rule: v7 reconciliation checkpoint 与新 arm 完成后先向协调任务报告；真正删除时不得提前 stage/commit，680 项全部缺失且完整 raw NUL status/name-status vectors 精确等于 manifest 后才可显式 stage。
+- Completion rule: 680 项均已按 ordinal manifest 单文件删除、完整 raw NUL status/name-status vectors 精确匹配、显式 stage 并提交；post-wave V-006/V-003 final 已通过。不得恢复这些工作树路径或重新 arm Night。
 
 #### Night exact absolute per-file manifest
 
@@ -1021,3 +1022,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-27T00:13:38+08:00 — v6 blocker 状态与 A.2 actor/identity 工作已保存为 clean checkpoint `d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74`，其直接父为 v6 setup `bb489a195d3ffeb439ea31a23a52b5ffb2abd48f`。v7 draft 只新增 `blocker_root_reconciliation.yaml` 的一次确定性重生成授权及不可避免的 v6→v7 package identity plumbing；其余 v6 标准、三波 actor/顺序/清单/聚合和恢复边界不变。尚未 finalize、重生成收据、arm 或删除。
 - 2026-07-27T01:06:50+08:00 — v7 frozen contract SHA-256=`69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97`，package-only setup=`0edcf12ce791fbfdc76e647d99885186716d0045`、直接父=`d89e3a2...`。唯一授权收据已精确重生成；V-005 18 passed、V-006 26 passed、control-plane pass/1386/active_references=0、full restore 1,386 files/9,787,412 bytes、full pytest 1354 passed/2 skipped。等待 scope audit 与 v7 reconciliation checkpoint；Night 未 arm、未删除。
 - 2026-07-27T01:13:47+08:00 — v7 reconciliation checkpoint `4c2f373a16c570183b88ed510dc2994ad044dec3` 已创建且 clean，直接父为 package-only setup `0edcf12...`，提交只含 9 个授权 A.1/A.2 路径、0 删除。当前只把本文件切换为 `armed_clean_checkpoint`；包含本行的下一 commit 自身即新 Night `wave_parent_commit`，其 SHA 不写回文件。删除仍未执行。
+- 2026-07-27T01:36:01+08:00 — 新 Night arm=`e3b7ac48b784749e32252faf543c8d9ab796d830` 通过完整只读 preflight 后，Codex exact-file surface 按 ordinal 逐项删除 680 个 literal tracked regular files；写 receipt 前完整向量仅含 680 D。deletion commit=`be42857bf88223e01c71e4a4dfbac8e3a47080aa` 精确含 680 D + 1 receipt A；post-wave V-006 26 passed、V-003 final 194 passed，工作树 clean。Bundle/old002837 未删除。

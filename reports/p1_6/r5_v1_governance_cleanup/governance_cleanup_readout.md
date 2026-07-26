@@ -73,7 +73,7 @@
 
 ## P5 — Historical runtime decoupling, pre-delete checkpoint
 
-- State: v7 pre-delete engineering proof complete; no deletion wave has been armed or executed.
+- State: v7 Night wave completed and post-wave validation passed; Bundle and old002837 have not been deleted.
 - Package: `docs/codex_tasks/v1_governance_integration_cleanup_v7`; frozen contract SHA-256 `69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97`.
 - Package setup checkpoint: `0edcf12ce791fbfdc76e647d99885186716d0045`, direct parent `d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74`, containing only the v7 contract and start file. The parent preserves the v6 actor-rebinding hard-stop evidence and no deletion.
 - Active production and retained tests no longer physically read Night, Bundle11R–17R or old 002837 worktree paths. Commands now require explicit workflow/run/input/output roots, use task-local fixtures, or read fixed Git blobs with blob OID, byte count and content SHA-256 verification.
@@ -81,12 +81,14 @@
 - The retained Bundle capability dependency graph is explicit and noncanonical. Active reference scan reports `reference_count=0` and `unknown_classification_count=0`.
 - The exact cleanup inventory contains 1,386 files and 9,787,412 content bytes. Its ordinal UTF-8 NUL path vector is 121,264 bytes with SHA-256 `974d45610144d616f69c3c368d9ea1a0a27d66601a24f748aa8148e2ee702f33`.
 - Wave partition is Night 680 files / 4,480,614 bytes / path SHA-256 `1ec2f42b84c1078f6b26caa377e9c1fb3efff9221196bc2e02bd819588a59c59`; Bundle 205 / 1,770,109 / `fc8912dfe6d20d92bd8fe907d4400ae90b724826a7c468ba5286232dc3b3363a`; old002837 501 / 3,536,689 / `73d0a405b928fa3fa615d5b0d527f16f7c1182bb16239fb9ef89266d9868862f`.
+- Night clean arm was `e3b7ac48b784749e32252faf543c8d9ab796d830`. The Codex exact-file surface removed the 680 ordinal Night paths and commit `be42857bf88223e01c71e4a4dfbac8e3a47080aa` contains exactly those 680 deletions plus `manual_deletion_wave_night.yaml`; Bundle 205 and old002837 501 paths remained present.
 - Every manifest row is bound to a durable baseline commit, blob OID, byte count, content SHA-256 and restore command. The v7 independent restore recovered all 1,386 files and 9,787,412 bytes byte-for-byte under `C:\Users\Q\AppData\Local\Temp\v7_v1_historical_restore_bfac086c247a468e84b001c2b52eca5d`.
 - Windows paths longer than 260 characters are handled only at the filesystem I/O boundary with extended-length paths; safety resolution, repo-escape checks, manifests and receipts keep normal paths. Unsafe in-repo restore roots and tampered hashes remain fail-closed.
 - In v7, the authorized deterministic root receipt is byte-identical to the unchanged validator rendering (4,013 bytes; SHA-256 `f81fd3bf40bfc953e90df585188510f2d8382fd2a8b364fece93d6ae7190e5e4`). V-005 passed 18; V-006 passed 26 in 666.15 seconds; the independent control-plane validator returned `decision=pass files=1386 active_references=0`.
 - Full repository pytest passed `1354 passed, 2 skipped` in 811.32 seconds. The two skips are the unchanged live-adapter manual smokes already present at `f60f220...`; no new skip, xfail, mock, collection ignore or assertion reduction was introduced.
+- After the Night deletion commit, V-006 passed `26 passed in 663.32s` and V-003 final passed `194 passed in 24.28s`; the worktree remained clean and the deleted Night paths were not recreated.
 - Independent quality audit passed: all changed paths were in A.1/A.2/A.7, no deletion or untracked path existed, each changed test retained or increased assertions, A.7 assertion counts increased from 6/3/3 to 13/13/13, and all 13+37+1 fixed-reader triplets matched.
 - User main worktree remains read-only at HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`; full status is 130 records / 9,156 bytes / SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`, tracked-only is 20 records / 1,025 bytes / `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`.
-- Next controlled action after the v7 reconciliation checkpoint is a new clean Night arm checkpoint. That checkpoint must retain all 680 exact absolute Night paths in v7 `START_HERE.md`; only Night is then executable by Codex one literal regular file at a time. Bundle and old002837 remain user-manual waves.
+- Next controlled action is a clean Bundle manual arm containing the exact 205 absolute paths and restore metadata. Codex must then stop; only the user may delete that Bundle wave. old002837 remains untouched until Bundle is committed and its post-wave regression passes.
 
 Later phases append their own sections. Publication evidence is never written here after the sealed candidate commit.

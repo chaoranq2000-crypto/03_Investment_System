@@ -71,3 +71,39 @@ v7_receipt_reconciliation_revalidation:
     added_silent_skips: 0
   night_arm_created: false
   deletion_performed: false
+night_wave_post_commit:
+  checked_at: 2026-07-27T01:36:01+08:00
+  wave_parent_commit: e3b7ac48b784749e32252faf543c8d9ab796d830
+  deletion_commit: be42857bf88223e01c71e4a4dfbac8e3a47080aa
+  deletion_actor: codex_exact_manifest_one_file_at_a_time
+  codex_delete_authorized: true
+  expected_deleted_files: 680
+  expected_content_bytes: 4480614
+  expected_path_vector_bytes: 55881
+  expected_path_vector_sha256: 1ec2f42b84c1078f6b26caa377e9c1fb3efff9221196bc2e02bd819588a59c59
+  pre_receipt_status:
+    record_count: 680
+    raw_byte_count: 57921
+    raw_sha256: be11b5726e8df8abab3d367101eb1d4eaf8cb9d40d7bca60419647666e531654
+    all_status_codes:
+      - " D"
+  pre_receipt_name_status:
+    record_count: 680
+    raw_byte_count: 57241
+    raw_sha256: a85643ca9282713d6369dedfcb9b68c2935680a32155b7f55e00e829f345c81a
+    all_status_codes:
+      - D
+  commit_scope:
+    exact_manifest_deletions: 680
+    added_receipts:
+      - reports/p1_6/r5_v1_governance_cleanup/validation/manual_deletion_wave_night.yaml
+    extra_paths: 0
+    worktree_clean_after_commit: true
+  post_wave_v006:
+    result: 26 passed in 663.32s
+  post_wave_v003_final:
+    result: 194 passed in 24.28s
+  full_repository_rerun_required_here: false
+  full_repository_reason: contract requires V-006, V-007 and V-003 final after each wave; full pytest remains required at final
+  bundle_armed: false
+  old002837_armed: false
