@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v7"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v7/CONTRACT.md"
 contract_sha256: "69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97"
-state: "running"
+state: "blocked"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74"
 last_completed_phase: "P4"
 next_phase: "P5"
 last_validation: "pass"
-updated_at: "2026-07-27T01:36:01+08:00"
+updated_at: "2026-07-27T01:41:58+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -40,14 +40,14 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `running`
+- **State:** `blocked`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`。v7 pre-delete V-005/V-006/full restore/full pytest 全通过；Night clean arm=`e3b7ac48...`，deletion commit=`be42857b...` 精确包含 680 个 manifest `D` 与 1 个 Night receipt `A`。删除前 status raw=57,921 bytes/SHA `be11b572...`，name-status raw=57,241 bytes/SHA `a85643ca...`；post-wave V-006 `26 passed in 663.32s`，V-003 final `194 passed in 24.28s`。Bundle 205 与 old002837 501 路径全部仍存在。
-- **Current blocker:** none before Bundle arm。Bundle arm 后必须切换为 `blocked` 等待用户手工删除。
+- **Latest validation:** `pass`。v7 pre-delete V-005/V-006/full restore/full pytest 全通过；Night clean arm=`e3b7ac48...`，deletion commit=`be42857b...` 精确包含 680 个 manifest `D` 与 1 个 Night receipt `A`。删除前 status raw=57,921 bytes/SHA `be11b572...`，name-status raw=57,241 bytes/SHA `a85643ca...`；post-wave V-006 `26 passed in 663.32s`，V-003 final `194 passed in 24.28s`；post-Night evidence checkpoint=`ada5ebff67e5604232463deb7effdcac1cd61d9e`。Bundle pre-arm 审计确认 205/205 路径存在、均为 tracked regular non-reparse file、index blob OID 与 manifest 精确相等；old002837 501/501 仍存在，Night 680/680 仍缺失。
+- **Current blocker:** Bundle wave actor 固定为 `user_manual_only`。包含本文件的 clean arm commit 创建后，Codex 必须停止并等待用户只删除下列 205 个明确文件。
 - **Prior hard-stop evidence:** v4 checkpoints `0f582599...` 与 `f1dafeb...` 保留历史冲突证据；v5 已修复三项 A.7 冲突以及 A.2 retained-dependency/unknown-classification 缺陷。旧 `82f7d37...` arm 因其后存在 policy/v6 commits 已失去 current-wave-parent 资格。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；批准的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`，tracked-only 为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。v6 准备时补丁工具的两份未跟踪草稿曾误落该树，已按两个明确文件路径逐一撤销；HEAD 与两组 raw NUL 向量随后精确恢复。不得再写入、清理、修复、吸收或提交其中内容。
-- **Next safe action:** 提交本 post-Night validation metadata；工作树 clean 后把 Bundle 的 205 个绝对路径和恢复方式写入本文件，创建 `chore(v1): arm bundle manual deletion checkpoint`，然后停止等待用户手工删除该波。
+- **Next safe action:** 把仅含本文件的变更提交为 `chore(v1): arm bundle manual deletion checkpoint`；该 clean commit 自身即 Bundle `wave_parent_commit`。随后停止，等待用户按下列 exact manifest 手工逐文件删除；不得删除 old002837 或任何清单外路径。
 
 ### P5 pre-delete completion evidence
 
@@ -760,6 +760,231 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 679. `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_night_shift_stale_decision_hashes.py`
 680. `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_night_shift_unblock_leverage.py`
 
+### P5 Bundle exact-manifest arm
+
+- Wave: `bundle`（顺序 2/3）
+- Arm state: `armed_clean_checkpoint`
+- Deletion actor: `user_manual_only`
+- Codex deletion authorization: `false`
+- `wave_parent_commit`: 本文件所在的 clean arm commit；提交后以 `git rev-parse HEAD` 取得并作为 V-007 的 current-wave parent，不把提交自身 SHA 写回本文件。
+- Expected deletion count: 205
+- Expected content bytes: 1,770,109
+- Expected ordinal UTF-8 NUL path-vector bytes: 13,852
+- Expected ordinal UTF-8 NUL path-vector SHA-256: `fc8912dfe6d20d92bd8fe907d4400ae90b724826a7c468ba5286232dc3b3363a`
+- Manifest source: `reports/p1_6/r5_v1_governance_cleanup/historical_cleanup_manifest.yaml`
+- Restore source: each manifest row's exact `baseline_commit:path`, `blob_oid`, byte count, content SHA-256 and `restore_command`; final full-restore receipt is `reports/p1_6/r5_v1_governance_cleanup/validation/historical_decoupling.yaml`.
+- Pre-arm proof: 205/205 paths exist; all are tracked regular non-reparse files; every index blob OID equals the manifest row; Night 680 paths remain absent and old002837 501 paths remain present.
+- Manual deletion rule: 仅用户可删除本波。请严格按下列清单每次删除一个明确 literal file；禁止递归、通配符、目录、集合、symlink/reparse 或清单外删除，也不得删除 old002837。完成后不要 stage 或 commit，先通知 Codex 验证完整 raw NUL status/name-status vectors。
+- Recovery rule: 任一误删、额外 M/R/??/type change、缺失路径或 actor 漂移都立即停止；按对应 manifest row 的 exact `restore_command` 恢复，不得用 bulk/recursive/checkout-reset 清理。
+
+#### Bundle exact absolute per-file manifest
+
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.agents\skills\company-valuation\references\bundle13r_deferred_valuation.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.agents\skills\evidence-ingest\references\bundle13r_backfill_execution.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.agents\skills\research-orchestrator\references\bundle12r_backflow_profile.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.agents\skills\research-orchestrator\references\bundle13r_dependency_order.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.agents\skills\stock-deep-dive\references\bundle13r_overlap_and_exposure.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.github\workflows\r5-bundle14r-golden-regression.yml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.github\workflows\r5-bundle15r-evidence-qualification.yml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.github\workflows\r5-bundle16r-evidence-pack-materialization.yml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.github\workflows\r5-bundle17r-activation-receipt.yml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.github\workflows\r5-bundle17r-targeted-backflow.yml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.github\workflows\r5_bundle17r_bf2.yml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\.github\workflows\r5_bundle17r_bf2_ex1.yml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\codex_tasks\r5_bundle17r\00_BASELINE_AND_SCOPE.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\codex_tasks\r5_bundle17r\01_RUN_16R_15R_14R.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\codex_tasks\r5_bundle17r\02_BIND_AND_VALIDATE.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\codex_tasks\r5_bundle17r\03_HUMAN_HANDOFF_AND_CLOSE.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\codex_tasks\r5_bundle17r_backflow\00_BASELINE_AND_INPUTS.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\codex_tasks\r5_bundle17r_backflow\01_COMPILE_AND_CLUSTER.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\codex_tasks\r5_bundle17r_backflow\02_EXECUTE_BATCHES.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\codex_tasks\r5_bundle17r_backflow\03_RERUN_AND_CLOSE.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\config\r5_bundle15r_evidence_qualification_policy.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\config\r5_bundle16r_pack_materialization_policy.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\config\r5_bundle16r_real_company_cases.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\config\r5_bundle17r_activation_policy.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\config\r5_bundle17r_backflow_execution_policy.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\config\r5_bundle17r_backflow_routes.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\config\r5_bundle17r_verified_result_policy.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\docs\workflows\R5_BUNDLE11R_RUNTIME_OPERATING_RESEARCH.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\docs\workflows\R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\docs\workflows\R5_BUNDLE13R_EVIDENCE_BACKFLOW_PROFILE.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\docs\workflows\R5_BUNDLE14R_EVIDENCE_TRIGGER_BACKFLOW.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\docs\workflows\R5_BUNDLE15R_REVIEWED_EVIDENCE_INTAKE.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\docs\workflows\R5_BUNDLE15R_REVIEWED_EVIDENCE_QUALIFICATION.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\docs\workflows\R5_BUNDLE16R_REVIEWED_EVIDENCE_PACK_MATERIALIZATION.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\R5_BUNDLE17R_BACKFLOW_CLOSE_READOUT_TEMPLATE.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\R5_BUNDLE17R_CLOSE_READOUT_TEMPLATE.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_manifest.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_a\R5_bundle17r_activation_receipt.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_a\R5_bundle17r_backflow_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_a\R5_bundle17r_case_matrix.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_a\R5_bundle17r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_a\R5_bundle17r_generation_lock.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_a\R5_bundle17r_status_proposal.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_a\human_review_handoffs\golden_copper_foil_product_generation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_a\human_review_handoffs\golden_crdmo_backlog_conversion.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_a\human_review_handoffs\golden_gold_mining_cycle.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_a\human_review_handoffs\golden_multi_business_ai_infrastructure.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_b\R5_bundle17r_activation_receipt.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_b\R5_bundle17r_backflow_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_b\R5_bundle17r_case_matrix.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_b\R5_bundle17r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_b\R5_bundle17r_generation_lock.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_b\R5_bundle17r_status_proposal.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_b\human_review_handoffs\golden_copper_foil_product_generation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_b\human_review_handoffs\golden_crdmo_backlog_conversion.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_b\human_review_handoffs\golden_gold_mining_cycle.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\activation_run_b\human_review_handoffs\golden_multi_business_ai_infrastructure.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\golden_regression\R5_bundle14r_backflow_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\golden_regression\R5_bundle14r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\golden_regression\R5_bundle14r_generation_lock.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\golden_regression\R5_bundle14r_suite_result.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\materialization\R5_BUNDLE16R_MATERIALIZATION_READOUT.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\materialization\R5_bundle16r_backflow_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\materialization\R5_bundle16r_catalog_inventory.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\materialization\R5_bundle16r_generation_lock.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\materialization\R5_bundle16r_mapping_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\materialization\R5_bundle16r_materialization_suite.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\materialization\R5_bundle16r_source_request_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\materialization\R5_bundle16r_status_proposal.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\R5_bundle15r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\R5_bundle15r_conflict_ledger.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\R5_bundle15r_evidence_request_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\R5_bundle15r_generation_lock.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\R5_bundle15r_qualification_suite.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\R5_bundle15r_status_proposal.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\audit\golden_copper_foil_product_generation_qualification_audit.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\audit\golden_crdmo_backlog_conversion_qualification_audit.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\audit\golden_gold_mining_cycle_qualification_audit.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\audit\golden_multi_business_ai_infrastructure_qualification_audit.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\qualification\golden_copper_foil_product_generation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\qualification\golden_crdmo_backlog_conversion.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\qualification\golden_gold_mining_cycle.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_a\qualification\qualification\golden_multi_business_ai_infrastructure.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\golden_regression\R5_bundle14r_backflow_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\golden_regression\R5_bundle14r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\golden_regression\R5_bundle14r_generation_lock.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\golden_regression\R5_bundle14r_suite_result.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\materialization\R5_BUNDLE16R_MATERIALIZATION_READOUT.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\materialization\R5_bundle16r_backflow_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\materialization\R5_bundle16r_catalog_inventory.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\materialization\R5_bundle16r_generation_lock.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\materialization\R5_bundle16r_mapping_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\materialization\R5_bundle16r_materialization_suite.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\materialization\R5_bundle16r_source_request_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\materialization\R5_bundle16r_status_proposal.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\R5_bundle15r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\R5_bundle15r_conflict_ledger.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\R5_bundle15r_evidence_request_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\R5_bundle15r_generation_lock.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\R5_bundle15r_qualification_suite.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\R5_bundle15r_status_proposal.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\audit\golden_copper_foil_product_generation_qualification_audit.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\audit\golden_crdmo_backlog_conversion_qualification_audit.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\audit\golden_gold_mining_cycle_qualification_audit.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\audit\golden_multi_business_ai_infrastructure_qualification_audit.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\qualification\golden_copper_foil_product_generation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\qualification\golden_crdmo_backlog_conversion.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\qualification\golden_gold_mining_cycle.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\chain_b\qualification\qualification\golden_multi_business_ai_infrastructure.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\quality_gate_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_c\R5_BUNDLE16R_MATERIALIZATION_READOUT.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_c\R5_bundle16r_backflow_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_c\R5_bundle16r_catalog_inventory.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_c\R5_bundle16r_generation_lock.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_c\R5_bundle16r_mapping_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_c\R5_bundle16r_materialization_suite.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_c\R5_bundle16r_source_request_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_c\R5_bundle16r_status_proposal.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_d\R5_BUNDLE16R_MATERIALIZATION_READOUT.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_d\R5_bundle16r_backflow_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_d\R5_bundle16r_catalog_inventory.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_d\R5_bundle16r_generation_lock.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_d\R5_bundle16r_mapping_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_d\R5_bundle16r_materialization_suite.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_d\R5_bundle16r_source_request_queue.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\p1_6\r5_bundle17r\upstream_preview_d\R5_bundle16r_status_proposal.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle14r_evidence_trigger.schema.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle15r_reviewed_evidence_intake.schema.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle15r_reviewed_evidence_pack.schema.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle16r_review_mapping.schema.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle17r_activation_manifest.schema.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle17r_backflow_execution_manifest.schema.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle17r_backflow_manifest.schema.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle17r_case_review_decision.schema.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle17r_verified_result_manifest.schema.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle17r_verified_work_order_spec.schema.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\schemas\r5_bundle17r_work_order_result.schema.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\apply_r5_bundle13r_workflow_state.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\audit_r5_bundle11r_target.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\audit_r5_bundle13r_baseline.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\build_r5_bundle11r_002837_inputs.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\build_r5_bundle11r_002837_reader_inputs.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\build_r5_bundle15r_reviewed_evidence_intake.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\build_r5_bundle16r_case_pack.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\close_r5_bundle11r_002837.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\integrate_r5_bundle11r_workflow.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\plan_r5_bundle14r_evidence_trigger.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\run_r5_bundle14r_golden_regression.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\run_r5_bundle15r_evidence_qualification.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\run_r5_bundle16r_evidence_pack_materializer.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\run_r5_bundle17r_activation_receipt.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\run_r5_bundle17r_backflow_execution.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\run_r5_bundle17r_targeted_backflow.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\run_r5_bundle17r_verified_result_materializer.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\validate_r5_bundle12r_generation_lock.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\scripts\validate_r5_bundle13r_generation_lock.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\maintenance\evidence_trigger_backflow.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\maintenance\reviewed_evidence_intake.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\quality\r5_bundle14r_semantic_regression.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\research\r5_bundle13r_workflow_state.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\research\r5_bundle14r_golden_regression.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\research\r5_bundle15r_evidence_qualification.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\research\r5_bundle16r_evidence_pack_materializer.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\research\r5_bundle16r_real_company_regression.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\research\r5_bundle17r_activation_receipt.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\research\r5_bundle17r_backflow_execution.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\research\r5_bundle17r_targeted_backflow.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\src\research\r5_bundle17r_verified_result_materializer.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\templates\r5_bundle12r_operating_evidence_input.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\templates\r5_bundle13r_reviewed_backfill_input.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\templates\r5_bundle16r_review_mapping.example.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\templates\r5_bundle17r_activation_manifest.example.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\templates\r5_bundle17r_backflow_execution_manifest.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\templates\r5_bundle17r_backflow_manifest.example.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\templates\r5_bundle17r_case_review_decision.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\templates\r5_bundle17r_verified_result_manifest.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\templates\r5_bundle17r_verified_work_order_spec.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\templates\r5_bundle17r_work_order_result.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\fixtures\r5_bundle13r\reviewed_backfill_invalid.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\fixtures\r5_bundle14r\cases\copper_foil.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\fixtures\r5_bundle14r\cases\crdmo.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\fixtures\r5_bundle14r\cases\gold_mining.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\fixtures\r5_bundle14r\cases\multi_business_ai_infrastructure.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\r5_bundle17r_bf2_test_support.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle11r_002837_close.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle11r_002837_inputs.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle11r_002837_reader_inputs.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle11r_runtime_integration.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle13r_workflow_state.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle14r_evidence_trigger.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle14r_golden_regression.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle15r_evidence_qualification.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle15r_reviewed_evidence_intake.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle16r_case_pack_builder.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle16r_evidence_pack_materializer.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle16r_real_company_regression.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_activation_receipt.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_backflow_execution.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_backflow_execution_cli.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_backflow_execution_determinism.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_backflow_execution_fail_closed.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_targeted_backflow.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_verified_result_materializer.py`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_verified_result_materializer_cli.py`
+
 ### P5 v7 planned mutation paths and inherited authorities
 
 v7 唯一新增既有文件写权限是把 A.1 `reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml` 一次机械重生成为现有未修改 validator 的精确输出；不得修改 validator/test、root migration 数据或断言。下列 A.2 工具、manifest、tests、validation receipts 与本文件只可做 v6→v7 package identity plumbing，并维护 v6 已验证的 wave-specific actor 与 safe Night delete surface；A.1 `governance_cleanup_readout.md` 仍只可更新 actor/checkpoint metadata。不以 wildcard 或 family 替代实际路径。其他 A.1 与全部 A.7 默认只读。
@@ -1023,3 +1248,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-27T01:06:50+08:00 — v7 frozen contract SHA-256=`69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97`，package-only setup=`0edcf12ce791fbfdc76e647d99885186716d0045`、直接父=`d89e3a2...`。唯一授权收据已精确重生成；V-005 18 passed、V-006 26 passed、control-plane pass/1386/active_references=0、full restore 1,386 files/9,787,412 bytes、full pytest 1354 passed/2 skipped。等待 scope audit 与 v7 reconciliation checkpoint；Night 未 arm、未删除。
 - 2026-07-27T01:13:47+08:00 — v7 reconciliation checkpoint `4c2f373a16c570183b88ed510dc2994ad044dec3` 已创建且 clean，直接父为 package-only setup `0edcf12...`，提交只含 9 个授权 A.1/A.2 路径、0 删除。当前只把本文件切换为 `armed_clean_checkpoint`；包含本行的下一 commit 自身即新 Night `wave_parent_commit`，其 SHA 不写回文件。删除仍未执行。
 - 2026-07-27T01:36:01+08:00 — 新 Night arm=`e3b7ac48b784749e32252faf543c8d9ab796d830` 通过完整只读 preflight 后，Codex exact-file surface 按 ordinal 逐项删除 680 个 literal tracked regular files；写 receipt 前完整向量仅含 680 D。deletion commit=`be42857bf88223e01c71e4a4dfbac8e3a47080aa` 精确含 680 D + 1 receipt A；post-wave V-006 26 passed、V-003 final 194 passed，工作树 clean。Bundle/old002837 未删除。
+- 2026-07-27T01:41:58+08:00 — Night post-wave evidence 已保存为 checkpoint `ada5ebff67e5604232463deb7effdcac1cd61d9e`。Bundle pre-arm 只读审计确认 205 个 exact paths 全部存在、tracked regular、non-reparse 且 index blob OID 与 manifest 精确匹配；本文件切换为 `blocked` 并列出完整绝对路径。包含本行的下一 commit 自身即 Bundle `wave_parent_commit`，其 SHA 不写回本文件；Codex 不删除 Bundle。
