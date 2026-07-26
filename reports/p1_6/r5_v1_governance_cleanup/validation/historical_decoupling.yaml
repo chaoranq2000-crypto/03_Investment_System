@@ -7,32 +7,54 @@ stop_class:
 - unverifiable_completion_criterion
 blocked_gate: P5_pre_delete
 contract_conflict:
-  conflict_id: night_ci_predelete_self_dependency
+  conflict_id: night_ci_predelete_self_dependencies
   exact_paths:
     active_ci: .github/workflows/ci.yml
-    immutable_until_manual_wave_test: tests/test_r5_night_shift_ci_contract.py
+    immutable_until_manual_wave_tests:
+    - tests/test_r5_night_shift_ci_contract.py
+    - tests/test_r5_night_shift_night03_ci_contract.py
+    - tests/test_r5_night_shift_night04_ci_contract.py
   exact_required_literal: tests/test_r5_night_shift_*.py
   criteria:
   - C-008 requires active code, tests, and CI to have zero physical reads of Night candidates.
   - C-010 requires full pytest to pass after the required pre-delete validation.
   - V-006 requires active physical references to equal zero before deletion.
   - P5 pre-delete validation requires full pytest before any manual deletion wave is armed.
-  - D-017 forbids weakening assertions and does not authorize modifying the deletion-target test.
+  - D-017 forbids weakening assertions and does not authorize modifying the three deletion-target
+    tests.
   proof:
-  - tests/test_r5_night_shift_ci_contract.py is itself a Night-family manual-deletion target.
-  - Its test_ci_runs_night_shift_suite_and_preserves_full_regression assertion requires
+  - All three tests are Night-family manual-deletion targets and are collected by the mandatory
+    pre-delete full pytest.
+  - tests/test_r5_night_shift_ci_contract.py directly requires
     .github/workflows/ci.yml to contain tests/test_r5_night_shift_*.py.
+  - tests/test_r5_night_shift_night03_ci_contract.py calls the frozen Night03 build_ci_contract,
+    which requires the Night glob, old job name, SOURCE_COMMIT, Bundle17R and Night02 guards.
+  - tests/test_r5_night_shift_night04_ci_contract.py calls the frozen Night04 build_ci_contract,
+    which requires the Night glob, SOURCE_COMMIT, Bundle17R, Night02 and Night03 guards.
+  - Focused reproduction results are 1 failed and 1 passed for the direct contract, plus 2 failed
+    for the Night03/Night04 contracts.
   - Removing that CI glob is required to reach zero active Night CI routes, but makes pre-delete
-    full pytest fail while the test still exists.
+    full pytest fail while the three tests still exist.
   - Keeping the glob makes C-008 and V-006 fail.
-  - The test cannot be modified, skipped, weakened, or manually deleted before the pre-delete gate
-    within frozen v4 authority.
+  - The tests cannot be modified, skipped, weakened, or manually deleted before the pre-delete
+    gate within frozen v4 authority.
   conclusion: No v4-authorized mutation can make both V-006 active-routing zero and the mandatory
     pre-delete full-pytest gate pass.
-  unblock: Create and freeze a new amended task package that either grants exact
-    assertion-preserving transition authority for tests/test_r5_night_shift_ci_contract.py or
-    changes the pre-delete/wave ordering while preserving both C-008 and C-010. Do not edit frozen
-    v4, suppress the test, retain the retired CI route, or weaken either criterion.
+  unblock: Create and freeze a new amended task package that grants exact assertion-preserving
+    transition-modify-then-delete authority for the three listed tests. Permit only equal-strength
+    inverse CI-retirement assertions, keep all three in the Night actual manifest, and preserve
+    C-008, C-010 and the pre-delete ordering. Do not edit frozen v4, suppress the tests, retain the
+    retired CI route, or weaken either criterion.
+implementation_findings:
+- finding_id: undefined_retained_dependency_constant
+  path: scripts/manage_r5_v1_historical_cleanup.py
+  classification: a2_local_repair
+  detail: The diagnostic receipt renderer references RETAINED_EVALUATOR_DEPENDENCY_PREFIXES,
+    which is not defined.
+- finding_id: retained_fixture_classification_not_closed
+  classification: a2_local_repair
+  detail: Ten excluded Bundle12R/13R evaluator fixtures are still reported as unknown active
+    classifications. The diagnostic manifests must not be used to arm a wave.
 inventory_generation_state: diagnostic_only_not_finalized_due_hard_stop
 contract:
   path: docs/codex_tasks/v1_governance_integration_cleanup_v4/CONTRACT.md

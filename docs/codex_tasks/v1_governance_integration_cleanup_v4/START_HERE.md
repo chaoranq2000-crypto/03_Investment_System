@@ -9,7 +9,7 @@ source_baseline: "312adc73821706b0b7ca6aa00e80ee608bd10b32"
 last_completed_phase: "P4"
 next_phase: "P5"
 last_validation: "fail"
-updated_at: "2026-07-26T12:00:00+08:00"
+updated_at: "2026-07-26T12:18:01+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -42,23 +42,25 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - **State:** `blocked`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `fail`。v4 setup checkpoint `63e542ddc8a7329812e8aac15ead871253b58ca6`、P1–P4 checkpoint 与已复核 postconditions 仍有效；P5 Group A/B 的 75 项针对性测试通过，但删除前完整 pytest 的只读 Night CI contract 复现为 `1 failed, 1 passed`，因此 P5 pre-delete gate 未通过。
-- **Current blocker:** 冻结 v4 对 P5 pre-delete 有不可同时满足的要求。C-008、P5 validation 与 V-006 要求 `.github/` 对 Night 候选树的 CI routing/物理引用为 0，因此 A.1 授权的 `.github/workflows/ci.yml` 必须移除 `python -m pytest -q tests/test_r5_night_shift_*.py`。但尚未 arm Night wave 时，删除候选且不在 A.1 的 `tests/test_r5_night_shift_ci_contract.py` 仍必须参加 V-010 删除前完整 pytest，其第 13 行又强制 CI 命令保留完全相同的 Night glob。当前真实结果为该断言失败。修改此测试越过 Appendix A；保留真实 Night 调用违反 C-008；用注释、恒假条件、mock、skip/xfail 或 collection ignore 使其表面通过都违反 D-017。P5 因冻结合同标准冲突硬停止，未 arm 或删除任何 wave。
+- **Latest validation:** `fail`。v4 setup checkpoint `63e542ddc8a7329812e8aac15ead871253b58ca6`、P1–P4 checkpoint 与已复核 postconditions 仍有效；P5 Group A/B 的 75 项针对性测试通过，但三项只读 Night CI contract 在删除前分别复现为直接测试 `1 failed, 1 passed`、Night03/Night04 `2 failed`，因此 P5 pre-delete full-pytest gate 未通过。
+- **Current blocker:** 冻结 v4 对 P5 pre-delete 有不可同时满足的要求。C-008、P5 validation 与 V-006 要求 `.github/` 对 Night 候选树的 CI routing/物理引用为 0，因此 A.1 授权的 `.github/workflows/ci.yml` 必须移除 Night glob、旧 job 名、SOURCE_COMMIT 和 Bundle17R/Night02/Night03 guard 路由。但尚未 arm Night wave 时，三个删除候选且不在 A.1 的测试仍必须参加 V-010 删除前完整 pytest：`tests/test_r5_night_shift_ci_contract.py` 直接要求 Night glob；`tests/test_r5_night_shift_night03_ci_contract.py` 与 `tests/test_r5_night_shift_night04_ci_contract.py` 通过各自 `build_ci_contract()` 间接要求同一旧路由与 guard。修改这些测试越过 Appendix A；保留真实 Night 调用违反 C-008；用注释、恒假条件、mock、skip/xfail 或 collection ignore 使其表面通过都违反 D-017。P5 因冻结合同标准冲突硬停止，未 arm 或删除任何 wave。
 - **Prior hard-stop evidence:** v2 `reports/p1_6/r5_v1_governance_cleanup/validation/p5_authority_conflict.yaml` 与 v3 frozen package 保持只读。v3 blocker package checkpoint 为 `312adc73821706b0b7ca6aa00e80ee608bd10b32`；P5 尚未开始，也没有 arm 任何删除波次。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；用户在获知外部漂移只来自 untracked 状态后明确回复“继续，以新快照为基线”。连续稳定的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`；tracked-only 仍为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。任务从未触碰该树；不得清理、修复、吸收或提交其中内容。
-- **Next safe action:** 用户需授权创建 amended v5 包，最小修订是把 `tests/test_r5_night_shift_ci_contract.py` 逐项加入 P5 `modify_existing_exact`，只允许把其正向 Night-routing 断言替换为“CI 不再运行 Night glob、仍运行 V-006 与 full pytest”的等强反向断言；或者明确改变 pre-delete validation/deletion ordering。不得原地修改 v4 合同，也不得在 v4 下继续参数化、提交 decoupling 或 arm Night wave。
+- **Next safe action:** 用户需授权创建 amended v5 包，最小修订是新增 exact `transition_modify_then_delete_exact`，只列上述三个测试，只允许把其正向 Night-routing/guard 断言替换为“CI 不再运行 Night 路由、仍保持 `fetch-depth: 0`、source-route、V-006 与 full pytest”的等强退休断言；三者随后仍留在 Night actual manifest 由用户手工删除。不得原地修改 v4 合同，也不得在 v4 下继续参数化、提交 decoupling 或 arm Night wave。
 
 ### P5 hard-stop evidence
 
 - Affected phase/criteria: `P5`, `C-008`, `C-010`, `V-006`, `V-010`, `D-017`.
-- Exact conflicting paths: writable `.github/workflows/ci.yml`; read-only-until-user-deletion `tests/test_r5_night_shift_ci_contract.py`.
-- Reproduction: `python -B -m pytest -q -p no:cacheprovider tests/test_r5_night_shift_ci_contract.py` → `1 failed, 1 passed`; failure is the missing exact substring `tests/test_r5_night_shift_*.py`.
+- Exact conflicting paths: writable `.github/workflows/ci.yml`; read-only-until-user-deletion `tests/test_r5_night_shift_ci_contract.py`, `tests/test_r5_night_shift_night03_ci_contract.py`, `tests/test_r5_night_shift_night04_ci_contract.py`.
+- Reproduction A: `python -B -m pytest -q -p no:cacheprovider tests/test_r5_night_shift_ci_contract.py` → `1 failed, 1 passed`; failure is the missing exact substring `tests/test_r5_night_shift_*.py`.
+- Reproduction B: `python -B -m pytest -q -p no:cacheprovider tests/test_r5_night_shift_night03_ci_contract.py tests/test_r5_night_shift_night04_ci_contract.py` → `2 failed`; both frozen builders report Night route/history guard checks false.
 - Attempt 1 rejected: restore the Night pytest step; this makes the test pass but leaves an active CI physical route to the deletion tree and fails C-008/V-006.
 - Attempt 2 rejected: keep the substring in a comment, echo, unreachable or constant-false step; this fabricates the test's claimed behavior and violates D-017.
-- Attempt 3 rejected: modify, skip, xfail, monkeypatch or collection-ignore the test; the path has no v4 write authority and the contract expressly forbids weakening.
+- Attempt 3 rejected: modify, skip, xfail, monkeypatch or collection-ignore the tests; the three paths have no v4 write authority and the contract expressly forbids weakening.
 - Secondary patch-review issue: the first fixed-baseline readers in `scripts/run_r5_v1_replay_002837.py`, `tests/test_r5_v1_blocker_root_cause_map.py` and `tests/test_r5_v1_workflow_state_validator.py` still need explicit blob OID + byte count + content SHA triplets before any future decoupling commit; this is solvable inside A.1 and is not the hard-stop cause.
+- Secondary diagnostic-tool issues: `scripts/manage_r5_v1_historical_cleanup.py` references an undefined retained-dependency constant, and its ten excluded Bundle12R/13R fixtures are still reported as unknown classifications. Both are repairable inside A.2 and are not additional contract conflicts; committed manifests remain diagnostic-only and cannot arm a wave.
 - Repository state at stop: P4 remains the last completed phase; v4 setup HEAD was `63e542ddc8a7329812e8aac15ead871253b58ca6`; only Appendix A.1/A.2 P5 partial mutations are present in the dedicated worktree; no file deletion, stage, commit, push, PR or publication occurred after setup.
-- Precise unblock question: authorize an amended v5 package with the single additional existing-file permission and equal-strength CI retirement assertion described above, while preserving all other v4 criteria and the three user-manual deletion waves?
+- Precise unblock question: authorize an amended v5 package with the exact three-path transition-write-then-Night-delete permission and equal-strength CI retirement assertions described above, while preserving all other v4 criteria and the three user-manual deletion waves?
 
 ### P5 initial planned mutation paths
 
@@ -300,3 +302,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-26T11:27:50+08:00 — 两项独立只读审计均返回 `SAFE TO FREEZE`，并复现 A.1=120、A.2=13、A.3=44、A.4=35、A.5=27、唯一 A.1∩A.5 两路径、A.6 116 paths/8065 bytes/SHA-256 `6c667b2aa0db007d5e89baf5b7bae837fd62249be3d85613f16aba3d14d32e6a`、active old-ID/Bundle unknown=0、新用户主树状态向量及远端 refs。v4 合同已冻结，canonical SHA-256 为 `c806d4811e4f40ffb86154c6144c75173c7d13e1fc193f9add07686495217736`；`--require-ready` 通过，只产生预期的 last_completed=P4 warning。
 - 2026-07-26T11:37:24+08:00 — package-only v4 setup checkpoint `63e542ddc8a7329812e8aac15ead871253b58ca6` 已创建且 clean。P1→P4 checkpoint direct ancestry 与产物逐项通过；当前 doc drift pass，V-003 final 九项 `194 passed`，V-005 `18 passed`，V-004 两次 replay semantic digest `2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6`、tree digest `3baefe904ef244d272f9432ea661a3e13f2704003bd8d19590232a4d9f78df5f` 且 `16 passed`，V-008 `decision=pass`/blocking=0；原 root map blob `526d9964a95ddc866fa960a1b9556e720ca80178` 与 f60f220 完全一致。最早未证明阶段为 P5，本文件切换为 running，并记录首轮逐路径 mutation set。
 - 2026-07-26T12:00:00+08:00 — P5 Group A/B 的授权内解耦补丁完成首轮只读审查和 75 项针对性测试，但 pre-delete full-pytest 复现 `tests/test_r5_night_shift_ci_contract.py` 为 `1 failed, 1 passed`。该只读删除候选要求 CI 保留 Night glob，而 C-008/V-006 要求 CI physical route=0；三种可能规避分别违反 C-008 或 D-017。两项独立审查与诊断工具确认 frozen v4 无授权内解，状态切换为 blocked；未删除、arm、stage、push、PR 或发布。用户主树完整新快照再次逐字节匹配，合同 hash 不变。
+- 2026-07-26T12:18:01+08:00 — blocker 后只读全仓冲突扫描把同类自依赖从 1 项纠正为 3 项：除直接 CI contract 外，Night03/Night04 CI contract 也分别经冻结 builder 要求旧 Night glob/history guards，实测另有 `2 failed`。未发现第四项同类权限/顺序冲突；Night05 `.gitattributes` 检查绑定固定 `a96c...` delivery，不依赖当前内容。最小 v5 unblock 因此改为三个 exact transition-modify-then-delete 路径，不能只授权原一项。另记录两个 A.2 诊断工具缺陷；均不扩大合同权限。
