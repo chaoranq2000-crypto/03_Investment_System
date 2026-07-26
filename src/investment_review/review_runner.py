@@ -25,6 +25,7 @@ from .artifact_io import (
 )
 from .episode_portfolio_context import (
     build_episode_portfolio_context,
+    build_ledger_snapshot_supplemental_source,
     replay_validate_episode_portfolio_context,
     validate_episode_portfolio_context,
 )
@@ -55,7 +56,16 @@ from .operation_review import (
     replay_validate_operation_review,
     validate_operation_review,
 )
-from .portfolio_snapshot_adapter import inspect_portfolio_snapshots
+from .ledger_snapshot_reconstruction import (
+    LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION,
+    build_ledger_snapshot_reconstruction,
+    replay_validate_ledger_snapshot_reconstruction,
+    validate_ledger_snapshot_reconstruction,
+)
+from .portfolio_snapshot_adapter import (
+    inspect_portfolio_snapshots,
+    load_cash_baseline_proof,
+)
 from .review_input_bundle import (
     build_review_input_bundle,
     replay_validate_review_input_bundle,
@@ -76,6 +86,9 @@ RUN_CATALOG_SCHEMA_VERSION = "investment_review.review_catalog.v1"
 RUN_SCOPES = frozenset({"single", "weekly", "monthly"})
 RUN_PERSPECTIVES = frozenset({"user", "system"})
 TERMINAL_RUN_STATUSES = frozenset({"succeeded", "partial", "blocked", "failed"})
+LEDGER_RECONSTRUCTION_PROJECTION_MANIFEST_VERSION = (
+    "investment_review.ledger_snapshot_projection_manifest.v1"
+)
 COMPLETED_STAGE_NAMES = (
     "sync",
     "fee",
@@ -517,6 +530,484 @@ def _sidecar_projection_state(
         )
     )
     return events, observation_rows, digest
+
+
+def _ledger_reconstruction_artifact_projection(
+    artifact: Mapping[str, Any],
+    *,
+    supplemental_source: Mapping[str, Any],
+) -> dict[str, Any]:
+    availability = str(supplemental_source.get("availability") or "")
+    status_by_availability = {
+        "available": "available",
+        "ambiguous": "partial",
+        "missing": "missing",
+        "invalid": "blocked",
+    }
+    if availability not in status_by_availability:
+        raise CanonicalGateBlocked(
+            "ledger snapshot supplemental source has invalid availability"
+        )
+    content_id = str(artifact.get("content_id") or "")
+    checkpoints = [
+        item
+        for item in artifact.get("anchors", [])
+        if isinstance(item, Mapping)
+        and item.get("anchor_type") == "checkpoint"
+    ]
+    if len(checkpoints) != 1:
+        raise CanonicalGateBlocked(
+            "ledger snapshot reconstruction requires one checkpoint anchor"
+        )
+    checkpoint_axis = (
+        checkpoints[0].get("snapshot_cash_valuation")
+        if isinstance(
+            checkpoints[0].get("snapshot_cash_valuation"),
+            Mapping,
+        )
+        else {}
+    )
+    checkpoint_fields = (
+        checkpoint_axis.get("fields")
+        if isinstance(checkpoint_axis.get("fields"), Mapping)
+        else {}
+    )
+    quantity_field = (
+        checkpoint_fields.get("position_quantity")
+        if isinstance(
+            checkpoint_fields.get("position_quantity"),
+            Mapping,
+        )
+        else {}
+    )
+    reconstructed_ending_quantity = quantity_field.get("value")
+    if (
+        quantity_field.get("status") not in {"available", "partial"}
+        or reconstructed_ending_quantity in (None, "")
+    ):
+        raise CanonicalGateBlocked(
+            "reconstructed checkpoint quantity is unavailable"
+        )
+    ending_quantity = str(reconstructed_ending_quantity)
+    if not content_id.startswith("sha256:") or not ending_quantity:
+        raise CanonicalGateBlocked(
+            "ledger snapshot reconstruction lacks receipt identity or quantity"
+        )
+    try:
+        reconstruction_as_of = _utc_text(
+            _utc(
+                artifact.get("as_of"),
+                field="ledger_snapshot_reconstruction.as_of",
+            )
+        )
+    except ReviewRunnerError as exc:
+        raise CanonicalGateBlocked(
+            "ledger snapshot reconstruction lacks a valid as_of"
+        ) from exc
+    return {
+        "schema_version": LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION,
+        "content_id": content_id,
+        "status": status_by_availability[availability],
+        "ending_quantity": ending_quantity,
+        "as_of": reconstruction_as_of,
+    }
+
+
+def _ledger_reconstruction_receipt_projection(
+    artifact: Mapping[str, Any],
+    *,
+    episode: Mapping[str, Any],
+    supplemental_source: Mapping[str, Any],
+    request_as_of: str,
+) -> dict[str, Any]:
+    projection = _ledger_reconstruction_artifact_projection(
+        artifact,
+        supplemental_source=supplemental_source,
+    )
+    if projection["ending_quantity"] != str(
+        episode.get("ending_quantity") or ""
+    ):
+        raise CanonicalGateBlocked(
+            "reconstructed checkpoint quantity does not close to the episode"
+        )
+    if projection["as_of"] != _episode_reconstruction_as_of(
+        episode,
+        request_as_of=request_as_of,
+    ):
+        raise CanonicalGateBlocked(
+            "reconstruction as_of does not match the episode boundary"
+        )
+    return projection
+
+
+def _ledger_reconstruction_projection_manifest(
+    projections_by_episode: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    episodes = [
+        {
+            "episode_id": episode_id,
+            **dict(projections_by_episode[episode_id]),
+        }
+        for episode_id in sorted(projections_by_episode)
+    ]
+    material = {
+        "schema_version": (
+            LEDGER_RECONSTRUCTION_PROJECTION_MANIFEST_VERSION
+        ),
+        "episodes": episodes,
+    }
+    return {
+        **material,
+        "content_id": "sha256:"
+        + _sha256_bytes(canonical_json_bytes(material)),
+    }
+
+
+def _episode_reconstruction_identity(
+    episode: Mapping[str, Any],
+) -> dict[str, Any]:
+    scope = (
+        episode.get("scope")
+        if isinstance(episode.get("scope"), Mapping)
+        else {}
+    )
+    return {
+        "episode_id": str(episode.get("episode_id") or ""),
+        "status": str(episode.get("status") or ""),
+        "closed_at": episode.get("closed_at"),
+        "ending_quantity": str(episode.get("ending_quantity") or ""),
+        "scope": {
+            key: scope.get(key)
+            for key in (
+                "account_id",
+                "instrument_id",
+                "symbol",
+                "market",
+                "currency",
+            )
+        },
+        "episode_event_ids": [
+            str(item.get("event_id") or "")
+            for item in episode.get("event_refs", [])
+            if isinstance(item, Mapping)
+        ],
+        "episode_event_ordering_keys": [
+            deepcopy(item.get("ordering_key"))
+            for item in episode.get("event_refs", [])
+            if isinstance(item, Mapping)
+        ],
+    }
+
+
+def _episode_reconstruction_as_of(
+    episode: Mapping[str, Any],
+    *,
+    request_as_of: str,
+) -> str:
+    canonical_request_as_of = _utc(
+        request_as_of,
+        field="ledger_reconstruction.request_as_of",
+    )
+    status = str(episode.get("status") or "")
+    if status == "open":
+        if episode.get("closed_at") not in (None, ""):
+            raise CanonicalGateBlocked(
+                "open episode has an unexpected closed boundary"
+            )
+        return _utc_text(canonical_request_as_of)
+    if status != "closed":
+        raise CanonicalGateBlocked(
+            "selected episode has an invalid reconstruction status"
+        )
+    closed_at = _utc(
+        episode.get("closed_at"),
+        field="ledger_reconstruction.episode.closed_at",
+    )
+    if closed_at > canonical_request_as_of:
+        raise CanonicalGateBlocked(
+            "closed episode boundary exceeds reconstruction request as_of"
+        )
+    return _utc_text(closed_at)
+
+
+def _runner_event_ordering_key(
+    event: Mapping[str, Any],
+) -> tuple[datetime, int, str, str]:
+    event_id = str(event.get("event_id") or "")
+    if not event_id:
+        raise CanonicalGateBlocked(
+            "reconstruction input event lacks canonical identity"
+        )
+    raw = event.get("raw_payload", event.get("raw_payload_json"))
+    if isinstance(raw, str):
+        try:
+            raw = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise CanonicalGateBlocked(
+                f"reconstruction event {event_id} has invalid raw payload"
+            ) from exc
+    if not isinstance(raw, Mapping):
+        raw = {}
+    row = raw.get("source_row", raw)
+    if not isinstance(row, Mapping):
+        row = raw
+    sequence_rank = 2
+    sequence_value = str(
+        event.get("source_record_id") or event_id
+    )
+    for key in (
+        "source_sequence",
+        "source_row",
+        "entry_id",
+        "row_index",
+    ):
+        value = row.get(key)
+        if value in (None, ""):
+            continue
+        try:
+            sequence_rank = 0
+            sequence_value = f"{int(value):020d}"
+        except (TypeError, ValueError):
+            sequence_rank = 1
+            sequence_value = str(value)
+        break
+    return (
+        _utc(
+            event.get("occurred_at"),
+            field=f"reconstruction.event[{event_id}].occurred_at",
+        ),
+        sequence_rank,
+        sequence_value,
+        event_id,
+    )
+
+
+def _episode_event_ordering_key(
+    event_ref: Mapping[str, Any],
+) -> tuple[datetime, int, str, str]:
+    event_id = str(event_ref.get("event_id") or "")
+    ordering_key = event_ref.get("ordering_key")
+    if (
+        not event_id
+        or not isinstance(ordering_key, list)
+        or len(ordering_key) != 4
+        or str(ordering_key[3] or "") != event_id
+        or isinstance(ordering_key[1], bool)
+    ):
+        raise CanonicalGateBlocked(
+            "closed episode lacks a canonical P2C event cursor"
+        )
+    try:
+        sequence_rank = int(ordering_key[1])
+    except (TypeError, ValueError) as exc:
+        raise CanonicalGateBlocked(
+            "closed episode has an invalid P2C event cursor"
+        ) from exc
+    sequence_value = str(ordering_key[2] or "")
+    if sequence_rank not in {0, 1, 2} or not sequence_value:
+        raise CanonicalGateBlocked(
+            "closed episode has an invalid P2C source order"
+        )
+    return (
+        _utc(
+            ordering_key[0],
+            field=f"episode.event_refs[{event_id}].ordering_key",
+        ),
+        sequence_rank,
+        sequence_value,
+        event_id,
+    )
+
+
+def _event_inputs_with_episode_boundary_provenance(
+    event_inputs: Sequence[Mapping[str, Any]],
+    *,
+    episode: Mapping[str, Any],
+) -> list[Mapping[str, Any]]:
+    """Validate the P2C cursor while preserving all peer provenance."""
+
+    if str(episode.get("status") or "") == "open":
+        return list(event_inputs)
+    if str(episode.get("status") or "") != "closed":
+        raise CanonicalGateBlocked(
+            "selected episode has an invalid cursor status"
+        )
+    closing_event_id = str(episode.get("closing_event_ref") or "")
+    event_refs = [
+        item
+        for item in episode.get("event_refs", [])
+        if isinstance(item, Mapping)
+    ]
+    closing_refs = [
+        item
+        for item in event_refs
+        if str(item.get("event_id") or "") == closing_event_id
+    ]
+    if len(closing_refs) != 1:
+        raise CanonicalGateBlocked(
+            "closed episode lacks one closing event cursor"
+        )
+    boundary = _episode_event_ordering_key(closing_refs[0])
+    ordered_inputs: dict[str, tuple[datetime, int, str, str]] = {}
+    input_by_id: dict[str, Mapping[str, Any]] = {}
+    for event in event_inputs:
+        event_id = str(event.get("event_id") or "")
+        if not event_id or event_id in input_by_id:
+            raise CanonicalGateBlocked(
+                "reconstruction inputs lack unique event identities"
+            )
+        ordered_inputs[event_id] = _runner_event_ordering_key(event)
+        input_by_id[event_id] = event
+    if (
+        closing_event_id not in ordered_inputs
+        or ordered_inputs[closing_event_id] != boundary
+    ):
+        raise CanonicalGateBlocked(
+            "P2C closing cursor does not match reconstruction source order"
+        )
+    selected_event_ids = {
+        str(item.get("event_id") or "") for item in event_refs
+    }
+    included_ids = {
+        event_id
+        for event_id, ordering_key in ordered_inputs.items()
+        if ordering_key <= boundary
+    }
+    if not selected_event_ids.issubset(included_ids):
+        raise CanonicalGateBlocked(
+            "closed episode events exceed its reconstruction cursor"
+        )
+    return [
+        input_by_id[event_id]
+        for event_id in sorted(
+            input_by_id,
+            key=lambda item: ordered_inputs[item],
+        )
+    ]
+
+
+def _build_runner_ledger_reconstruction(
+    *,
+    portfolio_db: Path,
+    event_inputs: Sequence[Mapping[str, Any]],
+    episode: Mapping[str, Any],
+    perspective: str,
+    as_of: str,
+    knowledge_cutoff: str,
+    portfolio_source_sha256: str,
+    sync_source_sha256: str,
+    mapping_sha256: str,
+    source_cutoff_id: str,
+    sidecar_projection_sha256: str,
+    knowledge_provenance: Mapping[str, Any],
+) -> dict[str, Any]:
+    reconstruction_as_of = _episode_reconstruction_as_of(
+        episode,
+        request_as_of=as_of,
+    )
+    reconstruction_event_inputs = (
+        _event_inputs_with_episode_boundary_provenance(
+            event_inputs,
+            episode=episode,
+        )
+    )
+    event_refs = [
+        item
+        for item in episode.get("event_refs", [])
+        if isinstance(item, Mapping)
+    ]
+    if not event_refs:
+        raise CanonicalGateBlocked(
+            "selected episode has no event references for reconstruction"
+        )
+    pre_event_at = min(
+        str(item.get("effective_at") or "") for item in event_refs
+    )
+    if not pre_event_at:
+        raise CanonicalGateBlocked(
+            "selected episode has no effective event boundary"
+        )
+    scope = (
+        episode.get("scope")
+        if isinstance(episode.get("scope"), Mapping)
+        else {}
+    )
+    episode_event_ids = [
+        str(item.get("event_id") or "") for item in event_refs
+    ]
+    if any(not item for item in episode_event_ids):
+        raise CanonicalGateBlocked(
+            "selected episode has an empty event identity"
+        )
+    cash_evidence = load_cash_baseline_proof(
+        portfolio_db,
+        account_id=str(scope.get("account_id") or ""),
+        as_of=reconstruction_as_of,
+        knowledge_cutoff_at=knowledge_cutoff,
+        pre_event_at=pre_event_at,
+    )
+    cash_evidence_content_id = str(cash_evidence.get("content_id") or "")
+    baseline_proof = cash_evidence.get("baseline_proof")
+    if (
+        not cash_evidence_content_id.startswith("sha256:")
+        or not isinstance(baseline_proof, Mapping)
+    ):
+        raise CanonicalGateBlocked(
+            "cash baseline adapter returned an unbound proof"
+        )
+    source_binding = {
+        "portfolio_source_sha256": portfolio_source_sha256,
+        "sync_source_sha256": sync_source_sha256,
+        "mapping_sha256": mapping_sha256,
+        "source_cutoff_id": source_cutoff_id,
+        "sidecar_projection_sha256": sidecar_projection_sha256,
+        "knowledge_provenance_content_id": (
+            str(knowledge_provenance.get("content_id") or "")
+        ),
+        "cash_baseline_proof_content_id": cash_evidence_content_id,
+    }
+    reconstruction = build_ledger_snapshot_reconstruction(
+        reconstruction_event_inputs,
+        episode=episode,
+        perspective=perspective,
+        as_of=reconstruction_as_of,
+        knowledge_cutoff=knowledge_cutoff,
+        source_binding=source_binding,
+        baseline_proof=baseline_proof,
+    )
+    validation = validate_ledger_snapshot_reconstruction(reconstruction)
+    if _is_blocked(validation):
+        raise CanonicalGateBlocked(
+            "ledger snapshot reconstruction validation blocked: "
+            + ",".join(_finding_codes(validation))
+        )
+    replay = replay_validate_ledger_snapshot_reconstruction(
+        reconstruction,
+        event_inputs=reconstruction_event_inputs,
+        episode=episode,
+        baseline_proof=baseline_proof,
+    )
+    if _is_blocked(replay) or not _source_verification_ready(replay):
+        raise CanonicalGateBlocked(
+            "ledger snapshot reconstruction source replay failed"
+        )
+    supplemental = build_ledger_snapshot_supplemental_source(
+        reconstruction
+    )
+    projection = _ledger_reconstruction_receipt_projection(
+        reconstruction,
+        episode=episode,
+        supplemental_source=supplemental,
+        request_as_of=as_of,
+    )
+    return {
+        "artifact": reconstruction,
+        "validation": validation,
+        "replay": replay,
+        "cash_evidence": cash_evidence,
+        "supplemental_source": supplemental,
+        "receipt_projection": projection,
+    }
 
 
 def _section_gap_codes(review: Mapping[str, Any]) -> list[str]:
@@ -990,59 +1481,491 @@ class ReviewRunner:
             )
             if replay_episode_ids != receipt_episode_ids:
                 findings.append("KNOWLEDGE_SOURCE_REPLAY_MEMBERSHIP_MISMATCH")
+            reconstruction_version = (
+                cutoffs.get(
+                    "ledger_snapshot_reconstruction_schema_version"
+                )
+                if isinstance(cutoffs, Mapping)
+                else None
+            )
+            reconstruction_signal = (
+                reconstruction_version is not None
+                or any(
+                    isinstance(item, Mapping)
+                    and "ledger_snapshot_reconstruction" in item
+                    for item in episodes
+                )
+                or any(
+                    isinstance(item, Mapping)
+                    and "ledger_snapshot_reconstruction" in item
+                    for item in replay_items
+                )
+            )
+            if reconstruction_signal:
+                if (
+                    not isinstance(cutoffs, Mapping)
+                    or cutoffs.get("reviewability_schema_version") != 1
+                    or reconstruction_version
+                    != LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
+                ):
+                    findings.append(
+                        "INVALID_LEDGER_RECONSTRUCTION_VERSION_BINDING"
+                    )
+                snapshot_stage = stage_index.get("snapshot")
+                snapshot_details = (
+                    snapshot_stage.get("details")
+                    if isinstance(snapshot_stage, Mapping)
+                    and isinstance(snapshot_stage.get("details"), Mapping)
+                    else {}
+                )
+                episode_projection_by_id: dict[str, Mapping[str, Any]] = {}
+                for episode_item in (
+                    episodes if isinstance(episodes, list) else []
+                ):
+                    episode_item_id = (
+                        str(episode_item.get("episode_id") or "")
+                        if isinstance(episode_item, Mapping)
+                        else ""
+                    )
+                    projection = (
+                        episode_item.get(
+                            "ledger_snapshot_reconstruction"
+                        )
+                        if isinstance(episode_item, Mapping)
+                        else None
+                    )
+                    if (
+                        not episode_item_id
+                        or not isinstance(projection, Mapping)
+                        or set(projection)
+                        != {
+                            "schema_version",
+                            "content_id",
+                            "status",
+                            "ending_quantity",
+                            "as_of",
+                        }
+                        or projection.get("schema_version")
+                        != LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
+                        or not str(
+                            projection.get("content_id") or ""
+                        ).startswith("sha256:")
+                        or projection.get("status")
+                        not in {
+                            "available",
+                            "partial",
+                            "missing",
+                            "blocked",
+                        }
+                        or not str(
+                            projection.get("ending_quantity") or ""
+                        )
+                    ):
+                        findings.append(
+                            "MALFORMED_LEDGER_RECONSTRUCTION_PROJECTION"
+                        )
+                        continue
+                    try:
+                        projection_as_of_valid = (
+                            _utc(
+                                projection.get("as_of"),
+                                field="projection.as_of",
+                            )
+                            <= _utc(
+                                cutoffs.get("as_of"),
+                                field="receipt.as_of",
+                            )
+                        )
+                    except ReviewRunnerError:
+                        projection_as_of_valid = False
+                    if not projection_as_of_valid:
+                        findings.append(
+                            "MALFORMED_LEDGER_RECONSTRUCTION_PROJECTION"
+                        )
+                        continue
+                    episode_projection_by_id[episode_item_id] = projection
+                reconstruction_ids = sorted(
+                    str(item.get("content_id") or "")
+                    for item in episode_projection_by_id.values()
+                )
+                receipt_projection_manifest = (
+                    _ledger_reconstruction_projection_manifest(
+                        episode_projection_by_id
+                    )
+                )
+                claimed_projection_sha256 = cutoffs.get(
+                    "ledger_snapshot_reconstruction_projection_sha256"
+                )
+                if (
+                    cutoffs.get(
+                        "ledger_snapshot_projection_manifest_version"
+                    )
+                    != LEDGER_RECONSTRUCTION_PROJECTION_MANIFEST_VERSION
+                    or claimed_projection_sha256
+                    != str(
+                        receipt_projection_manifest["content_id"]
+                    ).removeprefix("sha256:")
+                ):
+                    findings.append(
+                        "LEDGER_RECONSTRUCTION_PROJECTION_BINDING_MISMATCH"
+                    )
+                cash_proof_ids = snapshot_details.get(
+                    "cash_baseline_proof_content_ids"
+                )
+                if (
+                    snapshot_details.get(
+                        "ledger_snapshot_reconstruction_count"
+                    )
+                    != len(receipt_episode_ids)
+                    or snapshot_details.get(
+                        "ledger_snapshot_reconstruction_content_ids"
+                    )
+                    != reconstruction_ids
+                    or len(episode_projection_by_id)
+                    != len(receipt_episode_ids)
+                    or not isinstance(cash_proof_ids, list)
+                    or cash_proof_ids != sorted(set(cash_proof_ids))
+                    or len(cash_proof_ids) != len(receipt_episode_ids)
+                    or any(
+                        not str(item).startswith("sha256:")
+                        for item in cash_proof_ids
+                    )
+                ):
+                    findings.append(
+                        "LEDGER_RECONSTRUCTION_MEMBERSHIP_MISMATCH"
+                    )
+                snapshot_artifacts = (
+                    snapshot_stage.get("artifacts", [])
+                    if isinstance(snapshot_stage, Mapping)
+                    else []
+                )
+                descriptors_by_content_id = {
+                    str(item.get("content_id") or ""): item
+                    for item in snapshot_artifacts
+                    if isinstance(item, Mapping) and item.get("content_id")
+                }
+                if not set(
+                    [*reconstruction_ids, *(cash_proof_ids or [])]
+                ).issubset(descriptors_by_content_id):
+                    findings.append(
+                        "LEDGER_RECONSTRUCTION_ARTIFACT_BINDING_MISMATCH"
+                    )
+                replay_by_id = {
+                    str(item.get("episode_id") or ""): item
+                    for item in replay_items
+                    if isinstance(item, Mapping)
+                    and item.get("episode_id")
+                }
+                for episode_item_id, projection in (
+                    episode_projection_by_id.items()
+                ):
+                    replay_projection = (
+                        replay_by_id.get(episode_item_id, {}).get(
+                            "ledger_snapshot_reconstruction"
+                        )
+                        if isinstance(
+                            replay_by_id.get(episode_item_id), Mapping
+                        )
+                        else None
+                    )
+                    if (
+                        not isinstance(replay_projection, Mapping)
+                        or replay_projection.get("validation_status")
+                        != "accepted"
+                        or replay_projection.get("source_verification")
+                        != "verified"
+                        or {
+                            key: replay_projection.get(key)
+                            for key in (
+                                "schema_version",
+                                "content_id",
+                                "status",
+                                "ending_quantity",
+                                "as_of",
+                            )
+                        }
+                        != dict(projection)
+                    ):
+                        findings.append(
+                            "LEDGER_RECONSTRUCTION_SOURCE_REPLAY_MISMATCH"
+                        )
+                    if receipt.get("mode") == "apply":
+                        descriptor = descriptors_by_content_id.get(
+                            str(projection.get("content_id") or "")
+                        )
+                        artifact_path = (
+                            Path(str(descriptor.get("path") or ""))
+                            if isinstance(descriptor, Mapping)
+                            else None
+                        )
+                        if (
+                            artifact_path is None
+                            or not artifact_path.is_file()
+                        ):
+                            findings.append(
+                                "LEDGER_RECONSTRUCTION_ARTIFACT_MISSING"
+                            )
+                            continue
+                        try:
+                            reconstructed_artifact = load_json_object(
+                                artifact_path
+                            )
+                            reconstruction_validation = (
+                                validate_ledger_snapshot_reconstruction(
+                                    reconstructed_artifact
+                                )
+                            )
+                        except Exception:
+                            findings.append(
+                                "LEDGER_RECONSTRUCTION_ARTIFACT_INVALID"
+                            )
+                            continue
+                        artifact_source_binding = (
+                            reconstructed_artifact.get(
+                                "source_binding", {}
+                            ).get("proof")
+                            if isinstance(
+                                reconstructed_artifact.get(
+                                    "source_binding"
+                                ),
+                                Mapping,
+                            )
+                            else {}
+                        )
+                        receipt_source_proof = (
+                            source_proof
+                            if isinstance(source_proof, Mapping)
+                            else {}
+                        )
+                        try:
+                            reconstruction_cutoffs_match = (
+                                _utc(
+                                    reconstructed_artifact.get("as_of"),
+                                    field="reconstruction.as_of",
+                                )
+                                == _utc(
+                                    projection.get("as_of"),
+                                    field="projection.as_of",
+                                )
+                                and _utc(
+                                    reconstructed_artifact.get("as_of"),
+                                    field="reconstruction.as_of",
+                                )
+                                <= _utc(
+                                    cutoffs.get("as_of"),
+                                    field="receipt.as_of",
+                                )
+                                and _utc(
+                                    reconstructed_artifact.get(
+                                        "knowledge_cutoff"
+                                    ),
+                                    field=(
+                                        "reconstruction.knowledge_cutoff"
+                                    ),
+                                )
+                                == _utc(
+                                    cutoffs.get("knowledge_cutoff"),
+                                    field="receipt.knowledge_cutoff",
+                                )
+                            )
+                        except ReviewRunnerError:
+                            reconstruction_cutoffs_match = False
+                        try:
+                            artifact_projection = (
+                                _ledger_reconstruction_artifact_projection(
+                                    reconstructed_artifact,
+                                    supplemental_source=(
+                                        build_ledger_snapshot_supplemental_source(
+                                            reconstructed_artifact
+                                        )
+                                    ),
+                                )
+                            )
+                        except Exception:
+                            artifact_projection = None
+                        if (
+                            _is_blocked(reconstruction_validation)
+                            or reconstructed_artifact.get("content_id")
+                            != projection.get("content_id")
+                            or reconstructed_artifact.get("episode_id")
+                            != episode_item_id
+                            or reconstructed_artifact.get("perspective")
+                            != receipt_perspective
+                            or not reconstruction_cutoffs_match
+                            or artifact_source_binding.get(
+                                "portfolio_source_sha256"
+                            )
+                            != receipt_source_proof.get("sha256_before")
+                            or artifact_source_binding.get(
+                                "sync_source_sha256"
+                            )
+                            != sync_details.get("source_sha256")
+                            or artifact_source_binding.get(
+                                "mapping_sha256"
+                            )
+                            != sync_details.get("mapping_sha256")
+                            or artifact_source_binding.get(
+                                "source_cutoff_id"
+                            )
+                            != cutoffs.get("source_cutoff_id")
+                            or artifact_source_binding.get(
+                                "sidecar_projection_sha256"
+                            )
+                            != cutoffs.get("sidecar_projection_sha256")
+                            or artifact_source_binding.get(
+                                "knowledge_provenance_content_id"
+                            )
+                            != knowledge_content_id
+                            or artifact_projection != dict(projection)
+                        ):
+                            findings.append(
+                                "LEDGER_RECONSTRUCTION_ARTIFACT_INVALID"
+                            )
+                if receipt.get("mode") == "apply":
+                    for cash_content_id in cash_proof_ids or []:
+                        cash_descriptor = descriptors_by_content_id.get(
+                            str(cash_content_id)
+                        )
+                        cash_path = (
+                            Path(str(cash_descriptor.get("path") or ""))
+                            if isinstance(cash_descriptor, Mapping)
+                            else None
+                        )
+                        if cash_path is None or not cash_path.is_file():
+                            findings.append(
+                                "CASH_BASELINE_PROOF_ARTIFACT_INVALID"
+                            )
+                            continue
+                        try:
+                            cash_artifact = load_json_object(cash_path)
+                            cash_material = deepcopy(cash_artifact)
+                            supplied_cash_content_id = cash_material.pop(
+                                "content_id", None
+                            )
+                            expected_cash_content_id = (
+                                "sha256:"
+                                + sha256_text(
+                                    canonical_json(cash_material)
+                                )
+                            )
+                        except Exception:
+                            findings.append(
+                                "CASH_BASELINE_PROOF_ARTIFACT_INVALID"
+                            )
+                            continue
+                        cash_source_binding = (
+                            cash_artifact.get("source_binding")
+                            if isinstance(
+                                cash_artifact.get("source_binding"),
+                                Mapping,
+                            )
+                            else {}
+                        )
+                        receipt_source_proof = (
+                            source_proof
+                            if isinstance(source_proof, Mapping)
+                            else {}
+                        )
+                        if (
+                            cash_artifact.get("schema_version")
+                            != "investment_review.cash_baseline_proof.v1"
+                            or supplied_cash_content_id
+                            != cash_content_id
+                            or supplied_cash_content_id
+                            != expected_cash_content_id
+                            or cash_source_binding.get(
+                                "source_sha256_before"
+                            )
+                            != receipt_source_proof.get("sha256_before")
+                            or cash_source_binding.get(
+                                "source_sha256_after"
+                            )
+                            != receipt_source_proof.get("sha256_after")
+                            or cash_source_binding.get("sqlite_mode")
+                            != "ro"
+                            or cash_source_binding.get("query_only") is not True
+                        ):
+                            findings.append(
+                                "CASH_BASELINE_PROOF_ARTIFACT_INVALID"
+                            )
             if sync_details is None or not isinstance(cutoffs, Mapping):
                 findings.append("RUN_KEY_BINDING_INPUT_MISSING")
             else:
                 selection_mapping = (
                     selection if isinstance(selection, Mapping) else {}
                 )
-                expected_run_key = "review:" + sha256_text(
-                    canonical_json(
+                expected_key_material = {
+                    "runner_version": RUNNER_VERSION,
+                    "scope": receipt.get("scope"),
+                    "perspective": receipt_perspective,
+                    "source_cutoff_id": cutoffs.get("source_cutoff_id"),
+                    "source_sha256": sync_details.get("source_sha256"),
+                    "mapping_sha256": sync_details.get("mapping_sha256"),
+                    "sidecar_projection_sha256": cutoffs.get(
+                        "sidecar_projection_sha256"
+                    ),
+                    "knowledge_provenance_schema_version": (
+                        KNOWLEDGE_PROVENANCE_SCHEMA_VERSION
+                    ),
+                    "knowledge_provenance_method_version": (
+                        KNOWLEDGE_PROVENANCE_METHOD_VERSION
+                    ),
+                    "knowledge_provenance_content_id": knowledge_content_id,
+                    "operation_review_schema_version": (
+                        OPERATION_REVIEW_SCHEMA_VERSION
+                    ),
+                    "operation_review_method_version": (
+                        OPERATION_REVIEW_METHOD_VERSION
+                    ),
+                    "artifact_namespace": str(
+                        self.artifact_root.relative_to(self.repo_root)
+                    ).replace("\\", "/"),
+                    "as_of": cutoffs.get("as_of"),
+                    "knowledge_cutoff": cutoffs.get("knowledge_cutoff"),
+                    "episode_id": selection_mapping.get(
+                        "requested_episode_id"
+                    ),
+                }
+                receipt_reviewability_version = cutoffs.get(
+                    "reviewability_schema_version"
+                )
+                receipt_reconstruction_version = cutoffs.get(
+                    "ledger_snapshot_reconstruction_schema_version"
+                )
+                if (
+                    receipt_reviewability_version is not None
+                    or receipt_reconstruction_version is not None
+                ):
+                    if (
+                        receipt_reviewability_version != 1
+                        or receipt_reconstruction_version
+                        != LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
+                    ):
+                        findings.append(
+                            "INVALID_LEDGER_RECONSTRUCTION_VERSION_BINDING"
+                        )
+                    expected_key_material.update(
                         {
-                            "runner_version": RUNNER_VERSION,
-                            "scope": receipt.get("scope"),
-                            "perspective": receipt_perspective,
-                            "source_cutoff_id": cutoffs.get(
-                                "source_cutoff_id"
+                            "reviewability_schema_version": (
+                                receipt_reviewability_version
                             ),
-                            "source_sha256": sync_details.get(
-                                "source_sha256"
+                            "ledger_snapshot_reconstruction_schema_version": (
+                                receipt_reconstruction_version
                             ),
-                            "mapping_sha256": sync_details.get(
-                                "mapping_sha256"
-                            ),
-                            "sidecar_projection_sha256": cutoffs.get(
-                                "sidecar_projection_sha256"
-                            ),
-                            "knowledge_provenance_schema_version": (
-                                KNOWLEDGE_PROVENANCE_SCHEMA_VERSION
-                            ),
-                            "knowledge_provenance_method_version": (
-                                KNOWLEDGE_PROVENANCE_METHOD_VERSION
-                            ),
-                            "knowledge_provenance_content_id": (
-                                knowledge_content_id
-                            ),
-                            "operation_review_schema_version": (
-                                OPERATION_REVIEW_SCHEMA_VERSION
-                            ),
-                            "operation_review_method_version": (
-                                OPERATION_REVIEW_METHOD_VERSION
-                            ),
-                            "artifact_namespace": str(
-                                self.artifact_root.relative_to(
-                                    self.repo_root
+                            "ledger_snapshot_projection_manifest_version": (
+                                cutoffs.get(
+                                    "ledger_snapshot_projection_manifest_version"
                                 )
-                            ).replace("\\", "/"),
-                            "as_of": cutoffs.get("as_of"),
-                            "knowledge_cutoff": cutoffs.get(
-                                "knowledge_cutoff"
                             ),
-                            "episode_id": selection_mapping.get(
-                                "requested_episode_id"
+                            "ledger_snapshot_reconstruction_projection_sha256": (
+                                cutoffs.get(
+                                    "ledger_snapshot_reconstruction_projection_sha256"
+                                )
                             ),
                         }
                     )
+                expected_run_key = "review:" + sha256_text(
+                    canonical_json(expected_key_material)
                 )
                 expected_run_id = (
                     "reviewrun_" + sha256_text(expected_run_key)[:32]
@@ -1232,7 +2155,11 @@ class ReviewRunner:
             cutoff = sync_details["cutoff"]
             cutoff_id = str(cutoff.get("cutoff_id") or "")
             store = ReviewStore(self.review_db)
-            store.status()
+            store_status = store.status()
+            reviewability_schema_version = store_status.get(
+                "reviewability_schema_version"
+            )
+            reviewability_enabled = reviewability_schema_version == 1
             (
                 event_inputs,
                 event_observation_rows,
@@ -1271,6 +2198,70 @@ class ReviewRunner:
                 knowledge_provenance,
                 event_inputs,
             )
+            ledger_reconstructions: dict[str, dict[str, Any]] = {}
+            ledger_projection_manifest = (
+                _ledger_reconstruction_projection_manifest({})
+            )
+            preview_selected: list[dict[str, Any]] = []
+            if reviewability_enabled:
+                preview_collection = build_episode_collection(
+                    perspective_event_inputs,
+                    cutoff_at=_utc_text(episode_cutoff),
+                    snapshot_references=[],
+                )
+                preview_validation = validate_episode_collection(
+                    preview_collection
+                )
+                if _is_blocked(preview_validation):
+                    raise CanonicalGateBlocked(
+                        "P2C reconstruction preview validation blocked: "
+                        + ",".join(_finding_codes(preview_validation))
+                    )
+                preview_selected, _ = _select_episodes(
+                    preview_collection,
+                    scope=scope,
+                    cutoff=episode_cutoff,
+                    episode_id=episode_id,
+                )
+                current_stage = "snapshot"
+                for selected_episode in preview_selected:
+                    selected_episode_id = str(
+                        selected_episode.get("episode_id") or ""
+                    )
+                    ledger_reconstructions[selected_episode_id] = (
+                        _build_runner_ledger_reconstruction(
+                            portfolio_db=self.portfolio_db,
+                            event_inputs=perspective_event_inputs,
+                            episode=selected_episode,
+                            perspective=perspective,
+                            as_of=_utc_text(as_of_time),
+                            knowledge_cutoff=_utc_text(knowledge_time),
+                            portfolio_source_sha256=source_hash_before,
+                            sync_source_sha256=str(
+                                sync_details.get("source_sha256") or ""
+                            ),
+                            mapping_sha256=str(
+                                sync_details.get("mapping_sha256") or ""
+                            ),
+                            source_cutoff_id=cutoff_id,
+                            sidecar_projection_sha256=(
+                                sidecar_projection_sha256
+                            ),
+                            knowledge_provenance=knowledge_provenance,
+                        )
+                    )
+                ledger_projection_manifest = (
+                    _ledger_reconstruction_projection_manifest(
+                        {
+                            selected_episode_id: state[
+                                "receipt_projection"
+                            ]
+                            for selected_episode_id, state in (
+                                ledger_reconstructions.items()
+                            )
+                        }
+                    )
+                )
             key_material = {
                 "runner_version": RUNNER_VERSION,
                 "scope": scope,
@@ -1301,6 +2292,23 @@ class ReviewRunner:
                 "knowledge_cutoff": _utc_text(knowledge_time),
                 "episode_id": episode_id,
             }
+            if reviewability_enabled:
+                key_material.update(
+                    {
+                        "reviewability_schema_version": 1,
+                        "ledger_snapshot_reconstruction_schema_version": (
+                            LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
+                        ),
+                        "ledger_snapshot_projection_manifest_version": (
+                            LEDGER_RECONSTRUCTION_PROJECTION_MANIFEST_VERSION
+                        ),
+                        "ledger_snapshot_reconstruction_projection_sha256": (
+                            str(
+                                ledger_projection_manifest["content_id"]
+                            ).removeprefix("sha256:")
+                        ),
+                    }
+                )
             run_key = "review:" + sha256_text(canonical_json(key_material))
             run_id = "reviewrun_" + sha256_text(run_key)[:32]
             final_run_bound = True
@@ -1440,7 +2448,31 @@ class ReviewRunner:
             )
 
             run_dir = self.artifact_root / run_id
+            if reviewability_enabled:
+                actual_identities = [
+                    _episode_reconstruction_identity(item)
+                    for item in selected
+                ]
+                preview_identities = [
+                    _episode_reconstruction_identity(item)
+                    for item in preview_selected
+                ]
+                if (
+                    actual_identities != preview_identities
+                    or sorted(ledger_reconstructions)
+                    != [
+                        str(item.get("episode_id") or "")
+                        for item in selected
+                    ]
+                ):
+                    raise CanonicalGateBlocked(
+                        "snapshot-linked P2C selection drifted from the "
+                        "run-key reconstruction preview"
+                    )
+                current_stage = "snapshot"
             artifact_descriptors: list[dict[str, Any]] = []
+            reconstruction_descriptors: dict[str, dict[str, Any]] = {}
+            cash_evidence_descriptors: dict[str, dict[str, Any]] = {}
             if not dry_run:
                 snapshot_descriptor = _json_artifact(
                     run_dir / "snapshot_inventory.json",
@@ -1475,6 +2507,45 @@ class ReviewRunner:
                         operation_descriptor,
                     ]
                 )
+                for selected_episode_id in sorted(
+                    ledger_reconstructions
+                ):
+                    reconstruction_state = ledger_reconstructions[
+                        selected_episode_id
+                    ]
+                    reconstruction = reconstruction_state["artifact"]
+                    cash_evidence = reconstruction_state["cash_evidence"]
+                    episode_dir = (
+                        run_dir / "e" / selected_episode_id
+                    )
+                    reconstruction_descriptors[selected_episode_id] = (
+                        _json_artifact(
+                            episode_dir / "snapshot.json",
+                            reconstruction,
+                            content_id=str(
+                                reconstruction.get("content_id") or ""
+                            ),
+                        )
+                    )
+                    cash_evidence_descriptors[selected_episode_id] = (
+                        _json_artifact(
+                            episode_dir / "cash.json",
+                            cash_evidence,
+                            content_id=str(
+                                cash_evidence.get("content_id") or ""
+                            ),
+                        )
+                    )
+                    artifact_descriptors.extend(
+                        [
+                            reconstruction_descriptors[
+                                selected_episode_id
+                            ],
+                            cash_evidence_descriptors[
+                                selected_episode_id
+                            ],
+                        ]
+                    )
             else:
                 snapshot_descriptor = {
                     "content_id": str(snapshot_inventory.get("content_id") or ""),
@@ -1507,6 +2578,32 @@ class ReviewRunner:
                     ),
                     "write_status": "dry_run",
                 }
+                for selected_episode_id in sorted(
+                    ledger_reconstructions
+                ):
+                    reconstruction_state = ledger_reconstructions[
+                        selected_episode_id
+                    ]
+                    reconstruction = reconstruction_state["artifact"]
+                    cash_evidence = reconstruction_state["cash_evidence"]
+                    reconstruction_descriptors[selected_episode_id] = {
+                        "content_id": str(
+                            reconstruction.get("content_id") or ""
+                        ),
+                        "sha256": _sha256_bytes(
+                            pretty_json_bytes(reconstruction)
+                        ),
+                        "write_status": "dry_run",
+                    }
+                    cash_evidence_descriptors[selected_episode_id] = {
+                        "content_id": str(
+                            cash_evidence.get("content_id") or ""
+                        ),
+                        "sha256": _sha256_bytes(
+                            pretty_json_bytes(cash_evidence)
+                        ),
+                        "write_status": "dry_run",
+                    }
 
             snapshot_gaps = [
                 str(item.get("code") or "SNAPSHOT_QUALITY_WARNING")
@@ -1518,20 +2615,96 @@ class ReviewRunner:
                     )
                 )
             ]
+            if reviewability_enabled:
+                snapshot_gaps = sorted(
+                    {
+                        *snapshot_gaps,
+                        *(
+                            str(gap.get("code") or "")
+                            for state in ledger_reconstructions.values()
+                            for gap in state["artifact"].get("gaps", [])
+                            if isinstance(gap, Mapping)
+                            and str(gap.get("code") or "")
+                        ),
+                        *(
+                            str(gap.get("code") or "")
+                            for state in ledger_reconstructions.values()
+                            for gap in state["cash_evidence"].get(
+                                "gaps", []
+                            )
+                            if isinstance(gap, Mapping)
+                            and str(gap.get("code") or "")
+                        ),
+                    }
+                )
+            snapshot_stage_status = (
+                "ready" if snapshot_status == "complete" else "partial"
+            )
+            snapshot_stage_details: dict[str, Any] = {
+                "quality_status": snapshot_status,
+                "snapshot_count": len(
+                    snapshot_inventory.get("snapshot_references", [])
+                ),
+                "content_id": snapshot_inventory.get("content_id"),
+                "lineage": snapshot_inventory.get("lineage"),
+            }
+            snapshot_stage_artifacts = [snapshot_descriptor]
+            if reviewability_enabled:
+                reconstruction_projections = [
+                    state["receipt_projection"]
+                    for _, state in sorted(
+                        ledger_reconstructions.items()
+                    )
+                ]
+                if selected:
+                    snapshot_stage_status = (
+                        "ready"
+                        if all(
+                            item.get("status") == "available"
+                            for item in reconstruction_projections
+                        )
+                        else "partial"
+                    )
+                snapshot_stage_details.update(
+                    {
+                        "ledger_snapshot_reconstruction_count": len(
+                            reconstruction_projections
+                        ),
+                        "ledger_snapshot_reconstruction_content_ids": sorted(
+                            str(item.get("content_id") or "")
+                            for item in reconstruction_projections
+                        ),
+                        "cash_baseline_proof_content_ids": sorted(
+                            str(
+                                state["cash_evidence"].get(
+                                    "content_id"
+                                )
+                                or ""
+                            )
+                            for state in ledger_reconstructions.values()
+                        ),
+                    }
+                )
+                for selected_episode_id in sorted(
+                    ledger_reconstructions
+                ):
+                    snapshot_stage_artifacts.extend(
+                        [
+                            reconstruction_descriptors[
+                                selected_episode_id
+                            ],
+                            cash_evidence_descriptors[
+                                selected_episode_id
+                            ],
+                        ]
+                    )
             stages.append(
                 _stage(
                     "snapshot",
-                    "ready" if snapshot_status == "complete" else "partial",
-                    details={
-                        "quality_status": snapshot_status,
-                        "snapshot_count": len(
-                            snapshot_inventory.get("snapshot_references", [])
-                        ),
-                        "content_id": snapshot_inventory.get("content_id"),
-                        "lineage": snapshot_inventory.get("lineage"),
-                    },
+                    snapshot_stage_status,
+                    details=snapshot_stage_details,
                     gaps=snapshot_gaps,
-                    artifacts=[snapshot_descriptor],
+                    artifacts=snapshot_stage_artifacts,
                 )
             )
             stages.append(
@@ -1633,6 +2806,14 @@ class ReviewRunner:
 
                 current_stage = f"review_input:{selected_id}"
                 decisions, decision_gaps = _decision_sources(store, episode)
+                reconstruction_state = ledger_reconstructions.get(
+                    selected_id
+                )
+                supplemental_sources = (
+                    [reconstruction_state["supplemental_source"]]
+                    if reconstruction_state is not None
+                    else []
+                )
                 input_bundle = build_review_input_bundle(
                     collection,
                     context,
@@ -1640,7 +2821,7 @@ class ReviewRunner:
                     episode_id=selected_id,
                     review_cutoff=_utc_text(review_cutoff),
                     decision_sources=decisions,
-                    supplemental_sources=[],
+                    supplemental_sources=supplemental_sources,
                 )
                 input_validation = validate_review_input_bundle(input_bundle)
                 if (
@@ -1660,7 +2841,7 @@ class ReviewRunner:
                     episode_portfolio_context=context,
                     portfolio_db=self.portfolio_db,
                     decision_sources=decisions,
-                    supplemental_sources=[],
+                    supplemental_sources=supplemental_sources,
                 )
                 if (
                     _is_blocked(input_replay)
@@ -1746,8 +2927,7 @@ class ReviewRunner:
                 review_gaps = sorted(
                     set(decision_gaps + _section_gap_codes(review))
                 )
-                episode_results.append(
-                    {
+                episode_result: dict[str, Any] = {
                         "episode_id": selected_id,
                         "perspective": perspective,
                         "review_id": review.get("review_id"),
@@ -1797,9 +2977,24 @@ class ReviewRunner:
                             "markdown": markdown_descriptor,
                         },
                     }
-                )
-                replay_details.append(
-                    {
+                if reconstruction_state is not None:
+                    episode_result[
+                        "ledger_snapshot_reconstruction"
+                    ] = deepcopy(
+                        reconstruction_state["receipt_projection"]
+                    )
+                    episode_result["artifacts"].update(
+                        {
+                            "snapshot_reconstruction": (
+                                reconstruction_descriptors[selected_id]
+                            ),
+                            "cash_baseline_proof": (
+                                cash_evidence_descriptors[selected_id]
+                            ),
+                        }
+                    )
+                episode_results.append(episode_result)
+                replay_detail: dict[str, Any] = {
                         "episode_id": selected_id,
                         "context": {
                             "validation_status": _validation_status(
@@ -1850,7 +3045,21 @@ class ReviewRunner:
                             "perspective": perspective,
                         },
                     }
-                )
+                if reconstruction_state is not None:
+                    replay_detail[
+                        "ledger_snapshot_reconstruction"
+                    ] = {
+                        **deepcopy(
+                            reconstruction_state[
+                                "receipt_projection"
+                            ]
+                        ),
+                        "validation_status": _validation_status(
+                            reconstruction_state["replay"]
+                        ),
+                        "source_verification": "verified",
+                    }
+                replay_details.append(replay_detail)
 
             stages.append(
                 _stage(
@@ -1944,6 +3153,35 @@ class ReviewRunner:
                 if any(stage["status"] == "partial" for stage in stages)
                 else "ready"
             )
+            receipt_cutoffs = {
+                "perspective": perspective,
+                "as_of": _utc_text(as_of_time),
+                "knowledge_cutoff": _utc_text(knowledge_time),
+                "episode_cutoff": _utc_text(episode_cutoff),
+                "review_cutoff": _utc_text(review_cutoff),
+                "source_cutoff_id": cutoff_id,
+                "sidecar_projection_sha256": sidecar_projection_sha256,
+                "knowledge_provenance_content_id": (
+                    knowledge_provenance.get("content_id")
+                ),
+            }
+            if reviewability_enabled:
+                receipt_cutoffs.update(
+                    {
+                        "reviewability_schema_version": 1,
+                        "ledger_snapshot_reconstruction_schema_version": (
+                            LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
+                        ),
+                        "ledger_snapshot_projection_manifest_version": (
+                            LEDGER_RECONSTRUCTION_PROJECTION_MANIFEST_VERSION
+                        ),
+                        "ledger_snapshot_reconstruction_projection_sha256": (
+                            str(
+                                ledger_projection_manifest["content_id"]
+                            ).removeprefix("sha256:")
+                        ),
+                    }
+                )
             receipt: dict[str, Any] = {
                 "schema_version": RUN_RECEIPT_SCHEMA_VERSION,
                 "runner_version": RUNNER_VERSION,
@@ -1954,20 +3192,7 @@ class ReviewRunner:
                 "mode": mode,
                 "status": overall,
                 "trigger": canonical_trigger,
-                "cutoffs": {
-                    "perspective": perspective,
-                    "as_of": _utc_text(as_of_time),
-                    "knowledge_cutoff": _utc_text(knowledge_time),
-                    "episode_cutoff": _utc_text(episode_cutoff),
-                    "review_cutoff": _utc_text(review_cutoff),
-                    "source_cutoff_id": cutoff_id,
-                    "sidecar_projection_sha256": (
-                        sidecar_projection_sha256
-                    ),
-                    "knowledge_provenance_content_id": (
-                        knowledge_provenance.get("content_id")
-                    ),
-                },
+                "cutoffs": receipt_cutoffs,
                 "selection": selection,
                 "source_proof": {
                     "path": str(self.portfolio_db),

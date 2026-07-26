@@ -29,6 +29,7 @@ from .artifact_io import (
 from .episode_portfolio_context import (
     SCHEMA_VERSION as P2E3_SCHEMA_VERSION,
     VALIDATION_SCHEMA_VERSION as P2E3_VALIDATION_SCHEMA_VERSION,
+    build_ledger_snapshot_supplemental_source,
     replay_validate_episode_portfolio_context,
     validate_episode_portfolio_context,
 )
@@ -41,6 +42,9 @@ from .episodes import (
     snapshot_catalog_sort_key,
     validate_episode,
     validate_episode_collection,
+)
+from .ledger_snapshot_reconstruction import (
+    LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION,
 )
 
 
@@ -1314,33 +1318,86 @@ def _section(
     }
 
 
-def _portfolio_section(portfolio_slice: Mapping[str, Any]) -> dict[str, Any]:
+def _reconstructed_snapshot_sources(
+    supplemental_sources: Sequence[Mapping[str, Any]],
+) -> list[Mapping[str, Any]]:
+    return [
+        item
+        for item in supplemental_sources
+        if item.get("source_kind") == "snapshot"
+        and isinstance(item.get("payload"), Mapping)
+        and item["payload"].get("schema_version")
+        == LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
+    ]
+
+
+def _portfolio_section(
+    portfolio_slice: Mapping[str, Any],
+    supplemental_sources: Sequence[Mapping[str, Any]] = (),
+) -> dict[str, Any]:
+    reconstructed = _reconstructed_snapshot_sources(supplemental_sources)
     if portfolio_slice.get("status") == "missing":
-        return _section(
+        legacy = _section(
             "missing",
             str(portfolio_slice.get("reason") or "P2E-3 context is missing"),
             warning_codes=["PORTFOLIO_CONTEXT_MISSING"],
         )
-    contexts = [
-        item for item in portfolio_slice.get("contexts", []) if isinstance(item, Mapping)
-    ]
-    statuses: list[str] = []
-    codes: set[str] = set()
-    for context in contexts:
-        status, context_codes = _context_status(context)
-        statuses.append(status)
-        codes.update(context_codes)
-    if not contexts:
-        status = "missing"
-    elif "missing" in statuses and any(item != "missing" for item in statuses):
-        status = "ambiguous"
     else:
-        status = _merge_availability(*statuses)
+        contexts = [
+            item
+            for item in portfolio_slice.get("contexts", [])
+            if isinstance(item, Mapping)
+        ]
+        statuses: list[str] = []
+        codes: set[str] = set()
+        for context in contexts:
+            status, context_codes = _context_status(context)
+            statuses.append(status)
+            codes.update(context_codes)
+        if not contexts:
+            status = "missing"
+        elif "missing" in statuses and any(item != "missing" for item in statuses):
+            status = "ambiguous"
+        else:
+            status = _merge_availability(*statuses)
+        legacy = _section(
+            status,
+            "P2E-3 episode slice is frozen with its original availability states.",
+            source_ids=[item.get("context_id") for item in contexts],
+            warning_codes=codes,
+        )
+    if not reconstructed:
+        return legacy
+
+    reconstruction_statuses = [
+        str(item.get("availability") or "invalid") for item in reconstructed
+    ]
+    if "invalid" in reconstruction_statuses:
+        status = "invalid"
+    elif "ambiguous" in reconstruction_statuses:
+        status = "ambiguous"
+    elif "available" in reconstruction_statuses:
+        status = "available"
+    else:
+        status = str(legacy.get("status") or "missing")
     return _section(
         status,
-        "P2E-3 episode slice is frozen with its original availability states.",
-        source_ids=[item.get("context_id") for item in contexts],
-        warning_codes=codes,
+        (
+            "Validated ledger reconstruction is frozen with all field-level "
+            "availability; canonical P2E-3 evidence remains attached separately."
+        ),
+        source_ids=[
+            *legacy.get("source_ids", []),
+            *(item.get("source_id") for item in reconstructed),
+        ],
+        warning_codes=[
+            *legacy.get("warning_codes", []),
+            *(
+                code
+                for item in reconstructed
+                for code in item.get("warning_codes", [])
+            ),
+        ],
     )
 
 
@@ -1463,7 +1520,9 @@ def _section_availability(
             "P2C episode scope is the security identity source.",
             source_ids=[episode_id],
         ),
-        "portfolio_context": _portfolio_section(portfolio_slice),
+        "portfolio_context": _portfolio_section(
+            portfolio_slice, supplemental_sources
+        ),
         "market_context": _optional_section(
             supplemental_sources,
             {"market_context", "price", "classification"},
@@ -1755,6 +1814,98 @@ def _validate_source_manifests(
         str(item.get("source_id") or ""): item
         for item in [*linked_decisions, *supplemental_sources]
     }
+    reconstructed = _reconstructed_snapshot_sources(supplemental_sources)
+    if len(reconstructed) > 1:
+        findings.append(
+            _finding(
+                "blocker",
+                "LEDGER_RECONSTRUCTION_CARDINALITY_INVALID",
+                "a single-episode bundle may freeze at most one ledger reconstruction",
+            )
+        )
+    request = (
+        artifact.get("build_request")
+        if isinstance(artifact.get("build_request"), Mapping)
+        else {}
+    )
+    episode_scope = (
+        episode.get("scope")
+        if isinstance(episode.get("scope"), Mapping)
+        else {}
+    )
+    for source in reconstructed:
+        payload = (
+            source.get("payload")
+            if isinstance(source.get("payload"), Mapping)
+            else {}
+        )
+        scope = (
+            payload.get("scope")
+            if isinstance(payload.get("scope"), Mapping)
+            else {}
+        )
+        if (
+            str(payload.get("episode_id") or "")
+            != str(episode.get("episode_id") or "")
+            or str(scope.get("account_id") or "")
+            != str(episode_scope.get("account_id") or "")
+            or str(scope.get("symbol") or "")
+            != str(episode_scope.get("instrument_id") or "")
+        ):
+            findings.append(
+                _finding(
+                    "blocker",
+                    "LEDGER_RECONSTRUCTION_EPISODE_BINDING_MISMATCH",
+                    "ledger reconstruction scope does not match the frozen episode",
+                )
+            )
+        try:
+            reconstruction_as_of = _parse_timestamp(
+                payload.get("as_of"),
+                "ledger_snapshot_reconstruction.as_of",
+            )
+            reconstruction_cutoff = _parse_timestamp(
+                payload.get("knowledge_cutoff"),
+                "ledger_snapshot_reconstruction.knowledge_cutoff",
+            )
+            request_as_of = _parse_timestamp(
+                request.get("as_of"), "build_request.as_of"
+            )
+            request_cutoff = _parse_timestamp(
+                request.get("knowledge_cutoff"),
+                "build_request.knowledge_cutoff",
+            )
+            episode_status = str(episode.get("status") or "")
+            if episode_status == "closed":
+                episode_boundary = _parse_timestamp(
+                    episode.get("closed_at"),
+                    "episode.closed_at",
+                )
+                episode_boundary_mismatch = (
+                    reconstruction_as_of != episode_boundary
+                )
+            elif episode_status == "open":
+                episode_boundary_mismatch = (
+                    episode.get("closed_at") not in (None, "")
+                    or reconstruction_as_of != request_as_of
+                )
+            else:
+                episode_boundary_mismatch = True
+            cutoff_mismatch = (
+                episode_boundary_mismatch
+                or reconstruction_as_of > request_as_of
+                or reconstruction_cutoff != request_cutoff
+            )
+        except ReviewInputBundleError:
+            cutoff_mismatch = True
+        if cutoff_mismatch:
+            findings.append(
+                _finding(
+                    "blocker",
+                    "LEDGER_RECONSTRUCTION_CUTOFF_BINDING_MISMATCH",
+                    "ledger reconstruction cutoffs do not match the episode boundary and bundle request",
+                )
+            )
     excluded_by_id = {
         str(item.get("source_id") or ""): item for item in excluded
     }
@@ -2416,6 +2567,42 @@ def _validate_wrapped_source(
                 f"{field}.content_id does not bind its envelope and payload",
             )
         )
+    if (
+        not decision
+        and wrapper.get("source_kind") == "snapshot"
+        and payload.get("schema_version")
+        == LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
+    ):
+        try:
+            expected_raw = build_ledger_snapshot_supplemental_source(
+                payload,
+                locator=str(wrapper.get("locator") or ""),
+            )
+            expected_wrapper = _normalize_source_envelope(
+                expected_raw,
+                expected_kind=None,
+                decision=False,
+                field=field,
+            )
+            if dict(wrapper) != expected_wrapper:
+                findings.append(
+                    _finding(
+                        "blocker",
+                        "LEDGER_RECONSTRUCTION_ENVELOPE_MISMATCH",
+                        (
+                            f"{field} does not preserve the validated "
+                            "reconstruction identity, times and availability"
+                        ),
+                    )
+                )
+        except Exception as exc:
+            findings.append(
+                _finding(
+                    "blocker",
+                    "LEDGER_RECONSTRUCTION_INVALID",
+                    f"{field} failed reconstruction validation: {exc}",
+                )
+            )
     try:
         wrapper_id = str(wrapper.get("source_id") or "")
         payload_id = next(

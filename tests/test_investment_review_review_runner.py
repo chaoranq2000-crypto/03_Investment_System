@@ -156,6 +156,56 @@ def _fixture(
     )
 
 
+def _reviewability_fixture(
+    tmp_path: Path,
+    *,
+    rows: list[dict[str, str]] | None = None,
+) -> RunnerFixture:
+    root = tmp_path / "repo"
+    source, mapping, review_db = _write_fixture(
+        root,
+        rows=rows
+        or [
+            _trade_row(
+                event_date="2026-01-05",
+                event_type="BUY",
+                external_id="open-one",
+            ),
+            _trade_row(
+                event_date="2026-01-06",
+                event_type="BUY",
+                external_id="increase-one",
+            ),
+        ],
+    )
+    PortfolioStore(source).initialize()
+    store = ReviewStore(review_db)
+    store.initialize_reviewability_candidate()
+    sync_review_events(
+        source,
+        review_db=review_db,
+        mapping_path=mapping,
+        repo_root=root,
+    )
+    artifacts = root / "run-artifacts"
+    runner = ReviewRunner(
+        review_db=review_db,
+        portfolio_db=source,
+        mapping_path=mapping,
+        artifact_root=artifacts,
+        repo_root=root,
+    )
+    return RunnerFixture(
+        root=root,
+        source=source,
+        mapping=mapping,
+        review_db=review_db,
+        artifacts=artifacts,
+        store=store,
+        runner=runner,
+    )
+
+
 def _run(
     fixture: RunnerFixture,
     *,
@@ -318,6 +368,215 @@ def test_default_user_and_explicit_perspectives_are_bound_to_run_identity(
     assert system["selection"]["selected_episode_ids"] == []
 
 
+def test_legacy_sidecar_does_not_enable_ledger_reconstruction(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fixture = _fixture(tmp_path)
+
+    def unexpected_reconstruction(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        raise AssertionError(
+            "legacy sidecars must preserve their canonical runner path"
+        )
+
+    monkeypatch.setattr(
+        runner_module,
+        "build_ledger_snapshot_reconstruction",
+        unexpected_reconstruction,
+    )
+
+    receipt = _run(fixture, dry_run=True)
+
+    assert receipt["status"] == "partial"
+    assert "reviewability_schema_version" not in receipt["cutoffs"]
+    assert (
+        "ledger_snapshot_reconstruction_count"
+        not in _stage(receipt, "snapshot")["details"]
+    )
+    assert "ledger_snapshot_reconstruction" not in receipt["episodes"][0]
+
+
+def test_reviewability_runner_freezes_and_replays_ledger_reconstruction(
+    tmp_path: Path,
+) -> None:
+    fixture = _reviewability_fixture(tmp_path)
+    source_before = _sha256(fixture.source)
+
+    receipt = _run(fixture)
+
+    assert _sha256(fixture.source) == source_before
+    assert receipt["cutoffs"]["reviewability_schema_version"] == 1
+    assert (
+        receipt["cutoffs"][
+            "ledger_snapshot_reconstruction_schema_version"
+        ]
+        == runner_module.LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
+    )
+    assert (
+        receipt["cutoffs"][
+            "ledger_snapshot_projection_manifest_version"
+        ]
+        == runner_module.LEDGER_RECONSTRUCTION_PROJECTION_MANIFEST_VERSION
+    )
+    assert len(
+        receipt["cutoffs"][
+            "ledger_snapshot_reconstruction_projection_sha256"
+        ]
+    ) == 64
+    snapshot_stage = _stage(receipt, "snapshot")
+    assert snapshot_stage["details"][
+        "ledger_snapshot_reconstruction_count"
+    ] == 1
+    assert len(
+        snapshot_stage["details"]["cash_baseline_proof_content_ids"]
+    ) == 1
+    episode = receipt["episodes"][0]
+    projection = episode["ledger_snapshot_reconstruction"]
+    assert projection["ending_quantity"] == "20"
+    assert projection["status"] in {"available", "partial"}
+    assert snapshot_stage["details"][
+        "ledger_snapshot_reconstruction_content_ids"
+    ] == [projection["content_id"]]
+    descriptor = next(
+        item
+        for item in snapshot_stage["artifacts"]
+        if item.get("content_id") == projection["content_id"]
+    )
+    artifact = json.loads(
+        Path(descriptor["path"]).read_text(encoding="utf-8")
+    )
+    assert artifact["episode_id"] == episode["episode_id"]
+    assert artifact["content_id"] == projection["content_id"]
+    assert (
+        runner_module.validate_ledger_snapshot_reconstruction(artifact)[
+            "validation_status"
+        ]
+        == "accepted"
+    )
+    frozen_input = json.loads(
+        Path(episode["artifacts"]["input"]["path"]).read_text(
+            encoding="utf-8"
+        )
+    )
+    supplementals = frozen_input["frozen_sources"][
+        "supplemental_sources"
+    ]
+    assert len(supplementals) == 1
+    assert (
+        supplementals[0]["payload"]["schema_version"]
+        == runner_module.LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
+    )
+    replay = _stage(receipt, "source_replay")["details"]["episodes"][0][
+        "ledger_snapshot_reconstruction"
+    ]
+    assert replay == {
+        **projection,
+        "validation_status": "accepted",
+        "source_verification": "verified",
+    }
+    assert (
+        fixture.runner.validate_receipt(receipt)["validation_status"]
+        == "accepted"
+    )
+    assert _run(fixture) == receipt
+
+
+def test_reviewability_runner_fails_closed_when_reconstruction_replay_blocks(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fixture = _reviewability_fixture(tmp_path)
+
+    monkeypatch.setattr(
+        runner_module,
+        "replay_validate_ledger_snapshot_reconstruction",
+        lambda *args, **kwargs: {
+            "validation_status": "blocked",
+            "findings": [
+                {
+                    "severity": "blocker",
+                    "code": "SYNTHETIC_REPLAY_DRIFT",
+                }
+            ],
+            "source_verification": {"status": "failed"},
+        },
+    )
+
+    receipt = _run(fixture, dry_run=True)
+
+    assert receipt["status"] == "blocked"
+    assert receipt["stages"][-1]["status"] == "blocked"
+    assert (
+        receipt["stages"][-1]["details"]["error_type"]
+        == "CanonicalGateBlocked"
+    )
+    assert "CANONICAL_GATE_BLOCKED" in receipt["gaps"]
+
+
+@pytest.mark.parametrize("dry_run", [True, False])
+def test_receipt_validator_rejects_coordinated_reconstruction_quantity_tamper(
+    tmp_path: Path,
+    dry_run: bool,
+) -> None:
+    fixture = _reviewability_fixture(tmp_path)
+    tampered = deepcopy(_run(fixture, dry_run=dry_run))
+    tampered["episodes"][0]["ledger_snapshot_reconstruction"][
+        "ending_quantity"
+    ] = "999999"
+    _stage(tampered, "source_replay")["details"]["episodes"][0][
+        "ledger_snapshot_reconstruction"
+    ]["ending_quantity"] = "999999"
+    tampered["content_id"] = runner_module._receipt_content_id(tampered)
+
+    validation = fixture.runner.validate_receipt(tampered)
+
+    assert validation["validation_status"] == "blocked"
+    assert (
+        "LEDGER_RECONSTRUCTION_PROJECTION_BINDING_MISMATCH"
+        in validation["findings"]
+    )
+    if not dry_run:
+        assert (
+            "LEDGER_RECONSTRUCTION_ARTIFACT_INVALID"
+            in validation["findings"]
+        )
+
+
+def test_dry_receipt_validator_rejects_coordinated_reconstruction_id_tamper(
+    tmp_path: Path,
+) -> None:
+    fixture = _reviewability_fixture(tmp_path)
+    tampered = deepcopy(_run(fixture, dry_run=True))
+    projection = tampered["episodes"][0][
+        "ledger_snapshot_reconstruction"
+    ]
+    original_content_id = projection["content_id"]
+    fake_content_id = "sha256:" + ("f" * 64)
+    projection["content_id"] = fake_content_id
+    _stage(tampered, "source_replay")["details"]["episodes"][0][
+        "ledger_snapshot_reconstruction"
+    ]["content_id"] = fake_content_id
+    snapshot_stage = _stage(tampered, "snapshot")
+    snapshot_stage["details"][
+        "ledger_snapshot_reconstruction_content_ids"
+    ] = [fake_content_id]
+    for descriptor in snapshot_stage["artifacts"]:
+        if descriptor.get("content_id") == original_content_id:
+            descriptor["content_id"] = fake_content_id
+    tampered["episodes"][0]["artifacts"]["snapshot_reconstruction"][
+        "content_id"
+    ] = fake_content_id
+    tampered["content_id"] = runner_module._receipt_content_id(tampered)
+
+    validation = fixture.runner.validate_receipt(tampered)
+
+    assert validation["validation_status"] == "blocked"
+    assert (
+        "LEDGER_RECONSTRUCTION_PROJECTION_BINDING_MISMATCH"
+        in validation["findings"]
+    )
+
+
 def test_service_rejects_unknown_perspective_before_any_write(
     tmp_path: Path,
 ) -> None:
@@ -446,6 +705,27 @@ def test_apply_then_identical_repeat_reuses_immutable_receipt(
     )
 
 
+def test_receipt_validation_requires_the_generation_artifact_namespace(
+    tmp_path: Path,
+) -> None:
+    fixture = _fixture(tmp_path)
+    receipt = _run(fixture, dry_run=True)
+    mismatched_validator = ReviewRunner(
+        review_db=fixture.review_db,
+        portfolio_db=fixture.source,
+        mapping_path=fixture.mapping,
+        artifact_root=fixture.root / "different-artifact-namespace",
+        repo_root=fixture.root,
+    )
+
+    validation = mismatched_validator.validate_receipt(receipt)
+
+    assert validation["validation_status"] == "blocked"
+    assert validation["findings"] == [
+        "RUN_KEY_PERSPECTIVE_BINDING_MISMATCH"
+    ]
+
+
 def test_single_weekly_monthly_selection_is_deterministic(
     tmp_path: Path,
 ) -> None:
@@ -472,6 +752,119 @@ def test_single_weekly_monthly_selection_is_deterministic(
     assert set(selections["weekly"]) < set(selections["monthly"])
     assert _sha256(fixture.source) == source_before
     assert not fixture.artifacts.exists()
+
+
+@pytest.mark.parametrize("dry_run", [True, False])
+def test_monthly_reentry_does_not_merge_into_prior_closed_episode(
+    tmp_path: Path,
+    dry_run: bool,
+) -> None:
+    rows = [
+        *_closed_episode_rows("2026-01-05", "2026-01-06", "closed"),
+        _trade_row(
+            event_date="2026-01-31",
+            event_type="BUY",
+            external_id="reentry-open",
+            quantity="20",
+        ),
+    ]
+    fixture = _reviewability_fixture(tmp_path, rows=rows)
+
+    receipt = _run(fixture, scope="monthly", dry_run=dry_run)
+
+    assert receipt["status"] != "blocked"
+    assert len(receipt["selection"]["selected_episode_ids"]) == 2
+    projections = [
+        item["ledger_snapshot_reconstruction"]
+        for item in receipt["episodes"]
+    ]
+    assert sorted(item["ending_quantity"] for item in projections) == [
+        "0",
+        "20",
+    ]
+    assert sorted(item["as_of"] for item in projections) == [
+        "2026-01-06T02:00:00Z",
+        receipt["cutoffs"]["as_of"],
+    ]
+    assert (
+        fixture.runner.validate_receipt(receipt)["validation_status"]
+        == "accepted"
+    )
+
+
+def test_same_timestamp_reentry_uses_p2c_source_order_cursor(
+    tmp_path: Path,
+) -> None:
+    rows = [
+        _trade_row(
+            event_date="2026-01-05",
+            event_type="BUY",
+            external_id="same-time-open",
+        ),
+        _trade_row(
+            event_date="2026-01-06",
+            event_time="10:00:00",
+            event_type="SELL",
+            external_id="same-time-close",
+        ),
+        _trade_row(
+            event_date="2026-01-06",
+            event_time="10:00:00",
+            event_type="BUY",
+            external_id="same-time-reentry",
+            quantity="20",
+        ),
+    ]
+    fixture = _reviewability_fixture(tmp_path, rows=rows)
+
+    receipt = _run(fixture, scope="monthly")
+
+    assert receipt["status"] != "blocked"
+    assert len(receipt["selection"]["selected_episode_ids"]) == 2
+    projections = [
+        item["ledger_snapshot_reconstruction"]
+        for item in receipt["episodes"]
+    ]
+    assert sorted(item["ending_quantity"] for item in projections) == [
+        "0",
+        "20",
+    ]
+    closed_episode = next(
+        item
+        for item in receipt["episodes"]
+        if item["ledger_snapshot_reconstruction"]["ending_quantity"] == "0"
+    )
+    closed_artifact = json.loads(
+        Path(
+            closed_episode["artifacts"]["snapshot_reconstruction"]["path"]
+        ).read_text(encoding="utf-8")
+    )
+    closing_event_id = closed_artifact["source_binding"][
+        "episode_event_ids"
+    ][-1]
+    closing_anchors = [
+        item
+        for item in closed_artifact["anchors"]
+        if item["event_id"] == closing_event_id
+    ]
+    assert len(closing_anchors) == 2
+    assert {
+        item["ordering_status"] for item in closing_anchors
+    } == {"ambiguous"}
+    assert all(
+        len(item["same_time_event_ids"]) == 2
+        for item in closing_anchors
+    )
+    assert any(
+        closing_event_id in item["event_ids"]
+        and len(item["event_ids"]) == 2
+        and item["ordering_status"] == "ambiguous"
+        for item in closed_artifact["event_cursor"]["same_time_groups"]
+    )
+    assert (
+        fixture.runner.validate_receipt(receipt)["validation_status"]
+        == "accepted"
+    )
 
 
 def test_immutable_artifact_collision_blocks_without_overwrite(

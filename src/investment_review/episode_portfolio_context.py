@@ -30,6 +30,10 @@ from .artifact_io import (
     pretty_json_bytes,
 )
 from .episodes import COLLECTION_SCHEMA_VERSION, validate_episode_collection
+from .ledger_snapshot_reconstruction import (
+    LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION,
+    validate_ledger_snapshot_reconstruction,
+)
 from .models import ModelValidationError
 from .portfolio_context import (
     PORTFOLIO_METRIC_METHOD_REGISTRY,
@@ -49,6 +53,7 @@ _DECIMAL_RE = re.compile(
     r"^(?:0|-?(?:[1-9][0-9]*(?:\.[0-9]*[1-9])?|0\.[0-9]*[1-9]))$"
 )
 _METRIC_KEY_RE = re.compile(r"^[a-z][a-z0-9_.-]*$")
+_WARNING_CODE_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 _BUSINESS_TIMEZONE = ZoneInfo("Asia/Shanghai")
 _MARKET_CLOSE = time(15, 0)
 _CONTRACT_SCHEMA_PATH = (
@@ -76,6 +81,140 @@ _PARTIAL_METRIC_WARNING_CODES = {
 
 class EpisodePortfolioContextError(ValueError):
     """Raised when P2E-3 input or output violates the public contract."""
+
+
+def ledger_snapshot_reconstruction_availability(
+    artifact: Mapping[str, Any],
+) -> str:
+    """Project a validated v3 reconstruction into the legacy P2F availability set.
+
+    The v3 payload remains intact and therefore retains every field-level
+    ``available``/``partial``/``missing`` state.  Only the old P2F envelope,
+    whose closed vocabulary has no ``partial``, maps a mixed reconstruction to
+    ``ambiguous``.
+    """
+
+    if not isinstance(artifact, Mapping):
+        raise EpisodePortfolioContextError(
+            "ledger snapshot reconstruction must be an object"
+        )
+    if (
+        artifact.get("schema_version")
+        != LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
+    ):
+        raise EpisodePortfolioContextError(
+            "unsupported ledger snapshot reconstruction schema"
+        )
+    validation = validate_ledger_snapshot_reconstruction(artifact)
+    if (
+        not isinstance(validation, Mapping)
+        or validation.get("validation_status") == "blocked"
+        or any(
+            isinstance(item, Mapping) and item.get("severity") == "blocker"
+            for item in validation.get("findings", [])
+        )
+    ):
+        raise EpisodePortfolioContextError(
+            "ledger snapshot reconstruction failed closed validation"
+        )
+
+    statuses: list[str] = []
+    for anchor in artifact.get("anchors", []):
+        if not isinstance(anchor, Mapping):
+            continue
+        snapshot = anchor.get("snapshot_cash_valuation")
+        if isinstance(snapshot, Mapping):
+            statuses.append(str(snapshot.get("status") or ""))
+    if not statuses:
+        raise EpisodePortfolioContextError(
+            "ledger snapshot reconstruction has no snapshot anchors"
+        )
+    allowed = {"available", "partial", "missing", "not_applicable", "blocked"}
+    if any(item not in allowed for item in statuses):
+        raise EpisodePortfolioContextError(
+            "ledger snapshot reconstruction has an unsupported snapshot status"
+        )
+    if "blocked" in statuses:
+        return "invalid"
+    material = [item for item in statuses if item != "not_applicable"]
+    if not material or all(item == "missing" for item in material):
+        return "missing"
+    if all(item == "available" for item in material):
+        return "available"
+    return "ambiguous"
+
+
+def build_ledger_snapshot_supplemental_source(
+    artifact: Mapping[str, Any],
+    *,
+    locator: str | None = None,
+) -> dict[str, Any]:
+    """Wrap one validated v3 reconstruction for the existing P2F freeze gate.
+
+    This is an additive adapter only.  It does not mutate the canonical P2E-3
+    artifact or query either SQLite source.
+    """
+
+    availability = ledger_snapshot_reconstruction_availability(artifact)
+    effective = _parse_timestamp(
+        artifact.get("as_of"), "ledger_snapshot_reconstruction.as_of"
+    )
+    known = _parse_timestamp(
+        artifact.get("knowledge_cutoff"),
+        "ledger_snapshot_reconstruction.knowledge_cutoff",
+    )
+    if known < effective:
+        raise EpisodePortfolioContextError(
+            "ledger snapshot reconstruction knowledge_cutoff precedes as_of"
+        )
+    episode_id = str(artifact.get("episode_id") or "")
+    content_id = str(artifact.get("content_id") or "")
+    if not episode_id or _CONTENT_ID_RE.fullmatch(content_id) is None:
+        raise EpisodePortfolioContextError(
+            "ledger snapshot reconstruction lacks immutable identity"
+        )
+
+    warning_codes = {
+        str(item.get("code") or "")
+        for item in artifact.get("gaps", [])
+        if isinstance(item, Mapping)
+        and str(item.get("axis") or "")
+        in {"snapshot", "snapshot_cash_valuation"}
+        and _WARNING_CODE_RE.fullmatch(str(item.get("code") or ""))
+    }
+    if availability == "ambiguous" and not warning_codes:
+        warning_codes.add("RECONSTRUCTED_SNAPSHOT_PARTIAL")
+    elif availability == "missing" and not warning_codes:
+        warning_codes.add("RECONSTRUCTED_SNAPSHOT_MISSING")
+    elif availability == "invalid" and not warning_codes:
+        warning_codes.add("RECONSTRUCTED_SNAPSHOT_BLOCKED")
+
+    payload = deepcopy(dict(artifact))
+    source_id = _stable_id(
+        "ledger_snapshot_reconstruction",
+        {
+            "episode_id": episode_id,
+            "perspective": str(artifact.get("perspective") or ""),
+            "as_of": _iso(effective),
+            "knowledge_cutoff": _iso(known),
+            "content_id": content_id,
+        },
+    )
+    return {
+        "source_id": source_id,
+        "source_kind": "snapshot",
+        "content_id": _value_content_id(payload),
+        "availability": availability,
+        "effective_at": _iso(effective),
+        "knowledge_at": _iso(known),
+        "locator": (
+            str(locator)
+            if locator is not None
+            else f"ledger_snapshot_reconstruction/{content_id}.json"
+        ),
+        "warning_codes": sorted(warning_codes),
+        "payload": payload,
+    }
 
 
 def _parse_timestamp(value: object, field: str) -> datetime:

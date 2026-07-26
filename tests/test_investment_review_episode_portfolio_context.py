@@ -16,7 +16,9 @@ from src.investment_review.episode_portfolio_context import (
     METRIC_REGISTRY_VERSION,
     SCHEMA_VERSION,
     EpisodePortfolioContextError,
+    build_ledger_snapshot_supplemental_source,
     build_episode_portfolio_context,
+    ledger_snapshot_reconstruction_availability,
     load_episode_portfolio_context,
     query_episode_portfolio_context,
     replay_validate_episode_portfolio_context,
@@ -27,12 +29,95 @@ from src.investment_review.episode_portfolio_context import (
     _stable_id,
 )
 from src.investment_review.episodes import build_episode_collection
+from src.investment_review.ledger_snapshot_reconstruction import (
+    build_ledger_snapshot_reconstruction,
+)
 from src.investment_review.cli import main as review_main
 
 
 UTC = timezone.utc
 BASE = datetime(2026, 7, 1, 1, 30, tzinfo=UTC)
 CUTOFF = datetime(2026, 7, 1, 8, 0, tzinfo=UTC)
+
+
+def _ledger_reconstruction_fixture() -> dict[str, Any]:
+    payload_sha = hashlib.sha256(b"ledger-buy-1").hexdigest()
+    episode = {
+        "episode_id": "episode-ledger-wrapper",
+        "scope": {
+            "account_id": "acct-1",
+            "symbol": "600000.SH",
+            "instrument_id": "600000.SH",
+            "currency": "CNY",
+        },
+        "event_refs": [{"event_id": "ledger-buy-1"}],
+    }
+    events = [
+        {
+            "event_id": "ledger-buy-1",
+            "source_id": "src-ledger-wrapper",
+            "source_record_id": "acct-1::ledger-buy-1",
+            "payload_sha256": payload_sha,
+            "event_type": "buy",
+            "occurred_at": BASE.isoformat(),
+            "known_at": BASE.isoformat(),
+            "account": "acct-1",
+            "symbol": "600000.SH",
+            "side": "BUY",
+            "quantity": "100",
+            "price": "10",
+            "gross_amount": "1000",
+            "cash_amount": "-1001",
+            "fees": "1",
+            "currency": "CNY",
+            "raw_payload": {
+                "source_row": {
+                    "business_sequence": 1,
+                    "note": "fee_pending",
+                }
+            },
+        }
+    ]
+    digest = hashlib.sha256(b"ledger-wrapper-proof").hexdigest()
+    return build_ledger_snapshot_reconstruction(
+        events,
+        episode=episode,
+        perspective="user",
+        as_of=CUTOFF.isoformat(),
+        knowledge_cutoff=CUTOFF.isoformat(),
+        source_binding={
+            "portfolio_source_sha256": digest,
+            "sync_source_sha256": digest,
+            "mapping_sha256": digest,
+            "source_cutoff_id": "fixture-cutoff",
+            "sidecar_projection_sha256": digest,
+            "knowledge_provenance_content_id": digest,
+            "cash_baseline_proof_content_id": digest,
+        },
+        baseline_proof={
+            "schema_version": "investment_review.ledger_snapshot_baseline.v1",
+            "position": {
+                "status": "missing",
+                "quantity": None,
+                "cost_basis": None,
+                "effective_at": None,
+                "known_at": None,
+                "method": "missing",
+                "source_refs": [],
+            },
+            "cash": {
+                "status": "partial",
+                "value": "10000",
+                "currency": "CNY",
+                "effective_at": "2026-06-30T08:00:00+00:00",
+                "known_at": "2026-06-30T08:00:00+00:00",
+                "recorded_at": "2026-06-30T08:00:00+00:00",
+                "fee_pending": True,
+                "method": "cash_balance_snapshot",
+                "source_refs": ["cash:fixture-baseline"],
+            },
+        },
+    )
 
 
 def _event(
@@ -517,6 +602,45 @@ def test_minimal_artifact_matches_public_contract(artifact: dict[str, Any]) -> N
     validation = validate_episode_portfolio_context(artifact)
     assert validation["schema_version"] == "p2e3.trade_episode_portfolio_context.validation.v1"
     assert validation["validation_status"] in {"accepted", "accepted_with_warnings"}
+
+
+def test_ledger_reconstruction_wrapper_preserves_field_level_partial_states() -> None:
+    reconstruction = _ledger_reconstruction_fixture()
+
+    assert ledger_snapshot_reconstruction_availability(reconstruction) == "ambiguous"
+    wrapper = build_ledger_snapshot_supplemental_source(reconstruction)
+    repeat = build_ledger_snapshot_supplemental_source(reconstruction)
+
+    assert repeat == wrapper
+    assert wrapper["source_kind"] == "snapshot"
+    assert wrapper["availability"] == "ambiguous"
+    assert wrapper["payload"] == reconstruction
+    assert wrapper["effective_at"] == "2026-07-01T08:00:00Z"
+    assert wrapper["knowledge_at"] == "2026-07-01T08:00:00Z"
+    anchors = wrapper["payload"]["anchors"]
+    assert anchors
+    for anchor in anchors:
+        fields = anchor["snapshot_cash_valuation"]["fields"]
+        assert set(fields) == {
+            "position_quantity",
+            "cost_basis",
+            "cash",
+            "price",
+            "nav",
+            "weight",
+            "industry",
+        }
+    post = next(
+        item
+        for item in anchors
+        if item["anchor_type"] == "event_post"
+    )
+    assert (
+        post["snapshot_cash_valuation"]["fields"]["position_quantity"]["value"]
+        == "100"
+    )
+    assert post["snapshot_cash_valuation"]["fields"]["cash"]["status"] == "partial"
+    assert post["snapshot_cash_valuation"]["fields"]["price"]["status"] == "missing"
 
 
 @pytest.mark.parametrize("bad_value", [0.25, "NaN", "Infinity", "01"])

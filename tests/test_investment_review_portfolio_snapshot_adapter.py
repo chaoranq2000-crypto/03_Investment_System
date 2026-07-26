@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import sqlite3
 from copy import deepcopy
 from datetime import date, datetime, timezone
 from decimal import Decimal
@@ -13,6 +14,7 @@ from src.investment_review.portfolio_snapshot_adapter import (
     PortfolioSnapshotAdapter,
     PortfolioSnapshotAdapterError,
     inspect_portfolio_snapshots,
+    load_cash_baseline_proof,
 )
 from src.portfolio.models import ClosePrice, Instrument, LedgerEntry
 from src.portfolio.store import PortfolioStore
@@ -365,3 +367,169 @@ def test_adapter_rejects_source_change_during_inventory(tmp_path, monkeypatch):
             as_of="2026-07-12",
             knowledge_cutoff="2026-07-12T00:00:00+00:00",
         )
+
+
+def test_cash_baseline_is_strictly_pre_event_and_same_day_is_reconciliation_only(
+    tmp_path,
+):
+    store = _store(tmp_path)
+    pre = store.set_cash_balance(
+        "default",
+        Decimal("2697"),
+        date(2026, 7, 15),
+        source="reviewed_statement",
+    )
+    checkpoint = store.set_cash_balance(
+        "default",
+        Decimal("961.4"),
+        date(2026, 7, 17),
+        source="statement_calculated",
+        note="fee_pending_entries=7; calculation_status=fee_pending",
+    )
+    with store.connect() as connection:
+        connection.execute(
+            "UPDATE cash_balance_snapshots SET recorded_at = ? WHERE snapshot_id = ?",
+            ("2026-07-16T02:00:00+00:00", pre["snapshot_id"]),
+        )
+        connection.execute(
+            "UPDATE cash_balance_snapshots SET recorded_at = ? WHERE snapshot_id = ?",
+            ("2026-07-17T10:00:00+00:00", checkpoint["snapshot_id"]),
+        )
+        connection.commit()
+    before = _file_sha256(store.path)
+
+    proof = load_cash_baseline_proof(
+        store.path,
+        account_id="default",
+        pre_event_at="2026-07-17T05:40:00+00:00",
+        as_of="2026-07-17T05:55:28+00:00",
+        knowledge_cutoff_at="2026-07-18T00:00:00+00:00",
+    )
+    repeat = load_cash_baseline_proof(
+        store.path,
+        account_id="default",
+        pre_event_at="2026-07-17T05:40:00+00:00",
+        as_of="2026-07-17T05:55:28+00:00",
+        knowledge_cutoff_at="2026-07-18T00:00:00+00:00",
+    )
+
+    assert _file_sha256(store.path) == before
+    assert repeat == proof
+    assert proof["pre_event_baseline"]["row"]["snapshot_id"] == pre["snapshot_id"]
+    assert proof["pre_event_baseline"]["row"]["amount"] == "2697"
+    assert (
+        proof["checkpoint_reconciliation"]["row"]["snapshot_id"]
+        == checkpoint["snapshot_id"]
+    )
+    assert proof["checkpoint_reconciliation"]["row"]["fee_pending"] is True
+    baseline = proof["baseline_proof"]
+    assert baseline["schema_version"] == "investment_review.ledger_snapshot_baseline.v1"
+    assert baseline["position"]["status"] == "missing"
+    assert baseline["cash"] == {
+        "status": "available",
+        "value": "2697",
+        "currency": "CNY",
+        "effective_at": "2026-07-16T02:00:00+00:00",
+        "known_at": "2026-07-16T02:00:00+00:00",
+        "recorded_at": "2026-07-16T02:00:00+00:00",
+        "fee_pending": False,
+        "method": "cash_balance_snapshot",
+        "source_refs": [
+            proof["pre_event_baseline"]["row"]["row_content_id"]
+        ],
+    }
+    binding = proof["source_binding"]
+    assert binding["sqlite_mode"] == "ro"
+    assert binding["query_only"] is True
+    assert binding["quick_check"] == "ok"
+    assert binding["same_day_checkpoint_not_pre_baseline"] is True
+    assert binding["source_sha256_before"] == before
+    assert binding["source_sha256_after"] == before
+    _assert_no_floats(proof)
+
+
+def test_missing_cash_source_schema_degrades_cash_only(tmp_path):
+    source = tmp_path / "portfolio_without_cash.sqlite3"
+    with sqlite3.connect(source) as connection:
+        connection.execute("CREATE TABLE placeholder (id INTEGER PRIMARY KEY)")
+        connection.commit()
+    before = _file_sha256(source)
+
+    proof = load_cash_baseline_proof(
+        source,
+        account_id="default",
+        pre_event_at="2026-07-17T05:40:00+00:00",
+        as_of="2026-07-17T05:55:28+00:00",
+        knowledge_cutoff_at="2026-07-18T00:00:00+00:00",
+    )
+
+    assert _file_sha256(source) == before
+    assert proof["baseline_proof"]["cash"] == {
+        "status": "missing",
+        "value": None,
+        "currency": "CNY",
+        "effective_at": None,
+        "known_at": None,
+        "recorded_at": None,
+        "fee_pending": False,
+        "method": "missing",
+        "source_refs": [],
+    }
+    assert proof["pre_event_baseline"]["status"] == "missing"
+    assert proof["checkpoint_reconciliation"]["status"] == "missing"
+    assert {
+        item["code"] for item in proof["gaps"]
+    } == {"CASH_BASELINE_MISSING", "CASH_SOURCE_SCHEMA_MISSING"}
+    assert proof["source_binding"]["source_schema_status"] == "missing"
+    assert proof["source_binding"]["quick_check"] == "ok"
+
+
+def test_invalid_cash_row_is_excluded_without_hiding_schema_health(tmp_path):
+    source = tmp_path / "portfolio_invalid_cash.sqlite3"
+    with sqlite3.connect(source) as connection:
+        connection.executescript(
+            """
+            CREATE TABLE cash_balance_snapshots (
+                snapshot_id TEXT PRIMARY KEY,
+                account_id TEXT NOT NULL,
+                as_of_date TEXT NOT NULL,
+                amount TEXT NOT NULL,
+                source TEXT NOT NULL,
+                note TEXT NOT NULL DEFAULT '',
+                recorded_at TEXT NOT NULL
+            );
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO cash_balance_snapshots
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "cash-invalid",
+                "default",
+                "2026-07-15",
+                "not-a-decimal",
+                "fixture",
+                "",
+                "2026-07-15T12:30:30+00:00",
+            ),
+        )
+        connection.commit()
+    before = _file_sha256(source)
+
+    proof = load_cash_baseline_proof(
+        source,
+        account_id="default",
+        pre_event_at="2026-07-17T05:40:00+00:00",
+        as_of="2026-07-17T05:55:28+00:00",
+        knowledge_cutoff_at="2026-07-18T00:00:00+00:00",
+    )
+
+    assert _file_sha256(source) == before
+    assert proof["source_binding"]["source_schema_status"] == "available"
+    assert proof["baseline_proof"]["cash"]["status"] == "missing"
+    assert proof["invalid_rows"][0]["snapshot_id"] == "cash-invalid"
+    assert {
+        item["code"] for item in proof["gaps"]
+    } == {"CASH_BASELINE_MISSING", "CASH_EVIDENCE_ROW_INVALID"}

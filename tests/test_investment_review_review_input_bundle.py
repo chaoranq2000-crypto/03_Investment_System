@@ -16,9 +16,14 @@ from src.investment_review.artifact_io import canonical_json_bytes
 from src.investment_review.cli import main as review_main
 from src.investment_review.episode_portfolio_context import (
     build_episode_portfolio_context,
+    build_ledger_snapshot_supplemental_source,
     replay_validate_episode_portfolio_context,
 )
 from src.investment_review.episodes import build_episode_collection
+from src.investment_review.ledger_snapshot_reconstruction import (
+    LedgerSnapshotReconstructionError,
+    build_ledger_snapshot_reconstruction,
+)
 from src.investment_review.review_input_bundle import (
     ReviewInputBundleError,
     _content_id as _bundle_content_id,
@@ -567,6 +572,110 @@ def _build_bundle(
     )
 
 
+def _ledger_reconstruction_source(
+    chain: FixtureChain,
+    *,
+    episode_id: str | None = None,
+    as_of: datetime | str | None = None,
+    knowledge_cutoff: datetime | str = CUTOFF,
+) -> dict[str, Any]:
+    episode = deepcopy(chain.collection["episodes"][0])
+    if episode_id is not None:
+        episode["episode_id"] = episode_id
+    event_rows: list[dict[str, Any]] = []
+    gross_by_side = {"BUY": "1000", "SELL": "1100"}
+    for index, event in enumerate(episode["event_refs"], start=1):
+        side = str(event["side"])
+        event_rows.append(
+            {
+                "event_id": str(event["event_id"]),
+                "source_id": str(event["source_refs"]["source_id"]),
+                "source_record_id": str(
+                    event["source_refs"]["source_record_id"]
+                ),
+                "payload_sha256": str(
+                    event["source_refs"]["payload_sha256"]
+                ),
+                "event_type": side.lower(),
+                "occurred_at": str(event["effective_at"]),
+                "known_at": str(event["known_at"]),
+                "account": "acct-1",
+                "symbol": "600000.SH",
+                "side": side,
+                "quantity": str(event["signed_quantity"]).lstrip("-"),
+                "price": "10" if side == "BUY" else "11",
+                "gross_amount": gross_by_side[side],
+                "cash_amount": "-1001" if side == "BUY" else "1099",
+                "fees": "1",
+                "currency": "CNY",
+                "raw_payload": {
+                    "source_row": {
+                        "entry_id": index,
+                        "business_sequence": index,
+                        "note": "",
+                    }
+                },
+            }
+        )
+    digest = hashlib.sha256(b"p2f-ledger-reconstruction-proof").hexdigest()
+    reconstruction = build_ledger_snapshot_reconstruction(
+        event_rows,
+        episode=episode,
+        perspective="user",
+        as_of=(
+            as_of.isoformat()
+            if isinstance(as_of, datetime)
+            else (
+                as_of
+                if as_of is not None
+                else (
+                    str(episode["closed_at"])
+                    if episode.get("status") == "closed"
+                    else CUTOFF.isoformat()
+                )
+            )
+        ),
+        knowledge_cutoff=(
+            knowledge_cutoff.isoformat()
+            if isinstance(knowledge_cutoff, datetime)
+            else knowledge_cutoff
+        ),
+        source_binding={
+            "portfolio_source_sha256": digest,
+            "sync_source_sha256": digest,
+            "mapping_sha256": digest,
+            "source_cutoff_id": "fixture-cutoff",
+            "sidecar_projection_sha256": digest,
+            "knowledge_provenance_content_id": digest,
+            "cash_baseline_proof_content_id": digest,
+        },
+        baseline_proof={
+            "schema_version": "investment_review.ledger_snapshot_baseline.v1",
+            "position": {
+                "status": "missing",
+                "quantity": None,
+                "cost_basis": None,
+                "effective_at": None,
+                "known_at": None,
+                "method": "missing",
+                "source_refs": [],
+            },
+            "cash": {
+                "status": "available",
+                "value": "10000",
+                "currency": "CNY",
+                "effective_at": "2026-06-30T08:00:00+00:00",
+                "known_at": "2026-06-30T08:00:00+00:00",
+                "recorded_at": "2026-06-30T08:00:00+00:00",
+                "fee_pending": False,
+                "method": "cash_balance_snapshot",
+                "source_refs": ["cash:fixture-baseline"],
+            },
+        },
+    )
+    return build_ledger_snapshot_supplemental_source(reconstruction)
+
+
 def _finding_codes(validation: Mapping[str, Any]) -> set[str]:
     return {
         str(item.get("code"))
@@ -611,6 +720,149 @@ def test_f1_01_repeated_build_has_identical_content_id_and_bytes(
     assert first == second
     assert first["content_id"] == second["content_id"]
     assert canonical_json_bytes(first) == canonical_json_bytes(second)
+
+
+def test_ledger_reconstruction_is_frozen_without_flattening_field_states(
+    chain: FixtureChain,
+) -> None:
+    source = _ledger_reconstruction_source(chain)
+    supplemental = [*chain.supplemental, source]
+
+    result = _build_bundle(chain, supplemental=supplemental)
+    frozen = next(
+        item
+        for item in result["frozen_sources"]["supplemental_sources"]
+        if item["source_kind"] == "snapshot"
+    )
+
+    assert frozen["payload"] == source["payload"]
+    assert frozen["availability"] == "ambiguous"
+    assert result["section_availability"]["portfolio_context"]["status"] == "ambiguous"
+    assert frozen["source_id"] in result["section_availability"][
+        "portfolio_context"
+    ]["source_ids"]
+    checkpoint = next(
+        item
+        for item in frozen["payload"]["anchors"]
+        if item["anchor_type"] == "checkpoint"
+    )
+    fields = checkpoint["snapshot_cash_valuation"]["fields"]
+    assert fields["position_quantity"]["value"] == "0"
+    assert fields["cash"]["value"] == "10098"
+    assert fields["price"]["status"] == "missing"
+    assert fields["nav"]["status"] == "missing"
+
+    replay = replay_validate_review_input_bundle(
+        result,
+        episode_collection=chain.collection,
+        episode_portfolio_context=chain.portfolio_context,
+        portfolio_db=chain.portfolio_db,
+        decision_sources=chain.decisions,
+        supplemental_sources=supplemental,
+    )
+    assert replay["validation_status"] in {
+        "accepted",
+        "accepted_with_warnings",
+    }
+    assert replay["source_verification"]["status"] == "verified"
+
+
+def test_tampered_ledger_reconstruction_is_blocked_after_outer_rehash(
+    chain: FixtureChain,
+) -> None:
+    source = _ledger_reconstruction_source(chain)
+    result = _build_bundle(
+        chain, supplemental=[*chain.supplemental, source]
+    )
+    mutated = deepcopy(result)
+    frozen = next(
+        item
+        for item in mutated["frozen_sources"]["supplemental_sources"]
+        if item["source_kind"] == "snapshot"
+    )
+    checkpoint = next(
+        item
+        for item in frozen["payload"]["anchors"]
+        if item["anchor_type"] == "checkpoint"
+    )
+    checkpoint["snapshot_cash_valuation"]["fields"]["position_quantity"][
+        "value"
+    ] = "999"
+    _rehash(mutated)
+
+    validation = validate_review_input_bundle(mutated)
+    assert validation["validation_status"] == "blocked"
+    assert "LEDGER_RECONSTRUCTION_INVALID" in _finding_codes(validation)
+
+
+def test_cross_episode_ledger_reconstruction_substitution_is_rejected(
+    chain: FixtureChain,
+) -> None:
+    wrong_episode_source = _ledger_reconstruction_source(
+        chain, episode_id="episode-from-another-review"
+    )
+
+    with pytest.raises(ReviewInputBundleError):
+        _build_bundle(
+            chain,
+            supplemental=[*chain.supplemental, wrong_episode_source],
+        )
+
+
+def test_closed_episode_reconstruction_rejects_request_cutoff(
+    chain: FixtureChain,
+) -> None:
+    with pytest.raises(
+        LedgerSnapshotReconstructionError,
+        match="as_of must equal closed_at",
+    ):
+        _ledger_reconstruction_source(
+            chain,
+            as_of=CUTOFF,
+        )
+
+
+def test_open_episode_reconstruction_must_use_request_as_of(
+    tmp_path: Path,
+) -> None:
+    open_chain = _fixture_chain(
+        tmp_path,
+        events=[_event("buy-open")],
+        decisions=(),
+        supplemental=(),
+    )
+    earlier_source = _ledger_reconstruction_source(
+        open_chain,
+        as_of=BASE + timedelta(hours=1),
+    )
+
+    with pytest.raises(
+        ReviewInputBundleError,
+        match="ledger reconstruction cutoffs",
+    ):
+        _build_bundle(
+            open_chain,
+            decisions=(),
+            supplemental=[earlier_source],
+        )
+
+
+def test_reconstruction_knowledge_cutoff_must_match_request(
+    chain: FixtureChain,
+) -> None:
+    stale_knowledge_source = _ledger_reconstruction_source(
+        chain,
+        knowledge_cutoff=CUTOFF - timedelta(hours=1),
+    )
+
+    with pytest.raises(
+        ReviewInputBundleError,
+        match="ledger reconstruction cutoffs",
+    ):
+        _build_bundle(
+            chain,
+            supplemental=[*chain.supplemental, stale_knowledge_source],
+        )
 
 
 def test_f1_02_optional_source_reordering_is_canonical(
