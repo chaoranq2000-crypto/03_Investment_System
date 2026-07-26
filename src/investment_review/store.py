@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+import os
 import sqlite3
 import uuid
 from contextlib import contextmanager
@@ -28,6 +30,11 @@ from .models import (
     FeeCorrectionRecord,
     FeeProfileRecord,
     FeeProjectionRecord,
+    MARKET_FALLBACK_POLICY_VERSION,
+    MARKET_PROVIDER_ALLOWLIST_SHA256,
+    MARKET_PROVIDER_ALLOWLIST_VERSION,
+    OPERATION_CHECKPOINT_SCHEMA_VERSION,
+    OperationCheckpointRecord,
     ReviewRunRecord,
     ReviewRunStatusEvent,
     SourceDefinition,
@@ -43,6 +50,7 @@ APPLICATION_ID = 0x49525657  # ASCII "IRVW"
 P2H_STAGE1_SCHEMA_VERSION = 1
 P2H_STAGE2_SLICE_A_SCHEMA_VERSION = 1
 PRODUCT_COMPLETION_SCHEMA_VERSION = 1
+REVIEWABILITY_SCHEMA_VERSION = 1
 
 class ReviewStoreError(RuntimeError):
     """Base error for the review store."""
@@ -54,6 +62,37 @@ class DataConflictError(ReviewStoreError):
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _stable_file_state(path: Path) -> tuple[int, int, int, int, str] | None:
+    """Read a file identity/content snapshot without accepting an in-read race."""
+
+    if not path.exists():
+        return None
+    before = path.stat()
+    digest = _sha256_file(path)
+    after = path.stat()
+    if (
+        not os.path.samestat(before, after)
+        or before.st_size != after.st_size
+        or before.st_mtime_ns != after.st_mtime_ns
+    ):
+        raise OSError(f"File changed while hashing: {path}")
+    return (
+        int(after.st_dev),
+        int(after.st_ino),
+        int(after.st_size),
+        int(after.st_mtime_ns),
+        digest,
+    )
 
 
 _SCHEMA_SQL = """
@@ -378,6 +417,95 @@ CREATE INDEX IF NOT EXISTS idx_review_run_events_run_time
     ON review_run_status_events(run_id, occurred_at, known_at, run_event_id);
 """
 
+_REVIEWABILITY_SCHEMA_SQL = """
+CREATE TABLE operation_review_checkpoints (
+    checkpoint_id TEXT PRIMARY KEY,
+    checkpoint_key TEXT NOT NULL UNIQUE,
+    content_id TEXT NOT NULL UNIQUE,
+    episode_id TEXT NOT NULL,
+    position_case_id TEXT NOT NULL,
+    review_kind TEXT NOT NULL CHECK (
+        review_kind IN ('operation_review', 'active_checkpoint', 'postmortem')
+    ),
+    checkpoint_type TEXT NOT NULL CHECK (
+        checkpoint_type IN (
+            'entry', 'active_checkpoint', 'adjustment', 'exit', 'postmortem'
+        )
+    ),
+    perspective TEXT NOT NULL CHECK (perspective IN ('user', 'system')),
+    as_of TEXT NOT NULL,
+    knowledge_cutoff TEXT NOT NULL,
+    effective_at TEXT NOT NULL,
+    user_known_at TEXT,
+    system_observed_at TEXT,
+    recorded_at TEXT NOT NULL,
+    operation_status TEXT NOT NULL CHECK (
+        operation_status IN ('ready', 'partial', 'blocked')
+    ),
+    decision_status TEXT NOT NULL CHECK (
+        decision_status IN (
+            'complete', 'partial', 'not_recorded', 'not_applicable', 'blocked'
+        )
+    ),
+    snapshot_status TEXT NOT NULL CHECK (
+        snapshot_status IN ('available', 'partial', 'missing', 'blocked')
+    ),
+    market_status TEXT NOT NULL CHECK (
+        market_status IN (
+            'available', 'partial', 'missing', 'stale', 'insufficient',
+            'failed', 'withheld'
+        )
+    ),
+    lifecycle_status TEXT NOT NULL CHECK (
+        lifecycle_status IN ('open', 'closed', 'ambiguous', 'unknown')
+    ),
+    outcome_status TEXT NOT NULL CHECK (
+        outcome_status IN ('interim', 'final', 'not_applicable', 'missing')
+    ),
+    payload_json TEXT NOT NULL,
+    payload_sha256 TEXT NOT NULL,
+    inserted_at TEXT NOT NULL,
+    row_integrity_sha256 TEXT NOT NULL,
+    UNIQUE (
+        episode_id, review_kind, checkpoint_type, perspective, as_of,
+        knowledge_cutoff
+    )
+);
+
+CREATE TABLE operation_checkpoint_gaps (
+    checkpoint_id TEXT NOT NULL REFERENCES operation_review_checkpoints(
+        checkpoint_id
+    ) ON DELETE CASCADE,
+    gap_id TEXT NOT NULL,
+    axis TEXT NOT NULL CHECK (
+        axis IN (
+            'operation', 'decision', 'snapshot_cash_valuation', 'market',
+            'lifecycle', 'outcome'
+        )
+    ),
+    code TEXT NOT NULL,
+    severity TEXT NOT NULL CHECK (
+        severity IN ('info', 'warning', 'blocker')
+    ),
+    blocks_axis INTEGER NOT NULL CHECK (blocks_axis IN (0, 1)),
+    owner TEXT NOT NULL,
+    next_step TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    PRIMARY KEY (checkpoint_id, gap_id)
+);
+
+CREATE INDEX idx_operation_checkpoints_case_time
+    ON operation_review_checkpoints(
+        position_case_id, as_of, knowledge_cutoff, checkpoint_id
+    );
+CREATE INDEX idx_operation_checkpoints_episode_time
+    ON operation_review_checkpoints(
+        episode_id, as_of, knowledge_cutoff, checkpoint_id
+    );
+CREATE INDEX idx_operation_checkpoint_gaps_axis
+    ON operation_checkpoint_gaps(axis, severity, checkpoint_id, gap_id);
+"""
+
 _CORE_TABLES = frozenset(
     {
         "schema_meta",
@@ -432,6 +560,174 @@ _PRODUCT_COMPLETION_INDEXES = frozenset(
         "idx_review_run_events_run_time",
     }
 )
+
+_REVIEWABILITY_TABLES = frozenset(
+    {
+        "operation_review_checkpoints",
+        "operation_checkpoint_gaps",
+    }
+)
+
+_REVIEWABILITY_INDEXES = frozenset(
+    {
+        "idx_operation_checkpoints_case_time",
+        "idx_operation_checkpoints_episode_time",
+        "idx_operation_checkpoint_gaps_axis",
+    }
+)
+_REVIEWABILITY_FOUNDATION_TABLES = (
+    _CORE_TABLES | _PRODUCT_COMPLETION_TABLES | _REVIEWABILITY_TABLES
+)
+_REVIEWABILITY_FOUNDATION_INDEXES = (
+    _CORE_INDEXES | _PRODUCT_COMPLETION_INDEXES | _REVIEWABILITY_INDEXES
+)
+
+def _normalized_schema_sql(value: object) -> str | None:
+    """Normalize formatting without discarding any SQLite constraint text."""
+
+    if value is None:
+        return None
+    return " ".join(str(value).strip().split())
+
+
+def _pragma_manifest_rows(
+    conn: sqlite3.Connection,
+    pragma: str,
+    object_name: str,
+) -> list[dict[str, Any]]:
+    cursor = conn.execute(f'PRAGMA {pragma}("{object_name}")')
+    column_names = tuple(item[0] for item in cursor.description or ())
+    return [
+        {
+            name: row[name] if isinstance(row, sqlite3.Row) else row[index]
+            for index, name in enumerate(column_names)
+        }
+        for row in cursor.fetchall()
+    ]
+
+
+def _reviewability_schema_manifest(conn: sqlite3.Connection) -> dict[str, Any]:
+    """Describe every explicit foundation object and implicit table constraint."""
+
+    object_rows = conn.execute(
+        "SELECT type, name, tbl_name, sql FROM sqlite_master "
+        "WHERE type IN ('table', 'index', 'trigger', 'view') "
+        "AND name NOT LIKE 'sqlite_%' "
+        "ORDER BY type, name"
+    ).fetchall()
+    objects = [
+        {
+            "type": str(row["type"]),
+            "name": str(row["name"]),
+            "tbl_name": str(row["tbl_name"]),
+            "sql": _normalized_schema_sql(row["sql"]),
+        }
+        for row in object_rows
+    ]
+    table_names = sorted(
+        str(row["name"]) for row in object_rows if row["type"] == "table"
+    )
+    if set(table_names) != set(_REVIEWABILITY_FOUNDATION_TABLES):
+        raise ValueError(
+            "Reviewability foundation contains missing or unexpected tables"
+        )
+
+    tables: dict[str, Any] = {}
+    for table_name in table_names:
+        table_row = next(
+            row
+            for row in object_rows
+            if row["type"] == "table" and row["name"] == table_name
+        )
+        index_entries: list[dict[str, Any]] = []
+        index_list = _pragma_manifest_rows(conn, "index_list", table_name)
+        for index_row in sorted(index_list, key=lambda item: str(item["name"])):
+            index_name = str(index_row["name"])
+            schema_row = conn.execute(
+                "SELECT type, name, tbl_name, sql FROM sqlite_master "
+                "WHERE type = 'index' AND name = ?",
+                (index_name,),
+            ).fetchone()
+            if schema_row is None:
+                raise ValueError(f"Missing SQLite index metadata: {index_name}")
+            index_entries.append(
+                {
+                    "index_list": index_row,
+                    "sqlite_master": {
+                        "type": str(schema_row["type"]),
+                        "name": str(schema_row["name"]),
+                        "tbl_name": str(schema_row["tbl_name"]),
+                        "sql": _normalized_schema_sql(schema_row["sql"]),
+                    },
+                    "index_xinfo": sorted(
+                        _pragma_manifest_rows(conn, "index_xinfo", index_name),
+                        key=lambda item: int(item["seqno"]),
+                    ),
+                }
+            )
+
+        tables[table_name] = {
+            "sqlite_master": {
+                "type": str(table_row["type"]),
+                "name": str(table_row["name"]),
+                "tbl_name": str(table_row["tbl_name"]),
+                "sql": _normalized_schema_sql(table_row["sql"]),
+            },
+            "table_xinfo": sorted(
+                _pragma_manifest_rows(conn, "table_xinfo", table_name),
+                key=lambda item: int(item["cid"]),
+            ),
+            "foreign_key_list": sorted(
+                _pragma_manifest_rows(conn, "foreign_key_list", table_name),
+                key=lambda item: (int(item["id"]), int(item["seq"])),
+            ),
+            "indexes": index_entries,
+        }
+
+    return {
+        "schema_version": REVIEWABILITY_SCHEMA_VERSION,
+        "checkpoint_contract_version": OPERATION_CHECKPOINT_SCHEMA_VERSION,
+        "market_policy_version": MARKET_FALLBACK_POLICY_VERSION,
+        "market_provider_allowlist_version": MARKET_PROVIDER_ALLOWLIST_VERSION,
+        "market_provider_allowlist_sha256": MARKET_PROVIDER_ALLOWLIST_SHA256,
+        "required_explicit_indexes": sorted(_REVIEWABILITY_FOUNDATION_INDEXES),
+        "objects": objects,
+        "tables": tables,
+    }
+
+
+def _expected_reviewability_schema_manifest() -> dict[str, Any]:
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
+    try:
+        conn.executescript(
+            _SCHEMA_SQL
+            + "\n"
+            + _PRODUCT_COMPLETION_SCHEMA_SQL
+            + "\n"
+            + _REVIEWABILITY_SCHEMA_SQL
+        )
+        return _reviewability_schema_manifest(conn)
+    finally:
+        conn.close()
+
+
+_REVIEWABILITY_SCHEMA_MANIFEST = _expected_reviewability_schema_manifest()
+_COMPUTED_REVIEWABILITY_SCHEMA_MANIFEST_SHA256 = sha256_text(
+    canonical_json(_REVIEWABILITY_SCHEMA_MANIFEST)
+)
+REVIEWABILITY_SCHEMA_MANIFEST_SHA256 = (
+    "e1241c55fe615a0389b9f7ee2c8d0e7071d7c45487800d67b00d29f53dcceab0"
+)
+if (
+    _COMPUTED_REVIEWABILITY_SCHEMA_MANIFEST_SHA256
+    != REVIEWABILITY_SCHEMA_MANIFEST_SHA256
+):
+    raise RuntimeError(
+        "reviewability_schema_version=1 DDL changed without a version/hash update: "
+        f"{_COMPUTED_REVIEWABILITY_SCHEMA_MANIFEST_SHA256}"
+    )
 
 
 class ReviewStore:
@@ -650,6 +946,366 @@ class ReviewStore:
             "schema_version": SCHEMA_VERSION,
             "product_completion_schema_version": PRODUCT_COMPLETION_SCHEMA_VERSION,
         }
+
+    def initialize_reviewability_candidate(self) -> dict[str, Any]:
+        """Create or verify a new, explicitly selected v3 candidate sidecar.
+
+        Existing core/product sidecars without the v3 marker are inspected through
+        ``mode=ro`` and refused before any writable connection is opened.  This is
+        deliberately stricter than ``initialize_product_completion``: user and v2
+        candidate sidecars must never be upgraded into reviewability candidates.
+        """
+
+        if self.path.exists():
+            return self._validate_existing_reviewability_candidate()
+
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        create_flags = os.O_CREAT | os.O_EXCL | os.O_RDWR
+        if hasattr(os, "O_BINARY"):
+            create_flags |= os.O_BINARY
+        owned_fd: int | None = None
+        conn: sqlite3.Connection | None = None
+        try:
+            owned_fd = os.open(self.path, create_flags, 0o600)
+        except FileExistsError:
+            # Another actor won the creation race.  The path is now "existing" and
+            # therefore may only pass through the same immutable read-only gate.
+            return self._validate_existing_reviewability_candidate()
+
+        owned_stat = os.fstat(owned_fd)
+
+        def require_owned_path() -> None:
+            try:
+                current_stat = os.stat(self.path)
+            except OSError as exc:
+                raise ReviewStoreError(
+                    "New reviewability candidate path disappeared during initialization."
+                ) from exc
+            if not os.path.samestat(owned_stat, current_stat):
+                raise ReviewStoreError(
+                    "New reviewability candidate path identity changed during initialization."
+                )
+
+        try:
+            require_owned_path()
+            uri = f"{self.path.resolve().as_uri()}?mode=rw"
+            conn = sqlite3.connect(uri, uri=True)
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA foreign_keys = ON")
+            require_owned_path()
+            application_id = int(conn.execute("PRAGMA application_id").fetchone()[0])
+            tables = {
+                str(row[0])
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master "
+                    "WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+                ).fetchall()
+            }
+            if tables or application_id not in (0, APPLICATION_ID):
+                raise ReviewStoreError(
+                    "Reviewability candidate initialization requires a new or empty "
+                    "explicit path."
+                )
+            journal_mode = str(
+                conn.execute("PRAGMA journal_mode = WAL").fetchone()[0]
+            ).lower()
+            if journal_mode != "wal":
+                raise ReviewStoreError(
+                    "New reviewability candidate could not enable WAL journal mode."
+                )
+            require_owned_path()
+            initialized_at = _now()
+            marker_sql = f"""
+INSERT INTO schema_meta(key, value)
+VALUES('schema_version', '{SCHEMA_VERSION}');
+INSERT INTO schema_meta(key, value)
+VALUES('initialized_at', '{initialized_at}');
+INSERT INTO schema_meta(key, value)
+VALUES('p2h_stage1_schema_version', '{P2H_STAGE1_SCHEMA_VERSION}');
+INSERT INTO schema_meta(key, value)
+VALUES('p2h_stage2_slice_a_schema_version', '{P2H_STAGE2_SLICE_A_SCHEMA_VERSION}');
+INSERT INTO schema_meta(key, value)
+VALUES('product_completion_schema_version', '{PRODUCT_COMPLETION_SCHEMA_VERSION}');
+INSERT INTO schema_meta(key, value)
+VALUES('reviewability_schema_version', '{REVIEWABILITY_SCHEMA_VERSION}');
+INSERT INTO schema_meta(key, value)
+VALUES(
+    'reviewability_checkpoint_contract_version',
+    '{OPERATION_CHECKPOINT_SCHEMA_VERSION}'
+);
+INSERT INTO schema_meta(key, value)
+VALUES(
+    'reviewability_market_policy_version',
+    '{MARKET_FALLBACK_POLICY_VERSION}'
+);
+INSERT INTO schema_meta(key, value)
+VALUES(
+    'reviewability_market_provider_allowlist_version',
+    '{MARKET_PROVIDER_ALLOWLIST_VERSION}'
+);
+INSERT INTO schema_meta(key, value)
+VALUES(
+    'reviewability_market_provider_allowlist_sha256',
+    '{MARKET_PROVIDER_ALLOWLIST_SHA256}'
+);
+INSERT INTO schema_meta(key, value)
+VALUES(
+    'reviewability_schema_manifest_sha256',
+    '{REVIEWABILITY_SCHEMA_MANIFEST_SHA256}'
+);
+"""
+            conn.executescript(
+                "BEGIN IMMEDIATE;\n"
+                + _SCHEMA_SQL
+                + "\n"
+                + _PRODUCT_COMPLETION_SCHEMA_SQL
+                + "\n"
+                + _REVIEWABILITY_SCHEMA_SQL
+                + "\n"
+                + marker_sql
+                + f"\nPRAGMA application_id = {APPLICATION_ID};"
+                + f"\nPRAGMA user_version = {SCHEMA_VERSION};"
+                + "\nCOMMIT;"
+            )
+            require_owned_path()
+            self._validate_reviewability_candidate(conn)
+            require_owned_path()
+        except Exception:
+            if conn is not None and conn.in_transaction:
+                conn.rollback()
+            raise
+        finally:
+            if conn is not None:
+                conn.close()
+            os.close(owned_fd)
+        return self._reviewability_init_result()
+
+    def _validate_existing_reviewability_candidate(self) -> dict[str, Any]:
+        conn: sqlite3.Connection | None = None
+        wal_path = Path(f"{self.path}-wal")
+        shm_path = Path(f"{self.path}-shm")
+        try:
+            wal_before = _stable_file_state(wal_path)
+            shm_before = _stable_file_state(shm_path)
+            if (
+                (wal_before is not None and wal_before[2] > 0)
+                or (shm_before is not None and wal_before is None)
+            ):
+                raise ReviewStoreError(
+                    "Existing reviewability candidate has a nonempty WAL or "
+                    "unpaired SHM; refusing immutable validation."
+                )
+            before_stat = self.path.stat()
+            before_sha256 = _sha256_file(self.path)
+            uri = f"{self.path.resolve().as_uri()}?mode=ro&immutable=1"
+            conn = sqlite3.connect(uri, uri=True)
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA query_only = ON")
+            self._validate_reviewability_candidate(conn)
+            after_stat = self.path.stat()
+            after_sha256 = _sha256_file(self.path)
+            wal_after = _stable_file_state(wal_path)
+            shm_after = _stable_file_state(shm_path)
+            if (
+                (wal_after is not None and wal_after[2] > 0)
+                or wal_after != wal_before
+                or shm_after != shm_before
+                or not os.path.samestat(before_stat, after_stat)
+                or before_stat.st_size != after_stat.st_size
+                or before_stat.st_mtime_ns != after_stat.st_mtime_ns
+                or before_sha256 != after_sha256
+            ):
+                raise ReviewStoreError(
+                    "Existing reviewability candidate changed during immutable "
+                    "validation."
+                )
+        except (
+            ReviewStoreError,
+            sqlite3.DatabaseError,
+            OSError,
+            TypeError,
+            ValueError,
+        ) as exc:
+            raise ReviewStoreError(
+                "Existing database is not a complete reviewability v1 candidate; "
+                f"refusing silent upgrade or repair. Cause: {exc}"
+            ) from exc
+        finally:
+            if conn is not None:
+                conn.close()
+        return self._reviewability_init_result()
+
+    def _reviewability_init_result(self) -> dict[str, Any]:
+        return {
+            "database": str(self.path),
+            "schema_version": SCHEMA_VERSION,
+            "product_completion_schema_version": PRODUCT_COMPLETION_SCHEMA_VERSION,
+            "reviewability_schema_version": REVIEWABILITY_SCHEMA_VERSION,
+            "checkpoint_contract_version": OPERATION_CHECKPOINT_SCHEMA_VERSION,
+            "market_policy_version": MARKET_FALLBACK_POLICY_VERSION,
+            "market_provider_allowlist_version": MARKET_PROVIDER_ALLOWLIST_VERSION,
+            "market_provider_allowlist_sha256": MARKET_PROVIDER_ALLOWLIST_SHA256,
+            "schema_manifest_sha256": REVIEWABILITY_SCHEMA_MANIFEST_SHA256,
+        }
+
+    @staticmethod
+    def _validate_reviewability_candidate(conn: sqlite3.Connection) -> None:
+        journal_mode = str(conn.execute("PRAGMA journal_mode").fetchone()[0]).lower()
+        if journal_mode != "wal":
+            # An immutable SQLite connection deliberately ignores WAL semantics and
+            # reports ``delete`` even when the persistent database header is in WAL
+            # mode.  Existing candidates are opened immutable so validation cannot
+            # create or update a ``-shm`` file.  In that one case, validate the two
+            # persistent header mode bytes (write/read version at offsets 18/19)
+            # instead of weakening the WAL invariant.
+            database_rows = conn.execute("PRAGMA database_list").fetchall()
+            main_paths = [
+                Path(str(row[2]))
+                for row in database_rows
+                if str(row[1]) == "main" and str(row[2])
+            ]
+            header_is_wal = False
+            if len(main_paths) == 1:
+                try:
+                    with main_paths[0].open("rb") as database_file:
+                        header = database_file.read(20)
+                    header_is_wal = (
+                        len(header) == 20
+                        and header[:16] == b"SQLite format 3\x00"
+                        and header[18:20] == b"\x02\x02"
+                    )
+                except OSError:
+                    header_is_wal = False
+            if header_is_wal:
+                journal_mode = "wal"
+        if journal_mode != "wal":
+            raise ReviewStoreError(
+                "Reviewability candidate must preserve WAL journal mode."
+            )
+        quick_check = [
+            str(row[0]) for row in conn.execute("PRAGMA quick_check").fetchall()
+        ]
+        if quick_check != ["ok"]:
+            raise ReviewStoreError(
+                "Reviewability candidate SQLite quick_check did not return ok."
+            )
+        application_id = int(conn.execute("PRAGMA application_id").fetchone()[0])
+        user_version = int(conn.execute("PRAGMA user_version").fetchone()[0])
+        if application_id != APPLICATION_ID or user_version != SCHEMA_VERSION:
+            raise ReviewStoreError(
+                "Existing database is not the required review v2 foundation."
+            )
+        tables = {
+            str(row[0])
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master "
+                "WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()
+        }
+        indexes = {
+            str(row[0])
+            for row in conn.execute(
+                "SELECT name FROM sqlite_master "
+                "WHERE type='index' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()
+        }
+        if not _CORE_TABLES.issubset(tables) or not _CORE_INDEXES.issubset(indexes):
+            raise ReviewStoreError("Reviewability candidate core schema is incomplete.")
+        if not _PRODUCT_COMPLETION_TABLES.issubset(tables) or not (
+            _PRODUCT_COMPLETION_INDEXES.issubset(indexes)
+        ):
+            raise ReviewStoreError(
+                "Reviewability candidate product-completion schema is incomplete."
+            )
+        if not _REVIEWABILITY_TABLES.issubset(tables) or not (
+            _REVIEWABILITY_INDEXES.issubset(indexes)
+        ):
+            raise ReviewStoreError(
+                "Reviewability marker/schema is incomplete; refusing silent repair."
+            )
+
+        marker_keys = (
+            "schema_version",
+            "initialized_at",
+            "p2h_stage1_schema_version",
+            "p2h_stage2_slice_a_schema_version",
+            "product_completion_schema_version",
+            "reviewability_schema_version",
+            "reviewability_checkpoint_contract_version",
+            "reviewability_market_policy_version",
+            "reviewability_market_provider_allowlist_version",
+            "reviewability_market_provider_allowlist_sha256",
+            "reviewability_schema_manifest_sha256",
+        )
+        markers = {
+            str(row["key"]): str(row["value"])
+            for row in conn.execute(
+                "SELECT key, value FROM schema_meta "
+                f"WHERE key IN ({','.join('?' for _ in marker_keys)})",
+                marker_keys,
+            ).fetchall()
+        }
+        expected_markers = {
+            "schema_version": str(SCHEMA_VERSION),
+            "p2h_stage1_schema_version": str(P2H_STAGE1_SCHEMA_VERSION),
+            "p2h_stage2_slice_a_schema_version": str(
+                P2H_STAGE2_SLICE_A_SCHEMA_VERSION
+            ),
+            "product_completion_schema_version": str(
+                PRODUCT_COMPLETION_SCHEMA_VERSION
+            ),
+            "reviewability_schema_version": str(REVIEWABILITY_SCHEMA_VERSION),
+            "reviewability_checkpoint_contract_version": (
+                OPERATION_CHECKPOINT_SCHEMA_VERSION
+            ),
+            "reviewability_market_policy_version": MARKET_FALLBACK_POLICY_VERSION,
+            "reviewability_market_provider_allowlist_version": (
+                MARKET_PROVIDER_ALLOWLIST_VERSION
+            ),
+            "reviewability_market_provider_allowlist_sha256": (
+                MARKET_PROVIDER_ALLOWLIST_SHA256
+            ),
+            "reviewability_schema_manifest_sha256": (
+                REVIEWABILITY_SCHEMA_MANIFEST_SHA256
+            ),
+        }
+        initialized_at = markers.pop("initialized_at", None)
+        try:
+            initialized_at_is_valid = (
+                initialized_at is not None
+                and utc_iso(initialized_at, "UTC") == initialized_at
+            )
+        except (TypeError, ValueError):
+            initialized_at_is_valid = False
+        if not initialized_at_is_valid:
+            raise ReviewStoreError(
+                "Reviewability candidate initialized_at marker is missing or invalid."
+            )
+        if markers != expected_markers:
+            raise ReviewStoreError(
+                "Reviewability feature markers do not match the frozen v1 contract."
+            )
+
+        try:
+            actual_manifest = _reviewability_schema_manifest(conn)
+        except (sqlite3.DatabaseError, TypeError, ValueError) as exc:
+            raise ReviewStoreError(
+                "Reviewability schema manifest could not be reconstructed."
+            ) from exc
+        actual_manifest_sha256 = sha256_text(canonical_json(actual_manifest))
+        if (
+            actual_manifest != _REVIEWABILITY_SCHEMA_MANIFEST
+            or actual_manifest_sha256 != REVIEWABILITY_SCHEMA_MANIFEST_SHA256
+        ):
+            raise ReviewStoreError(
+                "Reviewability schema structure or constraints drifted from the "
+                "frozen manifest."
+            )
+
+    def _ensure_reviewability_initialized(self) -> None:
+        self._ensure_initialized()
+        with self.connection(read_only=True) as conn:
+            self._validate_reviewability_candidate(conn)
 
     def _ensure_initialized(self) -> None:
         if not self.path.is_file():
@@ -1946,6 +2602,420 @@ class ReviewStore:
         return result
 
     @staticmethod
+    def _operation_checkpoint_projection(
+        record: OperationCheckpointRecord,
+    ) -> dict[str, Any]:
+        payload = record.to_dict()
+        axes = payload["status_axes"]
+        times = payload["time_provenance"]
+        return {
+            "checkpoint_id": record.checkpoint_id,
+            "checkpoint_key": record.checkpoint_key,
+            "content_id": record.content_id,
+            "episode_id": payload["episode_id"],
+            "position_case_id": payload["position_case_id"],
+            "review_kind": payload["review_kind"],
+            "checkpoint_type": payload["checkpoint_type"],
+            "perspective": payload["perspective"],
+            "as_of": payload["as_of"],
+            "knowledge_cutoff": payload["knowledge_cutoff"],
+            "effective_at": times["effective_at"]["value"],
+            "user_known_at": times["user_known_at"]["value"],
+            "system_observed_at": times["system_observed_at"]["value"],
+            "recorded_at": times["recorded_at"]["value"],
+            "operation_status": axes["operation"]["status"],
+            "decision_status": axes["decision"]["status"],
+            "snapshot_status": axes["snapshot_cash_valuation"]["status"],
+            "market_status": axes["market"]["status"],
+            "lifecycle_status": axes["lifecycle"]["status"],
+            "outcome_status": axes["outcome"]["status"],
+        }
+
+    @staticmethod
+    def _operation_checkpoint_row_integrity_sha256(
+        *,
+        projection: Mapping[str, Any],
+        payload_sha256: str,
+        inserted_at: str,
+    ) -> str:
+        return sha256_text(
+            canonical_json(
+                {
+                    "schema_version": "investment_review.operation_checkpoint_row.v1",
+                    "projection": dict(projection),
+                    "payload_sha256": payload_sha256,
+                    "inserted_at": inserted_at,
+                }
+            )
+        )
+
+    @staticmethod
+    def _validate_operation_checkpoint_row(
+        row: sqlite3.Row,
+        gap_rows: Sequence[sqlite3.Row],
+    ) -> OperationCheckpointRecord:
+        """Reconstruct one row and reject every payload/projection divergence."""
+
+        raw_payload = row["payload_json"]
+        if not isinstance(raw_payload, str):
+            raise ReviewStoreError("Operation checkpoint payload_json is not text.")
+        try:
+            decoded = json.loads(raw_payload)
+            if not isinstance(decoded, dict):
+                raise TypeError("payload root must be an object")
+            record = OperationCheckpointRecord.from_mapping(decoded)
+        except (json.JSONDecodeError, TypeError, ValueError) as exc:
+            raise ReviewStoreError(
+                "Operation checkpoint canonical payload failed validation."
+            ) from exc
+
+        canonical_payload = record.canonical_bytes.decode("utf-8")
+        expected_payload_sha256 = sha256_text(canonical_payload)
+        if raw_payload != canonical_payload:
+            raise ReviewStoreError(
+                "Operation checkpoint payload_json is not canonical."
+            )
+        if row["payload_sha256"] != expected_payload_sha256:
+            raise ReviewStoreError(
+                "Operation checkpoint payload_sha256 does not match canonical payload."
+            )
+
+        projection = ReviewStore._operation_checkpoint_projection(record)
+        for column, expected in projection.items():
+            if row[column] != expected:
+                raise ReviewStoreError(
+                    "Operation checkpoint projection drifted from canonical payload: "
+                    f"{column}"
+                )
+        inserted_at = row["inserted_at"]
+        if (
+            not isinstance(inserted_at, str)
+            or utc_iso(inserted_at, "UTC") != inserted_at
+        ):
+            raise ReviewStoreError(
+                "Operation checkpoint inserted_at is not canonical UTC."
+            )
+        expected_row_integrity = (
+            ReviewStore._operation_checkpoint_row_integrity_sha256(
+                projection=projection,
+                payload_sha256=expected_payload_sha256,
+                inserted_at=inserted_at,
+            )
+        )
+        if row["row_integrity_sha256"] != expected_row_integrity:
+            raise ReviewStoreError(
+                "Operation checkpoint row integrity hash does not match."
+            )
+
+        expected_gaps = {
+            str(gap["gap_id"]): gap for gap in record.to_dict()["gaps"]
+        }
+        actual_gap_ids = [str(item["gap_id"]) for item in gap_rows]
+        if len(actual_gap_ids) != len(set(actual_gap_ids)):
+            raise ReviewStoreError(
+                "Operation checkpoint gap projection contains duplicate gap IDs."
+            )
+        if set(actual_gap_ids) != set(expected_gaps):
+            raise ReviewStoreError(
+                "Operation checkpoint gap projection is not exactly closed."
+            )
+
+        for gap_row in gap_rows:
+            gap_id = str(gap_row["gap_id"])
+            expected_gap = expected_gaps[gap_id]
+            canonical_gap = canonical_json(expected_gap)
+            raw_gap_payload = gap_row["payload_json"]
+            if not isinstance(raw_gap_payload, str):
+                raise ReviewStoreError(
+                    f"Operation checkpoint gap payload is not text: {gap_id}"
+                )
+            try:
+                decoded_gap = json.loads(raw_gap_payload)
+            except json.JSONDecodeError as exc:
+                raise ReviewStoreError(
+                    f"Operation checkpoint gap payload is invalid JSON: {gap_id}"
+                ) from exc
+            if decoded_gap != expected_gap or raw_gap_payload != canonical_gap:
+                raise ReviewStoreError(
+                    f"Operation checkpoint gap payload drifted: {gap_id}"
+                )
+            expected_projection = {
+                "checkpoint_id": record.checkpoint_id,
+                "gap_id": gap_id,
+                "axis": expected_gap["axis"],
+                "code": expected_gap["code"],
+                "severity": expected_gap["severity"],
+                "blocks_axis": int(expected_gap["blocks_axis"]),
+                "owner": expected_gap["owner"],
+                "next_step": expected_gap["next_step"],
+                "payload_json": canonical_gap,
+            }
+            for column, expected in expected_projection.items():
+                if gap_row[column] != expected:
+                    raise ReviewStoreError(
+                        "Operation checkpoint gap projection drifted: "
+                        f"{gap_id}.{column}"
+                    )
+        return record
+
+    @staticmethod
+    def _read_validated_operation_checkpoints(
+        conn: sqlite3.Connection,
+    ) -> list[OperationCheckpointRecord]:
+        """Load the complete checkpoint set so omitted/corrupt rows cannot hide."""
+
+        rows = conn.execute(
+            "SELECT * FROM operation_review_checkpoints ORDER BY checkpoint_id"
+        ).fetchall()
+        gap_rows = conn.execute(
+            "SELECT * FROM operation_checkpoint_gaps "
+            "ORDER BY checkpoint_id, gap_id"
+        ).fetchall()
+        checkpoint_ids = {str(row["checkpoint_id"]) for row in rows}
+        orphan_gap_ids = sorted(
+            {
+                str(row["checkpoint_id"])
+                for row in gap_rows
+                if str(row["checkpoint_id"]) not in checkpoint_ids
+            }
+        )
+        if orphan_gap_ids:
+            raise ReviewStoreError(
+                "Operation checkpoint gap projection contains orphan rows: "
+                + ", ".join(orphan_gap_ids)
+            )
+        gaps_by_checkpoint: dict[str, list[sqlite3.Row]] = {
+            checkpoint_id: [] for checkpoint_id in checkpoint_ids
+        }
+        for gap_row in gap_rows:
+            gaps_by_checkpoint[str(gap_row["checkpoint_id"])].append(gap_row)
+        return [
+            ReviewStore._validate_operation_checkpoint_row(
+                row,
+                gaps_by_checkpoint[str(row["checkpoint_id"])],
+            )
+            for row in rows
+        ]
+
+    @staticmethod
+    def _existing_operation_checkpoint_receipt(
+        stored_records: Sequence[OperationCheckpointRecord],
+        record: OperationCheckpointRecord,
+        payload_sha256: str,
+    ) -> dict[str, Any] | None:
+        existing = [
+            stored
+            for stored in stored_records
+            if (
+                stored.checkpoint_id == record.checkpoint_id
+                or stored.checkpoint_key == record.checkpoint_key
+                or stored.content_id == record.content_id
+            )
+        ]
+        if not existing:
+            return None
+        if len(existing) == 1 and (
+            existing[0].canonical_bytes == record.canonical_bytes
+        ):
+            return {
+                "checkpoint_id": record.checkpoint_id,
+                "checkpoint_key": record.checkpoint_key,
+                "content_id": record.content_id,
+                "payload_sha256": payload_sha256,
+                "status": "SKIPPED",
+            }
+        raise DataConflictError(
+            "Operation checkpoint identity or key changed after creation: "
+            f"checkpoint_key={record.checkpoint_key}"
+        )
+
+    def save_operation_checkpoint(
+        self, checkpoint: OperationCheckpointRecord | Mapping[str, Any]
+    ) -> dict[str, Any]:
+        """Create one immutable v3 checkpoint and its closed gap projection."""
+
+        self._ensure_reviewability_initialized()
+        record = OperationCheckpointRecord.from_mapping(
+            checkpoint.to_dict()
+            if isinstance(checkpoint, OperationCheckpointRecord)
+            else checkpoint
+        )
+        payload = record.to_dict()
+        payload_json = record.canonical_bytes.decode("utf-8")
+        payload_sha256 = sha256_text(payload_json)
+        projection = self._operation_checkpoint_projection(record)
+        inserted_at = _now()
+        row_integrity_sha256 = self._operation_checkpoint_row_integrity_sha256(
+            projection=projection,
+            payload_sha256=payload_sha256,
+            inserted_at=inserted_at,
+        )
+
+        # The idempotent path is genuinely read-only.  A second check under an
+        # IMMEDIATE transaction below closes the race before the create-only insert.
+        with self.connection(read_only=True) as conn:
+            existing_receipt = self._existing_operation_checkpoint_receipt(
+                self._read_validated_operation_checkpoints(conn),
+                record,
+                payload_sha256,
+            )
+        if existing_receipt is not None:
+            return existing_receipt
+
+        with self.connection() as conn:
+            with conn:
+                conn.execute("BEGIN IMMEDIATE")
+                self._validate_reviewability_candidate(conn)
+                existing_receipt = self._existing_operation_checkpoint_receipt(
+                    self._read_validated_operation_checkpoints(conn),
+                    record,
+                    payload_sha256,
+                )
+                if existing_receipt is not None:
+                    return existing_receipt
+                conn.execute(
+                    """
+                    INSERT INTO operation_review_checkpoints(
+                        checkpoint_id, checkpoint_key, content_id, episode_id,
+                        position_case_id, review_kind, checkpoint_type,
+                        perspective, as_of, knowledge_cutoff, effective_at,
+                        user_known_at, system_observed_at, recorded_at,
+                        operation_status, decision_status, snapshot_status,
+                        market_status, lifecycle_status, outcome_status,
+                        payload_json, payload_sha256, inserted_at,
+                        row_integrity_sha256
+                    ) VALUES (
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?
+                    )
+                    """,
+                    (
+                        projection["checkpoint_id"],
+                        projection["checkpoint_key"],
+                        projection["content_id"],
+                        projection["episode_id"],
+                        projection["position_case_id"],
+                        projection["review_kind"],
+                        projection["checkpoint_type"],
+                        projection["perspective"],
+                        projection["as_of"],
+                        projection["knowledge_cutoff"],
+                        projection["effective_at"],
+                        projection["user_known_at"],
+                        projection["system_observed_at"],
+                        projection["recorded_at"],
+                        projection["operation_status"],
+                        projection["decision_status"],
+                        projection["snapshot_status"],
+                        projection["market_status"],
+                        projection["lifecycle_status"],
+                        projection["outcome_status"],
+                        payload_json,
+                        payload_sha256,
+                        inserted_at,
+                        row_integrity_sha256,
+                    ),
+                )
+                for gap in payload["gaps"]:
+                    conn.execute(
+                        """
+                        INSERT INTO operation_checkpoint_gaps(
+                            checkpoint_id, gap_id, axis, code, severity,
+                            blocks_axis, owner, next_step, payload_json
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            record.checkpoint_id,
+                            gap["gap_id"],
+                            gap["axis"],
+                            gap["code"],
+                            gap["severity"],
+                            int(gap["blocks_axis"]),
+                            gap["owner"],
+                            gap["next_step"],
+                            canonical_json(gap),
+                        ),
+                    )
+        return {
+            "checkpoint_id": record.checkpoint_id,
+            "checkpoint_key": record.checkpoint_key,
+            "content_id": record.content_id,
+            "payload_sha256": payload_sha256,
+            "status": "INSERTED",
+        }
+
+    def get_operation_checkpoint(self, checkpoint_ref: str) -> dict[str, Any]:
+        self._ensure_reviewability_initialized()
+        with self.connection(read_only=True) as conn:
+            records = self._read_validated_operation_checkpoints(conn)
+        matches = [
+            record
+            for record in records
+            if checkpoint_ref
+            in {
+                record.checkpoint_id,
+                record.checkpoint_key,
+                record.content_id,
+            }
+        ]
+        if not matches:
+            raise ReviewStoreError(
+                f"Operation checkpoint not found: {checkpoint_ref}"
+            )
+        if len(matches) != 1:
+            raise ReviewStoreError(
+                f"Ambiguous operation checkpoint reference: {checkpoint_ref}"
+            )
+        return matches[0].to_dict()
+
+    def list_operation_checkpoints(
+        self,
+        *,
+        episode_id: str | None = None,
+        position_case_id: str | None = None,
+        perspective: str | None = None,
+        as_of: str | None = None,
+        knowledge_cutoff: str | None = None,
+    ) -> list[dict[str, Any]]:
+        self._ensure_reviewability_initialized()
+        normalized_as_of = utc_iso(as_of, "UTC") if as_of is not None else None
+        normalized_cutoff = (
+            utc_iso(knowledge_cutoff, "UTC")
+            if knowledge_cutoff is not None
+            else None
+        )
+        with self.connection(read_only=True) as conn:
+            records = self._read_validated_operation_checkpoints(conn)
+        result: list[dict[str, Any]] = []
+        for record in records:
+            payload = record.to_dict()
+            if episode_id is not None and payload["episode_id"] != episode_id:
+                continue
+            if (
+                position_case_id is not None
+                and payload["position_case_id"] != position_case_id
+            ):
+                continue
+            if perspective is not None and payload["perspective"] != perspective:
+                continue
+            if normalized_as_of is not None and payload["as_of"] > normalized_as_of:
+                continue
+            if (
+                normalized_cutoff is not None
+                and payload["knowledge_cutoff"] > normalized_cutoff
+            ):
+                continue
+            result.append(payload)
+        result.sort(
+            key=lambda item: (
+                item["as_of"],
+                item["knowledge_cutoff"],
+                item["checkpoint_id"],
+            )
+        )
+        return result
+
+    @staticmethod
     def _p2h_payload_json(value: Mapping[str, Any]) -> str:
         return canonical_json_bytes(value).decode("utf-8")
 
@@ -2855,6 +3925,13 @@ class ReviewStore:
                 "review_run_status_events",
             ]
             count_tables.extend(table for table in product_tables if table in tables)
+            reviewability_tables = [
+                "operation_review_checkpoints",
+                "operation_checkpoint_gaps",
+            ]
+            count_tables.extend(
+                table for table in reviewability_tables if table in tables
+            )
             counts = {
                 table: conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
                 for table in count_tables
@@ -2875,6 +3952,41 @@ class ReviewStore:
                 "SELECT value FROM schema_meta "
                 "WHERE key='product_completion_schema_version'"
             ).fetchone()
+            reviewability_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='reviewability_schema_version'"
+            ).fetchone()
+            checkpoint_contract_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='reviewability_checkpoint_contract_version'"
+            ).fetchone()
+            market_policy_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='reviewability_market_policy_version'"
+            ).fetchone()
+            market_allowlist_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='reviewability_market_provider_allowlist_version'"
+            ).fetchone()
+            market_allowlist_hash_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='reviewability_market_provider_allowlist_sha256'"
+            ).fetchone()
+            reviewability_manifest_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='reviewability_schema_manifest_sha256'"
+            ).fetchone()
+            reviewability_signals = (
+                reviewability_row is not None
+                or checkpoint_contract_row is not None
+                or market_policy_row is not None
+                or market_allowlist_row is not None
+                or market_allowlist_hash_row is not None
+                or reviewability_manifest_row is not None
+                or bool(_REVIEWABILITY_TABLES.intersection(tables))
+            )
+            if reviewability_signals:
+                self._validate_reviewability_candidate(conn)
         return {
             "database": str(self.path),
             "schema_version": int(version_row[0]) if version_row else None,
@@ -2884,6 +3996,30 @@ class ReviewStore:
             ),
             "product_completion_schema_version": (
                 int(product_row[0]) if product_row else None
+            ),
+            "reviewability_schema_version": (
+                int(reviewability_row[0]) if reviewability_row else None
+            ),
+            "reviewability_checkpoint_contract_version": (
+                str(checkpoint_contract_row[0])
+                if checkpoint_contract_row
+                else None
+            ),
+            "reviewability_market_policy_version": (
+                str(market_policy_row[0]) if market_policy_row else None
+            ),
+            "reviewability_market_provider_allowlist_version": (
+                str(market_allowlist_row[0]) if market_allowlist_row else None
+            ),
+            "reviewability_market_provider_allowlist_sha256": (
+                str(market_allowlist_hash_row[0])
+                if market_allowlist_hash_row
+                else None
+            ),
+            "reviewability_schema_manifest_sha256": (
+                str(reviewability_manifest_row[0])
+                if reviewability_manifest_row
+                else None
             ),
             "integrity_check": integrity,
             "counts": counts,

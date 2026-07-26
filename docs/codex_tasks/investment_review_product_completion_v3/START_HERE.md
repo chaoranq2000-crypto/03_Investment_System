@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "investment_review_product_completion_v3"
 contract_path: "docs/codex_tasks/investment_review_product_completion_v3/CONTRACT.md"
 contract_sha256: "1f566582eec30ec4d3efc9e0c2349912468642edae32ba79997bb76de6f35033"
-state: "ready"
+state: "running"
 execution_branch: "codex/investment-review-reviewability-corrections"
 source_baseline: "c3e296661c04b9de35795e2311674b507846d19a"
-last_completed_phase: "none"
-next_phase: "P1"
+last_completed_phase: "P1"
+next_phase: "P2"
 last_validation: "pass"
-updated_at: "2026-07-25T13:03:16+08:00"
+updated_at: "2026-07-26T11:23:22+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -36,17 +36,18 @@ Resume from the earliest phase whose postconditions are not proven. After each p
 
 ## Current checkpoint
 
-- **State:** `ready`
-- **Last completed phase:** `none`
-- **Next phase:** `P1`
-- **Latest validation:** `pass` — finalizer and `--require-ready` validation accepted frozen contract `1f566582eec30ec4d3efc9e0c2349912468642edae32ba79997bb76de6f35033`, 7 consecutive phases, 0 errors and 0 warnings.
+- **State:** `running`
+- **Last completed phase:** `P1`
+- **Next phase:** `P2`
+- **Latest validation:** `pass` — V-101 completed with 71 passed in 6.62s and no skip/failure/error; the final independent P1 audit found no remaining code blocker; frozen contract SHA-256 remains `1f566582eec30ec4d3efc9e0c2349912468642edae32ba79997bb76de6f35033`; final P1 V-002 found all three protected sources byte-identical to preflight with `quick_check=ok` and unchanged WAL/SHM state.
 - **Current blocker:** none
-- **Next safe action:** Open a new Codex chat in the execution worktree and paste the launch block.
+- **Next safe action:** After this P1 checkpoint commit, begin P2 decision-optional operation review implementation; do not initialize or write the real v3 candidate sidecar before P3.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
 ## Checkpoint history
 
+- 2026-07-26T11:23:22+08:00 — P1 completed. Added the opt-in reviewability skill/playbook boundary, closed `investment_review.operation_checkpoint.v1` schema, six independent status axes, field-specific four-time provenance, episode-rooted semantic keys, create-only checkpoint storage, row-integrity verification, and a full foundation DDL manifest. Froze the code-owned provider/endpoint/parameter/value allowlist and derived request fingerprint, including exact request caps, sensitive-value rejection, frozen cache lineage, market-time ordering, and offline consumers. Existing-candidate validation rejects nonempty WAL or structural drift while preserving the stable zero-WAL Windows read-only case; replay, status, and same-transaction saves fail closed on marker, manifest, payload, projection, inserted-time, gap, or row-integrity drift. V-101: 71 passed in 6.62s with no skip/failure/error; final independent audit found no blocker. Frozen contract/package hash remained unchanged. Final P1 V-002: formal portfolio DB, user sidecar and v2 candidate retained their preflight size/SHA-256, `quick_check=ok`, and unchanged WAL/SHM state; evidence is in `.codex_tmp/investment_review_product_completion_v3/protected_sources.json`. The real v3 candidate sidecar still does not exist. Next safe phase is P2.
 - 2026-07-25T13:03:16+08:00 — Finalized package version 3 after explicit user approval. Frozen contract SHA-256 is `1f566582eec30ec4d3efc9e0c2349912468642edae32ba79997bb76de6f35033`; task state is `ready`; finalizer validation returned 0 errors and 0 warnings. The next safe action is P1 execution from the package-only setup checkpoint.
 - 2026-07-25T12:57:24+08:00 — Workspace user confirmed the final v3 objective and acceptance criteria with `local_first_controlled_fallback_v1`: local cache first; only `missing`, `stale` or `insufficient` coverage may trigger a bounded existing allowlisted provider before bundle freeze; writes stay in the new v3 cache/sidecar; renderer, source replay, API and UI remain offline. Draft validation must be rerun before finalization.
 - 2026-07-25T03:25:18+08:00 — Added explicit v3 source reconciliation and protected-file criteria, replaced abbreviated evidence paths with exact paths, and revalidated the draft with 0 errors and 0 warnings. Current draft hash is `e4243ca18586dcdc647c0c047f2eced0184e8fd0c46232dae470b5f819770f75`.

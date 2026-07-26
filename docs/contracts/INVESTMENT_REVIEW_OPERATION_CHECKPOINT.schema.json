@@ -1,0 +1,3043 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/contracts/investment_review.operation_checkpoint.v1.schema.json",
+  "title": "Investment Review Operation Checkpoint v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "checkpoint_id",
+    "checkpoint_key",
+    "content_id",
+    "episode_id",
+    "position_case_id",
+    "review_kind",
+    "checkpoint_type",
+    "perspective",
+    "as_of",
+    "knowledge_cutoff",
+    "time_provenance",
+    "status_axes",
+    "market_fallback",
+    "gaps",
+    "source_refs",
+    "governance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "investment_review.operation_checkpoint.v1"
+    },
+    "checkpoint_id": {
+      "type": "string",
+      "pattern": "^review_checkpoint_[0-9a-f]{32}$"
+    },
+    "checkpoint_key": {
+      "type": "string",
+      "pattern": "^review_checkpoint_key_[0-9a-f]{64}$"
+    },
+    "content_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "episode_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "position_case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review_kind": {
+      "enum": [
+        "operation_review",
+        "active_checkpoint",
+        "postmortem"
+      ]
+    },
+    "checkpoint_type": {
+      "enum": [
+        "entry",
+        "active_checkpoint",
+        "adjustment",
+        "exit",
+        "postmortem"
+      ]
+    },
+    "perspective": {
+      "enum": [
+        "user",
+        "system"
+      ]
+    },
+    "as_of": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "knowledge_cutoff": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "time_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effective_at",
+        "user_known_at",
+        "system_observed_at",
+        "recorded_at"
+      ],
+      "properties": {
+        "effective_at": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/time_projection_required"
+            },
+            {
+              "properties": {
+                "basis": {
+                  "enum": [
+                    "source_occurred_at",
+                    "source_effective_at"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "user_known_at": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/time_projection_nullable"
+            },
+            {
+              "properties": {
+                "basis": {
+                  "enum": [
+                    "owner_action_default",
+                    "explicit_user_record",
+                    "source_occurred_at",
+                    "source_effective_at",
+                    "not_observed",
+                    "unknown"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "system_observed_at": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/time_projection_nullable"
+            },
+            {
+              "properties": {
+                "basis": {
+                  "enum": [
+                    "system_observation",
+                    "recorded_later",
+                    "ingest_observation",
+                    "not_observed",
+                    "unknown"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "recorded_at": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/time_projection_required"
+            },
+            {
+              "properties": {
+                "basis": {
+                  "enum": [
+                    "recorded_later",
+                    "ingest_observation",
+                    "system_observation"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "properties": {
+            "system_observed_at": {
+              "properties": {
+                "basis": {
+                  "not": {
+                    "const": "owner_action_default"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "status_axes": {
+      "$ref": "#/$defs/status_axes"
+    },
+    "market_fallback": {
+      "$ref": "#/$defs/market_fallback"
+    },
+    "gaps": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/gap"
+      }
+    },
+    "source_refs": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/source_refs"
+        },
+        {
+          "minItems": 1
+        }
+      ]
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "facts_only",
+        "no_motive",
+        "no_advice",
+        "no_score",
+        "no_diagnosis"
+      ],
+      "properties": {
+        "facts_only": {
+          "const": true
+        },
+        "no_motive": {
+          "const": true
+        },
+        "no_advice": {
+          "const": true
+        },
+        "no_score": {
+          "const": true
+        },
+        "no_diagnosis": {
+          "const": true
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "type": "object",
+              "required": [
+                "axis",
+                "blocks_axis"
+              ],
+              "properties": {
+                "axis": {
+                  "const": "operation"
+                },
+                "blocks_axis": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "operation": {
+                "properties": {
+                  "status": {
+                    "const": "blocked"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "type": "object",
+              "required": [
+                "axis",
+                "blocks_axis"
+              ],
+              "properties": {
+                "axis": {
+                  "const": "decision"
+                },
+                "blocks_axis": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "decision": {
+                "properties": {
+                  "status": {
+                    "const": "blocked"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "type": "object",
+              "required": [
+                "axis",
+                "blocks_axis"
+              ],
+              "properties": {
+                "axis": {
+                  "const": "snapshot_cash_valuation"
+                },
+                "blocks_axis": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "snapshot_cash_valuation": {
+                "properties": {
+                  "status": {
+                    "const": "blocked"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "type": "object",
+              "required": [
+                "axis",
+                "blocks_axis"
+              ],
+              "properties": {
+                "axis": {
+                  "const": "market"
+                },
+                "blocks_axis": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "market": {
+                "properties": {
+                  "status": {
+                    "const": "failed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "type": "object",
+              "required": [
+                "axis",
+                "blocks_axis"
+              ],
+              "properties": {
+                "axis": {
+                  "const": "lifecycle"
+                },
+                "blocks_axis": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "lifecycle": {
+                "properties": {
+                  "status": {
+                    "const": "ambiguous"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "type": "object",
+              "required": [
+                "axis",
+                "blocks_axis"
+              ],
+              "properties": {
+                "axis": {
+                  "const": "outcome"
+                },
+                "blocks_axis": {
+                  "const": true
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "outcome": {
+                "properties": {
+                  "status": {
+                    "const": "missing"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "operation": {
+                "properties": {
+                  "status": {
+                    "const": "blocked"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "$ref": "#/$defs/operation_blocker_gap"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "decision": {
+                "properties": {
+                  "status": {
+                    "const": "blocked"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "$ref": "#/$defs/decision_blocker_gap"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "snapshot_cash_valuation": {
+                "properties": {
+                  "status": {
+                    "const": "blocked"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "$ref": "#/$defs/snapshot_blocker_gap"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "market": {
+                "properties": {
+                  "status": {
+                    "const": "failed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "$ref": "#/$defs/market_blocker_gap"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "lifecycle": {
+                "properties": {
+                  "status": {
+                    "const": "ambiguous"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "$ref": "#/$defs/lifecycle_blocker_gap"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "outcome": {
+                "properties": {
+                  "status": {
+                    "const": "missing"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gaps": {
+            "contains": {
+              "$ref": "#/$defs/outcome_blocker_gap"
+            }
+          }
+        }
+      }
+    },
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "review_kind": {
+              "const": "operation_review"
+            },
+            "checkpoint_type": {
+              "enum": [
+                "entry",
+                "adjustment"
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "review_kind": {
+              "const": "operation_review"
+            },
+            "checkpoint_type": {
+              "const": "exit"
+            },
+            "status_axes": {
+              "properties": {
+                "lifecycle": {
+                  "properties": {
+                    "status": {
+                      "const": "closed"
+                    }
+                  }
+                },
+                "outcome": {
+                  "properties": {
+                    "status": {
+                      "const": "final"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "review_kind": {
+              "const": "active_checkpoint"
+            },
+            "checkpoint_type": {
+              "const": "active_checkpoint"
+            },
+            "status_axes": {
+              "properties": {
+                "lifecycle": {
+                  "properties": {
+                    "status": {
+                      "const": "open"
+                    }
+                  }
+                },
+                "outcome": {
+                  "properties": {
+                    "status": {
+                      "const": "interim"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "review_kind": {
+              "const": "postmortem"
+            },
+            "checkpoint_type": {
+              "const": "postmortem"
+            },
+            "status_axes": {
+              "properties": {
+                "lifecycle": {
+                  "properties": {
+                    "status": {
+                      "const": "closed"
+                    }
+                  }
+                },
+                "outcome": {
+                  "properties": {
+                    "status": {
+                      "const": "final"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "if": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "lifecycle": {
+                "properties": {
+                  "status": {
+                    "const": "open"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "outcome": {
+                "properties": {
+                  "status": {
+                    "not": {
+                      "const": "final"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "lifecycle": {
+                "properties": {
+                  "status": {
+                    "const": "closed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "outcome": {
+                "properties": {
+                  "status": {
+                    "not": {
+                      "const": "interim"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "outcome": {
+                "properties": {
+                  "status": {
+                    "const": "final"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "status_axes": {
+            "properties": {
+              "lifecycle": {
+                "properties": {
+                  "status": {
+                    "const": "closed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "market_fallback": {
+              "properties": {
+                "coverage_after": {
+                  "const": "satisfied"
+                }
+              }
+            },
+            "status_axes": {
+              "properties": {
+                "market": {
+                  "properties": {
+                    "status": {
+                      "const": "available"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "market_fallback": {
+              "properties": {
+                "coverage_after": {
+                  "const": "missing"
+                }
+              }
+            },
+            "status_axes": {
+              "properties": {
+                "market": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "missing",
+                        "failed"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "market_fallback": {
+              "properties": {
+                "coverage_after": {
+                  "const": "stale"
+                }
+              }
+            },
+            "status_axes": {
+              "properties": {
+                "market": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "stale",
+                        "failed"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "market_fallback": {
+              "properties": {
+                "coverage_after": {
+                  "const": "insufficient"
+                }
+              }
+            },
+            "status_axes": {
+              "properties": {
+                "market": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "insufficient",
+                        "partial",
+                        "failed"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "timestamp_or_null": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/timestamp"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "time_basis": {
+      "enum": [
+        "source_occurred_at",
+        "source_effective_at",
+        "owner_action_default",
+        "explicit_user_record",
+        "system_observation",
+        "recorded_later",
+        "ingest_observation",
+        "not_observed",
+        "unknown"
+      ]
+    },
+    "time_projection_required": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "basis",
+        "source_refs"
+      ],
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "basis": {
+          "enum": [
+            "source_occurred_at",
+            "source_effective_at",
+            "owner_action_default",
+            "explicit_user_record",
+            "system_observation",
+            "recorded_later",
+            "ingest_observation"
+          ]
+        },
+        "source_refs": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_refs"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        }
+      }
+    },
+    "time_projection_nullable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "basis",
+        "source_refs"
+      ],
+      "properties": {
+        "value": {
+          "$ref": "#/$defs/timestamp_or_null"
+        },
+        "basis": {
+          "$ref": "#/$defs/time_basis"
+        },
+        "source_refs": {
+          "$ref": "#/$defs/source_refs"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "value"
+            ]
+          },
+          "then": {
+            "properties": {
+              "basis": {
+                "enum": [
+                  "not_observed",
+                  "unknown"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "basis": {
+                "not": {
+                  "enum": [
+                    "not_observed",
+                    "unknown"
+                  ]
+                }
+              },
+              "source_refs": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "simple_axis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "source_refs"
+      ],
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "source_refs": {
+          "$ref": "#/$defs/source_refs"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "snapshot_field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "value",
+        "unit",
+        "source_refs"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "available",
+            "partial",
+            "missing",
+            "not_applicable"
+          ]
+        },
+        "value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_refs": {
+          "$ref": "#/$defs/source_refs"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "available"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_refs": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "available",
+                  "partial"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source_refs": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "missing",
+                  "not_applicable"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "snapshot_fields_available_or_not_applicable": {
+      "type": "object",
+      "properties": {
+        "position_quantity": {
+          "properties": {
+            "status": {
+              "enum": [
+                "available",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "cost_basis": {
+          "properties": {
+            "status": {
+              "enum": [
+                "available",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "cash": {
+          "properties": {
+            "status": {
+              "enum": [
+                "available",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "price": {
+          "properties": {
+            "status": {
+              "enum": [
+                "available",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "nav": {
+          "properties": {
+            "status": {
+              "enum": [
+                "available",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "weight": {
+          "properties": {
+            "status": {
+              "enum": [
+                "available",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "industry": {
+          "properties": {
+            "status": {
+              "enum": [
+                "available",
+                "not_applicable"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "snapshot_fields_missing_or_not_applicable": {
+      "type": "object",
+      "properties": {
+        "position_quantity": {
+          "properties": {
+            "status": {
+              "enum": [
+                "missing",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "cost_basis": {
+          "properties": {
+            "status": {
+              "enum": [
+                "missing",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "cash": {
+          "properties": {
+            "status": {
+              "enum": [
+                "missing",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "price": {
+          "properties": {
+            "status": {
+              "enum": [
+                "missing",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "nav": {
+          "properties": {
+            "status": {
+              "enum": [
+                "missing",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "weight": {
+          "properties": {
+            "status": {
+              "enum": [
+                "missing",
+                "not_applicable"
+              ]
+            }
+          }
+        },
+        "industry": {
+          "properties": {
+            "status": {
+              "enum": [
+                "missing",
+                "not_applicable"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "snapshot_fields_has_available": {
+      "type": "object",
+      "anyOf": [
+        {
+          "properties": {
+            "position_quantity": {
+              "properties": {
+                "status": {
+                  "const": "available"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "cost_basis": {
+              "properties": {
+                "status": {
+                  "const": "available"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "cash": {
+              "properties": {
+                "status": {
+                  "const": "available"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "price": {
+              "properties": {
+                "status": {
+                  "const": "available"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "nav": {
+              "properties": {
+                "status": {
+                  "const": "available"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "weight": {
+              "properties": {
+                "status": {
+                  "const": "available"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "industry": {
+              "properties": {
+                "status": {
+                  "const": "available"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "snapshot_fields_has_limit": {
+      "type": "object",
+      "anyOf": [
+        {
+          "properties": {
+            "position_quantity": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "partial",
+                    "missing"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "cost_basis": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "partial",
+                    "missing"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "cash": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "partial",
+                    "missing"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "price": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "partial",
+                    "missing"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "nav": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "partial",
+                    "missing"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "weight": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "partial",
+                    "missing"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "industry": {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "partial",
+                    "missing"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "snapshot_fields_has_missing": {
+      "type": "object",
+      "anyOf": [
+        {
+          "properties": {
+            "position_quantity": {
+              "properties": {
+                "status": {
+                  "const": "missing"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "cost_basis": {
+              "properties": {
+                "status": {
+                  "const": "missing"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "cash": {
+              "properties": {
+                "status": {
+                  "const": "missing"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "price": {
+              "properties": {
+                "status": {
+                  "const": "missing"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "nav": {
+              "properties": {
+                "status": {
+                  "const": "missing"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "weight": {
+              "properties": {
+                "status": {
+                  "const": "missing"
+                }
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "industry": {
+              "properties": {
+                "status": {
+                  "const": "missing"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "status_axes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation",
+        "decision",
+        "snapshot_cash_valuation",
+        "market",
+        "lifecycle",
+        "outcome"
+      ],
+      "properties": {
+        "operation": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/simple_axis"
+            },
+            {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "ready",
+                    "partial",
+                    "blocked"
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "ready",
+                      "partial"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "source_refs": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "decision": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/simple_axis"
+            },
+            {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "complete",
+                    "partial",
+                    "not_recorded",
+                    "not_applicable",
+                    "blocked"
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "complete",
+                      "partial"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "source_refs": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "snapshot_cash_valuation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "fields",
+            "source_refs"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "available",
+                "partial",
+                "missing",
+                "blocked"
+              ]
+            },
+            "fields": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "position_quantity",
+                "cost_basis",
+                "cash",
+                "price",
+                "nav",
+                "weight",
+                "industry"
+              ],
+              "properties": {
+                "position_quantity": {
+                  "$ref": "#/$defs/snapshot_field"
+                },
+                "cost_basis": {
+                  "$ref": "#/$defs/snapshot_field"
+                },
+                "cash": {
+                  "$ref": "#/$defs/snapshot_field"
+                },
+                "price": {
+                  "$ref": "#/$defs/snapshot_field"
+                },
+                "nav": {
+                  "$ref": "#/$defs/snapshot_field"
+                },
+                "weight": {
+                  "$ref": "#/$defs/snapshot_field"
+                },
+                "industry": {
+                  "$ref": "#/$defs/snapshot_field"
+                }
+              }
+            },
+            "source_refs": {
+              "$ref": "#/$defs/source_refs"
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "available"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "fields": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/snapshot_fields_available_or_not_applicable"
+                      },
+                      {
+                        "$ref": "#/$defs/snapshot_fields_has_available"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "missing"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "fields": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/snapshot_fields_missing_or_not_applicable"
+                      },
+                      {
+                        "$ref": "#/$defs/snapshot_fields_has_missing"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "partial"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "fields": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/snapshot_fields_has_available"
+                      },
+                      {
+                        "$ref": "#/$defs/snapshot_fields_has_limit"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "available",
+                      "partial"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "source_refs": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "market": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "temporal_role",
+            "effective_at",
+            "publicly_available_at",
+            "publicly_available_basis",
+            "fetched_at",
+            "system_observed_at",
+            "source_refs"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "available",
+                "partial",
+                "missing",
+                "stale",
+                "insufficient",
+                "failed",
+                "withheld"
+              ]
+            },
+            "temporal_role": {
+              "enum": [
+                "system_known_at_decision",
+                "reconstructed_public_context",
+                "withheld",
+                "missing"
+              ]
+            },
+            "effective_at": {
+              "$ref": "#/$defs/timestamp_or_null"
+            },
+            "publicly_available_at": {
+              "$ref": "#/$defs/timestamp_or_null"
+            },
+            "publicly_available_basis": {
+              "enum": [
+                "source_declared",
+                "exchange_calendar",
+                "provider_declared",
+                "unknown",
+                "not_applicable"
+              ]
+            },
+            "fetched_at": {
+              "$ref": "#/$defs/timestamp_or_null"
+            },
+            "system_observed_at": {
+              "$ref": "#/$defs/timestamp_or_null"
+            },
+            "source_refs": {
+              "$ref": "#/$defs/source_refs"
+            },
+            "summary": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "available"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "effective_at": {
+                    "$ref": "#/$defs/timestamp"
+                  },
+                  "source_refs": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "available",
+                      "partial",
+                      "stale",
+                      "insufficient"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "source_refs": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "temporal_role": {
+                    "const": "system_known_at_decision"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "system_observed_at": {
+                    "$ref": "#/$defs/timestamp"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "temporal_role": {
+                    "const": "reconstructed_public_context"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "fetched_at": {
+                    "$ref": "#/$defs/timestamp"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "lifecycle": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/simple_axis"
+            },
+            {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "open",
+                    "closed",
+                    "ambiguous",
+                    "unknown"
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "open",
+                      "closed"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "source_refs": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "outcome": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/simple_axis"
+            },
+            {
+              "properties": {
+                "status": {
+                  "enum": [
+                    "interim",
+                    "final",
+                    "not_applicable",
+                    "missing"
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "interim",
+                      "final"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "source_refs": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "market_fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy_version",
+        "allowlist_version",
+        "allowlist_sha256",
+        "coverage_before",
+        "coverage_after",
+        "status",
+        "request_count",
+        "limits",
+        "allowlist",
+        "cache_refs",
+        "fetch_receipt_refs",
+        "fetch_receipts",
+        "offline_consumers"
+      ],
+      "properties": {
+        "policy_version": {
+          "const": "local_first_controlled_fallback_v1"
+        },
+        "allowlist_version": {
+          "const": "market_provider_allowlist.v1"
+        },
+        "allowlist_sha256": {
+          "const": "sha256:1e612c7bf6090fcbfd32aaaef9ca7c73db8441ba939726b9d610238b29b3790a"
+        },
+        "coverage_before": {
+          "enum": [
+            "satisfied",
+            "missing",
+            "stale",
+            "insufficient"
+          ]
+        },
+        "coverage_after": {
+          "enum": [
+            "satisfied",
+            "missing",
+            "stale",
+            "insufficient"
+          ]
+        },
+        "status": {
+          "enum": [
+            "not_needed",
+            "succeeded",
+            "failed",
+            "provider_unavailable"
+          ]
+        },
+        "request_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Total HTTP attempts. It MUST equal sum(fetch_receipts[*].attempt_count); canonical validation enforces the arithmetic invariant."
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "timeout_seconds",
+            "max_retries",
+            "max_concurrency",
+            "max_requests_per_run"
+          ],
+          "properties": {
+            "timeout_seconds": {
+              "const": 20
+            },
+            "max_retries": {
+              "const": 2
+            },
+            "max_concurrency": {
+              "const": 2
+            },
+            "max_requests_per_run": {
+              "const": 20
+            }
+          }
+        },
+        "allowlist": {
+          "type": "array",
+          "minItems": 10,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "baostock:history_k_data_plus_5m",
+              "tushare:adj_factor",
+              "tushare:cb_daily",
+              "tushare:daily",
+              "tushare:etf_basic",
+              "tushare:etf_mins",
+              "tushare:fund_adj",
+              "tushare:fund_daily",
+              "tushare:stk_mins",
+              "tushare:stock_basic"
+            ]
+          }
+        },
+        "cache_refs": {
+          "$ref": "#/$defs/source_refs"
+        },
+        "fetch_receipt_refs": {
+          "$ref": "#/$defs/source_refs"
+        },
+        "fetch_receipts": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/fetch_receipt"
+          }
+        },
+        "offline_consumers": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "renderer",
+            "source_replay",
+            "api",
+            "ui"
+          ],
+          "properties": {
+            "renderer": {
+              "const": false
+            },
+            "source_replay": {
+              "const": false
+            },
+            "api": {
+              "const": false
+            },
+            "ui": {
+              "const": false
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "coverage_before": {
+                "const": "satisfied"
+              }
+            },
+            "required": [
+              "coverage_before"
+            ]
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "not_needed"
+              },
+              "coverage_after": {
+                "const": "satisfied"
+              },
+              "request_count": {
+                "const": 0
+              },
+              "cache_refs": {
+                "minItems": 1
+              },
+              "fetch_receipt_refs": {
+                "maxItems": 0
+              },
+              "fetch_receipts": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "succeeded",
+                  "failed",
+                  "provider_unavailable"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "coverage_before": {
+                "enum": [
+                  "missing",
+                  "stale",
+                  "insufficient"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "succeeded"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "request_count": {
+                "minimum": 1
+              },
+              "cache_refs": {
+                "minItems": 1
+              },
+              "fetch_receipt_refs": {
+                "minItems": 1
+              },
+              "fetch_receipts": {
+                "minItems": 1,
+                "contains": {
+                  "type": "object",
+                  "required": [
+                    "response_status"
+                  ],
+                  "properties": {
+                    "response_status": {
+                      "const": "succeeded"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "failed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "request_count": {
+                "minimum": 1
+              },
+              "fetch_receipt_refs": {
+                "minItems": 1
+              },
+              "fetch_receipts": {
+                "minItems": 1,
+                "not": {
+                  "contains": {
+                    "type": "object",
+                    "required": [
+                      "response_status"
+                    ],
+                    "properties": {
+                      "response_status": {
+                        "const": "succeeded"
+                      }
+                    }
+                  }
+                }
+              },
+              "coverage_after": {
+                "enum": [
+                  "missing",
+                  "stale",
+                  "insufficient"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "provider_unavailable"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "request_count": {
+                "const": 0
+              },
+              "fetch_receipt_refs": {
+                "minItems": 1,
+                "maxItems": 1
+              },
+              "fetch_receipts": {
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {
+                  "properties": {
+                    "response_status": {
+                      "const": "provider_unavailable"
+                    },
+                    "attempt_count": {
+                      "const": 0
+                    }
+                  }
+                }
+              },
+              "coverage_after": {
+                "enum": [
+                  "missing",
+                  "stale",
+                  "insufficient"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not_needed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "coverage_before": {
+                "const": "satisfied"
+              },
+              "coverage_after": {
+                "const": "satisfied"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "coverage_after": {
+                "const": "satisfied"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "not_needed",
+                  "succeeded"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "allowlisted_provider_endpoint": {
+      "oneOf": [
+        {
+          "properties": {
+            "provider_id": {
+              "const": "baostock"
+            },
+            "endpoint_id": {
+              "const": "history_k_data_plus_5m"
+            },
+            "redacted_parameters": {
+              "propertyNames": {
+                "enum": [
+                  "code",
+                  "fields",
+                  "start_date",
+                  "end_date",
+                  "frequency",
+                  "adjustflag"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "provider_id": {
+              "const": "tushare"
+            },
+            "endpoint_id": {
+              "const": "adj_factor"
+            },
+            "redacted_parameters": {
+              "propertyNames": {
+                "enum": [
+                  "ts_code",
+                  "trade_date",
+                  "start_date",
+                  "end_date",
+                  "fields"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "provider_id": {
+              "const": "tushare"
+            },
+            "endpoint_id": {
+              "const": "cb_daily"
+            },
+            "redacted_parameters": {
+              "propertyNames": {
+                "enum": [
+                  "ts_code",
+                  "trade_date",
+                  "start_date",
+                  "end_date",
+                  "fields"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "provider_id": {
+              "const": "tushare"
+            },
+            "endpoint_id": {
+              "const": "daily"
+            },
+            "redacted_parameters": {
+              "propertyNames": {
+                "enum": [
+                  "ts_code",
+                  "trade_date",
+                  "start_date",
+                  "end_date",
+                  "fields"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "provider_id": {
+              "const": "tushare"
+            },
+            "endpoint_id": {
+              "const": "etf_basic"
+            },
+            "redacted_parameters": {
+              "propertyNames": {
+                "enum": [
+                  "ts_code",
+                  "fields"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "provider_id": {
+              "const": "tushare"
+            },
+            "endpoint_id": {
+              "const": "etf_mins"
+            },
+            "redacted_parameters": {
+              "propertyNames": {
+                "enum": [
+                  "ts_code",
+                  "freq",
+                  "start_date",
+                  "end_date",
+                  "fields"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "provider_id": {
+              "const": "tushare"
+            },
+            "endpoint_id": {
+              "const": "fund_adj"
+            },
+            "redacted_parameters": {
+              "propertyNames": {
+                "enum": [
+                  "ts_code",
+                  "trade_date",
+                  "start_date",
+                  "end_date",
+                  "fields"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "provider_id": {
+              "const": "tushare"
+            },
+            "endpoint_id": {
+              "const": "fund_daily"
+            },
+            "redacted_parameters": {
+              "propertyNames": {
+                "enum": [
+                  "ts_code",
+                  "trade_date",
+                  "start_date",
+                  "end_date",
+                  "fields"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "provider_id": {
+              "const": "tushare"
+            },
+            "endpoint_id": {
+              "const": "stk_mins"
+            },
+            "redacted_parameters": {
+              "propertyNames": {
+                "enum": [
+                  "ts_code",
+                  "freq",
+                  "start_date",
+                  "end_date",
+                  "fields"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "provider_id": {
+              "const": "tushare"
+            },
+            "endpoint_id": {
+              "const": "stock_basic"
+            },
+            "redacted_parameters": {
+              "propertyNames": {
+                "enum": [
+                  "exchange",
+                  "list_status",
+                  "fields"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "fetch_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_id",
+        "provider_id",
+        "endpoint_id",
+        "provider_version",
+        "redacted_parameters",
+        "request_fingerprint_version",
+        "request_fingerprint",
+        "started_at",
+        "completed_at",
+        "fetched_at",
+        "response_status",
+        "attempt_count",
+        "raw_content_sha256",
+        "normalized_content_sha256",
+        "cache_entry_refs",
+        "cache_lineage"
+      ],
+      "properties": {
+        "receipt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "endpoint_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "redacted_parameters": {
+          "type": "object",
+          "propertyNames": {
+            "not": {
+              "pattern": "(?i:token|secret|password|api[_ -]?key|credential|authorization|auth|headers?|cookies?|session|bearer|proxy|access[_ -]?key|private[_ -]?key|signature)"
+            }
+          },
+          "properties": {
+            "adjustflag": {
+              "const": "3"
+            },
+            "code": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?:sh|sz|bj)\\.[0-9]{6}$"
+            },
+            "end_date": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?:[0-9]{8}|[0-9]{4}-[0-9]{2}-[0-9]{2}(?: [0-9]{2}:[0-9]{2}:[0-9]{2})?)$"
+            },
+            "exchange": {
+              "type": "string",
+              "pattern": "^(?:SSE|SZSE|BSE)?$"
+            },
+            "fields": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*(?:,[A-Za-z_][A-Za-z0-9_]*)*$"
+            },
+            "freq": {
+              "const": "1min"
+            },
+            "frequency": {
+              "const": "5"
+            },
+            "list_status": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[LDP]$"
+            },
+            "start_date": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?:[0-9]{8}|[0-9]{4}-[0-9]{2}-[0-9]{2}(?: [0-9]{2}:[0-9]{2}:[0-9]{2})?)$"
+            },
+            "trade_date": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?:[0-9]{8}|[0-9]{4}-[0-9]{2}-[0-9]{2})$"
+            },
+            "ts_code": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[0-9]{6}\\.(?:SH|SZ|BJ)$"
+            }
+          },
+          "patternProperties": {
+            ".*": {
+              "type": "string",
+              "maxLength": 512,
+              "not": {
+                "pattern": "(?i:token|secret|password|api[_ -]?key|credential|authorization|auth|headers?|cookies?|session|bearer|proxy|access[_ -]?key|private[_ -]?key|signature)"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "request_fingerprint_version": {
+          "const": "market_request_fingerprint.v1"
+        },
+        "request_fingerprint": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "description": "Derived from request_fingerprint_version, provider_id, endpoint_id, provider_version and the sorted redacted_parameters projection; canonical validation recomputes it."
+        },
+        "started_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "completed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "fetched_at": {
+          "$ref": "#/$defs/timestamp_or_null"
+        },
+        "response_status": {
+          "enum": [
+            "succeeded",
+            "failed",
+            "timeout",
+            "provider_unavailable",
+            "rejected"
+          ]
+        },
+        "attempt_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "raw_content_sha256": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "normalized_content_sha256": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cache_entry_refs": {
+          "$ref": "#/$defs/source_refs"
+        },
+        "cache_lineage": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/source_refs"
+            },
+            {
+              "minItems": 1
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/$defs/allowlisted_provider_endpoint"
+        },
+        {
+          "if": {
+            "properties": {
+              "response_status": {
+                "const": "succeeded"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "attempt_count": {
+                "minimum": 1
+              },
+              "fetched_at": {
+                "$ref": "#/$defs/timestamp"
+              },
+              "raw_content_sha256": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "normalized_content_sha256": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "cache_entry_refs": {
+                "minItems": 1
+              },
+              "cache_lineage": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "operation_blocker_gap": {
+      "type": "object",
+      "required": [
+        "axis",
+        "severity",
+        "blocks_axis"
+      ],
+      "properties": {
+        "axis": {
+          "const": "operation"
+        },
+        "severity": {
+          "const": "blocker"
+        },
+        "blocks_axis": {
+          "const": true
+        }
+      }
+    },
+    "decision_blocker_gap": {
+      "type": "object",
+      "required": [
+        "axis",
+        "severity",
+        "blocks_axis"
+      ],
+      "properties": {
+        "axis": {
+          "const": "decision"
+        },
+        "severity": {
+          "const": "blocker"
+        },
+        "blocks_axis": {
+          "const": true
+        }
+      }
+    },
+    "snapshot_blocker_gap": {
+      "type": "object",
+      "required": [
+        "axis",
+        "severity",
+        "blocks_axis"
+      ],
+      "properties": {
+        "axis": {
+          "const": "snapshot_cash_valuation"
+        },
+        "severity": {
+          "const": "blocker"
+        },
+        "blocks_axis": {
+          "const": true
+        }
+      }
+    },
+    "market_blocker_gap": {
+      "type": "object",
+      "required": [
+        "axis",
+        "severity",
+        "blocks_axis"
+      ],
+      "properties": {
+        "axis": {
+          "const": "market"
+        },
+        "severity": {
+          "const": "blocker"
+        },
+        "blocks_axis": {
+          "const": true
+        }
+      }
+    },
+    "lifecycle_blocker_gap": {
+      "type": "object",
+      "required": [
+        "axis",
+        "severity",
+        "blocks_axis"
+      ],
+      "properties": {
+        "axis": {
+          "const": "lifecycle"
+        },
+        "severity": {
+          "const": "blocker"
+        },
+        "blocks_axis": {
+          "const": true
+        }
+      }
+    },
+    "outcome_blocker_gap": {
+      "type": "object",
+      "required": [
+        "axis",
+        "severity",
+        "blocks_axis"
+      ],
+      "properties": {
+        "axis": {
+          "const": "outcome"
+        },
+        "severity": {
+          "const": "blocker"
+        },
+        "blocks_axis": {
+          "const": true
+        }
+      }
+    },
+    "gap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gap_id",
+        "axis",
+        "code",
+        "severity",
+        "blocks_axis",
+        "owner",
+        "next_step",
+        "source_refs"
+      ],
+      "properties": {
+        "gap_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "axis": {
+          "enum": [
+            "operation",
+            "decision",
+            "snapshot_cash_valuation",
+            "market",
+            "lifecycle",
+            "outcome"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$",
+          "not": {
+            "const": "OPEN_EPISODE_OUTCOME_NOT_FINAL"
+          }
+        },
+        "severity": {
+          "enum": [
+            "info",
+            "warning",
+            "blocker"
+          ]
+        },
+        "blocks_axis": {
+          "type": "boolean"
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "next_step": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_refs": {
+          "$ref": "#/$defs/source_refs"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "blocks_axis": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "severity": {
+                "const": "blocker"
+              },
+              "source_refs": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "severity": {
+                "const": "blocker"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "blocks_axis": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

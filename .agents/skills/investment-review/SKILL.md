@@ -84,6 +84,216 @@ database. Its API/UI/automation authority applies only to the product-completion
 review workflow described in
 `docs/playbooks/INVESTMENT_REVIEW_PRODUCT_COMPLETION.md`.
 
+## Product-completion v3 reviewability boundary
+
+The reviewability-corrections overlay is additive and explicitly opt-in. It uses
+`reviewability_schema_version=1` and
+`investment_review.operation_checkpoint.v1` only in a newly selected candidate
+sidecar. Core initialization and the v2 product-completion feature must not create
+or repair this overlay. A legacy, user, current-v2 or prior candidate sidecar without
+the exact marker and complete schema is read-only evidence and must be refused before
+opening any writable SQLite connection.
+
+A new candidate path must be owned through `O_CREAT | O_EXCL`; the exclusive file
+descriptor stays open while `fstat/stat + samestat` proves that every initialization
+step still targets the same file. An existing path passes only through an immutable
+`mode=ro` gate before any possible writable use. That immutable gate rejects a
+nonempty `-wal` or an unpaired `-shm`. It may accept the stable zero-byte WAL plus
+paired SHM left by ordinary read-only status on Windows, but snapshots and rechecks
+each auxiliary file's identity, size, nanosecond mtime and SHA-256; any auxiliary
+state/content change or nonempty WAL rejects the candidate. It separately snapshots
+the main file's identity, size, nanosecond mtime and SHA-256 before opening it, then
+requires the same main-file identity, size, mtime and hash before accepting it.
+Because immutable SQLite may report
+`journal_mode=delete`, the persistent main-file header must independently prove WAL.
+The candidate must keep
+`journal_mode=WAL`, return exactly `ok` from `PRAGMA quick_check`, and match the full
+core + product-completion + reviewability foundation manifest. That manifest covers
+every non-internal table/index/trigger/view plus `table_xinfo`, foreign keys,
+`index_list` and `index_xinfo`, including implicit indexes, and has the fixed SHA-256
+`e1241c55fe615a0389b9f7ee2c8d0e7071d7c45487800d67b00d29f53dcceab0`.
+Every save revalidates the marker, WAL/quick-check result and full manifest inside the
+same `BEGIN IMMEDIATE` writable transaction; an earlier read-only check is not enough.
+
+The overlay is released only through its seven verified gates:
+
+- P1 may define this boundary, the closed checkpoint contract and the empty additive
+  schema. It must not sync real data, run reviews, reconstruct snapshots, acquire
+  market data, automate work or expose API/UI behavior.
+- P2 may classify account operations from quantity-before/quantity-after and explicit
+  event facts. A missing Decision or reason projects `not_recorded` or
+  `not_applicable`; it never blocks an otherwise provable operation review.
+- P3 may project effective, user-known, system-observed and recorded/ingested times
+  with explicit bases and bind a `user` or `system` perspective into run identity and
+  replay. It must preserve existing event identities and reviewed mapping semantics.
+- P4 may reconstruct pre/post/cutoff holdings from a completely synchronized,
+  read-only ledger. Quantity, cost, cash, price, NAV, weight and industry availability
+  are independent; a missing component must not hide an available position or become
+  zero.
+- P5 may append episode-scoped entry, adjustment, active, exit and postmortem
+  checkpoints. `open` plus `outcome=interim` is a normal active-checkpoint
+  state, not a gap and not a reason to downgrade operation readiness.
+- P6 may freeze market context under `local_first_controlled_fallback_v1`. It checks
+  local coverage first. Only `missing`, `stale` or `insufficient` coverage may invoke
+  an existing allowlisted provider in the pre-bundle cache step, with timeout <=20s,
+  retries <=2, concurrency <=2 and requests/run <=20. The result and a redacted receipt
+  are written only to the new v3 cache/sidecar. Renderer, source replay, API and UI are
+  always offline.
+- P7 may expose the six validated axes and append-only human inputs through the local
+  service/UI and disableable in-process automation. It does not authorize production
+  publication, an OS scheduler/service or any P2H UI path.
+
+The P6 allowlist is code-owned and closed. Every checkpoint must carry
+`allowlist_version=market_provider_allowlist.v1`,
+`allowlist_sha256=sha256:1e612c7bf6090fcbfd32aaaef9ca7c73db8441ba939726b9d610238b29b3790a`
+and exactly these ten `provider:endpoint` values:
+
+- `baostock:history_k_data_plus_5m`;
+- `tushare:adj_factor`;
+- `tushare:cb_daily`;
+- `tushare:daily`;
+- `tushare:etf_basic`;
+- `tushare:etf_mins`;
+- `tushare:fund_adj`;
+- `tushare:fund_daily`;
+- `tushare:stk_mins`;
+- `tushare:stock_basic`.
+
+Receipt parameter keys are endpoint-specific and closed:
+
+- `baostock:history_k_data_plus_5m`: `code`, `fields`, `start_date`,
+  `end_date`, `frequency`, `adjustflag`;
+- `tushare:adj_factor`, `tushare:cb_daily`, `tushare:daily`,
+  `tushare:fund_adj`, `tushare:fund_daily`: `ts_code`, `trade_date`,
+  `start_date`, `end_date`, `fields`;
+- `tushare:etf_basic`: `ts_code`, `fields`;
+- `tushare:etf_mins`, `tushare:stk_mins`: `ts_code`, `freq`,
+  `start_date`, `end_date`, `fields`;
+- `tushare:stock_basic`: `exchange`, `list_status`, `fields`.
+
+Parameter values are also closed strings. They are trimmed, limited to 512
+characters, and only `exchange` may be empty:
+
+- `code`: lowercase `sh|sz|bj`, a dot and six digits;
+- `ts_code`: six digits and uppercase `.SH|.SZ|.BJ`;
+- `start_date`/`end_date`: `YYYYMMDD`, or `YYYY-MM-DD` optionally followed by
+  ` HH:MM:SS`; `trade_date`: `YYYYMMDD` or `YYYY-MM-DD`;
+- `fields`: one or more comma-separated ASCII identifiers;
+- `exchange`: empty or exactly `SSE|SZSE|BSE`; `list_status`: exactly `L|D|P`;
+- the baostock 5-minute endpoint requires exactly `frequency="5"` and
+  `adjustflag="3"`; Tushare minute endpoints require exactly `freq="1min"`.
+
+All non-listed keys and out-of-grammar values are rejected. The sensitive token,
+secret, password, API-key, credential, authorization/auth, header, cookie, session,
+bearer, proxy, access/private-key and signature pattern is applied case-insensitively
+to values as well as keys, so a safe key cannot persist secret-looking content. Each
+receipt carries
+`request_fingerprint_version=market_request_fingerprint.v1`; its fingerprint is
+derived, not trusted from the caller, from that version, provider, endpoint, provider
+version and the key-sorted safe parameter projection.
+
+The limits are exact, not defaults that a caller may raise:
+`timeout_seconds=20`, `max_retries=2`, `max_concurrency=2` and
+`max_requests_per_run=20`. `request_count` is the sum of every embedded receipt's
+`attempt_count`. A successful fallback requires at least one successful receipt,
+non-empty cache references, response hashes, fetched time, cache-entry references
+and cache lineage; the aggregate cache references cover every successful receipt's
+cache entry. Success may fully satisfy coverage or honestly remain missing, stale or
+insufficient. When local coverage is `satisfied`, the fallback is `not_needed`,
+the request count is zero, frozen local `cache_refs` are non-empty and no external
+fetch receipt may be present. Every embedded receipt, including failed, rejected,
+timeout and zero-attempt provider-unavailable receipts, must have non-empty
+`cache_lineage` binding the local cache requirement that triggered it.
+
+Fallback status is exactly one of `not_needed`, `succeeded`, `failed` or
+`provider_unavailable`; `attempted` and `not_attempted` are not states. Post-fallback
+coverage and the market axis are coupled exactly:
+`satisfied -> available`, `missing -> missing|failed`,
+`stale -> stale|failed`, and
+`insufficient -> insufficient|partial|failed`. Every fallback cache ref must be
+frozen into the market source refs, and every successful receipt cache entry must be
+present in both sets. Receipt start, completion and fetch times cannot exceed the
+checkpoint knowledge cutoff. Any successful external receipt forces
+`reconstructed_public_context`, and market `fetched_at` must equal the latest
+successful receipt fetch time.
+
+Every v3 checkpoint keeps these axes separate:
+
+- `operation`: `ready`, `partial` or `blocked`;
+- `decision`: `complete`, `partial`, `not_recorded`, `not_applicable` or `blocked`;
+- `snapshot_cash_valuation`: field-level availability for position quantity, cost,
+  cash, price, NAV, weight and industry;
+- `market`: availability plus temporal role;
+- `lifecycle`: `open`, `closed`, `ambiguous` or `unknown`;
+- `outcome`: `interim`, `final`, `not_applicable` or `missing`.
+
+Every gap has an axis, stable code, severity, owner, next step and source references.
+The raw code is evidence detail, not the primary user-facing conclusion.
+
+Material states require their own evidence. Root `source_refs` are always non-empty;
+operation `ready|partial`, decision `complete|partial`, snapshot aggregate
+`available|partial`, each snapshot field `available|partial`, market
+`available|partial|stale|insufficient`, lifecycle `open|closed` and outcome
+`interim|final` all require non-empty source refs. Snapshot aggregate state is
+derived from the seven field states: `available` contains only
+available/not-applicable fields and at least one available field; `missing` contains
+only missing/not-applicable fields and at least one explicitly missing field;
+`partial` contains at least one available and at least one partial/missing field. An
+available field also requires a value; missing/not-applicable values remain null.
+`market=available` additionally requires an effective time. An axis-blocking gap must be
+`severity=blocker`, carry non-empty source references and place only that axis in
+its defined blocked state.
+
+For account actions, `owner_action_default` may place `user_known_at` at effective
+time when the fact is unconflicted. It never proves `system_observed_at` and is
+forbidden for market data. Later ingestion retains its true recorded/system
+observation time. Later-acquired public data is
+`reconstructed_public_context` (or an equally explicit retrospective state), never
+proof that the user or system observed it at the decision time.
+
+The four checkpoint times are `effective_at`, `user_known_at`,
+`system_observed_at` and `recorded_at`; every one carries an explicit basis and
+source references. Available bases are field-specific:
+
+- effective: `source_occurred_at` or `source_effective_at`;
+- user-known: `owner_action_default`, `explicit_user_record`,
+  `source_occurred_at` or `source_effective_at`;
+- system-observed: `system_observation`, `recorded_later` or
+  `ingest_observation`;
+- recorded: `recorded_later`, `ingest_observation` or `system_observation`.
+
+`not_observed` and `unknown` are only for an actually null nullable time;
+effective and recorded time are non-null. The semantic boundary is
+`effective_at <= as_of <= knowledge_cutoff`; every non-null user/system/recorded
+time must also be no later than `knowledge_cutoff`. Market context separately
+preserves effective, public, fetched and system-observed time. The checkpoint is a
+closed Draft 2020-12 object,
+and `checkpoint_key` is exactly `review_checkpoint_key_` followed by 64 lowercase
+hexadecimal characters.
+
+Checkpoint kind/type/lifecycle/outcome combinations are closed. Active review kind
+and active checkpoint type imply each other and require `open + interim`;
+postmortem kind and type imply each other and require `closed + final`; an exit
+requires `closed + final`. `open + final` and `closed + interim` are invalid, and
+every final outcome requires a closed lifecycle.
+
+Semantic identity is episode-rooted and hashes only `episode_id`, `review_kind`,
+`checkpoint_type`, `perspective`, `as_of` and `knowledge_cutoff`.
+`position_case_id` remains payload/projection evidence but cannot fork the same
+semantic cutoff: changing it under the same tuple is a content conflict. The
+canonical payload/content hash excludes wall-clock `inserted_at`; the separate
+`investment_review.operation_checkpoint_row.v1` row-integrity hash binds the full
+projection, payload SHA-256 and actual `inserted_at` and is recomputed on read.
+
+This overlay must not change canonical event identity, make Decision fields optional
+inside an actual Decision object, rewrite reviewed mapping semantics, modify old
+artifacts, create motives/theses, diagnose psychology, score behavior, emit advice,
+write the portfolio database, copy/upgrade an old sidecar, call a model/broker, add a
+provider/dependency/credential, or publish.
+
+See `docs/playbooks/INVESTMENT_REVIEW_REVIEWABILITY.md` and
+`docs/contracts/INVESTMENT_REVIEW_OPERATION_CHECKPOINT.schema.json`.
+
 ## P2A portfolio-context boundary
 
 After the Phase 1 evidence layer is accepted, the implementation may also:
