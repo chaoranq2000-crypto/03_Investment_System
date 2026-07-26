@@ -1940,6 +1940,143 @@ VALUES(
             result.append(item)
         return result
 
+    def list_event_observation_evidence(
+        self,
+        *,
+        event_ids: Sequence[str] | None = None,
+        account: str | None = None,
+        symbol: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Read immutable ingest-time evidence without changing P2C projections.
+
+        ``trade_events.known_at`` is part of the legacy canonical event and is not
+        reinterpreted here.  This query exposes the separate evidence needed by a
+        versioned knowledge-provenance projection: the first ``INSERTED``
+        observation, its ingest run, the event's stored ingest time, and the exact
+        raw payload.  Missing linkage remains explicit as ``None``.
+        """
+
+        self._ensure_initialized()
+        normalized_event_ids: list[str] | None = None
+        if event_ids is not None:
+            normalized_event_ids = sorted(
+                {
+                    str(event_id).strip()
+                    for event_id in event_ids
+                    if str(event_id).strip()
+                }
+            )
+            if not normalized_event_ids:
+                return []
+
+        filters: list[str] = []
+        params: list[Any] = []
+        if normalized_event_ids is not None:
+            placeholders = ",".join("?" for _ in normalized_event_ids)
+            filters.append(f"e.event_id IN ({placeholders})")
+            params.extend(normalized_event_ids)
+        if account:
+            filters.append("e.account = ?")
+            params.append(account.strip())
+        if symbol:
+            filters.append("e.symbol = ?")
+            params.append(symbol.strip().upper())
+        where = f"WHERE {' AND '.join(filters)}" if filters else ""
+
+        with self.connection(read_only=True) as conn:
+            rows = conn.execute(
+                f"""
+                SELECT
+                    e.event_id,
+                    e.source_id,
+                    e.source_record_id,
+                    e.event_type,
+                    e.occurred_at,
+                    e.known_at,
+                    e.account,
+                    e.market,
+                    e.symbol,
+                    e.payload_sha256,
+                    e.raw_payload_json,
+                    e.first_ingest_run_id,
+                    e.ingested_at,
+                    l.outcome AS first_ingest_outcome,
+                    l.payload_sha256 AS first_observation_payload_sha256,
+                    l.observed_at AS first_inserted_observed_at,
+                    r.source_id AS first_ingest_source_id,
+                    r.source_fingerprint AS first_ingest_source_fingerprint,
+                    r.started_at AS first_ingest_started_at,
+                    r.finished_at AS first_ingest_finished_at,
+                    r.status AS first_ingest_status,
+                    r.manifest_json AS first_ingest_manifest_json
+                FROM trade_events e
+                LEFT JOIN ingest_run_events l
+                  ON l.run_id = e.first_ingest_run_id
+                 AND l.event_id = e.event_id
+                 AND l.outcome = 'INSERTED'
+                LEFT JOIN ingest_runs r
+                  ON r.run_id = e.first_ingest_run_id
+                {where}
+                ORDER BY
+                    e.account, e.market, e.symbol, e.occurred_at,
+                    e.source_record_id, e.event_id
+                """,
+                params,
+            ).fetchall()
+
+        evidence: list[dict[str, Any]] = []
+        for row in rows:
+            item = dict(row)
+            raw_payload_json = item.pop("raw_payload_json")
+            manifest_json = item.pop("first_ingest_manifest_json")
+            try:
+                raw_payload = json.loads(raw_payload_json)
+            except (TypeError, json.JSONDecodeError) as exc:
+                raise ReviewStoreError(
+                    "Stored event raw payload is not valid JSON: "
+                    f"event_id={item['event_id']}"
+                ) from exc
+            if not isinstance(raw_payload, dict):
+                raise ReviewStoreError(
+                    "Stored event raw payload must be a JSON object: "
+                    f"event_id={item['event_id']}"
+                )
+
+            first_ingest_manifest: dict[str, Any] | None = None
+            if manifest_json is not None:
+                try:
+                    decoded_manifest = json.loads(manifest_json)
+                except (TypeError, json.JSONDecodeError) as exc:
+                    raise ReviewStoreError(
+                        "Stored first-ingest manifest is not valid JSON: "
+                        f"event_id={item['event_id']}"
+                    ) from exc
+                if not isinstance(decoded_manifest, dict):
+                    raise ReviewStoreError(
+                        "Stored first-ingest manifest must be a JSON object: "
+                        f"event_id={item['event_id']}"
+                    )
+                first_ingest_manifest = decoded_manifest
+
+            first_ingest = {
+                "run_id": item.pop("first_ingest_run_id"),
+                "outcome": item.pop("first_ingest_outcome"),
+                "observed_at": item.pop("first_inserted_observed_at"),
+                "observation_payload_sha256": item.pop(
+                    "first_observation_payload_sha256"
+                ),
+                "source_id": item.pop("first_ingest_source_id"),
+                "source_fingerprint": item.pop("first_ingest_source_fingerprint"),
+                "started_at": item.pop("first_ingest_started_at"),
+                "finished_at": item.pop("first_ingest_finished_at"),
+                "status": item.pop("first_ingest_status"),
+                "manifest": first_ingest_manifest,
+            }
+            item["raw_payload"] = raw_payload
+            item["first_ingest"] = first_ingest
+            evidence.append(item)
+        return evidence
+
     @staticmethod
     def _product_payload(value: object, record_type: type[Any]) -> dict[str, Any]:
         if isinstance(value, record_type):

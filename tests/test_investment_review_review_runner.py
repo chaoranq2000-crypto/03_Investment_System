@@ -162,11 +162,13 @@ def _run(
     scope: str = "single",
     dry_run: bool = False,
     as_of: str = AS_OF,
+    perspective: str = "user",
 ) -> dict[str, Any]:
     return fixture.runner.run(
         scope=scope,
         as_of=as_of,
         knowledge_cutoff=KNOWLEDGE_CUTOFF,
+        perspective=perspective,
         dry_run=dry_run,
         trigger="pytest",
     )
@@ -211,6 +213,7 @@ def test_cli_dry_run_does_not_mutate_sidecar_source_or_artifacts(
 
     assert exit_code == 0
     assert receipt["mode"] == "dry_run"
+    assert receipt["cutoffs"]["perspective"] == "user"
     assert receipt["status"] == "partial"
     assert receipt["review_sidecar"]["mutated"] is False
     assert receipt["source_proof"]["unchanged"] is True
@@ -226,6 +229,44 @@ def test_cli_dry_run_does_not_mutate_sidecar_source_or_artifacts(
         for stage in receipt["stages"]
         for artifact in stage["artifacts"]
     )
+
+
+def test_cli_forwards_explicit_system_perspective(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    fixture = _fixture(tmp_path)
+    monkeypatch.setattr(runner_module, "_repo_root", lambda: fixture.root)
+    monkeypatch.setattr(sync_module, "_default_repo_root", lambda: fixture.root)
+
+    exit_code = review_cli_main(
+        [
+            "--db",
+            str(fixture.review_db),
+            "review-run",
+            "--portfolio-db",
+            str(fixture.source),
+            "--mapping",
+            str(fixture.mapping),
+            "--artifact-root",
+            str(fixture.artifacts),
+            "--scope",
+            "single",
+            "--as-of",
+            AS_OF,
+            "--knowledge-cutoff",
+            KNOWLEDGE_CUTOFF,
+            "--perspective",
+            "system",
+            "--dry-run",
+        ]
+    )
+    receipt = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert receipt["cutoffs"]["perspective"] == "system"
+    assert not fixture.artifacts.exists()
 
 
 @pytest.mark.parametrize(
@@ -249,6 +290,86 @@ def test_service_rejects_naive_or_date_only_cutoffs(
             dry_run=True,
         )
 
+    assert _sha256(fixture.review_db) == sidecar_before
+    assert not fixture.artifacts.exists()
+
+
+def test_default_user_and_explicit_perspectives_are_bound_to_run_identity(
+    tmp_path: Path,
+) -> None:
+    fixture = _fixture(tmp_path)
+
+    default_user = fixture.runner.run(
+        scope="single",
+        as_of=AS_OF,
+        knowledge_cutoff=KNOWLEDGE_CUTOFF,
+        dry_run=True,
+    )
+    explicit_user = _run(fixture, dry_run=True, perspective="user")
+    system = _run(fixture, dry_run=True, perspective="system")
+
+    assert default_user == explicit_user
+    assert default_user["cutoffs"]["perspective"] == "user"
+    assert system["cutoffs"]["perspective"] == "system"
+    assert system["run_key"] != default_user["run_key"]
+    assert system["content_id"] != default_user["content_id"]
+    assert len(default_user["episodes"]) == 1
+    assert system["episodes"] == []
+    assert system["selection"]["selected_episode_ids"] == []
+
+
+def test_service_rejects_unknown_perspective_before_any_write(
+    tmp_path: Path,
+) -> None:
+    fixture = _fixture(tmp_path)
+    sidecar_before = _sha256(fixture.review_db)
+
+    with pytest.raises(
+        ReviewRunnerError, match="unsupported review perspective"
+    ):
+        fixture.runner.run(
+            scope="single",
+            as_of=AS_OF,
+            knowledge_cutoff=KNOWLEDGE_CUTOFF,
+            perspective="omniscient",
+            dry_run=True,
+        )
+
+    assert _sha256(fixture.review_db) == sidecar_before
+    assert not fixture.artifacts.exists()
+
+
+def test_service_rejects_as_of_after_knowledge_before_sync_or_write(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fixture = _fixture(tmp_path)
+    sidecar_before = _sha256(fixture.review_db)
+    sync_called = False
+
+    def unexpected_sync(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        nonlocal sync_called
+        sync_called = True
+        raise AssertionError("sync must not run for an invalid cutoff order")
+
+    monkeypatch.setattr(
+        runner_module,
+        "sync_review_events",
+        unexpected_sync,
+    )
+
+    with pytest.raises(
+        ReviewRunnerError,
+        match="as_of must not be later than knowledge_cutoff",
+    ):
+        fixture.runner.run(
+            scope="single",
+            as_of="2026-07-14T00:00:01Z",
+            knowledge_cutoff="2026-07-14T00:00:00Z",
+            dry_run=False,
+        )
+
+    assert sync_called is False
     assert _sha256(fixture.review_db) == sidecar_before
     assert not fixture.artifacts.exists()
 
@@ -301,6 +422,8 @@ def test_apply_then_identical_repeat_reuses_immutable_receipt(
     sidecar_after_first = _sha256(fixture.review_db)
     artifacts_after_first = _tree_hashes(fixture.artifacts)
     second = _run(fixture)
+    recorded = fixture.store.get_review_run(str(first["run_key"]))
+    parameters = recorded["run"]["parameters"]
 
     assert first == second
     assert first["status"] == "partial"
@@ -311,6 +434,16 @@ def test_apply_then_identical_repeat_reuses_immutable_receipt(
     assert _sha256(fixture.review_db) == sidecar_after_first
     assert _tree_hashes(fixture.artifacts) == artifacts_after_first
     assert artifacts_after_first
+    assert parameters["perspective"] == "user"
+    assert parameters["knowledge_provenance_schema_version"] == (
+        runner_module.KNOWLEDGE_PROVENANCE_SCHEMA_VERSION
+    )
+    assert parameters["knowledge_provenance_method_version"] == (
+        runner_module.KNOWLEDGE_PROVENANCE_METHOD_VERSION
+    )
+    assert parameters["knowledge_provenance_content_id"] == (
+        first["cutoffs"]["knowledge_provenance_content_id"]
+    )
 
 
 def test_single_weekly_monthly_selection_is_deterministic(
@@ -514,6 +647,17 @@ def test_sync_preflight_failure_is_recorded_and_receipt_is_valid(
     assert recorded["status"] == "failed"
     assert recorded["status_event"]["details"]["failed_stage"] == "sync"
     assert recorded["status_event"]["details"]["retryable"] is True
+    parameters = recorded["run"]["parameters"]
+    assert parameters["perspective"] == "user"
+    assert parameters["knowledge_provenance_schema_version"] == (
+        runner_module.KNOWLEDGE_PROVENANCE_SCHEMA_VERSION
+    )
+    assert parameters["knowledge_provenance_method_version"] == (
+        runner_module.KNOWLEDGE_PROVENANCE_METHOD_VERSION
+    )
+    assert parameters[
+        "knowledge_provenance_request_content_id"
+    ].startswith("sha256:")
 
 
 def test_dry_run_with_lag_returns_valid_blocked_preflight_without_writes(
@@ -631,6 +775,8 @@ def test_real_facts_only_artifacts_pass_source_replay_and_no_advice_governance(
             episode["context"],
             episode["review_input"],
             episode["facts_only_review"],
+            episode["operation_review"],
+            episode["knowledge_provenance"],
         )
     )
     assert facts_stage["details"] == {
@@ -669,6 +815,13 @@ def test_no_decision_operation_review_is_ready_as_a_parallel_artifact(
 
     episode_stage = _stage(receipt, "episode")
     operation_content_id = episode_result["operation_review_content_id"]
+    knowledge_content_id = episode_result[
+        "knowledge_provenance_content_id"
+    ]
+    assert receipt["cutoffs"]["knowledge_provenance_content_id"] == (
+        knowledge_content_id
+    )
+    assert episode_result["perspective"] == "user"
     assert (
         episode_stage["details"]["operation_review_content_id"]
         == operation_content_id
@@ -684,6 +837,21 @@ def test_no_decision_operation_review_is_ready_as_a_parallel_artifact(
     )
     operation_artifact = json.loads(
         Path(operation_descriptor["path"]).read_text(encoding="utf-8")
+    )
+    knowledge_descriptor = next(
+        descriptor
+        for descriptor in episode_stage["artifacts"]
+        if descriptor["content_id"] == knowledge_content_id
+    )
+    knowledge_artifact = json.loads(
+        Path(knowledge_descriptor["path"]).read_text(encoding="utf-8")
+    )
+    assert knowledge_artifact["perspective"] == "user"
+    assert (
+        runner_module.validate_knowledge_provenance(knowledge_artifact)[
+            "validation_status"
+        ]
+        == "accepted"
     )
     assert (
         runner_module.validate_operation_review(operation_artifact)[
@@ -715,10 +883,15 @@ def test_no_decision_operation_review_is_ready_as_a_parallel_artifact(
     collection_descriptor = next(
         descriptor
         for descriptor in episode_stage["artifacts"]
-        if descriptor["content_id"] != operation_content_id
+        if Path(descriptor["path"]).name == "episode_collection.json"
     )
     collection = json.loads(
         Path(collection_descriptor["path"]).read_text(encoding="utf-8")
+    )
+    direct_user_collection = runner_module.build_episode_collection(
+        fixture.store.list_episode_projection_inputs(),
+        cutoff_at=receipt["cutoffs"]["episode_cutoff"],
+        snapshot_references=collection["snapshot_catalog"],
     )
     context = json.loads(
         Path(episode_result["artifacts"]["context"]["path"]).read_text(
@@ -748,6 +921,9 @@ def test_no_decision_operation_review_is_ready_as_a_parallel_artifact(
 
     assert saved_input["schema_version"] == "p2f.review_input_bundle.v1"
     assert saved_review["schema_version"] == "p2f.episode_review.v1"
+    assert canonical_json_bytes(collection) == canonical_json_bytes(
+        direct_user_collection
+    )
     assert canonical_json_bytes(saved_input) == canonical_json_bytes(
         rebuilt_input
     )
@@ -762,6 +938,10 @@ def test_receipt_validator_still_accepts_a_legacy_v1_receipt_projection(
     fixture = _fixture(tmp_path)
     current = _run(fixture)
     legacy = deepcopy(current)
+    legacy["cutoffs"].pop("perspective")
+    knowledge_content_id = legacy["cutoffs"].pop(
+        "knowledge_provenance_content_id"
+    )
 
     episode_stage = _stage(legacy, "episode")
     operation_content_id = episode_stage["details"].pop(
@@ -770,18 +950,28 @@ def test_receipt_validator_still_accepts_a_legacy_v1_receipt_projection(
     episode_stage["details"].pop("operation_review_validation_status")
     episode_stage["details"].pop("operation_review_source_replay")
     episode_stage["details"].pop("operation_review_summary")
+    episode_stage["details"].pop("perspective")
+    episode_stage["details"].pop("knowledge_provenance_content_id")
+    episode_stage["details"].pop(
+        "knowledge_provenance_validation_status"
+    )
+    episode_stage["details"].pop("knowledge_provenance_source_replay")
     episode_stage["artifacts"] = [
         descriptor
         for descriptor in episode_stage["artifacts"]
-        if descriptor.get("content_id") != operation_content_id
+        if descriptor.get("content_id")
+        not in {operation_content_id, knowledge_content_id}
     ]
     for episode in legacy["episodes"]:
         episode.pop("operation_review_status")
         episode.pop("decision_context_status")
         episode.pop("operation_count")
         episode.pop("operation_review_content_id")
+        episode.pop("perspective")
+        episode.pop("knowledge_provenance_content_id")
     for replay in _stage(legacy, "source_replay")["details"]["episodes"]:
         replay.pop("operation_review")
+        replay.pop("knowledge_provenance")
     legacy["content_id"] = runner_module._receipt_content_id(legacy)
 
     validation = fixture.runner.validate_receipt(legacy)
@@ -839,3 +1029,74 @@ def test_receipt_validator_still_accepts_a_legacy_v1_receipt_projection(
     )
 
     assert catalog.get_receipt(legacy["run_id"]) == legacy
+    catalog_items = {
+        item["run_id"]: item
+        for item in catalog.list_receipts()["runs"]
+    }
+    assert catalog_items[current["run_id"]]["perspective"] == "user"
+    assert catalog_items[legacy["run_id"]]["perspective"] == "legacy"
+
+
+def test_receipt_validator_rejects_an_unknown_perspective(
+    tmp_path: Path,
+) -> None:
+    fixture = _fixture(tmp_path)
+    receipt = _run(fixture, dry_run=True)
+    tampered = deepcopy(receipt)
+    tampered["cutoffs"]["perspective"] = "omniscient"
+    tampered["content_id"] = runner_module._receipt_content_id(tampered)
+
+    validation = fixture.runner.validate_receipt(tampered)
+
+    assert validation["validation_status"] == "blocked"
+    assert validation["findings"] == ["INVALID_PERSPECTIVE"]
+
+
+def test_receipt_validator_rejects_rehashed_legal_perspective_swap(
+    tmp_path: Path,
+) -> None:
+    fixture = _fixture(tmp_path)
+    receipt = _run(fixture, dry_run=True, perspective="user")
+    tampered = deepcopy(receipt)
+    tampered["cutoffs"]["perspective"] = "system"
+    tampered["content_id"] = runner_module._receipt_content_id(tampered)
+
+    validation = fixture.runner.validate_receipt(tampered)
+
+    assert validation["validation_status"] == "blocked"
+    assert {
+        "EPISODE_STAGE_PERSPECTIVE_BINDING_MISMATCH",
+        "RUN_KEY_PERSPECTIVE_BINDING_MISMATCH",
+    }.issubset(validation["findings"])
+
+
+def test_receipt_validator_rejects_perspective_downgrade_with_v3_signals(
+    tmp_path: Path,
+) -> None:
+    fixture = _fixture(tmp_path)
+    tampered = deepcopy(_run(fixture, dry_run=True))
+    tampered["cutoffs"].pop("perspective")
+    tampered["content_id"] = runner_module._receipt_content_id(tampered)
+
+    validation = fixture.runner.validate_receipt(tampered)
+
+    assert validation["validation_status"] == "blocked"
+    assert "MISSING_PERSPECTIVE" in validation["findings"]
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["scope", "mode", "status"],
+)
+def test_receipt_validator_blocks_unhashable_json_enum_values(
+    tmp_path: Path,
+    field: str,
+) -> None:
+    fixture = _fixture(tmp_path)
+    tampered = deepcopy(_run(fixture, dry_run=True))
+    tampered[field] = []
+    tampered["content_id"] = runner_module._receipt_content_id(tampered)
+
+    assert fixture.runner.validate_receipt(tampered)[
+        "validation_status"
+    ] == "blocked"

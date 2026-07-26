@@ -40,6 +40,14 @@ from .episodes import (
     validate_episode_collection,
 )
 from .models import canonical_json, sha256_text
+from .knowledge_provenance import (
+    METHOD_VERSION as KNOWLEDGE_PROVENANCE_METHOD_VERSION,
+    SCHEMA_VERSION as KNOWLEDGE_PROVENANCE_SCHEMA_VERSION,
+    build_knowledge_provenance,
+    project_perspective_event_inputs,
+    replay_validate_knowledge_provenance,
+    validate_knowledge_provenance,
+)
 from .operation_review import (
     METHOD_VERSION as OPERATION_REVIEW_METHOD_VERSION,
     SCHEMA_VERSION as OPERATION_REVIEW_SCHEMA_VERSION,
@@ -66,6 +74,7 @@ RUNNER_VERSION = "investment_review.review_runner.v1"
 RUN_RECEIPT_SCHEMA_VERSION = "investment_review.review_run_receipt.v1"
 RUN_CATALOG_SCHEMA_VERSION = "investment_review.review_catalog.v1"
 RUN_SCOPES = frozenset({"single", "weekly", "monthly"})
+RUN_PERSPECTIVES = frozenset({"user", "system"})
 TERMINAL_RUN_STATUSES = frozenset({"succeeded", "partial", "blocked", "failed"})
 COMPLETED_STAGE_NAMES = (
     "sync",
@@ -475,10 +484,17 @@ def _decision_sources(
 
 def _sidecar_projection_state(
     store: ReviewStore,
-) -> tuple[list[dict[str, Any]], str]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], str]:
     """Freeze the event/link/Decision inputs that can affect P2C or P2F."""
 
     events = store.list_episode_projection_inputs()
+    observation_rows = store.list_event_observation_evidence(
+        event_ids=[
+            str(event.get("event_id") or "")
+            for event in events
+            if event.get("event_id")
+        ]
+    )
     linked_decision_ids = sorted(
         {
             str(ref.get("decision_id") or "")
@@ -495,11 +511,12 @@ def _sidecar_projection_state(
         canonical_json(
             {
                 "events": events,
+                "event_observation_evidence": observation_rows,
                 "linked_decisions": decisions,
             }
         )
     )
-    return events, digest
+    return events, observation_rows, digest
 
 
 def _section_gap_codes(review: Mapping[str, Any]) -> list[str]:
@@ -709,23 +726,43 @@ class ReviewRunner:
             findings.append("UNSUPPORTED_RECEIPT_SCHEMA")
         if receipt.get("runner_version") != RUNNER_VERSION:
             findings.append("UNSUPPORTED_RUNNER_VERSION")
-        if receipt.get("scope") not in RUN_SCOPES:
+        if (
+            not isinstance(receipt.get("scope"), str)
+            or receipt.get("scope") not in RUN_SCOPES
+        ):
             findings.append("INVALID_SCOPE")
-        if receipt.get("mode") not in {"dry_run", "apply"}:
+        if (
+            not isinstance(receipt.get("mode"), str)
+            or receipt.get("mode") not in {"dry_run", "apply"}
+        ):
             findings.append("INVALID_MODE")
-        if receipt.get("status") not in {
-            "ready",
-            "partial",
-            "blocked",
-            "failed",
-        }:
+        if not isinstance(receipt.get("status"), str) or receipt.get(
+            "status"
+        ) not in {"ready", "partial", "blocked", "failed"}:
             findings.append("INVALID_STATUS")
         if not str(receipt.get("run_id") or "").startswith("reviewrun_"):
             findings.append("INVALID_RUN_ID")
         if not str(receipt.get("run_key") or "").startswith("review:"):
             findings.append("INVALID_RUN_KEY")
-        if receipt.get("content_id") != _receipt_content_id(receipt):
+        try:
+            expected_content_id = _receipt_content_id(receipt)
+        except (TypeError, UnicodeError, ValueError):
+            expected_content_id = None
+            findings.append("NON_CANONICAL_RECEIPT_VALUE")
+        if receipt.get("content_id") != expected_content_id:
             findings.append("RECEIPT_CONTENT_ID_MISMATCH")
+        cutoffs = receipt.get("cutoffs")
+        receipt_perspective: str | None = None
+        if not isinstance(cutoffs, Mapping):
+            findings.append("MALFORMED_CUTOFFS")
+        elif "perspective" in cutoffs:
+            if (
+                not isinstance(cutoffs.get("perspective"), str)
+                or cutoffs.get("perspective") not in RUN_PERSPECTIVES
+            ):
+                findings.append("INVALID_PERSPECTIVE")
+            else:
+                receipt_perspective = str(cutoffs["perspective"])
         stages = receipt.get("stages", [])
         if not isinstance(stages, list):
             findings.append("MALFORMED_STAGES")
@@ -735,10 +772,19 @@ class ReviewRunner:
             for stage in stages
             if isinstance(stage, Mapping)
         ]
-        if receipt.get("status") in {"ready", "partial"} and tuple(
+        completed_status = (
+            isinstance(receipt.get("status"), str)
+            and receipt.get("status") in {"ready", "partial"}
+        )
+        if completed_status and tuple(
             stage_names
         ) != COMPLETED_STAGE_NAMES:
             findings.append("INCOMPLETE_STAGE_SET")
+        completed_v3_receipt = (
+            receipt_perspective is not None
+            and completed_status
+            and tuple(stage_names) == COMPLETED_STAGE_NAMES
+        )
         source_proof = receipt.get("source_proof")
         if not isinstance(source_proof, Mapping):
             findings.append("MALFORMED_SOURCE_PROOF")
@@ -776,16 +822,56 @@ class ReviewRunner:
                 or selected_ids != sorted(set(episode_ids))
             ):
                 findings.append("EPISODE_SELECTION_MISMATCH")
+        v3_knowledge_signal = (
+            isinstance(cutoffs, Mapping)
+            and "knowledge_provenance_content_id" in cutoffs
+        )
+        for stage in stages:
+            details = (
+                stage.get("details")
+                if isinstance(stage, Mapping)
+                and isinstance(stage.get("details"), Mapping)
+                else {}
+            )
+            if (
+                "knowledge_provenance_content_id" in details
+                or "knowledge_provenance_source_replay" in details
+                or (
+                    stage.get("name") == "source_replay"
+                    and any(
+                        isinstance(item, Mapping)
+                        and "knowledge_provenance" in item
+                        for item in (
+                            details.get("episodes", [])
+                            if isinstance(details.get("episodes", []), list)
+                            else []
+                        )
+                    )
+                )
+            ):
+                v3_knowledge_signal = True
+        if isinstance(episodes, list) and any(
+            isinstance(item, Mapping)
+            and (
+                "perspective" in item
+                or "knowledge_provenance_content_id" in item
+            )
+            for item in episodes
+        ):
+            v3_knowledge_signal = True
+        if (
+            isinstance(cutoffs, Mapping)
+            and "perspective" not in cutoffs
+            and v3_knowledge_signal
+        ):
+            findings.append("MISSING_PERSPECTIVE")
         for stage in stages:
             if not isinstance(stage, Mapping):
                 findings.append("MALFORMED_STAGE")
                 continue
-            if stage.get("status") not in {
-                "ready",
-                "partial",
-                "blocked",
-                "failed",
-            }:
+            if not isinstance(stage.get("status"), str) or stage.get(
+                "status"
+            ) not in {"ready", "partial", "blocked", "failed"}:
                 findings.append("INVALID_STAGE_STATUS")
             for artifact in stage.get("artifacts", []):
                 if not isinstance(artifact, Mapping):
@@ -812,6 +898,167 @@ class ReviewRunner:
                     findings.append("ARTIFACT_HASH_MISMATCH")
                 if artifact.get("write_status") != "available":
                     findings.append("INVALID_ARTIFACT_WRITE_STATUS")
+        if completed_v3_receipt:
+            stage_index = {
+                str(stage.get("name") or ""): stage
+                for stage in stages
+                if isinstance(stage, Mapping)
+            }
+            sync_stage = stage_index.get("sync")
+            episode_stage = stage_index.get("episode")
+            replay_stage = stage_index.get("source_replay")
+            sync_details = (
+                sync_stage.get("details")
+                if isinstance(sync_stage, Mapping)
+                and isinstance(sync_stage.get("details"), Mapping)
+                else None
+            )
+            episode_details = (
+                episode_stage.get("details")
+                if isinstance(episode_stage, Mapping)
+                and isinstance(episode_stage.get("details"), Mapping)
+                else None
+            )
+            replay_stage_details = (
+                replay_stage.get("details")
+                if isinstance(replay_stage, Mapping)
+                and isinstance(replay_stage.get("details"), Mapping)
+                else None
+            )
+            knowledge_content_id = (
+                cutoffs.get("knowledge_provenance_content_id")
+                if isinstance(cutoffs, Mapping)
+                else None
+            )
+            if (
+                not isinstance(knowledge_content_id, str)
+                or not knowledge_content_id.startswith("sha256:")
+                or len(knowledge_content_id) != 71
+            ):
+                findings.append("INVALID_KNOWLEDGE_PROVENANCE_CONTENT_ID")
+            if (
+                episode_details is None
+                or episode_details.get("perspective")
+                != receipt_perspective
+                or episode_details.get("knowledge_provenance_content_id")
+                != knowledge_content_id
+            ):
+                findings.append("EPISODE_STAGE_PERSPECTIVE_BINDING_MISMATCH")
+            for episode in episodes if isinstance(episodes, list) else []:
+                if (
+                    not isinstance(episode, Mapping)
+                    or episode.get("perspective") != receipt_perspective
+                    or episode.get("knowledge_provenance_content_id")
+                    != knowledge_content_id
+                ):
+                    findings.append("EPISODE_PERSPECTIVE_BINDING_MISMATCH")
+            replay_items = (
+                replay_stage_details.get("episodes")
+                if isinstance(replay_stage_details, Mapping)
+                else None
+            )
+            if not isinstance(replay_items, list):
+                findings.append("MALFORMED_KNOWLEDGE_SOURCE_REPLAY")
+                replay_items = []
+            for replay_item in replay_items:
+                knowledge_replay = (
+                    replay_item.get("knowledge_provenance")
+                    if isinstance(replay_item, Mapping)
+                    else None
+                )
+                if (
+                    not isinstance(knowledge_replay, Mapping)
+                    or knowledge_replay.get("perspective")
+                    != receipt_perspective
+                    or knowledge_replay.get("content_id")
+                    != knowledge_content_id
+                    or knowledge_replay.get("source_verification")
+                    != "verified"
+                ):
+                    findings.append(
+                        "KNOWLEDGE_SOURCE_REPLAY_PERSPECTIVE_BINDING_MISMATCH"
+                    )
+            receipt_episode_ids = sorted(
+                str(item.get("episode_id") or "")
+                for item in episodes
+                if isinstance(item, Mapping)
+            )
+            replay_episode_ids = sorted(
+                str(item.get("episode_id") or "")
+                for item in replay_items
+                if isinstance(item, Mapping)
+            )
+            if replay_episode_ids != receipt_episode_ids:
+                findings.append("KNOWLEDGE_SOURCE_REPLAY_MEMBERSHIP_MISMATCH")
+            if sync_details is None or not isinstance(cutoffs, Mapping):
+                findings.append("RUN_KEY_BINDING_INPUT_MISSING")
+            else:
+                selection_mapping = (
+                    selection if isinstance(selection, Mapping) else {}
+                )
+                expected_run_key = "review:" + sha256_text(
+                    canonical_json(
+                        {
+                            "runner_version": RUNNER_VERSION,
+                            "scope": receipt.get("scope"),
+                            "perspective": receipt_perspective,
+                            "source_cutoff_id": cutoffs.get(
+                                "source_cutoff_id"
+                            ),
+                            "source_sha256": sync_details.get(
+                                "source_sha256"
+                            ),
+                            "mapping_sha256": sync_details.get(
+                                "mapping_sha256"
+                            ),
+                            "sidecar_projection_sha256": cutoffs.get(
+                                "sidecar_projection_sha256"
+                            ),
+                            "knowledge_provenance_schema_version": (
+                                KNOWLEDGE_PROVENANCE_SCHEMA_VERSION
+                            ),
+                            "knowledge_provenance_method_version": (
+                                KNOWLEDGE_PROVENANCE_METHOD_VERSION
+                            ),
+                            "knowledge_provenance_content_id": (
+                                knowledge_content_id
+                            ),
+                            "operation_review_schema_version": (
+                                OPERATION_REVIEW_SCHEMA_VERSION
+                            ),
+                            "operation_review_method_version": (
+                                OPERATION_REVIEW_METHOD_VERSION
+                            ),
+                            "artifact_namespace": str(
+                                self.artifact_root.relative_to(
+                                    self.repo_root
+                                )
+                            ).replace("\\", "/"),
+                            "as_of": cutoffs.get("as_of"),
+                            "knowledge_cutoff": cutoffs.get(
+                                "knowledge_cutoff"
+                            ),
+                            "episode_id": selection_mapping.get(
+                                "requested_episode_id"
+                            ),
+                        }
+                    )
+                )
+                expected_run_id = (
+                    "reviewrun_" + sha256_text(expected_run_key)[:32]
+                )
+                retry = receipt.get("retry")
+                retry_run_key = (
+                    retry.get("run_key")
+                    if isinstance(retry, Mapping)
+                    else None
+                )
+                if (
+                    receipt.get("run_key") != expected_run_key
+                    or receipt.get("run_id") != expected_run_id
+                    or retry_run_key != expected_run_key
+                ):
+                    findings.append("RUN_KEY_PERSPECTIVE_BINDING_MISMATCH")
         if expected_path is not None and not expected_path.is_file():
             findings.append("RECEIPT_MISSING")
         return {
@@ -826,26 +1073,65 @@ class ReviewRunner:
         scope: str,
         as_of: str,
         knowledge_cutoff: str,
+        perspective: str = "user",
         episode_id: str | None = None,
         dry_run: bool = False,
         trigger: str = "manual",
     ) -> dict[str, Any]:
         if scope not in RUN_SCOPES:
             raise ReviewRunnerError(f"unsupported review scope: {scope}")
+        if perspective not in RUN_PERSPECTIVES:
+            raise ReviewRunnerError(
+                f"unsupported review perspective: {perspective}"
+            )
         as_of_time = _utc(as_of, field="as_of")
         knowledge_time = _utc(
             knowledge_cutoff, field="knowledge_cutoff"
         )
-        episode_cutoff = min(as_of_time, knowledge_time)
-        review_cutoff = max(as_of_time, knowledge_time)
+        if as_of_time > knowledge_time:
+            raise ReviewRunnerError(
+                "as_of must not be later than knowledge_cutoff"
+            )
+        episode_cutoff = as_of_time
+        review_cutoff = knowledge_time
         mode = "dry_run" if dry_run else "apply"
         stages: list[dict[str, Any]] = []
         source_hash_before = _sha256_file(self.portfolio_db)
         current_stage = "sync"
+        provenance_request_content_id = (
+            "sha256:"
+            + _sha256_bytes(
+                canonical_json_bytes(
+                    {
+                        "schema_version": (
+                            KNOWLEDGE_PROVENANCE_SCHEMA_VERSION
+                        ),
+                        "method_version": (
+                            KNOWLEDGE_PROVENANCE_METHOD_VERSION
+                        ),
+                        "perspective": perspective,
+                        "as_of": _utc_text(as_of_time),
+                        "knowledge_cutoff": _utc_text(knowledge_time),
+                        "source_sha256": source_hash_before,
+                        "mapping_path": str(self.mapping_path),
+                    }
+                )
+            )
+        )
         preflight_material = {
             "runner_version": RUNNER_VERSION,
             "phase": "preflight",
             "scope": scope,
+            "perspective": perspective,
+            "knowledge_provenance_schema_version": (
+                KNOWLEDGE_PROVENANCE_SCHEMA_VERSION
+            ),
+            "knowledge_provenance_method_version": (
+                KNOWLEDGE_PROVENANCE_METHOD_VERSION
+            ),
+            "knowledge_provenance_request_content_id": (
+                provenance_request_content_id
+            ),
             "source_path": str(self.portfolio_db),
             "source_sha256": source_hash_before,
             "mapping_path": str(self.mapping_path),
@@ -933,6 +1219,7 @@ class ReviewRunner:
                     as_of=as_of_time,
                     knowledge_cutoff=knowledge_time,
                     episode_cutoff=episode_cutoff,
+                    perspective=perspective,
                     stages=stages,
                     status="blocked",
                     source_hash_before=source_hash_before,
@@ -946,16 +1233,61 @@ class ReviewRunner:
             cutoff_id = str(cutoff.get("cutoff_id") or "")
             store = ReviewStore(self.review_db)
             store.status()
-            event_inputs, sidecar_projection_sha256 = (
+            (
+                event_inputs,
+                event_observation_rows,
+                sidecar_projection_sha256,
+            ) = (
                 _sidecar_projection_state(store)
+            )
+            knowledge_provenance = build_knowledge_provenance(
+                event_inputs,
+                observation_evidence=event_observation_rows,
+                perspective=perspective,
+                as_of=_utc_text(as_of_time),
+                knowledge_cutoff=_utc_text(knowledge_time),
+            )
+            knowledge_validation = validate_knowledge_provenance(
+                knowledge_provenance
+            )
+            if _is_blocked(knowledge_validation):
+                raise CanonicalGateBlocked(
+                    "knowledge provenance validation blocked: "
+                    + ",".join(_finding_codes(knowledge_validation))
+                )
+            knowledge_replay = replay_validate_knowledge_provenance(
+                knowledge_provenance,
+                event_inputs=event_inputs,
+                observation_evidence=event_observation_rows,
+            )
+            if (
+                _is_blocked(knowledge_replay)
+                or not _source_verification_ready(knowledge_replay)
+            ):
+                raise CanonicalGateBlocked(
+                    "knowledge provenance source replay failed"
+                )
+            perspective_event_inputs = project_perspective_event_inputs(
+                knowledge_provenance,
+                event_inputs,
             )
             key_material = {
                 "runner_version": RUNNER_VERSION,
                 "scope": scope,
+                "perspective": perspective,
                 "source_cutoff_id": cutoff_id,
                 "source_sha256": sync_details["source_sha256"],
                 "mapping_sha256": sync_details["mapping_sha256"],
                 "sidecar_projection_sha256": sidecar_projection_sha256,
+                "knowledge_provenance_schema_version": (
+                    KNOWLEDGE_PROVENANCE_SCHEMA_VERSION
+                ),
+                "knowledge_provenance_method_version": (
+                    KNOWLEDGE_PROVENANCE_METHOD_VERSION
+                ),
+                "knowledge_provenance_content_id": (
+                    knowledge_provenance.get("content_id")
+                ),
                 "operation_review_schema_version": (
                     OPERATION_REVIEW_SCHEMA_VERSION
                 ),
@@ -1061,7 +1393,7 @@ class ReviewRunner:
 
             current_stage = "episode"
             collection = build_episode_collection(
-                event_inputs,
+                perspective_event_inputs,
                 cutoff_at=_utc_text(episode_cutoff),
                 snapshot_references=snapshot_inventory.get(
                     "snapshot_references", []
@@ -1075,7 +1407,7 @@ class ReviewRunner:
                 )
             operation_review = build_operation_review(
                 collection,
-                event_inputs=event_inputs,
+                event_inputs=perspective_event_inputs,
             )
             operation_validation = validate_operation_review(operation_review)
             if _is_blocked(operation_validation):
@@ -1086,7 +1418,7 @@ class ReviewRunner:
             operation_replay = replay_validate_operation_review(
                 operation_review,
                 episode_collection=collection,
-                event_inputs=event_inputs,
+                event_inputs=perspective_event_inputs,
             )
             if (
                 _is_blocked(operation_replay)
@@ -1121,6 +1453,13 @@ class ReviewRunner:
                     content_id="sha256:"
                     + str(collection.get("collection_digest") or ""),
                 )
+                knowledge_descriptor = _json_artifact(
+                    run_dir / "knowledge_provenance.json",
+                    knowledge_provenance,
+                    content_id=str(
+                        knowledge_provenance.get("content_id") or ""
+                    ),
+                )
                 operation_descriptor = _json_artifact(
                     run_dir / "operation_review.json",
                     operation_review,
@@ -1132,6 +1471,7 @@ class ReviewRunner:
                     [
                         snapshot_descriptor,
                         collection_descriptor,
+                        knowledge_descriptor,
                         operation_descriptor,
                     ]
                 )
@@ -1147,6 +1487,15 @@ class ReviewRunner:
                     "content_id": "sha256:"
                     + str(collection.get("collection_digest") or ""),
                     "sha256": _sha256_bytes(pretty_json_bytes(collection)),
+                    "write_status": "dry_run",
+                }
+                knowledge_descriptor = {
+                    "content_id": str(
+                        knowledge_provenance.get("content_id") or ""
+                    ),
+                    "sha256": _sha256_bytes(
+                        pretty_json_bytes(knowledge_provenance)
+                    ),
                     "write_status": "dry_run",
                 }
                 operation_descriptor = {
@@ -1204,6 +1553,14 @@ class ReviewRunner:
                         "collection_digest": collection.get(
                             "collection_digest"
                         ),
+                        "perspective": perspective,
+                        "knowledge_provenance_content_id": (
+                            knowledge_provenance.get("content_id")
+                        ),
+                        "knowledge_provenance_validation_status": (
+                            _validation_status(knowledge_validation)
+                        ),
+                        "knowledge_provenance_source_replay": "verified",
                         "operation_review_content_id": (
                             operation_review.get("content_id")
                         ),
@@ -1220,6 +1577,7 @@ class ReviewRunner:
                     ),
                     artifacts=[
                         collection_descriptor,
+                        knowledge_descriptor,
                         operation_descriptor,
                     ],
                 )
@@ -1391,6 +1749,7 @@ class ReviewRunner:
                 episode_results.append(
                     {
                         "episode_id": selected_id,
+                        "perspective": perspective,
                         "review_id": review.get("review_id"),
                         "status": (
                             "partial" if review_gaps else "ready"
@@ -1427,6 +1786,9 @@ class ReviewRunner:
                         "review_content_id": review.get("content_id"),
                         "operation_review_content_id": (
                             operation_review.get("content_id")
+                        ),
+                        "knowledge_provenance_content_id": (
+                            knowledge_provenance.get("content_id")
                         ),
                         "artifacts": {
                             "context": context_descriptor,
@@ -1476,6 +1838,16 @@ class ReviewRunner:
                                     "decision_context_status"
                                 )
                             ),
+                        },
+                        "knowledge_provenance": {
+                            "validation_status": _validation_status(
+                                knowledge_replay
+                            ),
+                            "source_verification": "verified",
+                            "content_id": knowledge_provenance.get(
+                                "content_id"
+                            ),
+                            "perspective": perspective,
                         },
                     }
                 )
@@ -1556,7 +1928,11 @@ class ReviewRunner:
                 raise CanonicalGateBlocked(
                     "portfolio source SHA-256 changed during review run"
                 )
-            _, sidecar_projection_after = _sidecar_projection_state(store)
+            (
+                _,
+                _,
+                sidecar_projection_after,
+            ) = _sidecar_projection_state(store)
             if sidecar_projection_after != sidecar_projection_sha256:
                 raise CanonicalGateBlocked(
                     "review sidecar event/decision projection changed during "
@@ -1579,6 +1955,7 @@ class ReviewRunner:
                 "status": overall,
                 "trigger": canonical_trigger,
                 "cutoffs": {
+                    "perspective": perspective,
                     "as_of": _utc_text(as_of_time),
                     "knowledge_cutoff": _utc_text(knowledge_time),
                     "episode_cutoff": _utc_text(episode_cutoff),
@@ -1586,6 +1963,9 @@ class ReviewRunner:
                     "source_cutoff_id": cutoff_id,
                     "sidecar_projection_sha256": (
                         sidecar_projection_sha256
+                    ),
+                    "knowledge_provenance_content_id": (
+                        knowledge_provenance.get("content_id")
                     ),
                 },
                 "selection": selection,
@@ -1679,6 +2059,7 @@ class ReviewRunner:
                 as_of=as_of_time,
                 knowledge_cutoff=knowledge_time,
                 episode_cutoff=episode_cutoff,
+                perspective=perspective,
                 stages=stages,
                 status=terminal_status,
                 source_hash_before=source_hash_before,
@@ -1740,6 +2121,7 @@ class ReviewRunner:
         as_of: datetime,
         knowledge_cutoff: datetime,
         episode_cutoff: datetime,
+        perspective: str,
         stages: Sequence[Mapping[str, Any]],
         status: str,
         source_hash_before: str,
@@ -1764,6 +2146,7 @@ class ReviewRunner:
             "status": status,
             "trigger": trigger,
             "cutoffs": {
+                "perspective": perspective,
                 "as_of": _utc_text(as_of),
                 "knowledge_cutoff": _utc_text(knowledge_cutoff),
                 "episode_cutoff": _utc_text(episode_cutoff),
@@ -1872,6 +2255,25 @@ class ReviewRunCatalog:
             raise ReviewRunnerError(
                 "receipt identity does not match the immutable run ledger"
             )
+        parameters = run["run"].get("parameters")
+        recorded_perspective = (
+            parameters.get("perspective")
+            if isinstance(parameters, Mapping)
+            else None
+        )
+        receipt_cutoffs = receipt.get("cutoffs")
+        receipt_perspective = (
+            receipt_cutoffs.get("perspective")
+            if isinstance(receipt_cutoffs, Mapping)
+            else None
+        )
+        if (
+            recorded_perspective is not None
+            or receipt_perspective is not None
+        ) and recorded_perspective != receipt_perspective:
+            raise ReviewRunnerError(
+                "receipt perspective does not match the immutable run ledger"
+            )
         return receipt
 
     def list_receipts(self) -> dict[str, Any]:
@@ -1898,6 +2300,10 @@ class ReviewRunCatalog:
                         "run_key": receipt["run_key"],
                         "scope": receipt["scope"],
                         "status": receipt["status"],
+                        "perspective": (
+                            receipt.get("cutoffs", {}).get("perspective")
+                            or "legacy"
+                        ),
                         "cutoffs": receipt["cutoffs"],
                         "episode_count": len(receipt["episodes"]),
                         "gaps": receipt["gaps"],
@@ -1963,6 +2369,7 @@ __all__ = [
     "RUNNER_VERSION",
     "RUN_CATALOG_SCHEMA_VERSION",
     "RUN_RECEIPT_SCHEMA_VERSION",
+    "RUN_PERSPECTIVES",
     "RUN_SCOPES",
     "ReviewRunCatalog",
     "ReviewRunner",

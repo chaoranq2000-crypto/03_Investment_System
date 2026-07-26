@@ -128,6 +128,84 @@ def test_product_schema_requires_explicit_opt_in_and_preserves_v2_boundary(
         ReviewStore(legacy).initialize_product_completion()
 
 
+def test_event_observation_evidence_is_read_only_and_keeps_p2c_shape(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "review.sqlite3"
+    store, event = _initialized_store(database)
+    projection_before = store.list_episode_projection_inputs()
+
+    source = SourceDefinition(
+        name="synthetic-product-store",
+        kind="sqlite",
+        uri="synthetic://portfolio.sqlite3",
+        identity_key="synthetic-product-store-v1",
+        read_only=True,
+    )
+    repeat = store.import_events(
+        source,
+        [event],
+        manifest={"fixture": "product-store-repeat"},
+    )
+    assert repeat["inserted"] == 0
+    assert repeat["skipped"] == 1
+    database_before = database.read_bytes()
+
+    evidence = store.list_event_observation_evidence(
+        event_ids=[event.event_id],
+        account="account-1",
+        symbol="600000.sh",
+    )
+    projection_after = store.list_episode_projection_inputs()
+
+    assert projection_after == projection_before
+    assert set(projection_after[0]) == set(projection_before[0])
+    assert database.read_bytes() == database_before
+    assert len(evidence) == 1
+    observed = evidence[0]
+    assert observed["event_id"] == event.event_id
+    assert observed["source_id"] == source.source_id
+    assert observed["payload_sha256"] == event.payload_sha256
+    assert observed["raw_payload"] == dict(event.raw_payload)
+    assert observed["ingested_at"]
+    assert observed["first_ingest"] == {
+        "run_id": projection_before[0]["first_ingest_run_id"],
+        "outcome": "INSERTED",
+        "observed_at": observed["first_ingest"]["observed_at"],
+        "observation_payload_sha256": event.payload_sha256,
+        "source_id": source.source_id,
+        "source_fingerprint": source.fingerprint,
+        "started_at": observed["first_ingest"]["started_at"],
+        "finished_at": observed["first_ingest"]["finished_at"],
+        "status": "COMPLETED",
+        "manifest": {"fixture": "product-store"},
+    }
+    assert observed["first_ingest"]["observed_at"]
+    assert observed["first_ingest"]["started_at"]
+    assert observed["first_ingest"]["finished_at"]
+    assert store.list_event_observation_evidence(event_ids=[]) == []
+    assert store.list_event_observation_evidence(symbol="000001.SZ") == []
+
+    with store.connection(read_only=True) as conn:
+        outcomes = conn.execute(
+            """
+            SELECT outcome, observed_at
+            FROM ingest_run_events
+            WHERE event_id = ?
+            ORDER BY observed_at, run_id
+            """,
+            (event.event_id,),
+        ).fetchall()
+    assert {str(row["outcome"]) for row in outcomes} == {"INSERTED", "SKIPPED"}
+    inserted_observation = next(
+        row for row in outcomes if str(row["outcome"]) == "INSERTED"
+    )
+    assert (
+        observed["first_ingest"]["observed_at"]
+        == inserted_observation["observed_at"]
+    )
+
+
 def test_fee_projection_unknown_and_append_only_corrections_preserve_event(
     tmp_path: Path,
 ) -> None:

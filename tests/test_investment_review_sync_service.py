@@ -435,6 +435,37 @@ def test_apply_is_exactly_reconciled_idempotent_and_persists_fee_states(
     assert second["fees"]["projections_inserted"] == 0
     assert second["fees"]["projections_skipped"] == 7
 
+    projection_before = store.list_episode_projection_inputs()
+    evidence_before = store.list_event_observation_evidence()
+    evidence_after = store.list_event_observation_evidence(
+        event_ids=[str(item["event_id"]) for item in projection_before]
+    )
+    projection_after = store.list_episode_projection_inputs()
+    assert projection_after == projection_before
+    assert evidence_after == evidence_before
+    assert len(evidence_after) == 7
+    assert all(item["first_ingest"]["outcome"] == "INSERTED" for item in evidence_after)
+    assert all(item["first_ingest"]["status"] == "COMPLETED" for item in evidence_after)
+    assert all(item["first_ingest"]["observed_at"] for item in evidence_after)
+    assert all(item["ingested_at"] for item in evidence_after)
+    assert all(
+        item["first_ingest"]["observation_payload_sha256"] == item["payload_sha256"]
+        for item in evidence_after
+    )
+    assert {
+        item["raw_payload"]["source_row"]["created_at"] for item in evidence_after
+    } == {"2026-07-14T00:00:00Z"}
+    assert all(
+        item["first_ingest"]["manifest"]["adapter"]
+        == "investment_review_sync_service"
+        for item in evidence_after
+    )
+    assert all(
+        "first_ingest" not in item
+        and "first_inserted_observed_at" not in item
+        for item in projection_after
+    )
+
     projections = store.list_fee_projections()
     assert len(projections) == 7
     target_id = next(

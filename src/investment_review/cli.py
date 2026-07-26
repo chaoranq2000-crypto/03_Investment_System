@@ -326,6 +326,7 @@ def _review_run(args: argparse.Namespace) -> int:
         scope=args.scope,
         as_of=args.as_of,
         knowledge_cutoff=args.knowledge_cutoff,
+        perspective=args.perspective,
         episode_id=args.episode_id,
         dry_run=args.dry_run,
         trigger=args.trigger,
@@ -443,6 +444,15 @@ def build_parser() -> argparse.ArgumentParser:
         "--knowledge-cutoff",
         required=True,
         help="Latest source knowledge time visible to this run",
+    )
+    review_run.add_argument(
+        "--perspective",
+        choices=("user", "system"),
+        default="user",
+        help=(
+            "Knowledge perspective for event visibility; defaults to the "
+            "account owner's user perspective"
+        ),
     )
     review_run.add_argument(
         "--episode-id",
