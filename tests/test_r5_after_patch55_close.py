@@ -8,7 +8,8 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DECISION_PATH = REPO_ROOT / "reports/p1_6/r5_after_patch55_decision.json"
 EXPECTED_PATH = REPO_ROOT / "config/r5_patch_49_55_expected_artifacts.yaml"
-NOTE_PATH = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_note_reviewed_input_draft.md"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+NOTE_SOURCE = f"{HISTORICAL_RUN}/R5_stock_research_note_reviewed_input_draft.md"
 
 
 def load_json(path: Path):
@@ -34,19 +35,23 @@ def test_after_patch55_decision_keeps_source_gapped_state():
         assert token in decision["known_todos"]
 
 
-def test_patch49_55_expected_artifacts_exist():
+def test_patch49_55_expected_artifacts_exist(historical_blob_bytes):
     expected = load_yaml(EXPECTED_PATH)
-    missing = [
-        item["path"]
-        for item in expected["required_artifacts"]
-        if not (REPO_ROOT / item["path"]).exists()
-    ]
+    missing = []
+    for item in expected["required_artifacts"]:
+        path = item["path"]
+        if path.startswith(HISTORICAL_RUN + "/"):
+            assert historical_blob_bytes(path)
+        elif not (REPO_ROOT / path).exists():
+            missing.append(path)
 
     assert not missing
 
 
-def test_rendered_reviewed_input_draft_has_no_direct_trading_language():
-    text = NOTE_PATH.read_text(encoding="utf-8")
+def test_rendered_reviewed_input_draft_has_no_direct_trading_language(
+    historical_blob_bytes,
+):
+    text = historical_blob_bytes(NOTE_SOURCE).decode("utf-8")
 
     for phrase in ["买入", "卖出", "持有", "仓位", "目标价", "保证收益", "buy rating", "sell rating", "hold rating"]:
         assert phrase.lower() not in text.lower()

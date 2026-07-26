@@ -15,7 +15,7 @@ from src.report.r5_reader_report_writer import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
 def load_script(name: str, path: Path):
@@ -26,8 +26,14 @@ def load_script(name: str, path: Path):
     return module
 
 
-def test_real_bundle10_pack_renders_without_identity_hardcoding() -> None:
-    pack = yaml.safe_load((RUN / "R5_bundle10_reader_pack.yaml").read_text(encoding="utf-8"))
+def historical_yaml(historical_blob_bytes, name: str):
+    return yaml.safe_load(historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8"))
+
+
+def test_real_bundle10_pack_renders_without_identity_hardcoding(
+    historical_blob_bytes,
+) -> None:
+    pack = historical_yaml(historical_blob_bytes, "R5_bundle10_reader_pack.yaml")
     report = build_reader_report(pack)
     appendix = build_traceability_appendix(pack)
     assert validate_citations(report, appendix) == []
@@ -39,14 +45,29 @@ def test_real_bundle10_pack_renders_without_identity_hardcoding() -> None:
         assert token not in writer_source
 
 
-def test_reader_pack_contract_accepts_real_bundle10_pack() -> None:
+def test_reader_pack_contract_accepts_real_bundle10_pack(
+    tmp_path: Path,
+    historical_blob_bytes,
+) -> None:
     validator = load_script("validate_r5_reader_report_pack", ROOT / "scripts/validate_r5_reader_report_pack.py")
-    pack = yaml.safe_load((RUN / "R5_bundle10_reader_pack.yaml").read_text(encoding="utf-8"))
-    assert validator.validate_pack(pack, ROOT) == []
+    pack = historical_yaml(historical_blob_bytes, "R5_bundle10_reader_pack.yaml")
+    fixture_root = tmp_path / "reader_pack_sources"
+    for record in pack["traceability_records"]:
+        source_path = record["source_path"]
+        if source_path.startswith(f"{HISTORICAL_RUN}/"):
+            payload = historical_blob_bytes(source_path)
+        else:
+            payload = (ROOT / source_path).read_bytes()
+        target = fixture_root / source_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+    assert validator.validate_pack(pack, fixture_root) == []
 
 
-def test_real_bundle10_pack_has_unique_prose_and_exact_value_sources() -> None:
-    pack = yaml.safe_load((RUN / "R5_bundle10_reader_pack.yaml").read_text(encoding="utf-8"))
+def test_real_bundle10_pack_has_unique_prose_and_exact_value_sources(
+    historical_blob_bytes,
+) -> None:
+    pack = historical_yaml(historical_blob_bytes, "R5_bundle10_reader_pack.yaml")
     report = build_reader_report(pack)
     prose = []
     for line in report.splitlines():
@@ -73,8 +94,8 @@ def test_real_bundle10_pack_has_unique_prose_and_exact_value_sources() -> None:
     assert "[E9][E15]" in report
     assert "[E18][E14]" in report
 
-    sentiment = yaml.safe_load(
-        (RUN / "R5_bundle10_sentiment_event_pack.yaml").read_text(encoding="utf-8")
+    sentiment = historical_yaml(
+        historical_blob_bytes, "R5_bundle10_sentiment_event_pack.yaml"
     )
     assert sentiment["as_of_date"] == pack["metadata"]["cutoff_date"]
     assert sentiment["information_cutoff_date"] == pack["metadata"]["cutoff_date"]

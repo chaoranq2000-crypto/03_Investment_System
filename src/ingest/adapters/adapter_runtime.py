@@ -77,7 +77,7 @@ def standard_parser(description: str, default_endpoint_hint: str) -> argparse.Ar
     parser.add_argument("--stock-code", required=True)
     parser.add_argument("--company-id", default="")
     parser.add_argument("--company-name", default="")
-    parser.add_argument("--workflow-id", default="wf_20260703_stock_first_002837_invic")
+    parser.add_argument("--workflow-id", default="")
     parser.add_argument("--as-of-date", required=True)
     parser.add_argument("--endpoint-hint", default=default_endpoint_hint)
     parser.add_argument("--begin-date", default="")
@@ -266,6 +266,10 @@ def execute_standard_adapter(
 ) -> tuple[int, dict[str, Any]]:
     parser = standard_parser(description, spec.default_endpoint_hint)
     args = parser.parse_args(argv)
+    if not args.workflow_id:
+        if args.mode != "fixture":
+            parser.error("--workflow-id is required outside fixture mode")
+        args.workflow_id = f"fixture_{safe_slug(spec.adapter_id)}"
     endpoint_hint = str(args.endpoint_hint)
     contract = spec.endpoints.get(endpoint_hint)
     if contract is None:

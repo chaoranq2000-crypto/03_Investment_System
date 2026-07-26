@@ -4,11 +4,17 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-STOCK_RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
-def test_r4_v0_2_references_required_reviews() -> None:
-    report = (STOCK_RUN / "R4_stock_deep_dive_v0_2.md").read_text(encoding="utf-8")
+def _historical_file(historical_blob_file, name: str) -> Path:
+    return historical_blob_file(f"{HISTORICAL_RUN}/{name}", f"r4_v0_2/{name}")
+
+
+def test_r4_v0_2_references_required_reviews(historical_blob_file) -> None:
+    report = _historical_file(
+        historical_blob_file, "R4_stock_deep_dive_v0_2.md"
+    ).read_text(encoding="utf-8")
 
     assert "Official Reconciliation Review" in report
     assert "Liquid-cooling Exposure Evidence Review" in report
@@ -17,8 +23,10 @@ def test_r4_v0_2_references_required_reviews() -> None:
     assert "R4_source_gap_report_v0_2.md" in report
 
 
-def test_r4_v0_2_gate_status_is_allowed_enum() -> None:
-    gate = (STOCK_RUN / "R4_quality_gate_report_v0_2.md").read_text(encoding="utf-8")
+def test_r4_v0_2_gate_status_is_allowed_enum(historical_blob_file) -> None:
+    gate = _historical_file(
+        historical_blob_file, "R4_quality_gate_report_v0_2.md"
+    ).read_text(encoding="utf-8")
     allowed = {
         "publishable_ready",
         "publishable_ready_with_disclosure_todos",
@@ -36,15 +44,17 @@ def test_r4_v0_2_gate_status_is_allowed_enum() -> None:
     assert "blocking_decision" in gate
 
 
-def test_r4_v0_2_does_not_write_liquid_cooling_revenue_pct() -> None:
-    report = (STOCK_RUN / "R4_stock_deep_dive_v0_2.md").read_text(encoding="utf-8")
+def test_r4_v0_2_does_not_write_liquid_cooling_revenue_pct(historical_blob_file) -> None:
+    report = _historical_file(
+        historical_blob_file, "R4_stock_deep_dive_v0_2.md"
+    ).read_text(encoding="utf-8")
 
     assert "liquid-cooling revenue_pct | MISSING_DISCLOSURE" in report
     assert "liquid-cooling profit_pct | MISSING_DISCLOSURE" in report
     assert "revenue_pct | 17" not in report
 
 
-def test_r4_v0_2_no_advice_boundary() -> None:
+def test_r4_v0_2_no_advice_boundary(historical_blob_file) -> None:
     forbidden = ["买入", "卖出", "持有", "仓位", "止盈", "止损", "交易建议", "强烈推荐", "目标价"]
     for name in [
         "R4_stock_deep_dive_v0_2.md",
@@ -52,7 +62,7 @@ def test_r4_v0_2_no_advice_boundary() -> None:
         "R4_source_gap_report_v0_2.md",
         "R4_open_questions_v0_2.md",
     ]:
-        text = (STOCK_RUN / name).read_text(encoding="utf-8")
+        text = _historical_file(historical_blob_file, name).read_text(encoding="utf-8")
         assert not [term for term in forbidden if term in text]
 
 

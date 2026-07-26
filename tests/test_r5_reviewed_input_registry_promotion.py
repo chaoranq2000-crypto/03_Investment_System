@@ -27,6 +27,7 @@ def test_no_accepted_inputs_do_not_change_registries(tmp_path: Path):
         repo_root=REPO_ROOT,
         workflow_id="wf_20260703_stock_first_002837_invic",
         dropzone_root=dropzone_root,
+        output_run_dir=tmp_path / "promotion_output",
     )
 
     assert result["promotion_status"] == "no_accepted_inputs"
@@ -34,12 +35,13 @@ def test_no_accepted_inputs_do_not_change_registries(tmp_path: Path):
     assert result["allowed_report_level"] == "source_gapped_research_draft"
 
 
-def test_pending_rows_do_not_unblock_registry_promotion():
+def test_pending_rows_do_not_unblock_registry_promotion(tmp_path: Path):
     promoter = load_promoter()
     result = promoter.build_promotion_result(
         repo_root=REPO_ROOT,
         workflow_id="wf_20260703_stock_first_002837_invic",
         dropzone_root=FIXTURE_ROOT / "valid_pending",
+        output_run_dir=tmp_path / "promotion_output",
     )
 
     assert result["promotion_status"] == "no_accepted_inputs"
@@ -47,12 +49,13 @@ def test_pending_rows_do_not_unblock_registry_promotion():
     assert result["registries_changed"] is False
 
 
-def test_invalid_accepted_rows_block_promotion():
+def test_invalid_accepted_rows_block_promotion(tmp_path: Path):
     promoter = load_promoter()
     result = promoter.build_promotion_result(
         repo_root=REPO_ROOT,
         workflow_id="wf_20260703_stock_first_002837_invic",
         dropzone_root=FIXTURE_ROOT / "invalid_missing_evidence",
+        output_run_dir=tmp_path / "promotion_output",
     )
 
     assert result["promotion_status"] == "blocked_invalid_dropzone"

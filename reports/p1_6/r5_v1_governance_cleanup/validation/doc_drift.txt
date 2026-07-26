@@ -1,5 +1,6 @@
 validation_id: V-002
-phase: P2
+phase: P5_pre_delete
+checked_at: 2026-07-26T15:10:00+08:00
 command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B scripts/check_doc_drift.py
 exit_code: 0
 output:

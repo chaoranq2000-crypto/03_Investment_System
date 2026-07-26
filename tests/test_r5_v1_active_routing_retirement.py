@@ -43,6 +43,106 @@ def test_active_roots_have_zero_candidate_worktree_routes() -> None:
     ]
 
 
+def test_transition_tests_and_retained_ci_are_equal_strength() -> None:
+    tool = load_tool()
+    authority = tool.parse_authority(ROOT)
+    transition = tool.validate_transition_contract(ROOT, authority)
+
+    assert transition["path_count"] == 3
+    assert set(transition["paths"]) == tool.EXPECTED_A7
+    assert all(
+        row["equal_strength_retirement_assertions"] is True
+        for row in transition["tests"]
+    )
+    assert all(transition["ci"].values())
+
+
+def test_reference_scanner_only_exempts_proven_tmp_paths() -> None:
+    tool = load_tool()
+    candidate = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+
+    pure_tmp = f"""
+from pathlib import Path
+def test_case(tmp_path):
+    target = tmp_path / {candidate!r} / "input.yaml"
+    target.read_text(encoding="utf-8")
+"""
+    assert tool._python_references("pure_tmp.py", pure_tmp) == []
+
+    scoped = f"""
+from pathlib import Path
+RUN = Path({candidate!r})
+def test_case(tmp_path):
+    run = tmp_path / RUN.name
+    run.read_text(encoding="utf-8")
+def active_reader():
+    RUN.read_text(encoding="utf-8")
+"""
+    scoped_references = tool._python_references("scoped.py", scoped)
+    assert len(scoped_references) == 1
+    assert scoped_references[0]["kind"] == "candidate_worktree_path_operation"
+
+    mixed = f"""
+from pathlib import Path
+ROOT = Path.cwd()
+def active_reader(tmp_path, use_tmp):
+    root = tmp_path if use_tmp else ROOT
+    target = root / {candidate!r} / "input.yaml"
+    target.read_text(encoding="utf-8")
+"""
+    mixed_references = tool._python_references("mixed.py", mixed)
+    assert len(mixed_references) == 1
+    assert mixed_references[0]["kind"] == "candidate_worktree_path_operation"
+
+    relative_cwd = f"""
+from pathlib import Path
+Path({candidate!r}).read_text(encoding="utf-8")
+"""
+    assert len(tool._python_references("relative.py", relative_cwd)) == 1
+
+    cli_default = f"""
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--run-root", default={candidate!r})
+"""
+    default_references = tool._python_references("default.py", cli_default)
+    assert len(default_references) == 1
+    assert default_references[0]["kind"] == "candidate_default_routing"
+
+    protected_reviewed_input = f"""
+from pathlib import Path
+Path("data/reviewed_inputs/{tool.OLD_WORKFLOW_ID}/input.yaml").read_text(
+    encoding="utf-8"
+)
+"""
+    assert (
+        tool._python_references(
+            "protected_reviewed_input.py",
+            protected_reviewed_input,
+        )
+        == []
+    )
+
+
+def test_text_scanner_separates_metadata_from_physical_paths() -> None:
+    tool = load_tool()
+    candidate = "wf_20260703_stock_first_002837_invic"
+    assert (
+        tool._text_references(
+            "metadata.yaml",
+            f"bundle12r_workflow_id: {candidate}\n",
+        )
+        == []
+    )
+    references = tool._text_references(
+        "routing.yaml",
+        "default_paths:\n"
+        f"  input_path: reports/workflow_runs/{candidate}/input.yaml\n",
+    )
+    assert len(references) == 1
+    assert references[0]["kind"] == "candidate_text_route_or_path"
+
+
 def test_retained_bundle_evaluators_are_explicit_and_noncanonical() -> None:
     bundle11 = read("scripts/run_r5_bundle11r_runtime.py")
     bundle12 = read("scripts/run_r5_bundle12r_operating_evidence_gate.py")

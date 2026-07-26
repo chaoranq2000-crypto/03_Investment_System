@@ -1,19 +1,19 @@
 schema_version: r5_v1_historical_baseline_manifest_v1
 contract:
-  path: docs/codex_tasks/v1_governance_integration_cleanup_v4/CONTRACT.md
-  canonical_sha256: c806d4811e4f40ffb86154c6144c75173c7d13e1fc193f9add07686495217736
+  path: docs/codex_tasks/v1_governance_integration_cleanup_v5/CONTRACT.md
+  canonical_sha256: 7a02675ea94dd9ef83f40df42889720998cbea0d8db26992d158bf3c78135ef4
   status: frozen
-  source_baseline: 312adc73821706b0b7ca6aa00e80ee608bd10b32
+  source_baseline: f1dafeb32b08d24a6960f31d4a0f6d8820b95839
 source_snapshot: 312adc73821706b0b7ca6aa00e80ee608bd10b32
 durable_restore_refs:
   night_source: a96c1b717bf15905d72fd142efd946fa01bce666
   engineering_source: f60f220ae252262a537c612ce193fc779901984b
 aggregate:
-  file_count: 1385
-  content_byte_count: 9782386
+  file_count: 1386
+  content_byte_count: 9787412
   path_vector_encoding: ordinal_utf8_nul
-  path_vector_byte_count: 121205
-  path_vector_sha256: 805071d4d60327d2df6d355741edbfb633b9fc474e9e6ae31e61e4fed6e969e1
+  path_vector_byte_count: 121264
+  path_vector_sha256: 974d45610144d616f69c3c368d9ea1a0a27d66601a24f748aa8148e2ee702f33
 files:
 - path: .agents/skills/company-valuation/references/bundle13r_deferred_valuation.md
   wave: bundle
@@ -11193,6 +11193,15 @@ files:
   content_sha256: 7f530b0c72c81a2e038bd31bbc6558f6cf9056464e614ba3645a97f3328db1f5
   cat_file_spec: f60f220ae252262a537c612ce193fc779901984b:templates/r5_bundle17r_work_order_result.yaml
   restore_command: git restore --source=f60f220ae252262a537c612ce193fc779901984b --worktree -- "templates/r5_bundle17r_work_order_result.yaml"
+- path: tests/fixtures/r5_bundle13r/reviewed_backfill_invalid.yaml
+  wave: bundle
+  source_snapshot: 312adc73821706b0b7ca6aa00e80ee608bd10b32
+  baseline_commit: f60f220ae252262a537c612ce193fc779901984b
+  blob_oid: e26abfdf34eead0d61be38739c9bed3481187986
+  byte_count: 5026
+  content_sha256: a0113f54b26d43a2250afead3ff5b7565632d81cd27b219f87cfc0f071e068f0
+  cat_file_spec: f60f220ae252262a537c612ce193fc779901984b:tests/fixtures/r5_bundle13r/reviewed_backfill_invalid.yaml
+  restore_command: git restore --source=f60f220ae252262a537c612ce193fc779901984b --worktree -- "tests/fixtures/r5_bundle13r/reviewed_backfill_invalid.yaml"
 - path: tests/fixtures/r5_bundle14r/cases/copper_foil.yaml
   wave: bundle
   source_snapshot: 312adc73821706b0b7ca6aa00e80ee608bd10b32

@@ -119,7 +119,7 @@ def write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str] | None =
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build evidence-grounded Bundle 8R pilot artifacts.")
     parser.add_argument("--repo-root", default=".")
-    parser.add_argument("--workflow-id", default="wf_20260703_stock_first_002837_invic")
+    parser.add_argument("--workflow-id", required=True)
     parser.add_argument("--as-of-date", default="2026-07-13")
     args = parser.parse_args()
 

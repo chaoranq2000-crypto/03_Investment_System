@@ -8,7 +8,6 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / ".agents/skills/evidence-ingest/scripts/build_r5_evidence_request_queue.py"
-PLAN_PATH = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_plan_from_gaps.yaml"
 
 
 def load_builder():
@@ -20,10 +19,66 @@ def load_builder():
     return module
 
 
-def test_build_queue_flattens_plan_requests():
+def write_plan(tmp_path: Path) -> Path:
+    def request(
+        request_id: str,
+        evidence_need: str,
+        source_type: str,
+        pack_section: str,
+    ) -> dict:
+        return {
+            "request_id": request_id,
+            "evidence_need": evidence_need,
+            "source_type": source_type,
+            "source_rank": "A" if source_type == "annual_report" else "B",
+            "freshness_policy": "explicit_as_of_date_or_visible_gap",
+            "required_for_pack": [pack_section],
+            "allowed_usage": ["fact_support"],
+            "missing_reason": evidence_need,
+            "next_action": "register reviewed evidence",
+        }
+
+    plan = {
+        "workflow_id": "wf_fixture_request_queue",
+        "stock_code": "300001",
+        "evidence_requests": {
+            "official_filings": [
+                request("request_business", "MISSING_DISCLOSURE", "annual_report", "business_breakdown_pack"),
+                request("request_exposure", "LOW_CONFIDENCE_CLUE_ONLY", "annual_report", "segment_exposure_pack"),
+            ],
+            "structured_financial_metrics": [
+                request("request_forecast", "TODO_MODEL_INPUT", "structured_financial_data", "forecast_model_pack"),
+            ],
+            "market_snapshot": [
+                request("request_market", "TODO_MARKET_DATA", "market_data_snapshot", "technical_market_pack"),
+            ],
+            "peer_snapshot": [
+                request("request_peer", "TODO_PEER_DATA", "peer_snapshot", "peer_comparison_pack"),
+            ],
+            "industry_context_clues": [
+                request("request_industry", "TODO_SOURCE_REQUIRED industry", "industry_context_clues", "industry_context_pack"),
+            ],
+            "news_event_clues": [
+                request("request_event", "TODO_SOURCE_REQUIRED event", "news_or_event_source", "sentiment_event_pack"),
+            ],
+            "investor_relations": [
+                request("request_ir", "TODO_SOURCE_REQUIRED investor relations", "investor_relations", "business_breakdown_pack"),
+            ],
+        },
+    }
+    path = tmp_path / "evidence_plan.yaml"
+    path.write_text(
+        yaml.safe_dump(plan, allow_unicode=True, sort_keys=False),
+        encoding="utf-8",
+    )
+    return path
+
+
+def test_build_queue_flattens_plan_requests(tmp_path: Path):
     builder = load_builder()
-    plan = builder.load_yaml(PLAN_PATH)
-    queue = builder.build_queue(plan, str(PLAN_PATH))
+    plan_path = write_plan(tmp_path)
+    plan = builder.load_yaml(plan_path)
+    queue = builder.build_queue(plan, str(plan_path))
 
     assert queue["artifact_type"] == "R5_evidence_request_queue"
     assert queue["no_live_api"] is True
@@ -31,10 +86,11 @@ def test_build_queue_flattens_plan_requests():
     assert queue["summary"]["source_gap_count"] >= 5
 
 
-def test_request_rows_have_required_contract_fields():
+def test_request_rows_have_required_contract_fields(tmp_path: Path):
     builder = load_builder()
-    plan = builder.load_yaml(PLAN_PATH)
-    request = builder.build_queue(plan, str(PLAN_PATH))["requests"][0]
+    plan_path = write_plan(tmp_path)
+    plan = builder.load_yaml(plan_path)
+    request = builder.build_queue(plan, str(plan_path))["requests"][0]
 
     for key in [
         "request_id",
@@ -63,9 +119,10 @@ def test_request_rows_have_required_contract_fields():
 
 def test_cli_writes_multiline_yaml_queue(tmp_path: Path):
     builder = load_builder()
+    plan_path = write_plan(tmp_path)
     out = tmp_path / "R5_evidence_request_queue.yaml"
 
-    assert builder.main(["--plan", str(PLAN_PATH), "--out", str(out)]) == 0
+    assert builder.main(["--plan", str(plan_path), "--out", str(out)]) == 0
     queue = yaml.safe_load(out.read_text(encoding="utf-8"))
 
     assert queue["requests"]

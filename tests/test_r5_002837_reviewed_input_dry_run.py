@@ -1,17 +1,13 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-RUN_DIR = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
-RESULT_PATH = RUN_DIR / "R5_reviewed_input_dry_run_result.yaml"
-
-
-def load_yaml(path: Path) -> Any:
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
+DRY_RUN_SOURCE = (
+    "reports/workflow_runs/wf_20260703_stock_first_002837_invic/"
+    "R5_reviewed_input_dry_run_result.yaml"
+)
 
 
 def has_reviewed_market(snapshot: dict[str, Any]) -> bool:
@@ -48,20 +44,52 @@ def has_reviewed_valuation_inputs(registry: dict[str, Any]) -> bool:
     )
 
 
-def test_current_002837_stubs_do_not_exceed_source_gapped_level():
-    market = load_yaml(RUN_DIR / "R5_market_snapshot_stub.yaml")
-    peer = load_yaml(RUN_DIR / "R5_peer_snapshot_stub.yaml")
-    assumptions = load_yaml(REPO_ROOT / ".agents/skills/stock-deep-dive/assets/r5_forecast_assumption_registry.example.yaml")
-    valuation = load_yaml(REPO_ROOT / ".agents/skills/stock-deep-dive/assets/r5_valuation_input_registry.example.yaml")
+def test_unreviewed_fixture_inputs_do_not_exceed_source_gapped_level(tmp_path):
+    fixture_path = tmp_path / "unreviewed_inputs.yaml"
+    fixture_path.write_text(
+        yaml.safe_dump(
+            {
+                "market": {
+                    "status": "TODO",
+                    "as_of_date": None,
+                    "source_evidence_ids": [],
+                },
+                "peer": {
+                    "status": "TODO",
+                    "peer_set": [],
+                    "peer_metrics": [],
+                },
+                "assumptions": {
+                    "assumptions": [
+                        {
+                            "review_status": "TODO",
+                            "supporting_evidence_ids": [],
+                            "supporting_metric_ids": [],
+                        }
+                    ]
+                },
+                "valuation": {
+                    "market_snapshot": {"review_status": "TODO"},
+                    "peer_snapshot": {"review_status": "TODO"},
+                    "forecast_model": {"review_status": "TODO"},
+                },
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    inputs = yaml.safe_load(fixture_path.read_text(encoding="utf-8"))
 
-    assert has_reviewed_market(market) is False
-    assert has_reviewed_peer(peer) is False
-    assert has_reviewed_forecast_assumptions(assumptions) is False
-    assert has_reviewed_valuation_inputs(valuation) is False
+    assert has_reviewed_market(inputs["market"]) is False
+    assert has_reviewed_peer(inputs["peer"]) is False
+    assert has_reviewed_forecast_assumptions(inputs["assumptions"]) is False
+    assert has_reviewed_valuation_inputs(inputs["valuation"]) is False
 
 
-def test_dry_run_result_reflects_promoted_physical_registries():
-    result = load_yaml(RESULT_PATH)
+def test_dry_run_result_reflects_promoted_physical_registries(
+    historical_blob_bytes,
+):
+    result = yaml.safe_load(historical_blob_bytes(DRY_RUN_SOURCE).decode("utf-8"))
 
     assert result["derivation_source"] == "validated_physical_registries"
     assert result["allowed_report_level"] == "reviewed_input_research_draft"

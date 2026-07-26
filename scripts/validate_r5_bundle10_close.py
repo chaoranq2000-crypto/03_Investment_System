@@ -10,9 +10,6 @@ from typing import Any, Mapping, Sequence
 import yaml
 
 
-DEFAULT_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-
-
 def load_yaml(path: Path) -> dict[str, Any]:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
@@ -402,7 +399,7 @@ def validate_bundle10(repo_root: Path, workflow_id: str) -> dict[str, Any]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate Bundle 10 automated completion and external-review boundary.")
     parser.add_argument("--repo-root", default=".")
-    parser.add_argument("--workflow-id", default=DEFAULT_WORKFLOW_ID)
+    parser.add_argument("--workflow-id", required=True)
     parser.add_argument("--output", default="")
     args = parser.parse_args(argv)
     root = Path(args.repo_root).resolve()

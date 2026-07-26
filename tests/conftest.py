@@ -11,6 +11,9 @@ import yaml
 
 
 HISTORICAL_BASELINE = "312adc73821706b0b7ca6aa00e80ee608bd10b32"
+HISTORICAL_MANIFEST = Path(
+    "reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml"
+)
 SOURCE_QUEUE = Path(
     "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml"
 )
@@ -41,6 +44,79 @@ def _historical_queue_blob(repo_root: Path) -> bytes:
     assert len(payload) == SOURCE_QUEUE_BYTES
     assert hashlib.sha256(payload).hexdigest() == SOURCE_QUEUE_SHA256
     return payload
+
+
+@pytest.fixture(scope="session")
+def historical_blob_bytes() -> Callable[[str], bytes]:
+    repo_root = Path(__file__).resolve().parents[1]
+    manifest = yaml.safe_load(
+        (repo_root / HISTORICAL_MANIFEST).read_text(encoding="utf-8")
+    )
+    assert manifest["source_snapshot"] == HISTORICAL_BASELINE
+    rows = {row["path"]: row for row in manifest["files"]}
+    assert len(rows) == len(manifest["files"])
+    cache: dict[str, bytes] = {}
+
+    def read(source_path: str) -> bytes:
+        if source_path in cache:
+            return cache[source_path]
+        assert source_path in rows, f"unbound historical blob: {source_path}"
+        row = rows[source_path]
+        object_name = f"{row['baseline_commit']}:{source_path}"
+        subprocess.run(
+            ["git", "-C", str(repo_root), "cat-file", "-e", object_name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True,
+        )
+        oid = subprocess.check_output(
+            ["git", "-C", str(repo_root), "rev-parse", object_name],
+            text=True,
+            encoding="utf-8",
+        ).strip()
+        assert oid == row["blob_oid"]
+        size = int(
+            subprocess.check_output(
+                ["git", "-C", str(repo_root), "cat-file", "-s", object_name],
+                text=True,
+                encoding="utf-8",
+            ).strip()
+        )
+        assert size == row["byte_count"]
+        payload = subprocess.check_output(
+            ["git", "-C", str(repo_root), "cat-file", "blob", object_name]
+        )
+        assert len(payload) == row["byte_count"]
+        assert hashlib.sha256(payload).hexdigest() == row["content_sha256"]
+        cache[source_path] = payload
+        return payload
+
+    return read
+
+
+@pytest.fixture
+def historical_blob_file(
+    tmp_path: Path,
+    historical_blob_bytes: Callable[[str], bytes],
+) -> Callable[[str, str], Path]:
+    root = (tmp_path / "fixed_baseline_inputs").resolve()
+
+    def materialize(source_path: str, local_relative: str) -> Path:
+        local_path = Path(local_relative)
+        assert not local_path.is_absolute()
+        assert ".." not in local_path.parts
+        assert "wf_20260703_stock_first_002837_invic" not in local_path.as_posix()
+        target = (root / local_path).resolve()
+        assert target.is_relative_to(root)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        payload = historical_blob_bytes(source_path)
+        if target.exists():
+            assert target.read_bytes() == payload
+        else:
+            target.write_bytes(payload)
+        return target
+
+    return materialize
 
 
 @pytest.fixture

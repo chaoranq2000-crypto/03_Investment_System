@@ -32,7 +32,6 @@ CANONICAL_CONTEXT = (
 )
 READY = load_yaml(ROOT / "tests" / "fixtures" / "r5_bundle13r" / "reviewed_backfill_ready.yaml")
 PARTIAL = load_yaml(ROOT / "tests" / "fixtures" / "r5_bundle13r" / "reviewed_backfill_partial.yaml")
-INVALID = load_yaml(ROOT / "tests" / "fixtures" / "r5_bundle13r" / "reviewed_backfill_invalid.yaml")
 
 
 def codes(items):
@@ -127,10 +126,13 @@ def test_partial_reviewed_backfill_stays_in_progress_without_inventing_values():
 
 def test_missing_evidence_and_locators_block_confirmed_promotion():
     _, queue = context_and_queue()
-    issues = validate_reviewed_backfill(INVALID, queue, CONTRACT)
+    invalid = deepcopy(READY)
+    invalid["responses"][0].pop("evidence_ids")
+    invalid["responses"][0].pop("locators")
+    issues = validate_reviewed_backfill(invalid, queue, CONTRACT)
     assert "OBSERVATION_EVIDENCE_IDS_MISSING" in codes(issues)
     assert "OBSERVATION_LOCATORS_MISSING" in codes(issues)
-    result = evaluate_backflow_execution(queue=queue, reviewed_backfill=INVALID, validation_issues=issues)
+    result = evaluate_backflow_execution(queue=queue, reviewed_backfill=invalid, validation_issues=issues)
     assert result["decision"] == "blocked_invalid_reviewed_backfill"
 
 

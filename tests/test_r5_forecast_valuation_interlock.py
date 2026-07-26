@@ -8,7 +8,9 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BUILDER_PATH = REPO_ROOT / "src/research/forecast_model_builder.py"
-FORECAST_PATH = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml"
+HISTORICAL_FORECAST = (
+    "reports/workflow_runs/wf_20260703_stock_first_002837_invic/forecast_model.yaml"
+)
 
 
 def load_builder():
@@ -18,6 +20,10 @@ def load_builder():
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def load_yaml_file(path: Path) -> dict:
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
 def test_builder_keeps_forecast_values_todo_without_reviewed_assumptions():
@@ -58,8 +64,11 @@ def test_builder_uses_reviewed_growth_only_when_explicitly_supplied():
     assert model["revenue_forecast"][1]["value"] == "TODO_MODEL_INPUT"
 
 
-def test_workflow_forecast_model_has_no_default_growth_forecast_values():
-    data = yaml.safe_load(FORECAST_PATH.read_text(encoding="utf-8"))
+def test_workflow_forecast_model_has_no_default_growth_forecast_values(historical_blob_file):
+    forecast_path = historical_blob_file(
+        HISTORICAL_FORECAST, "forecast_interlock/forecast_model.yaml"
+    )
+    data = load_yaml_file(forecast_path)
 
     assert data["model_input_status"]["revenue_forecast"] in (
         "TODO_MODEL_INPUT",

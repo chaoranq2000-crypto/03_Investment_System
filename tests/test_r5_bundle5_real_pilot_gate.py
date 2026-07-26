@@ -8,8 +8,7 @@ from pathlib import Path
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-RUN_DIR = REPO_ROOT / "reports/workflow_runs" / WORKFLOW_ID
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 RUNNER_PATH = REPO_ROOT / "scripts/run_r5_bundle5_research_draft_quality_gate.py"
 PACK_VALIDATOR_PATH = REPO_ROOT / ".agents/skills/stock-deep-dive/scripts/validate_r5_stock_research_pack.py"
 SCORECARD_VALIDATOR_PATH = REPO_ROOT / ".agents/skills/quality-review/scripts/validate_r5_quality_scorecard.py"
@@ -35,8 +34,16 @@ def load_yaml(path: Path):
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
-def test_real_pilot_gate_is_open_but_capped_at_reviewed_input() -> None:
-    gate = json.loads((RUN_DIR / "R5_bundle5_real_pilot_gate_result.json").read_text(encoding="utf-8"))
+def load_historical_yaml(historical_blob_bytes, filename: str):
+    source = f"{HISTORICAL_RUN}/{filename}"
+    return yaml.safe_load(historical_blob_bytes(source).decode("utf-8"))
+
+
+def test_real_pilot_gate_is_open_but_capped_at_reviewed_input(
+    historical_blob_bytes,
+) -> None:
+    source = f"{HISTORICAL_RUN}/R5_bundle5_real_pilot_gate_result.json"
+    gate = json.loads(historical_blob_bytes(source).decode("utf-8"))
 
     assert gate["current_r5_state"] == "R5_REVIEWED_INPUT_PILOT_ALLOWED"
     assert gate["reviewed_input_pilot_allowed"] is True
@@ -49,9 +56,24 @@ def test_real_pilot_gate_is_open_but_capped_at_reviewed_input() -> None:
 
 def test_bundle5_fixed_boundary_cannot_be_opened_by_empty_sample_blockers() -> None:
     rules = load_yaml(REPO_ROOT / "config/r5_bundle5_pilot_gate_rules.yaml")
-    inputs = RUNNER.pilot_gate.collect_inputs(REPO_ROOT, rules)
-    inputs["quality_scorecard_v2"] = dict(inputs["quality_scorecard_v2"])
-    inputs["quality_scorecard_v2"]["sample_quality_blockers"] = []
+    inputs = {
+        "strict_smoke_result": {"status": "pass", "failed": 0},
+        "reviewed_input_dry_run_result": {
+            flag: True
+            for flag in rules["required_for_reviewed_input_pilot"]
+        }
+        | {"remaining_todos": []},
+        "quality_scorecard_v2": {
+            "allowed_report_level": "reviewed_input_research_draft",
+            "sample_quality_blockers": [],
+            "p2_allowed": True,
+        },
+        "pack_promotion_gate_result": {
+            "promotion_level": "sample_quality_candidate",
+            "blockers": [],
+        },
+        "no_advice_gate_passed": True,
+    }
 
     result = RUNNER.pilot_gate.evaluate_gate(inputs, rules)
 
@@ -61,8 +83,13 @@ def test_bundle5_fixed_boundary_cannot_be_opened_by_empty_sample_blockers() -> N
     assert result["input_summary"]["pack_promotion_level"] == "reviewed_input_research_draft"
 
 
-def test_render_consumes_bundle5_real_artifacts_and_preserves_markers() -> None:
-    result = load_yaml(RUN_DIR / "R5_reviewed_input_render_result.yaml")
+def test_render_consumes_bundle5_real_artifacts_and_preserves_markers(
+    historical_blob_bytes,
+) -> None:
+    result = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_reviewed_input_render_result.yaml",
+    )
 
     assert result["rendered_output_type"] == "reviewed_input_research_draft"
     assert result["forbidden_language_check"] == {"status": "pass", "forbidden_found": []}
@@ -76,8 +103,11 @@ def test_render_consumes_bundle5_real_artifacts_and_preserves_markers() -> None:
     assert all(len(row["sha256"]) == 64 for row in result["input_artifacts"].values())
 
 
-def test_rendered_report_is_grounded_and_does_not_restore_resolved_todos() -> None:
-    text = (RUN_DIR / "R5_stock_research_note_reviewed_input_draft.md").read_text(encoding="utf-8")
+def test_rendered_report_is_grounded_and_does_not_restore_resolved_todos(
+    historical_blob_bytes,
+) -> None:
+    source = f"{HISTORICAL_RUN}/R5_stock_research_note_reviewed_input_draft.md"
+    text = historical_blob_bytes(source).decode("utf-8")
 
     for evidence_id in [
         "ev_annual_report_002837_20260421_2cbfc5",
@@ -99,8 +129,13 @@ def test_rendered_report_is_grounded_and_does_not_restore_resolved_todos() -> No
     assert RUNNER.renderer.FORBIDDEN.search(text) is None
 
 
-def test_transient_segment_exposure_uses_current_evidence_and_visible_missing_state() -> None:
-    pack = load_yaml(RUN_DIR / "R5_bundle5_stock_research_pack.yaml")
+def test_transient_segment_exposure_uses_current_evidence_and_visible_missing_state(
+    historical_blob_bytes,
+) -> None:
+    pack = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_stock_research_pack.yaml",
+    )
     exposure = pack["segment_exposure_pack"]["exposures"][0]
 
     assert exposure["segment_id"] == "ai_server_liquid_cooling"
@@ -111,9 +146,17 @@ def test_transient_segment_exposure_uses_current_evidence_and_visible_missing_st
     assert "ce7f64" not in yaml.safe_dump(pack, allow_unicode=True)
 
 
-def test_policy_enum_does_not_reactivate_resolved_todos() -> None:
-    pack = load_yaml(RUN_DIR / "R5_bundle5_stock_research_pack.yaml")
-    dry_run = load_yaml(RUN_DIR / "R5_reviewed_input_dry_run_result.yaml")
+def test_policy_enum_does_not_reactivate_resolved_todos(
+    historical_blob_bytes,
+) -> None:
+    pack = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_stock_research_pack.yaml",
+    )
+    dry_run = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_reviewed_input_dry_run_result.yaml",
+    )
     rules = load_yaml(REPO_ROOT / "config/r5_pack_promotion_rules.yaml")
 
     pack_issues = PACK_VALIDATOR.validate_pack_issues(pack)
@@ -122,8 +165,13 @@ def test_policy_enum_does_not_reactivate_resolved_todos() -> None:
     assert promotion["blockers"] == []
 
 
-def test_reviewed_input_scorecard_keeps_level_with_sample_blockers() -> None:
-    scorecard = load_yaml(RUN_DIR / "R5_bundle5_quality_scorecard.yaml")
+def test_reviewed_input_scorecard_keeps_level_with_sample_blockers(
+    historical_blob_bytes,
+) -> None:
+    scorecard = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_quality_scorecard.yaml",
+    )
     issues = SCORECARD_VALIDATOR.validate_scorecard(scorecard)
 
     assert not [issue for issue in issues if issue["severity"] == "high"]
@@ -133,8 +181,13 @@ def test_reviewed_input_scorecard_keeps_level_with_sample_blockers() -> None:
     assert scorecard["p2_allowed"] is False
 
 
-def test_quality_gate_has_zero_critical_blockers_and_visible_noncritical_issues() -> None:
-    quality = load_yaml(RUN_DIR / "R5_bundle5_quality_gate_result.yaml")
+def test_quality_gate_has_zero_critical_blockers_and_visible_noncritical_issues(
+    historical_blob_bytes,
+) -> None:
+    quality = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_quality_gate_result.yaml",
+    )
 
     assert quality["quality_decision"] == "accepted_with_todos"
     assert quality["allowed_report_level"] == "reviewed_input_research_draft"

@@ -1258,7 +1258,7 @@ def main() -> int:
     parser.add_argument(
         "--workflow-run",
         type=Path,
-        default=Path("reports/workflow_runs") / WORKFLOW_ID,
+        required=True,
     )
     args = parser.parse_args()
     readout = build_outputs(args.workflow_run)

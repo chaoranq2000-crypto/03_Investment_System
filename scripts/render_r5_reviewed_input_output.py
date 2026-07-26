@@ -12,7 +12,6 @@ from typing import Any
 
 import yaml
 
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 FORBIDDEN = re.compile(
     r"买入|卖出|持有|仓位|目标价|保证收益|buy\s+rating|sell\s+rating|hold\s+rating|position\s+sizing",
     re.IGNORECASE,
@@ -146,17 +145,9 @@ def render_output(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Render R5 reviewed-input output according to gates.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
-    parser.add_argument("--workflow-id", default=WORKFLOW_ID)
-    parser.add_argument(
-        "--output",
-        type=Path,
-        default=Path("reports/workflow_runs") / WORKFLOW_ID / "R5_stock_research_note_reviewed_input_draft.md",
-    )
-    parser.add_argument(
-        "--json",
-        type=Path,
-        default=Path("reports/workflow_runs") / WORKFLOW_ID / "R5_reviewed_input_render_result.yaml",
-    )
+    parser.add_argument("--workflow-id", required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--json", type=Path, required=True)
     parser.add_argument("--pack", type=Path, help="Explicit research-pack path.")
     parser.add_argument("--gate", type=Path, help="Explicit pilot-gate result path.")
     parser.add_argument("--staging", type=Path, help="Explicit reviewed-input staging path.")

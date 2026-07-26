@@ -24,16 +24,13 @@ def _relative(path: Path, root: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[1]))
-    parser.add_argument(
-        "--workflow-run",
-        default="reports/workflow_runs/wf_20260703_stock_first_002837_invic",
-    )
+    parser.add_argument("--workflow-run", required=True)
     parser.add_argument("--config", default="config/r5_bundle8_research_depth.yaml")
-    parser.add_argument("--source-catalog")
-    parser.add_argument("--output")
-    parser.add_argument("--industry-output")
-    parser.add_argument("--peer-output")
-    parser.add_argument("--company-output")
+    parser.add_argument("--source-catalog", required=True)
+    parser.add_argument("--output", required=True)
+    parser.add_argument("--industry-output", required=True)
+    parser.add_argument("--peer-output", required=True)
+    parser.add_argument("--company-output", required=True)
     parser.add_argument("--as-of-date")
     parser.add_argument(
         "--allow-blocked",
@@ -58,25 +55,13 @@ def main() -> int:
     config_path = Path(args.config)
     if not config_path.is_absolute():
         config_path = root / config_path
-    source_path = (
-        Path(args.source_catalog)
-        if args.source_catalog
-        else run / "R5_bundle8_evidence_source_catalog.yaml"
-    )
+    source_path = Path(args.source_catalog)
     if not source_path.is_absolute():
         source_path = root / source_path
-    output = Path(args.output) if args.output else run / "evidence_coverage_matrix.yaml"
-    industry_output = (
-        Path(args.industry_output)
-        if args.industry_output
-        else run / "industry_evidence_pack.yaml"
-    )
-    peer_output = Path(args.peer_output) if args.peer_output else run / "peer_operating_pack.yaml"
-    company_output = (
-        Path(args.company_output)
-        if args.company_output
-        else run / "company_operating_evidence_pack.yaml"
-    )
+    output = Path(args.output)
+    industry_output = Path(args.industry_output)
+    peer_output = Path(args.peer_output)
+    company_output = Path(args.company_output)
     output = output if output.is_absolute() else root / output
     industry_output = industry_output if industry_output.is_absolute() else root / industry_output
     peer_output = peer_output if peer_output.is_absolute() else root / peer_output

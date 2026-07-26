@@ -529,29 +529,52 @@ Proceed to Card 5.3 for dated market and peer inputs. Canonical registries remai
     path.write_text(text, encoding="utf-8")
 
 
-def build_outputs(repo_root: Path, workflow_id: str, reviewed_at: str) -> dict[str, Any]:
+def _resolve(repo_root: Path, path: Path) -> Path:
+    return path.resolve() if path.is_absolute() else (repo_root / path).resolve()
+
+
+def build_outputs(
+    repo_root: Path,
+    workflow_id: str,
+    reviewed_at: str,
+    *,
+    run_dir: Path,
+    dropzone_path: Path,
+    readout_path: Path,
+) -> dict[str, Any]:
     if workflow_id != WORKFLOW_ID:
         raise ValueError(f"this Bundle 5.2 builder is scoped to {WORKFLOW_ID}")
     datetime.fromisoformat(reviewed_at.replace("Z", "+00:00"))
     verified = verify_sources(repo_root)
     records = build_business_records(reviewed_at)
-    run_dir = repo_root / "reports/workflow_runs" / workflow_id
-    dropzone_path = repo_root / "data/reviewed_inputs" / workflow_id / "business_disclosure" / "official_2025_annual_report.yaml"
+    run_dir = _resolve(repo_root, run_dir)
+    dropzone_path = _resolve(repo_root, dropzone_path)
+    readout_path = _resolve(repo_root, readout_path)
     write_yaml(dropzone_path, {"records": records})
     write_yaml(run_dir / "R5_bundle5_financial_history_candidate.yaml", build_financial_history_pack())
     write_yaml(run_dir / "R5_bundle5_business_breakdown_candidate.yaml", build_business_breakdown_pack())
     write_yaml(run_dir / "R5_bundle5_core_preflight_after_disclosure.yaml", build_partial_core_preflight())
-    write_readout(repo_root / "reports/p1_6/R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_FINANCIAL_READOUT.md", reviewed_at, len(records))
+    write_readout(readout_path, reviewed_at, len(records))
     return {"verified_sources": verified, "record_count": len(records), "dropzone_path": dropzone_path.as_posix()}
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build R5 Bundle 5.2 official-disclosure onboarding outputs.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
-    parser.add_argument("--workflow-id", default=WORKFLOW_ID)
+    parser.add_argument("--workflow-id", required=True)
+    parser.add_argument("--run-dir", type=Path, required=True)
+    parser.add_argument("--dropzone-output", type=Path, required=True)
+    parser.add_argument("--readout-output", type=Path, required=True)
     parser.add_argument("--reviewed-at", required=True)
     args = parser.parse_args(argv)
-    result = build_outputs(args.repo_root.resolve(), args.workflow_id, args.reviewed_at)
+    result = build_outputs(
+        args.repo_root.resolve(),
+        args.workflow_id,
+        args.reviewed_at,
+        run_dir=args.run_dir,
+        dropzone_path=args.dropzone_output,
+        readout_path=args.readout_output,
+    )
     print(
         "r5_bundle5_card_5_2 status=generated "
         f"verified_sources={len(result['verified_sources'])} accepted_records={result['record_count']} "

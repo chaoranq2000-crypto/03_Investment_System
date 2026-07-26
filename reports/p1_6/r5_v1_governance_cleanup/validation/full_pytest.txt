@@ -1,0 +1,28 @@
+validation_id: V-010
+phase: P5_pre_delete
+checked_at: 2026-07-26T15:10:00+08:00
+command: $env:PYTHONDONTWRITEBYTECODE='1'; C:\Projects\03_Investment_System\.conda\investment-system\python.exe -m pytest -q
+first_run:
+  result: 8 failed, 1341 passed, 2 skipped in 631.93s
+  root_cause: retained Bundle4 smoke imported a removed compatibility symbol
+  correction:
+    - restored only a neutral import sentinel; no old workflow ID or CLI default returned
+    - replaced old-run hash reads with exact full-repository raw Git status vector preservation
+  focused_result: 8 passed
+  active_routing_result: 6 passed
+final_run:
+  exit_code: 0
+  result: 1349 passed, 2 skipped in 650.20s
+  failures: 0
+  errors: 0
+skip_baseline:
+  source_revision: f60f220ae252262a537c612ce193fc779901984b
+  source_result: 1184 passed, 2 skipped, 0 failed, 0 errors
+  skip_defining_test: tests/test_live_adapter_smoke.py
+  test_file_unchanged_from_source_revision: true
+  current_skips: 2
+  added_silent_skips: 0
+wave_state:
+  completed_wave_count: 0
+  absence_assertion_applicable: false
+  clean_checkout_smoke: pending_after_all_three_deletion_waves

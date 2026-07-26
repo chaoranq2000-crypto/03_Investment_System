@@ -57,21 +57,80 @@ SELECTED_EVIDENCE_IDS = (
 )
 STRUCTURED_EVIDENCE_IDS = frozenset(SELECTED_EVIDENCE_IDS[2:])
 
+EXPECTED_HISTORICAL_SOURCE_BLOBS = {
+    f"{SOURCE_RUN_REL.as_posix()}/bundle12r/R5_bundle12r_generation_lock.yaml": (
+        "5f8ad3b1c274e9c68bf99d7b9542e21e6e926227",
+        1710,
+        "ebf32dad2205641a36787456f5459a675757c2c48865e705868161a0786e985c",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/bundle12r/R5_bundle12r_backflow_plan.yaml": (
+        "bfc6e1af376e67d60e7af2d0c7021a4075fdbab7",
+        948,
+        "8aacce378fc1b4838d9470770b71a82efb0ba614fe2ab3917059904485c5103f",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/bundle12r/R5_bundle12r_operating_evidence_input_snapshot.yaml": (
+        "afe1e23d30455edc0e2141029f557f7639cb5c01",
+        10838,
+        "9de6bc0588d0e27fb43d8071379880dfe02cd4b22218a5991cd11d177a3d203f",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/bundle12r/R5_bundle12r_operating_evidence_result.yaml": (
+        "631d474fd36eb54d79e7a81f6e08141a32487b29",
+        9223,
+        "6bd9ff2064babdb013eb16b58f8b0b0dba2b89c7a9f2d8dd079ef6fbdf739eec",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/bundle12r/R5_bundle12r_research_question_plan.yaml": (
+        "2adef438f05b707216e482272244a8e9be42892c",
+        7195,
+        "4260648fa3a9871dcea6031e2cb62af9141a46e4b2fd5709867aa1dd1bec0407",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_reviewed_backfill_input.yaml": (
+        "3bd8354dd7bd0538994a525193984c07554314b7",
+        11718,
+        "704d8fc40ed9f938c1588d0a0a76cfb7f2c80c807abcf20489024d649ceed011",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_backflow_execution_result.yaml": (
+        "ff37c5be7d4d2ea8364dc323d1ea778f073e4865",
+        834,
+        "5fdffe16e79f8c85cea938f6fa834c7054b10e58477eba884a5b838c5d5aa059",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_close_readout.md": (
+        "68d70c90024d4a8b6571d037c3ac9abc95693aca",
+        3179,
+        "b62e64cafcd93bf164c4f4ff76adde1f0d107510a0e39807411d082515f92e5c",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_verification_summary.yaml": (
+        "032ad978f19ef2c6e8f07f0d2064d67b65f1b08a",
+        2214,
+        "4cfe4b07c12da3f108f164ca504018a825f33a4331cbbb2ebfa93cb29348b1c0",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_quality_report.md": (
+        "75baa766d71f35171141486880b0005816d048f6",
+        3042,
+        "6b3c41dc521c916faf599439e94a261613fc6782b9de69698755a913ca169831",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_quality_issues.csv": (
+        "842b9dfd67261a037afb062d5f7720c240b56354",
+        1716,
+        "fa6f98f2a3ecc6363d6a7d7e458cae2892118b5081af8374cdd0174ebe795f57",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/live_acquisition_run_log.yaml": (
+        "985091888c59948aaf6daf7291cfa37a4d76d39e",
+        6490,
+        "6395b1e65eec5961811a2fda322c29555e3d0e50786f7991d5632284d13fcd1c",
+    ),
+    f"{SOURCE_RUN_REL.as_posix()}/R5_bundle8r_evidence_manifest_delta.csv": (
+        "c64b320fcbb07b4f5637d9c2ef7f1510112b6136",
+        43773,
+        "a41ba3eecdea561ee3ed58df173628058a832b695f88bacbb996d258d0521d78",
+    ),
+}
+
 EXPECTED_SOURCE_HASHES = {
     "config/r5_bundle13r_backflow_execution_contract.yaml": "7c313ce7b8a24e9c5615d3914501651702c403106a545a4479ff6ff03c919ffe",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle12r/R5_bundle12r_generation_lock.yaml": "ebf32dad2205641a36787456f5459a675757c2c48865e705868161a0786e985c",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle12r/R5_bundle12r_backflow_plan.yaml": "8aacce378fc1b4838d9470770b71a82efb0ba614fe2ab3917059904485c5103f",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle12r/R5_bundle12r_operating_evidence_input_snapshot.yaml": "9de6bc0588d0e27fb43d8071379880dfe02cd4b22218a5991cd11d177a3d203f",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle12r/R5_bundle12r_operating_evidence_result.yaml": "6bd9ff2064babdb013eb16b58f8b0b0dba2b89c7a9f2d8dd079ef6fbdf739eec",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle12r/R5_bundle12r_research_question_plan.yaml": "4260648fa3a9871dcea6031e2cb62af9141a46e4b2fd5709867aa1dd1bec0407",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_reviewed_backfill_input.yaml": "704d8fc40ed9f938c1588d0a0a76cfb7f2c80c807abcf20489024d649ceed011",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_backflow_execution_result.yaml": "5fdffe16e79f8c85cea938f6fa834c7054b10e58477eba884a5b838c5d5aa059",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_close_readout.md": "b62e64cafcd93bf164c4f4ff76adde1f0d107510a0e39807411d082515f92e5c",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_verification_summary.yaml": "4cfe4b07c12da3f108f164ca504018a825f33a4331cbbb2ebfa93cb29348b1c0",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_quality_report.md": "6b3c41dc521c916faf599439e94a261613fc6782b9de69698755a913ca169831",
-    f"{SOURCE_RUN_REL.as_posix()}/bundle13r/R5_bundle13r_quality_issues.csv": "fa6f98f2a3ecc6363d6a7d7e458cae2892118b5081af8374cdd0174ebe795f57",
-    f"{SOURCE_RUN_REL.as_posix()}/live_acquisition_run_log.yaml": "6395b1e65eec5961811a2fda322c29555e3d0e50786f7991d5632284d13fcd1c",
-    f"{SOURCE_RUN_REL.as_posix()}/R5_bundle8r_evidence_manifest_delta.csv": "a41ba3eecdea561ee3ed58df173628058a832b695f88bacbb996d258d0521d78",
+    **{
+        path: content_sha256
+        for path, (_, _, content_sha256) in EXPECTED_HISTORICAL_SOURCE_BLOBS.items()
+    },
     "data/manifests/evidence_manifest.csv": "34568fb9f31dc84c16e4b086b751a81ef8770591086c59a901ea7107510175ae",
     "data/manifests/claims_registry.csv": "2c514ffb22320b9cb3e341088d384506d30d7612809850a9c1fad8b73dff0337",
     "data/manifests/metrics_draft.csv": "0b10415e98b29c350379881c4bc742fa27de8ea1bb197206e1a66c571af20ffe",
@@ -217,8 +276,69 @@ def is_historical_source_path(relative_path: str) -> bool:
 
 
 def read_git_blob(repo_root: Path, revision: str, relative_path: str) -> bytes:
+    if revision != HISTORICAL_BASELINE:
+        raise ReplayContractError(
+            f"unexpected historical baseline: expected {HISTORICAL_BASELINE}, found {revision}"
+        )
+    try:
+        expected_oid, expected_bytes, expected_sha256 = (
+            EXPECTED_HISTORICAL_SOURCE_BLOBS[relative_path]
+        )
+    except KeyError as exc:
+        raise ReplayContractError(
+            f"historical Git blob has no frozen triplet: {relative_path}"
+        ) from exc
+    spec = f"{revision}:{relative_path}"
+    metadata = subprocess.run(
+        ["git", "rev-parse", "--verify", spec],
+        cwd=repo_root,
+        text=True,
+        encoding="utf-8",
+        capture_output=True,
+        check=False,
+    )
+    if metadata.returncode != 0:
+        detail = metadata.stderr.strip()
+        raise ReplayContractError(
+            f"historical Git blob is unavailable: {spec}: {detail}"
+        )
+    observed_oid = metadata.stdout.strip()
+    if observed_oid != expected_oid:
+        raise ReplayContractError(
+            f"historical Git blob OID mismatch: {relative_path}: "
+            f"expected {expected_oid}, found {observed_oid}"
+        )
+    object_type = subprocess.run(
+        ["git", "cat-file", "-t", spec],
+        cwd=repo_root,
+        text=True,
+        encoding="utf-8",
+        capture_output=True,
+        check=False,
+    )
+    if object_type.returncode != 0 or object_type.stdout.strip() != "blob":
+        raise ReplayContractError(f"historical Git object is not a blob: {spec}")
+    object_size = subprocess.run(
+        ["git", "cat-file", "-s", spec],
+        cwd=repo_root,
+        text=True,
+        encoding="utf-8",
+        capture_output=True,
+        check=False,
+    )
+    if object_size.returncode != 0:
+        detail = object_size.stderr.strip()
+        raise ReplayContractError(
+            f"historical Git blob size is unavailable: {spec}: {detail}"
+        )
+    observed_bytes = int(object_size.stdout.strip())
+    if observed_bytes != expected_bytes:
+        raise ReplayContractError(
+            f"historical Git blob byte-count mismatch: {relative_path}: "
+            f"expected {expected_bytes}, found {observed_bytes}"
+        )
     completed = subprocess.run(
-        ["git", "cat-file", "blob", f"{revision}:{relative_path}"],
+        ["git", "cat-file", "blob", spec],
         cwd=repo_root,
         capture_output=True,
         check=False,
@@ -226,9 +346,17 @@ def read_git_blob(repo_root: Path, revision: str, relative_path: str) -> bytes:
     if completed.returncode != 0:
         detail = completed.stderr.decode("utf-8", errors="replace").strip()
         raise ReplayContractError(
-            f"historical Git blob is unavailable: {revision}:{relative_path}: {detail}"
+            f"historical Git blob is unavailable: {spec}: {detail}"
         )
-    return completed.stdout
+    payload = completed.stdout
+    observed_sha256 = hashlib.sha256(payload).hexdigest()
+    if len(payload) != expected_bytes or observed_sha256 != expected_sha256:
+        raise ReplayContractError(
+            f"historical Git blob content mismatch: {relative_path}: "
+            f"expected bytes={expected_bytes}, sha256={expected_sha256}; "
+            f"found bytes={len(payload)}, sha256={observed_sha256}"
+        )
+    return payload
 
 
 def _lexical_absolute(path: Path, repo_root: Path) -> str:

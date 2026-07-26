@@ -1,26 +1,35 @@
 from __future__ import annotations
 
 import csv
+import io
 from pathlib import Path
 
 import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 CLOSE = ROOT / "reports/p1_6/R5_BUNDLE_7_QUALITY_REBASE_AND_BACKFLOW_CLOSE_READOUT.md"
-QUALITY = RUN / "R5_bundle7_quality_gate_report.md"
 BUNDLE6_CLOSE = "reports/p1_6/R5_BUNDLE_6_READER_REPORT_QUALITY_REMEDIATION_CLOSE_READOUT.md"
 BUNDLE7_CLOSE = "reports/p1_6/R5_BUNDLE_7_QUALITY_REBASE_AND_BACKFLOW_CLOSE_READOUT.md"
 
 
-def load_yaml(path: Path):
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
+def historical_yaml(historical_blob_bytes, name: str):
+    return yaml.safe_load(historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8"))
 
 
-def test_bundle7_reader_remains_historical_fail_closed_while_current_workflow_advances() -> None:
-    scorecard = load_yaml(RUN / "R5_stock_research_report_reader_v2_quality_scorecard.yaml")
-    state = load_yaml(RUN / "workflow_state.yaml")
+def historical_csv(historical_blob_bytes, name: str) -> list[dict[str, str]]:
+    text = historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8-sig")
+    return list(csv.DictReader(io.StringIO(text)))
+
+
+def test_bundle7_reader_remains_historical_fail_closed_while_current_workflow_advances(
+    historical_blob_bytes,
+) -> None:
+    scorecard = historical_yaml(
+        historical_blob_bytes, "R5_stock_research_report_reader_v2_quality_scorecard.yaml"
+    )
+    state = historical_yaml(historical_blob_bytes, "workflow_state.yaml")
 
     assert scorecard["decision"] == "rejected"
     assert scorecard["quality_band"] == "research_draft"
@@ -50,19 +59,26 @@ def test_bundle7_reader_remains_historical_fail_closed_while_current_workflow_ad
     assert state.get("quality_backflow", {}).get("p2_allowed") is False
 
 
-def test_backflow_issues_routes_and_manifest_are_unique() -> None:
-    plan = load_yaml(RUN / "R5_bundle7_quality_backflow_plan.yaml")
+def test_backflow_issues_routes_and_manifest_are_unique(historical_blob_bytes) -> None:
+    plan = historical_yaml(
+        historical_blob_bytes, "R5_bundle7_quality_backflow_plan.yaml"
+    )
     assert len(plan["generated_issues"]) == 12
     assert len({row["issue_id"] for row in plan["generated_issues"]}) == 12
     assert len(plan["fix_routes"]) == 7
     assert plan["fix_routes"][0]["owner_skill"] == "evidence-ingest"
 
-    with (RUN / "open_todos.csv").open(encoding="utf-8", newline="") as handle:
-        todos = [row for row in csv.DictReader(handle) if row["issue_id"].startswith("R5Q-B7-")]
+    todos = [
+        row
+        for row in historical_csv(historical_blob_bytes, "open_todos.csv")
+        if row["issue_id"].startswith("R5Q-B7-")
+    ]
     assert len(todos) == len({row["issue_id"] for row in todos}) == 12
 
-    with (RUN / "artifact_manifest.csv").open(encoding="utf-8", newline="") as handle:
-        manifest_paths = [row["path"] for row in csv.DictReader(handle)]
+    manifest_paths = [
+        row["path"]
+        for row in historical_csv(historical_blob_bytes, "artifact_manifest.csv")
+    ]
     expected = {
         "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_report_reader_v2_quality_scorecard.yaml",
         "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle7_quality_backflow_plan.yaml",
@@ -73,9 +89,15 @@ def test_backflow_issues_routes_and_manifest_are_unique() -> None:
     assert all(manifest_paths.count(path) == 1 for path in expected)
 
 
-def test_current_quality_report_supersedes_old_sample_quality_surface() -> None:
-    current = QUALITY.read_text(encoding="utf-8")
-    historical = (RUN / "quality_gate_report.md").read_text(encoding="utf-8")
+def test_current_quality_report_supersedes_old_sample_quality_surface(
+    historical_blob_bytes,
+) -> None:
+    current = historical_blob_bytes(
+        f"{HISTORICAL_RUN}/R5_bundle7_quality_gate_report.md"
+    ).decode("utf-8")
+    historical = historical_blob_bytes(
+        f"{HISTORICAL_RUN}/quality_gate_report.md"
+    ).decode("utf-8")
 
     assert "status: `needs_fix`" in current
     assert "12 个 medium issue" in current
@@ -87,7 +109,9 @@ def test_current_quality_report_supersedes_old_sample_quality_surface() -> None:
 
 def test_canonical_indexes_supersede_bundle6_and_activate_bundle7_close() -> None:
     index_md = (ROOT / "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md").read_text(encoding="utf-8")
-    index_yaml = load_yaml(ROOT / "config/r5_readout_canonical_index.yaml")
+    index_yaml = yaml.safe_load(
+        (ROOT / "config/r5_readout_canonical_index.yaml").read_text(encoding="utf-8")
+    )
     entries = {row["path"]: row for row in index_yaml["readouts"]}
 
     assert f"| `{BUNDLE6_CLOSE}` | `superseded` | `false` |" in index_md

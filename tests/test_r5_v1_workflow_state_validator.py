@@ -33,6 +33,8 @@ LEGACY_STATE_REL = (
     "reports/workflow_runs/wf_20260703_stock_first_002837_invic/"
     "workflow_state.yaml"
 )
+LEGACY_STATE_BLOB_OID = "3a9d29405e3f0b5342cf1a2469f1e25c025e50ac"
+LEGACY_STATE_BYTES = 81447
 LEGACY_STATE_SHA256 = "aabe24082ff80facc55ba5eb51530199e9c2ba9d92d3b43c36e9189d0cdfed10"
 PROTECTED_V1_REPLAY_STATE_PATH = (
     ROOT
@@ -73,10 +75,39 @@ def run_validator(path: Path) -> subprocess.CompletedProcess[str]:
 
 
 def git_blob_bytes(revision: str, relative_path: str) -> bytes:
-    return subprocess.check_output(
-        ["git", "cat-file", "blob", f"{revision}:{relative_path}"],
+    assert revision == HISTORICAL_BASELINE
+    assert relative_path == LEGACY_STATE_REL
+    spec = f"{revision}:{relative_path}"
+    observed_oid = subprocess.check_output(
+        ["git", "rev-parse", "--verify", spec],
+        cwd=ROOT,
+        text=True,
+        encoding="utf-8",
+    ).strip()
+    assert observed_oid == LEGACY_STATE_BLOB_OID
+    object_type = subprocess.check_output(
+        ["git", "cat-file", "-t", spec],
+        cwd=ROOT,
+        text=True,
+        encoding="utf-8",
+    ).strip()
+    assert object_type == "blob"
+    observed_bytes = int(
+        subprocess.check_output(
+            ["git", "cat-file", "-s", spec],
+            cwd=ROOT,
+            text=True,
+            encoding="utf-8",
+        ).strip()
+    )
+    assert observed_bytes == LEGACY_STATE_BYTES
+    payload = subprocess.check_output(
+        ["git", "cat-file", "blob", spec],
         cwd=ROOT,
     )
+    assert len(payload) == LEGACY_STATE_BYTES
+    assert hashlib.sha256(payload).hexdigest() == LEGACY_STATE_SHA256
+    return payload
 
 
 @pytest.fixture

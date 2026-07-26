@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import importlib.util
 import json
 import os
@@ -14,8 +13,6 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts/run_r5_bundle4_reviewed_input_smoke.py"
 FIXTURE_ROOT = REPO_ROOT / "tests/fixtures/r5_reviewed_inputs"
-REAL_WORKFLOW = "wf_20260703_stock_first_002837_invic"
-REAL_RUN_DIR = REPO_ROOT / "reports/workflow_runs" / REAL_WORKFLOW
 
 SCENARIO_KEYS = {
     "empty_or_pending",
@@ -68,17 +65,18 @@ def run_smoke(tmp_path: Path) -> dict[str, Any]:
     return result
 
 
-def sha256_or_none(path: Path) -> str | None:
-    if not path.is_file():
-        return None
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def real_registry_hashes() -> dict[str, str | None]:
-    return {
-        key: sha256_or_none(REAL_RUN_DIR / filename)
-        for key, filename in REGISTRY_FILES.items()
-    }
+def repository_status_vector() -> bytes:
+    completed = subprocess.run(
+        ["git", "status", "--porcelain=v1", "-z", "-uall"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr.decode(
+        encoding="utf-8",
+        errors="replace",
+    )
+    return completed.stdout
 
 
 def assert_reviewed_flags(
@@ -251,13 +249,13 @@ def test_smoke_does_not_attempt_network_access(tmp_path: Path, monkeypatch) -> N
     assert result["overall_status"] == "pass"
 
 
-def test_real_002837_registry_hashes_remain_unchanged(tmp_path: Path) -> None:
-    before = real_registry_hashes()
+def test_smoke_preserves_exact_repository_status_vector(tmp_path: Path) -> None:
+    before = repository_status_vector()
 
     result = run_smoke(tmp_path / "real_boundary")
 
     assert result["real_workflow_unchanged"] is True
-    assert real_registry_hashes() == before
+    assert repository_status_vector() == before
 
 
 def test_cli_writes_json_and_repeated_runs_are_semantically_stable(tmp_path: Path) -> None:

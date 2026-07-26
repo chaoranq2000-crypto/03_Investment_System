@@ -24,15 +24,12 @@ def _relative(path: Path, root: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[1]))
-    parser.add_argument(
-        "--workflow-run",
-        default="reports/workflow_runs/wf_20260703_stock_first_002837_invic",
-    )
+    parser.add_argument("--workflow-run", required=True)
     parser.add_argument("--config", default="config/r5_bundle8_research_depth.yaml")
-    parser.add_argument("--source-catalog")
-    parser.add_argument("--coverage-matrix")
-    parser.add_argument("--analysis-inputs")
-    parser.add_argument("--output")
+    parser.add_argument("--source-catalog", required=True)
+    parser.add_argument("--coverage-matrix", required=True)
+    parser.add_argument("--analysis-inputs", required=True)
+    parser.add_argument("--output", required=True)
     parser.add_argument(
         "--allow-blocked",
         action="store_true",
@@ -56,22 +53,10 @@ def main() -> int:
     config_path = Path(args.config)
     if not config_path.is_absolute():
         config_path = root / config_path
-    source_path = (
-        Path(args.source_catalog)
-        if args.source_catalog
-        else run / "R5_bundle8_evidence_source_catalog.yaml"
-    )
-    coverage_path = (
-        Path(args.coverage_matrix)
-        if args.coverage_matrix
-        else run / "evidence_coverage_matrix.yaml"
-    )
-    inputs_path = (
-        Path(args.analysis_inputs)
-        if args.analysis_inputs
-        else run / "R5_bundle8_analysis_inputs_v2.yaml"
-    )
-    output = Path(args.output) if args.output else run / "analysis_pack_v2.yaml"
+    source_path = Path(args.source_catalog)
+    coverage_path = Path(args.coverage_matrix)
+    inputs_path = Path(args.analysis_inputs)
+    output = Path(args.output)
     paths = [source_path, coverage_path, inputs_path, output]
     source_path, coverage_path, inputs_path, output = [
         path if path.is_absolute() else root / path for path in paths

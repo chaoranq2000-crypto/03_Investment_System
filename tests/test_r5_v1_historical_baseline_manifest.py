@@ -39,7 +39,7 @@ def test_frozen_contract_authority_and_a6_inventory_are_exact(tool) -> None:
         "path": tool.CONTRACT_REL.as_posix(),
         "canonical_sha256": tool.EXPECTED_CONTRACT_SHA256,
         "status": "frozen",
-        "source_baseline": tool.PACKAGE_BASELINE,
+        "source_baseline": tool.PACKAGE_SOURCE_BASELINE,
     }
     authority = tool.parse_authority(ROOT)
     assert {key: len(value) for key, value in authority.items()} == {
@@ -48,6 +48,7 @@ def test_frozen_contract_authority_and_a6_inventory_are_exact(tool) -> None:
         "a3": 44,
         "a4": 35,
         "a5": 27,
+        "a7": 3,
     }
     assert authority["a1"] & authority["a5"] == tool.EXPECTED_A1_A5_OVERLAP
     assert all(
@@ -75,7 +76,7 @@ def test_baseline_manifest_is_exact_sorted_and_durable(tool, manifest) -> None:
     paths = [row["path"] for row in rows]
 
     assert manifest["schema_version"] == "r5_v1_historical_baseline_manifest_v1"
-    assert manifest["source_snapshot"] == tool.PACKAGE_BASELINE
+    assert manifest["source_snapshot"] == tool.HISTORICAL_SOURCE_SNAPSHOT
     assert manifest["durable_restore_refs"] == {
         "night_source": tool.NIGHT_SOURCE,
         "engineering_source": tool.ENGINEERING_SOURCE,
@@ -126,8 +127,9 @@ def test_full_restore_is_byte_for_byte_in_unique_temp_root(
     assert receipt["byte_for_byte_match"] is True
     for row in manifest["files"]:
         restored = restore_root / row["path"]
-        assert restored.is_file()
-        assert restored.read_bytes() == tool.git_blob(
+        filesystem_restored = tool._filesystem_path(restored)
+        assert filesystem_restored.is_file()
+        assert filesystem_restored.read_bytes() == tool.git_blob(
             ROOT, row["baseline_commit"], row["path"]
         )
 

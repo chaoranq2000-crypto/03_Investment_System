@@ -95,12 +95,15 @@ def test_actual_paths_are_eligible_and_disjoint_from_every_retained_set(
         | a6
     )
     assert actual.isdisjoint(retained)
+    assert actual & authority["a7"] == authority["a7"] == tool.EXPECTED_A7
+    assert all(
+        row["wave"] == "night"
+        for row in cleanup["files"]
+        if row["path"] in authority["a7"]
+    )
     assert actual.issuperset(authority["a3"])
     assert all(not tool.is_protected(path, a6) for path in actual)
-    assert all(
-        not path.startswith(tool.RETAINED_EVALUATOR_DEPENDENCY_PREFIXES)
-        for path in actual
-    )
+    assert actual.isdisjoint(tool.RETAINED_EVALUATOR_DEPENDENCIES)
     assert all(
         tool.classify_wave(path, authority["a3"]) == row["wave"]
         for row in cleanup["files"]

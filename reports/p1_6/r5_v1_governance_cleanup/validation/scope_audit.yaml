@@ -1,44 +1,55 @@
 schema_version: r5_v1_governance_cleanup_validation_v1
 validation_id: V-009
-phase: P4
-checked_at: "2026-07-25T15:53:48+08:00"
+phase: P5_pre_delete
+checked_at: "2026-07-26T15:10:00+08:00"
 decision: pass
-phase_parent: 6c7fc2a35942bb04f5ef0ecfa2c6ccbd10e0a069
-changed_path_count_before_scope_receipt: 8
-final_changed_path_count: 9
-unexpected_path_count: 0
-changed_paths:
-  - config/r5_readout_canonical_index.yaml
-  - docs/codex_tasks/v1_governance_integration_cleanup_v2/START_HERE.md
-  - reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md
-  - reports/p1_6/r5_v1_governance_cleanup/root_policy_migration.yaml
-  - reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml
-  - reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml
-  - schemas/r5_v1_root_policy_migration.schema.json
-  - scripts/validate_r5_v1_root_policy_migration.py
-  - tests/test_r5_v1_root_policy_migration.py
+phase_parent: ce4f9554db4fcdfa4699c70516d9a3497c565fc7
+changed_path_count_before_scope_receipt: 96
+final_changed_path_count: 97
+changed_path_vector:
+  encoding: ordinal_utf8_nul
+  byte_count: 4536
+  sha256: f7afb71403e09d6541ee9df2465d525421e9d297b177ebd5f0886362d62b9210
+authority_partition:
+  a1_modify_existing_exact: 85
+  a2_add_exact: 9
+  a7_transition_modify_then_delete_exact: 3
+  unauthorized_path_count: 0
+  unauthorized_paths: []
+status_classes:
+  modified_tracked_path_count: 96
+  added_authorized_a2_path_count: 1
+  deleted_path_count: 0
+  renamed_path_count: 0
+  type_change_count: 0
+  unauthorized_untracked_path_count: 0
 protected_checks:
-  frozen_contract_changed: false
-  prior_v1_package_changed: false
+  frozen_v5_contract_changed: false
+  prior_task_packages_changed: false
   data_raw_changed: false
   original_root_map_changed: false
-  v1_replay_changed: false
-  historical_workflow_changed: false
-  github_workflow_changed: false
+  canonical_policy_refresh_run_changed: false
+  deletion_candidate_removed: false
   agents_md_changed: false
   pyproject_changed: false
   user_main_worktree_written: false
-canonical_index_change:
-  scope: policy_migrations.blocker_root_policy
-  current_runs_changed: false
-  historical_readout_rows_changed: false
+manifest_scope:
+  historical_snapshot: 312adc73821706b0b7ca6aa00e80ee608bd10b32
+  file_count: 1386
+  night_count: 680
+  bundle_count: 205
+  old002837_count: 501
+  active_reference_count: 0
+  unknown_classification_count: 0
+  a7_overlap_exact: true
+  retained_or_protected_overlap_count: 0
 git_diff_check: pass
 user_main_worktree:
   head: a345fafb522300831ed4206d35fa17f44570cb1f
   status_rows: 130
   tracked_status_rows: 20
   status_porcelain_v1_uall_bytes: 9156
-  status_porcelain_v1_uall_sha256: 0cc3779c1d4c8f91101526f2952b4b60c1ba1afd3d683c2cefdf127996070cb2
+  status_porcelain_v1_uall_sha256: 1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0
   tracked_status_porcelain_bytes: 1025
-  tracked_status_porcelain_sha256: b2d3c77f464c3c7fd23fdcdfe3f0583ea81c1f8af1f84492e3073ca7aa46ac02
-  matches_preflight_vector: true
+  tracked_status_porcelain_sha256: 3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b
+  matches_authorized_snapshot: true

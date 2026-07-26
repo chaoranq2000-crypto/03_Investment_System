@@ -2,24 +2,31 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import io
 from pathlib import Path
 
 import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
-def read_csv(path: Path) -> list[dict[str, str]]:
-    with path.open("r", encoding="utf-8-sig", newline="") as handle:
-        return list(csv.DictReader(handle))
+def historical_yaml(historical_blob_bytes, name: str):
+    return yaml.safe_load(historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8"))
 
 
-def test_bundle10_state_is_finalized_after_external_human_review() -> None:
-    state = yaml.safe_load((RUN / "workflow_state.yaml").read_text(encoding="utf-8"))
-    scorecard = yaml.safe_load(
-        (RUN / "R5_stock_research_report_reader_v3_quality_scorecard.yaml").read_text(encoding="utf-8")
+def historical_csv(historical_blob_bytes, name: str) -> list[dict[str, str]]:
+    text = historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8-sig")
+    return list(csv.DictReader(io.StringIO(text)))
+
+
+def test_bundle10_state_is_finalized_after_external_human_review(
+    historical_blob_bytes,
+) -> None:
+    state = historical_yaml(historical_blob_bytes, "workflow_state.yaml")
+    scorecard = historical_yaml(
+        historical_blob_bytes, "R5_stock_research_report_reader_v3_quality_scorecard.yaml"
     )
     candidate = state["reader_candidate_snapshot"]
     assert state["status"] in {"accepted_with_todos", "needs_fix", "in_progress"}
@@ -69,18 +76,24 @@ def test_bundle10_state_is_finalized_after_external_human_review() -> None:
     assert scorecard["human_review_status"] == "pending"
     assert scorecard["sample_quality_report_allowed"] is False
     assert scorecard["p2_allowed"] is False
-    report_hash = hashlib.sha256((RUN / "R5_stock_research_report_reader_v3.md").read_bytes()).hexdigest()
+    report_payload = historical_blob_bytes(
+        f"{HISTORICAL_RUN}/R5_stock_research_report_reader_v3.md"
+    )
+    assert b"\r\n" not in report_payload
+    report_hash = hashlib.sha256(report_payload.replace(b"\n", b"\r\n")).hexdigest()
     assert candidate["report_sha256"] == report_hash
 
 
-def test_bundle10_artifacts_and_historical_bundle_closes_are_preserved() -> None:
-    state = yaml.safe_load((RUN / "workflow_state.yaml").read_text(encoding="utf-8"))
+def test_bundle10_artifacts_and_historical_bundle_closes_are_preserved(
+    historical_blob_bytes,
+) -> None:
+    state = historical_yaml(historical_blob_bytes, "workflow_state.yaml")
     assert state["bundle8_close"]["bundle_closed"] is True
     assert state["bundle9_close"]["bundle_closed"] is True
-    artifacts = read_csv(RUN / "artifact_manifest.csv")
+    artifacts = historical_csv(historical_blob_bytes, "artifact_manifest.csv")
     assert len({row["artifact_id"] for row in artifacts}) == len(artifacts)
     expected = {
-        f"reports/workflow_runs/{RUN.name}/{name}"
+        f"{HISTORICAL_RUN}/{name}"
         for name in (
             "R5_bundle10_reader_pack.yaml",
             "R5_stock_research_report_reader_v3.md",
@@ -97,11 +110,16 @@ def test_bundle10_artifacts_and_historical_bundle_closes_are_preserved() -> None
     }
     paths = [row["path"] for row in artifacts]
     assert all(paths.count(path) == 1 for path in expected)
-    assert all((ROOT / path).exists() for path in expected)
+    assert all(historical_blob_bytes(path) for path in expected)
 
 
-def test_bundle7_reader_backflow_and_external_review_todos_are_resolved() -> None:
-    todos = {row["issue_id"]: row for row in read_csv(RUN / "open_todos.csv")}
+def test_bundle7_reader_backflow_and_external_review_todos_are_resolved(
+    historical_blob_bytes,
+) -> None:
+    todos = {
+        row["issue_id"]: row
+        for row in historical_csv(historical_blob_bytes, "open_todos.csv")
+    }
     assert todos["R5Q-B7-A823A644"]["status"] == "resolved_bundle10_reader_density"
     assert todos["R5Q-B7-E0B818E7"]["status"] == "resolved_bundle10_sentiment_layers"
     assert todos["R5Q-B7-9A50BA49"]["status"] == "resolved_bundle10_future_event_chain"

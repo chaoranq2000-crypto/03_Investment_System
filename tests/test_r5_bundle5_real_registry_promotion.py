@@ -4,12 +4,13 @@ import importlib.util
 import sys
 from pathlib import Path
 
+import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-RUN_DIR = REPO_ROOT / "reports/workflow_runs" / WORKFLOW_ID
-DROPZONE = REPO_ROOT / "data/reviewed_inputs" / WORKFLOW_ID
+HISTORICAL_RUN = f"reports/workflow_runs/{WORKFLOW_ID}"
+RETAINED_DROPZONE = REPO_ROOT / "data/reviewed_inputs" / WORKFLOW_ID
 RUNNER_PATH = REPO_ROOT / "scripts/run_r5_bundle5_real_registry_promotion.py"
 STAGING_PATH = REPO_ROOT / "scripts/build_r5_reviewed_input_staging.py"
 
@@ -27,11 +28,28 @@ RUNNER = load_module("r5_bundle5_real_registry_runner_test", RUNNER_PATH)
 STAGING = load_module("r5_bundle5_staging_cap_test", STAGING_PATH)
 
 
-def test_complete_real_dropzone_is_capped_at_research_draft() -> None:
+@pytest.fixture
+def registry_fixture(historical_blob_file) -> tuple[Path, Path]:
+    registry_sources = list(RUNNER.promoter.REGISTRY_FILENAMES.values())
+    first_registry = None
+    for filename in registry_sources:
+        path = historical_blob_file(
+            f"{HISTORICAL_RUN}/{filename}",
+            f"registry_case/run/{filename}",
+        )
+        first_registry = first_registry or path
+    assert first_registry is not None
+    return RETAINED_DROPZONE, first_registry.parent
+
+
+def test_complete_real_dropzone_is_capped_at_research_draft(
+    registry_fixture: tuple[Path, Path],
+) -> None:
+    dropzone_root, run_dir = registry_fixture
     staging = STAGING.build_staging_result(
         repo_root=REPO_ROOT,
         workflow_id=WORKFLOW_ID,
-        dropzone_root=DROPZONE,
+        dropzone_root=dropzone_root,
     )
     assert staging["validation_status"] == "pass"
     assert staging["accepted_count"] == 22
@@ -43,8 +61,8 @@ def test_complete_real_dropzone_is_capped_at_research_draft() -> None:
         repo_root=REPO_ROOT,
         workflow_id=WORKFLOW_ID,
         stock_code="002837",
-        dropzone_root=DROPZONE,
-        output_run_dir=RUN_DIR,
+        dropzone_root=dropzone_root,
+        output_run_dir=run_dir,
         fixture_mode=False,
         dry_run=True,
     )
@@ -54,17 +72,27 @@ def test_complete_real_dropzone_is_capped_at_research_draft() -> None:
     assert dry_run["p2_allowed"] is False
 
 
-def test_prepromotion_inventory_covers_all_inputs_and_targets() -> None:
+def test_prepromotion_inventory_covers_all_inputs_and_targets(
+    registry_fixture: tuple[Path, Path],
+) -> None:
+    dropzone_root, run_dir = registry_fixture
     dry_run = RUNNER.promoter.promote_reviewed_inputs(
         repo_root=REPO_ROOT,
         workflow_id=WORKFLOW_ID,
         stock_code="002837",
-        dropzone_root=DROPZONE,
-        output_run_dir=RUN_DIR,
+        dropzone_root=dropzone_root,
+        output_run_dir=run_dir,
         fixture_mode=False,
         dry_run=True,
     )
-    inventory = RUNNER.build_prepromotion_inventory(REPO_ROOT, RUN_DIR, DROPZONE, dry_run)
+    inventory = RUNNER.build_prepromotion_inventory(
+        REPO_ROOT,
+        run_dir,
+        dropzone_root,
+        dry_run,
+        workflow_id=WORKFLOW_ID,
+        stock_code="002837",
+    )
     assert inventory["accepted_count"] == 22
     assert inventory["accepted_degraded_count"] == 0
     assert sum(row["record_count"] for row in inventory["input_files"]) == 22
@@ -74,15 +102,20 @@ def test_prepromotion_inventory_covers_all_inputs_and_targets() -> None:
     assert inventory["hard_boundaries"]["p2_allowed"] is False
 
 
-def test_fully_reviewed_forecast_merge_drops_stale_todo_interlock() -> None:
+def test_fully_reviewed_forecast_merge_drops_stale_todo_interlock(
+    registry_fixture: tuple[Path, Path],
+) -> None:
+    dropzone_root, run_dir = registry_fixture
     records = [
         row
-        for row in RUNNER.promoter.collect_records(DROPZONE)
+        for row in RUNNER.promoter.collect_records(dropzone_root)
         if row.get("review_status") == "accepted"
     ]
     conflicts: list[str] = []
     candidate = RUNNER.promoter._build_forecast_registry(WORKFLOW_ID, "002837", records, conflicts)
-    existing = RUNNER.registry_io.load_yaml(RUN_DIR / "R5_forecast_assumption_registry.yaml")
+    existing = RUNNER.registry_io.load_yaml(
+        run_dir / "R5_forecast_assumption_registry.yaml"
+    )
     merged = RUNNER.promoter._merge_forecast(
         existing,
         candidate,
@@ -100,7 +133,7 @@ def test_fully_reviewed_forecast_merge_drops_stale_todo_interlock() -> None:
 
 def test_backup_restore_round_trip_handles_existing_and_missing_targets(tmp_path: Path) -> None:
     repo = tmp_path / "repo"
-    run_dir = repo / "reports/workflow_runs" / WORKFLOW_ID
+    run_dir = repo / "run_fixture"
     run_dir.mkdir(parents=True)
     target_states = {
         "market_peer": b"artifact_type: old_market\n",
@@ -113,6 +146,7 @@ def test_backup_restore_round_trip_handles_existing_and_missing_targets(tmp_path
         if data is not None:
             targets[key].write_bytes(data)
     inventory = {
+        "workflow_id": "wf_fixture_backup_restore",
         "inventory_signature": "a" * 64,
         "registry_targets": {
             key: {
@@ -138,12 +172,13 @@ def test_backup_restore_round_trip_handles_existing_and_missing_targets(tmp_path
             assert restored[key] == RUNNER._sha256(target)
 
 
-def test_recorded_real_promotion_is_byte_and_semantic_idempotent() -> None:
-    result_path = RUN_DIR / "R5_bundle5_registry_idempotency_result.json"
-    assert result_path.is_file()
+def test_recorded_real_promotion_is_byte_and_semantic_idempotent(
+    historical_blob_bytes,
+) -> None:
     import json
 
-    result = json.loads(result_path.read_text(encoding="utf-8"))
+    result_source = f"{HISTORICAL_RUN}/R5_bundle5_registry_idempotency_result.json"
+    result = json.loads(historical_blob_bytes(result_source).decode("utf-8"))
     assert result["status"] == "pass"
     assert result["byte_level_idempotent"] is True
     assert result["semantic_idempotent"] is True
@@ -151,6 +186,7 @@ def test_recorded_real_promotion_is_byte_and_semantic_idempotent() -> None:
     assert result["sample_quality_report_allowed"] is False
     assert result["p2_allowed"] is False
 
-    backup = yaml.safe_load((RUN_DIR / "R5_bundle5_registry_backup_manifest.yaml").read_text(encoding="utf-8"))
+    backup_source = f"{HISTORICAL_RUN}/R5_bundle5_registry_backup_manifest.yaml"
+    backup = yaml.safe_load(historical_blob_bytes(backup_source).decode("utf-8"))
     assert backup["backup_verified"] is True
     assert len(backup["items"]) == 4

@@ -10,14 +10,6 @@ from typing import Any
 
 import yaml
 
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-RUN_REL = Path("reports/workflow_runs") / WORKFLOW_ID
-REPORT_REL = RUN_REL / "R5_stock_research_note_reviewed_input_draft.md"
-QUALITY_REL = RUN_REL / "R5_bundle5_quality_gate_result.yaml"
-BENCHMARK_REL = RUN_REL / "R5_bundle5_benchmark_coverage_precheck.yaml"
-BASELINE_REL = RUN_REL / "R5_bundle6_reader_surface_baseline.yaml"
-READOUT_REL = Path("reports/p1_6/R5_BUNDLE_6_0_STATUS_READER_QUALITY_BASELINE_READOUT.md")
-
 RAW_ID_RE = re.compile(r"\b(?:ev_[A-Za-z0-9_]+|r5_b5_[A-Za-z0-9_]+)\b")
 INTERNAL_PATH_RE = re.compile(
     r"(?:reports/workflow_runs|data/reviewed_inputs|data/raw|data/processed)/[^\s|]+"
@@ -49,6 +41,14 @@ def _load_yaml(path: Path) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError(f"{path} must contain a YAML mapping")
     return data
+
+
+def _display_path(path: Path, repo_root: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return resolved.relative_to(repo_root.resolve()).as_posix()
+    except ValueError:
+        return resolved.as_posix()
 
 
 def _unique_matches(pattern: re.Pattern[str], text: str) -> list[str]:
@@ -86,13 +86,14 @@ def scan_reader_surface(report_text: str) -> dict[str, Any]:
 def build_baseline(
     repo_root: Path,
     *,
+    run_root: Path,
+    truthfulness_path: Path,
     full_pytest_summary: str,
     bundle5_close_summary: str,
 ) -> dict[str, Any]:
-    report_path = repo_root / REPORT_REL
-    quality_path = repo_root / QUALITY_REL
-    benchmark_path = repo_root / BENCHMARK_REL
-    truthfulness_path = repo_root / "reports/p1_6/r5_bundle5_readout_truthfulness_result.json"
+    report_path = run_root / "R5_stock_research_note_reviewed_input_draft.md"
+    quality_path = run_root / "R5_bundle5_quality_gate_result.yaml"
+    benchmark_path = run_root / "R5_bundle5_benchmark_coverage_precheck.yaml"
     report_text = report_path.read_text(encoding="utf-8")
     benchmark = _load_yaml(benchmark_path)
     quality = _load_yaml(quality_path)
@@ -101,15 +102,15 @@ def build_baseline(
     return {
         "artifact_type": "R5_bundle6_reader_surface_baseline",
         "schema_version": "r5_bundle6_reader_surface_baseline_v0.1",
-        "workflow_id": WORKFLOW_ID,
+        "workflow_id": run_root.name,
         "stock_code": "002837",
         "classification": "audit_oriented_research_draft_not_reader_candidate",
         "before_state_preserved": True,
         "input_artifacts": {
-            "bundle5_draft": {"path": REPORT_REL.as_posix(), "sha256": _sha256(report_path)},
-            "bundle5_quality_gate": {"path": QUALITY_REL.as_posix(), "sha256": _sha256(quality_path)},
-            "bundle5_benchmark_precheck": {"path": BENCHMARK_REL.as_posix(), "sha256": _sha256(benchmark_path)},
-            "bundle5_truthfulness": {"path": truthfulness_path.relative_to(repo_root).as_posix(), "sha256": _sha256(truthfulness_path)},
+            "bundle5_draft": {"path": _display_path(report_path, repo_root), "sha256": _sha256(report_path)},
+            "bundle5_quality_gate": {"path": _display_path(quality_path, repo_root), "sha256": _sha256(quality_path)},
+            "bundle5_benchmark_precheck": {"path": _display_path(benchmark_path, repo_root), "sha256": _sha256(benchmark_path)},
+            "bundle5_truthfulness": {"path": _display_path(truthfulness_path, repo_root), "sha256": _sha256(truthfulness_path)},
         },
         "verification": {
             "bundle5_truthfulness": "pass_checked_8_failed_0",
@@ -143,11 +144,23 @@ def build_baseline(
     }
 
 
-def write_readout(repo_root: Path, baseline: dict[str, Any]) -> None:
+def write_readout(
+    repo_root: Path,
+    baseline: dict[str, Any],
+    *,
+    run_root: Path,
+    truthfulness_path: Path,
+    baseline_path: Path,
+    readout_path: Path,
+) -> None:
     surface = baseline["reader_surface"]
     coverage = baseline["coverage_baseline"]
     report_hash = baseline["input_artifacts"]["bundle5_draft"]["sha256"]
     quality_hash = baseline["input_artifacts"]["bundle5_quality_gate"]["sha256"]
+    baseline_display = _display_path(baseline_path, repo_root)
+    readout_display = _display_path(readout_path, repo_root)
+    run_display = _display_path(run_root, repo_root)
+    truthfulness_display = _display_path(truthfulness_path, repo_root)
     text = f"""# R5 Bundle 6.0 — Status and Reader-quality Baseline Readout
 
 status: accepted_baseline_only
@@ -155,9 +168,9 @@ status: accepted_baseline_only
 ## files_added
 
 - `scripts/build_r5_bundle6_reader_baseline.py`
-- `{BASELINE_REL.as_posix()}`
+- `{baseline_display}`
 - `tests/test_r5_bundle6_reader_baseline.py`
-- `{READOUT_REL.as_posix()}`
+- `{readout_display}`
 
 ## files_modified
 
@@ -168,7 +181,7 @@ status: accepted_baseline_only
 - `.\\.conda\\investment-system\\python.exe scripts\\check_r5_readout_truthfulness.py --rules config\\r5_readout_truthfulness_rules.yaml --glob 'reports/p1_6/R5_BUNDLE_5*READOUT.md' --strict`
 - `.\\.conda\\investment-system\\python.exe -m pytest -q tests\\test_r5_bundle5_close.py --tb=short -p no:cacheprovider`
 - `.\\.conda\\investment-system\\python.exe -m pytest -q --tb=short -p no:cacheprovider`
-- `.\\.conda\\investment-system\\python.exe scripts\\build_r5_bundle6_reader_baseline.py --repo-root . --full-pytest-summary "510 passed, 2 skipped in 20.98s" --bundle5-close-summary "9 passed in 0.17s"`
+- `.\\.conda\\investment-system\\python.exe scripts\\build_r5_bundle6_reader_baseline.py --repo-root . --run-root "{run_display}" --truthfulness-result "{truthfulness_display}" --baseline-output "{baseline_display}" --readout-output "{readout_display}" --full-pytest-summary "510 passed, 2 skipped in 20.98s" --bundle5-close-summary "9 passed in 0.17s"`
 
 ## exit_code
 
@@ -204,32 +217,58 @@ status: accepted_baseline_only
 - sample_quality_report_allowed: `false`
 - p2_allowed: `false`
 """
-    path = repo_root / READOUT_REL
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
+    readout_path.parent.mkdir(parents=True, exist_ok=True)
+    readout_path.write_text(text, encoding="utf-8")
 
 
-def run(repo_root: Path, *, full_pytest_summary: str, bundle5_close_summary: str) -> dict[str, Any]:
+def run(
+    repo_root: Path,
+    *,
+    run_root: Path,
+    truthfulness_path: Path,
+    baseline_path: Path,
+    readout_path: Path,
+    full_pytest_summary: str,
+    bundle5_close_summary: str,
+) -> dict[str, Any]:
     baseline = build_baseline(
         repo_root,
+        run_root=run_root,
+        truthfulness_path=truthfulness_path,
         full_pytest_summary=full_pytest_summary,
         bundle5_close_summary=bundle5_close_summary,
     )
-    baseline_path = repo_root / BASELINE_REL
     baseline_path.parent.mkdir(parents=True, exist_ok=True)
     baseline_path.write_text(yaml.safe_dump(baseline, allow_unicode=True, sort_keys=False), encoding="utf-8")
-    write_readout(repo_root, baseline)
+    write_readout(
+        repo_root,
+        baseline,
+        run_root=run_root,
+        truthfulness_path=truthfulness_path,
+        baseline_path=baseline_path,
+        readout_path=readout_path,
+    )
     return baseline
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Freeze the R5 Bundle 6.0 reader-quality baseline.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
+    parser.add_argument("--run-root", type=Path, required=True)
+    parser.add_argument("--truthfulness-result", type=Path, required=True)
+    parser.add_argument("--baseline-output", type=Path, required=True)
+    parser.add_argument("--readout-output", type=Path, required=True)
     parser.add_argument("--full-pytest-summary", required=True)
     parser.add_argument("--bundle5-close-summary", required=True)
     args = parser.parse_args(argv)
+    repo_root = args.repo_root.resolve()
+    resolve = lambda path: path if path.is_absolute() else repo_root / path
     result = run(
-        args.repo_root.resolve(),
+        repo_root,
+        run_root=resolve(args.run_root).resolve(),
+        truthfulness_path=resolve(args.truthfulness_result).resolve(),
+        baseline_path=resolve(args.baseline_output).resolve(),
+        readout_path=resolve(args.readout_output).resolve(),
         full_pytest_summary=args.full_pytest_summary,
         bundle5_close_summary=args.bundle5_close_summary,
     )

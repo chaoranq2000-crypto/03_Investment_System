@@ -1,5 +1,4 @@
 import csv
-import shutil
 from pathlib import Path
 
 import pytest
@@ -12,25 +11,26 @@ from scripts.reconcile_r5_quality_backflow import (
 )
 
 
-ROOT = Path(__file__).resolve().parents[1]
-SOURCE_RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
-def _copy_run(tmp_path: Path) -> tuple[Path, Path]:
+def _copy_run(tmp_path: Path, historical_blob_bytes) -> tuple[Path, Path]:
     root = tmp_path / "repo"
     run = root / "reports/workflow_runs/wf_test"
     run.mkdir(parents=True)
-    for name in ("workflow_state.yaml", "workflow_readout.md", "open_todos.csv", "artifact_manifest.csv"):
-        shutil.copy2(SOURCE_RUN / name, run / name)
-    scorecard = yaml.safe_load((SOURCE_RUN / "R5_stock_research_report_reader_v2_quality_scorecard.yaml").read_text(encoding="utf-8"))
-    (run / "R5_stock_research_report_reader_v2_quality_scorecard.yaml").write_text(
-        yaml.safe_dump(scorecard, allow_unicode=True, sort_keys=False), encoding="utf-8"
-    )
+    for name in (
+        "workflow_state.yaml",
+        "workflow_readout.md",
+        "open_todos.csv",
+        "artifact_manifest.csv",
+        "R5_stock_research_report_reader_v2_quality_scorecard.yaml",
+    ):
+        (run / name).write_bytes(historical_blob_bytes(f"{HISTORICAL_RUN}/{name}"))
     return root, run
 
 
-def test_plan_routes_reader_quality_failure_to_evidence_first(tmp_path):
-    root, run = _copy_run(tmp_path)
+def test_plan_routes_reader_quality_failure_to_evidence_first(tmp_path, historical_blob_bytes):
+    root, run = _copy_run(tmp_path, historical_blob_bytes)
     scorecard = yaml.safe_load((run / "R5_stock_research_report_reader_v2_quality_scorecard.yaml").read_text(encoding="utf-8"))
     state = yaml.safe_load((run / "workflow_state.yaml").read_text(encoding="utf-8"))
 
@@ -48,8 +48,10 @@ def test_plan_routes_reader_quality_failure_to_evidence_first(tmp_path):
     assert len(plan["generated_issues"]) == len(scorecard["candidate_blockers"])
 
 
-def test_apply_updates_state_todos_manifest_and_supersedes_historical_readout(tmp_path):
-    root, run = _copy_run(tmp_path)
+def test_apply_updates_state_todos_manifest_and_supersedes_historical_readout(
+    tmp_path, historical_blob_bytes
+):
+    root, run = _copy_run(tmp_path, historical_blob_bytes)
     scorecard_path = run / "R5_stock_research_report_reader_v2_quality_scorecard.yaml"
     plan_path = run / "R5_bundle7_quality_backflow_plan.yaml"
     readout_path = run / "R5_bundle7_quality_backflow_readout.md"

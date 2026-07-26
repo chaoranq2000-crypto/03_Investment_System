@@ -11,11 +11,19 @@ sys.path.insert(0, str(ROOT / "src" / "qa"))
 from r4_disclosure_backflow_review import OFFICIAL_DECISION_FIELDS, official_reconciliation_decision_rows  # noqa: E402
 
 
-STOCK_RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
-def test_every_official_reconciliation_row_has_review_decision() -> None:
-    with (STOCK_RUN / "official_reconciliation_review_decision.csv").open(
+def _historical_path(name: str) -> str:
+    return f"{HISTORICAL_RUN}/{name}"
+
+
+def test_every_official_reconciliation_row_has_review_decision(historical_blob_file) -> None:
+    decision_path = historical_blob_file(
+        _historical_path("official_reconciliation_review_decision.csv"),
+        "official_reconciliation/official_reconciliation_review_decision.csv",
+    )
+    with decision_path.open(
         "r", encoding="utf-8", newline=""
     ) as handle:
         rows = list(csv.DictReader(handle))
@@ -45,9 +53,15 @@ def test_promotion_allowed_true_requires_official_locator() -> None:
             assert row["official_locator"].startswith("page:")
 
 
-def test_review_decision_does_not_create_business_exposure_claim() -> None:
-    text = (STOCK_RUN / "official_reconciliation_review_decision.md").read_text(encoding="utf-8")
-    csv_text = (STOCK_RUN / "official_reconciliation_review_decision.csv").read_text(encoding="utf-8")
+def test_review_decision_does_not_create_business_exposure_claim(historical_blob_file) -> None:
+    text = historical_blob_file(
+        _historical_path("official_reconciliation_review_decision.md"),
+        "official_reconciliation/official_reconciliation_review_decision.md",
+    ).read_text(encoding="utf-8")
+    csv_text = historical_blob_file(
+        _historical_path("official_reconciliation_review_decision.csv"),
+        "official_reconciliation/official_reconciliation_review_decision.csv",
+    ).read_text(encoding="utf-8")
 
     assert "liquid_cooling_revenue_pct" not in csv_text
     assert "does not create liquid-cooling exposure evidence" in text

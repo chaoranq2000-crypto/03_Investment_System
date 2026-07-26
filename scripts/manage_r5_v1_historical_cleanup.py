@@ -25,7 +25,7 @@ import yaml
 
 
 CONTRACT_REL = Path(
-    "docs/codex_tasks/v1_governance_integration_cleanup_v4/CONTRACT.md"
+    "docs/codex_tasks/v1_governance_integration_cleanup_v5/CONTRACT.md"
 )
 BASELINE_MANIFEST_REL = Path(
     "reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml"
@@ -52,23 +52,31 @@ WAVE_RECEIPT_RELS = {
 }
 
 EXPECTED_CONTRACT_SHA256 = (
-    "c806d4811e4f40ffb86154c6144c75173c7d13e1fc193f9add07686495217736"
+    "7a02675ea94dd9ef83f40df42889720998cbea0d8db26992d158bf3c78135ef4"
 )
-PACKAGE_BASELINE = "312adc73821706b0b7ca6aa00e80ee608bd10b32"
+PACKAGE_SOURCE_BASELINE = "f1dafeb32b08d24a6960f31d4a0f6d8820b95839"
+HISTORICAL_SOURCE_SNAPSHOT = "312adc73821706b0b7ca6aa00e80ee608bd10b32"
 ENGINEERING_SOURCE = "f60f220ae252262a537c612ce193fc779901984b"
 NIGHT_SOURCE = "a96c1b717bf15905d72fd142efd946fa01bce666"
 OLD_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 OLD_RUN_PREFIX = f"reports/workflow_runs/{OLD_WORKFLOW_ID}"
+PROTECTED_REVIEWED_INPUT_PREFIX = f"data/reviewed_inputs/{OLD_WORKFLOW_ID}"
 EXPECTED_AUTHORITY_COUNTS = {
     "a1": 120,
     "a2": 13,
     "a3": 44,
     "a4": 35,
     "a5": 27,
+    "a7": 3,
 }
 EXPECTED_A1_A5_OVERLAP = {
     "src/research/r5_bundle13r_evidence_backflow.py",
     "tests/test_r5_bundle13r_evidence_backflow.py",
+}
+EXPECTED_A7 = {
+    "tests/test_r5_night_shift_ci_contract.py",
+    "tests/test_r5_night_shift_night03_ci_contract.py",
+    "tests/test_r5_night_shift_night04_ci_contract.py",
 }
 EXPECTED_A6 = {
     "path_count": 116,
@@ -100,6 +108,19 @@ RETAINED_EVALUATOR_DEPENDENCIES = {
     "tests/fixtures/r5_bundle13r/reviewed_backfill_ready.yaml",
     "tests/fixtures/r5_bundle13r/reviewed_backfill_partial.yaml",
 }
+V006_TEST_PATHS = (
+    "tests/test_r5_v1_historical_baseline_manifest.py",
+    "tests/test_r5_v1_historical_cleanup_manifest.py",
+    "tests/test_r5_v1_active_routing_retirement.py",
+)
+RETIRED_CI_MARKERS = (
+    "tests/test_r5_night_shift_",
+    "reports/p1_6/r5_night_shift/",
+    "reports/p1_6/r5_bundle17r",
+    "run night-shift contract",
+    "069da527452def6c59c3772750e933d8611ccadf",
+    "758ab7557d9de9eea42a5aeb5df95e3d68c26f0c",
+)
 
 NIGHT_CODEX_PREFIXES = (
     "codex_tasks/night_shift/r5_overnight_01/",
@@ -208,6 +229,18 @@ def require(condition: bool, message: str) -> None:
         raise CleanupValidationError(message)
 
 
+def _filesystem_path(path: Path) -> Path:
+    """Return a Windows extended-length path for filesystem I/O."""
+    if os.name != "nt":
+        return path
+    value = os.path.abspath(os.fspath(path))
+    if value.startswith("\\\\?\\"):
+        return Path(value)
+    if value.startswith("\\\\"):
+        return Path("\\\\?\\UNC\\" + value[2:])
+    return Path("\\\\?\\" + value)
+
+
 def canonical_text_sha256(path: Path) -> str:
     payload = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
     return hashlib.sha256(payload).hexdigest()
@@ -289,14 +322,14 @@ def verify_contract(repo_root: Path) -> dict[str, str]:
     text = contract.read_text(encoding="utf-8")
     require('status: "frozen"' in text, "contract is not frozen")
     require(
-        f'source_baseline: "{PACKAGE_BASELINE}"' in text,
+        f'source_baseline: "{PACKAGE_SOURCE_BASELINE}"' in text,
         "contract package baseline drift",
     )
     return {
         "path": CONTRACT_REL.as_posix(),
         "canonical_sha256": observed,
         "status": "frozen",
-        "source_baseline": PACKAGE_BASELINE,
+        "source_baseline": PACKAGE_SOURCE_BASELINE,
     }
 
 
@@ -340,6 +373,11 @@ def parse_authority(repo_root: Path) -> dict[str, set[str]]:
             "### A.5 Retained Bundle capability evaluators",
             "### A.6 `protected_historical_literal_families`",
         ),
+        "a7": _section_paths(
+            text,
+            "### A.7 `transition_modify_then_delete_exact`",
+            "## Deliverables",
+        ),
     }
     for key, expected in EXPECTED_AUTHORITY_COUNTS.items():
         require(
@@ -361,6 +399,7 @@ def parse_authority(repo_root: Path) -> dict[str, set[str]]:
                 f"unexpected {left.upper()}/{right.upper()} overlap: "
                 f"{sorted(overlap ^ expected)}",
             )
+    require(sections["a7"] == EXPECTED_A7, "A7 transition path set drift")
     return sections
 
 
@@ -375,13 +414,13 @@ def is_a6_family(path: str) -> bool:
 
 
 def expand_a6(repo_root: Path) -> set[str]:
-    paths = git_paths(repo_root, PACKAGE_BASELINE)
+    paths = git_paths(repo_root, HISTORICAL_SOURCE_SNAPSHOT)
     candidates = [path for path in paths if is_a6_family(path)]
     inventory = {
         path
         for path in candidates
         if OLD_WORKFLOW_ID.encode("utf-8")
-        in git_blob(repo_root, PACKAGE_BASELINE, path)
+        in git_blob(repo_root, HISTORICAL_SOURCE_SNAPSHOT, path)
     }
     vector_bytes, vector_sha = path_vector(inventory)
     require(
@@ -468,9 +507,13 @@ def build_candidate_inventory(
     authority: Mapping[str, set[str]],
     a6: set[str],
 ) -> dict[str, str]:
-    tracked = set(git_paths(repo_root, PACKAGE_BASELINE))
+    tracked = set(git_paths(repo_root, HISTORICAL_SOURCE_SNAPSHOT))
     for path in authority["a3"]:
         require(path in tracked, f"A3 path is not tracked at package baseline: {path}")
+    require(
+        RETAINED_EVALUATOR_DEPENDENCIES <= tracked,
+        "retained evaluator dependency set is not fully tracked at historical snapshot",
+    )
     classified = {
         path: wave
         for path in tracked
@@ -493,6 +536,14 @@ def build_candidate_inventory(
     require(
         set(actual).isdisjoint(retained),
         "actual cleanup inventory intersects retained authority",
+    )
+    require(
+        set(actual) & authority["a7"] == authority["a7"],
+        "actual cleanup inventory does not contain exactly all A7 transition paths",
+    )
+    require(
+        all(actual[path] == "night" for path in authority["a7"]),
+        "an A7 transition path is not assigned to the Night wave",
     )
     require(
         set(actual).issuperset(authority["a3"]),
@@ -532,13 +583,13 @@ def build_baseline_rows(
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for path, wave in inventory.items():
-        package_payload = git_blob(repo_root, PACKAGE_BASELINE, path)
+        package_payload = git_blob(repo_root, HISTORICAL_SOURCE_SNAPSHOT, path)
         baseline, payload = _baseline_for(repo_root, wave, path, package_payload)
         rows.append(
             {
                 "path": path,
                 "wave": wave,
-                "source_snapshot": PACKAGE_BASELINE,
+                "source_snapshot": HISTORICAL_SOURCE_SNAPSHOT,
                 "baseline_commit": baseline,
                 "blob_oid": git_blob_oid(repo_root, baseline, path),
                 "byte_count": len(payload),
@@ -565,7 +616,10 @@ def _aggregate(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
 def _candidate_tokens(value: str) -> set[str]:
     normalized = value.replace("\\", "/")
     targets: set[str] = set()
-    if OLD_WORKFLOW_ID in normalized:
+    if OLD_WORKFLOW_ID in normalized and (
+        PROTECTED_REVIEWED_INPUT_PREFIX not in normalized
+        or OLD_RUN_PREFIX in normalized
+    ):
         targets.add(OLD_RUN_PREFIX)
     if "night_shift" in normalized.lower() or "r5_overnight_" in normalized.lower():
         targets.add("night:*")
@@ -634,6 +688,7 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
             }
         ]
     assignments: dict[str, set[str]] = defaultdict(set)
+    assignment_nodes: list[tuple[str, ast.AST]] = []
     for node in ast.walk(tree):
         if isinstance(node, (ast.Assign, ast.AnnAssign)):
             value = node.value
@@ -647,6 +702,94 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
             strings = _expr_strings(value, assignments)
             for name in names:
                 assignments[name].update(strings)
+                if value is not None:
+                    assignment_nodes.append((name, value))
+
+    temporary_names = {
+        argument.arg
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+        for argument in (
+            *node.args.posonlyargs,
+            *node.args.args,
+            *node.args.kwonlyargs,
+        )
+        if argument.arg in {"tmp_path", "tmp_path_factory"}
+    }
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.With, ast.AsyncWith)):
+            continue
+        for item in node.items:
+            call = item.context_expr
+            target = item.optional_vars
+            if (
+                isinstance(call, ast.Call)
+                and isinstance(call.func, ast.Attribute)
+                and call.func.attr
+                in {"TemporaryDirectory", "NamedTemporaryFile"}
+                and isinstance(target, ast.Name)
+            ):
+                temporary_names.add(target.id)
+
+    def expression_is_temporary(node: ast.AST | None) -> bool:
+        if node is None:
+            return False
+        if isinstance(node, ast.Name):
+            return node.id in temporary_names
+        if isinstance(node, ast.Attribute):
+            if node.attr in {"name", "stem", "suffix"}:
+                return False
+            return expression_is_temporary(node.value)
+        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Div):
+            return expression_is_temporary(node.left)
+        if isinstance(node, ast.IfExp):
+            return expression_is_temporary(
+                node.body
+            ) and expression_is_temporary(node.orelse)
+        if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+            return bool(node.elts) and all(
+                expression_is_temporary(item) for item in node.elts
+            )
+        if isinstance(node, ast.JoinedStr):
+            formatted = [
+                value.value
+                for value in node.values
+                if isinstance(value, ast.FormattedValue)
+            ]
+            return bool(formatted) and all(
+                expression_is_temporary(value) for value in formatted
+            )
+        if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Name) and node.func.id == "Path":
+                return bool(node.args) and expression_is_temporary(node.args[0])
+            if isinstance(node.func, ast.Attribute):
+                if node.func.attr in {
+                    "absolute",
+                    "resolve",
+                    "with_name",
+                    "with_suffix",
+                }:
+                    return expression_is_temporary(node.func.value)
+                if node.func.attr in {"join", "joinpath", "mktemp"}:
+                    candidates = [node.func.value, *node.args]
+                    return any(
+                        expression_is_temporary(candidate)
+                        for candidate in candidates
+                    )
+        return False
+
+    assignments_by_name: dict[str, list[ast.AST]] = defaultdict(list)
+    for name, value in assignment_nodes:
+        assignments_by_name[name].append(value)
+    changed = True
+    while changed:
+        changed = False
+        for name, values in assignments_by_name.items():
+            if name in temporary_names:
+                continue
+            if values and all(expression_is_temporary(value) for value in values):
+                temporary_names.add(name)
+                changed = True
 
     references: list[dict[str, Any]] = []
 
@@ -700,7 +843,17 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
                 values.update(_expr_strings(arg, assignments))
             for keyword in node.keywords:
                 values.update(_expr_strings(keyword.value, assignments))
-            if function_name in physical_methods and _candidate_tokens(" ".join(values)):
+            temporary_operation = expression_is_temporary(
+                receiver
+            ) or (
+                bool(node.args)
+                and expression_is_temporary(node.args[0])
+            )
+            if (
+                function_name in physical_methods
+                and not temporary_operation
+                and _candidate_tokens(" ".join(values))
+            ):
                 add(node, "candidate_worktree_path_operation", values)
             if function_name == "add_argument":
                 defaults = {
@@ -717,8 +870,9 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
 def _text_references(path: str, text: str) -> list[dict[str, Any]]:
     references: list[dict[str, Any]] = []
     physical_context = re.compile(
-        r"(?i)(run:|pytest|git diff|path:|proof_path|source_path|input|output|"
-        r"eol=|workflow|include|uses:|read|open|exists|glob)"
+        r"(?i)(run:|pytest|git diff|path:|proof_path|source_path|"
+        r"(?:input|output|workflow|run)_(?:path|root|dir)|"
+        r"eol=|include|uses:|read|open|exists|glob)"
     )
     for line_number, line in enumerate(text.splitlines(), 1):
         targets = _candidate_tokens(line)
@@ -765,6 +919,14 @@ def scan_active_references(
         if path in authority["a2"]:
             allowed_literals.append(
                 {"path": path, "classification": "cleanup_control_plane"}
+            )
+            continue
+        if path in RETAINED_EVALUATOR_DEPENDENCIES:
+            allowed_literals.append(
+                {
+                    "path": path,
+                    "classification": "retained_evaluator_dependency",
+                }
             )
             continue
         classified = (
@@ -859,6 +1021,195 @@ def scan_active_references(
     }
 
 
+def validate_transition_contract(
+    repo_root: Path,
+    authority: Mapping[str, set[str]],
+) -> dict[str, Any]:
+    require(authority["a7"] == EXPECTED_A7, "A7 transition path set drift")
+
+    workflow_path = repo_root / ".github/workflows/ci.yml"
+    require(workflow_path.is_file(), "missing retained CI workflow")
+    workflow_text = workflow_path.read_text(encoding="utf-8")
+    workflow_lowered = workflow_text.casefold()
+    workflow = yaml.safe_load(workflow_text)
+    require(isinstance(workflow, dict), "CI workflow root must be an object")
+    jobs = workflow.get("jobs")
+    require(isinstance(jobs, dict), "CI workflow jobs must be an object")
+    tests_job = jobs.get("tests")
+    require(isinstance(tests_job, dict), "CI workflow tests job is missing")
+    steps = tests_job.get("steps")
+    require(isinstance(steps, list), "CI workflow tests steps must be a list")
+    require(
+        all(isinstance(step, dict) for step in steps),
+        "CI workflow contains a non-object step",
+    )
+    commands = [str(step.get("run", "")) for step in steps]
+
+    require(
+        all(marker not in workflow_lowered for marker in RETIRED_CI_MARKERS),
+        "CI workflow still contains a retired Night route or history guard",
+    )
+    require(
+        all("tests/test_r5_night_shift_" not in command for command in commands),
+        "CI run command still contains the retired Night test route",
+    )
+    require(
+        all(
+            "reports/p1_6/r5_night_shift/" not in command
+            for command in commands
+        ),
+        "CI run command still contains the retired Night report route",
+    )
+    require(
+        "continue-on-error: true" not in workflow_lowered
+        and "|| true" not in workflow_lowered,
+        "CI workflow contains an assertion-bypass route",
+    )
+    for step in steps:
+        continue_on_error = step.get("continue-on-error")
+        require(
+            continue_on_error not in (True, 1)
+            and str(continue_on_error).casefold() != "true",
+            "CI workflow contains continue-on-error",
+        )
+        condition = str(step.get("if", "")).replace(" ", "").casefold()
+        require(
+            condition not in {"false", "0", "${{false}}"},
+            "CI workflow contains an unreachable constant-false step",
+        )
+
+    checkout_steps = [
+        step
+        for step in steps
+        if str(step.get("uses", "")).startswith("actions/checkout@")
+    ]
+    require(len(checkout_steps) == 1, "CI must contain exactly one checkout step")
+    checkout_with = checkout_steps[0].get("with")
+    require(isinstance(checkout_with, dict), "checkout step is missing settings")
+    require(
+        str(checkout_with.get("fetch-depth")) == "0",
+        "checkout fetch-depth is not 0",
+    )
+    require(
+        commands.count("python -m pytest -q") == 1,
+        "CI must contain exactly one full pytest command",
+    )
+    require(
+        sum("run_source_route_quality_gate.py" in command for command in commands)
+        == 1,
+        "CI must contain exactly one source-route quality gate",
+    )
+    v006_commands = [
+        command
+        for command in commands
+        if all(test_path in command for test_path in V006_TEST_PATHS)
+    ]
+    require(
+        len(v006_commands) == 1,
+        "CI must contain one command with all three V-006 tests",
+    )
+    require(
+        all(
+            marker not in workflow_lowered
+            for marker in ("git push", "gh pr create", "--force")
+        ),
+        "CI workflow contains a publication mutation",
+    )
+
+    required_source_literals = {
+        *RETIRED_CI_MARKERS,
+        "fetch-depth",
+        "python -m pytest -q",
+        "run_source_route_quality_gate.py",
+        *V006_TEST_PATHS,
+        "git push",
+        "gh pr create",
+        "--force",
+        "continue-on-error: true",
+        "|| true",
+    }
+    forbidden_source_literals = (
+        "src.maintenance.night_shift",
+        "tests.night04_test_support",
+        "build_ci_contract",
+        "monkeypatch",
+        "unittest.mock",
+        "mock.patch",
+        "pytest.mark.skip",
+        "pytest.mark.xfail",
+        "collect_ignore",
+    )
+    test_rows: list[dict[str, Any]] = []
+    for relative in sorted(authority["a7"]):
+        path = repo_root / relative
+        require(path.is_file(), f"missing A7 transition test: {relative}")
+        source = path.read_text(encoding="utf-8")
+        lowered = source.casefold()
+        missing_literals = sorted(
+            literal for literal in required_source_literals if literal not in lowered
+        )
+        require(
+            not missing_literals,
+            f"{relative}: missing equal-strength literals {missing_literals}",
+        )
+        forbidden = sorted(
+            literal for literal in forbidden_source_literals if literal in lowered
+        )
+        require(
+            not forbidden,
+            f"{relative}: forbidden transition-test bypass {forbidden}",
+        )
+        tree = ast.parse(source, filename=relative)
+        test_functions = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name.startswith("test_")
+        ]
+        require(test_functions, f"{relative}: no executable test function")
+        require(
+            all(
+                any(isinstance(node, ast.Assert) for node in ast.walk(function))
+                for function in test_functions
+            ),
+            f"{relative}: a test function has no live assertion",
+        )
+        require(
+            not any(
+                isinstance(node, ast.If)
+                and isinstance(node.test, ast.Constant)
+                and node.test.value in (False, 0)
+                for node in ast.walk(tree)
+            ),
+            f"{relative}: constant-false branch is forbidden",
+        )
+        test_rows.append(
+            {
+                "path": relative,
+                "test_function_count": len(test_functions),
+                "assertion_count": sum(
+                    isinstance(node, ast.Assert) for node in ast.walk(tree)
+                ),
+                "equal_strength_retirement_assertions": True,
+            }
+        )
+
+    return {
+        "path_count": len(test_rows),
+        "paths": [row["path"] for row in test_rows],
+        "tests": test_rows,
+        "ci": {
+            "retired_night_routes_absent": True,
+            "checkout_fetch_depth_zero": True,
+            "source_route_gate_count": 1,
+            "v006_command_count": 1,
+            "full_pytest_command_count": 1,
+            "publication_mutation_absent": True,
+            "bypass_route_absent": True,
+        },
+    }
+
+
 def _reference_applies(reference: Mapping[str, Any], path: str, wave: str) -> bool:
     target = str(reference["target"])
     if target == OLD_RUN_PREFIX:
@@ -876,6 +1227,7 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
     authority = parse_authority(repo_root)
     a6 = expand_a6(repo_root)
     inventory = build_candidate_inventory(repo_root, authority, a6)
+    transition = validate_transition_contract(repo_root, authority)
     baseline_rows = build_baseline_rows(repo_root, inventory)
     active_scan = scan_active_references(repo_root, inventory, authority)
     by_path = {str(row["path"]): row for row in baseline_rows}
@@ -883,7 +1235,7 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
     baseline_manifest = {
         "schema_version": "r5_v1_historical_baseline_manifest_v1",
         "contract": contract,
-        "source_snapshot": PACKAGE_BASELINE,
+        "source_snapshot": HISTORICAL_SOURCE_SNAPSHOT,
         "durable_restore_refs": {
             "night_source": NIGHT_SOURCE,
             "engineering_source": ENGINEERING_SOURCE,
@@ -946,7 +1298,7 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
     cleanup_manifest = {
         "schema_version": "r5_v1_historical_cleanup_manifest_v1",
         "contract": contract,
-        "source_snapshot": PACKAGE_BASELINE,
+        "source_snapshot": HISTORICAL_SOURCE_SNAPSHOT,
         "deletion_actor": "user_manual_only",
         "codex_delete_authorized": False,
         "wave_order": list(WAVE_ORDER),
@@ -956,7 +1308,23 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
     }
 
     a6_bytes, a6_sha = path_vector(a6)
-    decision = "pass" if active_scan["reference_count"] == 0 else "fail"
+    actual_paths = set(inventory)
+    retained_paths = (
+        authority["a1"]
+        | authority["a2"]
+        | authority["a4"]
+        | authority["a5"]
+        | a6
+    )
+    retained_overlap = actual_paths & retained_paths
+    protected_overlap = {
+        path for path in actual_paths if is_protected(path, a6)
+    }
+    scan_passed = (
+        active_scan["reference_count"] == 0
+        and active_scan["unknown_classification_count"] == 0
+    )
+    decision = "pass" if scan_passed else "fail"
     receipt = {
         "schema_version": "r5_v1_historical_decoupling_validation_v1",
         "validation_id": "V-006",
@@ -969,8 +1337,14 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
             "a3_manual_delete_boundary_count": len(authority["a3"]),
             "a4_retain_legacy_literal_exact_count": len(authority["a4"]),
             "a5_retained_capability_evaluator_count": len(authority["a5"]),
+            "a7_transition_modify_then_delete_exact_count": len(authority["a7"]),
             "a1_a5_overlap": sorted(authority["a1"] & authority["a5"]),
-            "all_other_a1_a5_pairwise_overlaps_empty": True,
+            "a7_all_authority_overlaps_empty": all(
+                not (authority["a7"] & authority[key])
+                for key in ("a1", "a2", "a3", "a4", "a5")
+            )
+            and not (authority["a7"] & a6),
+            "all_other_authority_pairwise_overlaps_empty": True,
         },
         "a6_inventory": {
             "path_count": len(a6),
@@ -984,12 +1358,18 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
                 wave["wave"]: wave["aggregate"]["file_count"]
                 for wave in wave_documents
             },
-            "retained_overlap_count": 0,
-            "protected_overlap_count": 0,
-            "retained_evaluator_dependency_prefixes": list(
-                RETAINED_EVALUATOR_DEPENDENCY_PREFIXES
+            "retained_overlap_count": len(retained_overlap),
+            "protected_overlap_count": len(protected_overlap),
+            "a7_actual_overlap_count": len(actual_paths & authority["a7"]),
+            "a7_actual_overlap": sorted(actual_paths & authority["a7"]),
+            "a7_all_assigned_to_night": all(
+                inventory[path] == "night" for path in authority["a7"]
+            ),
+            "retained_evaluator_dependencies": sorted(
+                RETAINED_EVALUATOR_DEPENDENCIES
             ),
         },
+        "transition_validation": transition,
         "active_reference_scan": active_scan,
         "restore_verification": {
             "cat_file_e_verified": False,
@@ -1001,7 +1381,12 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
             "codex_delete_command_exists": False,
             "actual_manifest_uses_wildcards": False,
             "actual_manifest_paths_are_repo_relative": True,
-            "actual_manifest_disjoint_from_retained_and_protected": True,
+            "actual_manifest_disjoint_from_retained_and_protected": not (
+                retained_overlap or protected_overlap
+            ),
+            "actual_manifest_intersection_a7_equals_a7": (
+                actual_paths & authority["a7"] == authority["a7"]
+            ),
             "ci_fetch_depth_zero_required": True,
         },
     }
@@ -1099,6 +1484,10 @@ def validate_documents(
             receipt["active_reference_scan"]["reference_count"] == 0,
             "active candidate-tree references remain",
         )
+        require(
+            receipt["active_reference_scan"]["unknown_classification_count"] == 0,
+            "active candidate-tree classifications remain unknown",
+        )
     receipt["restore_verification"].update(
         {
             "cat_file_e_verified": verify_each_cat_file,
@@ -1109,6 +1498,7 @@ def validate_documents(
     receipt["decision"] = (
         "pass"
         if receipt["active_reference_scan"]["reference_count"] == 0
+        and receipt["active_reference_scan"]["unknown_classification_count"] == 0
         else "fail"
     )
     return receipt
@@ -1136,17 +1526,18 @@ def restore_all(
 ) -> dict[str, Any]:
     root = repo_root.resolve()
     target_root = restore_root.resolve()
+    target_filesystem_root = _filesystem_path(target_root)
     require(
         not target_root.is_relative_to(root),
         "restore root must be outside the repository",
     )
-    if target_root.exists():
+    if target_filesystem_root.exists():
         require(
-            not any(target_root.iterdir()),
+            not any(target_filesystem_root.iterdir()),
             "restore root must be new or empty",
         )
     else:
-        target_root.mkdir(parents=True)
+        target_filesystem_root.mkdir(parents=True)
     rows = list(baseline_manifest["files"])
     restored_bytes = 0
     for row in rows:
@@ -1162,9 +1553,10 @@ def restore_all(
         payload = git_blob(repo_root, str(row["baseline_commit"]), path)
         destination = (target_root / PurePosixPath(path)).resolve()
         require(destination.is_relative_to(target_root), f"restore path escapes: {path}")
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_bytes(payload)
-        restored = destination.read_bytes()
+        filesystem_destination = _filesystem_path(destination)
+        filesystem_destination.parent.mkdir(parents=True, exist_ok=True)
+        filesystem_destination.write_bytes(payload)
+        restored = filesystem_destination.read_bytes()
         require(restored == payload, f"{path}: restored bytes differ")
         require(
             hashlib.sha256(restored).hexdigest() == row["content_sha256"],
@@ -1352,7 +1744,13 @@ def main(argv: Sequence[str] | None = None) -> int:
             result = restore_all(root, args.restore_root, manifest)
             receipt = validate_repository(root, verify_each_cat_file=True)
             receipt["restore_verification"] = result
-            if receipt["active_reference_scan"]["reference_count"] == 0:
+            if (
+                receipt["active_reference_scan"]["reference_count"] == 0
+                and receipt["active_reference_scan"][
+                    "unknown_classification_count"
+                ]
+                == 0
+            ):
                 receipt["decision"] = "pass"
             write_yaml_exact(root, DECOUPLING_RECEIPT_REL, receipt)
         elif args.command == "verify-wave":

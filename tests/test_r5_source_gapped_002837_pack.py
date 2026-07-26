@@ -1,25 +1,24 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-RUN_DIR = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
-PACK_PATH = RUN_DIR / "R5_stock_research_pack_source_gapped.yaml"
-PLAN_PATH = RUN_DIR / "R5_evidence_plan_from_gaps.yaml"
-GAP_REPORT_PATH = RUN_DIR / "R5_source_gap_report.md"
-OPEN_QUESTIONS_PATH = RUN_DIR / "R5_open_questions.md"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+PACK_SOURCE = f"{HISTORICAL_RUN}/R5_stock_research_pack_source_gapped.yaml"
+PLAN_SOURCE = f"{HISTORICAL_RUN}/R5_evidence_plan_from_gaps.yaml"
+GAP_REPORT_SOURCE = f"{HISTORICAL_RUN}/R5_source_gap_report.md"
+OPEN_QUESTIONS_SOURCE = f"{HISTORICAL_RUN}/R5_open_questions.md"
 
 
-def load_yaml(path: Path) -> dict:
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+def load_historical_yaml(historical_blob_bytes, source_path: str) -> dict:
+    data = yaml.safe_load(historical_blob_bytes(source_path).decode("utf-8"))
     assert isinstance(data, dict)
     return data
 
 
-def test_002837_source_gapped_pack_keeps_research_draft_boundary():
-    pack = load_yaml(PACK_PATH)
+def test_002837_source_gapped_pack_keeps_research_draft_boundary(
+    historical_blob_bytes,
+):
+    pack = load_historical_yaml(historical_blob_bytes, PACK_SOURCE)
 
     assert pack["pack_status"] == "research_draft"
     assert pack["quality_status"]["allowed_report_level"] == "research_draft"
@@ -30,8 +29,10 @@ def test_002837_source_gapped_pack_keeps_research_draft_boundary():
     assert pack["sentiment_event_pack"]["status"] == "TODO"
 
 
-def test_002837_source_gap_register_covers_required_sections():
-    pack = load_yaml(PACK_PATH)
+def test_002837_source_gap_register_covers_required_sections(
+    historical_blob_bytes,
+):
+    pack = load_historical_yaml(historical_blob_bytes, PACK_SOURCE)
     sections = {item["section"] for item in pack["source_gap_register"]}
 
     assert {
@@ -44,8 +45,12 @@ def test_002837_source_gap_register_covers_required_sections():
     }.issubset(sections)
 
 
-def test_002837_gap_artifacts_are_multiline_and_parseable():
-    load_yaml(PACK_PATH)
-    load_yaml(PLAN_PATH)
-    assert len(GAP_REPORT_PATH.read_text(encoding="utf-8").splitlines()) > 8
-    assert len(OPEN_QUESTIONS_PATH.read_text(encoding="utf-8").splitlines()) > 8
+def test_002837_gap_artifacts_are_multiline_and_parseable(
+    historical_blob_bytes,
+):
+    load_historical_yaml(historical_blob_bytes, PACK_SOURCE)
+    load_historical_yaml(historical_blob_bytes, PLAN_SOURCE)
+    gap_report = historical_blob_bytes(GAP_REPORT_SOURCE).decode("utf-8")
+    open_questions = historical_blob_bytes(OPEN_QUESTIONS_SOURCE).decode("utf-8")
+    assert len(gap_report.splitlines()) > 8
+    assert len(open_questions.splitlines()) > 8

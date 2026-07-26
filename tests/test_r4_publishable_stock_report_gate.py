@@ -11,7 +11,30 @@ from check_no_unsupported_advice import find_unsupported_advice  # noqa: E402
 from r4_publishable_stock_report_gate import evaluate_r4_gate  # noqa: E402
 
 
-STOCK_RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+DATA_LAYER_RUN = ROOT / "reports/workflow_runs/wf_20260703_data_layer_002837_invic"
+
+
+def _historical_file(historical_blob_file, name: str) -> Path:
+    return historical_blob_file(f"{HISTORICAL_RUN}/{name}", f"r4_gate_stock_run/{name}")
+
+
+def _read_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def _minimal_stock_run(historical_blob_file) -> Path:
+    files = [
+        _historical_file(historical_blob_file, name)
+        for name in (
+            "business_segment_metric_pack.csv",
+            "R4_stock_deep_dive_v0_1.md",
+            "R4_quality_gate_report.md",
+            "R4_source_gap_report.md",
+        )
+    ]
+    assert len({path.parent for path in files}) == 1
+    return files[0].parent
 
 
 def test_r4_publishable_gate_documents_bridge_only_boundary() -> None:
@@ -30,8 +53,11 @@ def test_r4_publishable_gate_documents_bridge_only_boundary() -> None:
     assert "`QR-R4-5`" in quality_skill
 
 
-def test_r4_gate_status_is_bridge_only_with_visible_todos() -> None:
-    result = evaluate_r4_gate(repo_root=ROOT)
+def test_r4_gate_status_is_bridge_only_with_visible_todos(historical_blob_file) -> None:
+    result = evaluate_r4_gate(
+        data_layer_run=DATA_LAYER_RUN,
+        stock_run=_minimal_stock_run(historical_blob_file),
+    )
     assert result["status"] == "bridge_only"
     assert result["high_issues"] == 0
     assert result["medium_issues"] >= 1
@@ -39,10 +65,16 @@ def test_r4_gate_status_is_bridge_only_with_visible_todos() -> None:
     assert result["liquid_missing_count"] >= 1
 
 
-def test_r4_outputs_exist_and_keep_source_gaps_visible() -> None:
-    report = (STOCK_RUN / "R4_stock_deep_dive_v0_1.md").read_text(encoding="utf-8")
-    gate = (STOCK_RUN / "R4_quality_gate_report.md").read_text(encoding="utf-8")
-    gaps = (STOCK_RUN / "R4_source_gap_report.md").read_text(encoding="utf-8")
+def test_r4_outputs_exist_and_keep_source_gaps_visible(historical_blob_file) -> None:
+    report = _read_text(
+        _historical_file(historical_blob_file, "R4_stock_deep_dive_v0_1.md")
+    )
+    gate = _read_text(
+        _historical_file(historical_blob_file, "R4_quality_gate_report.md")
+    )
+    gaps = _read_text(
+        _historical_file(historical_blob_file, "R4_source_gap_report.md")
+    )
 
     assert "## 1. Metadata" in report
     assert "## 3. 公司财务质量" in report
@@ -54,7 +86,7 @@ def test_r4_outputs_exist_and_keep_source_gaps_visible() -> None:
     assert "MISSING_DISCLOSURE" in gaps
 
 
-def test_r4_outputs_pass_no_advice_scan() -> None:
+def test_r4_outputs_pass_no_advice_scan(historical_blob_file) -> None:
     for name in ["R4_stock_deep_dive_v0_1.md", "R4_quality_gate_report.md", "R4_source_gap_report.md"]:
-        text = (STOCK_RUN / name).read_text(encoding="utf-8")
+        text = _read_text(_historical_file(historical_blob_file, name))
         assert find_unsupported_advice(text) == []
