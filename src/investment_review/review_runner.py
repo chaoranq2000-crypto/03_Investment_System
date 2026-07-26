@@ -40,6 +40,13 @@ from .episodes import (
     validate_episode_collection,
 )
 from .models import canonical_json, sha256_text
+from .operation_review import (
+    METHOD_VERSION as OPERATION_REVIEW_METHOD_VERSION,
+    SCHEMA_VERSION as OPERATION_REVIEW_SCHEMA_VERSION,
+    build_operation_review,
+    replay_validate_operation_review,
+    validate_operation_review,
+)
 from .portfolio_snapshot_adapter import inspect_portfolio_snapshots
 from .review_input_bundle import (
     build_review_input_bundle,
@@ -949,6 +956,12 @@ class ReviewRunner:
                 "source_sha256": sync_details["source_sha256"],
                 "mapping_sha256": sync_details["mapping_sha256"],
                 "sidecar_projection_sha256": sidecar_projection_sha256,
+                "operation_review_schema_version": (
+                    OPERATION_REVIEW_SCHEMA_VERSION
+                ),
+                "operation_review_method_version": (
+                    OPERATION_REVIEW_METHOD_VERSION
+                ),
                 "artifact_namespace": str(
                     self.artifact_root.relative_to(self.repo_root)
                 ).replace("\\", "/"),
@@ -1060,6 +1073,33 @@ class ReviewRunner:
                     "P2C validation blocked: "
                     + ",".join(_finding_codes(episode_validation))
                 )
+            operation_review = build_operation_review(
+                collection,
+                event_inputs=event_inputs,
+            )
+            operation_validation = validate_operation_review(operation_review)
+            if _is_blocked(operation_validation):
+                raise CanonicalGateBlocked(
+                    "operation review validation blocked: "
+                    + ",".join(_finding_codes(operation_validation))
+                )
+            operation_replay = replay_validate_operation_review(
+                operation_review,
+                episode_collection=collection,
+                event_inputs=event_inputs,
+            )
+            if (
+                _is_blocked(operation_replay)
+                or not _source_verification_ready(operation_replay)
+            ):
+                raise CanonicalGateBlocked(
+                    "operation review source replay failed"
+                )
+            operation_episode_index = {
+                str(item.get("episode_id") or ""): dict(item)
+                for item in operation_review.get("episode_reviews", [])
+                if isinstance(item, Mapping) and item.get("episode_id")
+            }
             selected, selection = _select_episodes(
                 collection,
                 scope=scope,
@@ -1081,8 +1121,19 @@ class ReviewRunner:
                     content_id="sha256:"
                     + str(collection.get("collection_digest") or ""),
                 )
+                operation_descriptor = _json_artifact(
+                    run_dir / "operation_review.json",
+                    operation_review,
+                    content_id=str(
+                        operation_review.get("content_id") or ""
+                    ),
+                )
                 artifact_descriptors.extend(
-                    [snapshot_descriptor, collection_descriptor]
+                    [
+                        snapshot_descriptor,
+                        collection_descriptor,
+                        operation_descriptor,
+                    ]
                 )
             else:
                 snapshot_descriptor = {
@@ -1096,6 +1147,15 @@ class ReviewRunner:
                     "content_id": "sha256:"
                     + str(collection.get("collection_digest") or ""),
                     "sha256": _sha256_bytes(pretty_json_bytes(collection)),
+                    "write_status": "dry_run",
+                }
+                operation_descriptor = {
+                    "content_id": str(
+                        operation_review.get("content_id") or ""
+                    ),
+                    "sha256": _sha256_bytes(
+                        pretty_json_bytes(operation_review)
+                    ),
                     "write_status": "dry_run",
                 }
 
@@ -1144,11 +1204,24 @@ class ReviewRunner:
                         "collection_digest": collection.get(
                             "collection_digest"
                         ),
+                        "operation_review_content_id": (
+                            operation_review.get("content_id")
+                        ),
+                        "operation_review_validation_status": (
+                            _validation_status(operation_validation)
+                        ),
+                        "operation_review_source_replay": "verified",
+                        "operation_review_summary": operation_review.get(
+                            "summary"
+                        ),
                     },
                     gaps=(
                         ["NO_EPISODE_IN_SCOPE"] if not selected else []
                     ),
-                    artifacts=[collection_descriptor],
+                    artifacts=[
+                        collection_descriptor,
+                        operation_descriptor,
+                    ],
                 )
             )
 
@@ -1160,6 +1233,12 @@ class ReviewRunner:
 
             for episode in selected:
                 selected_id = str(episode["episode_id"])
+                operation_episode = operation_episode_index.get(selected_id)
+                if operation_episode is None:
+                    raise CanonicalGateBlocked(
+                        "operation review omitted selected episode: "
+                        + selected_id
+                    )
                 # Keep nested names deliberately short.  The evidence root and
                 # content-addressed IDs are already long enough to hit the
                 # legacy Windows MAX_PATH limit once atomic temp suffixes are
@@ -1321,6 +1400,19 @@ class ReviewRunner:
                                 "status", "unlinked"
                             )
                         ),
+                        "operation_review_status": str(
+                            operation_episode.get(
+                                "operation_review_status", "blocked"
+                            )
+                        ),
+                        "decision_context_status": str(
+                            operation_episode.get(
+                                "decision_context_status", "blocked"
+                            )
+                        ),
+                        "operation_count": len(
+                            operation_episode.get("operations", [])
+                        ),
                         "decision_source_count": len(decisions),
                         "fact_count": sum(
                             len(section.get("facts", []))
@@ -1333,6 +1425,9 @@ class ReviewRunner:
                         "context_content_id": context.get("content_id"),
                         "input_content_id": input_bundle.get("content_id"),
                         "review_content_id": review.get("content_id"),
+                        "operation_review_content_id": (
+                            operation_review.get("content_id")
+                        ),
                         "artifacts": {
                             "context": context_descriptor,
                             "input": input_descriptor,
@@ -1364,6 +1459,23 @@ class ReviewRunner:
                             ),
                             "source_verification": "verified",
                             "content_id": review.get("content_id"),
+                        },
+                        "operation_review": {
+                            "validation_status": _validation_status(
+                                operation_replay
+                            ),
+                            "source_verification": "verified",
+                            "content_id": operation_review.get("content_id"),
+                            "operation_review_status": (
+                                operation_episode.get(
+                                    "operation_review_status"
+                                )
+                            ),
+                            "decision_context_status": (
+                                operation_episode.get(
+                                    "decision_context_status"
+                                )
+                            ),
                         },
                     }
                 )

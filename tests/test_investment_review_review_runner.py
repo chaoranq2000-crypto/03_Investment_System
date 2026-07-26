@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -10,8 +11,15 @@ import pytest
 
 import src.investment_review.review_runner as runner_module
 import src.investment_review.sync_service as sync_module
+from src.investment_review.artifact_io import canonical_json_bytes
 from src.investment_review.cli import main as review_cli_main
+from src.investment_review.episode_review import (
+    build_facts_only_episode_review,
+)
 from src.investment_review.models import DecisionRecord
+from src.investment_review.review_input_bundle import (
+    build_review_input_bundle,
+)
 from src.investment_review.review_runner import (
     ReviewRunCatalog,
     ReviewRunner,
@@ -644,3 +652,190 @@ def test_real_facts_only_artifacts_pass_source_replay_and_no_advice_governance(
     assert review["governance"]["no_mechanical_score"] is True
     assert detail["validation"]["validation_status"] == "accepted"
     assert _sha256(fixture.source) == source_before
+
+
+def test_no_decision_operation_review_is_ready_as_a_parallel_artifact(
+    tmp_path: Path,
+) -> None:
+    fixture = _fixture(tmp_path)
+
+    receipt = _run(fixture)
+
+    episode_result = receipt["episodes"][0]
+    assert episode_result["operation_review_status"] == "ready"
+    assert episode_result["decision_context_status"] == "not_recorded"
+    assert episode_result["operation_count"] == 2
+    assert episode_result["decision_source_count"] == 0
+
+    episode_stage = _stage(receipt, "episode")
+    operation_content_id = episode_result["operation_review_content_id"]
+    assert (
+        episode_stage["details"]["operation_review_content_id"]
+        == operation_content_id
+    )
+    assert (
+        episode_stage["details"]["operation_review_source_replay"]
+        == "verified"
+    )
+    operation_descriptor = next(
+        descriptor
+        for descriptor in episode_stage["artifacts"]
+        if descriptor["content_id"] == operation_content_id
+    )
+    operation_artifact = json.loads(
+        Path(operation_descriptor["path"]).read_text(encoding="utf-8")
+    )
+    assert (
+        runner_module.validate_operation_review(operation_artifact)[
+            "validation_status"
+        ]
+        == "accepted"
+    )
+    operation_episode = operation_artifact["episode_reviews"][0]
+    assert operation_episode["operation_review_status"] == "ready"
+    assert operation_episode["decision_context_status"] == "not_recorded"
+    assert [
+        operation["operation_type"]
+        for operation in operation_episode["operations"]
+    ] == ["position_open", "position_close"]
+
+    replay_projection = _stage(receipt, "source_replay")["details"][
+        "episodes"
+    ][0]["operation_review"]
+    assert replay_projection == {
+        "validation_status": "accepted",
+        "source_verification": "verified",
+        "content_id": operation_content_id,
+        "operation_review_status": "ready",
+        "decision_context_status": "not_recorded",
+    }
+
+    # Rebuild the legacy P2F chain from the same frozen P2C/P2E-3 inputs.  The
+    # parallel operation projection must not enter either canonical payload.
+    collection_descriptor = next(
+        descriptor
+        for descriptor in episode_stage["artifacts"]
+        if descriptor["content_id"] != operation_content_id
+    )
+    collection = json.loads(
+        Path(collection_descriptor["path"]).read_text(encoding="utf-8")
+    )
+    context = json.loads(
+        Path(episode_result["artifacts"]["context"]["path"]).read_text(
+            encoding="utf-8"
+        )
+    )
+    saved_input = json.loads(
+        Path(episode_result["artifacts"]["input"]["path"]).read_text(
+            encoding="utf-8"
+        )
+    )
+    saved_review = json.loads(
+        Path(episode_result["artifacts"]["review"]["path"]).read_text(
+            encoding="utf-8"
+        )
+    )
+    rebuilt_input = build_review_input_bundle(
+        collection,
+        context,
+        portfolio_db=fixture.source,
+        episode_id=episode_result["episode_id"],
+        review_cutoff=receipt["cutoffs"]["review_cutoff"],
+        decision_sources=[],
+        supplemental_sources=[],
+    )
+    rebuilt_review = build_facts_only_episode_review(rebuilt_input)
+
+    assert saved_input["schema_version"] == "p2f.review_input_bundle.v1"
+    assert saved_review["schema_version"] == "p2f.episode_review.v1"
+    assert canonical_json_bytes(saved_input) == canonical_json_bytes(
+        rebuilt_input
+    )
+    assert canonical_json_bytes(saved_review) == canonical_json_bytes(
+        rebuilt_review
+    )
+
+
+def test_receipt_validator_still_accepts_a_legacy_v1_receipt_projection(
+    tmp_path: Path,
+) -> None:
+    fixture = _fixture(tmp_path)
+    current = _run(fixture)
+    legacy = deepcopy(current)
+
+    episode_stage = _stage(legacy, "episode")
+    operation_content_id = episode_stage["details"].pop(
+        "operation_review_content_id"
+    )
+    episode_stage["details"].pop("operation_review_validation_status")
+    episode_stage["details"].pop("operation_review_source_replay")
+    episode_stage["details"].pop("operation_review_summary")
+    episode_stage["artifacts"] = [
+        descriptor
+        for descriptor in episode_stage["artifacts"]
+        if descriptor.get("content_id") != operation_content_id
+    ]
+    for episode in legacy["episodes"]:
+        episode.pop("operation_review_status")
+        episode.pop("decision_context_status")
+        episode.pop("operation_count")
+        episode.pop("operation_review_content_id")
+    for replay in _stage(legacy, "source_replay")["details"]["episodes"]:
+        replay.pop("operation_review")
+    legacy["content_id"] = runner_module._receipt_content_id(legacy)
+
+    validation = fixture.runner.validate_receipt(legacy)
+
+    assert validation == {
+        "schema_version": (
+            "investment_review.review_run_receipt.validation.v1"
+        ),
+        "validation_status": "accepted",
+        "findings": [],
+    }
+
+    # Register the stripped shape as a distinct terminal ledger row and prove
+    # that the public catalog can still replay an authentic stored v1 receipt.
+    legacy["run_id"] = "reviewrun_legacy_v1"
+    legacy["run_key"] = "review:legacy-v1"
+    legacy["content_id"] = runner_module._receipt_content_id(legacy)
+    legacy_path = fixture.artifacts / "legacy_v1_receipt.json"
+    legacy_path.write_bytes(runner_module.pretty_json_bytes(legacy))
+    fixture.store.save_review_run(
+        {
+            "run_id": legacy["run_id"],
+            "run_key": legacy["run_key"],
+            "scope": legacy["scope"],
+            "requested_at": "2026-07-14T00:00:01Z",
+            "source_cutoff": legacy["cutoffs"]["episode_cutoff"],
+            "trigger": "legacy_fixture",
+            "parameters": {
+                "artifact_root": str(fixture.artifacts),
+                "legacy_receipt_schema": (
+                    "investment_review.review_run_receipt.v1"
+                ),
+            },
+        }
+    )
+    fixture.store.append_review_run_status(
+        {
+            "run_event_id": "runstatus_legacy_v1_terminal",
+            "run_id": legacy["run_id"],
+            "status": legacy["status"],
+            "occurred_at": "2026-07-14T00:00:02Z",
+            "known_at": "2026-07-14T00:00:02Z",
+            "details": {
+                "receipt_path": str(legacy_path),
+                "receipt_sha256": _sha256(legacy_path),
+                "receipt_content_id": legacy["content_id"],
+            },
+        }
+    )
+    catalog = ReviewRunCatalog(
+        review_db=fixture.review_db,
+        portfolio_db=fixture.source,
+        artifact_root=fixture.artifacts,
+        repo_root=fixture.root,
+    )
+
+    assert catalog.get_receipt(legacy["run_id"]) == legacy

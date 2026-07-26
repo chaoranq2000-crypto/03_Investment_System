@@ -6,10 +6,10 @@ contract_sha256: "1f566582eec30ec4d3efc9e0c2349912468642edae32ba79997bb76de6f350
 state: "running"
 execution_branch: "codex/investment-review-reviewability-corrections"
 source_baseline: "c3e296661c04b9de35795e2311674b507846d19a"
-last_completed_phase: "P1"
-next_phase: "P2"
+last_completed_phase: "P2"
+next_phase: "P3"
 last_validation: "pass"
-updated_at: "2026-07-26T11:23:22+08:00"
+updated_at: "2026-07-26T12:20:17+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -37,16 +37,17 @@ Resume from the earliest phase whose postconditions are not proven. After each p
 ## Current checkpoint
 
 - **State:** `running`
-- **Last completed phase:** `P1`
-- **Next phase:** `P2`
-- **Latest validation:** `pass` — V-101 completed with 71 passed in 6.62s and no skip/failure/error; the final independent P1 audit found no remaining code blocker; frozen contract SHA-256 remains `1f566582eec30ec4d3efc9e0c2349912468642edae32ba79997bb76de6f35033`; final P1 V-002 found all three protected sources byte-identical to preflight with `quick_check=ok` and unchanged WAL/SHM state.
+- **Last completed phase:** `P2`
+- **Next phase:** `P3`
+- **Latest validation:** `pass` — exact V-201 completed with 93 passed in 17.29s and no skip/failure/error; the final bounded compatibility and adversarial audits found no remaining blocker; the unchanged legacy P2E-3/P2F compatibility suite completed with 208 passed; frozen contract SHA-256 remains `1f566582eec30ec4d3efc9e0c2349912468642edae32ba79997bb76de6f35033`; final P2 V-002 found all three protected sources byte-identical to preflight with `quick_check=ok` and unchanged WAL/SHM state.
 - **Current blocker:** none
-- **Next safe action:** After this P1 checkpoint commit, begin P2 decision-optional operation review implementation; do not initialize or write the real v3 candidate sidecar before P3.
+- **Next safe action:** After this P2 checkpoint commit, begin P3 knowledge-provenance implementation. P3 may initialize the contract-named new v3 candidate sidecar only after rechecking mapping identity and must write no other sidecar.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
 ## Checkpoint history
 
+- 2026-07-26T12:20:17+08:00 — P2 completed. Added the versioned `investment_review.operation_review.v1` classifier as a parallel artifact without changing P2C/P2E-3/P2F schemas or bytes. Position roles derive only from the canonical quantity chain and explicit event type/side; no-Decision closed/open episodes retain `operation_review_status=ready` with `decision_context_status=not_recorded`, while standalone cash uses `not_applicable`. Reversal, flat outflow, correction, corporate action, transfer, unknown event semantics and inconsistent provenance remain explicit ambiguous/blocked facts. The closed validator/replay gate now rejects invalid P2C digests/schema, binary floats, lone surrogates, invalid/extreme timestamps or decimals, open-ended scope/reason fields, impossible self-rehashed roles, broken episode/cash ordering, missing material lineage and malformed replay inputs. Runner run keys bind classifier schema/method; the existing `episode` stage carries the additive artifact and independent readiness while authentic legacy v1 receipts still validate/replay. Exact V-201: 93 passed in 17.29s; legacy P2E-3/P2F compatibility: 208 passed; final independent compatibility and adversarial audits found no blocker. Package validation remained 0 errors/0 warnings and the frozen contract hash was unchanged. Final P2 V-002 matched all three protected-source preflight sizes, SHA-256 values, `quick_check=ok` and WAL/SHM states; the real v3 candidate sidecar remains absent. Next safe phase is P3.
 - 2026-07-26T11:23:22+08:00 — P1 completed. Added the opt-in reviewability skill/playbook boundary, closed `investment_review.operation_checkpoint.v1` schema, six independent status axes, field-specific four-time provenance, episode-rooted semantic keys, create-only checkpoint storage, row-integrity verification, and a full foundation DDL manifest. Froze the code-owned provider/endpoint/parameter/value allowlist and derived request fingerprint, including exact request caps, sensitive-value rejection, frozen cache lineage, market-time ordering, and offline consumers. Existing-candidate validation rejects nonempty WAL or structural drift while preserving the stable zero-WAL Windows read-only case; replay, status, and same-transaction saves fail closed on marker, manifest, payload, projection, inserted-time, gap, or row-integrity drift. V-101: 71 passed in 6.62s with no skip/failure/error; final independent audit found no blocker. Frozen contract/package hash remained unchanged. Final P1 V-002: formal portfolio DB, user sidecar and v2 candidate retained their preflight size/SHA-256, `quick_check=ok`, and unchanged WAL/SHM state; evidence is in `.codex_tmp/investment_review_product_completion_v3/protected_sources.json`. The real v3 candidate sidecar still does not exist. Next safe phase is P2.
 - 2026-07-25T13:03:16+08:00 — Finalized package version 3 after explicit user approval. Frozen contract SHA-256 is `1f566582eec30ec4d3efc9e0c2349912468642edae32ba79997bb76de6f35033`; task state is `ready`; finalizer validation returned 0 errors and 0 warnings. The next safe action is P1 execution from the package-only setup checkpoint.
 - 2026-07-25T12:57:24+08:00 — Workspace user confirmed the final v3 objective and acceptance criteria with `local_first_controlled_fallback_v1`: local cache first; only `missing`, `stale` or `insufficient` coverage may trigger a bounded existing allowlisted provider before bundle freeze; writes stay in the new v3 cache/sidecar; renderer, source replay, API and UI remain offline. Draft validation must be rerun before finalization.
