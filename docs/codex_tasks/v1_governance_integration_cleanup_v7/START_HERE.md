@@ -9,7 +9,7 @@ source_baseline: "d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74"
 last_completed_phase: "P4"
 next_phase: "P5"
 last_validation: "pass"
-updated_at: "2026-07-27T01:06:50+08:00"
+updated_at: "2026-07-27T01:13:47+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -44,10 +44,10 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
 - **Latest validation:** `pass`。v7 package frozen hash 与 integrity 通过；唯一授权收据逐字节等于未修改 validator 输出（4,013 bytes、SHA-256 `f81fd3bf40bfc953e90df585188510f2d8382fd2a8b364fece93d6ae7190e5e4`）；V-005 `18 passed in 18.79s`；V-006 `26 passed in 666.15s`；control-plane `decision=pass files=1386 active_references=0`；full restore `1386 files/9,787,412 bytes`；完整 pytest `1354 passed, 2 skipped in 811.32s`。没有 wave 被删除。
-- **Current blocker:** none。v7 reconciliation checkpoint 尚未提交，Night 尚未 arm。
+- **Current blocker:** none。当前仅待本文件形成新的 clean Night arm commit；尚未执行删除。
 - **Prior hard-stop evidence:** v4 checkpoints `0f582599...` 与 `f1dafeb...` 保留历史冲突证据；v5 已修复三项 A.7 冲突以及 A.2 retained-dependency/unknown-classification 缺陷。旧 `82f7d37...` arm 因其后存在 policy/v6 commits 已失去 current-wave-parent 资格。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；批准的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`，tracked-only 为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。v6 准备时补丁工具的两份未跟踪草稿曾误落该树，已按两个明确文件路径逐一撤销；HEAD 与两组 raw NUL 向量随后精确恢复。不得再写入、清理、修复、吸收或提交其中内容。
-- **Next safe action:** 审计本轮 changed paths、manifest/actor/用户主树状态与 package hash；显式提交合同指定的 `chore(v1): reconcile deterministic root receipt for v7` checkpoint。提交 clean 后仅更新本文件 arm metadata，再创建新的 clean Night arm checkpoint并报告 readiness。
+- **Next safe action:** 把仅含本文件的变更提交为 `chore(v1): arm night codex exact-file deletion checkpoint`；提交后只读验证 current HEAD/subject/contract/AGENTS/manifest/680 paths/restore/status，并先报告 readiness。报告前不得删除。
 
 ### P5 pre-delete completion evidence
 
@@ -60,12 +60,13 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - Current full repository pytest: `1354 passed, 2 skipped in 811.32s`; zero failures/errors and no added skip/xfail/mock/collection-ignore.
 - Scope: only the D-017 receipt/readout paths, A.2 identity/control receipts/tool/manifest/test and this v7 START changed; no deletion, untracked path, frozen-contract change, raw-data change or user-main write.
 
-### P5 Night exact-manifest candidate (not armed under v7)
+### P5 Night exact-manifest arm
 
 - Wave: `night`（顺序 1/3）
+- Arm state: `armed_clean_checkpoint`
 - Deletion actor: `codex_exact_manifest_one_file_at_a_time`
 - Codex deletion authorization: `true` for Night only; Bundle/old002837 remain `false`
-- `wave_parent_commit`: `PENDING_NEW_V7_ARM`；旧 `82f7d37a10a9677af631c1a5863661a64df3270b` 与全部 v6 前 arm 不得复用。v7 收据、identity plumbing 和全部验证通过后，创建本文件所在 clean arm commit，再由 `git rev-parse HEAD` 取得并写入 deletion receipt，不把提交自身 SHA 写回本文件。
+- `wave_parent_commit`: 本文件所在的 clean arm commit；提交后以 `git rev-parse HEAD` 取得并作为 `delete-wave --wave-parent` 参数及最终 deletion receipt 值，不把提交自身 SHA 写回本文件。旧 `82f7d37a10a9677af631c1a5863661a64df3270b` 与全部 v6 前 arm 不得复用。
 - Expected deletion count: 680
 - Expected content bytes: 4,480,614
 - Expected ordinal UTF-8 NUL path-vector bytes: 55,881
@@ -1019,3 +1020,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-27T00:09:50+08:00 — 用户明确批准最小 v7：“仅授权重新生成 `blocker_root_reconciliation.yaml`，其他 v6 标准、Night/Bundle/旧 002837 三波边界均不变。”当前 user-main HEAD/full/tracked NUL 向量和远端 main/Night05/V1 refs 再次精确匹配，execution ref 仍不存在；先保存本 blocked checkpoint，再创建 v7 package-only amendment。
 - 2026-07-27T00:13:38+08:00 — v6 blocker 状态与 A.2 actor/identity 工作已保存为 clean checkpoint `d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74`，其直接父为 v6 setup `bb489a195d3ffeb439ea31a23a52b5ffb2abd48f`。v7 draft 只新增 `blocker_root_reconciliation.yaml` 的一次确定性重生成授权及不可避免的 v6→v7 package identity plumbing；其余 v6 标准、三波 actor/顺序/清单/聚合和恢复边界不变。尚未 finalize、重生成收据、arm 或删除。
 - 2026-07-27T01:06:50+08:00 — v7 frozen contract SHA-256=`69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97`，package-only setup=`0edcf12ce791fbfdc76e647d99885186716d0045`、直接父=`d89e3a2...`。唯一授权收据已精确重生成；V-005 18 passed、V-006 26 passed、control-plane pass/1386/active_references=0、full restore 1,386 files/9,787,412 bytes、full pytest 1354 passed/2 skipped。等待 scope audit 与 v7 reconciliation checkpoint；Night 未 arm、未删除。
+- 2026-07-27T01:13:47+08:00 — v7 reconciliation checkpoint `4c2f373a16c570183b88ed510dc2994ad044dec3` 已创建且 clean，直接父为 package-only setup `0edcf12...`，提交只含 9 个授权 A.1/A.2 路径、0 删除。当前只把本文件切换为 `armed_clean_checkpoint`；包含本行的下一 commit 自身即新 Night `wave_parent_commit`，其 SHA 不写回文件。删除仍未执行。
