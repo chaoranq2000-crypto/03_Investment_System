@@ -12,7 +12,10 @@ import argparse
 import csv
 import hashlib
 import json
+import os
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -36,6 +39,7 @@ SOURCE_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 TARGET_WORKFLOW_ID = "wf_20260723_stock_first_002837_v1_replay"
 SOURCE_RUN_REL = Path("reports/workflow_runs") / SOURCE_WORKFLOW_ID
 TARGET_RUN_REL = Path("reports/workflow_runs") / TARGET_WORKFLOW_ID
+HISTORICAL_BASELINE = "f60f220ae252262a537c612ce193fc779901984b"
 AS_OF_DATE = "2026-07-23"
 
 EXACT_REPLAY_COMMAND = (
@@ -73,6 +77,17 @@ EXPECTED_SOURCE_HASHES = {
     "data/manifests/metrics_draft.csv": "0b10415e98b29c350379881c4bc742fa27de8ea1bb197206e1a66c571af20ffe",
     "reports/segments/ai_server_liquid_cooling/segment_definition.yaml": "98ed8a66c57572be011dc7970b23bdd8a96593ab06308e2408a227e159bed1aa",
 }
+
+HISTORICAL_FIXTURE_PATHS = (
+    "bundle12r/R5_bundle12r_generation_lock.yaml",
+    "bundle12r/R5_bundle12r_backflow_plan.yaml",
+    "bundle12r/R5_bundle12r_operating_evidence_input_snapshot.yaml",
+    "bundle12r/R5_bundle12r_operating_evidence_result.yaml",
+    "bundle12r/R5_bundle12r_research_question_plan.yaml",
+    "bundle13r/R5_bundle13r_reviewed_backfill_input.yaml",
+    "bundle13r/R5_bundle13r_backflow_execution_result.yaml",
+    "bundle13r/R5_bundle13r_quality_issues.csv",
+)
 
 EXPECTED_BUNDLE13_RESULT = {
     "decision": "backflow_execution_in_progress",
@@ -197,6 +212,60 @@ class ReplayContractError(RuntimeError):
     """Raised when a replay input or target violates the frozen contract."""
 
 
+def is_historical_source_path(relative_path: str) -> bool:
+    return relative_path.startswith(SOURCE_RUN_REL.as_posix() + "/")
+
+
+def read_git_blob(repo_root: Path, revision: str, relative_path: str) -> bytes:
+    completed = subprocess.run(
+        ["git", "cat-file", "blob", f"{revision}:{relative_path}"],
+        cwd=repo_root,
+        capture_output=True,
+        check=False,
+    )
+    if completed.returncode != 0:
+        detail = completed.stderr.decode("utf-8", errors="replace").strip()
+        raise ReplayContractError(
+            f"historical Git blob is unavailable: {revision}:{relative_path}: {detail}"
+        )
+    return completed.stdout
+
+
+def _lexical_absolute(path: Path, repo_root: Path) -> str:
+    candidate = path if path.is_absolute() else repo_root / path
+    return os.path.normcase(os.path.normpath(os.path.abspath(os.fspath(candidate))))
+
+
+def validate_source_run_identifier(repo_root: Path, source_run: Path) -> None:
+    expected = _lexical_absolute(repo_root / SOURCE_RUN_REL, repo_root)
+    actual = _lexical_absolute(source_run, repo_root)
+    if actual != expected:
+        raise ReplayContractError(
+            f"source run must identify {SOURCE_RUN_REL.as_posix()}, found {source_run}"
+        )
+
+
+def materialize_historical_source_fixture(
+    repo_root: Path,
+    fixture_root: Path,
+) -> Path:
+    source_fixture = fixture_root / "historical_source" / SOURCE_WORKFLOW_ID
+    for relative_in_run in HISTORICAL_FIXTURE_PATHS:
+        repository_path = (SOURCE_RUN_REL / relative_in_run).as_posix()
+        payload = read_git_blob(repo_root, HISTORICAL_BASELINE, repository_path)
+        expected = EXPECTED_SOURCE_HASHES[repository_path]
+        actual = hashlib.sha256(payload).hexdigest()
+        if actual != expected:
+            raise ReplayContractError(
+                "historical fixture hash mismatch: "
+                f"{repository_path}: expected {expected}, found {actual}"
+            )
+        target = source_fixture / relative_in_run
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(payload)
+    return source_fixture
+
+
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -273,32 +342,30 @@ def resolve_contract_paths(
     output_run: Path,
 ) -> tuple[Path, Path, Path]:
     root = repo_root.resolve()
-    expected_source = (root / SOURCE_RUN_REL).resolve()
+    validate_source_run_identifier(root, source_run)
+    expected_source = root / SOURCE_RUN_REL
     expected_output = (root / TARGET_RUN_REL).resolve()
-    actual_source = source_run.resolve()
     actual_output = output_run.resolve()
-    if actual_source != expected_source:
-        raise ReplayContractError(
-            f"source run must be {SOURCE_RUN_REL.as_posix()}, found {actual_source}"
-        )
     if actual_output != expected_output:
         raise ReplayContractError(
             f"output run must be {TARGET_RUN_REL.as_posix()}, found {actual_output}"
         )
-    if actual_source == actual_output:
+    if _lexical_absolute(source_run, root) == _lexical_absolute(output_run, root):
         raise ReplayContractError("source and output runs must be different")
-    if not actual_source.is_dir():
-        raise ReplayContractError(f"source run is missing: {actual_source}")
-    return root, actual_source, actual_output
+    return root, expected_source, actual_output
 
 
 def verify_expected_sources(repo_root: Path) -> list[dict[str, str]]:
     rows: list[dict[str, str]] = []
     for rel, expected in EXPECTED_SOURCE_HASHES.items():
-        path = repo_root / rel
-        if not path.is_file():
-            raise ReplayContractError(f"required read-only source is missing: {rel}")
-        actual = sha256_file(path)
+        if is_historical_source_path(rel):
+            payload = read_git_blob(repo_root, HISTORICAL_BASELINE, rel)
+            actual = hashlib.sha256(payload).hexdigest()
+        else:
+            path = repo_root / rel
+            if not path.is_file():
+                raise ReplayContractError(f"required read-only source is missing: {rel}")
+            actual = sha256_file(path)
         if actual != expected:
             raise ReplayContractError(
                 f"read-only source hash mismatch: {rel}: expected {expected}, found {actual}"
@@ -1137,6 +1204,8 @@ def materialize_replay(
     repo_root: Path,
     source_run: Path,
     output_run: Path,
+    *,
+    historical_fixture_root: Path | None = None,
 ) -> dict[str, Any]:
     """Materialize a replay into an already-authorized directory.
 
@@ -1144,10 +1213,21 @@ def materialize_replay(
     always enters through :func:`execute_replay`, which enforces the one frozen
     repository target before calling this helper.
     """
+    root = repo_root.resolve()
+    validate_source_run_identifier(root, source_run)
+    if historical_fixture_root is None:
+        historical_fixture_root = Path(
+            tempfile.mkdtemp(prefix="r5_v1_replay_historical_source_")
+        )
+    source_fixture = materialize_historical_source_fixture(
+        root,
+        historical_fixture_root,
+    )
+
     output_run.mkdir(parents=True, exist_ok=True)
-    first = materialize_once(repo_root, source_run, output_run)
+    first = materialize_once(root, source_fixture, output_run)
     first_hashes = capture_compare_hashes(output_run)
-    second = materialize_once(repo_root, source_run, output_run)
+    second = materialize_once(root, source_fixture, output_run)
     second_hashes = capture_compare_hashes(output_run)
     idempotence = write_idempotence_report(
         output_run,

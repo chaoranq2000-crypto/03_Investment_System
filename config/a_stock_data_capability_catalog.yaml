@@ -38,8 +38,7 @@ capabilities:
     primary_adapter_status: live_empty_needs_fix
     approved_alternatives: [tushare_adapter, baostock_adapter]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/mootdx_daily_bar.yaml
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: mootdx_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -89,7 +88,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [tushare_adapter]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_and_valuation.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: tencent_quote_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -138,7 +137,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: []
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_stock_reports_readout.json
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: eastmoney_report_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -165,7 +164,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: []
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_report_pdf.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: eastmoney_report_pdf_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -192,7 +191,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: []
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_industry_reports.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: eastmoney_industry_report_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -219,7 +218,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [eastmoney_report_adapter]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/ths_consensus_eps.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: ths_consensus_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -379,8 +378,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [tushare_adapter]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_lockup_expiry.yaml
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tushare_share_float_readout.json
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: eastmoney_capital_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -495,8 +493,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [tushare_adapter]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_holder_count.yaml
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tushare_stk_holdernumber_readout.json
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: eastmoney_capital_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -523,8 +520,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [tushare_adapter]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_dividend_history.yaml
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tushare_dividend_readout.json
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: eastmoney_capital_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -684,9 +680,7 @@ capabilities:
     primary_adapter_status: transport_failure_needs_fix
     approved_alternatives: [tushare_adapter, tencent_quote_adapter]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_stock_info.yaml
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tushare_stock_basic_scoped_readout.json
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_and_valuation.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: eastmoney_basic_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -713,7 +707,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [tushare_adapter, baostock_adapter]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/sina_financial_statements.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: sina_financial_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -740,7 +734,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [exchange_fallback_adapter]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: official_disclosure_pull
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -882,7 +876,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [official_disclosure_pull]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/cninfo_irm.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: cninfo_irm_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -998,7 +992,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [official_disclosure_pull]
     proof_paths:
-    - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/szse_announcement_fallback.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   target_adapter: exchange_fallback_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable

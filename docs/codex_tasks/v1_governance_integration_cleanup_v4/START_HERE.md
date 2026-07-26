@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v4"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v4/CONTRACT.md"
 contract_sha256: "c806d4811e4f40ffb86154c6144c75173c7d13e1fc193f9add07686495217736"
-state: "ready"
+state: "blocked"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "312adc73821706b0b7ca6aa00e80ee608bd10b32"
 last_completed_phase: "P4"
 next_phase: "P5"
-last_validation: "pass"
-updated_at: "2026-07-26T11:27:50+08:00"
+last_validation: "fail"
+updated_at: "2026-07-26T12:00:00+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -39,14 +39,178 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `ready`
+- **State:** `blocked`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`
-- **Current blocker:** none。v4 已冻结并通过 `--require-ready`；须先创建以 `312adc73821706b0b7ca6aa00e80ee608bd10b32` 为直接父提交且只新增本包两个文件的 setup checkpoint，随后复核 P1–P4 postconditions 并把本文件切换为 P5 running。
+- **Latest validation:** `fail`。v4 setup checkpoint `63e542ddc8a7329812e8aac15ead871253b58ca6`、P1–P4 checkpoint 与已复核 postconditions 仍有效；P5 Group A/B 的 75 项针对性测试通过，但删除前完整 pytest 的只读 Night CI contract 复现为 `1 failed, 1 passed`，因此 P5 pre-delete gate 未通过。
+- **Current blocker:** 冻结 v4 对 P5 pre-delete 有不可同时满足的要求。C-008、P5 validation 与 V-006 要求 `.github/` 对 Night 候选树的 CI routing/物理引用为 0，因此 A.1 授权的 `.github/workflows/ci.yml` 必须移除 `python -m pytest -q tests/test_r5_night_shift_*.py`。但尚未 arm Night wave 时，删除候选且不在 A.1 的 `tests/test_r5_night_shift_ci_contract.py` 仍必须参加 V-010 删除前完整 pytest，其第 13 行又强制 CI 命令保留完全相同的 Night glob。当前真实结果为该断言失败。修改此测试越过 Appendix A；保留真实 Night 调用违反 C-008；用注释、恒假条件、mock、skip/xfail 或 collection ignore 使其表面通过都违反 D-017。P5 因冻结合同标准冲突硬停止，未 arm 或删除任何 wave。
 - **Prior hard-stop evidence:** v2 `reports/p1_6/r5_v1_governance_cleanup/validation/p5_authority_conflict.yaml` 与 v3 frozen package 保持只读。v3 blocker package checkpoint 为 `312adc73821706b0b7ca6aa00e80ee608bd10b32`；P5 尚未开始，也没有 arm 任何删除波次。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；用户在获知外部漂移只来自 untracked 状态后明确回复“继续，以新快照为基线”。连续稳定的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`；tracked-only 仍为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。任务从未触碰该树；不得清理、修复、吸收或提交其中内容。
-- **Next safe action:** 显式暂存本包 `CONTRACT.md` 与 `START_HERE.md`，审计 cached diff 后创建 package-only v4 setup checkpoint。
+- **Next safe action:** 用户需授权创建 amended v5 包，最小修订是把 `tests/test_r5_night_shift_ci_contract.py` 逐项加入 P5 `modify_existing_exact`，只允许把其正向 Night-routing 断言替换为“CI 不再运行 Night glob、仍运行 V-006 与 full pytest”的等强反向断言；或者明确改变 pre-delete validation/deletion ordering。不得原地修改 v4 合同，也不得在 v4 下继续参数化、提交 decoupling 或 arm Night wave。
+
+### P5 hard-stop evidence
+
+- Affected phase/criteria: `P5`, `C-008`, `C-010`, `V-006`, `V-010`, `D-017`.
+- Exact conflicting paths: writable `.github/workflows/ci.yml`; read-only-until-user-deletion `tests/test_r5_night_shift_ci_contract.py`.
+- Reproduction: `python -B -m pytest -q -p no:cacheprovider tests/test_r5_night_shift_ci_contract.py` → `1 failed, 1 passed`; failure is the missing exact substring `tests/test_r5_night_shift_*.py`.
+- Attempt 1 rejected: restore the Night pytest step; this makes the test pass but leaves an active CI physical route to the deletion tree and fails C-008/V-006.
+- Attempt 2 rejected: keep the substring in a comment, echo, unreachable or constant-false step; this fabricates the test's claimed behavior and violates D-017.
+- Attempt 3 rejected: modify, skip, xfail, monkeypatch or collection-ignore the test; the path has no v4 write authority and the contract expressly forbids weakening.
+- Secondary patch-review issue: the first fixed-baseline readers in `scripts/run_r5_v1_replay_002837.py`, `tests/test_r5_v1_blocker_root_cause_map.py` and `tests/test_r5_v1_workflow_state_validator.py` still need explicit blob OID + byte count + content SHA triplets before any future decoupling commit; this is solvable inside A.1 and is not the hard-stop cause.
+- Repository state at stop: P4 remains the last completed phase; v4 setup HEAD was `63e542ddc8a7329812e8aac15ead871253b58ca6`; only Appendix A.1/A.2 P5 partial mutations are present in the dedicated worktree; no file deletion, stage, commit, push, PR or publication occurred after setup.
+- Precise unblock question: authorize an amended v5 package with the single additional existing-file permission and equal-strength CI retirement assertion described above, while preserving all other v4 criteria and the three user-manual deletion waves?
+
+### P5 initial planned mutation paths
+
+本清单只授权初始 decoupling iteration，不以 wildcard 或 family 替代实际路径。其他既有 A.1 文件即使合同允许，也必须先由 reference scan 证明需要修改，并先逐项加入本检查点后才能写入。
+
+新增或继续维护的 A.2 路径：
+
+- `scripts/manage_r5_v1_historical_cleanup.py`
+- `reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml`
+- `reports/p1_6/r5_v1_governance_cleanup/historical_cleanup_manifest.yaml`
+- `tests/test_r5_v1_historical_baseline_manifest.py`
+- `tests/test_r5_v1_historical_cleanup_manifest.py`
+- `tests/test_r5_v1_active_routing_retirement.py`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/historical_decoupling.yaml`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/manual_deletion_wave_night.yaml`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/manual_deletion_wave_bundle.yaml`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/manual_deletion_wave_old002837.yaml`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/clean_checkout_smoke.txt`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/full_pytest.txt`
+- `docs/codex_tasks/v1_governance_integration_cleanup_v4/START_HERE.md`
+
+首轮高置信既有物理解耦路径：
+
+- `.github/workflows/ci.yml`
+- `.github/workflows/r5_bundle11r_runtime.yml`
+- `.gitattributes`
+- `config/r5_readout_canonical_index.yaml`
+- `config/a_stock_data_capability_catalog.yaml`
+- `config/adapter_contract_registry.yaml`
+- `scripts/run_r5_v1_replay_002837.py`
+- `tests/conftest.py`
+- `tests/test_r5_v1_active_control_plane.py`
+- `tests/test_r5_v1_blocker_root_cause_map.py`
+- `tests/test_r5_v1_replay_002837.py`
+- `tests/test_r5_v1_workflow_state_validator.py`
+- `tests/test_valuation_input_contract.py`
+
+P5 readout 与 validator receipt 路径：
+
+- `reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/preflight.yaml`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/doc_drift.txt`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/governance_targeted.txt`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/refresh_002837.yaml`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml`
+- `reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml`
+
+### P5 reference-scan expanded exact mutation paths
+
+活动根反向扫描已证明 A.1 中全部 46 个保留代码路径都需要 D-017 最小物理解耦：41 个直接包含固定旧 workflow ID；其余 5 个通过 A.4 配置中的 `default_paths` 或 `required_inputs` 间接解析旧目录。`scripts/run_r5_v1_replay_002837.py` 已列于首轮清单；以下是其余逐路径代码 mutation set：
+
+- `scripts/build_evidence_generation_lock.py`
+- `scripts/build_r5_analysis_pack_v2.py`
+- `scripts/build_r5_bundle10_reader_pack.py`
+- `scripts/build_r5_bundle5_benchmark_coverage_precheck.py`
+- `scripts/build_r5_bundle5_forecast_valuation_onboarding.py`
+- `scripts/build_r5_bundle5_market_peer_onboarding.py`
+- `scripts/build_r5_bundle5_official_disclosure_onboarding.py`
+- `scripts/build_r5_bundle6_close_readout.py`
+- `scripts/build_r5_bundle6_human_review_handoff.py`
+- `scripts/build_r5_bundle6_reader_baseline.py`
+- `scripts/build_r5_bundle6_research_remediation.py`
+- `scripts/build_r5_bundle8_research_depth_plan.py`
+- `scripts/build_r5_bundle8r_pilot_artifacts.py`
+- `scripts/build_r5_bundle9_forecast.py`
+- `scripts/build_r5_bundle9_valuation.py`
+- `scripts/build_r5_bundle9r_forecast_valuation.py`
+- `scripts/build_r5_evidence_coverage_matrix.py`
+- `scripts/build_r5_reader_section_payloads.py`
+- `scripts/build_r5_reviewed_input_staging.py`
+- `scripts/close_r5_bundle8b.py`
+- `scripts/close_r5_bundle9.py`
+- `scripts/promote_r5_reviewed_inputs_to_registries.py`
+- `scripts/r5_next_pilot_gate.py`
+- `scripts/r5_pack_promotion_gate.py`
+- `scripts/r5_readiness_gate.py`
+- `scripts/r5_reviewed_input_pilot_gate.py`
+- `scripts/render_r5_reviewed_input_output.py`
+- `scripts/run_r5_bundle10_cross_industry_writer_regression.py`
+- `scripts/run_r5_bundle5_real_registry_promotion.py`
+- `scripts/run_r5_bundle5_research_draft_quality_gate.py`
+- `scripts/run_r5_bundle8_research_depth_gate.py`
+- `scripts/run_r5_reader_quality_gate.py`
+- `scripts/sync_r5_bundle10_external_review_pending.py`
+- `scripts/validate_r5_bundle10_close.py`
+- `scripts/validate_r5_bundle10_human_review_submission.py`
+- `scripts/validate_r5_bundle8b_close.py`
+- `scripts/validate_r5_bundle9_close.py`
+- `src/ingest/adapters/adapter_runtime.py`
+- `src/ingest/adapters/eastmoney_report_pdf_adapter.py`
+- `src/ingest/business_segment_extraction.py`
+- `src/ingest/official_financial_reconciliation.py`
+- `src/qa/r4_disclosure_backflow_review.py`
+- `src/qa/r4_publishable_stock_report_gate.py`
+- `src/report/r5_section_payload_builder.py`
+- `src/research/r5_bundle13r_evidence_backflow.py`
+
+同一扫描证明 A.1 的 60 个保留测试中有 58 个会物理读取候选目录或依赖旧默认输入；首轮清单已包含其中 6 个。下列其余 52 个测试路径进入 exact mutation set；`tests/test_r5_bundle4_close.py` 与 `tests/test_r5_bundle5_status_baseline.py` 仅检查 A.4 metadata，保持只读：
+
+- `tests/test_build_r5_evidence_plan_from_gaps.py`
+- `tests/test_build_r5_evidence_request_queue.py`
+- `tests/test_business_segment_extraction.py`
+- `tests/test_data_layer_bridge_draft.py`
+- `tests/test_liquid_cooling_exposure_evidence_review.py`
+- `tests/test_official_reconciliation_review_decision.py`
+- `tests/test_r4_artifact_formatting.py`
+- `tests/test_r4_publishable_stock_report_gate.py`
+- `tests/test_r4_stock_report_v0_2_gate.py`
+- `tests/test_r5_002837_reviewed_input_dry_run.py`
+- `tests/test_r5_002837_reviewed_input_staging.py`
+- `tests/test_r5_after_patch55_close.py`
+- `tests/test_r5_bundle10_close.py`
+- `tests/test_r5_bundle10_dynamic_writer.py`
+- `tests/test_r5_bundle10_human_review_finalize.py`
+- `tests/test_r5_bundle10_human_review_handoff.py`
+- `tests/test_r5_bundle10_human_review_submission.py`
+- `tests/test_r5_bundle10_state_sync.py`
+- `tests/test_r5_bundle10r_v5_artifacts.py`
+- `tests/test_r5_bundle10r_v5_human_review.py`
+- `tests/test_r5_bundle13r_evidence_backflow.py`
+- `tests/test_r5_bundle4_post_promotion_dry_run.py`
+- `tests/test_r5_bundle4_registry_promotion.py`
+- `tests/test_r5_bundle4_reviewed_input_smoke.py`
+- `tests/test_r5_bundle5_benchmark_coverage_precheck.py`
+- `tests/test_r5_bundle5_close.py`
+- `tests/test_r5_bundle5_real_input_inventory.py`
+- `tests/test_r5_bundle5_real_pilot_gate.py`
+- `tests/test_r5_bundle5_real_registry_promotion.py`
+- `tests/test_r5_bundle6_close.py`
+- `tests/test_r5_bundle6_human_review_handoff.py`
+- `tests/test_r5_bundle6_reader_baseline.py`
+- `tests/test_r5_bundle6_research_remediation.py`
+- `tests/test_r5_bundle7_close.py`
+- `tests/test_r5_bundle8b_local_close.py`
+- `tests/test_r5_bundle9_close.py`
+- `tests/test_r5_bundle9_forecast.py`
+- `tests/test_r5_bundle9_valuation.py`
+- `tests/test_r5_composer_research_draft_plus.py`
+- `tests/test_r5_forecast_valuation_interlock.py`
+- `tests/test_r5_pilot_gate_recheck_and_render.py`
+- `tests/test_r5_quality_backflow.py`
+- `tests/test_r5_reader_quality_gate.py`
+- `tests/test_r5_reader_report_writer.py`
+- `tests/test_r5_report_composer_degradation.py`
+- `tests/test_r5_reviewed_input_registry_promotion.py`
+- `tests/test_r5_source_gapped_002837_pack.py`
+- `tests/test_segment_exposure_gate.py`
+- `tests/test_segment_stock_backflow_review.py`
+- `tests/test_validate_r5_forecast_assumption_registry.py`
+- `tests/test_validate_r5_market_peer_input_registry.py`
+- `tests/test_validate_r5_market_peer_inputs.py`
 
 ### P4 completion scope
 
@@ -134,3 +298,5 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-26T11:11:15+08:00 — 用户再次回复“批准”。v4 draft 以 `312adc73821706b0b7ca6aa00e80ee608bd10b32` 为 source baseline，补齐 A.1 八个既有 readout/validation 路径，并闭合 A.1=120、A.2=13、A.3=44、A.4=35、A.5=27 与 A.6 source-baseline archive inventory 机制；P1–P4、三波用户手工删除边界与发布模式 A 不变。当时 package 仍为 draft，未冻结。
 - 2026-07-26T11:23:54+08:00 — 用户主工作树完整状态向量因仅 untracked 的外部变化由 102 records 漂移到 130 records，tracked-only 和 HEAD 均未变。按合同暂停并报告后，用户明确回复“继续，以新快照为基线”；两次连续采样确认新完整向量为 130 records/9156 bytes/SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`，tracked-only 仍为 20 records/1025 bytes/SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。v4 同时闭合 exact amendment disclosure、A6 与两个 Bundle17R direct-child deletion targets 的保护重叠、唯一 A.1/A.5 交集和 116-path ordinal NUL inventory 指纹。
 - 2026-07-26T11:27:50+08:00 — 两项独立只读审计均返回 `SAFE TO FREEZE`，并复现 A.1=120、A.2=13、A.3=44、A.4=35、A.5=27、唯一 A.1∩A.5 两路径、A.6 116 paths/8065 bytes/SHA-256 `6c667b2aa0db007d5e89baf5b7bae837fd62249be3d85613f16aba3d14d32e6a`、active old-ID/Bundle unknown=0、新用户主树状态向量及远端 refs。v4 合同已冻结，canonical SHA-256 为 `c806d4811e4f40ffb86154c6144c75173c7d13e1fc193f9add07686495217736`；`--require-ready` 通过，只产生预期的 last_completed=P4 warning。
+- 2026-07-26T11:37:24+08:00 — package-only v4 setup checkpoint `63e542ddc8a7329812e8aac15ead871253b58ca6` 已创建且 clean。P1→P4 checkpoint direct ancestry 与产物逐项通过；当前 doc drift pass，V-003 final 九项 `194 passed`，V-005 `18 passed`，V-004 两次 replay semantic digest `2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6`、tree digest `3baefe904ef244d272f9432ea661a3e13f2704003bd8d19590232a4d9f78df5f` 且 `16 passed`，V-008 `decision=pass`/blocking=0；原 root map blob `526d9964a95ddc866fa960a1b9556e720ca80178` 与 f60f220 完全一致。最早未证明阶段为 P5，本文件切换为 running，并记录首轮逐路径 mutation set。
+- 2026-07-26T12:00:00+08:00 — P5 Group A/B 的授权内解耦补丁完成首轮只读审查和 75 项针对性测试，但 pre-delete full-pytest 复现 `tests/test_r5_night_shift_ci_contract.py` 为 `1 failed, 1 passed`。该只读删除候选要求 CI 保留 Night glob，而 C-008/V-006 要求 CI physical route=0；三种可能规避分别违反 C-008 或 D-017。两项独立审查与诊断工具确认 frozen v4 无授权内解，状态切换为 blocked；未删除、arm、stage、push、PR 或发布。用户主树完整新快照再次逐字节匹配，合同 hash 不变。

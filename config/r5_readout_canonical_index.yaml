@@ -248,9 +248,9 @@ readouts:
     backflow rollback evidence and closed sample-quality/P2 boundaries
   replacement_or_supplement_path: null
   blocking_for_strict_smoke: true
-- path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle13r/R5_bundle13r_close_readout.md
+- path: reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md
   canonical_status: canonical
-  reason: Bundle 13R records the hash-bound evidence-backflow execution at the truthful
-    backflow-in-progress state with unresolved items and downstream gates closed
+  reason: V1 governance cleanup records the canonical policy refresh, root-policy
+    migration, historical decoupling, and bounded validation evidence
   replacement_or_supplement_path: null
   blocking_for_strict_smoke: true

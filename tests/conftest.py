@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import subprocess
 from itertools import count
 from pathlib import Path
 from typing import Any, Callable
@@ -8,17 +9,47 @@ from typing import Any, Callable
 import pytest
 import yaml
 
-from src.maintenance.night_shift.night03 import SOURCE_QUEUE
+
+HISTORICAL_BASELINE = "312adc73821706b0b7ca6aa00e80ee608bd10b32"
+SOURCE_QUEUE = Path(
+    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml"
+)
+SOURCE_QUEUE_BLOB_OID = "3e84cc0eb380dd771807f484370a262d8d03cd49"
+SOURCE_QUEUE_BYTES = 115020
+SOURCE_QUEUE_SHA256 = "dc2d6d6bb91b7ff326d3985d96f8eb8956a43710c61230eb06e6144e490e8ea1"
+
+
+def _historical_queue_blob(repo_root: Path) -> bytes:
+    object_name = f"{HISTORICAL_BASELINE}:{SOURCE_QUEUE.as_posix()}"
+    oid = subprocess.check_output(
+        ["git", "-C", str(repo_root), "rev-parse", object_name],
+        text=True,
+        encoding="utf-8",
+    ).strip()
+    assert oid == SOURCE_QUEUE_BLOB_OID
+    size = int(
+        subprocess.check_output(
+            ["git", "-C", str(repo_root), "cat-file", "-s", object_name],
+            text=True,
+            encoding="utf-8",
+        ).strip()
+    )
+    assert size == SOURCE_QUEUE_BYTES
+    payload = subprocess.check_output(
+        ["git", "-C", str(repo_root), "cat-file", "blob", object_name]
+    )
+    assert len(payload) == SOURCE_QUEUE_BYTES
+    assert hashlib.sha256(payload).hexdigest() == SOURCE_QUEUE_SHA256
+    return payload
 
 
 @pytest.fixture
 def night03_decision_factory(tmp_path: Path) -> Callable[..., tuple[Path, dict[str, Any], Path, Path]]:
     repo_root = Path(__file__).resolve().parents[1]
     root = tmp_path / "repo"
-    source = repo_root / SOURCE_QUEUE
     target = root / SOURCE_QUEUE
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_bytes(source.read_bytes())
+    target.write_bytes(_historical_queue_blob(repo_root))
     queue = yaml.safe_load(target.read_text(encoding="utf-8"))
     tasks = queue["tasks"]
     work_type_by_kind = {

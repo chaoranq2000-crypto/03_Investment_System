@@ -1,24 +1,29 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import subprocess
 from pathlib import Path
 
-from src.maintenance.night_shift.night05 import DELIVERY_COMMIT, build_scope_audit
-
 
 ROOT = Path(__file__).resolve().parents[1]
-BASELINE = "a96c1b717bf15905d72fd142efd946fa01bce666"
-PROTECTED_PATHS = (
-    "data/raw",
-    "reports/p1_6/r5_bundle17r",
-    "reports/p1_6/r5_night_shift/r5_overnight_02_20260720",
-    "reports/p1_6/r5_night_shift/r5_overnight_03_20260721",
-    "reports/p1_6/r5_night_shift/r5_overnight_04_20260722",
-    "reports/p1_6/r5_night_shift/r5_overnight_05_20260723",
-    "reports/workflow_runs/wf_20260703_stock_first_002837_invic",
-    "AGENTS.md",
-    ".github",
-    "pyproject.toml",
+DELIVERY_BASELINE = "a96c1b717bf15905d72fd142efd946fa01bce666"
+PACKAGE_BASELINE = "312adc73821706b0b7ca6aa00e80ee608bd10b32"
+HISTORICAL_SCOPE_AUDIT = (
+    "reports/p1_6/r5_night_shift/r5_overnight_05_20260723/"
+    "validation/scope_audit.json"
+)
+HISTORICAL_SCOPE_AUDIT_OID = "c50f932c7101a5d54f791dd6e6505a76103eda15"
+HISTORICAL_SCOPE_AUDIT_BYTES = 3269
+HISTORICAL_SCOPE_AUDIT_SHA256 = (
+    "8670a74e180024894126479e73e7fa4ebe4ba284ae4bb80683831c16691ded57"
+)
+RETAINED_CONTROL_PATHS = (
+    "reports/p1_6/r5_v1_governance_cleanup/root_policy_migration.yaml",
+    "reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml",
+    "reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml",
+    "reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/"
+    "validation/replay_receipt.yaml",
 )
 
 
@@ -30,6 +35,23 @@ def git_output(*args: str) -> str:
     return subprocess.check_output(
         ["git", "-C", str(ROOT), *args], text=True, encoding="utf-8"
     ).strip()
+
+
+def historical_scope_audit() -> dict[str, object]:
+    object_name = f"{DELIVERY_BASELINE}:{HISTORICAL_SCOPE_AUDIT}"
+    assert git_output("rev-parse", object_name) == HISTORICAL_SCOPE_AUDIT_OID
+    assert (
+        int(git_output("cat-file", "-s", object_name))
+        == HISTORICAL_SCOPE_AUDIT_BYTES
+    )
+    payload = subprocess.check_output(
+        ["git", "-C", str(ROOT), "cat-file", "blob", object_name]
+    )
+    assert len(payload) == HISTORICAL_SCOPE_AUDIT_BYTES
+    assert hashlib.sha256(payload).hexdigest() == HISTORICAL_SCOPE_AUDIT_SHA256
+    parsed = json.loads(payload)
+    assert isinstance(parsed, dict)
+    return parsed
 
 
 def test_canonical_entrypoint_and_state_owner_are_explicit() -> None:
@@ -61,7 +83,6 @@ def test_bundle_runtimes_are_explicit_local_evaluators_only() -> None:
             "src/research/r5_bundle13r_evidence_backflow.py",
         )
     )
-    night_cli = read("scripts/run_r5_night_shift.py")
 
     assert "退出普通 orchestrator 的默认 routing" in kernel
     assert "调用方明确请求某个 capability" in kernel
@@ -77,32 +98,35 @@ def test_bundle_runtimes_are_explicit_local_evaluators_only() -> None:
     assert 'parser.add_argument("--output-dir", required=True)' in bundle13_cli
     assert "workflow_state.yaml" not in bundle_sources
     assert "validate_workflow_state" not in bundle_sources
-    assert "night-shift mission dispatcher" in night_cli
-    assert "return runtime_main(arguments)" in night_cli
+    assert "workflow_state.yaml" not in bundle11_cli
+    assert "workflow_state.yaml" not in bundle12_cli + bundle13_cli
 
 
 def test_v1_protected_history_is_unchanged_from_the_night05_delivery() -> None:
-    assert DELIVERY_COMMIT == BASELINE
-    committed = git_output(
-        "diff", "--name-only", f"{BASELINE}..HEAD", "--", *PROTECTED_PATHS
+    assert (
+        git_output("merge-base", "--is-ancestor", DELIVERY_BASELINE, PACKAGE_BASELINE)
+        == ""
     )
-    working = git_output(
-        "diff", "--name-only", BASELINE, "--", *PROTECTED_PATHS
-    )
-    untracked_or_modified = git_output(
-        "status", "--short", "--untracked-files=all", "--", *PROTECTED_PATHS
-    )
-    assert committed == ""
-    assert working == ""
-    assert untracked_or_modified == ""
+    audit = historical_scope_audit()
+    assert audit["passed"] is True
+    assert audit["historical_changed_paths"] == []
+    assert audit["out_of_scope_paths"] == []
+    for relative in RETAINED_CONTROL_PATHS:
+        assert git_output("ls-files", "--error-unmatch", relative) == relative
+        path = ROOT / relative
+        assert path.is_file()
+        assert path.stat().st_size > 0
 
 
 def test_legacy_night05_scope_is_frozen_at_delivery_snapshot() -> None:
-    audit = build_scope_audit(ROOT)
-    assert audit["scope_head"] == BASELINE
-    assert audit["scope_mode"] == "frozen_delivery_snapshot"
+    audit = historical_scope_audit()
+    assert audit["mission_id"] == "r5_overnight_05_20260723"
+    assert audit["baseline_commit"] == "d0fc0fb735f0f581619e330b3fa6f1ef1914a276"
+    assert audit["git_diff_check"] == "passed"
     assert audit["historical_changed_paths"] == []
     assert audit["out_of_scope_paths"] == []
+    assert audit["force_push_used"] is False
+    assert audit["main_merged"] is False
 
 
 def test_orchestration_contract_is_only_a_compatibility_pointer() -> None:

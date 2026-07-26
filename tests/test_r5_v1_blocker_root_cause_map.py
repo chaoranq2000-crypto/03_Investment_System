@@ -16,21 +16,22 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 MAP_PATH = ROOT / "reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml"
 SCHEMA_PATH = ROOT / "schemas/r5_v1_blocker_root_cause_map.schema.json"
-OCCURRENCE_PATH = ROOT / (
+HISTORICAL_BASELINE = "a96c1b717bf15905d72fd142efd946fa01bce666"
+OCCURRENCE_REL = (
     "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/"
     "backflow/occurrence_inventory.json"
 )
-DAG_PATH = ROOT / (
+DAG_REL = (
     "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/"
     "backflow/dependency_dag.json"
 )
-QUEUE_METRICS_PATH = ROOT / (
+QUEUE_METRICS_REL = (
     "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/"
     "backflow/queue_metrics.json"
 )
-NIGHT04_ROOT = ROOT / "reports/p1_6/r5_night_shift/r5_overnight_04_20260722"
-NIGHT05_ROOT = ROOT / "reports/p1_6/r5_night_shift/r5_overnight_05_20260723"
-QUEUE_PATH = NIGHT05_ROOT / "next_night_queue.yaml"
+NIGHT04_REL = "reports/p1_6/r5_night_shift/r5_overnight_04_20260722"
+NIGHT05_REL = "reports/p1_6/r5_night_shift/r5_overnight_05_20260723"
+QUEUE_REL = f"{NIGHT05_REL}/next_night_queue.yaml"
 
 
 EXPECTED_BINDINGS = {
@@ -121,16 +122,37 @@ def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def sha256_file(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def sha256_git_blob(revision: str, relative_path: str) -> str:
-    payload = subprocess.check_output(
+def git_blob_bytes(revision: str, relative_path: str) -> bytes:
+    return subprocess.check_output(
         ["git", "cat-file", "blob", f"{revision}:{relative_path}"],
         cwd=ROOT,
     )
-    return hashlib.sha256(payload).hexdigest()
+
+
+def sha256_git_blob(revision: str, relative_path: str) -> str:
+    return hashlib.sha256(git_blob_bytes(revision, relative_path)).hexdigest()
+
+
+def baseline_blob_exists(relative_path: str) -> bool:
+    completed = subprocess.run(
+        ["git", "cat-file", "-e", f"{HISTORICAL_BASELINE}:{relative_path}"],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+    )
+    return completed.returncode == 0
+
+
+def load_baseline_yaml(relative_path: str) -> dict[str, Any]:
+    return yaml.safe_load(
+        git_blob_bytes(HISTORICAL_BASELINE, relative_path).decode("utf-8")
+    )
+
+
+def load_baseline_json(relative_path: str) -> dict[str, Any]:
+    return json.loads(
+        git_blob_bytes(HISTORICAL_BASELINE, relative_path).decode("utf-8")
+    )
 
 
 def canonical_json_bytes(value: Any) -> bytes:
@@ -267,18 +289,16 @@ def test_all_source_bindings_are_exact_and_frozen_baseline_blob_bound() -> None:
     }
     assert bindings == EXPECTED_BINDINGS
     baseline = document["source_baseline"]
+    assert baseline == HISTORICAL_BASELINE
     for relative, expected_hash in bindings.values():
-        source = ROOT / relative
-        assert source.is_file(), relative
         assert sha256_git_blob(baseline, relative) == expected_hash, relative
-        assert sha256_git_blob("HEAD", relative) == expected_hash, relative
 
 
 def test_occurrences_and_parents_preserve_all_69_ids_and_532_edges() -> None:
     document = load_yaml(MAP_PATH)
-    inventory = load_json(OCCURRENCE_PATH)
-    dag = load_json(DAG_PATH)
-    queue = load_yaml(QUEUE_PATH)
+    inventory = load_baseline_json(OCCURRENCE_REL)
+    dag = load_baseline_json(DAG_REL)
+    queue = load_baseline_yaml(QUEUE_REL)
     source_occurrences = {
         item["blocker_occurrence_id"]: item for item in inventory["occurrences"]
     }
@@ -339,7 +359,7 @@ def test_occurrences_and_parents_preserve_all_69_ids_and_532_edges() -> None:
 
 def test_dependency_groups_duplicates_and_references_are_exact_and_acyclic() -> None:
     document = load_yaml(MAP_PATH)
-    queue = load_yaml(QUEUE_PATH)
+    queue = load_baseline_yaml(QUEUE_REL)
     queue_tasks = {item["id"]: item for item in queue["tasks"]}
     mapped = {item["carry_forward_id"]: item for item in document["occurrences"]}
     root_ids = {item["root_cause_id"] for item in document["root_causes"]}
@@ -376,8 +396,8 @@ def test_dependency_groups_duplicates_and_references_are_exact_and_acyclic() -> 
     }
     assert actual_duplicates == expected_duplicates
 
-    conflict = load_yaml(
-        NIGHT04_ROOT / "pointer_prevalidation/conflict_matrix.yaml"
+    conflict = load_baseline_yaml(
+        f"{NIGHT04_REL}/pointer_prevalidation/conflict_matrix.yaml"
     )
     same_patch_edges = {
         frozenset((item["left"], item["right"]))
@@ -440,14 +460,14 @@ def test_root_assignments_are_complete_truthful_and_leave_no_active_engineering_
     for item in roots.values():
         assert item["evidence_paths"]
         assert item["active_v1_evidence_paths"]
-        assert all((ROOT / path).is_file() for path in item["evidence_paths"])
+        assert all(baseline_blob_exists(path) for path in item["evidence_paths"])
         assert all((ROOT / path).is_file() for path in item["active_v1_evidence_paths"])
         if item["status"] == "resolved":
             assert item["resolution_evidence_paths"]
         else:
             assert item["resolution_evidence_paths"] == []
 
-    ledger = load_json(NIGHT05_ROOT / "progress/blocker_ledger.json")
+    ledger = load_baseline_json(f"{NIGHT05_REL}/progress/blocker_ledger.json")
     source_blocker_ids = {
         blocker_id
         for item in roots.values()
@@ -468,21 +488,25 @@ def test_root_assignments_are_complete_truthful_and_leave_no_active_engineering_
 
 def test_source_truth_reconciles_63_20_6_69_43_0_without_fake_resolution() -> None:
     document = load_yaml(MAP_PATH)
-    inventory = load_json(OCCURRENCE_PATH)
-    dag = load_json(DAG_PATH)
-    metrics = load_json(QUEUE_METRICS_PATH)
-    taxonomy = load_json(NIGHT04_ROOT / "queue/taxonomy_audit.json")
-    truth = load_json(NIGHT04_ROOT / "queue/truth_snapshot.json")
-    candidates = load_yaml(NIGHT04_ROOT / "review_control/candidate_registry.yaml")
-    dependency = load_json(NIGHT04_ROOT / "execution/dependency_recompute.json")
-    parents = load_json(NIGHT04_ROOT / "execution/parent_recompute.json")
-    pointer_truth = load_json(
-        NIGHT04_ROOT / "pointer_prevalidation/dry_run_truth_receipt.json"
+    inventory = load_baseline_json(OCCURRENCE_REL)
+    dag = load_baseline_json(DAG_REL)
+    metrics = load_baseline_json(QUEUE_METRICS_REL)
+    taxonomy = load_baseline_json(f"{NIGHT04_REL}/queue/taxonomy_audit.json")
+    truth = load_baseline_json(f"{NIGHT04_REL}/queue/truth_snapshot.json")
+    candidates = load_baseline_yaml(
+        f"{NIGHT04_REL}/review_control/candidate_registry.yaml"
     )
-    queue = load_yaml(QUEUE_PATH)
-    mission = load_yaml(NIGHT05_ROOT / "mission_state.yaml")
-    recompute = load_json(NIGHT05_ROOT / "execution/recompute_summary.json")
-    change_log = load_json(NIGHT05_ROOT / "progress/change_log.json")
+    dependency = load_baseline_json(
+        f"{NIGHT04_REL}/execution/dependency_recompute.json"
+    )
+    parents = load_baseline_json(f"{NIGHT04_REL}/execution/parent_recompute.json")
+    pointer_truth = load_baseline_json(
+        f"{NIGHT04_REL}/pointer_prevalidation/dry_run_truth_receipt.json"
+    )
+    queue = load_baseline_yaml(QUEUE_REL)
+    mission = load_baseline_yaml(f"{NIGHT05_REL}/mission_state.yaml")
+    recompute = load_baseline_json(f"{NIGHT05_REL}/execution/recompute_summary.json")
+    change_log = load_baseline_json(f"{NIGHT05_REL}/progress/change_log.json")
     reconciliation = document["reconciliation"]
 
     assert inventory["occurrence_count"] == reconciliation["occurrence_count"] == 63
@@ -562,7 +586,7 @@ def test_source_truth_reconciles_63_20_6_69_43_0_without_fake_resolution() -> No
 
 def test_source_artifact_traceability_is_preserved_including_eight_pointer_nulls() -> None:
     document = load_yaml(MAP_PATH)
-    inventory = load_json(OCCURRENCE_PATH)
+    inventory = load_baseline_json(OCCURRENCE_REL)
     source_by_id = {
         item["blocker_occurrence_id"]: item for item in inventory["occurrences"]
     }
@@ -575,11 +599,14 @@ def test_source_artifact_traceability_is_preserved_including_eight_pointer_nulls
             assert mapped["source_classification"] == "engineering_local"
             match = re.search(r" in ([^:]+): '/", source["message"])
             assert match is not None
-            assert (ROOT / match.group(1)).is_file()
+            assert baseline_blob_exists(match.group(1))
         else:
-            path = ROOT / mapped["source_artifact_path"]
-            assert path.is_file()
-            assert sha256_file(path) == mapped["source_artifact_sha256"]
+            relative = mapped["source_artifact_path"]
+            assert baseline_blob_exists(relative)
+            assert (
+                sha256_git_blob(HISTORICAL_BASELINE, relative)
+                == mapped["source_artifact_sha256"]
+            )
     assert len(pointer_nulls) == 8
     assert Counter(item["field"] for item in pointer_nulls) == {
         "assertions.generation_id_present.pointer": 4,

@@ -94,7 +94,13 @@ def tree_hashes(root: Path) -> dict[str, str]:
 def built_replay(tmp_path_factory: pytest.TempPathFactory):
     runner = load_runner()
     output = tmp_path_factory.mktemp("r5_v1_replay") / "run"
-    result = runner.materialize_replay(ROOT, SOURCE_RUN, output)
+    fixture_root = tmp_path_factory.mktemp("r5_v1_replay_source")
+    result = runner.materialize_replay(
+        ROOT,
+        SOURCE_RUN,
+        output,
+        historical_fixture_root=fixture_root,
+    )
     return runner, output, result
 
 
@@ -145,14 +151,19 @@ def test_replay_uses_real_hash_bound_read_only_sources(built_replay) -> None:
     for row in rows:
         source_text = f"{row['source_path']}\n{row['processed_path']}".lower()
         assert "fixture" not in source_text
-        source = ROOT / row["source_path"]
-        assert source.is_file()
         assert row["source_hash_scope"] == "file_bytes"
-        assert (
-            sha256_for_scope(source, row["source_hash_scope"])
-            == row["expected_sha256"]
-            == row["observed_sha256"]
-        )
+        if runner.is_historical_source_path(row["source_path"]):
+            payload = runner.read_git_blob(
+                ROOT,
+                runner.HISTORICAL_BASELINE,
+                row["source_path"],
+            )
+            observed = hashlib.sha256(payload).hexdigest()
+        else:
+            source = ROOT / row["source_path"]
+            assert source.is_file()
+            observed = sha256_for_scope(source, row["source_hash_scope"])
+        assert observed == row["expected_sha256"] == row["observed_sha256"]
         if row["processed_path"]:
             processed = ROOT / row["processed_path"]
             assert processed.is_file()
@@ -327,17 +338,32 @@ def test_artifact_manifest_is_complete_and_hash_traceable(built_replay) -> None:
         assert sha256_file(output / rel) == row["sha256"]
 
 
-def test_replay_is_byte_idempotent_and_source_isolated(built_replay) -> None:
+def test_replay_is_byte_idempotent_and_source_isolated(
+    built_replay,
+    tmp_path: Path,
+) -> None:
     runner, output, first_result = built_replay
     source_before = {
-        rel: sha256_file(ROOT / rel)
+        rel: hashlib.sha256(
+            runner.read_git_blob(ROOT, runner.HISTORICAL_BASELINE, rel)
+        ).hexdigest()
         for rel in runner.EXPECTED_SOURCE_HASHES
-        if rel.startswith(runner.SOURCE_RUN_REL.as_posix())
+        if runner.is_historical_source_path(rel)
     }
     first_tree = tree_hashes(output)
-    second_result = runner.materialize_replay(ROOT, SOURCE_RUN, output)
+    second_result = runner.materialize_replay(
+        ROOT,
+        SOURCE_RUN,
+        output,
+        historical_fixture_root=tmp_path / "historical_source_fixture",
+    )
     second_tree = tree_hashes(output)
-    source_after = {rel: sha256_file(ROOT / rel) for rel in source_before}
+    source_after = {
+        rel: hashlib.sha256(
+            runner.read_git_blob(ROOT, runner.HISTORICAL_BASELINE, rel)
+        ).hexdigest()
+        for rel in source_before
+    }
     assert first_tree == second_tree
     assert source_before == source_after
     assert first_result["semantic_content_sha256"] == second_result["semantic_content_sha256"]

@@ -28,13 +28,12 @@ TEMPLATE_PATH = (
     / "assets"
     / "workflow_state_template.yaml"
 )
-LEGACY_STATE_PATH = (
-    ROOT
-    / "reports"
-    / "workflow_runs"
-    / "wf_20260703_stock_first_002837_invic"
-    / "workflow_state.yaml"
+HISTORICAL_BASELINE = "f60f220ae252262a537c612ce193fc779901984b"
+LEGACY_STATE_REL = (
+    "reports/workflow_runs/wf_20260703_stock_first_002837_invic/"
+    "workflow_state.yaml"
 )
+LEGACY_STATE_SHA256 = "aabe24082ff80facc55ba5eb51530199e9c2ba9d92d3b43c36e9189d0cdfed10"
 PROTECTED_V1_REPLAY_STATE_PATH = (
     ROOT
     / "reports"
@@ -71,6 +70,22 @@ def run_validator(path: Path) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         check=False,
     )
+
+
+def git_blob_bytes(revision: str, relative_path: str) -> bytes:
+    return subprocess.check_output(
+        ["git", "cat-file", "blob", f"{revision}:{relative_path}"],
+        cwd=ROOT,
+    )
+
+
+@pytest.fixture
+def legacy_state_fixture(tmp_path: Path) -> Path:
+    payload = git_blob_bytes(HISTORICAL_BASELINE, LEGACY_STATE_REL)
+    assert hashlib.sha256(payload).hexdigest() == LEGACY_STATE_SHA256
+    path = tmp_path / "legacy_workflow_state.yaml"
+    path.write_bytes(payload)
+    return path
 
 
 def write_state(tmp_path: Path, state: dict) -> Path:
@@ -183,13 +198,15 @@ def test_versioned_state_rejects_night_mission_status(tmp_path: Path) -> None:
     assert "invalid status" in result.stderr
 
 
-def test_protected_legacy_state_remains_read_only_compatible() -> None:
-    before = hashlib.sha256(LEGACY_STATE_PATH.read_bytes()).hexdigest()
-    result = run_validator(LEGACY_STATE_PATH)
-    after = hashlib.sha256(LEGACY_STATE_PATH.read_bytes()).hexdigest()
+def test_protected_legacy_state_remains_read_only_compatible(
+    legacy_state_fixture: Path,
+) -> None:
+    before = hashlib.sha256(legacy_state_fixture.read_bytes()).hexdigest()
+    result = run_validator(legacy_state_fixture)
+    after = hashlib.sha256(legacy_state_fixture.read_bytes()).hexdigest()
     assert result.returncode == 0, result.stderr
     assert "legacy compatibility" in result.stdout
-    assert after == before
+    assert after == before == LEGACY_STATE_SHA256
 
 
 def test_protected_v1_replay_state_remains_read_only_compatible() -> None:

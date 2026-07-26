@@ -56,7 +56,7 @@
 
 ## P4 — Historical blocker policy migration
 
-- State: implementation and required validators pass; awaiting the specified P4 checkpoint commit.
+- State: complete at checkpoint `3741c807ae1d9859e8cb72d5e587a5bb74f2082e`.
 - Phase parent: `6c7fc2a35942bb04f5ef0ecfa2c6ccbd10e0a069`.
 - The protected source root map remains byte-identical to engineering source `f60f220ae252262a537c612ce193fc779901984b`: Git blob `526d9964a95ddc866fa960a1b9556e720ca80178`, content SHA-256 `39aadff44cf51d1ad5607d8ec8481bbab42650723eaf5a981415df0ee3facacf`.
 - The active migration contains exactly seven root rows and no occurrence, parent, carry-forward or candidate-decision overlay. It preserves every historical root as open and all 63 historical occurrences as unresolved.
