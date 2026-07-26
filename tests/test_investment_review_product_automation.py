@@ -6,6 +6,7 @@ import sqlite3
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -28,6 +29,7 @@ import src.portfolio.web as web_module
 from tests.test_investment_review_review_runner import (
     RunnerFixture,
     _fixture as build_runner_fixture,
+    _reviewability_fixture as build_reviewability_runner_fixture,
     _trade_row,
 )
 from tests.test_investment_review_sync_service import _insert_ledger_row
@@ -54,6 +56,8 @@ def _coordinator(
     config: ReviewAutomationConfig | None = None,
     runner_factory=None,
     artifact_root: Path | None = None,
+    clock=None,
+    checkpoint_market_resolver=None,
 ) -> ReviewAutomationCoordinator:
     return ReviewAutomationCoordinator(
         portfolio_db=fixture.source,
@@ -63,6 +67,8 @@ def _coordinator(
         repo_root=fixture.root,
         config=config,
         runner_factory=runner_factory,
+        clock=clock,
+        checkpoint_market_resolver=checkpoint_market_resolver,
     )
 
 
@@ -210,6 +216,72 @@ def test_catch_up_key_binds_artifact_namespace(
         ("b", "weekly"),
         ("b", "monthly"),
     ]
+
+
+def test_reviewability_open_episode_uses_same_slot_idempotency_and_new_slot_key(
+    tmp_path: Path,
+) -> None:
+    fixture = build_reviewability_runner_fixture(tmp_path)
+    current = [datetime(2026, 7, 26, 8, 1, tzinfo=timezone.utc)]
+    coordinator = _coordinator(
+        fixture,
+        config=ReviewAutomationConfig(
+            enabled=True,
+            interval_seconds=900,
+            startup_catch_up=True,
+        ),
+        clock=lambda: current[0],
+    )
+
+    first = coordinator._prepare_plan(trigger="first")
+    repeated = coordinator._prepare_plan(trigger="same_slot")
+
+    assert repeated.run_key == first.run_key
+    assert first.checkpoint_slot == "2026-07-26T08:00:00Z"
+    assert first.as_of == first.checkpoint_slot
+    assert first.knowledge_cutoff == first.checkpoint_slot
+    assert first.checkpoint_plan_sha256 is not None
+    assert first.checkpoint_plan == {
+        "schema_version": (
+            integration_module.REVIEW_CHECKPOINT_PLAN_SCHEMA_VERSION
+        ),
+        "automation_version": (
+            integration_module.REVIEW_CHECKPOINT_AUTOMATION_VERSION
+        ),
+        "checkpoint_slot_seconds": 900,
+        "checkpoint_slot": "2026-07-26T08:00:00Z",
+        "as_of": "2026-07-26T08:00:00Z",
+        "knowledge_cutoff": "2026-07-26T08:00:00Z",
+        "identities": [
+            {
+                "episode_id": first.checkpoint_plan["identities"][0][
+                    "episode_id"
+                ],
+                "review_kind": "active_checkpoint",
+                "checkpoint_type": "active_checkpoint",
+                "perspective": "user",
+                "as_of": "2026-07-26T08:00:00Z",
+                "knowledge_cutoff": "2026-07-26T08:00:00Z",
+                "checkpoint_key": first.checkpoint_plan["identities"][0][
+                    "checkpoint_key"
+                ],
+                "checkpoint_id": first.checkpoint_plan["identities"][0][
+                    "checkpoint_id"
+                ],
+            }
+        ],
+        "content_id": first.checkpoint_plan["content_id"],
+    }
+
+    current[0] = datetime(2026, 7, 26, 8, 16, tzinfo=timezone.utc)
+    later = coordinator._prepare_plan(trigger="next_slot")
+
+    assert later.run_key != first.run_key
+    assert later.checkpoint_slot == "2026-07-26T08:15:00Z"
+    assert later.checkpoint_plan_sha256 != first.checkpoint_plan_sha256
+    assert later.checkpoint_plan["identities"][0]["episode_id"] == (
+        first.checkpoint_plan["identities"][0]["episode_id"]
+    )
 
 
 def test_serve_dashboard_explicit_automation_owns_start_and_stop(

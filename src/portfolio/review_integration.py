@@ -26,6 +26,12 @@ REVIEW_DATABASE_ENV = "INVESTMENT_REVIEW_DB"
 REVIEW_AUTOMATION_ENV = "INVESTMENT_REVIEW_AUTOMATION"
 REVIEW_AUTOMATION_INTERVAL_ENV = "INVESTMENT_REVIEW_AUTOMATION_INTERVAL_SECONDS"
 REVIEW_AUTOMATION_VERSION = "investment_review.catch_up.v1"
+REVIEW_CHECKPOINT_AUTOMATION_VERSION = (
+    "investment_review.open_checkpoint_catch_up.v1"
+)
+REVIEW_CHECKPOINT_PLAN_SCHEMA_VERSION = (
+    "investment_review.open_checkpoint_plan.v1"
+)
 REVIEW_AUTOMATION_SCOPES = ("single", "weekly", "monthly")
 DEFAULT_AUTOMATION_INTERVAL_SECONDS = 900.0
 AUTOMATION_LEASE_TIMEOUT_SECONDS = 120.0
@@ -183,6 +189,9 @@ class _AutomationPlan:
     source_sha256: str
     artifact_namespace: str
     projection_sha256: str
+    checkpoint_plan: dict[str, Any] | None
+    checkpoint_plan_sha256: str | None
+    checkpoint_slot: str | None
     as_of: str | None
     knowledge_cutoff: str | None
     source_cutoff: str | None
@@ -323,6 +332,10 @@ def _public_run_projection(value: object) -> dict[str, Any] | None:
                     "run_key": item.get("run_key"),
                     "status": item.get("status"),
                     "content_id": item.get("content_id"),
+                    "checkpoint_ids": item.get("checkpoint_ids", []),
+                    "checkpoint_count": item.get(
+                        "checkpoint_count", 0
+                    ),
                 }
             )
     return {
@@ -336,6 +349,10 @@ def _public_run_projection(value: object) -> dict[str, Any] | None:
         ),
         "source_cutoff_id": parameters.get("source_cutoff_id"),
         "projection_sha256": parameters.get("projection_sha256"),
+        "checkpoint_plan_sha256": parameters.get(
+            "checkpoint_plan_sha256"
+        ),
+        "checkpoint_slot": parameters.get("checkpoint_slot"),
         "attempt": details.get("attempt"),
         "retryable": details.get("retryable"),
         "scope_runs": projected_scopes,
@@ -521,6 +538,9 @@ class ReviewAutomationCoordinator:
         sync_service: Any | None = None,
         store: Any | None = None,
         runner_factory: RunnerFactory | None = None,
+        checkpoint_market_resolver: (
+            Callable[..., Mapping[str, Any]] | None
+        ) = None,
         clock: Clock | None = None,
     ) -> None:
         from src.investment_review.review_runner import ReviewRunner
@@ -584,6 +604,14 @@ class ReviewAutomationCoordinator:
         )
         self.store = store or ReviewStore(self.review_db)
         self.store.status()
+        if (
+            runner_factory is not None
+            and checkpoint_market_resolver is not None
+        ):
+            raise ValueError(
+                "runner_factory and checkpoint_market_resolver are "
+                "mutually exclusive"
+            )
         self._runner_factory = runner_factory or (
             lambda: ReviewRunner(
                 review_db=self.review_db,
@@ -591,6 +619,9 @@ class ReviewAutomationCoordinator:
                 mapping_path=self.mapping_path,
                 artifact_root=self.artifact_root,
                 repo_root=self.repo_root,
+                checkpoint_market_resolver=(
+                    checkpoint_market_resolver
+                ),
             )
         )
         self._clock = clock or (lambda: datetime.now(timezone.utc))
@@ -649,6 +680,107 @@ class ReviewAutomationCoordinator:
             if value is not None and str(value).strip()
         ]
         return utc_iso(max(parsed), "UTC") if parsed else None
+
+    def _open_checkpoint_plan(
+        self,
+        *,
+        events: list[dict[str, Any]],
+        latest_event_at: str | None,
+        latest_known_at: str | None,
+    ) -> dict[str, Any] | None:
+        """Plan one deterministic periodic cutoff for currently open episodes.
+
+        This planner only binds semantic checkpoint identities.  It does not
+        assemble market evidence or persist checkpoints; those remain runner
+        responsibilities.  Legacy sidecars keep the v1 event-cutoff key.
+        """
+
+        from src.investment_review.episodes import (
+            build_episode_collection,
+            validate_episode_collection,
+        )
+        from src.investment_review.models import canonical_json, sha256_text
+        from src.investment_review.time_utils import parse_datetime, utc_iso
+
+        status = self.store.status()
+        if status.get("reviewability_schema_version") != 1 or not events:
+            return None
+
+        now = self._clock()
+        if now.tzinfo is None or now.utcoffset() is None:
+            raise ValueError("review automation clock must be timezone-aware")
+        now_utc = now.astimezone(timezone.utc)
+        slot_seconds = max(1, int(round(self.config.interval_seconds)))
+        slot_epoch = int(now_utc.timestamp()) // slot_seconds * slot_seconds
+        slot_time = datetime.fromtimestamp(slot_epoch, tz=timezone.utc)
+        if latest_event_at is not None:
+            latest_event_time = parse_datetime(latest_event_at, "UTC")
+            if slot_time < latest_event_time:
+                slot_time = latest_event_time
+        checkpoint_cutoff = utc_iso(slot_time, "UTC")
+
+        collection = build_episode_collection(
+            events,
+            cutoff_at=checkpoint_cutoff,
+            snapshot_references=[],
+        )
+        validation = validate_episode_collection(collection)
+        if validation.get("validation_status") == "blocked":
+            raise RuntimeError(
+                "open checkpoint planning requires a validated episode "
+                "collection"
+            )
+        open_episode_ids = sorted(
+            str(item.get("episode_id") or "")
+            for item in collection.get("episodes", [])
+            if isinstance(item, Mapping)
+            and item.get("episode_id")
+            and item.get("status") == "open"
+        )
+        if not open_episode_ids:
+            return None
+
+        known_candidates = [
+            value
+            for value in (latest_known_at, checkpoint_cutoff)
+            if value is not None
+        ]
+        knowledge_cutoff = self._max_timestamp(known_candidates)
+        identities: list[dict[str, Any]] = []
+        for episode_id in open_episode_ids:
+            identity = {
+                "episode_id": episode_id,
+                "review_kind": "active_checkpoint",
+                "checkpoint_type": "active_checkpoint",
+                "perspective": "user",
+                "as_of": checkpoint_cutoff,
+                "knowledge_cutoff": knowledge_cutoff,
+            }
+            identity_digest = sha256_text(canonical_json(identity))
+            identities.append(
+                {
+                    **identity,
+                    "checkpoint_key": (
+                        f"review_checkpoint_key_{identity_digest}"
+                    ),
+                    "checkpoint_id": (
+                        f"review_checkpoint_{identity_digest[:32]}"
+                    ),
+                }
+            )
+        material = {
+            "schema_version": REVIEW_CHECKPOINT_PLAN_SCHEMA_VERSION,
+            "automation_version": REVIEW_CHECKPOINT_AUTOMATION_VERSION,
+            "checkpoint_slot_seconds": slot_seconds,
+            "checkpoint_slot": checkpoint_cutoff,
+            "as_of": checkpoint_cutoff,
+            "knowledge_cutoff": knowledge_cutoff,
+            "identities": identities,
+        }
+        return {
+            **material,
+            "content_id": "sha256:" + sha256_text(canonical_json(material)),
+        }
 
     def _prepare_plan(self, *, trigger: str) -> _AutomationPlan:
         from src.investment_review.models import canonical_json, sha256_text
@@ -710,12 +842,35 @@ class ReviewAutomationCoordinator:
         knowledge_cutoff = self._max_timestamp(known_values)
         if as_of is not None and knowledge_cutoff is None:
             knowledge_cutoff = as_of
+        checkpoint_plan = self._open_checkpoint_plan(
+            events=events,
+            latest_event_at=as_of,
+            latest_known_at=knowledge_cutoff,
+        )
+        checkpoint_plan_sha256: str | None = None
+        checkpoint_slot: str | None = None
+        automation_version = REVIEW_AUTOMATION_VERSION
+        if checkpoint_plan is not None:
+            automation_version = REVIEW_CHECKPOINT_AUTOMATION_VERSION
+            checkpoint_plan_sha256 = str(
+                checkpoint_plan["content_id"]
+            ).removeprefix("sha256:")
+            checkpoint_slot = str(checkpoint_plan["checkpoint_slot"])
+            as_of = str(checkpoint_plan["as_of"])
+            knowledge_cutoff = str(checkpoint_plan["knowledge_cutoff"])
         material = {
-            "automation_version": REVIEW_AUTOMATION_VERSION,
+            "automation_version": automation_version,
             "source_cutoff_id": cutoff_id,
             "source_sha256": source_sha256,
             "artifact_namespace": self.artifact_namespace,
             "projection_sha256": projection_sha256,
+            "checkpoint_plan_schema_version": (
+                REVIEW_CHECKPOINT_PLAN_SCHEMA_VERSION
+                if checkpoint_plan is not None
+                else None
+            ),
+            "checkpoint_plan_sha256": checkpoint_plan_sha256,
+            "checkpoint_slot": checkpoint_slot,
             "as_of": as_of,
             "knowledge_cutoff": knowledge_cutoff,
             "scopes": list(REVIEW_AUTOMATION_SCOPES),
@@ -728,6 +883,9 @@ class ReviewAutomationCoordinator:
             source_sha256=source_sha256,
             artifact_namespace=self.artifact_namespace,
             projection_sha256=projection_sha256,
+            checkpoint_plan=checkpoint_plan,
+            checkpoint_plan_sha256=checkpoint_plan_sha256,
+            checkpoint_slot=checkpoint_slot,
             as_of=as_of,
             knowledge_cutoff=knowledge_cutoff,
             source_cutoff=knowledge_cutoff or cutoff.get("max_known_at"),
@@ -762,11 +920,20 @@ class ReviewAutomationCoordinator:
                     "source_cutoff": plan.source_cutoff,
                     "trigger": trigger,
                     "parameters": {
-                        "automation_version": REVIEW_AUTOMATION_VERSION,
+                        "automation_version": (
+                            REVIEW_CHECKPOINT_AUTOMATION_VERSION
+                            if plan.checkpoint_plan is not None
+                            else REVIEW_AUTOMATION_VERSION
+                        ),
                         "source_cutoff_id": plan.source_cutoff_id,
                         "source_sha256": plan.source_sha256,
                         "artifact_namespace": plan.artifact_namespace,
                         "projection_sha256": plan.projection_sha256,
+                        "checkpoint_plan": plan.checkpoint_plan,
+                        "checkpoint_plan_sha256": (
+                            plan.checkpoint_plan_sha256
+                        ),
+                        "checkpoint_slot": plan.checkpoint_slot,
                         "as_of": plan.as_of,
                         "knowledge_cutoff": plan.knowledge_cutoff,
                         "scopes": list(REVIEW_AUTOMATION_SCOPES),
@@ -1097,6 +1264,8 @@ class ReviewAutomationCoordinator:
                                 "run_key": None,
                                 "status": "failed",
                                 "content_id": None,
+                                "checkpoint_ids": [],
+                                "checkpoint_count": 0,
                             }
                         )
                         continue
@@ -1115,6 +1284,36 @@ class ReviewAutomationCoordinator:
                                 "run_key": receipt.get("run_key"),
                                 "status": receipt.get("status"),
                                 "content_id": receipt.get("content_id"),
+                                "checkpoint_ids": sorted(
+                                    str(
+                                        (
+                                            item.get(
+                                                "review_checkpoint"
+                                            )
+                                            or {}
+                                        ).get("checkpoint_id")
+                                        or ""
+                                    )
+                                    for item in receipt.get(
+                                        "episodes", []
+                                    )
+                                    if isinstance(item, Mapping)
+                                    and isinstance(
+                                        item.get("review_checkpoint"),
+                                        Mapping,
+                                    )
+                                ),
+                                "checkpoint_count": sum(
+                                    1
+                                    for item in receipt.get(
+                                        "episodes", []
+                                    )
+                                    if isinstance(item, Mapping)
+                                    and isinstance(
+                                        item.get("review_checkpoint"),
+                                        Mapping,
+                                    )
+                                ),
                             }
                         )
                     except Exception as exc:
@@ -1132,6 +1331,8 @@ class ReviewAutomationCoordinator:
                                 "run_key": None,
                                 "status": "failed",
                                 "content_id": None,
+                                "checkpoint_ids": [],
+                                "checkpoint_count": 0,
                             }
                         )
 
@@ -1176,6 +1377,10 @@ class ReviewAutomationCoordinator:
                     "trigger": trigger,
                     "source_cutoff_id": plan.source_cutoff_id,
                     "projection_sha256": plan.projection_sha256,
+                    "checkpoint_plan_sha256": (
+                        plan.checkpoint_plan_sha256
+                    ),
+                    "checkpoint_slot": plan.checkpoint_slot,
                     "sync_action": plan.sync_action,
                     "counts": {
                         "source_seen": plan.source_seen,
@@ -1204,6 +1409,10 @@ class ReviewAutomationCoordinator:
                     "run_key": plan.run_key,
                     "source_cutoff_id": plan.source_cutoff_id,
                     "projection_sha256": plan.projection_sha256,
+                    "checkpoint_plan_sha256": (
+                        plan.checkpoint_plan_sha256
+                    ),
+                    "checkpoint_slot": plan.checkpoint_slot,
                     "as_of": plan.as_of,
                     "knowledge_cutoff": plan.knowledge_cutoff,
                     "sync_action": plan.sync_action,

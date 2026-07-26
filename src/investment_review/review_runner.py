@@ -14,7 +14,7 @@ from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Mapping, Sequence
 from zoneinfo import ZoneInfo
 
 from .artifact_io import (
@@ -40,7 +40,11 @@ from .episodes import (
     query_episode_collection,
     validate_episode_collection,
 )
-from .models import canonical_json, sha256_text
+from .models import (
+    OPERATION_CHECKPOINT_SCHEMA_VERSION,
+    canonical_json,
+    sha256_text,
+)
 from .knowledge_provenance import (
     METHOD_VERSION as KNOWLEDGE_PROVENANCE_METHOD_VERSION,
     SCHEMA_VERSION as KNOWLEDGE_PROVENANCE_SCHEMA_VERSION,
@@ -66,6 +70,13 @@ from .portfolio_snapshot_adapter import (
     inspect_portfolio_snapshots,
     load_cash_baseline_proof,
 )
+from .review_checkpoint import (
+    METHOD_VERSION as REVIEW_CHECKPOINT_METHOD_VERSION,
+    build_review_checkpoint,
+    canonical_review_checkpoint_bytes,
+    replay_validate_review_checkpoint,
+    validate_review_checkpoint,
+)
 from .review_input_bundle import (
     build_review_input_bundle,
     replay_validate_review_input_bundle,
@@ -88,6 +99,9 @@ RUN_PERSPECTIVES = frozenset({"user", "system"})
 TERMINAL_RUN_STATUSES = frozenset({"succeeded", "partial", "blocked", "failed"})
 LEDGER_RECONSTRUCTION_PROJECTION_MANIFEST_VERSION = (
     "investment_review.ledger_snapshot_projection_manifest.v1"
+)
+REVIEW_CHECKPOINT_PROJECTION_MANIFEST_VERSION = (
+    "investment_review.review_checkpoint_projection_manifest.v1"
 )
 COMPLETED_STAGE_NAMES = (
     "sync",
@@ -663,6 +677,94 @@ def _ledger_reconstruction_projection_manifest(
     }
 
 
+def _review_checkpoint_receipt_projection(
+    checkpoint: Mapping[str, Any],
+) -> dict[str, Any]:
+    validation = validate_review_checkpoint(checkpoint)
+    if _is_blocked(validation):
+        raise CanonicalGateBlocked(
+            "review checkpoint validation blocked: "
+            + ",".join(_finding_codes(validation))
+        )
+    axes = checkpoint.get("status_axes")
+    if not isinstance(axes, Mapping):
+        raise CanonicalGateBlocked("review checkpoint status axes are missing")
+    projections: dict[str, Mapping[str, Any]] = {}
+    for name in (
+        "operation",
+        "decision",
+        "snapshot_cash_valuation",
+        "market",
+        "lifecycle",
+        "outcome",
+    ):
+        axis = axes.get(name)
+        if not isinstance(axis, Mapping):
+            raise CanonicalGateBlocked(
+                f"review checkpoint axis is missing: {name}"
+            )
+        projections[name] = axis
+    lifecycle = str(projections["lifecycle"].get("status") or "")
+    outcome = str(projections["outcome"].get("status") or "")
+    notices = (
+        ["OPEN_EPISODE_OUTCOME_NOT_FINAL"]
+        if lifecycle == "open" and outcome == "interim"
+        else []
+    )
+    return {
+        "schema_version": OPERATION_CHECKPOINT_SCHEMA_VERSION,
+        "checkpoint_id": str(checkpoint.get("checkpoint_id") or ""),
+        "checkpoint_key": str(checkpoint.get("checkpoint_key") or ""),
+        "content_id": str(checkpoint.get("content_id") or ""),
+        "position_case_id": str(
+            checkpoint.get("position_case_id") or ""
+        ),
+        "review_kind": str(checkpoint.get("review_kind") or ""),
+        "checkpoint_type": str(checkpoint.get("checkpoint_type") or ""),
+        "perspective": str(checkpoint.get("perspective") or ""),
+        "as_of": str(checkpoint.get("as_of") or ""),
+        "knowledge_cutoff": str(
+            checkpoint.get("knowledge_cutoff") or ""
+        ),
+        "review_readiness": str(
+            projections["operation"].get("status") or ""
+        ),
+        "decision_context_status": str(
+            projections["decision"].get("status") or ""
+        ),
+        "snapshot_cash_valuation_status": str(
+            projections["snapshot_cash_valuation"].get("status") or ""
+        ),
+        "market_status": str(
+            projections["market"].get("status") or ""
+        ),
+        "episode_lifecycle": lifecycle,
+        "outcome_maturity": outcome,
+        "lifecycle_notices": notices,
+    }
+
+
+def _review_checkpoint_projection_manifest(
+    projections_by_episode: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    episodes = [
+        {
+            "episode_id": episode_id,
+            **dict(projections_by_episode[episode_id]),
+        }
+        for episode_id in sorted(projections_by_episode)
+    ]
+    material = {
+        "schema_version": REVIEW_CHECKPOINT_PROJECTION_MANIFEST_VERSION,
+        "episodes": episodes,
+    }
+    return {
+        **material,
+        "content_id": "sha256:"
+        + _sha256_bytes(canonical_json_bytes(material)),
+    }
+
+
 def _episode_reconstruction_identity(
     episode: Mapping[str, Any],
 ) -> dict[str, Any]:
@@ -1055,6 +1157,9 @@ class ReviewRunner:
         mapping_path: str | Path | None = None,
         artifact_root: str | Path | None = None,
         repo_root: str | Path | None = None,
+        checkpoint_market_resolver: (
+            Callable[..., Mapping[str, Any]] | None
+        ) = None,
     ) -> None:
         self.repo_root = (
             Path(repo_root).resolve()
@@ -1081,6 +1186,7 @@ class ReviewRunner:
         self.artifact_root = _resolve_artifact_root(
             artifact_root, repo_root=self.repo_root
         )
+        self.checkpoint_market_resolver = checkpoint_market_resolver
         if not _inside(self.review_db, self.repo_root):
             raise ReviewRunnerError(
                 "review sidecar must remain inside the selected checkout"
@@ -1089,6 +1195,67 @@ class ReviewRunner:
             raise ReviewRunnerError(
                 "portfolio source and review sidecar must be different files"
             )
+
+    def _checkpoint_market_inputs(
+        self,
+        *,
+        episode: Mapping[str, Any],
+        operation_review: Mapping[str, Any],
+        knowledge_provenance: Mapping[str, Any],
+        ledger_snapshot_reconstruction: Mapping[str, Any],
+        perspective: str,
+        as_of: str,
+        knowledge_cutoff: str,
+    ) -> dict[str, Any]:
+        resolver = self.checkpoint_market_resolver
+        if resolver is None:
+            raise CanonicalGateBlocked(
+                "CHECKPOINT_MARKET_PROJECTION_UNPROVEN"
+            )
+        resolved = resolver(
+            portfolio_db=self.portfolio_db,
+            review_db=self.review_db,
+            episode=deepcopy(dict(episode)),
+            operation_review=deepcopy(dict(operation_review)),
+            knowledge_provenance=deepcopy(dict(knowledge_provenance)),
+            ledger_snapshot_reconstruction=deepcopy(
+                dict(ledger_snapshot_reconstruction)
+            ),
+            perspective=perspective,
+            as_of=as_of,
+            knowledge_cutoff=knowledge_cutoff,
+        )
+        if not isinstance(resolved, Mapping):
+            raise CanonicalGateBlocked(
+                "CHECKPOINT_MARKET_PROJECTION_UNPROVEN"
+            )
+        if set(resolved) - {
+            "market_axis",
+            "market_fallback",
+            "market_gaps",
+        }:
+            raise CanonicalGateBlocked(
+                "checkpoint market resolver returned unsupported fields"
+            )
+        market_axis = resolved.get("market_axis")
+        market_fallback = resolved.get("market_fallback")
+        market_gaps = resolved.get("market_gaps", [])
+        if (
+            not isinstance(market_axis, Mapping)
+            or not isinstance(market_fallback, Mapping)
+            or not isinstance(market_gaps, (list, tuple))
+            or any(not isinstance(item, Mapping) for item in market_gaps)
+        ):
+            raise CanonicalGateBlocked(
+                "CHECKPOINT_MARKET_PROJECTION_UNPROVEN"
+            )
+        return {
+            "market_axis": deepcopy(dict(market_axis)),
+            "market_fallback": deepcopy(dict(market_fallback)),
+            "market_gaps": [
+                deepcopy(dict(item)) for item in market_gaps
+            ],
+        }
 
     def _append_status(
         self,
@@ -1888,6 +2055,256 @@ class ReviewRunner:
                             findings.append(
                                 "CASH_BASELINE_PROOF_ARTIFACT_INVALID"
                             )
+            checkpoint_version = (
+                cutoffs.get("operation_checkpoint_schema_version")
+                if isinstance(cutoffs, Mapping)
+                else None
+            )
+            checkpoint_signal = (
+                checkpoint_version is not None
+                or any(
+                    isinstance(item, Mapping)
+                    and "review_checkpoint" in item
+                    for item in episodes
+                )
+                or any(
+                    isinstance(item, Mapping)
+                    and "review_checkpoint" in item
+                    for item in replay_items
+                )
+            )
+            if checkpoint_signal:
+                if (
+                    not isinstance(cutoffs, Mapping)
+                    or checkpoint_version
+                    != OPERATION_CHECKPOINT_SCHEMA_VERSION
+                    or cutoffs.get("review_checkpoint_method_version")
+                    != REVIEW_CHECKPOINT_METHOD_VERSION
+                    or cutoffs.get(
+                        "review_checkpoint_projection_manifest_version"
+                    )
+                    != REVIEW_CHECKPOINT_PROJECTION_MANIFEST_VERSION
+                ):
+                    findings.append(
+                        "INVALID_REVIEW_CHECKPOINT_VERSION_BINDING"
+                    )
+                expected_projection_fields = {
+                    "schema_version",
+                    "checkpoint_id",
+                    "checkpoint_key",
+                    "content_id",
+                    "position_case_id",
+                    "review_kind",
+                    "checkpoint_type",
+                    "perspective",
+                    "as_of",
+                    "knowledge_cutoff",
+                    "review_readiness",
+                    "decision_context_status",
+                    "snapshot_cash_valuation_status",
+                    "market_status",
+                    "episode_lifecycle",
+                    "outcome_maturity",
+                    "lifecycle_notices",
+                }
+                checkpoint_projection_by_id: dict[
+                    str, Mapping[str, Any]
+                ] = {}
+                for episode_item in (
+                    episodes if isinstance(episodes, list) else []
+                ):
+                    episode_item_id = (
+                        str(episode_item.get("episode_id") or "")
+                        if isinstance(episode_item, Mapping)
+                        else ""
+                    )
+                    projection = (
+                        episode_item.get("review_checkpoint")
+                        if isinstance(episode_item, Mapping)
+                        else None
+                    )
+                    if projection is None:
+                        continue
+                    if (
+                        not episode_item_id
+                        or not isinstance(projection, Mapping)
+                        or set(projection) != expected_projection_fields
+                        or projection.get("schema_version")
+                        != OPERATION_CHECKPOINT_SCHEMA_VERSION
+                        or not str(
+                            projection.get("checkpoint_id") or ""
+                        ).startswith("review_checkpoint_")
+                        or not str(
+                            projection.get("checkpoint_key") or ""
+                        ).startswith("review_checkpoint_key_")
+                        or not str(
+                            projection.get("content_id") or ""
+                        ).startswith("sha256:")
+                        or projection.get("perspective")
+                        != receipt_perspective
+                        or projection.get("as_of")
+                        != cutoffs.get("as_of")
+                        or projection.get("knowledge_cutoff")
+                        != cutoffs.get("knowledge_cutoff")
+                        or projection.get("review_kind")
+                        != "active_checkpoint"
+                        or projection.get("checkpoint_type")
+                        != "active_checkpoint"
+                        or projection.get("episode_lifecycle") != "open"
+                        or projection.get("outcome_maturity") != "interim"
+                        or projection.get("lifecycle_notices")
+                        != ["OPEN_EPISODE_OUTCOME_NOT_FINAL"]
+                    ):
+                        findings.append(
+                            "MALFORMED_REVIEW_CHECKPOINT_PROJECTION"
+                        )
+                        continue
+                    checkpoint_projection_by_id[
+                        episode_item_id
+                    ] = projection
+                receipt_checkpoint_manifest = (
+                    _review_checkpoint_projection_manifest(
+                        checkpoint_projection_by_id
+                    )
+                )
+                if (
+                    cutoffs.get(
+                        "review_checkpoint_projection_sha256"
+                    )
+                    != str(
+                        receipt_checkpoint_manifest["content_id"]
+                    ).removeprefix("sha256:")
+                ):
+                    findings.append(
+                        "REVIEW_CHECKPOINT_PROJECTION_BINDING_MISMATCH"
+                    )
+                checkpoint_ids = sorted(
+                    str(item.get("content_id") or "")
+                    for item in checkpoint_projection_by_id.values()
+                )
+                checkpoint_stage_artifacts = (
+                    episode_stage.get("artifacts", [])
+                    if isinstance(episode_stage, Mapping)
+                    else []
+                )
+                checkpoint_descriptors = {
+                    str(item.get("content_id") or ""): item
+                    for item in checkpoint_stage_artifacts
+                    if isinstance(item, Mapping)
+                    and item.get("content_id")
+                }
+                if (
+                    episode_details is None
+                    or episode_details.get(
+                        "operation_checkpoint_schema_version"
+                    )
+                    != OPERATION_CHECKPOINT_SCHEMA_VERSION
+                    or episode_details.get(
+                        "review_checkpoint_method_version"
+                    )
+                    != REVIEW_CHECKPOINT_METHOD_VERSION
+                    or episode_details.get("review_checkpoint_count")
+                    != len(checkpoint_projection_by_id)
+                    or episode_details.get(
+                        "review_checkpoint_content_ids"
+                    )
+                    != checkpoint_ids
+                    or not set(checkpoint_ids).issubset(
+                        checkpoint_descriptors
+                    )
+                ):
+                    findings.append(
+                        "REVIEW_CHECKPOINT_MEMBERSHIP_MISMATCH"
+                    )
+                replay_by_id = {
+                    str(item.get("episode_id") or ""): item
+                    for item in replay_items
+                    if isinstance(item, Mapping)
+                    and item.get("episode_id")
+                }
+                for episode_item_id, projection in (
+                    checkpoint_projection_by_id.items()
+                ):
+                    replay_projection = (
+                        replay_by_id.get(episode_item_id, {}).get(
+                            "review_checkpoint"
+                        )
+                        if isinstance(
+                            replay_by_id.get(episode_item_id), Mapping
+                        )
+                        else None
+                    )
+                    if (
+                        not isinstance(replay_projection, Mapping)
+                        or replay_projection.get("validation_status")
+                        != "accepted"
+                        or replay_projection.get("source_verification")
+                        != "verified"
+                        or {
+                            key: replay_projection.get(key)
+                            for key in expected_projection_fields
+                        }
+                        != dict(projection)
+                    ):
+                        findings.append(
+                            "REVIEW_CHECKPOINT_SOURCE_REPLAY_MISMATCH"
+                        )
+                    if receipt.get("mode") != "apply":
+                        continue
+                    descriptor = checkpoint_descriptors.get(
+                        str(projection.get("content_id") or "")
+                    )
+                    artifact_path = (
+                        Path(str(descriptor.get("path") or ""))
+                        if isinstance(descriptor, Mapping)
+                        else None
+                    )
+                    try:
+                        checkpoint_artifact = (
+                            load_json_object(artifact_path)
+                            if artifact_path is not None
+                            and artifact_path.is_file()
+                            else None
+                        )
+                        checkpoint_validation = (
+                            validate_review_checkpoint(
+                                checkpoint_artifact
+                            )
+                        )
+                        stored_checkpoint = ReviewStore(
+                            self.review_db
+                        ).get_operation_checkpoint(
+                            str(projection.get("checkpoint_key") or "")
+                        )
+                    except Exception:
+                        checkpoint_artifact = None
+                        checkpoint_validation = {
+                            "validation_status": "blocked"
+                        }
+                        stored_checkpoint = None
+                    if (
+                        checkpoint_validation.get(
+                            "validation_status"
+                        )
+                        != "accepted"
+                        or not isinstance(checkpoint_artifact, Mapping)
+                        or checkpoint_artifact.get("episode_id")
+                        != episode_item_id
+                        or _review_checkpoint_receipt_projection(
+                            checkpoint_artifact
+                        )
+                        != dict(projection)
+                        or not isinstance(stored_checkpoint, Mapping)
+                        or canonical_review_checkpoint_bytes(
+                            stored_checkpoint
+                        )
+                        != canonical_review_checkpoint_bytes(
+                            checkpoint_artifact
+                        )
+                    ):
+                        findings.append(
+                            "REVIEW_CHECKPOINT_ARTIFACT_INVALID"
+                        )
             if sync_details is None or not isinstance(cutoffs, Mapping):
                 findings.append("RUN_KEY_BINDING_INPUT_MISSING")
             else:
@@ -1960,6 +2377,46 @@ class ReviewRunner:
                             "ledger_snapshot_reconstruction_projection_sha256": (
                                 cutoffs.get(
                                     "ledger_snapshot_reconstruction_projection_sha256"
+                                )
+                            ),
+                        }
+                    )
+                receipt_checkpoint_version = cutoffs.get(
+                    "operation_checkpoint_schema_version"
+                )
+                if (
+                    receipt_checkpoint_version is not None
+                    or cutoffs.get(
+                        "review_checkpoint_method_version"
+                    )
+                    is not None
+                    or cutoffs.get(
+                        "review_checkpoint_projection_manifest_version"
+                    )
+                    is not None
+                    or cutoffs.get(
+                        "review_checkpoint_projection_sha256"
+                    )
+                    is not None
+                ):
+                    expected_key_material.update(
+                        {
+                            "operation_checkpoint_schema_version": (
+                                receipt_checkpoint_version
+                            ),
+                            "review_checkpoint_method_version": (
+                                cutoffs.get(
+                                    "review_checkpoint_method_version"
+                                )
+                            ),
+                            "review_checkpoint_projection_manifest_version": (
+                                cutoffs.get(
+                                    "review_checkpoint_projection_manifest_version"
+                                )
+                            ),
+                            "review_checkpoint_projection_sha256": (
+                                cutoffs.get(
+                                    "review_checkpoint_projection_sha256"
                                 )
                             ),
                         }
@@ -2160,6 +2617,10 @@ class ReviewRunner:
                 "reviewability_schema_version"
             )
             reviewability_enabled = reviewability_schema_version == 1
+            checkpointing_enabled = (
+                reviewability_enabled
+                and self.checkpoint_market_resolver is not None
+            )
             (
                 event_inputs,
                 event_observation_rows,
@@ -2198,16 +2659,35 @@ class ReviewRunner:
                 knowledge_provenance,
                 event_inputs,
             )
+            snapshot_inventory: dict[str, Any] | None = None
+            if checkpointing_enabled:
+                snapshot_inventory = inspect_portfolio_snapshots(
+                    self.portfolio_db,
+                    as_of=as_of_time.astimezone(
+                        ZoneInfo("Asia/Shanghai")
+                    ).date().isoformat(),
+                    knowledge_cutoff=_utc_text(knowledge_time),
+                )
             ledger_reconstructions: dict[str, dict[str, Any]] = {}
             ledger_projection_manifest = (
                 _ledger_reconstruction_projection_manifest({})
+            )
+            review_checkpoints: dict[str, dict[str, Any]] = {}
+            checkpoint_projection_manifest = (
+                _review_checkpoint_projection_manifest({})
             )
             preview_selected: list[dict[str, Any]] = []
             if reviewability_enabled:
                 preview_collection = build_episode_collection(
                     perspective_event_inputs,
                     cutoff_at=_utc_text(episode_cutoff),
-                    snapshot_references=[],
+                    snapshot_references=(
+                        snapshot_inventory.get(
+                            "snapshot_references", []
+                        )
+                        if snapshot_inventory is not None
+                        else []
+                    ),
                 )
                 preview_validation = validate_episode_collection(
                     preview_collection
@@ -2262,6 +2742,126 @@ class ReviewRunner:
                         }
                     )
                 )
+                if checkpointing_enabled:
+                    preview_operation_review = build_operation_review(
+                        preview_collection,
+                        event_inputs=perspective_event_inputs,
+                    )
+                    preview_operation_validation = (
+                        validate_operation_review(
+                            preview_operation_review
+                        )
+                    )
+                    if _is_blocked(preview_operation_validation):
+                        raise CanonicalGateBlocked(
+                            "checkpoint operation-review preview blocked: "
+                            + ",".join(
+                                _finding_codes(
+                                    preview_operation_validation
+                                )
+                            )
+                        )
+                    preview_operation_replay = (
+                        replay_validate_operation_review(
+                            preview_operation_review,
+                            episode_collection=preview_collection,
+                            event_inputs=perspective_event_inputs,
+                        )
+                    )
+                    if (
+                        _is_blocked(preview_operation_replay)
+                        or not _source_verification_ready(
+                            preview_operation_replay
+                        )
+                    ):
+                        raise CanonicalGateBlocked(
+                            "checkpoint operation-review preview replay failed"
+                        )
+                    for selected_episode in preview_selected:
+                        if selected_episode.get("status") != "open":
+                            continue
+                        selected_episode_id = str(
+                            selected_episode.get("episode_id") or ""
+                        )
+                        reconstruction = ledger_reconstructions[
+                            selected_episode_id
+                        ]["artifact"]
+                        market_inputs = self._checkpoint_market_inputs(
+                            episode=selected_episode,
+                            operation_review=preview_operation_review,
+                            knowledge_provenance=knowledge_provenance,
+                            ledger_snapshot_reconstruction=reconstruction,
+                            perspective=perspective,
+                            as_of=_utc_text(as_of_time),
+                            knowledge_cutoff=_utc_text(knowledge_time),
+                        )
+                        checkpoint = build_review_checkpoint(
+                            episode=selected_episode,
+                            operation_review=preview_operation_review,
+                            knowledge_provenance=knowledge_provenance,
+                            ledger_snapshot_reconstruction=reconstruction,
+                            perspective=perspective,
+                            checkpoint_as_of=_utc_text(as_of_time),
+                            knowledge_cutoff=_utc_text(knowledge_time),
+                            checkpoint_type="active_checkpoint",
+                            market_axis=market_inputs["market_axis"],
+                            market_fallback=market_inputs[
+                                "market_fallback"
+                            ],
+                            market_gaps=market_inputs["market_gaps"],
+                        )
+                        checkpoint_replay = (
+                            replay_validate_review_checkpoint(
+                                checkpoint,
+                                episode=selected_episode,
+                                operation_review=preview_operation_review,
+                                knowledge_provenance=knowledge_provenance,
+                                ledger_snapshot_reconstruction=(
+                                    reconstruction
+                                ),
+                                perspective=perspective,
+                                checkpoint_as_of=_utc_text(as_of_time),
+                                knowledge_cutoff=_utc_text(knowledge_time),
+                                checkpoint_type="active_checkpoint",
+                                market_axis=market_inputs["market_axis"],
+                                market_fallback=market_inputs[
+                                    "market_fallback"
+                                ],
+                                market_gaps=market_inputs["market_gaps"],
+                            )
+                        )
+                        if (
+                            _is_blocked(checkpoint_replay)
+                            or not _source_verification_ready(
+                                checkpoint_replay
+                            )
+                        ):
+                            raise CanonicalGateBlocked(
+                                "review checkpoint source replay failed: "
+                                + selected_episode_id
+                            )
+                        review_checkpoints[selected_episode_id] = {
+                            "artifact": checkpoint,
+                            "market_inputs": market_inputs,
+                            "replay": checkpoint_replay,
+                            "receipt_projection": (
+                                _review_checkpoint_receipt_projection(
+                                    checkpoint
+                                )
+                            ),
+                        }
+                    checkpoint_projection_manifest = (
+                        _review_checkpoint_projection_manifest(
+                            {
+                                selected_episode_id: state[
+                                    "receipt_projection"
+                                ]
+                                for selected_episode_id, state in (
+                                    review_checkpoints.items()
+                                )
+                            }
+                        )
+                    )
             key_material = {
                 "runner_version": RUNNER_VERSION,
                 "scope": scope,
@@ -2307,6 +2907,23 @@ class ReviewRunner:
                                 ledger_projection_manifest["content_id"]
                             ).removeprefix("sha256:")
                         ),
+                    }
+                )
+            if checkpointing_enabled:
+                key_material.update(
+                    {
+                        "operation_checkpoint_schema_version": (
+                            OPERATION_CHECKPOINT_SCHEMA_VERSION
+                        ),
+                        "review_checkpoint_method_version": (
+                            REVIEW_CHECKPOINT_METHOD_VERSION
+                        ),
+                        "review_checkpoint_projection_manifest_version": (
+                            REVIEW_CHECKPOINT_PROJECTION_MANIFEST_VERSION
+                        ),
+                        "review_checkpoint_projection_sha256": str(
+                            checkpoint_projection_manifest["content_id"]
+                        ).removeprefix("sha256:"),
                     }
                 )
             run_key = "review:" + sha256_text(canonical_json(key_material))
@@ -2386,13 +3003,14 @@ class ReviewRunner:
             stages.append(_stage("fee", "ready", details=fee_details))
 
             current_stage = "snapshot"
-            snapshot_inventory = inspect_portfolio_snapshots(
-                self.portfolio_db,
-                as_of=as_of_time.astimezone(
-                    ZoneInfo("Asia/Shanghai")
-                ).date().isoformat(),
-                knowledge_cutoff=_utc_text(knowledge_time),
-            )
+            if snapshot_inventory is None:
+                snapshot_inventory = inspect_portfolio_snapshots(
+                    self.portfolio_db,
+                    as_of=as_of_time.astimezone(
+                        ZoneInfo("Asia/Shanghai")
+                    ).date().isoformat(),
+                    knowledge_cutoff=_utc_text(knowledge_time),
+                )
             snapshot_status = str(
                 (snapshot_inventory.get("quality") or {}).get("status")
                 or snapshot_inventory.get("status")
@@ -2470,9 +3088,88 @@ class ReviewRunner:
                         "run-key reconstruction preview"
                     )
                 current_stage = "snapshot"
+            if checkpointing_enabled:
+                selected_open_ids = sorted(
+                    str(item.get("episode_id") or "")
+                    for item in selected
+                    if item.get("status") == "open"
+                )
+                if selected_open_ids != sorted(review_checkpoints):
+                    raise CanonicalGateBlocked(
+                        "open checkpoint membership drifted from the run key"
+                    )
+                for selected_episode in selected:
+                    if selected_episode.get("status") != "open":
+                        continue
+                    selected_episode_id = str(
+                        selected_episode.get("episode_id") or ""
+                    )
+                    checkpoint_state = review_checkpoints[
+                        selected_episode_id
+                    ]
+                    market_inputs = checkpoint_state["market_inputs"]
+                    rebuilt_checkpoint = build_review_checkpoint(
+                        episode=selected_episode,
+                        operation_review=operation_review,
+                        knowledge_provenance=knowledge_provenance,
+                        ledger_snapshot_reconstruction=(
+                            ledger_reconstructions[
+                                selected_episode_id
+                            ]["artifact"]
+                        ),
+                        perspective=perspective,
+                        checkpoint_as_of=_utc_text(as_of_time),
+                        knowledge_cutoff=_utc_text(knowledge_time),
+                        checkpoint_type="active_checkpoint",
+                        market_axis=market_inputs["market_axis"],
+                        market_fallback=market_inputs[
+                            "market_fallback"
+                        ],
+                        market_gaps=market_inputs["market_gaps"],
+                    )
+                    if canonical_review_checkpoint_bytes(
+                        rebuilt_checkpoint
+                    ) != canonical_review_checkpoint_bytes(
+                        checkpoint_state["artifact"]
+                    ):
+                        raise CanonicalGateBlocked(
+                            "checkpoint content drifted from the run key: "
+                            + selected_episode_id
+                        )
+                    rebuilt_replay = replay_validate_review_checkpoint(
+                        rebuilt_checkpoint,
+                        episode=selected_episode,
+                        operation_review=operation_review,
+                        knowledge_provenance=knowledge_provenance,
+                        ledger_snapshot_reconstruction=(
+                            ledger_reconstructions[
+                                selected_episode_id
+                            ]["artifact"]
+                        ),
+                        perspective=perspective,
+                        checkpoint_as_of=_utc_text(as_of_time),
+                        knowledge_cutoff=_utc_text(knowledge_time),
+                        checkpoint_type="active_checkpoint",
+                        market_axis=market_inputs["market_axis"],
+                        market_fallback=market_inputs[
+                            "market_fallback"
+                        ],
+                        market_gaps=market_inputs["market_gaps"],
+                    )
+                    if (
+                        _is_blocked(rebuilt_replay)
+                        or not _source_verification_ready(rebuilt_replay)
+                    ):
+                        raise CanonicalGateBlocked(
+                            "checkpoint actual source replay failed: "
+                            + selected_episode_id
+                        )
+                    checkpoint_state["artifact"] = rebuilt_checkpoint
+                    checkpoint_state["replay"] = rebuilt_replay
             artifact_descriptors: list[dict[str, Any]] = []
             reconstruction_descriptors: dict[str, dict[str, Any]] = {}
             cash_evidence_descriptors: dict[str, dict[str, Any]] = {}
+            checkpoint_descriptors: dict[str, dict[str, Any]] = {}
             if not dry_run:
                 snapshot_descriptor = _json_artifact(
                     run_dir / "snapshot_inventory.json",
@@ -2546,6 +3243,25 @@ class ReviewRunner:
                             ],
                         ]
                     )
+                for selected_episode_id in sorted(review_checkpoints):
+                    checkpoint = review_checkpoints[
+                        selected_episode_id
+                    ]["artifact"]
+                    checkpoint_descriptors[selected_episode_id] = (
+                        _json_artifact(
+                            run_dir
+                            / "e"
+                            / selected_episode_id
+                            / "checkpoint.json",
+                            checkpoint,
+                            content_id=str(
+                                checkpoint.get("content_id") or ""
+                            ),
+                        )
+                    )
+                    artifact_descriptors.append(
+                        checkpoint_descriptors[selected_episode_id]
+                    )
             else:
                 snapshot_descriptor = {
                     "content_id": str(snapshot_inventory.get("content_id") or ""),
@@ -2601,6 +3317,19 @@ class ReviewRunner:
                         ),
                         "sha256": _sha256_bytes(
                             pretty_json_bytes(cash_evidence)
+                        ),
+                        "write_status": "dry_run",
+                    }
+                for selected_episode_id in sorted(review_checkpoints):
+                    checkpoint = review_checkpoints[
+                        selected_episode_id
+                    ]["artifact"]
+                    checkpoint_descriptors[selected_episode_id] = {
+                        "content_id": str(
+                            checkpoint.get("content_id") or ""
+                        ),
+                        "sha256": _sha256_bytes(
+                            pretty_json_bytes(checkpoint)
                         ),
                         "write_status": "dry_run",
                     }
@@ -2744,6 +3473,30 @@ class ReviewRunner:
                         "operation_review_summary": operation_review.get(
                             "summary"
                         ),
+                        **(
+                            {
+                                "operation_checkpoint_schema_version": (
+                                    OPERATION_CHECKPOINT_SCHEMA_VERSION
+                                ),
+                                "review_checkpoint_method_version": (
+                                    REVIEW_CHECKPOINT_METHOD_VERSION
+                                ),
+                                "review_checkpoint_count": len(
+                                    review_checkpoints
+                                ),
+                                "review_checkpoint_content_ids": sorted(
+                                    str(
+                                        state["artifact"].get(
+                                            "content_id"
+                                        )
+                                        or ""
+                                    )
+                                    for state in review_checkpoints.values()
+                                ),
+                            }
+                            if checkpointing_enabled
+                            else {}
+                        ),
                     },
                     gaps=(
                         ["NO_EPISODE_IN_SCOPE"] if not selected else []
@@ -2752,6 +3505,14 @@ class ReviewRunner:
                         collection_descriptor,
                         knowledge_descriptor,
                         operation_descriptor,
+                        *[
+                            checkpoint_descriptors[
+                                selected_episode_id
+                            ]
+                            for selected_episode_id in sorted(
+                                checkpoint_descriptors
+                            )
+                        ],
                     ],
                 )
             )
@@ -2809,6 +3570,7 @@ class ReviewRunner:
                 reconstruction_state = ledger_reconstructions.get(
                     selected_id
                 )
+                checkpoint_state = review_checkpoints.get(selected_id)
                 supplemental_sources = (
                     [reconstruction_state["supplemental_source"]]
                     if reconstruction_state is not None
@@ -2927,6 +3689,12 @@ class ReviewRunner:
                 review_gaps = sorted(
                     set(decision_gaps + _section_gap_codes(review))
                 )
+                if checkpoint_state is not None:
+                    review_gaps = [
+                        code
+                        for code in review_gaps
+                        if code != "OPEN_EPISODE_OUTCOME_NOT_FINAL"
+                    ]
                 episode_result: dict[str, Any] = {
                         "episode_id": selected_id,
                         "perspective": perspective,
@@ -2993,6 +3761,13 @@ class ReviewRunner:
                             ),
                         }
                     )
+                if checkpoint_state is not None:
+                    episode_result["review_checkpoint"] = deepcopy(
+                        checkpoint_state["receipt_projection"]
+                    )
+                    episode_result["artifacts"]["review_checkpoint"] = (
+                        checkpoint_descriptors[selected_id]
+                    )
                 episode_results.append(episode_result)
                 replay_detail: dict[str, Any] = {
                         "episode_id": selected_id,
@@ -3056,6 +3831,16 @@ class ReviewRunner:
                         ),
                         "validation_status": _validation_status(
                             reconstruction_state["replay"]
+                        ),
+                        "source_verification": "verified",
+                    }
+                if checkpoint_state is not None:
+                    replay_detail["review_checkpoint"] = {
+                        **deepcopy(
+                            checkpoint_state["receipt_projection"]
+                        ),
+                        "validation_status": _validation_status(
+                            checkpoint_state["replay"]
                         ),
                         "source_verification": "verified",
                     }
@@ -3147,6 +3932,31 @@ class ReviewRunner:
                     "review sidecar event/decision projection changed during "
                     "review run"
                 )
+            checkpoint_save_receipts: list[dict[str, Any]] = []
+            if not dry_run:
+                for selected_episode_id in sorted(review_checkpoints):
+                    current_stage = (
+                        f"review_checkpoint:{selected_episode_id}"
+                    )
+                    checkpoint = review_checkpoints[
+                        selected_episode_id
+                    ]["artifact"]
+                    save_receipt = store.save_operation_checkpoint(
+                        checkpoint
+                    )
+                    stored_checkpoint = store.get_operation_checkpoint(
+                        str(checkpoint["checkpoint_key"])
+                    )
+                    if canonical_review_checkpoint_bytes(
+                        stored_checkpoint
+                    ) != canonical_review_checkpoint_bytes(checkpoint):
+                        raise CanonicalGateBlocked(
+                            "stored checkpoint failed immutable readback: "
+                            + selected_episode_id
+                        )
+                    checkpoint_save_receipts.append(
+                        dict(save_receipt)
+                    )
 
             overall = (
                 "partial"
@@ -3180,6 +3990,23 @@ class ReviewRunner:
                                 ledger_projection_manifest["content_id"]
                             ).removeprefix("sha256:")
                         ),
+                    }
+                )
+            if checkpointing_enabled:
+                receipt_cutoffs.update(
+                    {
+                        "operation_checkpoint_schema_version": (
+                            OPERATION_CHECKPOINT_SCHEMA_VERSION
+                        ),
+                        "review_checkpoint_method_version": (
+                            REVIEW_CHECKPOINT_METHOD_VERSION
+                        ),
+                        "review_checkpoint_projection_manifest_version": (
+                            REVIEW_CHECKPOINT_PROJECTION_MANIFEST_VERSION
+                        ),
+                        "review_checkpoint_projection_sha256": str(
+                            checkpoint_projection_manifest["content_id"]
+                        ).removeprefix("sha256:"),
                     }
                 )
             receipt: dict[str, Any] = {
@@ -3245,6 +4072,23 @@ class ReviewRunner:
                         "receipt_content_id": receipt["content_id"],
                         "episode_count": len(episode_results),
                         "gap_codes": receipt["gaps"],
+                        "checkpoint_ids": sorted(
+                            str(
+                                state["artifact"].get(
+                                    "checkpoint_id"
+                                )
+                                or ""
+                            )
+                            for state in review_checkpoints.values()
+                        ),
+                        "checkpoint_save_status_counts": {
+                            status: sum(
+                                1
+                                for item in checkpoint_save_receipts
+                                if item.get("status") == status
+                            )
+                            for status in ("INSERTED", "SKIPPED")
+                        },
                     },
                 )
             return receipt

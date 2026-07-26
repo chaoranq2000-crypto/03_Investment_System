@@ -16,7 +16,13 @@ from src.investment_review.cli import main as review_cli_main
 from src.investment_review.episode_review import (
     build_facts_only_episode_review,
 )
-from src.investment_review.models import DecisionRecord
+from src.investment_review.models import (
+    MARKET_FALLBACK_POLICY_VERSION,
+    MARKET_PROVIDER_ALLOWLIST,
+    MARKET_PROVIDER_ALLOWLIST_SHA256,
+    MARKET_PROVIDER_ALLOWLIST_VERSION,
+    DecisionRecord,
+)
 from src.investment_review.review_input_bundle import (
     build_review_input_bundle,
 )
@@ -36,6 +42,7 @@ from tests.test_investment_review_sync_service import (
 
 AS_OF = "2026-02-02T23:59:59Z"
 KNOWLEDGE_CUTOFF = "2026-07-14T00:00:00Z"
+LATER_AS_OF = "2026-02-03T23:59:59Z"
 
 
 @dataclass(frozen=True)
@@ -160,6 +167,7 @@ def _reviewability_fixture(
     tmp_path: Path,
     *,
     rows: list[dict[str, str]] | None = None,
+    checkpoint_market_resolver: Any | None = None,
 ) -> RunnerFixture:
     root = tmp_path / "repo"
     source, mapping, review_db = _write_fixture(
@@ -194,6 +202,7 @@ def _reviewability_fixture(
         mapping_path=mapping,
         artifact_root=artifacts,
         repo_root=root,
+        checkpoint_market_resolver=checkpoint_market_resolver,
     )
     return RunnerFixture(
         root=root,
@@ -204,6 +213,56 @@ def _reviewability_fixture(
         store=store,
         runner=runner,
     )
+
+
+def _local_satisfied_checkpoint_market_resolver(
+    **kwargs: Any,
+) -> dict[str, Any]:
+    episode = kwargs["episode"]
+    scope = episode["scope"]
+    cache_ref = (
+        "fixture_market_cache:"
+        f"{scope['instrument_id']}:2026-01-07:local_close"
+    )
+    return {
+        "market_axis": {
+            "status": "available",
+            "temporal_role": "system_known_at_decision",
+            "effective_at": "2026-01-07T07:00:00Z",
+            "publicly_available_at": "2026-01-07T07:01:00Z",
+            "publicly_available_basis": "exchange_calendar",
+            "fetched_at": "2026-01-07T07:02:00Z",
+            "system_observed_at": "2026-01-07T07:02:00Z",
+            "summary": "测试夹具中的本地收盘价覆盖已冻结。",
+            "source_refs": [cache_ref],
+        },
+        "market_fallback": {
+            "policy_version": MARKET_FALLBACK_POLICY_VERSION,
+            "allowlist_version": MARKET_PROVIDER_ALLOWLIST_VERSION,
+            "allowlist_sha256": MARKET_PROVIDER_ALLOWLIST_SHA256,
+            "coverage_before": "satisfied",
+            "coverage_after": "satisfied",
+            "status": "not_needed",
+            "request_count": 0,
+            "limits": {
+                "timeout_seconds": 20,
+                "max_retries": 2,
+                "max_concurrency": 2,
+                "max_requests_per_run": 20,
+            },
+            "allowlist": sorted(MARKET_PROVIDER_ALLOWLIST),
+            "cache_refs": [cache_ref],
+            "fetch_receipt_refs": [],
+            "fetch_receipts": [],
+            "offline_consumers": {
+                "renderer": False,
+                "source_replay": False,
+                "api": False,
+                "ui": False,
+            },
+        },
+        "market_gaps": [],
+    }
 
 
 def _run(
@@ -479,6 +538,200 @@ def test_reviewability_runner_freezes_and_replays_ledger_reconstruction(
         == "accepted"
     )
     assert _run(fixture) == receipt
+
+
+def test_reviewability_runner_appends_open_active_checkpoints_idempotently(
+    tmp_path: Path,
+) -> None:
+    fixture = _reviewability_fixture(
+        tmp_path,
+        rows=[
+            *_closed_episode_rows(
+                "2026-01-01",
+                "2026-01-02",
+                "explicit-prior-flat-baseline",
+            ),
+            _trade_row(
+                event_date="2026-01-05",
+                event_type="BUY",
+                external_id="open-one",
+            ),
+            _trade_row(
+                event_date="2026-01-06",
+                event_type="BUY",
+                external_id="increase-one",
+            ),
+        ],
+        checkpoint_market_resolver=(
+            _local_satisfied_checkpoint_market_resolver
+        ),
+    )
+    source_before = _sha256(fixture.source)
+    sidecar_before = _sha256(fixture.review_db)
+
+    dry_receipt = _run(fixture, dry_run=True)
+    dry_episode = dry_receipt["episodes"][0]
+    dry_projection = dry_episode["review_checkpoint"]
+
+    assert _sha256(fixture.source) == source_before
+    assert _sha256(fixture.review_db) == sidecar_before
+    assert _tree_hashes(fixture.artifacts) == {}
+    assert fixture.store.list_operation_checkpoints() == []
+    assert dry_episode["operation_review_status"] == "ready"
+    assert dry_episode["decision_context_status"] == "not_recorded"
+    assert dry_projection["review_kind"] == "active_checkpoint"
+    assert dry_projection["checkpoint_type"] == "active_checkpoint"
+    assert dry_projection["review_readiness"] == "ready"
+    assert dry_projection["decision_context_status"] == "not_recorded"
+    assert dry_projection["episode_lifecycle"] == "open"
+    assert dry_projection["outcome_maturity"] == "interim"
+    assert dry_projection["market_status"] == "available"
+    assert dry_projection["lifecycle_notices"] == [
+        "OPEN_EPISODE_OUTCOME_NOT_FINAL"
+    ]
+    assert (
+        "OPEN_EPISODE_OUTCOME_NOT_FINAL" not in dry_receipt["gaps"]
+    )
+    assert dry_episode["artifacts"]["review_checkpoint"][
+        "write_status"
+    ] == "dry_run"
+    dry_replay = _stage(dry_receipt, "source_replay")["details"][
+        "episodes"
+    ][0]["review_checkpoint"]
+    assert dry_replay["validation_status"] == "accepted"
+    assert dry_replay["source_verification"] == "verified"
+    assert {
+        key: dry_replay[key] for key in dry_projection
+    } == dry_projection
+    assert (
+        fixture.runner.validate_receipt(dry_receipt)[
+            "validation_status"
+        ]
+        == "accepted"
+    )
+
+    applied = _run(fixture)
+    applied_episode = applied["episodes"][0]
+    applied_projection = applied_episode["review_checkpoint"]
+    checkpoints = fixture.store.list_operation_checkpoints(
+        episode_id=applied_episode["episode_id"]
+    )
+
+    assert len(checkpoints) == 1
+    assert applied_projection == dry_projection
+    assert _sha256(fixture.source) == source_before
+    checkpoint_descriptor = applied_episode["artifacts"][
+        "review_checkpoint"
+    ]
+    checkpoint_artifact = json.loads(
+        Path(checkpoint_descriptor["path"]).read_text(encoding="utf-8")
+    )
+    assert checkpoint_descriptor["content_id"] == (
+        applied_projection["content_id"]
+    )
+    assert checkpoint_artifact == checkpoints[0]
+    assert (
+        runner_module.validate_review_checkpoint(checkpoint_artifact)[
+            "validation_status"
+        ]
+        == "accepted"
+    )
+    assert {
+        gap["code"] for gap in checkpoint_artifact["gaps"]
+    }.isdisjoint({"OPEN_EPISODE_OUTCOME_NOT_FINAL"})
+    assert checkpoint_artifact["status_axes"]["operation"]["status"] == (
+        "ready"
+    )
+    assert checkpoint_artifact["status_axes"]["decision"]["status"] == (
+        "not_recorded"
+    )
+    assert checkpoint_artifact["status_axes"]["lifecycle"]["status"] == (
+        "open"
+    )
+    assert checkpoint_artifact["status_axes"]["outcome"]["status"] == (
+        "interim"
+    )
+    assert checkpoint_artifact["market_fallback"]["status"] == (
+        "not_needed"
+    )
+    assert checkpoint_artifact["market_fallback"]["request_count"] == 0
+    assert checkpoint_artifact["market_fallback"]["fetch_receipts"] == []
+    assert (
+        fixture.runner.validate_receipt(applied)["validation_status"]
+        == "accepted"
+    )
+
+    sidecar_after_apply = _sha256(fixture.review_db)
+    artifacts_after_apply = _tree_hashes(fixture.artifacts)
+    repeated = _run(fixture)
+
+    assert repeated == applied
+    assert _sha256(fixture.review_db) == sidecar_after_apply
+    assert _tree_hashes(fixture.artifacts) == artifacts_after_apply
+    assert len(
+        fixture.store.list_operation_checkpoints(
+            episode_id=applied_episode["episode_id"]
+        )
+    ) == 1
+
+    later = _run(fixture, as_of=LATER_AS_OF)
+    later_episode = later["episodes"][0]
+    later_projection = later_episode["review_checkpoint"]
+    appended = fixture.store.list_operation_checkpoints(
+        episode_id=applied_episode["episode_id"]
+    )
+
+    assert later["run_key"] != applied["run_key"]
+    assert later_episode["episode_id"] == applied_episode["episode_id"]
+    assert later_projection["position_case_id"] == (
+        applied_projection["position_case_id"]
+    )
+    assert later_projection["as_of"] == LATER_AS_OF
+    assert later_projection["checkpoint_key"] != (
+        applied_projection["checkpoint_key"]
+    )
+    assert [item["as_of"] for item in appended] == [
+        AS_OF,
+        LATER_AS_OF,
+    ]
+    assert len(appended) == 2
+    assert (
+        fixture.runner.validate_receipt(later)["validation_status"]
+        == "accepted"
+    )
+
+
+def test_reviewability_runner_rejects_an_unclosed_market_projection(
+    tmp_path: Path,
+) -> None:
+    fixture = _reviewability_fixture(
+        tmp_path,
+        checkpoint_market_resolver=lambda **kwargs: {
+            "unexpected_fixture_field": kwargs["as_of"]
+        },
+    )
+    source_before = _sha256(fixture.source)
+    sidecar_before = _sha256(fixture.review_db)
+
+    receipt = _run(fixture, dry_run=True)
+
+    assert receipt["status"] == "blocked"
+    assert receipt["stages"][-1]["status"] == "blocked"
+    assert receipt["stages"][-1]["details"]["error_type"] == (
+        "CanonicalGateBlocked"
+    )
+    assert "unsupported fields" in (
+        receipt["stages"][-1]["details"]["error"]
+    )
+    assert "CANONICAL_GATE_BLOCKED" in receipt["gaps"]
+    assert _sha256(fixture.source) == source_before
+    assert _sha256(fixture.review_db) == sidecar_before
+    assert fixture.store.list_operation_checkpoints() == []
+    assert not fixture.artifacts.exists()
+    assert (
+        fixture.runner.validate_receipt(receipt)["validation_status"]
+        == "accepted"
+    )
 
 
 def test_reviewability_runner_fails_closed_when_reconstruction_replay_blocks(
