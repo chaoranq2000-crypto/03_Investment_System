@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "investment_review_product_completion_v4"
 contract_path: "docs/codex_tasks/investment_review_product_completion_v4/CONTRACT.md"
 contract_sha256: "b74d5f00e28b7f2f9590a69ca7427384b25c7122369919803b9423d1c0715d4c"
-state: "ready"
+state: "blocked"
 execution_branch: "codex/investment-review-reviewability-corrections"
 source_baseline: "92181d0fe7b3d8bf48bd8d69977b4ba00bbad4f7"
 last_completed_phase: "P5"
 next_phase: "P6"
-last_validation: "pass"
-updated_at: "2026-07-27T00:34:20+08:00"
+last_validation: "fail"
+updated_at: "2026-07-27T03:56:59+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -38,12 +38,12 @@ Use an existing allowlisted provider only from the P6 pre-bundle cache step and 
 
 ## Current checkpoint
 
-- **State:** `ready`
+- **State:** `blocked`
 - **Last completed phase:** `P5` — inherited only from exact v3 commits/evidence and subject to v4 compatibility preflight.
 - **Next phase:** `P6`
-- **Latest validation:** `pass` — finalizer froze the contract at SHA-256 `b74d5f00e28b7f2f9590a69ca7427384b25c7122369919803b9423d1c0715d4c`; `--require-ready` returned `ok=true`, 0 errors and the expected inherited-phase warning (`ready package normally has last_completed_phase none`).
-- **Current blocker:** none. v4 is frozen and ready; user authorization, fixed publication-time policy, strict-before anchor boundary, exact P7 scope, and existing-candidate no-DDL storage decision are serialized in the contract. Frozen v3 remains blocked and unchanged.
-- **Next safe action:** Create and validate the package-only setup commit, remeasure protected sources and the existing candidate, then verify the ten carried P6 paths before the first P6 code mutation.
+- **Latest validation:** `fail` — V-001 and the final exact-v1 V-002 passed, two independent static audits approved the immutable one-shot script SHA-256 `03bb1c96f27c41c44de2879f7fcdedc87fd3ccf6c6b641a950eb60b5297976ce`, and the single marker transaction committed exact v2 with unchanged DDL and both immutable v1 checkpoints intact. The upgrader nevertheless raised `ReviewStoreError` at `after_rw_close` because Windows SQLite removed the zero-byte candidate WAL after the write connection closed, so the no-delete held-state check could no longer reopen that path. The paired real `588200.SH` dry/apply/repeat acceptance did not run.
+- **Current blocker:** The authorized marker invocation has already occurred and its create-only failure receipt says `do_not_retry_marker_upgrade=true`. Candidate main is now 4,763,648 bytes/SHA-256 `9eefa6e70e08c61841041e83ca2084e490a0124fcaa9570574922f6fbe092c8e`, exact v2 markers/manifest are present, DDL SHA-256 remains `f118af80f903e84c8b900e3784e2093df4c4f157ef524b6afedbe6c868797657`, the two v1 payload hashes remain exact, and WAL/SHM are absent. V-002 after failure passed and all three protected databases remain byte-identical with `quick_check=ok` and contract WAL/SHM states. Continuing would require changing the Windows post-close held-state rule and resuming from an already-upgraded candidate, neither of which v4 authorizes after the no-retry marker.
+- **Next safe action:** Do not open the candidate for write, do not rerun the marker upgrade, and do not enter P7. Exact unblock question: does the user authorize a successor v5 amendment that treats the verified exact-v2 candidate as the immutable starting state, fixes only the Windows post-close WAL disappearance proof, and resumes P6 from post-marker real acceptance without rerunning the marker transaction?
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
@@ -55,3 +55,6 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-27T00:30:36+08:00 — Revalidated the complete current draft after serializing exact P7 paths, adding operation-anchor event/order identity, fixing the formal 588200 paired user/system expectation, and closing the no-DDL store scope. Result: `ok=true`, 0 errors, 0 warnings; informational draft contract SHA-256 `601d20dcf6a7abc39b60af53c3c66441ea62198b2bd32efe05ffbbef8a03538b`.
 - 2026-07-27T00:32:50+08:00 — Froze the literal “before operation” boundary as strict `publication upper_bound < operation_anchor`; equality is ambiguous/ineligible for user, while real system observation retains `<= anchor`. Independent semantic/scope audit found no blocker. Draft validation returned 0 errors/0 warnings; informational SHA-256 `39e9f93a05f904c4db67f85abe4e00f2ffd93a8c703fdb0f6357f7a0fa589186`.
 - 2026-07-27T00:34:20+08:00 — Finalized v4 after explicit user authorization and continuation. Frozen contract SHA-256 is `b74d5f00e28b7f2f9590a69ca7427384b25c7122369919803b9423d1c0715d4c`; `--require-ready` returned `ok=true`, 0 errors, and only the expected warning because P1-P5 are inherited rather than `none`. No P6 source was mutated during package preparation.
+- 2026-07-27T00:41:46+08:00 — Validated package-only setup commit `c39628662f83fafcccdde12c7bb823f5069882de`: relative to `92181d0fe7b3d8bf48bd8d69977b4ba00bbad4f7` it adds only the two v4 package files. Reconfirmed frozen v4 SHA `b74d5f...15d4c`, frozen v3 SHA `1f5665...033`, V-002 protected-source/candidate P6-entry integrity, and exact ten-path V-003 carry manifest SHA `baae00...a872`. State moved to `running`; real candidate remains exact v1 and read-only until synthetic compatibility/amendment gates pass.
+- 2026-07-27T03:27:11+08:00 — Completed the stable P6 synthetic gate before any real candidate write. Exact results: V-101 `86 passed/7.37s`, V-610 `200 passed/22.24s`, V-501 `140 passed/120.62s`, V-601 `322 passed/168.85s`; adapter-only `100 passed/14.31s`; duplicate-provider active-checkpoint targeted `1 passed`. Independent replay returned V-610 `200 passed` and V-601 `322 passed/166.83s`; the source/test manifest was byte-identical before and after. Closed origin proof now rebuilds every local component from its bounded canonical database row and every external component from its complete immutable cache entry; source-read/WAL/SHM and detached-manifest projections are closed, canonical duplicate provider rows deduplicate, conflicting bytes remain revisions, and external non-timeseries versions no longer borrow the operation anchor as effective time. `py_compile`, `git diff --check`, scope/no-lockfile review and v1 schema SHA `994c8813...1d373` passed. Candidate is still exact v1 and has not been opened for write; the next action is the recorded V-002 exact-v1 gate followed by the one authorized no-DDL upgrade.
+- 2026-07-27T03:56:59+08:00 — Revalidated V-001 (`ok=true`, 0 errors/warnings), obtained two independent GO audits for one-shot script SHA `03bb1c96...7976ce`, and passed final exact-v1 V-002 with all protected sources unchanged. A first process launch failed during imports before any script logic or sentinel because the repository root was absent from Python's module path; a second V-002 proved candidate exact v1 and no cache/evidence write before the same audited script was launched with process-local `PYTHONPATH`. The create-only `upgrade_invocation_started.json` records invocation count 1 and no retry authority. The marker-only transaction committed exact v2, but the upgrader then failed its `after_rw_close` identity proof when the zero-byte WAL disappeared on Windows. `acceptance_failure.json` records `do_not_retry_marker_upgrade=true`. Read-only post-failure V-002 passed: candidate SHA is `9eefa6...2c8e`, exact v2 marker/manifest is present, DDL is unchanged, both v1 checkpoint payload hashes remain `319170...7e4c` and `2d4ac1...d5c0`, checkpoint count remains 2, WAL/SHM are absent, and the formal DB, user sidecar and v2 candidate are byte-identical with `quick_check=ok`. No provider/cache file, real v2 checkpoint, API/UI work, P6 commit or P7 mutation was produced. v4 hard-stops at P6; marker retry is forbidden.
