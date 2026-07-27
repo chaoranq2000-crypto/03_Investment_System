@@ -15,3 +15,23 @@ data/processed/logs/ev_company_ir_product_002837_20260715_2430bf__ingest_log.jso
 
 # OCR text mirrors preserve source line layout, including terminal spacing.
 data/processed/text/** whitespace=-trailing-space
+
+# These committed Bundle 16R snapshots intentionally retain their original
+# CRLF bytes. Treat the exact paths as opaque so a Windows clean checkout does
+# not become dirty solely from line-ending normalization.
+reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/human_review.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/reader_report.md -text
+reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/bundle16r/generated/workflow_state.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/stock_evidence_plan.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/human_review.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/reader_report.md -text
+reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/bundle16r/generated/workflow_state.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/stock_evidence_plan.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/human_review.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/reader_report.md -text
+reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/bundle16r/generated/workflow_state.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/stock_evidence_plan.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/human_review.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/reader_report.md -text
+reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/bundle16r/generated/workflow_state.yaml -text
+reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/stock_evidence_plan.yaml -text
