@@ -116,3 +116,14 @@
 - Remote preflight still matches frozen main `a345faf...`, Night05 `a96c1b...`, V1 source `f60f220...`; the execution ref is absent and there is no matching PR. Sealed candidate publication remains pending under mode A, and no external result will be written back after seal.
 
 Later phases append their own sections. Publication evidence is never written here after the sealed candidate commit.
+
+### v11 portable frozen-receipt repair
+
+- v10 sealed candidate `bcb535618367024eb85f8bee7abb8419c56d75eb` remains immutable failed ancestry. Its exact-head push CI run `30257647025` failed only the two V-006 paths that rebuilt the fixed Windows absolute directory receipt with mixed separators on Linux; no PR or merge was created.
+- v11 frozen contract SHA-256 is `68028d41f366d535daf7647faa8aae408e167f5442a96ed2ff7a3c3aeca18aae`; package-only setup `718d6630c861866b51ccec47787d3f4e146edc43` is a direct child of `bcb5356...`.
+- Repair checkpoint `f7ed76377594f789d4f9d1dadae6150abae179be` uses `PureWindowsPath` only while reconstructing the fixed receipt. Runtime deletion containment continues to use the unchanged dedicated-root `Path.resolve(strict=True)` checks.
+- A new POSIX path-flavour regression reproduced the exact pre-fix SHA drift and passed after repair. V-006 passed 30. The committed 29-row relative and absolute paths, 2208/3803 byte counts and both SHA-256 values remain unchanged.
+- V-002 passed; V-003 passed 194; V-004 produced identical semantic/tree digests and passed 16; V-005 passed 18; V-008 passed with 17 capabilities and zero blockers.
+- Dedicated-worktree full pytest passed `978 passed, 2 skipped in 743.29s`. Independent same-parent `--no-local` clone at `C:\Projects\v11_clean_checkout_c94b56f5d76040d4bc7d1347f9145cf8` passed `978 passed, 2 skipped in 730.76s` and remained clean.
+- v11 performed no deletion. All 1,386 files, 29 directories and the old root remain absent; immutable manifests/receipts and the dirty user main status vectors are unchanged.
+- Remote main/Night05/V1 source refs remain frozen; execution ref remains the failed candidate `bcb5356...`, with zero matching PRs. A new sealed candidate and publication mode A remain pending.

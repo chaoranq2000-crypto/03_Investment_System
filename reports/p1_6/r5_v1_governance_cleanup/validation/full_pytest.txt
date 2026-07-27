@@ -1,25 +1,34 @@
 validation_id: V-010
-phase: P5_v10_final
-checked_at: "2026-07-27T17:36:49+08:00"
+phase: P5_v11_final
+checked_at: "2026-07-27T21:18:41+08:00"
 decision: pass
 command: >-
   PYTHONDONTWRITEBYTECODE=1
   C:\Projects\03_Investment_System\.conda\investment-system\python.exe
   -m pytest -q
 working_directory: C:\Projects\03_Investment_System_v1_governance_cleanup
+tested_commit: f7ed76377594f789d4f9d1dadae6150abae179be
 result:
-  passed: 977
+  passed: 978
   skipped: 2
   failed: 0
   errors: 0
-  duration_seconds: 781.84
-  summary: "977 passed, 2 skipped in 781.84s (0:13:01)"
+  duration_seconds: 743.29
+  summary: "978 passed, 2 skipped in 743.29s (0:12:23)"
 skip_baseline:
   engineering_source: f60f220ae252262a537c612ce193fc779901984b
   new_silent_skip_count: 0
   explanation: >-
     The two skips are the unchanged opt-in live-adapter manual smokes already
     present at the engineering source baseline.
+v11_regression:
+  added_test_count: 1
+  test: test_fixed_absolute_directory_receipt_is_path_flavour_independent
+  pre_fix_result: "1 failed: old002837 absolute directory-vector SHA-256 drift"
+  post_fix_v006: "30 passed in 665.85s (0:11:05)"
+  relative_vector_changed: false
+  absolute_vector_changed: false
+  deletion_runtime_containment_changed: false
 deletion_absence:
   before_test:
     completed_wave_file_count_absent: 1386
@@ -32,19 +41,15 @@ deletion_absence:
   recreated_path_count: 0
 extended_cleanup:
   extended_wave_count: 0
-  rationale: >-
-    The v10 A.9 audit found no retirement-only candidate. All newly discovered
-    active routes were retainable and were closed by explicit input/output
-    routing, so A.10 deletion authority was not exercised.
+  v11_deletion_performed: false
 worktree:
   status_clean_after_test: true
-  dedicated_head: 8957416bf04434dc3d079a3ca9a2af49125e40d4
   user_main_head: a345fafb522300831ed4206d35fa17f44570cb1f
   user_main_status_vector_matches_authorized_snapshot: true
 clean_checkout_smoke:
   state: pass
-  tested_commit: 8957416bf04434dc3d079a3ca9a2af49125e40d4
-  result: "977 passed, 2 skipped in 707.55s (0:11:47)"
+  tested_commit: f7ed76377594f789d4f9d1dadae6150abae179be
+  result: "978 passed, 2 skipped in 730.76s (0:12:10)"
   status_rows_before_test: 0
   status_rows_after_test: 0
   evidence_path: reports/p1_6/r5_v1_governance_cleanup/validation/clean_checkout_smoke.txt

@@ -1,13 +1,13 @@
 validation_id: V-010_clean_checkout_smoke
-phase: P5_v10_final
-checked_at: "2026-07-27T18:18:54+08:00"
+phase: P5_v11_final
+checked_at: "2026-07-27T21:18:41+08:00"
 decision: pass
 source:
   dedicated_worktree: C:\Projects\03_Investment_System_v1_governance_cleanup
-  tested_commit: 8957416bf04434dc3d079a3ca9a2af49125e40d4
+  tested_commit: f7ed76377594f789d4f9d1dadae6150abae179be
 clone:
-  root: C:\Projects\v10_clean_checkout_e5d2592c15724999b727327886155c9c
-  git_dir: C:\Projects\v10_clean_checkout_e5d2592c15724999b727327886155c9c\.git
+  root: C:\Projects\v11_clean_checkout_c94b56f5d76040d4bc7d1347f9145cf8
+  git_dir: C:\Projects\v11_clean_checkout_c94b56f5d76040d4bc7d1347f9145cf8\.git
   independent_git_directory: true
   clone_mode: git_clone_no_local
   inherited_git_environment: false
@@ -18,18 +18,23 @@ topology:
   same_parent_as_protected_main: C:\Projects
   protected_main: C:\Projects\03_Investment_System
   protected_main_written: false
-  protected_output_guard_focused_test: "1 passed in 0.27s"
 command: >-
   PYTHONDONTWRITEBYTECODE=1
   C:\Projects\03_Investment_System\.conda\investment-system\python.exe
   -m pytest -q
 result:
-  passed: 977
+  passed: 978
   skipped: 2
   failed: 0
   errors: 0
-  duration_seconds: 707.55
-  summary: "977 passed, 2 skipped in 707.55s (0:11:47)"
+  duration_seconds: 730.76
+  summary: "978 passed, 2 skipped in 730.76s (0:12:10)"
+portable_receipt:
+  fixed_windows_root: C:\Projects\03_Investment_System_v1_governance_cleanup
+  current_checkout_root_used: false
+  path_count: 29
+  absolute_path_vector_byte_count: 3803
+  absolute_path_vector_sha256: 31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75
 skip_baseline:
   engineering_source: f60f220ae252262a537c612ce193fc779901984b
   new_silent_skip_count: 0
@@ -38,17 +43,3 @@ deletion_absence:
   completed_wave_directory_count_absent: 29
   old002837_root_absent: true
   recreated_path_count: 0
-rejected_smoke_attempts:
-  - clone_root: C:\Users\Q\AppData\Local\Temp\v10_clean_checkout_f8998cc963394c448e04cf188f7ab282
-    result: "1 failed, 976 passed, 2 skipped"
-    cause: >-
-      The clone was placed directly under the shared Temp parent, where an
-      unrelated pre-existing sibling named 03_Investment_System made the
-      protected-main topology assertion fail.
-  - clone_root: C:\Users\Q\AppData\Local\Temp\v10_smoke_root_ae9dff5c03274114957932903b94a3d5\checkout
-    result: "1 failed, 976 passed, 2 skipped"
-    cause: >-
-      The unique Temp parent removed the collision but also removed the
-      contract-required sibling relationship to the real protected main tree,
-      so the protected-output rejection could not be exercised.
-  classification: environment_topology_not_candidate_regression
