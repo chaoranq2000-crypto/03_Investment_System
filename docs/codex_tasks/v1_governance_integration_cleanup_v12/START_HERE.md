@@ -8,8 +8,8 @@ execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "ec1e98c6c9320c135324631ca67dca97dac11619"
 last_completed_phase: "P5"
 next_phase: "final_validation"
-last_validation: "partial"
-updated_at: "2026-07-27T15:48:03+00:00"
+last_validation: "pass"
+updated_at: "2026-07-27T16:00:02+00:00"
 ---
 # Start or resume final v12 stabilization
 
@@ -43,7 +43,7 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - **State:** `running`
 - **Last completed phase:** `P5`（历史工程交付完成；publication stabilization 尚未闭合）
 - **Next phase:** `final_validation`
-- **Latest validation:** `partial`。v11 candidate `ec1e98c6c9320c135324631ca67dca97dac11619` 的 push CI run `30269811587` 已通过 Linux V-006，但 full pytest collection 因 CI 未安装 `jsonschema` 失败。
+- **Latest validation:** `pass`。v11 candidate `ec1e98c6c9320c135324631ca67dca97dac11619` 的 push CI run `30269811587` 已通过 Linux V-006，但 full pytest collection 因 CI 未安装 `jsonschema` 失败。
 - **Current blocker:** 无合同 blocker；这是 v12 A.12 内的普通工程稳定化缺陷。
 - **Next safe action:** finalize/validate v12，创建 package-only setup commit；随后在 `.github/workflows/ci.yml` 的 conda test dependency install 中补充 `jsonschema`，运行验证并创建普通后继 candidate。
 
@@ -81,3 +81,4 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - 2026-07-27T15:30:02+00:00 — state=running; completed=P5; next=final_validation; validation=pass; A.12 repair validated: dedicated full 978 passed 2 baseline skips; independent clone C:\Projects\v12_clean_checkout_a395325 at a395325 passed 978 with 2 baseline skips and remained clean; V-002/V-003/V-004/V-005/V-006/V-008 and package validation pass; next create provisional seal and ordinary fast-forward push
 - 2026-07-27T15:36:04+00:00 — state=running; completed=P5; next=final_validation; validation=fail; provisional candidate 282412c push CI run 30280331693 failed after dependency/V-006 success: Linux checkout materialized two frozen 002837 processed text blobs as LF, so CRLF file-byte receipt mismatch caused 1 failed and 10 errors; preserve facts/hashes and enforce exact eol=crlf checkout paths
 - 2026-07-27T15:48:03+00:00 — state=running; completed=P5; next=final_validation; validation=partial; A.12 cross-platform receipt repair: exact two processed text paths enforce eol=crlf; new config assertion and policy-refresh 17 passed; dedicated full 979 passed with 2 baseline skips; fresh clean-clone checkout/hash/full smoke pending
+- 2026-07-27T16:00:02+00:00 — state=running; completed=P5; next=final_validation; validation=pass; A.12 receipt repair validated: exact clean-checkout CRLF hashes 0218a5ce and 1c26dcc2; policy-refresh 17 passed; dedicated full 979 passed 2 baseline skips; independent clone C:\Projects\v12_clean_checkout_9edc91b at 9edc91b passed 979 with 2 baseline skips and remained clean; next provisional seal and fast-forward push
