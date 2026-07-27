@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import socket
 import sqlite3
 import threading
 import time
@@ -25,10 +26,13 @@ from src.portfolio.review_integration import (
     trigger_post_commit_review_sync,
 )
 import src.portfolio.review_integration as integration_module
+import src.investment_review.market_context_adapter as market_adapter_module
 import src.portfolio.web as web_module
 from tests.test_investment_review_review_runner import (
     RunnerFixture,
+    _closed_episode_rows,
     _fixture as build_runner_fixture,
+    _local_satisfied_checkpoint_market_resolver,
     _reviewability_fixture as build_reviewability_runner_fixture,
     _trade_row,
 )
@@ -282,6 +286,644 @@ def test_reviewability_open_episode_uses_same_slot_idempotency_and_new_slot_key(
     assert later.checkpoint_plan["identities"][0]["episode_id"] == (
         first.checkpoint_plan["identities"][0]["episode_id"]
     )
+
+
+def test_v2_automation_binds_perspective_anchor_and_carries_system_limitation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fixture = build_reviewability_runner_fixture(
+        tmp_path,
+        rows=[
+            *_closed_episode_rows(
+                "2026-01-01",
+                "2026-01-02",
+                "v2-flat-a",
+                symbol="000001.SZ",
+            ),
+            *_closed_episode_rows(
+                "2026-01-01",
+                "2026-01-02",
+                "v2-flat-b",
+                symbol="000002.SZ",
+            ),
+            _trade_row(
+                event_date="2026-01-05",
+                event_type="BUY",
+                external_id="v2-open-a",
+                symbol="000001.SZ",
+            ),
+            _trade_row(
+                event_date="2026-01-05",
+                event_type="BUY",
+                external_id="v2-open-b",
+                symbol="000002.SZ",
+            ),
+        ],
+        automatic_market_context=True,
+    )
+    fixture.store.upgrade_reviewability_candidate_v2()
+    audit_now = datetime(2026, 8, 1, 8, 1, tzinfo=timezone.utc)
+    adapter = market_adapter_module.MarketContextAdapter(
+        cache_root=(
+            fixture.root
+            / ".codex_tmp"
+            / "investment_review_product_completion_v3"
+            / "market_cache"
+        ),
+        clock=lambda: audit_now,
+    )
+    observed_budget_ids: dict[str, list[int]] = {"user": [], "system": []}
+
+    def resolve_v2(**kwargs: Any) -> dict[str, Any]:
+        observed_budget_ids[str(kwargs["perspective"])].append(
+            id(kwargs["request_budget"])
+        )
+        return adapter(**kwargs)
+
+    user = _coordinator(
+        fixture,
+        config=ReviewAutomationConfig(
+            enabled=True,
+            interval_seconds=900,
+            startup_catch_up=True,
+            perspective="user",
+        ),
+        clock=lambda: audit_now,
+        checkpoint_market_resolver=resolve_v2,
+    )
+    system = _coordinator(
+        fixture,
+        config=ReviewAutomationConfig(
+            enabled=True,
+            interval_seconds=900,
+            startup_catch_up=True,
+            perspective="system",
+        ),
+        clock=lambda: audit_now,
+        checkpoint_market_resolver=resolve_v2,
+    )
+
+    user_plan = user._prepare_plan(trigger="v2_user")
+    user_repeat = user._prepare_plan(trigger="v2_user_repeat")
+    system_plan = system._prepare_plan(trigger="v2_system")
+
+    assert user_repeat.run_key == user_plan.run_key
+    assert user_repeat.market_input_sha256 == user_plan.market_input_sha256
+    assert user_plan.run_key != system_plan.run_key
+    assert user_plan.projection_sha256 != system_plan.projection_sha256
+    assert user_plan.market_input_sha256 != system_plan.market_input_sha256
+    assert len(observed_budget_ids["user"]) == 8
+    assert len(set(observed_budget_ids["user"][:4])) == 1
+    assert len(set(observed_budget_ids["user"][4:])) == 1
+    assert len(observed_budget_ids["system"]) == 4
+    assert len(set(observed_budget_ids["system"])) == 1
+    assert "investment_review_product_completion_v4" in (
+        user._lease.path.as_posix()
+    )
+    for plan, perspective, limitation in (
+        (user_plan, "user", "provider_unavailable"),
+        (system_plan, "system", "withheld_by_cutoff"),
+    ):
+        manifest = plan.market_input_manifest
+        checkpoint_plan = plan.checkpoint_plan
+        assert manifest is not None
+        assert checkpoint_plan is not None
+        assert manifest["schema_version"] == (
+            integration_module.REVIEW_AUTOMATION_MARKET_INPUT_MANIFEST_VERSION_V2
+        )
+        assert manifest["perspective"] == perspective
+        assert plan.perspective == perspective
+        assert len(manifest["items"]) == 4
+        assert len(checkpoint_plan["identities"]) == 2
+        identities = {
+            identity["episode_id"]: identity
+            for identity in checkpoint_plan["identities"]
+        }
+        for item in manifest["items"]:
+            projection = item["projection"]
+            fallback = projection["market_fallback"]
+            assert item["projection_kind"] == "full"
+            assert item["perspective"] == perspective
+            assert projection["perspective"] == perspective
+            assert fallback["status"] == limitation
+            assert fallback["request_count"] == 0
+            assert fallback["request_count_status"] == "verified"
+            assert fallback["unverified_attempt_upper_bound"] == 0
+            assert len(fallback["fetch_receipts"]) == 1
+            guard_receipt = fallback["fetch_receipts"][0]
+            assert guard_receipt["attempt_count"] == 0
+            assert guard_receipt["attempt_count_status"] == "verified"
+            assert guard_receipt["budget_charged_attempts"] == 0
+            assert guard_receipt["started_at"] == fallback["guard_audit_at"]
+            assert guard_receipt["completed_at"] == fallback["guard_audit_at"]
+            identity = identities.get(item["episode_id"])
+            if identity is not None:
+                for field in (
+                    "operation_anchor_event_id",
+                    "operation_anchor_at",
+                    "operation_anchor_ordering_key",
+                    "information_time_policy_version",
+                ):
+                    assert item[field] == identity[field]
+
+    socket_calls: list[tuple[object, ...]] = []
+
+    def forbidden_connect(*args: object, **_kwargs: object) -> None:
+        socket_calls.append(args)
+        raise AssertionError("v2 automation replay must remain offline")
+
+    monkeypatch.setattr(socket, "create_connection", forbidden_connect)
+    result = system.run_once(trigger="v2_system_carry")
+    assert result["status"] in {"partial", "succeeded"}, json.dumps(
+        result, ensure_ascii=False, indent=2
+    )
+    scope_runs = {item["scope"]: item for item in result["scope_runs"]}
+    assert scope_runs["single"]["checkpoint_count"] == 1
+    assert scope_runs["weekly"]["checkpoint_count"] == 2
+    assert scope_runs["monthly"]["checkpoint_count"] == 2
+    open_episode_ids = {
+        identity["episode_id"]
+        for identity in system_plan.checkpoint_plan["identities"]
+    }
+    planned_open_market_ids = sorted(
+        item["market_input_content_id"]
+        for item in system_plan.market_input_manifest["items"]
+        if item["episode_id"] in open_episode_ids
+    )
+    assert scope_runs["weekly"]["market_input_content_ids"] == (
+        planned_open_market_ids
+    )
+    assert scope_runs["monthly"]["market_input_content_ids"] == (
+        planned_open_market_ids
+    )
+    assert set(scope_runs["single"]["market_input_content_ids"]).issubset(
+        planned_open_market_ids
+    )
+    checkpoints = fixture.store.list_operation_checkpoints()
+    assert len(checkpoints) == 2
+    assert {item["perspective"] for item in checkpoints} == {"system"}
+    assert {item["market_fallback"]["status"] for item in checkpoints} == {
+        "withheld_by_cutoff"
+    }
+    assert socket_calls == []
+
+
+def test_reviewability_automation_task_key_binds_frozen_market_input_only(
+    tmp_path: Path,
+) -> None:
+    fixture = build_reviewability_runner_fixture(tmp_path)
+    current = [datetime(2026, 7, 26, 8, 1, tzinfo=timezone.utc)]
+    market_revision = ["first"]
+    calls: list[tuple[str, str, str]] = []
+
+    def resolver(**kwargs: Any) -> dict[str, Any]:
+        result = _local_satisfied_checkpoint_market_resolver(**kwargs)
+        result["market_axis"]["summary"] = market_revision[0]
+        calls.append(
+            (
+                str(kwargs["episode"]["episode_id"]),
+                str(kwargs["as_of"]),
+                str(kwargs["knowledge_cutoff"]),
+            )
+        )
+        return result
+
+    coordinator = _coordinator(
+        fixture,
+        config=ReviewAutomationConfig(
+            enabled=True,
+            interval_seconds=900,
+            startup_catch_up=True,
+        ),
+        checkpoint_market_resolver=resolver,
+        clock=lambda: current[0],
+    )
+
+    first = coordinator._prepare_plan(trigger="market_first")
+    repeated = coordinator._prepare_plan(trigger="market_repeat")
+    first_checkpoint_key = first.checkpoint_plan["identities"][0][
+        "checkpoint_key"
+    ]
+
+    assert repeated.run_key == first.run_key
+    assert repeated.market_input_sha256 == first.market_input_sha256
+    assert first.market_input_manifest["schema_version"] == (
+        integration_module.REVIEW_AUTOMATION_MARKET_INPUT_MANIFEST_VERSION
+    )
+    assert first.market_input_manifest["items"][0][
+        "market_input_content_id"
+    ].startswith("sha256:")
+    assert first.market_input_sha256 is not None
+    assert "investment_review_product_completion_v3" in (
+        coordinator._lease.path.as_posix()
+    )
+
+    market_revision[0] = "second"
+    changed_market = coordinator._prepare_plan(trigger="market_changed")
+
+    assert changed_market.run_key != first.run_key
+    assert changed_market.market_input_sha256 != first.market_input_sha256
+    assert (
+        changed_market.checkpoint_plan_sha256
+        == first.checkpoint_plan_sha256
+    )
+    assert changed_market.checkpoint_plan["identities"][0][
+        "checkpoint_key"
+    ] == first_checkpoint_key
+
+    current[0] = datetime(2026, 7, 26, 8, 16, tzinfo=timezone.utc)
+    later = coordinator._prepare_plan(trigger="market_next_slot")
+
+    assert later.run_key != changed_market.run_key
+    assert later.checkpoint_plan["identities"][0][
+        "checkpoint_key"
+    ] != first_checkpoint_key
+    assert len(calls) == 4
+
+
+def test_automation_market_budget_is_one_cap_across_all_episodes(
+    tmp_path: Path,
+) -> None:
+    rows = [
+        _trade_row(
+            event_date="2026-01-05",
+            event_type="BUY",
+            external_id=f"open-{index}",
+            symbol=f"{index:06d}.SZ",
+        )
+        for index in range(1, 9)
+    ]
+    fixture = build_reviewability_runner_fixture(tmp_path, rows=rows)
+    budget_ids: set[int] = set()
+    allocations: list[int] = []
+
+    def resolver(**kwargs: Any) -> dict[str, Any]:
+        budget = kwargs["request_budget"]
+        budget_ids.add(id(budget))
+        reserved = budget.reserve(3)
+        budget.settle(reserved, reserved)
+        allocations.append(reserved)
+        return _local_satisfied_checkpoint_market_resolver(**kwargs)
+
+    coordinator = _coordinator(
+        fixture,
+        checkpoint_market_resolver=resolver,
+        clock=lambda: datetime(2026, 7, 26, 8, 1, tzinfo=timezone.utc),
+    )
+    plan = coordinator._prepare_plan(trigger="shared_market_budget")
+
+    assert len(plan.market_input_manifest["items"]) == 8
+    assert len(budget_ids) == 1
+    assert sum(allocations) == 20
+    assert allocations[-2:] == [2, 0]
+    budget_snapshot = plan.market_input_manifest["request_budget"]
+    assert budget_snapshot["max_requests"] == 20
+    assert budget_snapshot["used_requests"] == 20
+    assert budget_snapshot["reserved_requests"] == 0
+    assert budget_snapshot["remaining_requests"] == 0
+    assert budget_snapshot.get("active_requests", 0) == 0
+
+
+def test_market_task_identity_ignores_first_fetch_vs_exact_cache_hit_budget(
+    tmp_path: Path,
+) -> None:
+    fixture = build_reviewability_runner_fixture(tmp_path)
+    first_resolution = [True]
+
+    def resolver(**kwargs: Any) -> dict[str, Any]:
+        if first_resolution[0]:
+            budget = kwargs["request_budget"]
+            reserved = budget.reserve(3)
+            budget.settle(reserved, reserved)
+        return _local_satisfied_checkpoint_market_resolver(**kwargs)
+
+    coordinator = _coordinator(
+        fixture,
+        checkpoint_market_resolver=resolver,
+        clock=lambda: datetime(2026, 7, 26, 8, 1, tzinfo=timezone.utc),
+    )
+    fetched = coordinator._prepare_plan(trigger="first_provider_fetch")
+    first_resolution[0] = False
+    cached = coordinator._prepare_plan(trigger="exact_cache_hit")
+
+    assert fetched.market_input_manifest["request_budget"][
+        "used_requests"
+    ] == 3
+    assert cached.market_input_manifest["request_budget"][
+        "used_requests"
+    ] == 0
+    assert cached.market_input_sha256 == fetched.market_input_sha256
+    assert cached.run_key == fetched.run_key
+
+
+def test_closed_only_automation_still_binds_market_manifest(
+    tmp_path: Path,
+) -> None:
+    fixture = build_reviewability_runner_fixture(
+        tmp_path,
+        rows=[
+            _trade_row(
+                event_date="2026-01-05",
+                event_type="BUY",
+                external_id="closed-buy",
+            ),
+            _trade_row(
+                event_date="2026-01-06",
+                event_type="SELL",
+                external_id="closed-sell",
+            ),
+        ],
+    )
+    revision = ["closed-a"]
+
+    def resolver(**kwargs: Any) -> dict[str, Any]:
+        result = _local_satisfied_checkpoint_market_resolver(**kwargs)
+        result["market_axis"]["summary"] = revision[0]
+        return result
+
+    coordinator = _coordinator(
+        fixture,
+        checkpoint_market_resolver=resolver,
+        clock=lambda: datetime(2026, 7, 26, 8, 1, tzinfo=timezone.utc),
+    )
+    first = coordinator._prepare_plan(trigger="closed_market_a")
+    revision[0] = "closed-b"
+    changed = coordinator._prepare_plan(trigger="closed_market_b")
+
+    assert first.checkpoint_plan is None
+    assert first.checkpoint_plan_sha256 is None
+    assert first.market_input_sha256 is not None
+    assert first.market_input_manifest["items"][0]["projection_kind"] == (
+        "legacy"
+    )
+    assert first.market_input_manifest["items"][0]["as_of"].startswith(
+        "2026-01-06T"
+    )
+    assert changed.run_key != first.run_key
+    assert changed.market_input_sha256 != first.market_input_sha256
+
+
+def test_scopes_consume_frozen_a_without_a_b_a_resolver_recall(
+    tmp_path: Path,
+) -> None:
+    fixture = build_reviewability_runner_fixture(tmp_path)
+    revisions = ["market-a", "market-b", "market-a"]
+    calls = 0
+    planned_episodes: list[dict[str, Any]] = []
+
+    def resolver(**kwargs: Any) -> dict[str, Any]:
+        nonlocal calls
+        result = _local_satisfied_checkpoint_market_resolver(**kwargs)
+        result["market_axis"]["summary"] = revisions[calls]
+        planned_episodes.append(dict(kwargs["episode"]))
+        calls += 1
+        return result
+
+    coordinator = _coordinator(
+        fixture,
+        checkpoint_market_resolver=resolver,
+        clock=lambda: datetime(2026, 7, 26, 8, 1, tzinfo=timezone.utc),
+    )
+
+    class ConsumingRunner:
+        checkpoint_market_resolver = None
+
+        def run(
+            self,
+            *,
+            scope: str,
+            as_of: str,
+            knowledge_cutoff: str,
+            **_kwargs: Any,
+        ) -> dict[str, Any]:
+            episode = planned_episodes[0]
+            projection = self.checkpoint_market_resolver(
+                episode=episode,
+                operation_review={},
+                knowledge_provenance={},
+                ledger_snapshot_reconstruction={},
+                perspective="user",
+                as_of=as_of,
+                knowledge_cutoff=knowledge_cutoff,
+            )
+            assert projection["market_axis"]["summary"] == "market-a"
+            return {
+                "run_id": f"reviewrun_{scope:0<32}"[:42],
+                "run_key": f"review:frozen:{scope}",
+                "status": "partial",
+                "content_id": "sha256:" + ("7" * 64),
+                "episodes": [
+                    {"episode_id": episode["episode_id"]}
+                ],
+            }
+
+    coordinator._runner_factory = ConsumingRunner
+    result = coordinator.run_once(trigger="hostile_a_b_a")
+
+    assert result["status"] == "partial"
+    assert calls == 1
+    persisted = fixture.store.get_review_run(result["run_key"])
+    manifest = persisted["run"]["parameters"]["market_input_manifest"]
+    planned_content_id = manifest["items"][0]["market_input_content_id"]
+    assert manifest["items"][0]["projection"]["market_axis"][
+        "summary"
+    ] == "market-a"
+    assert all(
+        item["market_input_content_ids"] == [planned_content_id]
+        for item in result["scope_runs"]
+    )
+
+    second = coordinator._prepare_plan(trigger="hostile_b")
+    third = coordinator._prepare_plan(trigger="hostile_a_again")
+    assert calls == 3
+    assert second.run_key != result["run_key"]
+    assert third.run_key == result["run_key"]
+
+
+def test_cutoff_unavailable_type_survives_freeze_and_scopes_continue(
+    tmp_path: Path,
+) -> None:
+    from src.investment_review.market_context_adapter import (
+        MarketContextCutoffUnavailableError,
+    )
+
+    fixture = build_reviewability_runner_fixture(tmp_path)
+    planned_episodes: list[dict[str, Any]] = []
+    calls = 0
+
+    def resolver(**kwargs: Any) -> dict[str, Any]:
+        nonlocal calls
+        calls += 1
+        planned_episodes.append(dict(kwargs["episode"]))
+        raise MarketContextCutoffUnavailableError(
+            "real cache step is later than cutoff"
+        )
+
+    coordinator = _coordinator(
+        fixture,
+        checkpoint_market_resolver=resolver,
+        clock=lambda: datetime(2026, 7, 26, 8, 1, tzinfo=timezone.utc),
+    )
+
+    class LimitationRunner:
+        checkpoint_market_resolver = None
+
+        def run(
+            self,
+            *,
+            scope: str,
+            as_of: str,
+            knowledge_cutoff: str,
+            **_kwargs: Any,
+        ) -> dict[str, Any]:
+            episode = planned_episodes[0]
+            with pytest.raises(MarketContextCutoffUnavailableError):
+                self.checkpoint_market_resolver(
+                    episode=episode,
+                    operation_review={},
+                    knowledge_provenance={},
+                    ledger_snapshot_reconstruction={},
+                    perspective="user",
+                    as_of=as_of,
+                    knowledge_cutoff=knowledge_cutoff,
+                )
+            return {
+                "run_id": f"reviewrun_{scope:0<32}"[:42],
+                "run_key": f"review:cutoff-limitation:{scope}",
+                "status": "partial",
+                "content_id": "sha256:" + ("8" * 64),
+                "episodes": [
+                    {
+                        "episode_id": episode["episode_id"],
+                        "market_context_limitation": {
+                            "code": "MARKET_CONTEXT_WITHHELD_BY_CUTOFF",
+                            "receipt_backdated": False,
+                        },
+                    }
+                ],
+            }
+
+    coordinator._runner_factory = LimitationRunner
+    result = coordinator.run_once(trigger="historical_cutoff_missing")
+
+    assert result["status"] == "partial"
+    assert calls == 1
+    run = fixture.store.get_review_run(result["run_key"])
+    item = run["run"]["parameters"]["market_input_manifest"]["items"][0]
+    assert item["projection"] is None
+    assert item["error_code"] == "MARKET_CONTEXT_WITHHELD_BY_CUTOFF"
+    assert "real cache step" not in json.dumps(item)
+    assert all(
+        scope_run["market_input_content_ids"] == []
+        for scope_run in result["scope_runs"]
+    )
+
+
+def test_full_market_projection_must_bind_instrument_and_cutoffs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from src.investment_review.review_runner import (
+        MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS,
+    )
+
+    base = {
+        "market_axis": {},
+        "market_fallback": {"fetch_receipts": []},
+        "market_gaps": [],
+        "supplemental_sources": [],
+        "market_input_content_id": "sha256:" + ("1" * 64),
+        "market_requirement_id": "market_requirement_test",
+        "market_resolution_id": "market_resolution_test",
+        "as_of": "2026-07-26T08:00:00Z",
+        "knowledge_cutoff": "2026-07-26T08:01:00Z",
+        "market_source_manifest": {},
+        "source_replay": {},
+        "resolution": {
+            "requirement": {"instrument_id": "000001.SZ"}
+        },
+    }
+    assert frozenset(base) == MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS
+    monkeypatch.setattr(
+        market_adapter_module,
+        "market_context_runner_projection",
+        lambda value: dict(value),
+    )
+
+    accepted = ReviewAutomationCoordinator._automation_market_projection(
+        base,
+        episode_id="episode-test",
+        instrument_id="000001.SZ",
+        as_of="2026-07-26T08:00:00Z",
+        knowledge_cutoff="2026-07-26T08:01:00Z",
+    )
+    assert accepted["projection_kind"] == "full"
+
+    mutations = [
+        {"instrument_id": "000002.SZ"},
+        {"as_of": "2026-07-26T08:00:01Z"},
+        {"knowledge_cutoff": "2026-07-26T08:01:01Z"},
+    ]
+    for mutation in mutations:
+        kwargs = {
+            "episode_id": "episode-test",
+            "instrument_id": "000001.SZ",
+            "as_of": "2026-07-26T08:00:00Z",
+            "knowledge_cutoff": "2026-07-26T08:01:00Z",
+            **mutation,
+        }
+        with pytest.raises(RuntimeError, match="does not bind"):
+            ReviewAutomationCoordinator._automation_market_projection(
+                base,
+                **kwargs,
+            )
+
+
+def test_default_market_adapter_receives_clock_and_custom_factory_is_explicit(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fixture = build_reviewability_runner_fixture(tmp_path)
+    frozen_now = datetime(2026, 7, 26, 8, 1, tzinfo=timezone.utc)
+    captured: dict[str, Any] = {}
+
+    class FakeDefaultAdapter:
+        def __init__(self, *, cache_root: Path, clock) -> None:
+            captured["cache_root"] = cache_root
+            captured["clock"] = clock
+
+        def __call__(self, **kwargs: Any) -> dict[str, Any]:
+            return _local_satisfied_checkpoint_market_resolver(**kwargs)
+
+    monkeypatch.setattr(
+        market_adapter_module,
+        "MarketContextAdapter",
+        FakeDefaultAdapter,
+    )
+    coordinator = ReviewAutomationCoordinator(
+        portfolio_db=fixture.source,
+        review_db=fixture.review_db,
+        mapping_path=fixture.mapping,
+        artifact_root=fixture.artifacts,
+        repo_root=fixture.root,
+        clock=lambda: frozen_now,
+    )
+    plan = coordinator._prepare_plan(trigger="default_adapter")
+
+    assert captured["clock"]() == frozen_now
+    assert str(captured["cache_root"]).endswith(
+        "investment_review_product_completion_v3\\market_cache"
+    )
+    assert plan.market_input_sha256 is not None
+    with pytest.raises(ValueError, match="requires explicit"):
+        ReviewAutomationCoordinator(
+            portfolio_db=fixture.source,
+            review_db=fixture.review_db,
+            mapping_path=fixture.mapping,
+            artifact_root=fixture.artifacts,
+            repo_root=fixture.root,
+            runner_factory=lambda: object(),
+        )
 
 
 def test_serve_dashboard_explicit_automation_owns_start_and_stop(

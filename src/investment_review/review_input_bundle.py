@@ -476,6 +476,131 @@ def _wrapped_source_content_id(wrapper: Mapping[str, Any]) -> str:
     return _value_content_id(material)
 
 
+def _market_context_schema_version(value: Mapping[str, Any]) -> str | None:
+    payload = value.get("payload")
+    if not isinstance(payload, Mapping):
+        return None
+    from . import market_context_adapter as market_adapter
+
+    exact_versions = {
+        str(getattr(market_adapter, name))
+        for name in (
+            "MARKET_CONTEXT_MANIFEST_VERSION",
+            "MARKET_CONTEXT_SOURCE_VERSION",
+            "MARKET_CONTEXT_MANIFEST_VERSION_V2",
+            "MARKET_CONTEXT_SOURCE_VERSION_V2",
+        )
+        if isinstance(getattr(market_adapter, name, None), str)
+    }
+    schema_version = str(payload.get("schema_version") or "")
+    return schema_version if schema_version in exact_versions else None
+
+
+def _is_versioned_market_context_source(value: Mapping[str, Any]) -> bool:
+    return _market_context_schema_version(value) is not None
+
+
+def _is_v2_market_context_source(value: Mapping[str, Any]) -> bool:
+    schema_version = _market_context_schema_version(value)
+    if schema_version is None:
+        return False
+    from . import market_context_adapter as market_adapter
+
+    v2_versions = {
+        str(getattr(market_adapter, name))
+        for name in (
+            "MARKET_CONTEXT_MANIFEST_VERSION_V2",
+            "MARKET_CONTEXT_SOURCE_VERSION_V2",
+        )
+        if isinstance(getattr(market_adapter, name, None), str)
+    }
+    return schema_version in v2_versions
+
+
+def _claims_versioned_market_context(value: Mapping[str, Any]) -> bool:
+    payload = value.get("payload")
+    if not isinstance(payload, Mapping):
+        return False
+    schema_version = str(payload.get("schema_version") or "")
+    return schema_version.startswith("investment_review.market_context_") or (
+        schema_version.startswith("investment_review.market_cache_")
+        and any(
+            key in payload
+            for key in (
+                "market_input_content_id",
+                "requirement_id",
+                "resolution_id",
+            )
+        )
+    )
+
+
+def _raw_supplemental_envelope(value: Mapping[str, Any]) -> dict[str, Any]:
+    """Project a frozen wrapper back to the adapter-owned raw envelope."""
+
+    return {
+        "source_id": str(value.get("source_id") or ""),
+        "source_kind": str(value.get("source_kind") or ""),
+        "availability": str(
+            value.get("availability") or value.get("status") or ""
+        ),
+        "effective_at": str(value.get("effective_at") or ""),
+        "knowledge_at": str(value.get("knowledge_at") or ""),
+        "locator": str(value.get("locator") or ""),
+        "warning_codes": list(value.get("warning_codes") or []),
+        "payload": deepcopy(dict(value.get("payload") or {})),
+    }
+
+
+def _market_context_source_set_validation(
+    values: Sequence[Mapping[str, Any]],
+) -> dict[str, Any] | None:
+    """Run the adapter's pure offline closure gate for versioned market inputs.
+
+    The import is intentionally local: the adapter owns the versioned market
+    contract, while P2F owns only its ordinary supplemental envelope.  Legacy
+    P2F market sources never enter this additive validator.
+    """
+
+    unsupported = [
+        str(item.get("source_id") or "")
+        for item in values
+        if _claims_versioned_market_context(item)
+        and not _is_versioned_market_context_source(item)
+    ]
+    if unsupported:
+        raise ReviewInputBundleError(
+            "market-context supplemental source claims an unsupported exact "
+            "schema version: " + ",".join(sorted(unsupported))
+        )
+    selected = [
+        _raw_supplemental_envelope(item)
+        for item in values
+        if _is_versioned_market_context_source(item)
+    ]
+    if not selected:
+        return None
+    selected.sort(key=lambda item: (item["source_kind"], item["source_id"]))
+    from .market_context_adapter import validate_market_context_supplemental_sources
+
+    result = validate_market_context_supplemental_sources(selected)
+    if not isinstance(result, Mapping):
+        raise ReviewInputBundleError(
+            "market-context supplemental validator returned a malformed result"
+        )
+    return deepcopy(dict(result))
+
+
+def _market_context_validation_blocked(result: Mapping[str, Any]) -> bool:
+    status = str(
+        result.get("validation_status")
+        or result.get("status")
+        or result.get("source_verification")
+        or ""
+    )
+    return status not in {"accepted", "accepted_with_warnings", "verified", "valid"}
+
+
 def _decision_link_matches(
     link: Mapping[str, Any],
     *,
@@ -792,6 +917,61 @@ def _normalize_supplemental(
             )
         sources[source_id] = payload
 
+    try:
+        market_validation = _market_context_source_set_validation(
+            list(sources.values())
+        )
+    except Exception as exc:
+        if isinstance(exc, ReviewInputBundleError):
+            raise
+        raise ReviewInputBundleError(
+            f"versioned market-context supplemental validation failed: {exc}"
+        ) from exc
+    if market_validation is not None and _market_context_validation_blocked(
+        market_validation
+    ):
+        raise ReviewInputBundleError(
+            "versioned market-context supplemental sources failed their "
+            "offline closure validation"
+        )
+
+    # A versioned market projection is one content-addressed closure: its
+    # manifest and every component source are only meaningful together.  The
+    # caller may ask P2F to review an earlier cutoff than the projection's
+    # freeze time, but filtering those sources one-by-one could retain an
+    # orphaned manifest or component and turn an ordinary market limitation
+    # into a hard validation failure.  Decide the projection as a unit instead.
+    versioned_market_source_ids = {
+        source_id
+        for source_id, payload in sources.items()
+        if _is_versioned_market_context_source(payload)
+    }
+    legacy_cutoff_market_source_ids = {
+        source_id
+        for source_id in versioned_market_source_ids
+        if not _is_v2_market_context_source(sources[source_id])
+    }
+    market_projection_withheld = False
+    if legacy_cutoff_market_source_ids:
+        for source_id in sorted(legacy_cutoff_market_source_ids):
+            wrapper = _normalize_source_envelope(
+                sources[source_id],
+                expected_kind=None,
+                decision=False,
+                field=f"supplemental[{source_id}]",
+            )
+            effective = _parse_timestamp(
+                wrapper["effective_at"],
+                f"supplemental[{source_id}].effective_at",
+            )
+            known = _parse_timestamp(
+                wrapper["knowledge_at"],
+                f"supplemental[{source_id}].knowledge_at",
+            )
+            if effective > review_cutoff or known > review_cutoff:
+                market_projection_withheld = True
+                break
+
     included: list[dict[str, Any]] = []
     warnings: list[dict[str, Any]] = []
     requests = [
@@ -804,6 +984,15 @@ def _normalize_supplemental(
         for source_id, payload in sorted(sources.items())
     ]
     excluded: list[dict[str, Any]] = []
+    if market_projection_withheld:
+        warnings.append(
+            _warning(
+                "MARKET_CONTEXT_WITHHELD_BY_CUTOFF",
+                "The complete versioned market projection was excluded by "
+                "the review cutoff.",
+                source_ids=sorted(legacy_cutoff_market_source_ids),
+            )
+        )
     for source_id, payload in sorted(sources.items()):
         wrapper = _normalize_source_envelope(
             payload,
@@ -818,7 +1007,23 @@ def _normalize_supplemental(
         known = _parse_timestamp(
             wrapper["knowledge_at"], f"supplemental[{source_id}].knowledge_at"
         )
-        if effective > review_cutoff or known > review_cutoff:
+        if (
+            market_projection_withheld
+            and source_id in legacy_cutoff_market_source_ids
+        ):
+            excluded.append(
+                _excluded_source_record(
+                    wrapper,
+                    reason_code=(
+                        f"{source_kind.upper()}_WITHHELD_BY_CUTOFF"
+                    ),
+                )
+            )
+            continue
+        if (
+            not _is_v2_market_context_source(payload)
+            and (effective > review_cutoff or known > review_cutoff)
+        ):
             warnings.append(
                 _warning(
                     f"{source_kind}_withheld_by_cutoff",
@@ -2010,13 +2215,69 @@ def _validate_source_manifests(
                 raise ReviewInputBundleError(
                     "excluded source knowledge_at precedes effective_at"
                 )
-            if reason.endswith("_WITHHELD_BY_CUTOFF") and (
-                review_cutoff is None
-                or (effective <= review_cutoff and known <= review_cutoff)
-            ):
-                raise ReviewInputBundleError(
-                    "withheld source does not exceed review_cutoff"
+            if reason.endswith("_WITHHELD_BY_CUTOFF"):
+                directly_exceeds_cutoff = (
+                    review_cutoff is not None
+                    and (
+                        effective > review_cutoff
+                        or known > review_cutoff
+                    )
                 )
+                atomic_market_members = [
+                    candidate
+                    for candidate in excluded
+                    if isinstance(candidate, Mapping)
+                    and str(
+                        candidate.get("reason_code") or ""
+                    ).endswith("_WITHHELD_BY_CUTOFF")
+                    and str(candidate.get("source_kind") or "")
+                    in {
+                        "market_context",
+                        "price",
+                        "classification",
+                        "other",
+                    }
+                    and str(candidate.get("source_id") or "").startswith(
+                        "market_"
+                    )
+                ]
+                atomic_market_member_ids = {
+                    str(candidate.get("source_id") or "")
+                    for candidate in atomic_market_members
+                }
+                atomic_market_has_manifest = sum(
+                    member_id.startswith("market_manifest_")
+                    for member_id in atomic_market_member_ids
+                ) == 1
+                atomic_market_has_late_member = False
+                if review_cutoff is not None:
+                    for candidate in atomic_market_members:
+                        candidate_effective = _parse_timestamp(
+                            candidate.get("effective_at"),
+                            "atomic market excluded effective_at",
+                        )
+                        candidate_known = _parse_timestamp(
+                            candidate.get("knowledge_at"),
+                            "atomic market excluded knowledge_at",
+                        )
+                        if (
+                            candidate_effective > review_cutoff
+                            or candidate_known > review_cutoff
+                        ):
+                            atomic_market_has_late_member = True
+                            break
+                atomically_withheld_market_member = (
+                    source_id in atomic_market_member_ids
+                    and atomic_market_has_manifest
+                    and atomic_market_has_late_member
+                )
+                if (
+                    not directly_exceeds_cutoff
+                    and not atomically_withheld_market_member
+                ):
+                    raise ReviewInputBundleError(
+                        "withheld source does not exceed review_cutoff"
+                    )
             if reason == "DECISION_EVENT_BINDING_MISSING" and source.get(
                 "source_kind"
             ) != "decision":
@@ -2803,8 +3064,10 @@ def _validate_wrapped_source(
                     f"{field}.warning_codes are not canonical",
                 )
             )
-        if review_cutoff is not None and (
-            effective > review_cutoff or known > review_cutoff
+        if (
+            review_cutoff is not None
+            and not _is_v2_market_context_source(wrapper)
+            and (effective > review_cutoff or known > review_cutoff)
         ):
             findings.append(
                 _finding(
@@ -3179,6 +3442,28 @@ def _validate_review_input_bundle_impl(artifact: Mapping[str, Any]) -> dict[str,
     decision_linkage_status = str(
         (episode.get("decision_linkage") or {}).get("status") or "missing"
     )
+    try:
+        market_validation = _market_context_source_set_validation(supplementals)
+    except Exception as exc:
+        findings.append(
+            _finding(
+                "blocker",
+                "MARKET_CONTEXT_SOURCE_SET_INVALID",
+                f"versioned market-context source closure failed: {exc}",
+            )
+        )
+    else:
+        if market_validation is not None and _market_context_validation_blocked(
+            market_validation
+        ):
+            findings.append(
+                _finding(
+                    "blocker",
+                    "MARKET_CONTEXT_SOURCE_SET_INVALID",
+                    "versioned market-context supplemental sources failed their "
+                    "offline closure validation",
+                )
+            )
     for index, item in enumerate(decisions):
         _validate_wrapped_source(
             item,

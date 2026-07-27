@@ -23,15 +23,22 @@ from .ledger_snapshot_reconstruction import (
 )
 from .models import (
     OPERATION_CHECKPOINT_SCHEMA_VERSION,
+    OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+    PUBLIC_INFORMATION_POLICY_VERSION,
     OperationCheckpointRecord,
+    OperationCheckpointRecordV2,
+    operation_checkpoint_from_mapping,
 )
 from .operation_review import validate_operation_review
 from .time_utils import parse_datetime, utc_iso
 
 
 METHOD_VERSION = "episode_scoped_append_only_checkpoint_v1"
+METHOD_VERSION_V2 = "episode_scoped_append_only_checkpoint_v2"
 VALIDATION_SCHEMA_VERSION = "investment_review.review_checkpoint.validation.v1"
+VALIDATION_SCHEMA_VERSION_V2 = "investment_review.review_checkpoint.validation.v2"
 REPLAY_SCHEMA_VERSION = "investment_review.review_checkpoint.replay.v1"
+REPLAY_SCHEMA_VERSION_V2 = "investment_review.review_checkpoint.replay.v2"
 APPEND_PLAN_SCHEMA_VERSION = "investment_review.review_checkpoint.append_plan.v1"
 
 CHECKPOINT_TYPES = frozenset(
@@ -57,6 +64,12 @@ _ROOT_FIELDS = {
     "source_refs",
     "governance",
 }
+_ROOT_FIELDS_V2 = _ROOT_FIELDS | {
+    "operation_anchor_event_id",
+    "operation_anchor_at",
+    "operation_anchor_ordering_key",
+    "information_time_policy_version",
+}
 _GAP_FIELDS = {
     "gap_id",
     "axis",
@@ -77,6 +90,12 @@ _AXES = {
     "outcome",
 }
 _ADJUSTMENT_OPERATION_TYPES = {
+    "position_increase",
+    "position_reduce",
+    "special_quantity_adjustment",
+}
+_ACTIVE_MATERIAL_OPERATION_TYPES = {
+    "position_open",
     "position_increase",
     "position_reduce",
     "special_quantity_adjustment",
@@ -499,6 +518,135 @@ def derive_checkpoint_semantics(
     )
 
 
+def _review_checkpoint_operation_anchor_from_validated(
+    episode: Mapping[str, Any],
+    *,
+    checkpoint_type: str,
+    checkpoint_as_of: str,
+    operations: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Derive the v2 anchor only from canonical selected operation facts."""
+
+    semantics = _checkpoint_semantics(
+        episode,
+        checkpoint_type=checkpoint_type,
+        checkpoint_as_of=checkpoint_as_of,
+        operations=operations,
+    )
+    event_refs = _episode_event_refs(episode)
+    if checkpoint_type == "active_checkpoint":
+        candidates: list[Mapping[str, Any]] = []
+        for event_ref in event_refs:
+            event_id = _text(event_ref.get("event_id"), name="episode event_id")
+            operation = operations[event_id]
+            if _dt(_event_time(event_ref)) > _dt(checkpoint_as_of):
+                continue
+            if operation.get("classification_status") != "ready":
+                continue
+            if operation.get("operation_type") not in _ACTIVE_MATERIAL_OPERATION_TYPES:
+                continue
+            candidates.append(event_ref)
+        if not candidates:
+            raise ReviewCheckpointError(
+                "v2 active checkpoint requires a selected, validated material operation"
+            )
+        anchor_ref = candidates[-1]
+        anchor_event_id = _text(
+            anchor_ref.get("event_id"), name="v2 active operation anchor event_id"
+        )
+        semantics["anchor_event_id"] = anchor_event_id
+    else:
+        anchor_event_id = semantics["anchor_event_id"]
+        anchor_ref = next(
+            item for item in event_refs if item.get("event_id") == anchor_event_id
+        )
+        operation = operations[anchor_event_id]
+        expected_types = {
+            "entry": {"position_open"},
+            "adjustment": _ADJUSTMENT_OPERATION_TYPES,
+            "exit": {"position_close"},
+            "postmortem": {"position_close"},
+        }[checkpoint_type]
+        if (
+            operation.get("classification_status") != "ready"
+            or operation.get("operation_type") not in expected_types
+        ):
+            raise ReviewCheckpointError(
+                "v2 operation anchor must be a ready material operation of the "
+                "checkpoint type"
+            )
+
+    operation_anchor_at = _event_time(anchor_ref)
+    raw_ordering_key = anchor_ref.get("ordering_key")
+    if (
+        not isinstance(raw_ordering_key, list)
+        or len(raw_ordering_key) != 4
+        or _timestamp(
+            raw_ordering_key[0], name="operation anchor ordering_key[0]"
+        )
+        != operation_anchor_at
+        or isinstance(raw_ordering_key[1], bool)
+        or not isinstance(raw_ordering_key[1], int)
+        or not str(raw_ordering_key[2] or "")
+        or str(raw_ordering_key[3] or "") != anchor_event_id
+    ):
+        raise ReviewCheckpointError(
+            "operation anchor ordering key is not the canonical P2C event key"
+        )
+    operation = operations[anchor_event_id]
+    return {
+        **semantics,
+        "operation_anchor_event_id": anchor_event_id,
+        "operation_anchor_at": operation_anchor_at,
+        "operation_anchor_ordering_key": [
+            operation_anchor_at,
+            raw_ordering_key[1],
+            str(raw_ordering_key[2]),
+            anchor_event_id,
+        ],
+        "operation_type": str(operation["operation_type"]),
+        "classification_status": str(operation["classification_status"]),
+        "source_refs": _source_ref_strings(operation),
+    }
+
+
+def derive_review_checkpoint_operation_anchor(
+    episode: Mapping[str, Any],
+    *,
+    operation_review: Mapping[str, Any],
+    checkpoint_type: str,
+    checkpoint_as_of: str,
+) -> dict[str, Any]:
+    """Return the authoritative v2 operation-anchor identity projection."""
+
+    _validation_accepted(validate_episode(episode), name="episode")
+    _validation_accepted(
+        validate_operation_review(operation_review), name="operation_review"
+    )
+    canonical_as_of = _timestamp(checkpoint_as_of, name="checkpoint_as_of")
+    episode_id = _text(episode.get("episode_id"), name="episode_id")
+    episode_review = _matched_episode_review(
+        operation_review, episode_id=episode_id
+    )
+    if episode_review.get("episode_status") != episode.get("status"):
+        raise ReviewCheckpointError(
+            "operation review lifecycle does not match the episode"
+        )
+    event_ids = [
+        _text(item.get("event_id"), name="episode event_id")
+        for item in _episode_event_refs(episode)
+    ]
+    operations = _operations_by_event(
+        episode_review, expected_event_ids=event_ids
+    )
+    return _review_checkpoint_operation_anchor_from_validated(
+        episode,
+        checkpoint_type=checkpoint_type,
+        checkpoint_as_of=canonical_as_of,
+        operations=operations,
+    )
+
+
 def _checkpoint_anchor(
     reconstruction: Mapping[str, Any],
 ) -> Mapping[str, Any]:
@@ -523,11 +671,12 @@ def _source_bindings(
     operation_review: Mapping[str, Any],
     knowledge_provenance: Mapping[str, Any],
     reconstruction: Mapping[str, Any],
+    method_version: str = METHOD_VERSION,
 ) -> list[str]:
     episode_id = _text(episode.get("episode_id"), name="episode_id")
     refs = {
         f"episode:{episode_id}",
-        f"method:{METHOD_VERSION}",
+        f"method:{method_version}",
         "operation_review:"
         + _content_id(
             operation_review.get("content_id"),
@@ -568,6 +717,7 @@ def build_review_checkpoint(
     market_axis: Mapping[str, Any],
     market_fallback: Mapping[str, Any],
     market_gaps: Iterable[Mapping[str, Any]] = (),
+    checkpoint_schema_version: str = OPERATION_CHECKPOINT_SCHEMA_VERSION,
 ) -> dict[str, Any]:
     """Build one immutable checkpoint from already frozen, offline sources.
 
@@ -611,6 +761,13 @@ def build_review_checkpoint(
     perspective = _text(perspective, name="perspective").lower()
     if perspective not in {"user", "system"}:
         raise ReviewCheckpointError("perspective must be user or system")
+    if checkpoint_schema_version not in {
+        OPERATION_CHECKPOINT_SCHEMA_VERSION,
+        OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+    }:
+        raise ReviewCheckpointError(
+            "checkpoint_schema_version must be the closed v1 or v2 contract"
+        )
 
     episode_id = _text(episode.get("episode_id"), name="episode_id")
     event_refs = _episode_event_refs(episode)
@@ -628,12 +785,38 @@ def build_review_checkpoint(
     operations = _operations_by_event(
         episode_review, expected_event_ids=event_ids
     )
-    semantics = _checkpoint_semantics(
-        episode,
-        checkpoint_type=checkpoint_type,
-        checkpoint_as_of=canonical_as_of,
-        operations=operations,
-    )
+    if checkpoint_schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2:
+        anchor_identity = _review_checkpoint_operation_anchor_from_validated(
+            episode,
+            checkpoint_type=checkpoint_type,
+            checkpoint_as_of=canonical_as_of,
+            operations=operations,
+        )
+        semantics = {
+            key: anchor_identity[key]
+            for key in (
+                "episode_id",
+                "position_case_id",
+                "review_kind",
+                "checkpoint_type",
+                "lifecycle",
+                "outcome",
+                "anchor_event_id",
+            )
+        }
+        operation_anchor_at = str(anchor_identity["operation_anchor_at"])
+        operation_anchor_ordering_key = deepcopy(
+            anchor_identity["operation_anchor_ordering_key"]
+        )
+    else:
+        semantics = _checkpoint_semantics(
+            episode,
+            checkpoint_type=checkpoint_type,
+            checkpoint_as_of=canonical_as_of,
+            operations=operations,
+        )
+        operation_anchor_at = ""
+        operation_anchor_ordering_key = []
 
     if knowledge_provenance.get("perspective") != perspective:
         raise ReviewCheckpointError(
@@ -772,6 +955,11 @@ def build_review_checkpoint(
         operation_review=operation_review,
         knowledge_provenance=knowledge_provenance,
         reconstruction=reconstruction,
+        method_version=(
+            METHOD_VERSION_V2
+            if checkpoint_schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+            else METHOD_VERSION
+        ),
     )
     operation_refs = set(bindings)
     for operation in operations.values():
@@ -929,7 +1117,7 @@ def build_review_checkpoint(
     root_refs.update(str(ref) for ref in market_fallback.get("cache_refs", []))
 
     raw_checkpoint = {
-        "schema_version": OPERATION_CHECKPOINT_SCHEMA_VERSION,
+        "schema_version": checkpoint_schema_version,
         "episode_id": episode_id,
         "position_case_id": semantics["position_case_id"],
         "review_kind": semantics["review_kind"],
@@ -944,8 +1132,19 @@ def build_review_checkpoint(
         "source_refs": sorted(root_refs),
         "governance": deepcopy(_GOVERNANCE),
     }
+    if checkpoint_schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2:
+        raw_checkpoint.update(
+            {
+                "operation_anchor_event_id": semantics["anchor_event_id"],
+                "operation_anchor_at": operation_anchor_at,
+                "operation_anchor_ordering_key": operation_anchor_ordering_key,
+                "information_time_policy_version": (
+                    PUBLIC_INFORMATION_POLICY_VERSION
+                ),
+            }
+        )
     try:
-        checkpoint = OperationCheckpointRecord.from_mapping(raw_checkpoint).to_dict()
+        checkpoint = operation_checkpoint_from_mapping(raw_checkpoint).to_dict()
     except Exception as exc:
         raise ReviewCheckpointError(
             f"checkpoint failed the closed operation contract: {type(exc).__name__}"
@@ -999,11 +1198,17 @@ def _semantic_validation_findings(
                     related_refs=matches,
                 )
             )
-    if f"method:{METHOD_VERSION}" not in refs:
+    checkpoint_schema_version = checkpoint.get("schema_version")
+    expected_method_version = (
+        METHOD_VERSION_V2
+        if checkpoint_schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+        else METHOD_VERSION
+    )
+    if f"method:{expected_method_version}" not in refs:
         findings.append(
             _finding(
                 "MISSING_CHECKPOINT_METHOD_BINDING",
-                "checkpoint source refs do not bind the P5 method version",
+                "checkpoint source refs do not bind the exact method version",
             )
         )
     nested_refs: set[str] = set()
@@ -1061,6 +1266,27 @@ def _semantic_validation_findings(
                     "active checkpoint cannot precede its latest material event",
                 )
             )
+    if checkpoint_schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2:
+        if checkpoint.get("operation_anchor_at") != effective_at:
+            findings.append(
+                _finding(
+                    "OPERATION_ANCHOR_TIME_MISMATCH",
+                    "v2 operation anchor must equal anchor event effective time",
+                )
+            )
+        ordering_key = checkpoint.get("operation_anchor_ordering_key")
+        if (
+            not isinstance(ordering_key, list)
+            or len(ordering_key) != 4
+            or ordering_key[0] != checkpoint.get("operation_anchor_at")
+            or ordering_key[3] != checkpoint.get("operation_anchor_event_id")
+        ):
+            findings.append(
+                _finding(
+                    "OPERATION_ANCHOR_ORDERING_KEY_MISMATCH",
+                    "v2 operation anchor ordering key is not closed",
+                )
+            )
     if isinstance(gaps, list) and any(
         isinstance(gap, Mapping)
         and str(gap.get("code") or "").upper()
@@ -1088,7 +1314,13 @@ def validate_review_checkpoint(artifact: object) -> dict[str, Any]:
             )
         )
     else:
-        if set(artifact) != _ROOT_FIELDS:
+        schema_version = artifact.get("schema_version")
+        expected_root_fields = (
+            _ROOT_FIELDS_V2
+            if schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+            else _ROOT_FIELDS
+        )
+        if set(artifact) != expected_root_fields:
             findings.append(
                 _finding(
                     "MALFORMED_REVIEW_CHECKPOINT_SHAPE",
@@ -1096,7 +1328,7 @@ def validate_review_checkpoint(artifact: object) -> dict[str, Any]:
                 )
             )
         try:
-            normalized = OperationCheckpointRecord.from_mapping(artifact).to_dict()
+            normalized = operation_checkpoint_from_mapping(artifact).to_dict()
         except Exception as exc:
             normalized = None
             findings.append(
@@ -1125,7 +1357,13 @@ def validate_review_checkpoint(artifact: object) -> dict[str, Any]:
         ),
     )
     return {
-        "schema_version": VALIDATION_SCHEMA_VERSION,
+        "schema_version": (
+            VALIDATION_SCHEMA_VERSION_V2
+            if isinstance(artifact, Mapping)
+            and artifact.get("schema_version")
+            == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+            else VALIDATION_SCHEMA_VERSION
+        ),
         "validation_status": "accepted" if not findings else "blocked",
         "findings": findings,
     }
@@ -1140,7 +1378,7 @@ def canonical_review_checkpoint_bytes(artifact: Mapping[str, Any]) -> bytes:
             "review checkpoint validation blocked: "
             + ",".join(item["code"] for item in validation["findings"])
         )
-    return OperationCheckpointRecord.from_mapping(artifact).canonical_bytes
+    return operation_checkpoint_from_mapping(artifact).canonical_bytes
 
 
 def replay_validate_review_checkpoint(
@@ -1157,6 +1395,7 @@ def replay_validate_review_checkpoint(
     market_axis: Mapping[str, Any],
     market_fallback: Mapping[str, Any],
     market_gaps: Iterable[Mapping[str, Any]] = (),
+    checkpoint_schema_version: str = OPERATION_CHECKPOINT_SCHEMA_VERSION,
 ) -> dict[str, Any]:
     """Rebuild from the frozen source set and require byte-identical output."""
 
@@ -1174,6 +1413,7 @@ def replay_validate_review_checkpoint(
             market_axis=market_axis,
             market_fallback=market_fallback,
             market_gaps=market_gaps,
+            checkpoint_schema_version=checkpoint_schema_version,
         )
     except Exception as exc:
         rebuilt = None
@@ -1207,7 +1447,11 @@ def replay_validate_review_checkpoint(
     )
     verified = not findings
     return {
-        "schema_version": REPLAY_SCHEMA_VERSION,
+        "schema_version": (
+            REPLAY_SCHEMA_VERSION_V2
+            if checkpoint_schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+            else REPLAY_SCHEMA_VERSION
+        ),
         "validation_status": "accepted" if verified else "blocked",
         "source_verification": {
             "status": "verified" if verified else "blocked",

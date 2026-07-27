@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import random
+import socket
 import sqlite3
 from copy import deepcopy
 from dataclasses import dataclass
@@ -24,6 +25,15 @@ from src.investment_review.ledger_snapshot_reconstruction import (
     LedgerSnapshotReconstructionError,
     build_ledger_snapshot_reconstruction,
 )
+from src.investment_review.market_context_adapter import (
+    MARKET_CONTEXT_MANIFEST_VERSION,
+    MARKET_CONTEXT_MANIFEST_VERSION_V2,
+    MarketContextAdapter,
+    offline_market_context_for_consumer,
+    resolve_market_context,
+    validate_market_context_supplemental_sources,
+)
+from src.investment_review.operation_review import build_operation_review
 from src.investment_review.review_input_bundle import (
     ReviewInputBundleError,
     _content_id as _bundle_content_id,
@@ -39,11 +49,13 @@ from src.investment_review.review_input_bundle import (
     save_review_input_bundle,
     validate_review_input_bundle,
 )
+from src.investment_review.store import ReviewStore
 
 
 UTC = timezone.utc
 BASE = datetime(2026, 7, 1, 1, 30, tzinfo=UTC)
 CUTOFF = datetime(2026, 7, 1, 8, 0, tzinfo=UTC)
+_NO_MARKET_FIXTURE = object()
 
 
 def _sha256(path: Path) -> str:
@@ -499,10 +511,20 @@ def _fixture_chain(
     snapshots: list[dict[str, Any]] | None = None,
     decisions: Iterable[dict[str, Any]] | None = None,
     supplemental: Iterable[dict[str, Any]] | None = None,
+    market_close_trade_date: str | None | object = _NO_MARKET_FIXTURE,
 ) -> FixtureChain:
     snapshot_rows = deepcopy(snapshots if snapshots is not None else _default_snapshots())
     collection = _collection(events, [_snapshot_ref(item) for item in snapshot_rows])
     portfolio_db = _create_p2b_db(tmp_path / "portfolio.sqlite3", snapshot_rows)
+    if market_close_trade_date is not _NO_MARKET_FIXTURE:
+        _install_market_fixture(
+            portfolio_db,
+            close_trade_date=(
+                str(market_close_trade_date)
+                if market_close_trade_date is not None
+                else None
+            ),
+        )
     portfolio_context = build_episode_portfolio_context(
         collection,
         portfolio_db=portfolio_db,
@@ -549,6 +571,114 @@ def _fixture_chain(
         episode_id=episode_id,
         decisions=decision_rows,
         supplemental=supplemental_rows,
+    )
+
+
+def _install_market_fixture(
+    portfolio_db: Path,
+    *,
+    close_trade_date: str | None,
+    close_fetched_at: str = "2026-07-01T02:00:00+00:00",
+    close: str = "3.929",
+) -> None:
+    connection = sqlite3.connect(portfolio_db)
+    try:
+        connection.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS close_prices (
+                observation_id INTEGER PRIMARY KEY,
+                ts_code TEXT NOT NULL,
+                trade_date TEXT NOT NULL,
+                close TEXT NOT NULL,
+                pre_close TEXT,
+                pct_chg TEXT,
+                source TEXT NOT NULL,
+                fetched_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS instruments (
+                ts_code TEXT PRIMARY KEY,
+                name TEXT,
+                asset_type TEXT,
+                exchange TEXT,
+                currency TEXT,
+                updated_at TEXT,
+                industry_name TEXT,
+                industry_source TEXT,
+                industry_updated_at TEXT
+            );
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO instruments (
+                ts_code, name, asset_type, exchange, currency, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "600000.SH",
+                "fixture instrument",
+                "stock",
+                "SSE",
+                "CNY",
+                "2026-06-30T10:00:00+00:00",
+            ),
+        )
+        if close_trade_date is not None:
+            connection.execute(
+                """
+                INSERT INTO close_prices (
+                    observation_id, ts_code, trade_date, close, pre_close,
+                    pct_chg, source, fetched_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    6993,
+                    "600000.SH",
+                    close_trade_date,
+                    close,
+                    "4.14",
+                    "-5.1",
+                    "fixture.fund_daily",
+                    close_fetched_at,
+                ),
+            )
+        connection.commit()
+    finally:
+        connection.close()
+
+
+def _market_projection(
+    chain: FixtureChain,
+    tmp_path: Path,
+    *,
+    market_knowledge_cutoff: datetime = CUTOFF,
+) -> dict[str, Any]:
+    repo_root = tmp_path / "repo"
+    review_db = (
+        repo_root
+        / "data"
+        / "db"
+        / "investment_review_reviewability_v3.sqlite3"
+    )
+    ReviewStore(review_db).initialize_reviewability_candidate()
+    projection = resolve_market_context(
+        portfolio_db=chain.portfolio_db,
+        review_db=review_db,
+        instrument_id="600000.SH",
+        as_of=CUTOFF.isoformat(),
+        knowledge_cutoff=market_knowledge_cutoff.isoformat(),
+        cache_root=(
+            repo_root
+            / ".codex_tmp"
+            / "investment_review_product_completion_v3"
+            / "market_cache"
+        ),
+        persist=False,
+        clock=lambda: market_knowledge_cutoff - timedelta(minutes=1),
+    )
+    return offline_market_context_for_consumer(
+        projection,
+        consumer="source_replay",
     )
 
 
@@ -720,6 +850,433 @@ def test_f1_01_repeated_build_has_identical_content_id_and_bytes(
     assert first == second
     assert first["content_id"] == second["content_id"]
     assert canonical_json_bytes(first) == canonical_json_bytes(second)
+
+
+def test_bundle_source_replay_uses_the_exact_frozen_list_without_network(
+    monkeypatch: pytest.MonkeyPatch,
+    chain: FixtureChain,
+    bundle: dict[str, Any],
+) -> None:
+    calls: list[tuple[object, ...]] = []
+
+    def forbidden_connect(*args: object, **_kwargs: object) -> None:
+        calls.append(args)
+        raise AssertionError("P2F source replay must remain offline")
+
+    monkeypatch.setattr(socket, "create_connection", forbidden_connect)
+    replay = replay_validate_review_input_bundle(
+        bundle,
+        episode_collection=chain.collection,
+        episode_portfolio_context=chain.portfolio_context,
+        portfolio_db=chain.portfolio_db,
+        decision_sources=chain.decisions,
+        supplemental_sources=chain.supplemental,
+    )
+
+    assert replay["source_verification"]["status"] == "verified"
+    assert calls == []
+
+
+def test_versioned_market_sources_are_frozen_and_replayed_as_one_exact_list(
+    tmp_path: Path,
+) -> None:
+    chain = _fixture_chain(
+        tmp_path,
+        supplemental=(),
+        market_close_trade_date="2026-06-30",
+    )
+    market = _market_projection(chain, tmp_path)
+    sources = market["supplemental_sources"]
+    assert validate_market_context_supplemental_sources(sources)[
+        "validation_status"
+    ] == "accepted"
+
+    result = _build_bundle(chain, supplemental=reversed(sources))
+    frozen = result["frozen_sources"]["supplemental_sources"]
+    assert [item["source_id"] for item in frozen] == [
+        item["source_id"] for item in sources
+    ]
+    prior_close = next(
+        item
+        for item in frozen
+        if (item.get("payload") or {}).get("component") == "prior_close"
+    )
+    assert prior_close["payload"]["values"]["close"] == "3.929"
+    assert prior_close["payload_content_id"] == _value_content_id(
+        prior_close["payload"]
+    )
+    assert result["section_availability"]["market_context"]["status"] == "available"
+
+    replay = replay_validate_review_input_bundle(
+        result,
+        episode_collection=chain.collection,
+        episode_portfolio_context=chain.portfolio_context,
+        portfolio_db=chain.portfolio_db,
+        decision_sources=chain.decisions,
+        supplemental_sources=sources,
+    )
+    assert replay["source_verification"]["status"] == "verified"
+
+    dropped = [
+        item
+        for item in sources
+        if (item.get("payload") or {}).get("component") != "prior_close"
+    ]
+    blocked = replay_validate_review_input_bundle(
+        result,
+        episode_collection=chain.collection,
+        episode_portfolio_context=chain.portfolio_context,
+        portfolio_db=chain.portfolio_db,
+        decision_sources=chain.decisions,
+        supplemental_sources=dropped,
+    )
+    assert blocked["validation_status"] == "blocked"
+
+
+def test_versioned_market_projection_is_atomically_withheld_by_cutoff(
+    tmp_path: Path,
+) -> None:
+    chain = _fixture_chain(
+        tmp_path,
+        supplemental=(),
+        market_close_trade_date="2026-06-30",
+    )
+    market_knowledge_cutoff = CUTOFF + timedelta(minutes=1)
+    sources = deepcopy(
+        _market_projection(
+            chain,
+            tmp_path,
+            market_knowledge_cutoff=market_knowledge_cutoff,
+        )["supplemental_sources"]
+    )
+    manifest = next(
+        item
+        for item in sources
+        if (item.get("payload") or {}).get("schema_version")
+        == MARKET_CONTEXT_MANIFEST_VERSION
+    )
+    # Keep the adapter-owned closure valid: the envelope time is deliberately
+    # within the frozen market resolution, while the P2F review cutoff is
+    # earlier. P2F must exclude the entire projection, not one member.
+
+    result = _build_bundle(
+        chain,
+        review_cutoff=CUTOFF,
+        supplemental=sources,
+    )
+
+    assert result["frozen_sources"]["supplemental_sources"] == []
+    assert {
+        item["source_id"] for item in result["excluded_sources"]
+    } == {item["source_id"] for item in sources}
+    assert {
+        item["reason_code"] for item in result["excluded_sources"]
+    } == {
+        f"{item['source_kind'].upper()}_WITHHELD_BY_CUTOFF"
+        for item in result["excluded_sources"]
+    }
+    assert result["section_availability"]["market_context"]["status"] == (
+        "withheld_by_cutoff"
+    )
+    assert "MARKET_CONTEXT_WITHHELD_BY_CUTOFF" in _warning_codes(result)
+    assert validate_review_input_bundle(result)["validation_status"] in {
+        "accepted",
+        "accepted_with_warnings",
+    }
+
+
+def test_v2_market_projection_freezes_real_post_cutoff_guard_audit_intact(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    events = [
+        _event(
+            "buy-1",
+            decision_refs=[
+                _decision_ref(
+                    "decision-1",
+                    "buy-1",
+                    effective_at=BASE - timedelta(minutes=20),
+                    knowledge_at=BASE - timedelta(minutes=15),
+                )
+            ],
+        ),
+        _event(
+            "sell-1",
+            at=BASE + timedelta(hours=1),
+            side="SELL",
+            sequence=2,
+        ),
+    ]
+    chain = _fixture_chain(
+        tmp_path,
+        events=events,
+        snapshots=[],
+        supplemental=(),
+    )
+    operation_review = build_operation_review(
+        chain.collection,
+        event_inputs=events,
+    )
+    repo_root = tmp_path / "repo"
+    review_db = (
+        repo_root
+        / "data"
+        / "db"
+        / "investment_review_reviewability_v3.sqlite3"
+    )
+    store = ReviewStore(review_db)
+    store.initialize_reviewability_candidate()
+    store.upgrade_reviewability_candidate_v2()
+    audit_at = CUTOFF + timedelta(days=1)
+    episode = chain.collection["episodes"][0]
+    projection = MarketContextAdapter(
+        cache_root=(
+            repo_root
+            / ".codex_tmp"
+            / "investment_review_product_completion_v3"
+            / "market_cache"
+        ),
+        persist=False,
+        clock=lambda: audit_at,
+    )(
+        portfolio_db=chain.portfolio_db,
+        review_db=review_db,
+        episode=episode,
+        operation_review=operation_review,
+        knowledge_provenance={},
+        ledger_snapshot_reconstruction={},
+        perspective="user",
+        as_of=str(episode["closed_at"]),
+        knowledge_cutoff=CUTOFF.isoformat(),
+        market_contract_version="v2",
+    )
+    sources = projection["supplemental_sources"]
+    manifest = next(
+        source
+        for source in sources
+        if (source.get("payload") or {}).get("schema_version")
+        == MARKET_CONTEXT_MANIFEST_VERSION_V2
+    )
+
+    assert manifest["knowledge_at"] == audit_at.isoformat().replace(
+        "+00:00", "Z"
+    )
+    assert manifest["knowledge_at"] > CUTOFF.isoformat()
+    assert projection["market_fallback"]["status"] == "provider_unavailable"
+    assert projection["market_fallback"]["request_count"] == 0
+    result = _build_bundle(
+        chain,
+        review_cutoff=CUTOFF,
+        supplemental=sources,
+    )
+
+    frozen_by_id = {
+        item["source_id"]: item
+        for item in result["frozen_sources"]["supplemental_sources"]
+    }
+    assert set(frozen_by_id) == {item["source_id"] for item in sources}
+    for source in sources:
+        frozen = frozen_by_id[source["source_id"]]
+        for field in (
+            "source_kind",
+            "availability",
+            "effective_at",
+            "knowledge_at",
+            "locator",
+            "warning_codes",
+            "payload",
+        ):
+            assert frozen[field] == source[field]
+    assert not {
+        item["source_id"] for item in result["excluded_sources"]
+    }.intersection({item["source_id"] for item in sources})
+    assert validate_review_input_bundle(result)["validation_status"] in {
+        "accepted",
+        "accepted_with_warnings",
+    }
+    socket_calls: list[tuple[object, ...]] = []
+
+    def forbidden_connect(*args: object, **_kwargs: object) -> None:
+        socket_calls.append(args)
+        raise AssertionError("v2 frozen source replay must remain offline")
+
+    monkeypatch.setattr(socket, "create_connection", forbidden_connect)
+    replay = replay_validate_review_input_bundle(
+        result,
+        episode_collection=chain.collection,
+        episode_portfolio_context=chain.portfolio_context,
+        portfolio_db=chain.portfolio_db,
+        decision_sources=chain.decisions,
+        supplemental_sources=sources,
+    )
+    assert replay["source_verification"]["status"] == "verified"
+    assert socket_calls == []
+
+
+@pytest.mark.parametrize(
+    ("case_name", "close_trade_date", "market_status", "p2f_status"),
+    [
+        ("missing", _NO_MARKET_FIXTURE, "missing", "missing"),
+        ("insufficient", None, "partial", "ambiguous"),
+        ("stale", "2026-05-01", "stale", "stale"),
+    ],
+)
+def test_versioned_market_limitations_keep_honest_envelopes_and_visible_status(
+    tmp_path: Path,
+    case_name: str,
+    close_trade_date: object,
+    market_status: str,
+    p2f_status: str,
+) -> None:
+    case_root = tmp_path / case_name
+    case_root.mkdir()
+    chain = _fixture_chain(
+        case_root,
+        supplemental=(),
+        market_close_trade_date=close_trade_date,
+    )
+    market = _market_projection(chain, case_root)
+    sources = market["supplemental_sources"]
+    manifest = next(
+        item
+        for item in sources
+        if (item.get("payload") or {}).get("schema_version")
+        == MARKET_CONTEXT_MANIFEST_VERSION
+    )
+    assert manifest["payload"]["market_status"] == market_status
+    assert manifest["availability"] == p2f_status
+    assert manifest["payload"]["source_verification"] == "verified"
+    assert manifest["payload"]["network_allowed"] is False
+
+    result = _build_bundle(chain, supplemental=sources)
+    assert result["section_availability"]["market_context"]["status"] == p2f_status
+    price_sources = [item for item in sources if item["source_kind"] == "price"]
+    if market_status == "stale":
+        assert price_sources
+        assert {item["availability"] for item in price_sources} == {"stale"}
+    else:
+        assert price_sources == []
+
+
+def test_coordinated_market_payload_and_manifest_tamper_is_rejected(
+    tmp_path: Path,
+) -> None:
+    chain = _fixture_chain(
+        tmp_path,
+        supplemental=(),
+        market_close_trade_date="2026-06-30",
+    )
+    sources = _market_projection(chain, tmp_path)["supplemental_sources"]
+    tampered = deepcopy(sources)
+    prior_close = next(
+        item
+        for item in tampered
+        if (item.get("payload") or {}).get("component") == "prior_close"
+    )
+    prior_close["payload"]["values"]["close"] = "999.999"
+    manifest = next(
+        item
+        for item in tampered
+        if (item.get("payload") or {}).get("schema_version")
+        == MARKET_CONTEXT_MANIFEST_VERSION
+    )
+    manifest["payload"]["market_input_content_id"] = _value_content_id(
+        {"coordinated": "forged"}
+    )
+
+    validation = validate_market_context_supplemental_sources(tampered)
+    assert validation["validation_status"] == "blocked"
+    with pytest.raises(
+        ReviewInputBundleError,
+        match="market-context supplemental",
+    ):
+        _build_bundle(chain, supplemental=tampered)
+
+
+@pytest.mark.parametrize("target", ["manifest", "component"])
+def test_versioned_market_payload_shapes_are_closed(
+    tmp_path: Path,
+    target: str,
+) -> None:
+    chain = _fixture_chain(
+        tmp_path,
+        supplemental=(),
+        market_close_trade_date="2026-06-30",
+    )
+    forged = deepcopy(
+        _market_projection(chain, tmp_path)["supplemental_sources"]
+    )
+    source = next(
+        item
+        for item in forged
+        if (
+            (item.get("payload") or {}).get("schema_version")
+            == MARKET_CONTEXT_MANIFEST_VERSION
+        )
+        == (target == "manifest")
+    )
+    source["payload"]["unexpected_unbound_field"] = "forbidden"
+
+    assert validate_market_context_supplemental_sources(forged)[
+        "validation_status"
+    ] == "blocked"
+    with pytest.raises(ReviewInputBundleError):
+        _build_bundle(chain, supplemental=forged)
+
+
+def test_versioned_market_schema_downgrade_cannot_bypass_closed_validation(
+    tmp_path: Path,
+) -> None:
+    chain = _fixture_chain(
+        tmp_path,
+        supplemental=(),
+        market_close_trade_date="2026-06-30",
+    )
+    forged = deepcopy(
+        _market_projection(chain, tmp_path)["supplemental_sources"]
+    )
+    manifest = next(
+        item
+        for item in forged
+        if (item.get("payload") or {}).get("schema_version")
+        == MARKET_CONTEXT_MANIFEST_VERSION
+    )
+    manifest["payload"]["schema_version"] = (
+        "investment_review.market_context_manifest.v0"
+    )
+
+    with pytest.raises(
+        ReviewInputBundleError,
+        match="market-context supplemental",
+    ):
+        _build_bundle(chain, supplemental=forged)
+
+
+@pytest.mark.parametrize(
+    "market_status",
+    ["missing", "failed", "stale", "insufficient", "partial"],
+)
+def test_limited_market_payload_cannot_claim_available_p2f_envelope(
+    tmp_path: Path,
+    market_status: str,
+) -> None:
+    chain = _fixture_chain(tmp_path, supplemental=())
+    sources = _market_projection(chain, tmp_path)["supplemental_sources"]
+    forged = deepcopy(sources)
+    manifest = next(
+        item
+        for item in forged
+        if (item.get("payload") or {}).get("schema_version")
+        == MARKET_CONTEXT_MANIFEST_VERSION
+    )
+    manifest["payload"]["market_status"] = market_status
+    manifest["availability"] = "available"
+
+    validation = validate_market_context_supplemental_sources(forged)
+    assert validation["validation_status"] == "blocked"
+    with pytest.raises(ReviewInputBundleError):
+        _build_bundle(chain, supplemental=forged)
 
 
 def test_ledger_reconstruction_is_frozen_without_flattening_field_states(

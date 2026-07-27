@@ -42,6 +42,8 @@ from .episodes import (
 )
 from .models import (
     OPERATION_CHECKPOINT_SCHEMA_VERSION,
+    OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+    PUBLIC_INFORMATION_POLICY_VERSION,
     canonical_json,
     sha256_text,
 )
@@ -66,14 +68,25 @@ from .ledger_snapshot_reconstruction import (
     replay_validate_ledger_snapshot_reconstruction,
     validate_ledger_snapshot_reconstruction,
 )
+from .market_context_adapter import (
+    MarketContextAdapter,
+    MarketContextCutoffUnavailableError,
+    MarketRequestBudget,
+    market_context_runner_projection,
+    replay_validate_market_context_resolution,
+    validate_market_context_resolution,
+    validate_market_context_supplemental_sources,
+)
 from .portfolio_snapshot_adapter import (
     inspect_portfolio_snapshots,
     load_cash_baseline_proof,
 )
 from .review_checkpoint import (
     METHOD_VERSION as REVIEW_CHECKPOINT_METHOD_VERSION,
+    METHOD_VERSION_V2 as REVIEW_CHECKPOINT_METHOD_VERSION_V2,
     build_review_checkpoint,
     canonical_review_checkpoint_bytes,
+    derive_review_checkpoint_operation_anchor,
     replay_validate_review_checkpoint,
     validate_review_checkpoint,
 )
@@ -102,6 +115,46 @@ LEDGER_RECONSTRUCTION_PROJECTION_MANIFEST_VERSION = (
 )
 REVIEW_CHECKPOINT_PROJECTION_MANIFEST_VERSION = (
     "investment_review.review_checkpoint_projection_manifest.v1"
+)
+MARKET_CONTEXT_PROJECTION_MANIFEST_VERSION = (
+    "investment_review.market_context_projection_manifest.v1"
+)
+MARKET_CONTEXT_LIMITATION_MANIFEST_VERSION = (
+    "investment_review.market_context_limitation_manifest.v1"
+)
+LEGACY_CHECKPOINT_MARKET_PROJECTION_VERSION = (
+    "investment_review.legacy_checkpoint_market_projection.v1"
+)
+DEFAULT_MARKET_CACHE_RELATIVE_PATH = Path(
+    ".codex_tmp/investment_review_product_completion_v3/market_cache"
+)
+_DEFAULT_MARKET_RESOLVER = object()
+MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS = frozenset(
+    {
+        "market_axis",
+        "market_fallback",
+        "market_gaps",
+        "supplemental_sources",
+        "market_input_content_id",
+        "market_requirement_id",
+        "market_resolution_id",
+        "as_of",
+        "knowledge_cutoff",
+        "market_source_manifest",
+        "source_replay",
+        "resolution",
+    }
+)
+MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS_V2 = frozenset(
+    {
+        *MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS,
+        "perspective",
+        "operation_anchor_event_id",
+        "operation_anchor_at",
+        "operation_anchor_ordering_key",
+        "information_time_policy_version",
+        "market_evidence_manifest",
+    }
 )
 COMPLETED_STAGE_NAMES = (
     "sync",
@@ -711,8 +764,8 @@ def _review_checkpoint_receipt_projection(
         if lifecycle == "open" and outcome == "interim"
         else []
     )
-    return {
-        "schema_version": OPERATION_CHECKPOINT_SCHEMA_VERSION,
+    projection = {
+        "schema_version": str(checkpoint.get("schema_version") or ""),
         "checkpoint_id": str(checkpoint.get("checkpoint_id") or ""),
         "checkpoint_key": str(checkpoint.get("checkpoint_key") or ""),
         "content_id": str(checkpoint.get("content_id") or ""),
@@ -742,6 +795,24 @@ def _review_checkpoint_receipt_projection(
         "outcome_maturity": outcome,
         "lifecycle_notices": notices,
     }
+    if checkpoint.get("schema_version") == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2:
+        projection.update(
+            {
+                "operation_anchor_event_id": str(
+                    checkpoint.get("operation_anchor_event_id") or ""
+                ),
+                "operation_anchor_at": str(
+                    checkpoint.get("operation_anchor_at") or ""
+                ),
+                "operation_anchor_ordering_key": deepcopy(
+                    checkpoint.get("operation_anchor_ordering_key")
+                ),
+                "information_time_policy_version": str(
+                    checkpoint.get("information_time_policy_version") or ""
+                ),
+            }
+        )
+    return projection
 
 
 def _review_checkpoint_projection_manifest(
@@ -763,6 +834,84 @@ def _review_checkpoint_projection_manifest(
         "content_id": "sha256:"
         + _sha256_bytes(canonical_json_bytes(material)),
     }
+
+
+def _market_context_projection_manifest(
+    projections_by_episode: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    episodes = [
+        {
+            "episode_id": episode_id,
+            **deepcopy(dict(projections_by_episode[episode_id])),
+        }
+        for episode_id in sorted(projections_by_episode)
+    ]
+    material = {
+        "schema_version": MARKET_CONTEXT_PROJECTION_MANIFEST_VERSION,
+        "episodes": episodes,
+    }
+    return {
+        **material,
+        "content_id": "sha256:"
+        + _sha256_bytes(canonical_json_bytes(material)),
+    }
+
+
+def _market_context_limitation_manifest(
+    limitations_by_episode: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    episodes = [
+        {
+            "episode_id": episode_id,
+            **deepcopy(dict(limitations_by_episode[episode_id])),
+        }
+        for episode_id in sorted(limitations_by_episode)
+    ]
+    material = {
+        "schema_version": MARKET_CONTEXT_LIMITATION_MANIFEST_VERSION,
+        "episodes": episodes,
+    }
+    return {
+        **material,
+        "content_id": "sha256:"
+        + _sha256_bytes(canonical_json_bytes(material)),
+    }
+
+
+def _valid_market_budget_snapshot(value: object) -> bool:
+    if not isinstance(value, Mapping) or set(value) != {
+        "max_requests",
+        "used_requests",
+        "reserved_requests",
+        "active_requests",
+        "remaining_requests",
+    }:
+        return False
+    used = value.get("used_requests")
+    return (
+        value.get("max_requests") == 20
+        and isinstance(used, int)
+        and not isinstance(used, bool)
+        and 0 <= used <= 20
+        and value.get("reserved_requests") == 0
+        and value.get("active_requests") == 0
+        and value.get("remaining_requests") == 20 - used
+    )
+
+
+def _review_checkpoint_market_gaps(
+    market_gaps: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Project market gaps into the checkpoint-owned gap ID namespace."""
+
+    return [
+        {
+            key: deepcopy(value)
+            for key, value in gap.items()
+            if key != "gap_id"
+        }
+        for gap in market_gaps
+    ]
 
 
 def _episode_reconstruction_identity(
@@ -1158,8 +1307,9 @@ class ReviewRunner:
         artifact_root: str | Path | None = None,
         repo_root: str | Path | None = None,
         checkpoint_market_resolver: (
-            Callable[..., Mapping[str, Any]] | None
-        ) = None,
+            Callable[..., Mapping[str, Any]] | None | object
+        ) = _DEFAULT_MARKET_RESOLVER,
+        market_cache_root: str | Path | None = None,
     ) -> None:
         self.repo_root = (
             Path(repo_root).resolve()
@@ -1186,7 +1336,35 @@ class ReviewRunner:
         self.artifact_root = _resolve_artifact_root(
             artifact_root, repo_root=self.repo_root
         )
-        self.checkpoint_market_resolver = checkpoint_market_resolver
+        market_cache_candidate = (
+            Path(market_cache_root).expanduser()
+            if market_cache_root is not None
+            else self.repo_root / DEFAULT_MARKET_CACHE_RELATIVE_PATH
+        )
+        if not market_cache_candidate.is_absolute():
+            market_cache_candidate = self.repo_root / market_cache_candidate
+        self.market_cache_root = market_cache_candidate.resolve(strict=False)
+        allowed_market_cache_root = (
+            self.repo_root
+            / ".codex_tmp"
+            / "investment_review_product_completion_v3"
+        ).resolve(strict=False)
+        if not _inside(self.market_cache_root, allowed_market_cache_root):
+            raise ReviewRunnerError(
+                "market cache must remain inside the v3 task cache root"
+            )
+        if checkpoint_market_resolver is _DEFAULT_MARKET_RESOLVER:
+            self.checkpoint_market_resolver: (
+                Callable[..., Mapping[str, Any]] | None
+            ) = MarketContextAdapter(cache_root=self.market_cache_root)
+        elif checkpoint_market_resolver is None or callable(
+            checkpoint_market_resolver
+        ):
+            self.checkpoint_market_resolver = checkpoint_market_resolver
+        else:
+            raise ReviewRunnerError(
+                "checkpoint_market_resolver must be callable or None"
+            )
         if not _inside(self.review_db, self.repo_root):
             raise ReviewRunnerError(
                 "review sidecar must remain inside the selected checkout"
@@ -1206,56 +1384,226 @@ class ReviewRunner:
         perspective: str,
         as_of: str,
         knowledge_cutoff: str,
+        request_budget: MarketRequestBudget,
+        reviewability_schema_version: int = 1,
     ) -> dict[str, Any]:
         resolver = self.checkpoint_market_resolver
         if resolver is None:
             raise CanonicalGateBlocked(
                 "CHECKPOINT_MARKET_PROJECTION_UNPROVEN"
             )
-        resolved = resolver(
-            portfolio_db=self.portfolio_db,
-            review_db=self.review_db,
-            episode=deepcopy(dict(episode)),
-            operation_review=deepcopy(dict(operation_review)),
-            knowledge_provenance=deepcopy(dict(knowledge_provenance)),
-            ledger_snapshot_reconstruction=deepcopy(
+        resolver_kwargs: dict[str, Any] = {
+            "portfolio_db": self.portfolio_db,
+            "review_db": self.review_db,
+            "episode": deepcopy(dict(episode)),
+            "operation_review": deepcopy(dict(operation_review)),
+            "knowledge_provenance": deepcopy(dict(knowledge_provenance)),
+            "ledger_snapshot_reconstruction": deepcopy(
                 dict(ledger_snapshot_reconstruction)
             ),
-            perspective=perspective,
-            as_of=as_of,
-            knowledge_cutoff=knowledge_cutoff,
+            "perspective": perspective,
+            "as_of": as_of,
+            "knowledge_cutoff": knowledge_cutoff,
+            "request_budget": request_budget,
+        }
+        if reviewability_schema_version >= 2:
+            resolver_kwargs["market_contract_version"] = "v2"
+        resolved = resolver(
+            **resolver_kwargs,
         )
         if not isinstance(resolved, Mapping):
             raise CanonicalGateBlocked(
                 "CHECKPOINT_MARKET_PROJECTION_UNPROVEN"
             )
-        if set(resolved) - {
+        legacy_fields = {
             "market_axis",
             "market_fallback",
             "market_gaps",
+        }
+        resolved_fields = frozenset(resolved)
+        if resolved_fields not in {
+            frozenset(legacy_fields),
+            MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS,
+            MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS_V2,
         }:
             raise CanonicalGateBlocked(
-                "checkpoint market resolver returned unsupported fields"
+                "checkpoint market resolver returned unsupported fields "
+                "or missing required fields"
             )
         market_axis = resolved.get("market_axis")
         market_fallback = resolved.get("market_fallback")
         market_gaps = resolved.get("market_gaps", [])
+        supplemental_sources = resolved.get("supplemental_sources", [])
+        market_input_content_id = resolved.get("market_input_content_id")
+        resolution = resolved.get("resolution")
         if (
             not isinstance(market_axis, Mapping)
             or not isinstance(market_fallback, Mapping)
             or not isinstance(market_gaps, (list, tuple))
             or any(not isinstance(item, Mapping) for item in market_gaps)
+            or not isinstance(supplemental_sources, (list, tuple))
+            or any(
+                not isinstance(item, Mapping)
+                for item in supplemental_sources
+            )
         ):
             raise CanonicalGateBlocked(
                 "CHECKPOINT_MARKET_PROJECTION_UNPROVEN"
             )
-        return {
+        normalized: dict[str, Any] = {
             "market_axis": deepcopy(dict(market_axis)),
             "market_fallback": deepcopy(dict(market_fallback)),
             "market_gaps": [
                 deepcopy(dict(item)) for item in market_gaps
             ],
+            "supplemental_sources": [
+                deepcopy(dict(item)) for item in supplemental_sources
+            ],
         }
+        if resolved_fields == frozenset(legacy_fields):
+            if reviewability_schema_version >= 2:
+                raise CanonicalGateBlocked(
+                    "v2 checkpoint requires a perspective/anchor-bound "
+                    "market projection"
+                )
+            legacy_resolution = {
+                "schema_version": LEGACY_CHECKPOINT_MARKET_PROJECTION_VERSION,
+                "as_of": as_of,
+                "knowledge_cutoff": knowledge_cutoff,
+                "market_axis": deepcopy(normalized["market_axis"]),
+                "market_fallback": deepcopy(normalized["market_fallback"]),
+                "market_gaps": deepcopy(normalized["market_gaps"]),
+            }
+            legacy_content_id = "sha256:" + _sha256_bytes(
+                canonical_json_bytes(legacy_resolution)
+            )
+            legacy_resolution["content_id"] = legacy_content_id
+            normalized.update(
+                {
+                    "market_input_content_id": legacy_content_id,
+                    "resolution": legacy_resolution,
+                    "receipt_projection": deepcopy(legacy_resolution),
+                    "full_market_context": False,
+                }
+            )
+            return normalized
+        if (
+            not isinstance(market_input_content_id, str)
+            or not market_input_content_id.startswith("sha256:")
+            or not isinstance(resolution, Mapping)
+        ):
+            raise CanonicalGateBlocked(
+                "CHECKPOINT_MARKET_PROJECTION_UNPROVEN"
+            )
+        resolution_validation = validate_market_context_resolution(
+            resolution
+        )
+        resolution_replay = replay_validate_market_context_resolution(
+            resolution
+        )
+        supplemental_validation = (
+            validate_market_context_supplemental_sources(
+                supplemental_sources,
+                expected_market_input_content_id=(
+                    market_input_content_id
+                ),
+            )
+        )
+        if (
+            _is_blocked(resolution_validation)
+            or _is_blocked(resolution_replay)
+            or _is_blocked(supplemental_validation)
+            or resolution_replay.get("source_verification")
+            != "verified"
+        ):
+            raise CanonicalGateBlocked(
+                "market context resolution failed offline validation"
+            )
+        projection = market_context_runner_projection(resolved)
+        if not isinstance(projection, Mapping):
+            raise CanonicalGateBlocked(
+                "market context runner projection is malformed"
+            )
+        if canonical_json_bytes(projection) != canonical_json_bytes(resolved):
+            raise CanonicalGateBlocked(
+                "market context resolver projection drifted"
+            )
+        if resolved_fields == MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS_V2:
+            from .models import PUBLIC_INFORMATION_POLICY_VERSION
+
+            episode_status = str(episode.get("status") or "")
+            anchor_checkpoint_type = {
+                "open": "active_checkpoint",
+                "closed": "exit",
+            }.get(episode_status)
+            if anchor_checkpoint_type is None:
+                raise CanonicalGateBlocked(
+                    "v2 market context requires a proven open or closed "
+                    "episode lifecycle"
+                )
+            expected_anchor = derive_review_checkpoint_operation_anchor(
+                episode,
+                operation_review=operation_review,
+                checkpoint_type=anchor_checkpoint_type,
+                checkpoint_as_of=as_of,
+            )
+            if (
+                projection.get("perspective") != perspective
+                or projection.get("operation_anchor_event_id")
+                != expected_anchor.get("operation_anchor_event_id")
+                or projection.get("operation_anchor_at")
+                != expected_anchor.get("operation_anchor_at")
+                or projection.get("operation_anchor_ordering_key")
+                != expected_anchor.get("operation_anchor_ordering_key")
+                or projection.get("information_time_policy_version")
+                != PUBLIC_INFORMATION_POLICY_VERSION
+            ):
+                raise CanonicalGateBlocked(
+                    "market context projection does not bind the canonical "
+                    "operation anchor, perspective and information-time policy"
+                )
+        elif reviewability_schema_version >= 2:
+            raise CanonicalGateBlocked(
+                "reviewability v2 cannot consume a v1 market projection"
+            )
+        episode_scope = (
+            episode.get("scope")
+            if isinstance(episode.get("scope"), Mapping)
+            else {}
+        )
+        requested_instrument = str(
+            episode_scope.get("instrument_id")
+            or episode.get("instrument_id")
+            or episode.get("symbol")
+            or ""
+        ).upper()
+        resolution_requirement = (
+            projection["resolution"].get("requirement")
+            if isinstance(projection.get("resolution"), Mapping)
+            and isinstance(
+                projection["resolution"].get("requirement"), Mapping
+            )
+            else {}
+        )
+        if (
+            not requested_instrument
+            or projection.get("as_of") != as_of
+            or projection.get("knowledge_cutoff") != knowledge_cutoff
+            or str(
+                resolution_requirement.get("instrument_id") or ""
+            ).upper()
+            != requested_instrument
+            or projection.get("market_requirement_id")
+            != resolution_requirement.get("requirement_id")
+        ):
+            raise CanonicalGateBlocked(
+                "market context projection does not bind the requested "
+                "instrument and cutoffs"
+            )
+        normalized = deepcopy(dict(projection))
+        normalized["receipt_projection"] = deepcopy(dict(projection))
+        normalized["full_market_context"] = True
+        return normalized
 
     def _append_status(
         self,
@@ -1671,7 +2019,8 @@ class ReviewRunner:
             if reconstruction_signal:
                 if (
                     not isinstance(cutoffs, Mapping)
-                    or cutoffs.get("reviewability_schema_version") != 1
+                    or cutoffs.get("reviewability_schema_version")
+                    not in {1, 2}
                     or reconstruction_version
                     != LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
                 ):
@@ -2055,6 +2404,576 @@ class ReviewRunner:
                             findings.append(
                                 "CASH_BASELINE_PROOF_ARTIFACT_INVALID"
                             )
+            limitation_manifest_version = (
+                cutoffs.get(
+                    "market_context_limitation_manifest_version"
+                )
+                if isinstance(cutoffs, Mapping)
+                else None
+            )
+            limitation_signal = (
+                limitation_manifest_version is not None
+                or any(
+                    isinstance(item, Mapping)
+                    and "market_context_limitation" in item
+                    for item in episodes
+                )
+                or any(
+                    isinstance(item, Mapping)
+                    and "market_context_limitation" in item
+                    for item in replay_items
+                )
+            )
+            market_limitation_by_id: dict[str, Mapping[str, Any]] = {}
+            if limitation_signal:
+                if (
+                    limitation_manifest_version
+                    != MARKET_CONTEXT_LIMITATION_MANIFEST_VERSION
+                    or not isinstance(
+                        cutoffs.get(
+                            "market_context_limitation_sha256"
+                        ),
+                        str,
+                    )
+                    or len(
+                        str(
+                            cutoffs.get(
+                                "market_context_limitation_sha256"
+                            )
+                        )
+                    )
+                    != 64
+                ):
+                    findings.append(
+                        "INVALID_MARKET_CONTEXT_LIMITATION_BINDING"
+                    )
+                expected_limitation_fields = {
+                    "status",
+                    "code",
+                    "instrument_id",
+                    "as_of",
+                    "knowledge_cutoff",
+                    "network_attempted",
+                    "receipt_backdated",
+                }
+                reconstruction_by_id = {
+                    str(item.get("episode_id") or ""): item.get(
+                        "ledger_snapshot_reconstruction"
+                    )
+                    for item in episodes
+                    if isinstance(item, Mapping)
+                }
+                for episode_item in episodes:
+                    if not isinstance(episode_item, Mapping):
+                        continue
+                    episode_item_id = str(
+                        episode_item.get("episode_id") or ""
+                    )
+                    limitation = episode_item.get(
+                        "market_context_limitation"
+                    )
+                    if limitation is None:
+                        continue
+                    reconstruction = reconstruction_by_id.get(
+                        episode_item_id
+                    )
+                    if (
+                        not episode_item_id
+                        or not isinstance(limitation, Mapping)
+                        or set(limitation)
+                        != expected_limitation_fields
+                        or limitation.get("status")
+                        != "withheld_by_cutoff"
+                        or limitation.get("code")
+                        != "MARKET_CONTEXT_WITHHELD_BY_CUTOFF"
+                        or not str(
+                            limitation.get("instrument_id") or ""
+                        )
+                        or limitation.get("knowledge_cutoff")
+                        != cutoffs.get("knowledge_cutoff")
+                        or not isinstance(reconstruction, Mapping)
+                        or limitation.get("as_of")
+                        != reconstruction.get("as_of")
+                        or limitation.get("network_attempted")
+                        is not False
+                        or limitation.get("receipt_backdated")
+                        is not False
+                    ):
+                        findings.append(
+                            "MALFORMED_MARKET_CONTEXT_LIMITATION"
+                        )
+                        continue
+                    market_limitation_by_id[
+                        episode_item_id
+                    ] = limitation
+                limitation_manifest = (
+                    _market_context_limitation_manifest(
+                        market_limitation_by_id
+                    )
+                )
+                if (
+                    cutoffs.get(
+                        "market_context_limitation_sha256"
+                    )
+                    != str(
+                        limitation_manifest["content_id"]
+                    ).removeprefix("sha256:")
+                ):
+                    findings.append(
+                        "MARKET_CONTEXT_LIMITATION_BINDING_MISMATCH"
+                    )
+                limitation_codes = sorted(
+                    str(item.get("code") or "")
+                    for item in market_limitation_by_id.values()
+                )
+                budget = (
+                    episode_details.get("market_request_budget")
+                    if isinstance(episode_details, Mapping)
+                    else None
+                )
+                if (
+                    episode_details is None
+                    or episode_details.get(
+                        "market_context_limitation_manifest_version"
+                    )
+                    != MARKET_CONTEXT_LIMITATION_MANIFEST_VERSION
+                    or episode_details.get(
+                        "market_context_limitation_count"
+                    )
+                    != len(market_limitation_by_id)
+                    or episode_details.get(
+                        "market_context_limitation_codes"
+                    )
+                    != limitation_codes
+                    or not _valid_market_budget_snapshot(budget)
+                ):
+                    findings.append(
+                        "MARKET_CONTEXT_LIMITATION_MEMBERSHIP_MISMATCH"
+                    )
+                replay_by_id = {
+                    str(item.get("episode_id") or ""): item
+                    for item in replay_items
+                    if isinstance(item, Mapping)
+                }
+                for episode_item_id, limitation in (
+                    market_limitation_by_id.items()
+                ):
+                    replay_limitation = replay_by_id.get(
+                        episode_item_id, {}
+                    ).get("market_context_limitation")
+                    if (
+                        not isinstance(replay_limitation, Mapping)
+                        or {
+                            key: replay_limitation.get(key)
+                            for key in expected_limitation_fields
+                        }
+                        != dict(limitation)
+                        or replay_limitation.get(
+                            "validation_status"
+                        )
+                        != "accepted"
+                        or replay_limitation.get(
+                            "source_verification"
+                        )
+                        != "not_available"
+                        or replay_limitation.get(
+                            "network_allowed"
+                        )
+                        is not False
+                    ):
+                        findings.append(
+                            "MARKET_CONTEXT_LIMITATION_REPLAY_MISMATCH"
+                        )
+            market_manifest_version = (
+                cutoffs.get(
+                    "market_context_projection_manifest_version"
+                )
+                if isinstance(cutoffs, Mapping)
+                else None
+            )
+            market_signal = (
+                market_manifest_version is not None
+                or any(
+                    isinstance(item, Mapping)
+                    and "market_context" in item
+                    for item in episodes
+                )
+                or any(
+                    isinstance(item, Mapping)
+                    and "market_context" in item
+                    for item in replay_items
+                )
+            )
+            if market_signal:
+                if (
+                    not isinstance(cutoffs, Mapping)
+                    or market_manifest_version
+                    != MARKET_CONTEXT_PROJECTION_MANIFEST_VERSION
+                    or not isinstance(
+                        cutoffs.get("market_context_projection_sha256"),
+                        str,
+                    )
+                    or len(
+                        str(
+                            cutoffs.get(
+                                "market_context_projection_sha256"
+                            )
+                        )
+                    )
+                    != 64
+                ):
+                    findings.append(
+                        "INVALID_MARKET_CONTEXT_VERSION_BINDING"
+                    )
+                market_projection_by_id: dict[
+                    str, Mapping[str, Any]
+                ] = {}
+                expected_market_projection_fields = (
+                    MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS_V2
+                    if cutoffs.get("reviewability_schema_version") == 2
+                    else MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS
+                )
+                for episode_item in (
+                    episodes if isinstance(episodes, list) else []
+                ):
+                    episode_item_id = (
+                        str(episode_item.get("episode_id") or "")
+                        if isinstance(episode_item, Mapping)
+                        else ""
+                    )
+                    projection = (
+                        episode_item.get("market_context")
+                        if isinstance(episode_item, Mapping)
+                        else None
+                    )
+                    if (
+                        projection is None
+                        and episode_item_id
+                        in market_limitation_by_id
+                    ):
+                        continue
+                    reconstruction_projection = (
+                        episode_item.get(
+                            "ledger_snapshot_reconstruction"
+                        )
+                        if isinstance(episode_item, Mapping)
+                        else None
+                    )
+                    if (
+                        not episode_item_id
+                        or not isinstance(projection, Mapping)
+                        or set(projection)
+                        != expected_market_projection_fields
+                    ):
+                        findings.append(
+                            "MALFORMED_MARKET_CONTEXT_PROJECTION"
+                        )
+                        continue
+                    try:
+                        resolution_validation = (
+                            validate_market_context_resolution(
+                                projection["resolution"]
+                            )
+                        )
+                        resolution_replay = (
+                            replay_validate_market_context_resolution(
+                                projection["resolution"]
+                            )
+                        )
+                        canonical_projection = (
+                            market_context_runner_projection(
+                                projection["resolution"]
+                            )
+                        )
+                        supplemental_validation = (
+                            validate_market_context_supplemental_sources(
+                                projection["supplemental_sources"],
+                                expected_market_input_content_id=str(
+                                    projection[
+                                        "market_input_content_id"
+                                    ]
+                                ),
+                            )
+                        )
+                        projection_cutoffs_match = (
+                            projection.get("knowledge_cutoff")
+                            == cutoffs.get("knowledge_cutoff")
+                            and isinstance(
+                                reconstruction_projection, Mapping
+                            )
+                            and projection.get("as_of")
+                            == reconstruction_projection.get("as_of")
+                        )
+                        source_read = projection[
+                            "resolution"
+                        ].get("source_read")
+                        source_hash_matches = (
+                            isinstance(source_read, Mapping)
+                            and isinstance(source_proof, Mapping)
+                            and str(
+                                source_read.get("source_sha256") or ""
+                            ).removeprefix("sha256:")
+                            == source_proof.get("sha256_before")
+                        )
+                    except Exception:
+                        resolution_validation = {
+                            "validation_status": "blocked"
+                        }
+                        resolution_replay = {
+                            "validation_status": "blocked"
+                        }
+                        canonical_projection = None
+                        supplemental_validation = {
+                            "validation_status": "blocked"
+                        }
+                        projection_cutoffs_match = False
+                        source_hash_matches = False
+                    if (
+                        _is_blocked(resolution_validation)
+                        or _is_blocked(resolution_replay)
+                        or _is_blocked(supplemental_validation)
+                        or resolution_replay.get(
+                            "source_verification"
+                        )
+                        != "verified"
+                        or canonical_projection != dict(projection)
+                        or not projection_cutoffs_match
+                        or not source_hash_matches
+                    ):
+                        findings.append(
+                            "MALFORMED_MARKET_CONTEXT_PROJECTION"
+                        )
+                        continue
+                    market_projection_by_id[
+                        episode_item_id
+                    ] = projection
+                if set(market_projection_by_id) & set(
+                    market_limitation_by_id
+                ):
+                    findings.append(
+                        "MARKET_CONTEXT_LIMITATION_STATE_CONFLICT"
+                    )
+                receipt_market_manifest = (
+                    _market_context_projection_manifest(
+                        market_projection_by_id
+                    )
+                )
+                if (
+                    cutoffs.get("market_context_projection_sha256")
+                    != str(
+                        receipt_market_manifest["content_id"]
+                    ).removeprefix("sha256:")
+                ):
+                    findings.append(
+                        "MARKET_CONTEXT_PROJECTION_BINDING_MISMATCH"
+                    )
+                market_content_ids = sorted(
+                    str(item.get("market_input_content_id") or "")
+                    for item in market_projection_by_id.values()
+                )
+                market_resolution_ids = sorted(
+                    str(item.get("market_resolution_id") or "")
+                    for item in market_projection_by_id.values()
+                )
+                market_stage_artifacts = (
+                    episode_stage.get("artifacts", [])
+                    if isinstance(episode_stage, Mapping)
+                    else []
+                )
+                market_descriptors = {
+                    str(item.get("content_id") or ""): item
+                    for item in market_stage_artifacts
+                    if isinstance(item, Mapping)
+                    and item.get("content_id")
+                }
+                if (
+                    episode_details is None
+                    or episode_details.get(
+                        "market_context_projection_manifest_version"
+                    )
+                    != MARKET_CONTEXT_PROJECTION_MANIFEST_VERSION
+                    or episode_details.get("market_context_count")
+                    != len(market_projection_by_id)
+                    or episode_details.get(
+                        "market_context_content_ids"
+                    )
+                    != market_content_ids
+                    or episode_details.get("market_resolution_ids")
+                    != market_resolution_ids
+                    or not _valid_market_budget_snapshot(
+                        episode_details.get(
+                            "market_request_budget"
+                        )
+                    )
+                    or len(market_projection_by_id)
+                    + len(market_limitation_by_id)
+                    != len(receipt_episode_ids)
+                    or not set(market_content_ids).issubset(
+                        market_descriptors
+                    )
+                ):
+                    findings.append(
+                        "MARKET_CONTEXT_MEMBERSHIP_MISMATCH"
+                    )
+                replay_by_id = {
+                    str(item.get("episode_id") or ""): item
+                    for item in replay_items
+                    if isinstance(item, Mapping)
+                    and item.get("episode_id")
+                }
+                receipt_episode_by_id = {
+                    str(item.get("episode_id") or ""): item
+                    for item in episodes
+                    if isinstance(item, Mapping)
+                    and item.get("episode_id")
+                }
+                for episode_item_id, projection in (
+                    market_projection_by_id.items()
+                ):
+                    replay_projection = (
+                        replay_by_id.get(episode_item_id, {}).get(
+                            "market_context"
+                        )
+                        if isinstance(
+                            replay_by_id.get(episode_item_id), Mapping
+                        )
+                        else None
+                    )
+                    if (
+                        not isinstance(replay_projection, Mapping)
+                        or replay_projection.get("validation_status")
+                        != "accepted"
+                        or replay_projection.get("source_verification")
+                        != "verified"
+                        or {
+                            key: replay_projection.get(key)
+                            for key in (
+                                expected_market_projection_fields
+                            )
+                        }
+                        != dict(projection)
+                    ):
+                        findings.append(
+                            "MARKET_CONTEXT_SOURCE_REPLAY_MISMATCH"
+                        )
+                    if receipt.get("mode") != "apply":
+                        continue
+                    descriptor = market_descriptors.get(
+                        str(
+                            projection.get(
+                                "market_input_content_id"
+                            )
+                            or ""
+                        )
+                    )
+                    artifact_path = (
+                        Path(str(descriptor.get("path") or ""))
+                        if isinstance(descriptor, Mapping)
+                        else None
+                    )
+                    episode_receipt = receipt_episode_by_id.get(
+                        episode_item_id, {}
+                    )
+                    input_descriptor = (
+                        episode_receipt.get("artifacts", {}).get(
+                            "input"
+                        )
+                        if isinstance(
+                            episode_receipt.get("artifacts"), Mapping
+                        )
+                        else None
+                    )
+                    input_path = (
+                        Path(str(input_descriptor.get("path") or ""))
+                        if isinstance(input_descriptor, Mapping)
+                        else None
+                    )
+                    try:
+                        market_artifact = load_json_object(
+                            artifact_path
+                        )
+                        artifact_projection = (
+                            market_context_runner_projection(
+                                market_artifact
+                            )
+                        )
+                        input_artifact = load_json_object(input_path)
+                        input_validation = validate_review_input_bundle(
+                            input_artifact
+                        )
+                        frozen_sources = input_artifact.get(
+                            "frozen_sources"
+                        )
+                        frozen_supplementals = (
+                            frozen_sources.get(
+                                "supplemental_sources", []
+                            )
+                            if isinstance(frozen_sources, Mapping)
+                            else []
+                        )
+                        market_source_ids = {
+                            str(item.get("source_id") or "")
+                            for item in projection[
+                                "supplemental_sources"
+                            ]
+                            if isinstance(item, Mapping)
+                        }
+                        input_market_sources = [
+                            {
+                                key: deepcopy(item.get(key))
+                                for key in (
+                                    "source_id",
+                                    "source_kind",
+                                    "availability",
+                                    "effective_at",
+                                    "knowledge_at",
+                                    "locator",
+                                    "warning_codes",
+                                    "payload",
+                                )
+                            }
+                            for item in frozen_supplementals
+                            if isinstance(item, Mapping)
+                            and str(item.get("source_id") or "")
+                            in market_source_ids
+                        ]
+                        input_market_sources.sort(
+                            key=lambda item: (
+                                str(item.get("source_kind") or ""),
+                                str(item.get("source_id") or ""),
+                            )
+                        )
+                    except Exception:
+                        artifact_projection = None
+                        input_validation = {
+                            "validation_status": "blocked"
+                        }
+                        input_market_sources = []
+                    if (
+                        artifact_projection != dict(projection)
+                        or _is_blocked(input_validation)
+                        or canonical_json_bytes(input_market_sources)
+                        != canonical_json_bytes(
+                            projection["supplemental_sources"]
+                        )
+                    ):
+                        findings.append(
+                            "MARKET_CONTEXT_ARTIFACT_INVALID"
+                        )
+            validated_market_ids = (
+                set(market_projection_by_id)
+                if market_signal
+                else set()
+            )
+            if (
+                market_signal or limitation_signal
+            ) and (
+                validated_market_ids
+                | set(market_limitation_by_id)
+            ) != set(receipt_episode_ids):
+                findings.append(
+                    "MARKET_CONTEXT_OR_LIMITATION_MEMBERSHIP_MISMATCH"
+                )
             checkpoint_version = (
                 cutoffs.get("operation_checkpoint_schema_version")
                 if isinstance(cutoffs, Mapping)
@@ -2076,10 +2995,17 @@ class ReviewRunner:
             if checkpoint_signal:
                 if (
                     not isinstance(cutoffs, Mapping)
-                    or checkpoint_version
-                    != OPERATION_CHECKPOINT_SCHEMA_VERSION
+                    or checkpoint_version not in {
+                        OPERATION_CHECKPOINT_SCHEMA_VERSION,
+                        OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+                    }
                     or cutoffs.get("review_checkpoint_method_version")
-                    != REVIEW_CHECKPOINT_METHOD_VERSION
+                    != (
+                        REVIEW_CHECKPOINT_METHOD_VERSION_V2
+                        if checkpoint_version
+                        == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+                        else REVIEW_CHECKPOINT_METHOD_VERSION
+                    )
                     or cutoffs.get(
                         "review_checkpoint_projection_manifest_version"
                     )
@@ -2107,6 +3033,18 @@ class ReviewRunner:
                     "outcome_maturity",
                     "lifecycle_notices",
                 }
+                if (
+                    checkpoint_version
+                    == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+                ):
+                    expected_projection_fields.update(
+                        {
+                            "operation_anchor_event_id",
+                            "operation_anchor_at",
+                            "operation_anchor_ordering_key",
+                            "information_time_policy_version",
+                        }
+                    )
                 checkpoint_projection_by_id: dict[
                     str, Mapping[str, Any]
                 ] = {}
@@ -2125,12 +3063,49 @@ class ReviewRunner:
                     )
                     if projection is None:
                         continue
+                    v2_binding_valid = True
+                    if (
+                        checkpoint_version
+                        == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+                        and isinstance(projection, Mapping)
+                    ):
+                        ordering_key = projection.get(
+                            "operation_anchor_ordering_key"
+                        )
+                        try:
+                            anchor_at = _utc(
+                                projection.get("operation_anchor_at"),
+                                field="receipt operation_anchor_at",
+                            )
+                            projection_as_of = _utc(
+                                projection.get("as_of"),
+                                field="receipt checkpoint as_of",
+                            )
+                        except ReviewRunnerError:
+                            v2_binding_valid = False
+                        else:
+                            v2_binding_valid = (
+                                anchor_at <= projection_as_of
+                                and isinstance(ordering_key, list)
+                                and len(ordering_key) == 4
+                                and ordering_key[0]
+                                == projection.get("operation_anchor_at")
+                                and ordering_key[3]
+                                == projection.get(
+                                    "operation_anchor_event_id"
+                                )
+                                and projection.get(
+                                    "information_time_policy_version"
+                                )
+                                == PUBLIC_INFORMATION_POLICY_VERSION
+                            )
                     if (
                         not episode_item_id
                         or not isinstance(projection, Mapping)
+                        or not v2_binding_valid
                         or set(projection) != expected_projection_fields
                         or projection.get("schema_version")
-                        != OPERATION_CHECKPOINT_SCHEMA_VERSION
+                        != checkpoint_version
                         or not str(
                             projection.get("checkpoint_id") or ""
                         ).startswith("review_checkpoint_")
@@ -2198,11 +3173,16 @@ class ReviewRunner:
                     or episode_details.get(
                         "operation_checkpoint_schema_version"
                     )
-                    != OPERATION_CHECKPOINT_SCHEMA_VERSION
+                    != checkpoint_version
                     or episode_details.get(
                         "review_checkpoint_method_version"
                     )
-                    != REVIEW_CHECKPOINT_METHOD_VERSION
+                    != (
+                        REVIEW_CHECKPOINT_METHOD_VERSION_V2
+                        if checkpoint_version
+                        == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+                        else REVIEW_CHECKPOINT_METHOD_VERSION
+                    )
                     or episode_details.get("review_checkpoint_count")
                     != len(checkpoint_projection_by_id)
                     or episode_details.get(
@@ -2354,7 +3334,7 @@ class ReviewRunner:
                     or receipt_reconstruction_version is not None
                 ):
                     if (
-                        receipt_reviewability_version != 1
+                        receipt_reviewability_version not in {1, 2}
                         or receipt_reconstruction_version
                         != LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
                     ):
@@ -2377,6 +3357,50 @@ class ReviewRunner:
                             "ledger_snapshot_reconstruction_projection_sha256": (
                                 cutoffs.get(
                                     "ledger_snapshot_reconstruction_projection_sha256"
+                                )
+                            ),
+                        }
+                    )
+                receipt_market_manifest_version = cutoffs.get(
+                    "market_context_projection_manifest_version"
+                )
+                if (
+                    receipt_market_manifest_version is not None
+                    or cutoffs.get(
+                        "market_context_projection_sha256"
+                    )
+                    is not None
+                ):
+                    expected_key_material.update(
+                        {
+                            "market_context_projection_manifest_version": (
+                                receipt_market_manifest_version
+                            ),
+                            "market_context_projection_sha256": (
+                                cutoffs.get(
+                                    "market_context_projection_sha256"
+                                )
+                            ),
+                        }
+                    )
+                receipt_limitation_manifest_version = cutoffs.get(
+                    "market_context_limitation_manifest_version"
+                )
+                if (
+                    receipt_limitation_manifest_version is not None
+                    or cutoffs.get(
+                        "market_context_limitation_sha256"
+                    )
+                    is not None
+                ):
+                    expected_key_material.update(
+                        {
+                            "market_context_limitation_manifest_version": (
+                                receipt_limitation_manifest_version
+                            ),
+                            "market_context_limitation_sha256": (
+                                cutoffs.get(
+                                    "market_context_limitation_sha256"
                                 )
                             ),
                         }
@@ -2457,6 +3481,7 @@ class ReviewRunner:
         episode_id: str | None = None,
         dry_run: bool = False,
         trigger: str = "manual",
+        market_request_budget: MarketRequestBudget | None = None,
     ) -> dict[str, Any]:
         if scope not in RUN_SCOPES:
             raise ReviewRunnerError(f"unsupported review scope: {scope}")
@@ -2472,6 +3497,20 @@ class ReviewRunner:
             raise ReviewRunnerError(
                 "as_of must not be later than knowledge_cutoff"
             )
+        if (
+            market_request_budget is not None
+            and not isinstance(
+                market_request_budget, MarketRequestBudget
+            )
+        ):
+            raise ReviewRunnerError(
+                "market_request_budget must be a MarketRequestBudget"
+            )
+        market_budget = (
+            market_request_budget
+            if market_request_budget is not None
+            else MarketRequestBudget()
+        )
         episode_cutoff = as_of_time
         review_cutoff = knowledge_time
         mode = "dry_run" if dry_run else "apply"
@@ -2616,10 +3655,21 @@ class ReviewRunner:
             reviewability_schema_version = store_status.get(
                 "reviewability_schema_version"
             )
-            reviewability_enabled = reviewability_schema_version == 1
+            reviewability_enabled = reviewability_schema_version in {1, 2}
             checkpointing_enabled = (
                 reviewability_enabled
                 and self.checkpoint_market_resolver is not None
+            )
+            checkpoint_schema_version = (
+                OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+                if reviewability_schema_version == 2
+                else OPERATION_CHECKPOINT_SCHEMA_VERSION
+            )
+            checkpoint_method_version = (
+                REVIEW_CHECKPOINT_METHOD_VERSION_V2
+                if checkpoint_schema_version
+                == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+                else REVIEW_CHECKPOINT_METHOD_VERSION
             )
             (
                 event_inputs,
@@ -2675,6 +3725,15 @@ class ReviewRunner:
             review_checkpoints: dict[str, dict[str, Any]] = {}
             checkpoint_projection_manifest = (
                 _review_checkpoint_projection_manifest({})
+            )
+            market_contexts: dict[str, dict[str, Any]] = {}
+            legacy_market_episode_ids: set[str] = set()
+            market_projection_manifest = (
+                _market_context_projection_manifest({})
+            )
+            market_limitations: dict[str, dict[str, Any]] = {}
+            market_limitation_manifest = (
+                _market_context_limitation_manifest({})
             )
             preview_selected: list[dict[str, Any]] = []
             if reviewability_enabled:
@@ -2778,37 +3837,95 @@ class ReviewRunner:
                             "checkpoint operation-review preview replay failed"
                         )
                     for selected_episode in preview_selected:
-                        if selected_episode.get("status") != "open":
-                            continue
                         selected_episode_id = str(
                             selected_episode.get("episode_id") or ""
                         )
                         reconstruction = ledger_reconstructions[
                             selected_episode_id
                         ]["artifact"]
-                        market_inputs = self._checkpoint_market_inputs(
-                            episode=selected_episode,
-                            operation_review=preview_operation_review,
-                            knowledge_provenance=knowledge_provenance,
-                            ledger_snapshot_reconstruction=reconstruction,
-                            perspective=perspective,
-                            as_of=_utc_text(as_of_time),
-                            knowledge_cutoff=_utc_text(knowledge_time),
+                        market_as_of = _episode_reconstruction_as_of(
+                            selected_episode,
+                            request_as_of=_utc_text(as_of_time),
                         )
+                        try:
+                            market_inputs = self._checkpoint_market_inputs(
+                                episode=selected_episode,
+                                operation_review=preview_operation_review,
+                                knowledge_provenance=knowledge_provenance,
+                                ledger_snapshot_reconstruction=(
+                                    reconstruction
+                                ),
+                                perspective=perspective,
+                                as_of=market_as_of,
+                                knowledge_cutoff=_utc_text(knowledge_time),
+                                request_budget=market_budget,
+                                reviewability_schema_version=int(
+                                    reviewability_schema_version or 0
+                                ),
+                            )
+                        except MarketContextCutoffUnavailableError:
+                            if int(reviewability_schema_version or 0) >= 2:
+                                raise CanonicalGateBlocked(
+                                    "reviewability v2 market adapter returned a "
+                                    "runner-level cutoff exception instead of a "
+                                    "canonical limitation projection"
+                                )
+                            selected_scope = (
+                                selected_episode.get("scope")
+                                if isinstance(
+                                    selected_episode.get("scope"),
+                                    Mapping,
+                                )
+                                else {}
+                            )
+                            market_limitations[selected_episode_id] = {
+                                "status": "withheld_by_cutoff",
+                                "code": (
+                                    "MARKET_CONTEXT_WITHHELD_BY_CUTOFF"
+                                ),
+                                "instrument_id": str(
+                                    selected_scope.get(
+                                        "instrument_id"
+                                    )
+                                    or ""
+                                ).upper(),
+                                "as_of": market_as_of,
+                                "knowledge_cutoff": _utc_text(
+                                    knowledge_time
+                                ),
+                                "network_attempted": False,
+                                "receipt_backdated": False,
+                            }
+                            continue
+                        if market_inputs["full_market_context"]:
+                            market_contexts[selected_episode_id] = (
+                                market_inputs
+                            )
+                        else:
+                            legacy_market_episode_ids.add(
+                                selected_episode_id
+                            )
+                        if selected_episode.get("status") != "open":
+                            continue
                         checkpoint = build_review_checkpoint(
                             episode=selected_episode,
                             operation_review=preview_operation_review,
                             knowledge_provenance=knowledge_provenance,
                             ledger_snapshot_reconstruction=reconstruction,
                             perspective=perspective,
-                            checkpoint_as_of=_utc_text(as_of_time),
+                            checkpoint_as_of=market_as_of,
                             knowledge_cutoff=_utc_text(knowledge_time),
                             checkpoint_type="active_checkpoint",
                             market_axis=market_inputs["market_axis"],
                             market_fallback=market_inputs[
                                 "market_fallback"
                             ],
-                            market_gaps=market_inputs["market_gaps"],
+                            market_gaps=_review_checkpoint_market_gaps(
+                                market_inputs["market_gaps"]
+                            ),
+                            checkpoint_schema_version=(
+                                checkpoint_schema_version
+                            ),
                         )
                         checkpoint_replay = (
                             replay_validate_review_checkpoint(
@@ -2820,14 +3937,19 @@ class ReviewRunner:
                                     reconstruction
                                 ),
                                 perspective=perspective,
-                                checkpoint_as_of=_utc_text(as_of_time),
+                                checkpoint_as_of=market_as_of,
                                 knowledge_cutoff=_utc_text(knowledge_time),
                                 checkpoint_type="active_checkpoint",
                                 market_axis=market_inputs["market_axis"],
                                 market_fallback=market_inputs[
                                     "market_fallback"
                                 ],
-                                market_gaps=market_inputs["market_gaps"],
+                                market_gaps=_review_checkpoint_market_gaps(
+                                    market_inputs["market_gaps"]
+                                ),
+                                checkpoint_schema_version=(
+                                    checkpoint_schema_version
+                                ),
                             )
                         )
                         if (
@@ -2850,6 +3972,23 @@ class ReviewRunner:
                                 )
                             ),
                         }
+                    market_projection_manifest = (
+                        _market_context_projection_manifest(
+                            {
+                                selected_episode_id: state[
+                                    "receipt_projection"
+                                ]
+                                for selected_episode_id, state in (
+                                    market_contexts.items()
+                                )
+                            }
+                        )
+                    )
+                    market_limitation_manifest = (
+                        _market_context_limitation_manifest(
+                            market_limitations
+                        )
+                    )
                     checkpoint_projection_manifest = (
                         _review_checkpoint_projection_manifest(
                             {
@@ -2895,7 +4034,9 @@ class ReviewRunner:
             if reviewability_enabled:
                 key_material.update(
                     {
-                        "reviewability_schema_version": 1,
+                        "reviewability_schema_version": (
+                            reviewability_schema_version
+                        ),
                         "ledger_snapshot_reconstruction_schema_version": (
                             LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
                         ),
@@ -2910,13 +4051,35 @@ class ReviewRunner:
                     }
                 )
             if checkpointing_enabled:
+                if market_contexts:
+                    key_material.update(
+                        {
+                        "market_context_projection_manifest_version": (
+                            MARKET_CONTEXT_PROJECTION_MANIFEST_VERSION
+                        ),
+                        "market_context_projection_sha256": str(
+                            market_projection_manifest["content_id"]
+                        ).removeprefix("sha256:"),
+                        }
+                    )
+                if market_limitations:
+                    key_material.update(
+                        {
+                            "market_context_limitation_manifest_version": (
+                                MARKET_CONTEXT_LIMITATION_MANIFEST_VERSION
+                            ),
+                            "market_context_limitation_sha256": str(
+                                market_limitation_manifest["content_id"]
+                            ).removeprefix("sha256:"),
+                        }
+                    )
                 key_material.update(
                     {
                         "operation_checkpoint_schema_version": (
-                            OPERATION_CHECKPOINT_SCHEMA_VERSION
+                            checkpoint_schema_version
                         ),
                         "review_checkpoint_method_version": (
-                            REVIEW_CHECKPOINT_METHOD_VERSION
+                            checkpoint_method_version
                         ),
                         "review_checkpoint_projection_manifest_version": (
                             REVIEW_CHECKPOINT_PROJECTION_MANIFEST_VERSION
@@ -3089,10 +4252,32 @@ class ReviewRunner:
                     )
                 current_stage = "snapshot"
             if checkpointing_enabled:
+                selected_market_ids = sorted(
+                    str(item.get("episode_id") or "")
+                    for item in selected
+                )
+                if selected_market_ids != sorted(
+                    {
+                        *market_contexts,
+                        *market_limitations,
+                        *legacy_market_episode_ids,
+                    }
+                ):
+                    raise CanonicalGateBlocked(
+                        "market context/limitation membership drifted from "
+                        "the run key"
+                    )
+                if set(market_contexts) & set(market_limitations):
+                    raise CanonicalGateBlocked(
+                        "an episode cannot have both frozen market context "
+                        "and a cutoff limitation"
+                    )
                 selected_open_ids = sorted(
                     str(item.get("episode_id") or "")
                     for item in selected
                     if item.get("status") == "open"
+                    and str(item.get("episode_id") or "")
+                    not in market_limitations
                 )
                 if selected_open_ids != sorted(review_checkpoints):
                     raise CanonicalGateBlocked(
@@ -3104,10 +4289,16 @@ class ReviewRunner:
                     selected_episode_id = str(
                         selected_episode.get("episode_id") or ""
                     )
+                    if selected_episode_id in market_limitations:
+                        continue
                     checkpoint_state = review_checkpoints[
                         selected_episode_id
                     ]
                     market_inputs = checkpoint_state["market_inputs"]
+                    checkpoint_as_of = _episode_reconstruction_as_of(
+                        selected_episode,
+                        request_as_of=_utc_text(as_of_time),
+                    )
                     rebuilt_checkpoint = build_review_checkpoint(
                         episode=selected_episode,
                         operation_review=operation_review,
@@ -3118,14 +4309,19 @@ class ReviewRunner:
                             ]["artifact"]
                         ),
                         perspective=perspective,
-                        checkpoint_as_of=_utc_text(as_of_time),
+                        checkpoint_as_of=checkpoint_as_of,
                         knowledge_cutoff=_utc_text(knowledge_time),
                         checkpoint_type="active_checkpoint",
                         market_axis=market_inputs["market_axis"],
                         market_fallback=market_inputs[
                             "market_fallback"
                         ],
-                        market_gaps=market_inputs["market_gaps"],
+                        market_gaps=_review_checkpoint_market_gaps(
+                            market_inputs["market_gaps"]
+                        ),
+                        checkpoint_schema_version=(
+                            checkpoint_schema_version
+                        ),
                     )
                     if canonical_review_checkpoint_bytes(
                         rebuilt_checkpoint
@@ -3147,14 +4343,19 @@ class ReviewRunner:
                             ]["artifact"]
                         ),
                         perspective=perspective,
-                        checkpoint_as_of=_utc_text(as_of_time),
+                        checkpoint_as_of=checkpoint_as_of,
                         knowledge_cutoff=_utc_text(knowledge_time),
                         checkpoint_type="active_checkpoint",
                         market_axis=market_inputs["market_axis"],
                         market_fallback=market_inputs[
                             "market_fallback"
                         ],
-                        market_gaps=market_inputs["market_gaps"],
+                        market_gaps=_review_checkpoint_market_gaps(
+                            market_inputs["market_gaps"]
+                        ),
+                        checkpoint_schema_version=(
+                            checkpoint_schema_version
+                        ),
                     )
                     if (
                         _is_blocked(rebuilt_replay)
@@ -3170,6 +4371,7 @@ class ReviewRunner:
             reconstruction_descriptors: dict[str, dict[str, Any]] = {}
             cash_evidence_descriptors: dict[str, dict[str, Any]] = {}
             checkpoint_descriptors: dict[str, dict[str, Any]] = {}
+            market_descriptors: dict[str, dict[str, Any]] = {}
             if not dry_run:
                 snapshot_descriptor = _json_artifact(
                     run_dir / "snapshot_inventory.json",
@@ -3262,6 +4464,34 @@ class ReviewRunner:
                     artifact_descriptors.append(
                         checkpoint_descriptors[selected_episode_id]
                     )
+                for selected_episode_id in sorted(market_contexts):
+                    market_state = market_contexts[selected_episode_id]
+                    market_artifact = {
+                        key: deepcopy(market_state[key])
+                        for key in (
+                            "market_axis",
+                            "market_fallback",
+                            "market_gaps",
+                            "supplemental_sources",
+                            "market_input_content_id",
+                            "resolution",
+                        )
+                    }
+                    market_descriptors[selected_episode_id] = (
+                        _json_artifact(
+                            run_dir
+                            / "e"
+                            / selected_episode_id
+                            / "market.json",
+                            market_artifact,
+                            content_id=str(
+                                market_state["market_input_content_id"]
+                            ),
+                        )
+                    )
+                    artifact_descriptors.append(
+                        market_descriptors[selected_episode_id]
+                    )
             else:
                 snapshot_descriptor = {
                     "content_id": str(snapshot_inventory.get("content_id") or ""),
@@ -3330,6 +4560,28 @@ class ReviewRunner:
                         ),
                         "sha256": _sha256_bytes(
                             pretty_json_bytes(checkpoint)
+                        ),
+                        "write_status": "dry_run",
+                    }
+                for selected_episode_id in sorted(market_contexts):
+                    market_state = market_contexts[selected_episode_id]
+                    market_artifact = {
+                        key: deepcopy(market_state[key])
+                        for key in (
+                            "market_axis",
+                            "market_fallback",
+                            "market_gaps",
+                            "supplemental_sources",
+                            "market_input_content_id",
+                            "resolution",
+                        )
+                    }
+                    market_descriptors[selected_episode_id] = {
+                        "content_id": str(
+                            market_state["market_input_content_id"]
+                        ),
+                        "sha256": _sha256_bytes(
+                            pretty_json_bytes(market_artifact)
                         ),
                         "write_status": "dry_run",
                     }
@@ -3475,11 +4727,57 @@ class ReviewRunner:
                         ),
                         **(
                             {
+                                "market_context_projection_manifest_version": (
+                                    MARKET_CONTEXT_PROJECTION_MANIFEST_VERSION
+                                ),
+                                "market_context_count": len(
+                                    market_contexts
+                                ),
+                                "market_context_content_ids": sorted(
+                                    str(
+                                        state["market_input_content_id"]
+                                    )
+                                    for state in market_contexts.values()
+                                ),
+                                "market_resolution_ids": sorted(
+                                    str(
+                                        state["receipt_projection"].get(
+                                            "market_resolution_id"
+                                        )
+                                        or ""
+                                    )
+                                    for state in market_contexts.values()
+                                ),
+                            }
+                            if market_contexts
+                            else {}
+                        ),
+                        **(
+                            {
+                                "market_request_budget": (
+                                    market_budget.snapshot()
+                                ),
+                                "market_context_limitation_manifest_version": (
+                                    MARKET_CONTEXT_LIMITATION_MANIFEST_VERSION
+                                ),
+                                "market_context_limitation_count": len(
+                                    market_limitations
+                                ),
+                                "market_context_limitation_codes": sorted(
+                                    str(item.get("code") or "")
+                                    for item in market_limitations.values()
+                                ),
+                            }
+                            if checkpointing_enabled
+                            else {}
+                        ),
+                        **(
+                            {
                                 "operation_checkpoint_schema_version": (
-                                    OPERATION_CHECKPOINT_SCHEMA_VERSION
+                                    checkpoint_schema_version
                                 ),
                                 "review_checkpoint_method_version": (
-                                    REVIEW_CHECKPOINT_METHOD_VERSION
+                                    checkpoint_method_version
                                 ),
                                 "review_checkpoint_count": len(
                                     review_checkpoints
@@ -3498,8 +4796,19 @@ class ReviewRunner:
                             else {}
                         ),
                     },
-                    gaps=(
-                        ["NO_EPISODE_IN_SCOPE"] if not selected else []
+                    gaps=sorted(
+                        {
+                            *(
+                                ["NO_EPISODE_IN_SCOPE"]
+                                if not selected
+                                else []
+                            ),
+                            *(
+                                str(item.get("code") or "")
+                                for item in market_limitations.values()
+                                if str(item.get("code") or "")
+                            ),
+                        }
                     ),
                     artifacts=[
                         collection_descriptor,
@@ -3511,6 +4820,12 @@ class ReviewRunner:
                             ]
                             for selected_episode_id in sorted(
                                 checkpoint_descriptors
+                            )
+                        ],
+                        *[
+                            market_descriptors[selected_episode_id]
+                            for selected_episode_id in sorted(
+                                market_descriptors
                             )
                         ],
                     ],
@@ -3571,11 +4886,16 @@ class ReviewRunner:
                     selected_id
                 )
                 checkpoint_state = review_checkpoints.get(selected_id)
-                supplemental_sources = (
-                    [reconstruction_state["supplemental_source"]]
-                    if reconstruction_state is not None
-                    else []
-                )
+                market_state = market_contexts.get(selected_id)
+                supplemental_sources: list[Mapping[str, Any]] = []
+                if reconstruction_state is not None:
+                    supplemental_sources.append(
+                        reconstruction_state["supplemental_source"]
+                    )
+                if market_state is not None:
+                    supplemental_sources.extend(
+                        market_state["supplemental_sources"]
+                    )
                 input_bundle = build_review_input_bundle(
                     collection,
                     context,
@@ -3689,6 +5009,17 @@ class ReviewRunner:
                 review_gaps = sorted(
                     set(decision_gaps + _section_gap_codes(review))
                 )
+                market_limitation = market_limitations.get(selected_id)
+                if market_limitation is not None:
+                    review_gaps = sorted(
+                        {
+                            *review_gaps,
+                            str(
+                                market_limitation.get("code")
+                                or "MARKET_CONTEXT_WITHHELD_BY_CUTOFF"
+                            ),
+                        }
+                    )
                 if checkpoint_state is not None:
                     review_gaps = [
                         code
@@ -3768,6 +5099,17 @@ class ReviewRunner:
                     episode_result["artifacts"]["review_checkpoint"] = (
                         checkpoint_descriptors[selected_id]
                     )
+                if market_state is not None:
+                    episode_result["market_context"] = deepcopy(
+                        market_state["receipt_projection"]
+                    )
+                    episode_result["artifacts"]["market_context"] = (
+                        market_descriptors[selected_id]
+                    )
+                if market_limitation is not None:
+                    episode_result["market_context_limitation"] = deepcopy(
+                        market_limitation
+                    )
                 episode_results.append(episode_result)
                 replay_detail: dict[str, Any] = {
                         "episode_id": selected_id,
@@ -3843,6 +5185,19 @@ class ReviewRunner:
                             checkpoint_state["replay"]
                         ),
                         "source_verification": "verified",
+                    }
+                if market_state is not None:
+                    replay_detail["market_context"] = {
+                        **deepcopy(market_state["receipt_projection"]),
+                        "validation_status": "accepted",
+                        "source_verification": "verified",
+                    }
+                if market_limitation is not None:
+                    replay_detail["market_context_limitation"] = {
+                        **deepcopy(market_limitation),
+                        "validation_status": "accepted",
+                        "source_verification": "not_available",
+                        "network_allowed": False,
                     }
                 replay_details.append(replay_detail)
 
@@ -3978,7 +5333,9 @@ class ReviewRunner:
             if reviewability_enabled:
                 receipt_cutoffs.update(
                     {
-                        "reviewability_schema_version": 1,
+                        "reviewability_schema_version": (
+                            reviewability_schema_version
+                        ),
                         "ledger_snapshot_reconstruction_schema_version": (
                             LEDGER_SNAPSHOT_RECONSTRUCTION_SCHEMA_VERSION
                         ),
@@ -3993,13 +5350,35 @@ class ReviewRunner:
                     }
                 )
             if checkpointing_enabled:
+                if market_contexts:
+                    receipt_cutoffs.update(
+                        {
+                            "market_context_projection_manifest_version": (
+                                MARKET_CONTEXT_PROJECTION_MANIFEST_VERSION
+                            ),
+                            "market_context_projection_sha256": str(
+                                market_projection_manifest["content_id"]
+                            ).removeprefix("sha256:"),
+                        }
+                    )
+                if market_limitations:
+                    receipt_cutoffs.update(
+                        {
+                            "market_context_limitation_manifest_version": (
+                                MARKET_CONTEXT_LIMITATION_MANIFEST_VERSION
+                            ),
+                            "market_context_limitation_sha256": str(
+                                market_limitation_manifest["content_id"]
+                            ).removeprefix("sha256:"),
+                        }
+                    )
                 receipt_cutoffs.update(
                     {
                         "operation_checkpoint_schema_version": (
-                            OPERATION_CHECKPOINT_SCHEMA_VERSION
+                            checkpoint_schema_version
                         ),
                         "review_checkpoint_method_version": (
-                            REVIEW_CHECKPOINT_METHOD_VERSION
+                            checkpoint_method_version
                         ),
                         "review_checkpoint_projection_manifest_version": (
                             REVIEW_CHECKPOINT_PROJECTION_MANIFEST_VERSION

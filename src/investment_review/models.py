@@ -19,7 +19,12 @@ class ModelValidationError(ValueError):
 
 
 OPERATION_CHECKPOINT_SCHEMA_VERSION = "investment_review.operation_checkpoint.v1"
+OPERATION_CHECKPOINT_SCHEMA_VERSION_V1 = OPERATION_CHECKPOINT_SCHEMA_VERSION
+OPERATION_CHECKPOINT_SCHEMA_VERSION_V2 = "investment_review.operation_checkpoint.v2"
 MARKET_FALLBACK_POLICY_VERSION = "local_first_controlled_fallback_v1"
+MARKET_FALLBACK_POLICY_VERSION_V1 = MARKET_FALLBACK_POLICY_VERSION
+MARKET_FALLBACK_POLICY_VERSION_V2 = "local_first_controlled_fallback_v2"
+PUBLIC_INFORMATION_POLICY_VERSION = "public_availability_user_knowledge_v1"
 MARKET_PROVIDER_ALLOWLIST_VERSION = "market_provider_allowlist.v1"
 MARKET_REQUEST_FINGERPRINT_VERSION = "market_request_fingerprint.v1"
 MARKET_PROVIDER_ALLOWLIST = frozenset(
@@ -2170,3 +2175,1497 @@ class OperationCheckpointRecord:
 
     def to_dict(self) -> dict[str, Any]:
         return json.loads(self.canonical_bytes.decode("utf-8"))
+
+
+_MARKET_FALLBACK_STATUSES_V2 = frozenset(
+    {
+        "not_needed",
+        "succeeded",
+        "failed",
+        "provider_unavailable",
+        "withheld_by_cutoff",
+        "budget_exhausted",
+    }
+)
+_MARKET_STATUSES_V2 = frozenset(
+    {"available", "partial", "missing", "stale", "insufficient", "failed"}
+)
+_MARKET_TEMPORAL_ROLES_V2 = frozenset(
+    {
+        "user_known_at_operation_by_verified_publication",
+        "system_known_at_operation",
+        "retrospective_context",
+        "ambiguous",
+        "unknown",
+        "missing",
+    }
+)
+_MARKET_LIMITATION_CODES_V2 = frozenset(
+    {
+        "withheld_by_cutoff",
+        "budget_exhausted",
+        "provider_unavailable",
+        "provider_attempt_count_unknown",
+    }
+)
+_MARKET_PUBLIC_BASES_V2 = frozenset(
+    {
+        "source_declared",
+        "exchange_calendar",
+        "provider_declared",
+        "verified_publication_interval",
+        "unknown",
+        "not_applicable",
+    }
+)
+_MARKET_INFORMATION_TIME_BASES_V2 = frozenset(
+    {
+        "exchange_bar_publication_time.v1",
+        "provider_exact_publication_time.v1",
+        "provider_publication_date_source_timezone.v1",
+        "unknown",
+        "conflicted",
+    }
+)
+_MARKET_ELIGIBILITY_REASON_CODES_V2 = frozenset(
+    {
+        "current_only_not_point_in_time",
+        "publication_time_or_revision_conflicted",
+        "publication_time_or_revision_unproven",
+        "publication_revision_binding_conflicted",
+        "verified_publication_strictly_before_operation",
+        "publication_interval_touches_operation_anchor",
+        "post_operation_publication",
+        "system_observation_unknown",
+        "system_observed_no_later_than_operation",
+        "system_observed_after_operation",
+    }
+)
+_MARKET_ELIGIBILITY_TEMPORAL_ROLES_V2 = frozenset(
+    {
+        "user_known_at_operation_by_verified_publication",
+        "system_known_at_operation",
+        "retrospective_public_context",
+        "publication_time_ambiguous",
+        "publication_time_unknown",
+        "system_observation_unknown",
+    }
+)
+
+
+def _sha256_content_id(value: object, *, name: str) -> str:
+    content_id = _strict_text(value, name)
+    if re.fullmatch(r"sha256:[0-9a-f]{64}", content_id) is None:
+        raise ModelValidationError(f"{name} must be a canonical SHA-256 content ID")
+    return content_id
+
+
+def _canonical_market_information_time_v2(value: object) -> dict[str, Any]:
+    item = _closed_object(
+        value,
+        name="status_axes.market.information_time",
+        required={
+            "status",
+            "lower_bound",
+            "upper_bound",
+            "basis",
+            "method_version",
+            "revision_ref",
+        },
+    )
+    status = _enum_text(
+        item["status"],
+        name="status_axes.market.information_time.status",
+        allowed=frozenset({"verified", "unknown", "conflicted"}),
+    )
+    basis = _enum_text(
+        item["basis"],
+        name="status_axes.market.information_time.basis",
+        allowed=_MARKET_INFORMATION_TIME_BASES_V2,
+    )
+    if item["method_version"] != "public_information_time.v1":
+        raise ModelValidationError("market information-time method version drift")
+    revision_ref = (
+        None
+        if item["revision_ref"] is None
+        else _strict_text(
+            item["revision_ref"],
+            "status_axes.market.information_time.revision_ref",
+        )
+    )
+    if status == "verified":
+        lower_bound = _aware_utc(
+            item["lower_bound"],
+            name="status_axes.market.information_time.lower_bound",
+        )
+        upper_bound = _aware_utc(
+            item["upper_bound"],
+            name="status_axes.market.information_time.upper_bound",
+        )
+        ensure_known_not_before_occurred(lower_bound, upper_bound)
+        if basis in {"unknown", "conflicted"} or revision_ref is None:
+            raise ModelValidationError(
+                "verified market information time requires versioned provenance"
+            )
+    else:
+        if item["lower_bound"] is not None or item["upper_bound"] is not None:
+            raise ModelValidationError(
+                "unknown/conflicted information time cannot carry trusted bounds"
+            )
+        lower_bound = upper_bound = None
+        if basis != status:
+            raise ModelValidationError(
+                "market information-time status and basis must agree"
+            )
+    return {
+        "status": status,
+        "lower_bound": lower_bound,
+        "upper_bound": upper_bound,
+        "basis": basis,
+        "method_version": "public_information_time.v1",
+        "revision_ref": revision_ref,
+    }
+
+
+def _canonical_market_version_provenance_v2(value: object) -> dict[str, str]:
+    item = _closed_object(
+        value,
+        name="status_axes.market.version_provenance",
+        required={"status", "content_sha256", "source_ref", "revision_ref"},
+    )
+    status = _enum_text(
+        item["status"],
+        name="status_axes.market.version_provenance.status",
+        allowed=frozenset({"verified", "unknown", "conflicted"}),
+    )
+    return {
+        "status": status,
+        "content_sha256": _sha256_content_id(
+            item["content_sha256"],
+            name="status_axes.market.version_provenance.content_sha256",
+        ),
+        "source_ref": _strict_text(
+            item["source_ref"], "status_axes.market.version_provenance.source_ref"
+        ),
+        "revision_ref": _strict_text(
+            item["revision_ref"],
+            "status_axes.market.version_provenance.revision_ref",
+        ),
+    }
+
+
+def _canonical_market_eligibility_v2(
+    value: object,
+    *,
+    perspective: str,
+    operation_anchor_at: str,
+) -> dict[str, Any]:
+    item = _closed_object(
+        value,
+        name="status_axes.market.perspective_eligibility",
+        required={
+            "perspective",
+            "status",
+            "reason_code",
+            "temporal_role",
+            "operation_anchor_at",
+            "projected_user_known_at",
+            "projected_system_known_at",
+            "actual_user_observation_proven",
+        },
+    )
+    eligibility_perspective = _enum_text(
+        item["perspective"],
+        name="status_axes.market.perspective_eligibility.perspective",
+        allowed=_PERSPECTIVES,
+    )
+    if eligibility_perspective != perspective:
+        raise ModelValidationError("market eligibility perspective drift")
+    eligibility_status = _enum_text(
+        item["status"],
+        name="status_axes.market.perspective_eligibility.status",
+        allowed=frozenset({"eligible", "ineligible", "ambiguous", "unknown"}),
+    )
+    reason_code = _enum_text(
+        item["reason_code"],
+        name="status_axes.market.perspective_eligibility.reason_code",
+        allowed=_MARKET_ELIGIBILITY_REASON_CODES_V2,
+    )
+    eligibility_role = _enum_text(
+        item["temporal_role"],
+        name="status_axes.market.perspective_eligibility.temporal_role",
+        allowed=_MARKET_ELIGIBILITY_TEMPORAL_ROLES_V2,
+    )
+    eligibility_anchor = _aware_utc(
+        item["operation_anchor_at"],
+        name="status_axes.market.perspective_eligibility.operation_anchor_at",
+    )
+    if eligibility_anchor != operation_anchor_at:
+        raise ModelValidationError("market eligibility operation anchor drift")
+    projected_user = (
+        None
+        if item["projected_user_known_at"] is None
+        else _aware_utc(
+            item["projected_user_known_at"],
+            name=(
+                "status_axes.market.perspective_eligibility."
+                "projected_user_known_at"
+            ),
+        )
+    )
+    projected_system = (
+        None
+        if item["projected_system_known_at"] is None
+        else _aware_utc(
+            item["projected_system_known_at"],
+            name=(
+                "status_axes.market.perspective_eligibility."
+                "projected_system_known_at"
+            ),
+        )
+    )
+    if item["actual_user_observation_proven"] is not False:
+        raise ModelValidationError(
+            "public-information policy cannot prove actual user observation"
+        )
+    return {
+        "perspective": eligibility_perspective,
+        "status": eligibility_status,
+        "reason_code": reason_code,
+        "temporal_role": eligibility_role,
+        "operation_anchor_at": eligibility_anchor,
+        "projected_user_known_at": projected_user,
+        "projected_system_known_at": projected_system,
+        "actual_user_observation_proven": False,
+    }
+
+
+def _canonical_market_axis_v2(
+    value: object,
+    *,
+    perspective: str,
+    operation_anchor_at: str,
+) -> dict[str, Any]:
+    item = _closed_object(
+        value,
+        name="status_axes.market",
+        required={
+            "status",
+            "temporal_role",
+            "perspective",
+            "eligible_source_refs",
+            "retrospective_source_refs",
+            "unknown_source_refs",
+            "effective_at",
+            "publicly_available_at",
+            "publicly_available_basis",
+            "fetched_at",
+            "system_observed_at",
+            "representative_source_id",
+            "representative_source_content_id",
+            "information_time",
+            "version_provenance",
+            "perspective_eligibility",
+            "market_evidence_manifest_content_id",
+            "source_refs",
+        },
+        optional={"summary"},
+    )
+    status = _enum_text(
+        item["status"], name="status_axes.market.status", allowed=_MARKET_STATUSES_V2
+    )
+    temporal_role = _enum_text(
+        item["temporal_role"],
+        name="status_axes.market.temporal_role",
+        allowed=_MARKET_TEMPORAL_ROLES_V2,
+    )
+    axis_perspective = _enum_text(
+        item["perspective"],
+        name="status_axes.market.perspective",
+        allowed=_PERSPECTIVES,
+    )
+    if axis_perspective != perspective:
+        raise ModelValidationError(
+            "status_axes.market perspective must match the checkpoint"
+        )
+    refs_by_role = {
+        key: _string_set(item[key], name=f"status_axes.market.{key}")
+        for key in (
+            "eligible_source_refs",
+            "retrospective_source_refs",
+            "unknown_source_refs",
+        )
+    }
+    role_sets = [set(refs) for refs in refs_by_role.values()]
+    if any(role_sets[left].intersection(role_sets[right]) for left in range(3) for right in range(left + 1, 3)):
+        raise ModelValidationError(
+            "market eligible, retrospective and unknown source refs must be disjoint"
+        )
+    source_refs = _string_set(
+        item["source_refs"], name="status_axes.market.source_refs"
+    )
+    classified_refs = set().union(*role_sets)
+    if not classified_refs.issubset(set(source_refs)):
+        raise ModelValidationError(
+            "market source_refs must cover every perspective-classified source"
+        )
+    market_evidence_manifest_content_id = _sha256_content_id(
+        item["market_evidence_manifest_content_id"],
+        name="status_axes.market.market_evidence_manifest_content_id",
+    )
+    market_evidence_manifest_ref = (
+        "market_evidence_manifest:" + market_evidence_manifest_content_id
+    )
+    if market_evidence_manifest_ref not in source_refs:
+        raise ModelValidationError(
+            "market source refs must bind the frozen evidence manifest"
+        )
+    representative_source_id = (
+        None
+        if item["representative_source_id"] is None
+        else _strict_text(
+            item["representative_source_id"],
+            "status_axes.market.representative_source_id",
+        )
+    )
+    if representative_source_id is None:
+        if any(
+            item[field] is not None
+            for field in (
+                "representative_source_content_id",
+                "information_time",
+                "version_provenance",
+                "perspective_eligibility",
+            )
+        ):
+            raise ModelValidationError(
+                "source-less market axis cannot carry representative proof"
+            )
+        if classified_refs:
+            raise ModelValidationError(
+                "classified market sources require one representative proof"
+            )
+        representative_source_content_id = None
+        information_time = None
+        version_provenance = None
+        perspective_eligibility = None
+    else:
+        if representative_source_id not in source_refs:
+            raise ModelValidationError(
+                "representative market source must be frozen in source_refs"
+            )
+        membership_count = sum(
+            representative_source_id in role_set for role_set in role_sets
+        )
+        if membership_count != 1:
+            raise ModelValidationError(
+                "representative market source must have one perspective category"
+            )
+        if any(
+            item[field] is None
+            for field in (
+                "representative_source_content_id",
+                "information_time",
+                "version_provenance",
+                "perspective_eligibility",
+            )
+        ):
+            raise ModelValidationError(
+                "representative market source requires complete closed proof"
+            )
+        representative_source_content_id = _sha256_content_id(
+            item["representative_source_content_id"],
+            name="status_axes.market.representative_source_content_id",
+        )
+        information_time = _canonical_market_information_time_v2(
+            item["information_time"]
+        )
+        version_provenance = _canonical_market_version_provenance_v2(
+            item["version_provenance"]
+        )
+        perspective_eligibility = _canonical_market_eligibility_v2(
+            item["perspective_eligibility"],
+            perspective=perspective,
+            operation_anchor_at=operation_anchor_at,
+        )
+        category_by_status = {
+            "eligible": "eligible_source_refs",
+            "ineligible": "retrospective_source_refs",
+            "ambiguous": "unknown_source_refs",
+            "unknown": "unknown_source_refs",
+        }
+        expected_category = category_by_status[perspective_eligibility["status"]]
+        if representative_source_id not in refs_by_role[expected_category]:
+            raise ModelValidationError(
+                "representative source category disagrees with eligibility proof"
+            )
+    times = {
+        key: (
+            None
+            if item[key] is None
+            else _aware_utc(item[key], name=f"status_axes.market.{key}")
+        )
+        for key in (
+            "effective_at",
+            "publicly_available_at",
+            "fetched_at",
+            "system_observed_at",
+        )
+    }
+    public_basis = _enum_text(
+        item["publicly_available_basis"],
+        name="status_axes.market.publicly_available_basis",
+        allowed=_MARKET_PUBLIC_BASES_V2,
+    )
+    if representative_source_id is None:
+        if (
+            status != "missing"
+            or temporal_role != "missing"
+            or any(value is not None for value in times.values())
+            or public_basis != "not_applicable"
+        ):
+            raise ModelValidationError(
+                "source-less market axis must remain an explicit missing projection"
+            )
+    if representative_source_id is not None:
+        if any(
+            times[field] is None
+            for field in ("effective_at", "fetched_at", "system_observed_at")
+        ):
+            raise ModelValidationError(
+                "representative market source requires effective, fetched and observed times"
+            )
+        ensure_known_not_before_occurred(
+            times["effective_at"], times["fetched_at"]
+        )
+        expected_axis_role = {
+            "user_known_at_operation_by_verified_publication": (
+                "user_known_at_operation_by_verified_publication"
+            ),
+            "system_known_at_operation": "system_known_at_operation",
+            "retrospective_public_context": "retrospective_context",
+            "publication_time_ambiguous": "ambiguous",
+            "publication_time_unknown": "unknown",
+            "system_observation_unknown": "unknown",
+        }[perspective_eligibility["temporal_role"]]
+        if temporal_role != expected_axis_role:
+            raise ModelValidationError(
+                "market temporal role disagrees with representative eligibility"
+            )
+        expected_eligibility_status = {
+            "user_known_at_operation_by_verified_publication": "eligible",
+            "system_known_at_operation": "eligible",
+            "retrospective_public_context": "ineligible",
+            "publication_time_ambiguous": "ambiguous",
+            "publication_time_unknown": "unknown",
+            "system_observation_unknown": "unknown",
+        }[perspective_eligibility["temporal_role"]]
+        if perspective_eligibility["status"] != expected_eligibility_status:
+            raise ModelValidationError(
+                "market eligibility status and temporal role disagree"
+            )
+        allowed_reasons_by_role = {
+            "user_known_at_operation_by_verified_publication": frozenset(
+                {"verified_publication_strictly_before_operation"}
+            ),
+            "system_known_at_operation": frozenset(
+                {"system_observed_no_later_than_operation"}
+            ),
+            "retrospective_public_context": frozenset(
+                {"post_operation_publication", "system_observed_after_operation"}
+            ),
+            "publication_time_ambiguous": frozenset(
+                {
+                    "publication_time_or_revision_conflicted",
+                    "publication_revision_binding_conflicted",
+                    "publication_interval_touches_operation_anchor",
+                }
+            ),
+            "publication_time_unknown": frozenset(
+                {
+                    "current_only_not_point_in_time",
+                    "publication_time_or_revision_unproven",
+                }
+            ),
+            "system_observation_unknown": frozenset(
+                {"system_observation_unknown"}
+            ),
+        }
+        if perspective_eligibility["reason_code"] not in allowed_reasons_by_role[
+            perspective_eligibility["temporal_role"]
+        ]:
+            raise ModelValidationError(
+                "market eligibility reason and temporal role disagree"
+            )
+        if information_time["status"] == "verified":
+            expected_public_basis = {
+                "exchange_bar_publication_time.v1": "exchange_calendar",
+                "provider_exact_publication_time.v1": "provider_declared",
+                "provider_publication_date_source_timezone.v1": (
+                    "verified_publication_interval"
+                ),
+            }[information_time["basis"]]
+            if (
+                times["publicly_available_at"] != information_time["upper_bound"]
+                or public_basis != expected_public_basis
+            ):
+                raise ModelValidationError(
+                    "market public-time projection disagrees with representative proof"
+                )
+        elif times["publicly_available_at"] is not None or public_basis != "unknown":
+            raise ModelValidationError(
+                "unverified market information time cannot project public availability"
+            )
+        eligibility_role = perspective_eligibility["temporal_role"]
+        projected_user = perspective_eligibility["projected_user_known_at"]
+        projected_system = perspective_eligibility["projected_system_known_at"]
+        if eligibility_role == "user_known_at_operation_by_verified_publication":
+            if (
+                perspective != "user"
+                or information_time["status"] != "verified"
+                or version_provenance["status"] != "verified"
+                or information_time["revision_ref"]
+                != version_provenance["revision_ref"]
+                or information_time["upper_bound"] >= operation_anchor_at
+                or projected_user != operation_anchor_at
+                or projected_system is not None
+            ):
+                raise ModelValidationError(
+                    "policy-known user market proof is not strictly pre-operation"
+                )
+        elif eligibility_role == "system_known_at_operation":
+            if (
+                perspective != "system"
+                or projected_system is None
+                or projected_system > operation_anchor_at
+                or projected_system != times["system_observed_at"]
+                or projected_user is not None
+            ):
+                raise ModelValidationError(
+                    "system-known market proof lacks timely real observation"
+                )
+        elif projected_user is not None or projected_system is not None:
+            raise ModelValidationError(
+                "ineligible or uncertain market proof cannot project known time"
+            )
+    if times["effective_at"] is not None and times["publicly_available_at"] is not None:
+        ensure_known_not_before_occurred(
+            times["effective_at"], times["publicly_available_at"]
+        )
+    if times["fetched_at"] is not None and times["system_observed_at"] is not None:
+        ensure_known_not_before_occurred(
+            times["fetched_at"], times["system_observed_at"]
+        )
+    if status in {"available", "partial", "stale", "insufficient"} and not source_refs:
+        raise ModelValidationError(
+            "material market states require explicit source references"
+        )
+    if status == "available" and (
+        times["effective_at"] is None or not refs_by_role["eligible_source_refs"]
+    ):
+        raise ModelValidationError(
+            "market available requires effective time and perspective-eligible evidence"
+        )
+    if temporal_role == "user_known_at_operation_by_verified_publication":
+        if perspective != "user" or not refs_by_role["eligible_source_refs"]:
+            raise ModelValidationError(
+                "publication-policy known role requires user perspective and eligible evidence"
+            )
+        public_at = times["publicly_available_at"]
+        if public_at is None or public_at >= operation_anchor_at:
+            raise ModelValidationError(
+                "verified publication must be strictly before the operation anchor"
+            )
+    if temporal_role == "system_known_at_operation":
+        observed = times["system_observed_at"]
+        if (
+            perspective != "system"
+            or observed is None
+            or observed > operation_anchor_at
+            or not refs_by_role["eligible_source_refs"]
+        ):
+            raise ModelValidationError(
+                "system known role requires real observation no later than the operation anchor"
+            )
+    if temporal_role == "retrospective_context" and not refs_by_role[
+        "retrospective_source_refs"
+    ]:
+        raise ModelValidationError(
+            "retrospective market role requires retrospective source references"
+        )
+    if temporal_role in {"ambiguous", "unknown"} and not refs_by_role[
+        "unknown_source_refs"
+    ]:
+        raise ModelValidationError(
+            "ambiguous or unknown market role requires unknown source references"
+        )
+    result: dict[str, Any] = {
+        "status": status,
+        "temporal_role": temporal_role,
+        "perspective": axis_perspective,
+        **refs_by_role,
+        **times,
+        "publicly_available_basis": public_basis,
+        "representative_source_id": representative_source_id,
+        "representative_source_content_id": representative_source_content_id,
+        "information_time": information_time,
+        "version_provenance": version_provenance,
+        "perspective_eligibility": perspective_eligibility,
+        "market_evidence_manifest_content_id": (
+            market_evidence_manifest_content_id
+        ),
+        "source_refs": source_refs,
+    }
+    if item.get("summary") is not None:
+        result["summary"] = _strict_text(
+            item["summary"], "status_axes.market.summary"
+        )
+    return result
+
+
+def _canonical_market_receipt_v2(value: object, *, index: int) -> dict[str, Any]:
+    receipt = _closed_object(
+        value,
+        name=f"market_fallback.fetch_receipts[{index}]",
+        required={
+            "receipt_id",
+            "provider_id",
+            "endpoint_id",
+            "provider_version",
+            "redacted_parameters",
+            "request_fingerprint_version",
+            "request_fingerprint",
+            "guard_audit_at",
+            "started_at",
+            "completed_at",
+            "fetched_at",
+            "system_observed_at",
+            "response_status",
+            "attempt_count",
+            "attempt_count_status",
+            "budget_charged_attempts",
+            "raw_content_sha256",
+            "normalized_content_sha256",
+            "cache_entry_refs",
+            "cache_lineage",
+        },
+    )
+    provider_id = _strict_text(
+        receipt["provider_id"], f"fetch_receipts[{index}].provider_id"
+    )
+    endpoint_id = _strict_text(
+        receipt["endpoint_id"], f"fetch_receipts[{index}].endpoint_id"
+    )
+    provider_endpoint = f"{provider_id}:{endpoint_id}"
+    if provider_endpoint not in MARKET_PROVIDER_ALLOWLIST:
+        raise ModelValidationError(
+            "v2 market fetch receipt provider/endpoint is not allowlisted"
+        )
+    parameters = receipt["redacted_parameters"]
+    if not isinstance(parameters, Mapping):
+        raise ModelValidationError(
+            f"fetch_receipts[{index}].redacted_parameters must be an object"
+        )
+    canonical_parameters: dict[str, str] = {}
+    for raw_key, raw_value in parameters.items():
+        key = _strict_text(raw_key, f"fetch_receipts[{index}] parameter key")
+        if re.search(MARKET_PROVIDER_SENSITIVE_PARAMETER_PATTERN, key, re.I):
+            raise ModelValidationError(
+                "v2 market fetch receipt parameters must not contain secret fields"
+            )
+        if key not in MARKET_PROVIDER_PARAMETER_ALLOWLIST[provider_endpoint]:
+            raise ModelValidationError(
+                "v2 market fetch receipt parameter is not allowlisted for "
+                f"{provider_endpoint}: {key}"
+            )
+        if key in canonical_parameters:
+            raise ModelValidationError(
+                "v2 market fetch receipt parameters contain duplicate normalized keys"
+            )
+        canonical_parameters[key] = _canonical_market_parameter_value(
+            raw_value,
+            key=key,
+            name=f"fetch_receipts[{index}].redacted_parameters.{key}",
+        )
+    provider_version = _strict_text(
+        receipt["provider_version"], f"fetch_receipts[{index}].provider_version"
+    )
+    if receipt["request_fingerprint_version"] != MARKET_REQUEST_FINGERPRINT_VERSION:
+        raise ModelValidationError("Unsupported v2 market request fingerprint version")
+    fingerprint = _strict_text(
+        receipt["request_fingerprint"],
+        f"fetch_receipts[{index}].request_fingerprint",
+    )
+    if fingerprint != market_request_fingerprint(
+        provider_id=provider_id,
+        endpoint_id=endpoint_id,
+        provider_version=provider_version,
+        redacted_parameters=canonical_parameters,
+    ):
+        raise ModelValidationError(
+            "v2 market request fingerprint does not match canonical request"
+        )
+    response_status = _enum_text(
+        receipt["response_status"],
+        name=f"fetch_receipts[{index}].response_status",
+        allowed=frozenset(
+            {
+                "succeeded",
+                "failed",
+                "timeout",
+                "rejected",
+                "provider_unavailable",
+                "withheld_by_cutoff",
+                "budget_exhausted",
+            }
+        ),
+    )
+    attempt_count = receipt["attempt_count"]
+    if (
+        isinstance(attempt_count, bool)
+        or not isinstance(attempt_count, int)
+        or not 0 <= attempt_count <= 3
+    ):
+        raise ModelValidationError(
+            "v2 market fetch receipt attempt_count must be between 0 and 3"
+        )
+    attempt_count_status = _enum_text(
+        receipt["attempt_count_status"],
+        name=f"fetch_receipts[{index}].attempt_count_status",
+        allowed=frozenset({"verified", "unknown"}),
+    )
+    budget_charged_attempts = receipt["budget_charged_attempts"]
+    if (
+        isinstance(budget_charged_attempts, bool)
+        or not isinstance(budget_charged_attempts, int)
+        or not 0 <= budget_charged_attempts <= 3
+    ):
+        raise ModelValidationError(
+            "v2 receipt budget_charged_attempts must be between 0 and 3"
+        )
+    if attempt_count_status == "verified":
+        if budget_charged_attempts != attempt_count:
+            raise ModelValidationError(
+                "verified v2 receipt must charge its exact attempt count"
+            )
+    elif (
+        response_status != "failed"
+        or attempt_count != 0
+        or budget_charged_attempts < 1
+    ):
+        raise ModelValidationError(
+            "unknown attempt count is only valid for bounded failed acquisition"
+        )
+    guard_audit_at = _aware_utc(
+        receipt["guard_audit_at"],
+        name=f"fetch_receipts[{index}].guard_audit_at",
+    )
+    submitted_cache_entry_refs = _string_set(
+        receipt["cache_entry_refs"],
+        name=f"fetch_receipts[{index}].cache_entry_refs",
+    )
+    zero_status = response_status in {
+        "provider_unavailable",
+        "withheld_by_cutoff",
+        "budget_exhausted",
+    }
+    if zero_status:
+        started_at = _aware_utc(
+            receipt["started_at"], name=f"fetch_receipts[{index}].started_at"
+        )
+        completed_at = _aware_utc(
+            receipt["completed_at"], name=f"fetch_receipts[{index}].completed_at"
+        )
+        if started_at != guard_audit_at or completed_at != guard_audit_at:
+            raise ModelValidationError(
+                "zero-attempt v2 guard receipt must bind start/completion to guard audit"
+            )
+        if (
+            attempt_count != 0
+            or attempt_count_status != "verified"
+            or budget_charged_attempts != 0
+            or receipt["fetched_at"] is not None
+            or receipt["system_observed_at"] is not None
+            or receipt["raw_content_sha256"] is not None
+            or receipt["normalized_content_sha256"] is not None
+            or submitted_cache_entry_refs
+        ):
+            raise ModelValidationError(
+                "zero-attempt v2 guard receipt cannot carry acquisition evidence"
+            )
+        fetched_at = None
+        system_observed_at = None
+        raw_hash = None
+        normalized_hash = None
+        cache_entry_refs: list[str] = []
+    else:
+        if attempt_count_status == "verified" and attempt_count < 1:
+            raise ModelValidationError(
+                "attempted v2 market receipt requires at least one HTTP attempt"
+            )
+        started_at = _aware_utc(
+            receipt["started_at"], name=f"fetch_receipts[{index}].started_at"
+        )
+        completed_at = _aware_utc(
+            receipt["completed_at"], name=f"fetch_receipts[{index}].completed_at"
+        )
+        ensure_known_not_before_occurred(started_at, completed_at)
+        ensure_known_not_before_occurred(guard_audit_at, started_at)
+        system_observed_at = _aware_utc(
+            receipt["system_observed_at"],
+            name=f"fetch_receipts[{index}].system_observed_at",
+        )
+        ensure_known_not_before_occurred(started_at, system_observed_at)
+        ensure_known_not_before_occurred(system_observed_at, completed_at)
+        fetched_at = (
+            None
+            if receipt["fetched_at"] is None
+            else _aware_utc(
+                receipt["fetched_at"], name=f"fetch_receipts[{index}].fetched_at"
+            )
+        )
+        if fetched_at is not None:
+            ensure_known_not_before_occurred(started_at, fetched_at)
+            ensure_known_not_before_occurred(fetched_at, system_observed_at)
+        raw_hash = receipt["raw_content_sha256"]
+        normalized_hash = receipt["normalized_content_sha256"]
+        for label, hash_value in (
+            ("raw_content_sha256", raw_hash),
+            ("normalized_content_sha256", normalized_hash),
+        ):
+            if hash_value is not None and re.fullmatch(
+                r"sha256:[0-9a-f]{64}", str(hash_value)
+            ) is None:
+                raise ModelValidationError(
+                    f"v2 market fetch receipt {label} must be SHA-256 or null"
+                )
+        cache_entry_refs = submitted_cache_entry_refs
+        if response_status == "succeeded":
+            if (
+                fetched_at is None
+                or raw_hash is None
+                or normalized_hash is None
+                or not cache_entry_refs
+            ):
+                raise ModelValidationError(
+                    "successful v2 market receipt lacks fetched/hash/cache evidence"
+                )
+        elif cache_entry_refs or raw_hash is not None or normalized_hash is not None:
+            raise ModelValidationError(
+                "failed v2 market receipt cannot carry successful cache evidence"
+            )
+        if attempt_count_status == "unknown" and fetched_at is not None:
+            raise ModelValidationError(
+                "unknown-count failed v2 receipt cannot claim fetched content"
+            )
+    cache_lineage = _string_set(
+        receipt["cache_lineage"], name=f"fetch_receipts[{index}].cache_lineage"
+    )
+    if not cache_lineage:
+        raise ModelValidationError(
+            "every v2 market receipt must bind the triggering requirement"
+        )
+    canonical = {
+        "receipt_id": _strict_text(
+            receipt["receipt_id"], f"fetch_receipts[{index}].receipt_id"
+        ),
+        "provider_id": provider_id,
+        "endpoint_id": endpoint_id,
+        "provider_version": provider_version,
+        "redacted_parameters": dict(sorted(canonical_parameters.items())),
+        "request_fingerprint_version": MARKET_REQUEST_FINGERPRINT_VERSION,
+        "request_fingerprint": fingerprint,
+        "guard_audit_at": guard_audit_at,
+        "started_at": started_at,
+        "completed_at": completed_at,
+        "fetched_at": fetched_at,
+        "system_observed_at": system_observed_at,
+        "response_status": response_status,
+        "attempt_count": attempt_count,
+        "attempt_count_status": attempt_count_status,
+        "budget_charged_attempts": budget_charged_attempts,
+        "raw_content_sha256": raw_hash,
+        "normalized_content_sha256": normalized_hash,
+        "cache_entry_refs": cache_entry_refs,
+        "cache_lineage": cache_lineage,
+    }
+    identity_material = dict(canonical)
+    identity_material["receipt_id"] = ""
+    expected_receipt_id = "market_fetch_receipt_v2_" + hashlib.sha256(
+        canonical_json_bytes(identity_material)
+    ).hexdigest()
+    if canonical["receipt_id"] != expected_receipt_id:
+        raise ModelValidationError("v2 market fetch receipt identity drift")
+    return canonical
+
+
+def _canonical_market_fallback_v2(
+    value: object,
+    *,
+    perspective: str,
+) -> dict[str, Any]:
+    item = _closed_object(
+        value,
+        name="market_fallback",
+        required={
+            "policy_version",
+            "public_information_policy_version",
+            "perspective",
+            "allowlist_version",
+            "allowlist_sha256",
+            "coverage_before",
+            "coverage_after",
+            "status",
+            "limitation_code",
+            "guard_audit_at",
+            "request_count",
+            "request_count_status",
+            "unverified_attempt_upper_bound",
+            "limits",
+            "allowlist",
+            "cache_refs",
+            "fetch_receipt_refs",
+            "fetch_receipts",
+            "offline_consumers",
+        },
+    )
+    if item["policy_version"] != MARKET_FALLBACK_POLICY_VERSION_V2:
+        raise ModelValidationError("Unsupported v2 market fallback policy version")
+    if item["public_information_policy_version"] != PUBLIC_INFORMATION_POLICY_VERSION:
+        raise ModelValidationError("Unsupported public information policy version")
+    fallback_perspective = _enum_text(
+        item["perspective"],
+        name="market_fallback.perspective",
+        allowed=_PERSPECTIVES,
+    )
+    if fallback_perspective != perspective:
+        raise ModelValidationError(
+            "market_fallback perspective must match the checkpoint"
+        )
+    if item["allowlist_version"] != MARKET_PROVIDER_ALLOWLIST_VERSION:
+        raise ModelValidationError("v2 market fallback allowlist version drift")
+    if item["allowlist_sha256"] != MARKET_PROVIDER_ALLOWLIST_SHA256:
+        raise ModelValidationError("v2 market fallback allowlist hash drift")
+    limits = _closed_object(
+        item["limits"],
+        name="market_fallback.limits",
+        required={
+            "timeout_seconds",
+            "max_retries",
+            "max_concurrency",
+            "max_requests_per_run",
+        },
+    )
+    expected_limits = {
+        "timeout_seconds": 20,
+        "max_retries": 2,
+        "max_concurrency": 2,
+        "max_requests_per_run": 20,
+    }
+    if limits != expected_limits:
+        raise ModelValidationError("v2 market fallback frozen limits drift")
+    allowlist = _string_set(item["allowlist"], name="market_fallback.allowlist")
+    if frozenset(allowlist) != MARKET_PROVIDER_ALLOWLIST:
+        raise ModelValidationError("v2 market fallback frozen allowlist drift")
+    offline = _closed_object(
+        item["offline_consumers"],
+        name="market_fallback.offline_consumers",
+        required={"renderer", "source_replay", "api", "ui"},
+    )
+    if any(value is not False for value in offline.values()):
+        raise ModelValidationError("v2 market fallback consumers must remain offline")
+    coverage_before = _enum_text(
+        item["coverage_before"],
+        name="market_fallback.coverage_before",
+        allowed=_MARKET_COVERAGE_STATES,
+    )
+    coverage_after = _enum_text(
+        item["coverage_after"],
+        name="market_fallback.coverage_after",
+        allowed=_MARKET_COVERAGE_STATES,
+    )
+    status = _enum_text(
+        item["status"],
+        name="market_fallback.status",
+        allowed=_MARKET_FALLBACK_STATUSES_V2,
+    )
+    limitation_code = item["limitation_code"]
+    if limitation_code is not None:
+        limitation_code = _enum_text(
+            limitation_code,
+            name="market_fallback.limitation_code",
+            allowed=_MARKET_LIMITATION_CODES_V2,
+        )
+    guard_audit_at = (
+        None
+        if item["guard_audit_at"] is None
+        else _aware_utc(item["guard_audit_at"], name="market_fallback.guard_audit_at")
+    )
+    receipts_input = item["fetch_receipts"]
+    if not isinstance(receipts_input, (list, tuple)) or len(receipts_input) > 20:
+        raise ModelValidationError("v2 market fallback receipts must be a bounded array")
+    receipts = sorted(
+        (
+            _canonical_market_receipt_v2(raw_receipt, index=index)
+            for index, raw_receipt in enumerate(receipts_input)
+        ),
+        key=lambda receipt: receipt["receipt_id"],
+    )
+    receipt_refs = _string_set(
+        item["fetch_receipt_refs"], name="market_fallback.fetch_receipt_refs"
+    )
+    if receipt_refs != [receipt["receipt_id"] for receipt in receipts]:
+        raise ModelValidationError(
+            "v2 market fallback receipt refs must bind embedded receipts"
+        )
+    request_count = item["request_count"]
+    verified_attempt_count = sum(
+        receipt["attempt_count"]
+        for receipt in receipts
+        if receipt["attempt_count_status"] == "verified"
+    )
+    unverified_attempt_upper_bound = item["unverified_attempt_upper_bound"]
+    expected_unverified_upper_bound = sum(
+        receipt["budget_charged_attempts"]
+        for receipt in receipts
+        if receipt["attempt_count_status"] == "unknown"
+    )
+    if (
+        isinstance(request_count, bool)
+        or not isinstance(request_count, int)
+        or request_count != verified_attempt_count
+        or isinstance(unverified_attempt_upper_bound, bool)
+        or not isinstance(unverified_attempt_upper_bound, int)
+        or unverified_attempt_upper_bound != expected_unverified_upper_bound
+        or request_count + unverified_attempt_upper_bound
+        > expected_limits["max_requests_per_run"]
+    ):
+        raise ModelValidationError("v2 market fallback request count drift")
+    request_count_status = _enum_text(
+        item["request_count_status"],
+        name="market_fallback.request_count_status",
+        allowed=frozenset({"verified", "bounded_unknown"}),
+    )
+    expected_request_count_status = (
+        "bounded_unknown" if expected_unverified_upper_bound else "verified"
+    )
+    if request_count_status != expected_request_count_status:
+        raise ModelValidationError("v2 market fallback request count status drift")
+    cache_refs = _string_set(item["cache_refs"], name="market_fallback.cache_refs")
+    successful = [
+        receipt for receipt in receipts if receipt["response_status"] == "succeeded"
+    ]
+    successful_cache_refs = {
+        cache_ref for receipt in successful for cache_ref in receipt["cache_entry_refs"]
+    }
+    if not successful_cache_refs.issubset(set(cache_refs)):
+        raise ModelValidationError(
+            "v2 market fallback cache refs omit successful receipt evidence"
+        )
+    if expected_unverified_upper_bound:
+        expected_limitation = "provider_attempt_count_unknown"
+    else:
+        expected_limitation = {
+            "provider_unavailable": "provider_unavailable",
+            "withheld_by_cutoff": "withheld_by_cutoff",
+            "budget_exhausted": "budget_exhausted",
+        }.get(status)
+    if limitation_code != expected_limitation:
+        raise ModelValidationError("v2 market fallback limitation/status drift")
+    zero_statuses = {
+        "not_needed",
+        "provider_unavailable",
+        "withheld_by_cutoff",
+        "budget_exhausted",
+    }
+    if status in zero_statuses and request_count != 0:
+        raise ModelValidationError("zero-request v2 fallback contains HTTP attempts")
+    if status == "not_needed":
+        if coverage_before != "satisfied" or coverage_after != "satisfied":
+            raise ModelValidationError("v2 not_needed requires satisfied local coverage")
+        if receipts or guard_audit_at is not None or not cache_refs:
+            raise ModelValidationError(
+                "v2 not_needed requires only frozen local source references"
+            )
+    elif status in {"provider_unavailable", "withheld_by_cutoff", "budget_exhausted"}:
+        if (
+            coverage_before not in _FALLBACK_TRIGGER_STATES
+            or coverage_after != coverage_before
+        ):
+            raise ModelValidationError(
+                "v2 zero-request limitation cannot change coverage"
+            )
+        if status == "withheld_by_cutoff" and perspective != "system":
+            raise ModelValidationError(
+                "withheld_by_cutoff is restricted to system perspective"
+            )
+        if (
+            guard_audit_at is None
+            or len(receipts) != 1
+            or receipts[0]["response_status"] != status
+            or receipts[0]["guard_audit_at"] != guard_audit_at
+        ):
+            raise ModelValidationError(
+                "v2 zero-request limitation requires one matching guard receipt"
+            )
+    else:
+        if guard_audit_at is not None or coverage_before not in _FALLBACK_TRIGGER_STATES:
+            raise ModelValidationError("attempted v2 fallback has invalid trigger/guard")
+        if status == "succeeded" and (not successful or request_count == 0):
+            raise ModelValidationError(
+                "successful v2 fallback requires a successful attempted receipt"
+            )
+        if status == "failed" and (
+            not receipts
+            or successful
+            or request_count + unverified_attempt_upper_bound == 0
+            or coverage_after != coverage_before
+        ):
+            raise ModelValidationError(
+                "failed v2 fallback requires attempted receipts and no success"
+            )
+    return {
+        "policy_version": MARKET_FALLBACK_POLICY_VERSION_V2,
+        "public_information_policy_version": PUBLIC_INFORMATION_POLICY_VERSION,
+        "perspective": fallback_perspective,
+        "allowlist_version": MARKET_PROVIDER_ALLOWLIST_VERSION,
+        "allowlist_sha256": MARKET_PROVIDER_ALLOWLIST_SHA256,
+        "coverage_before": coverage_before,
+        "coverage_after": coverage_after,
+        "status": status,
+        "limitation_code": limitation_code,
+        "guard_audit_at": guard_audit_at,
+        "request_count": request_count,
+        "request_count_status": request_count_status,
+        "unverified_attempt_upper_bound": unverified_attempt_upper_bound,
+        "limits": expected_limits,
+        "allowlist": allowlist,
+        "cache_refs": cache_refs,
+        "fetch_receipt_refs": receipt_refs,
+        "fetch_receipts": receipts,
+        "offline_consumers": {
+            "renderer": False,
+            "source_replay": False,
+            "api": False,
+            "ui": False,
+        },
+    }
+
+
+def _canonical_operation_anchor_ordering_key(
+    value: object,
+    *,
+    event_id: str,
+    anchor_at: str,
+) -> list[Any]:
+    if not isinstance(value, (list, tuple)) or len(value) != 4:
+        raise ModelValidationError(
+            "operation_anchor_ordering_key must contain exactly four fields"
+        )
+    ordering_at = _aware_utc(value[0], name="operation_anchor_ordering_key[0]")
+    sequence_rank = value[1]
+    if isinstance(sequence_rank, bool) or not isinstance(sequence_rank, int):
+        raise ModelValidationError(
+            "operation_anchor_ordering_key[1] must be an integer"
+        )
+    sequence_value = _strict_text(
+        value[2], "operation_anchor_ordering_key[2]"
+    )
+    closing_event_id = _strict_text(
+        value[3], "operation_anchor_ordering_key[3]"
+    )
+    if ordering_at != anchor_at or closing_event_id != event_id:
+        raise ModelValidationError(
+            "operation anchor ordering key must close over anchor time and event ID"
+        )
+    return [ordering_at, sequence_rank, sequence_value, closing_event_id]
+
+
+@dataclass(frozen=True)
+class OperationCheckpointRecordV2:
+    """Closed v2 checkpoint with explicit operation and information-time identity."""
+
+    payload: Mapping[str, Any]
+
+    @classmethod
+    def from_mapping(cls, value: Mapping[str, Any]) -> "OperationCheckpointRecordV2":
+        root = _closed_object(
+            value,
+            name="operation checkpoint v2",
+            required={
+                "schema_version",
+                "episode_id",
+                "position_case_id",
+                "review_kind",
+                "checkpoint_type",
+                "perspective",
+                "operation_anchor_event_id",
+                "operation_anchor_at",
+                "operation_anchor_ordering_key",
+                "as_of",
+                "knowledge_cutoff",
+                "information_time_policy_version",
+                "time_provenance",
+                "status_axes",
+                "market_fallback",
+                "gaps",
+                "source_refs",
+                "governance",
+            },
+            optional={
+                "checkpoint_id",
+                "checkpoint_key",
+                "content_id",
+            },
+        )
+        if root["schema_version"] != OPERATION_CHECKPOINT_SCHEMA_VERSION_V2:
+            raise ModelValidationError("Unsupported operation checkpoint v2 schema")
+        if root["information_time_policy_version"] != PUBLIC_INFORMATION_POLICY_VERSION:
+            raise ModelValidationError("Unsupported operation information-time policy")
+
+        perspective = _enum_text(
+            root["perspective"], name="perspective", allowed=_PERSPECTIVES
+        )
+        anchor_event_id = _strict_text(
+            root["operation_anchor_event_id"], "operation_anchor_event_id"
+        )
+        anchor_at = _aware_utc(root["operation_anchor_at"], name="operation_anchor_at")
+        anchor_ordering_key = _canonical_operation_anchor_ordering_key(
+            root["operation_anchor_ordering_key"],
+            event_id=anchor_event_id,
+            anchor_at=anchor_at,
+        )
+        as_of = _aware_utc(root["as_of"], name="as_of")
+        knowledge_cutoff = _aware_utc(
+            root["knowledge_cutoff"], name="knowledge_cutoff"
+        )
+        ensure_known_not_before_occurred(anchor_at, as_of)
+        ensure_known_not_before_occurred(as_of, knowledge_cutoff)
+
+        axes_input = _closed_object(
+            root["status_axes"],
+            name="status_axes",
+            required=set(REVIEWABILITY_STATUS_AXES),
+        )
+        market_axis = _canonical_market_axis_v2(
+            axes_input["market"],
+            perspective=perspective,
+            operation_anchor_at=anchor_at,
+        )
+        fallback = _canonical_market_fallback_v2(
+            root["market_fallback"], perspective=perspective
+        )
+
+        sentinel_ref = "market:v2-common-validation"
+        shadow_axes = dict(axes_input)
+        shadow_axes["market"] = {
+            "status": "available",
+            "temporal_role": "system_known_at_decision",
+            "effective_at": anchor_at,
+            "publicly_available_at": None,
+            "publicly_available_basis": "unknown",
+            "fetched_at": None,
+            "system_observed_at": anchor_at,
+            "source_refs": [sentinel_ref],
+        }
+        shadow_fallback = {
+            "policy_version": MARKET_FALLBACK_POLICY_VERSION,
+            "allowlist_version": MARKET_PROVIDER_ALLOWLIST_VERSION,
+            "allowlist_sha256": MARKET_PROVIDER_ALLOWLIST_SHA256,
+            "coverage_before": "satisfied",
+            "coverage_after": "satisfied",
+            "status": "not_needed",
+            "request_count": 0,
+            "limits": {
+                "timeout_seconds": 20,
+                "max_retries": 2,
+                "max_concurrency": 2,
+                "max_requests_per_run": 20,
+            },
+            "allowlist": sorted(MARKET_PROVIDER_ALLOWLIST),
+            "cache_refs": [sentinel_ref],
+            "fetch_receipt_refs": [],
+            "fetch_receipts": [],
+            "offline_consumers": {
+                "renderer": False,
+                "source_replay": False,
+                "api": False,
+                "ui": False,
+            },
+        }
+        shadow_gaps = [
+            gap
+            for gap in root["gaps"]
+            if not isinstance(gap, Mapping) or gap.get("axis") != "market"
+        ]
+        shadow_source_refs = sorted(
+            set(_string_set(root["source_refs"], name="source_refs"))
+            | {sentinel_ref}
+        )
+        shadow = {
+            "schema_version": OPERATION_CHECKPOINT_SCHEMA_VERSION,
+            "episode_id": root["episode_id"],
+            "position_case_id": root["position_case_id"],
+            "review_kind": root["review_kind"],
+            "checkpoint_type": root["checkpoint_type"],
+            "perspective": perspective,
+            "as_of": as_of,
+            "knowledge_cutoff": knowledge_cutoff,
+            "time_provenance": root["time_provenance"],
+            "status_axes": shadow_axes,
+            "market_fallback": shadow_fallback,
+            "gaps": shadow_gaps,
+            "source_refs": shadow_source_refs,
+            "governance": root["governance"],
+        }
+        common = OperationCheckpointRecord.from_mapping(shadow).to_dict()
+        if common["time_provenance"]["effective_at"]["value"] != anchor_at:
+            raise ModelValidationError(
+                "operation anchor time must equal anchor event effective time"
+            )
+
+        gaps = _canonical_gaps(root["gaps"])
+        status_axes = dict(common["status_axes"])
+        status_axes["market"] = market_axis
+        coverage_market_states = {
+            "satisfied": frozenset({"available"}),
+            "missing": frozenset({"missing", "failed"}),
+            "stale": frozenset({"stale", "failed"}),
+            "insufficient": frozenset(
+                {"insufficient", "partial", "failed"}
+            ),
+        }
+        if market_axis["status"] not in coverage_market_states[fallback["coverage_after"]]:
+            raise ModelValidationError(
+                "market axis status is inconsistent with perspective coverage_after"
+            )
+        if not set(fallback["cache_refs"]).issubset(set(market_axis["source_refs"])):
+            raise ModelValidationError(
+                "market source refs must include every frozen fallback cache ref"
+            )
+        blocking_status = {
+            "operation": "blocked",
+            "decision": "blocked",
+            "snapshot_cash_valuation": "blocked",
+            "market": "failed",
+            "lifecycle": "ambiguous",
+            "outcome": "missing",
+        }
+        blocked_gap_axes = {gap["axis"] for gap in gaps if gap["blocks_axis"]}
+        for gap in gaps:
+            if gap["blocks_axis"] and (
+                gap["severity"] != "blocker"
+                or not gap["source_refs"]
+                or status_axes[gap["axis"]]["status"]
+                != blocking_status[gap["axis"]]
+            ):
+                raise ModelValidationError(
+                    "axis-blocking gaps require blocker severity, evidence and a blocked axis state"
+                )
+            if gap["severity"] == "blocker" and not gap["blocks_axis"]:
+                raise ModelValidationError(
+                    "blocker severity must explicitly block its axis"
+                )
+        for axis, blocked_state in blocking_status.items():
+            if status_axes[axis]["status"] == blocked_state and axis not in blocked_gap_axes:
+                raise ModelValidationError(
+                    f"blocked {axis} axis requires an explicit blocker gap"
+                )
+
+        episode_id = _strict_text(root["episode_id"], "episode_id")
+        position_case_id = _strict_text(root["position_case_id"], "position_case_id")
+        review_kind = common["review_kind"]
+        checkpoint_type = common["checkpoint_type"]
+        source_refs = _string_set(root["source_refs"], name="source_refs")
+        if not source_refs:
+            raise ModelValidationError(
+                "operation checkpoint requires root source references"
+            )
+        identity_material = {
+            "episode_id": episode_id,
+            "review_kind": review_kind,
+            "checkpoint_type": checkpoint_type,
+            "perspective": perspective,
+            "operation_anchor_event_id": anchor_event_id,
+            "operation_anchor_at": anchor_at,
+            "operation_anchor_ordering_key": anchor_ordering_key,
+            "as_of": as_of,
+            "knowledge_cutoff": knowledge_cutoff,
+            "information_time_policy_version": PUBLIC_INFORMATION_POLICY_VERSION,
+        }
+        identity_digest = hashlib.sha256(
+            canonical_json_bytes(identity_material)
+        ).hexdigest()
+        checkpoint_key = f"review_checkpoint_key_{identity_digest}"
+        if root.get("checkpoint_key") not in (None, checkpoint_key):
+            raise ModelValidationError(
+                "checkpoint_key does not match canonical v2 semantic identity"
+            )
+        normalized: dict[str, Any] = {
+            "schema_version": OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+            "checkpoint_key": checkpoint_key,
+            "episode_id": episode_id,
+            "position_case_id": position_case_id,
+            "review_kind": review_kind,
+            "checkpoint_type": checkpoint_type,
+            "perspective": perspective,
+            "operation_anchor_event_id": anchor_event_id,
+            "operation_anchor_at": anchor_at,
+            "operation_anchor_ordering_key": anchor_ordering_key,
+            "as_of": as_of,
+            "knowledge_cutoff": knowledge_cutoff,
+            "information_time_policy_version": PUBLIC_INFORMATION_POLICY_VERSION,
+            "time_provenance": common["time_provenance"],
+            "status_axes": status_axes,
+            "market_fallback": fallback,
+            "gaps": gaps,
+            "source_refs": source_refs,
+            "governance": common["governance"],
+        }
+        checkpoint_id = "review_checkpoint_" + identity_digest[:32]
+        if root.get("checkpoint_id") not in (None, checkpoint_id):
+            raise ModelValidationError("checkpoint_id does not match canonical v2 identity")
+        normalized["checkpoint_id"] = checkpoint_id
+        content_id = "sha256:" + hashlib.sha256(
+            canonical_json_bytes(normalized)
+        ).hexdigest()
+        if root.get("content_id") not in (None, content_id):
+            raise ModelValidationError("content_id does not match canonical v2 content")
+        normalized["content_id"] = content_id
+        detached = json.loads(canonical_json_bytes(normalized).decode("utf-8"))
+        return cls(payload=detached)
+
+    @property
+    def checkpoint_id(self) -> str:
+        return str(self.payload["checkpoint_id"])
+
+    @property
+    def checkpoint_key(self) -> str:
+        return str(self.payload["checkpoint_key"])
+
+    @property
+    def content_id(self) -> str:
+        return str(self.payload["content_id"])
+
+    @property
+    def canonical_bytes(self) -> bytes:
+        return canonical_json_bytes(self.payload)
+
+    def to_dict(self) -> dict[str, Any]:
+        return json.loads(self.canonical_bytes.decode("utf-8"))
+
+
+OperationCheckpointRecordAny = OperationCheckpointRecord | OperationCheckpointRecordV2
+
+
+def operation_checkpoint_from_mapping(
+    value: Mapping[str, Any],
+) -> OperationCheckpointRecordAny:
+    """Dispatch without allowing either schema to reinterpret the other."""
+
+    schema_version = value.get("schema_version", OPERATION_CHECKPOINT_SCHEMA_VERSION)
+    if schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION:
+        return OperationCheckpointRecord.from_mapping(value)
+    if schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2:
+        return OperationCheckpointRecordV2.from_mapping(value)
+    raise ModelValidationError("Unsupported operation checkpoint schema")

@@ -8,9 +8,15 @@ import os
 import sqlite3
 import uuid
 from contextlib import contextmanager
+from contextvars import ContextVar
 from datetime import datetime, timezone
+from functools import wraps
 from pathlib import Path
 from typing import Any, Iterator, Mapping, Sequence
+
+if os.name == "nt":
+    import ctypes
+    from ctypes import wintypes
 
 from .artifact_io import canonical_json_bytes
 from .behavior_hypothesis_candidates import (
@@ -31,14 +37,19 @@ from .models import (
     FeeProfileRecord,
     FeeProjectionRecord,
     MARKET_FALLBACK_POLICY_VERSION,
+    MARKET_FALLBACK_POLICY_VERSION_V2,
     MARKET_PROVIDER_ALLOWLIST_SHA256,
     MARKET_PROVIDER_ALLOWLIST_VERSION,
     OPERATION_CHECKPOINT_SCHEMA_VERSION,
+    OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+    PUBLIC_INFORMATION_POLICY_VERSION,
     OperationCheckpointRecord,
+    OperationCheckpointRecordV2,
     ReviewRunRecord,
     ReviewRunStatusEvent,
     SourceDefinition,
     canonical_json,
+    operation_checkpoint_from_mapping,
     sha256_text,
 )
 from .portfolio_context import PortfolioContext, PortfolioSnapshot, calculate_portfolio_metrics
@@ -51,6 +62,8 @@ P2H_STAGE1_SCHEMA_VERSION = 1
 P2H_STAGE2_SLICE_A_SCHEMA_VERSION = 1
 PRODUCT_COMPLETION_SCHEMA_VERSION = 1
 REVIEWABILITY_SCHEMA_VERSION = 1
+REVIEWABILITY_SCHEMA_VERSION_V1 = REVIEWABILITY_SCHEMA_VERSION
+REVIEWABILITY_SCHEMA_VERSION_V2 = 2
 
 class ReviewStoreError(RuntimeError):
     """Base error for the review store."""
@@ -93,6 +106,605 @@ def _stable_file_state(path: Path) -> tuple[int, int, int, int, str] | None:
         int(after.st_mtime_ns),
         digest,
     )
+
+
+if os.name == "nt":
+    _FILE_READ_ATTRIBUTES = 0x0080
+    _FILE_SHARE_READ = 0x00000001
+    _FILE_SHARE_WRITE = 0x00000002
+    _OPEN_EXISTING = 3
+    _FILE_ATTRIBUTE_NORMAL = 0x00000080
+    _INVALID_HANDLE_VALUE = ctypes.c_void_p(-1).value
+    _WINDOWS_EPOCH_100NS = 116444736000000000
+
+    class _Win32FileTime(ctypes.Structure):
+        _fields_ = [
+            ("dwLowDateTime", wintypes.DWORD),
+            ("dwHighDateTime", wintypes.DWORD),
+        ]
+
+    class _Win32ByHandleFileInformation(ctypes.Structure):
+        _fields_ = [
+            ("dwFileAttributes", wintypes.DWORD),
+            ("ftCreationTime", _Win32FileTime),
+            ("ftLastAccessTime", _Win32FileTime),
+            ("ftLastWriteTime", _Win32FileTime),
+            ("dwVolumeSerialNumber", wintypes.DWORD),
+            ("nFileSizeHigh", wintypes.DWORD),
+            ("nFileSizeLow", wintypes.DWORD),
+            ("nNumberOfLinks", wintypes.DWORD),
+            ("nFileIndexHigh", wintypes.DWORD),
+            ("nFileIndexLow", wintypes.DWORD),
+        ]
+
+    _KERNEL32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    _CREATE_FILE_W = _KERNEL32.CreateFileW
+    _CREATE_FILE_W.argtypes = [
+        wintypes.LPCWSTR,
+        wintypes.DWORD,
+        wintypes.DWORD,
+        wintypes.LPVOID,
+        wintypes.DWORD,
+        wintypes.DWORD,
+        wintypes.HANDLE,
+    ]
+    _CREATE_FILE_W.restype = wintypes.HANDLE
+    _GET_FILE_INFORMATION_BY_HANDLE = _KERNEL32.GetFileInformationByHandle
+    _GET_FILE_INFORMATION_BY_HANDLE.argtypes = [
+        wintypes.HANDLE,
+        ctypes.POINTER(_Win32ByHandleFileInformation),
+    ]
+    _GET_FILE_INFORMATION_BY_HANDLE.restype = wintypes.BOOL
+    _CLOSE_HANDLE = _KERNEL32.CloseHandle
+    _CLOSE_HANDLE.argtypes = [wintypes.HANDLE]
+    _CLOSE_HANDLE.restype = wintypes.BOOL
+
+
+class _HeldUpgradeFile:
+    """Keep one upgrade input bound to its original filesystem object.
+
+    On Windows the handle deliberately omits ``FILE_SHARE_DELETE``.  As long as
+    it is open, the candidate path cannot be renamed away or replaced between
+    SQLite's ``mode=rw`` open and the next pathname check.  The POSIX fallback
+    keeps an fd open and rebinds the path to that fd at every gate; it does not
+    claim Windows delete-share semantics.
+    """
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        self._handle: int | None = None
+        self._fd: int | None = None
+        self._closed = False
+        if os.name == "nt":
+            handle = _CREATE_FILE_W(
+                str(path),
+                _FILE_READ_ATTRIBUTES,
+                _FILE_SHARE_READ | _FILE_SHARE_WRITE,
+                None,
+                _OPEN_EXISTING,
+                _FILE_ATTRIBUTE_NORMAL,
+                None,
+            )
+            if handle in (None, _INVALID_HANDLE_VALUE):
+                error = ctypes.get_last_error()
+                raise OSError(error, f"CreateFileW no-delete hold failed: {path}")
+            self._handle = int(handle)
+        else:
+            flags = os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
+            self._fd = os.open(path, flags)
+        self._initial_handle_state = self._read_handle_state()
+
+    def _read_handle_state(self) -> tuple[int, int, int, int]:
+        if self._closed:
+            raise OSError(f"Upgrade file hold was already closed: {self.path}")
+        if os.name == "nt":
+            if self._handle is None:
+                raise OSError(f"Missing Win32 upgrade handle: {self.path}")
+            information = _Win32ByHandleFileInformation()
+            if not _GET_FILE_INFORMATION_BY_HANDLE(
+                self._handle, ctypes.byref(information)
+            ):
+                error = ctypes.get_last_error()
+                raise OSError(
+                    error,
+                    f"GetFileInformationByHandle failed: {self.path}",
+                )
+            file_index = (
+                int(information.nFileIndexHigh) << 32
+            ) | int(information.nFileIndexLow)
+            size = (int(information.nFileSizeHigh) << 32) | int(
+                information.nFileSizeLow
+            )
+            filetime = (
+                int(information.ftLastWriteTime.dwHighDateTime) << 32
+            ) | int(information.ftLastWriteTime.dwLowDateTime)
+            mtime_ns = (filetime - _WINDOWS_EPOCH_100NS) * 100
+            return (
+                int(information.dwVolumeSerialNumber),
+                file_index,
+                size,
+                mtime_ns,
+            )
+        if self._fd is None:
+            raise OSError(f"Missing POSIX upgrade descriptor: {self.path}")
+        stat_result = os.fstat(self._fd)
+        return (
+            int(stat_result.st_dev),
+            int(stat_result.st_ino),
+            int(stat_result.st_size),
+            int(stat_result.st_mtime_ns),
+        )
+
+    @staticmethod
+    def _read_path_identity(path: Path) -> tuple[int, int]:
+        if os.name == "nt":
+            transient = _HeldUpgradeFile(path)
+            try:
+                return transient._initial_handle_state[:2]
+            finally:
+                transient.close()
+        stat_result = path.stat()
+        return (int(stat_result.st_dev), int(stat_result.st_ino))
+
+    def assert_initial_snapshot(
+        self,
+        expected: tuple[int, int, int, int, str],
+        *,
+        stage: str,
+    ) -> None:
+        current = self._read_handle_state()
+        if current != self._initial_handle_state:
+            raise ReviewStoreError(
+                f"Reviewability held handle changed during {stage}: {self.path}."
+            )
+        if os.name == "nt":
+            # CPython's Windows st_ino is the 64-bit file index returned by
+            # BY_HANDLE_FILE_INFORMATION.  Volume identity is independently
+            # rebound by opening the same absolute path below.
+            snapshot_matches_handle = (
+                expected[1] == current[1]
+                and expected[2] == current[2]
+                and expected[3] == current[3]
+            )
+        else:
+            snapshot_matches_handle = expected[:4] == current
+        if not snapshot_matches_handle or _stable_file_state(self.path) != expected:
+            raise ReviewStoreError(
+                f"Reviewability before snapshot is not bound to held handle at "
+                f"{stage}: {self.path}."
+            )
+        if self._read_path_identity(self.path) != current[:2]:
+            raise ReviewStoreError(
+                f"Reviewability path is not bound to held handle at {stage}: "
+                f"{self.path}."
+            )
+
+    def assert_current_binding(self, *, stage: str) -> None:
+        current = self.assert_held_identity(stage=stage)
+        if self._read_path_identity(self.path) != current[:2]:
+            raise ReviewStoreError(
+                f"Reviewability path-to-held-handle binding changed at {stage}: "
+                f"{self.path}."
+            )
+
+    def assert_held_identity(self, *, stage: str) -> tuple[int, int, int, int]:
+        current = self._read_handle_state()
+        if current[:2] != self._initial_handle_state[:2]:
+            raise ReviewStoreError(
+                f"Reviewability held handle identity changed at {stage}: "
+                f"{self.path}."
+            )
+        return current
+
+    def assert_held_identity_and_size(self, *, stage: str) -> None:
+        current = self.assert_held_identity(stage=stage)
+        if current[:3] != self._initial_handle_state[:3]:
+            raise ReviewStoreError(
+                f"Reviewability held handle identity or size changed at {stage}: "
+                f"{self.path}."
+            )
+
+    def close(self) -> None:
+        if self._closed:
+            return
+        if os.name == "nt":
+            if self._handle is not None:
+                _CLOSE_HANDLE(self._handle)
+                self._handle = None
+        elif self._fd is not None:
+            os.close(self._fd)
+            self._fd = None
+        self._closed = True
+
+
+class _ReviewabilityUpgradeFileGuard:
+    def __init__(
+        self,
+        path: Path,
+        *,
+        expected_main: tuple[int, int, int, int, str],
+        expected_wal: tuple[int, int, int, int, str] | None,
+        expected_shm: tuple[int, int, int, int, str] | None,
+    ) -> None:
+        self.path = path
+        self.expected_main = expected_main
+        self.expected_wal = expected_wal
+        self.expected_shm = expected_shm
+        self._files: dict[str, _HeldUpgradeFile] = {}
+        self._writer_open = False
+        self._writer_conn: sqlite3.Connection | None = None
+        self._marker_committed = False
+        self._checkpoint_complete = False
+        self._checkpoint_result: tuple[int, int, int] | None = None
+        self._auxiliary_terminal_absent = False
+        targets = [
+            ("main", path, expected_main),
+            ("wal", Path(f"{path}-wal"), expected_wal),
+            ("shm", Path(f"{path}-shm"), expected_shm),
+        ]
+        try:
+            for label, target, expected in targets:
+                if expected is None:
+                    continue
+                held = _HeldUpgradeFile(target)
+                self._files[label] = held
+                held.assert_initial_snapshot(expected, stage="initial_no_delete_hold")
+        except Exception:
+            self.close()
+            raise
+
+    @staticmethod
+    def _strict_path_present(path: Path, *, stage: str) -> bool:
+        try:
+            path.stat()
+        except FileNotFoundError:
+            return False
+        except OSError as exc:
+            raise ReviewStoreError(
+                f"Reviewability auxiliary path is unreadable at {stage}: "
+                f"{path}: {exc}"
+            ) from exc
+        return True
+
+    def assert_current(self, *, stage: str) -> None:
+        main = self._files.get("main")
+        if main is None:
+            raise ReviewStoreError(
+                f"Reviewability held main file is missing at {stage}."
+            )
+        main.assert_current_binding(stage=f"{stage}:main")
+        auxiliary = {
+            label: self._files.get(label) for label in ("wal", "shm")
+        }
+        wal_path = Path(f"{self.path}-wal")
+        shm_path = Path(f"{self.path}-shm")
+        if self._auxiliary_terminal_absent:
+            for label, held in auxiliary.items():
+                if held is not None:
+                    held.assert_held_identity_and_size(stage=f"{stage}:{label}")
+            wal_present = self._strict_path_present(
+                wal_path, stage=f"{stage}:wal"
+            )
+            shm_present = self._strict_path_present(
+                shm_path, stage=f"{stage}:shm"
+            )
+            if wal_present or shm_present:
+                raise ReviewStoreError(
+                    "Reviewability WAL/SHM reappeared after the terminal "
+                    f"absent transition at {stage}."
+                )
+            return
+        for label, held in auxiliary.items():
+            if held is not None:
+                held.assert_current_binding(stage=f"{stage}:{label}")
+
+    def mark_marker_committed(self, *, stage: str) -> None:
+        if not self._writer_open:
+            raise ReviewStoreError(
+                f"Reviewability marker commit lacks an active writer at {stage}."
+            )
+        if self._marker_committed:
+            raise ReviewStoreError(
+                f"Reviewability marker commit was recorded twice at {stage}."
+            )
+        self.assert_current(stage=stage)
+        self._marker_committed = True
+
+    def note_writer_open(
+        self,
+        conn: sqlite3.Connection,
+        *,
+        stage: str,
+    ) -> None:
+        if self._auxiliary_terminal_absent:
+            raise ReviewStoreError(
+                f"Reviewability writer reopened after terminal absence at {stage}."
+            )
+        if self._writer_open:
+            raise ReviewStoreError(
+                f"Reviewability upgrade opened overlapping writers at {stage}."
+            )
+        try:
+            conn.in_transaction
+        except sqlite3.ProgrammingError as exc:
+            raise ReviewStoreError(
+                f"Reviewability writer is already closed at {stage}."
+            ) from exc
+        self.assert_current(stage=stage)
+        self.assert_sqlite_main_binding(conn, stage=stage)
+        self._writer_open = True
+        self._writer_conn = conn
+
+    def record_checkpoint_result(
+        self,
+        result: Sequence[Any] | None,
+        *,
+        stage: str,
+    ) -> bool:
+        if not self._writer_open:
+            raise ReviewStoreError(
+                f"Reviewability WAL checkpoint lacks an active writer at {stage}."
+            )
+        if not self._marker_committed:
+            raise ReviewStoreError(
+                f"Reviewability WAL checkpoint preceded marker commit at {stage}."
+            )
+        self.assert_current(stage=stage)
+        try:
+            normalized = tuple(int(value) for value in result)
+        except (TypeError, ValueError) as exc:
+            raise ReviewStoreError(
+                f"Reviewability WAL checkpoint result is incomplete at {stage}."
+            ) from exc
+        if len(normalized) != 3:
+            raise ReviewStoreError(
+                f"Reviewability WAL checkpoint result is incomplete at {stage}."
+            )
+        self._checkpoint_result = normalized
+        self._checkpoint_complete = normalized == (0, 0, 0)
+        return self._checkpoint_complete
+
+    @staticmethod
+    def _assert_connection_closed(
+        conn: sqlite3.Connection,
+        *,
+        stage: str,
+    ) -> None:
+        try:
+            conn.in_transaction
+        except sqlite3.ProgrammingError:
+            return
+        raise ReviewStoreError(
+            f"Reviewability writer remained open at {stage}."
+        )
+
+    def assert_after_writer_close(
+        self,
+        conn: sqlite3.Connection,
+        *,
+        stage: str,
+    ) -> None:
+        if not self._writer_open:
+            raise ReviewStoreError(
+                f"Reviewability writer-close proof has no active writer at {stage}."
+            )
+        if self._writer_conn is not conn:
+            raise ReviewStoreError(
+                f"Reviewability writer-close proof changed connection at {stage}."
+            )
+        self._assert_connection_closed(conn, stage=stage)
+        self._writer_open = False
+        self._writer_conn = None
+        main = self._files.get("main")
+        if main is None:
+            raise ReviewStoreError(
+                f"Reviewability held main file is missing at {stage}."
+            )
+        main.assert_current_binding(stage=f"{stage}:main")
+
+        auxiliary = {
+            label: self._files.get(label) for label in ("wal", "shm")
+        }
+        for label, held in auxiliary.items():
+            if held is not None:
+                held.assert_held_identity(stage=f"{stage}:{label}")
+
+        wal_path = Path(f"{self.path}-wal")
+        shm_path = Path(f"{self.path}-shm")
+        wal_exists = self._strict_path_present(wal_path, stage=f"{stage}:wal")
+        shm_exists = self._strict_path_present(shm_path, stage=f"{stage}:shm")
+        if self._auxiliary_terminal_absent:
+            for label, held in auxiliary.items():
+                if held is not None:
+                    held.assert_held_identity_and_size(stage=f"{stage}:{label}")
+            if wal_exists or shm_exists:
+                raise ReviewStoreError(
+                    "Reviewability WAL/SHM reappeared after the terminal "
+                    f"absent transition at {stage}."
+                )
+            return
+        if wal_exists != shm_exists:
+            raise ReviewStoreError(
+                f"Reviewability WAL/SHM disappeared one-sided at {stage}."
+            )
+        if wal_exists:
+            if auxiliary["wal"] is None or auxiliary["shm"] is None:
+                raise ReviewStoreError(
+                    f"Reviewability unheld WAL/SHM remained after writer close at {stage}."
+                )
+            if self._checkpoint_complete:
+                auxiliary["wal"].assert_held_identity_and_size(
+                    stage=f"{stage}:wal"
+                )
+                auxiliary["shm"].assert_held_identity_and_size(
+                    stage=f"{stage}:shm"
+                )
+            auxiliary["wal"].assert_current_binding(stage=f"{stage}:wal")
+            auxiliary["shm"].assert_current_binding(stage=f"{stage}:shm")
+            return
+
+        if not self._marker_committed:
+            raise ReviewStoreError(
+                f"Reviewability WAL/SHM disappeared before marker commit at {stage}."
+            )
+        if not self._checkpoint_complete:
+            raise ReviewStoreError(
+                "Reviewability WAL/SHM disappeared before an exact "
+                f"(0, 0, 0) checkpoint at {stage}."
+            )
+        expected_pair = self.expected_wal is not None or self.expected_shm is not None
+        if expected_pair:
+            if self.expected_wal is None or self.expected_shm is None:
+                raise ReviewStoreError(
+                    f"Reviewability entrance WAL/SHM was not paired at {stage}."
+                )
+            if (
+                self.expected_wal[2] != 0
+                or self.expected_wal[4] != hashlib.sha256(b"").hexdigest()
+                or self.expected_shm[2] != 32768
+            ):
+                raise ReviewStoreError(
+                    "Reviewability terminal absence requires the entrance zero-WAL "
+                    f"and 32768-byte SHM pair at {stage}."
+                )
+            if auxiliary["wal"] is None or auxiliary["shm"] is None:
+                raise ReviewStoreError(
+                    f"Reviewability entrance WAL/SHM holds are missing at {stage}."
+                )
+            auxiliary["wal"].assert_held_identity_and_size(
+                stage=f"{stage}:wal"
+            )
+            auxiliary["shm"].assert_held_identity_and_size(
+                stage=f"{stage}:shm"
+            )
+        self._auxiliary_terminal_absent = True
+
+    def sqlite_rw_uri(self) -> str:
+        if os.name == "nt":
+            return f"{self.path.resolve().as_uri()}?mode=rw"
+        main = self._files.get("main")
+        if main is None or main._fd is None:
+            raise ReviewStoreError(
+                "Non-Windows reviewability upgrade lacks a held main descriptor."
+            )
+        for descriptor_root in (Path("/proc/self/fd"), Path("/dev/fd")):
+            descriptor_path = descriptor_root / str(main._fd)
+            if descriptor_path.exists():
+                return f"{descriptor_path.as_uri()}?mode=rw"
+        raise ReviewStoreError(
+            "Non-Windows reviewability upgrade cannot bind SQLite mode=rw to "
+            "the held main descriptor; failing closed."
+        )
+
+    def assert_sqlite_main_binding(
+        self,
+        conn: sqlite3.Connection,
+        *,
+        stage: str,
+    ) -> None:
+        main_paths = [
+            Path(str(row[2]))
+            for row in conn.execute("PRAGMA database_list").fetchall()
+            if str(row[1]) == "main" and str(row[2])
+        ]
+        if len(main_paths) != 1:
+            raise ReviewStoreError(
+                f"Reviewability SQLite main path drifted at {stage}."
+            )
+        if os.name == "nt":
+            if main_paths[0].resolve(strict=False) != self.path.resolve(strict=False):
+                raise ReviewStoreError(
+                    f"Reviewability SQLite main path drifted at {stage}."
+                )
+            return
+        main = self._files.get("main")
+        if main is None:
+            raise ReviewStoreError(
+                f"Reviewability held main descriptor is missing at {stage}."
+            )
+        try:
+            reported = main_paths[0].stat()
+        except OSError as exc:
+            raise ReviewStoreError(
+                f"Reviewability SQLite main identity is unreadable at {stage}: {exc}"
+            ) from exc
+        if (int(reported.st_dev), int(reported.st_ino)) != (
+            main._read_handle_state()[:2]
+        ):
+            raise ReviewStoreError(
+                f"Reviewability SQLite main handle drifted at {stage}."
+            )
+
+    def close(self) -> None:
+        for held in reversed(list(self._files.values())):
+            held.close()
+        self._files.clear()
+
+
+_CURRENT_REVIEWABILITY_UPGRADE_GUARD: ContextVar[
+    _ReviewabilityUpgradeFileGuard | None
+] = ContextVar("current_reviewability_upgrade_guard", default=None)
+
+
+def _hold_reviewability_upgrade_files(method: Any) -> Any:
+    """Acquire no-delete holds before the first immutable upgrade gate."""
+
+    @wraps(method)
+    def guarded(self: Any, *args: Any, **kwargs: Any) -> Any:
+        if not self.path.is_file():
+            raise ReviewStoreError(
+                "Reviewability v2 upgrade requires an existing explicit candidate."
+            )
+        before_main = _stable_file_state(self.path)
+        wal_path = Path(f"{self.path}-wal")
+        shm_path = Path(f"{self.path}-shm")
+        before_wal = _stable_file_state(wal_path)
+        before_shm = _stable_file_state(shm_path)
+        if before_main is None:
+            raise ReviewStoreError(
+                "Reviewability candidate disappeared before upgrade."
+            )
+        auxiliary_unpaired = (before_wal is None) != (before_shm is None)
+        auxiliary_invalid = bool(
+            before_wal is not None
+            and before_shm is not None
+            and (
+                before_wal[2] != 0
+                or before_wal[4] != hashlib.sha256(b"").hexdigest()
+                or before_shm[2] != 32768
+            )
+        )
+        if auxiliary_unpaired or auxiliary_invalid:
+            raise ReviewStoreError(
+                "Reviewability v2 upgrade requires either absent auxiliaries or "
+                "a stable zero-WAL and 32768-byte SHM pair."
+            )
+        try:
+            guard = _ReviewabilityUpgradeFileGuard(
+                self.path,
+                expected_main=before_main,
+                expected_wal=before_wal,
+                expected_shm=before_shm,
+            )
+        except ReviewStoreError:
+            raise
+        except OSError as exc:
+            raise ReviewStoreError(
+                "Reviewability upgrade no-delete hold could not be proven: "
+                f"{exc}"
+            ) from exc
+        token = _CURRENT_REVIEWABILITY_UPGRADE_GUARD.set(guard)
+        try:
+            return method(self, *args, **kwargs)
+        finally:
+            # This is deliberately the final action after exact-v2 validation,
+            # DDL comparison and byte-for-byte v1 replay in the wrapped method.
+            try:
+                _CURRENT_REVIEWABILITY_UPGRADE_GUARD.reset(token)
+            finally:
+                guard.close()
+
+    return guarded
 
 
 _SCHEMA_SQL = """
@@ -606,8 +1218,31 @@ def _pragma_manifest_rows(
     ]
 
 
-def _reviewability_schema_manifest(conn: sqlite3.Connection) -> dict[str, Any]:
-    """Describe every explicit foundation object and implicit table constraint."""
+def _reviewability_schema_manifest(
+    conn: sqlite3.Connection,
+    *,
+    reviewability_schema_version: int = REVIEWABILITY_SCHEMA_VERSION_V1,
+) -> dict[str, Any]:
+    """Describe the common DDL plus the selected closed semantic contract.
+
+    Reviewability v2 deliberately reuses the exact v1 SQLite objects.  The
+    manifest nevertheless binds the semantic feature markers so a marker-only
+    upgrade cannot silently reinterpret either contract.
+    """
+
+    if reviewability_schema_version == REVIEWABILITY_SCHEMA_VERSION_V1:
+        checkpoint_contract_version = OPERATION_CHECKPOINT_SCHEMA_VERSION
+        market_policy_version = MARKET_FALLBACK_POLICY_VERSION
+        public_information_policy_version: str | None = None
+    elif reviewability_schema_version == REVIEWABILITY_SCHEMA_VERSION_V2:
+        checkpoint_contract_version = OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+        market_policy_version = MARKET_FALLBACK_POLICY_VERSION_V2
+        public_information_policy_version = PUBLIC_INFORMATION_POLICY_VERSION
+    else:
+        raise ValueError(
+            "Unsupported reviewability schema version for manifest: "
+            f"{reviewability_schema_version}"
+        )
 
     object_rows = conn.execute(
         "SELECT type, name, tbl_name, sql FROM sqlite_master "
@@ -684,19 +1319,26 @@ def _reviewability_schema_manifest(conn: sqlite3.Connection) -> dict[str, Any]:
             "indexes": index_entries,
         }
 
-    return {
-        "schema_version": REVIEWABILITY_SCHEMA_VERSION,
-        "checkpoint_contract_version": OPERATION_CHECKPOINT_SCHEMA_VERSION,
-        "market_policy_version": MARKET_FALLBACK_POLICY_VERSION,
+    result = {
+        "schema_version": reviewability_schema_version,
+        "checkpoint_contract_version": checkpoint_contract_version,
+        "market_policy_version": market_policy_version,
         "market_provider_allowlist_version": MARKET_PROVIDER_ALLOWLIST_VERSION,
         "market_provider_allowlist_sha256": MARKET_PROVIDER_ALLOWLIST_SHA256,
         "required_explicit_indexes": sorted(_REVIEWABILITY_FOUNDATION_INDEXES),
         "objects": objects,
         "tables": tables,
     }
+    if public_information_policy_version is not None:
+        result["public_information_policy_version"] = (
+            public_information_policy_version
+        )
+    return result
 
 
-def _expected_reviewability_schema_manifest() -> dict[str, Any]:
+def _expected_reviewability_schema_manifest(
+    *, reviewability_schema_version: int = REVIEWABILITY_SCHEMA_VERSION_V1
+) -> dict[str, Any]:
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
@@ -708,12 +1350,17 @@ def _expected_reviewability_schema_manifest() -> dict[str, Any]:
             + "\n"
             + _REVIEWABILITY_SCHEMA_SQL
         )
-        return _reviewability_schema_manifest(conn)
+        return _reviewability_schema_manifest(
+            conn,
+            reviewability_schema_version=reviewability_schema_version,
+        )
     finally:
         conn.close()
 
 
-_REVIEWABILITY_SCHEMA_MANIFEST = _expected_reviewability_schema_manifest()
+_REVIEWABILITY_SCHEMA_MANIFEST = _expected_reviewability_schema_manifest(
+    reviewability_schema_version=REVIEWABILITY_SCHEMA_VERSION_V1
+)
 _COMPUTED_REVIEWABILITY_SCHEMA_MANIFEST_SHA256 = sha256_text(
     canonical_json(_REVIEWABILITY_SCHEMA_MANIFEST)
 )
@@ -727,6 +1374,28 @@ if (
     raise RuntimeError(
         "reviewability_schema_version=1 DDL changed without a version/hash update: "
         f"{_COMPUTED_REVIEWABILITY_SCHEMA_MANIFEST_SHA256}"
+    )
+
+_REVIEWABILITY_SCHEMA_MANIFEST_V2 = _expected_reviewability_schema_manifest(
+    reviewability_schema_version=REVIEWABILITY_SCHEMA_VERSION_V2
+)
+_COMPUTED_REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2 = sha256_text(
+    canonical_json(_REVIEWABILITY_SCHEMA_MANIFEST_V2)
+)
+# This constant is intentionally populated from the reviewed deterministic
+# manifest below.  Import-time equality makes any later DDL/metadata drift fail
+# closed before a candidate can be opened writable.
+REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2 = (
+    "352a9abff69da24e50bc0add0f0dcd802f500463b41cc826f6a140a02f2a4094"
+)
+if (
+    _COMPUTED_REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2
+    != REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2
+):
+    raise RuntimeError(
+        "reviewability_schema_version=2 contract metadata or DDL changed without "
+        "a version/hash update: "
+        f"{_COMPUTED_REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2}"
     )
 
 
@@ -1068,7 +1737,9 @@ VALUES(
                 + "\nCOMMIT;"
             )
             require_owned_path()
-            self._validate_reviewability_candidate(conn)
+            self._validate_reviewability_candidate(
+                conn, expected_version=REVIEWABILITY_SCHEMA_VERSION_V1
+            )
             require_owned_path()
         except Exception:
             if conn is not None and conn.in_transaction:
@@ -1078,10 +1749,15 @@ VALUES(
             if conn is not None:
                 conn.close()
             os.close(owned_fd)
-        return self._reviewability_init_result()
+        return self._reviewability_init_result(REVIEWABILITY_SCHEMA_VERSION_V1)
 
-    def _validate_existing_reviewability_candidate(self) -> dict[str, Any]:
+    def _validate_existing_reviewability_candidate(
+        self,
+        *,
+        expected_version: int | None = None,
+    ) -> dict[str, Any]:
         conn: sqlite3.Connection | None = None
+        validated_version: int | None = None
         wal_path = Path(f"{self.path}-wal")
         shm_path = Path(f"{self.path}-shm")
         try:
@@ -1101,7 +1777,9 @@ VALUES(
             conn = sqlite3.connect(uri, uri=True)
             conn.row_factory = sqlite3.Row
             conn.execute("PRAGMA query_only = ON")
-            self._validate_reviewability_candidate(conn)
+            validated_version = self._validate_reviewability_candidate(
+                conn, expected_version=expected_version
+            )
             after_stat = self.path.stat()
             after_sha256 = _sha256_file(self.path)
             wal_after = _stable_file_state(wal_path)
@@ -1127,29 +1805,566 @@ VALUES(
             ValueError,
         ) as exc:
             raise ReviewStoreError(
-                "Existing database is not a complete reviewability v1 candidate; "
+                "Existing database is not a complete reviewability candidate; "
                 f"refusing silent upgrade or repair. Cause: {exc}"
             ) from exc
         finally:
             if conn is not None:
                 conn.close()
-        return self._reviewability_init_result()
+        if validated_version is None:
+            raise ReviewStoreError(
+                "Existing reviewability candidate version was not proven."
+            )
+        return self._reviewability_init_result(validated_version)
 
-    def _reviewability_init_result(self) -> dict[str, Any]:
-        return {
+    def _reviewability_init_result(self, reviewability_version: int) -> dict[str, Any]:
+        if reviewability_version == REVIEWABILITY_SCHEMA_VERSION_V1:
+            checkpoint_version = OPERATION_CHECKPOINT_SCHEMA_VERSION
+            market_policy_version = MARKET_FALLBACK_POLICY_VERSION
+            public_information_policy_version: str | None = None
+            manifest_sha256 = REVIEWABILITY_SCHEMA_MANIFEST_SHA256
+        elif reviewability_version == REVIEWABILITY_SCHEMA_VERSION_V2:
+            checkpoint_version = OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+            market_policy_version = MARKET_FALLBACK_POLICY_VERSION_V2
+            public_information_policy_version = PUBLIC_INFORMATION_POLICY_VERSION
+            manifest_sha256 = REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2
+        else:
+            raise ReviewStoreError(
+                f"Unsupported reviewability schema version: {reviewability_version}"
+            )
+        result = {
             "database": str(self.path),
             "schema_version": SCHEMA_VERSION,
             "product_completion_schema_version": PRODUCT_COMPLETION_SCHEMA_VERSION,
-            "reviewability_schema_version": REVIEWABILITY_SCHEMA_VERSION,
-            "checkpoint_contract_version": OPERATION_CHECKPOINT_SCHEMA_VERSION,
-            "market_policy_version": MARKET_FALLBACK_POLICY_VERSION,
+            "reviewability_schema_version": reviewability_version,
+            "checkpoint_contract_version": checkpoint_version,
+            "market_policy_version": market_policy_version,
             "market_provider_allowlist_version": MARKET_PROVIDER_ALLOWLIST_VERSION,
             "market_provider_allowlist_sha256": MARKET_PROVIDER_ALLOWLIST_SHA256,
-            "schema_manifest_sha256": REVIEWABILITY_SCHEMA_MANIFEST_SHA256,
+            "schema_manifest_sha256": manifest_sha256,
         }
+        if public_information_policy_version is not None:
+            result["public_information_policy_version"] = (
+                public_information_policy_version
+            )
+        return result
 
     @staticmethod
-    def _validate_reviewability_candidate(conn: sqlite3.Connection) -> None:
+    def _reviewability_ddl_fingerprint(conn: sqlite3.Connection) -> str:
+        manifest = _reviewability_schema_manifest(
+            conn,
+            reviewability_schema_version=REVIEWABILITY_SCHEMA_VERSION_V1,
+        )
+        return sha256_text(
+            canonical_json(
+                {
+                    "required_explicit_indexes": manifest[
+                        "required_explicit_indexes"
+                    ],
+                    "objects": manifest["objects"],
+                    "tables": manifest["tables"],
+                }
+            )
+        )
+
+    @staticmethod
+    def _assert_reviewability_upgrade_path_state(
+        path: Path,
+        *,
+        expected_main: tuple[int, int, int, int, str],
+        expected_wal: tuple[int, int, int, int, str] | None,
+        expected_shm: tuple[int, int, int, int, str] | None,
+        stage: str,
+        lock_active: bool = False,
+        conn: sqlite3.Connection | None = None,
+        upgrade_guard: _ReviewabilityUpgradeFileGuard | None = None,
+    ) -> None:
+        """Fail closed on candidate replacement or pre-upgrade file drift.
+
+        A Windows WAL write lock makes the SHM bytes unreadable and may create
+        an empty WAL/SHM pair.  While that lock is active, preserve the exact
+        main-file state, require a zero-byte WAL, and compare SHM filesystem
+        identity/size.  Before the lock, all three stable content snapshots
+        must match byte-for-byte.
+        """
+
+        try:
+            if upgrade_guard is not None:
+                upgrade_guard.assert_current(stage=stage)
+            current_main = _stable_file_state(path)
+            wal_path = Path(f"{path}-wal")
+            shm_path = Path(f"{path}-shm")
+            if current_main != expected_main:
+                raise ReviewStoreError(
+                    f"Reviewability candidate main identity changed at {stage}."
+                )
+            if conn is not None:
+                if upgrade_guard is not None:
+                    upgrade_guard.assert_sqlite_main_binding(conn, stage=stage)
+                else:
+                    main_paths = [
+                        Path(str(row[2])).resolve(strict=False)
+                        for row in conn.execute("PRAGMA database_list").fetchall()
+                        if str(row[1]) == "main" and str(row[2])
+                    ]
+                    if main_paths != [path.resolve(strict=False)]:
+                        raise ReviewStoreError(
+                            f"Reviewability SQLite main path drifted at {stage}."
+                        )
+            if not lock_active:
+                if (
+                    _stable_file_state(wal_path) != expected_wal
+                    or _stable_file_state(shm_path) != expected_shm
+                ):
+                    raise ReviewStoreError(
+                        f"Reviewability WAL/SHM state changed at {stage}."
+                    )
+                return
+
+            current_wal = _stable_file_state(wal_path)
+            if current_wal is not None and (
+                current_wal[2] != 0
+                or current_wal[4]
+                != hashlib.sha256(b"").hexdigest()
+            ):
+                raise ReviewStoreError(
+                    f"Reviewability WAL gained content before marker writes at {stage}."
+                )
+            if expected_wal is not None and current_wal is not None and (
+                current_wal[:3] != expected_wal[:3]
+            ):
+                raise ReviewStoreError(
+                    f"Reviewability WAL identity changed at {stage}."
+                )
+            if expected_wal is not None and current_wal is None:
+                raise ReviewStoreError(
+                    f"Reviewability WAL disappeared at {stage}."
+                )
+
+            if shm_path.exists():
+                shm_stat = shm_path.stat()
+                current_shm_identity = (
+                    int(shm_stat.st_dev),
+                    int(shm_stat.st_ino),
+                    int(shm_stat.st_size),
+                )
+                if expected_shm is not None:
+                    if current_shm_identity != expected_shm[:3]:
+                        raise ReviewStoreError(
+                            f"Reviewability SHM identity changed at {stage}."
+                        )
+                elif current_shm_identity[2] != 32768:
+                    raise ReviewStoreError(
+                        f"Reviewability lock-created SHM size is invalid at {stage}."
+                    )
+            elif expected_shm is not None:
+                raise ReviewStoreError(
+                    f"Reviewability SHM disappeared at {stage}."
+                )
+        except ReviewStoreError:
+            raise
+        except (OSError, sqlite3.DatabaseError) as exc:
+            raise ReviewStoreError(
+                f"Reviewability candidate state could not be proven at {stage}: {exc}"
+            ) from exc
+
+    @staticmethod
+    def _assert_reviewability_upgrade_held_state(
+        path: Path,
+        *,
+        upgrade_guard: _ReviewabilityUpgradeFileGuard,
+        stage: str,
+        conn: sqlite3.Connection | None = None,
+    ) -> None:
+        """Rebind path and held identities after legitimate marker writes."""
+
+        try:
+            upgrade_guard.assert_current(stage=stage)
+            if conn is not None:
+                upgrade_guard.assert_sqlite_main_binding(conn, stage=stage)
+        except ReviewStoreError:
+            raise
+        except (OSError, sqlite3.DatabaseError) as exc:
+            raise ReviewStoreError(
+                "Reviewability held upgrade identity could not be proven at "
+                f"{stage}: {exc}"
+            ) from exc
+
+    @staticmethod
+    def _update_exact_marker(
+        conn: sqlite3.Connection,
+        *,
+        key: str,
+        expected: str,
+        replacement: str,
+    ) -> None:
+        cursor = conn.execute(
+            "UPDATE schema_meta SET value = ? WHERE key = ? AND value = ?",
+            (replacement, key, expected),
+        )
+        if cursor.rowcount != 1:
+            raise ReviewStoreError(
+                "Reviewability marker upgrade precondition failed for " f"{key}."
+            )
+
+    @_hold_reviewability_upgrade_files
+    def upgrade_reviewability_candidate_v2(self) -> dict[str, Any]:
+        """Explicitly upgrade one exact v1 candidate to v2 without any DDL.
+
+        This is intentionally not called by any initializer.  The caller must
+        select the candidate path explicitly.  Every precondition is rechecked
+        under the same ``BEGIN IMMEDIATE`` transaction that changes the five
+        semantic markers, and every pre-existing v1 checkpoint is replayed
+        before and after the marker change.
+        """
+
+        _upgrade_guard = _CURRENT_REVIEWABILITY_UPGRADE_GUARD.get()
+        if _upgrade_guard is None:
+            raise ReviewStoreError("Reviewability upgrade file guard is missing.")
+        before_main = _upgrade_guard.expected_main
+        before_wal = _upgrade_guard.expected_wal
+        before_shm = _upgrade_guard.expected_shm
+
+        # Immutable validation proves that this is an exact v1 candidate before
+        # any writable SQLite handle is opened.
+        self._validate_existing_reviewability_candidate(
+            expected_version=REVIEWABILITY_SCHEMA_VERSION_V1
+        )
+        immutable_uri = f"{self.path.resolve().as_uri()}?mode=ro&immutable=1"
+        immutable_conn = sqlite3.connect(immutable_uri, uri=True)
+        immutable_conn.row_factory = sqlite3.Row
+        immutable_conn.execute("PRAGMA query_only = ON")
+        try:
+            self._validate_reviewability_candidate(
+                immutable_conn, expected_version=REVIEWABILITY_SCHEMA_VERSION_V1
+            )
+            immutable_records = self._read_validated_operation_checkpoints(
+                immutable_conn
+            )
+            if any(
+                record.to_dict()["schema_version"]
+                != OPERATION_CHECKPOINT_SCHEMA_VERSION
+                for record in immutable_records
+            ):
+                raise ReviewStoreError(
+                    "Exact v1 upgrade precondition rejects non-v1 checkpoint rows."
+                )
+            before_checkpoint_bytes = [
+                record.canonical_bytes for record in immutable_records
+            ]
+            before_ddl_sha256 = self._reviewability_ddl_fingerprint(immutable_conn)
+        finally:
+            immutable_conn.close()
+
+        self._assert_reviewability_upgrade_path_state(
+            self.path,
+            expected_main=before_main,
+            expected_wal=before_wal,
+            expected_shm=before_shm,
+            stage="after_immutable_validation",
+            upgrade_guard=_upgrade_guard,
+        )
+        self._assert_reviewability_upgrade_path_state(
+            self.path,
+            expected_main=before_main,
+            expected_wal=before_wal,
+            expected_shm=before_shm,
+            stage="before_rw_open",
+            upgrade_guard=_upgrade_guard,
+        )
+
+        uri = _upgrade_guard.sqlite_rw_uri()
+        conn = sqlite3.connect(uri, uri=True)
+        committed = False
+        checkpoint_complete = False
+        try:
+            _upgrade_guard.note_writer_open(conn, stage="after_rw_open")
+            self._assert_reviewability_upgrade_path_state(
+                self.path,
+                expected_main=before_main,
+                expected_wal=before_wal,
+                expected_shm=before_shm,
+                stage="after_rw_open",
+                conn=conn,
+                upgrade_guard=_upgrade_guard,
+            )
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA foreign_keys = ON")
+            conn.execute("PRAGMA busy_timeout = 5000")
+            self._assert_reviewability_upgrade_path_state(
+                self.path,
+                expected_main=before_main,
+                expected_wal=before_wal,
+                expected_shm=before_shm,
+                stage="after_rw_pragmas",
+                conn=conn,
+                upgrade_guard=_upgrade_guard,
+            )
+            conn.execute("BEGIN IMMEDIATE")
+            self._assert_reviewability_upgrade_path_state(
+                self.path,
+                expected_main=before_main,
+                expected_wal=before_wal,
+                expected_shm=before_shm,
+                stage="locked_before_validation",
+                lock_active=True,
+                conn=conn,
+                upgrade_guard=_upgrade_guard,
+            )
+            self._validate_reviewability_candidate(
+                conn, expected_version=REVIEWABILITY_SCHEMA_VERSION_V1
+            )
+            locked_records = self._read_validated_operation_checkpoints(conn)
+            if [record.canonical_bytes for record in locked_records] != (
+                before_checkpoint_bytes
+            ):
+                raise ReviewStoreError(
+                    "Checkpoint rows changed between immutable and locked upgrade gates."
+                )
+            duplicate_semantic_rows = conn.execute(
+                "SELECT episode_id, review_kind, checkpoint_type, perspective, "
+                "as_of, knowledge_cutoff, COUNT(*) AS row_count "
+                "FROM operation_review_checkpoints "
+                "GROUP BY episode_id, review_kind, checkpoint_type, perspective, "
+                "as_of, knowledge_cutoff HAVING COUNT(*) != 1"
+            ).fetchall()
+            if duplicate_semantic_rows:
+                raise ReviewStoreError(
+                    "Operation checkpoint semantic tuple is not uniquely closed."
+                )
+            locked_ddl_sha256 = self._reviewability_ddl_fingerprint(conn)
+            if locked_ddl_sha256 != before_ddl_sha256:
+                raise ReviewStoreError(
+                    "Reviewability DDL changed before the marker upgrade lock."
+                )
+            self._assert_reviewability_upgrade_path_state(
+                self.path,
+                expected_main=before_main,
+                expected_wal=before_wal,
+                expected_shm=before_shm,
+                stage="locked_before_marker_writes",
+                lock_active=True,
+                conn=conn,
+                upgrade_guard=_upgrade_guard,
+            )
+
+            public_marker = conn.execute(
+                "SELECT value FROM schema_meta WHERE "
+                "key='reviewability_public_information_policy_version'"
+            ).fetchone()
+            if public_marker is not None:
+                raise ReviewStoreError(
+                    "Public-information marker already exists; exact v1 gate failed."
+                )
+            self._update_exact_marker(
+                conn,
+                key="reviewability_schema_version",
+                expected=str(REVIEWABILITY_SCHEMA_VERSION_V1),
+                replacement=str(REVIEWABILITY_SCHEMA_VERSION_V2),
+            )
+            self._update_exact_marker(
+                conn,
+                key="reviewability_checkpoint_contract_version",
+                expected=OPERATION_CHECKPOINT_SCHEMA_VERSION,
+                replacement=OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+            )
+            self._update_exact_marker(
+                conn,
+                key="reviewability_market_policy_version",
+                expected=MARKET_FALLBACK_POLICY_VERSION,
+                replacement=MARKET_FALLBACK_POLICY_VERSION_V2,
+            )
+            self._update_exact_marker(
+                conn,
+                key="reviewability_schema_manifest_sha256",
+                expected=REVIEWABILITY_SCHEMA_MANIFEST_SHA256,
+                replacement=REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2,
+            )
+            inserted = conn.execute(
+                "INSERT INTO schema_meta(key, value) VALUES(?, ?)",
+                (
+                    "reviewability_public_information_policy_version",
+                    PUBLIC_INFORMATION_POLICY_VERSION,
+                ),
+            )
+            if inserted.rowcount != 1:
+                raise ReviewStoreError(
+                    "Public-information marker insertion was not exact."
+                )
+            self._validate_reviewability_candidate(
+                conn, expected_version=REVIEWABILITY_SCHEMA_VERSION_V2
+            )
+            upgraded_records = self._read_validated_operation_checkpoints(conn)
+            if [record.canonical_bytes for record in upgraded_records] != (
+                before_checkpoint_bytes
+            ):
+                raise ReviewStoreError(
+                    "Immutable v1 checkpoint replay changed during marker upgrade."
+                )
+            after_locked_ddl_sha256 = self._reviewability_ddl_fingerprint(conn)
+            if after_locked_ddl_sha256 != before_ddl_sha256:
+                raise ReviewStoreError(
+                    "Reviewability v2 marker upgrade attempted to change DDL."
+                )
+            conn.commit()
+            committed = True
+            self._assert_reviewability_upgrade_held_state(
+                self.path,
+                upgrade_guard=_upgrade_guard,
+                stage="after_marker_commit",
+                conn=conn,
+            )
+            _upgrade_guard.mark_marker_committed(stage="after_marker_commit")
+            checkpoint_result = conn.execute(
+                "PRAGMA wal_checkpoint(TRUNCATE)"
+            ).fetchone()
+            self._assert_reviewability_upgrade_held_state(
+                self.path,
+                upgrade_guard=_upgrade_guard,
+                stage="after_marker_checkpoint",
+                conn=conn,
+            )
+            checkpoint_complete = _upgrade_guard.record_checkpoint_result(
+                checkpoint_result,
+                stage="after_marker_checkpoint",
+            )
+        except ReviewStoreError:
+            if conn.in_transaction:
+                conn.rollback()
+            raise
+        except Exception:
+            if conn.in_transaction:
+                conn.rollback()
+            if not committed:
+                raise
+        finally:
+            conn.close()
+        _upgrade_guard.assert_after_writer_close(
+            conn,
+            stage="after_rw_close",
+        )
+
+        # A marker transaction can commit before SQLite reports a busy WAL
+        # checkpoint.  Close the first handle, then perform one deterministic
+        # recovery checkpoint under an exact-v2 gate.  This prevents callers
+        # from mistaking an already-committed upgrade for a safe v1 retry.
+        if not checkpoint_complete:
+            self._assert_reviewability_upgrade_held_state(
+                self.path,
+                upgrade_guard=_upgrade_guard,
+                stage="before_recovery_rw_open",
+            )
+            recovery = sqlite3.connect(uri, uri=True)
+            recovery.row_factory = sqlite3.Row
+            recovery.execute("PRAGMA foreign_keys = ON")
+            recovery.execute("PRAGMA busy_timeout = 5000")
+            try:
+                _upgrade_guard.note_writer_open(
+                    recovery,
+                    stage="after_recovery_rw_open",
+                )
+                self._assert_reviewability_upgrade_held_state(
+                    self.path,
+                    upgrade_guard=_upgrade_guard,
+                    stage="after_recovery_rw_open",
+                    conn=recovery,
+                )
+                self._validate_reviewability_candidate(
+                    recovery, expected_version=REVIEWABILITY_SCHEMA_VERSION_V2
+                )
+                recovery_result = recovery.execute(
+                    "PRAGMA wal_checkpoint(TRUNCATE)"
+                ).fetchone()
+                self._assert_reviewability_upgrade_held_state(
+                    self.path,
+                    upgrade_guard=_upgrade_guard,
+                    stage="after_recovery_checkpoint",
+                    conn=recovery,
+                )
+                checkpoint_complete = _upgrade_guard.record_checkpoint_result(
+                    recovery_result,
+                    stage="after_recovery_checkpoint",
+                )
+            finally:
+                recovery.close()
+            _upgrade_guard.assert_after_writer_close(
+                recovery,
+                stage="after_recovery_close",
+            )
+            if not checkpoint_complete:
+                raise ReviewStoreError(
+                    "Reviewability v2 markers committed but WAL truncation remains "
+                    "incomplete; do not retry the marker upgrade."
+                )
+
+        self._assert_reviewability_upgrade_held_state(
+            self.path,
+            upgrade_guard=_upgrade_guard,
+            stage="before_final_exact_v2_validation",
+        )
+        result = self._validate_existing_reviewability_candidate(
+            expected_version=REVIEWABILITY_SCHEMA_VERSION_V2
+        )
+        self._assert_reviewability_upgrade_held_state(
+            self.path,
+            upgrade_guard=_upgrade_guard,
+            stage="after_final_exact_v2_validation",
+        )
+        final_replay_uri = (
+            f"{self.path.resolve().as_uri()}?mode=ro&immutable=1"
+        )
+        final_replay = sqlite3.connect(final_replay_uri, uri=True)
+        final_replay.row_factory = sqlite3.Row
+        final_replay.execute("PRAGMA query_only = ON")
+        try:
+            self._assert_reviewability_upgrade_held_state(
+                self.path,
+                upgrade_guard=_upgrade_guard,
+                stage="final_replay_connection",
+                conn=final_replay,
+            )
+            after_records = self._read_validated_operation_checkpoints(final_replay)
+            after_checkpoint_bytes = [
+                record.canonical_bytes for record in after_records
+            ]
+            after_ddl_sha256 = self._reviewability_ddl_fingerprint(final_replay)
+        finally:
+            final_replay.close()
+        if after_checkpoint_bytes != before_checkpoint_bytes:
+            raise ReviewStoreError(
+                "Immutable v1 checkpoint replay changed after marker upgrade."
+            )
+        if after_ddl_sha256 != before_ddl_sha256:
+            raise ReviewStoreError(
+                "Reviewability DDL changed after marker upgrade."
+            )
+        after_main = _stable_file_state(self.path)
+        if after_main is None:
+            raise ReviewStoreError("Reviewability candidate disappeared after upgrade.")
+        self._assert_reviewability_upgrade_held_state(
+            self.path,
+            upgrade_guard=_upgrade_guard,
+            stage="final_exact_v2_ddl_v1_replay",
+        )
+        result.update(
+            {
+                "status": "UPGRADED",
+                "before_size": before_main[2],
+                "before_sha256": before_main[4],
+                "after_size": after_main[2],
+                "after_sha256": after_main[4],
+                "ddl_sha256": after_ddl_sha256,
+                "preserved_v1_checkpoint_count": len(after_records),
+            }
+        )
+        return result
+
+    @staticmethod
+    def _validate_reviewability_candidate(
+        conn: sqlite3.Connection,
+        *,
+        expected_version: int | None = None,
+    ) -> int:
         journal_mode = str(conn.execute("PRAGMA journal_mode").fetchone()[0]).lower()
         if journal_mode != "wal":
             # An immutable SQLite connection deliberately ignores WAL semantics and
@@ -1233,6 +2448,7 @@ VALUES(
             "reviewability_schema_version",
             "reviewability_checkpoint_contract_version",
             "reviewability_market_policy_version",
+            "reviewability_public_information_policy_version",
             "reviewability_market_provider_allowlist_version",
             "reviewability_market_provider_allowlist_sha256",
             "reviewability_schema_manifest_sha256",
@@ -1245,7 +2461,7 @@ VALUES(
                 marker_keys,
             ).fetchall()
         }
-        expected_markers = {
+        common_expected_markers = {
             "schema_version": str(SCHEMA_VERSION),
             "p2h_stage1_schema_version": str(P2H_STAGE1_SCHEMA_VERSION),
             "p2h_stage2_slice_a_schema_version": str(
@@ -1254,19 +2470,11 @@ VALUES(
             "product_completion_schema_version": str(
                 PRODUCT_COMPLETION_SCHEMA_VERSION
             ),
-            "reviewability_schema_version": str(REVIEWABILITY_SCHEMA_VERSION),
-            "reviewability_checkpoint_contract_version": (
-                OPERATION_CHECKPOINT_SCHEMA_VERSION
-            ),
-            "reviewability_market_policy_version": MARKET_FALLBACK_POLICY_VERSION,
             "reviewability_market_provider_allowlist_version": (
                 MARKET_PROVIDER_ALLOWLIST_VERSION
             ),
             "reviewability_market_provider_allowlist_sha256": (
                 MARKET_PROVIDER_ALLOWLIST_SHA256
-            ),
-            "reviewability_schema_manifest_sha256": (
-                REVIEWABILITY_SCHEMA_MANIFEST_SHA256
             ),
         }
         initialized_at = markers.pop("initialized_at", None)
@@ -1281,31 +2489,89 @@ VALUES(
             raise ReviewStoreError(
                 "Reviewability candidate initialized_at marker is missing or invalid."
             )
+        try:
+            actual_version = int(markers.get("reviewability_schema_version", ""))
+        except (TypeError, ValueError):
+            actual_version = -1
+        if expected_version is not None and actual_version != expected_version:
+            raise ReviewStoreError(
+                "Reviewability feature marker version does not match the required "
+                f"exact precondition: expected={expected_version}, actual={actual_version}."
+            )
+        if actual_version == REVIEWABILITY_SCHEMA_VERSION_V1:
+            version_expected_markers = {
+                "reviewability_schema_version": str(
+                    REVIEWABILITY_SCHEMA_VERSION_V1
+                ),
+                "reviewability_checkpoint_contract_version": (
+                    OPERATION_CHECKPOINT_SCHEMA_VERSION
+                ),
+                "reviewability_market_policy_version": (
+                    MARKET_FALLBACK_POLICY_VERSION
+                ),
+                "reviewability_schema_manifest_sha256": (
+                    REVIEWABILITY_SCHEMA_MANIFEST_SHA256
+                ),
+            }
+            expected_manifest = _REVIEWABILITY_SCHEMA_MANIFEST
+            expected_manifest_sha256 = REVIEWABILITY_SCHEMA_MANIFEST_SHA256
+        elif actual_version == REVIEWABILITY_SCHEMA_VERSION_V2:
+            version_expected_markers = {
+                "reviewability_schema_version": str(
+                    REVIEWABILITY_SCHEMA_VERSION_V2
+                ),
+                "reviewability_checkpoint_contract_version": (
+                    OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+                ),
+                "reviewability_market_policy_version": (
+                    MARKET_FALLBACK_POLICY_VERSION_V2
+                ),
+                "reviewability_public_information_policy_version": (
+                    PUBLIC_INFORMATION_POLICY_VERSION
+                ),
+                "reviewability_schema_manifest_sha256": (
+                    REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2
+                ),
+            }
+            expected_manifest = _REVIEWABILITY_SCHEMA_MANIFEST_V2
+            expected_manifest_sha256 = REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2
+        else:
+            raise ReviewStoreError(
+                "Unsupported reviewability feature marker version."
+            )
+        expected_markers = {
+            **common_expected_markers,
+            **version_expected_markers,
+        }
         if markers != expected_markers:
             raise ReviewStoreError(
-                "Reviewability feature markers do not match the frozen v1 contract."
+                "Reviewability feature markers do not match the frozen exact contract."
             )
 
         try:
-            actual_manifest = _reviewability_schema_manifest(conn)
+            actual_manifest = _reviewability_schema_manifest(
+                conn,
+                reviewability_schema_version=actual_version,
+            )
         except (sqlite3.DatabaseError, TypeError, ValueError) as exc:
             raise ReviewStoreError(
                 "Reviewability schema manifest could not be reconstructed."
             ) from exc
         actual_manifest_sha256 = sha256_text(canonical_json(actual_manifest))
         if (
-            actual_manifest != _REVIEWABILITY_SCHEMA_MANIFEST
-            or actual_manifest_sha256 != REVIEWABILITY_SCHEMA_MANIFEST_SHA256
+            actual_manifest != expected_manifest
+            or actual_manifest_sha256 != expected_manifest_sha256
         ):
             raise ReviewStoreError(
                 "Reviewability schema structure or constraints drifted from the "
                 "frozen manifest."
             )
+        return actual_version
 
-    def _ensure_reviewability_initialized(self) -> None:
+    def _ensure_reviewability_initialized(self) -> int:
         self._ensure_initialized()
         with self.connection(read_only=True) as conn:
-            self._validate_reviewability_candidate(conn)
+            return self._validate_reviewability_candidate(conn)
 
     def _ensure_initialized(self) -> None:
         if not self.path.is_file():
@@ -2740,7 +4006,7 @@ VALUES(
 
     @staticmethod
     def _operation_checkpoint_projection(
-        record: OperationCheckpointRecord,
+        record: OperationCheckpointRecord | OperationCheckpointRecordV2,
     ) -> dict[str, Any]:
         payload = record.to_dict()
         axes = payload["status_axes"]
@@ -2774,11 +4040,20 @@ VALUES(
         projection: Mapping[str, Any],
         payload_sha256: str,
         inserted_at: str,
+        checkpoint_schema_version: str = OPERATION_CHECKPOINT_SCHEMA_VERSION,
     ) -> str:
+        if checkpoint_schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION:
+            row_schema_version = "investment_review.operation_checkpoint_row.v1"
+        elif checkpoint_schema_version == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2:
+            row_schema_version = "investment_review.operation_checkpoint_row.v2"
+        else:
+            raise ReviewStoreError(
+                "Unsupported operation checkpoint row-integrity version."
+            )
         return sha256_text(
             canonical_json(
                 {
-                    "schema_version": "investment_review.operation_checkpoint_row.v1",
+                    "schema_version": row_schema_version,
                     "projection": dict(projection),
                     "payload_sha256": payload_sha256,
                     "inserted_at": inserted_at,
@@ -2790,7 +4065,7 @@ VALUES(
     def _validate_operation_checkpoint_row(
         row: sqlite3.Row,
         gap_rows: Sequence[sqlite3.Row],
-    ) -> OperationCheckpointRecord:
+    ) -> OperationCheckpointRecord | OperationCheckpointRecordV2:
         """Reconstruct one row and reject every payload/projection divergence."""
 
         raw_payload = row["payload_json"]
@@ -2800,7 +4075,7 @@ VALUES(
             decoded = json.loads(raw_payload)
             if not isinstance(decoded, dict):
                 raise TypeError("payload root must be an object")
-            record = OperationCheckpointRecord.from_mapping(decoded)
+            record = operation_checkpoint_from_mapping(decoded)
         except (json.JSONDecodeError, TypeError, ValueError) as exc:
             raise ReviewStoreError(
                 "Operation checkpoint canonical payload failed validation."
@@ -2837,6 +4112,7 @@ VALUES(
                 projection=projection,
                 payload_sha256=expected_payload_sha256,
                 inserted_at=inserted_at,
+                checkpoint_schema_version=str(decoded.get("schema_version") or ""),
             )
         )
         if row["row_integrity_sha256"] != expected_row_integrity:
@@ -2898,7 +4174,7 @@ VALUES(
     @staticmethod
     def _read_validated_operation_checkpoints(
         conn: sqlite3.Connection,
-    ) -> list[OperationCheckpointRecord]:
+    ) -> list[OperationCheckpointRecord | OperationCheckpointRecordV2]:
         """Load the complete checkpoint set so omitted/corrupt rows cannot hide."""
 
         rows = conn.execute(
@@ -2936,8 +4212,10 @@ VALUES(
 
     @staticmethod
     def _existing_operation_checkpoint_receipt(
-        stored_records: Sequence[OperationCheckpointRecord],
-        record: OperationCheckpointRecord,
+        stored_records: Sequence[
+            OperationCheckpointRecord | OperationCheckpointRecordV2
+        ],
+        record: OperationCheckpointRecord | OperationCheckpointRecordV2,
         payload_sha256: str,
     ) -> dict[str, Any] | None:
         existing = [
@@ -2949,8 +4227,6 @@ VALUES(
                 or stored.content_id == record.content_id
             )
         ]
-        if not existing:
-            return None
         if len(existing) == 1 and (
             existing[0].canonical_bytes == record.canonical_bytes
         ):
@@ -2961,20 +4237,56 @@ VALUES(
                 "payload_sha256": payload_sha256,
                 "status": "SKIPPED",
             }
-        raise DataConflictError(
-            "Operation checkpoint identity or key changed after creation: "
-            f"checkpoint_key={record.checkpoint_key}"
+        if existing:
+            raise DataConflictError(
+                "Operation checkpoint identity or key changed after creation: "
+                f"checkpoint_key={record.checkpoint_key}"
+            )
+        record_payload = record.to_dict()
+        semantic_tuple = (
+            record_payload["episode_id"],
+            record_payload["review_kind"],
+            record_payload["checkpoint_type"],
+            record_payload["perspective"],
+            record_payload["as_of"],
+            record_payload["knowledge_cutoff"],
         )
+        semantic_collisions = [
+            stored
+            for stored in stored_records
+            if (
+                stored.to_dict()["episode_id"],
+                stored.to_dict()["review_kind"],
+                stored.to_dict()["checkpoint_type"],
+                stored.to_dict()["perspective"],
+                stored.to_dict()["as_of"],
+                stored.to_dict()["knowledge_cutoff"],
+            )
+            == semantic_tuple
+        ]
+        if semantic_collisions:
+            raise DataConflictError(
+                "Operation checkpoint storage tuple already belongs to another "
+                "immutable identity; v2 requires a new knowledge_cutoff."
+            )
+        return None
 
     def save_operation_checkpoint(
-        self, checkpoint: OperationCheckpointRecord | Mapping[str, Any]
+        self,
+        checkpoint: (
+            OperationCheckpointRecord
+            | OperationCheckpointRecordV2
+            | Mapping[str, Any]
+        ),
     ) -> dict[str, Any]:
-        """Create one immutable v3 checkpoint and its closed gap projection."""
+        """Create one immutable checkpoint under the exact selected feature marker."""
 
-        self._ensure_reviewability_initialized()
-        record = OperationCheckpointRecord.from_mapping(
+        reviewability_version = self._ensure_reviewability_initialized()
+        record = operation_checkpoint_from_mapping(
             checkpoint.to_dict()
-            if isinstance(checkpoint, OperationCheckpointRecord)
+            if isinstance(
+                checkpoint, (OperationCheckpointRecord, OperationCheckpointRecordV2)
+            )
             else checkpoint
         )
         payload = record.to_dict()
@@ -2986,6 +4298,7 @@ VALUES(
             projection=projection,
             payload_sha256=payload_sha256,
             inserted_at=inserted_at,
+            checkpoint_schema_version=str(payload["schema_version"]),
         )
 
         # The idempotent path is genuinely read-only.  A second check under an
@@ -2998,11 +4311,34 @@ VALUES(
             )
         if existing_receipt is not None:
             return existing_receipt
+        if (
+            reviewability_version == REVIEWABILITY_SCHEMA_VERSION_V1
+            and payload["schema_version"] != OPERATION_CHECKPOINT_SCHEMA_VERSION
+        ):
+            raise ReviewStoreError(
+                "Reviewability v1 candidate cannot create a v2 checkpoint before "
+                "the explicit marker upgrade."
+            )
+        if (
+            reviewability_version == REVIEWABILITY_SCHEMA_VERSION_V2
+            and payload["schema_version"] != OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+        ):
+            raise ReviewStoreError(
+                "Reviewability v2 candidate may replay old v1 checkpoints but must "
+                "not create a new v1 checkpoint."
+            )
 
         with self.connection() as conn:
             with conn:
                 conn.execute("BEGIN IMMEDIATE")
-                self._validate_reviewability_candidate(conn)
+                locked_version = self._validate_reviewability_candidate(conn)
+                if (
+                    locked_version is not None
+                    and locked_version != reviewability_version
+                ):
+                    raise ReviewStoreError(
+                        "Reviewability marker changed before the checkpoint write lock."
+                    )
                 existing_receipt = self._existing_operation_checkpoint_receipt(
                     self._read_validated_operation_checkpoints(conn),
                     record,
@@ -4101,6 +5437,10 @@ VALUES(
                 "SELECT value FROM schema_meta "
                 "WHERE key='reviewability_market_policy_version'"
             ).fetchone()
+            public_information_policy_row = conn.execute(
+                "SELECT value FROM schema_meta "
+                "WHERE key='reviewability_public_information_policy_version'"
+            ).fetchone()
             market_allowlist_row = conn.execute(
                 "SELECT value FROM schema_meta "
                 "WHERE key='reviewability_market_provider_allowlist_version'"
@@ -4117,6 +5457,7 @@ VALUES(
                 reviewability_row is not None
                 or checkpoint_contract_row is not None
                 or market_policy_row is not None
+                or public_information_policy_row is not None
                 or market_allowlist_row is not None
                 or market_allowlist_hash_row is not None
                 or reviewability_manifest_row is not None
@@ -4144,6 +5485,11 @@ VALUES(
             ),
             "reviewability_market_policy_version": (
                 str(market_policy_row[0]) if market_policy_row else None
+            ),
+            "reviewability_public_information_policy_version": (
+                str(public_information_policy_row[0])
+                if public_information_policy_row
+                else None
             ),
             "reviewability_market_provider_allowlist_version": (
                 str(market_allowlist_row[0]) if market_allowlist_row else None

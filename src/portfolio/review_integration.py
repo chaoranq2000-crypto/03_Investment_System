@@ -12,6 +12,7 @@ operating-system scheduler.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 import hashlib
@@ -32,6 +33,18 @@ REVIEW_CHECKPOINT_AUTOMATION_VERSION = (
 REVIEW_CHECKPOINT_PLAN_SCHEMA_VERSION = (
     "investment_review.open_checkpoint_plan.v1"
 )
+REVIEW_CHECKPOINT_AUTOMATION_VERSION_V2 = (
+    "investment_review.open_checkpoint_catch_up.v2"
+)
+REVIEW_CHECKPOINT_PLAN_SCHEMA_VERSION_V2 = (
+    "investment_review.open_checkpoint_plan.v2"
+)
+REVIEW_AUTOMATION_MARKET_INPUT_MANIFEST_VERSION = (
+    "investment_review.automation_market_input_manifest.v1"
+)
+REVIEW_AUTOMATION_MARKET_INPUT_MANIFEST_VERSION_V2 = (
+    "investment_review.automation_market_input_manifest.v2"
+)
 REVIEW_AUTOMATION_SCOPES = ("single", "weekly", "monthly")
 DEFAULT_AUTOMATION_INTERVAL_SECONDS = 900.0
 AUTOMATION_LEASE_TIMEOUT_SECONDS = 120.0
@@ -48,6 +61,7 @@ POST_COMMIT_AUTOMATION_HOOK: AutomationHook | None = None
 
 _LEASES_GUARD = threading.Lock()
 _LOCAL_LEASES: dict[str, threading.Lock] = {}
+_DEFAULT_CHECKPOINT_MARKET_RESOLVER = object()
 
 
 def _local_lease(path: Path) -> threading.Lock:
@@ -64,15 +78,22 @@ class _AutomationLease:
         *,
         repo_root: Path,
         review_db: Path,
+        task_namespace: str = "investment_review_product_completion_v2",
         timeout_seconds: float = AUTOMATION_LEASE_TIMEOUT_SECONDS,
     ) -> None:
+        if task_namespace not in {
+            "investment_review_product_completion_v2",
+            "investment_review_product_completion_v3",
+            "investment_review_product_completion_v4",
+        }:
+            raise ValueError("unsupported automation lease task namespace")
         identity = hashlib.sha256(
             str(review_db.resolve(strict=False)).casefold().encode("utf-8")
         ).hexdigest()[:32]
         self.path = (
             repo_root
             / ".codex_tmp"
-            / "investment_review_product_completion_v2"
+            / task_namespace
             / "automation_locks"
             / f"{identity}.lock"
         ).resolve(strict=False)
@@ -179,6 +200,7 @@ class ReviewAutomationConfig:
     enabled: bool = True
     interval_seconds: float = DEFAULT_AUTOMATION_INTERVAL_SECONDS
     startup_catch_up: bool = True
+    perspective: str = "user"
 
 
 @dataclass(frozen=True)
@@ -191,6 +213,8 @@ class _AutomationPlan:
     projection_sha256: str
     checkpoint_plan: dict[str, Any] | None
     checkpoint_plan_sha256: str | None
+    market_input_manifest: dict[str, Any] | None
+    market_input_sha256: str | None
     checkpoint_slot: str | None
     as_of: str | None
     knowledge_cutoff: str | None
@@ -199,6 +223,145 @@ class _AutomationPlan:
     source_seen: int
     sidecar_seen: int
     unsynced: int
+    perspective: str
+
+
+class _FrozenAutomationMarketResolver:
+    """Serve only the exact projections closed by one automation plan.
+
+    The pre-bundle resolver is deliberately not retained here.  Runner scopes
+    therefore cannot re-query a provider/cache and silently consume B after
+    the task key was bound to A.
+    """
+
+    def __init__(self, manifest: Mapping[str, Any]) -> None:
+        self._perspective = str(manifest.get("perspective") or "user")
+        if self._perspective not in {"user", "system"}:
+            raise RuntimeError(
+                "frozen market manifest perspective is malformed"
+            )
+        self._items: dict[
+            tuple[str, str, str, str, str], dict[str, Any]
+        ] = {}
+        raw_items = manifest.get("items")
+        if not isinstance(raw_items, list):
+            raise RuntimeError("frozen market manifest items are malformed")
+        for raw in raw_items:
+            if not isinstance(raw, Mapping):
+                raise RuntimeError("frozen market manifest item is malformed")
+            item = deepcopy(dict(raw))
+            key = (
+                str(item.get("episode_id") or ""),
+                str(item.get("instrument_id") or ""),
+                str(item.get("perspective") or self._perspective),
+                str(item.get("as_of") or ""),
+                str(item.get("knowledge_cutoff") or ""),
+            )
+            if not all(key) or key in self._items:
+                raise RuntimeError(
+                    "frozen market manifest identity is missing or duplicated"
+                )
+            self._items[key] = item
+        self._lock = threading.Lock()
+        self._consumed: list[dict[str, Any]] = []
+
+    @staticmethod
+    def _episode_instrument(episode: Mapping[str, Any]) -> str:
+        scope = (
+            episode.get("scope")
+            if isinstance(episode.get("scope"), Mapping)
+            else {}
+        )
+        return str(
+            scope.get("instrument_id")
+            or episode.get("instrument_id")
+            or episode.get("symbol")
+            or ""
+        ).upper()
+
+    def cursor(self) -> int:
+        with self._lock:
+            return len(self._consumed)
+
+    def consumed_since(self, cursor: int) -> list[dict[str, Any]]:
+        with self._lock:
+            return deepcopy(self._consumed[cursor:])
+
+    def __call__(
+        self,
+        *,
+        episode: Mapping[str, Any],
+        perspective: str = "user",
+        as_of: str,
+        knowledge_cutoff: str,
+        request_budget: object | None = None,
+        **_kwargs: Any,
+    ) -> dict[str, Any]:
+        del request_budget
+        episode_id = str(episode.get("episode_id") or "")
+        instrument_id = self._episode_instrument(episode)
+        key = (
+            episode_id,
+            instrument_id,
+            str(perspective),
+            str(as_of),
+            str(knowledge_cutoff),
+        )
+        item = self._items.get(key)
+        if item is None:
+            raise RuntimeError(
+                "runner requested market input outside the frozen automation plan"
+            )
+        consumed = {
+            "episode_id": episode_id,
+            "instrument_id": instrument_id,
+            "as_of": str(as_of),
+            "knowledge_cutoff": str(knowledge_cutoff),
+            "market_input_content_id": item.get(
+                "market_input_content_id"
+            ),
+            "market_requirement_id": item.get("market_requirement_id"),
+            "market_resolution_id": item.get("market_resolution_id"),
+            "fetch_receipt_ids": deepcopy(
+                item.get("fetch_receipt_ids", [])
+            ),
+            "source_ids": deepcopy(item.get("source_ids", [])),
+        }
+        if "perspective" in item:
+            consumed.update(
+                {
+                    "perspective": str(perspective),
+                    "operation_anchor_event_id": item.get(
+                        "operation_anchor_event_id"
+                    ),
+                    "operation_anchor_at": item.get(
+                        "operation_anchor_at"
+                    ),
+                    "operation_anchor_ordering_key": deepcopy(
+                        item.get("operation_anchor_ordering_key")
+                    ),
+                    "information_time_policy_version": item.get(
+                        "information_time_policy_version"
+                    ),
+                }
+            )
+        with self._lock:
+            self._consumed.append(consumed)
+        projection = item.get("projection")
+        if not isinstance(projection, Mapping):
+            if item.get("error_code") == (
+                "MARKET_CONTEXT_WITHHELD_BY_CUTOFF"
+            ):
+                from src.investment_review.market_context_adapter import (
+                    MarketContextCutoffUnavailableError,
+                )
+
+                raise MarketContextCutoffUnavailableError(
+                    "frozen market context is unavailable at the requested "
+                    "knowledge cutoff"
+                )
+            raise RuntimeError("MARKET_CONTEXT_RESOLUTION_UNAVAILABLE")
+        return deepcopy(dict(projection))
 
 
 def _parse_bool(value: object, *, field: str) -> bool:
@@ -338,7 +501,7 @@ def _public_run_projection(value: object) -> dict[str, Any] | None:
                     ),
                 }
             )
-    return {
+    projection = {
         "run_id": run.get("run_id"),
         "run_key": run.get("run_key"),
         "status": value.get("status"),
@@ -352,11 +515,15 @@ def _public_run_projection(value: object) -> dict[str, Any] | None:
         "checkpoint_plan_sha256": parameters.get(
             "checkpoint_plan_sha256"
         ),
+        "market_input_sha256": parameters.get("market_input_sha256"),
         "checkpoint_slot": parameters.get("checkpoint_slot"),
         "attempt": details.get("attempt"),
         "retryable": details.get("retryable"),
         "scope_runs": projected_scopes,
     }
+    if "perspective" in parameters:
+        projection["perspective"] = parameters.get("perspective")
+    return projection
 
 
 def review_automation_health(
@@ -539,8 +706,8 @@ class ReviewAutomationCoordinator:
         store: Any | None = None,
         runner_factory: RunnerFactory | None = None,
         checkpoint_market_resolver: (
-            Callable[..., Mapping[str, Any]] | None
-        ) = None,
+            Callable[..., Mapping[str, Any]] | None | object
+        ) = _DEFAULT_CHECKPOINT_MARKET_RESOLVER,
         clock: Clock | None = None,
     ) -> None:
         from src.investment_review.review_runner import ReviewRunner
@@ -596,6 +763,11 @@ class ReviewAutomationCoordinator:
             ) from exc
 
         self.config = config or ReviewAutomationConfig()
+        if self.config.perspective not in {"user", "system"}:
+            raise ValueError(
+                "review automation perspective must be user or system"
+            )
+        self._clock = clock or (lambda: datetime.now(timezone.utc))
         self.sync_service = sync_service or ReviewSyncService(
             self.portfolio_db,
             review_db=self.review_db,
@@ -603,7 +775,26 @@ class ReviewAutomationCoordinator:
             repo_root=self.repo_root,
         )
         self.store = store or ReviewStore(self.review_db)
-        self.store.status()
+        store_status = self.store.status()
+        self._reviewability_schema_version = int(
+            store_status.get("reviewability_schema_version") or 0
+        )
+        if (
+            self._reviewability_schema_version < 2
+            and self.config.perspective != "user"
+        ):
+            raise ValueError(
+                "system-perspective automation requires reviewability v2"
+            )
+        if (
+            runner_factory is not None
+            and checkpoint_market_resolver
+            is _DEFAULT_CHECKPOINT_MARKET_RESOLVER
+        ):
+            raise ValueError(
+                "runner_factory requires explicit "
+                "checkpoint_market_resolver=None"
+            )
         if (
             runner_factory is not None
             and checkpoint_market_resolver is not None
@@ -611,6 +802,30 @@ class ReviewAutomationCoordinator:
             raise ValueError(
                 "runner_factory and checkpoint_market_resolver are "
                 "mutually exclusive"
+            )
+        if checkpoint_market_resolver is _DEFAULT_CHECKPOINT_MARKET_RESOLVER:
+            from src.investment_review.market_context_adapter import (
+                MarketContextAdapter,
+            )
+
+            self._checkpoint_market_resolver: (
+                Callable[..., Mapping[str, Any]] | None
+            ) = MarketContextAdapter(
+                cache_root=(
+                    self.repo_root
+                    / ".codex_tmp"
+                    / "investment_review_product_completion_v3"
+                    / "market_cache"
+                ),
+                clock=self._clock,
+            )
+        elif checkpoint_market_resolver is None or callable(
+            checkpoint_market_resolver
+        ):
+            self._checkpoint_market_resolver = checkpoint_market_resolver
+        else:
+            raise ValueError(
+                "checkpoint_market_resolver must be callable or None"
             )
         self._runner_factory = runner_factory or (
             lambda: ReviewRunner(
@@ -620,19 +835,27 @@ class ReviewAutomationCoordinator:
                 artifact_root=self.artifact_root,
                 repo_root=self.repo_root,
                 checkpoint_market_resolver=(
-                    checkpoint_market_resolver
+                    self._checkpoint_market_resolver
                 ),
             )
         )
-        self._clock = clock or (lambda: datetime.now(timezone.utc))
         self._cycle_lock = threading.Lock()
+        lease_namespace = (
+            "investment_review_product_completion_v4"
+            if self._reviewability_schema_version >= 2
+            else "investment_review_product_completion_v3"
+            if self._reviewability_schema_version == 1
+            else "investment_review_product_completion_v2"
+        )
         self._lease = _AutomationLease(
             repo_root=self.repo_root,
             review_db=self.review_db,
+            task_namespace=lease_namespace,
         )
         self._enqueue_lease = _AutomationLease(
             repo_root=self.repo_root,
             review_db=self.review_db,
+            task_namespace=lease_namespace,
             timeout_seconds=0.05,
         )
         self._state_lock = threading.Lock()
@@ -643,8 +866,9 @@ class ReviewAutomationCoordinator:
         self._local_state = "idle" if self.config.enabled else "disabled"
         self._local_failure: dict[str, Any] | None = None
 
-    @staticmethod
-    def _projection_state(store: Any) -> tuple[list[dict[str, Any]], str]:
+    def _projection_state(
+        self, store: Any
+    ) -> tuple[list[dict[str, Any]], str]:
         from src.investment_review.models import canonical_json, sha256_text
 
         events = store.list_episode_projection_inputs()
@@ -660,14 +884,22 @@ class ReviewAutomationCoordinator:
             store.get_decision(decision_id)
             for decision_id in decision_ids
         ]
-        digest = sha256_text(
-            canonical_json(
-                {
-                    "events": events,
-                    "linked_decisions": decisions,
-                }
+        material: dict[str, Any] = {
+            "events": events,
+            "linked_decisions": decisions,
+        }
+        if self._reviewability_schema_version >= 2:
+            material["event_observation_evidence"] = (
+                store.list_event_observation_evidence(
+                    event_ids=[
+                        str(event.get("event_id") or "")
+                        for event in events
+                        if event.get("event_id")
+                    ]
+                )
             )
-        )
+            material["perspective"] = self.config.perspective
+        digest = sha256_text(canonical_json(material))
         return events, digest
 
     @staticmethod
@@ -681,13 +913,364 @@ class ReviewAutomationCoordinator:
         ]
         return utc_iso(max(parsed), "UTC") if parsed else None
 
+    @staticmethod
+    def _automation_market_projection(
+        resolved: object,
+        *,
+        episode_id: str,
+        instrument_id: str,
+        as_of: str,
+        knowledge_cutoff: str,
+        perspective: str = "user",
+    ) -> dict[str, Any]:
+        """Validate and close one exact runner-consumable market projection."""
+
+        from src.investment_review.artifact_io import canonical_json_bytes
+        from src.investment_review.market_context_adapter import (
+            market_context_runner_projection,
+        )
+        from src.investment_review.review_runner import (
+            LEGACY_CHECKPOINT_MARKET_PROJECTION_VERSION,
+            MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS,
+            MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS_V2,
+        )
+
+        if not isinstance(resolved, Mapping):
+            raise RuntimeError(
+                "automation market resolver must return a mapping"
+            )
+        fields = frozenset(resolved)
+        legacy_fields = frozenset(
+            {"market_axis", "market_fallback", "market_gaps"}
+        )
+        if fields == legacy_fields:
+            legacy_resolution = {
+                "schema_version": (
+                    LEGACY_CHECKPOINT_MARKET_PROJECTION_VERSION
+                ),
+                "as_of": as_of,
+                "knowledge_cutoff": knowledge_cutoff,
+                "market_axis": deepcopy(dict(resolved["market_axis"])),
+                "market_fallback": deepcopy(
+                    dict(resolved["market_fallback"])
+                ),
+                "market_gaps": deepcopy(list(resolved["market_gaps"])),
+            }
+            content_id = "sha256:" + hashlib.sha256(
+                canonical_json_bytes(legacy_resolution)
+            ).hexdigest()
+            return {
+                "episode_id": episode_id,
+                "instrument_id": instrument_id,
+                "as_of": as_of,
+                "knowledge_cutoff": knowledge_cutoff,
+                "projection_kind": "legacy",
+                "market_input_content_id": content_id,
+                "market_requirement_id": None,
+                "market_resolution_id": None,
+                "fetch_receipt_ids": [],
+                "source_ids": [],
+                "projection": deepcopy(dict(resolved)),
+            }
+        if fields not in {
+            MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS,
+            MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS_V2,
+        }:
+            raise RuntimeError(
+                "automation market resolver returned unsupported fields"
+            )
+        projection = market_context_runner_projection(resolved)
+        if dict(projection) != dict(resolved):
+            raise RuntimeError(
+                "automation market resolver projection drifted"
+            )
+        resolution = projection.get("resolution")
+        requirement = (
+            resolution.get("requirement")
+            if isinstance(resolution, Mapping)
+            and isinstance(resolution.get("requirement"), Mapping)
+            else {}
+        )
+        if (
+            projection.get("as_of") != as_of
+            or projection.get("knowledge_cutoff") != knowledge_cutoff
+            or str(requirement.get("instrument_id") or "").upper()
+            != instrument_id
+        ):
+            raise RuntimeError(
+                "automation market projection does not bind the requested "
+                "instrument/as_of/knowledge_cutoff"
+            )
+        is_v2 = fields == MARKET_CONTEXT_RUNNER_PROJECTION_FIELDS_V2
+        if is_v2 and (
+            projection.get("perspective") != perspective
+            or not projection.get("operation_anchor_event_id")
+            or not projection.get("operation_anchor_at")
+            or not isinstance(
+                projection.get("operation_anchor_ordering_key"), list
+            )
+            or not projection.get("information_time_policy_version")
+        ):
+            raise RuntimeError(
+                "automation v2 market projection does not bind perspective, "
+                "operation anchor and information-time policy"
+            )
+        fallback = projection.get("market_fallback")
+        receipts = (
+            fallback.get("fetch_receipts", [])
+            if isinstance(fallback, Mapping)
+            else []
+        )
+        supplementals = projection.get("supplemental_sources", [])
+        receipt_ids = sorted(
+            str(item.get("receipt_id") or "")
+            for item in receipts
+            if isinstance(item, Mapping) and item.get("receipt_id")
+        )
+        source_ids = sorted(
+            str(item.get("source_id") or "")
+            for item in supplementals
+            if isinstance(item, Mapping) and item.get("source_id")
+        )
+        item = {
+            "episode_id": episode_id,
+            "instrument_id": instrument_id,
+            "as_of": as_of,
+            "knowledge_cutoff": knowledge_cutoff,
+            "projection_kind": "full",
+            "market_input_content_id": str(
+                projection["market_input_content_id"]
+            ),
+            "market_requirement_id": str(
+                projection["market_requirement_id"]
+            ),
+            "market_resolution_id": str(
+                projection["market_resolution_id"]
+            ),
+            "fetch_receipt_ids": receipt_ids,
+            "source_ids": source_ids,
+            "projection": deepcopy(dict(projection)),
+        }
+        if is_v2:
+            item.update(
+                {
+                    "perspective": perspective,
+                    "operation_anchor_event_id": str(
+                        projection["operation_anchor_event_id"]
+                    ),
+                    "operation_anchor_at": str(
+                        projection["operation_anchor_at"]
+                    ),
+                    "operation_anchor_ordering_key": deepcopy(
+                        projection["operation_anchor_ordering_key"]
+                    ),
+                    "information_time_policy_version": str(
+                        projection["information_time_policy_version"]
+                    ),
+                }
+            )
+        return item
+
+    def _market_input_manifest(
+        self,
+        *,
+        episodes: list[dict[str, Any]],
+        operation_review: Mapping[str, Any],
+        perspective: str,
+        as_of: str,
+        knowledge_cutoff: str,
+        frozen_manifest: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
+        """Resolve/freeze market inputs once before runner scope execution."""
+
+        from src.investment_review.models import canonical_json, sha256_text
+        from src.investment_review.market_context_adapter import (
+            MarketContextCutoffUnavailableError,
+            MarketRequestBudget,
+        )
+        from src.investment_review.time_utils import utc_iso
+
+        resolver = self._checkpoint_market_resolver
+        if resolver is None:
+            return None
+        manifest_version = (
+            REVIEW_AUTOMATION_MARKET_INPUT_MANIFEST_VERSION_V2
+            if self._reviewability_schema_version >= 2
+            else REVIEW_AUTOMATION_MARKET_INPUT_MANIFEST_VERSION
+        )
+        if frozen_manifest is not None:
+            manifest = deepcopy(dict(frozen_manifest))
+            content_id = str(manifest.get("content_id") or "")
+            material = {
+                key: value
+                for key, value in manifest.items()
+                if key not in {"content_id", "request_budget"}
+            }
+            expected = "sha256:" + sha256_text(canonical_json(material))
+            if (
+                manifest.get("schema_version") != manifest_version
+                or content_id != expected
+                or not isinstance(manifest.get("items"), list)
+                or (
+                    self._reviewability_schema_version >= 2
+                    and manifest.get("perspective") != perspective
+                )
+            ):
+                raise RuntimeError(
+                    "frozen automation market manifest failed replay"
+                )
+            return manifest
+        request_budget = MarketRequestBudget()
+        items: list[dict[str, Any]] = []
+        for episode in sorted(
+            episodes, key=lambda item: str(item.get("episode_id") or "")
+        ):
+            episode_id = str(episode.get("episode_id") or "")
+            if not episode_id:
+                raise RuntimeError(
+                    "automation market planning requires episode_id"
+                )
+            scope = (
+                episode.get("scope")
+                if isinstance(episode.get("scope"), Mapping)
+                else {}
+            )
+            instrument_id = str(
+                scope.get("instrument_id")
+                or episode.get("instrument_id")
+                or episode.get("symbol")
+                or ""
+            ).upper()
+            if not instrument_id:
+                raise RuntimeError(
+                    "automation market planning requires instrument_id"
+                )
+            target_as_of = (
+                str(episode.get("closed_at") or "")
+                if episode.get("status") == "closed"
+                else as_of
+            )
+            target_as_of = utc_iso(target_as_of, "UTC")
+            try:
+                resolver_kwargs: dict[str, Any] = {
+                    "portfolio_db": self.portfolio_db,
+                    "review_db": self.review_db,
+                    "episode": deepcopy(episode),
+                    "operation_review": deepcopy(dict(operation_review)),
+                    "knowledge_provenance": {},
+                    "ledger_snapshot_reconstruction": {},
+                    "perspective": perspective,
+                    "as_of": target_as_of,
+                    "knowledge_cutoff": knowledge_cutoff,
+                    "request_budget": request_budget,
+                }
+                if self._reviewability_schema_version >= 2:
+                    resolver_kwargs["market_contract_version"] = "v2"
+                resolved = resolver(**resolver_kwargs)
+            except Exception as exc:
+                if self._reviewability_schema_version >= 2:
+                    raise RuntimeError(
+                        "v2 market resolver must return a canonical limitation "
+                        "projection instead of aborting automation"
+                    ) from exc
+                cutoff_unavailable = isinstance(
+                    exc, MarketContextCutoffUnavailableError
+                )
+                items.append(
+                    {
+                        "episode_id": episode_id,
+                        "instrument_id": instrument_id,
+                        "as_of": target_as_of,
+                        "knowledge_cutoff": knowledge_cutoff,
+                        "projection_kind": "unavailable",
+                        "market_input_content_id": None,
+                        "market_requirement_id": None,
+                        "market_resolution_id": None,
+                        "fetch_receipt_ids": [],
+                        "source_ids": [],
+                        "projection": None,
+                        "error_code": (
+                            "MARKET_CONTEXT_WITHHELD_BY_CUTOFF"
+                            if cutoff_unavailable
+                            else "MARKET_CONTEXT_RESOLUTION_UNAVAILABLE"
+                        ),
+                        "error_type": type(exc).__name__,
+                    }
+                )
+                continue
+            planned_item = self._automation_market_projection(
+                resolved,
+                episode_id=episode_id,
+                instrument_id=instrument_id,
+                perspective=perspective,
+                as_of=target_as_of,
+                knowledge_cutoff=knowledge_cutoff,
+            )
+            if self._reviewability_schema_version >= 2:
+                from src.investment_review.review_checkpoint import (
+                    derive_review_checkpoint_operation_anchor,
+                )
+
+                anchor_checkpoint_type = {
+                    "open": "active_checkpoint",
+                    "closed": "exit",
+                }.get(str(episode.get("status") or ""))
+                if anchor_checkpoint_type is None:
+                    raise RuntimeError(
+                        "v2 automation market planning requires a proven "
+                        "episode lifecycle"
+                    )
+                expected_anchor = derive_review_checkpoint_operation_anchor(
+                    episode,
+                    operation_review=operation_review,
+                    checkpoint_type=anchor_checkpoint_type,
+                    checkpoint_as_of=target_as_of,
+                )
+                if any(
+                    planned_item.get(field) != expected_anchor.get(field)
+                    for field in (
+                        "operation_anchor_event_id",
+                        "operation_anchor_at",
+                        "operation_anchor_ordering_key",
+                    )
+                ):
+                    raise RuntimeError(
+                        "automation market projection drifted from the "
+                        "canonical operation anchor"
+                    )
+            items.append(planned_item)
+        budget = request_budget.snapshot()
+        if (
+            budget["used_requests"] > budget["max_requests"]
+            or budget["reserved_requests"] != 0
+        ):
+            raise RuntimeError("automation market request budget did not settle")
+        material = {
+            "schema_version": manifest_version,
+            "as_of": as_of,
+            "knowledge_cutoff": knowledge_cutoff,
+            "items": items,
+        }
+        if self._reviewability_schema_version >= 2:
+            material["perspective"] = perspective
+        return {
+            **material,
+            # Runtime evidence is persisted for audit, but is deliberately
+            # outside semantic identity: a first provider fetch and a later
+            # hit on its exact frozen cache must have the same task key.
+            "request_budget": budget,
+            "content_id": "sha256:"
+            + sha256_text(canonical_json(material)),
+        }
+
     def _open_checkpoint_plan(
         self,
         *,
         events: list[dict[str, Any]],
         latest_event_at: str | None,
         latest_known_at: str | None,
-    ) -> dict[str, Any] | None:
+        frozen_market_manifest: Mapping[str, Any] | None = None,
+    ) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
         """Plan one deterministic periodic cutoff for currently open episodes.
 
         This planner only binds semantic checkpoint identities.  It does not
@@ -699,12 +1282,20 @@ class ReviewAutomationCoordinator:
             build_episode_collection,
             validate_episode_collection,
         )
+        from src.investment_review.operation_review import (
+            build_operation_review,
+            replay_validate_operation_review,
+            validate_operation_review,
+        )
         from src.investment_review.models import canonical_json, sha256_text
         from src.investment_review.time_utils import parse_datetime, utc_iso
 
         status = self.store.status()
-        if status.get("reviewability_schema_version") != 1 or not events:
-            return None
+        reviewability_schema_version = int(
+            status.get("reviewability_schema_version") or 0
+        )
+        if reviewability_schema_version not in {1, 2} or not events:
+            return None, None
 
         now = self._clock()
         if now.tzinfo is None or now.utcoffset() is None:
@@ -719,8 +1310,66 @@ class ReviewAutomationCoordinator:
                 slot_time = latest_event_time
         checkpoint_cutoff = utc_iso(slot_time, "UTC")
 
+        known_candidates = [
+            value
+            for value in (latest_known_at, checkpoint_cutoff)
+            if value is not None
+        ]
+        knowledge_cutoff = self._max_timestamp(known_candidates)
+        if knowledge_cutoff is None:
+            raise RuntimeError(
+                "open checkpoint planning requires knowledge_cutoff"
+            )
+        perspective_events = events
+        if reviewability_schema_version >= 2:
+            from src.investment_review.knowledge_provenance import (
+                build_knowledge_provenance,
+                project_perspective_event_inputs,
+                replay_validate_knowledge_provenance,
+                validate_knowledge_provenance,
+            )
+
+            observation_evidence = self.store.list_event_observation_evidence(
+                event_ids=[
+                    str(event.get("event_id") or "")
+                    for event in events
+                    if event.get("event_id")
+                ]
+            )
+            knowledge_provenance = build_knowledge_provenance(
+                events,
+                observation_evidence=observation_evidence,
+                perspective=self.config.perspective,
+                as_of=checkpoint_cutoff,
+                knowledge_cutoff=knowledge_cutoff,
+            )
+            knowledge_validation = validate_knowledge_provenance(
+                knowledge_provenance
+            )
+            knowledge_replay = replay_validate_knowledge_provenance(
+                knowledge_provenance,
+                event_inputs=events,
+                observation_evidence=observation_evidence,
+            )
+            if (
+                knowledge_validation.get("validation_status") == "blocked"
+                or knowledge_replay.get("validation_status") == "blocked"
+                or not isinstance(
+                    knowledge_replay.get("source_verification"), Mapping
+                )
+                or knowledge_replay["source_verification"].get("status")
+                != "verified"
+            ):
+                raise RuntimeError(
+                    "automation perspective projection is not replayable"
+                )
+            perspective_events = project_perspective_event_inputs(
+                knowledge_provenance,
+                events,
+            )
+
         collection = build_episode_collection(
-            events,
+            perspective_events,
             cutoff_at=checkpoint_cutoff,
             snapshot_references=[],
         )
@@ -730,32 +1379,102 @@ class ReviewAutomationCoordinator:
                 "open checkpoint planning requires a validated episode "
                 "collection"
             )
-        open_episode_ids = sorted(
+        operation_review = build_operation_review(
+            collection,
+            event_inputs=perspective_events,
+        )
+        operation_validation = validate_operation_review(operation_review)
+        operation_replay = replay_validate_operation_review(
+            operation_review,
+            episode_collection=collection,
+            event_inputs=perspective_events,
+        )
+        if (
+            operation_validation.get("validation_status") == "blocked"
+            or operation_replay.get("validation_status") == "blocked"
+            or not isinstance(
+                operation_replay.get("source_verification"), Mapping
+            )
+            or operation_replay["source_verification"].get("status")
+            != "verified"
+        ):
+            raise RuntimeError(
+                "open checkpoint planning requires a replayable operation "
+                "review"
+            )
+        episodes = sorted(
+            (
+                deepcopy(dict(item))
+                for item in collection.get("episodes", [])
+                if isinstance(item, Mapping)
+                and item.get("episode_id")
+            ),
+            key=lambda item: str(item.get("episode_id") or ""),
+        )
+        open_episodes = [
+            item for item in episodes if item.get("status") == "open"
+        ]
+        open_episode_ids = [
             str(item.get("episode_id") or "")
-            for item in collection.get("episodes", [])
-            if isinstance(item, Mapping)
-            and item.get("episode_id")
-            and item.get("status") == "open"
+            for item in open_episodes
+        ]
+        market_input_manifest = self._market_input_manifest(
+            episodes=episodes,
+            operation_review=operation_review,
+            perspective=self.config.perspective,
+            as_of=(
+                checkpoint_cutoff
+                if open_episode_ids
+                else str(latest_event_at or checkpoint_cutoff)
+            ),
+            knowledge_cutoff=knowledge_cutoff,
+            frozen_manifest=frozen_market_manifest,
         )
         if not open_episode_ids:
-            return None
-
-        known_candidates = [
-            value
-            for value in (latest_known_at, checkpoint_cutoff)
-            if value is not None
-        ]
-        knowledge_cutoff = self._max_timestamp(known_candidates)
+            return None, market_input_manifest
         identities: list[dict[str, Any]] = []
+        episodes_by_id = {
+            str(item.get("episode_id") or ""): item for item in open_episodes
+        }
         for episode_id in open_episode_ids:
             identity = {
                 "episode_id": episode_id,
                 "review_kind": "active_checkpoint",
                 "checkpoint_type": "active_checkpoint",
-                "perspective": "user",
+                "perspective": self.config.perspective,
                 "as_of": checkpoint_cutoff,
                 "knowledge_cutoff": knowledge_cutoff,
             }
+            if reviewability_schema_version >= 2:
+                from src.investment_review.models import (
+                    PUBLIC_INFORMATION_POLICY_VERSION,
+                )
+                from src.investment_review.review_checkpoint import (
+                    derive_review_checkpoint_operation_anchor,
+                )
+
+                anchor = derive_review_checkpoint_operation_anchor(
+                    episodes_by_id[episode_id],
+                    operation_review=operation_review,
+                    checkpoint_type="active_checkpoint",
+                    checkpoint_as_of=checkpoint_cutoff,
+                )
+                identity.update(
+                    {
+                        "operation_anchor_event_id": str(
+                            anchor["operation_anchor_event_id"]
+                        ),
+                        "operation_anchor_at": str(
+                            anchor["operation_anchor_at"]
+                        ),
+                        "operation_anchor_ordering_key": deepcopy(
+                            anchor["operation_anchor_ordering_key"]
+                        ),
+                        "information_time_policy_version": (
+                            PUBLIC_INFORMATION_POLICY_VERSION
+                        ),
+                    }
+                )
             identity_digest = sha256_text(canonical_json(identity))
             identities.append(
                 {
@@ -769,20 +1488,38 @@ class ReviewAutomationCoordinator:
                 }
             )
         material = {
-            "schema_version": REVIEW_CHECKPOINT_PLAN_SCHEMA_VERSION,
-            "automation_version": REVIEW_CHECKPOINT_AUTOMATION_VERSION,
+            "schema_version": (
+                REVIEW_CHECKPOINT_PLAN_SCHEMA_VERSION_V2
+                if reviewability_schema_version >= 2
+                else REVIEW_CHECKPOINT_PLAN_SCHEMA_VERSION
+            ),
+            "automation_version": (
+                REVIEW_CHECKPOINT_AUTOMATION_VERSION_V2
+                if reviewability_schema_version >= 2
+                else REVIEW_CHECKPOINT_AUTOMATION_VERSION
+            ),
             "checkpoint_slot_seconds": slot_seconds,
             "checkpoint_slot": checkpoint_cutoff,
             "as_of": checkpoint_cutoff,
             "knowledge_cutoff": knowledge_cutoff,
             "identities": identities,
         }
-        return {
-            **material,
-            "content_id": "sha256:" + sha256_text(canonical_json(material)),
-        }
+        return (
+            {
+                **material,
+                "content_id": (
+                    "sha256:" + sha256_text(canonical_json(material))
+                ),
+            },
+            market_input_manifest,
+        )
 
-    def _prepare_plan(self, *, trigger: str) -> _AutomationPlan:
+    def _prepare_plan(
+        self,
+        *,
+        trigger: str,
+        frozen_market_manifest: Mapping[str, Any] | None = None,
+    ) -> _AutomationPlan:
         from src.investment_review.models import canonical_json, sha256_text
 
         health = self.sync_service.status()
@@ -842,22 +1579,47 @@ class ReviewAutomationCoordinator:
         knowledge_cutoff = self._max_timestamp(known_values)
         if as_of is not None and knowledge_cutoff is None:
             knowledge_cutoff = as_of
-        checkpoint_plan = self._open_checkpoint_plan(
+        checkpoint_plan, market_input_manifest = self._open_checkpoint_plan(
             events=events,
             latest_event_at=as_of,
             latest_known_at=knowledge_cutoff,
+            frozen_market_manifest=frozen_market_manifest,
         )
         checkpoint_plan_sha256: str | None = None
         checkpoint_slot: str | None = None
+        market_input_sha256: str | None = None
         automation_version = REVIEW_AUTOMATION_VERSION
         if checkpoint_plan is not None:
-            automation_version = REVIEW_CHECKPOINT_AUTOMATION_VERSION
+            automation_version = str(
+                checkpoint_plan.get("automation_version")
+                or REVIEW_CHECKPOINT_AUTOMATION_VERSION
+            )
             checkpoint_plan_sha256 = str(
                 checkpoint_plan["content_id"]
             ).removeprefix("sha256:")
             checkpoint_slot = str(checkpoint_plan["checkpoint_slot"])
             as_of = str(checkpoint_plan["as_of"])
             knowledge_cutoff = str(checkpoint_plan["knowledge_cutoff"])
+        if market_input_manifest is not None:
+            if self._reviewability_schema_version >= 2:
+                automation_version = REVIEW_CHECKPOINT_AUTOMATION_VERSION_V2
+            market_input_sha256 = str(
+                market_input_manifest.get("content_id") or ""
+            ).removeprefix("sha256:")
+            if len(market_input_sha256) != 64:
+                raise RuntimeError(
+                    "automation market input manifest hash is invalid"
+                )
+            as_of = str(market_input_manifest.get("as_of") or as_of or "")
+            knowledge_cutoff = str(
+                market_input_manifest.get("knowledge_cutoff")
+                or knowledge_cutoff
+                or ""
+            )
+            if not as_of or not knowledge_cutoff:
+                raise RuntimeError(
+                    "automation market manifest cutoffs are invalid"
+                )
         material = {
             "automation_version": automation_version,
             "source_cutoff_id": cutoff_id,
@@ -865,16 +1627,19 @@ class ReviewAutomationCoordinator:
             "artifact_namespace": self.artifact_namespace,
             "projection_sha256": projection_sha256,
             "checkpoint_plan_schema_version": (
-                REVIEW_CHECKPOINT_PLAN_SCHEMA_VERSION
+                str(checkpoint_plan.get("schema_version"))
                 if checkpoint_plan is not None
                 else None
             ),
             "checkpoint_plan_sha256": checkpoint_plan_sha256,
+            "market_input_sha256": market_input_sha256,
             "checkpoint_slot": checkpoint_slot,
             "as_of": as_of,
             "knowledge_cutoff": knowledge_cutoff,
             "scopes": list(REVIEW_AUTOMATION_SCOPES),
         }
+        if self._reviewability_schema_version >= 2:
+            material["perspective"] = self.config.perspective
         digest = sha256_text(canonical_json(material))
         return _AutomationPlan(
             run_id=f"reviewrun_{digest[:32]}",
@@ -885,6 +1650,8 @@ class ReviewAutomationCoordinator:
             projection_sha256=projection_sha256,
             checkpoint_plan=checkpoint_plan,
             checkpoint_plan_sha256=checkpoint_plan_sha256,
+            market_input_manifest=market_input_manifest,
+            market_input_sha256=market_input_sha256,
             checkpoint_slot=checkpoint_slot,
             as_of=as_of,
             knowledge_cutoff=knowledge_cutoff,
@@ -893,7 +1660,113 @@ class ReviewAutomationCoordinator:
             source_seen=source_seen,
             sidecar_seen=sidecar_seen,
             unsynced=final_unsynced,
+            perspective=self.config.perspective,
         )
+
+    @staticmethod
+    def _verify_scope_market_consumption(
+        *,
+        manifest: Mapping[str, Any],
+        consumed: list[dict[str, Any]],
+        receipt: Mapping[str, Any],
+    ) -> dict[str, list[str]]:
+        """Prove a scope consumed exactly its planned frozen projections."""
+
+        from src.investment_review.artifact_io import canonical_json_bytes
+
+        planned = {
+            str(item.get("episode_id") or ""): item
+            for item in manifest.get("items", [])
+            if isinstance(item, Mapping) and item.get("episode_id")
+        }
+        receipt_episodes = {
+            str(item.get("episode_id") or ""): item
+            for item in receipt.get("episodes", [])
+            if isinstance(item, Mapping) and item.get("episode_id")
+        }
+        consumed_by_episode: dict[str, dict[str, Any]] = {}
+        for item in consumed:
+            episode_id = str(item.get("episode_id") or "")
+            if not episode_id or episode_id in consumed_by_episode:
+                raise RuntimeError(
+                    "scope consumed a frozen market projection more than once"
+                )
+            consumed_by_episode[episode_id] = item
+        if set(consumed_by_episode) != set(receipt_episodes):
+            raise RuntimeError(
+                "scope market consumption does not match receipt episodes: "
+                f"consumed={sorted(consumed_by_episode)}, "
+                f"receipt={sorted(receipt_episodes)}, "
+                f"status={receipt.get('status')}, gaps={receipt.get('gaps')}"
+            )
+
+        receipt_ids: set[str] = set()
+        source_ids: set[str] = set()
+        resolution_ids: set[str] = set()
+        content_ids: set[str] = set()
+        for episode_id, consumed_item in consumed_by_episode.items():
+            planned_item = planned.get(episode_id)
+            if planned_item is None:
+                raise RuntimeError(
+                    "scope consumed an episode outside the market plan"
+                )
+            for field in (
+                "instrument_id",
+                "perspective",
+                "as_of",
+                "knowledge_cutoff",
+                "market_input_content_id",
+                "market_requirement_id",
+                "market_resolution_id",
+                "fetch_receipt_ids",
+                "source_ids",
+                "operation_anchor_event_id",
+                "operation_anchor_at",
+                "operation_anchor_ordering_key",
+                "information_time_policy_version",
+            ):
+                if (
+                    field in consumed_item
+                    or field in planned_item
+                ) and consumed_item.get(field) != planned_item.get(field):
+                    raise RuntimeError(
+                        "scope market identifiers drifted from the plan"
+                    )
+            expected_projection = planned_item.get("projection")
+            if isinstance(expected_projection, Mapping):
+                received_projection = receipt_episodes[episode_id].get(
+                    "market_context"
+                )
+                if planned_item.get("projection_kind") == "full":
+                    if (
+                        not isinstance(received_projection, Mapping)
+                        or canonical_json_bytes(received_projection)
+                        != canonical_json_bytes(expected_projection)
+                    ):
+                        raise RuntimeError(
+                            "scope receipt market projection drifted from plan"
+                        )
+            receipt_ids.update(
+                str(value)
+                for value in planned_item.get("fetch_receipt_ids", [])
+            )
+            source_ids.update(
+                str(value) for value in planned_item.get("source_ids", [])
+            )
+            if planned_item.get("market_resolution_id"):
+                resolution_ids.add(
+                    str(planned_item["market_resolution_id"])
+                )
+            if planned_item.get("market_input_content_id"):
+                content_ids.add(
+                    str(planned_item["market_input_content_id"])
+                )
+        return {
+            "market_input_content_ids": sorted(content_ids),
+            "market_resolution_ids": sorted(resolution_ids),
+            "market_fetch_receipt_ids": sorted(receipt_ids),
+            "market_source_ids": sorted(source_ids),
+        }
 
     def _ensure_run(
         self,
@@ -921,8 +1794,18 @@ class ReviewAutomationCoordinator:
                     "trigger": trigger,
                     "parameters": {
                         "automation_version": (
-                            REVIEW_CHECKPOINT_AUTOMATION_VERSION
+                            str(
+                                plan.checkpoint_plan.get(
+                                    "automation_version"
+                                )
+                            )
                             if plan.checkpoint_plan is not None
+                            else REVIEW_CHECKPOINT_AUTOMATION_VERSION_V2
+                            if plan.market_input_manifest is not None
+                            and plan.market_input_manifest.get(
+                                "schema_version"
+                            )
+                            == REVIEW_AUTOMATION_MARKET_INPUT_MANIFEST_VERSION_V2
                             else REVIEW_AUTOMATION_VERSION
                         ),
                         "source_cutoff_id": plan.source_cutoff_id,
@@ -933,10 +1816,19 @@ class ReviewAutomationCoordinator:
                         "checkpoint_plan_sha256": (
                             plan.checkpoint_plan_sha256
                         ),
+                        "market_input_manifest": (
+                            plan.market_input_manifest
+                        ),
+                        "market_input_sha256": plan.market_input_sha256,
                         "checkpoint_slot": plan.checkpoint_slot,
                         "as_of": plan.as_of,
                         "knowledge_cutoff": plan.knowledge_cutoff,
                         "scopes": list(REVIEW_AUTOMATION_SCOPES),
+                        **(
+                            {"perspective": plan.perspective}
+                            if self._reviewability_schema_version >= 2
+                            else {}
+                        ),
                     },
                 }
             )
@@ -1243,6 +2135,21 @@ class ReviewAutomationCoordinator:
                     }
 
                 runner = self._runner_factory()
+                frozen_market_resolver: (
+                    _FrozenAutomationMarketResolver | None
+                ) = None
+                if plan.market_input_manifest is not None:
+                    frozen_market_resolver = _FrozenAutomationMarketResolver(
+                        plan.market_input_manifest
+                    )
+                    if not hasattr(runner, "checkpoint_market_resolver"):
+                        raise RuntimeError(
+                            "market-planned automation runner cannot accept "
+                            "the frozen resolver"
+                        )
+                    runner.checkpoint_market_resolver = (
+                        frozen_market_resolver
+                    )
                 scope_runs: list[dict[str, Any]] = []
                 failures: list[dict[str, str]] = []
                 for scope in REVIEW_AUTOMATION_SCOPES:
@@ -1270,13 +2177,35 @@ class ReviewAutomationCoordinator:
                         )
                         continue
                     try:
+                        market_cursor = (
+                            frozen_market_resolver.cursor()
+                            if frozen_market_resolver is not None
+                            else 0
+                        )
                         receipt = runner.run(
                             scope=scope,
                             as_of=plan.as_of,
                             knowledge_cutoff=plan.knowledge_cutoff,
+                            perspective=plan.perspective,
                             dry_run=False,
                             trigger=f"automation_{trigger}",
                         )
+                        market_identifiers: dict[str, list[str]] = {}
+                        if (
+                            frozen_market_resolver is not None
+                            and plan.market_input_manifest is not None
+                        ):
+                            market_identifiers = (
+                                self._verify_scope_market_consumption(
+                                    manifest=plan.market_input_manifest,
+                                    consumed=(
+                                        frozen_market_resolver.consumed_since(
+                                            market_cursor
+                                        )
+                                    ),
+                                    receipt=receipt,
+                                )
+                            )
                         scope_runs.append(
                             {
                                 "scope": scope,
@@ -1314,6 +2243,7 @@ class ReviewAutomationCoordinator:
                                         Mapping,
                                     )
                                 ),
+                                **market_identifiers,
                             }
                         )
                     except Exception as exc:
@@ -1339,7 +2269,8 @@ class ReviewAutomationCoordinator:
                 verified_run_key: str | None = None
                 try:
                     verified_plan = self._prepare_plan(
-                        trigger=f"{trigger}_post_cycle_verify"
+                        trigger=f"{trigger}_post_cycle_verify",
+                        frozen_market_manifest=plan.market_input_manifest,
                     )
                     verified_run_key = verified_plan.run_key
                     if verified_plan.run_key != plan.run_key:
@@ -1380,6 +2311,7 @@ class ReviewAutomationCoordinator:
                     "checkpoint_plan_sha256": (
                         plan.checkpoint_plan_sha256
                     ),
+                    "market_input_sha256": plan.market_input_sha256,
                     "checkpoint_slot": plan.checkpoint_slot,
                     "sync_action": plan.sync_action,
                     "counts": {
@@ -1412,6 +2344,7 @@ class ReviewAutomationCoordinator:
                     "checkpoint_plan_sha256": (
                         plan.checkpoint_plan_sha256
                     ),
+                    "market_input_sha256": plan.market_input_sha256,
                     "checkpoint_slot": plan.checkpoint_slot,
                     "as_of": plan.as_of,
                     "knowledge_cutoff": plan.knowledge_cutoff,

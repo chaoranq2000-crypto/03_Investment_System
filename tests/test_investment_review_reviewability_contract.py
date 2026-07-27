@@ -1,32 +1,44 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
+import shutil
 import sqlite3
+import subprocess
+import sys
 from copy import deepcopy
 from pathlib import Path
 
 import pytest
 from jsonschema import Draft202012Validator, FormatChecker
 
+from src.investment_review.artifact_io import canonical_json_bytes
 from src.investment_review.models import (
     MARKET_FALLBACK_POLICY_VERSION,
+    MARKET_FALLBACK_POLICY_VERSION_V2,
     MARKET_PROVIDER_ALLOWLIST,
     MARKET_PROVIDER_ALLOWLIST_SHA256,
     MARKET_PROVIDER_ALLOWLIST_VERSION,
     MARKET_REQUEST_FINGERPRINT_VERSION,
     ModelValidationError,
     OPERATION_CHECKPOINT_SCHEMA_VERSION,
+    OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+    PUBLIC_INFORMATION_POLICY_VERSION,
     OperationCheckpointRecord,
+    OperationCheckpointRecordV2,
     market_request_fingerprint,
 )
 from src.investment_review.store import (
     DataConflictError,
     REVIEWABILITY_SCHEMA_MANIFEST_SHA256,
+    REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2,
     REVIEWABILITY_SCHEMA_VERSION,
+    REVIEWABILITY_SCHEMA_VERSION_V2,
     ReviewStore,
     ReviewStoreError,
 )
+import src.investment_review.store as review_store_module
 
 
 SCHEMA_PATH = (
@@ -34,6 +46,12 @@ SCHEMA_PATH = (
     / "docs"
     / "contracts"
     / "INVESTMENT_REVIEW_OPERATION_CHECKPOINT.schema.json"
+)
+SCHEMA_V2_PATH = (
+    Path(__file__).parents[1]
+    / "docs"
+    / "contracts"
+    / "INVESTMENT_REVIEW_OPERATION_CHECKPOINT_V2.schema.json"
 )
 
 
@@ -166,6 +184,179 @@ def checkpoint_input() -> dict[str, object]:
     }
 
 
+def checkpoint_v2_input(*, perspective: str = "user") -> dict[str, object]:
+    payload = checkpoint_input()
+    market_source_ref = "close_price:588200.SH:2026-07-16"
+    market_evidence_manifest_content_id = "sha256:" + "d" * 64
+    payload.update(
+        {
+            "schema_version": OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+            "perspective": perspective,
+            "operation_anchor_event_id": "event:a",
+            "operation_anchor_at": "2026-07-17T05:30:00Z",
+            "operation_anchor_ordering_key": [
+                "2026-07-17T05:30:00Z",
+                2,
+                "1",
+                "event:a",
+            ],
+            "information_time_policy_version": (
+                PUBLIC_INFORMATION_POLICY_VERSION
+            ),
+            "knowledge_cutoff": "2026-07-26T12:00:00Z",
+        }
+    )
+    market = payload["status_axes"]["market"]
+    market.update(
+        {
+            "perspective": perspective,
+            "eligible_source_refs": (
+                [market_source_ref]
+                if perspective == "user"
+                else []
+            ),
+            "retrospective_source_refs": (
+                []
+                if perspective == "user"
+                else [market_source_ref]
+            ),
+            "unknown_source_refs": [],
+            "publicly_available_at": "2026-07-16T07:00:00Z",
+            "publicly_available_basis": "verified_publication_interval",
+            "temporal_role": (
+                "user_known_at_operation_by_verified_publication"
+                if perspective == "user"
+                else "retrospective_context"
+            ),
+            "status": "available" if perspective == "user" else "missing",
+            "representative_source_id": market_source_ref,
+            "representative_source_content_id": "sha256:" + "a" * 64,
+            "information_time": {
+                "status": "verified",
+                "lower_bound": "2026-07-16T00:00:00Z",
+                "upper_bound": "2026-07-16T07:00:00Z",
+                "basis": "provider_publication_date_source_timezone.v1",
+                "method_version": "public_information_time.v1",
+                "revision_ref": "revision:close:2026-07-16",
+            },
+            "version_provenance": {
+                "status": "verified",
+                "content_sha256": "sha256:" + "b" * 64,
+                "source_ref": market_source_ref,
+                "revision_ref": "revision:close:2026-07-16",
+            },
+            "perspective_eligibility": {
+                "perspective": perspective,
+                "status": "eligible" if perspective == "user" else "ineligible",
+                "reason_code": (
+                    "verified_publication_strictly_before_operation"
+                    if perspective == "user"
+                    else "system_observed_after_operation"
+                ),
+                "temporal_role": (
+                    "user_known_at_operation_by_verified_publication"
+                    if perspective == "user"
+                    else "retrospective_public_context"
+                ),
+                "operation_anchor_at": "2026-07-17T05:30:00Z",
+                "projected_user_known_at": (
+                    "2026-07-17T05:30:00Z" if perspective == "user" else None
+                ),
+                "projected_system_known_at": None,
+                "actual_user_observation_proven": False,
+            },
+            "market_evidence_manifest_content_id": (
+                market_evidence_manifest_content_id
+            ),
+            "source_refs": sorted(
+                set(market["source_refs"])
+                | {
+                    market_source_ref,
+                    "market_evidence_manifest:"
+                    + market_evidence_manifest_content_id,
+                }
+            ),
+        }
+    )
+    fallback = payload["market_fallback"]
+    fallback.update(
+        {
+            "policy_version": MARKET_FALLBACK_POLICY_VERSION_V2,
+            "public_information_policy_version": (
+                PUBLIC_INFORMATION_POLICY_VERSION
+            ),
+            "perspective": perspective,
+            "limitation_code": (
+                None if perspective == "user" else "withheld_by_cutoff"
+            ),
+            "guard_audit_at": (
+                None if perspective == "user" else "2026-07-27T00:00:00Z"
+            ),
+            "request_count_status": "verified",
+            "unverified_attempt_upper_bound": 0,
+        }
+    )
+    if perspective == "system":
+        guard_at = "2026-07-27T00:00:00Z"
+        parameters = {"ts_code": "588200.SH", "trade_date": "20260716"}
+        receipt = {
+            "receipt_id": "",
+            "provider_id": "tushare",
+            "endpoint_id": "daily",
+            "provider_version": "existing-adapter-v2",
+            "redacted_parameters": parameters,
+            "request_fingerprint_version": MARKET_REQUEST_FINGERPRINT_VERSION,
+            "request_fingerprint": market_request_fingerprint(
+                provider_id="tushare",
+                endpoint_id="daily",
+                provider_version="existing-adapter-v2",
+                redacted_parameters=parameters,
+            ),
+            "guard_audit_at": guard_at,
+            "started_at": guard_at,
+            "completed_at": guard_at,
+            "fetched_at": None,
+            "system_observed_at": None,
+            "response_status": "withheld_by_cutoff",
+            "attempt_count": 0,
+            "attempt_count_status": "verified",
+            "budget_charged_attempts": 0,
+            "raw_content_sha256": None,
+            "normalized_content_sha256": None,
+            "cache_entry_refs": [],
+            "cache_lineage": ["market_requirement_v2:test"],
+        }
+        receipt["receipt_id"] = "market_fetch_receipt_v2_" + hashlib.sha256(
+            canonical_json_bytes(receipt)
+        ).hexdigest()
+        fallback.update(
+            {
+                "coverage_before": "missing",
+                "coverage_after": "missing",
+                "status": "withheld_by_cutoff",
+                "cache_refs": [],
+                "fetch_receipt_refs": [receipt["receipt_id"]],
+                "fetch_receipts": [receipt],
+            }
+        )
+    payload["source_refs"] = sorted(
+        set(payload["source_refs"])
+        | {
+            market_source_ref,
+            "market_evidence_manifest:" + market_evidence_manifest_content_id,
+        }
+    )
+    return payload
+
+
+def _reidentify_v2_receipt(receipt: dict[str, object]) -> dict[str, object]:
+    receipt["receipt_id"] = ""
+    receipt["receipt_id"] = "market_fetch_receipt_v2_" + hashlib.sha256(
+        canonical_json_bytes(receipt)
+    ).hexdigest()
+    return receipt
+
+
 def fetch_receipt() -> dict[str, object]:
     parameters = {
         "ts_code": "588200.SH",
@@ -201,6 +392,20 @@ def _schema_validator() -> Draft202012Validator:
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
     return Draft202012Validator(schema, format_checker=FormatChecker())
+
+
+def _schema_v2_validator() -> Draft202012Validator:
+    schema = json.loads(SCHEMA_V2_PATH.read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(schema)
+    return Draft202012Validator(schema, format_checker=FormatChecker())
+
+
+def test_v1_schema_bytes_remain_frozen_and_v2_schema_is_independent() -> None:
+    assert hashlib.sha256(SCHEMA_PATH.read_bytes()).hexdigest() == (
+        "994c881379303101107b50286fafd7b38002f36f423d4eb3db4b9f1c01f1d373"
+    )
+    assert SCHEMA_V2_PATH != SCHEMA_PATH
+    _schema_v2_validator()
 
 
 def test_schema_accepts_ready_open_review_without_decision() -> None:
@@ -1004,6 +1209,96 @@ def _file_state(path: Path) -> tuple[bytes, tuple[tuple[bool, int, bytes | None]
     return path.read_bytes(), tuple(auxiliary)
 
 
+def _leave_detached_zero_wal_pair(database: Path) -> None:
+    script = """
+import os
+import sqlite3
+import sys
+
+connection = sqlite3.connect(sys.argv[1])
+connection.execute("BEGIN IMMEDIATE")
+connection.rollback()
+result = connection.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+if tuple(int(value) for value in result) != (0, 0, 0):
+    os._exit(91)
+os._exit(0)
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", script, str(database)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    wal_path = Path(f"{database}-wal")
+    shm_path = Path(f"{database}-shm")
+    assert wal_path.is_file() and wal_path.stat().st_size == 0
+    assert shm_path.is_file() and shm_path.stat().st_size == 32768
+
+
+class _FakeUpgradeHeld:
+    def __init__(self, path: Path, *, identity: int, size: int) -> None:
+        self.path = path
+        self.identity = identity
+        self.size = size
+        self.fail_identity = False
+        self.fail_size = False
+        self.fail_binding = False
+
+    def assert_held_identity(self, *, stage: str) -> tuple[int, int, int, int]:
+        if self.fail_identity:
+            raise ReviewStoreError(f"synthetic held identity drift at {stage}")
+        return (1, self.identity, self.size, 0)
+
+    def assert_held_identity_and_size(self, *, stage: str) -> None:
+        self.assert_held_identity(stage=stage)
+        if self.fail_size:
+            raise ReviewStoreError(f"synthetic held size drift at {stage}")
+
+    def assert_current_binding(self, *, stage: str) -> None:
+        self.assert_held_identity(stage=stage)
+        if self.fail_binding:
+            raise ReviewStoreError(f"synthetic pathname identity drift at {stage}")
+
+
+def _fake_upgrade_guard(
+    tmp_path: Path,
+    label: str,
+) -> tuple[object, Path, Path, dict[str, _FakeUpgradeHeld]]:
+    database = tmp_path / f"{label}.sqlite3"
+    wal_path = Path(f"{database}-wal")
+    shm_path = Path(f"{database}-shm")
+    database.write_bytes(b"main")
+    wal_path.write_bytes(b"")
+    shm_path.write_bytes(b"\0" * 32768)
+    files = {
+        "main": _FakeUpgradeHeld(database, identity=1, size=4),
+        "wal": _FakeUpgradeHeld(wal_path, identity=2, size=0),
+        "shm": _FakeUpgradeHeld(shm_path, identity=3, size=32768),
+    }
+    guard = review_store_module._ReviewabilityUpgradeFileGuard.__new__(
+        review_store_module._ReviewabilityUpgradeFileGuard
+    )
+    guard.path = database
+    guard.expected_main = (1, 1, 4, 0, hashlib.sha256(b"main").hexdigest())
+    guard.expected_wal = (1, 2, 0, 0, hashlib.sha256(b"").hexdigest())
+    guard.expected_shm = (
+        1,
+        3,
+        32768,
+        0,
+        hashlib.sha256(b"\0" * 32768).hexdigest(),
+    )
+    guard._files = files
+    guard._writer_open = False
+    guard._writer_conn = None
+    guard._marker_committed = False
+    guard._checkpoint_complete = False
+    guard._checkpoint_result = None
+    guard._auxiliary_terminal_absent = False
+    return guard, wal_path, shm_path, files
+
+
 def test_reviewability_initializer_is_new_candidate_only_and_idempotent(
     tmp_path: Path,
 ) -> None:
@@ -1466,3 +1761,639 @@ def test_checkpoint_store_replay_is_independent_of_semantic_set_order(
     right_receipt = right.save_operation_checkpoint(permuted)
     assert left_receipt["content_id"] == right_receipt["content_id"]
     assert left.list_operation_checkpoints() == right.list_operation_checkpoints()
+
+
+def test_v2_checkpoint_binds_anchor_policy_and_strict_publication_boundary() -> None:
+    payload = checkpoint_v2_input()
+    record = OperationCheckpointRecordV2.from_mapping(payload)
+    assert record.to_dict()["schema_version"] == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+    assert record.to_dict()["operation_anchor_at"] < record.to_dict()["as_of"]
+    assert (
+        record.to_dict()["status_axes"]["market"]["temporal_role"]
+        == "user_known_at_operation_by_verified_publication"
+    )
+    _schema_v2_validator().validate(record.to_dict())
+
+    equal_publication = checkpoint_v2_input()
+    equal_publication["status_axes"]["market"]["publicly_available_at"] = (
+        equal_publication["operation_anchor_at"]
+    )
+    equal_publication["status_axes"]["market"]["information_time"][
+        "upper_bound"
+    ] = equal_publication["operation_anchor_at"]
+    with pytest.raises(ModelValidationError, match="strictly pre-operation"):
+        OperationCheckpointRecordV2.from_mapping(equal_publication)
+
+    with pytest.raises(ModelValidationError, match="unsupported fields"):
+        OperationCheckpointRecord.from_mapping(payload)
+
+
+def test_v2_system_late_observation_is_retrospective_zero_request() -> None:
+    record = OperationCheckpointRecordV2.from_mapping(
+        checkpoint_v2_input(perspective="system")
+    ).to_dict()
+    assert record["status_axes"]["market"]["status"] == "missing"
+    assert record["market_fallback"]["status"] == "withheld_by_cutoff"
+    assert record["market_fallback"]["request_count"] == 0
+    assert record["market_fallback"]["fetch_receipts"][0]["attempt_count"] == 0
+    assert record["market_fallback"]["fetch_receipts"][0]["started_at"] == (
+        record["market_fallback"]["guard_audit_at"]
+    )
+    assert record["status_axes"]["market"]["system_observed_at"] > (
+        record["operation_anchor_at"]
+    )
+
+
+def test_v2_withholding_is_a_fallback_limitation_not_a_market_axis_state() -> None:
+    payload = checkpoint_v2_input(perspective="system")
+    payload["status_axes"]["market"]["status"] = "withheld"
+
+    with pytest.raises(ModelValidationError, match="status_axes.market.status"):
+        OperationCheckpointRecordV2.from_mapping(payload)
+    assert list(_schema_v2_validator().iter_errors(payload))
+
+
+def test_v2_schema_discriminator_is_required_and_exact() -> None:
+    missing = checkpoint_v2_input()
+    missing.pop("schema_version")
+    with pytest.raises(
+        ModelValidationError, match="missing required fields.*schema_version"
+    ):
+        OperationCheckpointRecordV2.from_mapping(missing)
+
+    wrong = checkpoint_v2_input()
+    wrong["schema_version"] = OPERATION_CHECKPOINT_SCHEMA_VERSION
+    with pytest.raises(ModelValidationError, match="Unsupported operation checkpoint v2"):
+        OperationCheckpointRecordV2.from_mapping(wrong)
+
+
+def test_v2_unknown_provider_attempt_count_is_bounded_not_fabricated() -> None:
+    payload = checkpoint_v2_input(perspective="system")
+    fallback = payload["market_fallback"]
+    receipt = deepcopy(fallback["fetch_receipts"][0])
+    receipt.update(
+        {
+            "guard_audit_at": "2026-07-27T00:00:00Z",
+            "started_at": "2026-07-27T00:00:01Z",
+            "completed_at": "2026-07-27T00:00:03Z",
+            "fetched_at": None,
+            "system_observed_at": "2026-07-27T00:00:02Z",
+            "response_status": "failed",
+            "attempt_count": 0,
+            "attempt_count_status": "unknown",
+            "budget_charged_attempts": 3,
+        }
+    )
+    _reidentify_v2_receipt(receipt)
+    fallback.update(
+        {
+            "status": "failed",
+            "limitation_code": "provider_attempt_count_unknown",
+            "guard_audit_at": None,
+            "request_count": 0,
+            "request_count_status": "bounded_unknown",
+            "unverified_attempt_upper_bound": 3,
+            "fetch_receipt_refs": [receipt["receipt_id"]],
+            "fetch_receipts": [receipt],
+        }
+    )
+    record = OperationCheckpointRecordV2.from_mapping(payload).to_dict()
+    assert record["market_fallback"]["request_count"] == 0
+    assert record["market_fallback"]["request_count_status"] == "bounded_unknown"
+    assert record["market_fallback"]["unverified_attempt_upper_bound"] == 3
+
+    wrong_status = deepcopy(payload)
+    wrong_status["market_fallback"]["request_count_status"] = "verified"
+    with pytest.raises(ModelValidationError, match="request count status drift"):
+        OperationCheckpointRecordV2.from_mapping(wrong_status)
+
+    wrong_limitation = deepcopy(payload)
+    wrong_limitation["market_fallback"]["limitation_code"] = None
+    with pytest.raises(ModelValidationError, match="limitation/status drift"):
+        OperationCheckpointRecordV2.from_mapping(wrong_limitation)
+
+    wrong_order = deepcopy(payload)
+    wrong_receipt = wrong_order["market_fallback"]["fetch_receipts"][0]
+    wrong_receipt["system_observed_at"] = "2026-07-27T00:00:00Z"
+    _reidentify_v2_receipt(wrong_receipt)
+    wrong_order["market_fallback"]["fetch_receipt_refs"] = [
+        wrong_receipt["receipt_id"]
+    ]
+    with pytest.raises(ValueError, match="cannot be earlier"):
+        OperationCheckpointRecordV2.from_mapping(wrong_order)
+
+
+def test_v2_receipt_time_order_and_normalized_parameter_keys_are_closed() -> None:
+    payload = checkpoint_v2_input(perspective="system")
+    receipt = payload["market_fallback"]["fetch_receipts"][0]
+    receipt["started_at"] = "2026-07-26T23:59:59Z"
+    _reidentify_v2_receipt(receipt)
+    with pytest.raises(ModelValidationError, match="bind start/completion"):
+        OperationCheckpointRecordV2.from_mapping(payload)
+
+    duplicate = checkpoint_v2_input(perspective="system")
+    duplicate_receipt = duplicate["market_fallback"]["fetch_receipts"][0]
+    duplicate_receipt["redacted_parameters"] = {
+        "ts_code": "588200.SH",
+        " ts_code ": "588200.SH",
+        "trade_date": "20260716",
+    }
+    _reidentify_v2_receipt(duplicate_receipt)
+    with pytest.raises(ModelValidationError, match="duplicate normalized keys"):
+        OperationCheckpointRecordV2.from_mapping(duplicate)
+
+
+def test_v2_market_proof_manifest_and_source_less_state_are_closed() -> None:
+    forged_unknown = checkpoint_v2_input()
+    market = forged_unknown["status_axes"]["market"]
+    market["information_time"].update(
+        {
+            "status": "unknown",
+            "lower_bound": None,
+            "upper_bound": None,
+            "basis": "unknown",
+        }
+    )
+    market["publicly_available_at"] = None
+    market["publicly_available_basis"] = "unknown"
+    with pytest.raises(ModelValidationError, match="policy-known user market proof"):
+        OperationCheckpointRecordV2.from_mapping(forged_unknown)
+
+    missing_manifest_ref = checkpoint_v2_input()
+    market = missing_manifest_ref["status_axes"]["market"]
+    manifest_ref = "market_evidence_manifest:" + market[
+        "market_evidence_manifest_content_id"
+    ]
+    market["source_refs"].remove(manifest_ref)
+    missing_manifest_ref["source_refs"].remove(manifest_ref)
+    with pytest.raises(ModelValidationError, match="bind the frozen evidence manifest"):
+        OperationCheckpointRecordV2.from_mapping(missing_manifest_ref)
+
+    source_less = checkpoint_v2_input(perspective="system")
+    market = source_less["status_axes"]["market"]
+    manifest_ref = "market_evidence_manifest:" + market[
+        "market_evidence_manifest_content_id"
+    ]
+    market.update(
+        {
+            "status": "missing",
+            "temporal_role": "missing",
+            "eligible_source_refs": [],
+            "retrospective_source_refs": [],
+            "unknown_source_refs": [],
+            "effective_at": None,
+            "publicly_available_at": None,
+            "publicly_available_basis": "not_applicable",
+            "fetched_at": None,
+            "system_observed_at": None,
+            "representative_source_id": None,
+            "representative_source_content_id": None,
+            "information_time": None,
+            "version_provenance": None,
+            "perspective_eligibility": None,
+            "source_refs": [manifest_ref],
+        }
+    )
+    source_less["source_refs"] = sorted(
+        set(source_less["source_refs"]) | {manifest_ref}
+    )
+    assert OperationCheckpointRecordV2.from_mapping(source_less).to_dict()[
+        "status_axes"
+    ]["market"]["temporal_role"] == "missing"
+
+    forged_time = deepcopy(source_less)
+    forged_time["status_axes"]["market"]["effective_at"] = (
+        "2026-07-16T07:00:00Z"
+    )
+    with pytest.raises(ModelValidationError, match="explicit missing projection"):
+        OperationCheckpointRecordV2.from_mapping(forged_time)
+
+
+def test_exact_v1_to_v2_marker_upgrade_is_atomic_no_ddl_and_replays_v1(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "upgrade-candidate.sqlite3"
+    store = ReviewStore(database)
+    store.initialize_reviewability_candidate()
+    v1_receipt = store.save_operation_checkpoint(checkpoint_input())
+    before_v1 = store.get_operation_checkpoint(v1_receipt["checkpoint_id"])
+    with sqlite3.connect(database) as conn:
+        before_ddl = conn.execute(
+            "SELECT type, name, tbl_name, sql FROM sqlite_master "
+            "ORDER BY type, name"
+        ).fetchall()
+
+    upgraded = store.upgrade_reviewability_candidate_v2()
+    assert upgraded["status"] == "UPGRADED"
+    assert upgraded["reviewability_schema_version"] == REVIEWABILITY_SCHEMA_VERSION_V2
+    assert upgraded["checkpoint_contract_version"] == (
+        OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+    )
+    assert upgraded["market_policy_version"] == MARKET_FALLBACK_POLICY_VERSION_V2
+    assert upgraded["public_information_policy_version"] == (
+        PUBLIC_INFORMATION_POLICY_VERSION
+    )
+    assert upgraded["schema_manifest_sha256"] == (
+        REVIEWABILITY_SCHEMA_MANIFEST_SHA256_V2
+    )
+    assert store.get_operation_checkpoint(v1_receipt["checkpoint_id"]) == before_v1
+    with sqlite3.connect(database) as conn:
+        after_ddl = conn.execute(
+            "SELECT type, name, tbl_name, sql FROM sqlite_master "
+            "ORDER BY type, name"
+        ).fetchall()
+    assert after_ddl == before_ddl
+    wal_path = Path(f"{database}-wal")
+    assert not wal_path.exists() or wal_path.stat().st_size == 0
+    with pytest.raises(ReviewStoreError, match="exact precondition"):
+        store.upgrade_reviewability_candidate_v2()
+
+    assert store.save_operation_checkpoint(before_v1)["status"] == "SKIPPED"
+    new_v1 = checkpoint_input()
+    new_v1["knowledge_cutoff"] = "2026-07-26T13:00:00Z"
+    with pytest.raises(ReviewStoreError, match="must not create a new v1"):
+        store.save_operation_checkpoint(new_v1)
+
+    v2 = checkpoint_v2_input()
+    assert store.save_operation_checkpoint(v2)["status"] == "INSERTED"
+    tuple_collision = checkpoint_v2_input()
+    tuple_collision["operation_anchor_ordering_key"][2] = "different"
+    with pytest.raises(DataConflictError, match="new knowledge_cutoff"):
+        store.save_operation_checkpoint(tuple_collision)
+
+
+def test_v2_marker_upgrade_rolls_back_all_marker_changes_on_midflight_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    store = ReviewStore(tmp_path / "upgrade-rollback.sqlite3")
+    store.initialize_reviewability_candidate()
+    original = ReviewStore._update_exact_marker
+    calls = 0
+
+    def fail_second_marker(
+        conn: sqlite3.Connection, *, key: str, expected: str, replacement: str
+    ) -> None:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise ReviewStoreError("synthetic marker failure")
+        original(conn, key=key, expected=expected, replacement=replacement)
+
+    monkeypatch.setattr(
+        ReviewStore, "_update_exact_marker", staticmethod(fail_second_marker)
+    )
+    with pytest.raises(ReviewStoreError, match="synthetic marker failure"):
+        store.upgrade_reviewability_candidate_v2()
+    status = store.status()
+    assert status["reviewability_schema_version"] == REVIEWABILITY_SCHEMA_VERSION
+    assert status["reviewability_schema_manifest_sha256"] == (
+        REVIEWABILITY_SCHEMA_MANIFEST_SHA256
+    )
+    assert status["reviewability_public_information_policy_version"] is None
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows delete-sharing semantics")
+def test_v2_marker_upgrade_no_delete_hold_blocks_real_path_replacement_race(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    database = tmp_path / "upgrade-path-race.sqlite3"
+    replacement = tmp_path / "upgrade-path-race-replacement.sqlite3"
+    store = ReviewStore(database)
+    store.initialize_reviewability_candidate()
+    shutil.copy2(database, replacement)
+    original_connect = review_store_module.sqlite3.connect
+    replacement_attempted = False
+    sharing_violation = False
+
+    def racing_connect(*args: object, **kwargs: object) -> sqlite3.Connection:
+        nonlocal replacement_attempted, sharing_violation
+        target = str(args[0]) if args else str(kwargs.get("database") or "")
+        if "mode=rw" in target and not replacement_attempted:
+            replacement_attempted = True
+            try:
+                os.replace(replacement, database)
+            except PermissionError:
+                sharing_violation = True
+        return original_connect(*args, **kwargs)
+
+    monkeypatch.setattr(review_store_module.sqlite3, "connect", racing_connect)
+    upgraded = store.upgrade_reviewability_candidate_v2()
+    assert upgraded["status"] == "UPGRADED"
+    assert replacement_attempted is True
+    assert sharing_violation is True
+    assert replacement.exists()
+
+
+def test_v2_marker_upgrade_fails_closed_when_rw_handle_is_substituted(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    database = tmp_path / "upgrade-swap-back.sqlite3"
+    replacement = tmp_path / "upgrade-swap-back-replacement.sqlite3"
+    store = ReviewStore(database)
+    store.initialize_reviewability_candidate()
+    shutil.copy2(database, replacement)
+    original_connect = review_store_module.sqlite3.connect
+    substituted = False
+
+    def substituted_connect(*args: object, **kwargs: object) -> sqlite3.Connection:
+        nonlocal substituted
+        target = str(args[0]) if args else str(kwargs.get("database") or "")
+        if "mode=rw" in target and not substituted:
+            substituted = True
+            replacement_uri = f"{replacement.resolve().as_uri()}?mode=rw"
+            return original_connect(replacement_uri, uri=True)
+        return original_connect(*args, **kwargs)
+
+    monkeypatch.setattr(
+        review_store_module.sqlite3, "connect", substituted_connect
+    )
+    with pytest.raises(
+        ReviewStoreError, match="SQLite main path drifted at after_rw_open"
+    ):
+        store.upgrade_reviewability_candidate_v2()
+    assert substituted is True
+    assert store.initialize_reviewability_candidate()[
+        "reviewability_schema_version"
+    ] == REVIEWABILITY_SCHEMA_VERSION
+    assert ReviewStore(replacement).initialize_reviewability_candidate()[
+        "reviewability_schema_version"
+    ] == REVIEWABILITY_SCHEMA_VERSION
+
+
+def test_v2_marker_upgrade_holds_existing_zero_wal_and_shm_through_checkpoint(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "upgrade-existing-aux.sqlite3"
+    store = ReviewStore(database)
+    store.initialize_reviewability_candidate()
+    keeper = sqlite3.connect(database)
+    try:
+        keeper.execute("BEGIN IMMEDIATE")
+        keeper.rollback()
+        assert keeper.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()[0] == 0
+        wal_path = Path(f"{database}-wal")
+        shm_path = Path(f"{database}-shm")
+        assert wal_path.is_file() and wal_path.stat().st_size == 0
+        assert shm_path.is_file() and shm_path.stat().st_size == 32768
+
+        upgraded = store.upgrade_reviewability_candidate_v2()
+        assert upgraded["status"] == "UPGRADED"
+        assert upgraded["reviewability_schema_version"] == (
+            REVIEWABILITY_SCHEMA_VERSION_V2
+        )
+        assert wal_path.is_file() and wal_path.stat().st_size == 0
+        assert shm_path.is_file() and shm_path.stat().st_size == 32768
+    finally:
+        keeper.close()
+
+    if os.name == "nt":
+        terminal_database = tmp_path / "upgrade-terminal-aux.sqlite3"
+        terminal_store = ReviewStore(terminal_database)
+        terminal_store.initialize_reviewability_candidate()
+        _leave_detached_zero_wal_pair(terminal_database)
+        terminal_wal = Path(f"{terminal_database}-wal")
+        terminal_shm = Path(f"{terminal_database}-shm")
+        original_connect = review_store_module.sqlite3.connect
+        connection_targets: list[str] = []
+
+        def recording_connect(
+            *args: object, **kwargs: object
+        ) -> sqlite3.Connection:
+            target = str(args[0]) if args else str(kwargs.get("database") or "")
+            connection_targets.append(target)
+            return original_connect(*args, **kwargs)
+
+        monkeypatch.setattr(
+            review_store_module.sqlite3,
+            "connect",
+            recording_connect,
+        )
+        terminal_upgrade = terminal_store.upgrade_reviewability_candidate_v2()
+        assert terminal_upgrade["status"] == "UPGRADED"
+        assert not terminal_wal.exists()
+        assert not terminal_shm.exists()
+        read_only_targets = [
+            target for target in connection_targets if "mode=ro" in target
+        ]
+        assert read_only_targets
+        assert all("immutable=1" in target for target in read_only_targets)
+
+
+@pytest.mark.parametrize(
+    "auxiliary_shape",
+    ["wal_only", "shm_only", "nonempty_wal", "wrong_shm_size"],
+)
+def test_marker_upgrade_rejects_invalid_entrance_auxiliary_pair(
+    tmp_path: Path,
+    auxiliary_shape: str,
+) -> None:
+    database = tmp_path / f"upgrade-invalid-{auxiliary_shape}.sqlite3"
+    store = ReviewStore(database)
+    store.initialize_reviewability_candidate()
+    wal_path = Path(f"{database}-wal")
+    shm_path = Path(f"{database}-shm")
+    if auxiliary_shape == "wal_only":
+        wal_path.write_bytes(b"")
+    elif auxiliary_shape == "shm_only":
+        shm_path.write_bytes(b"\0" * 32768)
+    elif auxiliary_shape == "nonempty_wal":
+        wal_path.write_bytes(b"drift")
+        shm_path.write_bytes(b"\0" * 32768)
+    else:
+        wal_path.write_bytes(b"")
+        shm_path.write_bytes(b"bad")
+
+    with pytest.raises(ReviewStoreError, match="stable zero-WAL"):
+        store.upgrade_reviewability_candidate_v2()
+
+
+@pytest.mark.parametrize(
+    ("checkpoint_result", "expected"),
+    [
+        ((0, 0, 0), True),
+        ((0, 1, 1), False),
+        ((0, 0, 1), False),
+        ((1, 0, 0), False),
+    ],
+)
+def test_upgrade_guard_checkpoint_result_requires_exact_zero_tuple(
+    tmp_path: Path,
+    checkpoint_result: tuple[int, int, int],
+    expected: bool,
+) -> None:
+    guard, _, _, _ = _fake_upgrade_guard(tmp_path, str(checkpoint_result))
+    connection = sqlite3.connect(":memory:")
+    try:
+        guard._writer_open = True
+        guard._writer_conn = connection
+        guard._marker_committed = True
+        assert guard.record_checkpoint_result(
+            checkpoint_result,
+            stage="synthetic_checkpoint",
+        ) is expected
+    finally:
+        connection.close()
+
+
+@pytest.mark.parametrize(
+    "checkpoint_result",
+    [None, (0, 0), (0, 0, 0, 0)],
+)
+def test_upgrade_guard_rejects_incomplete_checkpoint_result_shape(
+    tmp_path: Path,
+    checkpoint_result: tuple[int, ...] | None,
+) -> None:
+    guard, _, _, _ = _fake_upgrade_guard(tmp_path, "incomplete-result")
+    connection = sqlite3.connect(":memory:")
+    try:
+        guard._writer_open = True
+        guard._writer_conn = connection
+        guard._marker_committed = True
+        with pytest.raises(ReviewStoreError, match="result is incomplete"):
+            guard.record_checkpoint_result(
+                checkpoint_result,
+                stage="synthetic_checkpoint",
+            )
+    finally:
+        connection.close()
+
+
+def test_upgrade_guard_terminal_auxiliary_state_is_paired_and_one_way(
+    tmp_path: Path,
+) -> None:
+    guard, wal_path, shm_path, _ = _fake_upgrade_guard(tmp_path, "terminal")
+    connection = sqlite3.connect(":memory:")
+    guard._writer_open = True
+    guard._writer_conn = connection
+    guard._marker_committed = True
+    assert guard.record_checkpoint_result(
+        (0, 0, 0), stage="terminal_checkpoint"
+    ) is True
+    wal_path.unlink()
+    shm_path.unlink()
+    connection.close()
+    guard.assert_after_writer_close(connection, stage="terminal_close")
+    guard.assert_current(stage="terminal_replay_one")
+    guard.assert_current(stage="terminal_replay_two")
+    wal_path.write_bytes(b"")
+    with pytest.raises(ReviewStoreError, match="reappeared"):
+        guard.assert_current(stage="terminal_reappeared")
+
+
+def test_upgrade_guard_rejects_premature_single_and_drifted_terminal_absence(
+    tmp_path: Path,
+) -> None:
+    early, early_wal, early_shm, _ = _fake_upgrade_guard(tmp_path, "early")
+    early_connection = sqlite3.connect(":memory:")
+    early._writer_open = True
+    early._writer_conn = early_connection
+    early_wal.unlink()
+    early_shm.unlink()
+    early_connection.close()
+    with pytest.raises(ReviewStoreError, match="before marker commit"):
+        early.assert_after_writer_close(early_connection, stage="early_close")
+
+    incomplete, incomplete_wal, incomplete_shm, _ = _fake_upgrade_guard(
+        tmp_path, "incomplete"
+    )
+    incomplete_connection = sqlite3.connect(":memory:")
+    incomplete._writer_open = True
+    incomplete._writer_conn = incomplete_connection
+    incomplete._marker_committed = True
+    assert incomplete.record_checkpoint_result(
+        (0, 1, 1), stage="incomplete_checkpoint"
+    ) is False
+    incomplete_wal.unlink()
+    incomplete_shm.unlink()
+    incomplete_connection.close()
+    with pytest.raises(ReviewStoreError, match=r"exact \(0, 0, 0\)"):
+        incomplete.assert_after_writer_close(
+            incomplete_connection,
+            stage="incomplete_close",
+        )
+
+    for missing_label in ("wal", "shm"):
+        single, single_wal, single_shm, _ = _fake_upgrade_guard(
+            tmp_path, f"single-{missing_label}"
+        )
+        single_connection = sqlite3.connect(":memory:")
+        single._writer_open = True
+        single._writer_conn = single_connection
+        single._marker_committed = True
+        assert single.record_checkpoint_result(
+            (0, 0, 0), stage="single_checkpoint"
+        ) is True
+        (single_wal if missing_label == "wal" else single_shm).unlink()
+        single_connection.close()
+        with pytest.raises(ReviewStoreError, match="one-sided"):
+            single.assert_after_writer_close(
+                single_connection,
+                stage=f"single_{missing_label}_close",
+            )
+
+    binding, _, _, binding_files = _fake_upgrade_guard(tmp_path, "binding")
+    binding_connection = sqlite3.connect(":memory:")
+    binding._writer_open = True
+    binding._writer_conn = binding_connection
+    binding._marker_committed = True
+    assert binding.record_checkpoint_result(
+        (0, 0, 0), stage="binding_checkpoint"
+    ) is True
+    binding_files["wal"].fail_binding = True
+    binding_connection.close()
+    with pytest.raises(ReviewStoreError, match="pathname identity drift"):
+        binding.assert_after_writer_close(
+            binding_connection,
+            stage="binding_close",
+        )
+
+    held, held_wal, held_shm, held_files = _fake_upgrade_guard(
+        tmp_path, "held-size"
+    )
+    held_connection = sqlite3.connect(":memory:")
+    held._writer_open = True
+    held._writer_conn = held_connection
+    held._marker_committed = True
+    assert held.record_checkpoint_result(
+        (0, 0, 0), stage="held_checkpoint"
+    ) is True
+    held_files["wal"].fail_size = True
+    held_wal.unlink()
+    held_shm.unlink()
+    held_connection.close()
+    with pytest.raises(ReviewStoreError, match="held size drift"):
+        held.assert_after_writer_close(held_connection, stage="held_close")
+
+
+def test_v2_marker_upgrade_rejects_pre_open_metadata_tamper(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    database = tmp_path / "upgrade-metadata-race.sqlite3"
+    store = ReviewStore(database)
+    store.initialize_reviewability_candidate()
+    original_assert = ReviewStore._assert_reviewability_upgrade_path_state
+    touched = False
+
+    def touch_after_pre_open_check(path: Path, **kwargs: object) -> None:
+        nonlocal touched
+        original_assert(path, **kwargs)
+        if kwargs.get("stage") == "before_rw_open" and not touched:
+            stat_result = path.stat()
+            os.utime(
+                path,
+                ns=(
+                    stat_result.st_atime_ns,
+                    stat_result.st_mtime_ns + 10_000_000,
+                ),
+            )
+            touched = True
+
+    monkeypatch.setattr(
+        ReviewStore,
+        "_assert_reviewability_upgrade_path_state",
+        staticmethod(touch_after_pre_open_check),
+    )
+    with pytest.raises(ReviewStoreError, match="main identity changed at after_rw_open"):
+        store.upgrade_reviewability_candidate_v2()
+    assert touched is True

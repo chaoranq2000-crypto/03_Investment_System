@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sqlite3
 from copy import deepcopy
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -21,10 +23,27 @@ from src.investment_review.models import (
     MARKET_PROVIDER_ALLOWLIST,
     MARKET_PROVIDER_ALLOWLIST_SHA256,
     MARKET_PROVIDER_ALLOWLIST_VERSION,
+    OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+    PUBLIC_INFORMATION_POLICY_VERSION,
     DecisionRecord,
+)
+from src.investment_review.market_context_adapter import (
+    MARKET_GATEWAY_CONTRACT_VERSION,
+    MARKET_RATE_LIMIT_POLICY_VERSION,
+    MarketContextAdapter,
+    MarketRequestBudget,
+    _provider_information_candidate_v2,
+    _provider_publication_source_ref_v2,
+    market_context_resolution_path,
+    market_row_content_sha256_v2,
+    resolve_market_context,
 )
 from src.investment_review.review_input_bundle import (
     build_review_input_bundle,
+    validate_review_input_bundle,
+)
+from src.investment_review.review_checkpoint import (
+    derive_review_checkpoint_operation_anchor,
 )
 from src.investment_review.review_runner import (
     ReviewRunCatalog,
@@ -168,6 +187,7 @@ def _reviewability_fixture(
     *,
     rows: list[dict[str, str]] | None = None,
     checkpoint_market_resolver: Any | None = None,
+    automatic_market_context: bool = False,
 ) -> RunnerFixture:
     root = tmp_path / "repo"
     source, mapping, review_db = _write_fixture(
@@ -186,6 +206,13 @@ def _reviewability_fixture(
             ),
         ],
     )
+    if automatic_market_context:
+        review_db = (
+            root
+            / "data"
+            / "db"
+            / "investment_review_reviewability_v3.sqlite3"
+        )
     PortfolioStore(source).initialize()
     store = ReviewStore(review_db)
     store.initialize_reviewability_candidate()
@@ -196,14 +223,18 @@ def _reviewability_fixture(
         repo_root=root,
     )
     artifacts = root / "run-artifacts"
-    runner = ReviewRunner(
-        review_db=review_db,
-        portfolio_db=source,
-        mapping_path=mapping,
-        artifact_root=artifacts,
-        repo_root=root,
-        checkpoint_market_resolver=checkpoint_market_resolver,
-    )
+    runner_kwargs: dict[str, Any] = {
+        "review_db": review_db,
+        "portfolio_db": source,
+        "mapping_path": mapping,
+        "artifact_root": artifacts,
+        "repo_root": root,
+    }
+    if not automatic_market_context:
+        runner_kwargs["checkpoint_market_resolver"] = (
+            checkpoint_market_resolver
+        )
+    runner = ReviewRunner(**runner_kwargs)
     return RunnerFixture(
         root=root,
         source=source,
@@ -213,6 +244,73 @@ def _reviewability_fixture(
         store=store,
         runner=runner,
     )
+
+
+def _seed_cutoff_safe_market_rows(source: Path) -> None:
+    connection = sqlite3.connect(source)
+    columns = {
+        str(row[1])
+        for row in connection.execute("PRAGMA table_info(instruments)")
+    }
+    additions = {
+        "name": "TEXT NOT NULL DEFAULT ''",
+        "exchange": "TEXT NOT NULL DEFAULT ''",
+        "currency": "TEXT NOT NULL DEFAULT ''",
+        "industry_name": "TEXT NOT NULL DEFAULT ''",
+        "industry_source": "TEXT NOT NULL DEFAULT ''",
+        "industry_updated_at": "TEXT NOT NULL DEFAULT ''",
+        "updated_at": "TEXT NOT NULL DEFAULT ''",
+    }
+    for name, declaration in additions.items():
+        if name not in columns:
+            connection.execute(
+                f"ALTER TABLE instruments ADD COLUMN {name} {declaration}"
+            )
+    connection.execute(
+        """
+        UPDATE instruments
+        SET name = ?, exchange = ?, currency = ?, updated_at = ?
+        WHERE ts_code = ?
+        """,
+        (
+            "fixture instrument",
+            "SZ",
+            "CNY",
+            "2026-01-01T00:00:00Z",
+            "000001.SZ",
+        ),
+    )
+    connection.executemany(
+        """
+        INSERT INTO close_prices(
+            ts_code, trade_date, close, pre_close, pct_chg, source,
+            fetched_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        """,
+        [
+            (
+                "000001.SZ",
+                "2026-01-01",
+                "99",
+                "98",
+                "1.02",
+                "tushare.daily",
+                "2026-01-03T00:00:00Z",
+            ),
+            (
+                "000001.SZ",
+                "2026-02-01",
+                "101",
+                "100",
+                "1",
+                "tushare.daily",
+                "2026-02-02T00:00:00Z",
+            ),
+        ],
+    )
+    connection.commit()
+    assert connection.execute("PRAGMA quick_check").fetchone()[0] == "ok"
+    connection.close()
 
 
 def _local_satisfied_checkpoint_market_resolver(
@@ -732,6 +830,731 @@ def test_reviewability_runner_rejects_an_unclosed_market_projection(
         fixture.runner.validate_receipt(receipt)["validation_status"]
         == "accepted"
     )
+
+
+def test_p6_default_market_adapter_freezes_every_selected_episode(
+    tmp_path: Path,
+) -> None:
+    fixture = _reviewability_fixture(
+        tmp_path,
+        rows=[
+            *_closed_episode_rows(
+                "2026-02-01",
+                "2026-02-02",
+                "closed-market-target",
+            ),
+            _trade_row(
+                event_date="2026-02-02",
+                event_type="BUY",
+                external_id="open-market-target",
+                event_time="12:00:00",
+            ),
+        ],
+        automatic_market_context=True,
+    )
+    _seed_cutoff_safe_market_rows(fixture.source)
+    source_before = _sha256(fixture.source)
+
+    receipt = _run(fixture, scope="monthly")
+
+    assert _sha256(fixture.source) == source_before
+    assert len(receipt["episodes"]) == 2
+    assert receipt["cutoffs"][
+        "market_context_projection_manifest_version"
+    ] == runner_module.MARKET_CONTEXT_PROJECTION_MANIFEST_VERSION
+    assert len(
+        receipt["cutoffs"]["market_context_projection_sha256"]
+    ) == 64
+    episode_stage = _stage(receipt, "episode")
+    assert episode_stage["details"]["market_context_count"] == 2
+    market_cache = (
+        fixture.root
+        / ".codex_tmp"
+        / "investment_review_product_completion_v3"
+        / "market_cache"
+    )
+    for item in receipt["episodes"]:
+        assert market_context_resolution_path(
+            market_cache,
+            item["market_context"]["market_requirement_id"],
+        ).is_file()
+
+    open_episode = next(
+        item for item in receipt["episodes"] if "review_checkpoint" in item
+    )
+    closed_episode = next(
+        item for item in receipt["episodes"] if "review_checkpoint" not in item
+    )
+    for item in receipt["episodes"]:
+        market = item["market_context"]
+        assert market["as_of"] == item[
+            "ledger_snapshot_reconstruction"
+        ]["as_of"]
+        assert market["knowledge_cutoff"] == KNOWLEDGE_CUTOFF
+        assert market["market_fallback"]["status"] == "not_needed"
+        assert market["market_fallback"]["request_count"] == 0
+        assert market["market_fallback"]["fetch_receipts"] == []
+        assert market["source_replay"]["source_verification"] == (
+            "verified"
+        )
+        frozen_input = json.loads(
+            Path(item["artifacts"]["input"]["path"]).read_text(
+                encoding="utf-8"
+            )
+        )
+        frozen_source_ids = {
+            source["source_id"]
+            for source in frozen_input["frozen_sources"][
+                "supplemental_sources"
+            ]
+        }
+        assert {
+            source["source_id"]
+            for source in market["supplemental_sources"]
+        }.issubset(frozen_source_ids)
+
+    assert closed_episode["market_context"]["as_of"] < receipt[
+        "cutoffs"
+    ]["as_of"]
+    assert open_episode["market_context"]["as_of"] == receipt[
+        "cutoffs"
+    ]["as_of"]
+    checkpoint = json.loads(
+        Path(
+            open_episode["artifacts"]["review_checkpoint"]["path"]
+        ).read_text(encoding="utf-8")
+    )
+    assert checkpoint["status_axes"]["market"] == open_episode[
+        "market_context"
+    ]["market_axis"]
+    assert (
+        fixture.runner.validate_receipt(receipt)["validation_status"]
+        == "accepted"
+    )
+
+    cache_before = _tree_hashes(market_cache)
+    receipt_repeat = _run(fixture, scope="monthly")
+    assert receipt_repeat == receipt
+    assert _tree_hashes(market_cache) == cache_before
+
+
+def test_p6_missing_market_only_degrades_market_axis(
+    tmp_path: Path,
+) -> None:
+    fixture = _reviewability_fixture(
+        tmp_path,
+        rows=[
+            *_closed_episode_rows(
+                "2026-01-01",
+                "2026-01-02",
+                "explicit-prior-flat-baseline",
+            ),
+            _trade_row(
+                event_date="2026-01-05",
+                event_type="BUY",
+                external_id="open-market-target",
+            ),
+        ],
+        automatic_market_context=True,
+    )
+    fixture.runner.checkpoint_market_resolver = MarketContextAdapter(
+        cache_root=fixture.runner.market_cache_root,
+        clock=lambda: datetime(2026, 7, 13, tzinfo=timezone.utc),
+    )
+
+    receipt = _run(fixture)
+    episode = receipt["episodes"][0]
+    checkpoint = json.loads(
+        Path(episode["artifacts"]["review_checkpoint"]["path"]).read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert episode["operation_review_status"] == "ready"
+    assert checkpoint["status_axes"]["operation"]["status"] == "ready"
+    assert episode["market_context"]["market_axis"]["status"] in {
+        "missing",
+        "failed",
+        "insufficient",
+        "partial",
+    }
+    assert episode["market_context"]["market_fallback"]["status"] == (
+        "provider_unavailable"
+    )
+    assert episode["market_context"]["market_fallback"][
+        "request_count"
+    ] == 0
+    assert (
+        fixture.runner.validate_receipt(receipt)["validation_status"]
+        == "accepted"
+    )
+
+
+def test_p6_late_provider_receipt_is_not_backdated_and_operation_continues(
+    tmp_path: Path,
+) -> None:
+    fixture = _reviewability_fixture(
+        tmp_path,
+        rows=[
+            *_closed_episode_rows(
+                "2026-01-01",
+                "2026-01-02",
+                "explicit-prior-flat-baseline",
+            ),
+            _trade_row(
+                event_date="2026-01-05",
+                event_type="BUY",
+                external_id="open-market-target",
+            ),
+        ],
+        automatic_market_context=True,
+    )
+
+    receipt = _run(fixture)
+    episode = receipt["episodes"][0]
+    limitation = episode["market_context_limitation"]
+
+    assert receipt["status"] == "partial"
+    assert episode["operation_review_status"] == "ready"
+    assert limitation == {
+        "status": "withheld_by_cutoff",
+        "code": "MARKET_CONTEXT_WITHHELD_BY_CUTOFF",
+        "instrument_id": "000001.SZ",
+        "as_of": AS_OF,
+        "knowledge_cutoff": KNOWLEDGE_CUTOFF,
+        "network_attempted": False,
+        "receipt_backdated": False,
+    }
+    assert "market_context" not in episode
+    assert "review_checkpoint" not in episode
+    assert fixture.store.list_operation_checkpoints() == []
+    assert (
+        fixture.runner.validate_receipt(receipt)["validation_status"]
+        == "accepted"
+    )
+
+
+def test_p6_v2_provider_limitation_is_frozen_and_keeps_active_checkpoint(
+    tmp_path: Path,
+) -> None:
+    fixture = _reviewability_fixture(
+        tmp_path,
+        rows=[
+            *_closed_episode_rows(
+                "2026-02-01",
+                "2026-02-02",
+                "closed-v2-market-target",
+            ),
+            _trade_row(
+                event_date="2026-02-02",
+                event_type="BUY",
+                external_id="open-v2-market-target",
+                event_time="12:00:00",
+            ),
+        ],
+        automatic_market_context=True,
+    )
+    fixture.store.upgrade_reviewability_candidate_v2()
+    assert fixture.store.status()["reviewability_schema_version"] == 2
+    audit_now = datetime(2026, 7, 27, 8, 0, tzinfo=timezone.utc)
+    adapter = MarketContextAdapter(
+        cache_root=fixture.runner.market_cache_root,
+        clock=lambda: audit_now,
+    )
+    observed_anchors: list[dict[str, Any]] = []
+
+    def resolve_v2(**kwargs: Any) -> dict[str, Any]:
+        projection = adapter(**kwargs)
+        checkpoint_type = (
+            "active_checkpoint"
+            if kwargs["episode"]["status"] == "open"
+            else "exit"
+        )
+        expected = derive_review_checkpoint_operation_anchor(
+            kwargs["episode"],
+            operation_review=kwargs["operation_review"],
+            checkpoint_type=checkpoint_type,
+            checkpoint_as_of=kwargs["as_of"],
+        )
+        observed_anchors.append(
+            {
+                "episode_status": kwargs["episode"]["status"],
+                "expected": expected,
+                "actual": {
+                    field: projection[field]
+                    for field in (
+                        "operation_anchor_event_id",
+                        "operation_anchor_at",
+                        "operation_anchor_ordering_key",
+                    )
+                },
+            }
+        )
+        return projection
+
+    fixture.runner.checkpoint_market_resolver = resolve_v2
+    receipt = _run(fixture, scope="monthly")
+
+    assert receipt["status"] in {"partial", "ready"}, json.dumps(
+        {
+            "stage": receipt["stages"][-1],
+            "anchors": observed_anchors,
+        },
+        ensure_ascii=False,
+        indent=2,
+    )
+    assert receipt["cutoffs"].get("reviewability_schema_version") == 2, (
+        json.dumps(receipt["stages"], ensure_ascii=False, indent=2)
+    )
+    assert len(observed_anchors) == 2
+    assert all(
+        {
+            field: item["expected"][field]
+            for field in (
+                "operation_anchor_event_id",
+                "operation_anchor_at",
+                "operation_anchor_ordering_key",
+            )
+        }
+        == item["actual"]
+        for item in observed_anchors
+    )
+    assert len(receipt["episodes"]) == 2
+    episode_ids_by_status = {
+        item["episode_status"]: item["expected"]["episode_id"]
+        for item in observed_anchors
+    }
+    open_episode = next(
+        item
+        for item in receipt["episodes"]
+        if item["episode_id"] == episode_ids_by_status["open"]
+    )
+    closed_episode = next(
+        item
+        for item in receipt["episodes"]
+        if item["episode_id"] == episode_ids_by_status["closed"]
+    )
+
+    for episode in (open_episode, closed_episode):
+        market = episode["market_context"]
+        fallback = market["market_fallback"]
+        assert market["perspective"] == "user"
+        assert market["information_time_policy_version"] == (
+            PUBLIC_INFORMATION_POLICY_VERSION
+        )
+        assert market["operation_anchor_at"] <= market["as_of"]
+        assert fallback["status"] == "provider_unavailable"
+        assert fallback["request_count"] == 0
+        assert fallback["request_count_status"] == "verified"
+        assert fallback["unverified_attempt_upper_bound"] == 0
+        assert len(fallback["fetch_receipts"]) == 1
+        guard_receipt = fallback["fetch_receipts"][0]
+        assert guard_receipt["response_status"] == "provider_unavailable"
+        assert guard_receipt["attempt_count"] == 0
+        assert guard_receipt["attempt_count_status"] == "verified"
+        assert guard_receipt["budget_charged_attempts"] == 0
+        assert guard_receipt["started_at"] == fallback["guard_audit_at"]
+        assert guard_receipt["completed_at"] == fallback["guard_audit_at"]
+        assert guard_receipt["fetched_at"] is None
+        assert guard_receipt["raw_content_sha256"] is None
+        assert guard_receipt["normalized_content_sha256"] is None
+        assert guard_receipt["cache_entry_refs"] == []
+        # Audit time is a real post-cutoff fact, not a fabricated historical
+        # timestamp.  The v2 input bundle must nevertheless freeze it intact.
+        assert fallback["guard_audit_at"] == "2026-07-27T08:00:00Z"
+        assert fallback["guard_audit_at"] > KNOWLEDGE_CUTOFF
+        frozen_input = json.loads(
+            Path(episode["artifacts"]["input"]["path"]).read_text(
+                encoding="utf-8"
+            )
+        )
+        assert validate_review_input_bundle(frozen_input)[
+            "validation_status"
+        ] in {"accepted", "accepted_with_warnings"}
+
+    assert "review_checkpoint" not in closed_episode
+    assert closed_episode["market_context"]["operation_anchor_at"].startswith(
+        "2026-02-02T02:00:00"
+    )
+    assert open_episode["operation_review_status"] == "ready"
+    assert open_episode["market_context"]["operation_anchor_at"].startswith(
+        "2026-02-02T04:00:00"
+    )
+    checkpoint = json.loads(
+        Path(open_episode["artifacts"]["review_checkpoint"]["path"]).read_text(
+            encoding="utf-8"
+        )
+    )
+    assert checkpoint["schema_version"] == OPERATION_CHECKPOINT_SCHEMA_VERSION_V2
+    assert checkpoint["status_axes"]["operation"]["status"] == "ready"
+    open_market = open_episode["market_context"]
+    market_axis = open_market["market_axis"]
+    evidence_manifest = open_market["market_evidence_manifest"]
+    assert checkpoint["status_axes"]["market"] == market_axis
+    assert checkpoint["market_fallback"] == open_market["market_fallback"]
+    assert market_axis["market_evidence_manifest_content_id"] == (
+        evidence_manifest["content_id"]
+    )
+    assert (
+        "market_evidence_manifest:" + evidence_manifest["content_id"]
+        in checkpoint["source_refs"]
+    )
+    assert open_market["market_source_manifest"] == open_market["resolution"][
+        "market_source_manifest"
+    ]
+    assert evidence_manifest == open_market["resolution"][
+        "market_evidence_manifest"
+    ]
+    assert checkpoint["operation_anchor_event_id"] == open_episode[
+        "market_context"
+    ]["operation_anchor_event_id"]
+    assert checkpoint["operation_anchor_at"] == open_episode["market_context"][
+        "operation_anchor_at"
+    ]
+    assert checkpoint["operation_anchor_ordering_key"] == open_episode[
+        "market_context"
+    ]["operation_anchor_ordering_key"]
+    assert fixture.runner.validate_receipt(receipt)["validation_status"] == (
+        "accepted"
+    )
+
+
+def test_p6_v2_duplicate_provider_rows_keep_operation_ready_checkpoint(
+    tmp_path: Path,
+) -> None:
+    class DuplicateGateway:
+        transport_scheme = "https"
+        market_gateway_contract_version = MARKET_GATEWAY_CONTRACT_VERSION
+        rate_limit_policy_version = MARKET_RATE_LIMIT_POLICY_VERSION
+        enforces_provider_rate_limit = True
+        enforces_timeout_cap = True
+        enforces_retry_cap = True
+        enforces_concurrency_cap = True
+
+        def __init__(self) -> None:
+            self.calls: list[dict[str, Any]] = []
+
+        def fetch(self, **kwargs: Any) -> dict[str, Any]:
+            self.calls.append(deepcopy(kwargs))
+            request = kwargs["request"]
+            row: dict[str, Any] = {
+                "ts_code": "000001.SZ",
+                "trade_date": "2026-02-01",
+                "close": "101",
+                "pre_close": "100",
+                "pct_chg": "1",
+                "publication_status": "verified",
+                "publicly_available_at": "2026-02-01T07:00:00Z",
+                "publication_basis": "official_release_metadata.v1",
+                "revision_ref": "runner-duplicate-rev-1",
+            }
+            row["content_sha256"] = market_row_content_sha256_v2(
+                component="prior_close",
+                instrument_id="000001.SZ",
+                row=row,
+            )
+            information = _provider_information_candidate_v2(
+                normalized=row,
+                revision_ref=row["revision_ref"],
+                fetched_at="2026-07-27T08:00:00Z",
+            )
+            row["public_time_source_ref"] = (
+                _provider_publication_source_ref_v2(
+                    provider_id=str(request["provider_id"]),
+                    endpoint_id=str(request["endpoint_id"]),
+                    publication_basis=row["publication_basis"],
+                    revision_ref=row["revision_ref"],
+                    content_sha256=row["content_sha256"],
+                    information_time=information,
+                )
+            )
+            return {
+                "response_status": "succeeded",
+                "attempt_count": 1,
+                "fetched_at": "2026-07-27T08:00:00Z",
+                "raw_payload": "runner-duplicate-provider-response",
+                "rows": [deepcopy(row), deepcopy(row)],
+            }
+
+    fixture = _reviewability_fixture(
+        tmp_path,
+        rows=[
+            *_closed_episode_rows(
+                "2026-01-01",
+                "2026-01-02",
+                "duplicate-provider-baseline",
+            ),
+            _trade_row(
+                event_date="2026-02-02",
+                event_type="BUY",
+                external_id="open-v2-duplicate-provider",
+                event_time="12:00:00",
+            )
+        ],
+        automatic_market_context=True,
+    )
+    fixture.store.upgrade_reviewability_candidate_v2()
+    gateway = DuplicateGateway()
+    fixture.runner.checkpoint_market_resolver = MarketContextAdapter(
+        cache_root=fixture.runner.market_cache_root,
+        provider_gateway=gateway,
+        clock=lambda: datetime(2026, 7, 27, 8, 0, tzinfo=timezone.utc),
+    )
+
+    receipt = _run(fixture)
+    assert receipt["episodes"], json.dumps(receipt, ensure_ascii=False, indent=2)
+    episode = receipt["episodes"][0]
+    market = episode["market_context"]
+    external = [
+        item
+        for item in market["supplemental_sources"]
+        if item.get("payload", {}).get("origin") == "external_provider_cache"
+    ]
+
+    assert len(gateway.calls) == 1
+    assert episode["operation_review_status"] == "ready"
+    assert "review_checkpoint" in episode["artifacts"]
+    assert market["market_fallback"]["status"] == "succeeded"
+    assert market["market_fallback"]["request_count"] == 1
+    assert len(external) == 1
+    assert len(external[0]["payload"]["origin_cache_entry"]["rows"]) == 1
+    checkpoint = json.loads(
+        Path(episode["artifacts"]["review_checkpoint"]["path"]).read_text(
+            encoding="utf-8"
+        )
+    )
+    assert checkpoint["checkpoint_type"] == "active_checkpoint"
+    assert checkpoint["status_axes"]["operation"]["status"] == "ready"
+    assert fixture.runner.validate_receipt(receipt)["validation_status"] == (
+        "accepted"
+    )
+
+
+def test_p6_runner_shares_one_request_budget_across_selected_episodes(
+    tmp_path: Path,
+) -> None:
+    budget_ids: list[int] = []
+
+    def resolver(**kwargs: Any) -> dict[str, Any]:
+        budget = kwargs["request_budget"]
+        budget_ids.append(id(budget))
+        reserved = budget.reserve(1)
+        assert reserved == 1
+        budget.settle(reserved, 1)
+        return _local_satisfied_checkpoint_market_resolver(**kwargs)
+
+    fixture = _reviewability_fixture(
+        tmp_path,
+        rows=[
+            *_closed_episode_rows(
+                "2026-01-05",
+                "2026-01-06",
+                "closed",
+            ),
+            _trade_row(
+                event_date="2026-01-07",
+                event_type="BUY",
+                external_id="open",
+            ),
+        ],
+        checkpoint_market_resolver=resolver,
+    )
+    budget = MarketRequestBudget()
+
+    receipt = fixture.runner.run(
+        scope="monthly",
+        as_of=AS_OF,
+        knowledge_cutoff=KNOWLEDGE_CUTOFF,
+        dry_run=True,
+        market_request_budget=budget,
+    )
+
+    assert len(receipt["episodes"]) == 2
+    assert len(budget_ids) == 2
+    assert len(set(budget_ids)) == 1
+    assert budget_ids[0] == id(budget)
+    assert budget.snapshot() == {
+        "max_requests": 20,
+        "used_requests": 2,
+        "reserved_requests": 0,
+        "active_requests": 0,
+        "remaining_requests": 18,
+    }
+    assert _stage(receipt, "episode")["details"][
+        "market_request_budget"
+    ] == budget.snapshot()
+    assert (
+        fixture.runner.validate_receipt(receipt)["validation_status"]
+        == "accepted"
+    )
+
+
+@pytest.mark.parametrize(
+    "mismatch",
+    ["instrument_id", "as_of", "knowledge_cutoff"],
+)
+def test_p6_full_market_projection_binds_requested_episode_and_cutoffs(
+    tmp_path: Path,
+    mismatch: str,
+) -> None:
+    fixture = _reviewability_fixture(
+        tmp_path,
+        automatic_market_context=True,
+    )
+
+    def resolver(**kwargs: Any) -> dict[str, Any]:
+        episode_scope = kwargs["episode"]["scope"]
+        instrument_id = str(episode_scope["instrument_id"])
+        market_as_of = str(kwargs["as_of"])
+        market_cutoff = str(kwargs["knowledge_cutoff"])
+        if mismatch == "instrument_id":
+            instrument_id = "999999.SZ"
+        elif mismatch == "as_of":
+            market_as_of = "2026-02-01T23:59:59Z"
+        else:
+            market_cutoff = "2026-07-13T23:59:59Z"
+        return resolve_market_context(
+            portfolio_db=kwargs["portfolio_db"],
+            review_db=kwargs["review_db"],
+            instrument_id=instrument_id,
+            as_of=market_as_of,
+            knowledge_cutoff=market_cutoff,
+            cache_root=(
+                fixture.runner.market_cache_root / mismatch
+            ),
+            clock=lambda: datetime(
+                2026, 7, 13, tzinfo=timezone.utc
+            ),
+            request_budget=kwargs["request_budget"],
+        )
+
+    fixture.runner.checkpoint_market_resolver = resolver
+    receipt = _run(fixture, dry_run=True)
+
+    assert receipt["status"] == "blocked"
+    assert receipt["stages"][-1]["details"]["error_type"] == (
+        "CanonicalGateBlocked"
+    )
+    assert "does not bind the requested instrument and cutoffs" in (
+        receipt["stages"][-1]["details"]["error"]
+    )
+    assert (
+        fixture.runner.validate_receipt(receipt)["validation_status"]
+        == "accepted"
+    )
+
+
+def test_p6_market_hash_changes_run_key_not_checkpoint_key(
+    tmp_path: Path,
+) -> None:
+    fixture = _reviewability_fixture(
+        tmp_path,
+        rows=[
+            *_closed_episode_rows(
+                "2026-01-01",
+                "2026-01-02",
+                "explicit-prior-flat-baseline",
+            ),
+            _trade_row(
+                event_date="2026-01-05",
+                event_type="BUY",
+                external_id="open-market-target",
+            ),
+        ],
+        automatic_market_context=True,
+    )
+    _seed_cutoff_safe_market_rows(fixture.source)
+
+    def resolver_with_threshold(seconds: int):
+        def resolve(**kwargs: Any) -> dict[str, Any]:
+            episode = kwargs["episode"]
+            return resolve_market_context(
+                portfolio_db=kwargs["portfolio_db"],
+                review_db=kwargs["review_db"],
+                instrument_id=episode["scope"]["instrument_id"],
+                as_of=kwargs["as_of"],
+                knowledge_cutoff=kwargs["knowledge_cutoff"],
+                cache_root=(
+                    fixture.root
+                    / ".codex_tmp"
+                    / "investment_review_product_completion_v3"
+                    / "market_cache"
+                    / str(seconds)
+                ),
+                staleness_seconds={"prior_close": seconds},
+            )
+
+        return resolve
+
+    first_runner = ReviewRunner(
+        review_db=fixture.review_db,
+        portfolio_db=fixture.source,
+        mapping_path=fixture.mapping,
+        artifact_root=fixture.artifacts,
+        repo_root=fixture.root,
+        checkpoint_market_resolver=resolver_with_threshold(604800),
+    )
+    second_runner = ReviewRunner(
+        review_db=fixture.review_db,
+        portfolio_db=fixture.source,
+        mapping_path=fixture.mapping,
+        artifact_root=fixture.artifacts,
+        repo_root=fixture.root,
+        checkpoint_market_resolver=resolver_with_threshold(604801),
+    )
+
+    first = first_runner.run(
+        scope="single",
+        as_of=AS_OF,
+        knowledge_cutoff=KNOWLEDGE_CUTOFF,
+        dry_run=True,
+    )
+    second = second_runner.run(
+        scope="single",
+        as_of=AS_OF,
+        knowledge_cutoff=KNOWLEDGE_CUTOFF,
+        dry_run=True,
+    )
+
+    assert first["run_key"] != second["run_key"]
+    assert first["episodes"][0]["market_context"][
+        "market_input_content_id"
+    ] != second["episodes"][0]["market_context"][
+        "market_input_content_id"
+    ]
+    assert first["episodes"][0]["review_checkpoint"][
+        "checkpoint_key"
+    ] == second["episodes"][0]["review_checkpoint"]["checkpoint_key"]
+    assert first_runner.validate_receipt(first)["validation_status"] == (
+        "accepted"
+    )
+    assert second_runner.validate_receipt(second)[
+        "validation_status"
+    ] == "accepted"
+
+
+def test_default_market_sentinel_preserves_legacy_receipt_bytes(
+    tmp_path: Path,
+) -> None:
+    fixture = _fixture(tmp_path)
+    default_receipt = _run(fixture, dry_run=True)
+    disabled = ReviewRunner(
+        review_db=fixture.review_db,
+        portfolio_db=fixture.source,
+        mapping_path=fixture.mapping,
+        artifact_root=fixture.artifacts,
+        repo_root=fixture.root,
+        checkpoint_market_resolver=None,
+    )
+    disabled_receipt = disabled.run(
+        scope="single",
+        as_of=AS_OF,
+        knowledge_cutoff=KNOWLEDGE_CUTOFF,
+        dry_run=True,
+        trigger="pytest",
+    )
+
+    assert disabled_receipt == default_receipt
 
 
 def test_reviewability_runner_fails_closed_when_reconstruction_replay_blocks(

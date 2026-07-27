@@ -280,6 +280,90 @@ market `fetched_at` 必须等于成功 receipts 中最晚的真实 `fetched_at`�
 pre-bundle cache step 之外一律禁止联网。facts renderer、source replay、API 和 UI 的
 `network_allowed` 固定为 false。
 
+## 8A. v4 公开时间知识政策（独立 v2）
+
+v4 不重解释上文任何 v1 对象。它新增
+`investment_review.operation_checkpoint.v2`、
+`local_first_controlled_fallback_v2` 和
+`public_availability_user_knowledge_v1`，并保持 v1 schema 文件、canonical bytes、ID、
+validator、row-integrity hash 与 replay 不变。
+
+v2 checkpoint 身份在 v1 cutoff 身份之外明确绑定：
+
+- `operation_anchor_event_id`；
+- `operation_anchor_at`；
+- 四项 P2C canonical `operation_anchor_ordering_key`；
+- `perspective`、`as_of`、`knowledge_cutoff`；
+- `information_time_policy_version`。
+
+anchor 不接受调用方自报。builder 必须从同一 episode 和已验证 operation review 重算：
+entry/adjustment/exit/postmortem 使用对应实质操作；active checkpoint 使用不晚于 `as_of`
+的最后一个 selected、validated、material operation，并强制
+`operation_anchor_at <= as_of <= knowledge_cutoff`。
+
+每个 v2 market component 都必须保存 closed `information_time`：`status`、
+`lower_bound`、`upper_bound`、`basis`、`method_version`、`revision_ref`，并把 exact content
+hash/revision/source ref 与 `perspective_eligibility` 绑定。用户视角只有 exact version 的
+公开区间已验证且 `upper_bound < operation_anchor_at` 时，才能投影
+`user_known_at_operation_by_verified_publication`，并把
+`projected_user_known_at` 固定为 anchor。上界等于 anchor 不属于“操作之前”，必须是
+ambiguous/ineligible。date-only 时间按来源时区形成整日闭区间，并仍以区间上界比较；未知
+时区、冲突时间、无法证明 revision、后续修订借用旧发布时间或操作后公开均不得提升 coverage。
+
+这是可知性政策，不是实际阅读证据。所有输出都保持
+`actual_user_observation_proven=false`，不得据此推断用户注意、理解、motive、thesis 或
+因果。system 视角只在真实 `system_observed_at <= operation_anchor_at` 时投影
+`system_known_at_operation`；公开时间不能替代系统观察。
+
+v2 pre-bundle cache step 可以在当前真实时间获取历史已公开版本。`started_at`、
+`fetched_at`、`completed_at`、`system_observed_at` 永远保存真实 audit time，可以晚于
+operation 或 historical cutoff，不得回填、截断或拿来冒充 publication time。user 结果不
+能仅因晚 fetch 被 withheld；system 请求若不可能改善 operation-time system eligibility，
+则使用 `withheld_by_cutoff`，并且严格为零 attempt/零 request、无 fetch/hash/cache entry。
+共享预算耗尽使用独立 `budget_exhausted` limitation；以上局部限制都只降低 market 轴，
+不得取消 operation-ready active checkpoint。
+
+v2 receipt 额外闭合 `attempt_count_status` 与 `budget_charged_attempts`。provider 裸异常无法
+证明精确尝试数时，不把预算上界写成事实：receipt 保存 `attempt_count=0`、
+`attempt_count_status=unknown` 和实际保守扣减，fallback 分别保存已验证的 `request_count`、
+`request_count_status=bounded_unknown`、`unverified_attempt_upper_bound` 与
+`provider_attempt_count_unknown`。零请求 limitation 则使用 verified/zero guard receipt，且
+`guard_audit_at=started_at=completed_at`，没有 fetched/system-observed/hash/cache-entry。
+
+checkpoint market 轴必须闭合代表源的 `representative_source_id`、完整 envelope content ID、
+`information_time`、`version_provenance`、`perspective_eligibility`，并绑定只含 component/row
+sources 的 `market_evidence_manifest_content_id` 以及
+`market_evidence_manifest:<content_id>` source ref。外层 temporal role 使用简化词表，详细资格
+角色留在嵌套 proof。无代表源时上述五项均为 null，时间均为 null，basis 为
+`not_applicable`、role/status 为 `missing`，但空 evidence manifest 仍必须有稳定 content ID。
+
+每个本地 v2 component source 还必须嵌入受限且 canonical 的原始数据库行；每个外部
+source 必须嵌入完整、canonical 且不可变的 cache entry。离线 source replay 必须从该
+origin proof 重建投影值、effective/public time、version/revision proof、eligibility、
+receipt lineage 和 row identity。派生字段、hash 或 ref 不得脱离 origin proof 相互“自证”；
+revision conflict 必须由竞争的 origin proofs 派生。provider 返回的 canonical bytes 完全
+相同行可确定性去重；bytes 不同的行仍是不同 revision candidate，不得静默合并。
+
+若前一 provider 已有已验证的成功 receipt，后续 provider 出现尝试数未知，bounded fallback
+聚合仍保持 `succeeded` 并保留已成功证据，同时新增 bounded-unknown limitation。后续不确定性
+不得抹除已成功事实，也不得伪造精确 request total。
+
+v2 继续使用同一份 allowlist、参数语法、去敏、20 秒 timeout、2 次 retry、2 并发、每 run
+20 次 attempt、cache lineage 与下游离线边界。raw cache 只有在 bytes、revision 与
+information-time provenance 完全相同时才能跨 perspective 复用；requirement、resolution、
+manifest、task/run key 必须绑定 perspective/policy/anchor。
+
+存储升级是显式 opt-in 的单次 marker 事务，不是 initializer 行为。只有 exact v1 marker、
+固定 v1 manifest、零 WAL、`quick_check=ok`、完整 DDL 与全部 v1 row replay 均通过，才可在
+同一 `BEGIN IMMEDIATE` 中把 reviewability/checkpoint/market/manifest marker 更新为 v2，
+并新增 public-information marker。升级不得执行 DDL；v2 manifest 的固定 SHA-256 为
+`352a9abff69da24e50bc0add0f0dcd802f500463b41cc826f6a140a02f2a4094`。升级后可读取、重放和
+幂等跳过既有 v1 row，但不得创建新 v1 row；v2 新 row 必须使用新的明确
+`knowledge_cutoff`，先检测底层 v1 unique tuple 冲突，不能原地修订。
+升级器还必须在 RW 打开前后及 `BEGIN IMMEDIATE` 锁内重新核对最初 main/WAL/SHM 文件身份、
+零 WAL 状态和 SQLite `main` 路径；同内容替换、mtime/content 漂移或锁内身份变化均在 marker
+写入前 fail closed。
+
 ## 9. 确定性、兼容与安全
 
 - checkpoint 使用 `investment_review.operation_checkpoint.v1`；`checkpoint_key` 固定匹配

@@ -1,0 +1,517 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.invalid/contracts/investment_review.operation_checkpoint.v2.schema.json",
+  "title": "Investment Review Operation Checkpoint v2",
+  "description": "Closed operation checkpoint with an explicit operation anchor and perspective-specific public-information policy. Policy-known does not prove actual user reading.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "checkpoint_id",
+    "checkpoint_key",
+    "content_id",
+    "episode_id",
+    "position_case_id",
+    "review_kind",
+    "checkpoint_type",
+    "perspective",
+    "operation_anchor_event_id",
+    "operation_anchor_at",
+    "operation_anchor_ordering_key",
+    "as_of",
+    "knowledge_cutoff",
+    "information_time_policy_version",
+    "time_provenance",
+    "status_axes",
+    "market_fallback",
+    "gaps",
+    "source_refs",
+    "governance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "investment_review.operation_checkpoint.v2"
+    },
+    "checkpoint_id": {
+      "type": "string",
+      "pattern": "^review_checkpoint_[0-9a-f]{32}$"
+    },
+    "checkpoint_key": {
+      "type": "string",
+      "pattern": "^review_checkpoint_key_[0-9a-f]{64}$"
+    },
+    "content_id": {
+      "$ref": "#/$defs/sha256"
+    },
+    "episode_id": {
+      "$ref": "#/$defs/nonempty"
+    },
+    "position_case_id": {
+      "$ref": "#/$defs/nonempty"
+    },
+    "review_kind": {
+      "enum": ["operation_review", "active_checkpoint", "postmortem"]
+    },
+    "checkpoint_type": {
+      "enum": ["entry", "active_checkpoint", "adjustment", "exit", "postmortem"]
+    },
+    "perspective": {
+      "$ref": "#/$defs/perspective"
+    },
+    "operation_anchor_event_id": {
+      "$ref": "#/$defs/nonempty"
+    },
+    "operation_anchor_at": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "operation_anchor_ordering_key": {
+      "type": "array",
+      "prefixItems": [
+        {"$ref": "#/$defs/timestamp"},
+        {"type": "integer"},
+        {"$ref": "#/$defs/nonempty"},
+        {"$ref": "#/$defs/nonempty"}
+      ],
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "as_of": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "knowledge_cutoff": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "information_time_policy_version": {
+      "const": "public_availability_user_knowledge_v1"
+    },
+    "time_provenance": {
+      "$ref": "#/$defs/time_provenance"
+    },
+    "status_axes": {
+      "$ref": "#/$defs/status_axes"
+    },
+    "market_fallback": {
+      "$ref": "#/$defs/market_fallback"
+    },
+    "gaps": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/gap"}
+    },
+    "source_refs": {
+      "allOf": [
+        {"$ref": "#/$defs/source_refs"},
+        {"minItems": 1}
+      ]
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["facts_only", "no_motive", "no_advice", "no_score", "no_diagnosis"],
+      "properties": {
+        "facts_only": {"const": true},
+        "no_motive": {"const": true},
+        "no_advice": {"const": true},
+        "no_score": {"const": true},
+        "no_diagnosis": {"const": true}
+      }
+    }
+  },
+  "$defs": {
+    "nonempty": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "timestamp_or_null": {
+      "oneOf": [
+        {"$ref": "#/$defs/timestamp"},
+        {"type": "null"}
+      ]
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "sha256_or_null": {
+      "oneOf": [
+        {"$ref": "#/$defs/sha256"},
+        {"type": "null"}
+      ]
+    },
+    "perspective": {
+      "enum": ["user", "system"]
+    },
+    "source_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/nonempty"}
+    },
+    "time_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "basis", "source_refs"],
+      "properties": {
+        "value": {"$ref": "#/$defs/timestamp_or_null"},
+        "basis": {
+          "enum": [
+            "source_occurred_at",
+            "source_effective_at",
+            "owner_action_default",
+            "explicit_user_record",
+            "system_observation",
+            "recorded_later",
+            "ingest_observation",
+            "not_observed",
+            "unknown"
+          ]
+        },
+        "source_refs": {"$ref": "#/$defs/source_refs"}
+      }
+    },
+    "time_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["effective_at", "user_known_at", "system_observed_at", "recorded_at"],
+      "properties": {
+        "effective_at": {"$ref": "#/$defs/time_projection"},
+        "user_known_at": {"$ref": "#/$defs/time_projection"},
+        "system_observed_at": {"$ref": "#/$defs/time_projection"},
+        "recorded_at": {"$ref": "#/$defs/time_projection"}
+      }
+    },
+    "axis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "source_refs"],
+      "properties": {
+        "status": {"type": "string", "minLength": 1},
+        "summary": {"$ref": "#/$defs/nonempty"},
+        "source_refs": {"$ref": "#/$defs/source_refs"}
+      }
+    },
+    "snapshot_field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "value", "unit", "source_refs"],
+      "properties": {
+        "status": {"enum": ["available", "partial", "missing", "not_applicable"]},
+        "value": {"type": ["string", "null"]},
+        "unit": {"type": ["string", "null"]},
+        "source_refs": {"$ref": "#/$defs/source_refs"}
+      }
+    },
+    "snapshot_axis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "fields", "source_refs"],
+      "properties": {
+        "status": {"enum": ["available", "partial", "missing", "blocked"]},
+        "summary": {"$ref": "#/$defs/nonempty"},
+        "source_refs": {"$ref": "#/$defs/source_refs"},
+        "fields": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["position_quantity", "cost_basis", "cash", "price", "nav", "weight", "industry"],
+          "properties": {
+            "position_quantity": {"$ref": "#/$defs/snapshot_field"},
+            "cost_basis": {"$ref": "#/$defs/snapshot_field"},
+            "cash": {"$ref": "#/$defs/snapshot_field"},
+            "price": {"$ref": "#/$defs/snapshot_field"},
+            "nav": {"$ref": "#/$defs/snapshot_field"},
+            "weight": {"$ref": "#/$defs/snapshot_field"},
+            "industry": {"$ref": "#/$defs/snapshot_field"}
+          }
+        }
+      }
+    },
+    "market_information_time": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "lower_bound", "upper_bound", "basis", "method_version", "revision_ref"],
+      "properties": {
+        "status": {"enum": ["verified", "unknown", "conflicted"]},
+        "lower_bound": {"$ref": "#/$defs/timestamp_or_null"},
+        "upper_bound": {"$ref": "#/$defs/timestamp_or_null"},
+        "basis": {"enum": ["exchange_bar_publication_time.v1", "provider_exact_publication_time.v1", "provider_publication_date_source_timezone.v1", "unknown", "conflicted"]},
+        "method_version": {"const": "public_information_time.v1"},
+        "revision_ref": {"type": ["string", "null"], "minLength": 1}
+      }
+    },
+    "market_version_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "content_sha256", "source_ref", "revision_ref"],
+      "properties": {
+        "status": {"enum": ["verified", "unknown", "conflicted"]},
+        "content_sha256": {"$ref": "#/$defs/sha256"},
+        "source_ref": {"$ref": "#/$defs/nonempty"},
+        "revision_ref": {"$ref": "#/$defs/nonempty"}
+      }
+    },
+    "market_perspective_eligibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["perspective", "status", "reason_code", "temporal_role", "operation_anchor_at", "projected_user_known_at", "projected_system_known_at", "actual_user_observation_proven"],
+      "properties": {
+        "perspective": {"$ref": "#/$defs/perspective"},
+        "status": {"enum": ["eligible", "ineligible", "ambiguous", "unknown"]},
+        "reason_code": {"enum": ["current_only_not_point_in_time", "publication_time_or_revision_conflicted", "publication_time_or_revision_unproven", "publication_revision_binding_conflicted", "verified_publication_strictly_before_operation", "publication_interval_touches_operation_anchor", "post_operation_publication", "system_observation_unknown", "system_observed_no_later_than_operation", "system_observed_after_operation"]},
+        "temporal_role": {"enum": ["user_known_at_operation_by_verified_publication", "system_known_at_operation", "retrospective_public_context", "publication_time_ambiguous", "publication_time_unknown", "system_observation_unknown"]},
+        "operation_anchor_at": {"$ref": "#/$defs/timestamp"},
+        "projected_user_known_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "projected_system_known_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "actual_user_observation_proven": {"const": false}
+      }
+    },
+    "market_axis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "temporal_role",
+        "perspective",
+        "eligible_source_refs",
+        "retrospective_source_refs",
+        "unknown_source_refs",
+        "effective_at",
+        "publicly_available_at",
+        "publicly_available_basis",
+        "fetched_at",
+        "system_observed_at",
+        "representative_source_id",
+        "representative_source_content_id",
+        "information_time",
+        "version_provenance",
+        "perspective_eligibility",
+        "market_evidence_manifest_content_id",
+        "source_refs"
+      ],
+      "properties": {
+        "status": {"enum": ["available", "partial", "missing", "stale", "insufficient", "failed"]},
+        "temporal_role": {
+          "enum": [
+            "user_known_at_operation_by_verified_publication",
+            "system_known_at_operation",
+            "retrospective_context",
+            "ambiguous",
+            "unknown",
+            "missing"
+          ]
+        },
+        "perspective": {"$ref": "#/$defs/perspective"},
+        "eligible_source_refs": {"$ref": "#/$defs/source_refs"},
+        "retrospective_source_refs": {"$ref": "#/$defs/source_refs"},
+        "unknown_source_refs": {"$ref": "#/$defs/source_refs"},
+        "effective_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "publicly_available_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "publicly_available_basis": {
+          "enum": ["source_declared", "exchange_calendar", "provider_declared", "verified_publication_interval", "unknown", "not_applicable"]
+        },
+        "fetched_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "system_observed_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "representative_source_id": {"type": ["string", "null"], "minLength": 1},
+        "representative_source_content_id": {"$ref": "#/$defs/sha256_or_null"},
+        "information_time": {
+          "oneOf": [
+            {"$ref": "#/$defs/market_information_time"},
+            {"type": "null"}
+          ]
+        },
+        "version_provenance": {
+          "oneOf": [
+            {"$ref": "#/$defs/market_version_provenance"},
+            {"type": "null"}
+          ]
+        },
+        "perspective_eligibility": {
+          "oneOf": [
+            {"$ref": "#/$defs/market_perspective_eligibility"},
+            {"type": "null"}
+          ]
+        },
+        "market_evidence_manifest_content_id": {"$ref": "#/$defs/sha256"},
+        "summary": {"$ref": "#/$defs/nonempty"},
+        "source_refs": {"$ref": "#/$defs/source_refs"}
+      }
+    },
+    "status_axes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "decision", "snapshot_cash_valuation", "market", "lifecycle", "outcome"],
+      "properties": {
+        "operation": {
+          "allOf": [
+            {"$ref": "#/$defs/axis"},
+            {"properties": {"status": {"enum": ["ready", "partial", "blocked"]}}}
+          ]
+        },
+        "decision": {
+          "allOf": [
+            {"$ref": "#/$defs/axis"},
+            {"properties": {"status": {"enum": ["complete", "partial", "not_recorded", "not_applicable", "blocked"]}}}
+          ]
+        },
+        "snapshot_cash_valuation": {"$ref": "#/$defs/snapshot_axis"},
+        "market": {"$ref": "#/$defs/market_axis"},
+        "lifecycle": {
+          "allOf": [
+            {"$ref": "#/$defs/axis"},
+            {"properties": {"status": {"enum": ["open", "closed", "ambiguous", "unknown"]}}}
+          ]
+        },
+        "outcome": {
+          "allOf": [
+            {"$ref": "#/$defs/axis"},
+            {"properties": {"status": {"enum": ["interim", "final", "not_applicable", "missing"]}}}
+          ]
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["timeout_seconds", "max_retries", "max_concurrency", "max_requests_per_run"],
+      "properties": {
+        "timeout_seconds": {"const": 20},
+        "max_retries": {"const": 2},
+        "max_concurrency": {"const": 2},
+        "max_requests_per_run": {"const": 20}
+      }
+    },
+    "offline_consumers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["renderer", "source_replay", "api", "ui"],
+      "properties": {
+        "renderer": {"const": false},
+        "source_replay": {"const": false},
+        "api": {"const": false},
+        "ui": {"const": false}
+      }
+    },
+    "fetch_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_id",
+        "provider_id",
+        "endpoint_id",
+        "provider_version",
+        "redacted_parameters",
+        "request_fingerprint_version",
+        "request_fingerprint",
+        "guard_audit_at",
+        "started_at",
+        "completed_at",
+        "fetched_at",
+        "system_observed_at",
+        "response_status",
+        "attempt_count",
+        "attempt_count_status",
+        "budget_charged_attempts",
+        "raw_content_sha256",
+        "normalized_content_sha256",
+        "cache_entry_refs",
+        "cache_lineage"
+      ],
+      "properties": {
+        "receipt_id": {"$ref": "#/$defs/nonempty"},
+        "provider_id": {"$ref": "#/$defs/nonempty"},
+        "endpoint_id": {"$ref": "#/$defs/nonempty"},
+        "provider_version": {"$ref": "#/$defs/nonempty"},
+        "redacted_parameters": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "maxLength": 512}
+        },
+        "request_fingerprint_version": {"const": "market_request_fingerprint.v1"},
+        "request_fingerprint": {"$ref": "#/$defs/sha256"},
+        "guard_audit_at": {"$ref": "#/$defs/timestamp"},
+        "started_at": {"$ref": "#/$defs/timestamp"},
+        "completed_at": {"$ref": "#/$defs/timestamp"},
+        "fetched_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "system_observed_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "response_status": {"enum": ["succeeded", "failed", "timeout", "provider_unavailable", "rejected", "withheld_by_cutoff", "budget_exhausted"]},
+        "attempt_count": {"type": "integer", "minimum": 0, "maximum": 3},
+        "attempt_count_status": {"enum": ["verified", "unknown"]},
+        "budget_charged_attempts": {"type": "integer", "minimum": 0, "maximum": 3},
+        "raw_content_sha256": {"$ref": "#/$defs/sha256_or_null"},
+        "normalized_content_sha256": {"$ref": "#/$defs/sha256_or_null"},
+        "cache_entry_refs": {"$ref": "#/$defs/source_refs"},
+        "cache_lineage": {"$ref": "#/$defs/source_refs"}
+      }
+    },
+    "market_fallback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy_version",
+        "public_information_policy_version",
+        "perspective",
+        "allowlist_version",
+        "allowlist_sha256",
+        "coverage_before",
+        "coverage_after",
+        "status",
+        "limitation_code",
+        "guard_audit_at",
+        "request_count",
+        "request_count_status",
+        "unverified_attempt_upper_bound",
+        "limits",
+        "allowlist",
+        "cache_refs",
+        "fetch_receipt_refs",
+        "fetch_receipts",
+        "offline_consumers"
+      ],
+      "properties": {
+        "policy_version": {"const": "local_first_controlled_fallback_v2"},
+        "public_information_policy_version": {"const": "public_availability_user_knowledge_v1"},
+        "perspective": {"$ref": "#/$defs/perspective"},
+        "allowlist_version": {"const": "market_provider_allowlist.v1"},
+        "allowlist_sha256": {"const": "sha256:1e612c7bf6090fcbfd32aaaef9ca7c73db8441ba939726b9d610238b29b3790a"},
+        "coverage_before": {"enum": ["satisfied", "missing", "stale", "insufficient"]},
+        "coverage_after": {"enum": ["satisfied", "missing", "stale", "insufficient"]},
+        "status": {"enum": ["not_needed", "succeeded", "failed", "provider_unavailable", "withheld_by_cutoff", "budget_exhausted"]},
+        "limitation_code": {
+          "type": ["string", "null"],
+          "enum": [null, "withheld_by_cutoff", "budget_exhausted", "provider_unavailable", "provider_attempt_count_unknown"]
+        },
+        "guard_audit_at": {"$ref": "#/$defs/timestamp_or_null"},
+        "request_count": {"type": "integer", "minimum": 0, "maximum": 20},
+        "request_count_status": {"enum": ["verified", "bounded_unknown"]},
+        "unverified_attempt_upper_bound": {"type": "integer", "minimum": 0, "maximum": 20},
+        "limits": {"$ref": "#/$defs/limits"},
+        "allowlist": {"$ref": "#/$defs/source_refs"},
+        "cache_refs": {"$ref": "#/$defs/source_refs"},
+        "fetch_receipt_refs": {"$ref": "#/$defs/source_refs"},
+        "fetch_receipts": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {"$ref": "#/$defs/fetch_receipt"}
+        },
+        "offline_consumers": {"$ref": "#/$defs/offline_consumers"}
+      }
+    },
+    "gap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gap_id", "axis", "code", "severity", "blocks_axis", "owner", "next_step", "source_refs"],
+      "properties": {
+        "gap_id": {"$ref": "#/$defs/nonempty"},
+        "axis": {"enum": ["operation", "decision", "snapshot_cash_valuation", "market", "lifecycle", "outcome"]},
+        "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$", "not": {"const": "OPEN_EPISODE_OUTCOME_NOT_FINAL"}},
+        "severity": {"enum": ["info", "warning", "blocker"]},
+        "blocks_axis": {"type": "boolean"},
+        "owner": {"$ref": "#/$defs/nonempty"},
+        "next_step": {"$ref": "#/$defs/nonempty"},
+        "source_refs": {"$ref": "#/$defs/source_refs"}
+      }
+    }
+  }
+}

@@ -294,6 +294,101 @@ provider/dependency/credential, or publish.
 See `docs/playbooks/INVESTMENT_REVIEW_REVIEWABILITY.md` and
 `docs/contracts/INVESTMENT_REVIEW_OPERATION_CHECKPOINT.schema.json`.
 
+## Product-completion v4 public-information amendment boundary
+
+The separately authorized v4 amendment is additive. It must not reinterpret or
+modify any v1 checkpoint, fallback receipt, schema file, identity, golden or
+source replay. It adds exactly
+`investment_review.operation_checkpoint.v2`,
+`local_first_controlled_fallback_v2` and
+`public_availability_user_knowledge_v1`.
+
+Every v2 checkpoint binds a recomputed material operation anchor: event ID,
+effective time and the four-field canonical P2C ordering key. Entry,
+adjustment, exit and postmortem checkpoints use their corresponding operation;
+an active checkpoint uses the last selected, validated material operation no
+later than `as_of`. The invariant is
+`operation_anchor_at <= as_of <= knowledge_cutoff`; callers cannot self-assert
+the anchor.
+
+For market or information evidence, the user perspective may project
+`user_known_at_operation_by_verified_publication` only when the exact content
+revision has verified publication bounds and
+`upper_bound < operation_anchor_at`. Equality is ambiguous and ineligible.
+Date-only evidence uses the source-timezone closed-day interval and the same
+strict upper-bound test. Unknown/conflicted publication time, unknown timezone,
+post-operation publication, content-hash/ref drift and an unproven later
+revision remain unknown, ambiguous or ineligible.
+
+This projection means policy-available, not actually read. It must keep
+`actual_user_observation_proven=false` and must not infer attention,
+understanding, motive, thesis or causality. System eligibility is separate and
+requires a real `system_observed_at <= operation_anchor_at`; publication time
+cannot prove system observation.
+
+The v2 pre-bundle cache step may acquire an allowlisted historical version at
+the real current time when perspective-eligible local coverage is missing,
+stale or insufficient. Actual started/fetched/completed/system-observed audit
+times may be later than the operation or historical cutoff and must never be
+backdated or used as publication time. A user request must not be withheld only
+because acquisition is late. A system request that cannot improve historical
+system eligibility is canonical `withheld_by_cutoff` with zero attempts,
+requests, response hashes, fetch time and cache entry. Shared-budget exhaustion
+is a separate `budget_exhausted` limitation. Every such limitation still
+produces a frozen manifest and any otherwise provable operation-ready active
+checkpoint.
+
+Every v2 receipt separately closes `attempt_count_status=verified|unknown` and
+`budget_charged_attempts`. A bare provider exception must not fabricate an exact
+attempt count: it is `failed`, count zero, status `unknown`, conservatively charges
+the reserved bound, and aggregates as `request_count_status=bounded_unknown` plus
+`unverified_attempt_upper_bound` and `provider_attempt_count_unknown`. Zero-request
+guard receipts remain verified/zero and bind real `guard_audit_at=started_at=completed_at`
+without fetch, system-observation, response-hash or cache-entry evidence.
+
+The checkpoint market axis must bind one representative source's canonical envelope
+content ID, closed information-time proof, version provenance and perspective
+eligibility, plus the component-row-only `market_evidence_manifest_content_id` and
+`market_evidence_manifest:<content_id>` source ref. The outer axis uses the simplified
+closed temporal-role vocabulary; detailed eligibility roles remain nested. A source-less
+axis has null representative proof, null market times, `not_applicable` public basis and
+an explicit `missing` role while still binding the empty evidence manifest.
+
+Every local v2 component source also embeds the bounded canonical origin database row;
+every external source embeds the complete canonical immutable cache entry. Offline source
+replay must rebuild the projected values, effective/public times, version and revision
+proof, eligibility, receipt lineage and row identity from that origin proof. Projected
+fields, hashes or references must never validate one another without the origin proof,
+and revision conflicts must be derived from the competing origin proofs. Canonically
+byte-identical provider rows may be deduplicated; different bytes remain distinct revision
+candidates and must not be silently collapsed.
+
+If a provider has already produced a verified successful receipt and a later provider
+attempt has an unknown attempt count, the bounded fallback aggregate remains `succeeded`
+and retains that success. It additionally records the bounded-unknown attempt limitation;
+the later uncertainty must neither erase the successful evidence nor fabricate an exact
+request total.
+
+v2 inherits the exact v1 provider allowlist, safe parameters, redaction,
+timeout/retry/concurrency/request caps, cache lineage and offline renderer,
+source-replay, API and UI boundary. Raw bytes may cross perspectives only when
+their revision and information-time provenance are identical; requirements,
+resolutions, projections, manifests and task/run identities remain
+perspective/policy/anchor-specific.
+
+The existing authorized reviewability candidate may be upgraded once through
+an explicit exact-v1-gated `BEGIN IMMEDIATE` marker transaction. The upgrade
+must preserve WAL/quick-check, every DDL object and every immutable v1 row; it
+adds no table, column, index or sidecar. Afterward, v1 rows remain readable and
+replayable (and exact replays may be skipped), but no new v1 row may be created.
+Before and after opening the writable handle and again under the immediate lock,
+the upgrade must rebind the original main/WAL/SHM filesystem identity and the
+SQLite `main` path. Path replacement or metadata/content drift fails before any
+marker write.
+New v2 checkpoints use a new explicit `knowledge_cutoff` and must fail before
+SQLite insertion when the unchanged storage unique tuple would collide. See
+`docs/contracts/INVESTMENT_REVIEW_OPERATION_CHECKPOINT_V2.schema.json`.
+
 ## P2A portfolio-context boundary
 
 After the Phase 1 evidence layer is accepted, the implementation may also:

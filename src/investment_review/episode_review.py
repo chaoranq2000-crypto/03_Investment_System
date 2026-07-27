@@ -128,6 +128,14 @@ _NON_EX_ANTE_KINDS = {
 }
 _NOT_APPLICABLE_KINDS = {"episode_lifecycle", "security_identity"}
 _MARKET_KINDS = {"market_context", "price", "classification"}
+_MARKET_STATUS_GAP_CODES = {
+    "missing": "MARKET_CONTEXT_MISSING",
+    "failed": "MARKET_CONTEXT_FAILED",
+    "stale": "MARKET_CONTEXT_STALE",
+    "insufficient": "MARKET_CONTEXT_INSUFFICIENT",
+    "partial": "MARKET_CONTEXT_INSUFFICIENT",
+    "withheld": "MARKET_CONTEXT_WITHHELD_BY_CUTOFF",
+}
 _PLAN_FIELDS = {
     "planned_symbol": "symbol",
     "planned_market": "market",
@@ -1269,6 +1277,68 @@ def _build_optional_source_facts(
     return facts
 
 
+def _market_context_gap_codes(
+    sources: Sequence[Mapping[str, Any]],
+    *,
+    section_status: str,
+    facts: Sequence[Mapping[str, Any]],
+) -> list[str]:
+    """Keep aggregate market limitations visible without interpreting rows.
+
+    The versioned aggregate manifest is a frozen source just like every other
+    P2F supplemental.  Its internal market status is more precise than the
+    legacy P2F availability enum, so this facts-only projection carries that
+    precision only as a deterministic gap code.  It never calls an adapter,
+    provider, database, or network source.
+    """
+
+    from . import market_context_adapter as market_adapter
+
+    manifest_versions = {
+        str(getattr(market_adapter, name))
+        for name in (
+            "MARKET_CONTEXT_MANIFEST_VERSION",
+            "MARKET_CONTEXT_MANIFEST_VERSION_V2",
+        )
+        if isinstance(getattr(market_adapter, name, None), str)
+    }
+
+    statuses = {
+        str(payload.get("market_status") or "")
+        for source in sources
+        if source.get("source_kind") == "market_context"
+        and isinstance(source.get("payload"), Mapping)
+        for payload in [source["payload"]]
+        if payload.get("schema_version") in manifest_versions
+    }
+    v2_manifest_version = getattr(
+        market_adapter, "MARKET_CONTEXT_MANIFEST_VERSION_V2", None
+    )
+    explicit_v2_gaps = {
+        str(gap.get("code") or "")
+        for source in sources
+        if source.get("source_kind") == "market_context"
+        and isinstance(source.get("payload"), Mapping)
+        for payload in [source["payload"]]
+        if payload.get("schema_version") == v2_manifest_version
+        for gap in payload.get("market_gaps", [])
+        if isinstance(gap, Mapping) and str(gap.get("code") or "")
+    }
+    gaps = {
+        _MARKET_STATUS_GAP_CODES[status]
+        for status in statuses
+        if status in _MARKET_STATUS_GAP_CODES
+    }
+    gaps.update(explicit_v2_gaps)
+    if statuses:
+        return sorted(gaps)
+    if section_status == "withheld_by_cutoff":
+        gaps.add("MARKET_CONTEXT_WITHHELD_BY_CUTOFF")
+    elif not facts:
+        gaps.add("MARKET_CONTEXT_MISSING")
+    return sorted(gaps)
+
+
 def _normalized_plan_value(field: str, value: object) -> str | None:
     if value in (None, "") or isinstance(value, (Mapping, list, tuple, bool, float)):
         return None
@@ -1553,12 +1623,10 @@ def build_facts_only_episode_review(
     market_status = str(
         (section_availability.get("market_context") or {}).get("status") or "missing"
     )
-    market_gaps = (
-        ["MARKET_CONTEXT_WITHHELD_BY_CUTOFF"]
-        if market_status == "withheld_by_cutoff"
-        else ["MARKET_CONTEXT_MISSING"]
-        if not market_facts
-        else []
+    market_gaps = _market_context_gap_codes(
+        supplemental,
+        section_status=market_status,
+        facts=market_facts,
     )
     outcome_status = str(
         (section_availability.get("outcome_context") or {}).get("status") or "missing"

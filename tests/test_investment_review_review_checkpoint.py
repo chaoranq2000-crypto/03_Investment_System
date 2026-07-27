@@ -18,19 +18,24 @@ from src.investment_review.ledger_snapshot_reconstruction import (
 )
 from src.investment_review.models import (
     MARKET_FALLBACK_POLICY_VERSION,
+    MARKET_FALLBACK_POLICY_VERSION_V2,
     MARKET_PROVIDER_ALLOWLIST,
     MARKET_PROVIDER_ALLOWLIST_SHA256,
     MARKET_PROVIDER_ALLOWLIST_VERSION,
+    OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+    PUBLIC_INFORMATION_POLICY_VERSION,
     OperationCheckpointRecord,
 )
 from src.investment_review.operation_review import build_operation_review
 from src.investment_review.review_checkpoint import (
     METHOD_VERSION,
+    METHOD_VERSION_V2,
     ReviewCheckpointConflictError,
     ReviewCheckpointError,
     build_review_checkpoint,
     canonical_review_checkpoint_bytes,
     derive_checkpoint_semantics,
+    derive_review_checkpoint_operation_anchor,
     plan_review_checkpoint_append,
     replay_validate_review_checkpoint,
     validate_review_checkpoint,
@@ -246,6 +251,71 @@ def _market(
     return axis, fallback
 
 
+def _market_v2() -> tuple[dict[str, object], dict[str, object]]:
+    axis, fallback = _market()
+    cache_ref = str(axis["source_refs"][0])
+    manifest_content_id = "sha256:" + "d" * 64
+    axis.update(
+        {
+            "temporal_role": "user_known_at_operation_by_verified_publication",
+            "perspective": "user",
+            "eligible_source_refs": [cache_ref],
+            "retrospective_source_refs": [],
+            "unknown_source_refs": [],
+            "publicly_available_basis": "verified_publication_interval",
+            "representative_source_id": cache_ref,
+            "representative_source_content_id": "sha256:" + "a" * 64,
+            "information_time": {
+                "status": "verified",
+                "lower_bound": "2026-01-01T00:00:00Z",
+                "upper_bound": "2026-01-01T07:01:00Z",
+                "basis": "provider_publication_date_source_timezone.v1",
+                "method_version": "public_information_time.v1",
+                "revision_ref": "revision:close:2026-01-01",
+            },
+            "version_provenance": {
+                "status": "verified",
+                "content_sha256": "sha256:" + "b" * 64,
+                "source_ref": cache_ref,
+                "revision_ref": "revision:close:2026-01-01",
+            },
+            "perspective_eligibility": {
+                "perspective": "user",
+                "status": "eligible",
+                "reason_code": "verified_publication_strictly_before_operation",
+                "temporal_role": (
+                    "user_known_at_operation_by_verified_publication"
+                ),
+                "operation_anchor_at": ADJUSTED_AT,
+                "projected_user_known_at": ADJUSTED_AT,
+                "projected_system_known_at": None,
+                "actual_user_observation_proven": False,
+            },
+            "market_evidence_manifest_content_id": manifest_content_id,
+            "source_refs": sorted(
+                {
+                    cache_ref,
+                    "market_evidence_manifest:" + manifest_content_id,
+                }
+            ),
+        }
+    )
+    fallback.update(
+        {
+            "policy_version": MARKET_FALLBACK_POLICY_VERSION_V2,
+            "public_information_policy_version": (
+                PUBLIC_INFORMATION_POLICY_VERSION
+            ),
+            "perspective": "user",
+            "limitation_code": None,
+            "guard_audit_at": None,
+            "request_count_status": "verified",
+            "unverified_attempt_upper_bound": 0,
+        }
+    )
+    return axis, fallback
+
+
 def _build(
     sources: dict[str, Any],
     *,
@@ -308,6 +378,97 @@ def test_active_checkpoint_is_ready_open_interim_without_an_outcome_gap() -> Non
     )
     assert replay["validation_status"] == "accepted"
     assert replay["source_verification"]["status"] == "verified"
+
+
+def test_v2_active_checkpoint_recomputes_and_replays_operation_anchor() -> None:
+    sources = _sources(_open_events(), as_of=ACTIVE_AT)
+    market_axis, market_fallback = _market_v2()
+    checkpoint = build_review_checkpoint(
+        **sources,
+        perspective="user",
+        checkpoint_as_of=ACTIVE_AT,
+        knowledge_cutoff=KNOWLEDGE_CUTOFF,
+        checkpoint_type="active_checkpoint",
+        market_axis=market_axis,
+        market_fallback=market_fallback,
+        checkpoint_schema_version=OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+    )
+    assert checkpoint["operation_anchor_event_id"] == "evt-adjust"
+    assert checkpoint["operation_anchor_at"] == ADJUSTED_AT
+    assert checkpoint["operation_anchor_at"] < checkpoint["as_of"]
+    assert checkpoint["operation_anchor_ordering_key"][3] == "evt-adjust"
+    helper_anchor = derive_review_checkpoint_operation_anchor(
+        sources["episode"],
+        operation_review=sources["operation_review"],
+        checkpoint_type="active_checkpoint",
+        checkpoint_as_of=ACTIVE_AT,
+    )
+    assert checkpoint["operation_anchor_event_id"] == helper_anchor[
+        "operation_anchor_event_id"
+    ]
+    assert checkpoint["operation_anchor_at"] == helper_anchor["operation_anchor_at"]
+    assert checkpoint["operation_anchor_ordering_key"] == helper_anchor[
+        "operation_anchor_ordering_key"
+    ]
+    assert checkpoint["operation_anchor_ordering_key"][0] == ADJUSTED_AT
+    assert f"method:{METHOD_VERSION_V2}" in checkpoint["source_refs"]
+    assert validate_review_checkpoint(checkpoint)["validation_status"] == "accepted"
+    replay = replay_validate_review_checkpoint(
+        checkpoint,
+        **sources,
+        perspective="user",
+        checkpoint_as_of=ACTIVE_AT,
+        knowledge_cutoff=KNOWLEDGE_CUTOFF,
+        checkpoint_type="active_checkpoint",
+        market_axis=market_axis,
+        market_fallback=market_fallback,
+        checkpoint_schema_version=OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+    )
+    assert replay["validation_status"] == "accepted"
+    assert replay["source_verification"]["status"] == "verified"
+
+
+def test_v2_checkpoint_rejects_representative_effective_after_fetch() -> None:
+    sources = _sources(_open_events(), as_of=ACTIVE_AT)
+    market_axis, market_fallback = _market_v2()
+    market_axis["effective_at"] = "2026-01-01T07:03:00Z"
+    with pytest.raises(ReviewCheckpointError, match="closed operation contract"):
+        build_review_checkpoint(
+            **sources,
+            perspective="user",
+            checkpoint_as_of=ACTIVE_AT,
+            knowledge_cutoff=KNOWLEDGE_CUTOFF,
+            checkpoint_type="active_checkpoint",
+            market_axis=market_axis,
+            market_fallback=market_fallback,
+            checkpoint_schema_version=OPERATION_CHECKPOINT_SCHEMA_VERSION_V2,
+        )
+
+
+def test_v2_active_anchor_skips_later_ambiguous_nonmaterial_operation() -> None:
+    events = _open_events() + [
+        _event(
+            "evt-ambiguous",
+            "2026-01-03T12:00:00Z",
+            side="TRANSFER_IN",
+            quantity="10",
+            sequence=3,
+        )
+    ]
+    collection = build_episode_collection(events, cutoff_at=KNOWLEDGE_CUTOFF)
+    operation_review = build_operation_review(collection, event_inputs=events)
+    assert operation_review["episode_reviews"][0]["operations"][-1][
+        "classification_status"
+    ] == "ambiguous"
+    anchor = derive_review_checkpoint_operation_anchor(
+        collection["episodes"][0],
+        operation_review=operation_review,
+        checkpoint_type="active_checkpoint",
+        checkpoint_as_of=ACTIVE_AT,
+    )
+    assert anchor["operation_anchor_event_id"] == "evt-adjust"
+    assert anchor["operation_anchor_at"] == ADJUSTED_AT
+    assert anchor["classification_status"] == "ready"
 
 
 def test_entry_adjustment_exit_and_postmortem_have_closed_semantics() -> None:

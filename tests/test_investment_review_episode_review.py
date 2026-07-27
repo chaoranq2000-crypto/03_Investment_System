@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import socket
 import sys
 from copy import deepcopy
 from datetime import timedelta
@@ -906,6 +907,159 @@ def test_source_replay_accepts_exact_bundle_and_rejects_another_valid_bundle(
     _assert_blocked(
         replay_validate_episode_review(review, input_bundle=other_bundle)
     )
+
+
+def test_facts_renderer_and_source_replay_never_open_a_network_socket(
+    monkeypatch: pytest.MonkeyPatch,
+    review: dict[str, Any],
+    bundle: dict[str, Any],
+) -> None:
+    calls: list[tuple[object, ...]] = []
+
+    def forbidden_connect(*args: object, **_kwargs: object) -> None:
+        calls.append(args)
+        raise AssertionError("facts-only consumers must remain offline")
+
+    monkeypatch.setattr(socket, "create_connection", forbidden_connect)
+
+    rendered = render_episode_review_markdown(review)
+    replay = replay_validate_episode_review(review, input_bundle=bundle)
+
+    assert "# 单笔交易复盘" in rendered
+    assert replay["source_verification"]["status"] == "verified"
+    assert calls == []
+
+
+def test_available_prior_close_is_a_hash_bound_fact_without_interpretation(
+    tmp_path: Path,
+) -> None:
+    chain = P2F1._fixture_chain(
+        tmp_path,
+        supplemental=(),
+        market_close_trade_date="2026-06-30",
+    )
+    market = P2F1._market_projection(chain, tmp_path)
+    bundle = P2F1._build_bundle(
+        chain,
+        supplemental=market["supplemental_sources"],
+    )
+    artifact = build_facts_only_episode_review(bundle)
+    prior_close_source = next(
+        item
+        for item in bundle["frozen_sources"]["supplemental_sources"]
+        if (item.get("payload") or {}).get("component") == "prior_close"
+    )
+    prior_close_fact = next(
+        item
+        for item in _facts(artifact, "market_context")
+        if (item.get("data") or {}).get("source_id")
+        == prior_close_source["source_id"]
+    )
+
+    assert prior_close_source["payload"]["values"]["close"] == "3.929"
+    assert prior_close_fact["availability"] == "available"
+    assert prior_close_fact["data"]["payload_content_id"] == prior_close_source[
+        "payload_content_id"
+    ]
+    assert prior_close_fact["data"]["source_claim_type"] == "unknown"
+    assert artifact["fact_sections"]["market_context"]["gap_codes"] == []
+    assert artifact["interpretation_sections"] == {
+        name: [] for name in INTERPRETATION_SECTION_NAMES
+    }
+
+
+def test_versioned_market_facts_render_and_replay_offline_after_bundle_freeze(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    chain = P2F1._fixture_chain(
+        tmp_path,
+        supplemental=(),
+        market_close_trade_date="2026-06-30",
+    )
+    market = P2F1._market_projection(chain, tmp_path)
+    bundle = P2F1._build_bundle(
+        chain,
+        supplemental=market["supplemental_sources"],
+    )
+    calls: list[tuple[object, ...]] = []
+
+    def forbidden_connect(*args: object, **_kwargs: object) -> None:
+        calls.append(args)
+        raise AssertionError("frozen market consumers must remain offline")
+
+    from src.investment_review import market_context_adapter
+
+    monkeypatch.setattr(socket, "create_connection", forbidden_connect)
+    monkeypatch.setattr(
+        market_context_adapter,
+        "resolve_market_context",
+        forbidden_connect,
+    )
+    artifact = build_facts_only_episode_review(bundle)
+    rendered = render_episode_review_markdown(artifact)
+    replay = replay_validate_episode_review(artifact, input_bundle=bundle)
+
+    assert "3.929" in json.dumps(bundle, ensure_ascii=False)
+    assert "市场上下文" in rendered
+    assert replay["source_verification"]["status"] == "verified"
+    assert calls == []
+
+
+@pytest.mark.parametrize(
+    ("case_name", "close_trade_date", "expected_status", "expected_gap"),
+    [
+        (
+            "missing",
+            P2F1._NO_MARKET_FIXTURE,
+            "missing",
+            "MARKET_CONTEXT_MISSING",
+        ),
+        (
+            "insufficient",
+            None,
+            "ambiguous",
+            "MARKET_CONTEXT_INSUFFICIENT",
+        ),
+        (
+            "stale",
+            "2026-05-01",
+            "stale",
+            "MARKET_CONTEXT_STALE",
+        ),
+    ],
+)
+def test_versioned_market_limitations_remain_explicit_facts_only_gaps(
+    tmp_path: Path,
+    case_name: str,
+    close_trade_date: object,
+    expected_status: str,
+    expected_gap: str,
+) -> None:
+    case_root = tmp_path / case_name
+    case_root.mkdir()
+    chain = P2F1._fixture_chain(
+        case_root,
+        supplemental=(),
+        market_close_trade_date=close_trade_date,
+    )
+    market = P2F1._market_projection(chain, case_root)
+    bundle = P2F1._build_bundle(
+        chain,
+        supplemental=market["supplemental_sources"],
+    )
+    artifact = build_facts_only_episode_review(bundle)
+    section = artifact["fact_sections"]["market_context"]
+
+    assert section["status"] == expected_status
+    assert expected_gap in section["gap_codes"]
+    assert section["facts"]
+    if expected_status == "stale":
+        assert all(
+            fact["availability"] != "available"
+            for fact in section["facts"]
+            if (fact.get("data") or {}).get("source_kind") == "price"
+        )
 
 
 def test_section_status_and_gap_codes_are_exactly_derived_from_input_bundle(
