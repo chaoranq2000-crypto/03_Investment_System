@@ -3,10 +3,10 @@ validation_id: V-006
 phase: P5
 decision: pass
 contract:
-  path: docs/codex_tasks/v1_governance_integration_cleanup_v7/CONTRACT.md
-  canonical_sha256: 69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97
+  path: docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md
+  canonical_sha256: c8f19b03dd2fa17016bab3995eaa48fe8604bdb7e7027e5197aedcbfac01eb8b
   status: frozen
-  source_baseline: d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74
+  source_baseline: fe986a0359c0268ac94eea696c3a4795403e4614
 authority:
   a1_modify_existing_exact_count: 120
   a2_add_exact_count: 13
@@ -204,29 +204,43 @@ active_reference_scan:
 deletion_control:
   root_agents:
     path: AGENTS.md
-    blob_oid: 0a57c3f9f624f5645f52a056ed1a62991271f632
-    byte_count: 7661
-    sha256: 1717636c2e2dd7c92c9ac35ef66ef6231d471d398f28c681ad99e8a110174cbf
+    blob_oid: e9619f0e919764ff092c0cfe3550a41b618b0ea2
+    byte_count: 9605
+    sha256: e79ccc75e02041be1aec6948206bad70405958753511e633fc0394c1eb0c5fbf
   wave_actors:
     night:
       deletion_actor: codex_exact_manifest_one_file_at_a_time
       codex_delete_authorized: true
     bundle:
-      deletion_actor: user_manual_only
-      codex_delete_authorized: false
+      deletion_actor: codex_exact_manifest_one_file_at_a_time
+      codex_delete_authorized: true
     old002837:
-      deletion_actor: user_manual_only
-      codex_delete_authorized: false
-  night_delete_surface:
+      deletion_actor: codex_exact_manifest_one_file_at_a_time
+      codex_delete_authorized: true
+  file_delete_surface:
     command: delete-wave
+    eligible_waves:
+    - bundle
+    - old002837
+    completed_night_rejected: true
     single_literal_path_per_unlink: true
     ordinal_prefix_resume_only: true
+    head_and_index_blob_match_manifest: true
     rejects_stage_and_commit: true
     writes_receipt_only_after_complete_vector_validation: true
+  old002837_directory_surface:
+    command: delete-wave
+    requires_complete_501_file_deletion_vector: true
+    single_literal_directory_per_non_recursive_removal: true
+    deepest_first_prefix_suffix_resume_only: true
+    requires_empty_non_reparse_directory: true
+    complete_entry_enumeration: true
+    git_vectors_unchanged_per_directory: true
+    rejects_stage_and_commit: true
 restore_verification:
   file_count: 1386
   content_byte_count: 9787412
-  restore_root: C:\Users\Q\AppData\Local\Temp\v7_v1_historical_restore_bfac086c247a468e84b001c2b52eca5d
+  restore_root: C:\Users\Q\AppData\Local\Temp\v8_v1_historical_restore_e7939036de974f27afb7306970f49576
   cat_file_e_verified: true
   content_hash_verified: true
   full_restore_verified: true

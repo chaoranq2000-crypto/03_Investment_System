@@ -82,6 +82,7 @@ def test_baseline_manifest_is_exact_sorted_and_durable(tool, manifest) -> None:
     paths = [row["path"] for row in rows]
 
     assert manifest["schema_version"] == "r5_v1_historical_baseline_manifest_v1"
+    assert manifest["contract"] == tool.verify_contract(ROOT)
     assert manifest["source_snapshot"] == tool.HISTORICAL_SOURCE_SNAPSHOT
     assert manifest["durable_restore_refs"] == {
         "night_source": tool.NIGHT_SOURCE,

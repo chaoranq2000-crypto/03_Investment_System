@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v8"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md"
 contract_sha256: "c8f19b03dd2fa17016bab3995eaa48fe8604bdb7e7027e5197aedcbfac01eb8b"
-state: "ready"
+state: "running"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "fe986a0359c0268ac94eea696c3a4795403e4614"
 last_completed_phase: "P4"
 next_phase: "P5"
 last_validation: "pass"
-updated_at: "2026-07-27T05:17:48+00:00"
+updated_at: "2026-07-27T14:16:42+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -40,14 +40,14 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `ready`
+- **State:** `running`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`。继承证据显示 v7 pre-delete V-005/V-006/full restore/full pytest 全通过；Night clean arm=`e3b7ac48...`，deletion commit=`be42857b...` 精确包含 680 个 manifest `D` 与 1 个 Night receipt `A`，post-Night evidence checkpoint=`ada5ebff67e5604232463deb7effdcac1cd61d9e`。Bundle 205/205 路径与 old002837 501/501 路径仍存在，Night 680/680 缺失。old002837 独立只读审计证明 filesystem/index/manifest 501-file sets 闭合，canonical blobs 全匹配；删除文件后需清理的目录精确为 29 paths/2208 relative-vector bytes/SHA `1e987f...`、3803 absolute-vector bytes/SHA `31669a...`，无额外 entry、nested AGENTS、symlink/reparse 或 special entry。
-- **Current blocker:** 无执行 blocker；当前只是未冻结 package gate。冻结、package-only setup、A.2 identity/delete-surface plumbing 与新 Bundle v8 arm 完成前，不得删除任何 Bundle/old002837 路径。
+- **Latest validation:** `pass`。A.2 已机械重绑 v8 contract/root-AGENTS identity；三个 wave actor 均为 Codex=true，completed Night 被破坏性入口拒绝；Bundle/old002837 file surface 绑定新 v8 arm、ordinal-D prefix、HEAD/index blob 与单 literal unlink；old002837 directory surface 绑定固定 29-row deepest-first manifest、完整 entry 枚举、empty/non-reparse 与逐项 Git-vector 不变。全量恢复 `1386 files / 9,787,412 bytes` 四项 true；V-002 pass、V-003 final 194 passed、V-004 双 digest 相同且 16 passed、V-005 18 passed、V-006 28 passed、V-008 pass、V-011 `ok=true/state=running/warnings=0`、full pytest `1146 passed, 2 skipped`。
+- **Current blocker:** 无；尚需完成本 A.2 checkpoint 的 scope/user-main/remote preflight 审计并创建 `chore(v1): rebind remaining cleanup actors for v8`。在该 commit clean 且重新验证 Bundle 205-path materialization 前不得 arm 或删除。
 - **Prior hard-stop evidence:** v4 checkpoints `0f582599...` 与 `f1dafeb...` 保留历史冲突证据；v5 已修复三项 A.7 冲突以及 A.2 retained-dependency/unknown-classification 缺陷。旧 `82f7d37...` arm 因其后存在 policy/v6 commits 已失去 current-wave-parent 资格。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；批准的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`，tracked-only 为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。v6 准备时补丁工具的两份未跟踪草稿曾误落该树，已按两个明确文件路径逐一撤销；HEAD 与两组 raw NUL 向量随后精确恢复。不得再写入、清理、修复、吸收或提交其中内容。
-- **Next safe action:** Open a new Codex chat in the execution worktree and paste the launch block.
+- **Next safe action:** 审计当前 9-path diff 全部属于 A.1 actor/checkpoint metadata 或 A.2，复核用户主树只读向量、远端准备值与冻结合同，然后显式 stage 这 9 个路径并创建 `chore(v1): rebind remaining cleanup actors for v8`。
 
 ### P5 pre-delete completion evidence
 
@@ -55,10 +55,10 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - Historical cleanup inventory: 1,386 files / 9,787,412 content bytes / 121,264 path-vector bytes / SHA-256 `974d45610144d616f69c3c368d9ea1a0a27d66601a24f748aa8148e2ee702f33`.
 - Wave aggregates: Night 680 / 4,480,614 / `1ec2f42b84c1078f6b26caa377e9c1fb3efff9221196bc2e02bd819588a59c59`; Bundle 205 / 1,770,109 / `fc8912dfe6d20d92bd8fe907d4400ae90b724826a7c468ba5286232dc3b3363a`; old002837 501 / 3,536,689 / `73d0a405b928fa3fa615d5b0d527f16f7c1182bb16239fb9ef89266d9868862f`.
 - Reference graph: `reference_count=0`, `unknown_classification_count=0`, A.7 overlap exact and all Night, retained/protected overlap 0.
-- Restore proof: all 1,386 Git blobs recovered byte-for-byte; v7 root `C:\Users\Q\AppData\Local\Temp\v7_v1_historical_restore_bfac086c247a468e84b001c2b52eca5d`; `cat_file_e_verified`, `content_hash_verified`, `full_restore_verified` and `byte_for_byte_match` all true.
-- Current validators: V-005 18 passed; V-006 26 passed; A.7/actor/path authority and full restore covered by V-006; inherited untouched V-003/V-004/V-008 evidence remains green.
-- Current full repository pytest: `1354 passed, 2 skipped in 811.32s`; zero failures/errors and no added skip/xfail/mock/collection-ignore.
-- Scope through the current baseline: v7 completed the D-017 receipt/readout and A.2 identity/control work plus Night deletion; `fe986a0...` then changed only root `AGENTS.md`. The current uncommitted package contains only v8 `CONTRACT.md` and `START_HERE.md`; no Bundle/old002837 deletion, raw-data change or user-main write has occurred.
+- Restore proof: all 1,386 Git blobs recovered byte-for-byte under `C:\Users\Q\AppData\Local\Temp\v8_v1_historical_restore_e7939036de974f27afb7306970f49576`; `cat_file_e_verified`, `content_hash_verified`, `full_restore_verified` and `byte_for_byte_match` all true.
+- Current validators: V-002 pass；V-003 final 194 passed；V-004 两次 semantic digest 均为 `2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6` 且 16 passed；V-005 18 passed；V-006 28 passed；V-008 pass/17 capabilities/0 blockers；V-011 `ok=true`、`state=running`、0 warnings。
+- Current full repository pytest: `1146 passed, 2 skipped in 700.39s`; zero failures/errors and no added skip/xfail/mock/collection-ignore.
+- Scope through the current checkpoint: uncommitted changes are exactly v8 `START_HERE.md`、`governance_cleanup_readout.md` actor/checkpoint metadata、A.2 cleanup tool/two manifests/two tests/`historical_decoupling.yaml`/`full_pytest.txt` 共 9 paths；0 deletion，0 raw-data change，0 user-main write，Bundle/old002837 均未 arm。
 
 ### P5 Night exact-manifest completed
 
@@ -1252,3 +1252,5 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-27T13:10:00+08:00 — 用户明确授权 Codex 对经验证精确清单按单个明确路径逐项自动删除文件，并随后明确“允许删目录”。只读审计确认 old002837 501-file manifest/filesystem/index sets 完全闭合；删除文件后需按 deepest-first 清理恰好 29 个目录，relative NUL vector=2208 bytes/SHA `1e987f07...`，absolute NUL vector=3803 bytes/SHA `31669a8f...`，无 nested AGENTS、extra entry、symlink/reparse 或 special entry。
 - 2026-07-27T13:18:00+08:00 — exact-empty-directory policy checkpoint `fe986a0359c0268ac94eea696c3a4795403e4614` 已创建，直接父为 v7 Bundle manual arm `a75ade4...`，提交只修改根 `AGENTS.md`。新 policy 仅允许冻结 exact manifest、文件向量先验证、deepest-first、一次一个 absolute literal empty/non-reparse directory 的非递归删除，并要求每次前后目录 prefix/suffix 与 Git vectors fail-closed。
 - 2026-07-27T13:22:00+08:00 — v8 draft 以 `fe986a0...` 为 source baseline，只拟把剩余 Bundle/old002837 actor 重绑为 Codex exact-file actor，并加入 old002837 固定 29-row empty-directory cleanup surface；Night completed、三波顺序、1386 与 680/205/501 file sets/bytes/hash、恢复、回归和发布模式 A 不变。尚未 finalize、setup、A.2 plumbing、new arm 或删除。
+- 2026-07-27T13:19:36+08:00 — v8 已冻结，canonical SHA-256=`c8f19b03dd2fa17016bab3995eaa48fe8604bdb7e7027e5197aedcbfac01eb8b`；package-only setup checkpoint=`37d312b00bfbad33bf66a7e1a3169a9fd0559ad8` 精确只新增两份 v8 package 文件。contract/START/manifest/directory 三路独立审计均通过；当前仅进入 A.2 identity/actor/delete-surface plumbing，尚未新 arm 或删除 Bundle/old002837。
+- 2026-07-27T14:16:42+08:00 — v8 A.2 identity/actor/delete-surface plumbing 完成：三波 actor 全部 Codex=true；completed Night 拒绝重放；Bundle/old 文件面绑定新 arm、HEAD/index blob 和 exact ordinal prefix；old002837 目录面绑定 29-row deepest-first exact manifest、完整枚举、empty/non-reparse 与逐项 Git-vector 不变。全量恢复 1,386/9,787,412 通过，V-006 28 passed，full pytest 1146 passed/2 skipped；尚未 arm 或删除剩余波次。

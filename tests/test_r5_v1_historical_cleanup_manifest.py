@@ -61,6 +61,22 @@ def test_cleanup_manifest_is_exact_three_wave_partition(tool, documents) -> None
     assert paths == sorted(paths)
     assert len(paths) == len(set(paths))
     assert cleanup["aggregate"] == tool._aggregate(rows)
+    directories = cleanup["old002837_empty_directory_cleanup"]
+    assert directories == tool.build_old002837_directory_manifest(ROOT)
+    assert directories["aggregate"] == {
+        "directory_count": 29,
+        "path_vector_encoding": "deepest_first_utf8_nul",
+        "path_vector_byte_count": 2208,
+        "path_vector_sha256": (
+            "1e987f07ab4aa9b7c54a7444b053949b5c5d377655903d9715d8948e42446cd3"
+        ),
+        "absolute_path_vector_byte_count": 3803,
+        "absolute_path_vector_sha256": (
+            "31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75"
+        ),
+    }
+    assert directories["paths"] == list(tool.OLD002837_DIRECTORIES)
+    assert set(directories["paths"]).isdisjoint(paths)
 
     flattened = [
         path
@@ -142,16 +158,11 @@ def test_actual_manifest_has_no_wildcard_absolute_or_escaping_path(
         assert "\\" not in path
         assert row["active_reference_count"] >= 0
         assert row["reference_scan_scope"] == "tracked_active_roots"
-        actor_precondition = (
-            "codex_unlinks_only_this_exact_literal_regular_file"
-            if row["wave"] == "night"
-            else "user_manually_deletes_only_this_exact_path"
-        )
         assert row["deletion_preconditions"] == [
             "active_reference_count_equals_zero",
             "baseline_blob_and_full_restore_verified",
             "current_wave_armed_in_start_here",
-            actor_precondition,
+            "codex_unlinks_only_this_exact_literal_regular_file",
         ]
 
 
@@ -218,7 +229,7 @@ def test_vector_parsers_and_document_validation_fail_closed(tool, documents) -> 
         tool.validate_documents(ROOT, baseline, duplicate)
 
 
-def test_cli_exposes_only_night_delete_and_no_stage_or_commit_surface(tool) -> None:
+def test_cli_rejects_completed_night_and_has_no_stage_or_commit_surface(tool) -> None:
     parser = tool.build_parser()
     help_text = parser.format_help().lower()
     assert "stage" not in parser._subparsers._group_actions[0].choices
@@ -235,10 +246,10 @@ def test_cli_exposes_only_night_delete_and_no_stage_or_commit_surface(tool) -> N
     wave_action = next(
         action for action in delete_parser._actions if action.dest == "wave"
     )
-    assert tuple(wave_action.choices) == ("night",)
+    assert tuple(wave_action.choices) == ("bundle", "old002837")
     with pytest.raises(SystemExit):
         parser.parse_args(
-            ["delete-wave", "--wave", "bundle", "--wave-parent", "deadbeef"]
+            ["delete-wave", "--wave", "night", "--wave-parent", "deadbeef"]
         )
 
     tree = ast.parse(inspect.getsource(tool))
@@ -264,7 +275,7 @@ def _diff_payload(paths: list[str]) -> bytes:
     return b"".join(b"D\0" + path.encode("utf-8") + b"\0" for path in paths)
 
 
-def test_night_vector_accepts_only_an_exact_ordinal_prefix(tool) -> None:
+def test_file_vector_accepts_only_an_exact_ordinal_prefix(tool) -> None:
     expected = ["a.txt", "b.txt", "c.txt"]
     assert tool.validate_deletion_prefix_vectors(b"", b"", b"", expected)[
         "prefix_count"
@@ -301,7 +312,7 @@ def test_night_vector_accepts_only_an_exact_ordinal_prefix(tool) -> None:
         tool.validate_deletion_prefix_vectors(b"", b"", b"M\0a.txt\0", expected)
 
 
-def test_v7_actor_generation_and_tampering_fail_closed(tool) -> None:
+def test_v8_actor_generation_and_tampering_fail_closed(tool) -> None:
     _, cleanup, receipt = tool.build_documents(ROOT)
     tool.validate_fixed_cleanup_aggregates(cleanup)
     tool.validate_actor_bindings(cleanup)
@@ -310,6 +321,19 @@ def test_v7_actor_generation_and_tampering_fail_closed(tool) -> None:
     )
     assert receipt["deletion_control"]["wave_actors"] == tool.WAVE_ACTORS
     assert receipt["guards"]["codex_delete_command_exists"] is True
+    assert all(
+        actor == {
+            "deletion_actor": "codex_exact_manifest_one_file_at_a_time",
+            "codex_delete_authorized": True,
+        }
+        for actor in tool.WAVE_ACTORS.values()
+    )
+    assert receipt["deletion_control"]["file_delete_surface"][
+        "completed_night_rejected"
+    ] is True
+    assert receipt["deletion_control"]["old002837_directory_surface"][
+        "requires_complete_501_file_deletion_vector"
+    ] is True
 
     tampered_wave = copy.deepcopy(cleanup)
     tampered_wave["waves"][0]["codex_delete_authorized"] = False
@@ -320,12 +344,12 @@ def test_v7_actor_generation_and_tampering_fail_closed(tool) -> None:
     first_bundle = next(
         row for row in tampered_row["files"] if row["wave"] == "bundle"
     )
-    first_bundle["codex_delete_authorized"] = True
+    first_bundle["codex_delete_authorized"] = False
     with pytest.raises(tool.CleanupValidationError, match="actor/authorization"):
         tool.validate_actor_bindings(tampered_row)
 
 
-def test_night_arm_requires_exact_new_checkpoint_subject_and_committed_start(
+def test_bundle_arm_requires_exact_v8_checkpoint_subject_and_section_scoped_start(
     tool, documents, tmp_path: Path
 ) -> None:
     repo = tmp_path / "arm_repo"
@@ -341,26 +365,28 @@ def test_night_arm_requires_exact_new_checkpoint_subject_and_committed_start(
     )
     _, cleanup = documents
     expected = next(
-        list(wave["paths"]) for wave in cleanup["waves"] if wave["wave"] == "night"
+        list(wave["paths"]) for wave in cleanup["waves"] if wave["wave"] == "bundle"
     )
     start = repo / tool.START_HERE_REL
     start.parent.mkdir(parents=True)
     lines = [
         "---",
-        'task_id: "v1_governance_integration_cleanup_v7"',
+        'task_id: "v1_governance_integration_cleanup_v8"',
         f'contract_sha256: "{tool.EXPECTED_CONTRACT_SHA256}"',
         f'source_baseline: "{tool.PACKAGE_SOURCE_BASELINE}"',
+        'state: "running"',
         "---",
-        tool.NIGHT_ARM_STATE_MARKER,
-        "- Deletion actor: `codex_exact_manifest_one_file_at_a_time`",
-        "- Codex deletion authorization: `true` for Night only",
-        "- Expected deletion count: 680",
-        tool.EXPECTED_WAVE_AGGREGATES["night"]["path_vector_sha256"],
-        "### P5 Night exact-manifest arm",
+        tool.ARM_SECTION_HEADINGS["bundle"],
+        "- Wave: `bundle`",
+        tool.ARM_STATE_MARKER,
+        "- Contract deletion actor: `codex_exact_manifest_one_file_at_a_time`",
+        "- Contract Codex deletion authorization: `true`",
+        "- Expected deletion count: 205",
+        tool.EXPECTED_WAVE_AGGREGATES["bundle"]["path_vector_sha256"],
+        "#### Bundle exact absolute per-file manifest",
     ]
     lines.extend(
-        f"{index}. `{repo.joinpath(*Path(path).parts)}`"
-        for index, path in enumerate(expected, start=1)
+        f"- `{repo.joinpath(*Path(path).parts)}`" for path in expected
     )
     start.write_text("\n".join(lines) + "\n", encoding="utf-8")
     subprocess.run(["git", "-C", str(repo), "add", "--", start.as_posix()], check=True)
@@ -372,7 +398,7 @@ def test_night_arm_requires_exact_new_checkpoint_subject_and_committed_start(
             "commit",
             "-q",
             "-m",
-            "chore(v1): bind night deletion to codex exact-file actor",
+            "chore(v1): bind bundle deletion to codex exact-file actor",
         ],
         check=True,
     )
@@ -382,8 +408,8 @@ def test_night_arm_requires_exact_new_checkpoint_subject_and_committed_start(
         stdout=subprocess.PIPE,
         text=True,
     ).stdout.strip()
-    with pytest.raises(tool.CleanupValidationError, match="exact arm checkpoint"):
-        tool.validate_night_arm_identity(repo, migration, expected)
+    with pytest.raises(tool.CleanupValidationError, match="exact v8 arm checkpoint"):
+        tool.validate_wave_arm_identity(repo, migration, "bundle", expected)
 
     subprocess.run(
         [
@@ -394,7 +420,7 @@ def test_night_arm_requires_exact_new_checkpoint_subject_and_committed_start(
             "--allow-empty",
             "-q",
             "-m",
-            tool.NIGHT_ARM_COMMIT_SUBJECT,
+            tool.ARM_COMMIT_SUBJECTS["bundle"],
         ],
         check=True,
     )
@@ -404,9 +430,11 @@ def test_night_arm_requires_exact_new_checkpoint_subject_and_committed_start(
         stdout=subprocess.PIPE,
         text=True,
     ).stdout.strip()
-    identity = tool.validate_night_arm_identity(repo, arm, expected)
-    assert identity["commit_subject"] == tool.NIGHT_ARM_COMMIT_SUBJECT
-    assert identity["path_count"] == 680
+    identity = tool.validate_wave_arm_identity(repo, arm, "bundle", expected)
+    assert identity["commit_subject"] == tool.ARM_COMMIT_SUBJECTS["bundle"]
+    assert identity["path_count"] == 205
+    with pytest.raises(tool.CleanupValidationError, match="completed or unauthorized"):
+        tool.validate_wave_arm_identity(repo, arm, "night", expected)
 
 
 def test_literal_file_guard_and_single_unlink_use_a_real_temp_git_index(
@@ -418,9 +446,33 @@ def test_literal_file_guard_and_single_unlink_use_a_real_temp_git_index(
     regular = repo / "regular.txt"
     regular.write_text("temporary", encoding="utf-8")
     subprocess.run(["git", "-C", str(repo), "add", "--", "regular.txt"], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.name", "Codex Test"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.email", "codex@example.invalid"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repo), "commit", "-q", "-m", "fixture"],
+        check=True,
+    )
+    blob_oid = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD:regular.txt"],
+        check=True,
+        stdout=subprocess.PIPE,
+        text=True,
+    ).stdout.strip()
 
-    target = tool.validate_literal_tracked_file(repo, "regular.txt")
+    target = tool.validate_literal_tracked_file(
+        repo, "regular.txt", expected_blob_oid=blob_oid
+    )
     assert target == regular.resolve()
+    with pytest.raises(tool.CleanupValidationError, match="index blob OID"):
+        tool.validate_literal_tracked_file(
+            repo, "regular.txt", expected_blob_oid="0" * 40
+        )
     with pytest.raises(tool.CleanupValidationError, match="escaping"):
         tool.validate_literal_tracked_file(repo, "../outside.txt")
     directory = repo / "directory"
@@ -432,8 +484,90 @@ def test_literal_file_guard_and_single_unlink_use_a_real_temp_git_index(
         st_file_attributes = 0x400
 
     assert tool._is_reparse_stat(ReparseStat()) is True
+    regular.write_text("index drift", encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo), "add", "--", "regular.txt"], check=True)
+    with pytest.raises(tool.CleanupValidationError, match="index blob OID"):
+        tool.validate_literal_tracked_file(
+            repo, "regular.txt", expected_blob_oid=blob_oid
+        )
     tool._unlink_one_literal(target)
     assert not regular.exists()
+
+
+def test_directory_surface_is_deepest_first_prefix_only_and_git_invisible(
+    tool, tmp_path: Path
+) -> None:
+    repo = tmp_path / "directory_repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q", str(repo)], check=True)
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.name", "Codex Test"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repo), "config", "user.email", "codex@example.invalid"],
+        check=True,
+    )
+    subprocess.run(
+        ["git", "-C", str(repo), "commit", "--allow-empty", "-q", "-m", "root"],
+        check=True,
+    )
+    parent = subprocess.run(
+        ["git", "-C", str(repo), "rev-parse", "HEAD"],
+        check=True,
+        stdout=subprocess.PIPE,
+        text=True,
+    ).stdout.strip()
+    paths = ["run/a", "run/b", "run"]
+    for path in paths[:2]:
+        repo.joinpath(*Path(path).parts).mkdir(parents=True, exist_ok=True)
+
+    frozen_vectors = tool.capture_deletion_vectors(repo, parent)
+    state = tool.validate_directory_prefix_state(repo, paths, processed_count=0)
+    assert state["current_path"] == "run/a"
+    for index, path in enumerate(paths, start=1):
+        target = repo.joinpath(*Path(path).parts)
+        tool._rmdir_one_literal(target)
+        assert tool.capture_deletion_vectors(repo, parent) == frozen_vectors
+        state = tool.validate_directory_prefix_state(
+            repo, paths, processed_count=index
+        )
+    assert state["complete"] is True
+    assert not (repo / "run").exists()
+
+
+def test_directory_surface_rejects_extra_nonempty_gap_and_worktree_root(
+    tool, tmp_path: Path
+) -> None:
+    extra_repo = tmp_path / "extra_repo"
+    (extra_repo / "run" / "a").mkdir(parents=True)
+    (extra_repo / "run" / "extra").mkdir()
+    with pytest.raises(tool.CleanupValidationError, match="enumeration"):
+        tool.validate_directory_prefix_state(extra_repo, ["run/a", "run"])
+
+    file_repo = tmp_path / "file_repo"
+    (file_repo / "run" / "a").mkdir(parents=True)
+    (file_repo / "run" / "unexpected.txt").write_text(
+        "unexpected", encoding="utf-8"
+    )
+    with pytest.raises(tool.CleanupValidationError, match="non-directory entry"):
+        tool.validate_directory_prefix_state(file_repo, ["run/a", "run"])
+    with pytest.raises(tool.CleanupValidationError, match="non-empty"):
+        tool._rmdir_one_literal(file_repo / "run")
+
+    gap_repo = tmp_path / "gap_repo"
+    (gap_repo / "run" / "a").mkdir(parents=True)
+    (gap_repo / "run" / "b").mkdir()
+    (gap_repo / "run" / "b").rmdir()
+    with pytest.raises(tool.CleanupValidationError, match="prefix/remaining-suffix"):
+        tool.validate_directory_prefix_state(
+            gap_repo, ["run/a", "run/b", "run"]
+        )
+
+    root_repo = tmp_path / "root_repo"
+    root_repo.mkdir()
+    with pytest.raises(tool.CleanupValidationError, match="worktree root"):
+        tool.validate_directory_prefix_state(root_repo, ["."])
 
 
 def test_baseline_recovery_metadata_tampering_fails_closed(tool, documents) -> None:

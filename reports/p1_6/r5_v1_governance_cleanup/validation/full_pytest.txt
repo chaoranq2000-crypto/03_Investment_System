@@ -107,3 +107,68 @@ night_wave_post_commit:
   full_repository_reason: contract requires V-006, V-007 and V-003 final after each wave; full pytest remains required at final
   bundle_armed: false
   old002837_armed: false
+v8_a2_actor_and_directory_rebinding:
+  checked_at: 2026-07-27T14:16:42+08:00
+  contract_path: docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md
+  contract_sha256: c8f19b03dd2fa17016bab3995eaa48fe8604bdb7e7027e5197aedcbfac01eb8b
+  package_setup_commit: 37d312b00bfbad33bf66a7e1a3169a9fd0559ad8
+  source_baseline: fe986a0359c0268ac94eea696c3a4795403e4614
+  root_agents:
+    blob_oid: e9619f0e919764ff092c0cfe3550a41b618b0ea2
+    byte_count: 9605
+    sha256: e79ccc75e02041be1aec6948206bad70405958753511e633fc0394c1eb0c5fbf
+  actors:
+    night: codex_exact_manifest_one_file_at_a_time
+    bundle: codex_exact_manifest_one_file_at_a_time
+    old002837: codex_exact_manifest_one_file_at_a_time
+    all_codex_delete_authorized: true
+    completed_night_replay_rejected: true
+  file_manifest:
+    file_count: 1386
+    content_byte_count: 9787412
+    path_vector_byte_count: 121264
+    path_vector_sha256: 974d45610144d616f69c3c368d9ea1a0a27d66601a24f748aa8148e2ee702f33
+  old002837_directory_manifest:
+    directory_count: 29
+    order: deepest_first
+    relative_path_vector_byte_count: 2208
+    relative_path_vector_sha256: 1e987f07ab4aa9b7c54a7444b053949b5c5d377655903d9715d8948e42446cd3
+    absolute_path_vector_byte_count: 3803
+    absolute_path_vector_sha256: 31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75
+  full_restore:
+    result: decision=pass files=1386 bytes=9787412
+    restore_root: C:\Users\Q\AppData\Local\Temp\v8_v1_historical_restore_e7939036de974f27afb7306970f49576
+    cat_file_e_verified: true
+    content_hash_verified: true
+    full_restore_verified: true
+    byte_for_byte_match: true
+  v002:
+    result: Doc drift check passed.
+  v003_final:
+    result: 194 passed in 23.67s
+  v004:
+    semantic_digest_a: 2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6
+    semantic_digest_b: 2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6
+    test_result: 16 passed in 1.18s
+  v005:
+    result: 18 passed in 16.33s
+  v006:
+    result: 28 passed in 591.31s
+  v008:
+    result: decision=pass capabilities=17 blocking=0
+  v011:
+    result: ok=true state=running warnings=0
+  full_repository:
+    command: $env:PYTHONDONTWRITEBYTECODE='1'; C:\Projects\03_Investment_System\.conda\investment-system\python.exe -m pytest -q
+    exit_code: 0
+    result: 1146 passed, 2 skipped in 700.39s
+    failures: 0
+    errors: 0
+    current_skips: 2
+    added_silent_skips: 0
+  wave_state:
+    completed_night: true
+    bundle_armed: false
+    bundle_deleted: false
+    old002837_armed: false
+    old002837_deleted: false

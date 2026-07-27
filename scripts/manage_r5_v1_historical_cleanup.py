@@ -3,10 +3,12 @@
 
 This module inventories the frozen source tree, binds every proposed deletion to
 a durable Git blob, restores blobs into a caller-owned temporary directory, and
-validates NUL-delimited deletion vectors.  Its only destructive surface is the
-    v7-authorized Night ``delete-wave`` command: that command unlinks one validated
-literal regular file per call and cannot stage or commit changes.  Bundle and
-old002837 remain user-manual waves.
+validates NUL-delimited deletion vectors.  Its destructive surface rejects the
+completed Night wave and accepts only the next v8-armed Bundle or old002837 wave.
+It unlinks one validated literal regular file per operation and cannot stage or
+commit changes.  After all 501 old002837 files have a validated deletion vector,
+it may remove the frozen 29-row empty-directory manifest one literal directory
+per non-recursive operation.
 """
 
 from __future__ import annotations
@@ -27,10 +29,10 @@ import yaml
 
 
 CONTRACT_REL = Path(
-    "docs/codex_tasks/v1_governance_integration_cleanup_v7/CONTRACT.md"
+    "docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md"
 )
 START_HERE_REL = Path(
-    "docs/codex_tasks/v1_governance_integration_cleanup_v7/START_HERE.md"
+    "docs/codex_tasks/v1_governance_integration_cleanup_v8/START_HERE.md"
 )
 AGENTS_REL = Path("AGENTS.md")
 BASELINE_MANIFEST_REL = Path(
@@ -58,21 +60,36 @@ WAVE_RECEIPT_RELS = {
 }
 
 EXPECTED_CONTRACT_SHA256 = (
-    "69f751e9c61e12e881a3b353ea8ed8431d46da3098dd350458ab97d1fb1def97"
+    "c8f19b03dd2fa17016bab3995eaa48fe8604bdb7e7027e5197aedcbfac01eb8b"
 )
-PACKAGE_SOURCE_BASELINE = "d89e3a20eb3a3dc2f81cb6c02ecf4fc04d210b74"
+PACKAGE_SOURCE_BASELINE = "fe986a0359c0268ac94eea696c3a4795403e4614"
+PACKAGE_SETUP_CHECKPOINT = "37d312b00bfbad33bf66a7e1a3169a9fd0559ad8"
 DECOUPLING_CHECKPOINT = "805b8e3e9624e4e93057aa950cba4db1b3010cb3"
 OLD_NIGHT_ARM_COMMIT = "82f7d37a10a9677af631c1a5863661a64df3270b"
-NIGHT_ARM_COMMIT_SUBJECT = "chore(v1): arm night codex exact-file deletion checkpoint"
-NIGHT_ARM_STATE_MARKER = "- Arm state: `armed_clean_checkpoint`"
-EXPECTED_AGENTS_BLOB_OID = "0a57c3f9f624f5645f52a056ed1a62991271f632"
-EXPECTED_AGENTS_BYTE_COUNT = 7661
+COMPLETED_NIGHT_ARM_COMMIT = "e3b7ac48b784749e32252faf543c8d9ab796d830"
+COMPLETED_NIGHT_DELETION_COMMIT = "be42857bf88223e01c71e4a4dfbac8e3a47080aa"
+COMPLETED_NIGHT_EVIDENCE_COMMIT = "ada5ebff67e5604232463deb7effdcac1cd61d9e"
+SUPERSEDED_BUNDLE_ARM_COMMIT = "a75ade4a74d620830860fa05723936502a58661a"
+ARM_COMMIT_SUBJECTS = {
+    "bundle": "chore(v1): arm bundle codex exact-file deletion checkpoint",
+    "old002837": "chore(v1): arm 002837 codex exact-path deletion checkpoint",
+}
+ARM_SECTION_HEADINGS = {
+    "bundle": "### P5 Bundle exact-manifest retained for next v8 arm",
+    "old002837": "### P5 old002837 exact-path arm",
+}
+ARM_STATE_MARKER = "- Arm state: `armed_clean_checkpoint`"
+EXPECTED_AGENTS_BLOB_OID = "e9619f0e919764ff092c0cfe3550a41b618b0ea2"
+EXPECTED_AGENTS_BYTE_COUNT = 9605
 EXPECTED_AGENTS_SHA256 = (
-    "1717636c2e2dd7c92c9ac35ef66ef6231d471d398f28c681ad99e8a110174cbf"
+    "e79ccc75e02041be1aec6948206bad70405958753511e633fc0394c1eb0c5fbf"
 )
 HISTORICAL_SOURCE_SNAPSHOT = "312adc73821706b0b7ca6aa00e80ee608bd10b32"
 ENGINEERING_SOURCE = "f60f220ae252262a537c612ce193fc779901984b"
 NIGHT_SOURCE = "a96c1b717bf15905d72fd142efd946fa01bce666"
+DEDICATED_WORKTREE_ROOT = Path(
+    r"C:\Projects\03_Investment_System_v1_governance_cleanup"
+)
 OLD_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 OLD_RUN_PREFIX = f"reports/workflow_runs/{OLD_WORKFLOW_ID}"
 PROTECTED_REVIEWED_INPUT_PREFIX = f"data/reviewed_inputs/{OLD_WORKFLOW_ID}"
@@ -117,13 +134,60 @@ WAVE_ACTORS = {
         "codex_delete_authorized": True,
     },
     "bundle": {
-        "deletion_actor": "user_manual_only",
-        "codex_delete_authorized": False,
+        "deletion_actor": "codex_exact_manifest_one_file_at_a_time",
+        "codex_delete_authorized": True,
     },
     "old002837": {
-        "deletion_actor": "user_manual_only",
-        "codex_delete_authorized": False,
+        "deletion_actor": "codex_exact_manifest_one_file_at_a_time",
+        "codex_delete_authorized": True,
     },
+}
+REMAINING_CODEX_WAVES = ("bundle", "old002837")
+OLD002837_DIRECTORY_ACTOR = {
+    "deletion_actor": "codex_exact_manifest_one_empty_directory_at_a_time",
+    "codex_delete_authorized": True,
+}
+OLD002837_DIRECTORIES = (
+    f"{OLD_RUN_PREFIX}/data/processed/candidates",
+    f"{OLD_RUN_PREFIX}/data/processed/layout",
+    f"{OLD_RUN_PREFIX}/data/processed/logs",
+    f"{OLD_RUN_PREFIX}/data/processed/normalized",
+    f"{OLD_RUN_PREFIX}/data/processed/page_maps",
+    f"{OLD_RUN_PREFIX}/data/processed/tables",
+    f"{OLD_RUN_PREFIX}/data/processed/text",
+    f"{OLD_RUN_PREFIX}/data/raw/annual_reports",
+    f"{OLD_RUN_PREFIX}/data/raw/market_data",
+    f"{OLD_RUN_PREFIX}/adapter_receipts/bundle8r",
+    f"{OLD_RUN_PREFIX}/backups/r5_bundle5_pre_promotion_c7e2146bff39",
+    f"{OLD_RUN_PREFIX}/data/manifests",
+    f"{OLD_RUN_PREFIX}/data/processed",
+    f"{OLD_RUN_PREFIX}/data/raw",
+    f"{OLD_RUN_PREFIX}/adapter_receipts",
+    f"{OLD_RUN_PREFIX}/adapter_runs",
+    f"{OLD_RUN_PREFIX}/backups",
+    f"{OLD_RUN_PREFIX}/bundle10_cross_industry_regression",
+    f"{OLD_RUN_PREFIX}/bundle11r",
+    f"{OLD_RUN_PREFIX}/bundle12r",
+    f"{OLD_RUN_PREFIX}/bundle13r",
+    f"{OLD_RUN_PREFIX}/bundle14r",
+    f"{OLD_RUN_PREFIX}/bundle15r",
+    f"{OLD_RUN_PREFIX}/data",
+    f"{OLD_RUN_PREFIX}/fixtures",
+    f"{OLD_RUN_PREFIX}/handoffs",
+    f"{OLD_RUN_PREFIX}/reviewed_inputs_staging",
+    f"{OLD_RUN_PREFIX}/valuation",
+    OLD_RUN_PREFIX,
+)
+EXPECTED_OLD002837_DIRECTORY_VECTOR = {
+    "path_count": 29,
+    "path_vector_byte_count": 2208,
+    "path_vector_sha256": (
+        "1e987f07ab4aa9b7c54a7444b053949b5c5d377655903d9715d8948e42446cd3"
+    ),
+    "absolute_path_vector_byte_count": 3803,
+    "absolute_path_vector_sha256": (
+        "31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75"
+    ),
 }
 EXPECTED_CLEANUP_AGGREGATE = {
     "file_count": 1386,
@@ -323,6 +387,25 @@ def path_vector(paths: Iterable[str]) -> tuple[int, str]:
         path.encode("utf-8") + b"\0" for path in sorted(set(paths))
     )
     return len(payload), hashlib.sha256(payload).hexdigest()
+
+
+def ordered_path_vector(paths: Sequence[str]) -> tuple[int, str]:
+    values = [str(path) for path in paths]
+    require(len(values) == len(set(values)), "ordered path vector has duplicates")
+    payload = b"".join(path.encode("utf-8") + b"\0" for path in values)
+    return len(payload), hashlib.sha256(payload).hexdigest()
+
+
+def _absolute_manifest_path(repo_root: Path, relative_path: str) -> str:
+    pure = _validate_repo_relative_literal(relative_path)
+    root = repo_root.resolve(strict=True)
+    target = root.joinpath(*pure.parts)
+    require(target != root, "manifest path resolves to the repository root")
+    require(
+        target.resolve(strict=False).is_relative_to(root),
+        f"manifest path escapes repository: {relative_path}",
+    )
+    return str(target.resolve(strict=False))
 
 
 def _git(
@@ -1355,6 +1438,94 @@ def _reference_applies(reference: Mapping[str, Any], path: str, wave: str) -> bo
     return False
 
 
+def build_old002837_directory_manifest(repo_root: Path) -> dict[str, Any]:
+    paths = list(OLD002837_DIRECTORIES)
+    require(
+        len(paths) == EXPECTED_OLD002837_DIRECTORY_VECTOR["path_count"],
+        "old002837 directory count drift",
+    )
+    for path in paths:
+        pure = _validate_repo_relative_literal(path)
+        require(
+            path == OLD_RUN_PREFIX or path.startswith(OLD_RUN_PREFIX + "/"),
+            f"directory path escapes old002837 root: {path}",
+        )
+        require(
+            pure.as_posix() != ".",
+            "directory manifest contains the repository root",
+        )
+
+    position = {path: index for index, path in enumerate(paths)}
+    for child in paths:
+        parent = PurePosixPath(child).parent
+        while parent.as_posix() != ".":
+            parent_text = parent.as_posix()
+            if parent_text in position:
+                require(
+                    position[child] < position[parent_text],
+                    f"directory manifest is not deepest-first: {child}",
+                )
+            parent = parent.parent
+
+    relative_bytes, relative_sha = ordered_path_vector(paths)
+    require(
+        relative_bytes
+        == EXPECTED_OLD002837_DIRECTORY_VECTOR["path_vector_byte_count"],
+        "old002837 relative directory-vector byte count drift",
+    )
+    require(
+        relative_sha
+        == EXPECTED_OLD002837_DIRECTORY_VECTOR["path_vector_sha256"],
+        "old002837 relative directory-vector SHA-256 drift",
+    )
+
+    dedicated_root = DEDICATED_WORKTREE_ROOT
+    absolute_paths = [
+        str(dedicated_root.joinpath(*PurePosixPath(path).parts))
+        for path in paths
+    ]
+    absolute_bytes, absolute_sha = ordered_path_vector(absolute_paths)
+    require(
+        absolute_bytes
+        == EXPECTED_OLD002837_DIRECTORY_VECTOR[
+            "absolute_path_vector_byte_count"
+        ],
+        "old002837 absolute directory-vector byte count drift",
+    )
+    require(
+        absolute_sha
+        == EXPECTED_OLD002837_DIRECTORY_VECTOR["absolute_path_vector_sha256"],
+        "old002837 absolute directory-vector SHA-256 drift",
+    )
+    return {
+        "wave": "old002837",
+        **OLD002837_DIRECTORY_ACTOR,
+        "root": OLD_RUN_PREFIX,
+        "dedicated_worktree_root": str(dedicated_root),
+        "order": "deepest_first",
+        "removal_mode": "one_literal_empty_non_reparse_directory_non_recursive",
+        "preconditions": [
+            "old002837_file_deletion_vector_complete_501",
+            "git_vectors_unchanged_before_and_after_each_directory",
+            "processed_ordinal_prefix_absent",
+            "remaining_ordinal_suffix_present",
+            "complete_entry_enumeration_matches_remaining_directory_suffix",
+            "all_existing_path_components_non_reparse",
+            "current_directory_empty",
+        ],
+        "aggregate": {
+            "directory_count": len(paths),
+            "path_vector_encoding": "deepest_first_utf8_nul",
+            "path_vector_byte_count": relative_bytes,
+            "path_vector_sha256": relative_sha,
+            "absolute_path_vector_byte_count": absolute_bytes,
+            "absolute_path_vector_sha256": absolute_sha,
+        },
+        "paths": paths,
+        "absolute_paths": absolute_paths,
+    }
+
+
 def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     contract = verify_contract(repo_root)
     agents_identity = verify_root_agents(repo_root)
@@ -1418,11 +1589,7 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
                     "active_reference_count_equals_zero",
                     "baseline_blob_and_full_restore_verified",
                     "current_wave_armed_in_start_here",
-                    (
-                        "codex_unlinks_only_this_exact_literal_regular_file"
-                        if actor["codex_delete_authorized"]
-                        else "user_manually_deletes_only_this_exact_path"
-                    ),
+                    "codex_unlinks_only_this_exact_literal_regular_file",
                 ],
                 "restore_command": baseline["restore_command"],
             }
@@ -1449,6 +1616,9 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
         "wave_order": list(WAVE_ORDER),
         "aggregate": _aggregate(cleanup_rows),
         "waves": wave_documents,
+        "old002837_empty_directory_cleanup": build_old002837_directory_manifest(
+            repo_root
+        ),
         "files": cleanup_rows,
     }
 
@@ -1521,12 +1691,25 @@ def build_documents(repo_root: Path) -> tuple[dict[str, Any], dict[str, Any], di
             "wave_actors": {
                 wave: dict(WAVE_ACTORS[wave]) for wave in WAVE_ORDER
             },
-            "night_delete_surface": {
+            "file_delete_surface": {
                 "command": "delete-wave",
+                "eligible_waves": list(REMAINING_CODEX_WAVES),
+                "completed_night_rejected": True,
                 "single_literal_path_per_unlink": True,
                 "ordinal_prefix_resume_only": True,
+                "head_and_index_blob_match_manifest": True,
                 "rejects_stage_and_commit": True,
                 "writes_receipt_only_after_complete_vector_validation": True,
+            },
+            "old002837_directory_surface": {
+                "command": "delete-wave",
+                "requires_complete_501_file_deletion_vector": True,
+                "single_literal_directory_per_non_recursive_removal": True,
+                "deepest_first_prefix_suffix_resume_only": True,
+                "requires_empty_non_reparse_directory": True,
+                "complete_entry_enumeration": True,
+                "git_vectors_unchanged_per_directory": True,
+                "rejects_stage_and_commit": True,
             },
         },
         "restore_verification": {
@@ -1614,8 +1797,6 @@ def validate_actor_bindings(cleanup_manifest: Mapping[str, Any]) -> None:
             )
         expected_last_precondition = (
             "codex_unlinks_only_this_exact_literal_regular_file"
-            if expected_actor["codex_delete_authorized"]
-            else "user_manually_deletes_only_this_exact_path"
         )
         require(
             row.get("deletion_preconditions")
@@ -1629,10 +1810,38 @@ def validate_actor_bindings(cleanup_manifest: Mapping[str, Any]) -> None:
         )
 
 
+def validate_old002837_directory_manifest(
+    repo_root: Path, cleanup_manifest: Mapping[str, Any]
+) -> dict[str, Any]:
+    expected = build_old002837_directory_manifest(repo_root)
+    observed = cleanup_manifest.get("old002837_empty_directory_cleanup")
+    require(
+        observed == expected,
+        "old002837 empty-directory manifest differs from the frozen v8 vector",
+    )
+    file_paths = {
+        str(row.get("path")) for row in cleanup_manifest.get("files", [])
+    }
+    require(
+        file_paths.isdisjoint(expected["paths"]),
+        "directory manifest path leaked into the file manifest",
+    )
+    wave_paths = {
+        str(path)
+        for wave in cleanup_manifest.get("waves", [])
+        for path in wave.get("paths", [])
+    }
+    require(
+        wave_paths.isdisjoint(expected["paths"]),
+        "directory manifest path leaked into a wave file vector",
+    )
+    return expected
+
+
 def validate_fixed_cleanup_aggregates(cleanup_manifest: Mapping[str, Any]) -> None:
     require(
         cleanup_manifest.get("aggregate") == EXPECTED_CLEANUP_AGGREGATE,
-        "cleanup aggregate differs from the frozen v7 aggregate",
+        "cleanup aggregate differs from the frozen v8 file aggregate",
     )
     waves = list(cleanup_manifest.get("waves", []))
     require(len(waves) == len(WAVE_ORDER), "cleanup wave document count drift")
@@ -1686,62 +1895,120 @@ def _validate_baseline_row(repo_root: Path, row: Mapping[str, Any]) -> None:
     )
 
 
-def validate_night_arm_identity(
-    repo_root: Path, revision: str, expected_paths: Sequence[str]
+def _markdown_section(text: str, heading: str) -> str:
+    lines = text.splitlines()
+    try:
+        start = lines.index(heading)
+    except ValueError as exc:
+        raise CleanupValidationError(f"missing START section: {heading}") from exc
+    end = len(lines)
+    for index in range(start + 1, len(lines)):
+        if lines[index].startswith("### "):
+            end = index
+            break
+    return "\n".join(lines[start:end])
+
+
+def _absolute_list_after_subheading(section: str, subheading: str) -> list[str]:
+    lines = section.splitlines()
+    try:
+        start = lines.index(subheading)
+    except ValueError as exc:
+        raise CleanupValidationError(
+            f"missing START manifest subheading: {subheading}"
+        ) from exc
+    values: list[str] = []
+    for line in lines[start + 1 :]:
+        if line.startswith("#### "):
+            break
+        match = re.fullmatch(r"(?:-|\d+\.) `([^`]+)`", line)
+        if match:
+            values.append(match.group(1))
+    return values
+
+
+def _relative_values_from_absolute_start_paths(
+    repo_root: Path, absolute_values: Sequence[str], *, label: str
+) -> list[str]:
+    root = repo_root.resolve(strict=True)
+    values: list[str] = []
+    for value in absolute_values:
+        absolute = Path(value)
+        require(absolute.is_absolute(), f"{label} path is not absolute: {value}")
+        resolved = absolute.resolve(strict=False)
+        require(
+            resolved.is_relative_to(root),
+            f"{label} path escapes the dedicated worktree: {value}",
+        )
+        values.append(resolved.relative_to(root).as_posix())
+    return values
+
+
+def validate_wave_arm_identity(
+    repo_root: Path,
+    revision: str,
+    wave: str,
+    expected_paths: Sequence[str],
+    directory_manifest: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    require(
+        wave in REMAINING_CODEX_WAVES,
+        f"completed or unauthorized wave cannot be armed: {wave}",
+    )
+    require(
+        revision != SUPERSEDED_BUNDLE_ARM_COMMIT,
+        "the superseded v7 Bundle manual arm cannot be reused",
+    )
     subject = git_text(repo_root, "show", "-s", "--format=%s", revision)
     require(
-        subject == NIGHT_ARM_COMMIT_SUBJECT,
-        f"Night wave parent commit subject is not the exact arm checkpoint: {subject}",
+        subject == ARM_COMMIT_SUBJECTS[wave],
+        f"{wave} wave parent commit subject is not the exact v8 arm checkpoint: {subject}",
     )
     payload = git_blob(repo_root, revision, START_HERE_REL.as_posix())
     text = payload.decode("utf-8", errors="strict")
-    required_literals = (
-        'task_id: "v1_governance_integration_cleanup_v7"',
+    for literal in (
+        'task_id: "v1_governance_integration_cleanup_v8"',
         f'contract_sha256: "{EXPECTED_CONTRACT_SHA256}"',
         f'source_baseline: "{PACKAGE_SOURCE_BASELINE}"',
-        NIGHT_ARM_STATE_MARKER,
-        "- Deletion actor: `codex_exact_manifest_one_file_at_a_time`",
-        "- Codex deletion authorization: `true` for Night only",
-        "- Expected deletion count: 680",
-        EXPECTED_WAVE_AGGREGATES["night"]["path_vector_sha256"],
-    )
-    for literal in required_literals:
-        require(literal in text, f"committed v7 START lacks Night arm marker: {literal}")
-    require(
-        "candidate (not armed under v7)" not in text.lower(),
-        "committed v7 START still declares Night not armed",
-    )
+        'state: "running"',
+    ):
+        require(literal in text, f"committed v8 START identity drift: {literal}")
 
-    root = repo_root.resolve(strict=True)
-    absolute_values = [
-        match.group(1)
-        for line in text.splitlines()
-        if (match := re.fullmatch(r"\d+\. `([^`]+)`", line))
-    ]
-    require(len(absolute_values) == 680, "committed v7 START Night list is not 680 rows")
-    relative_values: list[str] = []
-    for value in absolute_values:
-        absolute = Path(value)
-        require(absolute.is_absolute(), f"START Night path is not absolute: {value}")
-        resolved = absolute.resolve(strict=False)
-        require(resolved.is_relative_to(root), f"START Night path escapes worktree: {value}")
-        relative_values.append(resolved.relative_to(root).as_posix())
+    section = _markdown_section(text, ARM_SECTION_HEADINGS[wave])
+    for literal in (
+        f"- Wave: `{wave}`",
+        ARM_STATE_MARKER,
+        "- Contract deletion actor: `codex_exact_manifest_one_file_at_a_time`",
+        "- Contract Codex deletion authorization: `true`",
+        f"- Expected deletion count: {len(expected_paths)}",
+        EXPECTED_WAVE_AGGREGATES[wave]["path_vector_sha256"],
+    ):
+        require(literal in section, f"committed v8 START lacks {wave} arm marker: {literal}")
+
+    file_heading = (
+        "#### Bundle exact absolute per-file manifest"
+        if wave == "bundle"
+        else "#### old002837 exact absolute per-file manifest"
+    )
+    absolute_values = _absolute_list_after_subheading(section, file_heading)
+    relative_values = _relative_values_from_absolute_start_paths(
+        repo_root, absolute_values, label=f"START {wave} file"
+    )
     require(
         relative_values == list(expected_paths),
-        "committed v7 START Night list differs from the ordinal cleanup manifest",
+        f"committed v8 START {wave} file list differs from the ordinal cleanup manifest",
     )
     vector_bytes, vector_sha = path_vector(relative_values)
     require(
-        vector_bytes
-        == EXPECTED_WAVE_AGGREGATES["night"]["path_vector_byte_count"],
-        "committed v7 START Night path-vector byte count drift",
+        vector_bytes == EXPECTED_WAVE_AGGREGATES[wave]["path_vector_byte_count"],
+        f"committed v8 START {wave} file-vector byte count drift",
     )
     require(
-        vector_sha == EXPECTED_WAVE_AGGREGATES["night"]["path_vector_sha256"],
-        "committed v7 START Night path-vector SHA-256 drift",
+        vector_sha == EXPECTED_WAVE_AGGREGATES[wave]["path_vector_sha256"],
+        f"committed v8 START {wave} file-vector SHA-256 drift",
     )
-    return {
+
+    identity: dict[str, Any] = {
         "path": START_HERE_REL.as_posix(),
         "commit_subject": subject,
         "arm_state": "armed_clean_checkpoint",
@@ -1749,43 +2016,233 @@ def validate_night_arm_identity(
         "path_vector_byte_count": vector_bytes,
         "path_vector_sha256": vector_sha,
     }
+    if wave == "old002837":
+        require(directory_manifest is not None, "old002837 arm lacks directory manifest")
+        for literal in (
+            "- Expected empty-directory count: 29",
+            EXPECTED_OLD002837_DIRECTORY_VECTOR["path_vector_sha256"],
+            EXPECTED_OLD002837_DIRECTORY_VECTOR["absolute_path_vector_sha256"],
+        ):
+            require(
+                literal in section,
+                f"committed v8 START lacks old002837 directory marker: {literal}",
+            )
+        directory_values = _absolute_list_after_subheading(
+            section, "#### old002837 exact absolute directory manifest"
+        )
+        expected_absolute = list(directory_manifest["absolute_paths"])
+        require(
+            directory_values == expected_absolute,
+            "committed v8 START old002837 directory list differs from the manifest",
+        )
+        directory_relative = _relative_values_from_absolute_start_paths(
+            repo_root,
+            directory_values,
+            label="START old002837 directory",
+        )
+        require(
+            directory_relative == list(directory_manifest["paths"]),
+            "committed v8 START old002837 relative directory order drift",
+        )
+        directory_bytes, directory_sha = ordered_path_vector(directory_relative)
+        absolute_bytes, absolute_sha = ordered_path_vector(directory_values)
+        require(
+            directory_bytes
+            == EXPECTED_OLD002837_DIRECTORY_VECTOR["path_vector_byte_count"]
+            and directory_sha
+            == EXPECTED_OLD002837_DIRECTORY_VECTOR["path_vector_sha256"],
+            "committed v8 START old002837 relative directory vector drift",
+        )
+        require(
+            absolute_bytes
+            == EXPECTED_OLD002837_DIRECTORY_VECTOR[
+                "absolute_path_vector_byte_count"
+            ]
+            and absolute_sha
+            == EXPECTED_OLD002837_DIRECTORY_VECTOR[
+                "absolute_path_vector_sha256"
+            ],
+            "committed v8 START old002837 absolute directory vector drift",
+        )
+        identity["directory_manifest"] = {
+            "directory_count": len(directory_values),
+            "path_vector_byte_count": directory_bytes,
+            "path_vector_sha256": directory_sha,
+            "absolute_path_vector_byte_count": absolute_bytes,
+            "absolute_path_vector_sha256": absolute_sha,
+        }
+    return identity
+
+
+def _require_ancestor(repo_root: Path, ancestor: str, descendant: str, label: str) -> None:
+    require(
+        _git(
+            repo_root,
+            "merge-base",
+            "--is-ancestor",
+            ancestor,
+            descendant,
+            check=False,
+        ).returncode
+        == 0,
+        f"{label} is not an ancestor of the wave parent",
+    )
+
+
+def _latest_commit_for_path(repo_root: Path, revision: str, relative: Path) -> tuple[str, str]:
+    payload = git_text(
+        repo_root,
+        "log",
+        "-1",
+        "--format=%H%x00%s",
+        revision,
+        "--",
+        relative.as_posix(),
+    )
+    commit, separator, subject = payload.partition("\0")
+    require(separator == "\0" and commit and subject, f"missing path history: {relative}")
+    return commit, subject
+
+
+def _require_paths_absent(
+    repo_root: Path, paths: Sequence[str], *, label: str
+) -> None:
+    root = repo_root.resolve(strict=True)
+    present = [
+        path
+        for path in paths
+        if os.path.lexists(root.joinpath(*PurePosixPath(path).parts))
+    ]
+    require(not present, f"{label} paths unexpectedly present: {present[:3]}")
+
+
+def _validate_completed_night(
+    repo_root: Path, head: str, night_paths: Sequence[str]
+) -> dict[str, Any]:
+    _require_ancestor(
+        repo_root, COMPLETED_NIGHT_ARM_COMMIT, head, "completed Night arm"
+    )
+    _require_ancestor(
+        repo_root,
+        COMPLETED_NIGHT_DELETION_COMMIT,
+        head,
+        "completed Night deletion",
+    )
+    _require_ancestor(
+        repo_root,
+        COMPLETED_NIGHT_EVIDENCE_COMMIT,
+        head,
+        "completed Night evidence",
+    )
+    receipt = load_committed_yaml(repo_root, head, WAVE_RECEIPT_RELS["night"])
+    require(receipt.get("decision") == "pass", "completed Night receipt is not pass")
+    require(receipt.get("wave") == "night", "completed Night receipt wave drift")
+    require(
+        receipt.get("wave_parent_commit") == COMPLETED_NIGHT_ARM_COMMIT,
+        "completed Night receipt arm drift",
+    )
+    require(
+        receipt.get("deletion_actor")
+        == WAVE_ACTORS["night"]["deletion_actor"]
+        and receipt.get("codex_delete_authorized") is True,
+        "completed Night receipt actor drift",
+    )
+    require(
+        receipt.get("expected_file_count") == len(night_paths) == 680,
+        "completed Night receipt count drift",
+    )
+    require(
+        receipt.get("status", {}).get("path_vector_sha256")
+        == EXPECTED_WAVE_AGGREGATES["night"]["path_vector_sha256"],
+        "completed Night receipt file vector drift",
+    )
+    latest_commit, latest_subject = _latest_commit_for_path(
+        repo_root, head, WAVE_RECEIPT_RELS["night"]
+    )
+    require(
+        latest_commit == COMPLETED_NIGHT_DELETION_COMMIT,
+        "completed Night receipt was rewritten after its deletion commit",
+    )
+    require(
+        latest_subject == "chore(v1): remove retired night workflow history",
+        "completed Night receipt commit subject drift",
+    )
+    _require_paths_absent(repo_root, night_paths, label="completed Night")
+    return {
+        "arm_commit": COMPLETED_NIGHT_ARM_COMMIT,
+        "deletion_commit": COMPLETED_NIGHT_DELETION_COMMIT,
+        "evidence_commit": COMPLETED_NIGHT_EVIDENCE_COMMIT,
+        "receipt": receipt,
+    }
+
+
+def _validate_prior_bundle_completion(
+    repo_root: Path, head: str, bundle_paths: Sequence[str]
+) -> dict[str, Any]:
+    receipt = load_committed_yaml(repo_root, head, WAVE_RECEIPT_RELS["bundle"])
+    require(receipt.get("decision") == "pass", "Bundle receipt is not pass")
+    require(receipt.get("wave") == "bundle", "Bundle receipt wave drift")
+    require(
+        receipt.get("deletion_actor") == WAVE_ACTORS["bundle"]["deletion_actor"]
+        and receipt.get("codex_delete_authorized") is True,
+        "Bundle receipt actor drift",
+    )
+    require(
+        receipt.get("expected_file_count") == len(bundle_paths) == 205,
+        "Bundle receipt count drift",
+    )
+    require(
+        receipt.get("status", {}).get("path_vector_sha256")
+        == EXPECTED_WAVE_AGGREGATES["bundle"]["path_vector_sha256"],
+        "Bundle receipt file vector drift",
+    )
+    arm_commit = str(receipt.get("wave_parent_commit"))
+    _require_ancestor(repo_root, arm_commit, head, "Bundle arm")
+    require(
+        git_text(repo_root, "show", "-s", "--format=%s", arm_commit)
+        == ARM_COMMIT_SUBJECTS["bundle"],
+        "Bundle receipt references a non-v8 arm",
+    )
+    latest_commit, latest_subject = _latest_commit_for_path(
+        repo_root, head, WAVE_RECEIPT_RELS["bundle"]
+    )
+    require(
+        latest_subject == "chore(v1): remove retired bundle workflow history",
+        "Bundle receipt was not committed by the exact deletion checkpoint",
+    )
+    _require_ancestor(repo_root, latest_commit, head, "Bundle deletion")
+    _require_paths_absent(repo_root, bundle_paths, label="completed Bundle")
+    return {
+        "arm_commit": arm_commit,
+        "deletion_commit": latest_commit,
+        "receipt": receipt,
+    }
 
 
 def validate_committed_control_plane(
-    repo_root: Path, wave_parent: str
+    repo_root: Path, wave: str, wave_parent: str
 ) -> dict[str, Any]:
+    require(
+        wave in REMAINING_CODEX_WAVES,
+        f"completed or unauthorized wave cannot enter delete surface: {wave}",
+    )
     head = git_text(repo_root, "rev-parse", "HEAD")
     require(head == wave_parent, "current HEAD is not the supplied wave parent")
-    require(head != OLD_NIGHT_ARM_COMMIT, "the superseded v5 Night arm cannot be reused")
-    subject = git_text(repo_root, "show", "-s", "--format=%s", head)
     require(
-        subject == NIGHT_ARM_COMMIT_SUBJECT,
-        f"Night wave parent commit subject is not the exact arm checkpoint: {subject}",
+        head not in {OLD_NIGHT_ARM_COMMIT, SUPERSEDED_BUNDLE_ARM_COMMIT},
+        "a superseded arm checkpoint cannot be reused",
     )
     require(
-        _git(
-            repo_root,
-            "merge-base",
-            "--is-ancestor",
-            PACKAGE_SOURCE_BASELINE,
-            head,
-            check=False,
-        ).returncode
-        == 0,
-        "v7 package source baseline is not an ancestor of the wave parent",
+        repo_root.resolve(strict=True)
+        == DEDICATED_WORKTREE_ROOT.resolve(strict=True),
+        "delete surface is not running in the dedicated worktree",
     )
-    require(
-        _git(
-            repo_root,
-            "merge-base",
-            "--is-ancestor",
-            DECOUPLING_CHECKPOINT,
-            head,
-            check=False,
-        ).returncode
-        == 0,
-        "historical decoupling checkpoint is not an ancestor of the wave parent",
+    _require_ancestor(repo_root, PACKAGE_SOURCE_BASELINE, head, "v8 package baseline")
+    _require_ancestor(repo_root, PACKAGE_SETUP_CHECKPOINT, head, "v8 package setup")
+    _require_ancestor(
+        repo_root, DECOUPLING_CHECKPOINT, head, "historical decoupling checkpoint"
     )
+
     contract = verify_committed_contract(repo_root, head)
     agents_identity = verify_root_agents(repo_root, revision=head)
     baseline = load_committed_yaml(repo_root, head, BASELINE_MANIFEST_REL)
@@ -1800,10 +2257,11 @@ def validate_committed_control_plane(
         )
     require(
         baseline.get("aggregate") == EXPECTED_CLEANUP_AGGREGATE,
-        "baseline aggregate differs from the frozen v7 aggregate",
+        "baseline aggregate differs from the frozen v8 file aggregate",
     )
     validate_fixed_cleanup_aggregates(cleanup)
     validate_actor_bindings(cleanup)
+    directory_manifest = validate_old002837_directory_manifest(repo_root, cleanup)
 
     baseline_rows = list(baseline.get("files", []))
     cleanup_rows = list(cleanup.get("files", []))
@@ -1817,13 +2275,17 @@ def validate_committed_control_plane(
     )
     require(baseline_paths == cleanup_paths, "baseline/cleanup path vectors differ")
     baseline_by_path = {str(row["path"]): row for row in baseline_rows}
-    night_rows = [row for row in cleanup_rows if row.get("wave") == "night"]
-    require(len(night_rows) == 680, "Night row count drift")
-    night_arm = validate_night_arm_identity(
-        repo_root,
-        head,
-        [str(row["path"]) for row in night_rows],
-    )
+    rows_by_wave = {
+        candidate: [
+            row for row in cleanup_rows if str(row.get("wave")) == candidate
+        ]
+        for candidate in WAVE_ORDER
+    }
+    for candidate, expected_count in (("night", 680), ("bundle", 205), ("old002837", 501)):
+        require(
+            len(rows_by_wave[candidate]) == expected_count,
+            f"{candidate} cleanup row count drift",
+        )
     for cleanup_row in cleanup_rows:
         path = str(cleanup_row["path"])
         _validate_repo_relative_literal(path)
@@ -1843,7 +2305,7 @@ def validate_committed_control_plane(
             cleanup_row.get("active_reference_count") == 0,
             f"{path}: active references are not zero",
         )
-    for cleanup_row in night_rows:
+    for cleanup_row in rows_by_wave[wave]:
         _validate_baseline_row(repo_root, baseline_by_path[str(cleanup_row["path"])])
 
     require(receipt.get("contract") == contract, "decoupling receipt contract drift")
@@ -1882,29 +2344,68 @@ def validate_committed_control_plane(
     )
     require(
         deletion_control.get("wave_actors")
-        == {wave: dict(WAVE_ACTORS[wave]) for wave in WAVE_ORDER},
+        == {candidate: dict(WAVE_ACTORS[candidate]) for candidate in WAVE_ORDER},
         "receipt wave actor bindings drift",
     )
-    surface = deletion_control.get("night_delete_surface", {})
     require(
-        surface
+        deletion_control.get("file_delete_surface")
         == {
             "command": "delete-wave",
+            "eligible_waves": list(REMAINING_CODEX_WAVES),
+            "completed_night_rejected": True,
             "single_literal_path_per_unlink": True,
             "ordinal_prefix_resume_only": True,
+            "head_and_index_blob_match_manifest": True,
             "rejects_stage_and_commit": True,
             "writes_receipt_only_after_complete_vector_validation": True,
         },
-        "receipt Night delete-surface guards drift",
+        "receipt file delete-surface guards drift",
+    )
+    require(
+        deletion_control.get("old002837_directory_surface")
+        == {
+            "command": "delete-wave",
+            "requires_complete_501_file_deletion_vector": True,
+            "single_literal_directory_per_non_recursive_removal": True,
+            "deepest_first_prefix_suffix_resume_only": True,
+            "requires_empty_non_reparse_directory": True,
+            "complete_entry_enumeration": True,
+            "git_vectors_unchanged_per_directory": True,
+            "rejects_stage_and_commit": True,
+        },
+        "receipt old002837 directory-surface guards drift",
+    )
+
+    night_completion = _validate_completed_night(
+        repo_root,
+        head,
+        [str(row["path"]) for row in rows_by_wave["night"]],
+    )
+    prior_bundle = None
+    if wave == "old002837":
+        prior_bundle = _validate_prior_bundle_completion(
+            repo_root,
+            head,
+            [str(row["path"]) for row in rows_by_wave["bundle"]],
+        )
+    arm = validate_wave_arm_identity(
+        repo_root,
+        head,
+        wave,
+        [str(row["path"]) for row in rows_by_wave[wave]],
+        directory_manifest if wave == "old002837" else None,
     )
     return {
         "contract": contract,
         "root_agents": agents_identity,
-        "night_arm": night_arm,
+        "arm": arm,
         "baseline": baseline,
         "cleanup": cleanup,
         "receipt": receipt,
-        "night_rows": night_rows,
+        "wave_rows": rows_by_wave[wave],
+        "night_completion": night_completion,
+        "prior_bundle": prior_bundle,
+        "directory_manifest": directory_manifest,
     }
 
 
@@ -1956,6 +2457,7 @@ def validate_documents(
     verify_root_agents(repo_root)
     validate_fixed_cleanup_aggregates(cleanup_manifest)
     validate_actor_bindings(cleanup_manifest)
+    validate_old002837_directory_manifest(repo_root, cleanup_manifest)
     baseline_rows = list(baseline_manifest["files"])
     cleanup_rows = list(cleanup_manifest["files"])
     require(
@@ -2226,8 +2728,55 @@ def _is_reparse_stat(value: Any) -> bool:
     return bool(getattr(value, "st_file_attributes", 0) & reparse_flag)
 
 
+def validate_manifest_git_identity(
+    repo_root: Path,
+    relative_path: str,
+    expected_blob_oid: str,
+    *,
+    revision: str = "HEAD",
+) -> None:
+    _validate_repo_relative_literal(relative_path)
+    stage = _git(
+        repo_root,
+        "ls-files",
+        "--stage",
+        "-z",
+        "--",
+        relative_path,
+        check=False,
+    )
+    require(stage.returncode == 0 and stage.stdout, f"untracked deletion target: {relative_path}")
+    records = [field for field in stage.stdout.split(b"\0") if field]
+    require(len(records) == 1, f"ambiguous tracked target: {relative_path}")
+    prefix, separator, encoded_path = records[0].partition(b"\t")
+    require(separator == b"\t", f"malformed index entry: {relative_path}")
+    prefix_fields = prefix.split(b" ")
+    require(len(prefix_fields) == 3, f"malformed index metadata: {relative_path}")
+    mode, index_oid_bytes, stage_bytes = prefix_fields
+    require(mode in {b"100644", b"100755"}, f"non-regular index mode: {relative_path}")
+    require(stage_bytes == b"0", f"non-zero index stage: {relative_path}")
+    require(
+        encoded_path.decode("utf-8", errors="surrogateescape") == relative_path,
+        f"index path identity drift: {relative_path}",
+    )
+    index_oid = index_oid_bytes.decode("ascii", errors="strict")
+    require(
+        index_oid == expected_blob_oid,
+        f"index blob OID drift: {relative_path}",
+    )
+    head_oid = git_blob_oid(repo_root, revision, relative_path)
+    require(
+        head_oid == expected_blob_oid,
+        f"{revision} blob OID drift: {relative_path}",
+    )
+
+
 def validate_literal_tracked_file(
-    repo_root: Path, relative_path: str
+    repo_root: Path,
+    relative_path: str,
+    *,
+    expected_blob_oid: str | None = None,
+    revision: str = "HEAD",
 ) -> Path:
     pure = _validate_repo_relative_literal(relative_path)
     root = repo_root.resolve(strict=True)
@@ -2252,26 +2801,27 @@ def validate_literal_tracked_file(
         )
         parent = parent.parent
 
-    stage = _git(
-        repo_root,
-        "ls-files",
-        "--stage",
-        "-z",
-        "--",
-        relative_path,
-        check=False,
-    )
-    require(stage.returncode == 0 and stage.stdout, f"untracked deletion target: {relative_path}")
-    records = [field for field in stage.stdout.split(b"\0") if field]
-    require(len(records) == 1, f"ambiguous tracked target: {relative_path}")
-    prefix, separator, encoded_path = records[0].partition(b"\t")
-    require(separator == b"\t", f"malformed index entry: {relative_path}")
-    mode = prefix.split(b" ", 1)[0]
-    require(mode in {b"100644", b"100755"}, f"non-regular index mode: {relative_path}")
-    require(
-        encoded_path.decode("utf-8", errors="surrogateescape") == relative_path,
-        f"index path identity drift: {relative_path}",
-    )
+    if expected_blob_oid is None:
+        stage = _git(
+            repo_root,
+            "ls-files",
+            "--stage",
+            "-z",
+            "--",
+            relative_path,
+            check=False,
+        )
+        require(
+            stage.returncode == 0 and stage.stdout,
+            f"untracked deletion target: {relative_path}",
+        )
+    else:
+        validate_manifest_git_identity(
+            repo_root,
+            relative_path,
+            expected_blob_oid,
+            revision=revision,
+        )
     return target
 
 
@@ -2283,6 +2833,194 @@ def _unlink_one_literal(target: Path) -> None:
     target.unlink()
 
 
+def _require_existing_components_non_reparse(
+    repo_root: Path, relative_path: str
+) -> None:
+    root = repo_root.resolve(strict=True)
+    current = root
+    for part in _validate_repo_relative_literal(relative_path).parts:
+        current = current / part
+        if not os.path.lexists(current):
+            break
+        metadata = current.lstat()
+        require(
+            not current.is_symlink() and not _is_reparse_stat(metadata),
+            f"directory path traverses a symlink/reparse point: {relative_path}",
+        )
+
+
+def _enumerate_directory_only_tree(
+    repo_root: Path, root_relative: str
+) -> set[str]:
+    root = repo_root.resolve(strict=True)
+    tree_root = root.joinpath(*_validate_repo_relative_literal(root_relative).parts)
+    if not os.path.lexists(tree_root):
+        return set()
+    tree_metadata = tree_root.lstat()
+    require(
+        tree_root != root,
+        "refusing to enumerate the repository/worktree root as a cleanup tree",
+    )
+    require(
+        tree_root.is_dir()
+        and not tree_root.is_symlink()
+        and not _is_reparse_stat(tree_metadata),
+        "old002837 cleanup root is not a real non-reparse directory",
+    )
+    discovered: set[str] = set()
+    pending = [tree_root]
+    while pending:
+        current = pending.pop()
+        relative_current = current.relative_to(root).as_posix()
+        require(
+            relative_current not in discovered,
+            f"duplicate directory encountered during complete enumeration: {relative_current}",
+        )
+        discovered.add(relative_current)
+        with os.scandir(current) as iterator:
+            entries = list(iterator)
+        for entry in entries:
+            entry_path = Path(entry.path)
+            metadata = entry.stat(follow_symlinks=False)
+            relative_entry = entry_path.relative_to(root).as_posix()
+            require(
+                not entry.is_symlink() and not _is_reparse_stat(metadata),
+                f"symlink/reparse entry in directory cleanup tree: {relative_entry}",
+            )
+            require(
+                entry.is_dir(follow_symlinks=False),
+                f"non-directory entry remains in directory cleanup tree: {relative_entry}",
+            )
+            pending.append(entry_path)
+    return discovered
+
+
+def validate_directory_prefix_state(
+    repo_root: Path,
+    expected_paths: Sequence[str],
+    *,
+    processed_count: int | None = None,
+) -> dict[str, Any]:
+    paths = [str(path) for path in expected_paths]
+    require(paths, "empty directory manifest")
+    require(len(paths) == len(set(paths)), "directory manifest has duplicates")
+    root = repo_root.resolve(strict=True)
+    for path in paths:
+        pure = _validate_repo_relative_literal(path)
+        require(
+            root.joinpath(*pure.parts) != root,
+            "directory manifest contains repository/worktree root",
+        )
+        _require_existing_components_non_reparse(repo_root, path)
+
+    positions = {path: index for index, path in enumerate(paths)}
+    for child in paths:
+        parent = PurePosixPath(child).parent
+        while parent.as_posix() != ".":
+            parent_text = parent.as_posix()
+            if parent_text in positions:
+                require(
+                    positions[child] < positions[parent_text],
+                    f"directory manifest is not deepest-first: {child}",
+                )
+            parent = parent.parent
+
+    present = [
+        os.path.lexists(root.joinpath(*PurePosixPath(path).parts))
+        for path in paths
+    ]
+    inferred = 0
+    while inferred < len(paths) and not present[inferred]:
+        inferred += 1
+    require(
+        not any(not value for value in present[inferred:]),
+        "directory state is not a processed-prefix/remaining-suffix split",
+    )
+    if processed_count is not None:
+        require(
+            inferred == processed_count,
+            "directory processed-prefix count changed between operations",
+        )
+    for path in paths[inferred:]:
+        target = root.joinpath(*PurePosixPath(path).parts)
+        metadata = target.lstat()
+        require(
+            target.is_dir()
+            and not target.is_symlink()
+            and not _is_reparse_stat(metadata),
+            f"remaining manifest target is not a real non-reparse directory: {path}",
+        )
+
+    root_relative = paths[-1]
+    discovered = _enumerate_directory_only_tree(repo_root, root_relative)
+    require(
+        discovered == set(paths[inferred:]),
+        "complete directory enumeration differs from the remaining manifest suffix",
+    )
+    current_path = paths[inferred] if inferred < len(paths) else None
+    if current_path is not None:
+        current = root.joinpath(*PurePosixPath(current_path).parts)
+        with os.scandir(current) as iterator:
+            entries = list(iterator)
+        require(
+            not entries,
+            f"current directory removal target is not empty: {current_path}",
+        )
+    return {
+        "processed_count": inferred,
+        "complete": inferred == len(paths),
+        "processed_paths": paths[:inferred],
+        "remaining_paths": paths[inferred:],
+        "current_path": current_path,
+    }
+
+
+def validate_runtime_directory_manifest(
+    repo_root: Path, directory_manifest: Mapping[str, Any]
+) -> dict[str, Any]:
+    root = repo_root.resolve(strict=True)
+    dedicated = DEDICATED_WORKTREE_ROOT.resolve(strict=True)
+    require(root == dedicated, "directory surface is not in the dedicated worktree")
+    require(
+        directory_manifest.get("paths") == list(OLD002837_DIRECTORIES),
+        "runtime directory paths differ from the frozen manifest",
+    )
+    actual_absolute = [
+        _absolute_manifest_path(repo_root, path)
+        for path in directory_manifest["paths"]
+    ]
+    require(
+        actual_absolute == list(directory_manifest.get("absolute_paths", [])),
+        "runtime absolute directory paths differ from the frozen manifest",
+    )
+    absolute_bytes, absolute_sha = ordered_path_vector(actual_absolute)
+    require(
+        absolute_bytes
+        == EXPECTED_OLD002837_DIRECTORY_VECTOR[
+            "absolute_path_vector_byte_count"
+        ]
+        and absolute_sha
+        == EXPECTED_OLD002837_DIRECTORY_VECTOR[
+            "absolute_path_vector_sha256"
+        ],
+        "runtime absolute directory vector drift",
+    )
+    return validate_directory_prefix_state(
+        repo_root, list(directory_manifest["paths"])
+    )
+
+
+def _rmdir_one_literal(target: Path) -> None:
+    metadata = target.lstat()
+    require(not target.is_symlink(), f"refusing symlink directory removal: {target}")
+    require(not _is_reparse_stat(metadata), f"refusing reparse directory removal: {target}")
+    require(stat.S_ISDIR(metadata.st_mode), f"refusing non-directory removal: {target}")
+    with os.scandir(target) as iterator:
+        entries = list(iterator)
+    require(not entries, f"refusing non-empty directory removal: {target}")
+    target.rmdir()
+
+
 def _wave_validation_receipt(
     wave: str,
     wave_parent: str,
@@ -2290,9 +3028,10 @@ def _wave_validation_receipt(
     status_bytes: bytes,
     diff_bytes: bytes,
     validation: Mapping[str, Any],
+    directory_validation: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     actor = WAVE_ACTORS[wave]
-    return {
+    receipt = {
         "schema_version": "r5_v1_deletion_wave_validation_v2",
         "validation_id": "V-007",
         "decision": "pass",
@@ -2328,6 +3067,9 @@ def _wave_validation_receipt(
             "stage_or_commit_performed": False,
         },
     }
+    if directory_validation is not None:
+        receipt["directory_cleanup"] = dict(directory_validation)
+    return receipt
 
 
 def verify_wave(
@@ -2336,13 +3078,11 @@ def verify_wave(
     wave: str,
     wave_parent: str,
 ) -> dict[str, Any]:
-    require(wave in WAVE_ORDER, f"unknown wave: {wave}")
+    control = validate_committed_control_plane(repo_root, wave, wave_parent)
     require(
-        git_text(repo_root, "rev-parse", "HEAD") == wave_parent,
-        "current HEAD is not the clean arm-wave parent",
+        dict(cleanup_manifest) == control["cleanup"],
+        "provided cleanup manifest differs from the committed control plane",
     )
-    validate_fixed_cleanup_aggregates(cleanup_manifest)
-    validate_actor_bindings(cleanup_manifest)
     committed_cleanup = load_committed_yaml(
         repo_root, wave_parent, CLEANUP_MANIFEST_REL
     )
@@ -2365,23 +3105,71 @@ def verify_wave(
         expected,
         require_complete=True,
     )
+    directory_validation = None
+    if wave == "old002837":
+        state = validate_runtime_directory_manifest(
+            repo_root, control["directory_manifest"]
+        )
+        require(state["complete"] is True, "old002837 directory vector is not complete")
+        directory_validation = {
+            **OLD002837_DIRECTORY_ACTOR,
+            "expected_directory_count": len(
+                control["directory_manifest"]["paths"]
+            ),
+            "processed_directory_count": state["processed_count"],
+            "complete": True,
+            "exact_root_absent": not os.path.lexists(
+                repo_root.resolve(strict=True)
+                .joinpath(*PurePosixPath(OLD_RUN_PREFIX).parts)
+            ),
+            "git_vectors_unchanged_during_directory_removal": True,
+            "relative_vector": {
+                "byte_count": EXPECTED_OLD002837_DIRECTORY_VECTOR[
+                    "path_vector_byte_count"
+                ],
+                "sha256": EXPECTED_OLD002837_DIRECTORY_VECTOR[
+                    "path_vector_sha256"
+                ],
+            },
+            "absolute_vector": {
+                "byte_count": EXPECTED_OLD002837_DIRECTORY_VECTOR[
+                    "absolute_path_vector_byte_count"
+                ],
+                "sha256": EXPECTED_OLD002837_DIRECTORY_VECTOR[
+                    "absolute_path_vector_sha256"
+                ],
+            },
+        }
     return _wave_validation_receipt(
-        wave, wave_parent, expected, status_bytes, diff_bytes, validation
+        wave,
+        wave_parent,
+        expected,
+        status_bytes,
+        diff_bytes,
+        validation,
+        directory_validation,
     )
 
 
-def delete_night_wave(repo_root: Path, wave_parent: str) -> dict[str, Any]:
-    control = validate_committed_control_plane(repo_root, wave_parent)
+def delete_file_wave(
+    repo_root: Path, wave: str, wave_parent: str
+) -> dict[str, Any]:
+    control = validate_committed_control_plane(repo_root, wave, wave_parent)
     cleanup = control["cleanup"]
-    night_document = next(
-        document for document in cleanup["waves"] if document["wave"] == "night"
+    wave_document = next(
+        document for document in cleanup["waves"] if document["wave"] == wave
     )
-    expected = [str(path) for path in night_document["paths"]]
+    expected = [str(path) for path in wave_document["paths"]]
+    rows = list(control["wave_rows"])
     require(
-        night_document.get("deletion_actor")
+        [str(row["path"]) for row in rows] == expected,
+        f"{wave} cleanup rows differ from the wave path vector",
+    )
+    require(
+        wave_document.get("deletion_actor")
         == "codex_exact_manifest_one_file_at_a_time"
-        and night_document.get("codex_delete_authorized") is True,
-        "Night is not authorized for Codex exact-file deletion",
+        and wave_document.get("codex_delete_authorized") is True,
+        f"{wave} is not authorized for Codex exact-file deletion",
     )
 
     status_bytes, diff_bytes, cached_bytes = capture_deletion_vectors(
@@ -2392,21 +3180,26 @@ def delete_night_wave(repo_root: Path, wave_parent: str) -> dict[str, Any]:
     )
     prefix_count = int(validation["prefix_count"])
     root = repo_root.resolve(strict=True)
+    for row in rows:
+        validate_manifest_git_identity(
+            repo_root,
+            str(row["path"]),
+            str(row["blob_oid"]),
+            revision=wave_parent,
+        )
     for path in expected[:prefix_count]:
         target = root.joinpath(*PurePosixPath(path).parts)
         require(
             not os.path.lexists(target),
             f"deleted ordinal prefix target still exists: {path}",
         )
-
-    remaining_targets = [
-        validate_literal_tracked_file(repo_root, path)
-        for path in expected[prefix_count:]
-    ]
-    require(
-        len(remaining_targets) == len(expected) - prefix_count,
-        "remaining Night target materialization drift",
-    )
+    for row in rows[prefix_count:]:
+        validate_literal_tracked_file(
+            repo_root,
+            str(row["path"]),
+            expected_blob_oid=str(row["blob_oid"]),
+            revision=wave_parent,
+        )
 
     for index in range(prefix_count, len(expected)):
         status_bytes, diff_bytes, cached_bytes = capture_deletion_vectors(
@@ -2417,12 +3210,28 @@ def delete_night_wave(repo_root: Path, wave_parent: str) -> dict[str, Any]:
         )
         require(
             current["prefix_count"] == index,
-            "Night deletion prefix changed between literal unlink operations",
+            f"{wave} deletion prefix changed between literal unlink operations",
         )
-        path = expected[index]
-        target = validate_literal_tracked_file(repo_root, path)
+        row = rows[index]
+        path = str(row["path"])
+        target = validate_literal_tracked_file(
+            repo_root,
+            path,
+            expected_blob_oid=str(row["blob_oid"]),
+            revision=wave_parent,
+        )
         _unlink_one_literal(target)
         require(not os.path.lexists(target), f"literal unlink did not remove: {path}")
+        after_status, after_diff, after_cached = capture_deletion_vectors(
+            repo_root, wave_parent
+        )
+        after = validate_deletion_prefix_vectors(
+            after_status, after_diff, after_cached, expected
+        )
+        require(
+            after["prefix_count"] == index + 1,
+            f"{wave} deletion prefix did not advance by one literal file",
+        )
 
     status_bytes, diff_bytes, cached_bytes = capture_deletion_vectors(
         repo_root, wave_parent
@@ -2434,15 +3243,130 @@ def delete_night_wave(repo_root: Path, wave_parent: str) -> dict[str, Any]:
         expected,
         require_complete=True,
     )
+    directory_validation = None
+    if wave == "old002837":
+        directory_manifest = control["directory_manifest"]
+        directory_paths = list(directory_manifest["paths"])
+        state = validate_runtime_directory_manifest(repo_root, directory_manifest)
+        directory_start = int(state["processed_count"])
+        frozen_status = status_bytes
+        frozen_diff = diff_bytes
+        frozen_cached = cached_bytes
+        for index in range(directory_start, len(directory_paths)):
+            before_status, before_diff, before_cached = capture_deletion_vectors(
+                repo_root, wave_parent
+            )
+            require(
+                before_status == frozen_status
+                and before_diff == frozen_diff
+                and before_cached == frozen_cached,
+                "Git vectors changed before a directory removal",
+            )
+            validate_deletion_prefix_vectors(
+                before_status,
+                before_diff,
+                before_cached,
+                expected,
+                require_complete=True,
+            )
+            before_state = validate_directory_prefix_state(
+                repo_root, directory_paths, processed_count=index
+            )
+            current_path = str(before_state["current_path"])
+            require(
+                current_path == directory_paths[index],
+                "directory current ordinal drift",
+            )
+            target = root.joinpath(*PurePosixPath(current_path).parts)
+            expected_absolute = str(directory_manifest["absolute_paths"][index])
+            require(
+                str(target.resolve(strict=True)) == expected_absolute,
+                "directory absolute literal identity drift",
+            )
+            _rmdir_one_literal(target)
+            require(
+                not os.path.lexists(target),
+                f"literal directory removal did not remove: {current_path}",
+            )
+            after_state = validate_directory_prefix_state(
+                repo_root, directory_paths, processed_count=index + 1
+            )
+            require(
+                after_state["processed_count"] == index + 1,
+                "directory processed prefix did not advance by one",
+            )
+            after_status, after_diff, after_cached = capture_deletion_vectors(
+                repo_root, wave_parent
+            )
+            require(
+                after_status == frozen_status
+                and after_diff == frozen_diff
+                and after_cached == frozen_cached,
+                "Git vectors changed during a directory removal",
+            )
+        final_directory_state = validate_directory_prefix_state(
+            repo_root, directory_paths, processed_count=len(directory_paths)
+        )
+        require(
+            final_directory_state["complete"] is True,
+            "old002837 directory cleanup is incomplete",
+        )
+        require(
+            not os.path.lexists(root.joinpath(*PurePosixPath(OLD_RUN_PREFIX).parts)),
+            "old002837 exact run root still exists",
+        )
+        status_bytes, diff_bytes, cached_bytes = capture_deletion_vectors(
+            repo_root, wave_parent
+        )
+        require(
+            status_bytes == frozen_status
+            and diff_bytes == frozen_diff
+            and cached_bytes == frozen_cached,
+            "final Git vectors changed during directory cleanup",
+        )
+        final_validation = validate_deletion_prefix_vectors(
+            status_bytes,
+            diff_bytes,
+            cached_bytes,
+            expected,
+            require_complete=True,
+        )
+        directory_validation = {
+            **OLD002837_DIRECTORY_ACTOR,
+            "expected_directory_count": len(directory_paths),
+            "processed_directory_count": len(directory_paths),
+            "complete": True,
+            "exact_root_absent": True,
+            "git_vectors_unchanged_during_directory_removal": True,
+            "file_vectors_validated_before_directory_removal": True,
+            "relative_vector": {
+                "byte_count": EXPECTED_OLD002837_DIRECTORY_VECTOR[
+                    "path_vector_byte_count"
+                ],
+                "sha256": EXPECTED_OLD002837_DIRECTORY_VECTOR[
+                    "path_vector_sha256"
+                ],
+            },
+            "absolute_vector": {
+                "byte_count": EXPECTED_OLD002837_DIRECTORY_VECTOR[
+                    "absolute_path_vector_byte_count"
+                ],
+                "sha256": EXPECTED_OLD002837_DIRECTORY_VECTOR[
+                    "absolute_path_vector_sha256"
+                ],
+            },
+        }
+
     receipt = _wave_validation_receipt(
-        "night",
+        wave,
         wave_parent,
         expected,
         status_bytes,
         diff_bytes,
         final_validation,
+        directory_validation,
     )
-    write_yaml_exact(repo_root, WAVE_RECEIPT_RELS["night"], receipt)
+    write_yaml_exact(repo_root, WAVE_RECEIPT_RELS[wave], receipt)
     return receipt
 
 
@@ -2457,10 +3381,10 @@ def build_parser() -> argparse.ArgumentParser:
     restore = subparsers.add_parser("verify-restore")
     restore.add_argument("--restore-root", type=Path, required=True)
     wave = subparsers.add_parser("verify-wave")
-    wave.add_argument("--wave", choices=WAVE_ORDER, required=True)
+    wave.add_argument("--wave", choices=REMAINING_CODEX_WAVES, required=True)
     wave.add_argument("--wave-parent", required=True)
     delete = subparsers.add_parser("delete-wave")
-    delete.add_argument("--wave", choices=("night",), required=True)
+    delete.add_argument("--wave", choices=REMAINING_CODEX_WAVES, required=True)
     delete.add_argument("--wave-parent", required=True)
     return parser
 
@@ -2500,8 +3424,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             receipt = verify_wave(root, cleanup, args.wave, args.wave_parent)
             write_yaml_exact(root, WAVE_RECEIPT_RELS[args.wave], receipt)
         elif args.command == "delete-wave":
-            require(args.wave == "night", "only the Night wave permits Codex deletion")
-            receipt = delete_night_wave(root, args.wave_parent)
+            receipt = delete_file_wave(root, args.wave, args.wave_parent)
         else:  # pragma: no cover
             raise CleanupValidationError(f"unsupported command: {args.command}")
     except (
