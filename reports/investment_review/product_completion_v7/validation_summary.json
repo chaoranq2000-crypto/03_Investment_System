@@ -1,0 +1,90 @@
+{
+  "schema_version": "investment_review.product_completion_v7.validation.v1",
+  "status": "accepted",
+  "recorded_at": "2026-07-27T10:15:27Z",
+  "contract": {
+    "path": "docs/codex_tasks/investment_review_product_completion_v7/CONTRACT.md",
+    "sha256": "83284cc306ae5a58e0281b048e860bc4822c4a7b6d57ac0270486f0ee938d497"
+  },
+  "git": {
+    "source_baseline": "aa8e3ed41a957fe6ab891f2a65753294b360d83d",
+    "setup_commit": "ccc69cc",
+    "p1_commit": "04aed2c",
+    "p2_commit_message": "test(review): close reviewability corrections v7 candidate",
+    "published": false
+  },
+  "validators": {
+    "V-001": "pass",
+    "V-002": "pass",
+    "V-101": "268 passed",
+    "V-701": "128 passed",
+    "V-702": "19 passed; vite build passed",
+    "V-703": "18 passed",
+    "V-801": "accepted",
+    "V-901": "1905 passed, 2 skipped",
+    "V-999": "pass"
+  },
+  "real_acceptance": {
+    "weekly_user": {
+      "episodes": 22,
+      "apply_repeat_canonical_byte_identical": true,
+      "sha256": "481c0bcc6cca5952a84d048c1ee2f7d2108e74ae67c241c09249a082974da9ee"
+    },
+    "weekly_system": {
+      "episodes": 22,
+      "apply_repeat_canonical_byte_identical": true,
+      "sha256": "8ad2ef78002378a432ea1140e7eb726a3629b19330e6432d9f1ee1d3175b8aae"
+    },
+    "monthly_user": {
+      "episodes": 25,
+      "apply_repeat_canonical_byte_identical": true,
+      "sha256": "010157904972fe8486f403d431c8b0d90988d3fced5818c9913d9c9f8f57d528"
+    },
+    "monthly_system": {
+      "episodes": 25,
+      "apply_repeat_canonical_byte_identical": true,
+      "sha256": "81600a7cbc9891470d74c37b41d1ab8d4c758c97e34110aeca1b3a07133f44c6"
+    },
+    "marker_rerun_count": 0,
+    "accepted_single_rerun_count": 0,
+    "external_network_calls": 0,
+    "p2_summary_sha256": "5fdd79a2dd66779a2cc711eb970594413fd9308a6af0eede85eafee0a6356a1f"
+  },
+  "browser": {
+    "status": "accepted",
+    "surface": "localhost",
+    "chinese_first_screen": true,
+    "single_listing_count": 2,
+    "weekly_listing_count": 44,
+    "paired_perspectives": true,
+    "six_axes_visible": true,
+    "evidence_drawer_visible": true,
+    "null_not_zero": true,
+    "actual_user_observation_proven": false
+  },
+  "candidate": {
+    "path": "data/db/investment_review_reviewability_v3.sqlite3",
+    "size": 7626752,
+    "sha256": "acf3b9c567cbe69ca4536285f4b5027016dd2e0ee2d382ebc4d993ff83410f38",
+    "quick_check": "ok",
+    "user_version": 2,
+    "checkpoint_count": 30,
+    "target_tuple_count": 2,
+    "wal_exists": false,
+    "shm_exists": false
+  },
+  "protected_sources_exact": true,
+  "cache": {
+    "entrance_count": 15,
+    "final_count": 153,
+    "created_count": 138,
+    "existing_paths_unchanged": true,
+    "deleted_count": 0
+  },
+  "boundaries": {
+    "actual_user_observation_proven": false,
+    "human_product_acceptance": false,
+    "production_released": false,
+    "direct_investment_advice": false
+  }
+}

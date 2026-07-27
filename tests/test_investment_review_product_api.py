@@ -483,7 +483,7 @@ def test_missing_receipt_is_visible_as_a_path_free_failed_run(
     assert str(product_api.runner.root) not in str(captured.value)
 
 
-def test_receipt_second_read_race_degrades_to_failed_without_escaping(
+def test_listing_reuses_validated_receipt_without_second_read(
     product_api: ProductApiFixture,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -504,11 +504,9 @@ def test_receipt_second_read_race_degrades_to_failed_without_escaping(
     )
     listing = product_api.service.list_reviews()
 
-    assert calls == 2
-    assert listing["status"] == "failed"
-    assert listing["data"]["reviews"][0]["gap_codes"] == [
-        "RUN_RECEIPT_INVALID"
-    ]
+    assert calls == 1
+    assert listing["status"] == "partial"
+    assert listing["data"]["count"] == 1
 
 
 def test_read_models_are_curated_and_health_does_not_leak_paths(
@@ -1105,6 +1103,40 @@ def test_service_identity_gate_preserves_repo_relative_paths(
     )
     listing = service.list_reviews()
     assert listing["data"]["count"] == 1
+
+
+def test_list_reviews_pushes_scope_into_trusted_catalog(
+    product_api: ProductApiFixture,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    receipt_scopes: list[str | None] = []
+    status_scopes: list[str | None] = []
+
+    def list_receipts(
+        *,
+        scope: str | None = None,
+        include_validated_receipt: bool = False,
+    ) -> dict[str, object]:
+        receipt_scopes.append(scope)
+        assert include_validated_receipt is True
+        return {"runs": [], "invalid_runs": []}
+
+    def list_run_statuses(*, scope: str | None = None) -> dict[str, object]:
+        status_scopes.append(scope)
+        return {"runs": []}
+
+    monkeypatch.setattr(product_api.service.catalog, "list_receipts", list_receipts)
+    monkeypatch.setattr(
+        product_api.service.catalog,
+        "list_run_statuses",
+        list_run_statuses,
+    )
+
+    listing = product_api.service.list_reviews(scope="single")
+
+    assert listing["data"]["count"] == 0
+    assert receipt_scopes == ["single"]
+    assert status_scopes == ["single"]
 
 
 def test_revision_path_rejects_link_like_leaf(

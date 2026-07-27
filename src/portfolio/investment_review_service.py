@@ -502,11 +502,17 @@ class _TrustedReviewCatalog:
             )
         return receipt
 
-    def list_receipts(self) -> dict[str, Any]:
+    def list_receipts(
+        self,
+        *,
+        scope: str | None = None,
+        include_validated_receipt: bool = False,
+    ) -> dict[str, Any]:
         items: list[dict[str, Any]] = []
         invalid_runs: list[dict[str, Any]] = []
-        for scope in sorted(RUN_SCOPES):
-            for run in self.store.list_review_runs(scope=scope):
+        scopes = (scope,) if scope is not None else tuple(sorted(RUN_SCOPES))
+        for selected_scope in scopes:
+            for run in self.store.list_review_runs(scope=selected_scope):
                 if run["status"] not in {"succeeded", "partial"}:
                     continue
                 parameters = run["run"].get("parameters")
@@ -532,25 +538,28 @@ class _TrustedReviewCatalog:
                         {
                             "run_id": str(run["run"].get("run_id") or ""),
                             "run_key": str(run["run"].get("run_key") or ""),
-                            "scope": str(run["run"].get("scope") or scope),
+                            "scope": str(
+                                run["run"].get("scope") or selected_scope
+                            ),
                             "status": "failed",
                             "requested_at": run["run"].get("requested_at"),
                             "gap_codes": ["RUN_RECEIPT_INVALID"],
                         }
                     )
                     continue
-                items.append(
-                    {
-                        "run_id": receipt["run_id"],
-                        "run_key": receipt["run_key"],
-                        "scope": receipt["scope"],
-                        "status": receipt["status"],
-                        "cutoffs": receipt["cutoffs"],
-                        "episode_count": len(receipt["episodes"]),
-                        "gaps": receipt["gaps"],
-                        "content_id": receipt["content_id"],
-                    }
-                )
+                item = {
+                    "run_id": receipt["run_id"],
+                    "run_key": receipt["run_key"],
+                    "scope": receipt["scope"],
+                    "status": receipt["status"],
+                    "cutoffs": receipt["cutoffs"],
+                    "episode_count": len(receipt["episodes"]),
+                    "gaps": receipt["gaps"],
+                    "content_id": receipt["content_id"],
+                }
+                if include_validated_receipt:
+                    item["_validated_receipt"] = receipt
+                items.append(item)
         items.sort(key=lambda item: (item["scope"], item["run_key"]))
         invalid_runs.sort(
             key=lambda item: (
@@ -565,10 +574,15 @@ class _TrustedReviewCatalog:
             "invalid_runs": invalid_runs,
         }
 
-    def list_run_statuses(self) -> dict[str, Any]:
+    def list_run_statuses(
+        self,
+        *,
+        scope: str | None = None,
+    ) -> dict[str, Any]:
         items: list[dict[str, Any]] = []
-        for scope in sorted(RUN_SCOPES):
-            for item in self.store.list_review_runs(scope=scope):
+        scopes = (scope,) if scope is not None else tuple(sorted(RUN_SCOPES))
+        for selected_scope in scopes:
+            for item in self.store.list_review_runs(scope=selected_scope):
                 run = item.get("run")
                 if not isinstance(run, Mapping):
                     continue
@@ -687,8 +701,13 @@ class _TrustedReviewCatalog:
         review_id: str,
         *,
         episode_id: str | None = None,
+        validated_receipt: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
-        receipt = self.get_receipt(run_id)
+        receipt = (
+            dict(validated_receipt)
+            if validated_receipt is not None
+            else self.get_receipt(run_id)
+        )
         if receipt.get("run_id") != run_id:
             raise ReviewRunnerError(
                 "run reference did not resolve to exact run ID"
@@ -957,11 +976,23 @@ class InvestmentReviewWebService:
             "content_id": review["content_id"],
         }
 
-    def _bundle(self, run_id: object, review_id: object) -> dict[str, Any]:
+    def _bundle(
+        self,
+        run_id: object,
+        review_id: object,
+        *,
+        validated_receipt: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any]:
         run = _required_id(run_id, "run_id", _RUN_ID)
         review = _required_id(review_id, "review_id", _REVIEW_ID)
         try:
-            return self.catalog.get_episode_bundle(run, review)
+            if validated_receipt is None:
+                return self.catalog.get_episode_bundle(run, review)
+            return self.catalog.get_episode_bundle(
+                run,
+                review,
+                validated_receipt=validated_receipt,
+            )
         except ReviewRunnerError as exc:
             message = str(exc).lower()
             if "not found" in message or "was not found" in message:
@@ -1650,8 +1681,11 @@ class InvestmentReviewWebService:
 
         reviews: list[dict[str, Any]] = []
         try:
-            receipt_catalog = self.catalog.list_receipts()
-            run_status_catalog = self.catalog.list_run_statuses()
+            receipt_catalog = self.catalog.list_receipts(
+                scope=scope,
+                include_validated_receipt=True,
+            )
+            run_status_catalog = self.catalog.list_run_statuses(scope=scope)
         except (ReviewRunnerError, ReviewStoreError) as exc:
             raise _error(503, "review_catalog_unavailable", "复盘目录不可用") from exc
         receipt_run_ids: set[str] = set()
@@ -1659,7 +1693,12 @@ class InvestmentReviewWebService:
             if scope is not None and run_item["scope"] != scope:
                 continue
             try:
-                receipt = self.catalog.get_receipt(str(run_item["run_id"]))
+                validated_receipt = run_item.get("_validated_receipt")
+                receipt = (
+                    dict(validated_receipt)
+                    if isinstance(validated_receipt, Mapping)
+                    else self.catalog.get_receipt(str(run_item["run_id"]))
+                )
             except (ReviewRunnerError, ReviewStoreError):
                 if status is None or status == "failed":
                     reviews.append(
@@ -1699,6 +1738,7 @@ class InvestmentReviewWebService:
                     bundle = self._bundle(
                         receipt["run_id"],
                         episode.get("review_id"),
+                        validated_receipt=receipt,
                     )
                     latest, _ = self._latest_review(bundle)
                 except InvestmentReviewServiceError as exc:
