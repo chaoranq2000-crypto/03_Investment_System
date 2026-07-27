@@ -9,7 +9,7 @@ source_baseline: "fe986a0359c0268ac94eea696c3a4795403e4614"
 last_completed_phase: "P4"
 next_phase: "P5"
 last_validation: "pass"
-updated_at: "2026-07-27T15:01:20+08:00"
+updated_at: "2026-07-27T15:23:23+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -43,11 +43,11 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - **State:** `running`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`。Bundle post-wave evidence checkpoint=`f98c7861b422a4081955e8f1513da4428534425c` 已创建且 clean。old002837 pre-arm audit 精确闭合：501/501 tracked regular/non-reparse files 的 HEAD/index blob OID 全匹配；旧 run tree 恰含 501 files + 29 directories，extra/special/reparse=0；relative/absolute directory vectors 分别为 2208/`1e987f07...` 与 3803/`31669a8f...`；Night/Bundle 保持缺失。
-- **Current blocker:** 无；本文件正在形成 old002837 的 clean v8 arm。包含本次清单更新的 arm commit 自身即 `wave_parent_commit`，SHA 不写回文件。
+- **Latest validation:** `pass`。old002837 clean arm=`196797dbc0668652be66c9a65ce09a2ebc119b8b`；Codex exact-file surface 删除 501 个 ordinal files，在完整 501-D vectors 通过后按固定 deepest-first manifest 非递归删除 29 个 empty/non-reparse directories；删除提交=`b5ebdbfe6ddce7698a438bc8afa69cf5a1c8fbd2`，精确包含 501 `D` 与 1 个 receipt `A`。post-wave V-006=`28 passed in 611.71s`，V-003 final=`194 passed in 23.41s`；三波 1386 files、29 directories 与旧 root 全缺失，工作树 clean。
+- **Current blocker:** 无；三个删除波次全部完成且各自 post-wave regressions 通过，正在执行最终本地验证与 candidate seal。
 - **Prior hard-stop evidence:** v4 checkpoints `0f582599...` 与 `f1dafeb...` 保留历史冲突证据；v5 已修复三项 A.7 冲突以及 A.2 retained-dependency/unknown-classification 缺陷。旧 `82f7d37...` arm 因其后存在 policy/v6 commits 已失去 current-wave-parent 资格。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；批准的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`，tracked-only 为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。v6 准备时补丁工具的两份未跟踪草稿曾误落该树，已按两个明确文件路径逐一撤销；HEAD 与两组 raw NUL 向量随后精确恢复。不得再写入、清理、修复、吸收或提交其中内容。
-- **Next safe action:** arm commit clean 后，以其 exact HEAD 作为 `wave_parent_commit` 调用 V-007/D-020 control plane；只有完整 contract/AGENTS/actor/顺序/Bundle receipt/501-row blob/恢复/空 status-prefix/29-row directory identity 全通过时，才从第 1 个 absolute literal file 开始逐项删除。
+- **Next safe action:** 运行 V-001–V-011 最终矩阵、全仓 pytest、两次 002837 replay、scope audit 和独立 clean-checkout smoke；机械刷新授权 evidence，确认全部删除路径未重建、主工作树未漂移后，创建最后一个 tracked `chore(v1): seal governance cleanup candidate` commit，并仅进入外部 publication。
 
 ### P5 pre-delete completion evidence
 
@@ -58,7 +58,7 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - Restore proof: all 1,386 Git blobs recovered byte-for-byte under `C:\Users\Q\AppData\Local\Temp\v8_v1_historical_restore_e7939036de974f27afb7306970f49576`; `cat_file_e_verified`, `content_hash_verified`, `full_restore_verified` and `byte_for_byte_match` all true.
 - Current validators: V-002 pass；V-003 final 194 passed；V-004 两次 semantic digest 均为 `2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6` 且 16 passed；V-005 18 passed；V-006 28 passed；V-008 pass/17 capabilities/0 blockers；V-011 `ok=true`、`state=running`、0 warnings。
 - Current full repository pytest: `1146 passed, 2 skipped in 700.39s`; zero failures/errors and no added skip/xfail/mock/collection-ignore.
-- Scope through the current checkpoint: Bundle post-wave evidence checkpoint `f98c7861...` 只更新 v8 `START_HERE.md` 与 `governance_cleanup_readout.md` metadata。当前 old002837 arm 只更新 v8 `START_HERE.md` 的 checkpoint metadata 与 501-file/29-directory absolute manifests；0 raw-data change，0 user-main write，old002837 尚未删除。
+- Scope through the current checkpoint: old002837 arm 只修改 v8 `START_HERE.md`；删除提交精确为 501 个 manifest `D` + `manual_deletion_wave_old002837.yaml` 1 个 `A`，并按冻结清单删除 29 个空目录。当前证据 checkpoint 只更新 v8 `START_HERE.md` 与 `governance_cleanup_readout.md` metadata；0 raw-data overwrite，0 user-main write。
 
 ### P5 Night exact-manifest completed
 
@@ -987,13 +987,15 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_verified_result_materializer.py`
 - `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_verified_result_materializer_cli.py`
 
-### P5 old002837 exact-path arm
+### P5 old002837 exact-path completed
 
 - Wave: `old002837`
-- Arm state: `armed_clean_checkpoint`
+- Arm state: `completed_committed`
 - Contract deletion actor: `codex_exact_manifest_one_file_at_a_time`
 - Contract Codex deletion authorization: `true`
-- `wave_parent_commit`: �������е� `chore(v1): arm 002837 codex exact-path deletion checkpoint` commit �������� SHA ��д�ر��ļ���
+- `wave_parent_commit`: `196797dbc0668652be66c9a65ce09a2ebc119b8b`
+- Deletion commit: `b5ebdbfe6ddce7698a438bc8afa69cf5a1c8fbd2`
+- Validation receipt: `reports/p1_6/r5_v1_governance_cleanup/validation/manual_deletion_wave_old002837.yaml`
 - Expected deletion count: 501
 - Expected content bytes: 3,536,689
 - Expected ordinal UTF-8 NUL path-vector bytes: 51,531
@@ -1003,9 +1005,9 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - Expected deepest-first absolute Windows UTF-8 NUL directory-vector bytes/SHA-256: 3,803 / `31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75`
 - Manifest source: `reports/p1_6/r5_v1_governance_cleanup/historical_cleanup_manifest.yaml`
 - Restore source: each file row's exact `baseline_commit:path`, `blob_oid`, byte count, content SHA-256 and `restore_command`; final full-restore receipt is `reports/p1_6/r5_v1_governance_cleanup/validation/historical_decoupling.yaml`.
-- Fresh pre-arm proof at Bundle evidence checkpoint `f98c7861b422a4081955e8f1513da4428534425c`: 501/501 files exist, are tracked regular/non-reparse, and every HEAD/index blob OID equals its manifest row; the old run tree contains exactly those 501 files and the fixed 29 directories, with zero extra/special/reparse entries; Night 680 and Bundle 205 paths remain absent.
-- File deletion rule after this clean v8 arm: Codex may delete only this exact ordinal list, one resolved absolute literal regular file per operation. Any identity, blob, containment, status, recovery-prefix, actor or order drift is a hard stop.
-- Directory deletion rule: only after the complete 501-D raw Git vectors pass in memory may Codex remove the following 29 exact absolute directories deepest-first, one empty/non-reparse literal directory per non-recursive operation, validating complete entries, processed prefix, remaining suffix and unchanged Git vectors before and after every row.
+- Fresh pre-arm proof at Bundle evidence checkpoint `f98c7861b422a4081955e8f1513da4428534425c`: 501/501 files existed, were tracked regular/non-reparse, and every HEAD/index blob OID equaled its manifest row; the old run tree contained exactly those 501 files and the fixed 29 directories, with zero extra/special/reparse entries; Night 680 and Bundle 205 paths remained absent.
+- File completion proof: control-plane preflight passed at the exact clean arm HEAD；Codex deleted one resolved absolute literal regular file per operation in ordinal order；stage 前 raw status/name-status vectors were exactly 501 `D` with SHA-256 `73d0a405b928fa3fa615d5b0d527f16f7c1182bb16239fb9ef89266d9868862f`；the deletion commit contains exactly those 501 deletions plus the pass receipt。
+- Directory completion proof: only after the complete 501-D vectors passed，Codex removed all 29 manifest directories deepest-first，one literal empty/non-reparse directory per non-recursive operation；the receipt proves complete entry enumeration，prefix/suffix state，unchanged Git vectors，and final exact-root absence。
 - Recovery rule: any extra D/M/R/??/type change, missing file, nonempty/extra directory, reparse point or prefix/suffix drift stops the wave; restore only the affected exact file from its manifest row and never use recursive, wildcard, bulk or reset cleanup.
 
 #### old002837 exact absolute per-file manifest
@@ -1816,3 +1818,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-27T14:26:15+08:00 — v8 A.2 checkpoint=`b6d4e9c459c89af28fe2bb2d9702fd047c89b372` 已创建且 clean。其上重新验证 Bundle 205/205 tracked regular/non-reparse files 与 HEAD/index blob OID 全匹配，Night 680 全缺失、old002837 501 全存在；本文件切换为 `armed_clean_checkpoint`，包含本行的下一 commit 自身即 Bundle `wave_parent_commit`，尚未删除。
 - 2026-07-27T14:57:16+08:00 — Bundle clean v8 arm=`b120a805736a89b5c6a0406e15d5a0d040a0f341`。D-020 control plane 按 ordinal manifest 逐文件删除 205 个 literal regular files；删除提交=`274d47ec299a42946bc3b83f7908257e80f0f99b`，精确含 205 `D` + Bundle receipt 1 `A`。post-wave V-006 `28 passed in 592.82s`、V-003 final `194 passed in 23.40s`；Night/Bundle 全缺失、old002837 501 全存在、工作树 clean。包含本行的 commit 是 Bundle post-wave evidence checkpoint，其自身 SHA 不写回本文件。
 - 2026-07-27T15:01:20+08:00 — Bundle post-wave evidence checkpoint=`f98c7861b422a4081955e8f1513da4428534425c` 已创建且 clean。old002837 pre-arm audit 逐项验证 501 个 files 的 HEAD/index blob identity，并完整枚举得到恰好 501 files + 29 directories、0 extra/special/reparse；两组目录向量与冻结值精确一致。本文件切换为 `armed_clean_checkpoint` 并列出完整 501-file/29-directory absolute manifests；包含本行的下一 commit 自身即 old002837 `wave_parent_commit`，尚未删除。
+- 2026-07-27T15:23:23+08:00 — old002837 clean v8 arm=`196797dbc0668652be66c9a65ce09a2ebc119b8b`。D-020 control plane 按 ordinal manifest 逐文件删除 501 个 literal regular files，完整 raw vectors 精确匹配后按固定 deepest-first manifest 非递归逐项删除 29 个 empty/non-reparse directories；删除提交=`b5ebdbfe6ddce7698a438bc8afa69cf5a1c8fbd2`，精确含 501 `D` + receipt 1 `A`。post-wave V-006 `28 passed in 611.71s`、V-003 final `194 passed in 23.41s`；三波文件与旧目录/根均未重建，工作树 clean。包含本行的 commit 是 old002837 post-wave evidence checkpoint，其自身 SHA 不写回本文件。
