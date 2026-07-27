@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   OPERATION_REVIEW_AXIS_NAMES,
+  isInvestmentReviewAcceptanceHealth,
   operationReviewHeadline,
   operationReviewView,
 } from "./investment_review.js";
@@ -10,6 +11,41 @@ const source = readFileSync(
   new URL("./investment_review.js", import.meta.url),
   "utf8",
 );
+const mainSource = readFileSync(
+  new URL("./main.js", import.meta.url),
+  "utf8",
+);
+
+describe("investment review read-only acceptance", () => {
+  it("requires the exact bounded health identity", () => {
+    expect(isInvestmentReviewAcceptanceHealth({
+      review_acceptance_read_only: true,
+      acceptance_task_id: "investment_review_local_acceptance_readiness_v1",
+      review_candidate_sha256: "a".repeat(64),
+    })).toBe(true);
+    expect(isInvestmentReviewAcceptanceHealth({
+      review_acceptance_read_only: true,
+      acceptance_task_id: "another-task",
+      review_candidate_sha256: "a".repeat(64),
+    })).toBe(false);
+    expect(isInvestmentReviewAcceptanceHealth({
+      review_acceptance_read_only: false,
+      acceptance_task_id: "investment_review_local_acceptance_readiness_v1",
+      review_candidate_sha256: "a".repeat(64),
+    })).toBe(false);
+  });
+
+  it("boots review-only before any portfolio or realtime work", () => {
+    expect(mainSource).toContain("if (isInvestmentReviewAcceptanceHealth(health))");
+    expect(mainSource).toContain("enterInvestmentReviewAcceptance(health)");
+    expect(mainSource.indexOf("if (isInvestmentReviewAcceptanceHealth(health))"))
+      .toBeLessThan(mainSource.lastIndexOf("loadPortfolio();"));
+    expect(mainSource).toContain('readOnly: true');
+    expect(source).toContain("只读人工验收");
+    expect(source).toContain("系统不会替您编造当时理由");
+    expect(source).toContain("不提供买卖或仓位建议");
+  });
+});
 
 describe("investment review automation health", () => {
   it("keeps partial completion distinct from success and failure", () => {

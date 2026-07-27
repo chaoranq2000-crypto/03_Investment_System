@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import threading
@@ -54,6 +55,7 @@ STATIC_ASSETS = {
     "/app.css": ("app.css", "text/css; charset=utf-8"),
     "/app.js": ("app.js", "text/javascript; charset=utf-8"),
 }
+REVIEW_ACCEPTANCE_TASK_ID = "investment_review_local_acceptance_readiness_v1"
 
 
 def _json_ready(value: Any) -> Any:
@@ -66,6 +68,14 @@ def _json_ready(value: Any) -> Any:
     if isinstance(value, (list, tuple)):
         return [_json_ready(item) for item in value]
     return value
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _parse_iso_date(value: str | None, field: str) -> date | None:
@@ -118,13 +128,27 @@ class DashboardApplication:
         realtime_cache_seconds: int = 55,
         investment_review_service: InvestmentReviewWebService | None = None,
         investment_review_error: ReviewHTTPError | None = None,
+        review_acceptance_read_only: bool = False,
+        review_candidate_sha256: str | None = None,
+        review_artifact_root: str | Path | None = None,
     ) -> None:
         self.store = store
         self.account_id = account_id
         self.env_file = str(env_file)
         self.refresh_lock = threading.Lock()
         self.realtime_lock = threading.Lock()
-        self.realtime_provider = realtime_provider or FallbackRealtimeProvider()
+        self.review_acceptance_read_only = bool(review_acceptance_read_only)
+        self.review_candidate_sha256 = review_candidate_sha256
+        self.review_artifact_root = (
+            str(Path(review_artifact_root).resolve(strict=False))
+            if review_artifact_root is not None
+            else None
+        )
+        self.realtime_provider = (
+            None
+            if self.review_acceptance_read_only
+            else (realtime_provider or FallbackRealtimeProvider())
+        )
         self.realtime_cache_seconds = realtime_cache_seconds
         self.investment_review_service = investment_review_service
         self.investment_review_error = investment_review_error
@@ -888,6 +912,37 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
             },
         )
 
+    def _health_payload(self) -> dict[str, Any]:
+        app = self.server.dashboard_app
+        payload: dict[str, Any] = {
+            "status": "ok",
+            "api_version": DASHBOARD_API_VERSION,
+            "capabilities": list(DASHBOARD_CAPABILITIES),
+        }
+        if app.review_acceptance_read_only:
+            payload.update(
+                {
+                    "review_acceptance_read_only": True,
+                    "acceptance_task_id": REVIEW_ACCEPTANCE_TASK_ID,
+                    "review_candidate_sha256": app.review_candidate_sha256,
+                    "review_artifact_root": app.review_artifact_root,
+                    "automation_enabled": False,
+                    "external_network_allowed": False,
+                    "human_product_acceptance": "pending",
+                    "production_released": False,
+                }
+            )
+        return payload
+
+    def _send_acceptance_read_only(self) -> None:
+        self._send_json(
+            HTTPStatus.FORBIDDEN,
+            {
+                "error": "人工验收模式只允许读取投资复盘",
+                "code": "review_acceptance_read_only",
+            },
+        )
+
     def _review_service(self) -> InvestmentReviewWebService:
         service = self.server.dashboard_app.investment_review_service
         if service is None:
@@ -1153,17 +1208,24 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802 - stdlib handler API
         parsed = urlparse(self.path)
         try:
+            if self.server.dashboard_app.review_acceptance_read_only:
+                if parsed.path == "/health":
+                    self._send_json(HTTPStatus.OK, self._health_payload())
+                    return
+                if parsed.path.startswith("/api/investment-review"):
+                    if self._review_get(parsed):
+                        return
+                    self.send_error(HTTPStatus.NOT_FOUND)
+                    return
+                if parsed.path.startswith("/api/"):
+                    self._send_acceptance_read_only()
+                    return
+                self._send_asset(parsed.path)
+                return
             if self._review_get(parsed):
                 return
             if parsed.path == "/health":
-                self._send_json(
-                    HTTPStatus.OK,
-                    {
-                        "status": "ok",
-                        "api_version": DASHBOARD_API_VERSION,
-                        "capabilities": list(DASHBOARD_CAPABILITIES),
-                    },
-                )
+                self._send_json(HTTPStatus.OK, self._health_payload())
                 return
             if parsed.path == "/api/portfolio":
                 query = parse_qs(parsed.query)
@@ -1264,6 +1326,9 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802 - stdlib handler API
         parsed = urlparse(self.path)
+        if self.server.dashboard_app.review_acceptance_read_only:
+            self._send_acceptance_read_only()
+            return
         try:
             if self._review_post(parsed):
                 return
@@ -1369,12 +1434,28 @@ def _configured_investment_review_service(
     store: PortfolioStore,
     *,
     env_file: str | Path,
+    explicit_review_db: str | Path | None = None,
+    artifact_root: str | Path | None = None,
+    read_only_acceptance: bool = False,
 ) -> tuple[InvestmentReviewWebService | None, ReviewHTTPError | None]:
     """Build the opt-in review service without creating or upgrading a sidecar."""
 
     try:
-        values = {**load_env_file(env_file), **os.environ}
-        review_db = configured_review_database(environ=values)
+        if read_only_acceptance:
+            if explicit_review_db is None or artifact_root is None:
+                raise ValueError(
+                    "acceptance mode requires explicit review DB and artifact root"
+                )
+            review_db = configured_review_database(
+                explicit_path=explicit_review_db,
+                environ={},
+            )
+        else:
+            values = {**load_env_file(env_file), **os.environ}
+            review_db = configured_review_database(
+                explicit_path=explicit_review_db,
+                environ=values,
+            )
     except (OSError, UnicodeError, ValueError):
         return None, ReviewHTTPError(
             HTTPStatus.SERVICE_UNAVAILABLE,
@@ -1393,7 +1474,9 @@ def _configured_investment_review_service(
         service = InvestmentReviewWebService(
             review_db=review_db,
             portfolio_db=store.path,
+            artifact_root=artifact_root,
             repo_root=repository_root(),
+            read_only_acceptance=read_only_acceptance,
         )
     except Exception:  # review configuration must not prevent the portfolio page
         return None, ReviewHTTPError(
@@ -1412,9 +1495,33 @@ def create_dashboard_server(
     host: str = "127.0.0.1",
     port: int = 8765,
     investment_review_service: InvestmentReviewWebService | None = None,
+    investment_review_db: str | Path | None = None,
+    investment_review_artifact_root: str | Path | None = None,
+    review_acceptance_read_only: bool = False,
+    expected_review_candidate_sha256: str | None = None,
 ) -> DashboardHTTPServer:
     if host not in {"127.0.0.1", "localhost", "::1"}:
         raise ValueError("Dashboard 只允许绑定本机回环地址")
+    if review_acceptance_read_only and host != "127.0.0.1":
+        raise ValueError("复盘人工验收模式只允许显式绑定 127.0.0.1")
+    actual_candidate_sha256: str | None = None
+    if review_acceptance_read_only:
+        if investment_review_db is None or investment_review_artifact_root is None:
+            raise ValueError("复盘人工验收模式要求显式数据库与产物目录")
+        candidate = configured_review_database(
+            explicit_path=investment_review_db,
+            environ={},
+        )
+        if candidate is None or not candidate.is_file():
+            raise ValueError("复盘人工验收候选数据库不存在")
+        expected = str(expected_review_candidate_sha256 or "").strip().lower()
+        if len(expected) != 64 or any(
+            character not in "0123456789abcdef" for character in expected
+        ):
+            raise ValueError("复盘人工验收模式要求精确候选 SHA-256")
+        actual_candidate_sha256 = _sha256_file(candidate)
+        if actual_candidate_sha256 != expected:
+            raise ValueError("复盘人工验收候选数据库 SHA-256 不匹配")
     investment_review_error: ReviewHTTPError | None = None
     if investment_review_service is None:
         (
@@ -1423,13 +1530,26 @@ def create_dashboard_server(
         ) = _configured_investment_review_service(
             store,
             env_file=env_file,
+            explicit_review_db=investment_review_db,
+            artifact_root=investment_review_artifact_root,
+            read_only_acceptance=review_acceptance_read_only,
         )
+    if review_acceptance_read_only and investment_review_service is None:
+        raise ValueError("复盘人工验收服务未能建立")
+    if review_acceptance_read_only and (
+        getattr(investment_review_service, "read_only_acceptance", False)
+        is not True
+    ):
+        raise ValueError("复盘人工验收服务未锁定为只读")
     app = DashboardApplication(
         store,
         account_id=account_id,
         env_file=env_file,
         investment_review_service=investment_review_service,
         investment_review_error=investment_review_error,
+        review_acceptance_read_only=review_acceptance_read_only,
+        review_candidate_sha256=actual_candidate_sha256,
+        review_artifact_root=investment_review_artifact_root,
     )
     return DashboardHTTPServer((host, port), app)
 
@@ -1444,7 +1564,13 @@ def serve_dashboard(
     open_browser: bool = True,
     investment_review_service: InvestmentReviewWebService | None = None,
     review_automation: bool | None = None,
+    investment_review_db: str | Path | None = None,
+    investment_review_artifact_root: str | Path | None = None,
+    review_acceptance_read_only: bool = False,
+    expected_review_candidate_sha256: str | None = None,
 ) -> None:
+    if review_acceptance_read_only and review_automation is not False:
+        raise ValueError("复盘人工验收模式必须显式关闭自动运行")
     service_was_injected = investment_review_service is not None
     server = create_dashboard_server(
         store,
@@ -1453,11 +1579,16 @@ def serve_dashboard(
         host=host,
         port=port,
         investment_review_service=investment_review_service,
+        investment_review_db=investment_review_db,
+        investment_review_artifact_root=investment_review_artifact_root,
+        review_acceptance_read_only=review_acceptance_read_only,
+        expected_review_candidate_sha256=expected_review_candidate_sha256,
     )
     automation: ReviewAutomationCoordinator | None = None
     review_service = server.dashboard_app.investment_review_service
     configure_automation = (
-        review_service is not None
+        not review_acceptance_read_only
+        and review_service is not None
         and (
             not service_was_injected
             or review_automation is not None
@@ -1513,7 +1644,10 @@ def serve_dashboard(
             print("复盘自动运行未启动；健康页已记录配置或启动失败。")
     actual_host, actual_port = server.server_address[:2]
     url = f"http://{actual_host}:{actual_port}/"
-    print(f"持仓可视化页面: {url}")
+    if review_acceptance_read_only:
+        print(f"交易复盘只读验收页面: {url}")
+    else:
+        print(f"持仓可视化页面: {url}")
     print("按 Ctrl+C 停止本地服务。")
     if open_browser:
         threading.Timer(0.4, lambda: webbrowser.open(url)).start()

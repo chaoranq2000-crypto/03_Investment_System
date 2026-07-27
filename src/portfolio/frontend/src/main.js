@@ -4,7 +4,10 @@ import { dispose, init, registerIndicator, registerOverlay } from "klinecharts";
 
 import "./app.css";
 import { selectContributionPositions } from "./contribution.js";
-import { mountInvestmentReview } from "./investment_review.js";
+import {
+  isInvestmentReviewAcceptanceHealth,
+  mountInvestmentReview,
+} from "./investment_review.js";
 import {
   DEFAULT_TECHNICAL_INDICATORS,
   TECHNICAL_INDICATOR_GROUPS,
@@ -2699,10 +2702,49 @@ function bindEvents() {
   });
 }
 
-applyPrivacyState();
-initializeCollapsibleModules();
-initializeStickyTableHeaders();
-bindEvents();
-startRealtimeTimer();
-loadPortfolio();
-mountInvestmentReview({ request: api, notify: showToast });
+function enterInvestmentReviewAcceptance(health) {
+  document.body.classList.add("investment-review-acceptance-mode");
+  document.body.dataset.reviewCandidateSha256 = health.review_candidate_sha256;
+  document.title = "交易复盘 · 只读人工验收";
+  const mounted = mountInvestmentReview({
+    request: api,
+    notify: showToast,
+    readOnly: true,
+  });
+  const main = document.querySelector("main");
+  if (main && mounted?.section) {
+    [...main.children].forEach((child) => {
+      child.hidden = child !== mounted.section;
+    });
+  }
+  document.querySelectorAll(".toolbar > :not(#investmentReviewEntry)")
+    .forEach((node) => {
+      node.hidden = true;
+    });
+  elements.footerStatus.textContent = "本地只读验收 · 外网关闭 · 自动运行关闭";
+  elements.footerStatusDot.classList.add("is-ready");
+  document.body.classList.add("page-ready");
+}
+
+async function bootstrap() {
+  let health = null;
+  try {
+    health = await api("/health");
+  } catch {
+    // Preserve the ordinary dashboard fallback; acceptance mode remains
+    // protected server-side even if this local health probe fails.
+  }
+  if (isInvestmentReviewAcceptanceHealth(health)) {
+    enterInvestmentReviewAcceptance(health);
+    return;
+  }
+  applyPrivacyState();
+  initializeCollapsibleModules();
+  initializeStickyTableHeaders();
+  bindEvents();
+  startRealtimeTimer();
+  loadPortfolio();
+  mountInvestmentReview({ request: api, notify: showToast });
+}
+
+void bootstrap();

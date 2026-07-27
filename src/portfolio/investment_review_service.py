@@ -836,7 +836,9 @@ class InvestmentReviewWebService:
         automation_status_provider: (
             Callable[[], Mapping[str, Any]] | None
         ) = None,
+        read_only_acceptance: bool = False,
     ) -> None:
+        self.read_only_acceptance = bool(read_only_acceptance)
         root = (
             Path(repo_root).resolve()
             if repo_root is not None
@@ -860,7 +862,23 @@ class InvestmentReviewWebService:
             if isinstance(catalog, _TrustedReviewCatalog)
             else _TrustedReviewCatalog(catalog)
         )
-        selected_store = store or self.catalog.store
+        if self.read_only_acceptance and store is None:
+            selected_store = ReviewStore(
+                self.catalog.store.path,
+                immutable_reads=True,
+                allow_writes=False,
+            )
+        else:
+            selected_store = store or self.catalog.store
+        if self.read_only_acceptance and (
+            getattr(selected_store, "immutable_reads", False) is not True
+            or getattr(selected_store, "allow_writes", True) is not False
+        ):
+            raise _error(
+                503,
+                "review_acceptance_store_not_read_only",
+                "人工验收模式要求 immutable/query-only 复盘数据库",
+            )
         try:
             selected_store_path = Path(selected_store.path).resolve(
                 strict=False
@@ -917,15 +935,42 @@ class InvestmentReviewWebService:
                     "正式来源数据库与受信任目录不一致",
                 )
         self.store = selected_store
-        self.sync_service = sync_service
-        if self.sync_service is None and portfolio_db is not None:
+        self.catalog.store = selected_store
+        if self.read_only_acceptance and sync_service is not None:
+            raise _error(
+                503,
+                "review_acceptance_sync_forbidden",
+                "人工验收模式不允许同步服务",
+            )
+        self.sync_service = None if self.read_only_acceptance else sync_service
+        if (
+            not self.read_only_acceptance
+            and self.sync_service is None
+            and portfolio_db is not None
+        ):
             self.sync_service = ReviewSyncService(
                 portfolio_db,
                 review_db=review_db or self.store.path,
                 mapping_path=mapping_path,
                 repo_root=root,
             )
-        self.automation_status_provider = automation_status_provider
+        self.automation_status_provider = (
+            (
+                lambda: {
+                    "enabled": False,
+                    "state": "disabled",
+                    "worker_alive": False,
+                    "queue_depth": 0,
+                    "run_count": 0,
+                    "latest": None,
+                    "last_success": None,
+                    "last_completed": None,
+                    "last_failure": None,
+                }
+            )
+            if self.read_only_acceptance
+            else automation_status_provider
+        )
 
         configured_revision_root = (
             Path(revision_root)
@@ -962,7 +1007,21 @@ class InvestmentReviewWebService:
     ) -> None:
         """Attach a process-local status source without changing the sidecar."""
 
+        if self.read_only_acceptance:
+            raise _error(
+                403,
+                "review_acceptance_read_only",
+                "人工验收模式不允许启用复盘自动运行",
+            )
         self.automation_status_provider = provider
+
+    def _require_writable(self) -> None:
+        if self.read_only_acceptance:
+            raise _error(
+                403,
+                "review_acceptance_read_only",
+                "人工验收模式只读，不允许保存决策或纠正",
+            )
 
     @staticmethod
     def _ref(bundle: Mapping[str, Any]) -> dict[str, Any]:
@@ -2312,6 +2371,13 @@ class InvestmentReviewWebService:
                 "reviews": review_health,
                 "automation": automation,
                 "boundary": dict(API_BOUNDARY),
+                "acceptance": {
+                    "read_only": self.read_only_acceptance,
+                    "mutations_allowed": not self.read_only_acceptance,
+                    "actual_user_observation_proven": False,
+                    "human_product_acceptance": "pending",
+                    "production_released": False,
+                },
             },
             gaps=health_gaps,
         )
@@ -2340,6 +2406,7 @@ class InvestmentReviewWebService:
             )
 
     def create_decision(self, payload: object) -> dict[str, Any]:
+        self._require_writable()
         value = _object_payload(
             payload,
             required={
@@ -2486,6 +2553,7 @@ class InvestmentReviewWebService:
         )
 
     def link_decision(self, payload: object) -> dict[str, Any]:
+        self._require_writable()
         value = _object_payload(
             payload,
             required={
@@ -2571,6 +2639,7 @@ class InvestmentReviewWebService:
         )
 
     def correct_fee(self, payload: object) -> dict[str, Any]:
+        self._require_writable()
         value = _object_payload(
             payload,
             required={
@@ -2752,6 +2821,7 @@ class InvestmentReviewWebService:
             return self._revision_locks.setdefault(key, threading.Lock())
 
     def correct_review(self, payload: object) -> dict[str, Any]:
+        self._require_writable()
         value = _object_payload(
             payload,
             required={

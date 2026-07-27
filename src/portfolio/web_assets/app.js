@@ -14840,6 +14840,10 @@ function sectionBlock(title, kicker = "") {
 		body
 	};
 }
+function isInvestmentReviewAcceptanceHealth(payload) {
+	const health = object(payload);
+	return health.review_acceptance_read_only === true && health.acceptance_task_id === "investment_review_local_acceptance_readiness_v1" && typeof health.review_candidate_sha256 === "string" && /^[0-9a-f]{64}$/.test(health.review_candidate_sha256);
+}
 function renderOperationReview(value) {
 	const review = operationReviewView(value);
 	const block = sectionBlock("操作复盘结论", "SIX-AXIS CHECKPOINT");
@@ -14978,10 +14982,11 @@ function formMessage(form, message, error = false) {
 	output.textContent = message;
 	output.classList.toggle("is-error", error);
 }
-function mountInvestmentReview({ request, notify = () => {} } = {}) {
+function mountInvestmentReview({ request, notify = () => {}, readOnly = false } = {}) {
 	if (typeof request !== "function") throw new Error("investment review requires a request function");
 	const root = document.querySelector("main");
 	if (!root || document.getElementById("investmentReviewSection")) return null;
+	const readOnlyMode = readOnly === true;
 	const state = {
 		reviews: [],
 		totalCount: 0,
@@ -14995,6 +15000,7 @@ function mountInvestmentReview({ request, notify = () => {} } = {}) {
 	section.id = "investmentReviewSection";
 	section.setAttribute("aria-labelledby", "investmentReviewTitle");
 	section.dataset.reveal = "";
+	section.dataset.readOnly = String(readOnlyMode);
 	const heading = element("header", "investment-review-heading");
 	const headingText = element("div");
 	headingText.append(element("p", "section-kicker", "INVESTMENT REVIEW"), element("h2", "", "交易复盘"));
@@ -15011,6 +15017,9 @@ function mountInvestmentReview({ request, notify = () => {} } = {}) {
 	heading.append(headingText, headingActions);
 	const content = element("div", "investment-review-content");
 	content.id = "investmentReviewContent";
+	const acceptanceBoundary = element("div", "investment-review-acceptance-boundary", "只读人工验收：本页不会写入复盘库，不提供买卖或仓位建议，也不推断未记录的投资动机。操作前公开可得不等于证明您实际阅读过。");
+	acceptanceBoundary.hidden = !readOnlyMode;
+	acceptanceBoundary.setAttribute("role", "note");
 	const healthLine = element("div", "investment-review-health-line", "复盘健康状态正在读取");
 	healthLine.id = "investmentReviewHealthLine";
 	healthLine.setAttribute("role", "status");
@@ -15040,7 +15049,7 @@ function mountInvestmentReview({ request, notify = () => {} } = {}) {
 	listStatus.setAttribute("role", "status");
 	const list = element("ol", "investment-review-list");
 	list.id = "investmentReviewList";
-	content.append(healthLine, controls, listStatus, list);
+	content.append(acceptanceBoundary, healthLine, controls, listStatus, list);
 	section.append(heading, content);
 	const holdings = root.querySelector(".holdings-section");
 	root.insertBefore(section, holdings || null);
@@ -15105,11 +15114,14 @@ function mountInvestmentReview({ request, notify = () => {} } = {}) {
 		if (event.key === "Escape" && evidenceDrawer.classList.contains("is-open")) closeEvidence();
 		else if (event.key === "Escape" && drawer.classList.contains("is-open")) closeDrawer();
 	});
-	const post = (name, payload) => request(`${REVIEW_API_ROOT}/${name}`, {
-		method: "POST",
-		headers: { "X-Investment-Review-Action": name },
-		body: JSON.stringify(payload)
-	});
+	const post = (name, payload) => {
+		if (readOnlyMode) throw new Error("只读人工验收模式不允许保存决策或纠正");
+		return request(`${REVIEW_API_ROOT}/${name}`, {
+			method: "POST",
+			headers: { "X-Investment-Review-Action": name },
+			body: JSON.stringify(payload)
+		});
+	};
 	function renderHealth() {
 		const health = object(state.health);
 		const status = statusValue(health.status);
@@ -15232,6 +15244,11 @@ function mountInvestmentReview({ request, notify = () => {} } = {}) {
 				decision_refs: values(eventItem.decision_refs)
 			}));
 			eventRow.appendChild(feeTrace);
+			if (readOnlyMode) {
+				eventRow.appendChild(element("p", "investment-review-boundary", "只读验收会话：手续费纠正已停用。"));
+				eventList.appendChild(eventRow);
+				return;
+			}
 			const feeDetails = element("details", "investment-review-inline-form");
 			feeDetails.appendChild(element("summary", "", "追加手续费纠正"));
 			const feeForm = element("form", "investment-review-form");
@@ -15304,6 +15321,10 @@ function mountInvestmentReview({ request, notify = () => {} } = {}) {
 		const decisions = values(detail.current_decisions);
 		if (decisions.length) block.body.appendChild(renderStructured(decisions));
 		else block.body.appendChild(element("p", "investment-review-warning", "decision unknown / unlinked"));
+		if (readOnlyMode) {
+			block.body.appendChild(element("p", "investment-review-boundary", "只读验收会话：补充决策与关联已停用；系统不会替您编造当时理由。"));
+			return block;
+		}
 		const form = element("form", "investment-review-form investment-review-decision-form");
 		const occurred = inputControl("datetime-local", "occurred_at", true);
 		occurred.value = localDateTime(review.opened_at);
@@ -15388,6 +15409,10 @@ function mountInvestmentReview({ request, notify = () => {} } = {}) {
 		const targets = interpretationTargets(detail);
 		const correctable = Boolean(capability.correctable ?? review.correctable ?? (generationMode !== "facts_only" && targets.length));
 		block.body.appendChild(element("p", "investment-review-boundary", `generation_mode ${generationMode}`));
+		if (readOnlyMode) {
+			block.body.appendChild(element("p", "investment-review-boundary", "只读验收会话：复盘修订已停用。"));
+			return block;
+		}
 		if (!correctable || generationMode === "facts_only") {
 			const disabled = actionButton("facts_only 不可纠正");
 			disabled.disabled = true;
@@ -18130,14 +18155,45 @@ function bindEvents() {
 		if (event.key === "Escape" && elements.detailDrawer.classList.contains("is-open")) closeDrawer();
 	});
 }
-applyPrivacyState();
-initializeCollapsibleModules();
-initializeStickyTableHeaders();
-bindEvents();
-startRealtimeTimer();
-loadPortfolio();
-mountInvestmentReview({
-	request: api,
-	notify: showToast
-});
+function enterInvestmentReviewAcceptance(health) {
+	document.body.classList.add("investment-review-acceptance-mode");
+	document.body.dataset.reviewCandidateSha256 = health.review_candidate_sha256;
+	document.title = "交易复盘 · 只读人工验收";
+	const mounted = mountInvestmentReview({
+		request: api,
+		notify: showToast,
+		readOnly: true
+	});
+	const main = document.querySelector("main");
+	if (main && mounted?.section) [...main.children].forEach((child) => {
+		child.hidden = child !== mounted.section;
+	});
+	document.querySelectorAll(".toolbar > :not(#investmentReviewEntry)").forEach((node) => {
+		node.hidden = true;
+	});
+	elements.footerStatus.textContent = "本地只读验收 · 外网关闭 · 自动运行关闭";
+	elements.footerStatusDot.classList.add("is-ready");
+	document.body.classList.add("page-ready");
+}
+async function bootstrap() {
+	let health = null;
+	try {
+		health = await api("/health");
+	} catch {}
+	if (isInvestmentReviewAcceptanceHealth(health)) {
+		enterInvestmentReviewAcceptance(health);
+		return;
+	}
+	applyPrivacyState();
+	initializeCollapsibleModules();
+	initializeStickyTableHeaders();
+	bindEvents();
+	startRealtimeTimer();
+	loadPortfolio();
+	mountInvestmentReview({
+		request: api,
+		notify: showToast
+	});
+}
+bootstrap();
 //#endregion

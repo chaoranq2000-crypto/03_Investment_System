@@ -389,3 +389,37 @@ API/UI 首屏用自然语言分别说明“操作复盘是否完成”和“哪�
 只在证据抽屉/技术详情中显示。用户可核查 perspective、来源、有效时间、公开/抓取/观察/
 录入时间与局部限制。任何 human correction 都是 append-only，并保留 reviewer、reason、
 双时间、expected parent 与 supersession lineage。
+
+## 11. 本地只读人工验收入口
+
+工程验收通过后，不要用普通持仓 Dashboard 直接审核复盘产品。普通入口会读取持仓、刷新
+行情并允许追加复盘记录；它不等于无副作用的人工验收环境。
+
+从专用 worktree 启动：
+
+```powershell
+Set-Location "C:\Projects\03_Investment_System_investment_review_reviewability"
+& ".\scripts\start_investment_review_acceptance.ps1"
+```
+
+默认只绑定 `http://127.0.0.1:8766/`。启动器逐项验证 exact v3 candidate 的 SHA-256 与
+关闭态，显式选择已验收 runner artifact root，跳过 portfolio initializer，关闭 review
+automation、provider、盘中/业绩刷新与全部外网，并把候选库锁为
+`mode=ro&immutable=1 + query_only`。服务端只开放静态页面、健康身份和 investment-review
+GET；portfolio/realtime/refresh 以及 decision/link/fee/review correction 均返回
+`review_acceptance_read_only`。
+
+停止时只使用任务自带的精确身份停止器：
+
+```powershell
+& ".\scripts\stop_investment_review_acceptance.ps1"
+```
+
+停止器核对任务 ID、PID、可执行文件、启动时间、命令行、候选指纹与端口健康身份；任何一项
+不匹配都拒绝终止进程。它不猜测、不复用也不终止未知端口占用者。
+
+人工至少查看一组 single user/system、一组 weekly、一组 monthly、一个
+`decision=not_recorded`、一个 missing-not-zero 字段、一个已验证发布时间早于操作但抓取较晚的
+对照，以及一个包含 owner/next step 的证据缺口。工程 smoke、截图或自动 DOM 断言都不能把
+`human_product_acceptance` 从 `pending` 改为 `accept`。用户最终只返回
+`accept`、`accept_with_issues` 或 `reject`，并以当时的 exact Git HEAD 为准。

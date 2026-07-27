@@ -1400,16 +1400,31 @@ if (
 
 
 class ReviewStore:
-    def __init__(self, path: str | Path = "data/db/investment_review.sqlite3") -> None:
+    def __init__(
+        self,
+        path: str | Path = "data/db/investment_review.sqlite3",
+        *,
+        immutable_reads: bool = False,
+        allow_writes: bool = True,
+    ) -> None:
         self.path = Path(path)
+        self.immutable_reads = bool(immutable_reads)
+        self.allow_writes = bool(allow_writes)
 
     def _connect(self, *, read_only: bool = False) -> sqlite3.Connection:
         if read_only:
             if not self.path.exists():
                 raise FileNotFoundError(self.path)
-            uri = f"{self.path.resolve().as_uri()}?mode=ro"
+            query = "mode=ro&immutable=1" if self.immutable_reads else "mode=ro"
+            uri = f"{self.path.resolve().as_uri()}?{query}"
             conn = sqlite3.connect(uri, uri=True)
+            if self.immutable_reads:
+                conn.execute("PRAGMA query_only = ON")
         else:
+            if not self.allow_writes:
+                raise ReviewStoreError(
+                    "review store is locked to immutable read-only acceptance mode"
+                )
             self.path.parent.mkdir(parents=True, exist_ok=True)
             conn = sqlite3.connect(self.path)
         conn.row_factory = sqlite3.Row
@@ -1426,6 +1441,10 @@ class ReviewStore:
             conn.close()
 
     def initialize(self) -> dict[str, Any]:
+        if not self.allow_writes:
+            raise ReviewStoreError(
+                "review store is locked to immutable read-only acceptance mode"
+            )
         self.path.parent.mkdir(parents=True, exist_ok=True)
         conn = sqlite3.connect(self.path)
         conn.row_factory = sqlite3.Row

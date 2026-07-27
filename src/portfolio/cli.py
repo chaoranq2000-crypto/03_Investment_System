@@ -764,6 +764,7 @@ def command_transfers(args: argparse.Namespace, store: PortfolioStore) -> int:
 
 
 def command_web(args: argparse.Namespace, store: PortfolioStore) -> int:
+    acceptance = bool(args.investment_review_acceptance)
     serve_dashboard(
         store,
         account_id=args.account,
@@ -771,7 +772,11 @@ def command_web(args: argparse.Namespace, store: PortfolioStore) -> int:
         host=args.host,
         port=args.port,
         open_browser=not args.no_open,
-        review_automation=not args.no_review_automation,
+        review_automation=False if acceptance else not args.no_review_automation,
+        investment_review_db=args.investment_review_db,
+        investment_review_artifact_root=args.investment_review_artifact_root,
+        review_acceptance_read_only=acceptance,
+        expected_review_candidate_sha256=args.investment_review_candidate_sha256,
     )
     return 0
 
@@ -950,6 +955,23 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="关闭本次进程内复盘启动补偿与周期检查",
     )
+    web_parser.add_argument(
+        "--investment-review-acceptance",
+        action="store_true",
+        help="启动只读、零外网的本地复盘人工验收模式",
+    )
+    web_parser.add_argument(
+        "--investment-review-db",
+        help="人工验收使用的绝对复盘候选库路径",
+    )
+    web_parser.add_argument(
+        "--investment-review-artifact-root",
+        help="人工验收使用的受信任复盘产物目录",
+    )
+    web_parser.add_argument(
+        "--investment-review-candidate-sha256",
+        help="人工验收候选库的精确 SHA-256",
+    )
     web_parser.set_defaults(handler=command_web)
     return parser
 
@@ -959,7 +981,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     store = PortfolioStore(args.db)
     try:
-        if args.command in {"snapshot", "snapshot-show", "snapshot-list"}:
+        if (
+            args.command == "web"
+            and getattr(args, "investment_review_acceptance", False)
+        ):
+            pass
+        elif args.command in {"snapshot", "snapshot-show", "snapshot-list"}:
             store.initialize(create_account=False)
         else:
             store.initialize(args.account, args.account_name)

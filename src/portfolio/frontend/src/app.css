@@ -3438,6 +3438,32 @@ h2 {
   }
 }
 
+.investment-review-acceptance-boundary {
+  border: 1px solid rgba(245, 217, 10, 0.42);
+  border-radius: 12px;
+  background: rgba(245, 217, 10, 0.08);
+  color: #fff4a8;
+  font-size: 14px;
+  line-height: 1.65;
+  padding: 14px 16px;
+}
+
+body.investment-review-acceptance-mode .page-shell {
+  max-width: 1320px;
+}
+
+body.investment-review-acceptance-mode .topbar {
+  border-bottom-color: rgba(245, 217, 10, 0.22);
+}
+
+body.investment-review-acceptance-mode .eyebrow {
+  color: #f5d90a;
+}
+
+body.investment-review-acceptance-mode .footer {
+  color: #b7b7b0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
