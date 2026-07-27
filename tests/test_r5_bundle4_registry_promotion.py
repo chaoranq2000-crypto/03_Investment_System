@@ -17,7 +17,9 @@ FIXTURE_ROOT = REPO_ROOT / "tests/fixtures/r5_reviewed_inputs"
 FIXTURE_WORKFLOW = "wf_fixture_r5_bundle4"
 FIXTURE_STOCK = "000000"
 REAL_WORKFLOW = "wf_20260703_stock_first_002837_invic"
-REAL_RUN_DIR = REPO_ROOT / "reports/workflow_runs" / REAL_WORKFLOW
+COMMITTED_RUN_PROBE = (
+    REPO_ROOT / "reports/workflow_runs/wf_fixture_committed_boundary_probe"
+)
 REGISTRY_FILES = {
     "market_peer": "R5_market_peer_input_registry.yaml",
     "forecast_assumptions": "R5_forecast_assumption_registry.yaml",
@@ -311,7 +313,7 @@ def test_invalid_input_keeps_existing_registry_bytes_and_hashes_unchanged(
         assert registry_result["after_hash"] == before_hashes[key]
 
 
-def test_fixture_mode_rejects_real_workflow_and_real_committed_run(
+def test_fixture_mode_rejects_real_workflow_and_any_committed_run(
     tmp_path: Path,
 ) -> None:
     promoter = load_promoter()
@@ -328,16 +330,16 @@ def test_fixture_mode_rejects_real_workflow_and_real_committed_run(
     assert_blocked_result(real_workflow_result)
     assert all(value is None for value in target_hashes(disposable_run).values())
 
-    real_before = target_bytes(REAL_RUN_DIR)
+    committed_before = target_bytes(COMMITTED_RUN_PROBE)
     real_run_result = promote(
         promoter,
         scenario="accepted_core_complete",
-        output_run_dir=REAL_RUN_DIR,
+        output_run_dir=COMMITTED_RUN_PROBE,
         dry_run=True,
     )
 
     assert_blocked_result(real_run_result)
-    assert target_bytes(REAL_RUN_DIR) == real_before
+    assert target_bytes(COMMITTED_RUN_PROBE) == committed_before
 
 
 @pytest.mark.parametrize(

@@ -134,6 +134,11 @@ Create or update `reports/workflow_runs/<workflow_id>/workflow_state.yaml`
 when the run requires persisted state. Use `workflow_state_schema.md`
 and the runtime rules in `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
+New or updated active runs must set `state_schema_version: r5_v1` and
+`final_report_review_semantics_version: final_report_review_v1`. The retained
+`references/orchestration_contract.md` path is a compatibility pointer, not a
+second runtime contract or a template for active state.
+
 ### ORCH-4 Select next stage and target skill
 
 Use canonical stages from `RESEARCH_WORKFLOW.md`; use
@@ -149,20 +154,72 @@ by `WORKFLOW_ORCHESTRATION_SPEC.md`.
 ### ORCH-6 Dispatch quality gate
 
 Dispatch the next canonical gate from `RESEARCH_WORKFLOW.md`.
-`quality-review` owns issue finding and severity; dispatch rules live in
+`quality-review` owns issue finding, severity and scoped issue fields; dispatch rules live in
 `WORKFLOW_ORCHESTRATION_SPEC.md`.
+
+Evidence, claim, metric, field, candidate, calculation, research-pack and
+generation-lock qualification is automated. A `reviewed` intermediate object
+means machine-qualified under provenance, schema, claim-type, metric, citation,
+hash and no-advice checks; it does not require a reviewer identity, authority,
+receipt or per-item human decision.
 
 ### ORCH-7 Route fix loop if needed
 
-If review finds blocking issues, update state to `needs_fix` or `blocked`
-and route to the owner skill. Fix loop rules live in
+For each active issue, consume `impact_scope`、`active_disposition`、
+`affected_capabilities` and `blocks_current_goal`. Derive the canonical outcome
+from the current-goal truth table in `RESEARCH_WORKFLOW.md`; severity alone is
+never a workflow decision.
+
+- visible unknowns that are not used by the current output may remain
+  `accepted_with_todos`;
+- unsupported-used numbers, calculation errors, true double-counting, broken
+  citations, hidden TODOs and no-advice violations are `needs_fix`;
+- only identity/path/parse/source identity or required-input failures that
+  prevent any honest target output are `blocked`.
+
+Route `needs_fix` to the owner skill and keep non-blocking limitations in TODOs.
+Fix loop rules live in
 `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
-### ORCH-8 Close with workflow_readout
+### ORCH-8 Close with workflow_readout and final-report review state
 
 For complete runs, write `workflow_readout.md` with final status, artifacts,
 quality results, backflow decision, TODOs, and P2 readiness only if relevant.
 Close rules live in `WORKFLOW_ORCHESTRATION_SPEC.md`.
+
+The only active human boundary is the final report. Record:
+
+```text
+automated_report_quality_passed
+final_report_review_status
+final_report_review.report_path
+final_report_review.report_sha256
+final_report_review.reviewer
+final_report_review.reviewed_at
+final_report_review.decision
+final_report_review.notes
+final_report_review.change_scope
+```
+
+`not_requested` has empty binding and person fields. `pending` binds a
+repo-relative report path and machine-computed SHA-256, with no reviewer,
+timestamp, notes or `change_scope`. `approved|changes_requested` additionally
+require a real non-machine reviewer, ISO timestamp and non-empty notes;
+`decision` equals the top-level status. `change_scope` is
+`automated_quality_defect|report_revision` only for `changes_requested`.
+
+Recompute the report hash from current bytes. Any byte change invalidates the
+old decision. Never synthesize reviewer identity or migrate a historical
+approval. `not_requested|pending` does not block automatic workflow close or
+`system_v1_complete`, but `sample_quality_ready` remains false.
+`sample_quality_ready=true` is permitted only when all necessary automated
+quality conditions pass, the current final report has a valid `approved`
+review, and every other applicable sample-quality condition holds. These are
+necessary conditions, not an automatic sufficiency rule.
+
+For `changes_requested`, route to `needs_fix` only when
+`change_scope=automated_quality_defect`; `report_revision` returns only to
+final-report writing and preserves the automatically derived outcome.
 
 ## Output style
 
@@ -191,6 +248,13 @@ Do not write long investment opinions from this skill.
 - Separate fact、estimate、inference、management_comment、analyst_view、opinion。
 - Record uncertainty、missing data and TODO。
 - Do not output buy/sell/hold advice.
+- Do not default-route Bundle11R–16R or `R5-G1`–`R5-G11`.
+- Do not let a local evaluator, historical `blocking_decision`, or severity
+  overwrite the canonical current-goal outcome.
+- Do not require human approval for evidence, claims, metrics, fields,
+  candidates, generation locks, calculations or intermediate receipts.
+- Do not reuse Bundle/Night/Reader reviewer authority or exact-hash decisions
+  as the current final-report review.
 
 ## Minimal close checklist
 
@@ -204,22 +268,28 @@ This checklist is an operational close check, not a second global gate table.
 [ ] quality_gate_report.md exists for complete runs
 [ ] lower-level skill handoffs are recorded or explicitly skipped
 [ ] segment-company exposure is updated or no-update reason is recorded
-[ ] no high-severity quality issues remain
+[ ] no issue has `blocks_current_goal=true` unless status is `needs_fix` or `blocked`
+[ ] visible unused unknowns and capability limitations remain explicit
+[ ] intermediate `reviewed` objects are machine-qualified, not human-approved
+[ ] final_report_review_status is valid; current report bytes match its hash when bound
+[ ] not_requested / pending does not alter automatic outcome; sample_quality_ready stays false
 [ ] workflow_readout.md states accepted / accepted_with_todos / needs_fix / blocked
 ```
 
-<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
-## Bundle 11R runtime routing
+## Explicit legacy capability-evaluator routing
 
-For a stock research workflow that has reached the post-10R research-depth stage, invoke `scripts/run_r5_bundle11r_runtime.py` with the business-line driver plan, evidence status, peer pack, and semantic payload. Persist its question matrix, driver pack, peer eligibility, semantic scorecard, and backflow plan under the workflow-run directory. Route the next action from `backflow_plan.tasks`; do not replace a failed operating-research gate by asking the Writer to add prose.
-<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+Bundle11R–16R and `R5-G1`–`R5-G11` are retired from ordinary orchestrator routing.
+Invoke a retained evaluator only when the handoff explicitly names a capability,
+such as business-line drivers, operating evidence, overlap reconciliation,
+peer eligibility or sample benchmarking.
 
-<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
-## Bundle 12R operating-evidence orchestration
+The evaluator output must keep its local ID, map to G0–G10, and return
+`impact_scope`、`active_disposition`、`affected_capabilities` and
+`blocks_current_goal`. Route only the affected capability. Never copy the
+evaluator's local pass/fail or highest severity directly into
+`workflow_state.status`.
 
-When operating evidence, overlap reconciliation or valuation-method eligibility
-is in scope, read `references/bundle12r_backflow_profile.md` and
-`docs/workflows/R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE.md`. Run the local gate,
-consume its backflow plan, and do not transfer Bundle 11R human review to a new
-Bundle 12R generation.
-<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+Historical Bundle14/15/16 per-case human reviews, independent receipts,
+reviewer-authored mappings and multiple exact-hash decisions are read-only
+compatibility evidence. They are not requested by this route and cannot
+satisfy the current final-report review.

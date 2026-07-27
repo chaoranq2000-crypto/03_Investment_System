@@ -10,8 +10,6 @@ from typing import Any
 
 import yaml
 
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-STOCK_CODE = "002837"
 VALID_COVERAGE_STATES = {"covered", "partial", "missing", "not_applicable"}
 ALIASES = {
     "research_conclusion_and_watch_conditions_without_action_instruction": "research_conclusion_and_watch_conditions",
@@ -55,6 +53,13 @@ def _unique(values: list[str]) -> list[str]:
     return list(dict.fromkeys(value for value in values if value))
 
 
+def _display_path(path: Path, repo_root: Path) -> str:
+    try:
+        return path.resolve().relative_to(repo_root.resolve()).as_posix()
+    except ValueError:
+        return path.resolve().as_posix()
+
+
 def find_forbidden_language(text: str, profile: dict[str, Any]) -> list[str]:
     hits: list[str] = []
     exact_patterns = _unique([str(value) for value in profile.get("forbidden_output_patterns", [])] + EXTRA_PATTERN_TEXT)
@@ -68,38 +73,59 @@ def find_forbidden_language(text: str, profile: dict[str, Any]) -> list[str]:
     return _unique(hits)
 
 
-def _registration_scan_paths(repo_root: Path) -> list[Path]:
-    paths: list[Path] = []
-    for base in (repo_root / "data/manifests", repo_root / "data/reviewed_inputs"):
-        if base.exists():
-            paths.extend(path for path in base.rglob("*") if path.is_file())
-    run_dir = repo_root / "reports/workflow_runs" / WORKFLOW_ID
-    paths.extend(path for path in run_dir.glob("R5_*registry.*") if path.is_file())
-    return sorted(set(paths))
+def _registration_scan_paths(
+    manifest_root: Path,
+    reviewed_input_root: Path,
+    registry_dir: Path,
+) -> list[Path]:
+    checked: list[Path] = []
+    for root in (manifest_root, reviewed_input_root):
+        if not root.is_dir():
+            raise ValueError(f"registration scan root is not a directory: {root}")
+        checked.extend(path for path in root.rglob("*") if path.is_file())
+    if not registry_dir.is_dir():
+        raise ValueError(f"registry scan directory is not a directory: {registry_dir}")
+    checked.extend(
+        path
+        for path in registry_dir.glob("R5_*registry.*")
+        if path.is_file()
+    )
+    return sorted(set(path.resolve() for path in checked))
 
 
-def scan_sample_registration(repo_root: Path, profile: dict[str, Any]) -> dict[str, Any]:
+def scan_sample_registration(
+    repo_root: Path,
+    profile: dict[str, Any],
+    *,
+    manifest_root: Path,
+    reviewed_input_root: Path,
+    registry_dir: Path,
+) -> dict[str, Any]:
     needles = [
         str(profile.get("profile_id", "")),
         str(profile.get("source_origin", "")),
         *[str(value) for value in profile.get("source_files", [])],
     ]
     matches: list[dict[str, str]] = []
-    checked_paths = _registration_scan_paths(repo_root)
+    checked_paths = _registration_scan_paths(
+        manifest_root,
+        reviewed_input_root,
+        registry_dir,
+    )
     for path in checked_paths:
         text = path.read_text(encoding="utf-8", errors="replace")
         for needle in needles:
             if needle and needle in text:
-                matches.append({"path": path.relative_to(repo_root).as_posix(), "needle": needle})
+                matches.append({"path": _display_path(path, repo_root), "needle": needle})
     return {
         "checked": len(checked_paths),
         "sample_evidence_registered_count": len(matches),
         "matches": matches,
-        "scan_scope": [
-            "data/manifests/**",
-            "data/reviewed_inputs/**",
-            f"reports/workflow_runs/{WORKFLOW_ID}/R5_*registry.*",
-        ],
+        "scan_scope": {
+            "manifest_root": _display_path(manifest_root, repo_root),
+            "reviewed_input_root": _display_path(reviewed_input_root, repo_root),
+            "registry_dir": _display_path(registry_dir, repo_root),
+        },
     }
 
 
@@ -143,12 +169,19 @@ def evaluate_dimension(section: dict[str, Any], report_text: str) -> dict[str, A
     }
 
 
-def build_precheck(repo_root: Path) -> dict[str, Any]:
-    run_dir = repo_root / "reports/workflow_runs" / WORKFLOW_ID
-    profile_path = repo_root / "codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml"
-    report_path = run_dir / "R5_stock_research_note_reviewed_input_draft.md"
-    pack_path = run_dir / "R5_bundle5_stock_research_pack.yaml"
-    quality_path = run_dir / "R5_bundle5_quality_gate_result.yaml"
+def build_precheck(
+    repo_root: Path,
+    *,
+    workflow_id: str,
+    stock_code: str,
+    profile_path: Path,
+    report_path: Path,
+    pack_path: Path,
+    quality_path: Path,
+    manifest_root: Path,
+    reviewed_input_root: Path,
+    registry_dir: Path,
+) -> dict[str, Any]:
     profile = load_yaml(profile_path)
     pack = load_yaml(pack_path)
     quality = load_yaml(quality_path)
@@ -184,7 +217,13 @@ def build_precheck(repo_root: Path) -> dict[str, Any]:
             coverage.append(evaluate_dimension(section, report_text))
 
     unsupported_dimensions = sorted(set(section_by_dimension) - set(expected_dimensions))
-    registration = scan_sample_registration(repo_root, profile)
+    registration = scan_sample_registration(
+        repo_root,
+        profile,
+        manifest_root=manifest_root,
+        reviewed_input_root=reviewed_input_root,
+        registry_dir=registry_dir,
+    )
     forbidden_matches = find_forbidden_language(report_text, profile)
     dimension_failures = [row["dimension"] for row in coverage if row["support_check"] != "pass"]
     blockers: list[str] = []
@@ -205,8 +244,8 @@ def build_precheck(repo_root: Path) -> dict[str, Any]:
     return {
         "artifact_type": "R5_bundle5_benchmark_coverage_precheck",
         "schema_version": "r5_bundle5_benchmark_coverage_precheck_v0.1",
-        "workflow_id": WORKFLOW_ID,
-        "stock_code": STOCK_CODE,
+        "workflow_id": workflow_id,
+        "stock_code": stock_code,
         "profile_id": profile.get("profile_id"),
         "precheck_status": "pass" if not blockers else "fail",
         "precheck_only": True,
@@ -215,10 +254,10 @@ def build_precheck(repo_root: Path) -> dict[str, Any]:
         "sample_quality_report_allowed": False,
         "p2_allowed": False,
         "input_artifacts": {
-            "profile": {"path": profile_path.relative_to(repo_root).as_posix(), "sha256": _sha256(profile_path)},
-            "real_draft": {"path": report_path.relative_to(repo_root).as_posix(), "sha256": _sha256(report_path)},
-            "research_pack": {"path": pack_path.relative_to(repo_root).as_posix(), "sha256": _sha256(pack_path)},
-            "quality_gate": {"path": quality_path.relative_to(repo_root).as_posix(), "sha256": _sha256(quality_path)},
+            "profile": {"path": _display_path(profile_path, repo_root), "sha256": _sha256(profile_path)},
+            "real_draft": {"path": _display_path(report_path, repo_root), "sha256": _sha256(report_path)},
+            "research_pack": {"path": _display_path(pack_path, repo_root), "sha256": _sha256(pack_path)},
+            "quality_gate": {"path": _display_path(quality_path, repo_root), "sha256": _sha256(quality_path)},
         },
         "coverage_dimensions_expected": expected_dimensions,
         "coverage": coverage,
@@ -243,9 +282,13 @@ def build_precheck(repo_root: Path) -> dict[str, Any]:
     }
 
 
-def write_readout(repo_root: Path, result: dict[str, Any]) -> None:
-    result_path = repo_root / f"reports/workflow_runs/{WORKFLOW_ID}/R5_bundle5_benchmark_coverage_precheck.yaml"
+def write_readout(
+    path: Path,
+    result_path: Path,
+    result: dict[str, Any],
+) -> None:
     summary = result["coverage_summary"]
+    workflow_id = result["workflow_id"]
     text = f"""# R5 Bundle 5.7 — Benchmark Coverage Precheck Readout
 
 status: pass_precheck_only
@@ -253,7 +296,7 @@ status: pass_precheck_only
 ## files_added
 
 - `scripts/build_r5_bundle5_benchmark_coverage_precheck.py`
-- `reports/workflow_runs/{WORKFLOW_ID}/R5_bundle5_benchmark_coverage_precheck.yaml`
+- `reports/workflow_runs/{workflow_id}/R5_bundle5_benchmark_coverage_precheck.yaml`
 - `tests/test_r5_bundle5_benchmark_coverage_precheck.py`
 - `reports/p1_6/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_READOUT.md`
 
@@ -263,7 +306,7 @@ status: pass_precheck_only
 
 ## commands_run
 
-- `.\\.conda\\investment-system\\python.exe scripts\\build_r5_bundle5_benchmark_coverage_precheck.py --repo-root .`
+- `.\\.conda\\investment-system\\python.exe scripts\\build_r5_bundle5_benchmark_coverage_precheck.py --repo-root . --workflow-id <id> --profile <path> --report <path> --pack <path> --quality <path> --output <path> ...`
 
 ## exit_code
 
@@ -294,26 +337,78 @@ status: pass_precheck_only
 - sample_quality_report_allowed: `false`
 - p2_allowed: `false`
 """
-    path = repo_root / "reports/p1_6/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_READOUT.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
 
 
-def run(repo_root: Path) -> dict[str, Any]:
-    result = build_precheck(repo_root)
-    result_path = repo_root / f"reports/workflow_runs/{WORKFLOW_ID}/R5_bundle5_benchmark_coverage_precheck.yaml"
+def run(
+    repo_root: Path,
+    *,
+    workflow_id: str,
+    stock_code: str,
+    profile_path: Path,
+    report_path: Path,
+    pack_path: Path,
+    quality_path: Path,
+    manifest_root: Path,
+    reviewed_input_root: Path,
+    registry_dir: Path,
+    result_path: Path,
+    readout_path: Path,
+) -> dict[str, Any]:
+    result = build_precheck(
+        repo_root,
+        workflow_id=workflow_id,
+        stock_code=stock_code,
+        profile_path=profile_path,
+        report_path=report_path,
+        pack_path=pack_path,
+        quality_path=quality_path,
+        manifest_root=manifest_root,
+        reviewed_input_root=reviewed_input_root,
+        registry_dir=registry_dir,
+    )
     _write_yaml(result_path, result)
     if result["blockers"]:
         raise RuntimeError("Bundle 5.7 precheck failed: " + "; ".join(result["blockers"]))
-    write_readout(repo_root, result)
+    write_readout(readout_path, result_path, result)
     return result
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run the Bundle 5.7 benchmark coverage precheck.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
+    parser.add_argument("--workflow-id", required=True)
+    parser.add_argument("--stock-code", required=True)
+    parser.add_argument("--profile", type=Path, required=True)
+    parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--pack", type=Path, required=True)
+    parser.add_argument("--quality", type=Path, required=True)
+    parser.add_argument("--manifest-root", type=Path, required=True)
+    parser.add_argument("--reviewed-input-root", type=Path, required=True)
+    parser.add_argument("--registry-dir", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--readout-output", type=Path, required=True)
     args = parser.parse_args(argv)
-    result = run(args.repo_root.resolve())
+    repo_root = args.repo_root.resolve()
+
+    def resolved(path: Path) -> Path:
+        return path.resolve() if path.is_absolute() else (repo_root / path).resolve()
+
+    result = run(
+        repo_root,
+        workflow_id=args.workflow_id,
+        stock_code=args.stock_code,
+        profile_path=resolved(args.profile),
+        report_path=resolved(args.report),
+        pack_path=resolved(args.pack),
+        quality_path=resolved(args.quality),
+        manifest_root=resolved(args.manifest_root),
+        reviewed_input_root=resolved(args.reviewed_input_root),
+        registry_dir=resolved(args.registry_dir),
+        result_path=resolved(args.output),
+        readout_path=resolved(args.readout_output),
+    )
     summary = result["coverage_summary"]
     print(
         "r5_bundle5_card_5_7 status={status} dimensions={dimensions} forbidden={forbidden} "

@@ -21,8 +21,10 @@ if str(SCRIPT_DIR) not in sys.path:
 import r5_reviewed_input_registry_io as registry_io  # noqa: E402
 import validate_r5_reviewed_input_dropzone as dropzone  # noqa: E402
 
-REAL_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-WORKFLOW_ID = REAL_WORKFLOW_ID
+# Import-only compatibility for the retained Bundle 4 smoke runner.  This
+# deliberately names no committed workflow; production callers must continue
+# to select workflow, input, and output paths explicitly.
+REAL_WORKFLOW_ID = "__retired_workflow_requires_explicit_selection__"
 FIXTURE_WORKFLOW_ID = "wf_fixture_r5_bundle4"
 CORE_FORECAST_DRIVERS = ["revenue_growth", "gross_margin", "opex", "net_profit", "eps"]
 REGISTRY_FILENAMES = {
@@ -927,11 +929,19 @@ def promote_reviewed_inputs(
     derived_stocks = list(validation.get("unique_stock_codes") or [])
     derived_workflow = derived_workflows[0] if len(derived_workflows) == 1 else None
     derived_stock = derived_stocks[0] if len(derived_stocks) == 1 else None
-    real_run_dir = (repo_root / "reports/workflow_runs" / REAL_WORKFLOW_ID).resolve()
+    committed_runs_root = (repo_root / "reports/workflow_runs").resolve()
+    output_targets_committed_run = (
+        output_run_dir == committed_runs_root
+        or committed_runs_root in output_run_dir.parents
+    )
 
     boundary_reason = None
-    if fixture_mode and (workflow_id == REAL_WORKFLOW_ID or output_run_dir == real_run_dir):
-        boundary_reason = "fixture mode rejects the real workflow ID and committed real run directory"
+    if fixture_mode and (
+        workflow_id != FIXTURE_WORKFLOW_ID or output_targets_committed_run
+    ):
+        boundary_reason = (
+            "fixture mode requires the fixture workflow ID and rejects every committed run directory"
+        )
     elif validation["status"] != "pass":
         boundary_reason = "dropzone validation failed"
     elif derived_workflow and derived_workflow != workflow_id:
@@ -1152,18 +1162,18 @@ def build_promotion_result(
     *,
     repo_root: Path,
     workflow_id: str,
-    dropzone_root: Path | None = None,
+    dropzone_root: Path,
+    output_run_dir: Path,
 ) -> dict[str, Any]:
-    """Backward-compatible wrapper used by Patch 53 tests and callers."""
+    """Build a promotion result from explicitly selected input and output roots."""
 
     repo_root = repo_root.resolve()
-    actual_dropzone_root = dropzone_root or repo_root / "data/reviewed_inputs" / workflow_id
     return promote_reviewed_inputs(
         repo_root=repo_root,
         workflow_id=workflow_id,
         stock_code=None,
-        dropzone_root=actual_dropzone_root,
-        output_run_dir=repo_root / "reports/workflow_runs" / workflow_id,
+        dropzone_root=dropzone_root,
+        output_run_dir=output_run_dir,
         fixture_mode=False,
         dry_run=False,
     )
@@ -1186,20 +1196,18 @@ def write_yaml(path: Path, payload: dict[str, Any]) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Promote accepted R5 reviewed inputs to physical registries.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
-    parser.add_argument("--workflow-id", default=WORKFLOW_ID)
+    parser.add_argument("--workflow-id", required=True)
     parser.add_argument("--stock-code")
-    parser.add_argument("--dropzone-root", type=Path)
-    parser.add_argument("--output-run-dir", type=Path)
+    parser.add_argument("--dropzone-root", type=Path, required=True)
+    parser.add_argument("--output-run-dir", type=Path, required=True)
     parser.add_argument("--fixture-mode", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--json", type=Path, required=True, help="Promotion result path; JSON or YAML by suffix.")
     args = parser.parse_args(argv)
 
     repo_root = args.repo_root.resolve()
-    dropzone_root = (args.dropzone_root or repo_root / "data/reviewed_inputs" / args.workflow_id).resolve()
-    output_run_dir = (
-        args.output_run_dir or repo_root / "reports/workflow_runs" / args.workflow_id
-    ).resolve()
+    dropzone_root = args.dropzone_root.resolve()
+    output_run_dir = args.output_run_dir.resolve()
     result = promote_reviewed_inputs(
         repo_root=repo_root,
         workflow_id=args.workflow_id,

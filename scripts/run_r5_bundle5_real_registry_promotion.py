@@ -20,9 +20,6 @@ import promote_r5_reviewed_inputs_to_registries as promoter  # noqa: E402
 import r5_reviewed_input_registry_io as registry_io  # noqa: E402
 import validate_r5_reviewed_input_dropzone as dropzone  # noqa: E402
 
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-STOCK_CODE = "002837"
-
 
 def _repo_rel(path: Path, repo_root: Path) -> str:
     try:
@@ -65,6 +62,9 @@ def build_prepromotion_inventory(
     run_dir: Path,
     dropzone_root: Path,
     dry_run: dict[str, Any],
+    *,
+    workflow_id: str,
+    stock_code: str,
 ) -> dict[str, Any]:
     validation = dropzone.validate_root(dropzone_root)
     if validation["status"] != "pass":
@@ -96,8 +96,8 @@ def build_prepromotion_inventory(
     return {
         "artifact_type": "R5_bundle5_prepromotion_inventory",
         "schema_version": "r5_bundle5_prepromotion_inventory_v0.1",
-        "workflow_id": WORKFLOW_ID,
-        "stock_code": STOCK_CODE,
+        "workflow_id": workflow_id,
+        "stock_code": stock_code,
         "inventory_signature": signature,
         "dropzone_validation_status": validation["status"],
         "accepted_count": validation["accepted_count"],
@@ -161,7 +161,7 @@ def create_backup_manifest(repo_root: Path, run_dir: Path, inventory: dict[str, 
     return {
         "artifact_type": "R5_bundle5_registry_backup_manifest",
         "schema_version": "r5_bundle5_registry_backup_manifest_v0.1",
-        "workflow_id": WORKFLOW_ID,
+        "workflow_id": inventory["workflow_id"],
         "inventory_signature": signature,
         "backup_dir": _repo_rel(backup_dir, repo_root),
         "backup_verified": True,
@@ -220,11 +220,18 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def prepare(repo_root: Path, run_dir: Path, dropzone_root: Path) -> tuple[dict[str, Any], dict[str, Any]]:
+def prepare(
+    repo_root: Path,
+    run_dir: Path,
+    dropzone_root: Path,
+    *,
+    workflow_id: str,
+    stock_code: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     dry_run = promoter.promote_reviewed_inputs(
         repo_root=repo_root,
-        workflow_id=WORKFLOW_ID,
-        stock_code=STOCK_CODE,
+        workflow_id=workflow_id,
+        stock_code=stock_code,
         dropzone_root=dropzone_root,
         output_run_dir=run_dir,
         fixture_mode=False,
@@ -234,7 +241,14 @@ def prepare(repo_root: Path, run_dir: Path, dropzone_root: Path) -> tuple[dict[s
         raise RuntimeError(f"promotion dry-run failed: {dry_run['promotion_status']}")
     if dry_run["sample_quality_report_allowed"] or dry_run["p2_allowed"]:
         raise RuntimeError("promotion dry-run violated fixed Bundle 5 boundaries")
-    inventory = build_prepromotion_inventory(repo_root, run_dir, dropzone_root, dry_run)
+    inventory = build_prepromotion_inventory(
+        repo_root,
+        run_dir,
+        dropzone_root,
+        dry_run,
+        workflow_id=workflow_id,
+        stock_code=stock_code,
+    )
     backup = create_backup_manifest(repo_root, run_dir, inventory)
     write_yaml(run_dir / "R5_bundle5_prepromotion_inventory.yaml", inventory)
     write_yaml(run_dir / "R5_bundle5_registry_backup_manifest.yaml", backup)
@@ -242,13 +256,21 @@ def prepare(repo_root: Path, run_dir: Path, dropzone_root: Path) -> tuple[dict[s
     return inventory, backup
 
 
-def promote_twice(repo_root: Path, run_dir: Path, dropzone_root: Path, backup: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+def promote_twice(
+    repo_root: Path,
+    run_dir: Path,
+    dropzone_root: Path,
+    backup: dict[str, Any],
+    *,
+    workflow_id: str,
+    stock_code: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
     verify_backup_and_prestate(repo_root, backup)
     try:
         first = promoter.promote_reviewed_inputs(
             repo_root=repo_root,
-            workflow_id=WORKFLOW_ID,
-            stock_code=STOCK_CODE,
+            workflow_id=workflow_id,
+            stock_code=stock_code,
             dropzone_root=dropzone_root,
             output_run_dir=run_dir,
             fixture_mode=False,
@@ -261,8 +283,8 @@ def promote_twice(repo_root: Path, run_dir: Path, dropzone_root: Path, backup: d
         first_hashes = {key: _sha256(path) for key, path in registry_paths(run_dir).items()}
         second = promoter.promote_reviewed_inputs(
             repo_root=repo_root,
-            workflow_id=WORKFLOW_ID,
-            stock_code=STOCK_CODE,
+            workflow_id=workflow_id,
+            stock_code=stock_code,
             dropzone_root=dropzone_root,
             output_run_dir=run_dir,
             fixture_mode=False,
@@ -299,19 +321,30 @@ def promote_twice(repo_root: Path, run_dir: Path, dropzone_root: Path, backup: d
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run the guarded R5 Bundle 5.5 real registry promotion.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
-    parser.add_argument("--workflow-id", default=WORKFLOW_ID)
+    parser.add_argument("--workflow-id", required=True)
+    parser.add_argument("--stock-code", required=True)
+    parser.add_argument("--run-dir", type=Path, required=True)
+    parser.add_argument("--dropzone-root", type=Path, required=True)
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument("--promote", action="store_true")
     args = parser.parse_args(argv)
-    if args.workflow_id != WORKFLOW_ID:
-        raise SystemExit(f"this runner is scoped to {WORKFLOW_ID}")
     if args.prepare_only == args.promote:
         raise SystemExit("choose exactly one of --prepare-only or --promote")
     repo_root = args.repo_root.resolve()
-    run_dir = repo_root / "reports/workflow_runs" / WORKFLOW_ID
-    dropzone_root = repo_root / "data/reviewed_inputs" / WORKFLOW_ID
+    run_dir = args.run_dir.resolve() if args.run_dir.is_absolute() else (repo_root / args.run_dir).resolve()
+    dropzone_root = (
+        args.dropzone_root.resolve()
+        if args.dropzone_root.is_absolute()
+        else (repo_root / args.dropzone_root).resolve()
+    )
     if args.prepare_only:
-        inventory, backup = prepare(repo_root, run_dir, dropzone_root)
+        inventory, backup = prepare(
+            repo_root,
+            run_dir,
+            dropzone_root,
+            workflow_id=args.workflow_id,
+            stock_code=args.stock_code,
+        )
         print(
             "r5_bundle5_card_5_5_prepare status=pass "
             f"accepted={inventory['accepted_count']} backups={len(backup['items'])} "
@@ -322,7 +355,14 @@ def main(argv: list[str] | None = None) -> int:
     backup = yaml.safe_load(backup_path.read_text(encoding="utf-8"))
     if not isinstance(backup, dict):
         raise SystemExit("backup manifest is missing or invalid; run --prepare-only first")
-    first, idempotency = promote_twice(repo_root, run_dir, dropzone_root, backup)
+    first, idempotency = promote_twice(
+        repo_root,
+        run_dir,
+        dropzone_root,
+        backup,
+        workflow_id=args.workflow_id,
+        stock_code=args.stock_code,
+    )
     print(
         "r5_bundle5_card_5_5_promotion status=pass "
         f"first={first['promotion_status']} second={idempotency['second_promotion_status']} "

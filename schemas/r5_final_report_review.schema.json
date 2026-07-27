@@ -1,0 +1,440 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "r5_final_report_review.schema.json",
+  "title": "R5 final report review workflow-state fragment",
+  "type": "object",
+  "required": [
+    "state_schema_version",
+    "decision_semantics_version",
+    "status",
+    "final_report_review_semantics_version",
+    "automated_report_quality_passed",
+    "system_v1_complete",
+    "sample_quality_ready",
+    "p2_ready",
+    "release_ready",
+    "final_report_review_status",
+    "final_report_review"
+  ],
+  "properties": {
+    "state_schema_version": {
+      "const": "r5_v1"
+    },
+    "decision_semantics_version": {
+      "const": "current_goal_v1"
+    },
+    "status": {
+      "enum": [
+        "planned",
+        "in_progress",
+        "blocked",
+        "needs_fix",
+        "ready_for_review",
+        "accepted",
+        "accepted_with_todos",
+        "archived"
+      ]
+    },
+    "final_report_review_semantics_version": {
+      "const": "final_report_review_v1"
+    },
+    "automated_report_quality_passed": {
+      "type": "boolean"
+    },
+    "system_v1_complete": {
+      "type": "boolean"
+    },
+    "sample_quality_ready": {
+      "type": "boolean"
+    },
+    "p2_ready": {
+      "type": "boolean"
+    },
+    "release_ready": {
+      "type": "boolean"
+    },
+    "final_report_review_status": {
+      "enum": [
+        "not_requested",
+        "pending",
+        "approved",
+        "changes_requested"
+      ]
+    },
+    "final_report_review": {
+      "$ref": "#/$defs/review_record"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "final_report_review_status": {
+            "const": "not_requested"
+          }
+        },
+        "required": [
+          "final_report_review_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "final_report_review": {
+            "$ref": "#/$defs/not_requested_record"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "final_report_review_status": {
+            "const": "pending"
+          }
+        },
+        "required": [
+          "final_report_review_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "final_report_review": {
+            "$ref": "#/$defs/pending_record"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "final_report_review_status": {
+            "const": "approved"
+          }
+        },
+        "required": [
+          "final_report_review_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "final_report_review": {
+            "$ref": "#/$defs/approved_record"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "final_report_review_status": {
+            "const": "changes_requested"
+          }
+        },
+        "required": [
+          "final_report_review_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "final_report_review": {
+            "$ref": "#/$defs/changes_requested_record"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "automated_report_quality_passed": {
+            "const": true
+          }
+        },
+        "required": [
+          "automated_report_quality_passed"
+        ]
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "enum": [
+              "accepted",
+              "accepted_with_todos"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "sample_quality_ready": {
+            "const": true
+          }
+        },
+        "required": [
+          "sample_quality_ready"
+        ]
+      },
+      "then": {
+        "properties": {
+          "automated_report_quality_passed": {
+            "const": true
+          },
+          "final_report_review_status": {
+            "const": "approved"
+          },
+          "status": {
+            "enum": [
+              "accepted",
+              "accepted_with_todos"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "system_v1_complete": {
+            "const": true
+          }
+        },
+        "required": [
+          "system_v1_complete"
+        ]
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "enum": [
+              "accepted",
+              "accepted_with_todos"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "repo_relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*[\\\\<>:\"|?*])(?!.*[\\x00-\\x1f])(?!.*(?:^|/)[^/]*[ .](?:/|$))reports/(?:stocks|segments)/[a-z0-9][a-z0-9_]*/.+\\.(?:[Mm][Dd]|[Pp][Dd][Ff]|[Hh][Tt][Mm][Ll]|[Dd][Oo][Cc][Xx])$"
+    },
+    "nullable_non_empty_text": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
+    },
+    "review_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report_path",
+        "report_sha256",
+        "reviewer",
+        "reviewed_at",
+        "decision",
+        "notes",
+        "change_scope"
+      ],
+      "properties": {
+        "report_path": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/repo_relative_path"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "report_sha256": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reviewer": {
+          "$ref": "#/$defs/nullable_non_empty_text"
+        },
+        "reviewed_at": {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision": {
+          "enum": [
+            "not_requested",
+            "pending",
+            "approved",
+            "changes_requested"
+          ]
+        },
+        "notes": {
+          "$ref": "#/$defs/nullable_non_empty_text"
+        },
+        "change_scope": {
+          "enum": [
+            "automated_quality_defect",
+            "report_revision",
+            null
+          ]
+        }
+      }
+    },
+    "not_requested_record": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/review_record"
+        },
+        {
+          "properties": {
+            "report_path": {
+              "type": "null"
+            },
+            "report_sha256": {
+              "type": "null"
+            },
+            "reviewer": {
+              "type": "null"
+            },
+            "reviewed_at": {
+              "type": "null"
+            },
+            "decision": {
+              "const": "not_requested"
+            },
+            "notes": {
+              "type": "null"
+            },
+            "change_scope": {
+              "type": "null"
+            }
+          }
+        }
+      ]
+    },
+    "pending_record": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/review_record"
+        },
+        {
+          "properties": {
+            "report_path": {
+              "$ref": "#/$defs/repo_relative_path"
+            },
+            "report_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "reviewer": {
+              "type": "null"
+            },
+            "reviewed_at": {
+              "type": "null"
+            },
+            "decision": {
+              "const": "pending"
+            },
+            "notes": {
+              "type": "null"
+            },
+            "change_scope": {
+              "type": "null"
+            }
+          }
+        }
+      ]
+    },
+    "approved_record": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/review_record"
+        },
+        {
+          "properties": {
+            "report_path": {
+              "$ref": "#/$defs/repo_relative_path"
+            },
+            "report_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "reviewer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reviewed_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "decision": {
+              "const": "approved"
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 1
+            },
+            "change_scope": {
+              "type": "null"
+            }
+          }
+        }
+      ]
+    },
+    "changes_requested_record": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/review_record"
+        },
+        {
+          "properties": {
+            "report_path": {
+              "$ref": "#/$defs/repo_relative_path"
+            },
+            "report_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "reviewer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reviewed_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "decision": {
+              "const": "changes_requested"
+            },
+            "notes": {
+              "type": "string",
+              "minLength": 1
+            },
+            "change_scope": {
+              "enum": [
+                "automated_quality_defect",
+                "report_revision"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

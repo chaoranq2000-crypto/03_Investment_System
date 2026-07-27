@@ -15,7 +15,6 @@ if str(SCRIPT_DIR) not in sys.path:
 
 import validate_r5_reviewed_input_dropzone as dropzone  # noqa: E402
 
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 TODO_TOKENS = [
     "TODO_MARKET_DATA",
     "TODO_PEER_DATA",
@@ -143,7 +142,7 @@ def write_yaml(path: Path, payload: dict[str, Any]) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build R5 reviewed-input staging result.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
-    parser.add_argument("--workflow-id", default=WORKFLOW_ID)
+    parser.add_argument("--workflow-id", required=True)
     parser.add_argument("--dropzone-root", type=Path)
     parser.add_argument("--json", type=Path, required=True, help="Output path; YAML is written for .yaml/.yml.")
     args = parser.parse_args(argv)

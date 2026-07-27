@@ -24,7 +24,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: false
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
       sse:
         status: routed_only
         supported_endpoint_hints:
@@ -87,7 +87,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   baostock_adapter:
     module: src.ingest.adapters.baostock_adapter
     entrypoint: main
@@ -109,7 +109,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   eastmoney_report_adapter:
     module: src.ingest.adapters.eastmoney_report_adapter
     entrypoint: main
@@ -128,7 +128,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: false
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/live_acquisition_run_log.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   market_snapshot_pull:
     module: src.ingest.market_snapshot_pull
     entrypoint: main
@@ -203,7 +203,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/mootdx_daily_bar.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   tencent_quote_adapter:
     module: src.ingest.adapters.tencent_quote_adapter
     entrypoint: main
@@ -223,7 +223,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/tencent_quote_and_valuation.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   baidu_kline_adapter:
     module: src.ingest.adapters.baidu_kline_adapter
     entrypoint: main
@@ -242,7 +242,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/baidu_kline_with_ma.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   eastmoney_report_pdf_adapter:
     module: src.ingest.adapters.eastmoney_report_pdf_adapter
     entrypoint: main
@@ -261,7 +261,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: false
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_report_pdf.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   eastmoney_industry_report_adapter:
     module: src.ingest.adapters.eastmoney_industry_report_adapter
     entrypoint: main
@@ -280,7 +280,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: false
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_industry_reports.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   ths_consensus_adapter:
     module: src.ingest.adapters.ths_consensus_adapter
     entrypoint: main
@@ -299,7 +299,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/ths_consensus_eps.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   iwencai_adapter:
     module: src.ingest.adapters.iwencai_adapter
     entrypoint: main
@@ -336,7 +336,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/cninfo_irm.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   sina_financial_adapter:
     module: src.ingest.adapters.sina_financial_adapter
     entrypoint: main
@@ -355,7 +355,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/sina_financial_statements.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   sina_fund_flow_adapter:
     module: src.ingest.adapters.sina_fund_flow_adapter
     entrypoint: main
@@ -393,7 +393,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_stock_info.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   eastmoney_capital_adapter:
     module: src.ingest.adapters.eastmoney_capital_adapter
     entrypoint: main
@@ -420,12 +420,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_holder_count.yaml
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_lockup_expiry.yaml
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_dividend_history.yaml
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_fund_flow.yaml
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_margin_trading.yaml
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_block_trade.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   eastmoney_market_context_adapter:
     module: src.ingest.adapters.eastmoney_market_context_adapter
     entrypoint: main
@@ -464,7 +459,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: false
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/eastmoney_news_clue.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   cls_telegraph_adapter:
     module: src.ingest.adapters.cls_telegraph_adapter
     entrypoint: main
@@ -483,7 +478,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/cls_telegraph.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
   exchange_fallback_adapter:
     module: src.ingest.adapters.exchange_fallback_adapter
     entrypoint: main
@@ -516,7 +511,7 @@ adapters:
         claim_boundary_verified: true
         independent_fallback_verified: true
         proof_paths:
-        - reports/workflow_runs/wf_20260703_stock_first_002837_invic/adapter_receipts/bundle8r/szse_announcement_fallback.yaml
+        - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
       bse:
         status: planned
         supported_endpoint_hints:

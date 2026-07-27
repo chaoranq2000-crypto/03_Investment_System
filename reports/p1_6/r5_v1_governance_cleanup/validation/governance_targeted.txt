@@ -1,0 +1,17 @@
+validation_id: V-003
+phase: P5_pre_delete
+checked_at: 2026-07-26T15:10:00+08:00
+command: C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B -m pytest -q tests/test_r5_v1_completion_semantics.py tests/test_r5_v1_active_control_plane.py tests/test_r5_v1_workflow_state_validator.py tests/test_r5_v1_replay_002837.py tests/test_validate_quality_issues.py tests/test_r5_reader_report_contract.py tests/test_r5_reader_quality_gate.py tests/test_r5_final_report_review_semantics.py tests/test_r5_v1_policy_refresh_002837.py
+exit_code: 0
+result: 194 passed in 27.27s
+
+P5 pre-delete cumulative validation:
+- V-002 doc drift: pass.
+- V-003 final nine-test command: 194 passed.
+- V-004: 16 passed in the contract-fixed two-directory rerun.
+- Two unique temporary outputs have semantic digest 2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6 and byte-identical 17-file trees.
+- V-005 fixed-Git-blob root reconciliation: 18 passed.
+- V-006 exact three-test command: 21 passed in 497.51s.
+- A.7 three Night CI tests: 4 passed with equal-strength retirement assertions.
+- Source-route quality gate: decision=pass, capabilities=17, blocking=0.
+- Full repository pytest: 1349 passed, 2 baseline-identical live-adapter skips, 0 failed/error.

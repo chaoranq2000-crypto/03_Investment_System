@@ -6,27 +6,30 @@ from pathlib import Path
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-RUN_DIR = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
-BASELINE_PATH = RUN_DIR / "R5_bundle6_reader_surface_baseline.yaml"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
-def load_yaml(path: Path):
-    return yaml.safe_load(path.read_text(encoding="utf-8"))
+def historical_yaml(historical_blob_bytes, name: str):
+    return yaml.safe_load(historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8"))
 
 
-def sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+def sha256(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
 
 
-def canonical_text_sha256(path: Path) -> str:
-    normalized = path.read_text(encoding="utf-8").encode("utf-8")
+def canonical_text_sha256(payload: bytes) -> str:
+    normalized = payload.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
     return hashlib.sha256(normalized).hexdigest()
 
 
-def test_bundle6_baseline_freezes_current_bundle5_artifacts() -> None:
-    baseline = load_yaml(BASELINE_PATH)
-    report = REPO_ROOT / baseline["input_artifacts"]["bundle5_draft"]["path"]
-    quality = REPO_ROOT / baseline["input_artifacts"]["bundle5_quality_gate"]["path"]
+def test_bundle6_baseline_freezes_current_bundle5_artifacts(historical_blob_bytes) -> None:
+    baseline = historical_yaml(
+        historical_blob_bytes, "R5_bundle6_reader_surface_baseline.yaml"
+    )
+    report = historical_blob_bytes(baseline["input_artifacts"]["bundle5_draft"]["path"])
+    quality = historical_blob_bytes(
+        baseline["input_artifacts"]["bundle5_quality_gate"]["path"]
+    )
 
     assert baseline["classification"] == "audit_oriented_research_draft_not_reader_candidate"
     assert baseline["before_state_preserved"] is True
@@ -42,11 +45,13 @@ def test_canonical_text_hash_is_line_ending_independent(tmp_path: Path) -> None:
     crlf.write_bytes(b"status: pass\r\ncount: 1\r\n")
     expected = hashlib.sha256(b"status: pass\ncount: 1\n").hexdigest()
 
-    assert canonical_text_sha256(crlf) == expected
+    assert canonical_text_sha256(crlf.read_bytes()) == expected
 
 
-def test_reader_surface_inventory_records_known_failures() -> None:
-    baseline = load_yaml(BASELINE_PATH)
+def test_reader_surface_inventory_records_known_failures(historical_blob_bytes) -> None:
+    baseline = historical_yaml(
+        historical_blob_bytes, "R5_bundle6_reader_surface_baseline.yaml"
+    )
     surface = baseline["reader_surface"]
 
     assert surface["line_count"] > 0
@@ -60,8 +65,10 @@ def test_reader_surface_inventory_records_known_failures() -> None:
     assert surface["over_precise_numeric_count"] > 0
 
 
-def test_coverage_and_fixed_boundaries_are_preserved() -> None:
-    baseline = load_yaml(BASELINE_PATH)
+def test_coverage_and_fixed_boundaries_are_preserved(historical_blob_bytes) -> None:
+    baseline = historical_yaml(
+        historical_blob_bytes, "R5_bundle6_reader_surface_baseline.yaml"
+    )
     coverage = baseline["coverage_baseline"]
 
     assert coverage["total"] == 10

@@ -1,15 +1,19 @@
 ---
 name: quality-review
-description: Use when checking evidence traceability, claim types, stale evidence, metric definitions, counter-evidence, missing data, update logs, exposure mapping, stock-led backflow, and investment-safety boundaries. Do not use to generate new unreviewed claims or trade instructions.
+description: Use when checking evidence traceability, claim types, stale evidence, metric definitions, counter-evidence, missing data, update logs, exposure mapping, stock-led backflow, and investment-safety boundaries. Do not use to generate new machine-unvalidated claims or trade instructions.
 ---
 
 # Quality Review
 
 ## Purpose
 
-Check that research artifacts are traceable, correctly typed, comparable, uncertainty-aware, counter-evidence-aware, updateable and free of direct trading instructions.
+Machine-check that research artifacts are traceable, correctly typed,
+comparable, uncertainty-aware, counter-evidence-aware, updateable and free of
+direct trading instructions.
 
-This skill owns issue detection and severity assignment. It does not own global workflow gate IDs.
+This skill owns issue detection, severity assignment and scoped issue
+classification. It does not own global workflow gate IDs or canonical outcome
+semantics.
 
 ## Canonical boundary
 
@@ -25,6 +29,11 @@ Skill-local checks must use `QR-*` IDs.
 R5 sample-quality checks use local `R5-G1` to `R5-G11` IDs from
 `references/r5_quality_gate.md`; they do not extend the global workflow gate
 table.
+
+In active issue records, `gate_id` is always a canonical `G0`–`G10` owner gate.
+Put the R5/QR/compatibility identifier in `local_check_id` and record every owner
+gate in `mapped_global_gate_ids`. Historical compact CSV files without those
+columns remain compatibility inputs only.
 
 ## When to use
 
@@ -60,38 +69,62 @@ source_gap_report.md
 - Check exposure mapping and backflow decisions.
 - Check report path and output boundary.
 - Output issue list, severity and fix owner.
+- Compute or recompute final-report SHA-256 and validate the review record
+  without creating reviewer identity or a human decision.
 
 ## Out of scope
 
-- Do not generate new unreviewed conclusions.
+- Do not generate new machine-unvalidated conclusions.
 - Do not replace `evidence-ingest`.
 - Do not replace segment or stock research.
 - Do not output buy/sell/hold instructions.
 - Do not silently modify reports; list required fixes.
+- Do not approve evidence, claims, metrics, fields, candidates, calculations,
+  generation locks or intermediate receipts on behalf of a human.
+- Do not synthesize a final-report reviewer, timestamp, approval or change request.
 
 ## Issue schema
 
 Every issue must use:
 
 ```csv
-issue_id,severity,gate_id,local_check_id,stage,target_artifact,description,fix_owner_skill,status,created_at,resolved_at,notes
+issue_id,severity,impact_scope,active_disposition,affected_capabilities,blocks_current_goal,gate_id,local_check_id,mapped_global_gate_ids,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
 ```
 
-For R5 issue-list validation, use the compact CSV schema in
+For active R5 issue-list validation, use the same scoped CSV contract in
 `references/issue_schema.md`:
 
 ```csv
-issue_id,severity,gate_id,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
+issue_id,severity,impact_scope,active_disposition,affected_capabilities,blocks_current_goal,gate_id,local_check_id,mapped_global_gate_ids,stage,target_artifact,section,description,fix_owner_skill,blocking_decision,next_action,status
+```
+
+For active rows, `blocking_decision` is a derived readout projection that must
+match the four scoped fields; it is not an independent decision input.
+Historical compact CSV rows that have `blocking_decision` but lack the scoped
+fields are compatibility inputs only. An adapter must classify them against the
+current goal and must not copy the historical decision into active state.
+
+Allowed scoped values:
+
+```text
+impact_scope:
+  workflow | report | section | claim | method | none
+
+active_disposition:
+  active_defect | unknown | method_unavailable | report_limitation |
+  historical_backlog | policy_retired | not_required_for_active_v1
 ```
 
 Severity:
 
 | severity | Meaning |
 |---|---|
-| critical | Blocks accepted status; indicates no-advice failure, identity failure, or impossible review state. |
-| high | Blocks accepted status; affects evidence traceability, identity, exposure, material claims, or no-advice boundary. |
-| medium | Does not block limited pilot if disclosed; affects completeness, comparability, confidence or important TODOs. |
+| critical | Highest risk or urgency; often identity, no-advice or material truthfulness risk. |
+| high | Material evidence, calculation, exposure, claim or report risk. |
+| medium | Completeness, comparability, confidence or important TODO risk. |
 | low | Formatting, naming, minor clarity or non-blocking improvements. |
+
+Severity is descriptive only. It never sets `blocks_current_goal` by itself.
 
 Status:
 
@@ -101,6 +134,60 @@ resolved
 accepted_todo
 waived_with_reason
 ```
+
+## Machine qualification and final-report human review
+
+Active V1 intermediate validation is automated. `reviewed evidence`,
+`reviewed_claims`, `reviewed_metrics`, promoted candidates and similar names
+mean that the objects passed applicable provenance, schema, claim-type,
+metric, citation, hash and no-advice checks. They do not mean human approval
+and do not require reviewer authority, signatures, independent receipts or
+per-candidate decisions.
+
+The only active human boundary is the final report. New or updated active
+states use:
+
+```text
+final_report_review_semantics_version: final_report_review_v1
+automated_report_quality_passed
+final_report_review_status:
+  not_requested | pending | approved | changes_requested
+final_report_review:
+  report_path
+  report_sha256
+  reviewer
+  reviewed_at
+  decision
+  notes
+  change_scope
+```
+
+This skill owns the automated report-quality checks and machine hash
+verification, not the human decision. `not_requested` leaves all binding,
+person, note and `change_scope` fields empty. `pending` binds the repo-relative
+final report path and current machine SHA-256 while reviewer, time, notes and
+`change_scope` remain empty. `approved|changes_requested` require a real
+non-machine reviewer, ISO time and non-empty notes; `decision` equals the
+top-level status. `change_scope` is
+`automated_quality_defect|report_revision` only for `changes_requested`.
+
+Any report-byte change invalidates the prior decision. `not_requested|pending`
+does not change the automatic workflow outcome or block
+`system_v1_complete`, but `sample_quality_ready=false`.
+`sample_quality_ready=true` requires all necessary automated quality
+conditions, a valid `approved` decision for current report bytes and all other
+applicable sample-quality conditions; these are necessary conditions and are
+not automatically sufficient.
+
+An `approved` review cannot override an automatic failure. A
+`changes_requested` review routes to `needs_fix` only when
+`change_scope=automated_quality_defect`; `report_revision` affects only the
+final report revision. Historical Bundle/Night/Reader reviewer authority,
+independent receipts, candidate decisions and exact-hash reviews are read-only
+and never satisfy the active final-report review.
+
+Only the final report hash binds human review. All other hashes, including
+generation locks, remain machine-integrity and reproducibility evidence.
 
 ## Global gate checks consumed by this skill
 
@@ -126,7 +213,8 @@ Pass conditions:
 Pass conditions:
 
 - Each metric has period, value, unit / currency, source evidence id and calculation method.
-- Metric candidates from structured API are draft unless promoted.
+- Metric candidates from structured API are draft unless machine-qualified
+  and promoted.
 
 ### G6 Exposure Gate
 
@@ -176,6 +264,23 @@ Use these subchecks when a report uses data-layer packs:
 | `QR-DL-5` | Official disclosure evidence exists before business exposure is written as fact; otherwise `MISSING_DISCLOSURE` is visible. |
 | `QR-DL-6` | Tushare / Baostock / market context snapshots do not support customer order, capacity or segment revenue facts by themselves. |
 
+The data-layer quality adapter uses implementation-local `DLQ-*` checks. They
+remain supporting checks and map as follows:
+
+| local_check_id | mapped_global_gate_ids | applicable_boundary | failure_backflow |
+|---|---|---|---|
+| `DLQ-1` | `G1` | source permission | `evidence-ingest` |
+| `DLQ-2` | `G1` | raw archive and hash presence | `evidence-ingest` |
+| `DLQ-3` | `G1\|G3` | structured snapshot reproducibility | `evidence-ingest` |
+| `DLQ-4` | `G3` | normalized field schema | `evidence-ingest` |
+| `DLQ-5` | `G2\|G3\|G9` | metric-only and no-advice boundary | source or text owner |
+| `DLQ-6` | `G3\|G7` | dated market snapshot | `evidence-ingest` |
+| `DLQ-7` | `G1\|G10` | source-license and secret hygiene | `evidence-ingest` |
+| `DLQ-8` | `G7\|G10` | supporting-pack and visible-TODO completeness | artifact owner |
+
+`data_layer_quality_report.md` is a supporting quality artifact. The active
+run's single current decision remains `quality_gate_report.md`.
+
 ### QR-VAL Valuation Sub-skill Subchecks
 
 Use these checks when a stock report consumes `company-valuation` outputs.
@@ -207,10 +312,11 @@ Reference:
 .agents/skills/stock-deep-dive/references/publishable_stock_report_gate.md
 ```
 
-### QR-R5 Sample-Quality Gate Subchecks
+### QR-R5 Legacy sample-quality capability evaluators
 
-Use `references/r5_quality_gate.md` when reviewing R5 research packs or R5
-report notes. The R5 local gates are:
+R5-G1–R5-G11 are not default checks for ordinary workflow completion. Use
+`references/r5_quality_gate.md` only when the handoff explicitly requests an
+R5 report capability evaluation. The retained local evaluators are:
 
 ```text
 R5-G1 Evidence Completeness Gate
@@ -226,6 +332,11 @@ R5-G10 No-Advice Gate
 R5-G11 Sample Benchmark Gate
 ```
 
+The same reference contains the mandatory local-to-global mapping. R5 local
+checks never appear in active `workflow_state.quality_gates[].gate_id`, never
+write canonical status directly, and only affect their declared
+`affected_capabilities`.
+
 Validate issue lists with:
 
 ```bash
@@ -234,12 +345,31 @@ python .agents/skills/quality-review/scripts/validate_quality_issues.py --issues
 
 ## Outcome rules
 
+The canonical truth table is owned by `RESEARCH_WORKFLOW.md`. This skill applies
+it row by row:
+
 | outcome | Conditions |
 |---|---|
-| `accepted` | No high / medium blocking issue. |
-| `accepted_with_todos` | No high issue; medium / low TODOs documented. |
-| `needs_fix` | At least one fixable high issue. |
-| `blocked` | Identity / evidence / path / source problem prevents review. |
+| `accepted` | Automated quality passes and no active limitation or TODO remains. |
+| `accepted_with_todos` | Visible unknown, unavailable non-required method or report limitation remains, but the current output does not use it without support. |
+| `needs_fix` | Current output contains an unsupported-used number, calculation error, true double-count, broken citation, hidden TODO, no-advice violation, or uses an unknown field. |
+| `blocked` | Identity, path, parse, source identity or an irreplaceable required input fails so that no honest target output can be generated. |
+
+`unknown` that is visible and unused sets `blocks_current_goal=false` even if
+its severity is high. `method_unavailable` is blocking only when the frozen
+current goal requires that method and no approved fallback exists.
+
+Apply missing information through this degradation ladder:
+
+```text
+direct issuer disclosure
+→ audited aggregate
+→ bounded estimate / scenario with explicit assumptions
+→ unknown or omit the dependent conclusion
+```
+
+Lower tiers must not be presented as higher tiers. Closing one capability does
+not close unrelated report sections or the whole workflow.
 
 ## Outputs
 
@@ -251,12 +381,18 @@ stale_or_contradicted_claims.csv
 required_fixes.md
 ```
 
+When a final report exists, the automated report-quality result and
+machine-computed report hash may also be recorded in `workflow_state.yaml`.
+This skill must not populate human-only fields.
+
 ## Guardrails
 
 - Quality review should surface problems, not hide gaps.
 - Unsupported conclusions must become TODO / MISSING / LOW_CONFIDENCE / UNVERIFIED.
 - Management comments, analyst predictions and media narratives must be labeled.
 - Scores, memos and watchlists are not trading signals.
+- Local Bundle/R5 results and historical `blocking_decision` values cannot
+  override the scoped current-goal derivation.
 
 ## Quality checklist
 
@@ -271,9 +407,24 @@ required_fixes.md
 9. Is update / backflow logging required?
 10. Is direct trading advice avoided?
 11. Are missing data-layer packs represented as TODO / MISSING rather than unsupported conclusions?
+12. Are intermediate `reviewed` objects machine-qualified without human-authority fields?
+13. If a final report review is bound, do its current bytes match the recorded SHA-256?
+14. Does `sample_quality_ready` remain false for `not_requested|pending`,
+    stale approval, or failed automated quality?
 
-<!-- BEGIN R5_BUNDLE11R_RUNTIME_INTEGRATION -->
-## Bundle 11R semantic research gate
+## Explicit legacy semantic evaluators
 
-Review both truthfulness and decision usefulness. Fail a candidate when a core section lacks issuer-specific metrics, an economic section lacks a model link, peer multiples use an ineligible peer set, watchpoints are not falsifiable, the same insight is repeated across sections, proxy share exceeds the contract, or direct trading/target-price language appears. Extra length, citations, technical indicators, or unrelated passing sections cannot compensate for these failures.
-<!-- END R5_BUNDLE11R_RUNTIME_INTEGRATION -->
+Bundle11R–16R semantic checks may be retained only as explicitly invoked
+capability-local evaluators mapped to G0–G10. They may flag missing
+issuer-specific metrics, model links, peer eligibility, falsifiability,
+duplication, proxy use or no-advice failures, but each finding must carry the
+scoped fields above.
+
+An unavailable optional model becomes a visible capability limitation. An
+unsupported model result actually used in the report, a true double-count or a
+direct trading instruction is an active defect and `needs_fix`. Extra length,
+citations or unrelated passing sections cannot offset an active defect.
+
+Legacy evaluator human-review, authority, receipt and candidate-decision
+artifacts remain read-only. Explicit capability evaluation is automatic and
+does not create another human boundary.

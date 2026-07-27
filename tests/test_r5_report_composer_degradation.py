@@ -6,7 +6,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WRITER_PATH = REPO_ROOT / "src/report/stock_report_writer.py"
-PACK_PATH = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_pack_source_gapped.yaml"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 COMPOSER_SCRIPT = REPO_ROOT / "scripts/compose_r5_report_from_pack.py"
 
 
@@ -28,11 +28,22 @@ def load_gate_composer():
     return module
 
 
-def test_source_gapped_pack_renders_only_degraded_draft(tmp_path: Path):
+def historical_input(historical_blob_file, name: str) -> Path:
+    return historical_blob_file(f"{HISTORICAL_RUN}/{name}", f"composer/{name}")
+
+
+def test_source_gapped_pack_renders_only_degraded_draft(
+    tmp_path: Path,
+    historical_blob_file,
+):
     writer = load_writer()
     out = tmp_path / "R5_stock_research_note_source_gapped.md"
+    pack_path = historical_input(
+        historical_blob_file,
+        "R5_stock_research_pack_source_gapped.yaml",
+    )
 
-    result = writer.render_source_gapped_research_draft(pack_path=PACK_PATH, output_path=out)
+    result = writer.render_source_gapped_research_draft(pack_path=pack_path, output_path=out)
     text = out.read_text(encoding="utf-8")
 
     assert result["output_type"] == "source_gapped_research_draft"
@@ -44,11 +55,15 @@ def test_source_gapped_pack_renders_only_degraded_draft(tmp_path: Path):
     assert "sample-quality" not in text.lower()
 
 
-def test_source_gapped_draft_contains_all_pack_gaps(tmp_path: Path):
+def test_source_gapped_draft_contains_all_pack_gaps(tmp_path: Path, historical_blob_file):
     writer = load_writer()
     out = tmp_path / "draft.md"
+    pack_path = historical_input(
+        historical_blob_file,
+        "R5_stock_research_pack_source_gapped.yaml",
+    )
 
-    writer.render_source_gapped_research_draft(pack_path=PACK_PATH, output_path=out)
+    writer.render_source_gapped_research_draft(pack_path=pack_path, output_path=out)
     text = out.read_text(encoding="utf-8")
 
     for gap_id in [
@@ -62,28 +77,51 @@ def test_source_gapped_draft_contains_all_pack_gaps(tmp_path: Path):
         assert gap_id in text
 
 
-def test_source_gapped_draft_has_no_direct_trading_language(tmp_path: Path):
+def test_source_gapped_draft_has_no_direct_trading_language(tmp_path: Path, historical_blob_file):
     writer = load_writer()
     out = tmp_path / "draft.md"
+    pack_path = historical_input(
+        historical_blob_file,
+        "R5_stock_research_pack_source_gapped.yaml",
+    )
 
-    writer.render_source_gapped_research_draft(pack_path=PACK_PATH, output_path=out)
+    writer.render_source_gapped_research_draft(pack_path=pack_path, output_path=out)
     text = out.read_text(encoding="utf-8")
 
     for phrase in ["买入", "卖出", "持有", "仓位", "buy rating", "sell rating", "hold rating"]:
         assert phrase.lower() not in text.lower()
 
 
-def test_gate_composer_pending_inputs_stay_research_draft(tmp_path: Path):
+def test_gate_composer_pending_inputs_stay_research_draft(
+    tmp_path: Path,
+    historical_blob_file,
+):
     composer = load_gate_composer()
     output = tmp_path / "pending_note.md"
+    pack_path = historical_input(
+        historical_blob_file,
+        "R5_stock_research_pack_source_gapped.yaml",
+    )
+    market_peer_registry = historical_input(
+        historical_blob_file,
+        "R5_market_peer_input_registry.yaml",
+    )
+    forecast_registry = historical_input(
+        historical_blob_file,
+        "R5_forecast_assumption_registry.yaml",
+    )
+    evidence_ledger = historical_input(
+        historical_blob_file,
+        "R5_evidence_request_review_ledger.yaml",
+    )
 
     result = composer.compose_with_gate(
-        pack_path=PACK_PATH,
+        pack_path=pack_path,
         output_path=output,
         gate_path=REPO_ROOT / "reports/p1_6/r5_after_patch40_pilot_gate_result.json",
-        market_peer_registry_path=REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_market_peer_input_registry.yaml",
-        forecast_registry_path=REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_forecast_assumption_registry.yaml",
-        evidence_ledger_path=REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_review_ledger.yaml",
+        market_peer_registry_path=market_peer_registry,
+        forecast_registry_path=forecast_registry,
+        evidence_ledger_path=evidence_ledger,
     )
     text = output.read_text(encoding="utf-8")
 

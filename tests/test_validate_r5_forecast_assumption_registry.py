@@ -8,8 +8,7 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / ".agents/skills/stock-deep-dive/scripts/validate_r5_forecast_assumption_registry.py"
-RUN_REGISTRY = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_forecast_assumption_registry.yaml"
-FORECAST_MODEL = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle5_forecast_model_candidate.yaml"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
 def load_validator():
@@ -54,10 +53,18 @@ def test_pending_registry_passes_but_keeps_todos():
     assert validator.derive_decision(data, issues) == "accepted_with_todos"
 
 
-def test_run_registry_and_rebuilt_pack_use_reviewed_numeric_forecast():
+def test_run_registry_and_rebuilt_pack_use_reviewed_numeric_forecast(historical_blob_file):
     validator = load_validator()
-    data = validator.load_yaml(RUN_REGISTRY)
-    forecast = yaml.safe_load(FORECAST_MODEL.read_text(encoding="utf-8"))
+    registry_path = historical_blob_file(
+        f"{HISTORICAL_RUN}/R5_forecast_assumption_registry.yaml",
+        "forecast_registry/R5_forecast_assumption_registry.yaml",
+    )
+    forecast_path = historical_blob_file(
+        f"{HISTORICAL_RUN}/R5_bundle5_forecast_model_candidate.yaml",
+        "forecast_registry/R5_bundle5_forecast_model_candidate.yaml",
+    )
+    data = validator.load_yaml(registry_path)
+    forecast = yaml.safe_load(forecast_path.read_text(encoding="utf-8"))
 
     assert validator.derive_decision(data, validator.validate_registry(data)) == "accepted"
     assert data["review_status"] == "reviewed"
@@ -70,7 +77,7 @@ def test_run_registry_and_rebuilt_pack_use_reviewed_numeric_forecast():
     }
     assert forecast["status"] == "ready"
     assert forecast["scenarios"]["base_case"]["forecast_table"]["2026E"]["revenue"]["value"] > 0
-    assert "TODO_MODEL_INPUT" not in RUN_REGISTRY.read_text(encoding="utf-8")
+    assert "TODO_MODEL_INPUT" not in registry_path.read_text(encoding="utf-8")
 
 
 def test_reviewed_assumption_requires_anchor_and_reviewer_note():

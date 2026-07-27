@@ -4,11 +4,18 @@ import csv
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-STOCK_RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
-def test_data_layer_bridge_draft_exposes_metrics_and_todos() -> None:
-    draft = STOCK_RUN / "R4_stock_report_data_layer_bridge_draft.md"
+def _historical_path(name: str) -> str:
+    return f"{HISTORICAL_RUN}/{name}"
+
+
+def test_data_layer_bridge_draft_exposes_metrics_and_todos(historical_blob_file) -> None:
+    draft = historical_blob_file(
+        _historical_path("R4_stock_report_data_layer_bridge_draft.md"),
+        "data_layer_bridge/R4_stock_report_data_layer_bridge_draft.md",
+    )
     text = draft.read_text(encoding="utf-8")
 
     assert "## 2. Financial Quality Table" in text
@@ -24,15 +31,27 @@ def test_data_layer_bridge_draft_exposes_metrics_and_todos() -> None:
     assert "MISSING_DISCLOSURE" in text
 
 
-def test_data_layer_bridge_outputs_keep_boundaries() -> None:
-    draft = (STOCK_RUN / "R4_stock_report_data_layer_bridge_draft.md").read_text(encoding="utf-8")
-    readout = (STOCK_RUN / "data_layer_bridge_readout.md").read_text(encoding="utf-8")
+def test_data_layer_bridge_outputs_keep_boundaries(historical_blob_file) -> None:
+    draft_path = historical_blob_file(
+        _historical_path("R4_stock_report_data_layer_bridge_draft.md"),
+        "data_layer_bridge/R4_stock_report_data_layer_bridge_draft.md",
+    )
+    readout_path = historical_blob_file(
+        _historical_path("data_layer_bridge_readout.md"),
+        "data_layer_bridge/data_layer_bridge_readout.md",
+    )
+    issue_path = historical_blob_file(
+        _historical_path("data_layer_bridge_issue_list.csv"),
+        "data_layer_bridge/data_layer_bridge_issue_list.csv",
+    )
+    draft = draft_path.read_text(encoding="utf-8")
+    readout = readout_path.read_text(encoding="utf-8")
     issue_rows = list(
-        csv.DictReader((STOCK_RUN / "data_layer_bridge_issue_list.csv").open("r", encoding="utf-8", newline=""))
+        csv.DictReader(issue_path.open("r", encoding="utf-8", newline=""))
     )
 
     assert issue_rows
-    assert len((STOCK_RUN / "data_layer_bridge_issue_list.csv").read_text(encoding="utf-8").splitlines()) >= 4
+    assert len(issue_path.read_text(encoding="utf-8").splitlines()) >= 4
     assert {row["issue_id"] for row in issue_rows} == {"DLBR-001", "DLBR-002", "DLBR-003"}
     assert "Data Layer Pack Gate" in readout
     assert "structured snapshots remain metric-only | pass" in readout
@@ -43,10 +62,19 @@ def test_data_layer_bridge_outputs_keep_boundaries() -> None:
         assert forbidden not in readout
 
 
-def test_integrated_data_layer_debug_outputs_keep_todos_visible() -> None:
-    integrated = (STOCK_RUN / "integrated_data_layer_readout.md").read_text(encoding="utf-8")
-    gate = (STOCK_RUN / "quality_gate_report_after_data_layer_bridge.md").read_text(encoding="utf-8")
-    gaps = (STOCK_RUN / "remaining_source_gaps_after_data_layer_bridge.md").read_text(encoding="utf-8")
+def test_integrated_data_layer_debug_outputs_keep_todos_visible(historical_blob_file) -> None:
+    integrated = historical_blob_file(
+        _historical_path("integrated_data_layer_readout.md"),
+        "data_layer_bridge/integrated_data_layer_readout.md",
+    ).read_text(encoding="utf-8")
+    gate = historical_blob_file(
+        _historical_path("quality_gate_report_after_data_layer_bridge.md"),
+        "data_layer_bridge/quality_gate_report_after_data_layer_bridge.md",
+    ).read_text(encoding="utf-8")
+    gaps = historical_blob_file(
+        _historical_path("remaining_source_gaps_after_data_layer_bridge.md"),
+        "data_layer_bridge/remaining_source_gaps_after_data_layer_bridge.md",
+    ).read_text(encoding="utf-8")
 
     assert "status: accepted_with_todos" in integrated
     assert integrated.count("## ") >= 3

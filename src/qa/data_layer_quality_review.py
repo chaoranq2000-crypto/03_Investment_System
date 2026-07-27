@@ -16,6 +16,8 @@ ISSUE_FIELDNAMES = [
     "severity",
     "issue_class",
     "gate_id",
+    "local_check_id",
+    "mapped_global_gate_ids",
     "stage",
     "target_artifact",
     "description",
@@ -32,6 +34,17 @@ REQUIRED_PACKS = [
     "technical_snapshot.yaml",
     "source_gap_report.md",
 ]
+
+LOCAL_CHECK_GATE_MAP = {
+    "DLQ-1": ("G1",),
+    "DLQ-2": ("G1",),
+    "DLQ-3": ("G1", "G3"),
+    "DLQ-4": ("G3",),
+    "DLQ-5": ("G2", "G3", "G9"),
+    "DLQ-6": ("G3", "G7"),
+    "DLQ-7": ("G1", "G10"),
+    "DLQ-8": ("G7", "G10"),
+}
 
 
 def read_csv_dicts(path: Path) -> list[dict[str, str]]:
@@ -68,7 +81,7 @@ def add_issue(
     issues: list[dict[str, str]],
     *,
     severity: str,
-    gate_id: str,
+    local_check_id: str,
     stage: str,
     target_artifact: str,
     description: str,
@@ -79,14 +92,17 @@ def add_issue(
 ) -> None:
     severity = severity.lower()
     issue_class = "blocking_issue" if severity == "high" else "accepted_todo"
-    issue_id = issue_id or f"DLQ-{gate_id}-{len(issues) + 1:03d}"
+    mapped_gate_ids = LOCAL_CHECK_GATE_MAP[local_check_id]
+    issue_id = issue_id or f"{local_check_id}-{len(issues) + 1:03d}"
     status = status or ("open" if issue_class == "blocking_issue" else "accepted_todo")
     issues.append(
         {
             "issue_id": issue_id,
             "severity": severity,
             "issue_class": issue_class,
-            "gate_id": gate_id,
+            "gate_id": mapped_gate_ids[0],
+            "local_check_id": local_check_id,
+            "mapped_global_gate_ids": "|".join(mapped_gate_ids),
             "stage": stage,
             "target_artifact": target_artifact,
             "description": description,
@@ -107,7 +123,7 @@ def add_open_todos(run_dir: Path, issues: list[dict[str, str]]) -> None:
             issues,
             issue_id=row.get("issue_id", ""),
             severity=severity,
-            gate_id="G-DL8",
+            local_check_id="DLQ-8",
             stage=row.get("stage", "open_todos"),
             target_artifact=row.get("target_artifact", ""),
             description=row.get("description", ""),
@@ -155,7 +171,7 @@ def check_source_permission(
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL1",
+                local_check_id="DLQ-1",
                 stage="source_permission",
                 target_artifact=str(manifest_path),
                 description=f"source_name not in source_registry: {source_name}",
@@ -167,7 +183,7 @@ def check_source_permission(
                 add_issue(
                     issues,
                     severity="high",
-                    gate_id="G-DL1",
+                    local_check_id="DLQ-1",
                     stage="source_permission",
                     target_artifact=str(manifest_path),
                     description=f"{source_name} does not allow source_type={source_type}",
@@ -176,7 +192,7 @@ def check_source_permission(
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL1",
+                local_check_id="DLQ-1",
                 stage="source_permission",
                 target_artifact=str(manifest_path),
                 description="D-rank source must use material_claim_allowed=false",
@@ -185,7 +201,7 @@ def check_source_permission(
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL1",
+                local_check_id="DLQ-1",
                 stage="source_permission",
                 target_artifact=str(manifest_path),
                 description=f"{source_name} structured snapshot must stay metric_only",
@@ -207,7 +223,7 @@ def check_raw_archive(
                 add_issue(
                     issues,
                     severity="high",
-                    gate_id="G-DL2",
+                    local_check_id="DLQ-2",
                     stage="raw_archive",
                     target_artifact=row.get("evidence_id", ""),
                     description="archive policy requires raw_file_path",
@@ -216,7 +232,7 @@ def check_raw_archive(
                 add_issue(
                     issues,
                     severity="high",
-                    gate_id="G-DL2",
+                    local_check_id="DLQ-2",
                     stage="raw_archive",
                     target_artifact=target,
                     description="raw file path does not exist",
@@ -225,7 +241,7 @@ def check_raw_archive(
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL2",
+                local_check_id="DLQ-2",
                 stage="raw_archive",
                 target_artifact=row.get("evidence_id", ""),
                 description="manifest row lacks file/content/API hash",
@@ -246,7 +262,7 @@ def check_reproducibility(
                 add_issue(
                     issues,
                     severity="high" if field == "api_params_hash" else "medium",
-                    gate_id="G-DL3",
+                    local_check_id="DLQ-3",
                     stage="reproducibility",
                     target_artifact=str(manifest_path),
                     description=f"structured snapshot missing {field}",
@@ -273,7 +289,7 @@ def check_field_schema(
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL4",
+                local_check_id="DLQ-4",
                 stage="field_schema",
                 target_artifact=table,
                 description="processed table missing or empty",
@@ -283,7 +299,7 @@ def check_field_schema(
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL4",
+                local_check_id="DLQ-4",
                 stage="field_schema",
                 target_artifact=table,
                 description="normalized table lacks stock_code/ts_code/code",
@@ -292,7 +308,7 @@ def check_field_schema(
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL4",
+                local_check_id="DLQ-4",
                 stage="field_schema",
                 target_artifact=table,
                 description="normalized table lacks period/trade_date/as_of_date",
@@ -301,7 +317,7 @@ def check_field_schema(
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL4",
+                local_check_id="DLQ-4",
                 stage="field_schema",
                 target_artifact=table,
                 description="normalized table lacks metric fields",
@@ -319,7 +335,7 @@ def check_metric_only_boundary(
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL5",
+                local_check_id="DLQ-5",
                 stage="metric_only_boundary",
                 target_artifact=str(claims_path),
                 description="structured data generated claim candidates",
@@ -330,7 +346,7 @@ def check_metric_only_boundary(
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL5",
+                local_check_id="DLQ-5",
                 stage="metric_only_boundary",
                 target_artifact=str(path),
                 description="data layer artifact contains unsupported advice language",
@@ -344,7 +360,7 @@ def check_pack_completeness(run_dir: Path, issues: list[dict[str, str]]) -> None
             add_issue(
                 issues,
                 severity="medium",
-                gate_id="G-DL8",
+                local_check_id="DLQ-8",
                 stage="pack_completeness",
                 target_artifact=file_name,
                 description=f"required downstream pack missing: {file_name}",
@@ -355,7 +371,7 @@ def check_pack_completeness(run_dir: Path, issues: list[dict[str, str]]) -> None
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL6",
+                local_check_id="DLQ-6",
                 stage="freshness",
                 target_artifact="valuation_snapshot.yaml",
                 description="valuation snapshot lacks trade/as-of date",
@@ -370,7 +386,7 @@ def check_token_leak(run_dir: Path, issues: list[dict[str, str]]) -> None:
             add_issue(
                 issues,
                 severity="high",
-                gate_id="G-DL7",
+                local_check_id="DLQ-7",
                 stage="license_terms",
                 target_artifact=str(path),
                 description="artifact contains token_value field",
@@ -380,7 +396,7 @@ def check_token_leak(run_dir: Path, issues: list[dict[str, str]]) -> None:
                 add_issue(
                     issues,
                     severity="high",
-                    gate_id="G-DL7",
+                    local_check_id="DLQ-7",
                     stage="license_terms",
                     target_artifact=str(path),
                     description="artifact contains an environment token value",
@@ -421,14 +437,14 @@ def write_report(path: Path, *, final_status: str, issues: list[dict[str, str]])
         f"| medium_issues | {medium} |",
         f"| low_issues | {low} |",
         "",
-        "| gate | status |",
-        "|---|---|",
+        "| local_check_id | mapped_global_gate_ids | status |",
+        "|---|---|---|",
     ]
-    for gate in ["G-DL1", "G-DL2", "G-DL3", "G-DL4", "G-DL5", "G-DL6", "G-DL7", "G-DL8"]:
-        gate_issues = [issue for issue in issues if issue["gate_id"] == gate]
+    for local_check_id, mapped_gate_ids in LOCAL_CHECK_GATE_MAP.items():
+        gate_issues = [issue for issue in issues if issue["local_check_id"] == local_check_id]
         gate_blockers = [issue for issue in gate_issues if issue["issue_class"] == "blocking_issue"]
         status = "blocked" if gate_blockers else "accepted_todo" if gate_issues else "pass"
-        lines.append(f"| {gate} | {status} |")
+        lines.append(f"| {local_check_id} | {', '.join(mapped_gate_ids)} | {status} |")
     lines.extend(["", "## Blocking Issues", ""])
     if blocking_issues:
         lines.extend(["| issue_id | severity | target_artifact | description |", "|---|---|---|---|"])
@@ -466,7 +482,7 @@ def review_data_layer_run(
         add_issue(
             issues,
             severity="high",
-            gate_id="G-DL2",
+            local_check_id="DLQ-2",
             stage="raw_archive",
             target_artifact=str(manifest_path),
             description="workflow-local evidence_manifest.csv is missing or empty",

@@ -1,0 +1,320 @@
+state_schema_version: r5_v1
+decision_semantics_version: current_goal_v1
+final_report_review_semantics_version: final_report_review_v1
+workflow_id: wf_20260725_stock_first_002837_v1_policy_refresh
+workflow_type: stock_first_closed_loop
+run_mode: normal
+status: accepted_with_todos
+created_at: '2026-07-25'
+updated_at: '2026-07-25'
+owner: codex
+active_segment_id: ai_server_liquid_cooling
+active_company_id: cn_002837_invic
+current_stage: T10
+completed_stages:
+- T0
+- T1
+- T2
+- T3
+- T4
+- T5
+- T6
+- T7
+- T8
+- T9
+- T10
+next_stage: null
+active_skill: research-orchestrator
+required_next_skill: null
+automated_report_quality_passed: true
+system_v1_complete: false
+sample_quality_ready: false
+p2_ready: false
+release_ready: false
+final_report_review_status: not_requested
+final_report_review:
+  report_path: null
+  report_sha256: null
+  reviewer: null
+  reviewed_at: null
+  decision: not_requested
+  notes: null
+  change_scope: null
+evidence_snapshot:
+  manifest_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/inputs/input_provenance.csv
+  evidence_count: 2
+  input_file_count: 4
+  notes: two hash-bound official disclosures; offline only
+claims_snapshot:
+  draft_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/disclosed_facts.yaml
+  registry_path: data/manifests/claims_registry.csv
+  claim_count: 11
+  notes: direct facts plus one bounded relationship inference
+metrics_snapshot:
+  draft_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/disclosed_facts.yaml
+  registry_path: null
+  metric_count: 10
+  notes: direct-disclosure values only; no derived allocation
+artifacts:
+- artifact_type: workflow_state
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: canonical current-goal V1 state
+- artifact_type: run_log
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/run_log.md
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: exact offline refresh command and stage log
+- artifact_type: manifest
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/artifact_manifest.csv
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: current run artifact index
+- artifact_type: open_todos
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/open_todos.csv
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: four visible nonblocking research limitations
+- artifact_type: quality_gate_report
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/quality_gate_report.md
+  created_by_skill: quality-review
+  stage: T9
+  status: current
+  required: true
+  notes: canonical G0-G10 automatic quality snapshot
+- artifact_type: readout
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_readout.md
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: canonical policy-refresh readout
+- artifact_type: input_provenance
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/inputs/input_provenance.csv
+  created_by_skill: evidence-ingest
+  stage: T1
+  status: current
+  required: true
+  notes: four hash-bound official input files
+- artifact_type: disclosed_facts
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/disclosed_facts.yaml
+  created_by_skill: evidence-ingest
+  stage: T2
+  status: current
+  required: true
+  notes: page-located official facts and one bounded inference
+- artifact_type: limitations
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/limitations.yaml
+  created_by_skill: stock-deep-dive
+  stage: T7
+  status: current
+  required: true
+  notes: unknowns and prohibited calculations
+- artifact_type: issue_change_log
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/issue_change_log.csv
+  created_by_skill: refresh-research
+  stage: T9
+  status: current
+  required: true
+  notes: four historical issue policy reclassifications
+- artifact_type: stock_research_pack
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/stock_research_pack.yaml
+  created_by_skill: stock-deep-dive
+  stage: T7
+  status: current
+  required: true
+  notes: run-scoped disclosure-first research pack
+- artifact_type: segment_exposure
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/segment_exposure.yaml
+  created_by_skill: segment-company-mapping
+  stage: T6
+  status: current
+  required: true
+  notes: lower-bound liquid exposure with explicit allocation gaps
+- artifact_type: report
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/stock_report_draft.md
+  created_by_skill: stock-deep-dive
+  stage: T7
+  status: current
+  required: true
+  notes: gap-visible automatic report draft
+- artifact_type: backflow_decision
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/backflow_decision.yaml
+  created_by_skill: segment-company-mapping
+  stage: T8
+  status: current
+  required: true
+  notes: run-scoped exposure update; no global mutation
+- artifact_type: artifact_hashes
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/validation/artifact_hashes.csv
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: non-recursive generated-artifact hash index
+- artifact_type: replay_receipt
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/validation/replay_receipt.yaml
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: offline source and semantic receipt
+- artifact_type: idempotence_report
+  path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/validation/idempotence_report.yaml
+  created_by_skill: research-orchestrator
+  stage: T10
+  status: current
+  required: true
+  notes: two-pass byte comparison
+open_todos:
+- issue_id: R5V1P3-G3-001
+  historical_issue_id: R5B13R-G3-001
+  severity: high
+  stage: T9
+  gate_id: G3
+  target_artifact: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/stock_research_pack.yaml
+  description: 机房与机柜产品线的销量、单价和产品组合未披露；行业分类总销量仅展示，未拆分且未进入产品线驱动计算。
+  fix_owner_skill: evidence-ingest
+  status: open
+  created_at: '2026-07-25'
+  resolved_at: ''
+  notes: next_step=仅在发行人披露同期间同口径分产品数据后更新；324058台不得替代产品线销量
+  impact_scope: claim
+  active_disposition: unknown
+  affected_capabilities:
+  - room_cooling_driver_disaggregation
+  - cabinet_cooling_driver_disaggregation
+  blocks_current_goal: false
+  used_in_numeric_calculation: false
+- issue_id: R5V1P3-G3-002
+  historical_issue_id: R5B13R-G3-002
+  severity: high
+  stage: T9
+  gate_id: G3
+  target_artifact: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/stock_research_pack.yaml
+  description: 液冷单机价值、验收率和独立毛利率未披露；当前报告未建立该驱动模型。
+  fix_owner_skill: evidence-ingest
+  status: open
+  created_at: '2026-07-25'
+  resolved_at: ''
+  notes: next_step=仅在合同、验收或独立毛利披露出现后建立模型；大于2亿元的收入下界不得推导单位经济性
+  impact_scope: method
+  active_disposition: method_unavailable
+  affected_capabilities:
+  - liquid_driver_model
+  blocks_current_goal: false
+  used_in_numeric_calculation: false
+- issue_id: R5V1P3-G6-001
+  historical_issue_id: R5B13R-G6-001
+  severity: high
+  stage: T9
+  gate_id: G6
+  target_artifact: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/segment_exposure.yaml
+  description: 机房与液冷存在部分分类重叠，但具体收入和毛利分配金额未披露；当前没有执行分配或跨线相加。
+  fix_owner_skill: stock-deep-dive
+  status: open
+  created_at: '2026-07-25'
+  resolved_at: ''
+  notes: next_step=等待同期间可核验分配证据；在此之前保持金额unknown并禁止聚合
+  impact_scope: method
+  active_disposition: method_unavailable
+  affected_capabilities:
+  - room_liquid_exact_allocation
+  - cross_line_aggregation
+  blocks_current_goal: false
+  used_in_numeric_calculation: false
+- issue_id: R5V1P3-G6-002
+  historical_issue_id: R5B13R-G6-002
+  severity: high
+  stage: T9
+  gate_id: G6
+  target_artifact: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/segment_exposure.yaml
+  description: 机柜与液冷的关系未披露；当前既不主张overlap，也不主张never-overlap。
+  fix_owner_skill: stock-deep-dive
+  status: open
+  created_at: '2026-07-25'
+  resolved_at: ''
+  notes: next_step=等待发行人明确业务线归类或可核验分配证据；历史overlaps假设已退出当前口径
+  impact_scope: claim
+  active_disposition: unknown
+  affected_capabilities:
+  - cabinet_liquid_relationship
+  blocks_current_goal: false
+  used_in_numeric_calculation: false
+quality_gates:
+- gate_id: G0
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: 002837、两份正式披露、离线边界和目标run均明确。
+- gate_id: G1
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: 两份PDF与两份processed text哈希一致，页码locator全部解析。
+- gate_id: G2
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: 直接披露标为fact；room/liquid关系标为有边界的inference。
+- gate_id: G3
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: 使用的每个数均有期间、单位、来源、页码和方法；缺失驱动未使用。
+- gate_id: G4
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: ai_server_liquid_cooling exposure由正式披露下界与显式缺口支持。
+- gate_id: G5
+  status: not_applicable
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: 本次stock-first刷新不重建company universe。
+- gate_id: G6
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: room/liquid部分重叠与未知金额并存；cabinet关系保持unknown且未聚合。
+- gate_id: G7
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: 自动报告展示事实、来源、限制和TODO，无隐藏缺口。
+- gate_id: G8
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: backflow为run-scoped更新；未越权修改全局exposure。
+- gate_id: G9
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: 没有交易指令、仓位建议、收益保证或确定性承诺。
+- gate_id: G10
+  status: pass
+  checked_by: quality-review
+  checked_at: '2026-07-25'
+  notes: 六件套唯一，辅助产物、重放receipt和哈希索引齐全。
+entry_criteria:
+- P2 checkpoint passed
+- four official input files match fixed hashes
+- all required printed-page locators resolve
+- no network access
+exit_criteria:
+- standard six-piece control plane exists
+- current-goal workflow state validates
+- two materialization passes have zero byte drift
+- unknown values are visible and unused
+- historical workflow directories are not read
+notes: Automatic report quality passed. Four high-severity research limitations remain visible, unused and nonblocking; therefore the derived status is accepted_with_todos. Final report review is not requested.

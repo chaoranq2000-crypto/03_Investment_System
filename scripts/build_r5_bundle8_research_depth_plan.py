@@ -16,7 +16,6 @@ from typing import Any
 import yaml
 
 
-DEFAULT_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 BASELINE_COMMIT = "6513350ab371cd2e5612fe2fb4a3f4c1f2f5f9d0"
 
 BUNDLE8_CODES = {
@@ -322,7 +321,7 @@ def render_readout(plan: dict[str, Any]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[1]))
-    parser.add_argument("--workflow-run", default=DEFAULT_RUN)
+    parser.add_argument("--workflow-run", required=True)
     parser.add_argument("--backflow-plan")
     parser.add_argument("--output")
     parser.add_argument("--readout-output")

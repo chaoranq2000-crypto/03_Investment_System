@@ -4,31 +4,33 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
-def load(name):
-    return yaml.safe_load((RUN / name).read_text(encoding="utf-8"))
+def historical_yaml(historical_blob_bytes, name: str):
+    return yaml.safe_load(historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8"))
 
 
-def test_coverage_keeps_methods_and_liquid_cooling_boundary_visible():
-    coverage = load("R5_bundle6_coverage_inventory.yaml")
+def test_coverage_keeps_methods_and_liquid_cooling_boundary_visible(historical_blob_bytes):
+    coverage = historical_yaml(historical_blob_bytes, "R5_bundle6_coverage_inventory.yaml")
     assert any(x["dimension"] == "industry_and_competition" and x["review_status"].startswith("accepted") for x in coverage["dimensions"])
     assert any(x["dimension"] == "historical_market_series" and not x["mandatory"] for x in coverage["dimensions"])
     assert "unverified" in coverage["liquid_cooling_boundary"]
     assert not coverage["sample_quality_report_allowed"] and not coverage["p2_allowed"]
 
 
-def test_forecast_bridge_reconciles_eps_and_has_explicit_scenarios():
-    bridge = load("R5_bundle6_forecast_bridge.yaml")
+def test_forecast_bridge_reconciles_eps_and_has_explicit_scenarios(historical_blob_bytes):
+    bridge = historical_yaml(historical_blob_bytes, "R5_bundle6_forecast_bridge.yaml")
     assert set(bridge["scenarios"]) == {"base_case", "bull_case", "bear_case"}
     assert max(abs(r["reconciliation_difference"]) for r in bridge["base_case_bridge"]) < 1e-6
     assert len(bridge["sensitivity_variables"]) == 2
     assert "不直接年化" in bridge["latest_quarter_treatment"]["model_choice"]
 
 
-def test_valuation_has_date_denominator_and_inactive_methods_without_values():
-    value = load("R5_bundle6_valuation_reasoning_pack.yaml")
+def test_valuation_has_date_denominator_and_inactive_methods_without_values(historical_blob_bytes):
+    value = historical_yaml(
+        historical_blob_bytes, "R5_bundle6_valuation_reasoning_pack.yaml"
+    )
     assert value["as_of_date"] == "2026-07-10"
     assert "TTM" in value["dated_snapshot"]["denominator_control"]
     inactive = [x for x in value["method_eligibility"] if x["status"] == "inactive"]

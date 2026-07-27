@@ -9,7 +9,6 @@ from typing import Any, Mapping
 import yaml
 
 
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 SYNC_DATE = "2026-07-13"
 
 
@@ -48,6 +47,7 @@ def append_unique(items: list[Any], value: Any) -> None:
 
 def render_readout(
     run: Path,
+    workflow_id: str,
     scorecard: Mapping[str, Any],
     regression: Mapping[str, Any],
     cross: Mapping[str, Any],
@@ -56,7 +56,7 @@ def render_readout(
     summary = regression["full_repository"]["summary"]
     text = f"""# R5 Bundle 10 Automated Completion Readout
 
-- workflow_id: `{WORKFLOW_ID}`
+- workflow_id: `{workflow_id}`
 - sync_date: `{SYNC_DATE}`
 - automated_decision: `candidate_ready_for_human_review`
 - reader_score: `{scorecard['score']}/{scorecard['threshold']}`
@@ -110,6 +110,7 @@ Bundle 10 的自动化工作已全部完成：动态 Writer 不再硬编码公�
 
 def update_state(
     run: Path,
+    run_ref: str,
     scorecard: Mapping[str, Any],
     regression: Mapping[str, Any],
     cross: Mapping[str, Any],
@@ -158,7 +159,7 @@ def update_state(
         ("bundle10_internal_completion_readout", "bundle10_internal_completion_readout.md", "research-orchestrator", "T11", "current"),
     ]
     for artifact_type, name, skill, stage, status in core:
-        rel = f"reports/workflow_runs/{WORKFLOW_ID}/{name}"
+        rel = f"{run_ref}/{name}"
         if rel in existing_paths:
             continue
         state["artifacts"].append(
@@ -212,10 +213,10 @@ def update_state(
     else:
         existing_gate.update(gate_payload)
     state["reader_candidate_snapshot"] = {
-        "report_path": f"reports/workflow_runs/{WORKFLOW_ID}/R5_stock_research_report_reader_v3.md",
-        "traceability_path": f"reports/workflow_runs/{WORKFLOW_ID}/R5_stock_research_report_traceability_v3.yaml",
-        "scorecard_path": f"reports/workflow_runs/{WORKFLOW_ID}/R5_stock_research_report_reader_v3_quality_scorecard.yaml",
-        "human_review_handoff_path": f"reports/workflow_runs/{WORKFLOW_ID}/R5_stock_research_report_reader_v3_human_review.yaml",
+        "report_path": f"{run_ref}/R5_stock_research_report_reader_v3.md",
+        "traceability_path": f"{run_ref}/R5_stock_research_report_traceability_v3.yaml",
+        "scorecard_path": f"{run_ref}/R5_stock_research_report_reader_v3_quality_scorecard.yaml",
+        "human_review_handoff_path": f"{run_ref}/R5_stock_research_report_reader_v3_human_review.yaml",
         "report_sha256": handoff["reader_report_sha256"],
         "decision": scorecard["decision"],
         "quality_band": scorecard["quality_band"],
@@ -246,7 +247,7 @@ def update_state(
     }
     backflow = state.setdefault("quality_backflow", {})
     backflow["prior_source_scorecard"] = backflow.get("source_scorecard")
-    backflow["source_scorecard"] = f"reports/workflow_runs/{WORKFLOW_ID}/R5_stock_research_report_reader_v3_quality_scorecard.yaml"
+    backflow["source_scorecard"] = f"{run_ref}/R5_stock_research_report_reader_v3_quality_scorecard.yaml"
     backflow["decision"] = scorecard["decision"]
     backflow["quality_band"] = scorecard["quality_band"]
     backflow["score"] = scorecard["score"]
@@ -329,7 +330,7 @@ def artifact_specs() -> list[tuple[str, str, str, str, str]]:
     ]
 
 
-def update_artifact_manifest(repo_root: Path, run: Path) -> dict[str, int]:
+def update_artifact_manifest(repo_root: Path, run: Path, run_ref: str) -> dict[str, int]:
     path = run / "artifact_manifest.csv"
     fields, rows = read_csv(path)
     by_path = {row["path"]: row for row in rows}
@@ -341,7 +342,7 @@ def update_artifact_manifest(repo_root: Path, run: Path) -> dict[str, int]:
     next_number = max(numbers, default=0) + 1
     added = 0
     for artifact_type, name, skill, stage, notes in artifact_specs():
-        rel = f"reports/workflow_runs/{WORKFLOW_ID}/{name}"
+        rel = f"{run_ref}/{name}"
         if rel in by_path:
             by_path[rel]["notes"] = notes
             by_path[rel]["exists"] = "True"
@@ -400,9 +401,12 @@ def append_run_log(
     return True
 
 
-def sync_bundle10(repo_root: Path) -> dict[str, Any]:
+def sync_bundle10(repo_root: Path, run_root: Path) -> dict[str, Any]:
     repo_root = repo_root.resolve()
-    run = repo_root / "reports/workflow_runs" / WORKFLOW_ID
+    run = run_root if run_root.is_absolute() else repo_root / run_root
+    run = run.resolve()
+    run_ref = run.relative_to(repo_root).as_posix()
+    workflow_id = run.name
     validation = json.loads((run / "R5_bundle10_close_input_validation.json").read_text(encoding="utf-8"))
     if validation.get("decision") != "pass":
         raise ValueError("Bundle 10 deterministic validation is not pass")
@@ -429,15 +433,15 @@ def sync_bundle10(repo_root: Path) -> dict[str, Any]:
     handoff = load_yaml(run / "R5_stock_research_report_reader_v3_human_review.yaml")
     if handoff.get("status") != "pending_external_human_review":
         raise ValueError("external human-review boundary is not pending")
-    render_readout(run, scorecard, regression, cross, handoff)
-    state = update_state(run, scorecard, regression, cross, handoff)
+    render_readout(run, workflow_id, scorecard, regression, cross, handoff)
+    state = update_state(run, run_ref, scorecard, regression, cross, handoff)
     todos = update_open_todos(run)
-    artifacts = update_artifact_manifest(repo_root, run)
+    artifacts = update_artifact_manifest(repo_root, run, run_ref)
     log_appended = append_run_log(run, scorecard, regression, cross)
     return {
         "artifact_type": "R5_bundle10_external_review_pending_sync",
         "schema_version": "v0.1",
-        "workflow_id": WORKFLOW_ID,
+        "workflow_id": workflow_id,
         "automated_decision": scorecard["decision"],
         "reader_score": scorecard["score"],
         "truthfulness_status": scorecard["truthfulness_status"],
@@ -457,8 +461,9 @@ def sync_bundle10(repo_root: Path) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Synchronize Bundle 10 automated completion to external-review pending state.")
     parser.add_argument("--repo-root", default=".")
+    parser.add_argument("--run-root", type=Path, required=True)
     args = parser.parse_args()
-    result = sync_bundle10(Path(args.repo_root))
+    result = sync_bundle10(Path(args.repo_root), args.run_root)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 

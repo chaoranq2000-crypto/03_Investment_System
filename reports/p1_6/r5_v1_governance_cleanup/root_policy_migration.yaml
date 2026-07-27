@@ -1,0 +1,181 @@
+schema_version: r5_v1_root_policy_migration_v1
+task_id: v1_governance_integration_cleanup_v2
+decision_semantics_version: current_goal_v1
+final_report_review_semantics_version: final_report_review_v1
+migration_is_historical_resolution: false
+source_root_map:
+  path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
+  sha256: 39aadff44cf51d1ad5607d8ec8481bbab42650723eaf5a981415df0ee3facacf
+  engineering_source_revision: f60f220ae252262a537c612ce193fc779901984b
+  git_blob_oid: 526d9964a95ddc866fa960a1b9556e720ca80178
+migration_roots:
+  - root_cause_id: external_approval_and_independent_receipts_absent
+    historical_category: human_judgment_pending
+    historical_root_status: open
+    historical_resolved: false
+    primary_occurrence_count: 20
+    active_disposition: policy_retired
+    impact_scope: none
+    active_v1_impact: no_canonical_impact
+    blocks_current_goal: false
+    owner: external_review_lead
+    next_step: No active V1 action; do not reactivate candidate-level approval or independent-receipt human gates, and use final_report_review_v1 with a real reviewer only if a final report is produced.
+    affected_capabilities: []
+    evidence_references:
+      - role: historical_root
+        path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
+        selector: root_cause_id=external_approval_and_independent_receipts_absent
+      - role: active_policy
+        path: docs/workflows/RESEARCH_WORKFLOW.md
+        selector: final_report_review_v1
+      - role: active_policy
+        path: schemas/r5_final_report_review.schema.json
+        selector: final_report_review_v1
+    current_limitation_references: []
+    rationale: Intermediate human approvals of evidence, candidates and execution receipts are retired as active gates; machine provenance, hashes and replay receipts remain required, and no historical candidate or four-case goal is resolved.
+  - root_cause_id: analyst_conclusions_pending
+    historical_category: human_judgment_pending
+    historical_root_status: open
+    historical_resolved: false
+    primary_occurrence_count: 20
+    active_disposition: report_limitation
+    impact_scope: section
+    active_v1_impact: visible_nonblocking_report_limitation
+    blocks_current_goal: false
+    owner: research_owner
+    next_step: If a historical case resumes, derive only conclusions supported by reviewed evidence and keep unsupported drivers, forecasts, overlap, semantics and valuation conclusions unknown or omitted.
+    affected_capabilities:
+      - historical_case_driver_analysis
+      - historical_case_forecast_analysis
+      - historical_case_overlap_analysis
+      - historical_case_semantic_analysis
+      - historical_case_valuation_analysis
+    evidence_references:
+      - role: historical_root
+        path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
+        selector: root_cause_id=analyst_conclusions_pending
+      - role: active_policy
+        path: docs/policies/QUALITY_GUARDRAILS.md
+        selector: unknown_or_omit
+      - role: current_limitation_example
+        path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/limitations.yaml
+        selector: limitation_id=lim_room_cabinet_driver_disaggregation
+    current_limitation_references:
+      - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/limitations.yaml
+      - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/stock_report_draft.md
+    rationale: Missing analysis remains an explicit report limitation for any conclusion that depends on it; P3 is only the current policy example and does not resolve the historical occurrences.
+  - root_cause_id: reviewed_evidence_acceptance_absent
+    historical_category: obtainable_evidence_gap
+    historical_root_status: open
+    historical_resolved: false
+    primary_occurrence_count: 8
+    active_disposition: unknown
+    impact_scope: claim
+    active_v1_impact: visible_unused_claim_unknown
+    blocks_current_goal: false
+    owner: evidence-ingest
+    next_step: If a historical case resumes, acquire and review available official evidence, preserve genuinely unavailable fields as unknown and do not infer issuer disclosure.
+    affected_capabilities:
+      - historical_official_source_coverage
+      - historical_reviewed_evidence_coverage
+    evidence_references:
+      - role: historical_root
+        path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
+        selector: root_cause_id=reviewed_evidence_acceptance_absent
+      - role: active_policy
+        path: docs/policies/QUALITY_GUARDRAILS.md
+        selector: evidence_first_missing_visible
+      - role: current_limitation_example
+        path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/inputs/input_provenance.csv
+        selector: input_id=input_001
+    current_limitation_references:
+      - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/inputs/input_provenance.csv
+      - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/research/limitations.yaml
+    rationale: Evidence gaps constrain only dependent research claims and methods; no reviewed evidence, issuer disclosure or historical acceptance is fabricated by this policy migration.
+  - root_cause_id: suite_exact_hash_review_pending
+    historical_category: human_judgment_pending
+    historical_root_status: open
+    historical_resolved: false
+    primary_occurrence_count: 3
+    active_disposition: not_required_for_active_v1
+    impact_scope: none
+    active_v1_impact: no_canonical_impact
+    blocks_current_goal: false
+    owner: typed_external_reviewers
+    next_step: No active V1 action; keep artifact hashes as machine-integrity controls and do not request intermediate suite-hash human decisions, while only a final report hash may bind final_report_review_v1.
+    affected_capabilities: []
+    evidence_references:
+      - role: historical_root
+        path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
+        selector: root_cause_id=suite_exact_hash_review_pending
+      - role: active_policy
+        path: docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
+        selector: final_report_only_human_review
+      - role: active_policy
+        path: schemas/r5_final_report_review.schema.json
+        selector: report_sha256
+    current_limitation_references: []
+    rationale: The old Bundle14R-16R intermediate exact-hash review requirement is retired from active routing without inventing the three historical decisions.
+  - root_cause_id: legacy_quality_case_id_contract_gap
+    historical_category: engineering_defect
+    historical_root_status: open
+    historical_resolved: false
+    primary_occurrence_count: 4
+    active_disposition: historical_backlog
+    impact_scope: none
+    active_v1_impact: no_canonical_impact
+    blocks_current_goal: false
+    owner: quality-review
+    next_step: If historical execution resumes, create an explicit golden-to-operating case alias in a new run and validate all four cases without rewriting historical artifacts.
+    affected_capabilities: []
+    evidence_references:
+      - role: historical_root
+        path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
+        selector: root_cause_id=legacy_quality_case_id_contract_gap
+      - role: active_policy
+        path: docs/workflows/RESEARCH_WORKFLOW.md
+        selector: current_goal_v1
+    current_limitation_references: []
+    rationale: The defect remains historically open but belongs only to retired Bundle16R-Bundle17R compatibility and is not an active V1 engineering defect.
+  - root_cause_id: legacy_generation_id_pointer_contract_gap
+    historical_category: engineering_defect
+    historical_root_status: open
+    historical_resolved: false
+    primary_occurrence_count: 4
+    active_disposition: historical_backlog
+    impact_scope: none
+    active_v1_impact: no_canonical_impact
+    blocks_current_goal: false
+    owner: engineering_executor
+    next_step: If historical execution resumes, apply one run-scoped generation-id semantic repair and validate all four mapped cases without rewriting history.
+    affected_capabilities: []
+    evidence_references:
+      - role: historical_root
+        path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
+        selector: root_cause_id=legacy_generation_id_pointer_contract_gap
+      - role: active_policy
+        path: docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
+        selector: current_goal_v1
+    current_limitation_references: []
+    rationale: The four pointer occurrences remain historical backlog with duplicate semantics; no historical output is patched and the active V1 control plane does not consume them.
+  - root_cause_id: legacy_quality_ready_pointer_contract_gap
+    historical_category: engineering_defect
+    historical_root_status: open
+    historical_resolved: false
+    primary_occurrence_count: 4
+    active_disposition: historical_backlog
+    impact_scope: none
+    active_v1_impact: no_canonical_impact
+    blocks_current_goal: false
+    owner: engineering_executor
+    next_step: If historical execution resumes, apply one run-scoped quality-ready semantic repair and validate all four mapped cases without rewriting history.
+    affected_capabilities: []
+    evidence_references:
+      - role: historical_root
+        path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
+        selector: root_cause_id=legacy_quality_ready_pointer_contract_gap
+      - role: active_policy
+        path: docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md
+        selector: current_goal_v1
+    current_limitation_references: []
+    rationale: The four pointer occurrences remain historical backlog with duplicate semantics; no historical output is patched and the active V1 control plane does not consume them.

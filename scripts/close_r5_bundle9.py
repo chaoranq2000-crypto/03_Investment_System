@@ -9,7 +9,6 @@ from typing import Any, Mapping
 import yaml
 
 
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 CLOSE_DATE = "2026-07-13"
 
 
@@ -46,7 +45,11 @@ def append_unique(items: list[Any], value: Any) -> None:
         items.append(value)
 
 
-def update_workflow_state(run: Path, regression: Mapping[str, Any]) -> dict[str, int]:
+def update_workflow_state(
+    run: Path,
+    regression: Mapping[str, Any],
+    run_ref: str,
+) -> dict[str, int]:
     path = run / "workflow_state.yaml"
     state = load_yaml(path)
     state.update(
@@ -69,8 +72,8 @@ def update_workflow_state(run: Path, regression: Mapping[str, Any]) -> dict[str,
 
     state["forecast_snapshot"] = {
         "status": "ready_with_disclosure_todos",
-        "model_path": f"reports/workflow_runs/{WORKFLOW_ID}/segment_forecast_model.yaml",
-        "assumption_registry_path": f"reports/workflow_runs/{WORKFLOW_ID}/R5_bundle9_forecast_assumption_registry.yaml",
+        "model_path": f"{run_ref}/segment_forecast_model.yaml",
+        "assumption_registry_path": f"{run_ref}/R5_bundle9_forecast_assumption_registry.yaml",
         "scenario_count": 3,
         "forecast_periods": ["2026E", "2027E", "2028E"],
         "assumption_count": 42,
@@ -80,9 +83,9 @@ def update_workflow_state(run: Path, regression: Mapping[str, Any]) -> dict[str,
     state["valuation_snapshot_bundle9"] = {
         "status": "partial_with_todos",
         "valuation_as_of_date": "2026-07-10",
-        "pack_path": f"reports/workflow_runs/{WORKFLOW_ID}/R5_bundle9_valuation_pack.yaml",
-        "reverse_valuation_path": f"reports/workflow_runs/{WORKFLOW_ID}/reverse_valuation.yaml",
-        "scenario_valuation_path": f"reports/workflow_runs/{WORKFLOW_ID}/scenario_valuation.yaml",
+        "pack_path": f"{run_ref}/R5_bundle9_valuation_pack.yaml",
+        "reverse_valuation_path": f"{run_ref}/reverse_valuation.yaml",
+        "scenario_valuation_path": f"{run_ref}/scenario_valuation.yaml",
         "peer_set_quality": "LOW_CONFIDENCE_PEER_SET",
         "sample_quality_allowed": False,
     }
@@ -100,7 +103,7 @@ def update_workflow_state(run: Path, regression: Mapping[str, Any]) -> dict[str,
         ("bundle9_close_readout", "bundle9_close_readout.md", "research-orchestrator", "T11"),
     ]
     for artifact_type, name, skill, stage in core_artifacts:
-        rel = f"reports/workflow_runs/{WORKFLOW_ID}/{name}"
+        rel = f"{run_ref}/{name}"
         if rel in existing_paths:
             continue
         state_artifacts.append(
@@ -255,7 +258,7 @@ def artifact_specs() -> list[tuple[str, str, str, str, str]]:
     ]
 
 
-def update_artifact_manifest(repo_root: Path, run: Path) -> dict[str, int]:
+def update_artifact_manifest(repo_root: Path, run: Path, run_ref: str) -> dict[str, int]:
     path = run / "artifact_manifest.csv"
     fields, rows = read_csv(path)
     existing_paths = {row["path"] for row in rows}
@@ -267,7 +270,7 @@ def update_artifact_manifest(repo_root: Path, run: Path) -> dict[str, int]:
     next_number = max(numbers, default=0) + 1
     added = 0
     for artifact_type, name, skill, stage, notes in artifact_specs():
-        rel = f"reports/workflow_runs/{WORKFLOW_ID}/{name}"
+        rel = f"{run_ref}/{name}"
         if rel in existing_paths:
             continue
         if not (repo_root / rel).exists():
@@ -292,11 +295,15 @@ def update_artifact_manifest(repo_root: Path, run: Path) -> dict[str, int]:
     return {"rows": len(rows), "added": added}
 
 
-def render_close_readout(run: Path, regression: Mapping[str, Any]) -> None:
+def render_close_readout(
+    run: Path,
+    regression: Mapping[str, Any],
+    workflow_id: str,
+) -> None:
     summary = regression["full_repository"]["summary"]
     text = f"""# R5 Bundle 9 Local Close Readout
 
-- workflow_id: `{WORKFLOW_ID}`
+- workflow_id: `{workflow_id}`
 - close_date: `{CLOSE_DATE}`
 - decision: `accepted_with_todos`
 - bundle_closed: `true`
@@ -373,9 +380,12 @@ def append_run_log(run: Path, regression: Mapping[str, Any]) -> bool:
     return True
 
 
-def close_bundle9(repo_root: Path) -> dict[str, Any]:
+def close_bundle9(repo_root: Path, run_root: Path) -> dict[str, Any]:
     repo_root = repo_root.resolve()
-    run = repo_root / "reports/workflow_runs" / WORKFLOW_ID
+    run = run_root if run_root.is_absolute() else repo_root / run_root
+    run = run.resolve()
+    run_ref = run.relative_to(repo_root).as_posix()
+    workflow_id = run.name
     validation = json.loads((run / "R5_bundle9_close_input_validation.json").read_text(encoding="utf-8"))
     if validation.get("decision") != "pass":
         raise ValueError("Bundle 9 deterministic validation is not pass")
@@ -385,15 +395,15 @@ def close_bundle9(repo_root: Path) -> dict[str, Any]:
     regression = load_yaml(run / "R5_bundle9_regression_summary.yaml")
     if regression.get("full_repository", {}).get("status") != "pass":
         raise ValueError("Bundle 9 full repository regression is not pass")
-    render_close_readout(run, regression)
-    state_result = update_workflow_state(run, regression)
+    render_close_readout(run, regression, workflow_id)
+    state_result = update_workflow_state(run, regression, run_ref)
     todo_result = update_open_todos(run)
-    artifact_result = update_artifact_manifest(repo_root, run)
+    artifact_result = update_artifact_manifest(repo_root, run, run_ref)
     log_appended = append_run_log(run, regression)
     return {
         "artifact_type": "R5_bundle9_close_result",
         "schema_version": "v0.1",
-        "workflow_id": WORKFLOW_ID,
+        "workflow_id": workflow_id,
         "decision": "accepted_with_todos",
         "bundle_closed": True,
         "next_stage": "R5_bundle10_dynamic_writer_regression",
@@ -410,8 +420,9 @@ def close_bundle9(repo_root: Path) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Close Bundle 9 locally after quality and regression checks.")
     parser.add_argument("--repo-root", default=".")
+    parser.add_argument("--run-root", type=Path, required=True)
     args = parser.parse_args()
-    result = close_bundle9(Path(args.repo_root))
+    result = close_bundle9(Path(args.repo_root), args.run_root)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 

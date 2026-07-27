@@ -315,14 +315,8 @@ DEFAULT_WORKFLOW_TOKEN = "wf_20260703_stock_first_002837_invic"
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run Bundle 10 cross-industry dynamic Writer regression.")
     parser.add_argument("--cases", default="tests/fixtures/r5_reader_writer/cross_industry_cases.yaml")
-    parser.add_argument(
-        "--output-dir",
-        default="reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle10_cross_industry_regression",
-    )
-    parser.add_argument(
-        "--summary",
-        default="reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_bundle10_cross_industry_writer_regression.yaml",
-    )
+    parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--summary", required=True)
     args = parser.parse_args()
     result = run_regression(ROOT / args.cases, ROOT / args.output_dir)
     summary = ROOT / args.summary

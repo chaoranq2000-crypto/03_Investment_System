@@ -4,14 +4,12 @@ import importlib.util
 import sys
 from pathlib import Path
 
+import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-RUN_DIR = REPO_ROOT / "reports/workflow_runs" / WORKFLOW_ID
 SCRIPT = REPO_ROOT / "scripts/build_r5_bundle5_benchmark_coverage_precheck.py"
 PROFILE_PATH = REPO_ROOT / "codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml"
-RESULT_PATH = RUN_DIR / "R5_bundle5_benchmark_coverage_precheck.yaml"
 
 
 def load_module():
@@ -30,9 +28,71 @@ def load_yaml(path: Path):
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
-def test_recorded_precheck_covers_exact_profile_dimensions() -> None:
+@pytest.fixture
+def precheck_fixture(tmp_path: Path) -> dict:
     profile = load_yaml(PROFILE_PATH)
-    result = load_yaml(RESULT_PATH)
+    report_path = tmp_path / "research_draft.md"
+    pack_path = tmp_path / "research_pack.yaml"
+    quality_path = tmp_path / "quality_gate.yaml"
+    manifest_root = tmp_path / "manifests"
+    reviewed_input_root = tmp_path / "reviewed_inputs"
+    registry_dir = tmp_path / "registries"
+    manifest_root.mkdir()
+    reviewed_input_root.mkdir()
+    registry_dir.mkdir()
+    registration_path = manifest_root / "reviewed_registry.yaml"
+    sections = []
+    report_lines = ["# Fixture research draft"]
+    for index, dimension in enumerate(profile["coverage_dimensions"], 1):
+        title = f"Fixture section {index}"
+        evidence_id = f"ev_fixture_{index:02d}"
+        sections.append(
+            {
+                "section_id": dimension,
+                "title": title,
+                "readiness": "covered",
+                "evidence_ids": [evidence_id],
+                "visible_gaps": [],
+            }
+        )
+        report_lines.extend([f"## {title}", evidence_id])
+    report_path.write_text("\n".join(report_lines) + "\n", encoding="utf-8")
+    pack_path.write_text(
+        yaml.safe_dump({"report_sections": sections}, sort_keys=False),
+        encoding="utf-8",
+    )
+    quality_path.write_text(
+        yaml.safe_dump({"critical_quality_blockers": 0}, sort_keys=False),
+        encoding="utf-8",
+    )
+    registration_path.write_text(
+        "artifact_type: reviewed_fixture_registry\n",
+        encoding="utf-8",
+    )
+    result = PRECHECK.build_precheck(
+        REPO_ROOT,
+        workflow_id="wf_fixture_benchmark",
+        stock_code="300001",
+        profile_path=PROFILE_PATH,
+        report_path=report_path,
+        pack_path=pack_path,
+        quality_path=quality_path,
+        manifest_root=manifest_root,
+        reviewed_input_root=reviewed_input_root,
+        registry_dir=registry_dir,
+    )
+    return {
+        "profile": profile,
+        "result": result,
+        "report_path": report_path,
+    }
+
+
+def test_recorded_precheck_covers_exact_profile_dimensions(
+    precheck_fixture: dict,
+) -> None:
+    profile = precheck_fixture["profile"]
+    result = precheck_fixture["result"]
 
     expected = profile["coverage_dimensions"]
     actual = [row["dimension"] for row in result["coverage"]]
@@ -44,8 +104,10 @@ def test_recorded_precheck_covers_exact_profile_dimensions() -> None:
     assert result["unsupported_populated_sections"] == []
 
 
-def test_every_dimension_has_repository_support_or_visible_gap() -> None:
-    result = load_yaml(RESULT_PATH)
+def test_every_dimension_has_repository_support_or_visible_gap(
+    precheck_fixture: dict,
+) -> None:
+    result = precheck_fixture["result"]
 
     for row in result["coverage"]:
         assert row["rendered"] is True
@@ -72,9 +134,11 @@ def test_profile_alias_does_not_create_an_eleventh_dimension() -> None:
     assert row["support_check"] == "pass"
 
 
-def test_prohibited_language_injection_fails_the_filter() -> None:
-    profile = load_yaml(PROFILE_PATH)
-    clean_report = (RUN_DIR / "R5_stock_research_note_reviewed_input_draft.md").read_text(encoding="utf-8")
+def test_prohibited_language_injection_fails_the_filter(
+    precheck_fixture: dict,
+) -> None:
+    profile = precheck_fixture["profile"]
+    clean_report = precheck_fixture["report_path"].read_text(encoding="utf-8")
 
     assert PRECHECK.find_forbidden_language(clean_report, profile) == []
     assert PRECHECK.find_forbidden_language(clean_report + "\n建议买入\n", profile)
@@ -109,8 +173,10 @@ def test_not_applicable_cannot_hide_a_known_gap() -> None:
     assert any("cannot hide" in issue for issue in row["issues"])
 
 
-def test_sample_material_is_not_registered_as_evidence() -> None:
-    result = load_yaml(RESULT_PATH)
+def test_sample_material_is_not_registered_as_evidence(
+    precheck_fixture: dict,
+) -> None:
+    result = precheck_fixture["result"]
 
     assert result["sample_evidence_registered_count"] == 0
     assert result["sample_registration_scan"]["matches"] == []
@@ -118,8 +184,10 @@ def test_sample_material_is_not_registered_as_evidence() -> None:
     assert result["forbidden_language_check"] == {"status": "pass", "match_count": 0, "matches": []}
 
 
-def test_precheck_never_changes_report_or_p2_boundaries() -> None:
-    result = load_yaml(RESULT_PATH)
+def test_precheck_never_changes_report_or_p2_boundaries(
+    precheck_fixture: dict,
+) -> None:
+    result = precheck_fixture["result"]
 
     assert result["precheck_status"] == "pass"
     assert result["blockers"] == []

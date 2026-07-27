@@ -1,0 +1,77 @@
+schema_version: r5_v1_governance_cleanup_validation_v3
+validation_id: V-009
+phase: P5_v11_final
+checked_at: "2026-07-27T21:18:41+08:00"
+decision: pass
+phase_parent: bcb535618367024eb85f8bee7abb8419c56d75eb
+validated_implementation_head: f7ed76377594f789d4f9d1dadae6150abae179be
+authority:
+  contract_path: docs/codex_tasks/v1_governance_integration_cleanup_v11/CONTRACT.md
+  contract_sha256: 68028d41f366d535daf7647faa8aae408e167f5442a96ed2ff7a3c3aeca18aae
+  current_authority: A.11
+changed_paths:
+  package_files_added: 2
+  implementation_files_modified: 1
+  test_files_modified: 1
+  validation_or_checkpoint_files_modified_before_seal: 6
+  unauthorized_path_count: 0
+  deleted_path_count: 0
+  renamed_path_count: 0
+  type_change_count: 0
+criterion_binding:
+  scripts_manage_cleanup: V-006_cross_platform_fixed_windows_receipt
+  test_historical_cleanup_manifest: V-006_path_flavour_regression
+  validation_and_start_files: V-009_V-010_V-011_seal_evidence
+protected_checks:
+  frozen_v11_contract_changed_after_setup: false
+  prior_task_packages_changed: false
+  immutable_wave_manifests_or_receipts_changed: false
+  relative_or_absolute_vector_changed: false
+  deletion_runtime_containment_changed: false
+  data_raw_changed: false
+  original_root_map_changed: false
+  blocker_root_reconciliation_changed: false
+  completed_deletion_path_recreated: false
+  user_main_worktree_written: false
+quality_checks:
+  git_diff_check: pass
+  focused_portable_receipt: "3 passed"
+  v006: "30 passed"
+  v003: "194 passed"
+  v004: "two equal semantic/tree digests; 16 passed"
+  v005: "18 passed"
+  v008: "pass: 17 capabilities / 0 blockers"
+  full_pytest: "978 passed / 2 skipped / 0 failed"
+  clean_checkout_smoke: "978 passed / 2 skipped / 0 failed"
+  assertions_weakened: false
+  skip_xfail_mock_or_collection_bypass_added: false
+  dependency_added: false
+deletion:
+  v11_deletion_performed: false
+  extended_wave_count: 0
+  all_1386_files_absent: true
+  all_29_directories_absent: true
+  old_root_absent: true
+failed_candidate:
+  sha: bcb535618367024eb85f8bee7abb8419c56d75eb
+  push_ci_run: 30257647025
+  result: failure
+  pr_created: false
+  merged: false
+user_main_worktree:
+  head: a345fafb522300831ed4206d35fa17f44570cb1f
+  status_rows: 130
+  tracked_status_rows: 20
+  status_porcelain_v1_uall_bytes: 9156
+  status_porcelain_v1_uall_sha256: 1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0
+  tracked_status_porcelain_bytes: 1025
+  tracked_status_porcelain_sha256: 3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b
+  matches_authorized_snapshot: true
+remote_preflight:
+  state: pass
+  origin: https://github.com/chaoranq2000-crypto/03_Investment_System.git
+  main: a345fafb522300831ed4206d35fa17f44570cb1f
+  night05: a96c1b717bf15905d72fd142efd946fa01bce666
+  v1_source: f60f220ae252262a537c612ce193fc779901984b
+  execution_ref: bcb535618367024eb85f8bee7abb8419c56d75eb
+  matching_pr_count: 0

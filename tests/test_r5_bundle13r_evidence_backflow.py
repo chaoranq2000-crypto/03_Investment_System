@@ -23,16 +23,11 @@ FIXTURE_CONTRACT = load_yaml(
 )
 CONTRACT = FIXTURE_CONTRACT
 CONTEXT = ROOT / "tests" / "fixtures" / "r5_bundle13r" / "bundle12r_context"
-CANONICAL_CONTEXT = (
-    ROOT
-    / "reports"
-    / "workflow_runs"
-    / "wf_20260703_stock_first_002837_invic"
-    / "bundle12r"
+HISTORICAL_CONTEXT = (
+    "reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle12r"
 )
 READY = load_yaml(ROOT / "tests" / "fixtures" / "r5_bundle13r" / "reviewed_backfill_ready.yaml")
 PARTIAL = load_yaml(ROOT / "tests" / "fixtures" / "r5_bundle13r" / "reviewed_backfill_partial.yaml")
-INVALID = load_yaml(ROOT / "tests" / "fixtures" / "r5_bundle13r" / "reviewed_backfill_invalid.yaml")
 
 
 def codes(items):
@@ -65,9 +60,27 @@ def test_context_binds_to_exact_bundle12r_generation():
     assert artifacts["result"]["decision"] == "needs_backflow"
 
 
-def test_canonical_contract_binds_to_current_locked_bundle12r_generation():
+def test_canonical_contract_binds_to_current_locked_bundle12r_generation(
+    historical_blob_file,
+):
+    names = (
+        "R5_bundle12r_generation_lock.yaml",
+        "R5_bundle12r_backflow_plan.yaml",
+        "R5_bundle12r_research_question_plan.yaml",
+        "R5_bundle12r_operating_evidence_input_snapshot.yaml",
+        "R5_bundle12r_operating_evidence_result.yaml",
+    )
+    canonical_context = historical_blob_file(
+        f"{HISTORICAL_CONTEXT}/{names[0]}",
+        f"bundle12r_context/{names[0]}",
+    ).parent
+    for name in names[1:]:
+        historical_blob_file(
+            f"{HISTORICAL_CONTEXT}/{name}",
+            f"bundle12r_context/{name}",
+        )
     artifacts, issues = validate_bundle12r_context(
-        CANONICAL_CONTEXT,
+        canonical_context,
         CANONICAL_CONTRACT,
         verify_artifact_hashes=True,
     )
@@ -127,10 +140,13 @@ def test_partial_reviewed_backfill_stays_in_progress_without_inventing_values():
 
 def test_missing_evidence_and_locators_block_confirmed_promotion():
     _, queue = context_and_queue()
-    issues = validate_reviewed_backfill(INVALID, queue, CONTRACT)
+    invalid = deepcopy(READY)
+    invalid["responses"][0].pop("evidence_ids")
+    invalid["responses"][0].pop("locators")
+    issues = validate_reviewed_backfill(invalid, queue, CONTRACT)
     assert "OBSERVATION_EVIDENCE_IDS_MISSING" in codes(issues)
     assert "OBSERVATION_LOCATORS_MISSING" in codes(issues)
-    result = evaluate_backflow_execution(queue=queue, reviewed_backfill=INVALID, validation_issues=issues)
+    result = evaluate_backflow_execution(queue=queue, reviewed_backfill=invalid, validation_issues=issues)
     assert result["decision"] == "blocked_invalid_reviewed_backfill"
 
 

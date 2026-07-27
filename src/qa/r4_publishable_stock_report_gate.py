@@ -10,9 +10,6 @@ import yaml
 from check_no_unsupported_advice import find_unsupported_advice
 
 
-DATA_LAYER_RUN = Path("reports/workflow_runs/wf_20260703_data_layer_002837_invic")
-STOCK_RUN = Path("reports/workflow_runs/wf_20260703_stock_first_002837_invic")
-
 R4_REPORT = "R4_stock_deep_dive_v0_1.md"
 R4_GATE_REPORT = "R4_quality_gate_report.md"
 R4_SOURCE_GAP_REPORT = "R4_source_gap_report.md"
@@ -51,9 +48,11 @@ def _business_rows(stock_run: Path) -> list[dict[str, str]]:
     return _read_csv(stock_run / "business_segment_metric_pack.csv")
 
 
-def evaluate_r4_gate(*, repo_root: Path) -> dict[str, object]:
-    data_layer_run = repo_root / DATA_LAYER_RUN
-    stock_run = repo_root / STOCK_RUN
+def evaluate_r4_gate(
+    *,
+    data_layer_run: Path,
+    stock_run: Path,
+) -> dict[str, object]:
     official = _official_rows(data_layer_run)
     business = _business_rows(stock_run)
     issues: list[dict[str, str]] = []
@@ -124,15 +123,17 @@ def evaluate_r4_gate(*, repo_root: Path) -> dict[str, object]:
     }
 
 
-def write_source_gap_report(*, repo_root: Path) -> None:
-    data_layer_run = repo_root / DATA_LAYER_RUN
-    stock_run = repo_root / STOCK_RUN
+def write_source_gap_report(
+    *,
+    data_layer_run: Path,
+    stock_run: Path,
+) -> None:
     source_gap = (data_layer_run / "source_gap_report.md").read_text(encoding="utf-8")
     remaining = (stock_run / "remaining_source_gaps_after_data_layer_bridge.md").read_text(encoding="utf-8")
     lines = [
         "# R4 Source Gap Report",
         "",
-        "workflow_id: wf_20260703_stock_first_002837_invic",
+        f"workflow_id: {stock_run.name}",
         "status: source_gaps_visible",
         "",
         "## Data-layer Source Gaps",
@@ -227,9 +228,12 @@ def _peer_table(rows: list[dict[str, str]]) -> str:
     return _table(out)
 
 
-def write_r4_report(*, repo_root: Path, gate: dict[str, object]) -> None:
-    data_layer_run = repo_root / DATA_LAYER_RUN
-    stock_run = repo_root / STOCK_RUN
+def write_r4_report(
+    *,
+    data_layer_run: Path,
+    stock_run: Path,
+    gate: dict[str, object],
+) -> None:
     official = _official_rows(data_layer_run)
     business = _business_rows(stock_run)
     valuation = _load_yaml(data_layer_run / "valuation_snapshot.yaml")
@@ -275,7 +279,7 @@ def write_r4_report(*, repo_root: Path, gate: dict[str, object]) -> None:
         "| stock_code | 002837 |",
         "| company_name | 英维克 |",
         "| report_date | 2026-07-03 |",
-        "| workflow_run_id | wf_20260703_stock_first_002837_invic |",
+        f"| workflow_run_id | {stock_run.name} |",
         "| evidence_snapshot | annual_report + structured metric packs + R4 reconciliation packs |",
         "| data_layer_status | accepted_with_todos |",
         f"| quality_status | {gate['status']} |",
@@ -368,8 +372,11 @@ def write_r4_report(*, repo_root: Path, gate: dict[str, object]) -> None:
     (stock_run / R4_REPORT).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def write_quality_gate_report(*, repo_root: Path, gate: dict[str, object]) -> None:
-    stock_run = repo_root / STOCK_RUN
+def write_quality_gate_report(
+    *,
+    stock_run: Path,
+    gate: dict[str, object],
+) -> None:
     issues = gate["issues"]
     lines = [
         "# R4 Quality Gate Report",
@@ -443,7 +450,13 @@ def _update_artifact_manifest(stock_run: Path) -> None:
         writer.writerows(rows)
 
 
-def write_stage_readouts(*, repo_root: Path, gate: dict[str, object]) -> None:
+def write_stage_readouts(
+    *,
+    repo_root: Path,
+    stock_run: Path,
+    gate: dict[str, object],
+) -> None:
+    stock_ref = stock_run.relative_to(repo_root).as_posix()
     r4_gate = repo_root / "reports/p1_6/R4_PUBLISHABLE_STOCK_REPORT_GATE_READOUT.md"
     r4_draft = repo_root / "reports/p1_6/R4_STOCK_REPORT_DRAFT_V0_1_READOUT.md"
     r4_gate.write_text(
@@ -457,7 +470,7 @@ def write_stage_readouts(*, repo_root: Path, gate: dict[str, object]) -> None:
                 "## Outputs",
                 "",
                 "- `.agents/skills/stock-deep-dive/references/publishable_stock_report_gate.md`",
-                "- `reports/workflow_runs/wf_20260703_stock_first_002837_invic/R4_quality_gate_report.md`",
+                f"- `{stock_ref}/{R4_GATE_REPORT}`",
                 "",
                 "## Decision",
                 "",
@@ -479,9 +492,9 @@ def write_stage_readouts(*, repo_root: Path, gate: dict[str, object]) -> None:
                 "",
                 "## Outputs",
                 "",
-                f"- `reports/workflow_runs/wf_20260703_stock_first_002837_invic/{R4_REPORT}`",
-                f"- `reports/workflow_runs/wf_20260703_stock_first_002837_invic/{R4_GATE_REPORT}`",
-                f"- `reports/workflow_runs/wf_20260703_stock_first_002837_invic/{R4_SOURCE_GAP_REPORT}`",
+                f"- `{stock_ref}/{R4_REPORT}`",
+                f"- `{stock_ref}/{R4_GATE_REPORT}`",
+                f"- `{stock_ref}/{R4_SOURCE_GAP_REPORT}`",
                 "",
                 "## Boundary",
                 "",
@@ -496,22 +509,44 @@ def write_stage_readouts(*, repo_root: Path, gate: dict[str, object]) -> None:
     )
 
 
-def build_r4_outputs(*, repo_root: Path) -> dict[str, object]:
-    write_source_gap_report(repo_root=repo_root)
-    first_gate = evaluate_r4_gate(repo_root=repo_root)
-    write_r4_report(repo_root=repo_root, gate=first_gate)
-    final_gate = evaluate_r4_gate(repo_root=repo_root)
-    write_quality_gate_report(repo_root=repo_root, gate=final_gate)
-    _update_artifact_manifest(repo_root / STOCK_RUN)
-    write_stage_readouts(repo_root=repo_root, gate=final_gate)
+def build_r4_outputs(
+    *,
+    repo_root: Path,
+    data_layer_run: Path,
+    stock_run: Path,
+) -> dict[str, object]:
+    repo_root = repo_root.resolve()
+    data_layer_run = (
+        data_layer_run if data_layer_run.is_absolute() else repo_root / data_layer_run
+    ).resolve()
+    stock_run = (
+        stock_run if stock_run.is_absolute() else repo_root / stock_run
+    ).resolve()
+    write_source_gap_report(data_layer_run=data_layer_run, stock_run=stock_run)
+    first_gate = evaluate_r4_gate(data_layer_run=data_layer_run, stock_run=stock_run)
+    write_r4_report(
+        data_layer_run=data_layer_run,
+        stock_run=stock_run,
+        gate=first_gate,
+    )
+    final_gate = evaluate_r4_gate(data_layer_run=data_layer_run, stock_run=stock_run)
+    write_quality_gate_report(stock_run=stock_run, gate=final_gate)
+    _update_artifact_manifest(stock_run)
+    write_stage_readouts(repo_root=repo_root, stock_run=stock_run, gate=final_gate)
     return final_gate
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run R4 publishable stock report gate and write R4 draft outputs.")
     parser.add_argument("--repo-root", default=".")
+    parser.add_argument("--data-layer-run", type=Path, required=True)
+    parser.add_argument("--stock-run", type=Path, required=True)
     args = parser.parse_args(argv)
-    gate = build_r4_outputs(repo_root=Path(args.repo_root).resolve())
+    gate = build_r4_outputs(
+        repo_root=Path(args.repo_root).resolve(),
+        data_layer_run=args.data_layer_run,
+        stock_run=args.stock_run,
+    )
     print(gate)
     return 1 if gate["status"] == "blocked" else 0
 

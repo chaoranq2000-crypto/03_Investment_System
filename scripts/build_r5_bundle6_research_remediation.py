@@ -8,9 +8,6 @@ from pathlib import Path
 import yaml
 
 
-RUN_REL = Path("reports/workflow_runs/wf_20260703_stock_first_002837_invic")
-
-
 def load(path: Path):
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
@@ -19,7 +16,7 @@ def dump(path: Path, data):
     path.write_text(yaml.safe_dump(data, allow_unicode=True, sort_keys=False), encoding="utf-8")
 
 
-def build_coverage() -> tuple[dict, dict]:
+def build_coverage(workflow_id: str) -> tuple[dict, dict]:
     dimensions = [
         {"dimension": "company_context", "mandatory": True, "review_status": "accepted", "reviewed_evidence": ["2025 annual report, pages 11-14"], "missing_evidence": [], "preferred_source_type": "official_disclosure", "date_requirement": "cutoff_or_earlier", "expected_output": "company boundary", "owner": "stock-deep-dive"},
         {"dimension": "financial_history", "mandatory": True, "review_status": "accepted", "reviewed_evidence": ["2025 annual report, page 7", "2026Q1 report, pages 2 and 9"], "missing_evidence": [], "preferred_source_type": "official_disclosure", "date_requirement": "2023A-2026Q1", "expected_output": "history and cash conversion", "owner": "stock-deep-dive"},
@@ -31,7 +28,7 @@ def build_coverage() -> tuple[dict, dict]:
         {"dimension": "sentiment", "mandatory": False, "review_status": "omitted_unsupported", "reviewed_evidence": [], "missing_evidence": ["definitionally clear dated ownership, flow or consensus input"], "preferred_source_type": "reviewed_structured_data", "date_requirement": "dated", "expected_output": "optional", "owner": "evidence-ingest"},
     ]
     coverage = {
-        "artifact_type": "R5_bundle6_coverage_inventory", "schema_version": "v0.1", "workflow_id": "wf_20260703_stock_first_002837_invic", "as_of_date": "2026-07-12",
+        "artifact_type": "R5_bundle6_coverage_inventory", "schema_version": "v0.1", "workflow_id": workflow_id, "as_of_date": "2026-07-12",
         "dimensions": dimensions,
         "industry_reader_boundary": "发行人披露可支持需求驱动、产品链定位和竞争压力；独立市场规模与份额仍不作事实结论。",
         "liquid_cooling_boundary": {"confirmed": "产品暴露和端到端产品覆盖", "broad_economics": "机房与机柜温控宽口径", "unverified": "液冷独立收入、毛利率与利润贡献", "future_measurement": "后续官方分产品披露、订单与毛利率"},
@@ -111,13 +108,15 @@ def build_valuation(valuation: dict, bridge: dict) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[1]))
+    parser.add_argument("--run-root", type=Path, required=True)
     args = parser.parse_args()
     root = Path(args.repo_root).resolve()
-    run = root / RUN_REL
+    run = args.run_root if args.run_root.is_absolute() else root / args.run_root
+    run = run.resolve()
     financial = load(run / "R5_bundle5_financial_history_candidate.yaml")
     forecast = load(run / "R5_bundle5_forecast_model_candidate.yaml")
     valuation = load(run / "R5_bundle5_valuation_pack_candidate.yaml")
-    coverage, plan = build_coverage()
+    coverage, plan = build_coverage(run.name)
     bridge = build_forecast(financial, forecast, valuation)
     reasoning = build_valuation(valuation, bridge)
     for name, value in (("R5_bundle6_coverage_inventory.yaml", coverage), ("R5_bundle6_industry_event_market_input_plan.yaml", plan), ("R5_bundle6_forecast_bridge.yaml", bridge), ("R5_bundle6_valuation_reasoning_pack.yaml", reasoning)):

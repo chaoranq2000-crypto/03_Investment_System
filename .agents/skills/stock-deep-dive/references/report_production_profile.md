@@ -1,8 +1,15 @@
 # Stock Report Production Profile — stock-deep-dive reference
 
-本文件定义 `stock-deep-dive` 内部如何把 reviewed evidence、reviewed metrics、data-layer packs 和 analysis pack 转成接近样例质量的个股报告草稿。
+本文件定义 `stock-deep-dive` 内部如何把机器验证通过的 evidence、metric、
+data-layer packs 和 analysis pack 转成接近样例质量的个股报告草稿。
+
+保留路径或字段中的 `reviewed` 表示通过 provenance、schema、claim-type、
+metric、citation、hash 和 no-advice 机器检查，不表示人工批准。唯一活动
+人工边界是最终报告质量审核。
 
 它是 skill-local profile，不是平级 workflow。
+它只在调用方明确请求该 report capability 时使用，不默认调用
+Bundle11R–16R 或 `R5-G1`–`R5-G11` evaluator，也不直接决定 canonical workflow outcome。
 
 ```yaml
 profile_id: stock_report_production
@@ -23,12 +30,13 @@ primary_subject: single_stock
 | RP1 Evidence Plan | T1 | 生成或检查 `stock_evidence_plan.yaml`。 | `evidence-ingest` |
 | RP2 Evidence Acquire & Parse | T1 | 获取 / 登记 / 解析官方披露和结构化数据。 | `evidence-ingest` |
 | RP3 Candidate Generation | T1-T2 | 生成 claim / metric / business-line / exposure candidates。 | `evidence-ingest` |
-| RP4 Candidate Review | T2 | 晋升 reviewed claims / metrics。 | `quality-review` |
+| RP4 Candidate Machine Qualification | T2 | 机器验证并晋升 claims / metrics；不要求 reviewer。 | `quality-review` |
 | RP5 Analysis Pack Build | T2-T7 | 生成 `stock_analysis_pack.yaml`。 | `stock-deep-dive` |
 | RP6 Forecast & Valuation Context | T7 | `stock-deep-dive` prepares `forecast_model.yaml` + `valuation_request.yaml`; `company-valuation` produces valuation artifacts; `stock-deep-dive` consumes them during RP8 report draft. | `stock-deep-dive` + `company-valuation` |
 | RP7 Technical / Sentiment / Event Pack | T7 | 消费 data-layer packs，不足则保留 TODO。 | `stock-deep-dive` |
 | RP8 Report Draft | T7 | 从 analysis pack 生成 report draft，不新增事实。 | `stock-deep-dive` |
-| RP9 Quality Review | T9 | 执行 G1/G2/G3/G6/G7/G8/G9，必要时附加 QR-* 子检查。 | `quality-review` |
+| RP9 Automated Quality Review | T9 | 机器执行 G1/G2/G3/G6/G7/G8/G9，必要时附加 QR-* 子检查。 | `quality-review` |
+| RP9-F Final Report Human Review | T9 | 对唯一最终报告记录可选人审；`not_requested|pending` 不阻塞自动闭环。 | real reviewer + `research-orchestrator` |
 | RP10 Backflow & Maintenance | T8 | 回写 exposure / claims / metrics / refresh todo。 | `segment-company-mapping` |
 | RP11 Close Readout | T10 | 输出 final readout 和状态。 | `research-orchestrator` |
 
@@ -89,6 +97,10 @@ evidence_gap_request:
   blocking_level: high | medium | low
   owner_skill: evidence-ingest
 ```
+
+`blocking_level` 是 gap 风险提示，不是 canonical `blocks_current_goal`。
+只有结合 actual dependency、`impact_scope` 和 `active_disposition` 后才能
+形成工作流决定。
 
 ## RP2 Evidence Acquire & Parse
 
@@ -153,7 +165,7 @@ evidence_gap_requests.yaml
 - 风险因素。
 - 管理层对行业和未来的表述。
 
-## RP4 Candidate Review
+## RP4 Candidate Machine Qualification
 
 候选晋升规则：
 
@@ -162,7 +174,7 @@ claim_candidates.csv → reviewed_claims.csv / claims_registry.csv
 metric_candidates.csv → reviewed_metrics.csv / metrics_registry.csv
 ```
 
-晋升条件：
+上述 `reviewed_*` 文件名是兼容命名，表示机器 qualification。晋升条件：
 
 - `evidence_id` 存在。
 - `quote_or_excerpt`、`page_no` 或 `table_cell_locator` 可回溯。
@@ -172,7 +184,7 @@ metric_candidates.csv → reviewed_metrics.csv / metrics_registry.csv
 
 ## RP5 Analysis Pack Build
 
-由 `stock-deep-dive` 基于 reviewed claims / reviewed metrics / accepted estimates 输出分析包：
+由 `stock-deep-dive` 基于机器验证通过的 claims / metrics / estimates 输出分析包：
 
 ```text
 reports/workflow_runs/<workflow_id>/stock_analysis_pack.yaml
@@ -182,7 +194,8 @@ reports/workflow_runs/<workflow_id>/financial_quality.yaml
 reports/workflow_runs/<workflow_id>/risk_counter_evidence.yaml
 ```
 
-`stock_analysis_pack.yaml` 是报告写作的唯一上游。不允许报告正文从未审查证据自由发挥。
+`stock_analysis_pack.yaml` 是报告写作的唯一上游。不允许报告正文从未通过
+机器验证的证据自由发挥。
 
 ## RP6 Forecast & Valuation Context
 
@@ -282,9 +295,10 @@ writer_gap_requests.yaml
 
 Valuation section must be assembled from `valuation/valuation_section_draft.md` or show visible valuation TODOs. The prose layer must not create new valuation facts.
 
-## RP9 Quality Review
+## RP9 Automated Quality Review
 
-由 `quality-review` 执行全局 gate 和局部 subchecks。
+由 `quality-review` 以机器方式执行全局 gate 和局部 subchecks。此步骤不创建
+reviewer authority、不签署 candidate、不批准 generation lock。
 
 全局 gate 来自 `RESEARCH_WORKFLOW.md`：
 
@@ -308,14 +322,68 @@ quality_gate_report.md
 stock_report_acceptance_checklist.yaml
 ```
 
-判定：
+每条 issue 必须包含：
 
 ```text
-accepted_sample_quality
-accepted_with_todos
-needs_fix
-blocked
+impact_scope
+active_disposition
+affected_capabilities
+blocks_current_goal
+local_check_id
+mapped_global_gate_ids
 ```
+
+判定使用 `RESEARCH_WORKFLOW.md` 的四个 canonical outcomes：
+
+| outcome | report-production interpretation |
+|---|---|
+| `accepted` | 自动质量通过，没有活动限制或 TODO。 |
+| `accepted_with_todos` | unknown / limitation 可见且没有被当前报告无依据使用。 |
+| `needs_fix` | unsupported-used、错误计算、真实 double-count、引用断裂、hidden TODO 或 no-advice 违规。 |
+| `blocked` | identity/path/parse/source identity 或不可替代必要输入失败，导致任何诚实报告都无法生成。 |
+
+Severity 只描述风险，不单独决定 outcome。缺失数据按 direct disclosure →
+audited aggregate → bounded estimate/scenario → unknown/omit 降级，并只关闭
+实际依赖它的 section、claim、calculation 或 method。
+
+R5-G1–R5-G11 and Bundle11R–16R are explicit capability-local evaluators only.
+When explicitly invoked, their local IDs map to G0–G10 and may update only
+`affected_capabilities`; their local result cannot overwrite the canonical status.
+
+## RP9-F Final Report Human Review
+
+自动质量结果与最终报告人审分开记录：
+
+```text
+automated_report_quality_passed
+final_report_review_status:
+  not_requested | pending | approved | changes_requested
+final_report_review:
+  report_path
+  report_sha256
+  reviewer
+  reviewed_at
+  decision
+  notes
+  change_scope
+```
+
+`pending` 由机器绑定 repo-relative 最终报告路径和当前字节 SHA-256；
+reviewer、时间、备注、`change_scope` 为空。`approved|changes_requested`
+还要求真实非机器 reviewer、ISO 时间和非空备注；`decision` 等于顶层
+status。`change_scope` 只在 `changes_requested` 中取
+`automated_quality_defect|report_revision`。
+
+报告字节变化使旧决定失效。`not_requested|pending` 不改变自动 outcome，
+不阻止 `system_v1_complete`，但 `sample_quality_ready=false`。全部必要
+自动质量条件通过、当前报告 `approved` 且 hash 匹配，以及其他适用样例质量
+条件，都是 `sample_quality_ready=true` 的必要条件，不构成自动充分条件。
+
+若 `changes_requested` 揭示自动质量缺陷，则路由 `needs_fix`；若
+`change_scope=report_revision`，只返回 RP8 修订最终报告。中间 evidence、
+claim、metric、candidate、计算、pack、generation lock 和 receipt 的 hash
+仅用于机器完整性。历史 Bundle/Night/Reader 人审只读，不能迁移 reviewer
+或决定。
 
 ## RP10 Backflow & Maintenance
 
@@ -332,7 +400,7 @@ refresh_log.md
 
 回写规则：
 
-- Exposure update 必须有 reviewed claim、reviewed metric 或 accepted TODO。
+- Exposure update 必须有机器验证通过的 claim、metric 或 accepted TODO。
 - Forecast / valuation 不回写为事实，只回写为 model snapshot。
 - Clue 不回写为 claim。
 - 报告状态和证据状态必须更新。
@@ -352,6 +420,12 @@ reviewed_metrics:
 open_gaps:
 high_issues:
 medium_issues:
+blocks_current_goal_count:
+affected_capabilities:
+automated_report_quality_passed:
+final_report_review_status:
+final_report_review_path:
+final_report_review_sha256:
 backflow_decision:
 next_run_recommendation:
 ```

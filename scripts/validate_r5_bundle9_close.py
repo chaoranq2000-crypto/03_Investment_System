@@ -9,7 +9,6 @@ from typing import Any, Mapping, Sequence
 import yaml
 
 
-DEFAULT_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 FORBIDDEN = ("买入", "卖出", "持有", "目标价", "仓位", "保证收益")
 
 
@@ -226,7 +225,7 @@ def validate_bundle9(repo_root: Path, workflow_id: str) -> dict[str, Any]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate Bundle 9 forecast and valuation close inputs.")
     parser.add_argument("--repo-root", default=".")
-    parser.add_argument("--workflow-id", default=DEFAULT_WORKFLOW_ID)
+    parser.add_argument("--workflow-id", required=True)
     parser.add_argument("--output", default="")
     args = parser.parse_args(argv)
     payload = validate_bundle9(Path(args.repo_root), args.workflow_id)

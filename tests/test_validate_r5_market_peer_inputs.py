@@ -9,8 +9,7 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / ".agents/skills/stock-deep-dive/scripts/validate_r5_market_peer_inputs.py"
-MARKET_PATH = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_market_snapshot_stub.yaml"
-PEER_PATH = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_peer_snapshot_stub.yaml"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
 def load_validator():
@@ -28,25 +27,42 @@ def load_yaml(path: Path) -> dict:
     return data
 
 
-def test_source_gapped_todo_stubs_are_accepted():
+def _inputs(historical_blob_file) -> tuple[Path, Path]:
+    market_path = historical_blob_file(
+        f"{HISTORICAL_RUN}/R5_market_snapshot_stub.yaml",
+        "market_peer_inputs/R5_market_snapshot_stub.yaml",
+    )
+    peer_path = historical_blob_file(
+        f"{HISTORICAL_RUN}/R5_peer_snapshot_stub.yaml",
+        "market_peer_inputs/R5_peer_snapshot_stub.yaml",
+    )
+    return market_path, peer_path
+
+
+def test_source_gapped_todo_stubs_are_accepted(historical_blob_file):
     validator = load_validator()
-    errors = validator.validate_inputs(load_yaml(MARKET_PATH), load_yaml(PEER_PATH))
+    market_path, peer_path = _inputs(historical_blob_file)
+    errors = validator.validate_inputs(load_yaml(market_path), load_yaml(peer_path))
 
     assert errors == []
 
 
-def test_sample_quality_candidate_requires_reviewed_inputs():
+def test_sample_quality_candidate_requires_reviewed_inputs(historical_blob_file):
     validator = load_validator()
-    errors = validator.validate_inputs(load_yaml(MARKET_PATH), load_yaml(PEER_PATH), level="sample_quality_candidate")
+    market_path, peer_path = _inputs(historical_blob_file)
+    errors = validator.validate_inputs(
+        load_yaml(market_path), load_yaml(peer_path), level="sample_quality_candidate"
+    )
 
     assert any("reviewed market snapshot" in error for error in errors)
     assert any("reviewed peer snapshot" in error for error in errors)
 
 
-def test_todo_market_stub_cannot_carry_unreviewed_numeric_values():
+def test_todo_market_stub_cannot_carry_unreviewed_numeric_values(historical_blob_file):
     validator = load_validator()
-    market = copy.deepcopy(load_yaml(MARKET_PATH))
-    peer = load_yaml(PEER_PATH)
+    market_path, peer_path = _inputs(historical_blob_file)
+    market = copy.deepcopy(load_yaml(market_path))
+    peer = load_yaml(peer_path)
     market["market_fields"]["current_price"] = 99.9
 
     errors = validator.validate_inputs(market, peer)
@@ -54,8 +70,9 @@ def test_todo_market_stub_cannot_carry_unreviewed_numeric_values():
     assert any("current_price" in error for error in errors)
 
 
-def test_cli_accepts_source_gapped_stubs(capsys):
+def test_cli_accepts_source_gapped_stubs(capsys, historical_blob_file):
     validator = load_validator()
+    market_path, peer_path = _inputs(historical_blob_file)
 
-    assert validator.main(["--market", str(MARKET_PATH), "--peer", str(PEER_PATH)]) == 0
+    assert validator.main(["--market", str(market_path), "--peer", str(peer_path)]) == 0
     assert "accepted_with_todos" in capsys.readouterr().out

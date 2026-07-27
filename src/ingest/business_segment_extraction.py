@@ -8,7 +8,6 @@ from typing import Sequence
 import yaml
 
 
-STOCK_RUN = Path("reports/workflow_runs/wf_20260703_stock_first_002837_invic")
 OFFICIAL_EVIDENCE_ID = "ev_annual_report_002837_20260421_ce7f64"
 
 FIELDNAMES = [
@@ -294,8 +293,12 @@ def write_stage_readout(repo_root: Path, rows: list[dict[str, str]]) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def build_business_segment_pack(*, repo_root: Path) -> list[dict[str, str]]:
-    stock_run = repo_root / STOCK_RUN
+def build_business_segment_pack(
+    *,
+    repo_root: Path,
+    workflow_run: Path,
+) -> list[dict[str, str]]:
+    stock_run = workflow_run if workflow_run.is_absolute() else repo_root / workflow_run
     rows = build_business_segment_rows()
     write_pack(stock_run / "business_segment_metric_pack.csv", rows)
     write_readout(stock_run / "business_segment_extraction_readout.md", rows)
@@ -309,9 +312,16 @@ def build_business_segment_pack(*, repo_root: Path) -> list[dict[str, str]]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build business segment metric pack for R4 readiness.")
     parser.add_argument("--repo-root", default=".")
+    parser.add_argument("--workflow-run", required=True)
     args = parser.parse_args(argv)
-    rows = build_business_segment_pack(repo_root=Path(args.repo_root).resolve())
-    print({"rows": len(rows), "output": PACK_POSIX})
+    repo_root = Path(args.repo_root).resolve()
+    workflow_run = Path(args.workflow_run)
+    rows = build_business_segment_pack(
+        repo_root=repo_root,
+        workflow_run=workflow_run,
+    )
+    output = workflow_run / "business_segment_metric_pack.csv"
+    print({"rows": len(rows), "output": output.as_posix()})
     return 0
 
 

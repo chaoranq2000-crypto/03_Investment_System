@@ -63,10 +63,7 @@ def _render_readout(report: dict[str, Any]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[1]))
-    parser.add_argument(
-        "--workflow-run",
-        default="reports/workflow_runs/wf_20260703_stock_first_002837_invic",
-    )
+    parser.add_argument("--workflow-run", required=True)
     parser.add_argument("--config", default="config/r5_bundle8_research_depth.yaml")
     parser.add_argument("--source-catalog")
     parser.add_argument("--coverage-matrix")

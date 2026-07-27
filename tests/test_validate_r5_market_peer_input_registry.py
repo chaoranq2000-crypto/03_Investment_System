@@ -6,7 +6,10 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / ".agents/skills/stock-deep-dive/scripts/validate_r5_market_peer_input_registry.py"
-RUN_REGISTRY = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_market_peer_input_registry.yaml"
+HISTORICAL_REGISTRY = (
+    "reports/workflow_runs/wf_20260703_stock_first_002837_invic/"
+    "R5_market_peer_input_registry.yaml"
+)
 
 
 def load_validator():
@@ -16,6 +19,10 @@ def load_validator():
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def load_registry(validator, path: Path):
+    return validator.load_yaml(path)
 
 
 def pending_registry():
@@ -51,9 +58,12 @@ def test_pending_registry_passes_with_visible_todos():
     assert validator.derive_decision(data, issues) == "accepted_with_todos"
 
 
-def test_run_registry_is_reviewed_but_capped_below_sample_quality():
+def test_run_registry_is_reviewed_but_capped_below_sample_quality(historical_blob_file):
     validator = load_validator()
-    data = validator.load_yaml(RUN_REGISTRY)
+    registry_path = historical_blob_file(
+        HISTORICAL_REGISTRY, "market_peer_registry/R5_market_peer_input_registry.yaml"
+    )
+    data = load_registry(validator, registry_path)
     issues = validator.validate_registry(data)
 
     assert validator.derive_decision(data, issues) == "accepted"

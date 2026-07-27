@@ -7,7 +7,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-STOCK_RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
 def _read_csv(path: Path) -> list[dict[str, str]]:
@@ -15,9 +15,23 @@ def _read_csv(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
-def test_product_line_clue_backflows_only_product_exposure() -> None:
-    review = yaml.safe_load((STOCK_RUN / "exposure_backflow_review.yaml").read_text(encoding="utf-8"))
-    local = yaml.safe_load((STOCK_RUN / "segment_exposure.yaml").read_text(encoding="utf-8"))
+def _historical_path(name: str) -> str:
+    return f"{HISTORICAL_RUN}/{name}"
+
+
+def test_product_line_clue_backflows_only_product_exposure(historical_blob_file) -> None:
+    review = yaml.safe_load(
+        historical_blob_file(
+            _historical_path("exposure_backflow_review.yaml"),
+            "segment_backflow/exposure_backflow_review.yaml",
+        ).read_text(encoding="utf-8")
+    )
+    local = yaml.safe_load(
+        historical_blob_file(
+            _historical_path("segment_exposure.yaml"),
+            "segment_backflow/segment_exposure.yaml",
+        ).read_text(encoding="utf-8")
+    )
     liquid = next(item for item in local["linked_segments"] if item["segment_id"] == "ai_server_liquid_cooling")
 
     assert review["decision"] == "update_exposure"
@@ -50,9 +64,17 @@ def test_company_universe_matches_backflow_registry_update() -> None:
         assert universe_row[field] == exposure_row[field]
 
 
-def test_backflow_review_has_change_note_and_next_action() -> None:
-    text = (STOCK_RUN / "exposure_backflow_review.md").read_text(encoding="utf-8")
-    review = yaml.safe_load((STOCK_RUN / "exposure_backflow_review.yaml").read_text(encoding="utf-8"))
+def test_backflow_review_has_change_note_and_next_action(historical_blob_file) -> None:
+    text = historical_blob_file(
+        _historical_path("exposure_backflow_review.md"),
+        "segment_backflow/exposure_backflow_review.md",
+    ).read_text(encoding="utf-8")
+    review = yaml.safe_load(
+        historical_blob_file(
+            _historical_path("exposure_backflow_review.yaml"),
+            "segment_backflow/exposure_backflow_review.yaml",
+        ).read_text(encoding="utf-8")
+    )
 
     assert "product-only" in text
     assert review["next_action"]

@@ -102,12 +102,8 @@ def write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> 
         writer.writerows(rows)
 
 
-def make_workflow_run(case_name: str) -> Path:
-    run = (
-        REPO_ROOT
-        / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/.tmp_mineru_output/valuation_input_contract_tests"
-        / case_name
-    )
+def make_workflow_run(tmp_path: Path, case_name: str) -> Path:
+    run = tmp_path / "valuation_input_contract_tests" / case_name
     run.mkdir(parents=True, exist_ok=True)
     stock_code = "002837"
     company_id = "cn_002837_invic"
@@ -274,15 +270,15 @@ def test_templates_are_parseable() -> None:
     assert "valuation_input_readiness" in readiness
 
 
-def test_todo_blank_numeric_fields_pass() -> None:
-    run = make_workflow_run("todo_blank_numeric_fields_pass")
+def test_todo_blank_numeric_fields_pass(tmp_path: Path) -> None:
+    run = make_workflow_run(tmp_path, "todo_blank_numeric_fields_pass")
     result = run_validator(run)
     assert result.returncode == 0, result.stdout + result.stderr
     assert "accepted_with_todos" in result.stdout
 
 
-def test_missing_required_columns_fail() -> None:
-    run = make_workflow_run("missing_required_columns_fail")
+def test_missing_required_columns_fail(tmp_path: Path) -> None:
+    run = make_workflow_run(tmp_path, "missing_required_columns_fail")
     bad_columns = MARKET_COLUMNS[:-1]
     write_csv(run / "market_snapshot.csv", bad_columns, [{column: "" for column in bad_columns}])
     result = run_validator(run)
@@ -290,8 +286,8 @@ def test_missing_required_columns_fail() -> None:
     assert "CSV_MISSING_COLUMNS" in result.stdout
 
 
-def test_ready_status_without_sources_fails() -> None:
-    run = make_workflow_run("ready_status_without_sources_fails")
+def test_ready_status_without_sources_fails(tmp_path: Path) -> None:
+    run = make_workflow_run(tmp_path, "ready_status_without_sources_fails")
     readiness = yaml.safe_load((run / "valuation_input_readiness.yaml").read_text(encoding="utf-8"))
     entry = readiness["valuation_input_readiness"]["statuses"]["financial_metric_pack"]
     entry["status"] = "ready"
@@ -306,8 +302,8 @@ def test_ready_status_without_sources_fails() -> None:
     assert "READY_WITHOUT_SOURCE" in result.stdout
 
 
-def test_prohibited_advice_language_fails() -> None:
-    run = make_workflow_run("prohibited_advice_language_fails")
+def test_prohibited_advice_language_fails(tmp_path: Path) -> None:
+    run = make_workflow_run(tmp_path, "prohibited_advice_language_fails")
     rows = list(csv.DictReader((run / "market_snapshot.csv").open("r", encoding="utf-8", newline="")))
     rows[0]["limitations"] = "建议" + "买" + "入"
     write_csv(run / "market_snapshot.csv", MARKET_COLUMNS, rows)
@@ -316,8 +312,8 @@ def test_prohibited_advice_language_fails() -> None:
     assert "NO_ADVICE_VIOLATION" in result.stdout
 
 
-def test_identity_mismatch_fails() -> None:
-    run = make_workflow_run("identity_mismatch_fails")
+def test_identity_mismatch_fails(tmp_path: Path) -> None:
+    run = make_workflow_run(tmp_path, "identity_mismatch_fails")
     rows = list(csv.DictReader((run / "market_snapshot.csv").open("r", encoding="utf-8", newline="")))
     rows[0]["stock_code"] = "000001"
     write_csv(run / "market_snapshot.csv", MARKET_COLUMNS, rows)

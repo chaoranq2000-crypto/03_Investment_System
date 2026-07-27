@@ -11,11 +11,19 @@ sys.path.insert(0, str(ROOT / "src" / "ingest"))
 from business_segment_extraction import FIELDNAMES, build_business_segment_rows  # noqa: E402
 
 
-STOCK_RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
-def test_business_segment_metric_pack_schema_is_stable() -> None:
-    with (STOCK_RUN / "business_segment_metric_pack.csv").open("r", encoding="utf-8", newline="") as handle:
+def _historical_path(name: str) -> str:
+    return f"{HISTORICAL_RUN}/{name}"
+
+
+def test_business_segment_metric_pack_schema_is_stable(historical_blob_file) -> None:
+    pack = historical_blob_file(
+        _historical_path("business_segment_metric_pack.csv"),
+        "business_segment/business_segment_metric_pack.csv",
+    )
+    with pack.open("r", encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
 
     assert rows
@@ -41,7 +49,11 @@ def test_reviewed_official_rows_have_official_evidence_id() -> None:
     assert all(row["official_evidence_id"].startswith("ev_annual_report_") for row in reviewed)
 
 
-def test_missing_disclosure_continues_into_source_gap_report() -> None:
-    gaps = (STOCK_RUN / "remaining_source_gaps_after_data_layer_bridge.md").read_text(encoding="utf-8")
+def test_missing_disclosure_continues_into_source_gap_report(historical_blob_file) -> None:
+    gaps_path = historical_blob_file(
+        _historical_path("remaining_source_gaps_after_data_layer_bridge.md"),
+        "business_segment/remaining_source_gaps_after_data_layer_bridge.md",
+    )
+    gaps = gaps_path.read_text(encoding="utf-8")
     assert "DISCLOSURE-SEGMENT-002" in gaps
     assert "MISSING_DISCLOSURE" in gaps

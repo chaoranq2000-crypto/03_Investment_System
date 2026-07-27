@@ -1,0 +1,50 @@
+schema_version: 1
+artifact_type: r5_v1_policy_refresh_limitations
+workflow_id: wf_20260725_stock_first_002837_v1_policy_refresh
+as_of_date: '2026-07-25'
+unknowns:
+- limitation_id: lim_room_cabinet_driver_disaggregation
+  status: UNKNOWN_NOT_DISCLOSED
+  fields:
+  - room_cooling_volume
+  - room_cooling_unit_price
+  - room_cooling_product_mix
+  - cabinet_cooling_volume
+  - cabinet_cooling_unit_price
+  - cabinet_cooling_product_mix
+  numeric_use: prohibited
+  reason: 324058 units is an industry-classification total and cannot be split between product lines
+- limitation_id: lim_liquid_unit_economics
+  status: METHOD_UNAVAILABLE
+  fields:
+  - liquid_unit_value
+  - liquid_acceptance_rate
+  - liquid_standalone_gross_margin
+  numeric_use: prohibited
+  reason: official sources do not disclose the required standalone fields
+- limitation_id: lim_room_liquid_exact_allocation
+  status: METHOD_UNAVAILABLE
+  known_relationship: partial_overlap_confirmed
+  fields:
+  - overlap_revenue_amount
+  - overlap_gross_profit_amount
+  numeric_use: prohibited
+  reason: the interim report confirms partial classification overlap but discloses no allocation amount
+- limitation_id: lim_cabinet_liquid_relationship
+  status: UNKNOWN_NOT_DISCLOSED
+  fields:
+  - cabinet_liquid_overlap_relationship
+  numeric_use: prohibited
+  assertions_forbidden:
+  - overlaps
+  - never_overlaps
+  reason: the interim disclosure names room cooling and other, not cabinet cooling
+prohibited_operations:
+- split_industry_total_volume_into_room_or_cabinet
+- treat_liquid_lower_bound_as_exact_value
+- add_liquid_revenue_to_room_revenue
+- add_liquid_revenue_to_cabinet_revenue
+- calculate_room_liquid_overlap_without_disclosed_allocation
+- assert_cabinet_liquid_overlap
+- assert_cabinet_liquid_never_overlap
+calculations: []

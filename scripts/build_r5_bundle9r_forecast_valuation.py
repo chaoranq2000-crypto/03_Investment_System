@@ -853,7 +853,7 @@ def validate_generation(repo_root: Path, lock: Mapping[str, Any]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build the Bundle 9R forecast and valuation artifacts from reviewed inputs.")
     parser.add_argument("--repo-root", default=".")
-    parser.add_argument("--workflow-id", default=WORKFLOW_ID)
+    parser.add_argument("--workflow-id", required=True)
     parser.add_argument("--phase", choices=("forecast", "valuation", "all"), default="all")
     args = parser.parse_args()
     repo_root = Path(args.repo_root).resolve()

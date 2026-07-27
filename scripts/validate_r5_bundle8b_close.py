@@ -2,15 +2,22 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
+import io
 import json
+import subprocess
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 import yaml
 
 
-DEFAULT_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
+HISTORICAL_SOURCE_SNAPSHOT = "312adc73821706b0b7ca6aa00e80ee608bd10b32"
+HISTORICAL_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
+HISTORICAL_MANIFEST = Path(
+    "reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml"
+)
 PEER_FIELD_MAP = {
     "total_revenue": ("income", "total_revenue"),
     "net_profit_attributable": ("income", "n_income_attr_p"),
@@ -36,6 +43,53 @@ def _read_csv(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(handle))
 
 
+def _historical_blob_reader(repo_root: Path) -> Callable[[str], bytes]:
+    manifest = _load_yaml(repo_root / HISTORICAL_MANIFEST)
+    if manifest.get("source_snapshot") != HISTORICAL_SOURCE_SNAPSHOT:
+        raise ValueError("historical baseline manifest source snapshot drift")
+    rows = {str(row["path"]): row for row in manifest.get("files", [])}
+    if len(rows) != len(manifest.get("files", [])):
+        raise ValueError("historical baseline manifest contains duplicate paths")
+
+    def read(source_path: str) -> bytes:
+        row = rows.get(source_path)
+        if row is None:
+            raise ValueError(f"historical blob is not manifest-bound: {source_path}")
+        object_name = f"{row['baseline_commit']}:{source_path}"
+        exists = subprocess.run(
+            ["git", "-C", str(repo_root), "cat-file", "-e", object_name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if exists.returncode:
+            raise ValueError(f"historical blob is unavailable: {object_name}")
+        oid = subprocess.check_output(
+            ["git", "-C", str(repo_root), "rev-parse", object_name],
+            text=True,
+            encoding="utf-8",
+        ).strip()
+        size = int(
+            subprocess.check_output(
+                ["git", "-C", str(repo_root), "cat-file", "-s", object_name],
+                text=True,
+                encoding="utf-8",
+            ).strip()
+        )
+        payload = subprocess.check_output(
+            ["git", "-C", str(repo_root), "cat-file", "blob", object_name]
+        )
+        if oid != row["blob_oid"]:
+            raise ValueError(f"historical blob OID drift: {source_path}")
+        if size != row["byte_count"] or len(payload) != row["byte_count"]:
+            raise ValueError(f"historical blob byte-count drift: {source_path}")
+        if hashlib.sha256(payload).hexdigest() != row["content_sha256"]:
+            raise ValueError(f"historical blob SHA-256 drift: {source_path}")
+        return payload
+
+    return read
+
+
 def _decimal_equal(left: object, right: object) -> bool:
     try:
         return Decimal(str(left)) == Decimal(str(right))
@@ -43,14 +97,54 @@ def _decimal_equal(left: object, right: object) -> bool:
         return False
 
 
-def validate_bundle8b(repo_root: Path, workflow_id: str = DEFAULT_WORKFLOW_ID) -> dict[str, Any]:
+def validate_bundle8b(
+    repo_root: Path,
+    workflow_id: str | None = None,
+) -> dict[str, Any]:
     repo_root = repo_root.resolve()
-    run = repo_root / "reports/workflow_runs" / workflow_id
+    if workflow_id is None:
+        effective_workflow_id = HISTORICAL_WORKFLOW_ID
+        read_blob = _historical_blob_reader(repo_root)
+        run_prefix = f"reports/workflow_runs/{effective_workflow_id}"
+
+        def load_run_yaml(name: str) -> dict[str, Any]:
+            payload = yaml.safe_load(read_blob(f"{run_prefix}/{name}"))
+            if not isinstance(payload, dict):
+                raise ValueError(f"historical YAML must be a mapping: {name}")
+            return payload
+
+        def read_run_csv(name: str) -> list[dict[str, str]]:
+            text = read_blob(f"{run_prefix}/{name}").decode("utf-8-sig")
+            return list(csv.DictReader(io.StringIO(text)))
+
+        def read_reference_bytes(path_value: str) -> bytes | None:
+            normalized = path_value.replace("\\", "/")
+            if normalized.startswith(f"{run_prefix}/"):
+                return read_blob(normalized)
+            path = repo_root / normalized
+            return path.read_bytes() if path.is_file() else None
+
+    else:
+        if not workflow_id.strip():
+            raise ValueError("workflow_id must be non-empty")
+        effective_workflow_id = workflow_id
+        run = repo_root / "reports/workflow_runs" / workflow_id
+
+        def load_run_yaml(name: str) -> dict[str, Any]:
+            return _load_yaml(run / name)
+
+        def read_run_csv(name: str) -> list[dict[str, str]]:
+            return _read_csv(run / name)
+
+        def read_reference_bytes(path_value: str) -> bytes | None:
+            path = repo_root / path_value
+            return path.read_bytes() if path.is_file() else None
+
     errors: list[str] = []
     checks: dict[str, Any] = {}
 
-    log = _load_yaml(run / "live_acquisition_run_log.yaml")
-    delta = _read_csv(run / "R5_bundle8b_evidence_manifest_delta.csv")
+    log = load_run_yaml("live_acquisition_run_log.yaml")
+    delta = read_run_csv("R5_bundle8b_evidence_manifest_delta.csv")
     manifest = _read_csv(repo_root / "data/manifests/evidence_manifest.csv")
     manifest_by_id = {row["evidence_id"]: row for row in manifest}
     delta_ids = [row["evidence_id"] for row in delta]
@@ -94,7 +188,7 @@ def validate_bundle8b(repo_root: Path, workflow_id: str = DEFAULT_WORKFLOW_ID) -
         errors.append(f"source health mismatch: {observed_health}")
     checks["source_health"] = observed_health
 
-    peer_pack = _load_yaml(run / "peer_operating_evidence_pack.yaml")
+    peer_pack = load_run_yaml("peer_operating_evidence_pack.yaml")
     peer_metric_checks = 0
     for company in peer_pack.get("companies", []):
         if not isinstance(company, Mapping):
@@ -129,7 +223,7 @@ def validate_bundle8b(repo_root: Path, workflow_id: str = DEFAULT_WORKFLOW_ID) -
         "metrics_checked": peer_metric_checks,
     }
 
-    gaps = _load_yaml(run / "liquid_cooling_disclosure_gap_register.yaml")
+    gaps = load_run_yaml("liquid_cooling_disclosure_gap_register.yaml")
     gap_by_id = {row["gap_id"]: row for row in gaps.get("gap_register", [])}
     revenue_gap = gap_by_id.get("LC-DISC-REV-2024", {})
     if revenue_gap.get("classification") != "B_approximate_or_computable_proxy":
@@ -138,8 +232,8 @@ def validate_bundle8b(repo_root: Path, workflow_id: str = DEFAULT_WORKFLOW_ID) -
         errors.append("2024 liquid-cooling approximate revenue is not 300000000 CNY")
     if revenue_gap.get("claim_type") != "management_comment":
         errors.append("2024 liquid-cooling approximate revenue is not management_comment")
-    evidence_path = repo_root / str(revenue_gap.get("source_path", ""))
-    source_text = evidence_path.read_text(encoding="utf-8") if evidence_path.exists() else ""
+    evidence_bytes = read_reference_bytes(str(revenue_gap.get("source_path", "")))
+    source_text = evidence_bytes.decode("utf-8") if evidence_bytes is not None else ""
     if "液冷技术相关营业收入" not in source_text or "约 3" not in source_text:
         errors.append("2024 liquid-cooling source text does not contain the cited approximate disclosure")
     required_missing = {"LC-DISC-REV-2025", "LC-DISC-GM", "LC-DISC-ORDERS", "LC-DISC-CUSTOMERS", "LC-DISC-CASH-COLLECTION"}
@@ -151,7 +245,7 @@ def validate_bundle8b(repo_root: Path, workflow_id: str = DEFAULT_WORKFLOW_ID) -
         "visible_missing_items": len(required_missing),
     }
 
-    event_pack = _load_yaml(run / "market_event_pack.yaml")
+    event_pack = load_run_yaml("market_event_pack.yaml")
     events = event_pack.get("future_event_calendar", [])
     event = events[0] if events else {}
     event_evidence = manifest_by_id.get(str(event.get("source_evidence_id", "")), {})
@@ -162,7 +256,7 @@ def validate_bundle8b(repo_root: Path, workflow_id: str = DEFAULT_WORKFLOW_ID) -
         errors.append("future event planned date does not match Tushare disclosure_date snapshot")
     for field in ("technical_snapshot_path", "valuation_snapshot_path"):
         path_value = event_pack.get("market_state", {}).get(field, "")
-        if not path_value or not (repo_root / path_value).exists():
+        if not path_value or read_reference_bytes(str(path_value)) is None:
             errors.append(f"market event pack path missing: {field}={path_value}")
     checks["market_event"] = {
         "planned_date": event.get("planned_date"),
@@ -173,7 +267,7 @@ def validate_bundle8b(repo_root: Path, workflow_id: str = DEFAULT_WORKFLOW_ID) -
     return {
         "artifact_type": "R5_bundle8b_close_input_validation",
         "schema_version": "v0.1",
-        "workflow_id": workflow_id,
+        "workflow_id": effective_workflow_id,
         "decision": "pass" if not errors else "fail",
         "checks": checks,
         "errors": errors,
@@ -183,7 +277,7 @@ def validate_bundle8b(repo_root: Path, workflow_id: str = DEFAULT_WORKFLOW_ID) -
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate Bundle 8B close inputs against evidence.")
     parser.add_argument("--repo-root", default=".")
-    parser.add_argument("--workflow-id", default=DEFAULT_WORKFLOW_ID)
+    parser.add_argument("--workflow-id", required=True)
     parser.add_argument("--output", default="")
     args = parser.parse_args(argv)
     payload = validate_bundle8b(Path(args.repo_root), args.workflow_id)

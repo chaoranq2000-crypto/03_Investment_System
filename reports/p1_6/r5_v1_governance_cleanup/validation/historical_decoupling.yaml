@@ -1,0 +1,84 @@
+schema_version: r5_v1_historical_decoupling_validation_v2
+validation_id: V-006
+phase: P5_v11_portable_receipt
+checked_at: "2026-07-27T20:51:32+08:00"
+decision: pass
+contract:
+  path: docs/codex_tasks/v1_governance_integration_cleanup_v11/CONTRACT.md
+  canonical_sha256: 68028d41f366d535daf7647faa8aae408e167f5442a96ed2ff7a3c3aeca18aae
+  source_baseline: bcb535618367024eb85f8bee7abb8419c56d75eb
+  setup_commit: 718d6630c861866b51ccec47787d3f4e146edc43
+cleanup_inventory:
+  file_count: 1386
+  content_byte_count: 9787412
+  path_vector_byte_count: 121264
+  path_vector_sha256: 974d45610144d616f69c3c368d9ea1a0a27d66601a24f748aa8148e2ee702f33
+  wave_file_counts:
+    night: 680
+    bundle: 205
+    old002837: 501
+  completed_wave_file_count_absent: 1386
+  completed_wave_directory_count_absent: 29
+  old002837_root_absent: true
+  retained_overlap_count: 0
+  protected_overlap_count: 0
+directory_inventory:
+  path_count: 29
+  relative_path_vector_byte_count: 2208
+  relative_path_vector_sha256: 1e987f07ab4aa9b7c54a7444b053949b5c5d377655903d9715d8948e42446cd3
+  absolute_path_vector_byte_count: 3803
+  absolute_path_vector_sha256: 31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75
+  reconstruction_semantics: fixed_pure_windows_path
+  current_checkout_root_used: false
+  cross_platform_regression:
+    pre_fix_simulation: "1 failed: old002837 absolute directory-vector SHA-256 drift"
+    post_fix_focused: "3 passed in 12.72s"
+    github_linux_failed_candidate_run: 30257647025
+    github_linux_failed_candidate_result: "2 failed, 27 passed"
+    failed_candidate: bcb535618367024eb85f8bee7abb8419c56d75eb
+active_reference_scan:
+  prior_v9_reference_count: 27
+  prior_v9_path_count: 12
+  final_reference_count: 0
+  final_unknown_classification_count: 0
+  physical_default_or_canonical_route_count: 0
+route_closure:
+  commit: 0d0e2cfeee55dbdc18bd519d9aed0cc703dd466c
+  focused_original_regressions: "13 passed"
+  route_and_behavior_suite: "62 passed"
+  explicit_root_subset: "36 passed"
+  active_routing_and_promotion_subset: "9 passed"
+  assertions_weakened: false
+  skip_xfail_mock_or_collection_bypass_added: false
+extended_cleanup:
+  extended_wave_count: 0
+  manifest_created: false
+  deletion_performed: false
+  rationale: >-
+    No retirement-only path was proven. Every affected active path remained
+    necessary and could be made explicit-root or manifest-bound without
+    changing research facts or completion semantics.
+restore_verification:
+  cat_file_rows_verified: 1386
+  full_restore_file_count: 1386
+  full_restore_content_byte_count: 9787412
+  byte_for_byte_match: true
+  result: "30 passed in 665.85s (0:11:05)"
+final_validator:
+  command: >-
+    C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B
+    -m pytest -q tests/test_r5_v1_historical_baseline_manifest.py
+    tests/test_r5_v1_historical_cleanup_manifest.py
+    tests/test_r5_v1_active_routing_retirement.py
+  passed: 30
+  failed: 0
+  errors: 0
+  duration_seconds: 665.85
+guards:
+  completed_wave_replay_rejected: true
+  recursive_or_wildcard_deletion_used: false
+  new_deletion_used: false
+  immutable_wave_manifests_and_receipts_changed: false
+  relative_or_absolute_vector_changed: false
+  deletion_runtime_containment_changed: false
+  user_main_worktree_written: false

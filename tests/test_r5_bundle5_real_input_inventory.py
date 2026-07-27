@@ -13,6 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / "scripts/build_r5_bundle5_real_input_inventory.py"
 WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 STOCK_CODE = "002837"
+FIXTURE_WORKFLOW_ID = "fixture_stock_first_002837"
 
 
 def load_builder():
@@ -31,12 +32,83 @@ def item_by_type(inventory: dict, input_type: str) -> dict:
     return next(item for item in inventory["items"] if item["input_type"] == input_type)
 
 
-def test_current_real_workflow_has_all_reviewed_core_input_types_after_promotion() -> None:
+def materialize_promoted_inventory_repo(
+    tmp_path: Path,
+    historical_blob_bytes,
+) -> tuple[Path, Path]:
+    repo = tmp_path / "promoted_inventory_repo"
+    validator_target = repo / "scripts" / "validate_r5_reviewed_input_dropzone.py"
+    validator_target.parent.mkdir(parents=True)
+    shutil.copyfile(
+        REPO_ROOT / "scripts" / "validate_r5_reviewed_input_dropzone.py",
+        validator_target,
+    )
+
+    source_dropzone = REPO_ROOT / "data" / "reviewed_inputs" / WORKFLOW_ID
+    target_dropzone = repo / "data" / "reviewed_inputs" / FIXTURE_WORKFLOW_ID
+    for source in source_dropzone.rglob("*"):
+        if not source.is_file():
+            continue
+        target = target_dropzone / source.relative_to(source_dropzone)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        payload = source.read_bytes().replace(
+            WORKFLOW_ID.encode("utf-8"),
+            FIXTURE_WORKFLOW_ID.encode("utf-8"),
+        )
+        target.write_bytes(payload)
+
+    manifest_source = REPO_ROOT / "data" / "manifests" / "evidence_manifest.csv"
+    manifest_target = repo / "data" / "manifests" / "evidence_manifest.csv"
+    manifest_target.parent.mkdir(parents=True)
+    shutil.copyfile(manifest_source, manifest_target)
+    with manifest_source.open("r", encoding="utf-8-sig", newline="") as handle:
+        for row in csv.DictReader(handle):
+            if STOCK_CODE not in " ".join(str(value) for value in row.values()):
+                continue
+            raw_path = Path(str(row.get("raw_file_path") or ""))
+            source = REPO_ROOT / raw_path
+            if source.is_file():
+                target = repo / raw_path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(source, target)
+
+    historical_run = f"reports/workflow_runs/{WORKFLOW_ID}"
+    run = repo / "reports" / "workflow_runs" / FIXTURE_WORKFLOW_ID
+    run.mkdir(parents=True)
+    for name in (
+        "R5_evidence_request_queue.yaml",
+        "R5_evidence_request_review_ledger.yaml",
+        "evidence_manifest_delta.csv",
+    ):
+        payload = historical_blob_bytes(f"{historical_run}/{name}").replace(
+            WORKFLOW_ID.encode("utf-8"),
+            FIXTURE_WORKFLOW_ID.encode("utf-8"),
+        )
+        (run / name).write_bytes(payload)
+        if name.endswith(".csv"):
+            for row in csv.DictReader(payload.decode("utf-8-sig").splitlines()):
+                raw_path = Path(str(row.get("raw_file_path") or ""))
+                source = REPO_ROOT / raw_path
+                if source.is_file():
+                    target = repo / raw_path
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copyfile(source, target)
+    return repo, target_dropzone
+
+
+def test_current_real_workflow_has_all_reviewed_core_input_types_after_promotion(
+    tmp_path: Path,
+    historical_blob_bytes,
+) -> None:
+    repo, dropzone = materialize_promoted_inventory_repo(
+        tmp_path,
+        historical_blob_bytes,
+    )
     inventory = BUILDER.build_inventory(
-        REPO_ROOT,
-        WORKFLOW_ID,
+        repo,
+        FIXTURE_WORKFLOW_ID,
         STOCK_CODE,
-        Path("data/reviewed_inputs") / WORKFLOW_ID,
+        dropzone,
     )
 
     assert inventory["status"] == "ready_for_later_promotion_card"

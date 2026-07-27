@@ -14,9 +14,11 @@ def sha(path: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[1]))
+    parser.add_argument("--run-root", type=Path, required=True)
     args = parser.parse_args()
     root = Path(args.repo_root).resolve()
-    run = root / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+    run = args.run_root if args.run_root.is_absolute() else root / args.run_root
+    run = run.resolve()
     report = run / "R5_stock_research_report_reader_v2.md"
     baseline = yaml.safe_load((run / "R5_bundle6_reader_surface_baseline.yaml").read_text(encoding="utf-8"))
     score = yaml.safe_load((run / "R5_stock_research_report_reader_v2_quality_scorecard.yaml").read_text(encoding="utf-8"))

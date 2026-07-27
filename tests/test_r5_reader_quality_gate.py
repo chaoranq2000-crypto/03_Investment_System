@@ -8,20 +8,29 @@ from scripts.run_r5_reader_quality_gate import evaluate
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
-
-
-def load(name: str):
-    return yaml.safe_load((RUN / name).read_text(encoding="utf-8"))
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
 @pytest.fixture
-def current_reader_inputs():
+def current_reader_inputs(historical_blob_file):
+    def historical_file(name: str) -> Path:
+        return historical_blob_file(f"{HISTORICAL_RUN}/{name}", f"reader_quality/{name}")
+
     return (
-        (RUN / "R5_stock_research_report_reader_v2.md").read_text(encoding="utf-8"),
-        load("R5_stock_research_report_traceability_v2.yaml"),
-        load("R5_bundle6_forecast_bridge.yaml"),
-        load("R5_bundle6_valuation_reasoning_pack.yaml"),
+        historical_file("R5_stock_research_report_reader_v2.md").read_text(encoding="utf-8"),
+        yaml.safe_load(
+            historical_file("R5_stock_research_report_traceability_v2.yaml").read_text(
+                encoding="utf-8"
+            )
+        ),
+        yaml.safe_load(
+            historical_file("R5_bundle6_forecast_bridge.yaml").read_text(encoding="utf-8")
+        ),
+        yaml.safe_load(
+            historical_file("R5_bundle6_valuation_reasoning_pack.yaml").read_text(
+                encoding="utf-8"
+            )
+        ),
         yaml.safe_load((ROOT / "config/r5_reader_quality_rubric.yaml").read_text(encoding="utf-8")),
         yaml.safe_load((ROOT / "benchmarks/r5_section_density_targets.yaml").read_text(encoding="utf-8")),
         yaml.safe_load((ROOT / "benchmarks/r5_report_quality_rubric.yaml").read_text(encoding="utf-8")),

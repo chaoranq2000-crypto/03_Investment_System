@@ -19,8 +19,6 @@ if str(SCRIPT_DIR) not in sys.path:
 import r5_reviewed_input_pilot_gate as pilot_gate  # noqa: E402
 import render_r5_reviewed_input_output as renderer  # noqa: E402
 
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-STOCK_CODE = "002837"
 ANNUAL_EVIDENCE_ID = "ev_annual_report_002837_20260421_2cbfc5"
 INTERIM_EVIDENCE_ID = "ev_interim_report_002837_20250819_47054e"
 Q1_EVIDENCE_ID = "ev_quarterly_report_002837_20260421_2f00c7"
@@ -108,8 +106,13 @@ def _columns(*pairs: tuple[str, str]) -> list[dict[str, str]]:
     return [{"key": key, "label": label} for key, label in pairs]
 
 
-def build_pack(repo_root: Path) -> dict[str, Any]:
-    run_dir = repo_root / "reports/workflow_runs" / WORKFLOW_ID
+def build_pack(
+    repo_root: Path,
+    run_dir: Path,
+    *,
+    workflow_id: str,
+    stock_code: str,
+) -> dict[str, Any]:
     history_path = run_dir / "R5_bundle5_financial_history_candidate.yaml"
     business_path = run_dir / "R5_bundle5_business_breakdown_candidate.yaml"
     market_path = run_dir / "R5_market_peer_input_registry.yaml"
@@ -510,17 +513,17 @@ def build_pack(repo_root: Path) -> dict[str, Any]:
         "status": "accepted_with_todos",
         "pack_status": "research_draft",
         "metadata": {
-            "workflow_id": WORKFLOW_ID,
-            "stock_code": STOCK_CODE,
+            "workflow_id": workflow_id,
+            "stock_code": stock_code,
             "company_id": "cn_002837_invic",
             "as_of_date": "2026-07-10",
             "registry_derivation": "validated_physical_registries",
         },
         "as_of_date": "2026-07-10",
-        "workflow_id": WORKFLOW_ID,
+        "workflow_id": workflow_id,
         "stock": {
             "company_name": "英维克",
-            "stock_code": STOCK_CODE,
+            "stock_code": stock_code,
             "exchange": "SZSE",
             "currency": "CNY",
             "fiscal_year_latest": "2025A",
@@ -539,7 +542,7 @@ def build_pack(repo_root: Path) -> dict[str, Any]:
         "company_identity_pack": {
             "status": "ready",
             "company_id": "cn_002837_invic",
-            "stock_code": STOCK_CODE,
+            "stock_code": stock_code,
             "company_name": "英维克",
             "evidence_ids": [ANNUAL_EVIDENCE_ID],
         },
@@ -717,8 +720,8 @@ def build_scorecard(pack: dict[str, Any], dry_run: dict[str, Any]) -> dict[str, 
     return {
         "artifact_type": "R5_quality_scorecard_v2",
         "schema_version": "r5_bundle5_quality_scorecard_v0.1",
-        "workflow_id": WORKFLOW_ID,
-        "stock_code": STOCK_CODE,
+        "workflow_id": pack["workflow_id"],
+        "stock_code": pack["stock"]["stock_code"],
         "allowed_report_level": "reviewed_input_research_draft",
         "no_advice_gate_passed": True,
         "reviewed_input_flags": flags,
@@ -756,12 +759,12 @@ def _quality_issue(issue_id: str, description: str, section: str, owner: str, ne
 
 def build_quality_result(
     repo_root: Path,
+    run_dir: Path,
     pack: dict[str, Any],
     scorecard: dict[str, Any],
     gate: dict[str, Any],
     render_result: dict[str, Any],
 ) -> dict[str, Any]:
-    run_dir = repo_root / "reports/workflow_runs" / WORKFLOW_ID
     report_path = run_dir / "R5_stock_research_note_reviewed_input_draft.md"
     report_text = report_path.read_text(encoding="utf-8")
     critical: list[str] = []
@@ -875,8 +878,8 @@ def build_quality_result(
     return {
         "artifact_type": "R5_bundle5_quality_gate_result",
         "schema_version": "r5_bundle5_quality_gate_result_v0.1",
-        "workflow_id": WORKFLOW_ID,
-        "stock_code": STOCK_CODE,
+        "workflow_id": pack["workflow_id"],
+        "stock_code": pack["stock"]["stock_code"],
         "quality_decision": "accepted_with_todos" if not critical else "blocked",
         "allowed_report_level": "reviewed_input_research_draft" if not critical else "blocked",
         "rendered_output_type": render_result.get("rendered_output_type"),
@@ -906,9 +909,13 @@ def build_quality_result(
     }
 
 
-def write_readout(repo_root: Path, quality: dict[str, Any]) -> None:
-    run_dir = repo_root / "reports/workflow_runs" / WORKFLOW_ID
-    report_path = run_dir / "R5_stock_research_note_reviewed_input_draft.md"
+def write_readout(
+    path: Path,
+    report_path: Path,
+    quality: dict[str, Any],
+    *,
+    workflow_id: str,
+) -> None:
     text = f"""# R5 Bundle 5.6 — Research Draft Render and Quality Gate Readout
 
 status: accepted_with_todos
@@ -917,9 +924,9 @@ status: accepted_with_todos
 
 - `scripts/run_r5_bundle5_research_draft_quality_gate.py`
 - `config/r5_bundle5_pilot_gate_rules.yaml`
-- `reports/workflow_runs/{WORKFLOW_ID}/R5_bundle5_stock_research_pack.yaml`
-- `reports/workflow_runs/{WORKFLOW_ID}/R5_bundle5_quality_scorecard.yaml`
-- `reports/workflow_runs/{WORKFLOW_ID}/R5_bundle5_quality_gate_result.yaml`
+- `reports/workflow_runs/{workflow_id}/R5_bundle5_stock_research_pack.yaml`
+- `reports/workflow_runs/{workflow_id}/R5_bundle5_quality_scorecard.yaml`
+- `reports/workflow_runs/{workflow_id}/R5_bundle5_quality_gate_result.yaml`
 - `tests/test_r5_bundle5_real_pilot_gate.py`
 
 ## files_modified
@@ -933,7 +940,7 @@ status: accepted_with_todos
 
 ## commands_run
 
-- `.\\.conda\\investment-system\\python.exe scripts\\run_r5_bundle5_research_draft_quality_gate.py --repo-root .`
+- `.\\.conda\\investment-system\\python.exe scripts\\run_r5_bundle5_research_draft_quality_gate.py --repo-root . --workflow-id <id> --run-dir <dir> ...`
 
 ## exit_code
 
@@ -964,14 +971,27 @@ status: accepted_with_todos
 - sample_quality_report_allowed: `false`
 - p2_allowed: `false`
 """
-    path = repo_root / "reports/p1_6/R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_QUALITY_READOUT.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
 
 
-def run(repo_root: Path) -> dict[str, Any]:
-    run_dir = repo_root / "reports/workflow_runs" / WORKFLOW_ID
-    pack = build_pack(repo_root)
+def run(
+    repo_root: Path,
+    run_dir: Path,
+    *,
+    workflow_id: str,
+    stock_code: str,
+    rules_path: Path,
+    strict_smoke_path: Path,
+    promotion_rules_path: Path,
+    readout_path: Path,
+) -> dict[str, Any]:
+    pack = build_pack(
+        repo_root,
+        run_dir,
+        workflow_id=workflow_id,
+        stock_code=stock_code,
+    )
     pack_path = run_dir / "R5_bundle5_stock_research_pack.yaml"
     _write_yaml(pack_path, pack)
 
@@ -980,9 +1000,28 @@ def run(repo_root: Path) -> dict[str, Any]:
     scorecard_path = run_dir / "R5_bundle5_quality_scorecard.yaml"
     _write_yaml(scorecard_path, scorecard)
 
-    rules_path = repo_root / "config/r5_bundle5_pilot_gate_rules.yaml"
     rules = load_yaml(rules_path)
-    gate = pilot_gate.evaluate_gate(pilot_gate.collect_inputs(repo_root, rules), rules)
+    strict_smoke = json.loads(strict_smoke_path.read_text(encoding="utf-8"))
+    if not isinstance(strict_smoke, dict):
+        raise ValueError(f"{strict_smoke_path} must contain a JSON object")
+    promotion_rules = load_yaml(promotion_rules_path)
+    promotion = pilot_gate.r5_pack_promotion_gate.evaluate_promotion(
+        pack,
+        dry_run,
+        promotion_rules,
+    )
+    gate_inputs = {
+        "strict_smoke_result": strict_smoke,
+        "source_gapped_pack": pack,
+        "reviewed_input_dry_run_result": dry_run,
+        "quality_scorecard_v2": scorecard,
+        "pack_promotion_gate_result": promotion,
+        "no_advice_gate_passed": pilot_gate.FORBIDDEN.search(
+            yaml.safe_dump(pack, allow_unicode=True)
+        )
+        is None,
+    }
+    gate = pilot_gate.evaluate_gate(gate_inputs, rules)
     gate_path = run_dir / "R5_bundle5_real_pilot_gate_result.json"
     gate_path.write_text(json.dumps(gate, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if gate.get("reviewed_input_pilot_allowed") is not True:
@@ -992,7 +1031,7 @@ def run(repo_root: Path) -> dict[str, Any]:
     report_path = run_dir / "R5_stock_research_note_reviewed_input_draft.md"
     render_result = renderer.render_output(
         repo_root=repo_root,
-        workflow_id=WORKFLOW_ID,
+        workflow_id=workflow_id,
         result_path=render_result_path,
         output_path=report_path,
         pack_path=pack_path,
@@ -1002,20 +1041,53 @@ def run(repo_root: Path) -> dict[str, Any]:
         scorecard_path=scorecard_path,
     )
 
-    quality = build_quality_result(repo_root, pack, scorecard, gate, render_result)
+    quality = build_quality_result(
+        repo_root,
+        run_dir,
+        pack,
+        scorecard,
+        gate,
+        render_result,
+    )
     quality_path = run_dir / "R5_bundle5_quality_gate_result.yaml"
     _write_yaml(quality_path, quality)
     if quality["critical_quality_blockers"]:
         raise RuntimeError("Bundle 5 quality gate blocked: " + "; ".join(quality["blocker_details"]))
-    write_readout(repo_root, quality)
+    write_readout(
+        readout_path,
+        report_path,
+        quality,
+        workflow_id=workflow_id,
+    )
     return {"gate": gate, "render": render_result, "quality": quality}
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run the Bundle 5.6 real research-draft quality gate.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
+    parser.add_argument("--workflow-id", required=True)
+    parser.add_argument("--stock-code", required=True)
+    parser.add_argument("--run-dir", type=Path, required=True)
+    parser.add_argument("--rules", type=Path, required=True)
+    parser.add_argument("--strict-smoke", type=Path, required=True)
+    parser.add_argument("--promotion-rules", type=Path, required=True)
+    parser.add_argument("--readout-output", type=Path, required=True)
     args = parser.parse_args(argv)
-    result = run(args.repo_root.resolve())
+    repo_root = args.repo_root.resolve()
+
+    def resolved(path: Path) -> Path:
+        return path.resolve() if path.is_absolute() else (repo_root / path).resolve()
+
+    result = run(
+        repo_root,
+        resolved(args.run_dir),
+        workflow_id=args.workflow_id,
+        stock_code=args.stock_code,
+        rules_path=resolved(args.rules),
+        strict_smoke_path=resolved(args.strict_smoke),
+        promotion_rules_path=resolved(args.promotion_rules),
+        readout_path=resolved(args.readout_output),
+    )
     print(
         "r5_bundle5_card_5_6 state={state} rendered={rendered} quality={quality} "
         "critical_blockers={blockers} sample_quality=false p2=false".format(

@@ -5,12 +5,9 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 import yaml
-
-
-DEFAULT_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -46,8 +43,14 @@ def load_submission_validator(repo_root: Path):
     return module
 
 
-def validate_bundle10(repo_root: Path, workflow_id: str) -> dict[str, Any]:
-    run = repo_root / "reports/workflow_runs" / workflow_id
+def validate_bundle10(
+    repo_root: Path,
+    workflow_id: str,
+    *,
+    run_dir: Path | None = None,
+    source_path_exists: Callable[[str], bool] | None = None,
+) -> dict[str, Any]:
+    run = run_dir or repo_root / "reports/workflow_runs" / workflow_id
     required = [
         "R5_bundle10_technical_market_pack.yaml",
         "R5_bundle10_sentiment_event_pack.yaml",
@@ -88,7 +91,11 @@ def validate_bundle10(repo_root: Path, workflow_id: str) -> dict[str, Any]:
     checks["writer_hardcoding"] = {"identity_tokens_found": hardcoded}
 
     pack = load_yaml(run / "R5_bundle10_reader_pack.yaml")
-    pack_issues = load_validator(repo_root).validate_pack(pack, repo_root)
+    pack_issues = load_validator(repo_root).validate_pack(
+        pack,
+        repo_root,
+        source_path_exists=source_path_exists,
+    )
     if pack_issues:
         errors.append(f"reader pack contract issues: {pack_issues}")
     checks["reader_pack_contract"] = {
@@ -402,7 +409,7 @@ def validate_bundle10(repo_root: Path, workflow_id: str) -> dict[str, Any]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate Bundle 10 automated completion and external-review boundary.")
     parser.add_argument("--repo-root", default=".")
-    parser.add_argument("--workflow-id", default=DEFAULT_WORKFLOW_ID)
+    parser.add_argument("--workflow-id", required=True)
     parser.add_argument("--output", default="")
     args = parser.parse_args(argv)
     root = Path(args.repo_root).resolve()

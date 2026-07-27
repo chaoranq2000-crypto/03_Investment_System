@@ -15,7 +15,7 @@ FIXTURE_ROOT = REPO_ROOT / "tests/fixtures/r5_reviewed_inputs"
 FIXTURE_WORKFLOW = "wf_fixture_r5_bundle4"
 FIXTURE_STOCK = "000000"
 REAL_WORKFLOW = "wf_20260703_stock_first_002837_invic"
-REAL_RUN_DIR = REPO_ROOT / "reports/workflow_runs" / REAL_WORKFLOW
+HISTORICAL_RUN = f"reports/workflow_runs/{REAL_WORKFLOW}"
 REGISTRY_FILES = {
     "market_peer": "R5_market_peer_input_registry.yaml",
     "forecast_assumptions": "R5_forecast_assumption_registry.yaml",
@@ -284,15 +284,26 @@ def test_repeated_result_is_byte_stable_through_registry_serializer(
     assert first_bytes == second_bytes
 
 
-def test_reading_real_002837_run_does_not_change_any_target_hash(builder) -> None:
-    promotion_path = REAL_RUN_DIR / "R5_reviewed_input_registry_promotion_result.yaml"
-    before = target_hashes(REAL_RUN_DIR, REAL_READ_TARGETS)
+def test_reading_historical_002837_inputs_does_not_change_any_target_hash(
+    builder,
+    historical_blob_file,
+) -> None:
+    run_dir = None
+    for name in REAL_READ_TARGETS:
+        path = historical_blob_file(
+            f"{HISTORICAL_RUN}/{name}",
+            f"bundle4_post_promotion_case/run/{name}",
+        )
+        run_dir = run_dir or path.parent
+    assert run_dir is not None
+    promotion_path = run_dir / "R5_reviewed_input_registry_promotion_result.yaml"
+    before = target_hashes(run_dir, REAL_READ_TARGETS)
 
     builder.build_dry_run_from_registries(
-        REAL_RUN_DIR,
+        run_dir,
         False,
         promotion_result_path=promotion_path,
         repo_root=REPO_ROOT,
     )
 
-    assert target_hashes(REAL_RUN_DIR, REAL_READ_TARGETS) == before
+    assert target_hashes(run_dir, REAL_READ_TARGETS) == before

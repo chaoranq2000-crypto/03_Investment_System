@@ -11,8 +11,8 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-RUN_DIR = REPO_ROOT / "reports/workflow_runs" / WORKFLOW_ID
-DROPZONE = REPO_ROOT / "data/reviewed_inputs" / WORKFLOW_ID
+HISTORICAL_RUN = f"reports/workflow_runs/{WORKFLOW_ID}"
+RETAINED_DROPZONE = REPO_ROOT / "data/reviewed_inputs" / WORKFLOW_ID
 MANIFEST_PATH = REPO_ROOT / "config/r5_bundle5_expected_artifacts.yaml"
 TRUTHFULNESS_PATH = REPO_ROOT / "reports/p1_6/r5_bundle5_readout_truthfulness_result.json"
 CLOSE_READOUT = REPO_ROOT / "reports/p1_6/R5_BUNDLE_5_REAL_REVIEWED_INPUT_ONBOARDING_CLOSE_READOUT.md"
@@ -28,6 +28,20 @@ def load_yaml(path: Path) -> dict[str, Any]:
 
 def load_json(path: Path) -> dict[str, Any]:
     data = json.loads(path.read_text(encoding="utf-8"))
+    assert isinstance(data, dict)
+    return data
+
+
+def load_historical_yaml(historical_blob_bytes, filename: str) -> dict[str, Any]:
+    source = f"{HISTORICAL_RUN}/{filename}"
+    data = yaml.safe_load(historical_blob_bytes(source).decode("utf-8"))
+    assert isinstance(data, dict)
+    return data
+
+
+def load_historical_json(historical_blob_bytes, filename: str) -> dict[str, Any]:
+    source = f"{HISTORICAL_RUN}/{filename}"
+    data = json.loads(historical_blob_bytes(source).decode("utf-8"))
     assert isinstance(data, dict)
     return data
 
@@ -55,9 +69,9 @@ def manifest_owned_paths(manifest: dict[str, Any]) -> list[str]:
     return sorted(set(paths))
 
 
-def accepted_dropzone_records() -> list[dict[str, Any]]:
+def accepted_dropzone_records(dropzone_root: Path) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
-    for path in sorted(DROPZONE.rglob("*.yaml")):
+    for path in sorted(dropzone_root.rglob("*.yaml")):
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         rows = data.get("records") if isinstance(data, dict) else None
         if isinstance(rows, list):
@@ -65,7 +79,9 @@ def accepted_dropzone_records() -> list[dict[str, Any]]:
     return records
 
 
-def test_manifest_declared_bundle5_artifacts_are_physical_and_boundaries_closed() -> None:
+def test_manifest_declared_bundle5_artifacts_are_physical_and_boundaries_closed(
+    historical_blob_bytes,
+) -> None:
     manifest = load_yaml(MANIFEST_PATH)
 
     assert manifest["bundle"] == "R5_BUNDLE_5_REAL_002837_REVIEWED_INPUT_ONBOARDING"
@@ -73,11 +89,19 @@ def test_manifest_declared_bundle5_artifacts_are_physical_and_boundaries_closed(
     assert manifest["fixed_boundaries"]["p2_allowed"] is False
     paths = manifest_owned_paths(manifest)
     assert paths
-    assert [path for path in paths if not (REPO_ROOT / path).exists()] == []
+    missing = []
+    for path in paths:
+        if path.startswith(HISTORICAL_RUN + "/"):
+            assert historical_blob_bytes(path)
+        elif not (REPO_ROOT / path).exists():
+            missing.append(path)
+    assert missing == []
 
 
-def test_all_22_accepted_real_inputs_have_review_and_evidence_provenance() -> None:
-    records = accepted_dropzone_records()
+def test_all_22_accepted_real_inputs_have_review_and_evidence_provenance(
+    historical_blob_bytes,
+) -> None:
+    records = accepted_dropzone_records(RETAINED_DROPZONE)
     assert len(records) == 22
     assert len({row["input_id"] for row in records}) == 22
 
@@ -99,10 +123,21 @@ def test_all_22_accepted_real_inputs_have_review_and_evidence_provenance() -> No
         assert "template" not in text
 
 
-def test_staging_promotion_and_registry_readiness_reconcile() -> None:
-    staging = load_yaml(RUN_DIR / "R5_bundle5_reviewed_input_staging.yaml")
-    promotion = load_yaml(RUN_DIR / "R5_bundle5_registry_promotion_result.yaml")
-    dry_run = load_yaml(RUN_DIR / "R5_reviewed_input_dry_run_result.yaml")
+def test_staging_promotion_and_registry_readiness_reconcile(
+    historical_blob_bytes,
+) -> None:
+    staging = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_reviewed_input_staging.yaml",
+    )
+    promotion = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_registry_promotion_result.yaml",
+    )
+    dry_run = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_reviewed_input_dry_run_result.yaml",
+    )
 
     assert staging["validation_status"] == "pass"
     assert promotion["validation_status"] == "pass"
@@ -125,10 +160,21 @@ def test_staging_promotion_and_registry_readiness_reconcile() -> None:
     assert promotion["p2_allowed"] is False
 
 
-def test_registry_promotion_is_backup_protected_and_idempotent() -> None:
-    inventory = load_yaml(RUN_DIR / "R5_bundle5_prepromotion_inventory.yaml")
-    backup = load_yaml(RUN_DIR / "R5_bundle5_registry_backup_manifest.yaml")
-    idempotency = load_json(RUN_DIR / "R5_bundle5_registry_idempotency_result.json")
+def test_registry_promotion_is_backup_protected_and_idempotent(
+    historical_blob_bytes,
+) -> None:
+    inventory = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_prepromotion_inventory.yaml",
+    )
+    backup = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_registry_backup_manifest.yaml",
+    )
+    idempotency = load_historical_json(
+        historical_blob_bytes,
+        "R5_bundle5_registry_idempotency_result.json",
+    )
 
     assert inventory["dropzone_validation_status"] == "pass"
     assert inventory["accepted_count"] == 22
@@ -138,7 +184,7 @@ def test_registry_promotion_is_backup_protected_and_idempotent() -> None:
     for row in backup["items"]:
         if row["pre_exists"]:
             assert row["pre_hash"] == row["backup_hash"]
-            assert (REPO_ROOT / row["backup_path"]).is_file()
+            assert historical_blob_bytes(row["backup_path"])
         else:
             assert row["action"] == "recorded_missing_target"
             assert row["backup_path"] is None
@@ -150,11 +196,25 @@ def test_registry_promotion_is_backup_protected_and_idempotent() -> None:
     assert set(idempotency["second_actions"].values()) == {"unchanged"}
 
 
-def test_core_pack_pilot_render_and_quality_gates_agree() -> None:
-    core = load_yaml(RUN_DIR / "R5_bundle5_core_asset_preflight.yaml")
-    gate = load_json(RUN_DIR / "R5_bundle5_real_pilot_gate_result.json")
-    render = load_yaml(RUN_DIR / "R5_reviewed_input_render_result.yaml")
-    quality = load_yaml(RUN_DIR / "R5_bundle5_quality_gate_result.yaml")
+def test_core_pack_pilot_render_and_quality_gates_agree(
+    historical_blob_bytes,
+) -> None:
+    core = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_core_asset_preflight.yaml",
+    )
+    gate = load_historical_json(
+        historical_blob_bytes,
+        "R5_bundle5_real_pilot_gate_result.json",
+    )
+    render = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_reviewed_input_render_result.yaml",
+    )
+    quality = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_quality_gate_result.yaml",
+    )
 
     assert core["blockers"] == []
     assert {core[key] for key in ["financial_history_status", "business_breakdown_status", "forecast_model_status", "valuation_status"]} <= {"accepted", "accepted_with_todos"}
@@ -171,8 +231,13 @@ def test_core_pack_pilot_render_and_quality_gates_agree() -> None:
         assert artifact["p2_allowed"] is False
 
 
-def test_benchmark_is_nonpromoting_and_sample_content_is_not_evidence() -> None:
-    benchmark = load_yaml(RUN_DIR / "R5_bundle5_benchmark_coverage_precheck.yaml")
+def test_benchmark_is_nonpromoting_and_sample_content_is_not_evidence(
+    historical_blob_bytes,
+) -> None:
+    benchmark = load_historical_yaml(
+        historical_blob_bytes,
+        "R5_bundle5_benchmark_coverage_precheck.yaml",
+    )
 
     assert benchmark["precheck_status"] == "pass"
     assert benchmark["coverage_summary"]["total"] == 10
@@ -185,9 +250,12 @@ def test_benchmark_is_nonpromoting_and_sample_content_is_not_evidence() -> None:
     assert benchmark["p2_allowed"] is False
 
 
-def test_real_draft_keeps_traceability_risk_counterevidence_and_source_gaps() -> None:
+def test_real_draft_keeps_traceability_risk_counterevidence_and_source_gaps(
+    historical_blob_bytes,
+) -> None:
     profile = load_yaml(REPO_ROOT / "codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml")
-    report = (RUN_DIR / "R5_stock_research_note_reviewed_input_draft.md").read_text(encoding="utf-8")
+    report_source = f"{HISTORICAL_RUN}/R5_stock_research_note_reviewed_input_draft.md"
+    report = historical_blob_bytes(report_source).decode("utf-8")
 
     assert PRECHECK.find_forbidden_language(report, profile) == []
     for marker in [

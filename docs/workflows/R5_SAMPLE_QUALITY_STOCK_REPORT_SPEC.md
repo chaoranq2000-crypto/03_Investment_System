@@ -2,6 +2,14 @@
 
 > R5 是在 R4 内部草稿之上的“样例质量个股深度报告”目标层。本文件定义 R5 的输入、输出、章节、质量门和降级规则。
 
+R5 是显式请求时才启用的 report-capability profile，不是 canonical workflow 的
+默认 routing，也不直接决定 `workflow_state.status`。canonical outcome 以
+`RESEARCH_WORKFLOW.md` 的当前目标范围 truth table 为准。
+
+本文件中的 evidence / claim / metric / research pack “已审查”只表示通过机器
+provenance、schema、claim-type、metric、citation、hash 和 no-advice 验证。
+中间产物不需要 reviewer 身份或人工批准；唯一活动人工边界是最终报告质量审核。
+
 ## 1. 核心定义
 
 ```text
@@ -14,10 +22,14 @@ R5_sample_quality_stock_note =
 + valuation context complete enough
 + market / sentiment / event data current enough
 + narrative layer coherent enough
-+ quality gate passed
++ automated quality gate passed
++ one valid final-report human review
 ```
 
-R5 不等于“更长的报告”。R5 是一套结构化研究资产经过质量门审查后，被转译成样例风格报告。
+R5 不等于“更长的报告”。R5 是一套结构化研究资产经过机器质量门后，
+被转译成样例风格报告。
+报告可以在 `not_requested|pending` 时作为自动研究产物存在，但不能标记
+`sample_quality_ready`。
 
 ## 2. R4 与 R5 的区别
 
@@ -29,7 +41,7 @@ R5 不等于“更长的报告”。R5 是一套结构化研究资产经过质�
 | 业务拆分 | 可存在 MISSING_DISCLOSURE | 必须支撑收入、毛利、利润池或明确缺口 |
 | 盈利预测 | 可缺失 | 必须至少有 base case |
 | 估值 | 可缺市场数据 | 必须有市场快照与同业语境 |
-| writer 角色 | 汇总证据 | 转译已审查研究资产 |
+| writer 角色 | 汇总证据 | 转译机器验证通过的研究资产 |
 
 ## 3. R5 事实源
 
@@ -45,7 +57,9 @@ R5_stock_research_pack.yaml
 R5_stock_research_note.md
 ```
 
-任何正文中的数字、判断、风险、事件或估值锚，都必须能回到 research pack 中的 evidence、metric、assumption、scenario 或 source_gap。
+任何正文中的数字、判断、风险、事件或估值锚，都必须能回到 research pack 中的
+evidence、metric、assumption、scenario 或 source_gap。research pack 的机器验证
+不能替代最终报告人审。
 
 ## 4. R5 研究包结构
 
@@ -127,7 +141,7 @@ R5 report note 固定章节：
   9.4 后续跟踪清单
 ```
 
-## 6. 样例质量要求
+## 6. 自动报告质量要求
 
 样例质量至少要求每章满足：
 
@@ -139,7 +153,7 @@ R5 report note 固定章节：
 来源：能回到 evidence / metric / assumption / source_gap。
 ```
 
-特别要求：
+这些要求先由机器 gate 检查。特别要求：
 
 ```text
 财务概览：必须讨论利润质量、现金流、异常项、ROE/ROIC 或周转效率。
@@ -155,17 +169,28 @@ R5 report note 固定章节：
 
 ## 7. 降级规则
 
+任何 capability 的输入不足都按同一阶梯降级：
+
 ```text
-缺 company_identity_pack：blocked。
-缺 evidence_snapshot_pack：blocked。
-缺 financial_history_pack：只能 source-gapped draft。
-缺 business_breakdown_pack：只能 research draft。
-缺 forecast_model_pack：不得标记 sample-quality。
-缺 valuation_pack 或 market_snapshot：不得标记 sample-quality。
-缺 technical_market_pack 的 as_of_date：不能写交易状态判断。
-缺 sentiment_event_pack：可以写基本面报告，但不得写情绪或催化强判断。
-缺 risk_counterevidence_pack：不得通过 R5 quality gate。
+发行人直接披露
+→ 经审计的聚合口径
+→ 明示假设、边界和不确定性的有界估计 / 情景
+→ unknown 或省略依赖该字段的结论
 ```
+
+| gap | capability-local effect | canonical effect |
+|---|---|---|
+| company identity、source identity、path 或 parse 失败，导致任何诚实报告都无法生成 | report capability unavailable | `blocked` |
+| financial history 不完整但缺口可见且未被无依据使用 | 只能 source-gapped draft | `accepted_with_todos` 可用 |
+| business breakdown 不完整但缺口可见 | 关闭依赖业务拆分的结论和 sample-quality | `accepted_with_todos` 可用 |
+| forecast model 不可用 | 省略盈利预测强结论和依赖该模型的方法 | 若当前目标不要求该方法，`accepted_with_todos` 可用 |
+| valuation / market snapshot 不可用 | 省略估值或市场状态强结论 | 若当前目标不要求该方法，`accepted_with_todos` 可用 |
+| technical `as_of_date` 缺失 | 不能写交易状态判断 | 非必需 capability limitation |
+| sentiment / event pack 缺失 | 不写情绪或催化强判断 | 非必需 capability limitation |
+| risk / counterevidence 被隐藏，或 unsupported number 实际进入报告 | 当前报告 defect | `needs_fix` |
+
+unknown 必须显式展示。低一级证据不得伪装成高一级；仅关闭实际依赖该字段的
+claim、section、calculation 或 method。severity 只描述风险，不能单独提升为全局 blocker。
 
 ## 8. No-advice 边界
 
@@ -191,7 +216,7 @@ R5 不输出：
 
 如样例文本中存在交易化表达，R5 只学习其“研究结构和信息密度”，不复制其交易指令表达。
 
-## 9. R5 quality gate 最小项
+## 9. Legacy R5 capability evaluators
 
 ```text
 R5-G1 Evidence Completeness Gate
@@ -207,26 +232,88 @@ R5-G10 No-Advice Gate
 R5-G11 Sample Benchmark Gate
 ```
 
-每个 gate 输出：
+`R5-G1`–`R5-G11` 已退出普通 stock workflow 的默认 routing。只有调用方明确请求
+R5 report capability check 时才能运行；它们保留 local ID，并使用以下既有
+G0–G10 owner 映射：
+
+| local_check_id | mapped_global_gate_ids |
+|---|---|
+| `R5-G1` | `G1` |
+| `R5-G2` | `G3\|G7` |
+| `R5-G3` | `G2\|G3\|G7` |
+| `R5-G4` | `G4\|G7` |
+| `R5-G5` | `G3\|G7` |
+| `R5-G6` | `G3\|G7` |
+| `R5-G7` | `G3\|G7` |
+| `R5-G8` | `G1\|G2\|G7` |
+| `R5-G9` | `G2\|G7` |
+| `R5-G10` | `G9` |
+| `R5-G11` | `G7` |
+
+每个 evaluator 输出至少包含：
 
 ```text
 issue_id
 severity
+impact_scope
+active_disposition
+affected_capabilities
+blocks_current_goal
+gate_id
+local_check_id
+mapped_global_gate_ids
 section
 artifact
 description
 fix_owner_skill
-blocking_decision
 next_action
 ```
 
-## 10. Writer 原则
+local evaluator 只能说明某个 capability 是否可用、受限或有 defect。它不得直接
+写 canonical status，也不得让 Bundle/R5 local pass 覆盖 unsupported-used、
+double-count、hidden TODO 或 no-advice defect。
+
+## 10. 唯一最终报告审核
+
+活动状态使用：
+
+```text
+final_report_review_semantics_version: final_report_review_v1
+automated_report_quality_passed: true | false
+final_report_review_status: not_requested | pending | approved | changes_requested
+final_report_review:
+  report_path
+  report_sha256
+  reviewer
+  reviewed_at
+  decision
+  notes
+  change_scope
+```
+
+`pending` 由机器绑定 repo-relative 最终报告路径和当前字节 SHA-256；
+`approved|changes_requested` 还必须有真实非机器 reviewer、ISO 时间和非空备注。
+`decision` 必须等于顶层 status。`change_scope` 只在 `changes_requested` 中取
+`automated_quality_defect|report_revision`，其他状态为空。
+
+报告字节变化后，旧审核立即失效。`not_requested|pending` 不改变自动 workflow
+outcome，也不阻止 `system_v1_complete`，但 `sample_quality_ready=false`。
+`sample_quality_ready=true` 的必要条件包括全部必要自动质量检查通过、最终报告
+`approved` 且当前 hash 匹配，以及其他适用样例质量条件；这些必要条件不得解释为
+自动充分。`changes_requested` 揭示自动质量缺陷时进入 `needs_fix`，只要求报告
+修订时不改变自动 outcome。
+
+只有最终报告 hash 绑定人工审核。research pack、evidence、claim、metric、
+candidate、计算、generation lock 和 receipt 的 hash 只用于机器完整性。
+历史 Bundle 多份 exact-hash 人审保持只读，不能满足当前最终报告审核。
+
+## 11. Writer 原则
 
 Report writer / composer 只能做三件事：
 
 ```text
 1. 组织结构；
-2. 转译已审查的研究资产；
+2. 转译机器验证通过的研究资产；
 3. 显式展示 source gap。
 ```
 

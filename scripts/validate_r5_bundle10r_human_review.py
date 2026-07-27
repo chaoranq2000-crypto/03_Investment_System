@@ -5,7 +5,7 @@ import argparse
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -35,6 +35,7 @@ def validate(
     handoff: str | Path,
     reader_lock: str | Path,
     submission: str | Path,
+    locked_artifact_resolver: Callable[[str], Path] | None = None,
 ) -> dict[str, Any]:
     paths = {
         "report_sha256": Path(report),
@@ -97,7 +98,12 @@ def validate(
     locked_verified = 0
     artifacts = lock_doc.get("artifacts") or []
     for artifact in artifacts:
-        artifact_path = REPO_ROOT / str(artifact.get("path") or "")
+        artifact_source_path = str(artifact.get("path") or "")
+        artifact_path = (
+            locked_artifact_resolver(artifact_source_path)
+            if locked_artifact_resolver is not None
+            else REPO_ROOT / artifact_source_path
+        )
         if not artifact_path.is_file():
             issues.append(_issue("locked_artifact_missing", str(artifact_path)))
             continue

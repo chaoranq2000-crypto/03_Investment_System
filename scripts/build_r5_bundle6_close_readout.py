@@ -14,12 +14,14 @@ def sha(path: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[1]))
+    parser.add_argument("--run-root", type=Path, required=True)
     parser.add_argument("--full-pytest-summary", required=True)
     parser.add_argument("--focused-pytest-summary", default="32 passed in 0.51s")
     args = parser.parse_args()
     root = Path(args.repo_root).resolve()
-    run_rel = Path("reports/workflow_runs/wf_20260703_stock_first_002837_invic")
-    run = root / run_rel
+    run = args.run_root if args.run_root.is_absolute() else root / args.run_root
+    run = run.resolve()
+    run_rel = run.relative_to(root)
     expected = yaml.safe_load((root / "codex_tasks/r5_after_bundle5/R5_BUNDLE6_EXPECTED_ARTIFACTS.yaml").read_text(encoding="utf-8"))
     score = yaml.safe_load((run / "R5_stock_research_report_reader_v2_quality_scorecard.yaml").read_text(encoding="utf-8"))
     review = yaml.safe_load((run / "R5_stock_research_report_reader_v2_human_review.yaml").read_text(encoding="utf-8"))
@@ -30,12 +32,18 @@ def main() -> int:
     human = run / "R5_stock_research_report_reader_v2_human_review.yaml"
     inventory = []
     for item in expected["required_artifacts"]:
-        path = root / item["path"]
+        item_path = Path(item["path"])
+        if len(item_path.parts) >= 4 and item_path.parts[:2] == ("reports", "workflow_runs"):
+            path = run.joinpath(*item_path.parts[3:])
+            display_path = (run_rel / Path(*item_path.parts[3:])).as_posix()
+        else:
+            path = root / item_path
+            display_path = item_path.as_posix()
         if path.name == "R5_BUNDLE_6_READER_REPORT_QUALITY_REMEDIATION_CLOSE_READOUT.md":
             continue
         if not path.exists():
-            raise SystemExit(f"missing expected artifact: {item['path']}")
-        inventory.append({"path": item["path"], "owner_card": item["owner_card"], "sha256": sha(path)})
+            raise SystemExit(f"missing expected artifact: {display_path}")
+        inventory.append({"path": display_path, "owner_card": item["owner_card"], "sha256": sha(path)})
     before = comparison["bundle5_draft"]
     after = comparison["bundle6_candidate"]
     lines = [
@@ -74,11 +82,11 @@ def main() -> int:
         "",
         "## commands_run",
         "",
-        "- `python scripts/build_r5_bundle6_research_remediation.py --repo-root .`",
+        f"- `python scripts/build_r5_bundle6_research_remediation.py --repo-root . --run-root {run_rel.as_posix()}`",
         "- `python scripts/build_r5_reader_section_payloads.py --repo-root .`",
         "- `python scripts/render_r5_traceability_appendix_v2.py --repo-root .`",
         "- `python scripts/render_r5_reader_report_v2.py --repo-root .` (run twice for stable hash)",
-        "- `python scripts/run_r5_reader_quality_gate.py --repo-root .`",
+        f"- `python scripts/run_r5_reader_quality_gate.py --repo-root . --workflow-run {run_rel.as_posix()}`",
         "- `python scripts/check_r5_readout_truthfulness.py --rules config/r5_readout_truthfulness_rules.yaml --glob 'reports/p1_6/R5_BUNDLE_6*READOUT.md' --strict`",
         "- `python -m pytest -q --tb=short -p no:cacheprovider`",
         "- `git diff --check`",

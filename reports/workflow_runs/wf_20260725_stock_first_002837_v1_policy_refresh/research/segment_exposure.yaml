@@ -1,0 +1,55 @@
+schema_version: segment_exposure_v0.1
+artifact_type: segment_exposure
+status: current
+workflow_id: wf_20260725_stock_first_002837_v1_policy_refresh
+company_id: cn_002837_invic
+stock_code: 002837
+company_name: 英维克
+as_of_date: '2026-07-25'
+exposures:
+- exposure_id: exp_002837_ai_server_liquid_cooling_2025h1
+  segment_id: ai_server_liquid_cooling
+  segment_name: AI服务器液冷
+  exposure_type: revenue
+  exposure_score: 4
+  confidence: high
+  period: 2025H1
+  liquid_related_revenue:
+    operator: greater_than
+    value: '200000000'
+    unit: CNY
+  revenue_pct: MISSING_DISCLOSURE
+  profit_pct: MISSING_DISCLOSURE
+  evidence_ids:
+  - ev_interim_report_002837_20250819_47054e
+  claim_ids: []
+  metric_ids: []
+  missing_reason: 'MISSING_DISCLOSURE: revenue share, profit share and exact business-line allocation'
+  exposure_score_rationale: issuer-disclosed positive revenue lower bound confirms business exposure; undisclosed share prevents score 5
+  backflow_decision: update_exposure
+  next_action: keep exact allocation unknown until issuer disclosure
+  source_metric_scope: liquid_cooling_related_revenue_lower_bound
+  uses_company_total_revenue_as_segment_revenue: false
+  fact_ids:
+  - fact_002837_2025h1_liquid_revenue_lower_bound
+  - fact_002837_2025h1_room_liquid_partial_overlap
+  line_relationships:
+    room_cooling:
+      relationship: partial_overlap_confirmed
+      allocation_amount: UNKNOWN_NOT_DISCLOSED
+    other:
+      relationship: partial_overlap_confirmed
+      allocation_amount: UNKNOWN_NOT_DISCLOSED
+    cabinet_cooling:
+      relationship: UNKNOWN_NOT_DISCLOSED
+      overlap_asserted: false
+      never_overlap_asserted: false
+  allocation_status: MISSING_DISCLOSURE
+  aggregation_allowed: false
+  confidence_detail:
+    revenue_lower_bound: high
+    room_other_classification: high
+    cabinet_relationship: unknown
+global_exposure_updated: false
+sample_quality_ready: false
+p2_ready: false

@@ -4,7 +4,10 @@
 
 `R5_stock_research_pack.yaml` is the structured source artifact for an R5 stock research note. It is a fact and gap carrier, not a report draft.
 
-Report writers may translate this pack into prose only after the pack and issue list are reviewed. They must not invent missing forecast, valuation, business breakdown, market, sentiment, catalyst, or exposure facts.
+Report writers may translate this pack into prose only after the pack and issue
+list pass machine validation. They must not invent missing forecast,
+valuation, business breakdown, market, sentiment, catalyst, or exposure facts.
+This intermediate qualification is not human approval.
 
 ## Canonical path
 
@@ -72,7 +75,10 @@ source_path
 missing_reason
 ```
 
-Use `source_evidence_id` for the disclosure or source record, `metric_id` for reviewed structured metrics, `claim_id` for reviewed claims, and `assumption_id` for forecast/valuation assumptions. If none exists, preserve `missing_reason` and add the item to `source_gap_register`.
+Use `source_evidence_id` for the disclosure or source record, `metric_id` for
+machine-qualified structured metrics, `claim_id` for machine-qualified claims,
+and `assumption_id` for forecast/valuation assumptions. If none exists,
+preserve `missing_reason` and add the item to `source_gap_register`.
 
 ## Claim type and uncertainty fields
 
@@ -84,7 +90,12 @@ confidence: high | medium | low | not_assessed | blocked
 review_status: reviewed | candidate | TODO | MISSING | blocked
 ```
 
-Facts require official disclosure or reviewed evidence. Estimates and assumptions require their model input or explicit TODO. Opinions and analyst views cannot be promoted into facts.
+The retained token `reviewed` means machine-qualified under provenance,
+schema, claim-type, metric, citation, hash and no-advice checks. It never
+denotes human approval. Facts require official disclosure or such
+machine-qualified evidence. Estimates and assumptions require their model
+input or explicit TODO. Opinions and analyst views cannot be promoted into
+facts.
 
 ## R4 to R5 mapping
 
@@ -125,7 +136,14 @@ sample_quality_ready
 blocked
 ```
 
-`sample_quality_ready` is forbidden unless `forecast_model_pack`, `valuation_pack`, and `business_breakdown_pack` are all `ready`, `high_issue_count == 0`, and `no_advice_gate_passed == true`.
+`sample_quality_ready` is forbidden unless `forecast_model_pack`,
+`valuation_pack`, and `business_breakdown_pack` are all `ready`, there is no
+active defect or report limitation for the sample-quality capability,
+`no_advice_gate_passed == true`, all other necessary automated quality checks
+pass, and the current final report has a valid `approved` review whose
+machine-recomputed SHA-256 matches the reviewed bytes. These are necessary
+conditions, not an automatic sufficiency rule. Severity counts remain
+descriptive and cannot decide readiness or canonical status by themselves.
 
 Canonical external output labels:
 
@@ -140,10 +158,15 @@ Mapping from pack state to external label:
 
 | Condition | External label |
 |---|---|
-| all required subpacks ready, no high issues, no-advice passed | `R5_sample_quality_ready` |
+| all required subpacks ready, no active defect/limitation for sample-quality, no-advice passed, all other applicable conditions met, and current final report review validly approved | `R5_sample_quality_ready` |
 | core identity/evidence are present but forecast/valuation/market gaps remain | `R5_research_draft` |
 | key financial/business/evidence fields are missing but visible | `R5_source_gapped_draft` |
-| identity/evidence/no-advice/source-gap visibility fails | `blocked` |
+| identity/path/parse/source identity failure prevents any honest report output | `blocked` |
+
+These external labels describe the report capability. They do not directly
+write canonical `workflow_state.status`. A no-advice violation, hidden source
+gap or unsupported-used value is `needs_fix`, not `blocked`; a visible unused
+unknown may coexist with canonical `accepted_with_todos`.
 
 ## Source-gap policy
 
@@ -161,6 +184,18 @@ LOW_CONFIDENCE_CLUE_ONLY
 
 If a metric value is `null`, the nearby object must carry `missing_reason`, `missing_items`, or another explicit source-gap explanation.
 
+Missing information follows:
+
+```text
+direct issuer disclosure
+→ audited aggregate
+→ bounded estimate / scenario with explicit assumptions
+→ unknown or omit the dependent conclusion
+```
+
+Lower tiers must not be promoted to higher tiers. An unknown closes only the
+claim, section, calculation or method that actually depends on it.
+
 `source_gap_register` should include:
 
 ```yaml
@@ -170,7 +205,7 @@ source_gap_register:
     missing_data: market_snapshot.current_price
     impact_on_conclusion: sample_quality_not_allowed
     fix_owner_skill: evidence-ingest
-    next_action: register reviewed market snapshot or keep TODO_MARKET_DATA
+    next_action: register machine-qualified market snapshot or keep TODO_MARKET_DATA
 ```
 
 ## Market and trading-state boundary
@@ -190,6 +225,10 @@ allowed_report_level
 r5_external_state
 high_issue_count
 medium_issue_count
+impact_scope
+active_disposition
+affected_capabilities
+blocks_current_goal
 source_gap_register
 known_blockers
 forecast_gap_status
@@ -200,7 +239,38 @@ no_advice_gate_input
 owner_next_actions
 ```
 
-The handoff must say whether the run is `R5_sample_quality_ready`, `R5_research_draft`, `R5_source_gapped_draft`, or `blocked`. A high severity issue blocks `R5_sample_quality_ready`.
+The handoff must say whether the report capability is
+`R5_sample_quality_ready`, `R5_research_draft`, `R5_source_gapped_draft`, or
+`blocked`. It must also provide scoped issue rows so `quality-review` can
+derive the canonical outcome from actual current-goal dependency. Severity
+alone never sets `blocks_current_goal`.
+
+Pack and issue-list validation is automatic. It must not request reviewer
+identity, authority, a receipt or per-candidate human decisions. After the
+final report is rendered, the active workflow separately records:
+
+```text
+automated_report_quality_passed
+final_report_review_status
+final_report_review.report_path
+final_report_review.report_sha256
+final_report_review.reviewer
+final_report_review.reviewed_at
+final_report_review.decision
+final_report_review.notes
+final_report_review.change_scope
+```
+
+`not_requested|pending` does not block the automatic workflow or
+`system_v1_complete`, but keeps `sample_quality_ready=false`. Report byte
+changes invalidate an old decision. `changes_requested` routes to
+`needs_fix` only for `change_scope=automated_quality_defect`; a
+`report_revision` request affects only the final report.
+
+Only the final report hash binds human review. Research-pack, evidence, claim,
+metric, candidate, calculation, generation-lock and receipt hashes remain
+machine-integrity evidence. Historical Bundle/Night/Reader approvals are
+read-only and cannot approve the current report.
 
 ## Validation
 
@@ -219,3 +289,13 @@ accepted_with_todos
 needs_fix
 blocked
 ```
+
+Outcome boundaries:
+
+- `accepted`: automatic quality passes and no active limitation remains;
+- `accepted_with_todos`: visible unknowns or unavailable non-required methods
+  remain but are not used without support;
+- `needs_fix`: unsupported-used values, errors, true double-counting, broken
+  citations, hidden TODOs or no-advice violations exist;
+- `blocked`: identity/path/parse/source identity or an irreplaceable required
+  input failure prevents any honest target output.

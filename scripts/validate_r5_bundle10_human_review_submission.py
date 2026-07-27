@@ -10,7 +10,10 @@ from typing import Any, Mapping, Sequence
 import yaml
 
 
-DEFAULT_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
+# Import-only compatibility for the retained finalizer.  ``None`` deliberately
+# fails closed if that legacy CLI omits its workflow id; no historical run is
+# selected implicitly.
+DEFAULT_WORKFLOW_ID: None = None
 REQUIRED_CHECK_IDS = tuple(f"HR-{number}" for number in range(1, 7))
 ALLOWED_REVIEW_DECISIONS = {"pass", "needs_fix", "reject"}
 ALLOWED_CHECK_STATUSES = {"pass", "needs_fix"}
@@ -201,7 +204,7 @@ def validate_submission(run: Path, submission_path: Path) -> dict[str, Any]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validate a real external Bundle 10 human-review submission.")
     parser.add_argument("--repo-root", default=".")
-    parser.add_argument("--workflow-id", default=DEFAULT_WORKFLOW_ID)
+    parser.add_argument("--workflow-id", required=True)
     parser.add_argument("--submission", required=True)
     parser.add_argument("--output", default="")
     args = parser.parse_args(argv)

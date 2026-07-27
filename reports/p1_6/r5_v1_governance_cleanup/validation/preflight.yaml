@@ -1,0 +1,55 @@
+schema_version: r5_v1_governance_cleanup_validation_v1
+validation_id: V-001
+phase: P5_pre_delete
+checked_at: "2026-07-26T15:10:00+08:00"
+decision: pass
+task_package:
+  path: docs/codex_tasks/v1_governance_integration_cleanup_v5
+  contract_sha256: 7a02675ea94dd9ef83f40df42889720998cbea0d8db26992d158bf3c78135ef4
+  validator_ok: true
+  state: ready
+  phases:
+    - P1
+    - P2
+    - P3
+    - P4
+    - P5
+git:
+  package_setup_commit: ce4f9554db4fcdfa4699c70516d9a3497c565fc7
+  package_setup_parent: f1dafeb32b08d24a6960f31d4a0f6d8820b95839
+  package_setup_paths:
+    - docs/codex_tasks/v1_governance_integration_cleanup_v5/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v5/START_HERE.md
+  historical_cleanup_snapshot: 312adc73821706b0b7ca6aa00e80ee608bd10b32
+  engineering_source_candidate: f60f220ae252262a537c612ce193fc779901984b
+  package_baseline_is_ancestor: true
+  historical_snapshot_is_ancestor: true
+  engineering_source_is_ancestor: true
+  branch: codex/v1-governance-integration-cleanup
+  deletion_count_before_checkpoint: 0
+  untracked_count_before_checkpoint: 0
+remote:
+  origin: https://github.com/chaoranq2000-crypto/03_Investment_System.git
+  main: a345fafb522300831ed4206d35fa17f44570cb1f
+  night05: a96c1b717bf15905d72fd142efd946fa01bce666
+  v1_source: f60f220ae252262a537c612ce193fc779901984b
+  execution_ref_present: false
+user_main_worktree:
+  path: C:/Projects/03_Investment_System
+  head: a345fafb522300831ed4206d35fa17f44570cb1f
+  status_rows: 130
+  tracked_status_rows: 20
+  status_porcelain_v1_uall_bytes: 9156
+  status_porcelain_v1_uall_sha256: 1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0
+  tracked_status_porcelain_bytes: 1025
+  tracked_status_porcelain_sha256: 3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b
+  matches_authorized_snapshot: true
+  handling: read_only
+phase_resume:
+  p1_checkpoint: 0906a5fa8c785da1a74326aa19dbf0abc58ddd2e
+  p2_checkpoint: aa73859ddf8dbef2ad94b8c72dbf0ffc3931b851
+  p3_checkpoint: 6c7fc2a35942bb04f5ef0ecfa2c6ccbd10e0a069
+  p4_checkpoint: 3741c807ae1d9859e8cb72d5e587a5bb74f2082e
+  earliest_unproven_phase_at_resume: P5
+  wave_armed: false
+  file_deleted: false

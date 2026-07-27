@@ -5,7 +5,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -31,7 +31,11 @@ def issue(severity: str, path: str, description: str) -> dict[str, str]:
     return {"severity": severity, "path": path, "description": description}
 
 
-def validate_pack(data: Mapping[str, Any], repo_root: Path = ROOT) -> list[dict[str, str]]:
+def validate_pack(
+    data: Mapping[str, Any],
+    repo_root: Path = ROOT,
+    source_path_exists: Callable[[str], bool] | None = None,
+) -> list[dict[str, str]]:
     issues: list[dict[str, str]] = []
     if data.get("artifact_type") != "R5_reader_report_pack":
         issues.append(issue("high", "artifact_type", "artifact_type must be R5_reader_report_pack"))
@@ -100,8 +104,14 @@ def validate_pack(data: Mapping[str, Any], repo_root: Path = ROOT) -> list[dict[
         if missing:
             issues.append(issue("high", f"traceability_records[{index}]", f"missing fields: {missing}"))
         source_path = str(row.get("source_path") or "")
-        if source_path and not Path(source_path).is_absolute() and not (repo_root / source_path).exists():
-            issues.append(issue("high", f"traceability_records[{index}].source_path", f"source path does not exist: {source_path}"))
+        if source_path and not Path(source_path).is_absolute():
+            source_exists = (
+                source_path_exists(source_path)
+                if source_path_exists is not None
+                else (repo_root / source_path).exists()
+            )
+            if not source_exists:
+                issues.append(issue("high", f"traceability_records[{index}].source_path", f"source path does not exist: {source_path}"))
 
     try:
         report = build_reader_report(data)

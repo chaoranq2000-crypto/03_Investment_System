@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import importlib.util
-import shutil
 from pathlib import Path
 
 import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 SCRIPT = ROOT / "scripts/finalize_r5_bundle10_after_human_review.py"
+WINDOWS_HASH_INPUTS = {
+    "R5_stock_research_report_reader_v3.md",
+    "R5_stock_research_report_traceability_v3.yaml",
+}
 
 
 def load_module():
@@ -20,8 +23,12 @@ def load_module():
     return module
 
 
-def prepare_run(tmp_path: Path) -> tuple[Path, Path]:
-    run = tmp_path / RUN.name
+def historical_yaml(historical_blob_bytes, name: str):
+    return yaml.safe_load(historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8"))
+
+
+def prepare_run(tmp_path: Path, historical_blob_bytes) -> tuple[Path, Path]:
+    run = tmp_path / "bundle10_finalize_run"
     run.mkdir()
     for name in (
         "R5_stock_research_report_reader_v3.md",
@@ -35,7 +42,11 @@ def prepare_run(tmp_path: Path) -> tuple[Path, Path]:
         "artifact_manifest.csv",
         "run_log.md",
     ):
-        shutil.copy2(RUN / name, run / name)
+        payload = historical_blob_bytes(f"{HISTORICAL_RUN}/{name}")
+        if name in WINDOWS_HASH_INPUTS:
+            assert b"\r\n" not in payload
+            payload = payload.replace(b"\n", b"\r\n")
+        (run / name).write_bytes(payload)
     handoff_path = run / "R5_stock_research_report_reader_v3_human_review.yaml"
     handoff = yaml.safe_load(handoff_path.read_text(encoding="utf-8"))
     handoff.update(
@@ -137,8 +148,11 @@ def prepare_run(tmp_path: Path) -> tuple[Path, Path]:
     return run, submission_path
 
 
-def test_finalizer_closes_only_a_validated_temp_human_submission(tmp_path: Path) -> None:
-    run, submission_path = prepare_run(tmp_path)
+def test_finalizer_closes_only_a_validated_temp_human_submission(
+    tmp_path: Path,
+    historical_blob_bytes,
+) -> None:
+    run, submission_path = prepare_run(tmp_path, historical_blob_bytes)
     result = load_module().finalize_bundle10(run, submission_path)
     assert result["decision"] == "pass"
     assert result["sample_quality_allowed"] is True
@@ -157,10 +171,12 @@ def test_finalizer_closes_only_a_validated_temp_human_submission(tmp_path: Path)
     assert (run / "R5_bundle10_final_close_validation.json").exists()
 
 
-def test_real_workflow_remains_finalized_after_temp_finalizer_test() -> None:
-    state = yaml.safe_load((RUN / "workflow_state.yaml").read_text(encoding="utf-8"))
-    handoff = yaml.safe_load(
-        (RUN / "R5_stock_research_report_reader_v3_human_review.yaml").read_text(encoding="utf-8")
+def test_real_workflow_remains_finalized_after_temp_finalizer_test(
+    historical_blob_bytes,
+) -> None:
+    state = historical_yaml(historical_blob_bytes, "workflow_state.yaml")
+    handoff = historical_yaml(
+        historical_blob_bytes, "R5_stock_research_report_reader_v3_human_review.yaml"
     )
     assert state["current_stage"] in {
         "T10_close_readout",
@@ -183,4 +199,6 @@ def test_real_workflow_remains_finalized_after_temp_finalizer_test() -> None:
     assert handoff["status"] == "passed_external_human_review"
     assert handoff["external_reviewer"] == "Q"
     assert handoff["p2_allowed"] is False
-    assert (RUN / "R5_stock_research_report_reader_v3_human_review_submission.yaml").exists()
+    assert historical_blob_bytes(
+        f"{HISTORICAL_RUN}/R5_stock_research_report_reader_v3_human_review_submission.yaml"
+    )

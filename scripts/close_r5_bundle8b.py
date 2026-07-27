@@ -9,9 +9,6 @@ from typing import Any, Mapping, Sequence
 import yaml
 
 
-WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-
-
 def load_yaml(path: Path) -> dict[str, Any]:
     payload = yaml.safe_load(path.read_text(encoding="utf-8"))
     if not isinstance(payload, dict):
@@ -47,7 +44,7 @@ def _append_unique(items: list[Any], value: Any) -> None:
         items.append(value)
 
 
-def _update_state(run: Path) -> dict[str, int]:
+def _update_state(run: Path, run_ref: str) -> dict[str, int]:
     state_path = run / "workflow_state.yaml"
     state = load_yaml(state_path)
     state.update(
@@ -70,10 +67,7 @@ def _update_state(run: Path) -> dict[str, int]:
     evidence = state.setdefault("evidence_snapshot", {})
     evidence.update(
         {
-            "manifest_path": (
-                "reports/workflow_runs/wf_20260703_stock_first_002837_invic/"
-                "R5_bundle8b_evidence_manifest_delta.csv"
-            ),
+            "manifest_path": f"{run_ref}/R5_bundle8b_evidence_manifest_delta.csv",
             "evidence_count": 46,
             "bundle8b_official_ir_count": 4,
             "bundle8b_reviewed_official_ir_count": 4,
@@ -113,7 +107,7 @@ def _update_state(run: Path) -> dict[str, int]:
         ("bundle8_close_readout", "bundle8_close_readout.md", "research-orchestrator", "T11"),
     ]
     for artifact_type, name, skill, stage in artifacts:
-        path_value = f"reports/workflow_runs/{WORKFLOW_ID}/{name}"
+        path_value = f"{run_ref}/{name}"
         if path_value not in state_paths:
             state_artifacts.append(
                 {
@@ -289,7 +283,7 @@ def _update_open_todos(run: Path) -> dict[str, int]:
     return {"rows": len(rows), "added": added}
 
 
-def _update_artifact_manifest(repo_root: Path, run: Path) -> dict[str, int]:
+def _update_artifact_manifest(repo_root: Path, run: Path, run_ref: str) -> dict[str, int]:
     path = run / "artifact_manifest.csv"
     fields, rows = read_csv(path)
     existing_paths = {row["path"] for row in rows}
@@ -324,7 +318,7 @@ def _update_artifact_manifest(repo_root: Path, run: Path) -> dict[str, int]:
     ]
     added = 0
     for artifact_type, name, skill, stage, notes in specs:
-        rel = f"reports/workflow_runs/{WORKFLOW_ID}/{name}"
+        rel = f"{run_ref}/{name}"
         if rel in existing_paths:
             continue
         if not (repo_root / rel).exists():
@@ -375,9 +369,11 @@ def _append_run_log(run: Path) -> bool:
     return True
 
 
-def close_bundle8b(repo_root: Path) -> dict[str, Any]:
+def close_bundle8b(repo_root: Path, run_root: Path) -> dict[str, Any]:
     repo_root = repo_root.resolve()
-    run = repo_root / "reports/workflow_runs" / WORKFLOW_ID
+    run = run_root if run_root.is_absolute() else repo_root / run_root
+    run = run.resolve()
+    run_ref = run.relative_to(repo_root).as_posix()
     validation = json.loads((run / "R5_bundle8b_close_input_validation.json").read_text(encoding="utf-8"))
     if validation.get("decision") != "pass":
         raise ValueError("Bundle 8B deterministic validation is not pass")
@@ -385,9 +381,9 @@ def close_bundle8b(repo_root: Path) -> dict[str, Any]:
     if "decision: `accepted_with_todos`" not in quality_text:
         raise ValueError("Bundle 8B quality decision is not accepted_with_todos")
     result = {
-        "state": _update_state(run),
+        "state": _update_state(run, run_ref),
         "todos": _update_open_todos(run),
-        "artifacts": _update_artifact_manifest(repo_root, run),
+        "artifacts": _update_artifact_manifest(repo_root, run, run_ref),
         "run_log_appended": _append_run_log(run),
     }
     return result
@@ -396,8 +392,9 @@ def close_bundle8b(repo_root: Path) -> dict[str, Any]:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Close R5 Bundle 8B locally after quality pass.")
     parser.add_argument("--repo-root", default=".")
+    parser.add_argument("--run-root", type=Path, required=True)
     args = parser.parse_args(argv)
-    result = close_bundle8b(Path(args.repo_root))
+    result = close_bundle8b(Path(args.repo_root), args.run_root)
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 

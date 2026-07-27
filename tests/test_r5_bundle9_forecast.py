@@ -1,22 +1,28 @@
 from __future__ import annotations
 
 import csv
+import io
 from pathlib import Path
 
 import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RUN = ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
-def load(name: str):
-    return yaml.safe_load((RUN / name).read_text(encoding="utf-8"))
+def historical_yaml(historical_blob_bytes, name: str):
+    return yaml.safe_load(historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8"))
 
 
-def test_bundle9_forecast_is_bottom_up_and_reconciled() -> None:
-    model = load("segment_forecast_model.yaml")
-    bridge = load("forecast_bridge.yaml")
+def historical_csv(historical_blob_bytes, name: str) -> list[dict[str, str]]:
+    text = historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8")
+    return list(csv.DictReader(io.StringIO(text)))
+
+
+def test_bundle9_forecast_is_bottom_up_and_reconciled(historical_blob_bytes) -> None:
+    model = historical_yaml(historical_blob_bytes, "segment_forecast_model.yaml")
+    bridge = historical_yaml(historical_blob_bytes, "forecast_bridge.yaml")
     assert model["status"] == "ready"
     assert model["model_type"].startswith("bottom_up_")
     assert set(model["business_line_anchors"]) == {
@@ -35,9 +41,13 @@ def test_bundle9_forecast_is_bottom_up_and_reconciled() -> None:
             assert row["bridge"]["free_cashflow"] is not None
 
 
-def test_bundle9_forecast_keeps_liquid_cooling_boundary_and_assumptions() -> None:
-    model = load("segment_forecast_model.yaml")
-    registry = load("R5_bundle9_forecast_assumption_registry.yaml")
+def test_bundle9_forecast_keeps_liquid_cooling_boundary_and_assumptions(
+    historical_blob_bytes,
+) -> None:
+    model = historical_yaml(historical_blob_bytes, "segment_forecast_model.yaml")
+    registry = historical_yaml(
+        historical_blob_bytes, "R5_bundle9_forecast_assumption_registry.yaml"
+    )
     assert model["liquid_cooling_boundary"]["claim_type"] == "management_comment"
     assert model["liquid_cooling_boundary"]["2025_revenue"] == "MISSING_DISCLOSURE"
     assert model["liquid_cooling_boundary"]["gross_margin"] == "MISSING_DISCLOSURE"
@@ -48,9 +58,10 @@ def test_bundle9_forecast_keeps_liquid_cooling_boundary_and_assumptions() -> Non
     )
 
 
-def test_bundle9_forecast_sensitivity_is_parseable_and_no_advice() -> None:
-    with (RUN / "forecast_sensitivity.csv").open("r", encoding="utf-8", newline="") as handle:
-        rows = list(csv.DictReader(handle))
+def test_bundle9_forecast_sensitivity_is_parseable_and_no_advice(
+    historical_blob_bytes,
+) -> None:
+    rows = historical_csv(historical_blob_bytes, "forecast_sensitivity.csv")
     assert len(rows) == 12
     assert {row["driver"] for row in rows} == {
         "room_cooling_revenue_growth",
@@ -59,7 +70,7 @@ def test_bundle9_forecast_sensitivity_is_parseable_and_no_advice() -> None:
         "nwc_to_revenue",
     }
     text = "\n".join(
-        (RUN / name).read_text(encoding="utf-8")
+        historical_blob_bytes(f"{HISTORICAL_RUN}/{name}").decode("utf-8")
         for name in (
             "segment_forecast_model.yaml",
             "forecast_bridge.yaml",
