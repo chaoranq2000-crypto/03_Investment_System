@@ -16,6 +16,12 @@ data/processed/logs/ev_company_ir_product_002837_20260715_2430bf__ingest_log.jso
 # OCR text mirrors preserve source line layout, including terminal spacing.
 data/processed/text/** whitespace=-trailing-space
 
+# The V1 policy refresh freezes both canonical LF content hashes and the
+# original CRLF checkout-byte receipts for these two official text mirrors.
+# Materialize the same receipt bytes on every checkout platform.
+data/processed/text/002837/cninfo_2025_annual_report_full_002837_2026-04-21.txt text eol=crlf
+data/processed/text/002837/cninfo_2025_interim_report_full_002837_2025-08-19.txt text eol=crlf
+
 # These committed Bundle 16R snapshots intentionally retain their original
 # CRLF bytes. Treat the exact paths as opaque so a Windows clean checkout does
 # not become dirty solely from line-ending normalization.

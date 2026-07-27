@@ -266,6 +266,25 @@ def load_runner():
     return module
 
 
+def test_official_processed_text_receipts_use_cross_platform_crlf_checkout() -> None:
+    paths = [
+        "data/processed/text/002837/"
+        "cninfo_2025_annual_report_full_002837_2026-04-21.txt",
+        "data/processed/text/002837/"
+        "cninfo_2025_interim_report_full_002837_2025-08-19.txt",
+    ]
+    completed = subprocess.run(
+        ["git", "check-attr", "text", "eol", "--", *paths],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    for path in paths:
+        assert f"{path}: text: set" in completed.stdout
+        assert f"{path}: eol: crlf" in completed.stdout
+
+
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
