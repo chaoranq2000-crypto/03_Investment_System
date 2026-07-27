@@ -1,1 +1,0 @@
-- gap_liquid_cooling_revenue_pct: 液冷收入占比和毛利率
