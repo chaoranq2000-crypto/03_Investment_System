@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v9"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v9/CONTRACT.md"
 contract_sha256: "990e582e36c18f93a4e594eb1c0dc1b043f182e1a45eeb0cd7c83fd61a7d2b82"
-state: "ready"
+state: "blocked"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "1e38e1f3704f9eff0328f80053d4da254f4b80b6"
 last_completed_phase: "P4"
 next_phase: "P5"
-last_validation: "pass"
-updated_at: "2026-07-27T08:07:01+00:00"
+last_validation: "fail"
+updated_at: "2026-07-27T08:38:56+00:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -40,12 +40,12 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `ready`
+- **State:** `blocked`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `fail`。v8 final V-010 为 `10 failed, 966 passed, 2 skipped in 683.95s`；focused exact rerun 为 `10 failed in 2.70s`。
-- **Current blocker:** v8 没有授权修改最终回归所需的精确 implementation/test paths。用户已批准最小 v9；当前只需冻结包、创建 package-only setup checkpoint 后在 A.8 内修复。
-- **Next safe action:** 验证 `--require-ready`，确认 setup diff 只有本包两文件并提交；随后执行 A.8 focused repair。
+- **Latest validation:** `fail`。v9 A.8 focused regression 为 `13 passed in 8.06s`；V-006 scanner 正反例为 `5 passed`，但 active-root scan 仍为 `1 failed`，精化后的真实剩余量为 27 references / 12 个 A.8 外路径。1386 files、29 directories 与 old root 测试后继续全 absent；用户主树完整/跟踪状态向量与冻结快照逐字节一致；`git diff --check` 通过。
+- **Current blocker:** V-006 证明 7 个保留生产实现仍使用旧 workflow run 作为 CLI 默认值、构建输入/输出或 rerun 命令，5 个保留测试仍把旧 workflow ID/path 送入活动 builder/registry/composer。精确路径为 `scripts/build_r5_bundle10_reader_pack.py`、`scripts/build_r5_bundle9_forecast.py`、`scripts/build_r5_bundle9_valuation.py`、`scripts/build_r5_reader_section_payloads.py`、`src/ingest/business_segment_extraction.py`、`src/qa/r4_disclosure_backflow_review.py`、`src/research/r5_bundle13r_evidence_backflow.py`、`tests/test_r5_bundle4_post_promotion_dry_run.py`、`tests/test_r5_bundle4_registry_promotion.py`、`tests/test_r5_bundle5_real_registry_promotion.py`、`tests/test_r5_composer_research_draft_plus.py`、`tests/test_r5_reviewed_input_registry_promotion.py`。这些路径均不在冻结 v9 Appendix A.8；修改任何一个都会越权，不能靠豁免 scanner、删除断言或接受非零引用完成 C-008/V-006。
+- **Next safe action:** 用户明确批准最小 v10：只新增上述 12-path active-route retirement authority；允许把生产 CLI default 改为 required/显式参数、把旧 run 输入/输出改为显式 generic/temp/blob-bound 输入，并把 5 个测试改为等强 generic/temp/blob-bound 正反例；其余 v9 标准、A.1–A.8、三波边界/commits/receipts、无删除/无恢复和发布模式 A 全部不变。
 
 ### Immutable completed deletion evidence
 
@@ -78,6 +78,7 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 | Timestamp | Phase | Commit | Validation | Scope |
 |---|---|---|---|---|
 | 2026-07-27T15:44:44+08:00 | P5 blocker | `1e38e1f3704f9eff0328f80053d4da254f4b80b6` | 10 failed, 966 passed, 2 skipped | v8 final-regression authority blocker evidence |
+| 2026-07-27T16:38:56+08:00 | P5 blocker | current checkpoint commit | A.8 focused 13 passed; V-006 active scan 27 references / 12 unauthorized paths | v9 A.8 repairs close all original regressions and strengthen the scanner; continuation requires exact v10 authority |
 
 ## Resume rules
 
@@ -88,3 +89,4 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 5. Modify only A.8 plus exact checkpoint evidence paths; any additional implementation/test path requires a new amendment.
 6. Run focused ten tests, V-006, all contract validators, full pytest, clean-checkout smoke, scope audit and package validation.
 7. After seal, do not write tracked files; publication evidence remains external.
+- 2026-07-27T08:08:24+00:00 — state=running; completed=P4; next=P5; validation=pass; v9 frozen and package-only setup checkpoint 49c9cc9 verified; begin A.8 final-regression repair

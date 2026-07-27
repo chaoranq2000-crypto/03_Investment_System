@@ -6,6 +6,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts/render_r5_reviewed_input_output.py"
+HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 
 def load_renderer():
@@ -17,16 +18,34 @@ def load_renderer():
     return module
 
 
-def test_blocked_gate_renders_source_gapped_draft(tmp_path: Path):
+def _render_inputs(historical_blob_file) -> dict[str, Path]:
+    return {
+        "pack_path": historical_blob_file(
+            f"{HISTORICAL_RUN}/R5_stock_research_pack_source_gapped.yaml",
+            "render/pack.yaml",
+        ),
+        "staging_path": historical_blob_file(
+            f"{HISTORICAL_RUN}/R5_reviewed_input_staging_result.yaml",
+            "render/staging.yaml",
+        ),
+        "promotion_path": historical_blob_file(
+            f"{HISTORICAL_RUN}/R5_reviewed_input_registry_promotion_result.yaml",
+            "render/promotion.yaml",
+        ),
+    }
+
+
+def test_blocked_gate_renders_source_gapped_draft(tmp_path: Path, historical_blob_file):
     renderer = load_renderer()
     output = tmp_path / "draft.md"
     result_path = tmp_path / "render_result.yaml"
 
     result = renderer.render_output(
         repo_root=REPO_ROOT,
-        workflow_id="wf_20260703_stock_first_002837_invic",
+        workflow_id="fixture_stock_first_002837",
         result_path=result_path,
         output_path=output,
+        **_render_inputs(historical_blob_file),
     )
     text = output.read_text(encoding="utf-8")
 
@@ -38,16 +57,17 @@ def test_blocked_gate_renders_source_gapped_draft(tmp_path: Path):
     assert "TODO_MARKET_DATA" in text
 
 
-def test_render_result_preserves_required_markers(tmp_path: Path):
+def test_render_result_preserves_required_markers(tmp_path: Path, historical_blob_file):
     renderer = load_renderer()
     output = tmp_path / "draft.md"
     result_path = tmp_path / "render_result.yaml"
 
     result = renderer.render_output(
         repo_root=REPO_ROOT,
-        workflow_id="wf_20260703_stock_first_002837_invic",
+        workflow_id="fixture_stock_first_002837",
         result_path=result_path,
         output_path=output,
+        **_render_inputs(historical_blob_file),
     )
 
     assert result["forbidden_language_check"]["status"] == "pass"

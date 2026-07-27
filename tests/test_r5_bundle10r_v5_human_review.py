@@ -14,10 +14,16 @@ VALIDATION_INPUTS = (
     "R5_bundle10r_human_review_handoff_v5.yaml",
     "R5_bundle10r_reader_generation_lock_v5.yaml",
     "R5_bundle10r_human_review_submission_v5.yaml",
+    "R5_bundle10r_reader_narrative_plan_v5.yaml",
+    "R5_bundle10r_reader_payload_v5.yaml",
 )
 
 
 def _validate(run: Path, submission: Path) -> dict:
+    artifact_paths = {
+        f"{HISTORICAL_RUN}/{name}": run / name
+        for name in VALIDATION_INPUTS
+    }
     return validate(
         report=run / "R5_bundle10r_reader_v5.md",
         appendix=run / "R5_bundle10r_traceability_v5.yaml",
@@ -25,6 +31,7 @@ def _validate(run: Path, submission: Path) -> dict:
         handoff=run / "R5_bundle10r_human_review_handoff_v5.yaml",
         reader_lock=run / "R5_bundle10r_reader_generation_lock_v5.yaml",
         submission=submission,
+        locked_artifact_resolver=artifact_paths.__getitem__,
     )
 
 

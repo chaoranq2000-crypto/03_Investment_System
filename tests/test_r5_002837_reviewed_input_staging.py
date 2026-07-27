@@ -18,14 +18,28 @@ def load_builder():
     return module
 
 
-def test_empty_dropzone_keeps_002837_source_gapped(tmp_path: Path):
+def test_empty_dropzone_keeps_002837_source_gapped(
+    tmp_path: Path,
+    historical_blob_bytes,
+):
     builder = load_builder()
     dropzone_root = tmp_path / "empty_dropzone"
     dropzone_root.mkdir()
+    workflow_id = "fixture_stock_first_002837"
+    run_dir = tmp_path / "repo" / "reports" / "workflow_runs" / workflow_id
+    run_dir.mkdir(parents=True)
+    historical_run = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+    for name in (
+        "R5_reviewed_input_dry_run_result.yaml",
+        "R5_evidence_request_review_ledger.yaml",
+    ):
+        (run_dir / name).write_bytes(
+            historical_blob_bytes(f"{historical_run}/{name}")
+        )
 
     result = builder.build_staging_result(
-        repo_root=REPO_ROOT,
-        workflow_id="wf_20260703_stock_first_002837_invic",
+        repo_root=tmp_path / "repo",
+        workflow_id=workflow_id,
         dropzone_root=dropzone_root,
     )
 
@@ -40,7 +54,7 @@ def test_pending_rows_do_not_create_reviewed_flags():
     builder = load_builder()
     result = builder.build_staging_result(
         repo_root=REPO_ROOT,
-        workflow_id="wf_20260703_stock_first_002837_invic",
+        workflow_id="fixture_stock_first_002837",
         dropzone_root=FIXTURE_ROOT / "valid_pending",
     )
 
@@ -54,7 +68,7 @@ def test_accepted_degraded_does_not_allow_sample_quality():
     builder = load_builder()
     result = builder.build_staging_result(
         repo_root=REPO_ROOT,
-        workflow_id="wf_20260703_stock_first_002837_invic",
+        workflow_id="fixture_stock_first_002837",
         dropzone_root=FIXTURE_ROOT / "valid_accepted_degraded",
     )
 

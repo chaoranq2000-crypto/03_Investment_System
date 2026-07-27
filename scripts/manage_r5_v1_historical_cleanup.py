@@ -31,6 +31,9 @@ import yaml
 CONTRACT_REL = Path(
     "docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md"
 )
+CURRENT_CONTRACT_REL = Path(
+    "docs/codex_tasks/v1_governance_integration_cleanup_v9/CONTRACT.md"
+)
 START_HERE_REL = Path(
     "docs/codex_tasks/v1_governance_integration_cleanup_v8/START_HERE.md"
 )
@@ -63,7 +66,12 @@ EXPECTED_CONTRACT_SHA256 = (
     "c8f19b03dd2fa17016bab3995eaa48fe8604bdb7e7027e5197aedcbfac01eb8b"
 )
 PACKAGE_SOURCE_BASELINE = "fe986a0359c0268ac94eea696c3a4795403e4614"
+CURRENT_CONTRACT_SHA256 = (
+    "990e582e36c18f93a4e594eb1c0dc1b043f182e1a45eeb0cd7c83fd61a7d2b82"
+)
+CURRENT_PACKAGE_SOURCE_BASELINE = "1e38e1f3704f9eff0328f80053d4da254f4b80b6"
 PACKAGE_SETUP_CHECKPOINT = "37d312b00bfbad33bf66a7e1a3169a9fd0559ad8"
+V9_PACKAGE_SETUP_CHECKPOINT = "49c9cc92a4a81a80b423d7c95785e291166bb987"
 DECOUPLING_CHECKPOINT = "805b8e3e9624e4e93057aa950cba4db1b3010cb3"
 OLD_NIGHT_ARM_COMMIT = "82f7d37a10a9677af631c1a5863661a64df3270b"
 COMPLETED_NIGHT_ARM_COMMIT = "e3b7ac48b784749e32252faf543c8d9ab796d830"
@@ -110,6 +118,22 @@ EXPECTED_A7 = {
     "tests/test_r5_night_shift_night03_ci_contract.py",
     "tests/test_r5_night_shift_night04_ci_contract.py",
 }
+EXPECTED_A8 = {
+    "scripts/validate_r5_bundle10_close.py",
+    "scripts/validate_r5_reader_report_pack.py",
+    "scripts/validate_r5_bundle10r_human_review.py",
+    "scripts/validate_r5_bundle8b_close.py",
+    "scripts/manage_r5_v1_historical_cleanup.py",
+    "tests/test_r5_002837_reviewed_input_staging.py",
+    "tests/test_r5_bundle10_close.py",
+    "tests/test_r5_bundle10r_v5_human_review.py",
+    "tests/test_r5_bundle13r_evidence_backflow.py",
+    "tests/test_r5_bundle5_real_input_inventory.py",
+    "tests/test_r5_bundle8b_close.py",
+    "tests/test_r5_pilot_gate_recheck_and_render.py",
+    "tests/test_r5_report_composer_degradation.py",
+    "tests/test_r5_v1_active_routing_retirement.py",
+}
 EXPECTED_A6 = {
     "path_count": 116,
     "path_vector_bytes": 8065,
@@ -128,6 +152,11 @@ ACTIVE_ROOTS = (
     ".agents/skills/",
 )
 WAVE_ORDER = ("night", "bundle", "old002837")
+MANIFEST_BLOB_METHODS = {
+    "historical_blob_bytes",
+    "historical_blob_file",
+    "read_blob",
+}
 WAVE_ACTORS = {
     "night": {
         "deletion_actor": "codex_exact_manifest_one_file_at_a_time",
@@ -548,6 +577,31 @@ def verify_committed_contract(repo_root: Path, revision: str) -> dict[str, str]:
     }
 
 
+def verify_current_contract(repo_root: Path) -> dict[str, str]:
+    contract = repo_root / CURRENT_CONTRACT_REL
+    require(
+        contract.is_file(),
+        f"missing frozen contract: {CURRENT_CONTRACT_REL.as_posix()}",
+    )
+    observed = canonical_text_sha256(contract)
+    require(
+        observed == CURRENT_CONTRACT_SHA256,
+        f"current frozen contract SHA-256 drift: {observed}",
+    )
+    text = contract.read_text(encoding="utf-8")
+    require('status: "frozen"' in text, "current contract is not frozen")
+    require(
+        f'source_baseline: "{CURRENT_PACKAGE_SOURCE_BASELINE}"' in text,
+        "current contract package baseline drift",
+    )
+    return {
+        "path": CURRENT_CONTRACT_REL.as_posix(),
+        "canonical_sha256": observed,
+        "status": "frozen",
+        "source_baseline": CURRENT_PACKAGE_SOURCE_BASELINE,
+    }
+
+
 def _section_paths(text: str, heading: str, next_heading: str) -> set[str]:
     lines = text.splitlines()
     try:
@@ -565,7 +619,8 @@ def _section_paths(text: str, heading: str, next_heading: str) -> set[str]:
 
 def parse_authority(repo_root: Path) -> dict[str, set[str]]:
     verify_contract(repo_root)
-    text = (repo_root / CONTRACT_REL).read_text(encoding="utf-8")
+    verify_current_contract(repo_root)
+    text = (repo_root / CURRENT_CONTRACT_REL).read_text(encoding="utf-8")
     sections = {
         "a1": _section_paths(
             text, "### A.1 `modify_existing_exact`", "### A.2 `add_exact`"
@@ -591,7 +646,7 @@ def parse_authority(repo_root: Path) -> dict[str, set[str]]:
         "a7": _section_paths(
             text,
             "### A.7 `transition_modify_then_delete_exact`",
-            "## Deliverables",
+            "### A.8 `final_regression_repair_exact`",
         ),
     }
     for key, expected in EXPECTED_AUTHORITY_COUNTS.items():
@@ -615,6 +670,15 @@ def parse_authority(repo_root: Path) -> dict[str, set[str]]:
                 f"{sorted(overlap ^ expected)}",
             )
     require(sections["a7"] == EXPECTED_A7, "A7 transition path set drift")
+    require(
+        _section_paths(
+            text,
+            "### A.8 `final_regression_repair_exact`",
+            "## Deliverables",
+        )
+        == EXPECTED_A8,
+        "A8 final-regression repair path set drift",
+    )
     return sections
 
 
@@ -858,11 +922,19 @@ def _expr_strings(
         values = set(assignments.get(node.id, set()))
         return values
     if isinstance(node, ast.JoinedStr):
-        pieces: list[str] = []
+        pieces: list[set[str]] = []
         for value in node.values:
             if isinstance(value, ast.Constant) and isinstance(value.value, str):
-                pieces.append(value.value)
-        return {"".join(pieces)} if pieces else set()
+                pieces.append({value.value})
+            elif isinstance(value, ast.FormattedValue):
+                rendered = _expr_strings(value.value, assignments, seen)
+                pieces.append(rendered or {""})
+        if not pieces:
+            return set()
+        combined = {""}
+        for options in pieces:
+            combined = {prefix + suffix for prefix in combined for suffix in options}
+        return combined
     if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Div)):
         left = _expr_strings(node.left, assignments, seen)
         right = _expr_strings(node.right, assignments, seen)
@@ -878,7 +950,34 @@ def _expr_strings(
             for item in node.elts
             for value in _expr_strings(item, assignments, seen)
         }
+    if isinstance(node, ast.IfExp):
+        return _expr_strings(node.body, assignments, seen) | _expr_strings(
+            node.orelse,
+            assignments,
+            seen,
+        )
+    if isinstance(node, ast.BoolOp):
+        return {
+            value
+            for item in node.values
+            for value in _expr_strings(item, assignments, seen)
+        }
+    if isinstance(node, ast.Dict):
+        return {
+            value
+            for item in (*node.keys, *node.values)
+            for value in _expr_strings(item, assignments, seen)
+        }
     if isinstance(node, ast.Call):
+        called_name = (
+            node.func.id
+            if isinstance(node.func, ast.Name)
+            else node.func.attr
+            if isinstance(node.func, ast.Attribute)
+            else ""
+        )
+        if called_name in MANIFEST_BLOB_METHODS:
+            return set()
         return {
             value
             for arg in node.args
@@ -902,8 +1001,99 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
                 "evidence": str(exc),
             }
         ]
-    assignments: dict[str, set[str]] = defaultdict(set)
-    assignment_nodes: list[tuple[str, ast.AST]] = []
+    parents: dict[ast.AST, ast.AST] = {}
+    for parent in ast.walk(tree):
+        for child in ast.iter_child_nodes(parent):
+            parents[child] = parent
+
+    def enclosing_scope(node: ast.AST) -> ast.AST | None:
+        current = parents.get(node)
+        while current is not None:
+            if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+                return current
+            current = parents.get(current)
+        return None
+
+    function_nodes = {
+        node.name: node
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
+
+    def called_name(node: ast.Call) -> str:
+        if isinstance(node.func, ast.Name):
+            return node.func.id
+        if isinstance(node.func, ast.Attribute):
+            return node.func.attr
+        return ""
+
+    manifest_bound_functions: set[str] = set()
+    for name, function in function_nodes.items():
+        parameters = {
+            argument.arg
+            for argument in (
+                *function.args.posonlyargs,
+                *function.args.args,
+                *function.args.kwonlyargs,
+            )
+        }
+        calls = [
+            node
+            for node in ast.walk(function)
+            if isinstance(node, ast.Call)
+        ]
+        direct_fixture_reader = any(
+            called_name(call) in parameters & MANIFEST_BLOB_METHODS
+            for call in calls
+        )
+        source = ast.get_source_segment(text, function) or ""
+        verified_git_blob_reader = (
+            "cat-file" in source
+            and "sha256" in source.lower()
+            and "assert" in source
+            and ("rev-parse" in source or "cat-file\", \"-t" in source)
+            and ("len(" in source or "cat-file\", \"-s" in source)
+        )
+        if direct_fixture_reader or verified_git_blob_reader:
+            manifest_bound_functions.add(name)
+
+    changed = True
+    while changed:
+        changed = False
+        for name, function in function_nodes.items():
+            if name in manifest_bound_functions:
+                continue
+            if any(
+                called_name(node) in manifest_bound_functions
+                for node in ast.walk(function)
+                if isinstance(node, ast.Call)
+            ):
+                manifest_bound_functions.add(name)
+                changed = True
+
+    def inside_pytest_raises(node: ast.AST) -> bool:
+        current = parents.get(node)
+        while current is not None:
+            if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+                return False
+            if isinstance(current, (ast.With, ast.AsyncWith)):
+                for item in current.items:
+                    context = item.context_expr
+                    if (
+                        isinstance(context, ast.Call)
+                        and isinstance(context.func, ast.Attribute)
+                        and isinstance(context.func.value, ast.Name)
+                        and context.func.value.id == "pytest"
+                        and context.func.attr == "raises"
+                    ):
+                        return True
+            current = parents.get(current)
+        return False
+
+    assignment_expressions: dict[
+        ast.AST | None,
+        dict[str, list[ast.AST]],
+    ] = defaultdict(lambda: defaultdict(list))
     for node in ast.walk(tree):
         if isinstance(node, (ast.Assign, ast.AnnAssign)):
             value = node.value
@@ -914,11 +1104,34 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
                 ]
             elif isinstance(node.target, ast.Name):
                 names = [node.target.id]
-            strings = _expr_strings(value, assignments)
             for name in names:
-                assignments[name].update(strings)
                 if value is not None:
-                    assignment_nodes.append((name, value))
+                    assignment_expressions[enclosing_scope(node)][name].append(value)
+
+    scope_assignments: dict[ast.AST | None, dict[str, set[str]]] = {}
+
+    def resolve_scope(scope: ast.AST | None) -> dict[str, set[str]]:
+        if scope in scope_assignments:
+            return scope_assignments[scope]
+        resolved: dict[str, set[str]] = defaultdict(set)
+        if scope is not None:
+            for name, values in resolve_scope(None).items():
+                resolved[name].update(values)
+        expressions = assignment_expressions.get(scope, {})
+        changed = True
+        while changed:
+            changed = False
+            for name, nodes in expressions.items():
+                before = len(resolved[name])
+                for value in nodes:
+                    resolved[name].update(_expr_strings(value, resolved))
+                changed = changed or len(resolved[name]) != before
+        scope_assignments[scope] = resolved
+        return resolved
+
+    resolve_scope(None)
+    for scope in assignment_expressions:
+        resolve_scope(scope)
 
     temporary_names = {
         argument.arg
@@ -994,8 +1207,9 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
         return False
 
     assignments_by_name: dict[str, list[ast.AST]] = defaultdict(list)
-    for name, value in assignment_nodes:
-        assignments_by_name[name].append(value)
+    for expressions in assignment_expressions.values():
+        for name, values in expressions.items():
+            assignments_by_name[name].extend(values)
     changed = True
     while changed:
         changed = False
@@ -1038,6 +1252,12 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
         "load_json",
         "read_csv",
     }
+    indirect_name = re.compile(
+        r"(?i)(?:load|read|validate|build|render|compose|materialize|resolve|run)"
+    )
+    path_keyword = re.compile(
+        r"(?i)(?:path|root|dir|file|workflow_id|context|report|artifact|input|source)"
+    )
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             names = [alias.name for alias in node.names]
@@ -1046,6 +1266,7 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
             module = node.module or ""
             add(node, "candidate_module_import", [module])
         elif isinstance(node, ast.Call):
+            assignments = resolve_scope(enclosing_scope(node))
             function_name = ""
             receiver: ast.AST | None = None
             if isinstance(node.func, ast.Name):
@@ -1064,12 +1285,41 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
                 bool(node.args)
                 and expression_is_temporary(node.args[0])
             )
+            explicit_historical_temp = any(
+                keyword.arg == "historical_fixture_root"
+                and expression_is_temporary(keyword.value)
+                for keyword in node.keywords
+            ) and any(expression_is_temporary(arg) for arg in node.args)
+            scope = enclosing_scope(node)
+            manifest_bound_context = (
+                isinstance(scope, (ast.FunctionDef, ast.AsyncFunctionDef))
+                and scope.name in manifest_bound_functions
+            )
+            manifest_bound_call = function_name in manifest_bound_functions
             if (
                 function_name in physical_methods
                 and not temporary_operation
                 and _candidate_tokens(" ".join(values))
             ):
                 add(node, "candidate_worktree_path_operation", values)
+            elif (
+                function_name not in MANIFEST_BLOB_METHODS
+                and not temporary_operation
+                and not explicit_historical_temp
+                and not manifest_bound_context
+                and not manifest_bound_call
+                and not inside_pytest_raises(node)
+                and _candidate_tokens(" ".join(values))
+                and (
+                    indirect_name.search(function_name)
+                    or any(
+                        keyword.arg
+                        and path_keyword.search(keyword.arg)
+                        for keyword in node.keywords
+                    )
+                )
+            ):
+                add(node, "candidate_indirect_path_operation", values)
             if function_name == "add_argument":
                 defaults = {
                     value
@@ -1103,7 +1353,63 @@ def _text_references(path: str, text: str) -> list[dict[str, Any]]:
                     "evidence": line.strip()[:500],
                 }
             )
-    return references
+    if path.endswith((".yaml", ".yml")):
+        try:
+            document = yaml.safe_load(text)
+        except yaml.YAMLError:
+            document = None
+
+        def walk(value: Any, keys: tuple[str, ...] = ()) -> None:
+            if isinstance(value, Mapping):
+                for key, item in value.items():
+                    walk(item, (*keys, str(key)))
+                return
+            if isinstance(value, list):
+                for item in value:
+                    walk(item, keys)
+                return
+            if not isinstance(value, str):
+                return
+            targets = _candidate_tokens(value)
+            if not targets or not any(
+                re.search(
+                    r"(?i)(?:path|root|dir|file|artifact|input|output|source|context|default)",
+                    key,
+                )
+                for key in keys
+            ):
+                return
+            line_number = next(
+                (
+                    index
+                    for index, line in enumerate(text.splitlines(), 1)
+                    if value in line
+                ),
+                1,
+            )
+            for target in sorted(targets):
+                references.append(
+                    {
+                        "source_path": path,
+                        "line": line_number,
+                        "kind": "candidate_yaml_artifact_path",
+                        "target": target,
+                        "evidence": value[:500],
+                    }
+                )
+
+        walk(document)
+    unique = {
+        (
+            row["source_path"],
+            row["line"],
+            row["kind"],
+            row["target"],
+            row["evidence"],
+        ): row
+        for row in references
+    }
+    return list(unique.values())
 
 
 def scan_active_references(

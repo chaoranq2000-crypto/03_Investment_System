@@ -117,6 +117,13 @@ def validate_bundle8b(
             text = read_blob(f"{run_prefix}/{name}").decode("utf-8-sig")
             return list(csv.DictReader(io.StringIO(text)))
 
+        def read_reference_bytes(path_value: str) -> bytes | None:
+            normalized = path_value.replace("\\", "/")
+            if normalized.startswith(f"{run_prefix}/"):
+                return read_blob(normalized)
+            path = repo_root / normalized
+            return path.read_bytes() if path.is_file() else None
+
     else:
         if not workflow_id.strip():
             raise ValueError("workflow_id must be non-empty")
@@ -128,6 +135,10 @@ def validate_bundle8b(
 
         def read_run_csv(name: str) -> list[dict[str, str]]:
             return _read_csv(run / name)
+
+        def read_reference_bytes(path_value: str) -> bytes | None:
+            path = repo_root / path_value
+            return path.read_bytes() if path.is_file() else None
 
     errors: list[str] = []
     checks: dict[str, Any] = {}
@@ -221,8 +232,8 @@ def validate_bundle8b(
         errors.append("2024 liquid-cooling approximate revenue is not 300000000 CNY")
     if revenue_gap.get("claim_type") != "management_comment":
         errors.append("2024 liquid-cooling approximate revenue is not management_comment")
-    evidence_path = repo_root / str(revenue_gap.get("source_path", ""))
-    source_text = evidence_path.read_text(encoding="utf-8") if evidence_path.exists() else ""
+    evidence_bytes = read_reference_bytes(str(revenue_gap.get("source_path", "")))
+    source_text = evidence_bytes.decode("utf-8") if evidence_bytes is not None else ""
     if "液冷技术相关营业收入" not in source_text or "约 3" not in source_text:
         errors.append("2024 liquid-cooling source text does not contain the cited approximate disclosure")
     required_missing = {"LC-DISC-REV-2025", "LC-DISC-GM", "LC-DISC-ORDERS", "LC-DISC-CUSTOMERS", "LC-DISC-CASH-COLLECTION"}
@@ -245,7 +256,7 @@ def validate_bundle8b(
         errors.append("future event planned date does not match Tushare disclosure_date snapshot")
     for field in ("technical_snapshot_path", "valuation_snapshot_path"):
         path_value = event_pack.get("market_state", {}).get(field, "")
-        if not path_value or not (repo_root / path_value).exists():
+        if not path_value or read_reference_bytes(str(path_value)) is None:
             errors.append(f"market event pack path missing: {field}={path_value}")
     checks["market_event"] = {
         "planned_date": event.get("planned_date"),

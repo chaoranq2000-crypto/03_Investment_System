@@ -41,6 +41,16 @@ def test_active_roots_have_zero_candidate_worktree_routes() -> None:
         )
         for row in scan["references"]
     ]
+    current_contract = tool.verify_current_contract(ROOT)
+    assert current_contract["canonical_sha256"] == tool.CURRENT_CONTRACT_SHA256
+    assert current_contract["source_baseline"] == tool.CURRENT_PACKAGE_SOURCE_BASELINE
+    contract = (ROOT / tool.CURRENT_CONTRACT_REL).read_text(encoding="utf-8")
+    assert tool._section_paths(
+        contract,
+        "### A.8 `final_regression_repair_exact`",
+        "## Deliverables",
+    ) == tool.EXPECTED_A8
+    assert len(tool.EXPECTED_A8) == 14
 
 
 def test_transition_tests_and_retained_ci_are_equal_strength() -> None:
@@ -127,6 +137,73 @@ Path("data/reviewed_inputs/{tool.OLD_WORKFLOW_ID}/input.yaml").read_text(
         == []
     )
 
+    indirect_call = f"""
+from pathlib import Path
+ROOT = Path.cwd()
+RUN = ROOT / {candidate!r}
+def validate_context(context_dir):
+    return context_dir
+validate_context(RUN)
+"""
+    indirect_references = tool._python_references("indirect.py", indirect_call)
+    assert len(indirect_references) == 1
+    assert indirect_references[0]["kind"] == "candidate_indirect_path_operation"
+
+    default_branch = f"""
+from pathlib import Path
+ROOT = Path.cwd()
+RUN = ROOT / {candidate!r}
+def load_context(path=None):
+    actual = path or RUN
+    return actual.read_text(encoding="utf-8")
+load_context()
+"""
+    default_references = tool._python_references("default_branch.py", default_branch)
+    assert any(
+        row["kind"] == "candidate_worktree_path_operation"
+        for row in default_references
+    )
+
+    manifest_bound_blob = f"""
+HISTORICAL_RUN = {candidate!r}
+def test_case(historical_blob_bytes):
+    return historical_blob_bytes(f"{{HISTORICAL_RUN}}/input.yaml")
+"""
+    assert tool._python_references("manifest_blob.py", manifest_bound_blob) == []
+
+    manifest_bound_wrapper = f"""
+import yaml
+HISTORICAL_RUN = {candidate!r}
+def load_historical_yaml(historical_blob_bytes, source_path):
+    return yaml.safe_load(historical_blob_bytes(source_path))
+def test_case(historical_blob_bytes):
+    return load_historical_yaml(historical_blob_bytes, HISTORICAL_RUN + "/input.yaml")
+"""
+    assert (
+        tool._python_references("manifest_blob_wrapper.py", manifest_bound_wrapper)
+        == []
+    )
+
+    verified_git_blob = f"""
+import hashlib
+import subprocess
+HISTORICAL_RUN = {candidate!r}
+EXPECTED_OID = "abc"
+EXPECTED_BYTES = 1
+EXPECTED_SHA256 = "def"
+def git_blob_bytes(relative_path):
+    spec = f"baseline:{{relative_path}}"
+    observed_oid = subprocess.check_output(["git", "rev-parse", spec], text=True)
+    assert observed_oid.strip() == EXPECTED_OID
+    payload = subprocess.check_output(["git", "cat-file", "blob", spec])
+    assert len(payload) == EXPECTED_BYTES
+    assert hashlib.sha256(payload).hexdigest() == EXPECTED_SHA256
+    return payload
+def test_case():
+    return git_blob_bytes(HISTORICAL_RUN + "/input.yaml")
+"""
+    assert tool._python_references("verified_git_blob.py", verified_git_blob) == []
+
 
 def test_text_scanner_separates_metadata_from_physical_paths() -> None:
     tool = load_tool()
@@ -143,8 +220,22 @@ def test_text_scanner_separates_metadata_from_physical_paths() -> None:
         "default_paths:\n"
         f"  input_path: reports/workflow_runs/{candidate}/input.yaml\n",
     )
-    assert len(references) == 1
-    assert references[0]["kind"] == "candidate_text_route_or_path"
+    assert {
+        row["kind"] for row in references
+    } == {
+        "candidate_text_route_or_path",
+        "candidate_yaml_artifact_path",
+    }
+
+    yaml_artifact = tool._text_references(
+        "artifact.yaml",
+        "artifacts:\n"
+        f"  - reports/workflow_runs/{candidate}/input.yaml\n",
+    )
+    assert any(
+        row["kind"] == "candidate_yaml_artifact_path"
+        for row in yaml_artifact
+    )
 
 
 def test_retained_bundle_evaluators_are_explicit_and_noncanonical() -> None:
