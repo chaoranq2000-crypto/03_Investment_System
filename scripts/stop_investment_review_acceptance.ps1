@@ -38,6 +38,16 @@ if (
 $processId = [int]$manifest.pid
 $process = Get-Process -Id $processId -ErrorAction SilentlyContinue
 if ($null -eq $process) {
+    if ($null -eq $manifest.stopped_at) {
+        $manifest.stopped_at = [DateTime]::UtcNow.ToString("o")
+    }
+    $manifest |
+        Add-Member `
+            -NotePropertyName stop_status `
+            -NotePropertyValue "already_stopped" `
+            -Force
+    $manifest | ConvertTo-Json -Depth 8 |
+        Set-Content -LiteralPath $manifestPath -Encoding utf8
     [ordered]@{
         status = "already_stopped"
         task_id = $taskId
@@ -48,14 +58,30 @@ if ($null -eq $process) {
 }
 
 $actualExecutable = $process.Path
-$actualStartTime = $process.StartTime.ToUniversalTime().ToString("o")
+$actualStartTime = $process.StartTime.ToUniversalTime()
+try {
+    $manifestStartTime = if ($manifest.process_start_time -is [DateTime]) {
+        ([DateTime]$manifest.process_start_time).ToUniversalTime()
+    }
+    else {
+        (
+            [DateTimeOffset]::Parse(
+                [string]$manifest.process_start_time,
+                [System.Globalization.CultureInfo]::InvariantCulture
+            )
+        ).UtcDateTime
+    }
+}
+catch {
+    throw "运行身份记录中的启动时间无效；不会终止进程"
+}
 if (
     -not [string]::Equals(
         $actualExecutable,
         [string]$manifest.executable,
         [System.StringComparison]::OrdinalIgnoreCase
     ) -or
-    $actualStartTime -ne [string]$manifest.process_start_time
+    $actualStartTime.Ticks -ne $manifestStartTime.Ticks
 ) {
     throw "PID 已被复用或可执行文件身份不匹配；不会终止进程"
 }
@@ -89,7 +115,10 @@ if (
 }
 
 Stop-Process -Id $processId -Force
-Wait-Process -Id $processId -Timeout 15 -ErrorAction Stop
+Wait-Process -Id $processId -Timeout 15 -ErrorAction SilentlyContinue
+if ($null -ne (Get-Process -Id $processId -ErrorAction SilentlyContinue)) {
+    throw "任务进程在 15 秒内未退出"
+}
 Start-Sleep -Milliseconds 250
 $remaining = @(
     Get-NetTCPConnection `
@@ -103,7 +132,11 @@ if ($remaining.Count -gt 0) {
 }
 
 $manifest.stopped_at = [DateTime]::UtcNow.ToString("o")
-$manifest.stop_status = "stopped"
+$manifest |
+    Add-Member `
+        -NotePropertyName stop_status `
+        -NotePropertyValue "stopped" `
+        -Force
 $manifest | ConvertTo-Json -Depth 8 |
     Set-Content -LiteralPath $manifestPath -Encoding utf8
 

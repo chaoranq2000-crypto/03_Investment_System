@@ -1,0 +1,112 @@
+{
+  "schema_version": "investment_review.local_acceptance_validation_summary.v1",
+  "task_id": "investment_review_local_acceptance_readiness_v1",
+  "contract_sha256": "0f7b37a382bbba0fa3faaace63621664aede2529842b52905ae7677f516c89ac",
+  "source_baseline": "07fe3a14dc5b4b770bad1dd1e30966672b74bce5",
+  "package_setup_commit": "37551d2a752eb0965edecc6d60c73f156c571b09",
+  "p1_checkpoint": "0b12580a3b329bb43c51226a1f365a7ac06ee5ac",
+  "p2_checkpoint": "containing_commit",
+  "recorded_at": "2026-07-27T16:04:31.7813732Z",
+  "status": "pass",
+  "engineering_acceptance_readiness": true,
+  "human_product_acceptance": "pending",
+  "actual_user_observation_proven": false,
+  "production_released": false,
+  "runtime": {
+    "host": "127.0.0.1",
+    "port": 8766,
+    "catalog_ready": true,
+    "review_count": 96,
+    "catalog_warm_duration_ms": 95778,
+    "detail_target_count": 6,
+    "detail_max_observed_load_ms": 801,
+    "automation_enabled": false,
+    "provider_attempt_count": 0,
+    "application_external_request_count": 0,
+    "stopped_with_verified_pid": true,
+    "candidate_aux_absent_while_running": true,
+    "candidate_aux_absent_after_stop": true
+  },
+  "api_smoke": {
+    "status": "pass",
+    "review_count": 96,
+    "scope_perspective_target_count": 6,
+    "blocked_route_count": 7,
+    "blocked_status": 403,
+    "blocked_code": "review_acceptance_read_only",
+    "evidence_path": ".codex_tmp/investment_review_local_acceptance_readiness_v1/api_smoke.json",
+    "evidence_sha256": "529ff07623087c0f12a90877cc248f7bc37321fd7c7cec4c5084de3250593ea5"
+  },
+  "browser": {
+    "status": "pass",
+    "page_title": "交易复盘 · 只读人工验收",
+    "visible_main": [
+      "investmentReviewSection"
+    ],
+    "observed_asset_count": 29,
+    "external_request_count": 0,
+    "forbidden_product_request_count": 0,
+    "visible_mutation_control_count": 0,
+    "six_axes_present": true,
+    "missing_not_zero": true,
+    "user_and_system_present": true,
+    "single_weekly_monthly_present": true,
+    "evidence_drawer_present": true,
+    "read_only_no_advice_no_motive_boundary_present": true,
+    "dom_evidence_sha256": "08d20834d0c74f293d7554fec87f9d6b178d8f215f66890737eaff17c172a1d6",
+    "request_trace_sha256": "91aaf4821b149833c67ff6859201294e84a5db28edf0e629008f261cb5f03449",
+    "screenshot_manifest_sha256": "b15905fa97a51171077056a5eab9e542fff17e19857a9c6600001c6c82fbbcb4",
+    "control_plane_note": "The Codex browser-control client logged two unsuccessful Statsig telemetry timeouts outside the acceptance tab. They were not product/page requests and do not appear in the tab asset trace."
+  },
+  "tests": {
+    "acceptance_mode": {
+      "result": "6 passed",
+      "duration_seconds": 1.0
+    },
+    "targeted_backend": {
+      "result": "89 passed",
+      "duration_seconds": 96.83
+    },
+    "frontend": {
+      "result": "3 files passed, 21 tests passed",
+      "build": "pass",
+      "app_js": {
+        "size": 675492,
+        "sha256": "0eb1a2f5c9d8d23770b2d75385d25d3eab44b557469b01df8e07764f02d345cb"
+      },
+      "app_css": {
+        "size": 66667,
+        "sha256": "06fbe002f88d3b947c099b19667af9f427bd9cb7fd8554b136f37551724210d3"
+      }
+    },
+    "full_pytest": {
+      "command": "C:\\Projects\\03_Investment_System\\.conda\\investment-system\\python.exe -B -m pytest -q",
+      "result": "1911 passed, 2 skipped",
+      "duration_seconds": 536.14
+    },
+    "powershell_parser": "pass",
+    "package_validator": "pass"
+  },
+  "protected_exit": {
+    "status": "pass",
+    "evidence_path": ".codex_tmp/investment_review_local_acceptance_readiness_v1/protected_exit.json",
+    "evidence_size": 226782,
+    "evidence_sha256": "fc94cd5a8a85a900e53ae96f9d1be6346df183ab0ac819f80c8a0122c977f5fc",
+    "formal_portfolio_db_sha256": "752e3b87966f23d2e6f3db89cd3a8d5df0ab893504ee4e7e83de793e4aa52f53",
+    "user_review_sidecar_sha256": "4eb58f12e2888d3761107e2d23f06efd69096e3525b955a1e96d4bcc092dae38",
+    "v2_candidate_sha256": "3d996f7a0493e1dd63b3883609f0494fc47d0e9a4939debb0bca63b82d353564",
+    "canonical_v3_candidate_sha256": "acf3b9c567cbe69ca4536285f4b5027016dd2e0ee2d382ebc4d993ff83410f38",
+    "reviewed_artifact_entry_count": 760,
+    "reviewed_artifact_manifest_sha256": "0d6faa30e62393287e3b8bb6f22ef2eba1e0fb6ded9bb7c9ced83dbfdf7a2021",
+    "v3_market_cache_entry_count": 153,
+    "v3_market_cache_manifest_sha256": "6eddbeeb98a8875d35267135a93e2c1226f031321adaf1c818d4ece5530cf92f"
+  },
+  "scope": {
+    "authorized_paths_only": true,
+    "package_setup_diff_exactly_two_files": true,
+    "dependency_or_lockfile_change": false,
+    "protected_database_written": false,
+    "predecessor_artifact_or_cache_written": false,
+    "publication_performed": false
+  }
+}

@@ -10,8 +10,13 @@ from urllib.request import Request, urlopen
 
 import pytest
 
-from src.investment_review.store import ReviewStore, ReviewStoreError
+from src.investment_review.store import (
+    ReviewStore,
+    ReviewStoreError,
+    immutable_review_store_read_context,
+)
 from src.portfolio import cli as cli_module
+from src.portfolio.investment_review_service import InvestmentReviewWebService
 from src.portfolio.store import PortfolioStore
 from src.portfolio.web import (
     REVIEW_ACCEPTANCE_TASK_ID,
@@ -239,3 +244,113 @@ def test_review_store_immutable_acceptance_reads_create_no_aux(
             pass
     with pytest.raises(ReviewStoreError, match="immutable read-only"):
         locked.initialize()
+
+
+def test_nested_review_store_inherits_immutable_acceptance_context(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "review-wal.sqlite3"
+    connection = sqlite3.connect(database)
+    assert connection.execute("PRAGMA journal_mode = WAL").fetchone()[0] == "wal"
+    connection.execute("CREATE TABLE marker(value TEXT NOT NULL)")
+    connection.execute("INSERT INTO marker(value) VALUES ('ready')")
+    connection.commit()
+    connection.close()
+    assert not Path(f"{database}-wal").exists()
+    assert not Path(f"{database}-shm").exists()
+
+    with immutable_review_store_read_context(database):
+        inherited = ReviewStore(database)
+        assert inherited.immutable_reads is True
+        assert inherited.allow_writes is False
+        with inherited.connection(read_only=True) as read_only:
+            assert read_only.execute("PRAGMA query_only").fetchone()[0] == 1
+            assert (
+                read_only.execute("SELECT value FROM marker").fetchone()[0]
+                == "ready"
+            )
+
+    assert not Path(f"{database}-wal").exists()
+    assert not Path(f"{database}-shm").exists()
+
+
+def test_acceptance_service_reuses_validated_process_local_cache(
+    tmp_path: Path,
+) -> None:
+    review_db = tmp_path / "review.sqlite3"
+    review_db.write_bytes(b"candidate")
+    artifact_root = tmp_path / "artifacts"
+    artifact_root.mkdir()
+    portfolio_db = tmp_path / "portfolio.sqlite3"
+    portfolio_db.write_bytes(b"formal")
+
+    class _Runner:
+        def __init__(self) -> None:
+            self.review_db = review_db
+            self.portfolio_db = portfolio_db
+            self.artifact_root = artifact_root
+
+    class _Catalog:
+        def __init__(self) -> None:
+            self.runner = _Runner()
+            self.store = ReviewStore(review_db)
+            self.bundle_calls = 0
+            self.receipt_list_calls = 0
+            self.status_list_calls = 0
+
+        def get_episode_bundle(
+            self,
+            run_id: str,
+            review_id: str,
+            *,
+            validated_receipt: object | None = None,
+        ) -> dict[str, object]:
+            self.bundle_calls += 1
+            return {
+                "run_id": run_id,
+                "review_id": review_id,
+                "validated_receipt": validated_receipt,
+            }
+
+        def list_receipts(
+            self,
+            *,
+            scope: str | None = None,
+            include_validated_receipt: bool = False,
+        ) -> dict[str, object]:
+            self.receipt_list_calls += 1
+            assert include_validated_receipt is True
+            return {"runs": [], "invalid_runs": []}
+
+        def list_run_statuses(
+            self,
+            *,
+            scope: str | None = None,
+        ) -> dict[str, object]:
+            self.status_list_calls += 1
+            return {"runs": []}
+
+    catalog = _Catalog()
+    service = InvestmentReviewWebService(
+        catalog=catalog,
+        repo_root=tmp_path,
+        read_only_acceptance=True,
+    )
+    service.catalog.get_episode_bundle = catalog.get_episode_bundle
+    service.catalog.list_receipts = catalog.list_receipts
+    service.catalog.list_run_statuses = catalog.list_run_statuses
+    run_id = "reviewrun_" + "1" * 32
+    review_id = "review:" + "2" * 32
+
+    first = service._bundle(run_id, review_id)  # noqa: SLF001
+    second = service._bundle(run_id, review_id)  # noqa: SLF001
+    assert first is second
+    assert catalog.bundle_calls == 1
+
+    first_listing = service.list_reviews(limit=200)
+    second_listing = service.list_reviews(limit=200)
+    assert first_listing is second_listing
+    assert catalog.receipt_list_calls == 1
+    assert catalog.status_list_calls == 1
+    assert service.store.immutable_reads is True
+    assert service.store.allow_writes is False

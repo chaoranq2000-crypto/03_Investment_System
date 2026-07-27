@@ -3464,6 +3464,11 @@ body.investment-review-acceptance-mode .footer {
   color: #b7b7b0;
 }
 
+body.investment-review-acceptance-mode .toolbar > :not(#investmentReviewEntry),
+body.investment-review-acceptance-mode main > :not(#investmentReviewSection) {
+  display: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -137,6 +137,23 @@ try {
         throw "端口健康身份与只读验收合同不匹配"
     }
 
+    $catalogStartedAt = [DateTime]::UtcNow
+    $catalog = Invoke-RestMethod `
+        -Uri "${url}api/investment-review/reviews?limit=200" `
+        -Method Get `
+        -TimeoutSec 300
+    $catalogDurationMs = [Math]::Round(
+        ([DateTime]::UtcNow - $catalogStartedAt).TotalMilliseconds
+    )
+    if (
+        $null -eq $catalog -or
+        $null -eq $catalog.data -or
+        $catalog.data.total_count -lt 1 -or
+        $catalog.data.reviews.Count -lt 1
+    ) {
+        throw "复盘目录未完成受信任产物预热，拒绝交付半加载页面"
+    }
+
     $head = (& git -C $repoRoot rev-parse HEAD).Trim()
     $manifest = [ordered]@{
         schema_version = "investment_review.local_acceptance_runtime.v1"
@@ -158,6 +175,9 @@ try {
         stdout_path = $stdoutPath
         stderr_path = $stderrPath
         health = $health
+        catalog_ready = $true
+        review_count = [int]$catalog.data.total_count
+        catalog_warm_duration_ms = [int64]$catalogDurationMs
         stopped_at = $null
     }
     $manifest | ConvertTo-Json -Depth 8 |
@@ -172,6 +192,8 @@ try {
         pid = $process.Id
         url = $url
         manifest = $manifestPath
+        catalog_ready = $true
+        review_count = [int]$catalog.data.total_count
         human_product_acceptance = "pending"
         production_released = $false
     } | ConvertTo-Json -Depth 4

@@ -65,6 +65,36 @@ REVIEWABILITY_SCHEMA_VERSION = 1
 REVIEWABILITY_SCHEMA_VERSION_V1 = REVIEWABILITY_SCHEMA_VERSION
 REVIEWABILITY_SCHEMA_VERSION_V2 = 2
 
+_IMMUTABLE_READ_CONTEXT_PATHS: ContextVar[frozenset[str]] = ContextVar(
+    "investment_review_immutable_read_context_paths",
+    default=frozenset(),
+)
+
+
+def _immutable_context_path(path: str | Path) -> str:
+    return str(Path(path).resolve(strict=False)).casefold()
+
+
+@contextmanager
+def immutable_review_store_read_context(
+    path: str | Path,
+) -> Iterator[None]:
+    """Make nested ``ReviewStore(path)`` instances immutable and non-writable.
+
+    Receipt validation reconstructs a store internally.  The acceptance
+    service uses this context so those nested readers inherit the same
+    immutable/query-only boundary as the explicit acceptance store.
+    """
+
+    selected = _immutable_context_path(path)
+    current = _IMMUTABLE_READ_CONTEXT_PATHS.get()
+    token = _IMMUTABLE_READ_CONTEXT_PATHS.set(current | {selected})
+    try:
+        yield
+    finally:
+        _IMMUTABLE_READ_CONTEXT_PATHS.reset(token)
+
+
 class ReviewStoreError(RuntimeError):
     """Base error for the review store."""
 
@@ -1408,8 +1438,12 @@ class ReviewStore:
         allow_writes: bool = True,
     ) -> None:
         self.path = Path(path)
-        self.immutable_reads = bool(immutable_reads)
-        self.allow_writes = bool(allow_writes)
+        inherited_immutable = (
+            _immutable_context_path(self.path)
+            in _IMMUTABLE_READ_CONTEXT_PATHS.get()
+        )
+        self.immutable_reads = bool(immutable_reads or inherited_immutable)
+        self.allow_writes = bool(allow_writes and not inherited_immutable)
 
     def _connect(self, *, read_only: bool = False) -> sqlite3.Connection:
         if read_only:

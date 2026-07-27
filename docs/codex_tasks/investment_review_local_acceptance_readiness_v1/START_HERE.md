@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "investment_review_local_acceptance_readiness_v1"
 contract_path: "docs/codex_tasks/investment_review_local_acceptance_readiness_v1/CONTRACT.md"
 contract_sha256: "0f7b37a382bbba0fa3faaace63621664aede2529842b52905ae7677f516c89ac"
-state: "running"
+state: "complete"
 execution_branch: "codex/investment-review-reviewability-corrections"
 source_baseline: "07fe3a14dc5b4b770bad1dd1e30966672b74bce5"
-last_completed_phase: "P1"
-next_phase: "P2"
+last_completed_phase: "P2"
+next_phase: "none"
 last_validation: "pass"
-updated_at: "2026-07-27T15:24:34+00:00"
+updated_at: "2026-07-27T16:04:31+00:00"
 ---
 # 在新的 Codex 任务中启动或续跑本阶段
 
@@ -36,13 +36,13 @@ Acceptance runtime is loopback-only, immutable/query-only, automation/provider/n
 
 ## Current checkpoint
 
-- **State:** `running`
-- **Last completed phase:** `P1`
-- **Next phase:** `P2`
+- **State:** `complete`
+- **Last completed phase:** `P2`
+- **Next phase:** `none`
 - **Latest validation:** `pass`
 - **Runtime authorizations:** bounded local engineering, loopback rehearsal, exact-owned process start/stop and audited per-file cleanup defined by the frozen contract; no external network, protected-data mutation, human acceptance or publication.
-- **Current blocker:** none
-- **Next safe action:** Execute P2 against the exact real candidate: start the owned localhost service, capture API/browser evidence, stop it, recheck protected state, run the full suite, and close the readiness report.
+- **Current blocker:** none for engineering readiness; human product acceptance remains `pending` by contract.
+- **Next safe action:** Start or inspect the final committed localhost handoff at `http://127.0.0.1:8766/`, then have the user return `accept`, `accept_with_issues`, or `reject` against that exact Git HEAD.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
@@ -50,3 +50,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 
 - 2026-07-27T23:01:17+08:00 — Package drafted from clean v7 compatibility checkpoint `07fe3a1...`. Live audit found the ordinary dashboard unsafe for strict acceptance because it initializes the formal DB, does not select the exact candidate/artifact root, starts automation by default, loads realtime/performance routes and exposes review mutation forms. This successor is therefore bounded to a dedicated immutable, loopback-only, review-read-only acceptance surface. Human acceptance and release remain pending/false.
 - 2026-07-27T15:24:34+00:00 — state=running; completed=P1; next=P2; validation=pass; P1 complete: dedicated immutable/query-only acceptance mode, explicit candidate/artifact identity, server-side route and mutation isolation, frontend review-only branch, verified-PID start/stop scripts and playbook added. Backend targeted regression 87 passed; frontend 21 passed plus build; PowerShell parser and unknown-process refusal passed. Protected four-DB state, 760-file artifact manifest and 153-file cache manifest remain exact; no external network, dependency, protected write or publication.
+- 2026-07-27T16:04:31+00:00 — state=complete; completed=P2; next=none; validation=pass. Real localhost rehearsal completed against the exact v3 candidate: 96 reviews, six single/weekly/monthly × user/system target views, six axes, missing-not-zero and evidence drawer rendered; 29 observed page assets were loopback-only; seven forbidden API/write routes returned `403 review_acceptance_read_only`. P2 fixed acceptance-only visibility, validated-result caching, nested immutable receipt reads and Windows stop identity/exit races, then repeated the real rehearsal with candidate WAL/SHM absent throughout and after verified stop. Targeted backend 89 passed; frontend 21 passed plus build; full pytest 1911 passed, 2 skipped; package/PowerShell/protected-state/tree checks passed. Engineering readiness is true; actual user observation is unproven, human acceptance is pending, production release is false, and no publication occurred.

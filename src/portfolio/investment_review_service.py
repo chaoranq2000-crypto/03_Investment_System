@@ -54,6 +54,7 @@ from src.investment_review.store import (
     DataConflictError,
     ReviewStore,
     ReviewStoreError,
+    immutable_review_store_read_context,
 )
 from src.investment_review.sync_service import ReviewSyncService
 
@@ -406,10 +407,19 @@ def _operation_review_summary(bundle: Mapping[str, Any]) -> dict[str, Any]:
 class _TrustedReviewCatalog:
     """P4 read adapter over the frozen P3 runner/catalog contract."""
 
-    def __init__(self, catalog: Any) -> None:
+    def __init__(
+        self,
+        catalog: Any,
+        *,
+        immutable_reads: bool = False,
+    ) -> None:
         self._catalog = catalog
         self.runner = catalog.runner
         self.store = catalog.store
+        self.immutable_reads = bool(immutable_reads)
+
+    def enable_immutable_reads(self) -> None:
+        self.immutable_reads = True
 
     @staticmethod
     def _sha256_file(path: Path) -> str:
@@ -480,10 +490,19 @@ class _TrustedReviewCatalog:
             )
         receipt = self._json_object(path, artifact_name="receipt")
         try:
-            validation = self.runner.validate_receipt(
-                receipt,
-                expected_path=path,
-            )
+            if self.immutable_reads:
+                with immutable_review_store_read_context(
+                    self.runner.review_db
+                ):
+                    validation = self.runner.validate_receipt(
+                        receipt,
+                        expected_path=path,
+                    )
+            else:
+                validation = self.runner.validate_receipt(
+                    receipt,
+                    expected_path=path,
+                )
         except (OSError, UnicodeError, ValueError) as exc:
             raise ReviewRunnerError(
                 "receipt artifact validation could not complete"
@@ -860,8 +879,13 @@ class InvestmentReviewWebService:
         self.catalog = (
             catalog
             if isinstance(catalog, _TrustedReviewCatalog)
-            else _TrustedReviewCatalog(catalog)
+            else _TrustedReviewCatalog(
+                catalog,
+                immutable_reads=self.read_only_acceptance,
+            )
         )
+        if self.read_only_acceptance:
+            self.catalog.enable_immutable_reads()
         if self.read_only_acceptance and store is None:
             selected_store = ReviewStore(
                 self.catalog.store.path,
@@ -1000,6 +1024,13 @@ class InvestmentReviewWebService:
         self._lock_guard = threading.Lock()
         self._revision_locks: dict[str, threading.Lock] = {}
         self._decision_locks: dict[str, threading.Lock] = {}
+        self._acceptance_cache_lock = threading.RLock()
+        self._acceptance_bundle_cache: dict[
+            tuple[str, str], dict[str, Any]
+        ] = {}
+        self._acceptance_list_cache: dict[
+            tuple[str | None, str | None, int], dict[str, Any]
+        ] = {}
 
     def set_automation_status_provider(
         self,
@@ -1044,32 +1075,53 @@ class InvestmentReviewWebService:
     ) -> dict[str, Any]:
         run = _required_id(run_id, "run_id", _RUN_ID)
         review = _required_id(review_id, "review_id", _REVIEW_ID)
-        try:
-            if validated_receipt is None:
-                return self.catalog.get_episode_bundle(run, review)
-            return self.catalog.get_episode_bundle(
-                run,
-                review,
-                validated_receipt=validated_receipt,
-            )
-        except ReviewRunnerError as exc:
-            message = str(exc).lower()
-            if "not found" in message or "was not found" in message:
-                raise _error(404, "review_not_found", "指定复盘不存在") from exc
-            raise _error(
-                409,
-                "review_artifact_invalid",
-                "指定复盘未通过受信任产物校验",
-            ) from exc
-        except ReviewStoreError as exc:
-            message = str(exc).lower()
-            if "not found" in message:
-                raise _error(404, "review_not_found", "指定复盘不存在") from exc
-            raise _error(
-                503,
-                "review_catalog_unavailable",
-                "复盘目录不可用",
-            ) from exc
+        cache_key = (run, review)
+
+        def load() -> dict[str, Any]:
+            try:
+                if validated_receipt is None:
+                    return self.catalog.get_episode_bundle(run, review)
+                return self.catalog.get_episode_bundle(
+                    run,
+                    review,
+                    validated_receipt=validated_receipt,
+                )
+            except ReviewRunnerError as exc:
+                message = str(exc).lower()
+                if "not found" in message or "was not found" in message:
+                    raise _error(
+                        404,
+                        "review_not_found",
+                        "指定复盘不存在",
+                    ) from exc
+                raise _error(
+                    409,
+                    "review_artifact_invalid",
+                    "指定复盘未通过受信任产物校验",
+                ) from exc
+            except ReviewStoreError as exc:
+                message = str(exc).lower()
+                if "not found" in message:
+                    raise _error(
+                        404,
+                        "review_not_found",
+                        "指定复盘不存在",
+                    ) from exc
+                raise _error(
+                    503,
+                    "review_catalog_unavailable",
+                    "复盘目录不可用",
+                ) from exc
+
+        if not self.read_only_acceptance:
+            return load()
+        with self._acceptance_cache_lock:
+            cached = self._acceptance_bundle_cache.get(cache_key)
+            if cached is not None:
+                return cached
+            bundle = load()
+            self._acceptance_bundle_cache[cache_key] = bundle
+            return bundle
 
     def _revision_directory(self, run_id: str, review_id: str) -> Path:
         digest = hashlib.sha256(f"{run_id}\0{review_id}".encode("utf-8")).hexdigest()
@@ -1738,6 +1790,13 @@ class InvestmentReviewWebService:
         if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 200:
             raise _error(400, "invalid_limit", "limit 必须在 1 到 200 之间")
 
+        cache_key = (scope, status, limit)
+        if self.read_only_acceptance:
+            with self._acceptance_cache_lock:
+                cached = self._acceptance_list_cache.get(cache_key)
+                if cached is not None:
+                    return cached
+
         reviews: list[dict[str, Any]] = []
         try:
             receipt_catalog = self.catalog.list_receipts(
@@ -1900,7 +1959,7 @@ class InvestmentReviewWebService:
             if selected
             else "unknown"
         )
-        return _envelope(
+        result = _envelope(
             status=aggregate,
             data={
                 "count": len(selected),
@@ -1915,6 +1974,10 @@ class InvestmentReviewWebService:
                 }
             ),
         )
+        if self.read_only_acceptance:
+            with self._acceptance_cache_lock:
+                self._acceptance_list_cache[cache_key] = result
+        return result
 
     def get_review_detail(
         self, run_id: object, review_id: object
