@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v8"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md"
 contract_sha256: "c8f19b03dd2fa17016bab3995eaa48fe8604bdb7e7027e5197aedcbfac01eb8b"
-state: "running"
+state: "blocked"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "fe986a0359c0268ac94eea696c3a4795403e4614"
 last_completed_phase: "P4"
 next_phase: "P5"
-last_validation: "pass"
-updated_at: "2026-07-27T15:23:23+08:00"
+last_validation: "fail"
+updated_at: "2026-07-27T15:44:44+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -40,14 +40,14 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `running`
+- **State:** `blocked`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`。old002837 clean arm=`196797dbc0668652be66c9a65ce09a2ebc119b8b`；Codex exact-file surface 删除 501 个 ordinal files，在完整 501-D vectors 通过后按固定 deepest-first manifest 非递归删除 29 个 empty/non-reparse directories；删除提交=`b5ebdbfe6ddce7698a438bc8afa69cf5a1c8fbd2`，精确包含 501 `D` 与 1 个 receipt `A`。post-wave V-006=`28 passed in 611.71s`，V-003 final=`194 passed in 23.41s`；三波 1386 files、29 directories 与旧 root 全缺失，工作树 clean。
-- **Current blocker:** 无；三个删除波次全部完成且各自 post-wave regressions 通过，正在执行最终本地验证与 candidate seal。
+- **Latest validation:** `fail`。最终 V-010 全仓 pytest 在三波全部提交后得到 `10 failed, 966 passed, 2 skipped in 683.95s`；精确重跑同 10 项得到 `10 failed in 2.70s`。三波 1,386 个文件、29 个目录和旧 run root 仍全部缺失，删除向量与用户主工作树向量均未漂移。
+- **Current blocker:** V-006 的静态扫描只识别同一文件内可见的候选字面量与直接 `open/read/exists/load_*` 调用，没有追踪测试参数、YAML 内路径或函数默认值进入被调用实现后的运行时文件读取，因此错误报告 `active_references=0`。最终回归证明 8 个保留测试文件中的 10 项仍依赖已删 Bundle/old002837 资产。冻结 v8 又明确把已完成 A.1 解耦设为只读、禁止其他测试/业务 validator 修改，并且至少 `tests/test_r5_bundle8b_close.py` 与 `scripts/validate_r5_bundle10r_human_review.py` 不在任何 A.1–A.7 写入集合内；同包修复会扩大授权范围，必须先创建最小修订。
 - **Prior hard-stop evidence:** v4 checkpoints `0f582599...` 与 `f1dafeb...` 保留历史冲突证据；v5 已修复三项 A.7 冲突以及 A.2 retained-dependency/unknown-classification 缺陷。旧 `82f7d37...` arm 因其后存在 policy/v6 commits 已失去 current-wave-parent 资格。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；批准的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`，tracked-only 为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。v6 准备时补丁工具的两份未跟踪草稿曾误落该树，已按两个明确文件路径逐一撤销；HEAD 与两组 raw NUL 向量随后精确恢复。不得再写入、清理、修复、吸收或提交其中内容。
-- **Next safe action:** 运行 V-001–V-011 最终矩阵、全仓 pytest、两次 002837 replay、scope audit 和独立 clean-checkout smoke；机械刷新授权 evidence，确认全部删除路径未重建、主工作树未漂移后，创建最后一个 tracked `chore(v1): seal governance cleanup candidate` commit，并仅进入外部 publication。
+- **Next safe action:** 请求用户批准最小 v9：仅重新开放这 8 个失败测试、修复已证实的精确运行时解析路径并加强 V-006 对跨调用/YAML/default 物理读取的拒绝；不得恢复任何已删路径、改变三波清单/提交/顺序/恢复证明、弱化断言或进入发布。获批前不修改失败路径。
 
 ### P5 pre-delete completion evidence
 
@@ -57,7 +57,7 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - Reference graph: `reference_count=0`, `unknown_classification_count=0`, A.7 overlap exact and all Night, retained/protected overlap 0.
 - Restore proof: all 1,386 Git blobs recovered byte-for-byte under `C:\Users\Q\AppData\Local\Temp\v8_v1_historical_restore_e7939036de974f27afb7306970f49576`; `cat_file_e_verified`, `content_hash_verified`, `full_restore_verified` and `byte_for_byte_match` all true.
 - Current validators: V-002 pass；V-003 final 194 passed；V-004 两次 semantic digest 均为 `2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6` 且 16 passed；V-005 18 passed；V-006 28 passed；V-008 pass/17 capabilities/0 blockers；V-011 `ok=true`、`state=running`、0 warnings。
-- Current full repository pytest: `1146 passed, 2 skipped in 700.39s`; zero failures/errors and no added skip/xfail/mock/collection-ignore.
+- Pre-delete full repository pytest: `1146 passed, 2 skipped in 700.39s`。最终 all-wave V-010 失败为 `10 failed, 966 passed, 2 skipped in 683.95s`；失败全部来自保留测试对已删历史资产的运行时读取，未新增 skip/xfail/mock/collection-ignore。
 - Scope through the current checkpoint: old002837 arm 只修改 v8 `START_HERE.md`；删除提交精确为 501 个 manifest `D` + `manual_deletion_wave_old002837.yaml` 1 个 `A`，并按冻结清单删除 29 个空目录。当前证据 checkpoint 只更新 v8 `START_HERE.md` 与 `governance_cleanup_readout.md` metadata；0 raw-data overwrite，0 user-main write。
 
 ### P5 Night exact-manifest completed
@@ -1819,3 +1819,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-27T14:57:16+08:00 — Bundle clean v8 arm=`b120a805736a89b5c6a0406e15d5a0d040a0f341`。D-020 control plane 按 ordinal manifest 逐文件删除 205 个 literal regular files；删除提交=`274d47ec299a42946bc3b83f7908257e80f0f99b`，精确含 205 `D` + Bundle receipt 1 `A`。post-wave V-006 `28 passed in 592.82s`、V-003 final `194 passed in 23.40s`；Night/Bundle 全缺失、old002837 501 全存在、工作树 clean。包含本行的 commit 是 Bundle post-wave evidence checkpoint，其自身 SHA 不写回本文件。
 - 2026-07-27T15:01:20+08:00 — Bundle post-wave evidence checkpoint=`f98c7861b422a4081955e8f1513da4428534425c` 已创建且 clean。old002837 pre-arm audit 逐项验证 501 个 files 的 HEAD/index blob identity，并完整枚举得到恰好 501 files + 29 directories、0 extra/special/reparse；两组目录向量与冻结值精确一致。本文件切换为 `armed_clean_checkpoint` 并列出完整 501-file/29-directory absolute manifests；包含本行的下一 commit 自身即 old002837 `wave_parent_commit`，尚未删除。
 - 2026-07-27T15:23:23+08:00 — old002837 clean v8 arm=`196797dbc0668652be66c9a65ce09a2ebc119b8b`。D-020 control plane 按 ordinal manifest 逐文件删除 501 个 literal regular files，完整 raw vectors 精确匹配后按固定 deepest-first manifest 非递归逐项删除 29 个 empty/non-reparse directories；删除提交=`b5ebdbfe6ddce7698a438bc8afa69cf5a1c8fbd2`，精确含 501 `D` + receipt 1 `A`。post-wave V-006 `28 passed in 611.71s`、V-003 final `194 passed in 23.41s`；三波文件与旧目录/根均未重建，工作树 clean。包含本行的 commit 是 old002837 post-wave evidence checkpoint，其自身 SHA 不写回本文件。
+- 2026-07-27T15:44:44+08:00 — 最终 V-010 在已提交三波均缺失的真实工作树上复现 `10 failed, 966 passed, 2 skipped in 683.95s`，精确失败集重跑为 `10 failed in 2.70s`。只读审计证明 V-006 未追踪跨函数参数、YAML 路径和默认值的数据流，造成删除前假阴性；8 个失败测试中 7 个虽列于 A.1，但 v8 已把 A.1 解耦设为只读，`tests/test_r5_bundle8b_close.py` 与至少一个必需实现又在全部 authority sets 外。按更新后的 autonomous-stage-runner 三问测试，目标/完成标准不变，但授权范围必须扩大，因此 v8 切换为 blocked，等待最小 v9；没有恢复、stage、push、PR 或发布。

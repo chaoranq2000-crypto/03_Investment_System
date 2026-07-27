@@ -78,3 +78,25 @@ user_main_worktree:
   tracked_status_porcelain_bytes: 1025
   tracked_status_porcelain_sha256: 3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b
   matches_authorized_snapshot: true
+v8_final_hard_stop:
+  checked_at: "2026-07-27T15:44:44+08:00"
+  candidate_head: 30be091e5d845e8b91be4409c5139dc9d69b8268
+  final_full_pytest: "10 failed / 966 passed / 2 skipped"
+  focused_reproduction: "10 failed in 2.70s"
+  changed_paths_for_blocker_checkpoint:
+    - docs/codex_tasks/v1_governance_integration_cleanup_v8/START_HERE.md
+    - reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md
+    - reports/p1_6/r5_v1_governance_cleanup/validation/full_pytest.txt
+    - reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml
+  authority:
+    all_paths_authorized_as_checkpoint_or_validation_metadata: true
+    failing_paths_modified: false
+    frozen_contract_modified: false
+    deleted_paths_restored: false
+  protected_state:
+    all_1386_deleted_file_paths_absent: true
+    all_29_old002837_directories_absent: true
+    old002837_root_absent: true
+    user_main_worktree_written: false
+    user_main_status_vector_matches_authorized_snapshot: true
+  decision: hard_stop_requires_minimal_v9

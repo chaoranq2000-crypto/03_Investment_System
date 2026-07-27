@@ -172,3 +172,52 @@ v8_a2_actor_and_directory_rebinding:
     bundle_deleted: false
     old002837_armed: false
     old002837_deleted: false
+v8_final_after_all_waves:
+  checked_at: 2026-07-27T15:44:44+08:00
+  candidate_head: 30be091e5d845e8b91be4409c5139dc9d69b8268
+  command: $env:PYTHONDONTWRITEBYTECODE='1'; C:\Projects\03_Investment_System\.conda\investment-system\python.exe -m pytest -q
+  exit_code: 1
+  result: 10 failed, 966 passed, 2 skipped in 683.95s
+  failures: 10
+  errors: 0
+  focused_reproduction:
+    result: 10 failed in 2.70s
+    stable_failure_set: true
+  failed_tests:
+    - tests/test_r5_002837_reviewed_input_staging.py::test_empty_dropzone_keeps_002837_source_gapped
+    - tests/test_r5_bundle10_close.py::test_bundle10_completion_and_external_review_lifecycle_passes
+    - tests/test_r5_bundle10r_v5_human_review.py::test_real_v5_human_review_submission_passes_exact_hash_validation
+    - tests/test_r5_bundle13r_evidence_backflow.py::test_canonical_contract_binds_to_current_locked_bundle12r_generation
+    - tests/test_r5_bundle5_real_input_inventory.py::test_current_real_workflow_has_all_reviewed_core_input_types_after_promotion
+    - tests/test_r5_bundle8b_close.py::test_bundle8b_close_inputs_reconcile_to_evidence
+    - tests/test_r5_pilot_gate_recheck_and_render.py::test_blocked_gate_renders_source_gapped_draft
+    - tests/test_r5_pilot_gate_recheck_and_render.py::test_render_result_preserves_required_markers
+    - tests/test_r5_report_composer_degradation.py::test_source_gapped_draft_contains_all_pack_gaps
+    - tests/test_r5_report_composer_degradation.py::test_gate_composer_pending_inputs_stay_research_draft
+  failure_class:
+    deletion_vector_mismatch: false
+    deleted_path_recreated: false
+    retained_runtime_physical_dependency: true
+    v006_false_negative: true
+  scanner_false_negative:
+    implementation: scripts/manage_r5_v1_historical_cleanup.py::scan_active_references
+    detail: only same-file candidate literals and direct physical method calls are followed; candidate values passed through function calls, YAML artifact paths, or default-value branches are not resolved into the callee's physical reads
+    prior_reported_reference_count: 0
+  authority_audit:
+    failing_test_files_in_a1: 7
+    failing_test_files_outside_all_sets:
+      - tests/test_r5_bundle8b_close.py
+    additionally_proven_implementation_outside_all_sets:
+      - scripts/validate_r5_bundle10r_human_review.py
+    v8_a1_reopened: false
+    v8_same_package_fix_authorized: false
+  amendment_test:
+    objective_truth_or_definition_of_done_changed: false
+    fixed_decision_changed: true
+    authorization_envelope_expands: true
+    decision: hard_stop_requires_minimal_v9
+  preserved_state:
+    all_1386_deleted_file_paths_absent: true
+    all_29_old002837_directories_absent: true
+    old002837_root_absent: true
+    user_main_status_vector_unchanged: true
