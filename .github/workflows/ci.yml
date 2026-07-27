@@ -21,7 +21,7 @@ jobs:
           activate-environment: investment-system-ci
           python-version: "3.11"
       - name: Install test dependencies
-        run: conda install -y pytest pyyaml pandas pypdf
+        run: conda install -y pytest pyyaml pandas pypdf jsonschema
       - name: Compile Python files
         run: python -m py_compile $(git ls-files '*.py')
       - name: Validate source routes and operational adapters

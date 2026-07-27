@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v12"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v12/CONTRACT.md"
 contract_sha256: "d1eb2910de17dddd3e065ef500461f3ea22d7c434c5a94d0a7c5b90d9e041460"
-state: "ready"
+state: "running"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "ec1e98c6c9320c135324631ca67dca97dac11619"
 last_completed_phase: "P5"
-next_phase: "none"
-last_validation: "pass"
-updated_at: "2026-07-27T14:53:25+00:00"
+next_phase: "final_validation"
+last_validation: "partial"
+updated_at: "2026-07-27T15:17:49+00:00"
 ---
 # Start or resume final v12 stabilization
 
@@ -40,10 +40,10 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `ready`
+- **State:** `running`
 - **Last completed phase:** `P5`（历史工程交付完成；publication stabilization 尚未闭合）
-- **Next phase:** `none`
-- **Latest validation:** `failed`。v11 candidate `ec1e98c6c9320c135324631ca67dca97dac11619` 的 push CI run `30269811587` 已通过 Linux V-006，但 full pytest collection 因 CI 未安装 `jsonschema` 失败。
+- **Next phase:** `final_validation`
+- **Latest validation:** `partial`。v11 candidate `ec1e98c6c9320c135324631ca67dca97dac11619` 的 push CI run `30269811587` 已通过 Linux V-006，但 full pytest collection 因 CI 未安装 `jsonschema` 失败。
 - **Current blocker:** 无合同 blocker；这是 v12 A.12 内的普通工程稳定化缺陷。
 - **Next safe action:** finalize/validate v12，创建 package-only setup commit；随后在 `.github/workflows/ci.yml` 的 conda test dependency install 中补充 `jsonschema`，运行验证并创建普通后继 candidate。
 
@@ -76,3 +76,5 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 ## Checkpoint history
 
 - 2026-07-27T22:50:01+08:00 — state=draft; completed=P5; next=none; validation=failed; user authorized final v12 continuous engineering stabilization; `ec1e98c...` retained as failed candidate; immediate proven defect is missing CI `jsonschema`.
+- 2026-07-27T14:53:56+00:00 — state=running; completed=P5; next=final_validation; validation=partial; v12 setup fb89525 verified package-only; begin A.12 repair for CI missing jsonschema at run 30269811587
+- 2026-07-27T15:17:49+00:00 — state=running; completed=P5; next=final_validation; validation=partial; A.12 jsonschema CI install repair passed focused 80, V-002, V-003 194, V-004 16 with identical digests, V-005 18, V-006 30, V-008 17 capabilities, and full 978 passed with 2 baseline skips; clean clone smoke pending
