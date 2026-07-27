@@ -14631,6 +14631,81 @@ function values(value) {
 function object(value) {
 	return value && typeof value === "object" && !Array.isArray(value) ? value : {};
 }
+var OPERATION_REVIEW_AXIS_NAMES = Object.freeze([
+	"operation",
+	"decision",
+	"snapshot_cash_valuation",
+	"market",
+	"lifecycle",
+	"outcome"
+]);
+var OPERATION_REVIEW_AXIS_LABELS = Object.freeze({
+	operation: "操作事实",
+	decision: "决策记录",
+	snapshot_cash_valuation: "持仓、现金与估值",
+	market: "市场信息",
+	lifecycle: "持仓回合",
+	outcome: "结果成熟度"
+});
+var OPERATION_REVIEW_STATUS_TEXT = Object.freeze({
+	ready: "操作事实已具备复盘条件。",
+	not_recorded: "没有找到已记录的当时决策理由；系统不会代为推断。",
+	open: "该持仓回合仍在进行。",
+	interim: "当前仅为阶段状态，不是最终结果。",
+	partial: "已有部分证据，缺失项仍单独保留。",
+	available: "对应证据可用。",
+	missing: "对应证据缺失，未以零值代替。",
+	blocked: "该轴尚未满足校验条件。",
+	failed: "该轴处理失败，其他轴仍独立呈现。",
+	unknown: "该轴状态尚未确定。"
+});
+function operationReviewView(value) {
+	const review = object(value);
+	if (review.available !== true) return {
+		available: false,
+		reason: text(review.reason, "operation_checkpoint_not_generated_for_this_run"),
+		axes: []
+	};
+	const sourceAxes = object(review.axes);
+	return {
+		available: true,
+		schema_version: text(review.schema_version, ""),
+		checkpoint_id: text(review.checkpoint_id, ""),
+		content_id: text(review.content_id, ""),
+		checkpoint_type: text(review.checkpoint_type, ""),
+		perspective: review.perspective === "system" ? "system" : "user",
+		as_of: review.as_of ?? null,
+		knowledge_cutoff: review.knowledge_cutoff ?? null,
+		operation_anchor: object(review.operation_anchor),
+		information_time_policy_version: review.information_time_policy_version ?? null,
+		actual_user_observation_proven: review.actual_user_observation_proven === true,
+		gaps: values(review.gaps),
+		source_refs: values(review.source_refs),
+		axes: OPERATION_REVIEW_AXIS_NAMES.map((name) => {
+			const axis = object(sourceAxes[name]);
+			return {
+				name,
+				label: OPERATION_REVIEW_AXIS_LABELS[name],
+				status: text(axis.status, "unknown").toLowerCase(),
+				summary: axis.summary ?? null,
+				source_refs: values(axis.source_refs),
+				fields: object(axis.fields),
+				evidence: axis
+			};
+		})
+	};
+}
+function operationReviewHeadline(value) {
+	const review = operationReviewView(value);
+	if (!review.available) return "本次运行未生成六轴操作检查点；旧版事实复盘仍可核查。";
+	const statuses = Object.fromEntries(review.axes.map((axis) => [axis.name, axis.status]));
+	if (statuses.operation === "ready" && statuses.lifecycle === "open" && statuses.outcome === "interim") return "操作事实已可复盘；持仓回合仍在进行，当前结果仅为阶段状态。";
+	return "六个状态轴按各自证据独立呈现；局部缺失不会被隐藏或补成零。";
+}
+function operationAxisNarrative(axis) {
+	if (typeof axis.summary === "string" && axis.summary.trim()) return axis.summary.trim();
+	return OPERATION_REVIEW_STATUS_TEXT[axis.status] || OPERATION_REVIEW_STATUS_TEXT.unknown;
+}
 function unwrap(payload) {
 	const envelope = object(payload);
 	return Object.prototype.hasOwnProperty.call(envelope, "data") ? object(envelope.data) : envelope;
@@ -14765,6 +14840,63 @@ function sectionBlock(title, kicker = "") {
 		body
 	};
 }
+function renderOperationReview(value) {
+	const review = operationReviewView(value);
+	const block = sectionBlock("操作复盘结论", "SIX-AXIS CHECKPOINT");
+	if (!review.available) {
+		block.body.appendChild(element("p", "investment-review-empty-copy", operationReviewHeadline(value)));
+		return block.section;
+	}
+	block.section.classList.add("investment-review-operation");
+	block.body.appendChild(element("p", "investment-review-operation-headline", operationReviewHeadline(value)));
+	block.body.appendChild(element("p", "investment-review-perspective-note", review.perspective === "user" ? "用户视角：按操作前已公开且版本已验证的信息投影；这不证明用户实际阅读过该信息。" : "系统视角：只采用系统在操作锚点前实际观测到的信息；之后取得的资料仅作回顾背景。"));
+	appendPairs(block.body, [
+		["视角", review.perspective === "user" ? "用户视角" : "系统视角"],
+		["操作锚点", review.operation_anchor.at],
+		["复盘时点", review.as_of],
+		["知识截止", review.knowledge_cutoff],
+		["信息时间规则", review.information_time_policy_version]
+	]);
+	const grid = element("div", "investment-review-axis-grid");
+	review.axes.forEach((axis) => {
+		const card = element("article", "investment-review-axis-card");
+		card.dataset.axis = axis.name;
+		const heading = element("header", "investment-review-axis-heading");
+		const badge = element("span", "investment-review-status", axis.status);
+		badge.dataset.status = axis.status;
+		heading.append(element("h4", "", axis.label), badge);
+		card.append(heading, element("p", "investment-review-axis-summary", operationAxisNarrative(axis)));
+		if (axis.name === "snapshot_cash_valuation") appendPairs(card, Object.entries({
+			position_quantity: "持仓数量",
+			cost_basis: "成本",
+			cash: "现金",
+			price: "价格",
+			nav: "净资产",
+			weight: "权重",
+			industry: "行业"
+		}).map(([name, label]) => {
+			const field = object(axis.fields[name]);
+			return [label, `${field.value === null || field.value === void 0 ? "缺失" : `${field.value}${field.unit ? ` ${field.unit}` : ""}`} · ${text(field.status, "unknown")}`];
+		}));
+		if (axis.name === "market") {
+			const evidence = object(axis.evidence);
+			const eligibility = object(evidence.perspective_eligibility);
+			appendPairs(card, [
+				["信息角色", evidence.temporal_role],
+				["信息生效", evidence.effective_at],
+				["公开时间", evidence.publicly_available_at],
+				["实际抓取", evidence.fetched_at],
+				["系统观测", evidence.system_observed_at],
+				["版本校验", object(evidence.version_provenance).status],
+				["来源", `${axis.source_refs.length} 项，明细见证据抽屉`]
+			]);
+			card.appendChild(element("p", "investment-review-perspective-note", eligibility.actual_user_observation_proven === true ? "产物含用户接触证据，但系统仍不推断是否实际阅读或如何理解。" : "没有用户实际接触证据；公开可得性不能替代实际阅读证明。"));
+		}
+		grid.appendChild(card);
+	});
+	block.body.appendChild(grid);
+	return block.section;
+}
 function normalizeReviews(payload) {
 	const data = unwrap(payload);
 	return values(data.reviews || data.items).map((item) => ({
@@ -14774,7 +14906,8 @@ function normalizeReviews(payload) {
 		episode_id: text(item?.episode_id, ""),
 		status: statusValue(item?.status),
 		scope: REVIEW_SCOPES.has(item?.scope) ? item.scope : "unknown",
-		gap_codes: gapList(item?.gap_codes || item?.gaps)
+		gap_codes: gapList(item?.gap_codes || item?.gaps),
+		operation_review: object(item?.operation_review)
 	}));
 }
 function interpretationTargets(detail) {
@@ -15007,8 +15140,9 @@ function mountInvestmentReview({ request, notify = () => {} } = {}) {
 			top.append(identity, statusBadge(review.status));
 			const dates = [review.opened_at, review.closed_at].filter(Boolean).map(String).join(" → ") || "time unknown";
 			const meta = element("p", "investment-review-list-meta", `${review.scope} · ${dates} · facts ${text(review.fact_count, "unknown")} · decision ${text(review.decision_status)}`);
-			const gaps = element("p", "investment-review-list-gaps", review.gap_codes.length ? review.gap_codes.join(" · ") : "gaps none");
-			button.append(top, meta, gaps);
+			const conclusion = element("p", "investment-review-list-conclusion", operationReviewHeadline(review.operation_review));
+			const gaps = element("p", "investment-review-list-gaps", review.gap_codes.length ? `有 ${review.gap_codes.length} 项待核查证据，代码与责任信息见证据抽屉。` : "当前没有已记录的证据缺口。");
+			button.append(top, meta, conclusion, gaps);
 			button.disabled = !review.run_id || !review.review_id;
 			button.addEventListener("click", () => void openReview(review));
 			row.appendChild(button);
@@ -15022,6 +15156,27 @@ function mountInvestmentReview({ request, notify = () => {} } = {}) {
 		headingBlock.append(element("p", "section-kicker", "TRACEABLE EVIDENCE"), element("h2", "", "证据与来源"));
 		headingBlock.lastChild.id = "investmentReviewEvidenceTitle";
 		evidenceContent.appendChild(headingBlock);
+		const checkpoint = object(data.operation_checkpoint);
+		if (checkpoint.available === true) {
+			const operation = sectionBlock("操作检查点证据", "SIX-AXIS EVIDENCE");
+			operation.body.appendChild(renderStructured({
+				schema_version: checkpoint.schema_version,
+				checkpoint_id: checkpoint.checkpoint_id,
+				content_id: checkpoint.content_id,
+				perspective: checkpoint.perspective,
+				operation_anchor: checkpoint.operation_anchor,
+				as_of: checkpoint.as_of,
+				knowledge_cutoff: checkpoint.knowledge_cutoff,
+				information_time_policy_version: checkpoint.information_time_policy_version,
+				actual_user_observation_proven: checkpoint.actual_user_observation_proven,
+				axes: checkpoint.axes,
+				gaps: checkpoint.gaps,
+				source_refs: checkpoint.source_refs,
+				market_fallback: checkpoint.market_fallback,
+				time_provenance: checkpoint.time_provenance
+			}));
+			evidenceContent.appendChild(operation.section);
+		}
 		values(data.sections).forEach((sectionItem) => {
 			const item = object(sectionItem);
 			const block = sectionBlock(text(item.name, "section"), "EVIDENCE SECTION");
@@ -15330,7 +15485,9 @@ function mountInvestmentReview({ request, notify = () => {} } = {}) {
 		header.append(element("p", "section-kicker", "TRACEABLE REVIEW"), element("h2", "", text(summary.symbol ?? review.symbol, review.episode_id)), element("p", "investment-review-mono", `${review.run_id} · ${review.review_id}`), statusBadge(summary.status ?? review.status));
 		header.querySelector("h2").id = "investmentReviewDrawerTitle";
 		drawerContent.appendChild(header);
-		appendList(drawerContent, gapList(summary.gap_codes ?? review.gap_codes), "gaps none");
+		const gapCount = gapList(summary.gap_codes ?? review.gap_codes).length;
+		drawerContent.appendChild(element("p", "investment-review-gap-summary", gapCount ? `有 ${gapCount} 项证据缺口；代码、责任人和下一步请在证据抽屉核查。` : "当前没有已记录的证据缺口。"));
+		drawerContent.appendChild(renderOperationReview(detail.operation_review ?? summary.operation_review));
 		const onSaved = async () => {
 			await Promise.allSettled([loadHealth(), loadReviews()]);
 			if (state.selected) await openReview(state.selected, { preserveOpen: true });

@@ -2635,12 +2635,19 @@ h2 {
 }
 
 .investment-review-list-meta,
+.investment-review-list-conclusion,
 .investment-review-list-gaps {
   margin: 13px 0 0;
   color: var(--muted);
   font-family: var(--mono);
   font-size: 10px;
   line-height: 1.65;
+}
+
+.investment-review-list-conclusion {
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 13px;
 }
 
 .investment-review-list-gaps {
@@ -2768,6 +2775,82 @@ h2 {
 
 .investment-review-detail-body > .investment-review-status {
   margin-bottom: 12px;
+}
+
+.investment-review-gap-summary {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--line-soft);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.investment-review-operation-headline {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-family: var(--display);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.investment-review-perspective-note {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.investment-review-axis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.investment-review-axis-card {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line-soft);
+  background: color-mix(in oklch, var(--surface-raised) 76%, transparent);
+}
+
+.investment-review-axis-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.investment-review-axis-heading h4 {
+  margin: 2px 0 0;
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 560;
+}
+
+.investment-review-axis-summary {
+  min-height: 42px;
+  margin: 12px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.investment-review-axis-card .investment-review-pair {
+  grid-template-columns: minmax(74px, 0.35fr) minmax(0, 0.65fr);
+  gap: 10px;
+}
+
+.investment-review-axis-card .investment-review-pair dt,
+.investment-review-axis-card .investment-review-pair dd {
+  font-size: 10px;
+}
+
+.investment-review-status[data-status="not_recorded"],
+.investment-review-status[data-status="open"],
+.investment-review-status[data-status="interim"] {
+  border-color: color-mix(in oklch, var(--amber) 72%, var(--line));
+  color: var(--amber);
 }
 
 .investment-review-pairs {
@@ -3333,6 +3416,10 @@ h2 {
   }
 
   .investment-review-list {
+    grid-template-columns: 1fr;
+  }
+
+  .investment-review-axis-grid {
     grid-template-columns: 1fr;
   }
 

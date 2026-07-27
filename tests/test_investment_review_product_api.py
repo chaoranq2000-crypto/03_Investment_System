@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import json
+import socket
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator, Mapping
 
 import pytest
 
 import src.portfolio.investment_review_service as review_service_module
+from src.investment_review.market_context_adapter import MarketContextAdapter
 from src.investment_review.models import DecisionRecord
 from src.investment_review.review_runner import (
     ReviewRunCatalog,
@@ -22,9 +25,13 @@ from src.portfolio.investment_review_service import (
 )
 from tests.test_investment_review_episode_interpretation import _build
 from tests.test_investment_review_review_runner import (
+    AS_OF,
     RunnerFixture,
+    _closed_episode_rows,
     _fixture,
+    _reviewability_fixture,
     _run,
+    _trade_row,
 )
 
 
@@ -234,6 +241,177 @@ def test_catalog_get_episode_bundle_is_exactly_run_qualified(
             product_api.run_id,
             "review:" + "f" * 32,
         )
+
+
+def test_v2_operation_checkpoint_projects_six_axes_and_paired_perspectives(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rows = [
+        *_closed_episode_rows(
+            "2026-02-01",
+            "2026-02-02",
+            "api-v2-flat-baseline",
+        ),
+        _trade_row(
+            event_date="2026-02-02",
+            event_type="BUY",
+            external_id="api-v2-open",
+            event_time="12:00:00",
+        ),
+    ]
+    fixture = _reviewability_fixture(
+        tmp_path,
+        rows=rows,
+        automatic_market_context=True,
+    )
+    fixture.store.upgrade_reviewability_candidate_v2()
+    fixture.runner.checkpoint_market_resolver = MarketContextAdapter(
+        cache_root=fixture.runner.market_cache_root,
+        provider_gateway=None,
+        clock=lambda: datetime(2026, 7, 29, 8, 0, tzinfo=timezone.utc),
+    )
+    source_before = fixture.source.read_bytes()
+    user_receipt = fixture.runner.run(
+        scope="single",
+        as_of=AS_OF,
+        knowledge_cutoff="2026-07-28T00:00:00Z",
+        perspective="user",
+        dry_run=False,
+        trigger="pytest-v2-api",
+    )
+    system_receipt = fixture.runner.run(
+        scope="single",
+        as_of=AS_OF,
+        knowledge_cutoff="2026-07-28T00:00:00Z",
+        perspective="system",
+        dry_run=False,
+        trigger="pytest-v2-api",
+    )
+    assert fixture.source.read_bytes() == source_before
+
+    catalog = ReviewRunCatalog(
+        review_db=fixture.review_db,
+        portfolio_db=fixture.source,
+        artifact_root=fixture.artifacts,
+        repo_root=fixture.root,
+    )
+    service = InvestmentReviewWebService(
+        catalog=catalog,
+        store=fixture.store,
+        revision_root=fixture.artifacts / "human_revisions",
+        repo_root=fixture.root,
+    )
+    socket_calls: list[str] = []
+
+    def forbidden_network(*args: Any, **kwargs: Any) -> None:
+        socket_calls.append(repr((args, kwargs)))
+        raise AssertionError("validated API projections must remain offline")
+
+    monkeypatch.setattr(socket, "create_connection", forbidden_network)
+    monkeypatch.setattr(socket.socket, "connect", forbidden_network)
+    projections: dict[str, dict[str, Any]] = {}
+    for perspective, receipt in (
+        ("user", user_receipt),
+        ("system", system_receipt),
+    ):
+        episode = receipt["episodes"][0]
+        detail = service.get_review_detail(
+            receipt["run_id"],
+            episode["review_id"],
+        )
+        operation_review = detail["data"]["operation_review"]
+        projections[perspective] = operation_review
+        assert operation_review["available"] is True
+        assert operation_review["schema_version"] == (
+            "investment_review.operation_checkpoint.v2"
+        )
+        assert operation_review["perspective"] == perspective
+        assert operation_review["actual_user_observation_proven"] is False
+        assert set(operation_review["axes"]) == {
+            "operation",
+            "decision",
+            "snapshot_cash_valuation",
+            "market",
+            "lifecycle",
+            "outcome",
+        }
+        assert operation_review["axes"]["operation"]["status"] == "ready"
+        assert operation_review["axes"]["decision"]["status"] == "not_recorded"
+        assert operation_review["axes"]["lifecycle"]["status"] == "open"
+        assert operation_review["axes"]["outcome"]["status"] == "interim"
+        fields = operation_review["axes"]["snapshot_cash_valuation"]["fields"]
+        assert fields["position_quantity"]["value"] not in {None, "0"}
+        for field in ("industry", "nav", "price", "weight"):
+            assert fields[field]["value"] is None
+        assert all(
+            {
+                "code",
+                "severity",
+                "owner",
+                "next_step",
+                "source_refs",
+            }.issubset(gap)
+            for gap in operation_review["gaps"]
+        )
+
+        evidence = service.get_evidence(
+            receipt["run_id"],
+            episode["review_id"],
+        )
+        assert evidence["data"]["operation_checkpoint"] == operation_review
+        listing = service.list_reviews(scope="single")
+        listed = next(
+            item
+            for item in listing["data"]["reviews"]
+            if item["run_id"] == receipt["run_id"]
+        )
+        assert listed["operation_review"]["perspective"] == perspective
+        assert listed["operation_review"]["axis_statuses"] == {
+            name: operation_review["axes"][name]["status"]
+            for name in (
+                "operation",
+                "decision",
+                "snapshot_cash_valuation",
+                "market",
+                "lifecycle",
+                "outcome",
+            )
+        }
+        serialized = json.dumps(
+            [detail, evidence, listed],
+            ensure_ascii=False,
+        )
+        assert str(fixture.root) not in serialized
+
+    assert projections["user"]["checkpoint_id"] != (
+        projections["system"]["checkpoint_id"]
+    )
+    forbidden_keys = {
+        "motive",
+        "psychology",
+        "diagnosis",
+        "score",
+        "recommendation",
+        "actually_read",
+    }
+
+    def keys(value: object) -> set[str]:
+        if isinstance(value, Mapping):
+            return {
+                str(key).lower()
+                for key in value
+            } | {
+                nested
+                for item in value.values()
+                for nested in keys(item)
+            }
+        if isinstance(value, (list, tuple)):
+            return {nested for item in value for nested in keys(item)}
+        return set()
+
+    assert forbidden_keys.isdisjoint(keys(projections))
+    assert socket_calls == []
 
 
 def test_catalog_rejects_receipt_paths_outside_trusted_root(

@@ -1860,7 +1860,9 @@ class OperationCheckpointRecord:
                 "snapshot missing requires at least one explicitly missing component"
             )
         if snapshot["status"] == "partial" and (
-            not any(status == "available" for status in field_statuses)
+            not any(
+                status in {"available", "partial"} for status in field_statuses
+            )
             or not any(status in {"partial", "missing"} for status in field_statuses)
         ):
             raise ModelValidationError(

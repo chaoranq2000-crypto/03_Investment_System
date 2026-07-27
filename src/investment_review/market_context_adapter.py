@@ -74,6 +74,9 @@ MARKET_CACHE_ENTRY_VERSION_V2 = "investment_review.market_cache_entry.v2"
 MARKET_CONTEXT_MANIFEST_VERSION_V2 = "investment_review.market_context_manifest.v2"
 MARKET_SOURCE_MANIFEST_VERSION_V2 = "investment_review.market_source_manifest.v2"
 MARKET_SOURCE_REPLAY_VERSION_V2 = "investment_review.market_context_source_replay.v2"
+MARKET_CONTEXT_CACHE_REPAIR_VERSION_V2 = (
+    "investment_review.current_industry_effective_time_repair.v1"
+)
 MARKET_INFORMATION_TIME_METHOD_VERSION = "public_information_time.v1"
 MARKET_EXCHANGE_PUBLICATION_RULE_VERSION = "exchange_bar_publication_time.v1"
 
@@ -4328,7 +4331,7 @@ def _local_source_from_record_v2(
         source_provider = industry_source
         table = "instruments"
         point_in_time = False
-        contextual_effective_at = as_of
+        contextual_effective_at = None
     else:
         raise MarketContextError("v2 origin local component is unsupported")
     if not _component_values_sufficient(component, values):
@@ -7790,6 +7793,79 @@ def market_context_resolution_path_v2(
     )
 
 
+def _market_context_repair_path_v2(
+    cache_root: str | Path, requirement_id: str
+) -> Path:
+    repair_identity = (
+        requirement_id + ":" + MARKET_CONTEXT_CACHE_REPAIR_VERSION_V2
+    )
+    return (
+        Path(cache_root).resolve(strict=False)
+        / "v2"
+        / "r_repair"
+        / _short_cache_name(repair_identity)
+    )
+
+
+def _is_legacy_current_industry_contextual_cache_v2(
+    value: Mapping[str, Any],
+    requirement: Mapping[str, Any],
+) -> bool:
+    """Recognize only the closed cache defect fixed by v7.
+
+    The legacy projection promoted a current-only industry's effective time to
+    the later review ``as_of`` while retaining its earlier observation time.
+    Arbitrary invalid or identity-drifted cache content remains fail closed.
+    """
+
+    try:
+        if value.get("requirement") != requirement:
+            return False
+        sources = value.get("supplemental_sources")
+        if not isinstance(sources, list):
+            return False
+        validation = validate_market_context_resolution_v2(value)
+        finding_messages = {
+            str(finding.get("message") or "")
+            for finding in validation.get("findings", [])
+            if isinstance(finding, Mapping)
+        }
+        if (
+            validation.get("validation_status") != "blocked"
+            or finding_messages != {"v2 local source canonical proof drift"}
+        ):
+            return False
+        legacy_sources = [
+            source
+            for source in sources
+            if isinstance(source, Mapping)
+            and isinstance(source.get("payload"), Mapping)
+            and source["payload"].get("component") == "current_industry"
+        ]
+        for source in legacy_sources:
+            payload = source["payload"]
+            eligibility = payload.get("perspective_eligibility")
+            fetched_at = payload.get("fetched_at")
+            observed_at = payload.get("system_observed_at")
+            effective_at = payload.get("effective_at")
+            if (
+                isinstance(eligibility, Mapping)
+                and payload.get("point_in_time") is False
+                and eligibility.get("status") == "unknown"
+                and eligibility.get("reason_code")
+                == "current_only_not_point_in_time"
+                and effective_at == requirement.get("as_of")
+                and payload.get("coverage_effective_at") == fetched_at
+                and fetched_at == observed_at
+                and parse_datetime(str(fetched_at), "UTC")
+                < parse_datetime(str(effective_at), "UTC")
+            ):
+                return True
+        return False
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
 def _resolve_market_context_for_requirement_v2(
     *,
     source_path: Path,
@@ -7803,11 +7879,32 @@ def _resolve_market_context_for_requirement_v2(
     resolution_path = market_context_resolution_path_v2(
         root, str(requirement["requirement_id"])
     )
-    if resolution_path.exists():
-        resolution = load_market_context_resolution_v2(resolution_path)
+    repair_path = _market_context_repair_path_v2(
+        root, str(requirement["requirement_id"])
+    )
+    if repair_path.exists():
+        resolution = load_market_context_resolution_v2(repair_path)
         if resolution["requirement"] != requirement:
-            raise MarketContextError("cached v2 market requirement identity drift")
+            raise MarketContextError(
+                "repaired v2 market requirement identity drift"
+            )
         return market_context_runner_projection_v2(resolution)
+    if resolution_path.exists():
+        raw_resolution = load_json_object(resolution_path)
+        try:
+            resolution = load_market_context_resolution_v2(resolution_path)
+        except MarketContextError:
+            if not _is_legacy_current_industry_contextual_cache_v2(
+                raw_resolution, requirement
+            ):
+                raise
+            resolution_path = repair_path
+        else:
+            if resolution["requirement"] != requirement:
+                raise MarketContextError(
+                    "cached v2 market requirement identity drift"
+                )
+            return market_context_runner_projection_v2(resolution)
     if persist:
         _create_or_compare(
             root / "v2" / "q" / _short_cache_name(str(requirement["requirement_id"])),

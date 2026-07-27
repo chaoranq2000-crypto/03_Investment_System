@@ -12,6 +12,7 @@ from typing import Any
 
 import pytest
 
+from src.investment_review import market_context_adapter as market_context_module
 from src.investment_review.artifact_io import canonical_json_bytes
 from src.investment_review.market_context_adapter import (
     MARKET_CONTEXT_MANIFEST_VERSION,
@@ -46,6 +47,7 @@ from src.investment_review.market_context_adapter import (
     market_row_content_sha256_v2,
     load_market_context_resolution,
     market_context_resolution_path,
+    market_context_resolution_path_v2,
     offline_market_context_for_consumer,
     replay_validate_market_context_resolution,
     resolve_market_context,
@@ -81,6 +83,7 @@ def _portfolio_db(
     with_optional_rows: bool = False,
     close_fetched_at: str = "2026-07-17T07:36:48Z",
     instrument_updated_at: str = "2026-07-17T07:34:46Z",
+    industry_updated_at: str = "2026-07-17T07:51:58Z",
 ) -> Path:
     tmp_path.mkdir(parents=True, exist_ok=True)
     path = tmp_path / "portfolio.sqlite3"
@@ -147,7 +150,7 @@ def _portfolio_db(
                 "CNY",
                 "电子" if with_industry else "",
                 "reviewed.current" if with_industry else "",
-                "2026-07-17T07:51:58Z" if with_industry else "",
+                industry_updated_at if with_industry else "",
                 instrument_updated_at,
             ),
         )
@@ -3046,6 +3049,117 @@ def test_v2_all_local_component_values_rebuild_from_origin_record(
         forged = _reclose_local_projection_v2(forged, requirement)
         with pytest.raises(MarketContextError, match="canonical proof"):
             _canonical_component_source_v2(forged, requirement)
+
+
+def test_v2_current_industry_preserves_observation_time_before_review_as_of(
+    tmp_path: Path,
+) -> None:
+    industry_observed_at = "2026-07-14T17:43:41Z"
+    source = _portfolio_db(
+        tmp_path,
+        with_close=False,
+        instrument_updated_at="2026-07-14T17:42:14Z",
+        industry_updated_at=industry_observed_at,
+    )
+
+    result = _resolve_v2(
+        tmp_path,
+        source,
+        required_components=("instrument",),
+        optional_components=("current_industry",),
+    )
+
+    industry = next(
+        item
+        for item in result["supplemental_sources"]
+        if item.get("payload", {}).get("component") == "current_industry"
+    )
+    payload = industry["payload"]
+    axis = result["market_axis"]
+    assert payload["effective_at"] == industry_observed_at
+    assert payload["coverage_effective_at"] == industry_observed_at
+    assert payload["fetched_at"] == industry_observed_at
+    assert payload["system_observed_at"] == industry_observed_at
+    assert payload["perspective_eligibility"]["status"] == "unknown"
+    assert payload["perspective_eligibility"]["reason_code"] == (
+        "current_only_not_point_in_time"
+    )
+    assert payload["point_in_time"] is False
+    assert axis["effective_at"] == industry_observed_at
+    assert axis["effective_at"] <= axis["fetched_at"]
+    assert axis["temporal_role"] == "unknown"
+    assert validate_market_context_resolution_v2(result["resolution"])[
+        "validation_status"
+    ] == "accepted"
+    assert replay_validate_market_context_resolution(
+        result["resolution"]
+    )["source_verification"] == "verified"
+
+
+def test_v2_legacy_current_industry_cache_repairs_create_only(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    industry_observed_at = "2026-07-14T17:43:41Z"
+    source = _portfolio_db(
+        tmp_path,
+        with_close=False,
+        instrument_updated_at="2026-07-14T17:42:14Z",
+        industry_updated_at=industry_observed_at,
+    )
+    canonical_local_row_source = market_context_module._local_row_source_v2
+
+    def legacy_local_row_source(**kwargs: Any) -> dict[str, Any]:
+        if kwargs.get("component") == "current_industry":
+            kwargs["contextual_effective_at"] = datetime.fromisoformat(
+                str(kwargs["requirement"]["as_of"]).replace("Z", "+00:00")
+            )
+        return canonical_local_row_source(**kwargs)
+
+    monkeypatch.setattr(
+        market_context_module,
+        "_local_row_source_v2",
+        legacy_local_row_source,
+    )
+    first = _resolve_v2(
+        tmp_path,
+        source,
+        required_components=("instrument",),
+        optional_components=("current_industry",),
+    )
+    requirement = first["resolution"]["requirement"]
+    primary_path = market_context_resolution_path_v2(
+        _cache_root(tmp_path), requirement["requirement_id"]
+    )
+    legacy_bytes = primary_path.read_bytes()
+    monkeypatch.setattr(
+        market_context_module,
+        "_local_row_source_v2",
+        canonical_local_row_source,
+    )
+
+    repaired = _resolve_v2(
+        tmp_path,
+        source,
+        required_components=("instrument",),
+        optional_components=("current_industry",),
+    )
+    repair_paths = list((_cache_root(tmp_path) / "v2/r_repair").glob("*.json"))
+
+    assert primary_path.read_bytes() == legacy_bytes
+    assert len(repair_paths) == 1
+    assert repaired["market_axis"]["effective_at"] == industry_observed_at
+    assert repaired["market_axis"]["effective_at"] <= repaired["market_axis"][
+        "fetched_at"
+    ]
+    repeat = _resolve_v2(
+        tmp_path,
+        source,
+        required_components=("instrument",),
+        optional_components=("current_industry",),
+    )
+    assert canonical_json_bytes(repaired) == canonical_json_bytes(repeat)
+    assert primary_path.read_bytes() == legacy_bytes
 
 
 @pytest.mark.parametrize(

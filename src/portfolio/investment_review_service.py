@@ -42,6 +42,7 @@ from src.investment_review.models import (
     ModelValidationError,
     canonical_json,
 )
+from src.investment_review.review_checkpoint import validate_review_checkpoint
 from src.investment_review.review_input_bundle import validate_review_input_bundle
 from src.investment_review.review_runner import (
     RUN_CATALOG_SCHEMA_VERSION,
@@ -63,6 +64,14 @@ API_BOUNDARY = {
     "source": "validated_review_artifacts_and_candidate_sidecar",
     "portfolio_source_write": False,
 }
+OPERATION_REVIEW_AXES = (
+    "operation",
+    "decision",
+    "snapshot_cash_valuation",
+    "market",
+    "lifecycle",
+    "outcome",
+)
 
 _RUN_ID = re.compile(r"^reviewrun_[0-9a-f]{32}$")
 _REVIEW_ID = re.compile(r"^review:[0-9a-f]{32}$")
@@ -291,6 +300,107 @@ def _public_projection(value: object) -> Any:
     ):
         return "[local_path_redacted]"
     return value
+
+
+def _operation_review_projection(bundle: Mapping[str, Any]) -> dict[str, Any]:
+    """Project a validated checkpoint without inventing missing axis values."""
+
+    checkpoint = bundle.get("review_checkpoint")
+    if not isinstance(checkpoint, Mapping):
+        return {
+            "available": False,
+            "reason": "operation_checkpoint_not_generated_for_this_run",
+            "axes": {},
+        }
+
+    raw_axes = checkpoint.get("status_axes")
+    raw_axes = raw_axes if isinstance(raw_axes, Mapping) else {}
+    axes = {
+        name: _public_projection(dict(raw_axes[name]))
+        for name in OPERATION_REVIEW_AXES
+        if isinstance(raw_axes.get(name), Mapping)
+    }
+    market_axis = axes.get("market")
+    market_axis = market_axis if isinstance(market_axis, Mapping) else {}
+    eligibility = market_axis.get("perspective_eligibility")
+    eligibility = eligibility if isinstance(eligibility, Mapping) else {}
+    return {
+        "available": True,
+        "schema_version": checkpoint.get("schema_version"),
+        "checkpoint_id": checkpoint.get("checkpoint_id"),
+        "checkpoint_key": checkpoint.get("checkpoint_key"),
+        "content_id": checkpoint.get("content_id"),
+        "checkpoint_type": checkpoint.get("checkpoint_type"),
+        "review_kind": checkpoint.get("review_kind"),
+        "perspective": checkpoint.get("perspective"),
+        "as_of": checkpoint.get("as_of"),
+        "knowledge_cutoff": checkpoint.get("knowledge_cutoff"),
+        "operation_anchor": {
+            "event_id": checkpoint.get("operation_anchor_event_id"),
+            "at": checkpoint.get("operation_anchor_at"),
+            "ordering_key": _public_projection(
+                checkpoint.get("operation_anchor_ordering_key")
+            ),
+        },
+        "information_time_policy_version": checkpoint.get(
+            "information_time_policy_version"
+        ),
+        "actual_user_observation_proven": eligibility.get(
+            "actual_user_observation_proven"
+        )
+        is True,
+        "axes": axes,
+        "gaps": _public_projection(checkpoint.get("gaps", [])),
+        "source_refs": _public_projection(checkpoint.get("source_refs", [])),
+        "market_fallback": _public_projection(
+            checkpoint.get("market_fallback")
+        ),
+        "time_provenance": _public_projection(
+            checkpoint.get("time_provenance")
+        ),
+        "governance": _public_projection(checkpoint.get("governance")),
+    }
+
+
+def _operation_review_summary(bundle: Mapping[str, Any]) -> dict[str, Any]:
+    projection = _operation_review_projection(bundle)
+    if projection["available"] is not True:
+        return projection
+    axes = projection["axes"]
+    market = axes.get("market")
+    market = market if isinstance(market, Mapping) else {}
+    return {
+        "available": True,
+        "schema_version": projection.get("schema_version"),
+        "checkpoint_id": projection.get("checkpoint_id"),
+        "content_id": projection.get("content_id"),
+        "checkpoint_type": projection.get("checkpoint_type"),
+        "perspective": projection.get("perspective"),
+        "as_of": projection.get("as_of"),
+        "knowledge_cutoff": projection.get("knowledge_cutoff"),
+        "operation_anchor": projection.get("operation_anchor"),
+        "information_time_policy_version": projection.get(
+            "information_time_policy_version"
+        ),
+        "actual_user_observation_proven": projection.get(
+            "actual_user_observation_proven"
+        ),
+        "axis_statuses": {
+            name: (
+                axes[name].get("status")
+                if isinstance(axes.get(name), Mapping)
+                else "unknown"
+            )
+            for name in OPERATION_REVIEW_AXES
+        },
+        "market_temporal_role": market.get("temporal_role"),
+        "market_effective_at": market.get("effective_at"),
+        "market_publicly_available_at": market.get(
+            "publicly_available_at"
+        ),
+        "market_fetched_at": market.get("fetched_at"),
+        "market_system_observed_at": market.get("system_observed_at"),
+    }
 
 
 class _TrustedReviewCatalog:
@@ -559,6 +669,8 @@ class _TrustedReviewCatalog:
             validation = validate_review_input_bundle(artifact)
         elif artifact_name == "review":
             validation = validate_episode_review(artifact)
+        elif artifact_name == "review_checkpoint":
+            validation = validate_review_checkpoint(artifact)
         else:
             raise ReviewRunnerError(
                 f"unsupported trusted artifact kind: {artifact_name}"
@@ -614,6 +726,23 @@ class _TrustedReviewCatalog:
                 )
             )
 
+        checkpoint_descriptor = artifacts.get("review_checkpoint")
+        checkpoint_summary = episode_summary.get("review_checkpoint")
+        if checkpoint_descriptor is not None or checkpoint_summary is not None:
+            if not isinstance(checkpoint_descriptor, Mapping) or not isinstance(
+                checkpoint_summary, Mapping
+            ):
+                raise ReviewRunnerError(
+                    "review checkpoint descriptor and summary must agree"
+                )
+            (
+                loaded["review_checkpoint"],
+                validations["review_checkpoint"],
+            ) = self._load_episode_artifact(
+                descriptor=checkpoint_descriptor,
+                artifact_name="review_checkpoint",
+            )
+
         frozen_sources = loaded["input"].get("frozen_sources")
         episode = (
             frozen_sources.get("episode")
@@ -635,6 +764,19 @@ class _TrustedReviewCatalog:
             raise ReviewRunnerError(
                 "run-qualified episode artifact identities do not agree"
             )
+        checkpoint = loaded.get("review_checkpoint")
+        if checkpoint is not None and (
+            checkpoint.get("episode_id") != episode_summary.get("episode_id")
+            or checkpoint.get("content_id")
+            != checkpoint_summary.get("content_id")
+            or checkpoint.get("checkpoint_id")
+            != checkpoint_summary.get("checkpoint_id")
+            or checkpoint.get("perspective")
+            != episode_summary.get("perspective")
+        ):
+            raise ReviewRunnerError(
+                "run-qualified checkpoint artifact identities do not agree"
+            )
         bundle = {
             "schema_version": "investment_review.review_episode_bundle.v1",
             "receipt": receipt,
@@ -643,6 +785,7 @@ class _TrustedReviewCatalog:
             "context": loaded["context"],
             "input": loaded["input"],
             "review": loaded["review"],
+            "review_checkpoint": checkpoint,
             "validations": validations,
         }
         transform = getattr(self._catalog, "transform_episode_bundle", None)
@@ -1480,6 +1623,7 @@ class InvestmentReviewWebService:
             "revision_no": revision.get("revision_no"),
             "generation_mode": generation_mode,
             "correctable": generation_mode in {"model_assisted", "human_authored"},
+            "operation_review": _operation_review_summary(bundle),
         }
 
     def list_reviews(
@@ -1711,6 +1855,7 @@ class InvestmentReviewWebService:
                 "frozen_decision_linkage": bundle["episode"].get(
                     "decision_linkage"
                 ),
+                "operation_review": _operation_review_projection(bundle),
                 "interpretation_sections": latest.get("interpretation_sections"),
                 "warnings": latest.get("warnings", []),
             },
@@ -1875,6 +2020,7 @@ class InvestmentReviewWebService:
             data={
                 "sections": sections,
                 "source_inventory": inventory,
+                "operation_checkpoint": _operation_review_projection(bundle),
                 "warnings": _public_projection(
                     latest.get("warnings", [])
                 ),

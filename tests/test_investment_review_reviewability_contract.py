@@ -1788,6 +1788,46 @@ def test_v2_checkpoint_binds_anchor_policy_and_strict_publication_boundary() -> 
         OperationCheckpointRecord.from_mapping(payload)
 
 
+def test_v2_snapshot_accepts_truthful_partial_components_with_explicit_missing() -> None:
+    payload = checkpoint_v2_input()
+    snapshot = payload["status_axes"]["snapshot_cash_valuation"]
+    snapshot["fields"]["position_quantity"]["status"] = "partial"
+    snapshot["fields"]["cost_basis"]["status"] = "partial"
+
+    record = OperationCheckpointRecordV2.from_mapping(payload).to_dict()
+
+    assert record["status_axes"]["snapshot_cash_valuation"]["status"] == "partial"
+    assert (
+        record["status_axes"]["snapshot_cash_valuation"]["fields"][
+            "position_quantity"
+        ]["status"]
+        == "partial"
+    )
+    assert (
+        record["status_axes"]["snapshot_cash_valuation"]["fields"]["cash"]["value"]
+        is None
+    )
+    _schema_v2_validator().validate(record)
+
+
+def test_v2_snapshot_partial_rejects_only_missing_components() -> None:
+    payload = checkpoint_v2_input()
+    snapshot = payload["status_axes"]["snapshot_cash_valuation"]
+    for field in snapshot["fields"].values():
+        field.update(
+            status="missing",
+            value=None,
+            unit=None,
+            source_refs=[],
+        )
+
+    with pytest.raises(
+        ModelValidationError,
+        match="snapshot partial requires both available and limited components",
+    ):
+        OperationCheckpointRecordV2.from_mapping(payload)
+
+
 def test_v2_system_late_observation_is_retrospective_zero_request() -> None:
     record = OperationCheckpointRecordV2.from_mapping(
         checkpoint_v2_input(perspective="system")
