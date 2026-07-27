@@ -9,7 +9,7 @@ source_baseline: "fe986a0359c0268ac94eea696c3a4795403e4614"
 last_completed_phase: "P4"
 next_phase: "P5"
 last_validation: "pass"
-updated_at: "2026-07-27T14:57:16+08:00"
+updated_at: "2026-07-27T15:01:20+08:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -43,11 +43,11 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - **State:** `running`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`。Bundle 新 v8 arm=`b120a805736a89b5c6a0406e15d5a0d040a0f341`；Codex exact-file surface 删除 205 个 ordinal manifest paths，删除提交=`274d47ec299a42946bc3b83f7908257e80f0f99b`，精确包含 205 `D` 与 1 个 Bundle receipt `A`。post-wave V-006=`28 passed in 592.82s`，V-003 final=`194 passed in 23.40s`；Night/Bundle 全缺失，old002837 `501/501` 仍存在，工作树 clean。
-- **Current blocker:** 无；Bundle 波已完成且回归通过，正在准备 old002837 的 501-file + 29-directory clean v8 arm。
+- **Latest validation:** `pass`。Bundle post-wave evidence checkpoint=`f98c7861b422a4081955e8f1513da4428534425c` 已创建且 clean。old002837 pre-arm audit 精确闭合：501/501 tracked regular/non-reparse files 的 HEAD/index blob OID 全匹配；旧 run tree 恰含 501 files + 29 directories，extra/special/reparse=0；relative/absolute directory vectors 分别为 2208/`1e987f07...` 与 3803/`31669a8f...`；Night/Bundle 保持缺失。
+- **Current blocker:** 无；本文件正在形成 old002837 的 clean v8 arm。包含本次清单更新的 arm commit 自身即 `wave_parent_commit`，SHA 不写回文件。
 - **Prior hard-stop evidence:** v4 checkpoints `0f582599...` 与 `f1dafeb...` 保留历史冲突证据；v5 已修复三项 A.7 冲突以及 A.2 retained-dependency/unknown-classification 缺陷。旧 `82f7d37...` arm 因其后存在 policy/v6 commits 已失去 current-wave-parent 资格。
 - **User-main protection snapshot:** HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`；批准的新完整 `porcelain=v1 -z -uall` 向量为 130 records、9156 bytes、SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`，tracked-only 为 20 records、1025 bytes、SHA-256 `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`。v6 准备时补丁工具的两份未跟踪草稿曾误落该树，已按两个明确文件路径逐一撤销；HEAD 与两组 raw NUL 向量随后精确恢复。不得再写入、清理、修复、吸收或提交其中内容。
-- **Next safe action:** 只读复核 old002837 501 个 tracked regular/non-reparse files 的 HEAD/index blob identity，以及固定 29 个 empty/non-reparse directories 的完整 entry/prefix/suffix 向量；随后在本文件逐项列出 501 个 absolute file paths 与 29 个 absolute directory paths，并创建只含本文件的 clean old002837 v8 arm。
+- **Next safe action:** arm commit clean 后，以其 exact HEAD 作为 `wave_parent_commit` 调用 V-007/D-020 control plane；只有完整 contract/AGENTS/actor/顺序/Bundle receipt/501-row blob/恢复/空 status-prefix/29-row directory identity 全通过时，才从第 1 个 absolute literal file 开始逐项删除。
 
 ### P5 pre-delete completion evidence
 
@@ -58,7 +58,7 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - Restore proof: all 1,386 Git blobs recovered byte-for-byte under `C:\Users\Q\AppData\Local\Temp\v8_v1_historical_restore_e7939036de974f27afb7306970f49576`; `cat_file_e_verified`, `content_hash_verified`, `full_restore_verified` and `byte_for_byte_match` all true.
 - Current validators: V-002 pass；V-003 final 194 passed；V-004 两次 semantic digest 均为 `2d8487beb46f10b6df103a9a2808998870a19556ef6879959ed15c6eb90cbcc6` 且 16 passed；V-005 18 passed；V-006 28 passed；V-008 pass/17 capabilities/0 blockers；V-011 `ok=true`、`state=running`、0 warnings。
 - Current full repository pytest: `1146 passed, 2 skipped in 700.39s`; zero failures/errors and no added skip/xfail/mock/collection-ignore.
-- Scope through the current checkpoint: Bundle arm 只修改 v8 `START_HERE.md`；Bundle 删除提交精确为 205 个 manifest `D` + `manual_deletion_wave_bundle.yaml` 1 个 `A`。当前证据 checkpoint 只更新 v8 `START_HERE.md` 与 `governance_cleanup_readout.md` metadata；0 raw-data change，0 user-main write，old002837 尚未 arm 或删除。
+- Scope through the current checkpoint: Bundle post-wave evidence checkpoint `f98c7861...` 只更新 v8 `START_HERE.md` 与 `governance_cleanup_readout.md` metadata。当前 old002837 arm 只更新 v8 `START_HERE.md` 的 checkpoint metadata 与 501-file/29-directory absolute manifests；0 raw-data change，0 user-main write，old002837 尚未删除。
 
 ### P5 Night exact-manifest completed
 
@@ -987,6 +987,563 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_verified_result_materializer.py`
 - `C:\Projects\03_Investment_System_v1_governance_cleanup\tests\test_r5_bundle17r_verified_result_materializer_cli.py`
 
+### P5 old002837 exact-path arm
+
+- Wave: `old002837`
+- Arm state: `armed_clean_checkpoint`
+- Contract deletion actor: `codex_exact_manifest_one_file_at_a_time`
+- Contract Codex deletion authorization: `true`
+- `wave_parent_commit`: �������е� `chore(v1): arm 002837 codex exact-path deletion checkpoint` commit �������� SHA ��д�ر��ļ���
+- Expected deletion count: 501
+- Expected content bytes: 3,536,689
+- Expected ordinal UTF-8 NUL path-vector bytes: 51,531
+- Expected ordinal UTF-8 NUL path-vector SHA-256: `73d0a405b928fa3fa615d5b0d527f16f7c1182bb16239fb9ef89266d9868862f`
+- Expected empty-directory count: 29
+- Expected deepest-first repo-relative UTF-8 NUL directory-vector bytes/SHA-256: 2,208 / `1e987f07ab4aa9b7c54a7444b053949b5c5d377655903d9715d8948e42446cd3`
+- Expected deepest-first absolute Windows UTF-8 NUL directory-vector bytes/SHA-256: 3,803 / `31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75`
+- Manifest source: `reports/p1_6/r5_v1_governance_cleanup/historical_cleanup_manifest.yaml`
+- Restore source: each file row's exact `baseline_commit:path`, `blob_oid`, byte count, content SHA-256 and `restore_command`; final full-restore receipt is `reports/p1_6/r5_v1_governance_cleanup/validation/historical_decoupling.yaml`.
+- Fresh pre-arm proof at Bundle evidence checkpoint `f98c7861b422a4081955e8f1513da4428534425c`: 501/501 files exist, are tracked regular/non-reparse, and every HEAD/index blob OID equals its manifest row; the old run tree contains exactly those 501 files and the fixed 29 directories, with zero extra/special/reparse entries; Night 680 and Bundle 205 paths remain absent.
+- File deletion rule after this clean v8 arm: Codex may delete only this exact ordinal list, one resolved absolute literal regular file per operation. Any identity, blob, containment, status, recovery-prefix, actor or order drift is a hard stop.
+- Directory deletion rule: only after the complete 501-D raw Git vectors pass in memory may Codex remove the following 29 exact absolute directories deepest-first, one empty/non-reparse literal directory per non-recursive operation, validating complete entries, processed prefix, remaining suffix and unchanged Git vectors before and after every row.
+- Recovery rule: any extra D/M/R/??/type change, missing file, nonempty/extra directory, reparse point or prefix/suffix drift stops the wave; restore only the affected exact file from its manifest row and never use recursive, wildcard, bulk or reset cleanup.
+
+#### old002837 exact absolute per-file manifest
+
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_open_questions_v0_2.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_open_questions_v0_3.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_quality_gate_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_quality_gate_report_v0_2.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_quality_gate_report_v0_3.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_source_gap_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_source_gap_report_v0_2.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_source_gap_report_v0_3.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_stock_deep_dive_v0_1.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_stock_deep_dive_v0_2.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_stock_deep_dive_v0_3.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R4_stock_report_data_layer_bridge_draft.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_ai_assisted_semantic_precheck.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_close_input_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_cross_industry_writer_regression.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_final_close_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_human_review_submission_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_independent_subagent_review.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_independent_subagent_review.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_reader_gate_forecast.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_reader_gate_valuation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_reader_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_reader_pack_build_readout.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_regression_summary.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_sentiment_event_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_single_action_human_confirmation.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10_technical_market_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_close_readout_v5.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_final_close_readout_v5.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_generation_binding_validation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_human_feedback_v4.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_human_feedback_v5.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_human_review_handoff.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_human_review_handoff_v5.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_human_review_readout_v5.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_human_review_submission_v5.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_quality_gate_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_quality_gate_report_v5.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_quality_scorecard.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_reader_generation_lock.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_reader_generation_lock_v5.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_reader_input_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_reader_narrative_plan_v5.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_reader_payload_v4.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_reader_payload_v5.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_reader_v4.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_reader_v5.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_reader_v5_quality_scorecard.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_reader_v5_revision_log.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_traceability_v4.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle10r_traceability_v5.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_benchmark_coverage_precheck.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_business_breakdown_candidate.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_business_disclosure_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_core_asset_preflight.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_core_preflight_after_disclosure.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_core_preflight_after_forecast_valuation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_dropzone_validation_final.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_dropzone_validation_initial.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_financial_history_candidate.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_forecast_assumption_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_forecast_model_candidate.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_market_peer_acquisition_log.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_market_snapshot_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_peer_set_review.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_peer_snapshot_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_prepromotion_inventory.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_quality_gate_result.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_quality_scorecard.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_real_input_inventory.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_real_pilot_gate_result.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_registry_backup_manifest.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_registry_idempotency_result.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_registry_promotion_dry_run.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_registry_promotion_result.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_reviewed_input_staging.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_stock_research_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_valuation_input_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle5_valuation_pack_candidate.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle6_before_after_comparison.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle6_coverage_inventory.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle6_forecast_bridge.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle6_industry_event_market_input_plan.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle6_reader_section_payloads.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle6_reader_surface_baseline.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle6_valuation_reasoning_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle7_quality_backflow_plan.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle7_quality_backflow_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle7_quality_gate_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8_analysis_inputs_v2.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8_evidence_source_catalog.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8_quality_gate_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8_quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8_research_depth_execution_plan.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8_research_depth_execution_plan.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8_research_depth_gate.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8_research_depth_gate.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8a_adapter_run_queue_dry_run.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8a_evidence_acquisition_request.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8a_integration_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8a_source_route_quality_report.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8a_to_bundle10_execution_audit.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_close_input_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_close_quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_eastmoney_research_metadata_readout.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_evidence_manifest_delta.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_ir_2025_001_parse_job.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_ir_2025_002_parse_job.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_ir_2025_003_parse_job.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_ir_2025_005_parse_job.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_management_comment_review.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_peer_valuation_300499.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_peer_valuation_300602.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_peer_valuation_300731.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_peer_valuation_301018.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_source_route_quality_report.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_technical_snapshot.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8b_valuation_snapshot.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_baseline_audit.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_close_quality_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_coverage_matrix.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_evidence_generation_lock.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_evidence_generation_lock_v2.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_evidence_manifest_delta.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_forward_requalification_state.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_generation_lock_correction.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_live_acquisition_run_log.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle8r_source_health_ledger.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9_close_input_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9_forecast_assumption_registry.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9_forecast_build_readout.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9_peer_reconciliation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9_quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9_regression_summary.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9_valuation_build_readout.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9_valuation_input_registry.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9_valuation_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_consensus_comparison.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_financial_statement_bridge.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_forecast_assumption_registry.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_generation_binding_validation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_input_review_ledger.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_market_snapshot.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_model_generation_lock.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_model_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_peer_operating_reconciliation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_quality_scorecard.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_reverse_valuation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_scenario_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_scenario_valuation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_segment_driver_model.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_sensitivity.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_bundle9r_valuation_request.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_capital_event_news_adapter_receipts.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_estimate_distribution_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_evidence_plan_from_gaps.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_evidence_request_queue.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_evidence_request_review_ledger.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_failed_missing_disclosure_register.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_forecast_assumption_registry.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_future_event_calendar.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_future_event_calendar_summary.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_independent_fallback_test.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_industry_research_inventory.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_ir_question_answer_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_market_fundamental_adapter_receipts.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_market_peer_input_registry.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_market_snapshot_stub.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_open_questions.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_patch_plan_requirement_matrix.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_peer_snapshot_stub.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_report_pdf_archive_manifest.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_research_ir_adapter_receipts.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_reviewed_input_dry_run_result.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_reviewed_input_registry_promotion_result.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_reviewed_input_render_result.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_reviewed_input_staging_result.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_schema_drift_regression.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_source_gap_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_note_reviewed_input_draft.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_note_source_gapped.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_pack_source_gapped.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_reader_v2.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_reader_v2_human_review.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_reader_v2_quality_scorecard.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_reader_v3.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_reader_v3_human_review.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_reader_v3_human_review_form.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_reader_v3_human_review_submission.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_reader_v3_human_review_submission_template.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_reader_v3_quality_scorecard.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_traceability_v2.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_stock_research_report_traceability_v3.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\R5_valuation_input_registry.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\baidu_kline_with_ma.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\cls_telegraph.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\cninfo_irm.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_block_trade.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_dividend_history.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_fund_flow.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_holder_count.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_industry_reports.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_lockup_expiry.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_margin_trading.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_news_clue.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_report_pdf.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_stock_info.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\eastmoney_stock_reports_readout.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\mootdx_daily_bar.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\mootdx_f10.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\mootdx_finance_snapshot.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\sina_financial_statements.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\szse_announcement_fallback.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\tencent_quote_and_valuation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\tencent_quote_or_kline.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\ths_consensus_eps.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\tushare_dividend_readout.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\tushare_share_float_readout.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\tushare_stk_holdernumber_readout.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\tushare_stock_basic_readout.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r\tushare_stock_basic_scoped_readout.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\baostock_history_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\baostock_query_balance_data_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\baostock_query_cash_flow_data_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\baostock_query_dupont_data_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\baostock_query_profit_data_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\tushare_balancesheet_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\tushare_cashflow_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\tushare_daily_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\tushare_daily_basic_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\tushare_fina_indicator_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\tushare_fina_mainbz_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs\tushare_income_002837_20260713.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\analysis_pack_v2.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\analyst_forecast_comparison.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\artifact_manifest.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\backflow_decision.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\backups\r5_bundle5_pre_promotion_c7e2146bff39\R5_evidence_request_review_ledger.yaml.pre_promotion.bak`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\backups\r5_bundle5_pre_promotion_c7e2146bff39\R5_forecast_assumption_registry.yaml.pre_promotion.bak`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\backups\r5_bundle5_pre_promotion_c7e2146bff39\R5_market_peer_input_registry.yaml.pre_promotion.bak`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle10_cross_industry_regression\healthcare_services_reader.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle10_cross_industry_regression\healthcare_services_traceability.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle10_cross_industry_regression\industrial_equipment_reader.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle10_cross_industry_regression\industrial_equipment_traceability.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle10_final_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle10_internal_completion_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle10_quality_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_backflow_plan.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_change_log.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_evidence_status.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_human_review_handoff.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_human_review_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_human_review_submission.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_human_review_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_input_build_receipt.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_operating_driver_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_operating_evidence_gap_requests.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_operating_metric_candidates.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_operating_metric_promotion_log.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_operating_metric_registry.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_operating_to_9r_reconciliation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_peer_eligibility.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_peer_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_quality_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_reader.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_reader_generation_lock.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_reader_input_build_receipt.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_reader_input_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_reader_narrative_plan.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_reader_payload.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_reader_quality_scorecard.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_research_question_matrix.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_runtime_result.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_runtime_summary.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_segment_driver_plan.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_semantic_payload.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_semantic_quality_scorecard.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_strict_target_audit.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r\R5_bundle11r_traceability.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_backflow_plan.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_backflow_resolution.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_coverage_report.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_evidence_review_ledger.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_generation_lock.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_independent_subagent_review.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_operating_evidence_contract_snapshot.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_operating_evidence_input.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_operating_evidence_input_snapshot.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_operating_evidence_result.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_operating_metric_candidates.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_operating_metric_registry.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_quality_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_research_question_plan.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r\R5_bundle12r_valuation_eligibility.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_backflow_execution_contract_snapshot.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_backflow_execution_result.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_cninfo_irm_live_receipt.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_execution_queue.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_generation_lock.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_preflight_quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_preflight_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_promoted_operating_evidence_input.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_quality_issues.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_quality_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_rerun_bundle12r.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_reviewed_backfill_input.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_reviewed_backfill_input_snapshot.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_source_route_quality_report.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_szse_live_receipt.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_t1_evidence_review.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_t2_overlap_review.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_unresolved_items.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\R5_bundle13r_verification_summary.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\baseline_audit.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r\baseline_audit_original_package.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle14r\R5_bundle14r_candidate_evidence_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle14r\R5_bundle14r_evidence_trigger_registry.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle15r\R5_bundle15r_intake_contract.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle15r\R5_bundle15r_reviewed_evidence_input.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle8_close_quality_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle8_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle9_close_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle9_quality_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\business_breakdown.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\business_driver_tree.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\business_segment_extraction_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\business_segment_metric_pack.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\catalyst_calendar.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\claim_promotion_log.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\claims_registry.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\company_operating_evidence_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\competitive_position_matrix.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\manifests\evidence_manifest.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\manifests\ingest_runs.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\manifests\metrics_draft.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\candidates\claim_candidates_ev_annual_report_002837_20260421_ce7f64.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\candidates\metric_candidates_ev_annual_report_002837_20260421_ce7f64.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\layout\ev_annual_report_002837_20260421_ce7f64_content.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\layout\ev_annual_report_002837_20260421_ce7f64_middle.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\logs\ev_annual_report_002837_20260421_ce7f64__ingest_log.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\logs\ev_annual_report_002837_20260421_ce7f64_parse_log.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\logs\ev_structured_financial_data_002837_20260701_418339__ingest_log.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\logs\ev_structured_financial_data_002837_20260701_875a4c__ingest_log.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\logs\ev_structured_financial_data_002837_20260701_89213a__ingest_log.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\logs\ev_structured_financial_data_002837_20260701_bad80e__ingest_log.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\logs\ev_structured_financial_data_002837_20260701_f82181__ingest_log.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\normalized\local_tushare_fixture_balancesheet_002837_2026-07-01_bad80e49.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\normalized\local_tushare_fixture_cashflow_002837_2026-07-01_41833915.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\normalized\local_tushare_fixture_fina_indicator_002837_2026-07-01_875a4c87.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\normalized\local_tushare_fixture_income_002837_2026-07-01_89213a96.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\normalized\local_tushare_fixture_stock_basic_002837_2026-07-01_f821810b.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\page_maps\ev_annual_report_002837_20260421_ce7f64_page_map.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\tables\ev_annual_report_002837_20260421_ce7f64_tables.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\text\ev_annual_report_002837_20260421_ce7f64.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\raw\annual_reports\szse_annual_report_002837_2026-04-21.pdf`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\raw\market_data\local_tushare_fixture_balancesheet_002837_2026-07-01_bad80e49.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\raw\market_data\local_tushare_fixture_cashflow_002837_2026-07-01_41833915.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\raw\market_data\local_tushare_fixture_fina_indicator_002837_2026-07-01_875a4c87.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\raw\market_data\local_tushare_fixture_income_002837_2026-07-01_89213a96.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\raw\market_data\local_tushare_fixture_stock_basic_002837_2026-07-01_f821810b.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data_layer_bridge_issue_list.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data_layer_bridge_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\evidence_coverage_matrix.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\evidence_gap_requests.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\evidence_manifest_delta.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\evidence_map.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\exposure_backflow_review.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\exposure_backflow_review.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\exposure_change_note.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\financial_metric_pack.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\financial_quality.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\fixtures\balancesheet_002837.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\fixtures\cashflow_002837.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\fixtures\fina_indicator_002837.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\fixtures\income_002837.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\fixtures\stock_basic_002837.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\forecast_bridge.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\forecast_model.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\forecast_sensitivity.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\01_to_evidence-ingest.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\02_to_stock-deep-dive.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\03_to_segment-company-mapping.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\04_to_quality-review.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\05_to_quality-review_official_reconciliation_review.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\06_to_evidence-ingest_bundle5_real_input_inventory.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\07_to_quality-review_bundle5_real_input_inventory.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\08_to_evidence-ingest_bundle5_authorized_restart.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\09_to_stock-deep-dive_bundle5_official_disclosure.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\10_to_evidence-ingest_bundle5_market_peer.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\11_to_company-valuation_bundle5_forecast_valuation.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\12_to_evidence-ingest_bundle8_evidence_coverage.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\13_to_segment-research_bundle8_industry_peer_inputs.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\14_to_stock-deep-dive_bundle8_analysis_engine.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\15_to_quality-review_bundle8_integration_gate.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\16_to_research-orchestrator_bundle9_entry_pending_close.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\17_to_evidence-ingest_bundle8a_live_gap_closure.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\18_to_quality-review_bundle8b_close_gate.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\19_to_research-orchestrator_bundle8b_close.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\20_to_quality-review_bundle9_gate.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\21_to_research-orchestrator_bundle9_close.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\22_to_quality-review_bundle10_reader_gate.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\23_to_research-orchestrator_bundle10_external_review_pending.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\24_to_quality-review_bundle10_independent_subagent_panel.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\25_to_stock-deep-dive_bundle9r_rebuild.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\26_to_company-valuation_bundle9r_rebuild.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\27_to_quality-review_bundle9r_gate.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\28_to_stock-deep-dive_bundle10r_reader_rebuild.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\29_to_quality-review_bundle10r_non_compensating_gate.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\30_to_stock-deep-dive_bundle10r_reader_v5_narrative_revision.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\31_to_quality-review_bundle10r_reader_v5.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\32_to_stock-deep-dive_bundle10r_reader_v6_revision.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\33_to_evidence-ingest_bundle11r_operating_metric.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\34_to_stock-deep-dive_bundle11r_operating_runtime.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\35_to_quality-review_bundle11r_semantic_reader_gate.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\36_to_research-orchestrator_bundle11r_close.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\37_to_evidence-ingest_bundle12r_official_operating_evidence.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\38_to_stock-deep-dive_bundle12r_overlap_gate.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\39_to_company-valuation_bundle12r_method_eligibility.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\40_to_quality-review_bundle12r_fail_closed.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\41_to_research-orchestrator_bundle12r_close.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\42_to_evidence-ingest_bundle13r_t1_backflow.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\43_to_stock-deep-dive_bundle13r_t2_overlap.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\44_to_quality-review_bundle13r_backflow_gate.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs\45_to_research-orchestrator_bundle13r_close.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\industry_context_card.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\industry_evidence_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\ingest_log.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\integrated_data_layer_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\liquid_cooling_disclosure_gap_register.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\liquid_cooling_exposure_evidence_review.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\liquid_cooling_exposure_evidence_review.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\live_acquisition_run_log.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\market_event_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\market_sentiment_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\market_snapshot.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\metric_promotion_log.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\metrics_draft_delta.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\metrics_registry.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\mineru_parse_job.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\official_reconciliation_review_decision.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\official_reconciliation_review_decision.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\open_todos.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\peer_comparison.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\peer_market_snapshot.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\peer_operating_evidence_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\peer_operating_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\quality_gate_report.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\quality_gate_report_after_data_layer_bridge.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\quality_issue_list.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\remaining_source_gaps_after_data_layer_bridge.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\report_evidence_map.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\report_open_questions.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\reverse_valuation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\reviewed_inputs_staging\README.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\risk_counter_evidence.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\risk_counterevidence_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\run_log.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\scenario_valuation.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\schema_drift_issue_list.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\segment_economics.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\segment_exposure.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\segment_exposure_draft.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\segment_forecast_model.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\segment_led_replay_preparation_note.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\stock_analysis_pack.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\stock_evidence_plan.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\stock_report_acceptance_checklist.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\stock_report_draft.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\stock_report_sample_quality_draft.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\technical_snapshot.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\thesis_tree.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation\R5_valuation_handoff.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation\peer_comparison.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation\sensitivity_table.csv`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation\valuation_gap_requests.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation\valuation_model.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation\valuation_output.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation\valuation_quality_handoff.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation\valuation_section_draft.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation\valuation_snapshot.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation_input_readiness.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation_input_validation.json`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation_input_validation.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation_model.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation_request.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\workflow_readout.md`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\workflow_state.yaml`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\workflow_state.yaml.pre_bundle13r_20260715.bak`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\writer_gap_requests.yaml`
+
+#### old002837 exact absolute directory manifest
+
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\candidates`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\layout`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\logs`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\normalized`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\page_maps`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\tables`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed\text`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\raw\annual_reports`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\raw\market_data`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts\bundle8r`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\backups\r5_bundle5_pre_promotion_c7e2146bff39`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\manifests`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\processed`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data\raw`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_receipts`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\adapter_runs`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\backups`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle10_cross_industry_regression`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle11r`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle12r`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle13r`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle14r`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\bundle15r`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\data`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\fixtures`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\handoffs`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\reviewed_inputs_staging`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic\valuation`
+- `C:\Projects\03_Investment_System_v1_governance_cleanup\reports\workflow_runs\wf_20260703_stock_first_002837_invic`
+
 ### P5 v8 planned mutation paths and inherited authorities
 
 v8 只允许把下列 A.2 工具、manifest、tests、validation receipts 与本文件从 v7 identity 机械重绑到冻结 v8，并实现 Bundle/old002837 Codex actor、current-wave file delete surface 与 old002837 固定 29-row empty-directory surface；不得改变 1386 个 file paths、聚合、恢复、顺序或测试强度。A.1 `governance_cleanup_readout.md` 只可更新 actor/checkpoint metadata；合同逐项指定的 A.1 validation receipts 只可机械刷新当前证据。已完成的 `blocker_root_reconciliation.yaml`、其他 A.1 和全部 A.7 默认只读。不以 wildcard、family 或动态发现替代实际路径。
@@ -1258,3 +1815,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-27T14:16:42+08:00 — v8 A.2 identity/actor/delete-surface plumbing 完成：三波 actor 全部 Codex=true；completed Night 拒绝重放；Bundle/old 文件面绑定新 arm、HEAD/index blob 和 exact ordinal prefix；old002837 目录面绑定 29-row deepest-first exact manifest、完整枚举、empty/non-reparse 与逐项 Git-vector 不变。全量恢复 1,386/9,787,412 通过，V-006 28 passed，full pytest 1146 passed/2 skipped；尚未 arm 或删除剩余波次。
 - 2026-07-27T14:26:15+08:00 — v8 A.2 checkpoint=`b6d4e9c459c89af28fe2bb2d9702fd047c89b372` 已创建且 clean。其上重新验证 Bundle 205/205 tracked regular/non-reparse files 与 HEAD/index blob OID 全匹配，Night 680 全缺失、old002837 501 全存在；本文件切换为 `armed_clean_checkpoint`，包含本行的下一 commit 自身即 Bundle `wave_parent_commit`，尚未删除。
 - 2026-07-27T14:57:16+08:00 — Bundle clean v8 arm=`b120a805736a89b5c6a0406e15d5a0d040a0f341`。D-020 control plane 按 ordinal manifest 逐文件删除 205 个 literal regular files；删除提交=`274d47ec299a42946bc3b83f7908257e80f0f99b`，精确含 205 `D` + Bundle receipt 1 `A`。post-wave V-006 `28 passed in 592.82s`、V-003 final `194 passed in 23.40s`；Night/Bundle 全缺失、old002837 501 全存在、工作树 clean。包含本行的 commit 是 Bundle post-wave evidence checkpoint，其自身 SHA 不写回本文件。
+- 2026-07-27T15:01:20+08:00 — Bundle post-wave evidence checkpoint=`f98c7861b422a4081955e8f1513da4428534425c` 已创建且 clean。old002837 pre-arm audit 逐项验证 501 个 files 的 HEAD/index blob identity，并完整枚举得到恰好 501 files + 29 directories、0 extra/special/reparse；两组目录向量与冻结值精确一致。本文件切换为 `armed_clean_checkpoint` 并列出完整 501-file/29-directory absolute manifests；包含本行的下一 commit 自身即 old002837 `wave_parent_commit`，尚未删除。
