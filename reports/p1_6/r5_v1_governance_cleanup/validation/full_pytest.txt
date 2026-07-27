@@ -38,9 +38,13 @@ extended_cleanup:
     routing, so A.10 deletion authority was not exercised.
 worktree:
   status_clean_after_test: true
-  dedicated_head: 0d0e2cfeee55dbdc18bd519d9aed0cc703dd466c
+  dedicated_head: 8957416bf04434dc3d079a3ca9a2af49125e40d4
   user_main_head: a345fafb522300831ed4206d35fa17f44570cb1f
   user_main_status_vector_matches_authorized_snapshot: true
 clean_checkout_smoke:
-  state: pending_pre_seal_checkpoint
+  state: pass
+  tested_commit: 8957416bf04434dc3d079a3ca9a2af49125e40d4
+  result: "977 passed, 2 skipped in 707.55s (0:11:47)"
+  status_rows_before_test: 0
+  status_rows_after_test: 0
   evidence_path: reports/p1_6/r5_v1_governance_cleanup/validation/clean_checkout_smoke.txt

@@ -6,10 +6,10 @@ contract_sha256: "f7715de5429b961a34eca9c62fa3609682f8bdd5783900f3a830d81763e568
 state: "running"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "696ca4cdf54858f9e259bb19fdd6349cd3cf2d6d"
-last_completed_phase: "P4"
-next_phase: "P5"
-last_validation: "partial"
-updated_at: "2026-07-27T09:36:49+00:00"
+last_completed_phase: "P5"
+next_phase: "none"
+last_validation: "pass"
+updated_at: "2026-07-27T10:18:54+00:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -41,11 +41,11 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 ## Current checkpoint
 
 - **State:** `running`
-- **Last completed phase:** `P4`
-- **Next phase:** `P5`
-- **Latest validation:** `partial`（全部专用工作树验证通过，仅待 independent clean-checkout smoke）。v10 route closure 已把 active references 从 27 降至 0；focused 13、route/behavior 62、explicit-root 36、V-003 194、V-004 16、V-005 18、V-006 29、V-008 通过；全仓 `977 passed, 2 skipped`。1386 files、29 directories 与 old root 在测试前后均 absent；用户主树快照精确不变。
+- **Last completed phase:** `P5`
+- **Next phase:** `none`（tracked stage complete；external publication pending）
+- **Latest validation:** `pass`。v10 route closure 已把 active references 从 27 降至 0；focused 13、route/behavior 62、explicit-root 36、V-003 194、V-004 16、V-005 18、V-006 29、V-008 通过；专用工作树与独立同父目录 clone 均为全仓 `977 passed, 2 skipped`。1386 files、29 directories 与 old root 在测试前后均 absent；用户主树快照精确不变。
 - **Current blocker:** 无。A.10 审计没有发现 retirement-only 候选，故 `extended_wave_count=0`，未新增 manifest 或执行删除。
-- **Next safe action:** 提交本地验证证据 checkpoint；在独立 local clone 对该精确 checkpoint 运行 full pytest；随后写入 smoke 证据并创建 sealed candidate。
+- **Next safe action:** 创建最后一个 tracked commit `chore(v1): seal governance cleanup candidate`；此后不再写 tracked 文件，按发布模式 A 执行 ordinary branch push、exact-head push CI、唯一 PR、PR CI、guarded merge 和 main CI。
 
 ### Immutable completed deletion evidence
 
@@ -91,3 +91,4 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - 2026-07-27T08:55:33+00:00 — state=running; completed=P4; next=P5; validation=partial; v10 setup 1b0298d verified; begin A.9 closure of 27 references across 12 paths; A.10 extended waves only if retirement-only candidates are proven
 - 2026-07-27T09:07:17+00:00 — state=running; completed=P4; next=P5; validation=partial; A.9 route closure complete: active references 27 to 0; focused original regressions 13 passed; route/behavior suites 62 passed and explicit-root subset 36 passed; A.10 extended_wave_count=0 because no retirement-only file candidate was proven; next run full contract validation
 - 2026-07-27T09:36:49+00:00 — state=running; completed=P4; next=P5; validation=partial with only independent clean-checkout smoke pending; V-002/V-003/V-004/V-005/V-006/V-008 and full repository pytest passed; 977 passed and 2 unchanged baseline skips; all completed-wave targets remained absent; next create validation checkpoint and run independent local clone smoke
+- 2026-07-27T10:18:54+00:00 — state=running; completed=P5; next=none; validation=pass; exact CRLF historical snapshots are preserved by 16 path-specific attributes; independent same-parent clone at 8957416 passed 977 with 2 unchanged skips and remained clean; remote preflight matches frozen refs and no matching PR exists; seal and publication mode A are next

@@ -4,7 +4,7 @@ phase: P5_v10_final
 checked_at: "2026-07-27T17:36:49+08:00"
 decision: pass
 phase_parent: 696ca4cdf54858f9e259bb19fdd6349cd3cf2d6d
-current_head: 0d0e2cfeee55dbdc18bd519d9aed0cc703dd466c
+current_head: 8957416bf04434dc3d079a3ca9a2af49125e40d4
 authority:
   contract_path: docs/codex_tasks/v1_governance_integration_cleanup_v10/CONTRACT.md
   contract_sha256: f7715de5429b961a34eca9c62fa3609682f8bdd5783900f3a830d81763e568ec
@@ -14,6 +14,7 @@ changed_paths:
   package_files_added: 2
   active_implementation_files_modified: 8
   test_files_modified: 7
+  git_attribute_files_modified: 1
   start_here_modified: true
   unauthorized_path_count: 0
   deleted_path_count_since_v10_baseline: 0
@@ -40,6 +41,8 @@ quality_checks:
   assertions_weakened: false
   skip_xfail_mock_or_collection_bypass_added: false
   dependency_added: false
+  historical_snapshot_content_changed: false
+  exact_crlf_snapshot_paths_marked_opaque: 16
 extended_cleanup:
   extended_wave_count: 0
   manifest_created: false
@@ -54,4 +57,11 @@ user_main_worktree:
   tracked_status_porcelain_sha256: 3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b
   matches_authorized_snapshot: true
 remote_preflight:
-  state: pending_refresh_before_publication
+  checked_at: "2026-07-27T18:18:54+08:00"
+  state: pass
+  origin: https://github.com/chaoranq2000-crypto/03_Investment_System.git
+  main: a345fafb522300831ed4206d35fa17f44570cb1f
+  night05: a96c1b717bf15905d72fd142efd946fa01bce666
+  v1_source: f60f220ae252262a537c612ce193fc779901984b
+  execution_ref_present: false
+  matching_pr_count: 0

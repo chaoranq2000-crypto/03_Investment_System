@@ -110,6 +110,9 @@
 - Final dedicated-worktree pytest passed `977 passed, 2 skipped in 781.84s`; both skips are unchanged opt-in live-adapter manual smokes already present at `f60f220...`.
 - Before and after validation, all 1,386 completed-wave files, all 29 directories and the exact old run root remained absent. The three historical manifests, receipts, commits and vectors remain unchanged.
 - User main worktree remains read-only at `a345fafb522300831ed4206d35fa17f44570cb1f` and exactly matches the authorized full/tracked status vectors.
-- Independent local-clone full pytest and sealed candidate publication remain pending. Publication follows mode A and no external result will be written back after seal.
+- The first two clean-clone attempts under the shared or unique Temp parent were rejected because the protection test requires the checkout and real dirty main tree to share `C:\Projects` as their parent. They are environment-topology failures, not candidate regressions.
+- The final independent `--no-local` clone at `C:\Projects\v10_clean_checkout_e5d2592c15724999b727327886155c9c` has its own `.git`, checked out `8957416bf04434dc3d079a3ca9a2af49125e40d4`, was clean before and after testing, and passed `977 passed, 2 skipped in 707.55s`.
+- Sixteen exact historical Bundle16R YAML/Markdown snapshots have CRLF blobs despite the repository LF default. A path-specific `.gitattributes` exception preserves their bytes and makes Windows clean checkout status deterministic without altering snapshot content or hashes.
+- Remote preflight still matches frozen main `a345faf...`, Night05 `a96c1b...`, V1 source `f60f220...`; the execution ref is absent and there is no matching PR. Sealed candidate publication remains pending under mode A, and no external result will be written back after seal.
 
 Later phases append their own sections. Publication evidence is never written here after the sealed candidate commit.
