@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v11"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v11/CONTRACT.md"
 contract_sha256: "68028d41f366d535daf7647faa8aae408e167f5442a96ed2ff7a3c3aeca18aae"
-state: "ready"
+state: "running"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "bcb535618367024eb85f8bee7abb8419c56d75eb"
 last_completed_phase: "P4"
 next_phase: "P5"
-last_validation: "pass"
-updated_at: "2026-07-27T12:34:21+00:00"
+last_validation: "partial"
+updated_at: "2026-07-27T12:51:32+00:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -40,13 +40,13 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `ready`（用户已批准最小 v11；待 finalize）
+- **State:** `running`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `failed`。v10 candidate `bcb535618367024eb85f8bee7abb8419c56d75eb` 的本地 V-006、专用树 full pytest 与同父目录 clean clone 均通过；远端 exact-head push CI run `30257647025` 在 Linux V-006 因 mixed Windows/Linux separator 失败 `2 failed, 27 passed`。
-- **Current blocker:** 用户已解除一次性 supersede 权限 blocker；v11 只待冻结、package-only setup、A.11 portable receipt 修复与全验证。
+- **Latest validation:** `partial`。POSIX path-flavour regression 在修复前精确复现 `old002837 absolute directory-vector SHA-256 drift`；修复后 focused 3 passed，完整 V-006 `30 passed in 665.85s`。既有 29/2208/relative SHA 与 29/3803/absolute SHA 均不变。
+- **Current blocker:** 无。v11 已冻结并通过 package-only setup；A.11 portable receipt repair 正在执行。
 - **Active authorization:** 用户原文：“批准创建最小 v11 修订包：仅授权修复 V-006 的跨平台绝对目录向量校验，使普通 Linux checkout 验证冻结的专用 Windows 路径收据，而不以当前 checkout 路径重算该固定哈希；授权将 bcb5356 标记为失败候选并生成新的 sealed candidate。既有相对/绝对向量、1386 文件、29 目录、三波边界、事实语义、完成标准、主工作树保护和发布模式 A 均不变。”
-- **Next safe action:** finalize/validate v11；提交 package-only setup；验证 frozen vectors、失败 CI、主树与远端 refs；只修改 A.11 exact paths。
+- **Next safe action:** 创建 `fix(v1): make frozen directory receipt portable` checkpoint；随后运行 V-002–V-011、全仓 pytest、同父目录 independent clone smoke 和最终 scope audit。
 
 ### Immutable completed deletion evidence
 
@@ -95,3 +95,5 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - 2026-07-27T10:18:54+00:00 — state=running; completed=P5; next=none; validation=pass; exact CRLF historical snapshots are preserved by 16 path-specific attributes; independent same-parent clone at 8957416 passed 977 with 2 unchanged skips and remained clean; remote preflight matches frozen refs and no matching PR exists; seal and publication mode A are next
 - 2026-07-27T10:20:04+00:00 — state=blocked; completed=P4; next=P5; validation=failed; v10 seal bcb5356 push CI run 30257647025 failed 2 of 29 V-006 tests because Linux pathlib.Path rebuilt a fixed Windows receipt with mixed separators; no PR or merge was created
 - 2026-07-27T10:31:00+00:00 — state=draft; completed=P4; next=P5; validation=failed; user approved minimal v11 portable Windows absolute receipt repair and one new sealed candidate; bcb5356 remains failed candidate ancestry; no deletion or vector change authorized
+- 2026-07-27T10:38:00+00:00 — state=running; completed=P4; next=P5; validation=partial; v11 setup 718d663 verified package-only with direct parent bcb5356; exact A.11 paths are test, cleanup tool, v11 START and six validation/readout files; first reproduce POSIX path-flavour failure
+- 2026-07-27T12:51:32+00:00 — state=running; completed=P4; next=P5; validation=partial; pre-fix POSIX flavour regression reproduced the exact CI drift; PureWindowsPath repair passed focused 3 and full V-006 30; fixed manifests, vectors and deletion containment unchanged; next create portable-receipt fix checkpoint

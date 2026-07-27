@@ -22,7 +22,7 @@ import stat
 import subprocess
 import sys
 from collections import defaultdict
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Iterable, Mapping, Sequence
 
 import yaml
@@ -32,7 +32,7 @@ CONTRACT_REL = Path(
     "docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md"
 )
 CURRENT_CONTRACT_REL = Path(
-    "docs/codex_tasks/v1_governance_integration_cleanup_v10/CONTRACT.md"
+    "docs/codex_tasks/v1_governance_integration_cleanup_v11/CONTRACT.md"
 )
 START_HERE_REL = Path(
     "docs/codex_tasks/v1_governance_integration_cleanup_v8/START_HERE.md"
@@ -67,9 +67,9 @@ EXPECTED_CONTRACT_SHA256 = (
 )
 PACKAGE_SOURCE_BASELINE = "fe986a0359c0268ac94eea696c3a4795403e4614"
 CURRENT_CONTRACT_SHA256 = (
-    "f7715de5429b961a34eca9c62fa3609682f8bdd5783900f3a830d81763e568ec"
+    "68028d41f366d535daf7647faa8aae408e167f5442a96ed2ff7a3c3aeca18aae"
 )
-CURRENT_PACKAGE_SOURCE_BASELINE = "696ca4cdf54858f9e259bb19fdd6349cd3cf2d6d"
+CURRENT_PACKAGE_SOURCE_BASELINE = "bcb535618367024eb85f8bee7abb8419c56d75eb"
 PACKAGE_SETUP_CHECKPOINT = "37d312b00bfbad33bf66a7e1a3169a9fd0559ad8"
 V9_PACKAGE_SETUP_CHECKPOINT = "49c9cc92a4a81a80b423d7c95785e291166bb987"
 V10_PACKAGE_SETUP_CHECKPOINT = "1b0298da4513147830b359aaf3fa3f5a8c0f7371"
@@ -1817,8 +1817,9 @@ def build_old002837_directory_manifest(repo_root: Path) -> dict[str, Any]:
     )
 
     dedicated_root = DEDICATED_WORKTREE_ROOT
+    dedicated_windows_root = PureWindowsPath(str(dedicated_root))
     absolute_paths = [
-        str(dedicated_root.joinpath(*PurePosixPath(path).parts))
+        str(dedicated_windows_root.joinpath(*PurePosixPath(path).parts))
         for path in paths
     ]
     absolute_bytes, absolute_sha = ordered_path_vector(absolute_paths)

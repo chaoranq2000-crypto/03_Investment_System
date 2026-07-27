@@ -5,7 +5,7 @@ import copy
 import importlib.util
 import inspect
 import subprocess
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 import pytest
 
@@ -112,6 +112,34 @@ def test_cleanup_manifest_is_exact_three_wave_partition(tool, documents) -> None
             "restore_command",
         ):
             assert row[key] == baseline_row[key]
+
+
+def test_fixed_absolute_directory_receipt_is_path_flavour_independent(
+    tool, monkeypatch
+) -> None:
+    dedicated_root_text = str(tool.DEDICATED_WORKTREE_ROOT)
+    monkeypatch.setattr(
+        tool,
+        "DEDICATED_WORKTREE_ROOT",
+        PurePosixPath(dedicated_root_text),
+    )
+
+    directories = tool.build_old002837_directory_manifest(ROOT)
+    expected_paths = [
+        str(
+            PureWindowsPath(dedicated_root_text).joinpath(
+                *PurePosixPath(path).parts
+            )
+        )
+        for path in tool.OLD002837_DIRECTORIES
+    ]
+
+    assert directories["dedicated_worktree_root"] == dedicated_root_text
+    assert directories["absolute_paths"] == expected_paths
+    assert directories["aggregate"]["absolute_path_vector_byte_count"] == 3803
+    assert directories["aggregate"]["absolute_path_vector_sha256"] == (
+        "31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75"
+    )
 
 
 def test_actual_paths_are_eligible_and_disjoint_from_every_retained_set(
