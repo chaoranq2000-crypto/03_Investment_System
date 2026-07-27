@@ -8,7 +8,10 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WRITER_PATH = REPO_ROOT / "src/report/stock_report_writer.py"
-PACK_PATH = REPO_ROOT / "reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_stock_research_pack_source_gapped.yaml"
+PACK_SOURCE = (
+    "reports/workflow_runs/wf_20260703_stock_first_002837_invic/"
+    "R5_stock_research_pack_source_gapped.yaml"
+)
 
 
 def load_writer():
@@ -48,13 +51,24 @@ def write_scorecard(path: Path) -> None:
     path.write_text(yaml.safe_dump(data, allow_unicode=True, sort_keys=False), encoding="utf-8")
 
 
-def test_reviewed_input_mode_renders_mixed_readiness_sections(tmp_path: Path):
+def test_reviewed_input_mode_renders_mixed_readiness_sections(
+    tmp_path: Path,
+    historical_blob_file,
+):
     writer = load_writer()
     scorecard = tmp_path / "scorecard.yaml"
     output = tmp_path / "draft_plus.md"
+    pack_path = historical_blob_file(
+        PACK_SOURCE,
+        "composer_research_draft_plus/pack.yaml",
+    )
     write_scorecard(scorecard)
 
-    result = writer.render_reviewed_input_research_draft(pack_path=PACK_PATH, scorecard_path=scorecard, output_path=output)
+    result = writer.render_reviewed_input_research_draft(
+        pack_path=pack_path,
+        scorecard_path=scorecard,
+        output_path=output,
+    )
     text = output.read_text(encoding="utf-8")
 
     assert result["output_type"] == "reviewed_input_research_draft"
@@ -64,13 +78,24 @@ def test_reviewed_input_mode_renders_mixed_readiness_sections(tmp_path: Path):
     assert "Source Gap Appendix" in text
 
 
-def test_reviewed_input_mode_has_no_direct_trading_language(tmp_path: Path):
+def test_reviewed_input_mode_has_no_direct_trading_language(
+    tmp_path: Path,
+    historical_blob_file,
+):
     writer = load_writer()
     scorecard = tmp_path / "scorecard.yaml"
     output = tmp_path / "draft_plus.md"
+    pack_path = historical_blob_file(
+        PACK_SOURCE,
+        "composer_research_draft_plus/pack.yaml",
+    )
     write_scorecard(scorecard)
 
-    writer.render_reviewed_input_research_draft(pack_path=PACK_PATH, scorecard_path=scorecard, output_path=output)
+    writer.render_reviewed_input_research_draft(
+        pack_path=pack_path,
+        scorecard_path=scorecard,
+        output_path=output,
+    )
     text = output.read_text(encoding="utf-8")
 
     for phrase in ["买入", "卖出", "持有", "仓位", "buy rating", "sell rating", "hold rating"]:

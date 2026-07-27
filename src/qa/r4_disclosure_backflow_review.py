@@ -19,7 +19,7 @@ STOCK_CODE = "002837"
 STOCK_NAME = "英维克"
 OFFICIAL_EVIDENCE_ID = "ev_annual_report_002837_20260421_ce7f64"
 
-STOCK_RUN = Path(f"reports/workflow_runs/{WORKFLOW_ID}")
+STOCK_RUN = Path("__workflow_run_required__")
 DATA_LAYER_RUN = Path(f"reports/workflow_runs/{DATA_LAYER_ID}")
 P1_6 = Path("reports/p1_6")
 SEGMENT_UNIVERSE = Path("reports/segments/ai_server_liquid_cooling/company_universe.csv")
@@ -35,6 +35,26 @@ R4_V02 = STOCK_RUN / "R4_stock_deep_dive_v0_2.md"
 R4_GATE_V02 = STOCK_RUN / "R4_quality_gate_report_v0_2.md"
 R4_SOURCE_GAP_V02 = STOCK_RUN / "R4_source_gap_report_v0_2.md"
 R4_OPEN_QUESTIONS_V02 = STOCK_RUN / "R4_open_questions_v0_2.md"
+
+
+def configure_workflow_run(workflow_run: Path) -> None:
+    global STOCK_RUN
+    global OFFICIAL_DECISION_CSV, OFFICIAL_DECISION_MD
+    global LIQUID_REVIEW_CSV, LIQUID_REVIEW_MD
+    global BACKFLOW_REVIEW_MD, BACKFLOW_REVIEW_YAML
+    global R4_V02, R4_GATE_V02, R4_SOURCE_GAP_V02, R4_OPEN_QUESTIONS_V02
+
+    STOCK_RUN = workflow_run
+    OFFICIAL_DECISION_CSV = STOCK_RUN / "official_reconciliation_review_decision.csv"
+    OFFICIAL_DECISION_MD = STOCK_RUN / "official_reconciliation_review_decision.md"
+    LIQUID_REVIEW_CSV = STOCK_RUN / "liquid_cooling_exposure_evidence_review.csv"
+    LIQUID_REVIEW_MD = STOCK_RUN / "liquid_cooling_exposure_evidence_review.md"
+    BACKFLOW_REVIEW_MD = STOCK_RUN / "exposure_backflow_review.md"
+    BACKFLOW_REVIEW_YAML = STOCK_RUN / "exposure_backflow_review.yaml"
+    R4_V02 = STOCK_RUN / "R4_stock_deep_dive_v0_2.md"
+    R4_GATE_V02 = STOCK_RUN / "R4_quality_gate_report_v0_2.md"
+    R4_SOURCE_GAP_V02 = STOCK_RUN / "R4_source_gap_report_v0_2.md"
+    R4_OPEN_QUESTIONS_V02 = STOCK_RUN / "R4_open_questions_v0_2.md"
 
 OFFICIAL_DECISION_FIELDS = [
     "metric_name",
@@ -474,8 +494,12 @@ def build_official_reconciliation_review(repo_root: Path) -> list[dict[str, str]
     return rows
 
 
-def liquid_cooling_review_rows(repo_root: Path) -> list[dict[str, str]]:
-    business = _read_csv(repo_root / STOCK_RUN / "business_segment_metric_pack.csv")
+def liquid_cooling_review_rows(
+    repo_root: Path,
+    workflow_run: Path | None = None,
+) -> list[dict[str, str]]:
+    run_dir = workflow_run if workflow_run is not None else STOCK_RUN
+    business = _read_csv(repo_root / run_dir / "business_segment_metric_pack.csv")
     output: list[dict[str, str]] = []
     for index, row in enumerate(business, start=1):
         evidence_class = row["evidence_class"]
@@ -1320,7 +1344,8 @@ def finalize_artifact_manifest(repo_root: Path) -> None:
     _append_artifacts(repo_root / STOCK_RUN, additions)
 
 
-def run_all(repo_root: Path) -> None:
+def run_all(repo_root: Path, workflow_run: Path) -> None:
+    configure_workflow_run(workflow_run)
     write_phase0_and_format_readouts(repo_root)
     _write_handoff(repo_root / STOCK_RUN)
     build_official_reconciliation_review(repo_root)
@@ -1340,8 +1365,9 @@ def run_all(repo_root: Path) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run R4 disclosure/backflow review and write v0.2 readiness artifacts.")
     parser.add_argument("--repo-root", default=".")
+    parser.add_argument("--workflow-run", required=True)
     args = parser.parse_args(argv)
-    run_all(Path(args.repo_root).resolve())
+    run_all(Path(args.repo_root).resolve(), Path(args.workflow_run))
     print({"workflow_id": WORKFLOW_ID, "status": "publishable_ready_with_disclosure_todos"})
     return 0
 

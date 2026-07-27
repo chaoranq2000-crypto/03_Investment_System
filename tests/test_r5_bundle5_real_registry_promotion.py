@@ -112,14 +112,20 @@ def test_fully_reviewed_forecast_merge_drops_stale_todo_interlock(
         if row.get("review_status") == "accepted"
     ]
     conflicts: list[str] = []
-    candidate = RUNNER.promoter._build_forecast_registry(WORKFLOW_ID, "002837", records, conflicts)
     existing = RUNNER.registry_io.load_yaml(
         run_dir / "R5_forecast_assumption_registry.yaml"
+    )
+    workflow_id = existing["workflow_id"]
+    candidate = RUNNER.promoter._build_forecast_registry(
+        workflow_id,
+        "002837",
+        records,
+        conflicts,
     )
     merged = RUNNER.promoter._merge_forecast(
         existing,
         candidate,
-        WORKFLOW_ID,
+        workflow_id,
         "002837",
         conflicts,
     )

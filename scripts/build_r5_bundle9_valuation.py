@@ -1197,7 +1197,7 @@ def build_outputs(run_dir: Path) -> dict[str, Any]:
     peers = read_peer_inputs(run_dir)
     scenarios = scenario_tables(forecast)
     valuation_dir = run_dir / "valuation"
-    output_root = f"reports/workflow_runs/{WORKFLOW_ID}/valuation"
+    output_root = f"reports/workflow_runs/{run_dir.name}/valuation"
 
     write_csv(run_dir / "market_snapshot.csv", MARKET_COLUMNS, [build_market_snapshot_row()])
     write_csv(run_dir / "peer_market_snapshot.csv", PEER_COLUMNS, build_peer_snapshot_rows(peers))

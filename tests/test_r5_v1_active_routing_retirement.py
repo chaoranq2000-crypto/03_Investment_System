@@ -48,9 +48,12 @@ def test_active_roots_have_zero_candidate_worktree_routes() -> None:
     assert tool._section_paths(
         contract,
         "### A.8 `final_regression_repair_exact`",
-        "## Deliverables",
+        "### A.9 `controlled_stage_closure_authority`",
     ) == tool.EXPECTED_A8
     assert len(tool.EXPECTED_A8) == 14
+    assert "### A.10 `extended_exact_cleanup_waves`" in contract
+    assert "每个调用只能处理 manifest 当前 ordinal 的一个" in contract
+    assert "没有合格候选时，记录 `extended_wave_count=0`" in contract
 
 
 def test_transition_tests_and_retained_ci_are_equal_strength() -> None:
@@ -69,6 +72,25 @@ def test_transition_tests_and_retained_ci_are_equal_strength() -> None:
         for row in transition["tests"]
     )
     assert all(transition["ci"].values())
+
+
+def test_retained_builders_require_explicit_workflow_roots() -> None:
+    explicit_cli_paths = (
+        "scripts/build_r5_bundle10_reader_pack.py",
+        "scripts/build_r5_bundle9_forecast.py",
+        "scripts/build_r5_reader_section_payloads.py",
+        "src/ingest/business_segment_extraction.py",
+        "src/qa/r4_disclosure_backflow_review.py",
+    )
+    for path in explicit_cli_paths:
+        source = read(path)
+        assert 'add_argument("--workflow-run", required=True)' in source, path
+
+    valuation = read("scripts/build_r5_bundle9_valuation.py")
+    assert 'f"reports/workflow_runs/{run_dir.name}/valuation"' in valuation
+
+    backflow = read("src/research/r5_bundle13r_evidence_backflow.py")
+    assert '(output_root.parent / "bundle12r_rerun_after_13r").as_posix()' in backflow
 
 
 def test_reference_scanner_only_exempts_proven_tmp_paths() -> None:
@@ -148,6 +170,32 @@ validate_context(RUN)
     indirect_references = tool._python_references("indirect.py", indirect_call)
     assert len(indirect_references) == 1
     assert indirect_references[0]["kind"] == "candidate_indirect_path_operation"
+
+    bare_workflow_router = f"""
+def load_by_workflow_id(workflow_id):
+    return workflow_id
+load_by_workflow_id({tool.OLD_WORKFLOW_ID!r})
+"""
+    assert len(
+        tool._python_references("bare_workflow_router.py", bare_workflow_router)
+    ) == 1
+
+    explicit_nonrouting_metadata = f"""
+def build_result(workflow_id, dropzone_root, output_run_dir):
+    return workflow_id, dropzone_root, output_run_dir
+build_result(
+    workflow_id={tool.OLD_WORKFLOW_ID!r},
+    dropzone_root="tests/fixtures/reviewed",
+    output_run_dir="task-temp/output",
+)
+"""
+    assert (
+        tool._python_references(
+            "explicit_nonrouting_metadata.py",
+            explicit_nonrouting_metadata,
+        )
+        == []
+    )
 
     default_branch = f"""
 from pathlib import Path

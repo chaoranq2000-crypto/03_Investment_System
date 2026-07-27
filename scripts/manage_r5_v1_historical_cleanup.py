@@ -32,7 +32,7 @@ CONTRACT_REL = Path(
     "docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md"
 )
 CURRENT_CONTRACT_REL = Path(
-    "docs/codex_tasks/v1_governance_integration_cleanup_v9/CONTRACT.md"
+    "docs/codex_tasks/v1_governance_integration_cleanup_v10/CONTRACT.md"
 )
 START_HERE_REL = Path(
     "docs/codex_tasks/v1_governance_integration_cleanup_v8/START_HERE.md"
@@ -67,11 +67,12 @@ EXPECTED_CONTRACT_SHA256 = (
 )
 PACKAGE_SOURCE_BASELINE = "fe986a0359c0268ac94eea696c3a4795403e4614"
 CURRENT_CONTRACT_SHA256 = (
-    "990e582e36c18f93a4e594eb1c0dc1b043f182e1a45eeb0cd7c83fd61a7d2b82"
+    "f7715de5429b961a34eca9c62fa3609682f8bdd5783900f3a830d81763e568ec"
 )
-CURRENT_PACKAGE_SOURCE_BASELINE = "1e38e1f3704f9eff0328f80053d4da254f4b80b6"
+CURRENT_PACKAGE_SOURCE_BASELINE = "696ca4cdf54858f9e259bb19fdd6349cd3cf2d6d"
 PACKAGE_SETUP_CHECKPOINT = "37d312b00bfbad33bf66a7e1a3169a9fd0559ad8"
 V9_PACKAGE_SETUP_CHECKPOINT = "49c9cc92a4a81a80b423d7c95785e291166bb987"
+V10_PACKAGE_SETUP_CHECKPOINT = "1b0298da4513147830b359aaf3fa3f5a8c0f7371"
 DECOUPLING_CHECKPOINT = "805b8e3e9624e4e93057aa950cba4db1b3010cb3"
 OLD_NIGHT_ARM_COMMIT = "82f7d37a10a9677af631c1a5863661a64df3270b"
 COMPLETED_NIGHT_ARM_COMMIT = "e3b7ac48b784749e32252faf543c8d9ab796d830"
@@ -674,7 +675,7 @@ def parse_authority(repo_root: Path) -> dict[str, set[str]]:
         _section_paths(
             text,
             "### A.8 `final_regression_repair_exact`",
-            "## Deliverables",
+            "### A.9 `controlled_stage_closure_authority`",
         )
         == EXPECTED_A8,
         "A8 final-regression repair path set drift",
@@ -1290,6 +1291,35 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
                 and expression_is_temporary(keyword.value)
                 for keyword in node.keywords
             ) and any(expression_is_temporary(arg) for arg in node.args)
+            candidate_values = [
+                value for value in values if _candidate_tokens(value)
+            ]
+            bare_workflow_id_only = bool(candidate_values) and all(
+                value.replace("\\", "/").strip("/") == OLD_WORKFLOW_ID
+                for value in candidate_values
+            )
+            explicit_path_inputs = any(
+                keyword.arg
+                in {
+                    "dropzone_root",
+                    "output_run_dir",
+                    "run_dir",
+                    "input_root",
+                    "source_root",
+                    "artifact_root",
+                }
+                for keyword in node.keywords
+            ) or (
+                sum(
+                    isinstance(arg, ast.Name)
+                    and path_keyword.search(arg.id) is not None
+                    for arg in node.args
+                )
+                >= 2
+            )
+            explicit_nonrouting_workflow_metadata = (
+                bare_workflow_id_only and explicit_path_inputs
+            )
             scope = enclosing_scope(node)
             manifest_bound_context = (
                 isinstance(scope, (ast.FunctionDef, ast.AsyncFunctionDef))
@@ -1306,6 +1336,7 @@ def _python_references(path: str, text: str) -> list[dict[str, Any]]:
                 function_name not in MANIFEST_BLOB_METHODS
                 and not temporary_operation
                 and not explicit_historical_temp
+                and not explicit_nonrouting_workflow_metadata
                 and not manifest_bound_context
                 and not manifest_bound_call
                 and not inside_pytest_raises(node)

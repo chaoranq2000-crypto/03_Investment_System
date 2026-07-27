@@ -773,7 +773,7 @@ def build(run: Path) -> dict[str, Any]:
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build R5 Bundle 9 bottom-up forecast assets.")
-    parser.add_argument("--workflow-run", default=f"reports/workflow_runs/{WORKFLOW_ID}")
+    parser.add_argument("--workflow-run", required=True)
     args = parser.parse_args(argv)
     result = build(Path(args.workflow_run))
     print(json.dumps(result, ensure_ascii=False, indent=2))

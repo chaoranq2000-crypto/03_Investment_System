@@ -854,7 +854,7 @@ def build_bundle10(repo_root: Path, run: Path) -> dict[str, Any]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build Bundle 10 technical, event and reader packs.")
     parser.add_argument("--repo-root", default=".")
-    parser.add_argument("--workflow-run", default=f"reports/workflow_runs/{DEFAULT_WORKFLOW_ID}")
+    parser.add_argument("--workflow-run", required=True)
     args = parser.parse_args()
     repo_root = Path(args.repo_root).resolve()
     run = Path(args.workflow_run)

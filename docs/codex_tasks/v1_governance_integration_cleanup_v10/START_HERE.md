@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "v1_governance_integration_cleanup_v10"
 contract_path: "docs/codex_tasks/v1_governance_integration_cleanup_v10/CONTRACT.md"
 contract_sha256: "f7715de5429b961a34eca9c62fa3609682f8bdd5783900f3a830d81763e568ec"
-state: "ready"
+state: "running"
 execution_branch: "codex/v1-governance-integration-cleanup"
 source_baseline: "696ca4cdf54858f9e259bb19fdd6349cd3cf2d6d"
 last_completed_phase: "P4"
 next_phase: "P5"
-last_validation: "pass"
-updated_at: "2026-07-27T08:54:59+00:00"
+last_validation: "partial"
+updated_at: "2026-07-27T09:07:17+00:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -40,10 +40,10 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 
 ## Current checkpoint
 
-- **State:** `ready`
+- **State:** `running`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `pass`。source baseline `696ca4c...` 上 v9 A.8 focused regression 为 `13 passed in 8.06s`；V-006 scanner 正反例 `5 passed`，active-root scan 尚有 27 references / 12 paths。1386 files、29 directories 与 old root 全 absent；用户主树快照精确不变。
+- **Latest validation:** `partial`。source baseline `696ca4c...` 上 v9 A.8 focused regression 为 `13 passed in 8.06s`；V-006 scanner 正反例 `5 passed`，active-root scan 尚有 27 references / 12 paths。1386 files、29 directories 与 old root 全 absent；用户主树快照精确不变。
 - **Current blocker:** 无。用户已明确批准 v10 受控全阶段收尾权限和扩展 exact-manifest deletion waves；仍需冻结和验证本包。
 - **Next safe action:** finalize v10，验证 package-only setup diff 并提交；随后从 27 references / 12 paths 开始执行 P5。
 
@@ -88,3 +88,5 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 6. Run focused ten tests, V-006, all contract validators, full pytest, clean-checkout smoke, scope audit and package validation.
 7. After seal, do not write tracked files; publication evidence remains external.
 - 2026-07-27T08:48:46+00:00 — state=draft; completed=P4; next=P5; validation=not_run; v10 broad authority approved; finalize package before execution
+- 2026-07-27T08:55:33+00:00 — state=running; completed=P4; next=P5; validation=partial; v10 setup 1b0298d verified; begin A.9 closure of 27 references across 12 paths; A.10 extended waves only if retirement-only candidates are proven
+- 2026-07-27T09:07:17+00:00 — state=running; completed=P4; next=P5; validation=partial; A.9 route closure complete: active references 27 to 0; focused original regressions 13 passed; route/behavior suites 62 passed and explicit-root subset 36 passed; A.10 extended_wave_count=0 because no retirement-only file candidate was proven; next run full contract validation

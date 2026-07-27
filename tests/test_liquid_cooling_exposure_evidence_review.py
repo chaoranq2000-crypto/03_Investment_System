@@ -12,6 +12,7 @@ from r4_disclosure_backflow_review import LIQUID_REVIEW_FIELDS, liquid_cooling_r
 
 
 HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
+FIXTURE_RUN = Path("fixture_runs/liquid_review")
 
 
 def _historical_path(name: str) -> str:
@@ -33,11 +34,7 @@ def _minimal_review_root(tmp_path: Path, historical_blob_file) -> Path:
         "liquid_review_source/business_segment_metric_pack.csv",
     )
     root = tmp_path / "liquid_review_repo"
-    target = (
-        root
-        / "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
-        / "business_segment_metric_pack.csv"
-    )
+    target = root / FIXTURE_RUN / "business_segment_metric_pack.csv"
     target.parent.mkdir(parents=True)
     target.write_bytes(source.read_bytes())
     return root
@@ -59,7 +56,10 @@ def test_liquid_cooling_review_schema_and_rows(historical_blob_file) -> None:
 def test_product_and_customer_clues_do_not_generate_revenue_pct(
     tmp_path, historical_blob_file
 ) -> None:
-    rows = liquid_cooling_review_rows(_minimal_review_root(tmp_path, historical_blob_file))
+    rows = liquid_cooling_review_rows(
+        _minimal_review_root(tmp_path, historical_blob_file),
+        FIXTURE_RUN,
+    )
     clue_rows = [row for row in rows if row["review_decision"] == "supports_product_exposure_only"]
 
     assert clue_rows
@@ -83,7 +83,10 @@ def test_missing_disclosure_stays_in_source_gap_report(historical_blob_file) -> 
 def test_energy_storage_revenue_is_not_mapped_to_liquid_cooling_revenue(
     tmp_path, historical_blob_file
 ) -> None:
-    rows = liquid_cooling_review_rows(_minimal_review_root(tmp_path, historical_blob_file))
+    rows = liquid_cooling_review_rows(
+        _minimal_review_root(tmp_path, historical_blob_file),
+        FIXTURE_RUN,
+    )
     energy = next(row for row in rows if row["metric_name"] == "energy_storage_application_revenue")
 
     assert energy["review_decision"] == "not_ai_server_liquid_cooling_revenue"

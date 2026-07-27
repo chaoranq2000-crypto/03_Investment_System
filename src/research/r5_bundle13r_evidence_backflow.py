@@ -1075,7 +1075,7 @@ def write_bundle13r_outputs(
         paths["rerun"],
         render_rerun_command(
             paths["promoted_input"].name,
-            "reports/workflow_runs/wf_20260703_stock_first_002837_invic/bundle12r_rerun_after_13r",
+            (output_root.parent / "bundle12r_rerun_after_13r").as_posix(),
         ),
     )
 
