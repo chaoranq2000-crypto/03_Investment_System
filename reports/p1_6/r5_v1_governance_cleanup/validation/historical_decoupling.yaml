@@ -1,254 +1,74 @@
-schema_version: r5_v1_historical_decoupling_validation_v1
+schema_version: r5_v1_historical_decoupling_validation_v2
 validation_id: V-006
-phase: P5
+phase: P5_v10_final
+checked_at: "2026-07-27T17:36:49+08:00"
 decision: pass
 contract:
-  path: docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md
-  canonical_sha256: c8f19b03dd2fa17016bab3995eaa48fe8604bdb7e7027e5197aedcbfac01eb8b
-  status: frozen
-  source_baseline: fe986a0359c0268ac94eea696c3a4795403e4614
-authority:
-  a1_modify_existing_exact_count: 120
-  a2_add_exact_count: 13
-  a3_manual_delete_boundary_count: 44
-  a4_retain_legacy_literal_exact_count: 35
-  a5_retained_capability_evaluator_count: 27
-  a7_transition_modify_then_delete_exact_count: 3
-  a1_a5_overlap:
-  - src/research/r5_bundle13r_evidence_backflow.py
-  - tests/test_r5_bundle13r_evidence_backflow.py
-  a7_all_authority_overlaps_empty: true
-  all_other_authority_pairwise_overlaps_empty: true
-a6_inventory:
-  path_count: 116
-  path_vector_encoding: ordinal_utf8_nul
-  path_vector_byte_count: 8065
-  path_vector_sha256: 6c667b2aa0db007d5e89baf5b7bae837fd62249be3d85613f16aba3d14d32e6a
+  path: docs/codex_tasks/v1_governance_integration_cleanup_v10/CONTRACT.md
+  canonical_sha256: f7715de5429b961a34eca9c62fa3609682f8bdd5783900f3a830d81763e568ec
+  source_baseline: 696ca4cdf54858f9e259bb19fdd6349cd3cf2d6d
+  setup_commit: 1b0298da4513147830b359aaf3fa3f5a8c0f7371
 cleanup_inventory:
   file_count: 1386
   content_byte_count: 9787412
-  path_vector_encoding: ordinal_utf8_nul
   path_vector_byte_count: 121264
   path_vector_sha256: 974d45610144d616f69c3c368d9ea1a0a27d66601a24f748aa8148e2ee702f33
   wave_file_counts:
     night: 680
     bundle: 205
     old002837: 501
+  completed_wave_file_count_absent: 1386
+  completed_wave_directory_count_absent: 29
+  old002837_root_absent: true
   retained_overlap_count: 0
   protected_overlap_count: 0
-  a7_actual_overlap_count: 3
-  a7_actual_overlap:
-  - tests/test_r5_night_shift_ci_contract.py
-  - tests/test_r5_night_shift_night03_ci_contract.py
-  - tests/test_r5_night_shift_night04_ci_contract.py
-  a7_all_assigned_to_night: true
-  retained_evaluator_dependencies:
-  - tests/fixtures/r5_bundle12r/invic_gap_template.yaml
-  - tests/fixtures/r5_bundle12r/ready_manufacturing.yaml
-  - tests/fixtures/r5_bundle13r/bundle12r_context/R5_bundle12r_backflow_plan.yaml
-  - tests/fixtures/r5_bundle13r/bundle12r_context/R5_bundle12r_generation_lock.yaml
-  - tests/fixtures/r5_bundle13r/bundle12r_context/R5_bundle12r_operating_evidence_input_snapshot.yaml
-  - tests/fixtures/r5_bundle13r/bundle12r_context/R5_bundle12r_operating_evidence_result.yaml
-  - tests/fixtures/r5_bundle13r/bundle12r_context/R5_bundle12r_research_question_plan.yaml
-  - tests/fixtures/r5_bundle13r/r5_bundle13r_fixture_contract.yaml
-  - tests/fixtures/r5_bundle13r/reviewed_backfill_partial.yaml
-  - tests/fixtures/r5_bundle13r/reviewed_backfill_ready.yaml
-transition_validation:
-  path_count: 3
-  paths:
-  - tests/test_r5_night_shift_ci_contract.py
-  - tests/test_r5_night_shift_night03_ci_contract.py
-  - tests/test_r5_night_shift_night04_ci_contract.py
-  tests:
-  - path: tests/test_r5_night_shift_ci_contract.py
-    source_commit: 805b8e3e9624e4e93057aa950cba4db1b3010cb3
-    test_function_count: 2
-    assertion_count: 13
-    equal_strength_retirement_assertions: true
-  - path: tests/test_r5_night_shift_night03_ci_contract.py
-    source_commit: 805b8e3e9624e4e93057aa950cba4db1b3010cb3
-    test_function_count: 1
-    assertion_count: 13
-    equal_strength_retirement_assertions: true
-  - path: tests/test_r5_night_shift_night04_ci_contract.py
-    source_commit: 805b8e3e9624e4e93057aa950cba4db1b3010cb3
-    test_function_count: 1
-    assertion_count: 13
-    equal_strength_retirement_assertions: true
-  ci:
-    retired_night_routes_absent: true
-    checkout_fetch_depth_zero: true
-    source_route_gate_count: 1
-    v006_command_count: 1
-    full_pytest_command_count: 1
-    publication_mutation_absent: true
-    bypass_route_absent: true
+directory_inventory:
+  path_count: 29
+  relative_path_vector_byte_count: 2208
+  relative_path_vector_sha256: 1e987f07ab4aa9b7c54a7444b053949b5c5d377655903d9715d8948e42446cd3
+  absolute_path_vector_byte_count: 3803
+  absolute_path_vector_sha256: 31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75
 active_reference_scan:
-  roots:
-  - .github/
-  - src/
-  - scripts/
-  - tests/
-  - config/
-  - schemas/
-  - templates/
-  - .agents/skills/
-  reference_count: 0
-  unknown_classification_count: 0
-  unknown_classifications: []
-  allowed_literal_count: 51
-  allowed_literals:
-  - path: .agents/skills/evidence-ingest/assets/r5_evidence_request_review_ledger.example.yaml
-    classification: a4_metadata_literal
-  - path: .agents/skills/evidence-ingest/assets/r5_official_disclosure_gap_review.example.yaml
-    classification: a4_metadata_literal
-  - path: .agents/skills/evidence-ingest/assets/r5_reviewed_evidence_registry.example.yaml
-    classification: a4_metadata_literal
-  - path: .agents/skills/quality-review/assets/r5_quality_scorecard.example.yaml
-    classification: a4_metadata_literal
-  - path: .agents/skills/stock-deep-dive/assets/r5_forecast_assumption_registry.example.yaml
-    classification: a4_metadata_literal
-  - path: .agents/skills/stock-deep-dive/assets/r5_market_peer_input_registry.example.yaml
-    classification: a4_metadata_literal
-  - path: .agents/skills/stock-deep-dive/assets/r5_market_snapshot.reviewed.example.yaml
-    classification: a4_metadata_literal
-  - path: .agents/skills/stock-deep-dive/assets/r5_peer_snapshot.reviewed.example.yaml
-    classification: a4_metadata_literal
-  - path: .agents/skills/stock-deep-dive/assets/r5_valuation_input_registry.example.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_bundle10r_expected_artifacts.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_bundle10r_generation_binding.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_bundle13r_backflow_execution_contract.yaml
-    classification: a5_explicit_evaluator
-  - path: config/r5_bundle4_expected_artifacts.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_bundle5_expected_artifacts.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_bundle5_pilot_gate_rules.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_bundle8r_generation_inputs.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_bundle9r_expected_artifacts.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_bundle9r_generation_binding.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_next_pilot_gate_rules.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_pack_promotion_rules.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_patch_49_55_expected_artifacts.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_readiness_gate_rules.yaml
-    classification: a4_metadata_literal
-  - path: config/r5_reviewed_input_pilot_gate_rules.yaml
-    classification: a4_metadata_literal
-  - path: scripts/build_r5_bundle10_human_review_handoff.py
-    classification: a4_metadata_literal
-  - path: scripts/manage_r5_v1_historical_cleanup.py
-    classification: cleanup_control_plane
-  - path: scripts/start_r5_bundle9r_forecast_valuation_rebuild.py
-    classification: a4_metadata_literal
-  - path: scripts/validate_r5_v1_root_policy_migration.py
-    classification: negative_assertion_or_metadata
-  - path: src/research/r5_bundle13r_evidence_backflow.py
-    classification: a5_explicit_evaluator
-  - path: templates/r5_bundle8r_research_request.example.yaml
-    classification: a4_metadata_literal
-  - path: tests/fixtures/r5_bundle12r/invic_gap_template.yaml
-    classification: retained_evaluator_dependency
-  - path: tests/fixtures/r5_bundle13r/bundle12r_context/R5_bundle12r_backflow_plan.yaml
-    classification: retained_evaluator_dependency
-  - path: tests/fixtures/r5_bundle13r/bundle12r_context/R5_bundle12r_generation_lock.yaml
-    classification: retained_evaluator_dependency
-  - path: tests/fixtures/r5_bundle13r/bundle12r_context/R5_bundle12r_operating_evidence_input_snapshot.yaml
-    classification: retained_evaluator_dependency
-  - path: tests/fixtures/r5_bundle13r/bundle12r_context/R5_bundle12r_operating_evidence_result.yaml
-    classification: retained_evaluator_dependency
-  - path: tests/fixtures/r5_bundle13r/bundle12r_context/R5_bundle12r_research_question_plan.yaml
-    classification: retained_evaluator_dependency
-  - path: tests/fixtures/r5_bundle13r/r5_bundle13r_fixture_contract.yaml
-    classification: retained_evaluator_dependency
-  - path: tests/fixtures/r5_bundle13r/reviewed_backfill_partial.yaml
-    classification: retained_evaluator_dependency
-  - path: tests/fixtures/r5_bundle13r/reviewed_backfill_ready.yaml
-    classification: retained_evaluator_dependency
-  - path: tests/fixtures/r5_reviewed_inputs/README.md
-    classification: a4_metadata_literal
-  - path: tests/fixtures/r5_reviewed_inputs/invalid_accepted_todo/valuation_inputs/bad_todo.yaml
-    classification: a4_metadata_literal
-  - path: tests/fixtures/r5_reviewed_inputs/invalid_missing_evidence/business_disclosure/bad_missing_evidence.yaml
-    classification: a4_metadata_literal
-  - path: tests/fixtures/r5_reviewed_inputs/valid_accepted_degraded/forecast_assumptions/accepted_degraded.yaml
-    classification: a4_metadata_literal
-  - path: tests/fixtures/r5_reviewed_inputs/valid_pending/market_snapshot/pending_market.csv
-    classification: a4_metadata_literal
-  - path: tests/test_r5_bundle12r_cli_and_lock.py
-    classification: a5_explicit_evaluator
-  - path: tests/test_r5_bundle12r_operating_evidence.py
-    classification: a5_explicit_evaluator
-  - path: tests/test_r5_bundle13r_cli_and_lock.py
-    classification: a5_explicit_evaluator
-  - path: tests/test_r5_bundle13r_evidence_backflow.py
-    classification: a5_explicit_evaluator
-  - path: tests/test_r5_v1_active_routing_retirement.py
-    classification: cleanup_control_plane
-  - path: tests/test_r5_v1_root_policy_migration.py
-    classification: a4_metadata_literal
-  - path: tests/test_validate_r5_official_disclosure_gap_review.py
-    classification: a4_metadata_literal
-  - path: tests/test_validate_r5_reviewed_evidence_registry.py
-    classification: a4_metadata_literal
-  references: []
-deletion_control:
-  root_agents:
-    path: AGENTS.md
-    blob_oid: e9619f0e919764ff092c0cfe3550a41b618b0ea2
-    byte_count: 9605
-    sha256: e79ccc75e02041be1aec6948206bad70405958753511e633fc0394c1eb0c5fbf
-  wave_actors:
-    night:
-      deletion_actor: codex_exact_manifest_one_file_at_a_time
-      codex_delete_authorized: true
-    bundle:
-      deletion_actor: codex_exact_manifest_one_file_at_a_time
-      codex_delete_authorized: true
-    old002837:
-      deletion_actor: codex_exact_manifest_one_file_at_a_time
-      codex_delete_authorized: true
-  file_delete_surface:
-    command: delete-wave
-    eligible_waves:
-    - bundle
-    - old002837
-    completed_night_rejected: true
-    single_literal_path_per_unlink: true
-    ordinal_prefix_resume_only: true
-    head_and_index_blob_match_manifest: true
-    rejects_stage_and_commit: true
-    writes_receipt_only_after_complete_vector_validation: true
-  old002837_directory_surface:
-    command: delete-wave
-    requires_complete_501_file_deletion_vector: true
-    single_literal_directory_per_non_recursive_removal: true
-    deepest_first_prefix_suffix_resume_only: true
-    requires_empty_non_reparse_directory: true
-    complete_entry_enumeration: true
-    git_vectors_unchanged_per_directory: true
-    rejects_stage_and_commit: true
+  prior_v9_reference_count: 27
+  prior_v9_path_count: 12
+  final_reference_count: 0
+  final_unknown_classification_count: 0
+  physical_default_or_canonical_route_count: 0
+route_closure:
+  commit: 0d0e2cfeee55dbdc18bd519d9aed0cc703dd466c
+  focused_original_regressions: "13 passed"
+  route_and_behavior_suite: "62 passed"
+  explicit_root_subset: "36 passed"
+  active_routing_and_promotion_subset: "9 passed"
+  assertions_weakened: false
+  skip_xfail_mock_or_collection_bypass_added: false
+extended_cleanup:
+  extended_wave_count: 0
+  manifest_created: false
+  deletion_performed: false
+  rationale: >-
+    No retirement-only path was proven. Every affected active path remained
+    necessary and could be made explicit-root or manifest-bound without
+    changing research facts or completion semantics.
 restore_verification:
-  file_count: 1386
-  content_byte_count: 9787412
-  restore_root: C:\Users\Q\AppData\Local\Temp\v8_v1_historical_restore_e7939036de974f27afb7306970f49576
-  cat_file_e_verified: true
-  content_hash_verified: true
-  full_restore_verified: true
+  cat_file_rows_verified: 1386
+  full_restore_file_count: 1386
+  full_restore_content_byte_count: 9787412
   byte_for_byte_match: true
+  result: "29 passed in 618.47s (0:10:18)"
+final_validator:
+  command: >-
+    C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B
+    -m pytest -q tests/test_r5_v1_historical_baseline_manifest.py
+    tests/test_r5_v1_historical_cleanup_manifest.py
+    tests/test_r5_v1_active_routing_retirement.py
+  passed: 29
+  failed: 0
+  errors: 0
+  duration_seconds: 618.47
 guards:
-  codex_delete_command_exists: true
-  actual_manifest_uses_wildcards: false
-  actual_manifest_paths_are_repo_relative: true
-  actual_manifest_disjoint_from_retained_and_protected: true
-  actual_manifest_intersection_a7_equals_a7: true
-  ci_fetch_depth_zero_required: true
+  completed_wave_replay_rejected: true
+  recursive_or_wildcard_deletion_used: false
+  new_deletion_used: false
+  immutable_wave_manifests_and_receipts_changed: false
+  user_main_worktree_written: false

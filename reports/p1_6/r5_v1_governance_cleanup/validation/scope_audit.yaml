@@ -1,74 +1,49 @@
-schema_version: r5_v1_governance_cleanup_validation_v1
+schema_version: r5_v1_governance_cleanup_validation_v2
 validation_id: V-009
-phase: P5_v8_a2_rebinding
-checked_at: "2026-07-27T14:16:42+08:00"
+phase: P5_v10_final
+checked_at: "2026-07-27T17:36:49+08:00"
 decision: pass
-phase_parent: 37d312b00bfbad33bf66a7e1a3169a9fd0559ad8
-changed_path_count_before_scope_receipt: 9
-final_changed_path_count: 10
-changed_path_vector:
-  encoding: ordinal_utf8_nul
-  byte_count: 626
-  sha256: e728aed336c41d1cd022b97687565d3b93d8d567c7176d818deace4daaae8c17
-authority_partition:
-  a1_actor_or_checkpoint_metadata: 2
-  a2_add_exact: 8
-  a7_transition_modify_then_delete_exact: 0
+phase_parent: 696ca4cdf54858f9e259bb19fdd6349cd3cf2d6d
+current_head: 0d0e2cfeee55dbdc18bd519d9aed0cc703dd466c
+authority:
+  contract_path: docs/codex_tasks/v1_governance_integration_cleanup_v10/CONTRACT.md
+  contract_sha256: f7715de5429b961a34eca9c62fa3609682f8bdd5783900f3a830d81763e568ec
+  controlled_stage_closure: A.9
+  extended_exact_cleanup: A.10
+changed_paths:
+  package_files_added: 2
+  active_implementation_files_modified: 8
+  test_files_modified: 7
+  start_here_modified: true
   unauthorized_path_count: 0
-  unauthorized_paths: []
-status_classes:
-  modified_tracked_path_count: 10
-  added_authorized_a2_path_count: 0
-  deleted_path_count: 0
+  deleted_path_count_since_v10_baseline: 0
   renamed_path_count: 0
   type_change_count: 0
-  unauthorized_untracked_path_count: 0
+criterion_binding:
+  C-008_active_routing_retirement: true
+  V-006_scanner_and_restore: true
+  V-009_scope_audit: true
+  V-010_full_repository_regression: true
 protected_checks:
-  frozen_v8_contract_changed: false
+  frozen_v10_contract_changed_after_setup: false
   prior_task_packages_changed: false
+  immutable_wave_manifests_or_receipts_changed: false
   data_raw_changed: false
   original_root_map_changed: false
   blocker_root_reconciliation_changed: false
-  canonical_policy_refresh_run_changed: false
-  deletion_candidate_removed: false
-  completed_night_path_recreated: false
-  agents_md_changed: false
-  pyproject_changed: false
+  completed_deletion_path_recreated: false
   user_main_worktree_written: false
-manifest_scope:
-  contract_path: docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md
-  contract_sha256: c8f19b03dd2fa17016bab3995eaa48fe8604bdb7e7027e5197aedcbfac01eb8b
-  historical_snapshot: 312adc73821706b0b7ca6aa00e80ee608bd10b32
-  file_count: 1386
-  night_count: 680
-  bundle_count: 205
-  old002837_count: 501
+quality_checks:
+  git_diff_check: pass
   active_reference_count: 0
   unknown_classification_count: 0
-  all_wave_actors_codex_authorized: true
-  completed_night_replay_rejected: true
-  a7_overlap_exact: true
-  retained_or_protected_overlap_count: 0
-  old002837_directory_count: 29
-  old002837_directory_relative_vector_sha256: 1e987f07ab4aa9b7c54a7444b053949b5c5d377655903d9715d8948e42446cd3
-  old002837_directory_absolute_vector_sha256: 31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75
-validation_summary:
-  full_restore: "pass: 1386 files / 9787412 bytes / byte-for-byte"
-  v002: pass
-  v003_final: "194 passed"
-  v004: "two equal semantic digests; 16 passed"
-  v005: "18 passed"
-  v006: "28 passed"
-  v008: "pass: 17 capabilities / 0 blockers"
-  v011: "ok=true / state=running / warnings=0"
-  full_pytest: "1146 passed / 2 skipped / 0 failed / 0 errors"
-git_diff_check: pass
-remote_preflight:
-  origin: https://github.com/chaoranq2000-crypto/03_Investment_System.git
-  main: a345fafb522300831ed4206d35fa17f44570cb1f
-  night05: a96c1b717bf15905d72fd142efd946fa01bce666
-  v1_source: f60f220ae252262a537c612ce193fc779901984b
-  execution_ref_present: false
+  assertions_weakened: false
+  skip_xfail_mock_or_collection_bypass_added: false
+  dependency_added: false
+extended_cleanup:
+  extended_wave_count: 0
+  manifest_created: false
+  deletion_performed: false
 user_main_worktree:
   head: a345fafb522300831ed4206d35fa17f44570cb1f
   status_rows: 130
@@ -78,25 +53,5 @@ user_main_worktree:
   tracked_status_porcelain_bytes: 1025
   tracked_status_porcelain_sha256: 3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b
   matches_authorized_snapshot: true
-v8_final_hard_stop:
-  checked_at: "2026-07-27T15:44:44+08:00"
-  candidate_head: 30be091e5d845e8b91be4409c5139dc9d69b8268
-  final_full_pytest: "10 failed / 966 passed / 2 skipped"
-  focused_reproduction: "10 failed in 2.70s"
-  changed_paths_for_blocker_checkpoint:
-    - docs/codex_tasks/v1_governance_integration_cleanup_v8/START_HERE.md
-    - reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md
-    - reports/p1_6/r5_v1_governance_cleanup/validation/full_pytest.txt
-    - reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml
-  authority:
-    all_paths_authorized_as_checkpoint_or_validation_metadata: true
-    failing_paths_modified: false
-    frozen_contract_modified: false
-    deleted_paths_restored: false
-  protected_state:
-    all_1386_deleted_file_paths_absent: true
-    all_29_old002837_directories_absent: true
-    old002837_root_absent: true
-    user_main_worktree_written: false
-    user_main_status_vector_matches_authorized_snapshot: true
-  decision: hard_stop_requires_minimal_v9
+remote_preflight:
+  state: pending_refresh_before_publication

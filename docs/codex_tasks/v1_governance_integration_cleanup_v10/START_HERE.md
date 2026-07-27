@@ -9,7 +9,7 @@ source_baseline: "696ca4cdf54858f9e259bb19fdd6349cd3cf2d6d"
 last_completed_phase: "P4"
 next_phase: "P5"
 last_validation: "partial"
-updated_at: "2026-07-27T09:07:17+00:00"
+updated_at: "2026-07-27T09:36:49+00:00"
 ---
 # Start or resume this stage in a new Codex chat
 
@@ -43,9 +43,9 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - **State:** `running`
 - **Last completed phase:** `P4`
 - **Next phase:** `P5`
-- **Latest validation:** `partial`。source baseline `696ca4c...` 上 v9 A.8 focused regression 为 `13 passed in 8.06s`；V-006 scanner 正反例 `5 passed`，active-root scan 尚有 27 references / 12 paths。1386 files、29 directories 与 old root 全 absent；用户主树快照精确不变。
-- **Current blocker:** 无。用户已明确批准 v10 受控全阶段收尾权限和扩展 exact-manifest deletion waves；仍需冻结和验证本包。
-- **Next safe action:** finalize v10，验证 package-only setup diff 并提交；随后从 27 references / 12 paths 开始执行 P5。
+- **Latest validation:** `partial`（全部专用工作树验证通过，仅待 independent clean-checkout smoke）。v10 route closure 已把 active references 从 27 降至 0；focused 13、route/behavior 62、explicit-root 36、V-003 194、V-004 16、V-005 18、V-006 29、V-008 通过；全仓 `977 passed, 2 skipped`。1386 files、29 directories 与 old root 在测试前后均 absent；用户主树快照精确不变。
+- **Current blocker:** 无。A.10 审计没有发现 retirement-only 候选，故 `extended_wave_count=0`，未新增 manifest 或执行删除。
+- **Next safe action:** 提交本地验证证据 checkpoint；在独立 local clone 对该精确 checkpoint 运行 full pytest；随后写入 smoke 证据并创建 sealed candidate。
 
 ### Immutable completed deletion evidence
 
@@ -90,3 +90,4 @@ Never edit the frozen contract, add phases, weaken a criterion, fabricate data o
 - 2026-07-27T08:48:46+00:00 — state=draft; completed=P4; next=P5; validation=not_run; v10 broad authority approved; finalize package before execution
 - 2026-07-27T08:55:33+00:00 — state=running; completed=P4; next=P5; validation=partial; v10 setup 1b0298d verified; begin A.9 closure of 27 references across 12 paths; A.10 extended waves only if retirement-only candidates are proven
 - 2026-07-27T09:07:17+00:00 — state=running; completed=P4; next=P5; validation=partial; A.9 route closure complete: active references 27 to 0; focused original regressions 13 passed; route/behavior suites 62 passed and explicit-root subset 36 passed; A.10 extended_wave_count=0 because no retirement-only file candidate was proven; next run full contract validation
+- 2026-07-27T09:36:49+00:00 — state=running; completed=P4; next=P5; validation=partial with only independent clean-checkout smoke pending; V-002/V-003/V-004/V-005/V-006/V-008 and full repository pytest passed; 977 passed and 2 unchanged baseline skips; all completed-wave targets remained absent; next create validation checkpoint and run independent local clone smoke

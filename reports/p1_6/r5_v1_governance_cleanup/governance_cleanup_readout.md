@@ -99,4 +99,17 @@
 - User main worktree remains read-only at HEAD `a345fafb522300831ed4206d35fa17f44570cb1f`; full status is 130 records / 9,156 bytes / SHA-256 `1b21ac246cb2ad4b055f5a264503fb1fad8fe9edae153e25c9cd6d19d4a719c0`, tracked-only is 20 records / 1,025 bytes / `3ab441f68037823866029eb2136149a807f6382755966daf96d33a85b965609b`.
 - Next controlled action is user approval of a minimal v9 authorization amendment that reopens only the exact failing tests, the exact runtime path-resolution fixes proven necessary, and V-006 false-negative coverage. All three deletion manifests, deletion commits, wave order, absence state, restore proof and publication protocol remain unchanged. No seal or publication is authorized while V-010 fails.
 
+### v10 controlled stage closure
+
+- Package: `docs/codex_tasks/v1_governance_integration_cleanup_v10`; frozen SHA-256 `f7715de5429b961a34eca9c62fa3609682f8bdd5783900f3a830d81763e568ec`.
+- Package-only setup commit: `1b0298da4513147830b359aaf3fa3f5a8c0f7371`, direct parent `696ca4cdf54858f9e259bb19fdd6349cd3cf2d6d`.
+- Route-closure commit: `0d0e2cfeee55dbdc18bd519d9aed0cc703dd466c`. It replaced active default/canonical/worktree routing with explicit inputs or output roots and strengthened the scanner without changing research facts or completion semantics.
+- The strengthened active-root audit moved from 27 references across 12 paths to zero references and zero unknown classifications. Focused original regressions passed 13; route/behavior suites passed 62; the explicit-root subset passed 36.
+- A.10 found no retirement-only candidate. `extended_wave_count=0`; no new cleanup manifest was created and no v10 deletion was performed.
+- V-002 passed. V-003 final passed 194. Two V-004 runs remained semantically and byte-tree deterministic and its test passed 16. V-005 passed 18. V-006 passed 29 and restored all 1,386 files / 9,787,412 bytes byte-for-byte in an external temporary root. V-008 passed with 17 capabilities and zero blockers.
+- Final dedicated-worktree pytest passed `977 passed, 2 skipped in 781.84s`; both skips are unchanged opt-in live-adapter manual smokes already present at `f60f220...`.
+- Before and after validation, all 1,386 completed-wave files, all 29 directories and the exact old run root remained absent. The three historical manifests, receipts, commits and vectors remain unchanged.
+- User main worktree remains read-only at `a345fafb522300831ed4206d35fa17f44570cb1f` and exactly matches the authorized full/tracked status vectors.
+- Independent local-clone full pytest and sealed candidate publication remain pending. Publication follows mode A and no external result will be written back after seal.
+
 Later phases append their own sections. Publication evidence is never written here after the sealed candidate commit.
