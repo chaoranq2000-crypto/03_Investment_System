@@ -1,0 +1,122 @@
+schema_version: investment_review.analysis_brief.v1
+subject_type: portfolio
+period_type: daily
+period_start: "2026-07-15"
+period_end: "2026-07-15"
+report_cutoff_at: "2026-07-15T15:00:00+08:00"
+source_fact_sha256: 19e00545fdb54af1c61224c05420132a5e77cf4d33a4fe929d2c7068e3563c3e
+
+central_judgment:
+  type: inference_and_existing_analyst_view
+  text: >-
+    当日总资产上涨 3.2%，但风险结构没有同步改善：现金降至 0.56%，最大单一标的升至
+    30.4%，前三大合计 65.51%，且当日继续增持两个头部持仓。复盘主线不是追逐当日收益，
+    而是保持现有 reduce 建议，先恢复现金缓冲并降低集中度。
+  evidence:
+    - $.sections.performance_and_positions.performance
+    - $.sections.performance_and_positions.risk_change
+    - $.sections.performance_and_positions.positions[ts_code=002997.SZ|002558.SZ]
+    - $.sections.recommendation
+
+material_findings:
+  - type: fact_plus_inference
+    text: >-
+      总资产增加 14648.84 元、涨幅 3.2%，但现金减少 8730.26 元至 2626.74 元；
+      同期持仓市值增加 23379.10 元、增幅 5.24%。收益改善与现金缓冲收缩同时发生，
+      不能把上涨等同于风险下降。
+    evidence:
+      - $.sections.performance_and_positions.performance
+      - $.sections.performance_and_positions.cash
+      - portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42+ledger_entries:through:2026-07-15
+  - type: fact_plus_inference
+    text: >-
+      瑞鹄模具由 4400 股增至 5200 股，权重由 26.89% 升至 30.4%；巨人网络由
+      3400 股增至 3600 股，权重由 19.97% 升至 22.54%。两者均高于现有建议中的
+      20% 单标的上沿。
+    evidence:
+      - $.sections.performance_and_positions.opening_positions[ts_code=002997.SZ|002558.SZ]
+      - $.sections.performance_and_positions.positions[ts_code=002997.SZ|002558.SZ]
+      - $.sections.recommendation.target_position.single_instrument_cap_range_pct
+  - type: retrospective_inference
+    text: >-
+      德展健康日内新增 5800 股后又全部卖出，持仓回到 17200 股；毛价差仅 3 元，
+      未覆盖 25.43 元规则回填费用，净结果 -22.43 元。主要问题是第二笔在更高价格
+      以更大规模加仓，而不是手续费本身。
+    evidence:
+      - $.sections.operations_and_motives.episode_summaries[ts_code=000813.SZ]
+      - $.sections.review_judgments[0]
+      - portfolio.sqlite3#ledger_entries:963
+      - portfolio.sqlite3#ledger_entries:965
+      - portfolio.sqlite3#ledger_entries:966
+
+causal_chain:
+  - text: >-
+      当日共 10 笔操作；巨人网络增加 200 股、瑞鹄模具增加 800 股，沪电股份和
+      川投能源退出，德展健康完成日内闭环。净结果是现金减少且头部仓位继续扩大。
+    evidence:
+      - $.sections.operations_and_motives
+      - $.sections.performance_and_positions.cash
+      - $.sections.performance_and_positions.positions
+  - text: >-
+      头部加仓把最大单一标的和前三大权重推至高集中状态；缺少明确风险预算时，
+      仓位结构问题比当日收益更需要优先处理，因此导向现有 reduce 建议。
+    evidence:
+      - $.sections.performance_and_positions.risk_change
+      - $.sections.recommendation.rationale
+
+operation_assessment:
+  effective:
+    text: >-
+      德展健康首笔 1700 股试仓限制了初始试错规模，随后卖出全部日内新增并恢复原仓位，
+      没有让一次盘中试错永久扩大暴露。
+    evidence:
+      - $.sections.operations_and_motives.operations[operation_id=operation_f3be1fd57fda2d9246c294f1]
+      - $.sections.operations_and_motives.operations[operation_id=operation_7a88627d20e969bd2c5b97de]
+  needs_improvement:
+    text: >-
+      德展健康第二笔在更高价格放大规模；同时组合在现金已很低时仍向瑞鹄模具和巨人网络
+      两个头部持仓加仓，与降低集中度的风险目标不一致。
+    evidence:
+      - $.sections.review_judgments[0]
+      - $.sections.operations_and_motives.episode_summaries[ts_code=000813.SZ|002997.SZ|002558.SZ]
+      - $.sections.performance_and_positions.risk_change
+  uncertainty:
+    text: >-
+      当日操作均缺少 Decision，相关 motive 只能标为 system_inference，不能表述为用户真实动机。
+      除德展健康外，冻结事实不足以评价其他操作背后的投资判断是否正确。
+    evidence:
+      - $.sections.operations_and_motives.operations[*].decision_status
+      - $.sections.operations_and_motives.operations[*].motive
+
+action_plan:
+  text: >-
+    保持现有 reduce 建议：下一交易周或下一次实质性信息更新前，将超过 20% 的单一标的
+    降至 15%–20%，并把现金提高至 5%–10%。这是建议而非订单，不自动执行。
+  evidence:
+    - $.sections.recommendation
+    - $.safety
+
+risk_invalidation:
+  risks:
+    - 减仓后标的继续上涨会产生机会成本。
+    - 日报只展开当日操作标的，缺少全组合基本面覆盖。
+    - 指数或板块同涨不代表组合内每只股票的风险同步下降。
+  invalidation:
+    - 用户已有可验证且不同的风险预算或资金安排。
+    - 正式账本现金或持仓在报告截止后发生变化。
+    - 新增全组合基本面证据支持当前集中度且风险预算允许。
+  missing:
+    - MISSING_EXPLICIT_USER_RISK_BUDGET
+    - MISSING_FULL_PORTFOLIO_FUNDAMENTAL_COVERAGE
+    - MISSING_DECISION
+  evidence:
+    - $.sections.recommendation.major_downside_risks
+    - $.sections.recommendation.invalidation_conditions
+    - $.sections.recommendation.important_missing_inputs
+    - $.sections.risks_invalidation_and_missing.data_limitations
+
+omitted_to_appendix:
+  - 全部持仓逐项成本、浮盈亏与小权重变化。
+  - 10 笔逐笔操作、system_inference、替代解释和操作时点证据。
+  - 只针对当日操作标的德展健康的完整四层上下文。
+  - 费用回填、被替代现金快照、计算方法和完整来源。

@@ -1,0 +1,27 @@
+schema_version: investment_review.reader_review.v1
+review_round: 1
+reviewer_role: principle_based_reader
+review_scope:
+  - portfolio_daily_reader_draft.md
+  - instrument_000813_daily_reader_draft.md
+verdict: pass
+core_problem: "未发现需要进入修订轮的实质性原则问题。"
+must_fix: []
+keep:
+  - sample: both
+    point: "中心判断鲜明，事实、因果链与下一步行动衔接自然。"
+  - sample: portfolio
+    point: "收益改善与现金、集中度恶化的矛盾表达清楚，未把上涨错误归因于单一持仓。"
+  - sample: instrument_000813
+    point: "system_inference 与事后检验明确分开；冻结事实核验显示无操作后信息泄漏。"
+  - sample: both
+    point: "建议、仓位、风险、失效条件及非订单边界完整，费用仅作必要说明，正文与折叠附录分工合理。"
+review_constraints:
+  rewrote_report: false
+  must_fix_count: 0
+  max_must_fix_allowed: 3
+  additional_review_rounds: 0
+  files_modified_by_reviewer: false
+  network_accessed: false
+  formal_portfolio_db_opened: false
+  broker_accessed: false

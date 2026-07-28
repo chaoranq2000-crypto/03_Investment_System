@@ -1,0 +1,125 @@
+schema_version: investment_review.analysis_brief.v1
+subject_type: instrument
+subject_id: 000813.SZ
+subject_name: 德展健康
+period_type: daily
+period_start: "2026-07-15"
+period_end: "2026-07-15"
+report_cutoff_at: "2026-07-15T15:00:00+08:00"
+source_fact_sha256: 95e47b5eccd16eddfc3227edac3b17b31240b342edd23762edcc3a8fe934631f
+
+central_judgment:
+  type: inference_and_existing_analyst_view
+  text: >-
+    德展健康短期趋势转强，但没有形成基本面反转证据：当日上涨 2.37%，3/5/20 日涨幅均为正，
+    最新财务快照仍亏损、估值不能证明便宜，现有仓位账面亏损 41.29%。当日做 T 又因
+    “越涨越加”及费用产生净亏损，因此保持现有 reduce 建议，将权重由 12.57% 降至 8%–12%。
+  evidence:
+    - $.sections.decision_context
+    - $.sections.performance_and_positions.positions[ts_code=000813.SZ]
+    - $.sections.operations_and_motives.episode_summaries[0]
+    - $.sections.recommendation
+
+material_findings:
+  - type: fact_plus_inference
+    text: >-
+      价格由 3.37 元升至 3.45 元，当日涨 2.37%；3/5/20 个交易日涨幅为
+      6.81%/5.83%/13.86%。但中证医药当日涨 3.17%，标的落后板块 0.79 个百分点，
+      因而只能确认短期趋势偏强，不能确认个股独立走强。
+    evidence:
+      - $.sections.performance_and_positions.performance
+      - $.sections.decision_context.market_and_sector
+      - $.sections.decision_context.technical_and_trend
+  - type: fact_plus_inference
+    text: >-
+      最新财务快照净利润 -4316.79 万元，同比亏损扩大 47.45%；PE(TTM) 为负，
+      PS(TTM) 18.263067 倍不能单独证明便宜。收盘价 3.45 元低于账面成本 5.8762 元，
+      期末浮亏 41.29%，短期上涨尚未改变中期风险收益矛盾。
+    evidence:
+      - $.sections.decision_context.fundamental_and_valuation
+      - $.sections.performance_and_positions.positions[0]
+  - type: retrospective_fact_and_inference
+    text: >-
+      三笔操作形成 17200→18900→23000→17200 股的日内闭环。毛价差仅 3 元，
+      费用 25.43 元，净结果 -22.43 元；第二笔以 3.48 元买入 4100 股，是前笔规模
+      2.41 倍，成为执行质量的主要拖累。
+    evidence:
+      - $.sections.operations_and_motives.operations
+      - $.sections.operations_and_motives.episode_summaries[0]
+      - $.sections.review_judgments[0]
+
+causal_chain:
+  - text: >-
+      操作前近三次收盘累计上涨约 4.33%；首笔只增加原持仓 9.88%，系统中等置信度推断
+      其更像顺势小额试仓。该判断只使用 09:38:45 以前信息，不是用户陈述。
+    evidence:
+      - $.sections.operations_and_motives.operations[operation_id=operation_f3be1fd57fda2d9246c294f1].motive
+  - text: >-
+      随盘中价格上升，第二笔买入规模扩大至前笔 2.41 倍、价格提高 2.05%；
+      系统推断其可能是看到强势后放大试仓，也可能只是预设拆单，不能确认真实意图。
+    evidence:
+      - $.sections.operations_and_motives.operations[operation_id=operation_cfc86fabc78d9cd8a7531aed].motive
+  - text: >-
+      随后卖出数量恰好等于当日新增 5800 股，持仓恢复原值；系统推断可能是完成做 T
+      或撤回未形成优势的加仓。收盘后的毛价差和费用只用于事后检验，不用于倒推动机。
+    evidence:
+      - $.sections.operations_and_motives.operations[operation_id=operation_7a88627d20e969bd2c5b97de].motive
+      - $.sections.decision_context.timing_policy
+
+operation_assessment:
+  effective:
+    text: >-
+      首笔小额试仓限制了初始风险；最后卖出全部日内新增、恢复 17200 股基础仓位，
+      没有把一次盘中试错演变为永久加仓。
+    evidence:
+      - $.sections.operations_and_motives.operations[0]
+      - $.sections.operations_and_motives.operations[2]
+  needs_improvement:
+    text: >-
+      第二笔在价格更高时明显放大规模，按收盘回看毛价差 -123 元；整个闭环毛利仅 3 元，
+      无法覆盖费用。改进重点是预先限定追价和加仓规模，而不是事后归因于手续费。
+    evidence:
+      - $.sections.operations_and_motives.operations[1].retrospective_evaluation
+      - $.sections.operations_and_motives.episode_summaries[0]
+      - $.sections.review_judgments[0]
+  uncertainty:
+    text: >-
+      三笔均为 decision_status=not_recorded，动机均为 medium 置信度的 system_inference；
+      MISSING_DECISION 和 MISSING_STRATEGY_OR_TARGET_POSITION 阻止确认真实交易计划。
+    evidence:
+      - $.sections.operations_and_motives.operations[*].decision_status
+      - $.sections.operations_and_motives.operations[*].motive
+
+action_plan:
+  text: >-
+    保持现有 reduce 建议：下一交易周或下一次实质性信息更新前，把德展健康权重由
+    12.57% 降至 8%–12%。不因单日上涨追加确定性判断；该建议不是订单且未执行。
+  evidence:
+    - $.sections.recommendation
+    - $.sections.performance_and_positions.positions[0].portfolio_weight_pct
+    - $.safety
+
+risk_invalidation:
+  risks:
+    - 减仓后价格继续上涨会产生机会成本。
+    - 短期趋势转强不等于经营反转。
+    - 市场或医药板块共振不能证明持续跑赢。
+    - 技术趋势只提供概率性上下文。
+  invalidation:
+    - 用户补充可验证的目标仓位与止损/加仓计划。
+    - 新基本面或估值证据改变风险收益判断。
+    - 截止后正式账本仓位发生变化。
+  missing:
+    - MISSING_DECISION
+    - MISSING_EXPLICIT_USER_RISK_BUDGET
+    - MISSING_STRATEGY_OR_TARGET_POSITION
+  evidence:
+    - $.sections.recommendation.major_downside_risks
+    - $.sections.recommendation.invalidation_conditions
+    - $.sections.risks_invalidation_and_missing
+
+omitted_to_appendix:
+  - 三笔逐条盘前观察、替代解释与时间戳。
+  - 完整财务、估值、市场、板块和技术指标。
+  - 现金、组合集中度及非本标的组合事实。
+  - 重复的建议依据、完整来源和安全元数据。

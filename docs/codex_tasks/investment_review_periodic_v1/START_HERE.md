@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "investment_review_periodic_v1"
 contract_path: "docs/codex_tasks/investment_review_periodic_v1/CONTRACT.md"
 contract_sha256: "e8debe680f8c679b0ff95f3f77677f7ba1508fb8a11a9f0794e0a146e5dc7a38"
-state: "running"
+state: "blocked"
 execution_branch: "codex/investment-review-periodic-v1"
 source_baseline: "7df75562eb7c7123ff066406f92fd6b844be994b"
-last_completed_phase: "P4"
-next_phase: "P5"
-last_validation: "partial"
-updated_at: "2026-07-28T15:00:50+00:00"
+last_completed_phase: "P5"
+next_phase: "P6"
+last_validation: "pass"
+updated_at: "2026-07-28T15:20:13+00:00"
 ---
 # 在新 Codex 聊天中启动或恢复本阶段
 
@@ -38,16 +38,17 @@ Reconcile ordinary drift and conflicts in this same package. Revise CONTRACT.md 
 
 ## Current checkpoint
 
-- **State:** `running`
-- **Last completed phase:** `P4`
-- **Next phase:** `P5`
-- **Latest validation:** `partial` — revised contract recorded and package validation pending after checkpoint-state update.
+- **State:** `blocked`
+- **Last completed phase:** `P5`
+- **Next phase:** `P6`
+- **Latest validation:** `pass` — two frozen-input reader samples passed V-601, the one-pass principle review, package validation, source/DB hash checks, and `git diff --check`.
 - **Runtime authorizations:** `accept_p1_sample_and_continue` remains historical proof for P2–P4. No P5 reader-quality grant is active.
-- **Current blocker:** none.
-- **Implementation checkpoint:** `4a70cc2` (`test(review): seal periodic review validation`) is the completed P1–P4 baseline for P5.
+- **Current blocker:** awaiting the exact user grant `accept_reader_report_samples_and_continue`; P6–P7 are not authorized.
+- **Implementation checkpoint:** `40c049f` (`docs(review): start reader-first quality iteration`) records the P5 contract baseline; the Git commit containing this file is the P5 sample checkpoint.
 - **Existing final evidence:** `reports/investment_review/periodic_v1/final/FINAL_READOUT.md` and `validation_summary.json`.
 - **Formal portfolio DB:** SHA-256 `6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057`, unchanged.
-- **Next safe action:** Execute P5 only: freeze the two existing real JSON facts, produce and review two reader-first samples, validate them, then stop at the P5 sample gate.
+- **P5 evidence:** `reports/investment_review/periodic_v1/reader_quality_pilot/P5_READOUT.md`, two reader samples, their analysis briefs, one principle review, and `validation_summary.json`.
+- **Next safe action:** Show the two P5 samples to the user and wait. Record `accept_reader_report_samples_and_continue` only if the user explicitly grants it; then resume P6.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
@@ -64,3 +65,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-28T09:29:52+00:00 — state=complete; completed=P4; next=none; validation=pass; P2-P4 complete: 619 derived reports; six real daily/weekly/monthly samples; V-101 110 tests, V-102 23 tests plus build, V-301/V-401/V-402 passed, V-501 71 tests; formal SQLite unchanged; local implementation commit ac045c0; no push/deploy/OS scheduler/broker access.
 - 2026-07-28T15:00:50+00:00 — contract revision; previous_sha256=7cb2b06aac33573dc4fd69e8cdacb5f2d386fe8b5d6021dc033b187360a63fb7; new_sha256=e8debe680f8c679b0ff95f3f77677f7ba1508fb8a11a9f0794e0a146e5dc7a38; reason=User directed execution of the approved reader-first analysis and editing plan; add P5-P7, a two-sample quality gate, principle-based development subagents, and keep runtime model integration out of scope.
 - 2026-07-28T15:00:50+00:00 — state=running; completed=P4; next=P5; validation=partial; P5 reader-quality execution started from the verified P1-P4 baseline. No `accept_reader_report_samples_and_continue` grant is active.
+- 2026-07-28T15:20:13+00:00 — state=blocked; completed=P5; next=P6; validation=pass; two frozen-input reader-first daily samples, two analysis briefs and one principle review passed V-601; reviewer verdict=pass, must_fix=0, revisions=0; package validator and git diff check passed; formal SQLite SHA-256 unchanged; awaiting exact user grant accept_reader_report_samples_and_continue.

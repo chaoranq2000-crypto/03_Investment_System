@@ -1,0 +1,38 @@
+{
+  "schema_version": "investment_review.reader_quality_pilot_input.v1",
+  "pilot_id": "reader_quality_pilot_20260715",
+  "frozen_at": "2026-07-28T15:02:46Z",
+  "source_commit": "40c049fb83827a679d86105146f349ab0a91d6ad",
+  "facts": [
+    {
+      "subject_type": "portfolio",
+      "period_type": "daily",
+      "period_start": "2026-07-15",
+      "period_end": "2026-07-15",
+      "path": "reports/investment_review/periodic_v1/final/portfolio_daily_2026-07-15_2026-07-15.json",
+      "sha256": "19e00545fdb54af1c61224c05420132a5e77cf4d33a4fe929d2c7068e3563c3e",
+      "byte_length": 91653
+    },
+    {
+      "subject_type": "instrument",
+      "subject_id": "000813.SZ",
+      "subject_name": "德展健康",
+      "period_type": "daily",
+      "period_start": "2026-07-15",
+      "period_end": "2026-07-15",
+      "path": "reports/investment_review/periodic_v1/final/instrument_000813.SZ_daily_2026-07-15_2026-07-15.json",
+      "sha256": "95e47b5eccd16eddfc3227edac3b17b31240b342edd23762edcc3a8fe934631f",
+      "byte_length": 32299
+    }
+  ],
+  "formal_portfolio_db": {
+    "path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+    "access": "not_opened_by_pilot_subagents",
+    "sha256_before": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "byte_length": 2600960,
+    "last_write_time_utc": "2026-07-28T06:26:40.3218648Z"
+  },
+  "network_access": false,
+  "runtime_model_provider_added": false,
+  "orders_executed": false
+}
