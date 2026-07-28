@@ -1,6 +1,6 @@
 {
   "schema_version": "investment_review.periodic_v1.final_validation.v1",
-  "status": "candidate",
+  "status": "pass",
   "p1_sample_acceptance": {
     "grant": "accept_p1_sample_and_continue",
     "recorded": true
@@ -369,7 +369,14 @@
       "os_scheduler_or_service_installed": false
     },
     "V-999": {
-      "status": "pending_final_git_checkpoint"
+      "status": "pass",
+      "implementation_commit": "ac045c0",
+      "task_checkpoint_commit": "054142b",
+      "git_diff_check": "pass",
+      "worktree_clean_before_evidence_seal": true,
+      "task_package_validation": "pass",
+      "formal_db_sha256_unchanged": true,
+      "production_released": false
     }
   },
   "coverage_audit": {

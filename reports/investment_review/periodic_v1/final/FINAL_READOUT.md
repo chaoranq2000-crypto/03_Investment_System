@@ -4,6 +4,7 @@
 - 六类真实报告：6 / 6
 - 派生报告库当前报告数：619
 - 正式组合库 SHA-256：`6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057`（前后不变）
+- 本地实现 checkpoint：`ac045c0`；任务包完成 checkpoint：`054142b`
 - 订单执行：`false`；券商访问：`false`；保证收益：`false`
 - 生产发布：`false`；OS scheduler/service：未安装
 
@@ -23,7 +24,7 @@
 - V-401：六类真实样本全部通过；sidecar 内周报 22 份、月报 23 份。
 - V-402：localhost API 与浏览器通过；默认最新、组合/标的、日/周/月及历史报告均可读，控制台错误为 0。
 - V-501：71 项 automation/API/web 测试通过；仅进程内/CLI 生成，未安装系统调度器或服务。
-- V-999：等待本地 Git checkpoint 后执行最终 clean/status/log 检查。
+- V-999：通过；`git diff --check`、clean/status/log、任务包校验、正式库哈希与未发布状态均已核对。
 
 ## 已知限制
 
