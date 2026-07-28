@@ -42,6 +42,11 @@ from src.investment_review.models import (
     ModelValidationError,
     canonical_json,
 )
+from src.investment_review.periodic_reports import (
+    REPORT_API_SCHEMA_VERSION,
+    PeriodicReportError,
+    PeriodicReportStore,
+)
 from src.investment_review.review_checkpoint import validate_review_checkpoint
 from src.investment_review.review_input_bundle import validate_review_input_bundle
 from src.investment_review.review_runner import (
@@ -82,6 +87,7 @@ _RUN_ID = re.compile(r"^reviewrun_[0-9a-f]{32}$")
 _REVIEW_ID = re.compile(r"^review:[0-9a-f]{32}$")
 _EPISODE_ID = re.compile(r"^te_[0-9a-f]{32}$")
 _EVENT_ID = re.compile(r"^evt_[0-9a-f]{32}$")
+_PERIODIC_REPORT_ID = re.compile(r"^periodic_[0-9a-f]{32}$")
 _DECISION_ID = re.compile(r"^dec_[0-9a-f]{32}$")
 _CONTENT_ID = re.compile(r"^sha256:[0-9a-f]{64}$")
 _REQUEST_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")
@@ -964,6 +970,10 @@ class InvestmentReviewWebService:
                 )
         self.store = selected_store
         self.catalog.store = selected_store
+        self.periodic_reports = PeriodicReportStore(
+            self.store.path,
+            read_only=self.read_only_acceptance,
+        )
         if self.read_only_acceptance and sync_service is not None:
             raise _error(
                 503,
@@ -1983,6 +1993,83 @@ class InvestmentReviewWebService:
                 self._acceptance_list_cache[cache_key] = result
         return result
 
+    def list_periodic_reports(
+        self,
+        *,
+        subject_type: str | None = None,
+        subject_id: str | None = None,
+        period_type: str | None = None,
+        limit: int = 100,
+    ) -> dict[str, Any]:
+        if subject_type is not None and subject_type not in {
+            "portfolio",
+            "instrument",
+        }:
+            raise _error(
+                400,
+                "invalid_subject_type",
+                "subject_type 必须是 portfolio 或 instrument",
+            )
+        if period_type is not None and period_type != "daily":
+            raise _error(
+                400,
+                "invalid_period_type",
+                "P1 period_type 只支持 daily",
+            )
+        if subject_id is not None and not str(subject_id).strip():
+            raise _error(400, "invalid_subject_id", "subject_id 不能为空")
+        if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 200:
+            raise _error(400, "invalid_limit", "limit 必须在 1 到 200 之间")
+        try:
+            reports = self.periodic_reports.list(
+                subject_type=subject_type,
+                subject_id=subject_id,
+                period_type=period_type,
+                limit=limit,
+            )
+        except PeriodicReportError as exc:
+            raise _error(
+                503,
+                "periodic_report_store_unavailable",
+                "周期报告存储不可用",
+            ) from exc
+        return {
+            "schema_version": REPORT_API_SCHEMA_VERSION,
+            "status": "ready",
+            "data": {
+                "reports": reports,
+                "total_count": len(reports),
+                "supported_period_types": ["daily"],
+                "supported_subject_types": ["portfolio", "instrument"],
+            },
+        }
+
+    def get_periodic_report(self, report_id: object) -> dict[str, Any]:
+        selected = _required_id(
+            report_id,
+            "report_id",
+            _PERIODIC_REPORT_ID,
+        )
+        try:
+            report = self.periodic_reports.get(selected)
+        except PeriodicReportError as exc:
+            if "not found" in str(exc).lower():
+                raise _error(
+                    404,
+                    "periodic_report_not_found",
+                    "指定周期报告不存在",
+                ) from exc
+            raise _error(
+                503,
+                "periodic_report_store_unavailable",
+                "周期报告存储不可用",
+            ) from exc
+        return {
+            "schema_version": REPORT_API_SCHEMA_VERSION,
+            "status": "ready",
+            "data": {"report": report},
+        }
+
     def get_review_detail(
         self, run_id: object, review_id: object
     ) -> dict[str, Any]:
@@ -2358,6 +2445,10 @@ class InvestmentReviewWebService:
             ),
         }
         try:
+            periodic_count = self.periodic_reports.count()
+        except PeriodicReportError:
+            periodic_count = 0
+        try:
             if self.automation_status_provider is not None:
                 raw_automation = self.automation_status_provider()
             else:
@@ -2378,6 +2469,8 @@ class InvestmentReviewWebService:
             }
         automation = self._automation_health_projection(raw_automation)
         status = str(sync["status"])
+        if self.read_only_acceptance and periodic_count > 0 and status == "unknown":
+            status = "available"
         latest_run_status = (
             str(runs[-1].get("status") or "unknown") if runs else None
         )
@@ -2436,6 +2529,11 @@ class InvestmentReviewWebService:
                 "last_success": sync["last_success"],
                 "last_failure": sync["last_failure"],
                 "reviews": review_health,
+                "periodic_reports": {
+                    "count": periodic_count,
+                    "supported_period_types": ["daily"],
+                    "supported_subject_types": ["portfolio", "instrument"],
+                },
                 "automation": automation,
                 "boundary": dict(API_BOUNDARY),
                 "acceptance": {

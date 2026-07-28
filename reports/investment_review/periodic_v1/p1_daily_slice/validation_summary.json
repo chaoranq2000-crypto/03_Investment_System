@@ -1,0 +1,54 @@
+{
+  "schema_version": "investment_review.p1_daily_slice.validation.v1",
+  "status": "pass",
+  "selected_report_date": "2026-07-15",
+  "selected_instrument": "000813.SZ",
+  "selection_reason": "最近数据充分且包含无 Decision 的日内加仓后减回原仓位操作，可同时检验时间边界、动机推断、手续费缺失和直接仓位建议。",
+  "reports": [
+    {
+      "report_id": "periodic_dd724753590fb15defdee6c87864c014",
+      "subject": {
+        "type": "portfolio",
+        "id": "default",
+        "name": "组合账户"
+      },
+      "validation": {
+        "status": "accepted",
+        "errors": []
+      }
+    },
+    {
+      "report_id": "periodic_aafcedcdac74189c5b01a678c6ac379c",
+      "subject": {
+        "type": "instrument",
+        "id": "000813.SZ",
+        "name": "德展健康"
+      },
+      "validation": {
+        "status": "accepted",
+        "errors": []
+      }
+    }
+  ],
+  "store_receipts": [
+    {
+      "status": "updated",
+      "report_id": "periodic_dd724753590fb15defdee6c87864c014",
+      "payload_sha256": "36dd046d1f3ce5f97daa4d684c75e9c0207a0609b05d4d1f4380ec084de5b514"
+    },
+    {
+      "status": "skipped",
+      "report_id": "periodic_aafcedcdac74189c5b01a678c6ac379c",
+      "payload_sha256": "787a46a26497efc1f0f8ba2dd5f24f60a3239f8d521b2795edd0b659b8190e4e"
+    }
+  ],
+  "formal_portfolio_db": {
+    "mode": "ro+immutable+query_only",
+    "sha256_before": "752e3b87966f23d2e6f3db89cd3a8d5df0ab893504ee4e7e83de793e4aa52f53",
+    "sha256_after": "752e3b87966f23d2e6f3db89cd3a8d5df0ab893504ee4e7e83de793e4aa52f53",
+    "unchanged": true
+  },
+  "orders_executed": false,
+  "broker_accessed": false,
+  "guaranteed_return_claims": false
+}

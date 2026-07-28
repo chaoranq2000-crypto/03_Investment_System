@@ -5,6 +5,9 @@ import {
   isInvestmentReviewAcceptanceHealth,
   operationReviewHeadline,
   operationReviewView,
+  periodicReportHeadline,
+  periodicReportView,
+  projectedTime,
 } from "./investment_review.js";
 
 const source = readFileSync(
@@ -15,6 +18,68 @@ const mainSource = readFileSync(
   new URL("./main.js", import.meta.url),
   "utf8",
 );
+
+describe("periodic investment reports", () => {
+  const report = {
+    report_id: `periodic_${"a".repeat(32)}`,
+    status: "ready",
+    subject: { type: "instrument", id: "000813.SZ", name: "德展健康" },
+    period: {
+      type: "daily",
+      start: "2026-07-15",
+      end: "2026-07-15",
+      report_cutoff_at: "2026-07-15T15:00:00+08:00",
+    },
+    headline: "无 Decision 日报样本。",
+    sections: {
+      performance_and_positions: {
+        performance: { asset_change_pct: "3.22" },
+      },
+      operations_and_motives: {
+        operation_count: 3,
+        operations: [{
+          motive: {
+            label: "system_inference",
+            input_cutoff_at: "2026-07-15T01:38:45Z",
+            uses_later_information: false,
+          },
+        }],
+      },
+      recommendation: {
+        action: "reduce",
+        target_position: {
+          target_position_range_pct: ["8", "12"],
+          target_position_note: "把单标的权重降至 8%–12%。",
+        },
+      },
+    },
+  };
+
+  it("normalizes the reader-facing daily report and direct position advice", () => {
+    const view = periodicReportView(report);
+    expect(view.subject.type).toBe("instrument");
+    expect(view.period.type).toBe("daily");
+    expect(view.operation_count).toBe(3);
+    expect(view.recommendation.action).toBe("reduce");
+    expect(periodicReportHeadline(report)).toContain("8%–12%");
+    expect(projectedTime(view.period.report_cutoff_at)).toBe(
+      "2026-07-15T15:00:00+08:00",
+    );
+    expect(projectedTime({ occurred_at: "2026-07-15T01:38:45Z" })).toBe(
+      "2026-07-15T01:38:45Z",
+    );
+  });
+
+  it("loads the periodic list and detail before operation-level evidence", () => {
+    expect(source).toContain("/periodic-reports?period_type=daily&limit=200");
+    expect(source).toContain("/periodic-report?");
+    expect(source.indexOf("PERIODIC REPORTS")).toBeLessThan(
+      source.indexOf("OPERATION EVIDENCE"),
+    );
+    expect(source).toContain("MOTIVE · SYSTEM INFERENCE");
+    expect(source).toContain("RECOMMENDATION · NOT AN ORDER");
+  });
+});
 
 describe("investment review read-only acceptance", () => {
   it("requires the exact bounded health identity", () => {

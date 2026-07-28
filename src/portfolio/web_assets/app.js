@@ -14786,6 +14786,7 @@ function appendPairs(parent, entries) {
 	parent.appendChild(list);
 }
 function projectedTime(value) {
+	if (typeof value === "string" || typeof value === "number") return text(value);
 	const item = object(value);
 	return text(item.occurred_at ?? item.known_at ?? item.status_occurred_at ?? item.requested_at ?? item.status_event?.occurred_at ?? item.status_event?.known_at ?? item.run?.requested_at);
 }
@@ -14914,6 +14915,36 @@ function normalizeReviews(payload) {
 		operation_review: object(item?.operation_review)
 	}));
 }
+function periodicReportView(value) {
+	const report = object(value);
+	const subject = object(report.subject);
+	const period = object(report.period);
+	const sections = object(report.sections);
+	const recommendation = object(report.recommendation || sections.recommendation);
+	const performance = object(object(sections.performance_and_positions).performance);
+	const operations = object(sections.operations_and_motives);
+	return {
+		...report,
+		report_id: text(report.report_id, ""),
+		status: statusValue(report.status || "ready"),
+		subject: {
+			type: ["portfolio", "instrument"].includes(subject.type) ? subject.type : "unknown",
+			id: text(subject.id, ""),
+			name: text(subject.name, subject.id)
+		},
+		period: {
+			type: text(period.type, "unknown"),
+			start: period.start ?? null,
+			end: period.end ?? null,
+			report_cutoff_at: period.report_cutoff_at ?? null
+		},
+		headline: text(report.headline, "周期报告缺少结论摘要"),
+		recommendation,
+		performance,
+		operation_count: Number(report.operation_count ?? operations.operation_count ?? 0),
+		sections
+	};
+}
 function interpretationTargets(detail) {
 	const sections = object(detail.interpretation_sections);
 	const targets = [];
@@ -14988,10 +15019,15 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 	if (!root || document.getElementById("investmentReviewSection")) return null;
 	const readOnlyMode = readOnly === true;
 	const state = {
+		periodicReports: [],
+		periodicTotalCount: 0,
+		periodicSubject: "all",
+		periodicPeriod: "daily",
 		reviews: [],
 		totalCount: 0,
 		health: null,
 		selected: null,
+		selectedPeriodic: null,
 		requestVersion: 0,
 		scope: "all",
 		status: "all"
@@ -15023,6 +15059,35 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 	const healthLine = element("div", "investment-review-health-line", "复盘健康状态正在读取");
 	healthLine.id = "investmentReviewHealthLine";
 	healthLine.setAttribute("role", "status");
+	const periodicHeading = element("div", "investment-review-subheading");
+	periodicHeading.append(element("p", "section-kicker", "PERIODIC REPORTS"), element("h3", "", "周期报告"));
+	const periodicControls = element("div", "investment-review-controls");
+	const periodicSubjectSelect = element("select", "investment-review-select");
+	periodicSubjectSelect.setAttribute("aria-label", "按报告对象筛选周期报告");
+	[
+		["all", "组合与标的"],
+		["portfolio", "组合"],
+		["instrument", "单标的"]
+	].forEach(([value, label]) => {
+		const option = element("option", "", label);
+		option.value = value;
+		periodicSubjectSelect.appendChild(option);
+	});
+	const periodicPeriodSelect = element("select", "investment-review-select");
+	periodicPeriodSelect.setAttribute("aria-label", "按周期筛选报告");
+	[["daily", "日报"]].forEach(([value, label]) => {
+		const option = element("option", "", label);
+		option.value = value;
+		periodicPeriodSelect.appendChild(option);
+	});
+	periodicControls.append(periodicSubjectSelect, periodicPeriodSelect);
+	const periodicListStatus = element("p", "investment-review-list-status", "正在读取周期报告");
+	periodicListStatus.id = "investmentReviewPeriodicListStatus";
+	periodicListStatus.setAttribute("role", "status");
+	const periodicList = element("ol", "investment-review-list");
+	periodicList.id = "investmentReviewPeriodicList";
+	const evidenceHeading = element("div", "investment-review-subheading");
+	evidenceHeading.append(element("p", "section-kicker", "OPERATION EVIDENCE"), element("h3", "", "操作级证据复盘"));
 	const controls = element("div", "investment-review-controls");
 	const scopeSelect = element("select", "investment-review-select");
 	scopeSelect.setAttribute("aria-label", "按运行范围筛选复盘");
@@ -15049,7 +15114,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 	listStatus.setAttribute("role", "status");
 	const list = element("ol", "investment-review-list");
 	list.id = "investmentReviewList";
-	content.append(acceptanceBoundary, healthLine, controls, listStatus, list);
+	content.append(acceptanceBoundary, healthLine, periodicHeading, periodicControls, periodicListStatus, periodicList, evidenceHeading, controls, listStatus, list);
 	section.append(heading, content);
 	const holdings = root.querySelector(".holdings-section");
 	root.insertBefore(section, holdings || null);
@@ -15098,6 +15163,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 	const closeDrawer = () => {
 		state.requestVersion += 1;
 		state.selected = null;
+		state.selectedPeriodic = null;
 		closeEvidence();
 		backdrop.hidden = true;
 		drawer.classList.remove("is-open");
@@ -15131,9 +15197,35 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		const lag = object(health.lag);
 		const fees = object(health.fees);
 		const reviews = object(health.reviews);
+		const periodicReports = object(health.periodic_reports);
 		const automation = object(health.automation);
 		healthLine.replaceChildren();
-		healthLine.append(element("span", "", `source ${text(counts.source_seen ?? counts.source, "unknown")}`), element("span", "", `sidecar ${text(counts.sidecar_seen ?? counts.sidecar, "unknown")}`), element("span", "", `unsynced ${text(lag.unsynced ?? counts.unsynced, "unknown")}`), element("span", "", `fees actual ${text(fees.actual, "0")} / estimated ${text(fees.estimated, "0")} / unknown ${text(fees.unknown, "0")}`), element("span", "", `reviews ${text(reviews.count ?? reviews.review_count, state.reviews.length)}`), element("span", "", `automation ${text(automation.state, "disabled")}`), element("span", "", `auto_completed ${projectedTime(automation.last_completed)}`), element("span", "", `auto_success ${projectedTime(automation.last_success)}`), element("span", "", `auto_failure ${projectedTime(automation.last_failure)}`), element("span", "", `last_success ${projectedTime(health.last_success)}`), element("span", "", `last_failure ${projectedTime(health.last_failure)}`), element("span", "", `boundary ${boundaryText(health.boundary)}`));
+		healthLine.append(element("span", "", `source ${text(counts.source_seen ?? counts.source, "unknown")}`), element("span", "", `sidecar ${text(counts.sidecar_seen ?? counts.sidecar, "unknown")}`), element("span", "", `unsynced ${text(lag.unsynced ?? counts.unsynced, "unknown")}`), element("span", "", `fees actual ${text(fees.actual, "0")} / estimated ${text(fees.estimated, "0")} / unknown ${text(fees.unknown, "0")}`), element("span", "", `reviews ${text(reviews.count ?? reviews.review_count, state.reviews.length)}`), element("span", "", `periodic ${text(periodicReports.count, state.periodicReports.length)}`), element("span", "", `automation ${text(automation.state, "disabled")}`), element("span", "", `auto_completed ${projectedTime(automation.last_completed)}`), element("span", "", `auto_success ${projectedTime(automation.last_success)}`), element("span", "", `auto_failure ${projectedTime(automation.last_failure)}`), element("span", "", `last_success ${projectedTime(health.last_success)}`), element("span", "", `last_failure ${projectedTime(health.last_failure)}`), element("span", "", `boundary ${boundaryText(health.boundary)}`));
+	}
+	function renderPeriodicList() {
+		periodicList.replaceChildren();
+		const filtered = state.periodicReports.filter((report) => (state.periodicSubject === "all" || report.subject.type === state.periodicSubject) && report.period.type === state.periodicPeriod);
+		periodicListStatus.textContent = state.periodicTotalCount > state.periodicReports.length ? `${filtered.length} / 已载入 ${state.periodicReports.length} / 总计 ${state.periodicTotalCount} 份周期报告` : `${filtered.length} / ${state.periodicReports.length} 份周期报告`;
+		if (!filtered.length) {
+			periodicList.appendChild(element("li", "investment-review-empty", "当前筛选下没有周期报告；P1 只生成已验证的真实日报样板。"));
+			return;
+		}
+		filtered.forEach((reportValue) => {
+			const report = periodicReportView(reportValue);
+			const row = element("li", "investment-review-list-item");
+			const button = actionButton("", "investment-review-list-button");
+			const top = element("div", "investment-review-list-top");
+			const identity = element("div");
+			identity.append(element("strong", "", report.subject.name), element("span", "investment-review-mono", `${report.period.type} · ${text(report.period.end)}`));
+			top.append(identity, statusBadge(report.status));
+			const recommendation = object(report.recommendation);
+			const target = object(recommendation.target_position);
+			button.append(top, element("p", "investment-review-list-meta", `${report.subject.type} · operations ${report.operation_count} · cutoff ${projectedTime(report.period.report_cutoff_at)}`), element("p", "investment-review-list-conclusion", report.headline), element("p", "investment-review-list-gaps", `建议 ${text(recommendation.action)} · ${text(target.target_position_note, "仓位精度受缺失数据限制")}`));
+			button.disabled = !report.report_id;
+			button.addEventListener("click", () => void openPeriodicReport(report));
+			row.appendChild(button);
+			periodicList.appendChild(row);
+		});
 	}
 	function renderList() {
 		list.replaceChildren();
@@ -15499,6 +15591,104 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		block.body.appendChild(form);
 		return block;
 	}
+	function renderPeriodicDetail(value) {
+		const report = periodicReportView(value);
+		const sections = object(report.sections);
+		const facts = object(sections.performance_and_positions);
+		const performance = object(facts.performance);
+		const risk = object(facts.risk_change);
+		const operations = values(object(sections.operations_and_motives).operations);
+		const recommendation = object(sections.recommendation);
+		const limitations = object(sections.risks_invalidation_and_missing);
+		drawerContent.replaceChildren();
+		const header = element("header", "investment-review-drawer-heading");
+		header.append(element("p", "section-kicker", "PERIODIC REVIEW"), element("h2", "", `${report.subject.name} · ${text(report.period.end)} 日报`), element("p", "investment-review-mono", report.report_id), statusBadge(report.status));
+		header.querySelector("h2").id = "investmentReviewDrawerTitle";
+		drawerContent.append(header, element("p", "investment-review-gap-summary", report.headline));
+		const performanceBlock = sectionBlock("收益、持仓、现金和风险变化", "PERIOD FACTS");
+		appendPairs(performanceBlock.body, [
+			["期初总资产", performance.start_total_assets_cny],
+			["期末总资产", performance.end_total_assets_cny],
+			["资产变动", `${text(performance.asset_change_cny)} / ${text(performance.asset_change_pct)}%`],
+			["现金权重", `${text(risk.cash_weight_pct)}%`],
+			["最大单一标的", `${text(risk.top_position_weight_pct)}%`],
+			["前三大合计", `${text(risk.top3_weight_pct)}%`],
+			["集中度", risk.concentration_status]
+		]);
+		const positionDetails = element("details", "investment-review-structured-details");
+		positionDetails.append(element("summary", "", "查看持仓与现金事实"), renderStructured({
+			cash: facts.cash,
+			positions: facts.positions,
+			calculation_method: performance.calculation_method
+		}));
+		performanceBlock.body.appendChild(positionDetails);
+		drawerContent.appendChild(performanceBlock.section);
+		const operationsBlock = sectionBlock("操作与交易动机复盘", "MOTIVE · SYSTEM INFERENCE");
+		if (!operations.length) operationsBlock.body.appendChild(element("p", "investment-review-empty-copy", "本期没有持仓变动操作；表现、风险与建议仍正常生成。"));
+		operations.forEach((operationValue) => {
+			const operation = object(operationValue);
+			const motive = object(operation.motive);
+			const evaluation = object(operation.retrospective_evaluation);
+			const card = element("article", "investment-review-detail-block");
+			const heading = element("header", "investment-review-detail-heading");
+			heading.append(element("strong", "", `${text(operation.side)} ${text(operation.ts_code)}`), element("span", "investment-review-mono", projectedTime(operation.occurred_at)));
+			card.append(heading, element("p", "", `${text(operation.quantity)} 股 × ${text(operation.price_cny)} 元 · 持仓 ${text(operation.quantity_before)} → ${text(operation.quantity_after)} · fee ${text(operation.fee_status)}`), element("p", "investment-review-list-conclusion", `${text(motive.label)} / ${text(motive.confidence, "recorded")}：${text(motive.most_likely_motive, "见已记录 Decision")}`), element("p", "investment-review-list-gaps", `替代解释：${values(motive.alternative_explanations).join("；") || "无"}`), element("p", "", `事后评价：${text(evaluation.narrative)} 毛价差 ${text(evaluation.gross_mark_to_close_cny)} 元`));
+			const evidence = element("details", "investment-review-structured-details");
+			evidence.append(element("summary", "", "查看推断依据、缺失信息和时间边界"), renderStructured({
+				input_cutoff_at: motive.input_cutoff_at,
+				uses_later_information: motive.uses_later_information,
+				supporting_observations: motive.supporting_observations,
+				important_missing_information: motive.important_missing_information
+			}));
+			card.appendChild(evidence);
+			operationsBlock.body.appendChild(card);
+		});
+		drawerContent.appendChild(operationsBlock.section);
+		const recommendationBlock = sectionBlock("个性化交易建议与建议仓位", "RECOMMENDATION · NOT AN ORDER");
+		recommendationBlock.body.append(element("span", "investment-review-mono", `confidence ${text(recommendation.confidence)}`), element("h3", "", `${text(recommendation.action).toUpperCase()} · ${text(object(recommendation.target_position).target_position_note)}`), element("p", "", `期限：${text(recommendation.time_horizon)}`));
+		values(recommendation.rationale).forEach((itemValue) => {
+			const item = object(itemValue);
+			recommendationBlock.body.appendChild(element("p", "", `${text(item.type)}：${text(item.text)}`));
+		});
+		recommendationBlock.body.appendChild(renderStructured({
+			major_downside_risks: recommendation.major_downside_risks,
+			invalidation_conditions: recommendation.invalidation_conditions,
+			important_missing_inputs: recommendation.important_missing_inputs,
+			data_timestamp: recommendation.data_timestamp,
+			orders_executed: recommendation.orders_executed,
+			guaranteed_return: recommendation.guaranteed_return
+		}));
+		drawerContent.appendChild(recommendationBlock.section);
+		const limitationsBlock = sectionBlock("风险、失效条件和数据缺失", "LIMITATIONS");
+		limitationsBlock.body.appendChild(renderStructured(limitations));
+		drawerContent.appendChild(limitationsBlock.section);
+	}
+	async function openPeriodicReport(report, { preserveOpen = false } = {}) {
+		const reportId = text(report.report_id, "");
+		if (!reportId) return;
+		const version = state.requestVersion + 1;
+		state.requestVersion = version;
+		state.selected = null;
+		state.selectedPeriodic = report;
+		if (!preserveOpen) {
+			backdrop.hidden = false;
+			drawer.hidden = false;
+			drawer.inert = false;
+			drawer.classList.add("is-open");
+			drawer.setAttribute("aria-hidden", "false");
+			document.body.classList.add("investment-review-open");
+			closeButton.focus();
+		}
+		drawerContent.replaceChildren(element("p", "investment-review-loading", "正在读取周期报告"));
+		try {
+			const payload = await request(`${REVIEW_API_ROOT}/periodic-report?${new URLSearchParams({ report_id: reportId }).toString()}`);
+			if (version !== state.requestVersion) return;
+			renderPeriodicDetail(object(unwrap(payload).report));
+		} catch (error) {
+			if (version !== state.requestVersion) return;
+			drawerContent.replaceChildren(element("h2", "", report.subject.name), statusBadge("failed"), element("p", "investment-review-warning", `periodic-report: ${error.message || "failed"}`));
+		}
+	}
 	function renderDetail(review, responses) {
 		const detail = unwrap(responses.review);
 		const timeline = unwrap(responses.timeline);
@@ -15547,6 +15737,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		const version = state.requestVersion + 1;
 		state.requestVersion = version;
 		state.selected = review;
+		state.selectedPeriodic = null;
 		if (!preserveOpen) {
 			backdrop.hidden = false;
 			drawer.hidden = false;
@@ -15586,6 +15777,20 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		}
 		renderHealth();
 	}
+	async function loadPeriodicReports() {
+		periodicListStatus.textContent = "正在读取周期报告";
+		try {
+			const data = unwrap(await request(`${REVIEW_API_ROOT}/periodic-reports?period_type=daily&limit=200`));
+			state.periodicReports = values(data.reports).map(periodicReportView);
+			state.periodicTotalCount = Number(data.total_count ?? state.periodicReports.length);
+			renderPeriodicList();
+		} catch (error) {
+			state.periodicReports = [];
+			state.periodicTotalCount = 0;
+			periodicListStatus.textContent = `failed · ${error.message}`;
+			periodicList.replaceChildren(element("li", "investment-review-empty", "周期报告 API 不可用；操作级证据复盘仍可独立使用。"));
+		}
+	}
 	async function loadReviews() {
 		listStatus.textContent = "正在读取复盘列表";
 		try {
@@ -15604,12 +15809,24 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 	const refresh = async () => {
 		refreshButton.disabled = true;
 		try {
-			await Promise.all([loadHealth(), loadReviews()]);
+			await Promise.all([
+				loadHealth(),
+				loadPeriodicReports(),
+				loadReviews()
+			]);
 		} finally {
 			refreshButton.disabled = false;
 		}
 	};
 	refreshButton.addEventListener("click", () => void refresh());
+	periodicSubjectSelect.addEventListener("change", () => {
+		state.periodicSubject = periodicSubjectSelect.value;
+		renderPeriodicList();
+	});
+	periodicPeriodSelect.addEventListener("change", () => {
+		state.periodicPeriod = periodicPeriodSelect.value;
+		renderPeriodicList();
+	});
 	scopeSelect.addEventListener("change", () => {
 		state.scope = scopeSelect.value;
 		renderList();

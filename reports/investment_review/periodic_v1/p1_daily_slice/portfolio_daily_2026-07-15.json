@@ -1,0 +1,1205 @@
+{
+  "schema_version": "investment_review.periodic_report.v1",
+  "report_id": "periodic_dd724753590fb15defdee6c87864c014",
+  "status": "ready",
+  "subject": {
+    "type": "portfolio",
+    "id": "default",
+    "name": "组合账户"
+  },
+  "period": {
+    "type": "daily",
+    "start": "2026-07-15",
+    "end": "2026-07-15",
+    "report_cutoff_at": "2026-07-15T20:30:30+08:00"
+  },
+  "generated_at": "2026-07-15T12:30:30+00:00",
+  "headline": "组合当日资产变动 3.22%，现金权重 0.57%；建议 reduce，优先降低集中度并保留现金缓冲。",
+  "sections": {
+    "performance_and_positions": {
+      "performance": {
+        "type": "fact",
+        "comparison_date": "2026-07-14",
+        "start_total_assets_cny": "457388",
+        "end_total_assets_cny": "472107.1",
+        "asset_change_cny": "14719.1",
+        "asset_change_pct": "3.22",
+        "cash_change_cny": "-8660",
+        "valuation_complete": true,
+        "calculation_method": "期末总资产减上一交易日总资产；当日无外部资金流证据时作为资产变动，手续费待补会降低精度。",
+        "source_refs": [
+          "portfolio.sqlite3#ledger_entries",
+          "portfolio.sqlite3#close_prices",
+          "portfolio.sqlite3#cash_balance_snapshots"
+        ]
+      },
+      "cash": {
+        "amount_cny": "2697",
+        "as_of_date": "2026-07-15",
+        "source": "statement_calculated",
+        "status": "LOW_CONFIDENCE",
+        "fee_pending": true,
+        "note": "statement_cash_replay; anchor_snapshot_id=7de3e9bc-4927-4632-aecc-5e1cdcd54f42; anchor_as_of=2026-07-14; ledger_entries=10; cash_change=-8660; fee_pending_entries=10; calculation_status=fee_pending; ledger_fingerprint=7bc48a25e4a662494cd2243b06892abdd35b612ad733f0bf220ab4074848b280",
+        "recorded_at": "2026-07-15T12:30:30+00:00",
+        "source_ref": "portfolio.sqlite3#cash_balance_snapshots:e694beb7-5be3-4474-9126-0e35fd804f00"
+      },
+      "positions": [
+        {
+          "ts_code": "002997.SZ",
+          "name": "瑞鹄模具",
+          "asset_type": "equity",
+          "industry_name": "汽车配件",
+          "quantity": "5200",
+          "average_cost_cny": "32.4005",
+          "remaining_cost_cny": "168482.46",
+          "close_cny": "27.6",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "143520",
+          "unrealized_pnl_cny": "-24962.46",
+          "unrealized_return_pct": "-14.82",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:002997.SZ:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:002997.SZ:2026-07-15"
+          ],
+          "portfolio_weight_pct": "30.4"
+        },
+        {
+          "ts_code": "002558.SZ",
+          "name": "巨人网络",
+          "asset_type": "equity",
+          "industry_name": "互联网",
+          "quantity": "3600",
+          "average_cost_cny": "26.9429",
+          "remaining_cost_cny": "96994.58",
+          "close_cny": "29.56",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "106416",
+          "unrealized_pnl_cny": "9421.42",
+          "unrealized_return_pct": "9.71",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:002558.SZ:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:002558.SZ:2026-07-15"
+          ],
+          "portfolio_weight_pct": "22.54"
+        },
+        {
+          "ts_code": "000813.SZ",
+          "name": "德展健康",
+          "asset_type": "equity",
+          "industry_name": "医药生物",
+          "quantity": "17200",
+          "average_cost_cny": "5.8586",
+          "remaining_cost_cny": "100768",
+          "close_cny": "3.45",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "59340",
+          "unrealized_pnl_cny": "-41428",
+          "unrealized_return_pct": "-41.11",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:000813.SZ:2026-07-15"
+          ],
+          "portfolio_weight_pct": "12.57"
+        },
+        {
+          "ts_code": "159792.SZ",
+          "name": "港股通互联网ETF富国",
+          "asset_type": "etf",
+          "industry_name": "互联网",
+          "quantity": "98700",
+          "average_cost_cny": "0.6771",
+          "remaining_cost_cny": "66827.89",
+          "close_cny": "0.599",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.fund_daily",
+          "market_value_cny": "59121.3",
+          "unrealized_pnl_cny": "-7706.59",
+          "unrealized_return_pct": "-11.53",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:159792.SZ:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:159792.SZ:2026-07-15"
+          ],
+          "portfolio_weight_pct": "12.52"
+        },
+        {
+          "ts_code": "159892.SZ",
+          "name": "恒生医药ETF华夏",
+          "asset_type": "etf",
+          "industry_name": "医药生物",
+          "quantity": "41600",
+          "average_cost_cny": "0.6998",
+          "remaining_cost_cny": "29111.9",
+          "close_cny": "0.748",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.fund_daily",
+          "market_value_cny": "31116.8",
+          "unrealized_pnl_cny": "2004.9",
+          "unrealized_return_pct": "6.89",
+          "realized_pnl_to_date_cny": "2430.6",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:159892.SZ:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:159892.SZ:2026-07-15"
+          ],
+          "portfolio_weight_pct": "6.59"
+        },
+        {
+          "ts_code": "600030.SH",
+          "name": "中信证券",
+          "asset_type": "equity",
+          "industry_name": "证券",
+          "quantity": "500",
+          "average_cost_cny": "27.8303",
+          "remaining_cost_cny": "13915.14",
+          "close_cny": "28.6",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "14300",
+          "unrealized_pnl_cny": "384.86",
+          "unrealized_return_pct": "2.77",
+          "realized_pnl_to_date_cny": "1016.53",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:600030.SH:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:600030.SH:2026-07-15"
+          ],
+          "portfolio_weight_pct": "3.03"
+        },
+        {
+          "ts_code": "601888.SH",
+          "name": "中国中免",
+          "asset_type": "equity",
+          "industry_name": "旅游服务",
+          "quantity": "200",
+          "average_cost_cny": "73.46",
+          "remaining_cost_cny": "14692",
+          "close_cny": "54.41",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "10882",
+          "unrealized_pnl_cny": "-3810",
+          "unrealized_return_pct": "-25.93",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:601888.SH:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:601888.SH:2026-07-15"
+          ],
+          "portfolio_weight_pct": "2.3"
+        },
+        {
+          "ts_code": "002352.SZ",
+          "name": "顺丰控股",
+          "asset_type": "equity",
+          "industry_name": "仓储物流",
+          "quantity": "200",
+          "average_cost_cny": "36.6254",
+          "remaining_cost_cny": "7325.07",
+          "close_cny": "33.48",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "6696",
+          "unrealized_pnl_cny": "-629.07",
+          "unrealized_return_pct": "-8.59",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:002352.SZ:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:002352.SZ:2026-07-15"
+          ],
+          "portfolio_weight_pct": "1.42"
+        },
+        {
+          "ts_code": "600600.SH",
+          "name": "青岛啤酒",
+          "asset_type": "equity",
+          "industry_name": "啤酒",
+          "quantity": "100",
+          "average_cost_cny": "67.5736",
+          "remaining_cost_cny": "6757.36",
+          "close_cny": "54.94",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "5494",
+          "unrealized_pnl_cny": "-1263.36",
+          "unrealized_return_pct": "-18.7",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:600600.SH:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:600600.SH:2026-07-15"
+          ],
+          "portfolio_weight_pct": "1.16"
+        },
+        {
+          "ts_code": "601985.SH",
+          "name": "中国核电",
+          "asset_type": "equity",
+          "industry_name": "新型电力",
+          "quantity": "600",
+          "average_cost_cny": "9.2184",
+          "remaining_cost_cny": "5531.06",
+          "close_cny": "8.96",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "5376",
+          "unrealized_pnl_cny": "-155.06",
+          "unrealized_return_pct": "-2.8",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:601985.SH:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:601985.SH:2026-07-15"
+          ],
+          "portfolio_weight_pct": "1.14"
+        },
+        {
+          "ts_code": "601333.SH",
+          "name": "广深铁路",
+          "asset_type": "equity",
+          "industry_name": "铁路",
+          "quantity": "1600",
+          "average_cost_cny": "3.04",
+          "remaining_cost_cny": "4864",
+          "close_cny": "3",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "4800",
+          "unrealized_pnl_cny": "-64",
+          "unrealized_return_pct": "-1.32",
+          "realized_pnl_to_date_cny": "481.1",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:601333.SH:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:601333.SH:2026-07-15"
+          ],
+          "portfolio_weight_pct": "1.02"
+        },
+        {
+          "ts_code": "601021.SH",
+          "name": "春秋航空",
+          "asset_type": "equity",
+          "industry_name": "空运",
+          "quantity": "100",
+          "average_cost_cny": "55.02",
+          "remaining_cost_cny": "5502",
+          "close_cny": "45.99",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "4599",
+          "unrealized_pnl_cny": "-903",
+          "unrealized_return_pct": "-16.41",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:601021.SH:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:601021.SH:2026-07-15"
+          ],
+          "portfolio_weight_pct": "0.97"
+        },
+        {
+          "ts_code": "600132.SH",
+          "name": "重庆啤酒",
+          "asset_type": "equity",
+          "industry_name": "啤酒",
+          "quantity": "100",
+          "average_cost_cny": "53.11",
+          "remaining_cost_cny": "5311",
+          "close_cny": "43.28",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "4328",
+          "unrealized_pnl_cny": "-983",
+          "unrealized_return_pct": "-18.51",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:600132.SH:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:600132.SH:2026-07-15"
+          ],
+          "portfolio_weight_pct": "0.92"
+        },
+        {
+          "ts_code": "513330.SH",
+          "name": "恒生互联网ETF华夏",
+          "asset_type": "etf",
+          "industry_name": "互联网",
+          "quantity": "11000",
+          "average_cost_cny": "0.5419",
+          "remaining_cost_cny": "5961",
+          "close_cny": "0.387",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.fund_daily",
+          "market_value_cny": "4257",
+          "unrealized_pnl_cny": "-1704",
+          "unrealized_return_pct": "-28.59",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:513330.SH:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:513330.SH:2026-07-15"
+          ],
+          "portfolio_weight_pct": "0.9"
+        },
+        {
+          "ts_code": "000786.SZ",
+          "name": "北新建材",
+          "asset_type": "equity",
+          "industry_name": "其他建材",
+          "quantity": "200",
+          "average_cost_cny": "23.185",
+          "remaining_cost_cny": "4637",
+          "close_cny": "17.75",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "3550",
+          "unrealized_pnl_cny": "-1087",
+          "unrealized_return_pct": "-23.44",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:000786.SZ:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:000786.SZ:2026-07-15"
+          ],
+          "portfolio_weight_pct": "0.75"
+        },
+        {
+          "ts_code": "603833.SH",
+          "name": "欧派家居",
+          "asset_type": "equity",
+          "industry_name": "家居用品",
+          "quantity": "100",
+          "average_cost_cny": "50.833",
+          "remaining_cost_cny": "5083.3",
+          "close_cny": "32.14",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "3214",
+          "unrealized_pnl_cny": "-1869.3",
+          "unrealized_return_pct": "-36.77",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:603833.SH:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:603833.SH:2026-07-15"
+          ],
+          "portfolio_weight_pct": "0.68"
+        },
+        {
+          "ts_code": "002572.SZ",
+          "name": "索菲亚",
+          "asset_type": "equity",
+          "industry_name": "家居用品",
+          "quantity": "300",
+          "average_cost_cny": "12.6",
+          "remaining_cost_cny": "3780",
+          "close_cny": "8",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "2400",
+          "unrealized_pnl_cny": "-1380",
+          "unrealized_return_pct": "-36.51",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:002572.SZ:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:002572.SZ:2026-07-15"
+          ],
+          "portfolio_weight_pct": "0.51"
+        }
+      ],
+      "risk_change": {
+        "type": "fact_and_inference",
+        "cash_weight_pct": "0.57",
+        "top_position_weight_pct": "30.4",
+        "top3_weight_pct": "65.51",
+        "concentration_status": "HIGH",
+        "missing_prices": [],
+        "cash_status": "LOW_CONFIDENCE"
+      }
+    },
+    "operations_and_motives": {
+      "operation_count": 10,
+      "operations": [
+        {
+          "operation_id": "operation_e3bf53488fcfb15f173cbb71",
+          "event_id": "evt_periodic_5e2f72a3c70e8904e4655f6a175406ed",
+          "episode_id": "te_d74c04117bf7f46f44544606803e33b0",
+          "episode_status": "open",
+          "occurred_at": "2026-07-15T01:32:00Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "buy",
+          "side": "BUY",
+          "ts_code": "002558.SZ",
+          "name": "巨人网络",
+          "quantity": "200",
+          "price_cny": "26.24",
+          "gross_amount_cny": "5248",
+          "fee_cny": null,
+          "fee_status": "MISSING",
+          "quantity_before": "3400",
+          "quantity_after": "3600",
+          "operation_role": "add",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:962",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_e3bf53488fcfb15f173cbb71",
+            "input_cutoff_at": "2026-07-15T01:32:00Z",
+            "most_likely_motive": "最可能是在回撤中补仓，尝试降低持仓成本或恢复目标仓位。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "add 200 股，成交价 26.24 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:962",
+                "observed_at": "2026-07-15T01:32:00Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 26.87 元，成交价相对其变动 -2.34%",
+                "source_ref": "portfolio.sqlite3#close_prices:002558.SZ:2026-07-14:19",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 21.29%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-15T01:32:00Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是长期配置或现金再平衡，而非基于短线价格判断。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_INTRADAY_MARKET_CONTEXT",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "reasonable",
+            "gross_mark_to_close_cny": "664",
+            "fee_status": "MISSING",
+            "narrative": "按当日收盘价回看，成交方向获得了正的毛价差。 手续费缺失，不能把毛价差当作真实净收益。"
+          }
+        },
+        {
+          "operation_id": "operation_f3be1fd57fda2d9246c294f1",
+          "event_id": "evt_periodic_6f67e40d657baa6ac9001e9196ff371f",
+          "episode_id": "te_d423cfe1b64873938d5598be9ae39f4e",
+          "episode_status": "open",
+          "occurred_at": "2026-07-15T01:38:45Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "buy",
+          "side": "BUY",
+          "ts_code": "000813.SZ",
+          "name": "德展健康",
+          "quantity": "1700",
+          "price_cny": "3.41",
+          "gross_amount_cny": "5797",
+          "fee_cny": null,
+          "fee_status": "MISSING",
+          "quantity_before": "17200",
+          "quantity_after": "18900",
+          "operation_role": "add",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:963",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_f3be1fd57fda2d9246c294f1",
+            "input_cutoff_at": "2026-07-15T01:38:45Z",
+            "most_likely_motive": "最可能是顺势加仓或建立日内试仓，尝试延续操作前已可见的上涨。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "add 1700 股，成交价 3.41 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:963",
+                "observed_at": "2026-07-15T01:38:45Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 3.37 元，成交价相对其变动 1.19%",
+                "source_ref": "portfolio.sqlite3#close_prices:000813.SZ:2026-07-14:13",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 12.57%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-15T01:38:45Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是长期仓位补回或被动再平衡，现有数据无法证明追涨动机。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_INTRADAY_MARKET_CONTEXT",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "reasonable",
+            "gross_mark_to_close_cny": "68",
+            "fee_status": "MISSING",
+            "narrative": "按当日收盘价回看，成交方向获得了正的毛价差。 手续费缺失，不能把毛价差当作真实净收益。"
+          }
+        },
+        {
+          "operation_id": "operation_dfa8ba75c7ed9efe745dc6c7",
+          "event_id": "evt_periodic_a883ca4db0e2ded8c5c792e003fa9c29",
+          "episode_id": "te_51a2aa34b240f93a2c5dc81bcac62df2",
+          "episode_status": "closed",
+          "occurred_at": "2026-07-15T02:01:42Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "sell",
+          "side": "SELL",
+          "ts_code": "002463.SZ",
+          "name": "002463.SZ",
+          "quantity": "100",
+          "price_cny": "140.33",
+          "gross_amount_cny": "14033",
+          "fee_cny": null,
+          "fee_status": "MISSING",
+          "quantity_before": "100",
+          "quantity_after": "0",
+          "operation_role": "exit",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:964",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_dfa8ba75c7ed9efe745dc6c7",
+            "input_cutoff_at": "2026-07-15T02:01:42Z",
+            "most_likely_motive": "最可能是在上涨中降低仓位风险或兑现一部分利润。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "exit 100 股，成交价 140.33 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:964",
+                "observed_at": "2026-07-15T02:01:42Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 137.13 元，成交价相对其变动 2.33%",
+                "source_ref": "portfolio.sqlite3#close_prices:002463.SZ:2026-07-14:18",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是组合再平衡或现金需要，与价格判断无关。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_INTRADAY_MARKET_CONTEXT",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "reasonable",
+            "gross_mark_to_close_cny": "320",
+            "fee_status": "MISSING",
+            "narrative": "按当日收盘价回看，成交方向获得了正的毛价差。 手续费缺失，不能把毛价差当作真实净收益。"
+          }
+        },
+        {
+          "operation_id": "operation_cfc86fabc78d9cd8a7531aed",
+          "event_id": "evt_periodic_cdb80e783d25a67f25e14aca0592ad3b",
+          "episode_id": "te_d423cfe1b64873938d5598be9ae39f4e",
+          "episode_status": "open",
+          "occurred_at": "2026-07-15T02:01:57Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "buy",
+          "side": "BUY",
+          "ts_code": "000813.SZ",
+          "name": "德展健康",
+          "quantity": "4100",
+          "price_cny": "3.48",
+          "gross_amount_cny": "14268",
+          "fee_cny": null,
+          "fee_status": "MISSING",
+          "quantity_before": "18900",
+          "quantity_after": "23000",
+          "operation_role": "add",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:965",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_cfc86fabc78d9cd8a7531aed",
+            "input_cutoff_at": "2026-07-15T02:01:57Z",
+            "most_likely_motive": "在已有同日买入后继续分批加仓，最可能是在确认盘中强度后扩大试仓。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "add 4100 股，成交价 3.48 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:965",
+                "observed_at": "2026-07-15T02:01:57Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 3.37 元，成交价相对其变动 3.26%",
+                "source_ref": "portfolio.sqlite3#close_prices:000813.SZ:2026-07-14:13",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              },
+              {
+                "type": "fact",
+                "text": "本次操作前同日已有 1 笔该标的操作",
+                "source_ref": "portfolio.sqlite3#ledger_entries:963",
+                "observed_at": "2026-07-15T02:01:57Z"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 13.81%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-15T02:01:57Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能只是拆单执行既定买入数量，并不代表新的判断。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_INTRADAY_MARKET_CONTEXT",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "needs_improvement",
+            "gross_mark_to_close_cny": "-123",
+            "fee_status": "MISSING",
+            "narrative": "按当日收盘价回看，成交方向产生了负的毛价差。 手续费缺失，不能把毛价差当作真实净收益。"
+          }
+        },
+        {
+          "operation_id": "operation_7a88627d20e969bd2c5b97de",
+          "event_id": "evt_periodic_f71ac23fd4bf6a5fcc89b6022d832aa6",
+          "episode_id": "te_d423cfe1b64873938d5598be9ae39f4e",
+          "episode_status": "open",
+          "occurred_at": "2026-07-15T02:32:42Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "sell",
+          "side": "SELL",
+          "ts_code": "000813.SZ",
+          "name": "德展健康",
+          "quantity": "5800",
+          "price_cny": "3.46",
+          "gross_amount_cny": "20068",
+          "fee_cny": null,
+          "fee_status": "MISSING",
+          "quantity_before": "23000",
+          "quantity_after": "17200",
+          "operation_role": "reduce",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:966",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_7a88627d20e969bd2c5b97de",
+            "input_cutoff_at": "2026-07-15T02:32:42Z",
+            "most_likely_motive": "最可能是撤回当日新增仓位、控制盘中风险，或完成一次短线做 T。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "reduce 5800 股，成交价 3.46 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:966",
+                "observed_at": "2026-07-15T02:32:42Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 3.37 元，成交价相对其变动 2.67%",
+                "source_ref": "portfolio.sqlite3#close_prices:000813.SZ:2026-07-14:13",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              },
+              {
+                "type": "fact",
+                "text": "本次操作前同日已有 2 笔该标的操作",
+                "source_ref": "portfolio.sqlite3#ledger_entries:963,portfolio.sqlite3#ledger_entries:965",
+                "observed_at": "2026-07-15T02:32:42Z"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 16.81%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-15T02:32:42Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是预设拆单卖出或现金调度，不能据此认定实际交易意图。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_INTRADAY_MARKET_CONTEXT",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "reasonable",
+            "gross_mark_to_close_cny": "58",
+            "fee_status": "MISSING",
+            "narrative": "按当日收盘价回看，成交方向获得了正的毛价差。 手续费缺失，不能把毛价差当作真实净收益。"
+          }
+        },
+        {
+          "operation_id": "operation_9c37a355ed29b3cfc55bdfb8",
+          "event_id": "evt_periodic_ade8c79124cff4b6bc307ee94de93ed3",
+          "episode_id": "te_45031e9996e398c591670df9afb9cf9d",
+          "episode_status": "open",
+          "occurred_at": "2026-07-15T02:34:06Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "buy",
+          "side": "BUY",
+          "ts_code": "002997.SZ",
+          "name": "瑞鹄模具",
+          "quantity": "200",
+          "price_cny": "27.77",
+          "gross_amount_cny": "5554",
+          "fee_cny": null,
+          "fee_status": "MISSING",
+          "quantity_before": "4400",
+          "quantity_after": "4600",
+          "operation_role": "add",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:967",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_9c37a355ed29b3cfc55bdfb8",
+            "input_cutoff_at": "2026-07-15T02:34:06Z",
+            "most_likely_motive": "最可能是在回撤中补仓，尝试降低持仓成本或恢复目标仓位。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "add 200 股，成交价 27.77 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:967",
+                "observed_at": "2026-07-15T02:34:06Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 27.95 元，成交价相对其变动 -0.64%",
+                "source_ref": "portfolio.sqlite3#close_prices:002997.SZ:2026-07-14:16",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 25.72%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-15T02:34:06Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是长期配置或现金再平衡，而非基于短线价格判断。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_INTRADAY_MARKET_CONTEXT",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "needs_improvement",
+            "gross_mark_to_close_cny": "-34",
+            "fee_status": "MISSING",
+            "narrative": "按当日收盘价回看，成交方向产生了负的毛价差。 手续费缺失，不能把毛价差当作真实净收益。"
+          }
+        },
+        {
+          "operation_id": "operation_1963bd0afb7b3a094f2c30fc",
+          "event_id": "evt_periodic_27580ed321dd38c0c5bd0ca1b87dba86",
+          "episode_id": "te_45031e9996e398c591670df9afb9cf9d",
+          "episode_status": "open",
+          "occurred_at": "2026-07-15T02:34:08Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "buy",
+          "side": "BUY",
+          "ts_code": "002997.SZ",
+          "name": "瑞鹄模具",
+          "quantity": "100",
+          "price_cny": "27.77",
+          "gross_amount_cny": "2777",
+          "fee_cny": null,
+          "fee_status": "MISSING",
+          "quantity_before": "4600",
+          "quantity_after": "4700",
+          "operation_role": "add",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:968",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_1963bd0afb7b3a094f2c30fc",
+            "input_cutoff_at": "2026-07-15T02:34:08Z",
+            "most_likely_motive": "在已有同日买入后继续分批加仓，最可能是在确认盘中强度后扩大试仓。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "add 100 股，成交价 27.77 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:968",
+                "observed_at": "2026-07-15T02:34:08Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 27.95 元，成交价相对其变动 -0.64%",
+                "source_ref": "portfolio.sqlite3#close_prices:002997.SZ:2026-07-14:16",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              },
+              {
+                "type": "fact",
+                "text": "本次操作前同日已有 1 笔该标的操作",
+                "source_ref": "portfolio.sqlite3#ledger_entries:967",
+                "observed_at": "2026-07-15T02:34:08Z"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 26.89%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-15T02:34:08Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能只是拆单执行既定买入数量，并不代表新的判断。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_INTRADAY_MARKET_CONTEXT",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "needs_improvement",
+            "gross_mark_to_close_cny": "-17",
+            "fee_status": "MISSING",
+            "narrative": "按当日收盘价回看，成交方向产生了负的毛价差。 手续费缺失，不能把毛价差当作真实净收益。"
+          }
+        },
+        {
+          "operation_id": "operation_fae882a6a36d56ee5fbd6f3d",
+          "event_id": "evt_periodic_ca369f7ca988362614efcb47ab9b3d0a",
+          "episode_id": "te_5a89b8ef4da6beff11bd2f556cee6326",
+          "episode_status": "closed",
+          "occurred_at": "2026-07-15T02:42:18Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "sell",
+          "side": "SELL",
+          "ts_code": "600674.SH",
+          "name": "600674.SH",
+          "quantity": "100",
+          "price_cny": "15.61",
+          "gross_amount_cny": "1561",
+          "fee_cny": null,
+          "fee_status": "MISSING",
+          "quantity_before": "300",
+          "quantity_after": "200",
+          "operation_role": "reduce",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:969",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_fae882a6a36d56ee5fbd6f3d",
+            "input_cutoff_at": "2026-07-15T02:42:18Z",
+            "most_likely_motive": "最可能是在上涨中降低仓位风险或兑现一部分利润。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "reduce 100 股，成交价 15.61 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:969",
+                "observed_at": "2026-07-15T02:42:18Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 15.3 元，成交价相对其变动 2.03%",
+                "source_ref": "portfolio.sqlite3#close_prices:600674.SH:2026-07-14:8",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是组合再平衡或现金需要，与价格判断无关。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_INTRADAY_MARKET_CONTEXT",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "reasonable",
+            "gross_mark_to_close_cny": "31",
+            "fee_status": "MISSING",
+            "narrative": "按当日收盘价回看，成交方向获得了正的毛价差。 手续费缺失，不能把毛价差当作真实净收益。"
+          }
+        },
+        {
+          "operation_id": "operation_95e41978f7365fa7bc5b138f",
+          "event_id": "evt_periodic_59cd4bb7af7f4dd07ddc60abdda131fe",
+          "episode_id": "te_5a89b8ef4da6beff11bd2f556cee6326",
+          "episode_status": "closed",
+          "occurred_at": "2026-07-15T02:42:18Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "sell",
+          "side": "SELL",
+          "ts_code": "600674.SH",
+          "name": "600674.SH",
+          "quantity": "200",
+          "price_cny": "15.61",
+          "gross_amount_cny": "3122",
+          "fee_cny": null,
+          "fee_status": "MISSING",
+          "quantity_before": "200",
+          "quantity_after": "0",
+          "operation_role": "exit",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:970",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_95e41978f7365fa7bc5b138f",
+            "input_cutoff_at": "2026-07-15T02:42:18Z",
+            "most_likely_motive": "最可能是在上涨中降低仓位风险或兑现一部分利润。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "exit 200 股，成交价 15.61 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:970",
+                "observed_at": "2026-07-15T02:42:18Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 15.3 元，成交价相对其变动 2.03%",
+                "source_ref": "portfolio.sqlite3#close_prices:600674.SH:2026-07-14:8",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              },
+              {
+                "type": "fact",
+                "text": "本次操作前同日已有 1 笔该标的操作",
+                "source_ref": "portfolio.sqlite3#ledger_entries:969",
+                "observed_at": "2026-07-15T02:42:18Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是组合再平衡或现金需要，与价格判断无关。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_INTRADAY_MARKET_CONTEXT",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "reasonable",
+            "gross_mark_to_close_cny": "62",
+            "fee_status": "MISSING",
+            "narrative": "按当日收盘价回看，成交方向获得了正的毛价差。 手续费缺失，不能把毛价差当作真实净收益。"
+          }
+        },
+        {
+          "operation_id": "operation_b34a4e5a9b7177f7707eaec7",
+          "event_id": "evt_periodic_c190d403adc2ce985abba97f2bd591f8",
+          "episode_id": "te_45031e9996e398c591670df9afb9cf9d",
+          "episode_status": "open",
+          "occurred_at": "2026-07-15T05:51:31Z",
+          "source_imported_at": "2026-07-15T12:15:40+00:00",
+          "event_type": "buy",
+          "side": "BUY",
+          "ts_code": "002997.SZ",
+          "name": "瑞鹄模具",
+          "quantity": "500",
+          "price_cny": "27.6",
+          "gross_amount_cny": "13800",
+          "fee_cny": null,
+          "fee_status": "MISSING",
+          "quantity_before": "4700",
+          "quantity_after": "5200",
+          "operation_role": "add",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:971",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_b34a4e5a9b7177f7707eaec7",
+            "input_cutoff_at": "2026-07-15T05:51:31Z",
+            "most_likely_motive": "在已有同日买入后继续分批加仓，最可能是在确认盘中强度后扩大试仓。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "add 500 股，成交价 27.6 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:971",
+                "observed_at": "2026-07-15T05:51:31Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 27.95 元，成交价相对其变动 -1.25%",
+                "source_ref": "portfolio.sqlite3#close_prices:002997.SZ:2026-07-14:16",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              },
+              {
+                "type": "fact",
+                "text": "本次操作前同日已有 2 笔该标的操作",
+                "source_ref": "portfolio.sqlite3#ledger_entries:967,portfolio.sqlite3#ledger_entries:968",
+                "observed_at": "2026-07-15T05:51:31Z"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 27.48%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-15T05:51:31Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能只是拆单执行既定买入数量，并不代表新的判断。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_INTRADAY_MARKET_CONTEXT",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "mixed",
+            "gross_mark_to_close_cny": "0",
+            "fee_status": "MISSING",
+            "narrative": "按当日收盘价回看，毛价差接近零。 手续费缺失，不能把毛价差当作真实净收益。"
+          }
+        }
+      ]
+    },
+    "review_judgments": [
+      {
+        "type": "inference",
+        "status": "needs_improvement",
+        "text": "当日执行评价仅使用成交、收盘价和已知费用；毛价差不能替代真实净收益。",
+        "source_refs": [
+          "portfolio.sqlite3#ledger_entries:962",
+          "portfolio.sqlite3#ledger_entries:963",
+          "portfolio.sqlite3#ledger_entries:964",
+          "portfolio.sqlite3#ledger_entries:965",
+          "portfolio.sqlite3#ledger_entries:966",
+          "portfolio.sqlite3#ledger_entries:967",
+          "portfolio.sqlite3#ledger_entries:968",
+          "portfolio.sqlite3#ledger_entries:969",
+          "portfolio.sqlite3#ledger_entries:970",
+          "portfolio.sqlite3#ledger_entries:971"
+        ]
+      }
+    ],
+    "recommendation": {
+      "type": "analyst_view",
+      "action": "reduce",
+      "target_position": {
+        "target_cash_range_pct": [
+          "5",
+          "10"
+        ],
+        "single_instrument_cap_range_pct": [
+          "15",
+          "20"
+        ],
+        "target_position_note": "把超过 20% 的单一标的降至 15%–20%，并将现金提高至 5%–10%。"
+      },
+      "time_horizon": "下一交易周或下一次实质性信息更新前",
+      "confidence": "medium",
+      "rationale": [
+        {
+          "type": "fact",
+          "text": "当前现金权重约 0.57%。",
+          "source_ref": "portfolio.sqlite3#cash_balance_snapshots+close_prices"
+        },
+        {
+          "type": "fact",
+          "text": "最大单一标的权重约 30.4%，前三大合计约 65.51%。",
+          "source_ref": "portfolio.sqlite3#ledger_entries+close_prices"
+        },
+        {
+          "type": "opinion",
+          "text": "在缺少完整风险预算时，先降低集中度比继续放大方向暴露更稳妥。",
+          "source_ref": "periodic_report:risk_guardrail"
+        }
+      ],
+      "major_downside_risks": [
+        "减仓后标的继续上涨会产生机会成本",
+        "当前建议未纳入公司基本面与估值",
+        "现金数据含 fee_pending，精确比例可能小幅变化"
+      ],
+      "invalidation_conditions": [
+        "用户已有可验证且不同的风险预算或资金安排",
+        "正式账本现金或持仓在报告截止后发生变化",
+        "缺失手续费补齐后显著改变当日现金与执行评价"
+      ],
+      "data_timestamp": "2026-07-15T15:00:00+08:00",
+      "report_cutoff_at": "2026-07-15T20:30:30+08:00",
+      "important_missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT",
+        "MISSING_TRADE_FEES"
+      ],
+      "orders_executed": false,
+      "guaranteed_return": false
+    },
+    "risks_invalidation_and_missing": {
+      "major_risks": [
+        "减仓后标的继续上涨会产生机会成本",
+        "当前建议未纳入公司基本面与估值",
+        "现金数据含 fee_pending，精确比例可能小幅变化"
+      ],
+      "invalidation_conditions": [
+        "用户已有可验证且不同的风险预算或资金安排",
+        "正式账本现金或持仓在报告截止后发生变化",
+        "缺失手续费补齐后显著改变当日现金与执行评价"
+      ],
+      "missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT",
+        "MISSING_TRADE_FEES"
+      ],
+      "data_limitations": [
+        "MISSING_DECISION",
+        "MISSING_TRADE_FEES"
+      ]
+    }
+  },
+  "source": {
+    "source_path": "portfolio.sqlite3 (formal, immutable/query-only)",
+    "source_sha256": "752e3b87966f23d2e6f3db89cd3a8d5df0ab893504ee4e7e83de793e4aa52f53",
+    "source_observed_through": "2026-07-15T12:30:30+00:00",
+    "review_sidecar": "investment_review.sqlite3 (derived report state)",
+    "source_refs": [
+      "portfolio.sqlite3#ledger_entries",
+      "portfolio.sqlite3#close_prices",
+      "portfolio.sqlite3#cash_balance_snapshots",
+      "investment_review.sqlite3#decisions"
+    ]
+  },
+  "safety": {
+    "orders_executed": false,
+    "broker_accessed": false,
+    "guaranteed_return_claims": false,
+    "recommendation_is_not_an_order": true
+  },
+  "content_id": "sha256:b67f5c2c4a2183f13fd0f0f8cc1bb0a6f14ecff28bc265acf0dc2030cd607c31"
+}

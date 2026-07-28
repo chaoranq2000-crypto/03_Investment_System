@@ -14,6 +14,7 @@ import pytest
 import src.portfolio.investment_review_service as review_service_module
 from src.investment_review.market_context_adapter import MarketContextAdapter
 from src.investment_review.models import DecisionRecord
+from src.investment_review.periodic_reports import PeriodicReportStore
 from src.investment_review.review_runner import (
     ReviewRunCatalog,
     ReviewRunnerError,
@@ -121,6 +122,100 @@ def product_api(tmp_path: Path) -> ProductApiFixture:
         episode_id=str(episode["episode_id"]),
         event_id=event_id,
     )
+
+
+def _periodic_api_report() -> dict[str, Any]:
+    return {
+        "schema_version": "investment_review.periodic_report.v1",
+        "report_id": "periodic_" + "a" * 32,
+        "status": "ready",
+        "subject": {
+            "type": "portfolio",
+            "id": "default",
+            "name": "组合账户",
+        },
+        "period": {
+            "type": "daily",
+            "start": "2026-07-15",
+            "end": "2026-07-15",
+            "report_cutoff_at": "2026-07-15T15:00:00+08:00",
+        },
+        "generated_at": "2026-07-15T12:00:00Z",
+        "headline": "组合日报 API 样本。",
+        "sections": {
+            "performance_and_positions": {
+                "performance": {"asset_change_pct": "1"},
+                "cash": {"amount_cny": "100"},
+                "positions": [],
+                "risk_change": {"cash_weight_pct": "10"},
+            },
+            "operations_and_motives": {
+                "operation_count": 0,
+                "operations": [],
+            },
+            "review_judgments": [],
+            "recommendation": {
+                "type": "analyst_view",
+                "action": "hold",
+                "target_position": {
+                    "target_cash_range_pct": ["5", "10"],
+                    "target_position_note": "保持现金缓冲。",
+                },
+                "time_horizon": "下一交易周",
+                "confidence": "low",
+                "rationale": [],
+                "major_downside_risks": ["样本风险"],
+                "invalidation_conditions": ["账本变化"],
+                "data_timestamp": "2026-07-15T15:00:00+08:00",
+                "report_cutoff_at": "2026-07-15T15:00:00+08:00",
+                "important_missing_inputs": ["MISSING_VALUATION"],
+                "orders_executed": False,
+                "guaranteed_return": False,
+            },
+            "risks_invalidation_and_missing": {
+                "major_risks": ["样本风险"],
+                "invalidation_conditions": ["账本变化"],
+                "missing_inputs": ["MISSING_VALUATION"],
+                "data_limitations": [],
+            },
+        },
+        "source": {
+            "source_path": "portfolio.sqlite3",
+            "source_sha256": "b" * 64,
+            "source_observed_through": "2026-07-15T12:00:00Z",
+            "review_sidecar": "investment_review.sqlite3",
+            "source_refs": ["portfolio.sqlite3#ledger_entries"],
+        },
+        "safety": {
+            "orders_executed": False,
+            "broker_accessed": False,
+            "guaranteed_return_claims": False,
+            "recommendation_is_not_an_order": True,
+        },
+        "content_id": "sha256:" + "c" * 64,
+    }
+
+
+def test_periodic_report_api_lists_and_reads_from_the_selected_sidecar(
+    product_api: ProductApiFixture,
+) -> None:
+    store = PeriodicReportStore(product_api.runner.review_db)
+    store.initialize()
+    report = _periodic_api_report()
+    assert store.save(report)["status"] == "inserted"
+
+    listing = product_api.service.list_periodic_reports(
+        subject_type="portfolio",
+        period_type="daily",
+    )
+    detail = product_api.service.get_periodic_report(report["report_id"])
+
+    assert listing["status"] == "ready"
+    assert listing["data"]["total_count"] == 1
+    assert listing["data"]["reports"][0]["report_id"] == report["report_id"]
+    assert detail["data"]["report"] == report
+    health = product_api.service.get_health()
+    assert health["data"]["periodic_reports"]["count"] == 1
 
 
 def _all_strings(value: object) -> Iterator[str]:

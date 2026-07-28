@@ -998,6 +998,8 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
             "/api/investment-review/context",
             "/api/investment-review/evidence",
             "/api/investment-review/health",
+            "/api/investment-review/periodic-reports",
+            "/api/investment-review/periodic-report",
         }
         if parsed.path not in routes:
             return False
@@ -1025,6 +1027,37 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                 status=query.get("status"),
                 limit=limit,
             )
+        elif parsed.path == "/api/investment-review/periodic-reports":
+            query = self._review_query(
+                parsed.query,
+                allowed={
+                    "subject_type",
+                    "subject_id",
+                    "period_type",
+                    "limit",
+                },
+            )
+            try:
+                limit = int(query.get("limit", "100"))
+            except ValueError as exc:
+                raise ReviewHTTPError(
+                    HTTPStatus.BAD_REQUEST,
+                    "invalid_limit",
+                    "limit 必须是整数",
+                ) from exc
+            payload = service.list_periodic_reports(
+                subject_type=query.get("subject_type"),
+                subject_id=query.get("subject_id"),
+                period_type=query.get("period_type"),
+                limit=limit,
+            )
+        elif parsed.path == "/api/investment-review/periodic-report":
+            query = self._review_query(
+                parsed.query,
+                allowed={"report_id"},
+                required={"report_id"},
+            )
+            payload = service.get_periodic_report(query["report_id"])
         else:
             query = self._review_query(
                 parsed.query,

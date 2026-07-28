@@ -5429,19 +5429,23 @@ VALUES(
                 ).fetchall()
             }
             count_tables = [
-                "data_sources",
-                "source_config_versions",
-                "ingest_runs",
-                "ingest_run_events",
-                "trade_events",
-                "decisions",
-                "decision_event_links",
-                "portfolio_snapshots",
-                "position_snapshot_items",
-                "behavior_hypothesis_candidates",
-                "behavior_hypothesis_review_events",
-                "behavior_observation_protocols",
-                "behavior_observation_protocol_review_events",
+                table
+                for table in [
+                    "data_sources",
+                    "source_config_versions",
+                    "ingest_runs",
+                    "ingest_run_events",
+                    "trade_events",
+                    "decisions",
+                    "decision_event_links",
+                    "portfolio_snapshots",
+                    "position_snapshot_items",
+                    "behavior_hypothesis_candidates",
+                    "behavior_hypothesis_review_events",
+                    "behavior_observation_protocols",
+                    "behavior_observation_protocol_review_events",
+                ]
+                if table in tables
             ]
             product_tables = [
                 "fee_profiles",
