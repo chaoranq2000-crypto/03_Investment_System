@@ -1,7 +1,238 @@
 {
-  "content_id": "sha256:219ae9e7c88288318140d3da70a06618bf4ce49c359d172bffc7b2a860e1a071",
+  "analysis_brief": {
+    "action_plan": {
+      "action": "hold",
+      "confidence": "low",
+      "guaranteed_return": false,
+      "orders_executed": false,
+      "source_refs": [
+        "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.recommendation"
+      ],
+      "target_position": {
+        "single_instrument_cap_range_pct": [
+          "15",
+          "20"
+        ],
+        "target_cash_range_pct": [
+          "5",
+          "10"
+        ],
+        "target_position_note": "把超过 20% 的单一标的降至 15%–20%，并将现金提高至 5%–10%。"
+      },
+      "target_position_note": "维持现有总风险暴露；若有超过 20% 的单一标的则降至 15%–20%，并将现金提高至 5%–10%。",
+      "text": "维持 low 置信度的 hold 建议：维持现有总风险暴露；若有超过 20% 的单一标的则降至 15%–20%，并将现金提高至 5%–10%。期限为 next_natural_week。",
+      "time_horizon": "next_natural_week",
+      "type": "analyst_view"
+    },
+    "causal_chain": [
+      {
+        "source_refs": [
+          "periodic_report:periodic_43fd660602e2097c7012ea4263646a99",
+          "periodic_report:periodic_50782e6df8b962519ccc04d093c28259",
+          "periodic_report:periodic_b0eaa38f809e317e9a562f0d8d2d6519",
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.performance",
+          "periodic_report:periodic_e8935b23867b269f642e424b56aece46",
+          "periodic_report:periodic_ef811d08837b74e65eff96210b437c79"
+        ],
+        "text": "本周持仓市值（不含现金）上涨 4.04%，覆盖 5 个交易日，对应变化 18001.7 元。",
+        "type": "inference"
+      },
+      {
+        "source_refs": [
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.risk_change"
+        ],
+        "text": "本周风险判断的关键约束包括：现金权重尚无法可靠计算；收益变化不能替代对现金与集中度的检查。",
+        "type": "inference"
+      },
+      {
+        "source_refs": [
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.period_attribution"
+        ],
+        "text": "本周覆盖 5 个交易日：3 日走强、2 日回落，操作发生在 4 个交易日；期初至期末新增或加仓 2 个标的、减仓或退出 2 个标的。",
+        "type": "inference"
+      },
+      {
+        "source_refs": [
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.operations_and_motives",
+          "portfolio.sqlite3#ledger_entries:903",
+          "portfolio.sqlite3#ledger_entries:904",
+          "portfolio.sqlite3#ledger_entries:905",
+          "portfolio.sqlite3#ledger_entries:906",
+          "portfolio.sqlite3#ledger_entries:907",
+          "portfolio.sqlite3#ledger_entries:908",
+          "portfolio.sqlite3#ledger_entries:909",
+          "portfolio.sqlite3#ledger_entries:910",
+          "portfolio.sqlite3#ledger_entries:911",
+          "portfolio.sqlite3#ledger_entries:912",
+          "portfolio.sqlite3#ledger_entries:915",
+          "portfolio.sqlite3#ledger_entries:916",
+          "portfolio.sqlite3#ledger_entries:917",
+          "portfolio.sqlite3#ledger_entries:918",
+          "portfolio.sqlite3#ledger_entries:919",
+          "portfolio.sqlite3#ledger_entries:920",
+          "portfolio.sqlite3#ledger_entries:921"
+        ],
+        "text": "本周共有 17 笔操作。其中 17 笔缺少 Decision，以下仅为 system_inference：更像在上涨中降低仓位风险或兑现一部分利润；更像小幅顺势试仓，而不是一次性改变长期仓位。替代解释与时点证据保留在附录。德展健康仓位路径为 17200 → 17200 → 8900 股；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。事后结果只用于检验执行，不用于倒推动机。",
+        "type": "inference"
+      }
+    ],
+    "central_judgment": {
+      "source_refs": [
+        "periodic_report:periodic_43fd660602e2097c7012ea4263646a99",
+        "periodic_report:periodic_50782e6df8b962519ccc04d093c28259",
+        "periodic_report:periodic_b0eaa38f809e317e9a562f0d8d2d6519",
+        "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.performance",
+        "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.risk_change",
+        "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.recommendation",
+        "periodic_report:periodic_e8935b23867b269f642e424b56aece46",
+        "periodic_report:periodic_ef811d08837b74e65eff96210b437c79"
+      ],
+      "text": "组合账户本周持仓市值（不含现金）上涨 4.04%，覆盖 5 个交易日，对应变化 18001.7 元；但本周风险判断的关键约束包括：现金权重尚无法可靠计算；收益变化不能替代对现金与集中度的检查。因此现有 hold 建议不变：维持现有总风险暴露；若有超过 20% 的单一标的则降至 15%–20%，并将现金提高至 5%–10%。",
+      "type": "inference_and_analyst_view"
+    },
+    "evidence_pool": {
+      "four_layer_context_is_not_mandatory_headings": true,
+      "section_keys": [
+        "performance_and_positions",
+        "decision_context",
+        "operations_and_motives",
+        "review_judgments",
+        "recommendation",
+        "risks_invalidation_and_missing"
+      ]
+    },
+    "material_findings": [
+      {
+        "importance": 100,
+        "kind": "period_performance",
+        "source_refs": [
+          "periodic_report:periodic_43fd660602e2097c7012ea4263646a99",
+          "periodic_report:periodic_50782e6df8b962519ccc04d093c28259",
+          "periodic_report:periodic_b0eaa38f809e317e9a562f0d8d2d6519",
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.performance",
+          "periodic_report:periodic_e8935b23867b269f642e424b56aece46",
+          "periodic_report:periodic_ef811d08837b74e65eff96210b437c79"
+        ],
+        "text": "本周持仓市值（不含现金）上涨 4.04%，覆盖 5 个交易日，对应变化 18001.7 元。",
+        "type": "fact"
+      },
+      {
+        "importance": 95,
+        "kind": "portfolio_risk",
+        "source_refs": [
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.risk_change"
+        ],
+        "text": "本周风险判断的关键约束包括：现金权重尚无法可靠计算；收益变化不能替代对现金与集中度的检查。",
+        "type": "fact_and_inference"
+      },
+      {
+        "importance": 92,
+        "kind": "cross_period_synthesis",
+        "source_refs": [
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.period_attribution"
+        ],
+        "text": "本周覆盖 5 个交易日：3 日走强、2 日回落，操作发生在 4 个交易日；期初至期末新增或加仓 2 个标的、减仓或退出 2 个标的。",
+        "type": "fact_and_inference"
+      },
+      {
+        "importance": 88,
+        "kind": "operation_review",
+        "source_refs": [
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.operations_and_motives",
+          "portfolio.sqlite3#ledger_entries:903",
+          "portfolio.sqlite3#ledger_entries:904",
+          "portfolio.sqlite3#ledger_entries:905",
+          "portfolio.sqlite3#ledger_entries:906",
+          "portfolio.sqlite3#ledger_entries:907",
+          "portfolio.sqlite3#ledger_entries:908",
+          "portfolio.sqlite3#ledger_entries:909",
+          "portfolio.sqlite3#ledger_entries:910",
+          "portfolio.sqlite3#ledger_entries:911",
+          "portfolio.sqlite3#ledger_entries:912",
+          "portfolio.sqlite3#ledger_entries:915",
+          "portfolio.sqlite3#ledger_entries:916",
+          "portfolio.sqlite3#ledger_entries:917",
+          "portfolio.sqlite3#ledger_entries:918",
+          "portfolio.sqlite3#ledger_entries:919",
+          "portfolio.sqlite3#ledger_entries:920",
+          "portfolio.sqlite3#ledger_entries:921"
+        ],
+        "text": "本周共有 17 笔操作。其中 17 笔缺少 Decision，以下仅为 system_inference：更像在上涨中降低仓位风险或兑现一部分利润；更像小幅顺势试仓，而不是一次性改变长期仓位。替代解释与时点证据保留在附录。德展健康仓位路径为 17200 → 17200 → 8900 股；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。事后结果只用于检验执行，不用于倒推动机。",
+        "type": "system_inference_and_retrospective"
+      }
+    ],
+    "operation_assessment": {
+      "separates_motive_from_retrospective": true,
+      "source_refs": [
+        "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.operations_and_motives",
+        "portfolio.sqlite3#ledger_entries:903",
+        "portfolio.sqlite3#ledger_entries:904",
+        "portfolio.sqlite3#ledger_entries:905",
+        "portfolio.sqlite3#ledger_entries:906",
+        "portfolio.sqlite3#ledger_entries:907",
+        "portfolio.sqlite3#ledger_entries:908",
+        "portfolio.sqlite3#ledger_entries:909",
+        "portfolio.sqlite3#ledger_entries:910",
+        "portfolio.sqlite3#ledger_entries:911",
+        "portfolio.sqlite3#ledger_entries:912",
+        "portfolio.sqlite3#ledger_entries:915",
+        "portfolio.sqlite3#ledger_entries:916",
+        "portfolio.sqlite3#ledger_entries:917",
+        "portfolio.sqlite3#ledger_entries:918",
+        "portfolio.sqlite3#ledger_entries:919",
+        "portfolio.sqlite3#ledger_entries:920",
+        "portfolio.sqlite3#ledger_entries:921"
+      ],
+      "text": "本周共有 17 笔操作。其中 17 笔缺少 Decision，以下仅为 system_inference：更像在上涨中降低仓位风险或兑现一部分利润；更像小幅顺势试仓，而不是一次性改变长期仓位。替代解释与时点证据保留在附录。德展健康仓位路径为 17200 → 17200 → 8900 股；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。事后结果只用于检验执行，不用于倒推动机。"
+    },
+    "period": {
+      "calendar_end": "2026-07-05",
+      "calendar_start": "2026-06-29",
+      "completeness": "partial_selected_window",
+      "covered_trading_dates": [
+        "2026-06-29",
+        "2026-06-30",
+        "2026-07-01",
+        "2026-07-02",
+        "2026-07-03"
+      ],
+      "end": "2026-07-03",
+      "report_cutoff_at": "2026-07-03T15:00:00+08:00",
+      "start": "2026-06-29",
+      "type": "weekly"
+    },
+    "risks_and_invalidation": {
+      "invalidation_conditions": [
+        "用户已有可验证且不同的风险预算或资金安排",
+        "正式账本现金或持仓在报告截止后发生变化",
+        "新增全组合基本面证据支持当前集中度且风险预算允许"
+      ],
+      "major_risks": [
+        "减仓后标的继续上涨会产生机会成本",
+        "日报只展开当日操作标的，未完成全组合逐标的基本面覆盖",
+        "指数或板块同涨不代表组合内每只股票的风险同步下降"
+      ],
+      "missing_inputs": [
+        "MISSING_DECISION",
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FULL_PORTFOLIO_FUNDAMENTAL_COVERAGE",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT"
+      ],
+      "source_refs": [
+        "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.risks_invalidation_and_missing"
+      ]
+    },
+    "schema_version": "investment_review.periodic_analysis_brief.v1",
+    "source_report_schema_version": "investment_review.periodic_report.v2",
+    "subject": {
+      "id": "default",
+      "name": "组合账户",
+      "type": "portfolio"
+    }
+  },
+  "content_id": "sha256:f9b900476327a79000338648a67ce8c339dddce6253a3f3501de14e8e26b5bc0",
   "generated_at": "2026-07-15T01:15:00+00:00",
-  "headline": "组合账户本周持仓市值（不含现金）变动 4.04%，共 17 笔操作；下一周期建议 hold。",
+  "headline": "组合账户本周持仓市值（不含现金）上涨 4.04%，覆盖 5 个交易日，对应变化 18001.7 元；但本周风险判断的关键约束包括：现金权重尚无法可靠计算；收益变化不能替代对现金与集中度的检查。因此现有 hold 建议不变：维持现有总风险暴露；若有超过 20% 的单一标的则降至 15%–20%，并将现金提高至 5%–10%。",
   "period": {
     "calendar_end": "2026-07-05",
     "calendar_start": "2026-06-29",
@@ -18,14 +249,138 @@
     "start": "2026-06-29",
     "type": "weekly"
   },
-  "report_id": "periodic_166f2bb2d1c13343a6c63f4626ba5ad7",
+  "reader_report": {
+    "action_plan": {
+      "action": "hold",
+      "confidence": "low",
+      "guaranteed_return": false,
+      "orders_executed": false,
+      "source_refs": [
+        "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.recommendation"
+      ],
+      "target_position": {
+        "single_instrument_cap_range_pct": [
+          "15",
+          "20"
+        ],
+        "target_cash_range_pct": [
+          "5",
+          "10"
+        ],
+        "target_position_note": "把超过 20% 的单一标的降至 15%–20%，并将现金提高至 5%–10%。"
+      },
+      "target_position_note": "维持现有总风险暴露；若有超过 20% 的单一标的则降至 15%–20%，并将现金提高至 5%–10%。",
+      "text": "维持 low 置信度的 hold 建议：维持现有总风险暴露；若有超过 20% 的单一标的则降至 15%–20%，并将现金提高至 5%–10%。期限为 next_natural_week。",
+      "time_horizon": "next_natural_week",
+      "type": "analyst_view"
+    },
+    "appendix": {
+      "collapsed_by_default": true,
+      "includes_source_and_safety": true,
+      "section_keys": [
+        "performance_and_positions",
+        "decision_context",
+        "operations_and_motives",
+        "review_judgments",
+        "recommendation",
+        "risks_invalidation_and_missing"
+      ]
+    },
+    "central_judgment": "组合账户本周持仓市值（不含现金）上涨 4.04%，覆盖 5 个交易日，对应变化 18001.7 元；但本周风险判断的关键约束包括：现金权重尚无法可靠计算；收益变化不能替代对现金与集中度的检查。因此现有 hold 建议不变：维持现有总风险暴露；若有超过 20% 的单一标的则降至 15%–20%，并将现金提高至 5%–10%。",
+    "central_judgment_source_refs": [
+      "periodic_report:periodic_43fd660602e2097c7012ea4263646a99",
+      "periodic_report:periodic_50782e6df8b962519ccc04d093c28259",
+      "periodic_report:periodic_b0eaa38f809e317e9a562f0d8d2d6519",
+      "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.performance",
+      "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.risk_change",
+      "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.recommendation",
+      "periodic_report:periodic_e8935b23867b269f642e424b56aece46",
+      "periodic_report:periodic_ef811d08837b74e65eff96210b437c79"
+    ],
+    "guaranteed_return": false,
+    "invalidation_conditions": [
+      "用户已有可验证且不同的风险预算或资金安排",
+      "正式账本现金或持仓在报告截止后发生变化",
+      "新增全组合基本面证据支持当前集中度且风险预算允许"
+    ],
+    "major_risks": [
+      "减仓后标的继续上涨会产生机会成本",
+      "日报只展开当日操作标的，未完成全组合逐标的基本面覆盖",
+      "指数或板块同涨不代表组合内每只股票的风险同步下降"
+    ],
+    "missing_inputs": [
+      "MISSING_DECISION",
+      "MISSING_EXPLICIT_USER_RISK_BUDGET",
+      "MISSING_FULL_PORTFOLIO_FUNDAMENTAL_COVERAGE",
+      "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT"
+    ],
+    "narrative_sections": [
+      {
+        "key": "judgment_basis",
+        "paragraphs": [
+          "本周持仓市值（不含现金）上涨 4.04%，覆盖 5 个交易日，对应变化 18001.7 元。",
+          "本周风险判断的关键约束包括：现金权重尚无法可靠计算；收益变化不能替代对现金与集中度的检查。"
+        ],
+        "source_refs": [
+          "periodic_report:periodic_43fd660602e2097c7012ea4263646a99",
+          "periodic_report:periodic_50782e6df8b962519ccc04d093c28259",
+          "periodic_report:periodic_b0eaa38f809e317e9a562f0d8d2d6519",
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.performance",
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.risk_change",
+          "periodic_report:periodic_e8935b23867b269f642e424b56aece46",
+          "periodic_report:periodic_ef811d08837b74e65eff96210b437c79"
+        ],
+        "title": "收益变化与风险结构"
+      },
+      {
+        "key": "cross_period_synthesis",
+        "paragraphs": [
+          "本周覆盖 5 个交易日：3 日走强、2 日回落，操作发生在 4 个交易日；期初至期末新增或加仓 2 个标的、减仓或退出 2 个标的。"
+        ],
+        "source_refs": [
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.performance_and_positions.period_attribution"
+        ],
+        "title": "跨期变化"
+      },
+      {
+        "key": "operation_review",
+        "paragraphs": [
+          "本周共有 17 笔操作。其中 17 笔缺少 Decision，以下仅为 system_inference：更像在上涨中降低仓位风险或兑现一部分利润；更像小幅顺势试仓，而不是一次性改变长期仓位。替代解释与时点证据保留在附录。德展健康仓位路径为 17200 → 17200 → 8900 股；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。事后结果只用于检验执行，不用于倒推动机。"
+        ],
+        "source_refs": [
+          "periodic_report:periodic_d8f5c799ed4d76e3c9f5ef651d99ab95#sections.operations_and_motives",
+          "portfolio.sqlite3#ledger_entries:903",
+          "portfolio.sqlite3#ledger_entries:904",
+          "portfolio.sqlite3#ledger_entries:905",
+          "portfolio.sqlite3#ledger_entries:906",
+          "portfolio.sqlite3#ledger_entries:907",
+          "portfolio.sqlite3#ledger_entries:908",
+          "portfolio.sqlite3#ledger_entries:909",
+          "portfolio.sqlite3#ledger_entries:910",
+          "portfolio.sqlite3#ledger_entries:911",
+          "portfolio.sqlite3#ledger_entries:912",
+          "portfolio.sqlite3#ledger_entries:915",
+          "portfolio.sqlite3#ledger_entries:916",
+          "portfolio.sqlite3#ledger_entries:917",
+          "portfolio.sqlite3#ledger_entries:918",
+          "portfolio.sqlite3#ledger_entries:919",
+          "portfolio.sqlite3#ledger_entries:920",
+          "portfolio.sqlite3#ledger_entries:921"
+        ],
+        "title": "操作复盘"
+      }
+    ],
+    "orders_executed": false,
+    "schema_version": "investment_review.reader_report.v1"
+  },
+  "report_id": "periodic_d8f5c799ed4d76e3c9f5ef651d99ab95",
   "safety": {
     "broker_accessed": false,
     "guaranteed_return_claims": false,
     "orders_executed": false,
     "recommendation_is_not_an_order": true
   },
-  "schema_version": "investment_review.periodic_report.v1",
+  "schema_version": "investment_review.periodic_report.v2",
   "sections": {
     "decision_context": {
       "framework": "four_layer_periodic_review_v1",
@@ -3624,7 +3979,12 @@
       "investment_review.sqlite3#periodic_reports:periodic_ef811d08837b74e65eff96210b437c79",
       "investment_review.sqlite3#periodic_reports:periodic_50782e6df8b962519ccc04d093c28259"
     ],
-    "source_sha256": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057"
+    "source_sha256": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "upgraded_from": {
+      "report_id": "periodic_166f2bb2d1c13343a6c63f4626ba5ad7",
+      "schema_version": "investment_review.periodic_report.v1",
+      "structured_facts_changed": false
+    }
   },
   "status": "ready",
   "subject": {

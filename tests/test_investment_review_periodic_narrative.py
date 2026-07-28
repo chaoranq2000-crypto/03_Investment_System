@@ -15,6 +15,7 @@ from src.investment_review.periodic_reports import (
     build_aggregate_report,
     build_daily_report,
     render_periodic_report_markdown,
+    upgrade_periodic_report_v2,
     validate_periodic_report,
 )
 from tests.test_investment_review_periodic_reports import (
@@ -99,7 +100,11 @@ def test_v2_no_trade_and_missing_cash_degrade_without_inventing_facts(
     )
     assert "没有持仓变动操作" in reader_text
     assert "不构造虚假动机或执行评价" in reader_text
-    assert "MISSING" in report["headline"]
+    assert "现金权重尚无法可靠计算" in report["headline"]
+    assert "MISSING等因素" not in report["headline"]
+    assert report["sections"]["performance_and_positions"]["risk_change"][
+        "cash_weight_pct"
+    ] is None
     assert report["sections"]["performance_and_positions"]["cash"] is None
     assert validate_periodic_report(report)["status"] == "accepted"
 
@@ -181,6 +186,16 @@ def test_v1_reports_remain_valid_readable_and_storable(
     assert store.get(legacy["report_id"])["schema_version"] == (
         LEGACY_REPORT_SCHEMA_VERSION
     )
+
+    upgraded = upgrade_periodic_report_v2(legacy)
+    assert upgraded["schema_version"] == REPORT_SCHEMA_VERSION
+    assert upgraded["source"]["upgraded_from"] == {
+        "schema_version": LEGACY_REPORT_SCHEMA_VERSION,
+        "report_id": legacy["report_id"],
+        "structured_facts_changed": False,
+    }
+    assert upgraded["sections"] == legacy["sections"]
+    assert validate_periodic_report(upgraded)["status"] == "accepted"
 
 
 def test_v2_validator_rejects_untraceable_or_template_shaped_reader_text(

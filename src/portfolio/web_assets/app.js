@@ -14929,8 +14929,10 @@ function periodicReportView(value) {
 	const recommendation = object(report.recommendation || sections.recommendation);
 	const performance = object(object(sections.performance_and_positions).performance);
 	const operations = object(sections.operations_and_motives);
+	const readerReport = object(report.reader_report);
 	return {
 		...report,
+		schema_version: text(report.schema_version, ""),
 		report_id: text(report.report_id, ""),
 		status: statusValue(report.status || "ready"),
 		subject: {
@@ -14944,7 +14946,18 @@ function periodicReportView(value) {
 			end: period.end ?? null,
 			report_cutoff_at: period.report_cutoff_at ?? null
 		},
-		headline: text(report.headline, "周期报告缺少结论摘要"),
+		headline: text(readerReport.central_judgment || report.headline, "周期报告缺少结论摘要"),
+		analysis_brief: object(report.analysis_brief),
+		reader_report: {
+			...readerReport,
+			central_judgment: text(readerReport.central_judgment, ""),
+			narrative_sections: values(readerReport.narrative_sections),
+			action_plan: object(readerReport.action_plan),
+			major_risks: values(readerReport.major_risks),
+			invalidation_conditions: values(readerReport.invalidation_conditions),
+			missing_inputs: values(readerReport.missing_inputs),
+			appendix: object(readerReport.appendix)
+		},
 		recommendation,
 		performance,
 		operation_count: Number(report.operation_count ?? operations.operation_count ?? 0),
@@ -15622,6 +15635,9 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		const episodeSummaries = values(operationsSection.episode_summaries);
 		const recommendation = object(sections.recommendation);
 		const limitations = object(sections.risks_invalidation_and_missing);
+		const readerReport = object(report.reader_report);
+		const readerSections = values(readerReport.narrative_sections);
+		const isReaderReport = report.schema_version === "investment_review.periodic_report.v2" && Boolean(readerReport.central_judgment) && readerSections.length > 0;
 		const periodLabel = {
 			daily: "日报",
 			weekly: "周报",
@@ -15638,6 +15654,38 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		header.append(element("p", "section-kicker", "PERIODIC REVIEW"), element("h2", "", `${subjectLabel} · ${text(report.period.end)} ${periodLabel}`), element("p", "investment-review-mono", report.report_id), statusBadge(report.status));
 		header.querySelector("h2").id = "investmentReviewDrawerTitle";
 		drawerContent.append(header, element("p", "investment-review-gap-summary", report.headline));
+		if (isReaderReport) {
+			readerSections.forEach((sectionValue) => {
+				const readerSection = object(sectionValue);
+				const block = sectionBlock(text(readerSection.title, "综合分析"), "READER ANALYSIS");
+				values(readerSection.paragraphs).forEach((paragraph, index) => {
+					block.body.appendChild(element("p", index === 0 ? "investment-review-list-conclusion" : "", text(paragraph)));
+				});
+				drawerContent.appendChild(block.section);
+			});
+			const readerAction = object(readerReport.action_plan);
+			const actionBlock = sectionBlock(report.subject.type === "instrument" ? `${subjectLabel}下一步行动` : "下一步行动", "RECOMMENDATION · NOT AN ORDER");
+			actionBlock.body.append(element("span", "investment-review-mono", `confidence ${text(readerAction.confidence)}`), element("h3", "", `${text(readerAction.action).toUpperCase()} · ${text(readerAction.target_position_note, "仓位精度受缺失数据限制")}`), element("p", "", `期限：${text(readerAction.time_horizon)}`), element("p", "investment-review-list-gaps", "这是分析建议，不是订单；系统不会连接券商或自动执行交易。"));
+			drawerContent.appendChild(actionBlock.section);
+			const riskBlock = sectionBlock("风险、失效条件与数据缺口", "RISK · INVALIDATION · MISSING");
+			values(readerReport.major_risks).forEach((item) => {
+				riskBlock.body.appendChild(element("p", "", `主要风险：${text(item)}`));
+			});
+			values(readerReport.invalidation_conditions).forEach((item) => {
+				riskBlock.body.appendChild(element("p", "", `失效条件：${text(item)}`));
+			});
+			riskBlock.body.appendChild(element("p", "investment-review-list-gaps", `缺失输入：${values(readerReport.missing_inputs).join("、") || "无明确缺失项"}`));
+			drawerContent.appendChild(riskBlock.section);
+			const appendix = element("details", "investment-review-structured-details");
+			appendix.append(element("summary", "", "查看完整结构化事实、逐笔操作与来源"), renderStructured({
+				analysis_brief: report.analysis_brief,
+				sections: report.sections,
+				source: report.source,
+				safety: report.safety
+			}));
+			drawerContent.appendChild(appendix);
+			return;
+		}
 		const performanceBlock = sectionBlock("收益、持仓、现金和风险变化", "PERIOD FACTS");
 		appendPairs(performanceBlock.body, [
 			["期初总资产", performance.start_total_assets_cny],

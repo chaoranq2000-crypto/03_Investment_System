@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "investment_review_periodic_v1"
 contract_path: "docs/codex_tasks/investment_review_periodic_v1/CONTRACT.md"
 contract_sha256: "e8debe680f8c679b0ff95f3f77677f7ba1508fb8a11a9f0794e0a146e5dc7a38"
-state: "running"
+state: "complete"
 execution_branch: "codex/investment-review-periodic-v1"
 source_baseline: "7df75562eb7c7123ff066406f92fd6b844be994b"
-last_completed_phase: "P6"
-next_phase: "P7"
+last_completed_phase: "P7"
+next_phase: "none"
 last_validation: "pass"
-updated_at: "2026-07-28T16:02:57+00:00"
+updated_at: "2026-07-30T08:25:09+00:00"
 ---
 # 在新 Codex 聊天中启动或恢复本阶段
 
@@ -38,17 +38,17 @@ Reconcile ordinary drift and conflicts in this same package. Revise CONTRACT.md 
 
 ## Current checkpoint
 
-- **State:** `running`
-- **Last completed phase:** `P6`
-- **Next phase:** `P7`
-- **Latest validation:** `pass` — V-701 passed: deterministic V2 `analysis_brief`/`reader_report`, V1 read/store/render fallback, missing-data/no-trade/cross-day synthesis checks, 115 affected backend tests, compile check, package validation, source DB hash check, and `git diff --check`.
+- **State:** `complete`
+- **Last completed phase:** `P7`
+- **Next phase:** `none`
+- **Latest validation:** `pass` — V-702/V-801 passed: V-101 110 tests, narrative 5 tests, V-102 23 tests plus production build, V-501 71 tests, localhost API/browser V2 default view and V1 fallback, six accepted real V2 samples, weekly/monthly cross-period synthesis, sidecar idempotency, compile/package/diff checks, and unchanged formal SQLite. Post-completion editorial regression also passed 5 narrative tests and replaced mechanical missing-value prose with natural language while preserving structured missing facts.
 - **Runtime authorizations:** `accept_p1_sample_and_continue` remains historical proof for P2–P4. User grant `accept_reader_report_samples_and_continue` is active for target `P5 reader-quality daily samples`, authorizing P6–P7 within the unchanged contract boundary.
 - **Current blocker:** none.
-- **Implementation checkpoint:** `43346cd` contains the accepted P5 samples; `d50a952` records the user grant; the Git commit containing this file is the P6 implementation checkpoint.
+- **Implementation checkpoint:** `43346cd` contains the accepted P5 samples; `d50a952` records the user grant; `823ef6d` contains the P6 deterministic narrative generator; the Git commit containing this file is the P7 completion checkpoint.
 - **Existing final evidence:** `reports/investment_review/periodic_v1/final/FINAL_READOUT.md` and `validation_summary.json`.
 - **Formal portfolio DB:** SHA-256 `6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057`, unchanged.
 - **P5 evidence:** `reports/investment_review/periodic_v1/reader_quality_pilot/P5_READOUT.md`, two reader samples, their analysis briefs, one principle review, and `validation_summary.json`.
-- **Next safe action:** Execute P7: make the report center default to the V2 reader narrative with a collapsed fact appendix, regenerate the six real samples, and run V-702/V-801.
+- **Next safe action:** None within the active contract. Push, PR, merge, deploy, production running or OS scheduler/service installation requires a separate explicit authorization.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
@@ -68,3 +68,5 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-28T15:20:13+00:00 — state=blocked; completed=P5; next=P6; validation=pass; two frozen-input reader-first daily samples, two analysis briefs and one principle review passed V-601; reviewer verdict=pass, must_fix=0, revisions=0; package validator and git diff check passed; formal SQLite SHA-256 unchanged; awaiting exact user grant accept_reader_report_samples_and_continue.
 - 2026-07-28T15:53:13+00:00 — state=running; completed=P5; next=P6; validation=pass; user sample-acceptance grant recorded verbatim: accept_reader_report_samples_and_continue. C-HUMAN-002 and D-015 are satisfied; proceed through P6–P7 within the unchanged authorization envelope.
 - 2026-07-28T16:02:57+00:00 — state=running; completed=P6; next=P7; validation=pass; V-701 passed with deterministic periodic report V2 analysis_brief/reader_report, V1 compatibility, one central judgment, bounded material findings, collapsed full-fact Markdown appendix, cross-day weekly/monthly synthesis, 115 affected backend tests, compile/package/diff checks, and unchanged formal SQLite SHA-256.
+- 2026-07-28T16:26:53+00:00 — state=complete; completed=P7; next=none; validation=pass; V-702/V-801 passed: report center defaults to the V2 reader narrative with an expandable collapsed fact appendix; V1 fallback and weekly cross-period view passed localhost browser QA with 0 console errors/warnings; V-101 110 tests, narrative 5 tests, V-102 23 tests plus build, and V-501 71 tests passed; six real V2 samples validated; repeat save produced 6 skipped receipts with sidecar count 619 and unchanged sidecar SHA-256; formal SQLite SHA-256 unchanged; no push/deploy/OS scheduler/broker access/order execution.
+- 2026-07-30T08:25:09+00:00 — state=complete; completed=P7; next=none; validation=pass; post-completion visual-language audit removed the mechanical phrase `MISSING等因素`, regenerated the affected portfolio daily/weekly/monthly V2 samples from unchanged V1 structured facts, passed 5 narrative regression tests, and repeated all six saves with 6 skipped receipts; sidecar count remains 619 and formal SQLite remains unchanged.

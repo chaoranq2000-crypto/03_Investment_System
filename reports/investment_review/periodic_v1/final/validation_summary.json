@@ -1,13 +1,84 @@
 {
-  "schema_version": "investment_review.periodic_v1.final_validation.v1",
+  "schema_version": "investment_review.periodic_v2.final_validation.v1",
   "status": "pass",
+  "completed_at": "2026-07-30T08:25:09+00:00",
+  "validation_results": {
+    "V-101": {
+      "status": "pass",
+      "tests_passed": 110,
+      "failures": 0
+    },
+    "V-102": {
+      "status": "pass",
+      "frontend_tests_passed": 23,
+      "test_files_passed": 3,
+      "production_build": "pass",
+      "vite_modules_transformed": 9
+    },
+    "V-501": {
+      "status": "pass",
+      "tests_passed": 71,
+      "failures": 0
+    },
+    "V-601": {
+      "status": "pass",
+      "user_grant": "accept_reader_report_samples_and_continue",
+      "reader_sample_verdict": "accepted"
+    },
+    "V-701": {
+      "status": "pass",
+      "affected_backend_tests_passed": 115,
+      "periodic_narrative_tests_passed": 5,
+      "post_completion_editorial_regression_tests_passed": 5,
+      "mechanical_missing_phrase_absent": true,
+      "runtime_model_provider_used": false,
+      "v1_compatibility": "pass"
+    },
+    "V-702": {
+      "status": "pass",
+      "localhost_root_status": 200,
+      "read_only_acceptance_mode": true,
+      "v2_default_reader_view": "pass",
+      "collapsed_appendix_expandable": true,
+      "weekly_cross_period_view": "pass",
+      "v1_ui_fallback": "pass",
+      "browser_console_errors": 0,
+      "browser_console_warnings": 0
+    },
+    "V-801": {
+      "status": "pass",
+      "real_v2_samples_accepted": 6,
+      "weekly_monthly_cross_period_synthesis": "pass",
+      "sidecar_idempotency": "pass",
+      "formal_portfolio_db_unchanged": true,
+      "compileall": "pass",
+      "git_diff_check": "pass",
+      "package_validator": "pass"
+    }
+  },
+  "sidecar_idempotency": {
+    "path": "data/db/investment_review.sqlite3",
+    "report_count_before": 619,
+    "report_count_after": 619,
+    "repeat_receipts": {
+      "skipped": 6
+    },
+    "sha256_before": "76de62c9740dc87ca994dcb81a8242d73c22521f436d352978abb09fab34cc76",
+    "sha256_after": "76de62c9740dc87ca994dcb81a8242d73c22521f436d352978abb09fab34cc76",
+    "unchanged": true
+  },
   "p1_sample_acceptance": {
     "grant": "accept_p1_sample_and_continue",
     "recorded": true
   },
+  "p5_sample_acceptance": {
+    "grant": "accept_reader_report_samples_and_continue",
+    "recorded": true
+  },
   "sample_matrix": [
     {
-      "report_id": "periodic_07389934450c03465de361729f061a97",
+      "report_id": "periodic_f4d948bbd24570e0b2149ab200c718cd",
+      "schema_version": "investment_review.periodic_report.v2",
       "subject": {
         "id": "default",
         "name": "组合账户",
@@ -19,6 +90,16 @@
         "start": "2026-07-15",
         "type": "daily"
       },
+      "analysis_brief_schema_version": "investment_review.periodic_analysis_brief.v1",
+      "reader_report_schema_version": "investment_review.reader_report.v1",
+      "central_judgment": "组合账户当日总资产上涨 3.2%，对应变化 14648.84 元；但当日风险判断的关键约束包括：现金权重仅 0.56%、最大单一标的 30.4%、前三大合计 65.51%；收益变化不能替代对现金与集中度的检查；本期操作暴露出需要改进的执行问题。因此现有 reduce 建议不变：把超过 20% 的单一标的降至 15%–20%，并将现金提高至 5%–10%。",
+      "narrative_section_titles": [
+        "收益变化与风险结构",
+        "操作复盘"
+      ],
+      "cross_period_synthesis": [],
+      "main_text_line_count": 35,
+      "collapsed_fact_appendix": true,
       "operation_count": 10,
       "performance_basis": "total_assets",
       "period_change_cny": "14648.84",
@@ -26,11 +107,17 @@
         "status": "accepted",
         "errors": []
       },
+      "upgraded_from": {
+        "report_id": "periodic_07389934450c03465de361729f061a97",
+        "schema_version": "investment_review.periodic_report.v1",
+        "structured_facts_changed": false
+      },
       "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_daily_2026-07-15_2026-07-15.json",
       "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_daily_2026-07-15_2026-07-15.md"
     },
     {
-      "report_id": "periodic_f86542248148c05f93aad799f5dcb3d4",
+      "report_id": "periodic_899f2428a2dcc1b172113fc6ef72167f",
+      "schema_version": "investment_review.periodic_report.v2",
       "subject": {
         "id": "000813.SZ",
         "name": "德展健康",
@@ -42,6 +129,16 @@
         "start": "2026-07-15",
         "type": "daily"
       },
+      "analysis_brief_schema_version": "investment_review.periodic_analysis_brief.v1",
+      "reader_report_schema_version": "investment_review.reader_report.v1",
+      "central_judgment": "德展健康当日收盘价上涨 2.37%，对应变化 0.08 元/股；但最新可得财务仍显示亏损，现有估值信息不能证明当前价格便宜，短期上涨尚不能证明基本面反转；当日期末仓位权重 12.57%，收盘价 3.45 元、账面成本 5.8762 元，未实现收益率 -41.29%；本期操作暴露出需要改进的执行问题。因此现有 reduce 建议不变：把单标的权重降至 8%–12%。",
+      "narrative_section_titles": [
+        "趋势、基本面与仓位约束",
+        "操作复盘"
+      ],
+      "cross_period_synthesis": [],
+      "main_text_line_count": 36,
+      "collapsed_fact_appendix": true,
       "operation_count": 3,
       "performance_basis": "instrument_close_price",
       "period_change_cny": "0.08",
@@ -49,11 +146,17 @@
         "status": "accepted",
         "errors": []
       },
+      "upgraded_from": {
+        "report_id": "periodic_f86542248148c05f93aad799f5dcb3d4",
+        "schema_version": "investment_review.periodic_report.v1",
+        "structured_facts_changed": false
+      },
       "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_daily_2026-07-15_2026-07-15.json",
       "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_daily_2026-07-15_2026-07-15.md"
     },
     {
-      "report_id": "periodic_166f2bb2d1c13343a6c63f4626ba5ad7",
+      "report_id": "periodic_d8f5c799ed4d76e3c9f5ef651d99ab95",
+      "schema_version": "investment_review.periodic_report.v2",
       "subject": {
         "id": "default",
         "name": "组合账户",
@@ -75,6 +178,19 @@
         "start": "2026-06-29",
         "type": "weekly"
       },
+      "analysis_brief_schema_version": "investment_review.periodic_analysis_brief.v1",
+      "reader_report_schema_version": "investment_review.reader_report.v1",
+      "central_judgment": "组合账户本周持仓市值（不含现金）上涨 4.04%，覆盖 5 个交易日，对应变化 18001.7 元；但本周风险判断的关键约束包括：现金权重尚无法可靠计算；收益变化不能替代对现金与集中度的检查。因此现有 hold 建议不变：维持现有总风险暴露；若有超过 20% 的单一标的则降至 15%–20%，并将现金提高至 5%–10%。",
+      "narrative_section_titles": [
+        "收益变化与风险结构",
+        "跨期变化",
+        "操作复盘"
+      ],
+      "cross_period_synthesis": [
+        "本周覆盖 5 个交易日：3 日走强、2 日回落，操作发生在 4 个交易日；期初至期末新增或加仓 2 个标的、减仓或退出 2 个标的。"
+      ],
+      "main_text_line_count": 39,
+      "collapsed_fact_appendix": true,
       "operation_count": 17,
       "performance_basis": "invested_market_value_ex_cash",
       "period_change_cny": "18001.7",
@@ -82,11 +198,17 @@
         "status": "accepted",
         "errors": []
       },
+      "upgraded_from": {
+        "report_id": "periodic_166f2bb2d1c13343a6c63f4626ba5ad7",
+        "schema_version": "investment_review.periodic_report.v1",
+        "structured_facts_changed": false
+      },
       "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_weekly_2026-06-29_2026-07-03.json",
       "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_weekly_2026-06-29_2026-07-03.md"
     },
     {
-      "report_id": "periodic_8cddad3e62933d01392d53865f4718d0",
+      "report_id": "periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8",
+      "schema_version": "investment_review.periodic_report.v2",
       "subject": {
         "id": "000813.SZ",
         "name": "德展健康",
@@ -108,6 +230,19 @@
         "start": "2026-06-29",
         "type": "weekly"
       },
+      "analysis_brief_schema_version": "investment_review.periodic_analysis_brief.v1",
+      "reader_report_schema_version": "investment_review.reader_report.v1",
+      "central_judgment": "德展健康本周收盘价上涨 6.69%，覆盖 5 个交易日，对应变化 0.2 元/股；但最新可得财务仍显示亏损；本周期末仓位权重 MISSING%，收盘价 3.19 元、账面成本 8.4227 元，未实现收益率 -62.13%。因此现有 hold 建议不变：维持观察仓或空仓，不主动扩大到 5% 以上。",
+      "narrative_section_titles": [
+        "趋势、基本面与仓位约束",
+        "跨期变化",
+        "操作复盘"
+      ],
+      "cross_period_synthesis": [
+        "本周覆盖 5 个交易日：4 日走强、1 日回落，操作发生在 1 个交易日；期初至期末新增或加仓 0 个标的、减仓或退出 1 个标的。"
+      ],
+      "main_text_line_count": 40,
+      "collapsed_fact_appendix": true,
       "operation_count": 2,
       "performance_basis": "instrument_close_price",
       "period_change_cny": "0.2",
@@ -115,11 +250,17 @@
         "status": "accepted",
         "errors": []
       },
+      "upgraded_from": {
+        "report_id": "periodic_8cddad3e62933d01392d53865f4718d0",
+        "schema_version": "investment_review.periodic_report.v1",
+        "structured_facts_changed": false
+      },
       "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_weekly_2026-06-29_2026-07-03.json",
       "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_weekly_2026-06-29_2026-07-03.md"
     },
     {
-      "report_id": "periodic_9a97f190ae85fdb1730a3de16b57ccb4",
+      "report_id": "periodic_1695124c2ad446827350839c6c2a0376",
+      "schema_version": "investment_review.periodic_report.v2",
       "subject": {
         "id": "default",
         "name": "组合账户",
@@ -157,6 +298,19 @@
         "start": "2026-06-01",
         "type": "monthly"
       },
+      "analysis_brief_schema_version": "investment_review.periodic_analysis_brief.v1",
+      "reader_report_schema_version": "investment_review.reader_report.v1",
+      "central_judgment": "组合账户本月持仓市值（不含现金）上涨 0.02%，覆盖 21 个交易日，对应变化 101 元；但本月风险判断的关键约束包括：现金权重尚无法可靠计算；收益变化不能替代对现金与集中度的检查。因此现有 hold 建议不变：维持现有总风险暴露；若有超过 20% 的单一标的则降至 15%–20%，并将现金提高至 5%–10%。",
+      "narrative_section_titles": [
+        "收益变化与风险结构",
+        "跨期变化",
+        "操作复盘"
+      ],
+      "cross_period_synthesis": [
+        "本月覆盖 21 个交易日：10 日走强、11 日回落，操作发生在 10 个交易日；期初至期末新增或加仓 5 个标的、减仓或退出 4 个标的。"
+      ],
+      "main_text_line_count": 39,
+      "collapsed_fact_appendix": true,
       "operation_count": 34,
       "performance_basis": "invested_market_value_ex_cash",
       "period_change_cny": "101",
@@ -164,11 +318,17 @@
         "status": "accepted",
         "errors": []
       },
+      "upgraded_from": {
+        "report_id": "periodic_9a97f190ae85fdb1730a3de16b57ccb4",
+        "schema_version": "investment_review.periodic_report.v1",
+        "structured_facts_changed": false
+      },
       "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_monthly_2026-06-01_2026-06-30.json",
       "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_monthly_2026-06-01_2026-06-30.md"
     },
     {
-      "report_id": "periodic_c3e4d1f2658deb858efca2a190d33988",
+      "report_id": "periodic_e8c73040d23d55c55c882da4b6a53bbd",
+      "schema_version": "investment_review.periodic_report.v2",
       "subject": {
         "id": "000813.SZ",
         "name": "德展健康",
@@ -206,6 +366,19 @@
         "start": "2026-06-01",
         "type": "monthly"
       },
+      "analysis_brief_schema_version": "investment_review.periodic_analysis_brief.v1",
+      "reader_report_schema_version": "investment_review.reader_report.v1",
+      "central_judgment": "德展健康本月收盘价回落 10.09%，覆盖 21 个交易日，对应变化 -0.34 元/股；同时最新可得财务仍显示亏损；本月期末仓位权重 MISSING%，收盘价 3.03 元、账面成本 5.906 元，未实现收益率 -48.7%。因此现有 hold 建议不变：维持观察仓或空仓，不主动扩大到 5% 以上。",
+      "narrative_section_titles": [
+        "趋势、基本面与仓位约束",
+        "跨期变化",
+        "操作复盘"
+      ],
+      "cross_period_synthesis": [
+        "本月覆盖 21 个交易日：7 日走强、13 日回落，操作发生在 1 个交易日；期初至期末新增或加仓 0 个标的、减仓或退出 1 个标的。"
+      ],
+      "main_text_line_count": 40,
+      "collapsed_fact_appendix": true,
       "operation_count": 1,
       "performance_basis": "instrument_close_price",
       "period_change_cny": "-0.34",
@@ -213,10 +386,22 @@
         "status": "accepted",
         "errors": []
       },
+      "upgraded_from": {
+        "report_id": "periodic_c3e4d1f2658deb858efca2a190d33988",
+        "schema_version": "investment_review.periodic_report.v1",
+        "structured_facts_changed": false
+      },
       "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_monthly_2026-06-01_2026-06-30.json",
       "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_monthly_2026-06-01_2026-06-30.md"
     }
   ],
+  "reader_report_behavior": {
+    "all_samples_v2": true,
+    "one_central_judgment_per_report": true,
+    "collapsed_fact_appendix": true,
+    "weekly_monthly_cross_period_synthesis": true,
+    "runtime_model_provider_used": false
+  },
   "periodic_report_store_count": 619,
   "automation": {
     "enabled": true,
@@ -315,82 +500,6 @@
     },
     "os_scheduler_installed": false,
     "state": "succeeded"
-  },
-  "validation_results": {
-    "V-101": {
-      "status": "pass",
-      "tests_passed": 110,
-      "duration_seconds": 126.17
-    },
-    "V-102": {
-      "status": "pass",
-      "frontend_tests_passed": 23,
-      "production_build": "pass"
-    },
-    "V-201": {
-      "status": "pass",
-      "p1_reports": 2,
-      "formal_db_unchanged": true
-    },
-    "V-301": {
-      "status": "pass",
-      "trading_days": 3,
-      "daily_reports": 58,
-      "operation_counts_by_day": [6, 10, 0],
-      "no_trade_day_proven": true,
-      "repeat_idempotent": true
-    },
-    "V-401": {
-      "status": "pass",
-      "real_sample_matrix_reports": 6,
-      "stored_weekly_reports": 22,
-      "stored_monthly_reports": 23,
-      "instrument_performance_basis_errors": 0
-    },
-    "V-402": {
-      "status": "pass",
-      "localhost_api_status": "available",
-      "listed_reports": 619,
-      "default_latest_end": "2026-07-16",
-      "subject_navigation": ["portfolio", "instrument"],
-      "period_navigation": ["daily", "weekly", "monthly"],
-      "six_real_details_readable": true,
-      "chinese_name_and_code_visible": true,
-      "four_layer_context_visible": true,
-      "system_inference_visible": true,
-      "recommendation_risk_invalidation_and_missing_visible": true,
-      "browser_console_error_count": 0
-    },
-    "V-501": {
-      "status": "pass",
-      "tests_passed": 71,
-      "duration_seconds": 90.38,
-      "process_local_only": true,
-      "os_scheduler_or_service_installed": false
-    },
-    "V-999": {
-      "status": "pass",
-      "implementation_commit": "ac045c0",
-      "task_checkpoint_commit": "054142b",
-      "git_diff_check": "pass",
-      "worktree_clean_before_evidence_seal": true,
-      "task_package_validation": "pass",
-      "formal_db_sha256_unchanged": true,
-      "production_released": false
-    }
-  },
-  "coverage_audit": {
-    "derived_db_sha256": "1c6ba91b669f0701d0ece3b655605b81fb67be8a7c8f0b4c6311c09f67406550",
-    "report_count": 619,
-    "portfolio_daily": 27,
-    "instrument_daily": 547,
-    "portfolio_weekly": 1,
-    "instrument_weekly": 21,
-    "portfolio_monthly": 1,
-    "instrument_monthly": 22,
-    "literal_None_report_count": 0,
-    "instrument_code_as_name_report_count": 0,
-    "invalid_instrument_performance_basis_count": 0
   },
   "formal_portfolio_db": {
     "mode": "ro+immutable+query_only",

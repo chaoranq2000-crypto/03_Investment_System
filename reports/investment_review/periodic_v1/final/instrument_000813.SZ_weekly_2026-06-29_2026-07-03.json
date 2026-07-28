@@ -1,7 +1,216 @@
 {
-  "content_id": "sha256:8deb28edbe9ce293201c4444047a8196703392ebd0705482d43e46b3fd218635",
+  "analysis_brief": {
+    "action_plan": {
+      "action": "hold",
+      "confidence": "low",
+      "guaranteed_return": false,
+      "orders_executed": false,
+      "source_refs": [
+        "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.recommendation"
+      ],
+      "target_position": {
+        "target_position_note": "维持观察仓或空仓，不主动扩大到 5% 以上。",
+        "target_position_range_pct": [
+          "0",
+          "5"
+        ]
+      },
+      "target_position_note": "维持观察仓或空仓，不主动扩大到 5% 以上。",
+      "text": "维持 low 置信度的 hold 建议：维持观察仓或空仓，不主动扩大到 5% 以上。期限为 next_natural_week。",
+      "time_horizon": "next_natural_week",
+      "type": "analyst_view"
+    },
+    "causal_chain": [
+      {
+        "source_refs": [
+          "periodic_report:periodic_5198459011a3578900e420594db4db8c",
+          "periodic_report:periodic_7f93a88be1de3f719c647dd91890ee01",
+          "periodic_report:periodic_93f612568adda4100919dbddde7ac8e1",
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.performance",
+          "periodic_report:periodic_e175c041568ff7532178b0204aa57073",
+          "periodic_report:periodic_f37f40b8c64b834ec3903cc6fe1e99e3"
+        ],
+        "text": "本周收盘价上涨 6.69%，覆盖 5 个交易日，对应变化 0.2 元/股。",
+        "type": "inference"
+      },
+      {
+        "source_refs": [
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.period_attribution"
+        ],
+        "text": "本周覆盖 5 个交易日：4 日走强、1 日回落，操作发生在 1 个交易日；期初至期末新增或加仓 0 个标的、减仓或退出 1 个标的。",
+        "type": "inference"
+      },
+      {
+        "source_refs": [
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.positions",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-07-03",
+          "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03"
+        ],
+        "text": "本周期末仓位权重 MISSING%，收盘价 3.19 元、账面成本 8.4227 元，未实现收益率 -62.13%。",
+        "type": "inference"
+      },
+      {
+        "source_refs": [
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.operations_and_motives",
+          "portfolio.sqlite3#ledger_entries:915",
+          "portfolio.sqlite3#ledger_entries:921"
+        ],
+        "text": "本周共有 2 笔操作。其中 2 笔缺少 Decision，以下仅为 system_inference：更像在上涨中降低仓位风险或兑现一部分利润；更像小幅顺势试仓，而不是一次性改变长期仓位。替代解释与时点证据保留在附录。德展健康仓位路径为 17200 → 17200 → 8900 股；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。事后结果只用于检验执行，不用于倒推动机。",
+        "type": "inference"
+      },
+      {
+        "source_refs": [
+          "baostock.query_history_k_data_plus:sz.000813:2026-06-30:daily_valuation",
+          "baostock.query_history_k_data_plus:sz.000813:2026-07-03:daily_valuation",
+          "baostock.query_profit_data:sz.000813:2026-03-31:published:2026-04-25",
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.decision_context.fundamental_and_valuation"
+        ],
+        "text": "本周覆盖 5 个交易日，2 日具备可核对的基本面/估值上下文；期末判断：最新可得财务快照净利润 -4316.79 万元，同比亏损扩大 47.45%；负 PE 不具备常规可比意义，PS(TTM…",
+        "type": "inference"
+      }
+    ],
+    "central_judgment": {
+      "source_refs": [
+        "periodic_report:periodic_5198459011a3578900e420594db4db8c",
+        "periodic_report:periodic_7f93a88be1de3f719c647dd91890ee01",
+        "periodic_report:periodic_93f612568adda4100919dbddde7ac8e1",
+        "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.performance",
+        "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.positions",
+        "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.recommendation",
+        "periodic_report:periodic_e175c041568ff7532178b0204aa57073",
+        "periodic_report:periodic_f37f40b8c64b834ec3903cc6fe1e99e3",
+        "portfolio.sqlite3#close_prices:000813.SZ:2026-07-03",
+        "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03"
+      ],
+      "text": "德展健康本周收盘价上涨 6.69%，覆盖 5 个交易日，对应变化 0.2 元/股；但最新可得财务仍显示亏损；本周期末仓位权重 MISSING%，收盘价 3.19 元、账面成本 8.4227 元，未实现收益率 -62.13%。因此现有 hold 建议不变：维持观察仓或空仓，不主动扩大到 5% 以上。",
+      "type": "inference_and_analyst_view"
+    },
+    "evidence_pool": {
+      "four_layer_context_is_not_mandatory_headings": true,
+      "section_keys": [
+        "performance_and_positions",
+        "decision_context",
+        "operations_and_motives",
+        "review_judgments",
+        "recommendation",
+        "risks_invalidation_and_missing"
+      ]
+    },
+    "material_findings": [
+      {
+        "importance": 100,
+        "kind": "period_performance",
+        "source_refs": [
+          "periodic_report:periodic_5198459011a3578900e420594db4db8c",
+          "periodic_report:periodic_7f93a88be1de3f719c647dd91890ee01",
+          "periodic_report:periodic_93f612568adda4100919dbddde7ac8e1",
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.performance",
+          "periodic_report:periodic_e175c041568ff7532178b0204aa57073",
+          "periodic_report:periodic_f37f40b8c64b834ec3903cc6fe1e99e3"
+        ],
+        "text": "本周收盘价上涨 6.69%，覆盖 5 个交易日，对应变化 0.2 元/股。",
+        "type": "fact"
+      },
+      {
+        "importance": 92,
+        "kind": "cross_period_synthesis",
+        "source_refs": [
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.period_attribution"
+        ],
+        "text": "本周覆盖 5 个交易日：4 日走强、1 日回落，操作发生在 1 个交易日；期初至期末新增或加仓 0 个标的、减仓或退出 1 个标的。",
+        "type": "fact_and_inference"
+      },
+      {
+        "importance": 90,
+        "kind": "position_risk",
+        "source_refs": [
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.positions",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-07-03",
+          "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03"
+        ],
+        "text": "本周期末仓位权重 MISSING%，收盘价 3.19 元、账面成本 8.4227 元，未实现收益率 -62.13%。",
+        "type": "fact_and_inference"
+      },
+      {
+        "importance": 88,
+        "kind": "operation_review",
+        "source_refs": [
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.operations_and_motives",
+          "portfolio.sqlite3#ledger_entries:915",
+          "portfolio.sqlite3#ledger_entries:921"
+        ],
+        "text": "本周共有 2 笔操作。其中 2 笔缺少 Decision，以下仅为 system_inference：更像在上涨中降低仓位风险或兑现一部分利润；更像小幅顺势试仓，而不是一次性改变长期仓位。替代解释与时点证据保留在附录。德展健康仓位路径为 17200 → 17200 → 8900 股；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。事后结果只用于检验执行，不用于倒推动机。",
+        "type": "system_inference_and_retrospective"
+      },
+      {
+        "importance": 75,
+        "kind": "fundamental_constraint",
+        "source_refs": [
+          "baostock.query_history_k_data_plus:sz.000813:2026-06-30:daily_valuation",
+          "baostock.query_history_k_data_plus:sz.000813:2026-07-03:daily_valuation",
+          "baostock.query_profit_data:sz.000813:2026-03-31:published:2026-04-25",
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.decision_context.fundamental_and_valuation"
+        ],
+        "text": "本周覆盖 5 个交易日，2 日具备可核对的基本面/估值上下文；期末判断：最新可得财务快照净利润 -4316.79 万元，同比亏损扩大 47.45%；负 PE 不具备常规可比意义，PS(TTM…",
+        "type": "fact_and_inference"
+      }
+    ],
+    "operation_assessment": {
+      "separates_motive_from_retrospective": true,
+      "source_refs": [
+        "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.operations_and_motives",
+        "portfolio.sqlite3#ledger_entries:915",
+        "portfolio.sqlite3#ledger_entries:921"
+      ],
+      "text": "本周共有 2 笔操作。其中 2 笔缺少 Decision，以下仅为 system_inference：更像在上涨中降低仓位风险或兑现一部分利润；更像小幅顺势试仓，而不是一次性改变长期仓位。替代解释与时点证据保留在附录。德展健康仓位路径为 17200 → 17200 → 8900 股；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。事后结果只用于检验执行，不用于倒推动机。"
+    },
+    "period": {
+      "calendar_end": "2026-07-05",
+      "calendar_start": "2026-06-29",
+      "completeness": "partial_selected_window",
+      "covered_trading_dates": [
+        "2026-06-29",
+        "2026-06-30",
+        "2026-07-01",
+        "2026-07-02",
+        "2026-07-03"
+      ],
+      "end": "2026-07-03",
+      "report_cutoff_at": "2026-07-03T15:00:00+08:00",
+      "start": "2026-06-29",
+      "type": "weekly"
+    },
+    "risks_and_invalidation": {
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "major_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "最新可得财务快照仍显示经营风险，短期趋势转强不等于基本面反转",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "missing_inputs": [
+        "MISSING_DECISION",
+        "MISSING_EXPLICIT_USER_RISK_BUDGET"
+      ],
+      "source_refs": [
+        "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.risks_invalidation_and_missing"
+      ]
+    },
+    "schema_version": "investment_review.periodic_analysis_brief.v1",
+    "source_report_schema_version": "investment_review.periodic_report.v2",
+    "subject": {
+      "id": "000813.SZ",
+      "name": "德展健康",
+      "type": "instrument"
+    }
+  },
+  "content_id": "sha256:9b5fd3024b005ca0bb0db7bf8b6c2b3b3aa5a14c62863bdccf013e20a5a237b3",
   "generated_at": "2026-07-28T08:35:23Z",
-  "headline": "德展健康本周收盘价变动 6.69%，共 2 笔操作；下一周期建议 hold。",
+  "headline": "德展健康本周收盘价上涨 6.69%，覆盖 5 个交易日，对应变化 0.2 元/股；但最新可得财务仍显示亏损；本周期末仓位权重 MISSING%，收盘价 3.19 元、账面成本 8.4227 元，未实现收益率 -62.13%。因此现有 hold 建议不变：维持观察仓或空仓，不主动扩大到 5% 以上。",
   "period": {
     "calendar_end": "2026-07-05",
     "calendar_start": "2026-06-29",
@@ -18,14 +227,126 @@
     "start": "2026-06-29",
     "type": "weekly"
   },
-  "report_id": "periodic_8cddad3e62933d01392d53865f4718d0",
+  "reader_report": {
+    "action_plan": {
+      "action": "hold",
+      "confidence": "low",
+      "guaranteed_return": false,
+      "orders_executed": false,
+      "source_refs": [
+        "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.recommendation"
+      ],
+      "target_position": {
+        "target_position_note": "维持观察仓或空仓，不主动扩大到 5% 以上。",
+        "target_position_range_pct": [
+          "0",
+          "5"
+        ]
+      },
+      "target_position_note": "维持观察仓或空仓，不主动扩大到 5% 以上。",
+      "text": "维持 low 置信度的 hold 建议：维持观察仓或空仓，不主动扩大到 5% 以上。期限为 next_natural_week。",
+      "time_horizon": "next_natural_week",
+      "type": "analyst_view"
+    },
+    "appendix": {
+      "collapsed_by_default": true,
+      "includes_source_and_safety": true,
+      "section_keys": [
+        "performance_and_positions",
+        "decision_context",
+        "operations_and_motives",
+        "review_judgments",
+        "recommendation",
+        "risks_invalidation_and_missing"
+      ]
+    },
+    "central_judgment": "德展健康本周收盘价上涨 6.69%，覆盖 5 个交易日，对应变化 0.2 元/股；但最新可得财务仍显示亏损；本周期末仓位权重 MISSING%，收盘价 3.19 元、账面成本 8.4227 元，未实现收益率 -62.13%。因此现有 hold 建议不变：维持观察仓或空仓，不主动扩大到 5% 以上。",
+    "central_judgment_source_refs": [
+      "periodic_report:periodic_5198459011a3578900e420594db4db8c",
+      "periodic_report:periodic_7f93a88be1de3f719c647dd91890ee01",
+      "periodic_report:periodic_93f612568adda4100919dbddde7ac8e1",
+      "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.performance",
+      "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.positions",
+      "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.recommendation",
+      "periodic_report:periodic_e175c041568ff7532178b0204aa57073",
+      "periodic_report:periodic_f37f40b8c64b834ec3903cc6fe1e99e3",
+      "portfolio.sqlite3#close_prices:000813.SZ:2026-07-03",
+      "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03"
+    ],
+    "guaranteed_return": false,
+    "invalidation_conditions": [
+      "用户提供可验证的目标仓位与止损/加仓计划",
+      "新的基本面或估值证据改变风险收益判断",
+      "正式账本持仓在报告截止后已发生变化"
+    ],
+    "major_risks": [
+      "减仓后价格继续上涨会产生机会成本",
+      "最新可得财务快照仍显示经营风险，短期趋势转强不等于基本面反转",
+      "大盘或板块共同上涨不能证明个股会持续跑赢",
+      "技术趋势是概率性上下文，不能保证后续收益"
+    ],
+    "missing_inputs": [
+      "MISSING_DECISION",
+      "MISSING_EXPLICIT_USER_RISK_BUDGET"
+    ],
+    "narrative_sections": [
+      {
+        "key": "judgment_basis",
+        "paragraphs": [
+          "本周收盘价上涨 6.69%，覆盖 5 个交易日，对应变化 0.2 元/股。",
+          "本周覆盖 5 个交易日，2 日具备可核对的基本面/估值上下文；期末判断：最新可得财务快照净利润 -4316.79 万元，同比亏损扩大 47.45%；负 PE 不具备常规可比意义，PS(TTM… 本周期末仓位权重 MISSING%，收盘价 3.19 元、账面成本 8.4227 元，未实现收益率 -62.13%。"
+        ],
+        "source_refs": [
+          "baostock.query_history_k_data_plus:sz.000813:2026-06-30:daily_valuation",
+          "baostock.query_history_k_data_plus:sz.000813:2026-07-03:daily_valuation",
+          "baostock.query_profit_data:sz.000813:2026-03-31:published:2026-04-25",
+          "periodic_report:periodic_5198459011a3578900e420594db4db8c",
+          "periodic_report:periodic_7f93a88be1de3f719c647dd91890ee01",
+          "periodic_report:periodic_93f612568adda4100919dbddde7ac8e1",
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.decision_context.fundamental_and_valuation",
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.performance",
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.positions",
+          "periodic_report:periodic_e175c041568ff7532178b0204aa57073",
+          "periodic_report:periodic_f37f40b8c64b834ec3903cc6fe1e99e3",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-07-03",
+          "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03"
+        ],
+        "title": "趋势、基本面与仓位约束"
+      },
+      {
+        "key": "cross_period_synthesis",
+        "paragraphs": [
+          "本周覆盖 5 个交易日：4 日走强、1 日回落，操作发生在 1 个交易日；期初至期末新增或加仓 0 个标的、减仓或退出 1 个标的。"
+        ],
+        "source_refs": [
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.performance_and_positions.period_attribution"
+        ],
+        "title": "跨期变化"
+      },
+      {
+        "key": "operation_review",
+        "paragraphs": [
+          "本周共有 2 笔操作。其中 2 笔缺少 Decision，以下仅为 system_inference：更像在上涨中降低仓位风险或兑现一部分利润；更像小幅顺势试仓，而不是一次性改变长期仓位。替代解释与时点证据保留在附录。德展健康仓位路径为 17200 → 17200 → 8900 股；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。事后结果只用于检验执行，不用于倒推动机。"
+        ],
+        "source_refs": [
+          "periodic_report:periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8#sections.operations_and_motives",
+          "portfolio.sqlite3#ledger_entries:915",
+          "portfolio.sqlite3#ledger_entries:921"
+        ],
+        "title": "操作复盘"
+      }
+    ],
+    "orders_executed": false,
+    "schema_version": "investment_review.reader_report.v1"
+  },
+  "report_id": "periodic_bcd4f7d2d0a3af230d9b5599ea22dfe8",
   "safety": {
     "broker_accessed": false,
     "guaranteed_return_claims": false,
     "orders_executed": false,
     "recommendation_is_not_an_order": true
   },
-  "schema_version": "investment_review.periodic_report.v1",
+  "schema_version": "investment_review.periodic_report.v2",
   "sections": {
     "decision_context": {
       "framework": "four_layer_periodic_review_v1",
@@ -724,7 +1045,12 @@
       "investment_review.sqlite3#periodic_reports:periodic_f37f40b8c64b834ec3903cc6fe1e99e3",
       "investment_review.sqlite3#periodic_reports:periodic_93f612568adda4100919dbddde7ac8e1"
     ],
-    "source_sha256": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057"
+    "source_sha256": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "upgraded_from": {
+      "report_id": "periodic_8cddad3e62933d01392d53865f4718d0",
+      "schema_version": "investment_review.periodic_report.v1",
+      "structured_facts_changed": false
+    }
   },
   "status": "ready",
   "subject": {

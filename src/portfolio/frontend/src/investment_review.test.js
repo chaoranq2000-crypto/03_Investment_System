@@ -23,6 +23,7 @@ const mainSource = readFileSync(
 
 describe("periodic investment reports", () => {
   const report = {
+    schema_version: "investment_review.periodic_report.v2",
     report_id: `periodic_${"a".repeat(32)}`,
     status: "ready",
     subject: { type: "instrument", id: "000813.SZ", name: "德展健康" },
@@ -33,6 +34,33 @@ describe("periodic investment reports", () => {
       report_cutoff_at: "2026-07-15T15:00:00+08:00",
     },
     headline: "无 Decision 日报样本。",
+    analysis_brief: {
+      central_judgment: {
+        text: "短期趋势转强，但执行和基本面约束仍在。",
+      },
+    },
+    reader_report: {
+      schema_version: "investment_review.reader_report.v1",
+      central_judgment: "短期趋势转强，但执行和基本面约束仍在。",
+      narrative_sections: [{
+        key: "judgment_basis",
+        title: "趋势、基本面与仓位约束",
+        paragraphs: ["短期上涨不足以证明基本面反转。"],
+        source_refs: ["fixture:reader"],
+      }],
+      action_plan: {
+        action: "reduce",
+        confidence: "medium",
+        target_position_note: "把单标的权重降至 8%–12%。",
+        time_horizon: "下一交易周",
+      },
+      major_risks: ["减仓后继续上涨会产生机会成本"],
+      invalidation_conditions: ["新基本面证据改变判断"],
+      missing_inputs: ["MISSING_DECISION"],
+      appendix: {
+        collapsed_by_default: true,
+      },
+    },
     sections: {
       performance_and_positions: {
         performance: { asset_change_pct: "3.22" },
@@ -100,8 +128,11 @@ describe("periodic investment reports", () => {
     expect(view.period.type).toBe("daily");
     expect(view.operation_count).toBe(3);
     expect(view.recommendation.action).toBe("reduce");
+    expect(view.reader_report.central_judgment).toContain("执行和基本面");
     expect(periodicSubjectLabel(view)).toBe("德展健康（000813.SZ）");
-    expect(periodicReportHeadline(report)).toContain("8%–12%");
+    expect(periodicReportHeadline(report)).toBe(
+      "短期趋势转强，但执行和基本面约束仍在。",
+    );
     expect(projectedTime(view.period.report_cutoff_at)).toBe(
       "2026-07-15T15:00:00+08:00",
     );
@@ -131,6 +162,9 @@ describe("periodic investment reports", () => {
     expect(source).toContain("operation.name, operation.ts_code");
     expect(source).toContain("rule_backfilled");
     expect(source).toContain("RECOMMENDATION · NOT AN ORDER");
+    expect(source).toContain("READER ANALYSIS");
+    expect(source).toContain("查看完整结构化事实、逐笔操作与来源");
+    expect(source).toContain("investment_review.periodic_report.v2");
   });
 });
 

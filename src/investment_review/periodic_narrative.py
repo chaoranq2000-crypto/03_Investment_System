@@ -213,7 +213,7 @@ def _risk_finding(report: Mapping[str, Any]) -> dict[str, Any] | None:
         top3_weight = _decimal(risk.get("top3_weight_pct"))
         material: list[str] = []
         if cash_weight is None:
-            material.append("现金权重 MISSING")
+            material.append("现金权重尚无法可靠计算")
         elif cash_weight < Decimal("5"):
             material.append(f"现金权重仅 {cash_weight}%")
         else:
@@ -229,9 +229,9 @@ def _risk_finding(report: Mapping[str, Any]) -> dict[str, Any] | None:
             claim_type="fact_and_inference",
             importance=95,
             text=(
-                f"{period_label}风险承载主要受"
+                f"{period_label}风险判断的关键约束包括："
                 + "、".join(material)
-                + "等因素约束；收益变化不能替代对现金与集中度的检查。"
+                + "；收益变化不能替代对现金与集中度的检查。"
             ),
             source_refs=_refs(
                 report,
@@ -494,10 +494,20 @@ def _action_plan(report: Mapping[str, Any]) -> dict[str, Any]:
     recommendation = _mapping(sections.get("recommendation"))
     target = _mapping(recommendation.get("target_position"))
     action = str(recommendation.get("action") or "hold")
-    target_note = str(
+    source_target_note = str(
         target.get("target_position_note")
         or "仓位精度受当前缺失数据限制。"
     )
+    target_note = source_target_note
+    if action == "hold" and source_target_note.startswith("把超过"):
+        target_note = (
+            "维持现有总风险暴露；"
+            + source_target_note.replace("把超过", "若有超过", 1).replace(
+                "降至",
+                "则降至",
+                1,
+            )
+        )
     confidence = str(recommendation.get("confidence") or "low")
     horizon = str(recommendation.get("time_horizon") or "下一次实质性信息更新前")
     return {

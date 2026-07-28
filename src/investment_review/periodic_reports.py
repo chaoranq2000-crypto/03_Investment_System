@@ -165,6 +165,70 @@ def _attach_reader_narrative(report: dict[str, Any]) -> None:
     report["headline"] = reader_report["central_judgment"]
 
 
+def upgrade_periodic_report_v2(
+    report: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Upgrade a valid V1 payload without changing its structured facts."""
+
+    original = deepcopy(dict(report))
+    validation = validate_periodic_report(original)
+    if validation["status"] != "accepted":
+        raise PeriodicReportError(
+            "cannot upgrade invalid periodic report: "
+            + ", ".join(validation["errors"])
+        )
+    if original.get("schema_version") == REPORT_SCHEMA_VERSION:
+        return original
+    legacy_report_id = str(original.get("report_id") or "")
+    subject = (
+        original.get("subject")
+        if isinstance(original.get("subject"), Mapping)
+        else {}
+    )
+    period = (
+        original.get("period")
+        if isinstance(original.get("period"), Mapping)
+        else {}
+    )
+    identity = {
+        "schema_version": REPORT_SCHEMA_VERSION,
+        "subject_type": subject.get("type"),
+        "subject_id": subject.get("id"),
+        "period_type": period.get("type"),
+        "period_start": period.get("start"),
+        "period_end": period.get("end"),
+    }
+    original["schema_version"] = REPORT_SCHEMA_VERSION
+    original["report_id"] = (
+        "periodic_" + _sha256_text(_canonical_json(identity))[:32]
+    )
+    original.pop("analysis_brief", None)
+    original.pop("reader_report", None)
+    original.pop("content_id", None)
+    source = dict(
+        original.get("source")
+        if isinstance(original.get("source"), Mapping)
+        else {}
+    )
+    source["upgraded_from"] = {
+        "schema_version": LEGACY_REPORT_SCHEMA_VERSION,
+        "report_id": legacy_report_id,
+        "structured_facts_changed": False,
+    }
+    original["source"] = source
+    _attach_reader_narrative(original)
+    original["content_id"] = "sha256:" + _sha256_text(
+        _canonical_json(original)
+    )
+    validation = validate_periodic_report(original)
+    if validation["status"] != "accepted":
+        raise PeriodicReportError(
+            "upgraded periodic report validation failed: "
+            + ", ".join(validation["errors"])
+        )
+    return original
+
+
 @contextmanager
 def _read_only_connection(path: str | Path) -> Iterator[sqlite3.Connection]:
     selected = Path(path).expanduser().resolve(strict=True)
@@ -4798,12 +4862,46 @@ def export_final_sample_matrix(
             json_path,
             json.dumps(report, ensure_ascii=False, indent=2) + "\n",
         )
-        _write_report(markdown_path, render_periodic_report_markdown(report))
+        markdown = render_periodic_report_markdown(report)
+        _write_report(markdown_path, markdown)
+        reader_report = (
+            report.get("reader_report")
+            if isinstance(report.get("reader_report"), Mapping)
+            else {}
+        )
+        analysis_brief = (
+            report.get("analysis_brief")
+            if isinstance(report.get("analysis_brief"), Mapping)
+            else {}
+        )
         matrix.append(
             {
                 "report_id": report["report_id"],
+                "schema_version": report.get("schema_version"),
                 "subject": report["subject"],
                 "period": report["period"],
+                "analysis_brief_schema_version": analysis_brief.get(
+                    "schema_version"
+                ),
+                "reader_report_schema_version": reader_report.get(
+                    "schema_version"
+                ),
+                "central_judgment": reader_report.get("central_judgment"),
+                "narrative_section_titles": [
+                    item.get("title")
+                    for item in reader_report.get("narrative_sections", [])
+                    if isinstance(item, Mapping)
+                ],
+                "cross_period_synthesis": [
+                    item.get("text")
+                    for item in analysis_brief.get("material_findings", [])
+                    if isinstance(item, Mapping)
+                    and item.get("kind") == "cross_period_synthesis"
+                ],
+                "main_text_line_count": len(
+                    markdown.split("<details>", 1)[0].splitlines()
+                ),
+                "collapsed_fact_appendix": "<details>" in markdown,
                 "operation_count": report["sections"][
                     "operations_and_motives"
                 ]["operation_count"],
@@ -4814,6 +4912,9 @@ def export_final_sample_matrix(
                     "performance_and_positions"
                 ]["performance"].get("period_change_cny"),
                 "validation": validate_periodic_report(report),
+                "upgraded_from": report.get("source", {}).get(
+                    "upgraded_from"
+                ),
                 "json_path": str(json_path),
                 "markdown_path": str(markdown_path),
             }
@@ -4825,13 +4926,35 @@ def export_final_sample_matrix(
         )
     automation_status = store.get_json_meta("periodic_automation_status")
     validation_summary = {
-        "schema_version": "investment_review.periodic_v1.final_validation.v1",
+        "schema_version": "investment_review.periodic_v2.final_validation.v1",
         "status": "candidate",
         "p1_sample_acceptance": {
             "grant": "accept_p1_sample_and_continue",
             "recorded": True,
         },
+        "p5_sample_acceptance": {
+            "grant": "accept_reader_report_samples_and_continue",
+            "recorded": True,
+        },
         "sample_matrix": matrix,
+        "reader_report_behavior": {
+            "all_samples_v2": all(
+                item["schema_version"] == REPORT_SCHEMA_VERSION
+                for item in matrix
+            ),
+            "one_central_judgment_per_report": all(
+                bool(item["central_judgment"]) for item in matrix
+            ),
+            "collapsed_fact_appendix": all(
+                item["collapsed_fact_appendix"] for item in matrix
+            ),
+            "weekly_monthly_cross_period_synthesis": all(
+                bool(item["cross_period_synthesis"])
+                for item in matrix
+                if item["period"]["type"] in {"weekly", "monthly"}
+            ),
+            "runtime_model_provider_used": False,
+        },
         "periodic_report_store_count": store.count(),
         "automation": automation_status
         or {
@@ -4868,12 +4991,15 @@ def export_final_sample_matrix(
         json.dumps(validation_summary, ensure_ascii=False, indent=2) + "\n",
     )
     readout_lines = [
-        "# 周期投资复盘 V1 本地候选",
+        "# 周期投资复盘读者版 V2 本地候选",
         "",
         "- P1 用户授权：`accept_p1_sample_and_continue`（已记录）",
+        "- P5 用户授权：`accept_reader_report_samples_and_continue`（已记录）",
         f"- 六类真实报告：{len(matrix)} / 6",
         f"- 派生报告库当前报告数：{store.count()}",
         f"- 正式组合库 SHA-256：`{source_before}`（前后不变）",
+        "- 默认主文：中心判断、综合分析、操作复盘与行动；完整事实默认折叠",
+        "- 运行时模型/provider：未接入；V1 历史报告保持兼容",
         "- 订单执行：`false`；券商访问：`false`；保证收益：`false`",
         "- 生产发布：`false`；OS scheduler/service：未安装",
         "",
