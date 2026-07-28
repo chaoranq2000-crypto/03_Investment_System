@@ -6,10 +6,10 @@ contract_sha256: "e8debe680f8c679b0ff95f3f77677f7ba1508fb8a11a9f0794e0a146e5dc7a
 state: "running"
 execution_branch: "codex/investment-review-periodic-v1"
 source_baseline: "7df75562eb7c7123ff066406f92fd6b844be994b"
-last_completed_phase: "P5"
-next_phase: "P6"
+last_completed_phase: "P6"
+next_phase: "P7"
 last_validation: "pass"
-updated_at: "2026-07-28T15:53:13+00:00"
+updated_at: "2026-07-28T16:02:57+00:00"
 ---
 # 在新 Codex 聊天中启动或恢复本阶段
 
@@ -39,16 +39,16 @@ Reconcile ordinary drift and conflicts in this same package. Revise CONTRACT.md 
 ## Current checkpoint
 
 - **State:** `running`
-- **Last completed phase:** `P5`
-- **Next phase:** `P6`
-- **Latest validation:** `pass` — two frozen-input reader samples passed V-601, the one-pass principle review, package validation, source/DB hash checks, and `git diff --check`.
+- **Last completed phase:** `P6`
+- **Next phase:** `P7`
+- **Latest validation:** `pass` — V-701 passed: deterministic V2 `analysis_brief`/`reader_report`, V1 read/store/render fallback, missing-data/no-trade/cross-day synthesis checks, 115 affected backend tests, compile check, package validation, source DB hash check, and `git diff --check`.
 - **Runtime authorizations:** `accept_p1_sample_and_continue` remains historical proof for P2–P4. User grant `accept_reader_report_samples_and_continue` is active for target `P5 reader-quality daily samples`, authorizing P6–P7 within the unchanged contract boundary.
 - **Current blocker:** none.
-- **Implementation checkpoint:** `40c049f` (`docs(review): start reader-first quality iteration`) records the P5 contract baseline; the Git commit containing this file is the P5 sample checkpoint.
+- **Implementation checkpoint:** `43346cd` contains the accepted P5 samples; `d50a952` records the user grant; the Git commit containing this file is the P6 implementation checkpoint.
 - **Existing final evidence:** `reports/investment_review/periodic_v1/final/FINAL_READOUT.md` and `validation_summary.json`.
 - **Formal portfolio DB:** SHA-256 `6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057`, unchanged.
 - **P5 evidence:** `reports/investment_review/periodic_v1/reader_quality_pilot/P5_READOUT.md`, two reader samples, their analysis briefs, one principle review, and `validation_summary.json`.
-- **Next safe action:** Execute P6: build the deterministic `analysis_brief` and reader-report V2 pipeline with V1 compatibility, then run V-701 before entering P7.
+- **Next safe action:** Execute P7: make the report center default to the V2 reader narrative with a collapsed fact appendix, regenerate the six real samples, and run V-702/V-801.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
@@ -67,3 +67,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-28T15:00:50+00:00 — state=running; completed=P4; next=P5; validation=partial; P5 reader-quality execution started from the verified P1-P4 baseline. No `accept_reader_report_samples_and_continue` grant is active.
 - 2026-07-28T15:20:13+00:00 — state=blocked; completed=P5; next=P6; validation=pass; two frozen-input reader-first daily samples, two analysis briefs and one principle review passed V-601; reviewer verdict=pass, must_fix=0, revisions=0; package validator and git diff check passed; formal SQLite SHA-256 unchanged; awaiting exact user grant accept_reader_report_samples_and_continue.
 - 2026-07-28T15:53:13+00:00 — state=running; completed=P5; next=P6; validation=pass; user sample-acceptance grant recorded verbatim: accept_reader_report_samples_and_continue. C-HUMAN-002 and D-015 are satisfied; proceed through P6–P7 within the unchanged authorization envelope.
+- 2026-07-28T16:02:57+00:00 — state=running; completed=P6; next=P7; validation=pass; V-701 passed with deterministic periodic report V2 analysis_brief/reader_report, V1 compatibility, one central judgment, bounded material findings, collapsed full-fact Markdown appendix, cross-day weekly/monthly synthesis, 115 affected backend tests, compile/package/diff checks, and unchanged formal SQLite SHA-256.

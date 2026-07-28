@@ -295,13 +295,17 @@ def test_real_contract_shape_builds_portfolio_and_no_decision_instrument_daily(
         "guaranteed_return_claims": False,
         "recommendation_is_not_an_order": True,
     }
+    assert instrument["schema_version"] == "investment_review.periodic_report.v2"
+    assert instrument["headline"] == instrument["reader_report"]["central_judgment"]
+    assert instrument["analysis_brief"]["material_findings"]
     markdown = render_periodic_report_markdown(instrument)
     assert "system_inference" in markdown
     assert "样本一号（000001.SZ）" in markdown
-    assert "标的收盘价：10.8 → 11 元/股" in markdown
-    assert "四层决策上下文" in markdown
-    assert "## 6. 样本一号（000001.SZ）个性化交易建议与建议仓位" in markdown
-    assert "本报告不会执行订单" in markdown
+    assert "当日收盘价上涨 1.85%" in markdown
+    assert "结构化事实与来源" in markdown
+    assert "## 下一步行动" in markdown
+    assert "四层决策上下文" not in markdown
+    assert "报告不会连接券商或自动执行交易" in markdown
 
 
 def test_available_four_layer_context_flows_into_motive_and_recommendation(
@@ -477,7 +481,7 @@ def test_missing_historical_cash_preserves_total_asset_gap_and_market_value_basi
     assert performance["performance_basis"] == "invested_market_value_ex_cash"
     assert performance["period_change_cny"] is not None
     assert performance["period_change_pct"] is not None
-    assert "现金权重 MISSING%" in report["headline"]
+    assert "现金权重 MISSING" in report["headline"]
     assert "None" not in report["headline"]
     assert validate_periodic_report(report)["status"] == "accepted"
 
@@ -561,7 +565,7 @@ def test_daily_range_covers_held_traded_no_trade_exit_and_is_idempotent(
     )
     assert exited is not None
     assert exited["subject"]["name"] == "样本二号"
-    assert "样本二号（000002.SZ）期末权重 0%" in exited["headline"]
+    assert "期末已无该标的持仓" in exited["headline"]
     assert (output / "daily_range_validation.json").is_file()
 
 
@@ -634,7 +638,7 @@ def test_weekly_monthly_summaries_reconcile_daily_facts_and_are_idempotent(
     assert monthly_performance["price_change_cny"] == "1"
     assert monthly_performance["price_change_pct"] == "9.8"
     assert monthly_performance["asset_change_cny"] is None
-    assert "样本一号本月收盘价变动 9.8%" in stored_monthly["headline"]
+    assert "样本一号本月收盘价上涨 9.8%" in stored_monthly["headline"]
     assert stored_weekly["source"]["daily_report_ids"] == [
         item["source_report_id"]
         for item in stored_weekly["sections"]["performance_and_positions"][
@@ -710,9 +714,9 @@ def test_newly_opened_instrument_keeps_unavailable_return_explicit(
 
     assert performance["performance_basis"] == "instrument_position_market_value"
     assert performance["period_change_pct"] is None
-    assert "变动 MISSING%" in aggregate["headline"]
-    assert "期初可比价格 MISSING" in markdown
-    assert "（MISSING%）" in markdown
+    assert "收益率保持 MISSING" in aggregate["headline"]
+    assert "缺少可比期初价格" in markdown
+    assert "收益率保持 MISSING" in markdown
     assert "None" not in markdown
 
 

@@ -23,10 +23,21 @@ from zoneinfo import ZoneInfo
 from src.portfolio.accounting import build_position_states
 
 from .episodes import build_episode_collection
+from .periodic_narrative import (
+    build_analysis_brief,
+    build_reader_report,
+    render_reader_report_markdown,
+    validate_periodic_narrative,
+)
 from .periodic_context import PeriodicContextError, fetch_p1_decision_context
 
 
-REPORT_SCHEMA_VERSION = "investment_review.periodic_report.v1"
+LEGACY_REPORT_SCHEMA_VERSION = "investment_review.periodic_report.v1"
+REPORT_SCHEMA_VERSION = "investment_review.periodic_report.v2"
+SUPPORTED_REPORT_SCHEMA_VERSIONS = {
+    LEGACY_REPORT_SCHEMA_VERSION,
+    REPORT_SCHEMA_VERSION,
+}
 REPORT_API_SCHEMA_VERSION = "investment_review.periodic_reports.api.v1"
 PERIODIC_STORE_SCHEMA_VERSION = "1"
 SHANGHAI = ZoneInfo("Asia/Shanghai")
@@ -141,6 +152,17 @@ def _event_time(row: Mapping[str, Any]) -> datetime:
 
 def _report_cutoff(day: date) -> datetime:
     return datetime.combine(day, time(15, 0), tzinfo=SHANGHAI)
+
+
+def _attach_reader_narrative(report: dict[str, Any]) -> None:
+    analysis_brief = build_analysis_brief(report)
+    reader_report = build_reader_report(
+        report,
+        analysis_brief=analysis_brief,
+    )
+    report["analysis_brief"] = analysis_brief
+    report["reader_report"] = reader_report
+    report["headline"] = reader_report["central_judgment"]
 
 
 @contextmanager
@@ -2638,6 +2660,7 @@ def build_daily_report(
         performance=performance,
         recommendation=recommendation,
     )
+    _attach_reader_narrative(report)
     report["content_id"] = "sha256:" + _sha256_text(_canonical_json(report))
     validation = validate_periodic_report(report)
     if validation["status"] != "accepted":
@@ -3285,6 +3308,7 @@ def build_aggregate_report(
             "recommendation_is_not_an_order": True,
         },
     }
+    _attach_reader_narrative(report)
     report["content_id"] = "sha256:" + _sha256_text(_canonical_json(report))
     validation = validate_periodic_report(report)
     if validation["status"] != "accepted":
@@ -3297,7 +3321,8 @@ def build_aggregate_report(
 
 def validate_periodic_report(report: Mapping[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
-    if report.get("schema_version") != REPORT_SCHEMA_VERSION:
+    schema_version = report.get("schema_version")
+    if schema_version not in SUPPORTED_REPORT_SCHEMA_VERSIONS:
         errors.append("unsupported_schema_version")
     subject = report.get("subject")
     if not isinstance(subject, Mapping) or subject.get("type") not in _SUBJECT_TYPES:
@@ -3425,6 +3450,8 @@ def validate_periodic_report(report: Mapping[str, Any]) -> dict[str, Any]:
         ):
             if safety.get(field) is not False:
                 errors.append(f"{field}_not_false")
+    if schema_version == REPORT_SCHEMA_VERSION:
+        errors.extend(validate_periodic_narrative(report))
     return {
         "status": "accepted" if not errors else "blocked",
         "errors": sorted(set(errors)),
@@ -3432,6 +3459,9 @@ def validate_periodic_report(report: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
+    if report.get("schema_version") == REPORT_SCHEMA_VERSION:
+        return render_reader_report_markdown(report)
+
     subject = report["subject"]
     period = report["period"]
     sections = report["sections"]
@@ -4032,11 +4062,27 @@ class PeriodicReportStore:
         return [
             {
                 "report_id": report["report_id"],
+                "schema_version": report.get("schema_version"),
                 "status": report.get("status"),
                 "subject": report["subject"],
                 "period": report["period"],
                 "generated_at": report.get("generated_at"),
                 "headline": report.get("headline"),
+                "reader_report": (
+                    {
+                        "schema_version": report["reader_report"].get(
+                            "schema_version"
+                        ),
+                        "central_judgment": report["reader_report"].get(
+                            "central_judgment"
+                        ),
+                        "action_plan": report["reader_report"].get(
+                            "action_plan"
+                        ),
+                    }
+                    if isinstance(report.get("reader_report"), Mapping)
+                    else None
+                ),
                 "recommendation": report["sections"].get("recommendation"),
                 "risk_change": report["sections"]
                 .get("performance_and_positions", {})
