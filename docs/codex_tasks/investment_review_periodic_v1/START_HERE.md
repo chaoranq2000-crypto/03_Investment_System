@@ -2,14 +2,14 @@
 schema_version: "1"
 task_id: "investment_review_periodic_v1"
 contract_path: "docs/codex_tasks/investment_review_periodic_v1/CONTRACT.md"
-contract_sha256: "585ef450730b0d105f418112d50ac597a9a98ba576e04ec5e0365b27a29a5fff"
-state: "blocked"
+contract_sha256: "7cb2b06aac33573dc4fd69e8cdacb5f2d386fe8b5d6021dc033b187360a63fb7"
+state: "running"
 execution_branch: "codex/investment-review-periodic-v1"
 source_baseline: "7df75562eb7c7123ff066406f92fd6b844be994b"
 last_completed_phase: "P1"
-next_phase: "P2"
-last_validation: "pass"
-updated_at: "2026-07-28T05:36:09+00:00"
+next_phase: "P1"
+last_validation: "partial"
+updated_at: "2026-07-28T06:56:38+00:00"
 ---
 # 在新 Codex 聊天中启动或恢复本阶段
 
@@ -22,7 +22,7 @@ Use $autonomous-stage-runner in execute mode.
 
 Task package: docs/codex_tasks/investment_review_periodic_v1
 Active contract: docs/codex_tasks/investment_review_periodic_v1/CONTRACT.md
-Recorded contract SHA-256: 585ef450730b0d105f418112d50ac597a9a98ba576e04ec5e0365b27a29a5fff
+Recorded contract SHA-256: 7cb2b06aac33573dc4fd69e8cdacb5f2d386fe8b5d6021dc033b187360a63fb7
 Execution worktree: C:\Projects\03_Investment_System_periodic_review_v1
 Execution branch: codex/investment-review-periodic-v1
 Source baseline: 7df75562eb7c7123ff066406f92fd6b844be994b
@@ -38,13 +38,13 @@ Reconcile ordinary drift and conflicts in this same package. Revise CONTRACT.md 
 
 ## Current checkpoint
 
-- **State:** `blocked`
+- **State:** `running`
 - **Last completed phase:** `P1`
-- **Next phase:** `P2`
-- **Latest validation:** `V-001/V-101/V-102/V-201 pass; localhost API/browser QA pass; formal DB unchanged`
+- **Next phase:** `P1`
+- **Latest validation:** `V-001 package validation pass after contract revision; prior P1 engineering evidence is superseded for affected criteria`
 - **Runtime authorizations:** none
-- **Current blocker:** P1 engineering is complete, but the user has not yet granted `accept_p1_sample_and_continue`; entering P2 is prohibited.
-- **Next safe action:** The user reviews the two reports and `P1_READOUT.md`, then either replies exactly `accept_p1_sample_and_continue` or gives P1 sample feedback.
+- **Current blocker:** none for P1 iteration. The user confirmed the report framework but did not grant `accept_p1_sample_and_continue`; entering P2 remains prohibited.
+- **Next safe action:** Rebuild the real portfolio and no-Decision instrument daily reports with Chinese names, four-layer decision context, non-mechanical motive analysis, current fee provenance and cash-consistency handling; rerun only affected P1 validators.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
@@ -54,3 +54,5 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-28T11:21:38+08:00 — Boundary and implementation-plan foundation committed as `7df75562eb7c7123ff066406f92fd6b844be994b`; this is now the execution baseline.
 - 2026-07-28T13:02:46+08:00 — Execute-mode run started after V-001 passed with no warnings; P1 is the earliest unproven outcome and no runtime authorization is active.
 - 2026-07-28T05:36:09+00:00 — state=blocked; completed=P1; next=P2; validation=pass; P1 engineering complete: real portfolio and no-Decision instrument daily reports pass V-101/V-102/V-201 and localhost API/browser QA; awaiting exact user grant accept_p1_sample_and_continue.
+- 2026-07-28T06:55:29+00:00 — contract revision; previous_sha256=585ef450730b0d105f418112d50ac597a9a98ba576e04ec5e0365b27a29a5fff; new_sha256=7cb2b06aac33573dc4fd69e8cdacb5f2d386fe8b5d6021dc033b187360a63fb7; reason=User rejected the initial P1 sample, confirmed the four-layer review framework and reported completion of the formal-ledger fee backfill; revise P1 criteria, data baseline and fee provenance handling.
+- 2026-07-28T06:56:38+00:00 — state=running; completed=P1-initial-engineering-only; next=P1-iteration; validation=partial; user feedback supersedes affected P1 evidence, report-framework confirmation is recorded, and no sample-acceptance grant is active.
