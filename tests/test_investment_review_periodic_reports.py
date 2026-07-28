@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import sqlite3
+from copy import deepcopy
 from pathlib import Path
 
 from src.investment_review.periodic_reports import (
     PeriodicReportStore,
+    _fee_provenance,
     build_daily_report,
     render_periodic_report_markdown,
     validate_periodic_report,
@@ -129,13 +131,14 @@ def _formal_portfolio_db(tmp_path: Path) -> Path:
             INSERT INTO cash_balance_snapshots(
                 snapshot_id, account_id, as_of_date, amount, source, note,
                 recorded_at
-            ) VALUES (?, 'default', ?, ?, 'statement_calculated', ?, ?)
+            ) VALUES (?, 'default', ?, ?, ?, ?, ?)
             """,
             [
                 (
                     "cash-previous",
                     "2026-07-14",
                     "1000",
+                    "user_provided",
                     "fixture",
                     "2026-07-14T12:00:00Z",
                 ),
@@ -143,6 +146,7 @@ def _formal_portfolio_db(tmp_path: Path) -> Path:
                     "cash-report",
                     "2026-07-15",
                     "1002",
+                    "statement_calculated",
                     "fee_pending",
                     "2026-07-15T12:00:00Z",
                 ),
@@ -156,6 +160,55 @@ def _empty_sidecar(tmp_path: Path) -> Path:
     path = tmp_path / "investment_review.sqlite3"
     sqlite3.connect(path).close()
     return path
+
+
+def _point_in_time_context() -> dict[str, object]:
+    return {
+        "subject": {
+            "ts_code": "000001.SZ",
+            "name": "样本一号",
+            "industry_name": "样本行业",
+        },
+        "fetched_at": "2026-07-15T12:30:00Z",
+        "fundamental_and_valuation": {
+            "status": "available",
+            "summary": "最新公开财务与估值快照已核对。",
+            "observations": [
+                {
+                    "type": "fact",
+                    "text": "样本财务事实。",
+                    "source_ref": "fixture:fundamental",
+                }
+            ],
+            "source_refs": ["fixture:fundamental"],
+        },
+        "market_and_sector": {
+            "status": "available",
+            "summary": "指数与板块仅用于解释环境，不直接证明动机。",
+            "observations": [],
+            "source_refs": ["fixture:market"],
+        },
+        "technical_and_trend": {
+            "status": "available",
+            "summary": "短线趋势偏强，但只作概率性上下文。",
+            "observations": [],
+            "source_refs": ["fixture:technical"],
+        },
+        "intraday_bars": [
+            {
+                "bar_end_at": "2026-07-15T09:35:00+08:00",
+                "high_cny": "11",
+                "close_cny": "10.98",
+                "source_ref": "fixture:09:35",
+            },
+            {
+                "bar_end_at": "2026-07-15T10:05:00+08:00",
+                "high_cny": "11.1",
+                "close_cny": "11.08",
+                "source_ref": "fixture:10:05",
+            },
+        ],
+    }
 
 
 def test_real_contract_shape_builds_portfolio_and_no_decision_instrument_daily(
@@ -200,7 +253,20 @@ def test_real_contract_shape_builds_portfolio_and_no_decision_instrument_daily(
         item["motive"]["input_cutoff_at"] == item["occurred_at"]
         for item in operations
     )
-    assert all(item["fee_status"] == "MISSING" for item in operations)
+    assert all(item["fee_status"] == "unknown" for item in operations)
+    assert all(item["name"] == "样本一号" for item in operations)
+    assert instrument["sections"]["decision_context"]["report_depth"] == (
+        "daily_delta_only"
+    )
+    assert set(instrument["sections"]["decision_context"]) >= {
+        "fundamental_and_valuation",
+        "market_and_sector",
+        "technical_and_trend",
+        "position_and_execution",
+    }
+    assert instrument["sections"]["performance_and_positions"]["cash"][
+        "consistency_status"
+    ] == "replayed_from_anchor"
     assert instrument["safety"] == {
         "orders_executed": False,
         "broker_accessed": False,
@@ -209,8 +275,106 @@ def test_real_contract_shape_builds_portfolio_and_no_decision_instrument_daily(
     }
     markdown = render_periodic_report_markdown(instrument)
     assert "system_inference" in markdown
+    assert "样本一号（000001.SZ）" in markdown
+    assert "四层决策上下文" in markdown
     assert "个性化交易建议与建议仓位" in markdown
     assert "本报告不会执行订单" in markdown
+
+
+def test_available_four_layer_context_flows_into_motive_and_recommendation(
+    tmp_path: Path,
+) -> None:
+    source = _formal_portfolio_db(tmp_path)
+    sidecar = _empty_sidecar(tmp_path)
+    report = build_daily_report(
+        portfolio_db=source,
+        review_db=sidecar,
+        report_date="2026-07-15",
+        subject_type="instrument",
+        subject_id="000001.SZ",
+        point_in_time_context=_point_in_time_context(),
+    )
+
+    context = report["sections"]["decision_context"]
+    recommendation = report["sections"]["recommendation"]
+    operations = report["sections"]["operations_and_motives"]["operations"]
+    assert all(
+        context[key]["status"] == "available"
+        for key in (
+            "fundamental_and_valuation",
+            "market_and_sector",
+            "technical_and_trend",
+            "position_and_execution",
+        )
+    )
+    assert recommendation["confidence"] == "medium"
+    assert "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT" not in (
+        recommendation["important_missing_inputs"]
+    )
+    assert "MISSING_INTRADAY_MARKET_CONTEXT" not in operations[0]["motive"][
+        "important_missing_information"
+    ]
+
+
+def test_fee_provenance_separates_actual_backfill_exemption_and_unknown() -> None:
+    assert _fee_provenance(
+        {"fees": "6.2", "note": "broker_statement=true"}
+    )["status"] == "reported_actual"
+    backfilled = _fee_provenance(
+        {
+            "fees": "5.06",
+            "note": (
+                "fees_missing=true; fee_rule=historical_fee_rule_v1; "
+                "fee_backfilled_rule=true"
+            ),
+        }
+    )
+    assert backfilled["status"] == "rule_backfilled"
+    assert backfilled["fee_rule"] == "historical_fee_rule_v1"
+    assert _fee_provenance(
+        {
+            "fees": "0",
+            "note": "fee_rule=online_primary_bond_subscription_fee_exempt_v1",
+        }
+    )["status"] == "formal_exemption"
+    assert _fee_provenance(
+        {"fees": "0", "note": "fees_missing=true"}
+    )["status"] == "unknown"
+
+
+def test_rule_backfilled_fees_replay_cash_without_missing_fee_warning(
+    tmp_path: Path,
+) -> None:
+    source = _formal_portfolio_db(tmp_path)
+    sidecar = _empty_sidecar(tmp_path)
+    with sqlite3.connect(source) as connection:
+        connection.execute(
+            """
+            UPDATE ledger_entries
+            SET fees = '1',
+                note = 'fee_rule=historical_fee_rule_v1; fee_backfilled_rule=true'
+            WHERE event_date = '2026-07-15'
+            """
+        )
+        connection.commit()
+
+    report = build_daily_report(
+        portfolio_db=source,
+        review_db=sidecar,
+        report_date="2026-07-15",
+        subject_type="instrument",
+        subject_id="000001.SZ",
+    )
+
+    cash = report["sections"]["performance_and_positions"]["cash"]
+    operations = report["sections"]["operations_and_motives"]["operations"]
+    assert cash["amount_cny"] == "1000"
+    assert cash["fee_pending"] is False
+    assert cash["fee_provenance_status"] == "complete"
+    assert {item["fee_status"] for item in operations} == {"rule_backfilled"}
+    assert "UNKNOWN_TRADE_FEE_PROVENANCE" not in report["sections"][
+        "risks_invalidation_and_missing"
+    ]["data_limitations"]
 
 
 def test_periodic_store_is_additive_and_idempotent(tmp_path: Path) -> None:
@@ -236,6 +400,15 @@ def test_periodic_store_is_additive_and_idempotent(tmp_path: Path) -> None:
     listing = store.list(subject_type="instrument", period_type="daily")
     assert [item["report_id"] for item in listing] == [report["report_id"]]
 
+    refreshed = deepcopy(report)
+    refreshed["report_id"] = "periodic_" + "b" * 32
+    refreshed["headline"] = "同一报告期在来源修正后刷新。"
+    receipt = store.save(refreshed)
+    assert receipt["status"] == "updated"
+    assert receipt["report_id"] == refreshed["report_id"]
+    assert store.count() == 1
+    assert store.get(refreshed["report_id"]) == refreshed
+
 
 def test_daily_report_still_exists_without_trades(tmp_path: Path) -> None:
     source = _formal_portfolio_db(tmp_path)
@@ -255,3 +428,26 @@ def test_daily_report_still_exists_without_trades(tmp_path: Path) -> None:
         "reduce",
     }
     assert validate_periodic_report(report)["status"] == "accepted"
+
+
+def test_validator_rejects_post_operation_motive_observation(
+    tmp_path: Path,
+) -> None:
+    source = _formal_portfolio_db(tmp_path)
+    sidecar = _empty_sidecar(tmp_path)
+    report = build_daily_report(
+        portfolio_db=source,
+        review_db=sidecar,
+        report_date="2026-07-15",
+        subject_type="instrument",
+        subject_id="000001.SZ",
+    )
+    drifted = deepcopy(report)
+    operation = drifted["sections"]["operations_and_motives"]["operations"][0]
+    operation["motive"]["supporting_observations"][0]["observed_at"] = (
+        "2026-07-15T15:00:00+08:00"
+    )
+
+    validation = validate_periodic_report(drifted)
+    assert validation["status"] == "blocked"
+    assert "motive_observation_after_operation" in validation["errors"]

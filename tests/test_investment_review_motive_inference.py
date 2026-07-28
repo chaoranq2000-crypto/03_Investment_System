@@ -132,3 +132,67 @@ def test_reduce_after_same_day_buys_is_a_labeled_hypothesis_not_user_fact() -> N
         observation["observed_at"] <= sell["occurred_at"]
         for observation in motive["supporting_observations"]
     )
+
+
+def test_completed_intraday_bar_and_position_path_make_motive_specific() -> None:
+    first = _operation(
+        operation_id="buy-small",
+        occurred_at="2026-07-15T01:38:45Z",
+        side="BUY",
+        quantity="1700",
+        price="3.41",
+        before="17200",
+        after="18900",
+    )
+    prior = [
+        {
+            "trade_date": "2026-07-14",
+            "close": "3.37",
+            "source_ref": "close:2026-07-14",
+        },
+        {
+            "trade_date": "2026-07-13",
+            "close": "3.29",
+            "source_ref": "close:2026-07-13",
+        },
+        {
+            "trade_date": "2026-07-10",
+            "close": "3.23",
+            "source_ref": "close:2026-07-10",
+        },
+    ]
+    bars = [
+        {
+            "bar_end_at": "2026-07-15T09:35:00+08:00",
+            "high_cny": "3.41",
+            "close_cny": "3.4",
+            "source_ref": "baostock:09:35",
+        },
+        {
+            "bar_end_at": "2026-07-15T09:40:00+08:00",
+            "high_cny": "3.43",
+            "close_cny": "3.42",
+            "source_ref": "baostock:09:40",
+        },
+    ]
+
+    motive = infer_motive_hypothesis(
+        first,
+        earlier_operations=[],
+        prior_closes=prior,
+        position_weight_before_pct="11",
+        intraday_bars=bars,
+    )
+
+    assert "小幅顺势试仓" in motive["most_likely_motive"]
+    assert "MISSING_INTRADAY_MARKET_CONTEXT" not in (
+        motive["important_missing_information"]
+    )
+    assert any(
+        "09:35:00" in observation["text"]
+        for observation in motive["supporting_observations"]
+    )
+    assert all(
+        observation["observed_at"] <= first["occurred_at"]
+        for observation in motive["supporting_observations"]
+    )

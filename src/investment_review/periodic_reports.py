@@ -22,6 +22,7 @@ from zoneinfo import ZoneInfo
 from src.portfolio.accounting import build_position_states
 
 from .episodes import build_episode_collection
+from .periodic_context import PeriodicContextError, fetch_p1_decision_context
 
 
 REPORT_SCHEMA_VERSION = "investment_review.periodic_report.v1"
@@ -34,6 +35,8 @@ _SUBJECT_TYPES = {"portfolio", "instrument"}
 _PERIOD_TYPES = {"daily"}
 _ACTIONS = {"buy", "sell", "hold", "add", "reduce", "exit"}
 _POSITION_EVENT_TYPES = {"BUY", "SELL"}
+_CASH_EVENT_TYPES = {"BUY", "SELL", "DIVIDEND", "CASH_FEE"}
+_FEE_EXEMPT_RULES = {"online_primary_bond_subscription_fee_exempt_v1"}
 
 
 class PeriodicReportError(ValueError):
@@ -171,6 +174,68 @@ def _ledger_rows(
     ]
 
 
+def _note_fields(note: object) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    for part in str(note or "").split(";"):
+        key, separator, value = part.strip().partition("=")
+        if separator and key.strip():
+            fields[key.strip().lower()] = value.strip()
+    return fields
+
+
+def _fee_provenance(row: Mapping[str, Any]) -> dict[str, Any]:
+    """Classify fee evidence without treating estimates as broker actuals."""
+
+    note = str(row.get("note") or "")
+    note_lower = note.lower()
+    fields = _note_fields(note)
+    fee_value = _decimal(row.get("fees"), default=ZERO) or ZERO
+    fee_rule = fields.get("fee_rule")
+    if fields.get("fee_backfilled_rule", "").lower() == "true":
+        status = "rule_backfilled"
+    elif fee_rule in _FEE_EXEMPT_RULES:
+        status = "formal_exemption"
+    elif fee_value > ZERO:
+        status = "reported_actual"
+    elif any(
+        marker in note_lower
+        for marker in ("fee_pending", "fees_missing=true", "missing_source_column")
+    ):
+        status = "unknown"
+    else:
+        status = "unknown"
+    return {
+        "amount_cny": _decimal_text(fee_value, places=2),
+        "status": status,
+        "fee_rule": fee_rule,
+        "is_known": status != "unknown",
+        "note_ref": (
+            f"fee_rule={fee_rule}" if fee_rule else "ledger note has no fee rule"
+        ),
+    }
+
+
+def _cash_delta(rows: Sequence[Mapping[str, Any]]) -> tuple[Decimal, int]:
+    change = ZERO
+    unknown_fee_entries = 0
+    for row in rows:
+        event_type = str(row.get("event_type") or "").upper()
+        gross = _decimal(row.get("gross_amount"), default=ZERO) or ZERO
+        fees = _decimal(row.get("fees"), default=ZERO) or ZERO
+        cash_amount = _decimal(row.get("cash_amount"), default=ZERO) or ZERO
+        if event_type == "BUY":
+            change -= gross + fees
+        elif event_type == "SELL":
+            change += gross - fees
+        elif event_type == "DIVIDEND":
+            change += cash_amount
+        elif event_type == "CASH_FEE":
+            change -= cash_amount
+        if event_type in _POSITION_EVENT_TYPES and not _fee_provenance(row)["is_known"]:
+            unknown_fee_entries += 1
+    return change, unknown_fee_entries
+
+
 def _cash_snapshot(
     connection: sqlite3.Connection,
     *,
@@ -191,12 +256,99 @@ def _cash_snapshot(
         return None
     note = str(row["note"] or "")
     fee_pending = "fee_pending" in note or "fees_missing" in note
+    if fee_pending:
+        anchor = connection.execute(
+            """
+            SELECT snapshot_id, as_of_date, amount, source, note, recorded_at
+            FROM cash_balance_snapshots
+            WHERE account_id = ? AND as_of_date <= ?
+              AND source <> 'statement_calculated'
+            ORDER BY as_of_date DESC, recorded_at DESC, snapshot_id DESC
+            LIMIT 1
+            """,
+            (account_id, through.isoformat()),
+        ).fetchone()
+        if anchor is not None:
+            replay_rows = [
+                dict(item)
+                for item in connection.execute(
+                    """
+                    SELECT *
+                    FROM ledger_entries
+                    WHERE account_id = ?
+                      AND event_date > ?
+                      AND event_date <= ?
+                      AND event_type IN ('BUY', 'SELL', 'DIVIDEND', 'CASH_FEE')
+                    ORDER BY event_date,
+                      CASE WHEN event_time = '' THEN '99:99:99' ELSE event_time END,
+                      entry_id
+                    """,
+                    (
+                        account_id,
+                        anchor["as_of_date"],
+                        through.isoformat(),
+                    ),
+                )
+            ]
+            change, unknown_fee_entries = _cash_delta(replay_rows)
+            amount = (_decimal(anchor["amount"], default=ZERO) or ZERO) + change
+            replay_complete = unknown_fee_entries == 0
+            return {
+                "amount_cny": _decimal_text(amount, places=2),
+                "as_of_date": (
+                    max(
+                        (str(item.get("event_date") or "") for item in replay_rows),
+                        default=str(anchor["as_of_date"]),
+                    )
+                ),
+                "source": "derived_read_only_ledger_replay",
+                "status": "fact" if replay_complete else "LOW_CONFIDENCE",
+                "fee_pending": not replay_complete,
+                "fee_provenance_status": (
+                    "complete" if replay_complete else "contains_unknown"
+                ),
+                "consistency_status": "replayed_from_anchor",
+                "cash_change_from_anchor_cny": _decimal_text(change, places=2),
+                "anchor": {
+                    "amount_cny": _decimal_text(
+                        _decimal(anchor["amount"]), places=2
+                    ),
+                    "as_of_date": anchor["as_of_date"],
+                    "source": anchor["source"],
+                    "source_ref": (
+                        "portfolio.sqlite3#cash_balance_snapshots:"
+                        f"{anchor['snapshot_id']}"
+                    ),
+                },
+                "superseded_snapshot": {
+                    "amount_cny": _decimal_text(_decimal(row["amount"]), places=2),
+                    "as_of_date": row["as_of_date"],
+                    "note": note,
+                    "source_ref": (
+                        "portfolio.sqlite3#cash_balance_snapshots:"
+                        f"{row['snapshot_id']}"
+                    ),
+                },
+                "replayed_ledger_entries": len(replay_rows),
+                "unknown_fee_entries": unknown_fee_entries,
+                "recorded_at": max(
+                    str(row["recorded_at"] or ""),
+                    str(anchor["recorded_at"] or ""),
+                ),
+                "source_ref": (
+                    "portfolio.sqlite3#cash_balance_snapshots:"
+                    f"{anchor['snapshot_id']}+ledger_entries:"
+                    f"through:{through.isoformat()}"
+                ),
+            }
     return {
         "amount_cny": _decimal_text(_decimal(row["amount"]), places=2),
         "as_of_date": row["as_of_date"],
         "source": row["source"],
         "status": "LOW_CONFIDENCE" if fee_pending else "fact",
         "fee_pending": fee_pending,
+        "fee_provenance_status": "contains_unknown" if fee_pending else "complete",
+        "consistency_status": "snapshot_direct",
         "note": note,
         "recorded_at": row["recorded_at"],
         "source_ref": f"portfolio.sqlite3#cash_balance_snapshots:{row['snapshot_id']}",
@@ -526,12 +678,34 @@ def _operation_role(operation: Mapping[str, Any]) -> str:
     return "cash_or_non_position"
 
 
+def _intraday_context_at(
+    operation: Mapping[str, Any],
+    intraday_bars: Sequence[Mapping[str, Any]] | None,
+) -> dict[str, Any] | None:
+    if not intraday_bars:
+        return None
+    cutoff = _aware_timestamp(str(operation.get("occurred_at") or ""))
+    completed: list[tuple[datetime, Mapping[str, Any]]] = []
+    for bar in intraday_bars:
+        value = str(bar.get("bar_end_at") or "")
+        if not value:
+            continue
+        bar_time = _aware_timestamp(value)
+        if bar_time <= cutoff:
+            completed.append((bar_time, bar))
+    if not completed:
+        return None
+    _, selected = max(completed, key=lambda item: item[0])
+    return dict(selected)
+
+
 def infer_motive_hypothesis(
     operation: Mapping[str, Any],
     *,
     earlier_operations: Sequence[Mapping[str, Any]],
     prior_closes: Sequence[Mapping[str, Any]],
     position_weight_before_pct: str | None,
+    intraday_bars: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Infer one motive using only inputs available by this operation."""
 
@@ -540,6 +714,13 @@ def infer_motive_hypothesis(
     side = str(operation.get("side") or "")
     price = _decimal(operation.get("price_cny"))
     quantity = _decimal(operation.get("quantity"), default=ZERO) or ZERO
+    quantity_before = (
+        _decimal(operation.get("quantity_before"), default=ZERO) or ZERO
+    )
+    quantity_after = (
+        _decimal(operation.get("quantity_after"), default=ZERO) or ZERO
+    )
+    position_change_pct = _pct(quantity, quantity_before)
     previous_close = (
         _decimal(prior_closes[0].get("close")) if prior_closes else None
     )
@@ -571,6 +752,19 @@ def infer_motive_hypothesis(
         ),
         ZERO,
     )
+    earlier_buy_operations = [
+        item for item in earlier_same_instrument if item.get("side") == "BUY"
+    ]
+    latest_completed_bar = _intraday_context_at(operation, intraday_bars)
+    bar_high = (
+        _decimal(latest_completed_bar.get("high_cny"))
+        if latest_completed_bar
+        else None
+    )
+    trade_vs_bar_high = _pct(
+        price - bar_high if price is not None and bar_high is not None else None,
+        bar_high,
+    )
 
     observations = [
         {
@@ -583,6 +777,18 @@ def infer_motive_hypothesis(
             "observed_at": occurred_at,
         }
     ]
+    if position_change_pct is not None:
+        observations.append(
+            {
+                "type": "fact",
+                "text": (
+                    f"本笔数量相当于操作前持仓的 "
+                    f"{_decimal_text(position_change_pct, places=2)}%"
+                ),
+                "source_ref": operation.get("source_ref"),
+                "observed_at": occurred_at,
+            }
+        )
     if previous_close is not None:
         observations.append(
             {
@@ -609,6 +815,26 @@ def infer_motive_hypothesis(
                 "observed_at": occurred_at,
             }
         )
+    if latest_completed_bar is not None:
+        observations.append(
+            {
+                "type": "fact",
+                "text": (
+                    f"操作前最近一根已完成 5 分钟 K 线截至 "
+                    f"{latest_completed_bar.get('bar_end_at')}："
+                    f"高 {latest_completed_bar.get('high_cny')} 元、"
+                    f"收 {latest_completed_bar.get('close_cny')} 元；"
+                    f"成交价相对该高点 "
+                    f"{_decimal_text(trade_vs_bar_high, places=2)}%"
+                ),
+                "source_ref": latest_completed_bar.get("source_ref"),
+                "observed_at": _iso_utc(
+                    _aware_timestamp(
+                        str(latest_completed_bar.get("bar_end_at") or "")
+                    )
+                ),
+            }
+        )
     if position_weight_before_pct is not None:
         observations.append(
             {
@@ -621,35 +847,140 @@ def infer_motive_hypothesis(
 
     trend_up = prior_return is not None and prior_return > Decimal("1")
     if side == "BUY":
-        if earlier_same_instrument:
-            motive = "在已有同日买入后继续分批加仓，最可能是在确认盘中强度后扩大试仓。"
-            alternative = "也可能只是拆单执行既定买入数量，并不代表新的判断。"
+        if earlier_buy_operations:
+            previous_buy = earlier_buy_operations[-1]
+            previous_buy_quantity = (
+                _decimal(previous_buy.get("quantity"), default=ZERO) or ZERO
+            )
+            previous_buy_price = _decimal(previous_buy.get("price_cny"))
+            size_multiple = (
+                quantity / previous_buy_quantity
+                if previous_buy_quantity > ZERO
+                else None
+            )
+            price_step = _pct(
+                price - previous_buy_price
+                if price is not None and previous_buy_price is not None
+                else None,
+                previous_buy_price,
+            )
+            if (
+                size_multiple is not None
+                and size_multiple > Decimal("1")
+                and price_step is not None
+                and price_step > ZERO
+            ):
+                motive = (
+                    "系统推断：在前一笔买入后，本笔加仓规模约为前笔的 "
+                    f"{_decimal_text(size_multiple, places=2)} 倍，成交价又提高 "
+                    f"{_decimal_text(price_step, places=2)}%；"
+                    "更像是在看到盘中强势后放大试仓。规模随价格上升而扩大，"
+                    "执行上带有追高风险，但这不是用户已记录动机。"
+                )
+            elif size_multiple is not None and size_multiple <= Decimal("1"):
+                motive = (
+                    "系统推断：本笔延续同日买入，但规模缩小为前笔的 "
+                    f"{_decimal_text(size_multiple, places=2)} 倍、成交价变化 "
+                    f"{_decimal_text(price_step, places=2)}%；"
+                    "更像控制加仓节奏或继续拆单，不能据此声称用户在放大判断。"
+                )
+            else:
+                motive = (
+                    "系统推断：本笔延续同日买入，规模约为前笔的 "
+                    f"{_decimal_text(size_multiple, places=2)} 倍、成交价变化 "
+                    f"{_decimal_text(price_step, places=2)}%；"
+                    "更像分批补仓或执行既定数量，而非顺价追高。"
+                )
+            alternative = (
+                "也可能只是预先拆分的固定买入计划；缺少 Decision 和目标仓位，"
+                "不能把盘面解释当成用户事实。"
+            )
         elif trend_up or (trade_vs_prior is not None and trade_vs_prior > ZERO):
-            motive = "最可能是顺势加仓或建立日内试仓，尝试延续操作前已可见的上涨。"
-            alternative = "也可能是长期仓位补回或被动再平衡，现有数据无法证明追涨动机。"
+            bar_phrase = (
+                "，且成交接近操作前最近已完成 5 分钟 K 线高点"
+                if bar_high is not None
+                and price is not None
+                and abs(trade_vs_bar_high or ZERO) <= Decimal("0.5")
+                else ""
+            )
+            trend_phrase = (
+                f"操作前近三次收盘累计上涨约 "
+                f"{_decimal_text(prior_return, places=2)}%"
+                if prior_return is not None
+                else (
+                    f"成交价较操作前最近收盘高 "
+                    f"{_decimal_text(trade_vs_prior, places=2)}%"
+                )
+            )
+            motive = (
+                f"系统推断：{trend_phrase}，"
+                f"本笔仅增加操作前持仓的 "
+                f"{_decimal_text(position_change_pct, places=2)}%{bar_phrase}；"
+                "更像小幅顺势试仓，而不是一次性改变长期仓位。"
+            )
+            alternative = (
+                "也可能是长期仓位补回或被动再平衡；没有 Decision，"
+                "不能确认其依据是短线趋势。"
+            )
         else:
-            motive = "最可能是在回撤中补仓，尝试降低持仓成本或恢复目标仓位。"
+            motive = (
+                "系统推断：本笔在操作前趋势不强时增加仓位，更像回撤补仓或"
+                "恢复目标仓位；现有数据不能证明其目的。"
+            )
             alternative = "也可能是长期配置或现金再平衡，而非基于短线价格判断。"
     elif side == "SELL":
-        if earlier_buys >= quantity and quantity > ZERO:
-            motive = "最可能是撤回当日新增仓位、控制盘中风险，或完成一次短线做 T。"
+        if (
+            earlier_buys == quantity
+            and quantity > ZERO
+            and quantity_after
+            == (
+                _decimal(earlier_buy_operations[0].get("quantity_before"))
+                if earlier_buy_operations
+                else None
+            )
+        ):
+            motive = (
+                f"系统推断：本笔卖出数量恰好等于此前同日买入的 "
+                f"{_decimal_text(earlier_buys)} 股，并把持仓恢复到 "
+                f"{_decimal_text(quantity_after)} 股；结构上最像撤回全部日内新增、"
+                "完成一次做 T，或在加仓未形成足够优势时回到原仓位。"
+            )
+            alternative = (
+                "也可能是预设的同量拆单卖出或现金调度；数量闭环只提高结构解释力，"
+                "仍不能证明用户真实意图。"
+            )
+        elif earlier_buys >= quantity and quantity > ZERO:
+            motive = (
+                "系统推断：本笔卖出可由此前同日买入数量覆盖，"
+                "更像撤回部分新增仓位、控制盘中风险或做 T。"
+            )
             alternative = "也可能是预设拆单卖出或现金调度，不能据此认定实际交易意图。"
         elif trade_vs_prior is not None and trade_vs_prior > ZERO:
-            motive = "最可能是在上涨中降低仓位风险或兑现一部分利润。"
+            motive = "系统推断：本笔更像在上涨中降低仓位风险或兑现一部分利润。"
             alternative = "也可能是组合再平衡或现金需要，与价格判断无关。"
         else:
-            motive = "最可能是降低持仓风险或执行止损/退出计划。"
+            motive = "系统推断：本笔更像降低持仓风险或执行止损/退出计划。"
             alternative = "也可能是组合再平衡；缺少 Decision，不能确认止损理由。"
     else:
-        motive = "当前操作不改变持仓，最可能是现金或费用类账务事件。"
+        motive = "系统推断：当前操作不改变持仓，更像现金或费用类账务事件。"
         alternative = "缺少原始说明时不能进一步归因。"
 
     confidence = (
         "medium"
         if previous_close is not None
-        and (len(prior_closes) >= 3 or earlier_same_instrument)
+        and (
+            len(prior_closes) >= 3
+            or earlier_same_instrument
+            or latest_completed_bar is not None
+        )
         else "low"
     )
+    missing = [
+        "MISSING_DECISION",
+        "MISSING_STRATEGY_OR_TARGET_POSITION",
+    ]
+    if latest_completed_bar is None:
+        missing.append("MISSING_INTRADAY_MARKET_CONTEXT")
     return {
         "label": "system_inference",
         "operation_id": operation.get("operation_id"),
@@ -658,11 +989,7 @@ def infer_motive_hypothesis(
         "supporting_observations": observations,
         "alternative_explanations": [alternative],
         "confidence": confidence,
-        "important_missing_information": [
-            "MISSING_DECISION",
-            "MISSING_INTRADAY_MARKET_CONTEXT",
-            "MISSING_STRATEGY_OR_TARGET_POSITION",
-        ],
+        "important_missing_information": missing,
         "uses_later_information": False,
     }
 
@@ -697,8 +1024,14 @@ def _operation_evaluation(
     else:
         judgment = "needs_improvement"
         narrative = "按当日收盘价回看，成交方向产生了负的毛价差。"
-    if fee_status != "actual":
-        narrative += " 手续费缺失，不能把毛价差当作真实净收益。"
+    if fee_status == "unknown":
+        narrative += " 费用来源仍未知，不能把毛价差当作真实净收益。"
+    elif fee_status == "rule_backfilled":
+        narrative += " 费用为规则回填值，可用于净结果计算，但不冒充券商实收。"
+    elif fee_status == "formal_exemption":
+        narrative += " 该笔为正式规则确认的费用豁免。"
+    elif fee_status == "reported_actual":
+        narrative += " 该笔采用账本记录的实收费用。"
     return {
         "type": "retrospective_outcome",
         "judgment": judgment,
@@ -715,6 +1048,7 @@ def _daily_operations(
     report_date: date,
     end_snapshot: Mapping[str, Any],
     review_db: str | Path | None,
+    point_in_time_context: Mapping[str, Any] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     day_rows = [
         row
@@ -730,20 +1064,44 @@ def _daily_operations(
     positions = {
         item["ts_code"]: item for item in end_snapshot.get("positions", [])
     }
+    day_codes = sorted(
+        {
+            str(row.get("ts_code") or "")
+            for row in day_rows
+            if row.get("ts_code")
+        }
+    )
+    instrument_names: dict[str, str] = {}
+    if day_codes:
+        placeholders = ",".join("?" for _ in day_codes)
+        instrument_names = {
+            str(item["ts_code"]): str(item["name"] or item["ts_code"])
+            for item in connection.execute(
+                f"SELECT ts_code, name FROM instruments "
+                f"WHERE ts_code IN ({placeholders})",
+                tuple(day_codes),
+            )
+        }
+    context_subject = (
+        str(point_in_time_context.get("subject", {}).get("ts_code") or "")
+        if isinstance(point_in_time_context, Mapping)
+        and isinstance(point_in_time_context.get("subject"), Mapping)
+        else ""
+    )
+    intraday_bars = (
+        list(point_in_time_context.get("intraday_bars", []))
+        if isinstance(point_in_time_context, Mapping)
+        else []
+    )
     earlier: list[dict[str, Any]] = []
     result: list[dict[str, Any]] = []
     prior_cache: dict[str, list[dict[str, Any]]] = {}
     for row in day_rows:
         event_id = _event_id(row)
         transition = transition_index.get(event_id, {})
-        note = str(row.get("note") or "")
-        fee_value = _decimal(row.get("fees"), default=ZERO) or ZERO
-        fee_missing = (
-            "fee_pending" in note
-            or "fees_missing" in note
-            or (fee_value == ZERO and row.get("event_type") in _POSITION_EVENT_TYPES)
-        )
+        fee = _fee_provenance(row)
         occurred_at = _iso_utc(_event_time(row))
+        code = str(row.get("ts_code") or "")
         operation = {
             "operation_id": "operation_" + _sha256_text(event_id)[:24],
             "event_id": event_id,
@@ -753,17 +1111,19 @@ def _daily_operations(
             "source_imported_at": row.get("created_at"),
             "event_type": str(row.get("event_type") or "").lower(),
             "side": str(row.get("event_type") or "").upper(),
-            "ts_code": row.get("ts_code"),
-            "name": positions.get(str(row.get("ts_code")), {}).get(
-                "name", row.get("ts_code")
+            "ts_code": code,
+            "name": positions.get(code, {}).get(
+                "name", instrument_names.get(code, code)
             ),
             "quantity": str(row.get("quantity") or "0"),
             "price_cny": _decimal_text(_decimal(row.get("price")), places=4),
             "gross_amount_cny": _decimal_text(
                 _decimal(row.get("gross_amount")), places=2
             ),
-            "fee_cny": None if fee_missing else _decimal_text(fee_value, places=2),
-            "fee_status": "MISSING" if fee_missing else "actual",
+            "fee_cny": fee["amount_cny"],
+            "fee_status": fee["status"],
+            "fee_rule": fee["fee_rule"],
+            "fee_is_known": fee["is_known"],
             "quantity_before": transition.get("quantity_before"),
             "quantity_after": transition.get("quantity_after"),
             "operation_role": None,
@@ -774,7 +1134,6 @@ def _daily_operations(
             "source_ref": f"portfolio.sqlite3#ledger_entries:{row.get('entry_id')}",
         }
         operation["operation_role"] = _operation_role(operation)
-        code = str(row.get("ts_code") or "")
         if code not in prior_cache:
             prior_cache[code] = _prior_closes(
                 connection,
@@ -810,6 +1169,9 @@ def _daily_operations(
                 position_weight_before_pct=_decimal_text(
                     estimated_weight_before, places=2
                 ),
+                intraday_bars=(
+                    intraday_bars if context_subject == code else None
+                ),
             )
         closing_row = _price_row(
             connection,
@@ -828,17 +1190,282 @@ def _daily_operations(
     return result, collection
 
 
+def _daily_episode_summaries(
+    operations: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    grouped: dict[str, list[Mapping[str, Any]]] = {}
+    for operation in operations:
+        grouped.setdefault(str(operation.get("ts_code") or ""), []).append(operation)
+    summaries: list[dict[str, Any]] = []
+    for code, items in sorted(grouped.items()):
+        ordered = sorted(items, key=lambda item: str(item.get("occurred_at") or ""))
+        buys = [item for item in ordered if item.get("side") == "BUY"]
+        sells = [item for item in ordered if item.get("side") == "SELL"]
+        bought_quantity = sum(
+            (_decimal(item.get("quantity"), default=ZERO) or ZERO for item in buys),
+            ZERO,
+        )
+        sold_quantity = sum(
+            (_decimal(item.get("quantity"), default=ZERO) or ZERO for item in sells),
+            ZERO,
+        )
+        buy_gross = sum(
+            (
+                _decimal(item.get("gross_amount_cny"), default=ZERO) or ZERO
+                for item in buys
+            ),
+            ZERO,
+        )
+        sell_gross = sum(
+            (
+                _decimal(item.get("gross_amount_cny"), default=ZERO) or ZERO
+                for item in sells
+            ),
+            ZERO,
+        )
+        fees_known = all(bool(item.get("fee_is_known")) for item in ordered)
+        fee_total = sum(
+            (
+                _decimal(item.get("fee_cny"), default=ZERO) or ZERO
+                for item in ordered
+            ),
+            ZERO,
+        )
+        opening_quantity = _decimal(ordered[0].get("quantity_before"), default=ZERO)
+        closing_quantity = _decimal(ordered[-1].get("quantity_after"), default=ZERO)
+        quantity_path = [
+            opening_quantity or ZERO,
+            *[
+                _decimal(item.get("quantity_after"), default=ZERO) or ZERO
+                for item in ordered
+            ],
+        ]
+        peak_quantity = max(quantity_path, default=ZERO)
+        peak_increase_pct = _pct(
+            peak_quantity - (opening_quantity or ZERO),
+            opening_quantity,
+        )
+        closed_round_trip = (
+            bought_quantity == sold_quantity
+            and bought_quantity > ZERO
+            and opening_quantity == closing_quantity
+        )
+        gross_round_trip = (
+            sell_gross - buy_gross if closed_round_trip else None
+        )
+        net_round_trip = (
+            gross_round_trip - fee_total
+            if gross_round_trip is not None and fees_known
+            else None
+        )
+        if closed_round_trip and len(buys) > 1:
+            first_quantity = _decimal(buys[0].get("quantity"), default=ZERO) or ZERO
+            largest_later = max(
+                (
+                    _decimal(item.get("quantity"), default=ZERO) or ZERO
+                    for item in buys[1:]
+                ),
+                default=ZERO,
+            )
+            scale_up = (
+                largest_later > first_quantity
+                and _decimal(buys[-1].get("price_cny"), default=ZERO)
+                > _decimal(buys[0].get("price_cny"), default=ZERO)
+            )
+            if net_round_trip is not None and net_round_trip < ZERO and scale_up:
+                assessment = (
+                    "先小额试仓本身控制了初始风险，但随后在更高价格放大加仓，"
+                    "最终又全部撤回；毛价差没有覆盖费用。需要改进的是"
+                    "“价格越高、加仓越大”的执行节奏，而不是把亏损简单归因于手续费。"
+                )
+            elif net_round_trip is not None and net_round_trip < ZERO:
+                assessment = "日内仓位已回到起点，但闭环净结果为负，操作收益未覆盖费用。"
+            else:
+                assessment = "日内新增仓位已全部撤回；应结合净结果判断做 T 是否有效。"
+        elif closed_round_trip:
+            assessment = "日内新增仓位已全部撤回，形成可核对的仓位闭环。"
+        else:
+            assessment = "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。"
+        summaries.append(
+            {
+                "type": "retrospective_execution_summary",
+                "ts_code": code,
+                "name": ordered[0].get("name") or code,
+                "opening_quantity": _decimal_text(opening_quantity),
+                "peak_quantity": _decimal_text(peak_quantity),
+                "closing_quantity": _decimal_text(closing_quantity),
+                "peak_increase_pct": _decimal_text(peak_increase_pct, places=2),
+                "bought_quantity": _decimal_text(bought_quantity),
+                "sold_quantity": _decimal_text(sold_quantity),
+                "round_trip_closed": closed_round_trip,
+                "gross_round_trip_pnl_cny": _decimal_text(
+                    gross_round_trip, places=2
+                ),
+                "fee_total_cny": (
+                    _decimal_text(fee_total, places=2) if fees_known else None
+                ),
+                "fee_statuses": sorted(
+                    {str(item.get("fee_status") or "unknown") for item in ordered}
+                ),
+                "net_round_trip_pnl_cny": _decimal_text(
+                    net_round_trip, places=2
+                ),
+                "assessment": assessment,
+                "source_refs": [str(item.get("source_ref") or "") for item in ordered],
+            }
+        )
+    return summaries
+
+
+def _missing_context_layer(name: str) -> dict[str, Any]:
+    return {
+        "status": "missing",
+        "scope": "daily_operation_delta",
+        "summary": f"本期未取得可核对的{name}增量上下文。",
+        "observations": [],
+        "source_refs": [],
+    }
+
+
+def _decision_context(
+    *,
+    subject_type: str,
+    subject_id: str,
+    snapshot: Mapping[str, Any],
+    positions: Sequence[Mapping[str, Any]],
+    operations: Sequence[Mapping[str, Any]],
+    episode_summaries: Sequence[Mapping[str, Any]],
+    point_in_time_context: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    source = point_in_time_context if isinstance(point_in_time_context, Mapping) else {}
+    fundamental = dict(
+        source.get("fundamental_and_valuation")
+        if isinstance(source.get("fundamental_and_valuation"), Mapping)
+        else _missing_context_layer("基本面与估值")
+    )
+    market = dict(
+        source.get("market_and_sector")
+        if isinstance(source.get("market_and_sector"), Mapping)
+        else _missing_context_layer("大盘与板块")
+    )
+    technical = dict(
+        source.get("technical_and_trend")
+        if isinstance(source.get("technical_and_trend"), Mapping)
+        else _missing_context_layer("技术与趋势")
+    )
+    if subject_type == "portfolio" and source:
+        operated_name = str(source.get("subject", {}).get("name") or subject_id)
+        for layer in (fundamental, market, technical):
+            layer["scope"] = "daily_operated_instrument_delta"
+            layer["portfolio_scope_note"] = (
+                f"日报只展开当日操作相关标的 {operated_name}，"
+                "不冒充全组合基本面覆盖。"
+            )
+
+    position_observations = [
+        {
+            "type": "fact",
+            "text": (
+                f"报告截止现金权重 {snapshot.get('cash_weight_pct')}%，"
+                f"最大单一标的权重 {snapshot.get('top_position_weight_pct')}%，"
+                f"前三大合计 {snapshot.get('top3_weight_pct')}%。"
+            ),
+            "source_ref": "portfolio.sqlite3#ledger_entries+cash_balance_snapshots+close_prices",
+        }
+    ]
+    for summary in episode_summaries:
+        position_observations.append(
+            {
+                "type": "retrospective_outcome",
+                "text": (
+                    f"{summary.get('name')}（{summary.get('ts_code')}）"
+                    f"持仓 {summary.get('opening_quantity')} → "
+                    f"{summary.get('peak_quantity')} → "
+                    f"{summary.get('closing_quantity')}；"
+                    f"{summary.get('assessment')}"
+                ),
+                "source_ref": ",".join(summary.get("source_refs", [])),
+            }
+        )
+    selected_weight = next(
+        (
+            item.get("portfolio_weight_pct")
+            for item in positions
+            if item.get("ts_code") == subject_id
+        ),
+        None,
+    )
+    position_summary = (
+        f"标的期末组合权重 {selected_weight or '0'}%；"
+        f"当日 {len(operations)} 笔操作已按仓位路径和净闭环复盘。"
+        if subject_type == "instrument"
+        else (
+            f"组合现金权重 {snapshot.get('cash_weight_pct')}%，"
+            f"最大单一标的 {snapshot.get('top_position_weight_pct')}%；"
+            "日报只展开当日操作带来的仓位与执行变化。"
+        )
+    )
+    return {
+        "framework": "four_layer_periodic_review_v1",
+        "report_depth": "daily_delta_only",
+        "fundamental_and_valuation": fundamental,
+        "market_and_sector": market,
+        "technical_and_trend": technical,
+        "position_and_execution": {
+            "status": "available",
+            "scope": "daily_operation_delta",
+            "summary": position_summary,
+            "observations": position_observations,
+            "episode_summaries": list(episode_summaries),
+            "source_refs": sorted(
+                {
+                    ref
+                    for item in position_observations
+                    for ref in [str(item.get("source_ref") or "")]
+                    if ref
+                }
+            ),
+        },
+        "timing_policy": (
+            "动机仅使用操作时点已可见信息；收盘、板块相对表现和净闭环"
+            "只进入事后复盘与报告截止建议。"
+        ),
+    }
+
+
 def build_recommendation(
     *,
     subject_type: str,
     subject_id: str,
     snapshot: Mapping[str, Any],
     report_cutoff_at: str,
+    decision_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     positions = list(snapshot.get("positions", []))
     total_assets = _decimal(snapshot.get("total_assets_cny"))
     cash_weight = _decimal(snapshot.get("cash_weight_pct"))
     top_weight = _decimal(snapshot.get("top_position_weight_pct"))
+    context = decision_context if isinstance(decision_context, Mapping) else {}
+    fundamental = (
+        context.get("fundamental_and_valuation")
+        if isinstance(context.get("fundamental_and_valuation"), Mapping)
+        else {}
+    )
+    market = (
+        context.get("market_and_sector")
+        if isinstance(context.get("market_and_sector"), Mapping)
+        else {}
+    )
+    technical = (
+        context.get("technical_and_trend")
+        if isinstance(context.get("technical_and_trend"), Mapping)
+        else {}
+    )
+    execution = (
+        context.get("position_and_execution")
+        if isinstance(context.get("position_and_execution"), Mapping)
+        else {}
+    )
     latest_price_date = max(
         (
             str(item.get("price_date") or "")
@@ -847,12 +1474,15 @@ def build_recommendation(
         ),
         default=None,
     )
-    missing_inputs = [
-        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT",
-        "MISSING_EXPLICIT_USER_RISK_BUDGET",
-    ]
+    missing_inputs = ["MISSING_EXPLICIT_USER_RISK_BUDGET"]
+    if fundamental.get("status") not in {"available", "partial"}:
+        missing_inputs.append("MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT")
+    if market.get("status") not in {"available", "partial"}:
+        missing_inputs.append("MISSING_MARKET_AND_SECTOR_CONTEXT")
+    if technical.get("status") != "available":
+        missing_inputs.append("MISSING_TECHNICAL_AND_TREND_CONTEXT")
     if snapshot.get("cash", {}).get("fee_pending"):
-        missing_inputs.append("MISSING_TRADE_FEES")
+        missing_inputs.append("UNKNOWN_TRADE_FEE_PROVENANCE")
     if subject_type == "portfolio":
         concentrated = top_weight is not None and top_weight > Decimal("20")
         cash_thin = cash_weight is not None and cash_weight < Decimal("5")
@@ -885,16 +1515,30 @@ def build_recommendation(
                 "source_ref": "periodic_report:risk_guardrail",
             },
         ]
+        if market.get("summary"):
+            rationale.append(
+                {
+                    "type": "inference",
+                    "text": (
+                        f"当日操作环境增量：{market.get('summary')}"
+                        " 这不替代全组合逐标的研究。"
+                    ),
+                    "source_ref": ",".join(market.get("source_refs", [])),
+                }
+            )
         invalidation = [
             "用户已有可验证且不同的风险预算或资金安排",
             "正式账本现金或持仓在报告截止后发生变化",
-            "缺失手续费补齐后显著改变当日现金与执行评价",
+            "新增全组合基本面证据支持当前集中度且风险预算允许",
         ]
         risks = [
             "减仓后标的继续上涨会产生机会成本",
-            "当前建议未纳入公司基本面与估值",
-            "现金数据含 fee_pending，精确比例可能小幅变化",
+            "日报只展开当日操作标的，未完成全组合逐标的基本面覆盖",
+            "指数或板块同涨不代表组合内每只股票的风险同步下降",
         ]
+        if snapshot.get("cash", {}).get("fee_pending"):
+            risks.append("部分交易费用来源未知，现金比例仍有小幅误差风险")
+        missing_inputs.append("MISSING_FULL_PORTFOLIO_FUNDAMENTAL_COVERAGE")
         confidence = "medium" if total_assets is not None else "low"
     else:
         selected = next(
@@ -934,7 +1578,9 @@ def build_recommendation(
                     f"{selected.get('portfolio_weight_pct') if selected else '0'}%。"
                 ),
                 "source_ref": (
-                    selected.get("source_refs", [None])[0] if selected else "portfolio.sqlite3#ledger_entries"
+                    selected.get("source_refs", [None])[0]
+                    if selected
+                    else "portfolio.sqlite3#ledger_entries"
                 ),
             },
             {
@@ -946,9 +1592,43 @@ def build_recommendation(
                 "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
             },
             {
+                "type": "inference",
+                "text": (
+                    str(fundamental.get("summary"))
+                    if fundamental.get("summary")
+                    else "基本面与估值增量不足，不能仅因短期价格反弹扩大集中仓位。"
+                ),
+                "source_ref": ",".join(fundamental.get("source_refs", []))
+                or "periodic_report:risk_guardrail",
+            },
+            {
+                "type": "inference",
+                "text": (
+                    str(market.get("summary"))
+                    if market.get("summary")
+                    else "大盘与板块信息不足，不能把共同涨跌直接解释为个股动机。"
+                ),
+                "source_ref": ",".join(market.get("source_refs", []))
+                or "periodic_report:market_context_boundary",
+            },
+            {
+                "type": "inference",
+                "text": (
+                    str(technical.get("summary"))
+                    if technical.get("summary")
+                    else "技术与趋势信息不足，不据此放大仓位。"
+                ),
+                "source_ref": ",".join(technical.get("source_refs", []))
+                or "periodic_report:trend_boundary",
+            },
+            {
                 "type": "opinion",
-                "text": "缺少基本面、估值和明确风险预算时，不应仅因短期价格反弹扩大集中仓位。",
-                "source_ref": "periodic_report:risk_guardrail",
+                "text": (
+                    str(execution.get("summary"))
+                    if execution.get("summary")
+                    else "在缺少明确风险预算时，不应继续扩大单一标的集中度。"
+                ),
+                "source_ref": "periodic_report:position_and_execution",
             },
         ]
         invalidation = [
@@ -958,11 +1638,25 @@ def build_recommendation(
         ]
         risks = [
             "减仓后价格继续上涨会产生机会成本",
-            "仅靠账本与日线无法判断公司长期价值",
-            "手续费和盘中市场背景缺失会影响执行评价",
+            (
+                "最新可得财务快照仍显示经营风险，短期趋势转强不等于基本面反转"
+                if fundamental.get("observations")
+                else "轻量日报不能替代公司长期价值深度研究"
+            ),
+            "大盘或板块共同上涨不能证明个股会持续跑赢",
+            "技术趋势是概率性上下文，不能保证后续收益",
         ]
-        confidence = "low"
-        missing_inputs.append("MISSING_INTRADAY_MARKET_CONTEXT")
+        if snapshot.get("cash", {}).get("fee_pending"):
+            risks.append("部分交易费用来源未知，会影响执行净结果")
+        confidence = (
+            "medium"
+            if all(
+                layer.get("status") in {"available", "partial"}
+                for layer in (fundamental, market, technical)
+            )
+            and total_assets is not None
+            else "low"
+        )
     return {
         "type": "analyst_view",
         "action": action,
@@ -1002,10 +1696,11 @@ def _report_headline(
         (item for item in snapshot.get("positions", []) if item.get("ts_code") == subject_id),
         None,
     )
+    display_name = selected.get("name") if selected else subject_id
     return (
-        f"{subject_id} 期末权重 "
+        f"{display_name}（{subject_id}）期末权重 "
         f"{selected.get('portfolio_weight_pct') if selected else '0'}%，"
-        f"当日操作已按无 Decision 的 system_inference 复盘；"
+        f"当日操作已按四层上下文与无 Decision 的 system_inference 复盘；"
         f"建议 {recommendation.get('action')}。"
     )
 
@@ -1018,6 +1713,7 @@ def build_daily_report(
     subject_type: str,
     subject_id: str | None = None,
     account_id: str = "default",
+    point_in_time_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one deterministic P1 daily report from immutable source data."""
 
@@ -1054,6 +1750,7 @@ def build_daily_report(
             report_date=day,
             end_snapshot=end_snapshot,
             review_db=review_db,
+            point_in_time_context=point_in_time_context,
         )
 
     if subject_type == "instrument":
@@ -1067,6 +1764,7 @@ def build_daily_report(
         ]
     else:
         selected_positions = end_snapshot["positions"]
+    episode_summaries = _daily_episode_summaries(operations)
 
     source_observed_through = max(
         filter(
@@ -1080,12 +1778,21 @@ def build_daily_report(
         ),
         default=None,
     )
-    effective_cutoff = market_cutoff
-    if source_observed_through:
-        observed_at = _aware_timestamp(str(source_observed_through))
-        if observed_at > effective_cutoff:
-            effective_cutoff = observed_at
-    report_cutoff_at = effective_cutoff.astimezone(SHANGHAI).isoformat(
+    generated_at = max(
+        filter(
+            None,
+            [
+                source_observed_through,
+                (
+                    point_in_time_context.get("fetched_at")
+                    if isinstance(point_in_time_context, Mapping)
+                    else None
+                ),
+            ],
+        ),
+        default=None,
+    )
+    report_cutoff_at = market_cutoff.astimezone(SHANGHAI).isoformat(
         timespec="seconds"
     )
 
@@ -1129,8 +1836,9 @@ def build_daily_report(
         ),
         "valuation_complete": not end_snapshot.get("missing_prices"),
         "calculation_method": (
-            "期末总资产减上一交易日总资产；当日无外部资金流证据时作为资产变动，"
-            "手续费待补会降低精度。"
+            "期末总资产减上一交易日总资产；当日无外部资金流证据时作为资产变动。"
+            "若历史现金快照仍带 fee_pending，则从最近可靠现金锚点按当前账本费用"
+            "只读重放，并保留被替代快照。"
         ),
         "source_refs": [
             "portfolio.sqlite3#ledger_entries",
@@ -1138,33 +1846,47 @@ def build_daily_report(
             "portfolio.sqlite3#cash_balance_snapshots",
         ],
     }
+    decision_context = _decision_context(
+        subject_type=subject_type,
+        subject_id=selected_subject,
+        snapshot=end_snapshot,
+        positions=selected_positions,
+        operations=operations,
+        episode_summaries=episode_summaries,
+        point_in_time_context=point_in_time_context,
+    )
     recommendation = build_recommendation(
         subject_type=subject_type,
         subject_id=selected_subject,
         snapshot=end_snapshot,
         report_cutoff_at=report_cutoff_at,
+        decision_context=decision_context,
     )
-    judgments = [
-        {
-            "type": "inference",
-            "status": "needs_improvement"
-            if any(
-                item["retrospective_evaluation"]["judgment"]
-                == "needs_improvement"
-                for item in operations
-            )
-            else "mixed"
-            if operations
-            else "no_trade",
-            "text": (
-                "当日执行评价仅使用成交、收盘价和已知费用；"
-                "毛价差不能替代真实净收益。"
-            ),
-            "source_refs": [
-                item["source_ref"] for item in operations
-            ],
-        }
-    ]
+    judgments = (
+        [
+            {
+                "type": "inference",
+                "status": (
+                    "needs_improvement"
+                    if _decimal(item.get("net_round_trip_pnl_cny")) is not None
+                    and (_decimal(item.get("net_round_trip_pnl_cny")) or ZERO)
+                    < ZERO
+                    else "mixed"
+                ),
+                "text": item.get("assessment"),
+                "source_refs": item.get("source_refs", []),
+            }
+            for item in episode_summaries
+        ]
+        or [
+            {
+                "type": "inference",
+                "status": "no_trade",
+                "text": "当日无持仓变动，不构造虚假的操作评价。",
+                "source_refs": [],
+            }
+        ]
+    )
     risks = {
         "type": "fact_and_inference",
         "cash_weight_pct": end_snapshot.get("cash_weight_pct"),
@@ -1188,7 +1910,6 @@ def build_daily_report(
         "period_type": "daily",
         "period_start": day.isoformat(),
         "period_end": day.isoformat(),
-        "source_sha256": source_sha,
     }
     report_id = "periodic_" + _sha256_text(_canonical_json(identity))[:32]
     report = {
@@ -1204,7 +1925,14 @@ def build_daily_report(
                 else (
                     selected_positions[0]["name"]
                     if selected_positions
-                    else selected_subject
+                    else (
+                        point_in_time_context.get("subject", {}).get("name")
+                        if isinstance(point_in_time_context, Mapping)
+                        and isinstance(
+                            point_in_time_context.get("subject"), Mapping
+                        )
+                        else selected_subject
+                    )
                 )
             ),
         },
@@ -1214,7 +1942,7 @@ def build_daily_report(
             "end": day.isoformat(),
             "report_cutoff_at": report_cutoff_at,
         },
-        "generated_at": source_observed_through,
+        "generated_at": generated_at,
         "headline": "",
         "sections": {
             "performance_and_positions": {
@@ -1223,9 +1951,11 @@ def build_daily_report(
                 "positions": selected_positions,
                 "risk_change": risks,
             },
+            "decision_context": decision_context,
             "operations_and_motives": {
                 "operation_count": len(operations),
                 "operations": operations,
+                "episode_summaries": episode_summaries,
             },
             "review_judgments": judgments,
             "recommendation": recommendation,
@@ -1238,8 +1968,11 @@ def build_daily_report(
                 "data_limitations": sorted(
                     {
                         *(
-                            ["MISSING_TRADE_FEES"]
-                            if end_snapshot.get("cash", {}).get("fee_pending")
+                            ["UNKNOWN_TRADE_FEE_PROVENANCE"]
+                            if any(
+                                item.get("fee_status") == "unknown"
+                                for item in operations
+                            )
                             else []
                         ),
                         *(
@@ -1266,6 +1999,11 @@ def build_daily_report(
             "source_path": "portfolio.sqlite3 (formal, immutable/query-only)",
             "source_sha256": source_sha,
             "source_observed_through": source_observed_through,
+            "context_fetched_at": (
+                point_in_time_context.get("fetched_at")
+                if isinstance(point_in_time_context, Mapping)
+                else None
+            ),
             "review_sidecar": (
                 "investment_review.sqlite3 (derived report state)"
                 if review_db is not None
@@ -1276,6 +2014,11 @@ def build_daily_report(
                 "portfolio.sqlite3#close_prices",
                 "portfolio.sqlite3#cash_balance_snapshots",
                 "investment_review.sqlite3#decisions",
+                *(
+                    ["baostock#bounded_periodic_context"]
+                    if point_in_time_context
+                    else []
+                ),
             ],
         },
         "safety": {
@@ -1309,6 +2052,8 @@ def validate_periodic_report(report: Mapping[str, Any]) -> dict[str, Any]:
     subject = report.get("subject")
     if not isinstance(subject, Mapping) or subject.get("type") not in _SUBJECT_TYPES:
         errors.append("invalid_subject")
+    elif not str(subject.get("name") or "").strip():
+        errors.append("missing_subject_name")
     period = report.get("period")
     if not isinstance(period, Mapping) or period.get("type") not in _PERIOD_TYPES:
         errors.append("invalid_period")
@@ -1316,6 +2061,23 @@ def validate_periodic_report(report: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(sections, Mapping):
         errors.append("missing_sections")
         sections = {}
+    decision_context = sections.get("decision_context")
+    if not isinstance(decision_context, Mapping):
+        errors.append("missing_decision_context")
+    else:
+        if decision_context.get("report_depth") != "daily_delta_only":
+            errors.append("invalid_daily_context_depth")
+        for layer_name in (
+            "fundamental_and_valuation",
+            "market_and_sector",
+            "technical_and_trend",
+            "position_and_execution",
+        ):
+            layer = decision_context.get(layer_name)
+            if not isinstance(layer, Mapping):
+                errors.append(f"missing_context_layer_{layer_name}")
+            elif not str(layer.get("summary") or "").strip():
+                errors.append(f"missing_context_summary_{layer_name}")
     recommendation = sections.get("recommendation")
     if not isinstance(recommendation, Mapping):
         errors.append("missing_recommendation")
@@ -1332,6 +2094,10 @@ def validate_periodic_report(report: Mapping[str, Any]) -> dict[str, Any]:
             errors.append("orders_executed_not_false")
         if recommendation.get("guaranteed_return") is not False:
             errors.append("guaranteed_return_not_false")
+        if str(recommendation.get("data_timestamp") or "") > str(
+            period.get("report_cutoff_at") if isinstance(period, Mapping) else ""
+        ):
+            errors.append("recommendation_uses_post_cutoff_data")
     operations_section = sections.get("operations_and_motives")
     operations = (
         operations_section.get("operations", [])
@@ -1342,6 +2108,20 @@ def validate_periodic_report(report: Mapping[str, Any]) -> dict[str, Any]:
         if not isinstance(operation, Mapping):
             errors.append("invalid_operation")
             continue
+        if not str(operation.get("name") or "").strip():
+            errors.append("missing_operation_name")
+        if operation.get("fee_status") not in {
+            "reported_actual",
+            "rule_backfilled",
+            "formal_exemption",
+            "unknown",
+        }:
+            errors.append("invalid_fee_provenance")
+        if (
+            operation.get("fee_status") == "rule_backfilled"
+            and not operation.get("fee_rule")
+        ):
+            errors.append("rule_backfilled_fee_missing_rule")
         motive = operation.get("motive")
         if not isinstance(motive, Mapping):
             errors.append("missing_motive")
@@ -1359,6 +2139,22 @@ def validate_periodic_report(report: Mapping[str, Any]) -> dict[str, Any]:
             operation.get("occurred_at") or ""
         ):
             errors.append("motive_cutoff_after_operation")
+        for observation in motive.get("supporting_observations", []):
+            if not isinstance(observation, Mapping):
+                errors.append("invalid_motive_observation")
+                continue
+            observed_at = str(observation.get("observed_at") or "")
+            if observed_at:
+                try:
+                    observation_time = _aware_timestamp(observed_at)
+                    operation_time = _aware_timestamp(
+                        str(operation.get("occurred_at") or "")
+                    )
+                except PeriodicReportError:
+                    errors.append("invalid_motive_observation_time")
+                else:
+                    if observation_time > operation_time:
+                        errors.append("motive_observation_after_operation")
     safety = report.get("safety")
     if not isinstance(safety, Mapping):
         errors.append("missing_safety")
@@ -1383,57 +2179,215 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
     performance = sections["performance_and_positions"]["performance"]
     cash = sections["performance_and_positions"].get("cash") or {}
     risk = sections["performance_and_positions"]["risk_change"]
+    context = sections["decision_context"]
     recommendation = sections["recommendation"]
     operations = sections["operations_and_motives"]["operations"]
+    episode_summaries = sections["operations_and_motives"].get(
+        "episode_summaries", []
+    )
+    subject_label = (
+        subject["name"]
+        if subject["type"] == "portfolio"
+        else f"{subject['name']}（{subject['id']}）"
+    )
+    fee_labels = {
+        "reported_actual": "账本实收",
+        "rule_backfilled": "规则回填",
+        "formal_exemption": "正式豁免",
+        "unknown": "来源未知",
+    }
     lines = [
-        f"# {subject['name']} {period['end']} 日报",
+        f"# {subject_label} {period['end']} 日报",
         "",
         f"> {report['headline']}",
         "",
         "## 1. 本期结论摘要",
         "",
-        f"- 报告对象：`{subject['type']}` / `{subject['id']}`",
+        f"- 报告对象：{subject_label}；类型 `{subject['type']}`",
         f"- 报告截止：`{period['report_cutoff_at']}`",
-        f"- 直接建议：`{recommendation['action']}`；{recommendation['target_position'].get('target_position_note')}",
+        (
+            f"- 直接建议：`{recommendation['action']}`；"
+            f"{recommendation['target_position'].get('target_position_note')}"
+        ),
         f"- 建议置信度：`{recommendation['confidence']}`；本报告不会执行订单。",
         "",
         "## 2. 收益、持仓、现金和风险变化",
         "",
-        f"- 总资产：{performance.get('start_total_assets_cny')} → {performance.get('end_total_assets_cny')} 元，变动 {performance.get('asset_change_cny')} 元（{performance.get('asset_change_pct')}%）。",
-        f"- 现金：{cash.get('amount_cny', 'MISSING')} 元，组合权重 {risk.get('cash_weight_pct')}%，状态 `{cash.get('status', 'MISSING')}`。",
-        f"- 集中度：最大单一标的 {risk.get('top_position_weight_pct')}%，前三大合计 {risk.get('top3_weight_pct')}%，状态 `{risk.get('concentration_status')}`。",
+        (
+            f"- 总资产：{performance.get('start_total_assets_cny')} → "
+            f"{performance.get('end_total_assets_cny')} 元，变动 "
+            f"{performance.get('asset_change_cny')} 元"
+            f"（{performance.get('asset_change_pct')}%）。"
+        ),
+        (
+            f"- 现金：{cash.get('amount_cny', 'MISSING')} 元，组合权重 "
+            f"{risk.get('cash_weight_pct')}%，状态 "
+            f"`{cash.get('status', 'MISSING')}`。"
+        ),
+        (
+            f"- 现金一致性：`{cash.get('consistency_status', 'unknown')}`；"
+            f"费用来源完整性 "
+            f"`{cash.get('fee_provenance_status', 'unknown')}`。"
+        ),
+        (
+            f"- 集中度：最大单一标的 "
+            f"{risk.get('top_position_weight_pct')}%，前三大合计 "
+            f"{risk.get('top3_weight_pct')}%，状态 "
+            f"`{risk.get('concentration_status')}`。"
+        ),
         f"- 计算说明：{performance.get('calculation_method')}",
         "",
-        "## 3. 操作与交易动机复盘",
+        "## 3. 四层决策上下文（日报增量）",
         "",
     ]
-    if not operations:
-        lines.append("- 当日无持仓变动操作；报告仍保留表现、风险与建议。")
-    for operation in operations:
-        motive = operation["motive"]
-        evaluation = operation["retrospective_evaluation"]
+    layer_labels = (
+        ("fundamental_and_valuation", "基本面与估值"),
+        ("market_and_sector", "大盘与板块"),
+        ("technical_and_trend", "技术与趋势"),
+        ("position_and_execution", "仓位与执行"),
+    )
+    for key, label in layer_labels:
+        layer = context[key]
         lines.extend(
             [
-                f"### {operation['occurred_at']} · {operation['side']} {operation['ts_code']}",
+                f"### 3.{len([line for line in lines if line.startswith('### 3.')]) + 1} {label}",
                 "",
-                f"- 操作事实：{operation['quantity']} 股 × {operation['price_cny']} 元；持仓 {operation.get('quantity_before')} → {operation.get('quantity_after')}；手续费 `{operation['fee_status']}`。",
-                f"- 动机标签：`{motive['label']}`；置信度 `{motive.get('confidence', 'recorded')}`。",
-                f"- 最可能动机：{motive.get('most_likely_motive', '见已记录 Decision。')}",
-                f"- 替代解释：{'；'.join(motive.get('alternative_explanations', [])) or '无。'}",
-                f"- 事后评价：{evaluation['narrative']} 毛价差 {evaluation.get('gross_mark_to_close_cny')} 元。",
+                f"- 状态：`{layer.get('status')}`；{layer.get('summary')}",
+            ]
+        )
+        if layer.get("portfolio_scope_note"):
+            lines.append(f"- 范围说明：{layer.get('portfolio_scope_note')}")
+        for observation in layer.get("observations", [])[:4]:
+            lines.append(
+                f"- {observation.get('type', 'unknown')}：{observation.get('text')}"
+            )
+        lines.append("")
+    lines.extend(
+        [
+            "## 4. 操作与交易动机复盘",
+            "",
+        ]
+    )
+    if not operations:
+        lines.append("- 当日无持仓变动操作；报告仍保留表现、风险与建议。")
+    for summary in episode_summaries:
+        fee_basis = "、".join(
+            fee_labels.get(str(item), str(item))
+            for item in summary.get("fee_statuses", [])
+        )
+        lines.extend(
+            [
+                f"### {summary.get('name')}（{summary.get('ts_code')}）当日执行摘要",
+                "",
+                (
+                    f"- 仓位路径：{summary.get('opening_quantity')} → "
+                    f"{summary.get('peak_quantity')} → "
+                    f"{summary.get('closing_quantity')} 股；峰值较期初 "
+                    f"{summary.get('peak_increase_pct')}%。"
+                ),
+            ]
+        )
+        if summary.get("round_trip_closed"):
+            lines.append(
+                f"- 闭环结果：毛价差 {summary.get('gross_round_trip_pnl_cny')} 元；"
+                f"费用 {summary.get('fee_total_cny')} 元（{fee_basis}）；"
+                f"净结果 {summary.get('net_round_trip_pnl_cny')} 元。"
+            )
+        else:
+            lines.append(
+                f"- 当日非闭环：买入 {summary.get('bought_quantity')} 股、"
+                f"卖出 {summary.get('sold_quantity')} 股；"
+                f"已知费用 {summary.get('fee_total_cny')} 元（{fee_basis}），"
+                "不计算虚假的日内净收益。"
+            )
+        lines.extend([f"- 执行判断：{summary.get('assessment')}", ""])
+    if subject["type"] == "portfolio" and operations:
+        lines.extend(["### 组合逐笔动机简表", ""])
+        for operation in operations:
+            local_time = _aware_timestamp(operation["occurred_at"]).astimezone(
+                SHANGHAI
+            )
+            motive = operation["motive"]
+            lines.append(
+                f"- {local_time.strftime('%H:%M:%S')} "
+                f"{operation['side']} "
+                f"{operation.get('name') or operation['ts_code']}"
+                f"（{operation['ts_code']}）{operation['quantity']} 股："
+                f"{motive.get('most_likely_motive', '见已记录 Decision。')}"
+            )
+        lines.extend(
+            [
+                "",
+                "- 逐笔费用、替代解释和时点证据保留在同名 JSON/API 详情中；"
+                "组合日报只呈现当日增量，避免重复铺陈。",
                 "",
             ]
         )
+    else:
+        for operation in operations:
+            motive = operation["motive"]
+            evaluation = operation["retrospective_evaluation"]
+            operation_label = (
+                f"{operation.get('name') or operation['ts_code']}"
+                f"（{operation['ts_code']}）"
+            )
+            fee_label = fee_labels.get(
+                str(operation.get("fee_status") or ""), "来源未知"
+            )
+            fee_rule = (
+                f"，规则 `{operation.get('fee_rule')}`"
+                if operation.get("fee_rule")
+                else ""
+            )
+            local_time = _aware_timestamp(operation["occurred_at"]).astimezone(
+                SHANGHAI
+            )
+            lines.extend(
+                [
+                    (
+                        f"### {local_time.isoformat(timespec='seconds')} "
+                        f"· {operation['side']} {operation_label}"
+                    ),
+                    "",
+                    (
+                        f"- 操作事实：{operation['quantity']} 股 × "
+                        f"{operation['price_cny']} 元；持仓 "
+                        f"{operation.get('quantity_before')} → "
+                        f"{operation.get('quantity_after')}。"
+                    ),
+                    (
+                        f"- 费用：{operation.get('fee_cny')} 元；"
+                        f"来源 `{fee_label}`{fee_rule}。"
+                    ),
+                    (
+                        f"- 动机标签：`{motive['label']}`；置信度 "
+                        f"`{motive.get('confidence', 'recorded')}`。"
+                    ),
+                    (
+                        f"- 最可能动机："
+                        f"{motive.get('most_likely_motive', '见已记录 Decision。')}"
+                    ),
+                    (
+                        f"- 替代解释："
+                        f"{'；'.join(motive.get('alternative_explanations', [])) or '无。'}"
+                    ),
+                    (
+                        f"- 事后评价：{evaluation['narrative']} 毛价差 "
+                        f"{evaluation.get('gross_mark_to_close_cny')} 元。"
+                    ),
+                    "",
+                ]
+            )
     lines.extend(
         [
-            "## 4. 哪些判断或执行合理，哪些需要改进",
+            "## 5. 哪些判断或执行合理，哪些需要改进",
             "",
             *[
                 f"- `{item['status']}`：{item['text']}"
                 for item in sections["review_judgments"]
             ],
             "",
-            "## 5. 个性化交易建议与建议仓位",
+            "## 6. 个性化交易建议与建议仓位",
             "",
             f"- 动作：`{recommendation['action']}`",
             f"- 仓位：`{json.dumps(recommendation['target_position'], ensure_ascii=False)}`",
@@ -1443,7 +2397,7 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
                 for item in recommendation["rationale"]
             ],
             "",
-            "## 6. 主要依据、风险、失效条件和数据缺失",
+            "## 7. 主要依据、风险、失效条件和数据缺失",
             "",
             *[
                 f"- 主要风险：{item}"
@@ -1463,6 +2417,7 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
             f"- 来源：{', '.join(report['source']['source_refs'])}",
             "- 动机推断只使用各操作时点以前的信息；当日收盘结果只进入事后评价。",
             "- 建议只使用报告 cutoff 及以前的账本与市场信息。",
+            "- 规则回填费用会明确标注，不冒充券商实收；正式豁免与来源未知分开显示。",
             "",
             "</details>",
             "",
@@ -1551,7 +2506,6 @@ class PeriodicReportStore:
                 str(report["period"]["type"]),
                 str(report["period"]["start"]),
                 str(report["period"]["end"]),
-                str(report["source"]["source_sha256"]),
             ]
         )
 
@@ -1570,14 +2524,25 @@ class PeriodicReportStore:
                 """
                 SELECT report_id, payload_sha256 FROM periodic_reports
                 WHERE report_id = ? OR identity_key = ?
+                   OR (
+                     subject_type = ? AND subject_id = ? AND period_type = ?
+                     AND period_start = ? AND period_end = ?
+                   )
+                ORDER BY CASE WHEN report_id = ? THEN 0 ELSE 1 END
+                LIMIT 1
                 """,
-                (report["report_id"], identity_key),
+                (
+                    report["report_id"],
+                    identity_key,
+                    report["subject"]["type"],
+                    report["subject"]["id"],
+                    report["period"]["type"],
+                    report["period"]["start"],
+                    report["period"]["end"],
+                    report["report_id"],
+                ),
             ).fetchone()
             if existing is not None:
-                if existing["report_id"] != report["report_id"]:
-                    raise PeriodicReportError(
-                        "periodic report identity conflicts with different content"
-                    )
                 if existing["payload_sha256"] == payload_sha:
                     return {
                         "status": "skipped",
@@ -1590,24 +2555,28 @@ class PeriodicReportStore:
                 connection.execute(
                     """
                     UPDATE periodic_reports
-                    SET report_cutoff_at = ?, generated_at = ?, status = ?,
+                    SET report_id = ?, identity_key = ?, schema_version = ?,
+                        report_cutoff_at = ?, generated_at = ?, status = ?,
                         payload_json = ?, payload_sha256 = ?, created_at = ?
                     WHERE report_id = ?
                     """,
                     (
+                        report["report_id"],
+                        identity_key,
+                        report["schema_version"],
                         report["period"]["report_cutoff_at"],
                         report.get("generated_at"),
                         report.get("status", "ready"),
                         payload,
                         payload_sha,
                         now,
-                        report["report_id"],
+                        existing["report_id"],
                     ),
                 )
                 connection.commit()
                 return {
                     "status": "updated",
-                    "report_id": existing["report_id"],
+                    "report_id": report["report_id"],
                     "payload_sha256": payload_sha,
                 }
             now = datetime.now(timezone.utc).isoformat(timespec="seconds").replace(
@@ -1764,6 +2733,29 @@ def generate_p1_daily_slice(
         raise PeriodicReportError("P1 artifacts must remain in the execution worktree")
 
     source_before = sha256_file(source)
+    selected_day = _parse_date(report_date)
+    with _read_only_connection(source) as connection:
+        metadata = connection.execute(
+            """
+            SELECT ts_code, name, industry_name
+            FROM instruments
+            WHERE ts_code = ?
+            """,
+            (instrument,),
+        ).fetchone()
+    if metadata is None:
+        raise PeriodicReportError(f"instrument metadata not found: {instrument}")
+    try:
+        point_in_time_context = fetch_p1_decision_context(
+            ts_code=instrument,
+            name=str(metadata["name"] or instrument),
+            industry_name=str(metadata["industry_name"] or "MISSING"),
+            report_date=selected_day,
+        )
+    except PeriodicContextError as exc:
+        raise PeriodicReportError(
+            f"P1 four-layer context fetch failed: {exc}"
+        ) from exc
     store = PeriodicReportStore(sidecar)
     store.initialize()
     reports = [
@@ -1772,6 +2764,7 @@ def generate_p1_daily_slice(
             review_db=sidecar,
             report_date=report_date,
             subject_type="portfolio",
+            point_in_time_context=point_in_time_context,
         ),
         build_daily_report(
             portfolio_db=source,
@@ -1779,10 +2772,11 @@ def generate_p1_daily_slice(
             report_date=report_date,
             subject_type="instrument",
             subject_id=instrument,
+            point_in_time_context=point_in_time_context,
         ),
     ]
     receipts = [store.save(report) for report in reports]
-    day = _parse_date(report_date).isoformat()
+    day = selected_day.isoformat()
     output.mkdir(parents=True, exist_ok=True)
     paths: list[str] = []
     for report in reports:
@@ -1809,13 +2803,47 @@ def generate_p1_daily_slice(
         "selected_instrument": instrument,
         "selection_reason": (
             "最近数据充分且包含无 Decision 的日内加仓后减回原仓位操作，"
-            "可同时检验时间边界、动机推断、手续费缺失和直接仓位建议。"
+            "可同时检验四层上下文、时间边界、非机械动机推断、"
+            "费用来源分类、现金一致性和直接仓位建议。"
         ),
+        "context": {
+            "provider": point_in_time_context.get("provider"),
+            "fetched_at": point_in_time_context.get("fetched_at"),
+            "subject": point_in_time_context.get("subject"),
+            "intraday_bar_count": len(
+                point_in_time_context.get("intraday_bars", [])
+            ),
+            "layer_statuses": {
+                key: point_in_time_context.get(key, {}).get("status")
+                for key in (
+                    "fundamental_and_valuation",
+                    "market_and_sector",
+                    "technical_and_trend",
+                )
+            },
+        },
         "reports": [
             {
                 "report_id": report["report_id"],
                 "subject": report["subject"],
                 "validation": validate_periodic_report(report),
+                "operation_names_present": all(
+                    bool(item.get("name"))
+                    for item in report["sections"]["operations_and_motives"][
+                        "operations"
+                    ]
+                ),
+                "fee_statuses": sorted(
+                    {
+                        item.get("fee_status")
+                        for item in report["sections"][
+                            "operations_and_motives"
+                        ]["operations"]
+                    }
+                ),
+                "cash_consistency_status": report["sections"][
+                    "performance_and_positions"
+                ]["cash"].get("consistency_status"),
             }
             for report in reports
         ],

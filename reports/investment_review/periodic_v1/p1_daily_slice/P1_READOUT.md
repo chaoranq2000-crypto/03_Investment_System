@@ -1,18 +1,18 @@
 # P1 真实日报垂直样板验收说明
 
-生成与验收时间：`2026-07-28T13:35:19+08:00`
+生成与验收时间：`2026-07-28T15:35:00+08:00`
 
 ## 样本选择
 
 - 报告日：`2026-07-15`
 - 组合：`default` / 组合账户
 - 无 Decision 标的：`000813.SZ` / 德展健康
-- 选择原因：该日账本、收盘价、上一交易日资产和现金锚点均可核对；德展健康有两笔买入和一笔卖出，仓位由 `17200 → 23000 → 17200`，且 review sidecar 没有对应 Decision，适合同时验证系统动机推断、时点边界、手续费缺失和直接仓位建议。
+- 选择原因：该日账本、日线、5 分钟线、上一交易日现金锚点和公开财务快照均可核对；德展健康两次买入后一次卖出，持仓 `17200 → 23000 → 17200`，适合验证四层上下文、操作时点边界、动机推断、费用来源与日内闭环。
 
 ## 两份读者报告
 
-- [组合日报](portfolio_daily_2026-07-15.md)：总资产 `457388 → 472107.1` 元，资产变动 `14719.1` 元（`3.22%`）；现金 `2697` 元、权重 `0.57%`、状态 `LOW_CONFIDENCE`；最大单一标的 `30.4%`，前三大合计 `65.51%`。建议 `reduce`，把超过 `20%` 的单一标的降至 `15%–20%`，并将现金提高至 `5%–10%`。
-- [德展健康日报](instrument_daily_000813.SZ_2026-07-15.md)：期末持仓 `17200` 股、收盘价 `3.45` 元、组合权重 `12.57%`；三笔操作均以 `system_inference` 给出最可能动机、替代解释、定性置信度和缺失信息。建议 `reduce`，目标权重 `8%–12%`。
+- [组合日报](portfolio_daily_2026-07-15.md)：总资产 `457388 → 472036.84` 元，变动 `14648.84` 元（`3.2%`）；现金从可靠锚点按当前账本只读重放为 `2626.74` 元，权重 `0.56%`；最大单一标的 `30.4%`，前三大 `65.51%`。四层上下文只展开当日代表性操作标的，不冒充全组合研究；十笔操作以五个标的执行摘要和折叠简表呈现。
+- [德展健康日报](instrument_daily_000813.SZ_2026-07-15.md)：显示德展健康（`000813.SZ`）、基本面与估值、大盘与板块、技术与趋势、仓位与执行四层分析。系统推断为“先小幅顺势试仓—在更高价格放大加仓—卖出同日新增并恢复原仓位”；日内毛价差 `3` 元、规则回填费用 `25.43` 元、净结果 `-22.43` 元。建议 `reduce` 至 `8%–12%`，置信度 `medium`。
 
 JSON 原始报告：
 
@@ -20,38 +20,45 @@ JSON 原始报告：
 - [德展健康日报 JSON](instrument_daily_000813.SZ_2026-07-15.json)
 - [生成与只读校验摘要](validation_summary.json)
 
-## 数据与时间核对
+## 四层上下文与时间边界
 
-| 检查项 | 结果 | 证据 |
+| 层 | P1 增量结果 | 时间性质 |
 |---|---|---|
-| 正式组合库访问 | `ro+immutable+query_only` | `validation_summary.json` |
-| 正式库 SHA-256 前后 | 均为 `752e3b87966f23d2e6f3db89cd3a8d5df0ab893504ee4e7e83de793e4aa52f53` | `validation_summary.json` |
-| 组合表现与风险 | 与 `ledger_entries`、`close_prices`、`cash_balance_snapshots` 重放结果一致 | 两份报告的 `source_refs` |
-| 动机信息边界 | 每笔 `motive.input_cutoff_at` 不晚于该笔 `occurred_at`，`uses_later_information=false` | 标的日报 JSON |
-| 事后信息分区 | 收盘价回看只进入 `retrospective_evaluation`，不进入操作时点动机 | 标的日报 JSON |
-| 建议信息边界 | `data_timestamp=2026-07-15T15:00:00+08:00`，不晚于 `report_cutoff_at=2026-07-15T20:30:30+08:00` | 两份报告 JSON |
-| Decision 状态 | `not_recorded`，未伪装为用户原始陈述 | 标的日报 JSON |
+| 基本面与估值 | 2026Q1 净利润 `-4316.79` 万元，同比亏损扩大 `47.45%`；负 PE 不作常规可比，PS(TTM) `18.263067` 倍 | 报告截止前已公开 |
+| 大盘与板块 | 德展健康 `+2.37%`，深证成指 `-0.97%`，沪深300 `-0.2%`，中证医药 `+3.17%`；标的落后板块 `0.79` 个百分点 | 收盘后事后环境，不冒充动机 |
+| 技术与趋势 | 3/5/20 个交易日涨跌幅 `6.81% / 5.83% / 13.86%` | 报告截止趋势，不保证后续收益 |
+| 仓位与执行 | 峰值较期初增加 `33.72%`，随后恢复 `17200` 股；净闭环 `-22.43` 元 | 事后执行复盘 |
+
+- 每笔 `motive.input_cutoff_at` 等于操作时间；支持观察均不晚于该操作，`uses_later_information=false`。
+- 09:38:45 买入只使用 09:35 已完成的 5 分钟线；后续操作和收盘结果没有倒灌。
+- 大盘、板块和收盘结果只进入事后上下文、执行评价与报告截止建议。
+- `data_timestamp` 与 `report_cutoff_at` 均为 `2026-07-15T15:00:00+08:00`。
+
+## 费用与现金一致性
+
+- 三笔德展健康费用分别为 `5.06 / 5.14 / 15.23` 元，状态均为 `rule_backfilled`，规则为 `historical_fee_rule_v1`；没有冒充券商实收。
+- 旧 `2026-07-15` 现金快照 `2697` 元仍带 `fee_pending`。报告未继续采用该数，而是从 `2026-07-14` 用户现金锚点 `11357` 元按当前十笔账本重放，得到 `2626.74` 元。
+- 当前报告不再出现 `MISSING_TRADE_FEES` 或“手续费缺失”误报；正式豁免、规则回填、账本实收和来源未知分别处理。
 
 ## API 与页面验收
 
-- localhost 只读验收身份通过：`review_acceptance_read_only=true`、`external_network_allowed=false`、`automation_enabled=false`。
-- `/api/investment-review/health` 返回 `available`，周期报告计数为 `2`。
-- 周期报告列表与详情 API 均能读取两个确定的 `report_id`。
-- 页面“周期报告”位于“操作级证据复盘”之前，能直接打开组合日报和德展健康日报。
-- 组合详情可见 `3.22%` 资产变动、`reduce`、`15%–20%` 单标的区间、`5%–10%` 现金区间、主要风险和 `MISSING_TRADE_FEES`。
-- 标的详情可见三笔真实操作时间、`system_inference`、替代解释、`reduce`、`8%–12%` 目标权重、风险与失效条件。
-- 页面明确显示 `RECOMMENDATION · NOT AN ORDER`；浏览器控制台无 warning/error。
+- localhost 只读验收通过：`read_only=true`、`mutations_allowed=false`、`automation.enabled=false`、订单执行和 broker write 均为 `false`。
+- `/api/investment-review/health` 返回 `available`；周期报告恰为 `2` 份，不保留旧来源版本的重复列表项。
+- 组合与德展健康详情均可打开。德展详情可见中文名（代码）、四层区块、北京时间、三笔 `system_inference`、替代解释、规则回填费用、`-22.43` 元净结果和 `8%–12%` 建议。
+- 组合详情以五个标的执行摘要呈现，十笔动机简表默认折叠；未闭环标的不计算虚假的日内净收益。
+- 页面显示 `RECOMMENDATION · NOT AN ORDER`；浏览器控制台 warning/error 为 `0`。
 
 ## 工程验证
 
-- V-101：`99 passed`。
+- V-101：`104 passed`。
 - V-102：Vitest `23 passed`；Vite production build 成功并更新 `web_assets`。
-- V-201：两份真实报告生成成功、字段核对通过、正式组合库 SHA-256 前后不变。
+- V-201：报告结构、数字、四层上下文、中文名称、费用来源、现金重放、动机时点边界和只读哈希均通过。
+- 正式组合库 SHA-256 前后均为 `6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057`；无 WAL/SHM。
 
 ## 已知限制与安全边界
 
-- `MISSING_DECISION`：动机是 `system_inference`，不是用户陈述。
-- `MISSING_TRADE_FEES`：毛价差不是净收益，现金精度标为 `LOW_CONFIDENCE`。
-- 缺少明确风险预算、基本面和估值上下文；德展健康还缺盘中市场背景，因此标的建议为 `low` confidence。
+- `MISSING_DECISION`：动机明确标记为 `system_inference`，不是用户陈述。
+- `MISSING_EXPLICIT_USER_RISK_BUDGET`：`8%–12%` 是当前证据下的个性化风控建议；若用户有明确且可验证的风险预算，应重新计算。
+- 组合日报只对当日代表性操作标的展开四层上下文，仍标记 `MISSING_FULL_PORTFOLIO_FUNDAMENTAL_COVERAGE`。
 - `orders_executed=false`、`broker_accessed=false`、`guaranteed_return_claims=false`、`production_released=false`。
-- P1 工程验证已经完成；是否具有实际复盘和决策价值仍需用户人工确认。未收到 `accept_p1_sample_and_continue` 前不得进入 P2。
+- P1 工程验证已完成；是否具有实际复盘与决策价值只能由用户确认。未收到精确授权 `accept_p1_sample_and_continue` 前不得进入 P2。

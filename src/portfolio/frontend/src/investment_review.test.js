@@ -5,6 +5,7 @@ import {
   isInvestmentReviewAcceptanceHealth,
   operationReviewHeadline,
   operationReviewView,
+  periodicOperationTime,
   periodicReportHeadline,
   periodicReportView,
   projectedTime,
@@ -35,14 +36,51 @@ describe("periodic investment reports", () => {
       performance_and_positions: {
         performance: { asset_change_pct: "3.22" },
       },
+      decision_context: {
+        report_depth: "daily_delta_only",
+        fundamental_and_valuation: {
+          status: "available",
+          summary: "最新财务仍为亏损。",
+        },
+        market_and_sector: {
+          status: "available",
+          summary: "板块上涨不直接证明交易动机。",
+        },
+        technical_and_trend: {
+          status: "available",
+          summary: "短线偏强但不保证收益。",
+        },
+        position_and_execution: {
+          status: "available",
+          summary: "日内新增仓位已撤回。",
+        },
+      },
       operations_and_motives: {
         operation_count: 3,
         operations: [{
+          ts_code: "000813.SZ",
+          name: "德展健康",
+          fee_cny: "5.06",
+          fee_status: "rule_backfilled",
+          fee_rule: "historical_fee_rule_v1",
           motive: {
             label: "system_inference",
             input_cutoff_at: "2026-07-15T01:38:45Z",
             uses_later_information: false,
           },
+        }],
+        episode_summaries: [{
+          ts_code: "000813.SZ",
+          name: "德展健康",
+          opening_quantity: "17200",
+          peak_quantity: "23000",
+          closing_quantity: "17200",
+          peak_increase_pct: "33.72",
+          gross_round_trip_pnl_cny: "3",
+          fee_total_cny: "25.43",
+          net_round_trip_pnl_cny: "-22.43",
+          fee_statuses: ["rule_backfilled"],
+          assessment: "毛价差没有覆盖费用。",
         }],
       },
       recommendation: {
@@ -68,6 +106,9 @@ describe("periodic investment reports", () => {
     expect(projectedTime({ occurred_at: "2026-07-15T01:38:45Z" })).toBe(
       "2026-07-15T01:38:45Z",
     );
+    expect(periodicOperationTime("2026-07-15T01:38:45Z")).toBe(
+      "2026-07-15 09:38:45 +08:00",
+    );
   });
 
   it("loads the periodic list and detail before operation-level evidence", () => {
@@ -77,6 +118,10 @@ describe("periodic investment reports", () => {
       source.indexOf("OPERATION EVIDENCE"),
     );
     expect(source).toContain("MOTIVE · SYSTEM INFERENCE");
+    expect(source).toContain("四层决策上下文（日报增量）");
+    expect(source).toContain("FUNDAMENTAL · MARKET · TREND · EXECUTION");
+    expect(source).toContain("operation.name, operation.ts_code");
+    expect(source).toContain("rule_backfilled");
     expect(source).toContain("RECOMMENDATION · NOT AN ORDER");
   });
 });

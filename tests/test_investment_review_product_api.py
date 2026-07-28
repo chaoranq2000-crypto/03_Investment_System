@@ -149,9 +149,30 @@ def _periodic_api_report() -> dict[str, Any]:
                 "positions": [],
                 "risk_change": {"cash_weight_pct": "10"},
             },
+            "decision_context": {
+                "framework": "four_layer_periodic_review_v1",
+                "report_depth": "daily_delta_only",
+                "fundamental_and_valuation": {
+                    "status": "missing",
+                    "summary": "本期无基本面与估值增量。",
+                },
+                "market_and_sector": {
+                    "status": "missing",
+                    "summary": "本期无大盘与板块增量。",
+                },
+                "technical_and_trend": {
+                    "status": "missing",
+                    "summary": "本期无技术与趋势增量。",
+                },
+                "position_and_execution": {
+                    "status": "available",
+                    "summary": "本期无持仓变动。",
+                },
+            },
             "operations_and_motives": {
                 "operation_count": 0,
                 "operations": [],
+                "episode_summaries": [],
             },
             "review_judgments": [],
             "recommendation": {

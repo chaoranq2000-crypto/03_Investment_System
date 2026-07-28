@@ -263,6 +263,14 @@ export function projectedTime(value) {
   );
 }
 
+export function periodicOperationTime(value) {
+  const raw = projectedTime(value);
+  const timestamp = Date.parse(raw);
+  if (!Number.isFinite(timestamp)) return raw;
+  const shanghai = new Date(timestamp + (8 * 60 * 60 * 1000));
+  return `${shanghai.toISOString().slice(0, 19).replace("T", " ")} +08:00`;
+}
+
 function boundaryText(value) {
   if (value === null || value === undefined || value === "") return "unknown";
   if (typeof value !== "object") return String(value);
@@ -1354,9 +1362,10 @@ export function mountInvestmentReview({
     const facts = object(sections.performance_and_positions);
     const performance = object(facts.performance);
     const risk = object(facts.risk_change);
-    const operations = values(
-      object(sections.operations_and_motives).operations,
-    );
+    const decisionContext = object(sections.decision_context);
+    const operationsSection = object(sections.operations_and_motives);
+    const operations = values(operationsSection.operations);
+    const episodeSummaries = values(operationsSection.episode_summaries);
     const recommendation = object(sections.recommendation);
     const limitations = object(sections.risks_invalidation_and_missing);
     drawerContent.replaceChildren();
@@ -1409,6 +1418,55 @@ export function mountInvestmentReview({
     performanceBlock.body.appendChild(positionDetails);
     drawerContent.appendChild(performanceBlock.section);
 
+    const contextBlock = sectionBlock(
+      "四层决策上下文（日报增量）",
+      "FUNDAMENTAL · MARKET · TREND · EXECUTION",
+    );
+    [
+      ["fundamental_and_valuation", "基本面与估值"],
+      ["market_and_sector", "大盘与板块"],
+      ["technical_and_trend", "技术与趋势"],
+      ["position_and_execution", "仓位与执行"],
+    ].forEach(([key, label]) => {
+      const layer = object(decisionContext[key]);
+      const card = element("article", "investment-review-detail-block");
+      card.append(
+        element("h3", "", label),
+        element(
+          "p",
+          "investment-review-list-conclusion",
+          `${text(layer.status, "missing")}：${text(layer.summary, "本期无可核对增量")}`,
+        ),
+      );
+      if (layer.portfolio_scope_note) {
+        card.appendChild(
+          element(
+            "p",
+            "investment-review-list-gaps",
+            `范围：${text(layer.portfolio_scope_note)}`,
+          ),
+        );
+      }
+      const observations = values(layer.observations);
+      if (observations.length) {
+        const details = element(
+          "details",
+          "investment-review-structured-details",
+        );
+        details.append(
+          element("summary", "", "查看本层事实与推断"),
+          renderStructured({
+            scope: layer.scope,
+            observations,
+            source_refs: layer.source_refs,
+          }),
+        );
+        card.appendChild(details);
+      }
+      contextBlock.body.appendChild(card);
+    });
+    drawerContent.appendChild(contextBlock.section);
+
     const operationsBlock = sectionBlock(
       "操作与交易动机复盘",
       "MOTIVE · SYSTEM INFERENCE",
@@ -1422,7 +1480,70 @@ export function mountInvestmentReview({
         ),
       );
     }
-    operations.forEach((operationValue) => {
+    const feeLabels = {
+      reported_actual: "账本实收",
+      rule_backfilled: "规则回填",
+      formal_exemption: "正式豁免",
+      unknown: "来源未知",
+    };
+    episodeSummaries.forEach((summaryValue) => {
+      const summary = object(summaryValue);
+      const card = element("article", "investment-review-detail-block");
+      const feeBasis = values(summary.fee_statuses)
+        .map((item) => feeLabels[item] || text(item))
+        .join("、");
+      card.append(
+        element(
+          "h3",
+          "",
+          `${text(summary.name, summary.ts_code)}（${text(summary.ts_code)}）当日执行摘要`,
+        ),
+        element(
+          "p",
+          "investment-review-list-conclusion",
+          `仓位 ${text(summary.opening_quantity)} → ${text(summary.peak_quantity)} → ${text(summary.closing_quantity)} 股 · 峰值 +${text(summary.peak_increase_pct)}%`,
+        ),
+        summary.round_trip_closed
+          ? element(
+            "p",
+            "",
+            `闭环毛价差 ${text(summary.gross_round_trip_pnl_cny)} 元 · 费用 ${text(summary.fee_total_cny)} 元（${feeBasis}）· 净结果 ${text(summary.net_round_trip_pnl_cny)} 元`,
+          )
+          : element(
+            "p",
+            "",
+            `当日非闭环：买入 ${text(summary.bought_quantity)} 股、卖出 ${text(summary.sold_quantity)} 股 · 已知费用 ${text(summary.fee_total_cny)} 元（${feeBasis}）· 不计算日内净收益`,
+          ),
+        element(
+          "p",
+          "investment-review-list-gaps",
+          text(summary.assessment),
+        ),
+      );
+      operationsBlock.body.appendChild(card);
+    });
+    if (report.subject.type === "portfolio" && operations.length) {
+      const details = element(
+        "details",
+        "investment-review-structured-details",
+      );
+      details.appendChild(
+        element("summary", "", `查看 ${operations.length} 笔操作时点动机简表`),
+      );
+      operations.forEach((operationValue) => {
+        const operation = object(operationValue);
+        const motive = object(operation.motive);
+        details.appendChild(
+          element(
+            "p",
+            "",
+            `${periodicOperationTime(operation.occurred_at)} · ${text(operation.side)} ${text(operation.name, operation.ts_code)}（${text(operation.ts_code)}）${text(operation.quantity)} 股：${text(motive.most_likely_motive, "见已记录 Decision")}`,
+          ),
+        );
+      });
+      operationsBlock.body.appendChild(details);
+    } else {
+      operations.forEach((operationValue) => {
       const operation = object(operationValue);
       const motive = object(operation.motive);
       const evaluation = object(operation.retrospective_evaluation);
@@ -1432,12 +1553,12 @@ export function mountInvestmentReview({
         element(
           "strong",
           "",
-          `${text(operation.side)} ${text(operation.ts_code)}`,
+          `${text(operation.side)} ${text(operation.name, operation.ts_code)}（${text(operation.ts_code)}）`,
         ),
         element(
           "span",
           "investment-review-mono",
-          projectedTime(operation.occurred_at),
+          periodicOperationTime(operation.occurred_at),
         ),
       );
       card.append(
@@ -1445,7 +1566,7 @@ export function mountInvestmentReview({
         element(
           "p",
           "",
-          `${text(operation.quantity)} 股 × ${text(operation.price_cny)} 元 · 持仓 ${text(operation.quantity_before)} → ${text(operation.quantity_after)} · fee ${text(operation.fee_status)}`,
+          `${text(operation.quantity)} 股 × ${text(operation.price_cny)} 元 · 持仓 ${text(operation.quantity_before)} → ${text(operation.quantity_after)} · 费用 ${text(operation.fee_cny)} 元（${text(feeLabels[operation.fee_status], "来源未知")}${operation.fee_rule ? ` / ${text(operation.fee_rule)}` : ""}）`,
         ),
         element(
           "p",
@@ -1479,7 +1600,8 @@ export function mountInvestmentReview({
       );
       card.appendChild(evidence);
       operationsBlock.body.appendChild(card);
-    });
+      });
+    }
     drawerContent.appendChild(operationsBlock.section);
 
     const recommendationBlock = sectionBlock(
