@@ -3,13 +3,13 @@ schema_version: "1"
 task_id: "investment_review_periodic_v1"
 contract_path: "docs/codex_tasks/investment_review_periodic_v1/CONTRACT.md"
 contract_sha256: "7cb2b06aac33573dc4fd69e8cdacb5f2d386fe8b5d6021dc033b187360a63fb7"
-state: "running"
+state: "complete"
 execution_branch: "codex/investment-review-periodic-v1"
 source_baseline: "7df75562eb7c7123ff066406f92fd6b844be994b"
-last_completed_phase: "P1"
-next_phase: "P2"
+last_completed_phase: "P4"
+next_phase: "none"
 last_validation: "pass"
-updated_at: "2026-07-28T07:56:16+00:00"
+updated_at: "2026-07-28T09:29:52+00:00"
 ---
 # 在新 Codex 聊天中启动或恢复本阶段
 
@@ -38,13 +38,16 @@ Reconcile ordinary drift and conflicts in this same package. Revise CONTRACT.md 
 
 ## Current checkpoint
 
-- **State:** `running`
-- **Last completed phase:** `P1`
-- **Next phase:** `P2`
+- **State:** `complete`
+- **Last completed phase:** `P4`
+- **Next phase:** `none`
 - **Latest validation:** `pass`
 - **Runtime authorizations:** `accept_p1_sample_and_continue` — user sample acceptance recorded verbatim on 2026-07-28; authorizes entry into P2–P4 only within the existing contract envelope.
 - **Current blocker:** none.
-- **Next safe action:** Execute P2 daily-report generalization and prove V-301 on at least three consecutive real trading days before proceeding to P3.
+- **Implementation checkpoint:** `ac045c0` (`feat(review): complete periodic reports P2-P4`).
+- **Final evidence:** `reports/investment_review/periodic_v1/final/FINAL_READOUT.md` and `validation_summary.json`.
+- **Formal portfolio DB:** SHA-256 `6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057`, unchanged.
+- **Next safe action:** No execution phase remains. Review the local candidate; push, PR, merge, deploy, broker access, or OS-level scheduling still requires a new explicit grant.
 
 The Git commit containing this file is the checkpoint commit. Do not write that commit's own hash into this file.
 
@@ -58,3 +61,4 @@ The Git commit containing this file is the checkpoint commit. Do not write that 
 - 2026-07-28T06:56:38+00:00 — state=running; completed=P1-initial-engineering-only; next=P1-iteration; validation=partial; user feedback supersedes affected P1 evidence, report-framework confirmation is recorded, and no sample-acceptance grant is active.
 - 2026-07-28T07:42:36+00:00 — state=blocked; completed=P1; next=P2; validation=pass; Revised real P1 portfolio and no-Decision instrument daily samples pass V-101 (104 tests), V-102 (23 frontend tests plus production build), V-201, localhost API/browser QA, and formal SQLite hash preservation; awaiting exact user grant accept_p1_sample_and_continue.
 - 2026-07-28T07:56:16+00:00 — state=running; completed=P1; next=P2; validation=pass; User sample-acceptance grant recorded verbatim: accept_p1_sample_and_continue. C-HUMAN-001 and D-007 are satisfied; proceed through P2-P4 within the unchanged authorization envelope.
+- 2026-07-28T09:29:52+00:00 — state=complete; completed=P4; next=none; validation=pass; P2-P4 complete: 619 derived reports; six real daily/weekly/monthly samples; V-101 110 tests, V-102 23 tests plus build, V-301/V-401/V-402 passed, V-501 71 tests; formal SQLite unchanged; local implementation commit ac045c0; no push/deploy/OS scheduler/broker access.
