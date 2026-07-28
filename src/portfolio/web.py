@@ -16,6 +16,10 @@ from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from src.utils.tushare_client import get_tushare_pro, load_env_file
+from src.investment_review.periodic_runner import (
+    PeriodicReportAutomationCoordinator,
+    periodic_automation_config,
+)
 
 from .industries import IndustryFetchError, TushareIndustryProvider
 from .intraday import IntradayFetchError, IntradayService, build_intraday_provider
@@ -1618,6 +1622,7 @@ def serve_dashboard(
         expected_review_candidate_sha256=expected_review_candidate_sha256,
     )
     automation: ReviewAutomationCoordinator | None = None
+    periodic_automation: PeriodicReportAutomationCoordinator | None = None
     review_service = server.dashboard_app.investment_review_service
     configure_automation = (
         not review_acceptance_read_only
@@ -1675,6 +1680,49 @@ def serve_dashboard(
                 }
             )
             print("复盘自动运行未启动；健康页已记录配置或启动失败。")
+    periodic_status_setter = (
+        getattr(review_service, "set_periodic_automation_status_provider", None)
+        if review_service is not None
+        else None
+    )
+    if configure_automation and callable(periodic_status_setter):
+        try:
+            values = {**load_env_file(env_file), **os.environ}
+            periodic_config = periodic_automation_config(
+                environ=values,
+                enabled_override=(
+                    False if review_automation is False else None
+                ),
+            )
+            periodic_automation = PeriodicReportAutomationCoordinator(
+                portfolio_db=store.path,
+                review_db=review_service.store.path,
+                repo_root=repository_root(),
+                account_id=account_id,
+                config=periodic_config,
+            )
+            periodic_status_setter(periodic_automation.status)
+            periodic_automation.start()
+        except Exception as exc:
+            error_type = type(exc).__name__
+            failed_at = datetime.now(timezone.utc).isoformat(
+                timespec="seconds"
+            ).replace("+00:00", "Z")
+            periodic_status_setter(
+                lambda: {
+                    "enabled": review_automation is not False,
+                    "state": "failed",
+                    "latest": None,
+                    "last_success": None,
+                    "last_failure": {
+                        "status": "failed",
+                        "error_type": error_type,
+                        "completed_at": failed_at,
+                    },
+                    "os_scheduler_installed": False,
+                }
+            )
+            print("周期报告自动运行未启动；健康页已记录配置或启动失败。")
     actual_host, actual_port = server.server_address[:2]
     url = f"http://{actual_host}:{actual_port}/"
     if review_acceptance_read_only:
@@ -1694,5 +1742,12 @@ def serve_dashboard(
             if stopped.get("worker_alive") is True:
                 print(
                     "复盘自动运行仍在完成当前原子步骤；进程退出后不会安装或保留系统任务。"
+                )
+        if periodic_automation is not None:
+            stopped = periodic_automation.stop(timeout=30.0)
+            if stopped.get("worker_alive") is True:
+                print(
+                    "周期报告自动运行仍在完成当前幂等生成；"
+                    "进程退出后不会安装或保留系统任务。"
                 )
         server.server_close()

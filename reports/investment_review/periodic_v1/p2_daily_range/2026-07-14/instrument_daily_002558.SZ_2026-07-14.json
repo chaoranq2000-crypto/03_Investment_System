@@ -1,0 +1,521 @@
+{
+  "schema_version": "investment_review.periodic_report.v1",
+  "report_id": "periodic_aa33a0c9656f5c265d63730d852b2359",
+  "status": "ready",
+  "subject": {
+    "type": "instrument",
+    "id": "002558.SZ",
+    "name": "巨人网络"
+  },
+  "period": {
+    "type": "daily",
+    "start": "2026-07-14",
+    "end": "2026-07-14",
+    "report_cutoff_at": "2026-07-14T15:00:00+08:00"
+  },
+  "generated_at": "2026-07-15T01:15:00+00:00",
+  "headline": "巨人网络（002558.SZ）期末权重 19.97%，收盘价变动 -5.65%；当日操作已按四层上下文与无 Decision 的 system_inference 复盘；建议 reduce。",
+  "sections": {
+    "performance_and_positions": {
+      "performance": {
+        "type": "fact",
+        "comparison_date": "2026-07-13",
+        "start_total_assets_cny": null,
+        "end_total_assets_cny": null,
+        "asset_change_cny": null,
+        "asset_change_pct": null,
+        "start_close_cny": "28.48",
+        "end_close_cny": "26.87",
+        "start_price_date": "2026-07-13",
+        "end_price_date": "2026-07-14",
+        "price_change_cny": "-1.61",
+        "price_change_pct": "-5.65",
+        "start_quantity": "2800",
+        "end_quantity": "3400",
+        "quantity_change": "600",
+        "start_invested_market_value_cny": "79744",
+        "end_invested_market_value_cny": "91358",
+        "invested_market_value_change_cny": "11614",
+        "invested_market_value_change_pct": "14.56",
+        "performance_basis": "instrument_close_price",
+        "period_change_cny": "-1.61",
+        "period_change_pct": "-5.65",
+        "cash_change_cny": null,
+        "valuation_complete": true,
+        "calculation_method": "标的收益以报告日与上一交易日收盘价变化计算，避免买卖数量变化冒充投资收益；持仓市值与数量变化另列，用于解释加减仓或退出。缺价时保持 MISSING，不以组合总资产变化替代标的表现。",
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:002558.SZ:2026-07-13",
+          "portfolio.sqlite3#close_prices:002558.SZ:2026-07-14",
+          "portfolio.sqlite3#ledger_entries:002558.SZ:through:2026-07-14"
+        ]
+      },
+      "opening_cash": null,
+      "cash": {
+        "amount_cny": "11357",
+        "as_of_date": "2026-07-14",
+        "source": "user_provided",
+        "status": "fact",
+        "fee_pending": false,
+        "fee_provenance_status": "complete",
+        "consistency_status": "snapshot_direct",
+        "note": "用户提供的 2026-07-14 账户现金余额；本次交割单不含完整银证转账流水",
+        "recorded_at": "2026-07-14T17:42:53+00:00",
+        "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42"
+      },
+      "opening_positions": [
+        {
+          "ts_code": "002558.SZ",
+          "name": "巨人网络",
+          "asset_type": "equity",
+          "industry_name": "互联网",
+          "quantity": "2800",
+          "average_cost_cny": "26.9616",
+          "remaining_cost_cny": "75492.58",
+          "close_cny": "28.48",
+          "price_date": "2026-07-13",
+          "price_source": "tushare.daily",
+          "market_value_cny": "79744",
+          "unrealized_pnl_cny": "4251.42",
+          "unrealized_return_pct": "5.63",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:002558.SZ:through:2026-07-13",
+            "portfolio.sqlite3#close_prices:002558.SZ:2026-07-13"
+          ],
+          "portfolio_weight_pct": null
+        }
+      ],
+      "positions": [
+        {
+          "ts_code": "002558.SZ",
+          "name": "巨人网络",
+          "asset_type": "equity",
+          "industry_name": "互联网",
+          "quantity": "3400",
+          "average_cost_cny": "26.9873",
+          "remaining_cost_cny": "91756.74",
+          "close_cny": "26.87",
+          "price_date": "2026-07-14",
+          "price_source": "tushare.daily",
+          "market_value_cny": "91358",
+          "unrealized_pnl_cny": "-398.74",
+          "unrealized_return_pct": "-0.43",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:002558.SZ:through:2026-07-14",
+            "portfolio.sqlite3#close_prices:002558.SZ:2026-07-14"
+          ],
+          "portfolio_weight_pct": "19.97"
+        }
+      ],
+      "risk_change": {
+        "type": "fact_and_inference",
+        "cash_weight_pct": "2.48",
+        "top_position_weight_pct": "26.89",
+        "top3_weight_pct": "59.53",
+        "concentration_status": "HIGH",
+        "missing_prices": [],
+        "cash_status": "fact"
+      }
+    },
+    "decision_context": {
+      "framework": "four_layer_periodic_review_v1",
+      "report_depth": "daily_delta_only",
+      "fundamental_and_valuation": {
+        "status": "missing",
+        "scope": "latest_public_snapshot_before_report_cutoff",
+        "summary": "正式组合库不保存财务与估值快照；本日报未用常识或未来披露补造基本面结论，需在标的研究证据可用后补充。",
+        "metrics": {},
+        "valuation": {},
+        "observations": [],
+        "source_refs": []
+      },
+      "market_and_sector": {
+        "status": "partial",
+        "scope": "report_day_delta",
+        "summary": "标的当日涨跌幅 -5.65%；正式组合库未保存同日基准和板块指数，因此不做大盘/板块归因。",
+        "stock_change_pct": "-5.65",
+        "benchmarks": [],
+        "sector": null,
+        "observations": [
+          {
+            "type": "fact",
+            "text": "标的当日涨跌幅 -5.65%。",
+            "timing": "end_of_day_retrospective",
+            "source_ref": "portfolio.sqlite3#close_prices:002558.SZ:2026-07-14:19"
+          }
+        ],
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:002558.SZ:2026-07-14:19"
+        ]
+      },
+      "technical_and_trend": {
+        "status": "available",
+        "scope": "report_cutoff_technical_delta",
+        "summary": "截至报告日，正式行情中的 3/5/20 个交易日涨跌幅分别为 -5.12%/-7.63%/MISSING%；成交量与日内高低价不在该轻量回退数据中。",
+        "metrics": {
+          "trade_date": "2026-07-14",
+          "close_cny": "26.87",
+          "return_3_session_pct": "-5.12",
+          "return_5_session_pct": "-7.63",
+          "return_20_session_pct": null,
+          "volume_vs_prior_5d_avg": null,
+          "day_open_cny": null,
+          "day_high_cny": null,
+          "day_low_cny": null
+        },
+        "observations": [],
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:002558.SZ:2026-07-14:19"
+        ]
+      },
+      "position_and_execution": {
+        "status": "available",
+        "scope": "daily_operation_delta",
+        "summary": "标的期末组合权重 19.97%；当日 2 笔操作已按仓位路径和净闭环复盘。",
+        "observations": [
+          {
+            "type": "fact",
+            "text": "报告截止现金权重 2.48%，最大单一标的权重 26.89%，前三大合计 59.53%。",
+            "source_ref": "portfolio.sqlite3#ledger_entries+cash_balance_snapshots+close_prices"
+          },
+          {
+            "type": "retrospective_outcome",
+            "text": "巨人网络（002558.SZ）持仓 2800 → 3400 → 3400；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+            "source_ref": "portfolio.sqlite3#ledger_entries:959,portfolio.sqlite3#ledger_entries:961"
+          }
+        ],
+        "episode_summaries": [
+          {
+            "type": "retrospective_execution_summary",
+            "ts_code": "002558.SZ",
+            "name": "巨人网络",
+            "opening_quantity": "2800",
+            "peak_quantity": "3400",
+            "closing_quantity": "3400",
+            "peak_increase_pct": "21.43",
+            "bought_quantity": "600",
+            "sold_quantity": "0",
+            "round_trip_closed": false,
+            "gross_round_trip_pnl_cny": null,
+            "fee_total_cny": "10.16",
+            "fee_statuses": [
+              "rule_backfilled"
+            ],
+            "net_round_trip_pnl_cny": null,
+            "assessment": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+            "source_refs": [
+              "portfolio.sqlite3#ledger_entries:959",
+              "portfolio.sqlite3#ledger_entries:961"
+            ]
+          }
+        ],
+        "source_refs": [
+          "portfolio.sqlite3#ledger_entries+cash_balance_snapshots+close_prices",
+          "portfolio.sqlite3#ledger_entries:959,portfolio.sqlite3#ledger_entries:961"
+        ]
+      },
+      "timing_policy": "动机仅使用操作时点已可见信息；收盘、板块相对表现和净闭环只进入事后复盘与报告截止建议。"
+    },
+    "operations_and_motives": {
+      "operation_count": 2,
+      "operations": [
+        {
+          "operation_id": "operation_f5d5e03b1a29253724f7216a",
+          "event_id": "evt_periodic_64d2b2a19755261b54ae9ceec4e1a9e5",
+          "episode_id": "te_d74c04117bf7f46f44544606803e33b0",
+          "episode_status": "open",
+          "occurred_at": "2026-07-14T05:25:08Z",
+          "source_imported_at": "2026-07-14T17:42:14+00:00",
+          "event_type": "buy",
+          "side": "BUY",
+          "ts_code": "002558.SZ",
+          "name": "巨人网络",
+          "quantity": "200",
+          "price_cny": "27.13",
+          "gross_amount_cny": "5426",
+          "fee_cny": "5.05",
+          "fee_status": "rule_backfilled",
+          "fee_rule": "historical_fee_rule_v1",
+          "fee_is_known": true,
+          "quantity_before": "2800",
+          "quantity_after": "3000",
+          "operation_role": "add",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:959",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_f5d5e03b1a29253724f7216a",
+            "input_cutoff_at": "2026-07-14T05:25:08Z",
+            "most_likely_motive": "系统推断：本笔在操作前趋势不强时增加仓位，更像回撤补仓或恢复目标仓位；现有数据不能证明其目的。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "add 200 股，成交价 27.13 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:959",
+                "observed_at": "2026-07-14T05:25:08Z"
+              },
+              {
+                "type": "fact",
+                "text": "本笔数量相当于操作前持仓的 7.14%",
+                "source_ref": "portfolio.sqlite3#ledger_entries:959",
+                "observed_at": "2026-07-14T05:25:08Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 28.48 元，成交价相对其变动 -4.74%",
+                "source_ref": "portfolio.sqlite3#close_prices:002558.SZ:2026-07-13:839",
+                "observed_at": "2026-07-13T15:00:00+08:00"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 16.45%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-14T05:25:08Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是长期配置或现金再平衡，而非基于短线价格判断。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_STRATEGY_OR_TARGET_POSITION",
+              "MISSING_INTRADAY_MARKET_CONTEXT"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "needs_improvement",
+            "gross_mark_to_close_cny": "-52",
+            "fee_status": "rule_backfilled",
+            "narrative": "按当日收盘价回看，成交方向产生了负的毛价差。 费用为规则回填值，可用于净结果计算，但不冒充券商实收。"
+          }
+        },
+        {
+          "operation_id": "operation_d87868839dec668750751ab7",
+          "event_id": "evt_periodic_bf2c072ce1ea8296939ba2fa643803b2",
+          "episode_id": "te_d74c04117bf7f46f44544606803e33b0",
+          "episode_status": "open",
+          "occurred_at": "2026-07-14T06:18:43Z",
+          "source_imported_at": "2026-07-14T17:42:14+00:00",
+          "event_type": "buy",
+          "side": "BUY",
+          "ts_code": "002558.SZ",
+          "name": "巨人网络",
+          "quantity": "400",
+          "price_cny": "27.07",
+          "gross_amount_cny": "10828",
+          "fee_cny": "5.11",
+          "fee_status": "rule_backfilled",
+          "fee_rule": "historical_fee_rule_v1",
+          "fee_is_known": true,
+          "quantity_before": "3000",
+          "quantity_after": "3400",
+          "operation_role": "add",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:961",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_d87868839dec668750751ab7",
+            "input_cutoff_at": "2026-07-14T06:18:43Z",
+            "most_likely_motive": "系统推断：本笔延续同日买入，规模约为前笔的 2 倍、成交价变化 -0.22%；更像分批补仓或执行既定数量，而非顺价追高。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "add 400 股，成交价 27.07 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:961",
+                "observed_at": "2026-07-14T06:18:43Z"
+              },
+              {
+                "type": "fact",
+                "text": "本笔数量相当于操作前持仓的 13.33%",
+                "source_ref": "portfolio.sqlite3#ledger_entries:961",
+                "observed_at": "2026-07-14T06:18:43Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 28.48 元，成交价相对其变动 -4.95%",
+                "source_ref": "portfolio.sqlite3#close_prices:002558.SZ:2026-07-13:839",
+                "observed_at": "2026-07-13T15:00:00+08:00"
+              },
+              {
+                "type": "fact",
+                "text": "本次操作前同日已有 1 笔该标的操作",
+                "source_ref": "portfolio.sqlite3#ledger_entries:959",
+                "observed_at": "2026-07-14T06:18:43Z"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 17.62%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-14T06:18:43Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能只是预先拆分的固定买入计划；缺少 Decision 和目标仓位，不能把盘面解释当成用户事实。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_STRATEGY_OR_TARGET_POSITION",
+              "MISSING_INTRADAY_MARKET_CONTEXT"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "needs_improvement",
+            "gross_mark_to_close_cny": "-80",
+            "fee_status": "rule_backfilled",
+            "narrative": "按当日收盘价回看，成交方向产生了负的毛价差。 费用为规则回填值，可用于净结果计算，但不冒充券商实收。"
+          }
+        }
+      ],
+      "episode_summaries": [
+        {
+          "type": "retrospective_execution_summary",
+          "ts_code": "002558.SZ",
+          "name": "巨人网络",
+          "opening_quantity": "2800",
+          "peak_quantity": "3400",
+          "closing_quantity": "3400",
+          "peak_increase_pct": "21.43",
+          "bought_quantity": "600",
+          "sold_quantity": "0",
+          "round_trip_closed": false,
+          "gross_round_trip_pnl_cny": null,
+          "fee_total_cny": "10.16",
+          "fee_statuses": [
+            "rule_backfilled"
+          ],
+          "net_round_trip_pnl_cny": null,
+          "assessment": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:959",
+            "portfolio.sqlite3#ledger_entries:961"
+          ]
+        }
+      ]
+    },
+    "review_judgments": [
+      {
+        "type": "inference",
+        "status": "mixed",
+        "text": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+        "source_refs": [
+          "portfolio.sqlite3#ledger_entries:959",
+          "portfolio.sqlite3#ledger_entries:961"
+        ]
+      }
+    ],
+    "recommendation": {
+      "type": "analyst_view",
+      "action": "reduce",
+      "target_position": {
+        "target_position_range_pct": [
+          "8",
+          "12"
+        ],
+        "target_position_note": "把单标的权重降至 8%–12%。"
+      },
+      "time_horizon": "下一交易周或下一次实质性信息更新前",
+      "confidence": "low",
+      "rationale": [
+        {
+          "type": "fact",
+          "text": "报告截止时组合权重约 19.97%。",
+          "source_ref": "portfolio.sqlite3#ledger_entries:002558.SZ:through:2026-07-14"
+        },
+        {
+          "type": "fact",
+          "text": "收盘价 26.87 元，账面成本 26.9873 元。",
+          "source_ref": "portfolio.sqlite3#ledger_entries+close_prices"
+        },
+        {
+          "type": "inference",
+          "text": "正式组合库不保存财务与估值快照；本日报未用常识或未来披露补造基本面结论，需在标的研究证据可用后补充。",
+          "source_ref": "periodic_report:risk_guardrail"
+        },
+        {
+          "type": "inference",
+          "text": "标的当日涨跌幅 -5.65%；正式组合库未保存同日基准和板块指数，因此不做大盘/板块归因。",
+          "source_ref": "portfolio.sqlite3#close_prices:002558.SZ:2026-07-14:19"
+        },
+        {
+          "type": "inference",
+          "text": "截至报告日，正式行情中的 3/5/20 个交易日涨跌幅分别为 -5.12%/-7.63%/MISSING%；成交量与日内高低价不在该轻量回退数据中。",
+          "source_ref": "portfolio.sqlite3#close_prices:002558.SZ:2026-07-14:19"
+        },
+        {
+          "type": "opinion",
+          "text": "标的期末组合权重 19.97%；当日 2 笔操作已按仓位路径和净闭环复盘。",
+          "source_ref": "periodic_report:position_and_execution"
+        }
+      ],
+      "major_downside_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "轻量日报不能替代公司长期价值深度研究",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "data_timestamp": "2026-07-14T15:00:00+08:00",
+      "report_cutoff_at": "2026-07-14T15:00:00+08:00",
+      "important_missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT"
+      ],
+      "orders_executed": false,
+      "guaranteed_return": false
+    },
+    "risks_invalidation_and_missing": {
+      "major_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "轻量日报不能替代公司长期价值深度研究",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT"
+      ],
+      "data_limitations": [
+        "MISSING_DECISION"
+      ]
+    }
+  },
+  "source": {
+    "source_path": "portfolio.sqlite3 (formal, immutable/query-only)",
+    "source_sha256": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "source_observed_through": "2026-07-15T01:15:00+00:00",
+    "context_fetched_at": "2026-07-15T01:14:47+00:00",
+    "review_sidecar": "investment_review.sqlite3 (derived report state)",
+    "source_refs": [
+      "portfolio.sqlite3#ledger_entries",
+      "portfolio.sqlite3#close_prices",
+      "portfolio.sqlite3#cash_balance_snapshots",
+      "investment_review.sqlite3#decisions",
+      "baostock#bounded_periodic_context"
+    ]
+  },
+  "safety": {
+    "orders_executed": false,
+    "broker_accessed": false,
+    "guaranteed_return_claims": false,
+    "recommendation_is_not_an_order": true
+  },
+  "content_id": "sha256:6bd1015d3a05bf7ea71da95a339e570efc89d1732dca04757a0015f903cca81f"
+}

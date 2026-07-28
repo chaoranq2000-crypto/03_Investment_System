@@ -27,7 +27,14 @@ from src.portfolio.review_integration import (
 )
 import src.portfolio.review_integration as integration_module
 import src.investment_review.market_context_adapter as market_adapter_module
+import src.investment_review.periodic_runner as periodic_runner_module
 import src.portfolio.web as web_module
+from src.investment_review.periodic_runner import (
+    PeriodicAutomationConfig,
+    PeriodicReportAutomationCoordinator,
+    PeriodicReportRunner,
+    periodic_automation_config,
+)
 from tests.test_investment_review_review_runner import (
     RunnerFixture,
     _closed_episode_rows,
@@ -37,6 +44,10 @@ from tests.test_investment_review_review_runner import (
     _trade_row,
 )
 from tests.test_investment_review_sync_service import _insert_ledger_row
+from tests.test_investment_review_periodic_reports import (
+    _empty_sidecar as _periodic_sidecar,
+    _formal_portfolio_db as _periodic_portfolio_db,
+)
 from tests.test_portfolio_tracker import _portfolio_store_with_opening
 
 
@@ -118,6 +129,84 @@ def test_automation_configuration_is_strict_and_disableable(
             repo_root=tmp_path,
         )
     assert not missing.exists()
+
+
+def test_periodic_report_runner_catches_up_and_exposes_replayable_status(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    source = _periodic_portfolio_db(tmp_path)
+    sidecar = _periodic_sidecar(tmp_path)
+    source_before = _sha256(source)
+    runner = PeriodicReportRunner(
+        portfolio_db=source,
+        review_db=sidecar,
+        repo_root=tmp_path,
+    )
+    now = datetime(2026, 7, 17, 8, 0, tzinfo=timezone.utc)
+
+    first = runner.run_once(
+        trigger="test_catch_up",
+        now=now,
+        start_date="2026-07-14",
+    )
+    replay = runner.run_once(trigger="test_replay", now=now)
+
+    assert first["state"] == "succeeded"
+    assert first["latest"]["daily"]["period"]["trading_day_count"] == 3
+    assert first["latest"]["summaries"][0]["period_type"] == "weekly"
+    assert replay["state"] == "succeeded"
+    assert replay["latest"]["daily"]["status"] == "up_to_date"
+    assert runner.status()["last_success"]["trigger"] == "test_replay"
+    assert _sha256(source) == source_before
+
+    monkeypatch.setattr(
+        periodic_runner_module,
+        "generate_daily_range",
+        lambda **_kwargs: (_ for _ in ()).throw(RuntimeError("bounded failure")),
+    )
+    failed = runner.run_once(
+        trigger="test_failure",
+        now=now,
+        start_date="2026-07-14",
+    )
+    assert failed["state"] == "failed"
+    assert failed["last_failure"]["error_type"] == "RuntimeError"
+    assert "bounded failure" in failed["last_failure"]["error"]
+    assert runner.status()["last_success"]["trigger"] == "test_replay"
+
+
+def test_periodic_automation_is_process_local_and_disableable(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    source = _periodic_portfolio_db(tmp_path)
+    sidecar = _periodic_sidecar(tmp_path)
+    disabled = periodic_automation_config(
+        environ={
+            periodic_runner_module.PERIODIC_AUTOMATION_ENV: "0",
+            periodic_runner_module.PERIODIC_AUTOMATION_INTERVAL_ENV: "invalid-unused",
+        }
+    )
+    assert disabled == PeriodicAutomationConfig(enabled=False)
+    with pytest.raises(ValueError, match="between 30 and 86400"):
+        periodic_automation_config(
+            environ={
+                periodic_runner_module.PERIODIC_AUTOMATION_INTERVAL_ENV: "1"
+            }
+        )
+    coordinator = PeriodicReportAutomationCoordinator(
+        portfolio_db=source,
+        review_db=sidecar,
+        repo_root=tmp_path,
+        config=disabled,
+    )
+    assert coordinator.start()["enabled"] is False
+    assert coordinator.run_once()["enabled"] is False
+    assert coordinator.stop()["worker_alive"] is False
+    assert coordinator.status()["os_scheduler_installed"] is False
 
 
 def test_catch_up_runs_three_scopes_and_replays_without_drift(
@@ -944,9 +1033,13 @@ def test_serve_dashboard_explicit_automation_owns_start_and_stop(
                 )
             )
             self.provider = None
+            self.periodic_provider = None
 
         def set_automation_status_provider(self, provider) -> None:
             self.provider = provider
+
+        def set_periodic_automation_status_provider(self, provider) -> None:
+            self.periodic_provider = provider
 
     class FakeCoordinator:
         def __init__(self, **kwargs: Any) -> None:
@@ -965,6 +1058,26 @@ def test_serve_dashboard_explicit_automation_owns_start_and_stop(
 
         def stop(self, *, timeout: float) -> dict[str, Any]:
             calls.append(("stop", timeout))
+            return self.status()
+
+    class FakePeriodicCoordinator:
+        def __init__(self, **kwargs: Any) -> None:
+            calls.append(("periodic_init", kwargs["config"].enabled))
+
+        def status(self) -> dict[str, Any]:
+            return {
+                "enabled": True,
+                "state": "idle",
+                "worker_alive": False,
+                "os_scheduler_installed": False,
+            }
+
+        def start(self) -> dict[str, Any]:
+            calls.append("periodic_start")
+            return self.status()
+
+        def stop(self, *, timeout: float) -> dict[str, Any]:
+            calls.append(("periodic_stop", timeout))
             return self.status()
 
     class FakeServer:
@@ -992,6 +1105,11 @@ def test_serve_dashboard_explicit_automation_owns_start_and_stop(
         "ReviewAutomationCoordinator",
         FakeCoordinator,
     )
+    monkeypatch.setattr(
+        web_module,
+        "PeriodicReportAutomationCoordinator",
+        FakePeriodicCoordinator,
+    )
     monkeypatch.setattr(web_module, "load_env_file", lambda _path: {})
     monkeypatch.setattr(
         web_module,
@@ -1009,10 +1127,14 @@ def test_serve_dashboard_explicit_automation_owns_start_and_stop(
     assert calls == [
         ("init", True),
         "start",
+        ("periodic_init", True),
+        "periodic_start",
         ("stop", 30.0),
+        ("periodic_stop", 30.0),
         "server_close",
     ]
     assert service.provider is not None
+    assert service.periodic_provider is not None
 
     calls.clear()
     web_module.serve_dashboard(

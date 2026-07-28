@@ -6,7 +6,7 @@
   "selection_reason": "最近数据充分且包含无 Decision 的日内加仓后减回原仓位操作，可同时检验四层上下文、时间边界、非机械动机推断、费用来源分类、现金一致性和直接仓位建议。",
   "context": {
     "provider": "baostock",
-    "fetched_at": "2026-07-28T07:29:29Z",
+    "fetched_at": "2026-07-28T09:23:27Z",
     "subject": {
       "ts_code": "000813.SZ",
       "name": "德展健康",
@@ -59,47 +59,14 @@
     {
       "status": "updated",
       "report_id": "periodic_07389934450c03465de361729f061a97",
-      "payload_sha256": "a5de9ef16cd2eec51364e2a98fcdff39de068d2f5b16a17c92f5764a8d28aa2a"
+      "payload_sha256": "d34f312897554576d9dadb8e3ef95a6771d97c92d625cf7a0d3812151ccca09a"
     },
     {
       "status": "updated",
       "report_id": "periodic_f86542248148c05f93aad799f5dcb3d4",
-      "payload_sha256": "5cb6baf2f6ec5376daad6a3655340a5a734d27f0e27884777fd1a849334fbdcd"
+      "payload_sha256": "c2010c5e386b5b9995c4cfcc0828d3ee6fa2feae0dd6222b5787d9f2e90ac882"
     }
   ],
-  "engineering_validation": {
-    "V-101": "104 passed",
-    "V-102": {
-      "vitest": "23 passed",
-      "vite_build": "pass"
-    },
-    "V-201": {
-      "status": "pass",
-      "instrument_name_and_code_visible": true,
-      "four_layer_context_visible": true,
-      "motive_time_boundary_pass": true,
-      "fee_provenance": "rule_backfilled",
-      "stale_cash_snapshot_replayed": true,
-      "corrected_cash_cny": "2626.74",
-      "round_trip_gross_pnl_cny": "3",
-      "round_trip_fee_cny": "25.43",
-      "round_trip_net_pnl_cny": "-22.43",
-      "missing_fee_false_positive_absent": true
-    },
-    "localhost_api": {
-      "status": "available",
-      "read_only": true,
-      "automation_enabled": false,
-      "periodic_report_count": 2
-    },
-    "localhost_browser": {
-      "portfolio_report_opened": true,
-      "instrument_report_opened": true,
-      "four_layers_visible": true,
-      "local_operation_times_visible": true,
-      "console_warning_or_error_count": 0
-    }
-  },
   "formal_portfolio_db": {
     "mode": "ro+immutable+query_only",
     "sha256_before": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",

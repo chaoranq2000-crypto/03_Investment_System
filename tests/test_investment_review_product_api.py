@@ -224,19 +224,66 @@ def test_periodic_report_api_lists_and_reads_from_the_selected_sidecar(
     store.initialize()
     report = _periodic_api_report()
     assert store.save(report)["status"] == "inserted"
+    weekly_report = deepcopy(report)
+    weekly_report["report_id"] = "periodic_" + "d" * 32
+    weekly_report["period"] = {
+        "type": "weekly",
+        "start": "2026-07-13",
+        "end": "2026-07-17",
+        "report_cutoff_at": "2026-07-17T15:00:00+08:00",
+    }
+    weekly_report["sections"]["decision_context"]["report_depth"] = (
+        "weekly_synthesis"
+    )
+    weekly_report["sections"]["recommendation"]["data_timestamp"] = (
+        "2026-07-17T15:00:00+08:00"
+    )
+    weekly_report["sections"]["recommendation"]["report_cutoff_at"] = (
+        "2026-07-17T15:00:00+08:00"
+    )
+    weekly_report["content_id"] = "sha256:" + "e" * 64
+    assert store.save(weekly_report)["status"] == "inserted"
 
     listing = product_api.service.list_periodic_reports(
         subject_type="portfolio",
         period_type="daily",
     )
+    weekly_listing = product_api.service.list_periodic_reports(
+        subject_type="portfolio",
+        period_type="weekly",
+    )
+    full_listing = product_api.service.list_periodic_reports(limit=1000)
     detail = product_api.service.get_periodic_report(report["report_id"])
 
     assert listing["status"] == "ready"
     assert listing["data"]["total_count"] == 1
     assert listing["data"]["reports"][0]["report_id"] == report["report_id"]
+    assert weekly_listing["data"]["reports"][0]["report_id"] == (
+        weekly_report["report_id"]
+    )
+    assert full_listing["data"]["total_count"] == 2
+    with pytest.raises(InvestmentReviewServiceError) as captured:
+        product_api.service.list_periodic_reports(limit=1001)
+    assert captured.value.code == "invalid_limit"
+    assert listing["data"]["supported_period_types"] == [
+        "daily",
+        "weekly",
+        "monthly",
+    ]
     assert detail["data"]["report"] == report
     health = product_api.service.get_health()
-    assert health["data"]["periodic_reports"]["count"] == 1
+    assert health["data"]["periodic_reports"]["count"] == 2
+    assert health["data"]["periodic_reports"]["supported_period_types"] == [
+        "daily",
+        "weekly",
+        "monthly",
+    ]
+    assert health["data"]["periodic_reports"]["automation"]["state"] == (
+        "never_run"
+    )
+    assert health["data"]["periodic_reports"]["automation"][
+        "os_scheduler_installed"
+    ] is False
 
 
 def _all_strings(value: object) -> Iterator[str]:

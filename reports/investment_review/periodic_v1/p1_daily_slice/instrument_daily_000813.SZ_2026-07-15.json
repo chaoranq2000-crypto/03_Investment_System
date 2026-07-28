@@ -13,25 +13,53 @@
     "end": "2026-07-15",
     "report_cutoff_at": "2026-07-15T15:00:00+08:00"
   },
-  "generated_at": "2026-07-28T07:29:29Z",
-  "headline": "德展健康（000813.SZ）期末权重 12.57%，当日操作已按四层上下文与无 Decision 的 system_inference 复盘；建议 reduce。",
+  "generated_at": "2026-07-28T09:23:27Z",
+  "headline": "德展健康（000813.SZ）期末权重 12.57%，收盘价变动 2.37%；当日操作已按四层上下文与无 Decision 的 system_inference 复盘；建议 reduce。",
   "sections": {
     "performance_and_positions": {
       "performance": {
         "type": "fact",
         "comparison_date": "2026-07-14",
-        "start_total_assets_cny": "457388",
-        "end_total_assets_cny": "472036.84",
-        "asset_change_cny": "14648.84",
-        "asset_change_pct": "3.2",
-        "cash_change_cny": "-8730.26",
+        "start_total_assets_cny": null,
+        "end_total_assets_cny": null,
+        "asset_change_cny": null,
+        "asset_change_pct": null,
+        "start_close_cny": "3.37",
+        "end_close_cny": "3.45",
+        "start_price_date": "2026-07-14",
+        "end_price_date": "2026-07-15",
+        "price_change_cny": "0.08",
+        "price_change_pct": "2.37",
+        "start_quantity": "17200",
+        "end_quantity": "17200",
+        "quantity_change": "0",
+        "start_invested_market_value_cny": "57964",
+        "end_invested_market_value_cny": "59340",
+        "invested_market_value_change_cny": "1376",
+        "invested_market_value_change_pct": "2.37",
+        "performance_basis": "instrument_close_price",
+        "period_change_cny": "0.08",
+        "period_change_pct": "2.37",
+        "cash_change_cny": null,
         "valuation_complete": true,
-        "calculation_method": "期末总资产减上一交易日总资产；当日无外部资金流证据时作为资产变动。若历史现金快照仍带 fee_pending，则从最近可靠现金锚点按当前账本费用只读重放，并保留被替代快照。",
+        "calculation_method": "标的收益以报告日与上一交易日收盘价变化计算，避免买卖数量变化冒充投资收益；持仓市值与数量变化另列，用于解释加减仓或退出。缺价时保持 MISSING，不以组合总资产变化替代标的表现。",
         "source_refs": [
-          "portfolio.sqlite3#ledger_entries",
-          "portfolio.sqlite3#close_prices",
-          "portfolio.sqlite3#cash_balance_snapshots"
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-07-14",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-07-15",
+          "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-15"
         ]
+      },
+      "opening_cash": {
+        "amount_cny": "11357",
+        "as_of_date": "2026-07-14",
+        "source": "user_provided",
+        "status": "fact",
+        "fee_pending": false,
+        "fee_provenance_status": "complete",
+        "consistency_status": "snapshot_direct",
+        "note": "用户提供的 2026-07-14 账户现金余额；本次交割单不含完整银证转账流水",
+        "recorded_at": "2026-07-14T17:42:53+00:00",
+        "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42"
       },
       "cash": {
         "amount_cny": "2626.74",
@@ -59,6 +87,29 @@
         "recorded_at": "2026-07-15T12:30:30+00:00",
         "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42+ledger_entries:through:2026-07-15"
       },
+      "opening_positions": [
+        {
+          "ts_code": "000813.SZ",
+          "name": "德展健康",
+          "asset_type": "equity",
+          "industry_name": "医药生物",
+          "quantity": "17200",
+          "average_cost_cny": "5.8749",
+          "remaining_cost_cny": "101047.56",
+          "close_cny": "3.37",
+          "price_date": "2026-07-14",
+          "price_source": "tushare.daily",
+          "market_value_cny": "57964",
+          "unrealized_pnl_cny": "-43083.56",
+          "unrealized_return_pct": "-42.64",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-14",
+            "portfolio.sqlite3#close_prices:000813.SZ:2026-07-14"
+          ],
+          "portfolio_weight_pct": "12.67"
+        }
+      ],
       "positions": [
         {
           "ts_code": "000813.SZ",
@@ -638,7 +689,7 @@
     "source_path": "portfolio.sqlite3 (formal, immutable/query-only)",
     "source_sha256": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
     "source_observed_through": "2026-07-15T12:30:30+00:00",
-    "context_fetched_at": "2026-07-28T07:29:29Z",
+    "context_fetched_at": "2026-07-28T09:23:27Z",
     "review_sidecar": "investment_review.sqlite3 (derived report state)",
     "source_refs": [
       "portfolio.sqlite3#ledger_entries",
@@ -654,5 +705,5 @@
     "guaranteed_return_claims": false,
     "recommendation_is_not_an_order": true
   },
-  "content_id": "sha256:4bd6b2404d815893af2d0f4e18933b633b36c0bd19d6cfcab2966fd377fe0dfa"
+  "content_id": "sha256:fa10d682fe313124a5fb17758c8615451c895fe5bbd9c81509d9612d133d4b2c"
 }

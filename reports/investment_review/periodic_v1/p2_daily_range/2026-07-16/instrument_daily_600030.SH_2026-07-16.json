@@ -1,0 +1,346 @@
+{
+  "schema_version": "investment_review.periodic_report.v1",
+  "report_id": "periodic_71672cc79e69b4821a5ac06fc3c045b4",
+  "status": "ready",
+  "subject": {
+    "type": "instrument",
+    "id": "600030.SH",
+    "name": "中信证券"
+  },
+  "period": {
+    "type": "daily",
+    "start": "2026-07-16",
+    "end": "2026-07-16",
+    "report_cutoff_at": "2026-07-16T15:00:00+08:00"
+  },
+  "generated_at": "2026-07-16T13:49:26+00:00",
+  "headline": "中信证券（600030.SH）期末权重 2.94%，收盘价变动 -1.75%；当日操作已按四层上下文与无 Decision 的 system_inference 复盘；建议 hold。",
+  "sections": {
+    "performance_and_positions": {
+      "performance": {
+        "type": "fact",
+        "comparison_date": "2026-07-15",
+        "start_total_assets_cny": null,
+        "end_total_assets_cny": null,
+        "asset_change_cny": null,
+        "asset_change_pct": null,
+        "start_close_cny": "28.6",
+        "end_close_cny": "28.1",
+        "start_price_date": "2026-07-15",
+        "end_price_date": "2026-07-16",
+        "price_change_cny": "-0.5",
+        "price_change_pct": "-1.75",
+        "start_quantity": "500",
+        "end_quantity": "500",
+        "quantity_change": "0",
+        "start_invested_market_value_cny": "14300",
+        "end_invested_market_value_cny": "14050",
+        "invested_market_value_change_cny": "-250",
+        "invested_market_value_change_pct": "-1.75",
+        "performance_basis": "instrument_close_price",
+        "period_change_cny": "-0.5",
+        "period_change_pct": "-1.75",
+        "cash_change_cny": null,
+        "valuation_complete": true,
+        "calculation_method": "标的收益以报告日与上一交易日收盘价变化计算，避免买卖数量变化冒充投资收益；持仓市值与数量变化另列，用于解释加减仓或退出。缺价时保持 MISSING，不以组合总资产变化替代标的表现。",
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:600030.SH:2026-07-15",
+          "portfolio.sqlite3#close_prices:600030.SH:2026-07-16",
+          "portfolio.sqlite3#ledger_entries:600030.SH:through:2026-07-16"
+        ]
+      },
+      "opening_cash": {
+        "amount_cny": "2626.74",
+        "as_of_date": "2026-07-15",
+        "source": "derived_read_only_ledger_replay",
+        "status": "fact",
+        "fee_pending": false,
+        "fee_provenance_status": "complete",
+        "consistency_status": "replayed_from_anchor",
+        "cash_change_from_anchor_cny": "-8730.26",
+        "anchor": {
+          "amount_cny": "11357",
+          "as_of_date": "2026-07-14",
+          "source": "user_provided",
+          "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42"
+        },
+        "superseded_snapshot": {
+          "amount_cny": "2697",
+          "as_of_date": "2026-07-15",
+          "note": "statement_cash_replay; anchor_snapshot_id=7de3e9bc-4927-4632-aecc-5e1cdcd54f42; anchor_as_of=2026-07-14; ledger_entries=10; cash_change=-8660; fee_pending_entries=10; calculation_status=fee_pending; ledger_fingerprint=7bc48a25e4a662494cd2243b06892abdd35b612ad733f0bf220ab4074848b280",
+          "source_ref": "portfolio.sqlite3#cash_balance_snapshots:e694beb7-5be3-4474-9126-0e35fd804f00"
+        },
+        "replayed_ledger_entries": 10,
+        "unknown_fee_entries": 0,
+        "recorded_at": "2026-07-15T12:30:30+00:00",
+        "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42+ledger_entries:through:2026-07-15"
+      },
+      "cash": {
+        "amount_cny": "2626.74",
+        "as_of_date": "2026-07-15",
+        "source": "derived_read_only_ledger_replay",
+        "status": "fact",
+        "fee_pending": false,
+        "fee_provenance_status": "complete",
+        "consistency_status": "replayed_from_anchor",
+        "cash_change_from_anchor_cny": "-8730.26",
+        "anchor": {
+          "amount_cny": "11357",
+          "as_of_date": "2026-07-14",
+          "source": "user_provided",
+          "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42"
+        },
+        "superseded_snapshot": {
+          "amount_cny": "2697",
+          "as_of_date": "2026-07-15",
+          "note": "statement_cash_replay; anchor_snapshot_id=7de3e9bc-4927-4632-aecc-5e1cdcd54f42; anchor_as_of=2026-07-14; ledger_entries=10; cash_change=-8660; fee_pending_entries=10; calculation_status=fee_pending; ledger_fingerprint=7bc48a25e4a662494cd2243b06892abdd35b612ad733f0bf220ab4074848b280",
+          "source_ref": "portfolio.sqlite3#cash_balance_snapshots:e694beb7-5be3-4474-9126-0e35fd804f00"
+        },
+        "replayed_ledger_entries": 10,
+        "unknown_fee_entries": 0,
+        "recorded_at": "2026-07-15T12:30:30+00:00",
+        "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42+ledger_entries:through:2026-07-16"
+      },
+      "opening_positions": [
+        {
+          "ts_code": "600030.SH",
+          "name": "中信证券",
+          "asset_type": "equity",
+          "industry_name": "证券",
+          "quantity": "500",
+          "average_cost_cny": "27.8303",
+          "remaining_cost_cny": "13915.14",
+          "close_cny": "28.6",
+          "price_date": "2026-07-15",
+          "price_source": "tushare.daily",
+          "market_value_cny": "14300",
+          "unrealized_pnl_cny": "384.86",
+          "unrealized_return_pct": "2.77",
+          "realized_pnl_to_date_cny": "944.19",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:600030.SH:through:2026-07-15",
+            "portfolio.sqlite3#close_prices:600030.SH:2026-07-15"
+          ],
+          "portfolio_weight_pct": "3.03"
+        }
+      ],
+      "positions": [
+        {
+          "ts_code": "600030.SH",
+          "name": "中信证券",
+          "asset_type": "equity",
+          "industry_name": "证券",
+          "quantity": "500",
+          "average_cost_cny": "27.8303",
+          "remaining_cost_cny": "13915.14",
+          "close_cny": "28.1",
+          "price_date": "2026-07-16",
+          "price_source": "tushare.daily",
+          "market_value_cny": "14050",
+          "unrealized_pnl_cny": "134.86",
+          "unrealized_return_pct": "0.97",
+          "realized_pnl_to_date_cny": "944.19",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:600030.SH:through:2026-07-16",
+            "portfolio.sqlite3#close_prices:600030.SH:2026-07-16"
+          ],
+          "portfolio_weight_pct": "2.94"
+        }
+      ],
+      "risk_change": {
+        "type": "fact_and_inference",
+        "cash_weight_pct": "0.55",
+        "top_position_weight_pct": "30.13",
+        "top3_weight_pct": "65.73",
+        "concentration_status": "HIGH",
+        "missing_prices": [],
+        "cash_status": "fact"
+      }
+    },
+    "decision_context": {
+      "framework": "four_layer_periodic_review_v1",
+      "report_depth": "daily_delta_only",
+      "fundamental_and_valuation": {
+        "status": "missing",
+        "scope": "latest_public_snapshot_before_report_cutoff",
+        "summary": "正式组合库不保存财务与估值快照；本日报未用常识或未来披露补造基本面结论，需在标的研究证据可用后补充。",
+        "metrics": {},
+        "valuation": {},
+        "observations": [],
+        "source_refs": []
+      },
+      "market_and_sector": {
+        "status": "partial",
+        "scope": "report_day_delta",
+        "summary": "标的当日涨跌幅 -1.75%；正式组合库未保存同日基准和板块指数，因此不做大盘/板块归因。",
+        "stock_change_pct": "-1.75",
+        "benchmarks": [],
+        "sector": null,
+        "observations": [
+          {
+            "type": "fact",
+            "text": "标的当日涨跌幅 -1.75%。",
+            "timing": "end_of_day_retrospective",
+            "source_ref": "portfolio.sqlite3#close_prices:600030.SH:2026-07-16:6982"
+          }
+        ],
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:600030.SH:2026-07-16:6982"
+        ]
+      },
+      "technical_and_trend": {
+        "status": "available",
+        "scope": "report_cutoff_technical_delta",
+        "summary": "截至报告日，正式行情中的 3/5/20 个交易日涨跌幅分别为 -0.07%/-2.02%/2.67%；成交量与日内高低价不在该轻量回退数据中。",
+        "metrics": {
+          "trade_date": "2026-07-16",
+          "close_cny": "28.1",
+          "return_3_session_pct": "-0.07",
+          "return_5_session_pct": "-2.02",
+          "return_20_session_pct": "2.67",
+          "volume_vs_prior_5d_avg": null,
+          "day_open_cny": null,
+          "day_high_cny": null,
+          "day_low_cny": null
+        },
+        "observations": [],
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:600030.SH:2026-07-16:6982"
+        ]
+      },
+      "position_and_execution": {
+        "status": "available",
+        "scope": "daily_operation_delta",
+        "summary": "标的期末组合权重 2.94%；当日 0 笔操作已按仓位路径和净闭环复盘。",
+        "observations": [
+          {
+            "type": "fact",
+            "text": "报告截止现金权重 0.55%，最大单一标的权重 30.13%，前三大合计 65.73%。",
+            "source_ref": "portfolio.sqlite3#ledger_entries+cash_balance_snapshots+close_prices"
+          }
+        ],
+        "episode_summaries": [],
+        "source_refs": [
+          "portfolio.sqlite3#ledger_entries+cash_balance_snapshots+close_prices"
+        ]
+      },
+      "timing_policy": "动机仅使用操作时点已可见信息；收盘、板块相对表现和净闭环只进入事后复盘与报告截止建议。"
+    },
+    "operations_and_motives": {
+      "operation_count": 0,
+      "operations": [],
+      "episode_summaries": []
+    },
+    "review_judgments": [
+      {
+        "type": "inference",
+        "status": "no_trade",
+        "text": "当日无持仓变动，不构造虚假的操作评价。",
+        "source_refs": []
+      }
+    ],
+    "recommendation": {
+      "type": "analyst_view",
+      "action": "hold",
+      "target_position": {
+        "target_position_range_pct": [
+          "0",
+          "5"
+        ],
+        "target_position_note": "维持观察仓或空仓，不主动扩大到 5% 以上。"
+      },
+      "time_horizon": "下一交易周或下一次实质性信息更新前",
+      "confidence": "low",
+      "rationale": [
+        {
+          "type": "fact",
+          "text": "报告截止时组合权重约 2.94%。",
+          "source_ref": "portfolio.sqlite3#ledger_entries:600030.SH:through:2026-07-16"
+        },
+        {
+          "type": "fact",
+          "text": "收盘价 28.1 元，账面成本 27.8303 元。",
+          "source_ref": "portfolio.sqlite3#ledger_entries+close_prices"
+        },
+        {
+          "type": "inference",
+          "text": "正式组合库不保存财务与估值快照；本日报未用常识或未来披露补造基本面结论，需在标的研究证据可用后补充。",
+          "source_ref": "periodic_report:risk_guardrail"
+        },
+        {
+          "type": "inference",
+          "text": "标的当日涨跌幅 -1.75%；正式组合库未保存同日基准和板块指数，因此不做大盘/板块归因。",
+          "source_ref": "portfolio.sqlite3#close_prices:600030.SH:2026-07-16:6982"
+        },
+        {
+          "type": "inference",
+          "text": "截至报告日，正式行情中的 3/5/20 个交易日涨跌幅分别为 -0.07%/-2.02%/2.67%；成交量与日内高低价不在该轻量回退数据中。",
+          "source_ref": "portfolio.sqlite3#close_prices:600030.SH:2026-07-16:6982"
+        },
+        {
+          "type": "opinion",
+          "text": "标的期末组合权重 2.94%；当日 0 笔操作已按仓位路径和净闭环复盘。",
+          "source_ref": "periodic_report:position_and_execution"
+        }
+      ],
+      "major_downside_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "轻量日报不能替代公司长期价值深度研究",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "data_timestamp": "2026-07-16T15:00:00+08:00",
+      "report_cutoff_at": "2026-07-16T15:00:00+08:00",
+      "important_missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT"
+      ],
+      "orders_executed": false,
+      "guaranteed_return": false
+    },
+    "risks_invalidation_and_missing": {
+      "major_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "轻量日报不能替代公司长期价值深度研究",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT"
+      ],
+      "data_limitations": []
+    }
+  },
+  "source": {
+    "source_path": "portfolio.sqlite3 (formal, immutable/query-only)",
+    "source_sha256": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "source_observed_through": "2026-07-16T13:49:26+00:00",
+    "context_fetched_at": "2026-07-16T13:49:25+00:00",
+    "review_sidecar": "investment_review.sqlite3 (derived report state)",
+    "source_refs": [
+      "portfolio.sqlite3#ledger_entries",
+      "portfolio.sqlite3#close_prices",
+      "portfolio.sqlite3#cash_balance_snapshots",
+      "investment_review.sqlite3#decisions",
+      "baostock#bounded_periodic_context"
+    ]
+  },
+  "safety": {
+    "orders_executed": false,
+    "broker_accessed": false,
+    "guaranteed_return_claims": false,
+    "recommendation_is_not_an_order": true
+  },
+  "content_id": "sha256:9a8bc42fad271c99c024879817b780d4be00edd446e7c43c26e16c8bc7e82779"
+}

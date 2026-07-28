@@ -1,13 +1,20 @@
 from __future__ import annotations
 
+import json
 import sqlite3
 from copy import deepcopy
+from datetime import date
 from pathlib import Path
 
 from src.investment_review.periodic_reports import (
     PeriodicReportStore,
     _fee_provenance,
+    _natural_calendar_bounds,
+    build_aggregate_report,
     build_daily_report,
+    export_final_sample_matrix,
+    generate_daily_range,
+    generate_periodic_summaries,
     render_periodic_report_markdown,
     validate_periodic_report,
 )
@@ -110,9 +117,11 @@ def _formal_portfolio_db(tmp_path: Path) -> Path:
             ("000001.SZ", "2026-07-11", "10.2", "10", "2", 1),
             ("000001.SZ", "2026-07-14", "10.8", "10.2", "5.88", 2),
             ("000001.SZ", "2026-07-15", "11", "10.8", "1.85", 3),
+            ("000001.SZ", "2026-07-16", "11.2", "11", "1.82", 7),
             ("000002.SZ", "2026-07-11", "20", "20", "0", 4),
             ("000002.SZ", "2026-07-14", "20.5", "20", "2.5", 5),
             ("000002.SZ", "2026-07-15", "20.2", "20.5", "-1.46", 6),
+            ("000002.SZ", "2026-07-16", "20.1", "20.2", "-0.5", 8),
         ]
         connection.executemany(
             """
@@ -267,6 +276,19 @@ def test_real_contract_shape_builds_portfolio_and_no_decision_instrument_daily(
     assert instrument["sections"]["performance_and_positions"]["cash"][
         "consistency_status"
     ] == "replayed_from_anchor"
+    portfolio_performance = portfolio["sections"]["performance_and_positions"][
+        "performance"
+    ]
+    instrument_performance = instrument["sections"][
+        "performance_and_positions"
+    ]["performance"]
+    assert portfolio_performance["performance_basis"] == "total_assets"
+    assert instrument_performance["performance_basis"] == "instrument_close_price"
+    assert instrument_performance["start_close_cny"] == "10.8"
+    assert instrument_performance["end_close_cny"] == "11"
+    assert instrument_performance["price_change_cny"] == "0.2"
+    assert instrument_performance["price_change_pct"] == "1.85"
+    assert instrument_performance["asset_change_cny"] is None
     assert instrument["safety"] == {
         "orders_executed": False,
         "broker_accessed": False,
@@ -276,8 +298,9 @@ def test_real_contract_shape_builds_portfolio_and_no_decision_instrument_daily(
     markdown = render_periodic_report_markdown(instrument)
     assert "system_inference" in markdown
     assert "样本一号（000001.SZ）" in markdown
+    assert "标的收盘价：10.8 → 11 元/股" in markdown
     assert "四层决策上下文" in markdown
-    assert "个性化交易建议与建议仓位" in markdown
+    assert "## 6. 样本一号（000001.SZ）个性化交易建议与建议仓位" in markdown
     assert "本报告不会执行订单" in markdown
 
 
@@ -428,6 +451,353 @@ def test_daily_report_still_exists_without_trades(tmp_path: Path) -> None:
         "reduce",
     }
     assert validate_periodic_report(report)["status"] == "accepted"
+
+
+def test_missing_historical_cash_preserves_total_asset_gap_and_market_value_basis(
+    tmp_path: Path,
+) -> None:
+    source = _formal_portfolio_db(tmp_path)
+    sidecar = _empty_sidecar(tmp_path)
+    with sqlite3.connect(source) as connection:
+        connection.execute("DELETE FROM cash_balance_snapshots")
+        connection.commit()
+
+    report = build_daily_report(
+        portfolio_db=source,
+        review_db=sidecar,
+        report_date="2026-07-15",
+        subject_type="portfolio",
+    )
+    facts = report["sections"]["performance_and_positions"]
+    performance = facts["performance"]
+
+    assert facts["cash"] is None
+    assert performance["start_total_assets_cny"] is None
+    assert performance["end_total_assets_cny"] is None
+    assert performance["performance_basis"] == "invested_market_value_ex_cash"
+    assert performance["period_change_cny"] is not None
+    assert performance["period_change_pct"] is not None
+    assert "现金权重 MISSING%" in report["headline"]
+    assert "None" not in report["headline"]
+    assert validate_periodic_report(report)["status"] == "accepted"
+
+
+def test_daily_range_covers_held_traded_no_trade_exit_and_is_idempotent(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    source = _formal_portfolio_db(tmp_path)
+    sidecar = _empty_sidecar(tmp_path)
+    output = tmp_path / "daily-range"
+    with sqlite3.connect(source) as connection:
+        connection.execute(
+            """
+            INSERT INTO ledger_entries(
+                account_id, event_date, event_time, event_type, ts_code,
+                quantity, price, gross_amount, fees, total_cost, cash_amount,
+                external_id, dedupe_key, import_batch_id, source_row, note,
+                created_at
+            ) VALUES (
+                'default', '2026-07-15', '14:20:00', 'SELL', '000002.SZ',
+                '100', '20.2', '2020', '0', '0', '0',
+                'fixture-5', 'ledger-5', 'batch-periodic', 5,
+                'broker=fixture; fees_missing=true',
+                '2026-07-15T12:00:00Z'
+            )
+            """
+        )
+        connection.commit()
+    before = source.read_bytes()
+
+    first = generate_daily_range(
+        portfolio_db=source,
+        review_db=sidecar,
+        start_date="2026-07-14",
+        end_date="2026-07-16",
+        output_dir=output,
+    )
+    second = generate_daily_range(
+        portfolio_db=source,
+        review_db=sidecar,
+        start_date="2026-07-14",
+        end_date="2026-07-16",
+        output_dir=output,
+    )
+
+    assert source.read_bytes() == before
+    assert first["period"] == {
+        "start": "2026-07-14",
+        "end": "2026-07-16",
+        "trading_day_count": 3,
+    }
+    assert [item["trade_date"] for item in first["coverage"]] == [
+        "2026-07-14",
+        "2026-07-15",
+        "2026-07-16",
+    ]
+    assert [item["no_trade_day"] for item in first["coverage"]] == [
+        True,
+        False,
+        True,
+    ]
+    assert first["coverage"][1]["traded_instruments"] == [
+        "000001.SZ",
+        "000002.SZ",
+    ]
+    assert first["coverage"][1]["instrument_reports"] == 2
+    assert first["coverage"][2]["held_instruments"] == ["000001.SZ"]
+    assert first["coverage"][2]["instrument_reports"] == 1
+    assert first["report_count"] == 8
+    assert {item["status"] for item in second["store_receipts"]} == {"skipped"}
+    report_store = PeriodicReportStore(sidecar)
+    assert report_store.count() == 8
+    exited = report_store.get_by_identity(
+        subject_type="instrument",
+        subject_id="000002.SZ",
+        period_type="daily",
+        period_start="2026-07-15",
+        period_end="2026-07-15",
+    )
+    assert exited is not None
+    assert exited["subject"]["name"] == "样本二号"
+    assert "样本二号（000002.SZ）期末权重 0%" in exited["headline"]
+    assert (output / "daily_range_validation.json").is_file()
+
+
+def test_weekly_monthly_summaries_reconcile_daily_facts_and_are_idempotent(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    source = _formal_portfolio_db(tmp_path)
+    sidecar = _empty_sidecar(tmp_path)
+    generate_daily_range(
+        portfolio_db=source,
+        review_db=sidecar,
+        start_date="2026-07-14",
+        end_date="2026-07-16",
+    )
+
+    weekly = generate_periodic_summaries(
+        review_db=sidecar,
+        period_type="weekly",
+        start_date="2026-07-13",
+        end_date="2026-07-19",
+        output_dir=tmp_path / "weekly",
+        subject_type="portfolio",
+    )
+    weekly_replay = generate_periodic_summaries(
+        review_db=sidecar,
+        period_type="weekly",
+        start_date="2026-07-13",
+        end_date="2026-07-19",
+        output_dir=tmp_path / "weekly",
+        subject_type="portfolio",
+    )
+    monthly = generate_periodic_summaries(
+        review_db=sidecar,
+        period_type="monthly",
+        start_date="2026-07-01",
+        end_date="2026-07-31",
+        output_dir=tmp_path / "monthly",
+        subject_type="instrument",
+        subject_id="000001.SZ",
+    )
+
+    assert weekly["report_count"] == 1
+    assert weekly["reports"][0]["daily_source_count"] == 3
+    assert weekly["reports"][0]["operation_count"] == 2
+    assert weekly["reports"][0]["validation"]["status"] == "accepted"
+    assert {item["status"] for item in weekly_replay["store_receipts"]} == {
+        "skipped"
+    }
+    assert monthly["report_count"] == 1
+    stored_weekly = PeriodicReportStore(sidecar).get(
+        weekly["reports"][0]["report_id"]
+    )
+    stored_monthly = PeriodicReportStore(sidecar).get(
+        monthly["reports"][0]["report_id"]
+    )
+    assert stored_weekly["sections"]["decision_context"]["report_depth"] == (
+        "weekly_synthesis"
+    )
+    assert stored_monthly["sections"]["decision_context"]["report_depth"] == (
+        "monthly_synthesis"
+    )
+    monthly_performance = stored_monthly["sections"][
+        "performance_and_positions"
+    ]["performance"]
+    assert monthly_performance["performance_basis"] == "instrument_close_price"
+    assert monthly_performance["start_close_cny"] == "10.2"
+    assert monthly_performance["end_close_cny"] == "11.2"
+    assert monthly_performance["price_change_cny"] == "1"
+    assert monthly_performance["price_change_pct"] == "9.8"
+    assert monthly_performance["asset_change_cny"] is None
+    assert "样本一号本月收盘价变动 9.8%" in stored_monthly["headline"]
+    assert stored_weekly["source"]["daily_report_ids"] == [
+        item["source_report_id"]
+        for item in stored_weekly["sections"]["performance_and_positions"][
+            "period_attribution"
+        ]["daily_changes"]
+    ]
+    assert "周报" in render_periodic_report_markdown(stored_weekly)
+    assert "月报" in render_periodic_report_markdown(stored_monthly)
+
+
+def test_aggregate_no_trade_period_and_cross_month_week_boundary(
+    tmp_path: Path,
+) -> None:
+    source = _formal_portfolio_db(tmp_path)
+    sidecar = _empty_sidecar(tmp_path)
+    reports = [
+        build_daily_report(
+            portfolio_db=source,
+            review_db=sidecar,
+            report_date=day,
+            subject_type="portfolio",
+        )
+        for day in ("2026-07-14", "2026-07-16")
+    ]
+    aggregate = build_aggregate_report(
+        daily_reports=reports,
+        period_type="weekly",
+        period_start="2026-07-14",
+        period_end="2026-07-16",
+    )
+
+    assert aggregate["sections"]["operations_and_motives"]["operation_count"] == 0
+    assert aggregate["sections"]["review_judgments"][0]["status"] == "no_trade"
+    assert validate_periodic_report(aggregate)["status"] == "accepted"
+    assert _natural_calendar_bounds(date(2026, 7, 1), "weekly") == (
+        date(2026, 6, 29),
+        date(2026, 7, 5),
+    )
+
+
+def test_newly_opened_instrument_keeps_unavailable_return_explicit(
+    tmp_path: Path,
+) -> None:
+    source = _formal_portfolio_db(tmp_path)
+    sidecar = _empty_sidecar(tmp_path)
+    reports = [
+        build_daily_report(
+            portfolio_db=source,
+            review_db=sidecar,
+            report_date=day,
+            subject_type="instrument",
+            subject_id="000001.SZ",
+        )
+        for day in ("2026-07-14", "2026-07-15", "2026-07-16")
+    ]
+    opening_performance = reports[0]["sections"][
+        "performance_and_positions"
+    ]["performance"]
+    opening_performance["start_close_cny"] = None
+    opening_performance["start_price_date"] = None
+    opening_performance["start_invested_market_value_cny"] = "0"
+
+    aggregate = build_aggregate_report(
+        daily_reports=reports,
+        period_type="monthly",
+        period_start="2026-07-14",
+        period_end="2026-07-16",
+    )
+    performance = aggregate["sections"]["performance_and_positions"][
+        "performance"
+    ]
+    markdown = render_periodic_report_markdown(aggregate)
+
+    assert performance["performance_basis"] == "instrument_position_market_value"
+    assert performance["period_change_pct"] is None
+    assert "变动 MISSING%" in aggregate["headline"]
+    assert "期初可比价格 MISSING" in markdown
+    assert "（MISSING%）" in markdown
+    assert "None" not in markdown
+
+
+def test_final_export_contains_exact_six_report_types_and_safety_manifest(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    source = _formal_portfolio_db(tmp_path)
+    sidecar = _empty_sidecar(tmp_path)
+    generate_daily_range(
+        portfolio_db=source,
+        review_db=sidecar,
+        start_date="2026-07-14",
+        end_date="2026-07-16",
+    )
+    for period_type, period_start, period_end in (
+        ("weekly", "2026-07-14", "2026-07-16"),
+        ("monthly", "2026-07-14", "2026-07-16"),
+    ):
+        daily = [
+            PeriodicReportStore(sidecar).get_by_identity(
+                subject_type=subject_type,
+                subject_id=subject_id,
+                period_type="daily",
+                period_start=day,
+                period_end=day,
+            )
+            for subject_type, subject_id in (
+                ("portfolio", "default"),
+                ("instrument", "000001.SZ"),
+            )
+            for day in ("2026-07-14", "2026-07-15", "2026-07-16")
+        ]
+        for subject_type, subject_id in (
+            ("portfolio", "default"),
+            ("instrument", "000001.SZ"),
+        ):
+            selected = [
+                item
+                for item in daily
+                if item is not None
+                and item["subject"]["type"] == subject_type
+                and item["subject"]["id"] == subject_id
+            ]
+            PeriodicReportStore(sidecar).save(
+                build_aggregate_report(
+                    daily_reports=selected,
+                    period_type=period_type,
+                    period_start=period_start,
+                    period_end=period_end,
+                )
+            )
+    output = tmp_path / "final"
+    result = export_final_sample_matrix(
+        portfolio_db=source,
+        review_db=sidecar,
+        output_dir=output,
+        instrument="000001.SZ",
+        daily_date="2026-07-15",
+        weekly_start="2026-07-14",
+        weekly_end="2026-07-16",
+        monthly_start="2026-07-14",
+        monthly_end="2026-07-16",
+    )
+
+    assert result["report_count"] == 6
+    manifest = json.loads(
+        (output / "validation_summary.json").read_text(encoding="utf-8")
+    )
+    assert {
+        (item["subject"]["type"], item["period"]["type"])
+        for item in manifest["sample_matrix"]
+    } == {
+        ("portfolio", "daily"),
+        ("instrument", "daily"),
+        ("portfolio", "weekly"),
+        ("instrument", "weekly"),
+        ("portfolio", "monthly"),
+        ("instrument", "monthly"),
+    }
+    assert manifest["formal_portfolio_db"]["unchanged"] is True
+    assert manifest["orders_executed"] is False
+    assert manifest["production_released"] is False
+    assert (output / "FINAL_READOUT.md").is_file()
 
 
 def test_validator_rejects_post_operation_motive_observation(

@@ -8,6 +8,7 @@ import {
   periodicOperationTime,
   periodicReportHeadline,
   periodicReportView,
+  periodicSubjectLabel,
   projectedTime,
 } from "./investment_review.js";
 
@@ -99,6 +100,7 @@ describe("periodic investment reports", () => {
     expect(view.period.type).toBe("daily");
     expect(view.operation_count).toBe(3);
     expect(view.recommendation.action).toBe("reduce");
+    expect(periodicSubjectLabel(view)).toBe("德展健康（000813.SZ）");
     expect(periodicReportHeadline(report)).toContain("8%–12%");
     expect(projectedTime(view.period.report_cutoff_at)).toBe(
       "2026-07-15T15:00:00+08:00",
@@ -106,19 +108,25 @@ describe("periodic investment reports", () => {
     expect(projectedTime({ occurred_at: "2026-07-15T01:38:45Z" })).toBe(
       "2026-07-15T01:38:45Z",
     );
+    expect(projectedTime({ completed_at: "2026-07-28T08:00:00Z" })).toBe(
+      "2026-07-28T08:00:00Z",
+    );
     expect(periodicOperationTime("2026-07-15T01:38:45Z")).toBe(
       "2026-07-15 09:38:45 +08:00",
     );
   });
 
   it("loads the periodic list and detail before operation-level evidence", () => {
-    expect(source).toContain("/periodic-reports?period_type=daily&limit=200");
+    expect(source).toContain("/periodic-reports?limit=1000");
     expect(source).toContain("/periodic-report?");
     expect(source.indexOf("PERIODIC REPORTS")).toBeLessThan(
       source.indexOf("OPERATION EVIDENCE"),
     );
     expect(source).toContain("MOTIVE · SYSTEM INFERENCE");
-    expect(source).toContain("四层决策上下文（日报增量）");
+    expect(source).toContain("weekly: \"自然周汇总\"");
+    expect(source).toContain("monthly: \"自然月汇总\"");
+    expect(source).toContain("[\"weekly\", \"周报\"]");
+    expect(source).toContain("[\"monthly\", \"月报\"]");
     expect(source).toContain("FUNDAMENTAL · MARKET · TREND · EXECUTION");
     expect(source).toContain("operation.name, operation.ts_code");
     expect(source).toContain("rule_backfilled");
@@ -159,6 +167,9 @@ describe("investment review read-only acceptance", () => {
 
 describe("investment review automation health", () => {
   it("keeps partial completion distinct from success and failure", () => {
+    expect(source).toContain("periodic_auto ${text(periodicAutomation.state");
+    expect(source).toContain("periodic_success ${projectedTime(periodicAutomation.last_success)");
+    expect(source).toContain("periodic_failure ${projectedTime(periodicAutomation.last_failure)");
     expect(source).toContain("automation ${text(automation.state");
     expect(source).toContain("auto_completed ${projectedTime(automation.last_completed)");
     expect(source).toContain("auto_success ${projectedTime(automation.last_success)");

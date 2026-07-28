@@ -1,0 +1,604 @@
+{
+  "schema_version": "investment_review.periodic_report.v1",
+  "report_id": "periodic_75ce4311066fac155531b8822220d950",
+  "status": "ready",
+  "subject": {
+    "type": "instrument",
+    "id": "002463.SZ",
+    "name": "沪电股份"
+  },
+  "period": {
+    "type": "daily",
+    "start": "2026-07-14",
+    "end": "2026-07-14",
+    "report_cutoff_at": "2026-07-14T15:00:00+08:00"
+  },
+  "generated_at": "2026-07-15T01:15:00+00:00",
+  "headline": "沪电股份（002463.SZ）期末权重 3%，收盘价变动 10%；当日操作已按四层上下文与无 Decision 的 system_inference 复盘；建议 hold。",
+  "sections": {
+    "performance_and_positions": {
+      "performance": {
+        "type": "fact",
+        "comparison_date": "2026-07-13",
+        "start_total_assets_cny": null,
+        "end_total_assets_cny": null,
+        "asset_change_cny": null,
+        "asset_change_pct": null,
+        "start_close_cny": "124.66",
+        "end_close_cny": "137.13",
+        "start_price_date": "2026-07-13",
+        "end_price_date": "2026-07-14",
+        "price_change_cny": "12.47",
+        "price_change_pct": "10",
+        "start_quantity": "400",
+        "end_quantity": "100",
+        "quantity_change": "-300",
+        "start_invested_market_value_cny": "49864",
+        "end_invested_market_value_cny": "13713",
+        "invested_market_value_change_cny": "-36151",
+        "invested_market_value_change_pct": "-72.5",
+        "performance_basis": "instrument_close_price",
+        "period_change_cny": "12.47",
+        "period_change_pct": "10",
+        "cash_change_cny": null,
+        "valuation_complete": true,
+        "calculation_method": "标的收益以报告日与上一交易日收盘价变化计算，避免买卖数量变化冒充投资收益；持仓市值与数量变化另列，用于解释加减仓或退出。缺价时保持 MISSING，不以组合总资产变化替代标的表现。",
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:002463.SZ:2026-07-13",
+          "portfolio.sqlite3#close_prices:002463.SZ:2026-07-14",
+          "portfolio.sqlite3#ledger_entries:002463.SZ:through:2026-07-14"
+        ]
+      },
+      "opening_cash": null,
+      "cash": {
+        "amount_cny": "11357",
+        "as_of_date": "2026-07-14",
+        "source": "user_provided",
+        "status": "fact",
+        "fee_pending": false,
+        "fee_provenance_status": "complete",
+        "consistency_status": "snapshot_direct",
+        "note": "用户提供的 2026-07-14 账户现金余额；本次交割单不含完整银证转账流水",
+        "recorded_at": "2026-07-14T17:42:53+00:00",
+        "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42"
+      },
+      "opening_positions": [
+        {
+          "ts_code": "002463.SZ",
+          "name": "沪电股份",
+          "asset_type": "equity",
+          "industry_name": "元器件",
+          "quantity": "400",
+          "average_cost_cny": "135.5192",
+          "remaining_cost_cny": "54207.67",
+          "close_cny": "124.66",
+          "price_date": "2026-07-13",
+          "price_source": "tushare.daily",
+          "market_value_cny": "49864",
+          "unrealized_pnl_cny": "-4343.67",
+          "unrealized_return_pct": "-8.01",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:002463.SZ:through:2026-07-13",
+            "portfolio.sqlite3#close_prices:002463.SZ:2026-07-13"
+          ],
+          "portfolio_weight_pct": null
+        }
+      ],
+      "positions": [
+        {
+          "ts_code": "002463.SZ",
+          "name": "沪电股份",
+          "asset_type": "equity",
+          "industry_name": "元器件",
+          "quantity": "100",
+          "average_cost_cny": "134.7247",
+          "remaining_cost_cny": "13472.47",
+          "close_cny": "137.13",
+          "price_date": "2026-07-14",
+          "price_source": "tushare.daily",
+          "market_value_cny": "13713",
+          "unrealized_pnl_cny": "240.53",
+          "unrealized_return_pct": "1.79",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:002463.SZ:through:2026-07-14",
+            "portfolio.sqlite3#close_prices:002463.SZ:2026-07-14"
+          ],
+          "portfolio_weight_pct": "3"
+        }
+      ],
+      "risk_change": {
+        "type": "fact_and_inference",
+        "cash_weight_pct": "2.48",
+        "top_position_weight_pct": "26.89",
+        "top3_weight_pct": "59.53",
+        "concentration_status": "HIGH",
+        "missing_prices": [],
+        "cash_status": "fact"
+      }
+    },
+    "decision_context": {
+      "framework": "four_layer_periodic_review_v1",
+      "report_depth": "daily_delta_only",
+      "fundamental_and_valuation": {
+        "status": "missing",
+        "scope": "latest_public_snapshot_before_report_cutoff",
+        "summary": "正式组合库不保存财务与估值快照；本日报未用常识或未来披露补造基本面结论，需在标的研究证据可用后补充。",
+        "metrics": {},
+        "valuation": {},
+        "observations": [],
+        "source_refs": []
+      },
+      "market_and_sector": {
+        "status": "partial",
+        "scope": "report_day_delta",
+        "summary": "标的当日涨跌幅 10%；正式组合库未保存同日基准和板块指数，因此不做大盘/板块归因。",
+        "stock_change_pct": "10",
+        "benchmarks": [],
+        "sector": null,
+        "observations": [
+          {
+            "type": "fact",
+            "text": "标的当日涨跌幅 10%。",
+            "timing": "end_of_day_retrospective",
+            "source_ref": "portfolio.sqlite3#close_prices:002463.SZ:2026-07-14:18"
+          }
+        ],
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:002463.SZ:2026-07-14:18"
+        ]
+      },
+      "technical_and_trend": {
+        "status": "available",
+        "scope": "report_cutoff_technical_delta",
+        "summary": "截至报告日，正式行情中的 3/5/20 个交易日涨跌幅分别为 -0.12%/5.71%/MISSING%；成交量与日内高低价不在该轻量回退数据中。",
+        "metrics": {
+          "trade_date": "2026-07-14",
+          "close_cny": "137.13",
+          "return_3_session_pct": "-0.12",
+          "return_5_session_pct": "5.71",
+          "return_20_session_pct": null,
+          "volume_vs_prior_5d_avg": null,
+          "day_open_cny": null,
+          "day_high_cny": null,
+          "day_low_cny": null
+        },
+        "observations": [],
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:002463.SZ:2026-07-14:18"
+        ]
+      },
+      "position_and_execution": {
+        "status": "available",
+        "scope": "daily_operation_delta",
+        "summary": "标的期末组合权重 3%；当日 3 笔操作已按仓位路径和净闭环复盘。",
+        "observations": [
+          {
+            "type": "fact",
+            "text": "报告截止现金权重 2.48%，最大单一标的权重 26.89%，前三大合计 59.53%。",
+            "source_ref": "portfolio.sqlite3#ledger_entries+cash_balance_snapshots+close_prices"
+          },
+          {
+            "type": "retrospective_outcome",
+            "text": "沪电股份（002463.SZ）持仓 400 → 400 → 100；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+            "source_ref": "portfolio.sqlite3#ledger_entries:956,portfolio.sqlite3#ledger_entries:958,portfolio.sqlite3#ledger_entries:960"
+          }
+        ],
+        "episode_summaries": [
+          {
+            "type": "retrospective_execution_summary",
+            "ts_code": "002463.SZ",
+            "name": "沪电股份",
+            "opening_quantity": "400",
+            "peak_quantity": "400",
+            "closing_quantity": "100",
+            "peak_increase_pct": "0",
+            "bought_quantity": "0",
+            "sold_quantity": "300",
+            "round_trip_closed": false,
+            "gross_round_trip_pnl_cny": null,
+            "fee_total_cny": "35.8",
+            "fee_statuses": [
+              "reported_actual"
+            ],
+            "net_round_trip_pnl_cny": null,
+            "assessment": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+            "source_refs": [
+              "portfolio.sqlite3#ledger_entries:956",
+              "portfolio.sqlite3#ledger_entries:958",
+              "portfolio.sqlite3#ledger_entries:960"
+            ]
+          }
+        ],
+        "source_refs": [
+          "portfolio.sqlite3#ledger_entries+cash_balance_snapshots+close_prices",
+          "portfolio.sqlite3#ledger_entries:956,portfolio.sqlite3#ledger_entries:958,portfolio.sqlite3#ledger_entries:960"
+        ]
+      },
+      "timing_policy": "动机仅使用操作时点已可见信息；收盘、板块相对表现和净闭环只进入事后复盘与报告截止建议。"
+    },
+    "operations_and_motives": {
+      "operation_count": 3,
+      "operations": [
+        {
+          "operation_id": "operation_eea6a2ef7313d2e6cf1269c7",
+          "event_id": "evt_periodic_91028480c3395c244b70cac9b2be20d1",
+          "episode_id": "te_51a2aa34b240f93a2c5dc81bcac62df2",
+          "episode_status": "open",
+          "occurred_at": "2026-07-14T02:31:55Z",
+          "source_imported_at": "2026-07-14T17:42:14+00:00",
+          "event_type": "sell",
+          "side": "SELL",
+          "ts_code": "002463.SZ",
+          "name": "沪电股份",
+          "quantity": "100",
+          "price_cny": "134.03",
+          "gross_amount_cny": "13403",
+          "fee_cny": "11.83",
+          "fee_status": "reported_actual",
+          "fee_rule": null,
+          "fee_is_known": true,
+          "quantity_before": "400",
+          "quantity_after": "300",
+          "operation_role": "reduce",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:956",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_eea6a2ef7313d2e6cf1269c7",
+            "input_cutoff_at": "2026-07-14T02:31:55Z",
+            "most_likely_motive": "系统推断：本笔更像在上涨中降低仓位风险或兑现一部分利润。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "reduce 100 股，成交价 134.03 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:956",
+                "observed_at": "2026-07-14T02:31:55Z"
+              },
+              {
+                "type": "fact",
+                "text": "本笔数量相当于操作前持仓的 25%",
+                "source_ref": "portfolio.sqlite3#ledger_entries:956",
+                "observed_at": "2026-07-14T02:31:55Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 124.66 元，成交价相对其变动 7.52%",
+                "source_ref": "portfolio.sqlite3#close_prices:002463.SZ:2026-07-13:809",
+                "observed_at": "2026-07-13T15:00:00+08:00"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 12%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-14T02:31:55Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是组合再平衡或现金需要，与价格判断无关。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_STRATEGY_OR_TARGET_POSITION",
+              "MISSING_INTRADAY_MARKET_CONTEXT"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "needs_improvement",
+            "gross_mark_to_close_cny": "-310",
+            "fee_status": "reported_actual",
+            "narrative": "按当日收盘价回看，成交方向产生了负的毛价差。 该笔采用账本记录的实收费用。"
+          }
+        },
+        {
+          "operation_id": "operation_943a18806e856fa6f64f6223",
+          "event_id": "evt_periodic_2826dd1b92edb5b3666d169126c12978",
+          "episode_id": "te_51a2aa34b240f93a2c5dc81bcac62df2",
+          "episode_status": "open",
+          "occurred_at": "2026-07-14T05:16:29Z",
+          "source_imported_at": "2026-07-14T17:42:14+00:00",
+          "event_type": "sell",
+          "side": "SELL",
+          "ts_code": "002463.SZ",
+          "name": "沪电股份",
+          "quantity": "100",
+          "price_cny": "137.13",
+          "gross_amount_cny": "13713",
+          "fee_cny": "12",
+          "fee_status": "reported_actual",
+          "fee_rule": null,
+          "fee_is_known": true,
+          "quantity_before": "300",
+          "quantity_after": "200",
+          "operation_role": "reduce",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:958",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_943a18806e856fa6f64f6223",
+            "input_cutoff_at": "2026-07-14T05:16:29Z",
+            "most_likely_motive": "系统推断：本笔更像在上涨中降低仓位风险或兑现一部分利润。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "reduce 100 股，成交价 137.13 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:958",
+                "observed_at": "2026-07-14T05:16:29Z"
+              },
+              {
+                "type": "fact",
+                "text": "本笔数量相当于操作前持仓的 33.33%",
+                "source_ref": "portfolio.sqlite3#ledger_entries:958",
+                "observed_at": "2026-07-14T05:16:29Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 124.66 元，成交价相对其变动 10%",
+                "source_ref": "portfolio.sqlite3#close_prices:002463.SZ:2026-07-13:809",
+                "observed_at": "2026-07-13T15:00:00+08:00"
+              },
+              {
+                "type": "fact",
+                "text": "本次操作前同日已有 1 笔该标的操作",
+                "source_ref": "portfolio.sqlite3#ledger_entries:956",
+                "observed_at": "2026-07-14T05:16:29Z"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 9%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-14T05:16:29Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是组合再平衡或现金需要，与价格判断无关。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_STRATEGY_OR_TARGET_POSITION",
+              "MISSING_INTRADAY_MARKET_CONTEXT"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "mixed",
+            "gross_mark_to_close_cny": "0",
+            "fee_status": "reported_actual",
+            "narrative": "按当日收盘价回看，毛价差接近零。 该笔采用账本记录的实收费用。"
+          }
+        },
+        {
+          "operation_id": "operation_93e1aa20a314fbc98eae4949",
+          "event_id": "evt_periodic_13999c24ce2d05e236104712a9a25e97",
+          "episode_id": "te_51a2aa34b240f93a2c5dc81bcac62df2",
+          "episode_status": "open",
+          "occurred_at": "2026-07-14T05:52:55Z",
+          "source_imported_at": "2026-07-14T17:42:14+00:00",
+          "event_type": "sell",
+          "side": "SELL",
+          "ts_code": "002463.SZ",
+          "name": "沪电股份",
+          "quantity": "100",
+          "price_cny": "136.55",
+          "gross_amount_cny": "13655",
+          "fee_cny": "11.97",
+          "fee_status": "reported_actual",
+          "fee_rule": null,
+          "fee_is_known": true,
+          "quantity_before": "200",
+          "quantity_after": "100",
+          "operation_role": "reduce",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:960",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_93e1aa20a314fbc98eae4949",
+            "input_cutoff_at": "2026-07-14T05:52:55Z",
+            "most_likely_motive": "系统推断：本笔更像在上涨中降低仓位风险或兑现一部分利润。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "reduce 100 股，成交价 136.55 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:960",
+                "observed_at": "2026-07-14T05:52:55Z"
+              },
+              {
+                "type": "fact",
+                "text": "本笔数量相当于操作前持仓的 50%",
+                "source_ref": "portfolio.sqlite3#ledger_entries:960",
+                "observed_at": "2026-07-14T05:52:55Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 124.66 元，成交价相对其变动 9.54%",
+                "source_ref": "portfolio.sqlite3#close_prices:002463.SZ:2026-07-13:809",
+                "observed_at": "2026-07-13T15:00:00+08:00"
+              },
+              {
+                "type": "fact",
+                "text": "本次操作前同日已有 2 笔该标的操作",
+                "source_ref": "portfolio.sqlite3#ledger_entries:956,portfolio.sqlite3#ledger_entries:958",
+                "observed_at": "2026-07-14T05:52:55Z"
+              },
+              {
+                "type": "estimate",
+                "text": "按上一收盘估算，操作前组合权重约 6%",
+                "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+                "observed_at": "2026-07-14T05:52:55Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是组合再平衡或现金需要，与价格判断无关。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_STRATEGY_OR_TARGET_POSITION",
+              "MISSING_INTRADAY_MARKET_CONTEXT"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "needs_improvement",
+            "gross_mark_to_close_cny": "-58",
+            "fee_status": "reported_actual",
+            "narrative": "按当日收盘价回看，成交方向产生了负的毛价差。 该笔采用账本记录的实收费用。"
+          }
+        }
+      ],
+      "episode_summaries": [
+        {
+          "type": "retrospective_execution_summary",
+          "ts_code": "002463.SZ",
+          "name": "沪电股份",
+          "opening_quantity": "400",
+          "peak_quantity": "400",
+          "closing_quantity": "100",
+          "peak_increase_pct": "0",
+          "bought_quantity": "0",
+          "sold_quantity": "300",
+          "round_trip_closed": false,
+          "gross_round_trip_pnl_cny": null,
+          "fee_total_cny": "35.8",
+          "fee_statuses": [
+            "reported_actual"
+          ],
+          "net_round_trip_pnl_cny": null,
+          "assessment": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:956",
+            "portfolio.sqlite3#ledger_entries:958",
+            "portfolio.sqlite3#ledger_entries:960"
+          ]
+        }
+      ]
+    },
+    "review_judgments": [
+      {
+        "type": "inference",
+        "status": "mixed",
+        "text": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+        "source_refs": [
+          "portfolio.sqlite3#ledger_entries:956",
+          "portfolio.sqlite3#ledger_entries:958",
+          "portfolio.sqlite3#ledger_entries:960"
+        ]
+      }
+    ],
+    "recommendation": {
+      "type": "analyst_view",
+      "action": "hold",
+      "target_position": {
+        "target_position_range_pct": [
+          "0",
+          "5"
+        ],
+        "target_position_note": "维持观察仓或空仓，不主动扩大到 5% 以上。"
+      },
+      "time_horizon": "下一交易周或下一次实质性信息更新前",
+      "confidence": "low",
+      "rationale": [
+        {
+          "type": "fact",
+          "text": "报告截止时组合权重约 3%。",
+          "source_ref": "portfolio.sqlite3#ledger_entries:002463.SZ:through:2026-07-14"
+        },
+        {
+          "type": "fact",
+          "text": "收盘价 137.13 元，账面成本 134.7247 元。",
+          "source_ref": "portfolio.sqlite3#ledger_entries+close_prices"
+        },
+        {
+          "type": "inference",
+          "text": "正式组合库不保存财务与估值快照；本日报未用常识或未来披露补造基本面结论，需在标的研究证据可用后补充。",
+          "source_ref": "periodic_report:risk_guardrail"
+        },
+        {
+          "type": "inference",
+          "text": "标的当日涨跌幅 10%；正式组合库未保存同日基准和板块指数，因此不做大盘/板块归因。",
+          "source_ref": "portfolio.sqlite3#close_prices:002463.SZ:2026-07-14:18"
+        },
+        {
+          "type": "inference",
+          "text": "截至报告日，正式行情中的 3/5/20 个交易日涨跌幅分别为 -0.12%/5.71%/MISSING%；成交量与日内高低价不在该轻量回退数据中。",
+          "source_ref": "portfolio.sqlite3#close_prices:002463.SZ:2026-07-14:18"
+        },
+        {
+          "type": "opinion",
+          "text": "标的期末组合权重 3%；当日 3 笔操作已按仓位路径和净闭环复盘。",
+          "source_ref": "periodic_report:position_and_execution"
+        }
+      ],
+      "major_downside_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "轻量日报不能替代公司长期价值深度研究",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "data_timestamp": "2026-07-14T15:00:00+08:00",
+      "report_cutoff_at": "2026-07-14T15:00:00+08:00",
+      "important_missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT"
+      ],
+      "orders_executed": false,
+      "guaranteed_return": false
+    },
+    "risks_invalidation_and_missing": {
+      "major_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "轻量日报不能替代公司长期价值深度研究",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT"
+      ],
+      "data_limitations": [
+        "MISSING_DECISION"
+      ]
+    }
+  },
+  "source": {
+    "source_path": "portfolio.sqlite3 (formal, immutable/query-only)",
+    "source_sha256": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "source_observed_through": "2026-07-15T01:15:00+00:00",
+    "context_fetched_at": "2026-07-15T01:14:47+00:00",
+    "review_sidecar": "investment_review.sqlite3 (derived report state)",
+    "source_refs": [
+      "portfolio.sqlite3#ledger_entries",
+      "portfolio.sqlite3#close_prices",
+      "portfolio.sqlite3#cash_balance_snapshots",
+      "investment_review.sqlite3#decisions",
+      "baostock#bounded_periodic_context"
+    ]
+  },
+  "safety": {
+    "orders_executed": false,
+    "broker_accessed": false,
+    "guaranteed_return_claims": false,
+    "recommendation_is_not_an_order": true
+  },
+  "content_id": "sha256:4369e80fb549743ad3296e4c36b2e1170f97a2f122a8e0035d741aca6a692c47"
+}

@@ -1,0 +1,404 @@
+{
+  "schema_version": "investment_review.periodic_v1.final_validation.v1",
+  "status": "candidate",
+  "p1_sample_acceptance": {
+    "grant": "accept_p1_sample_and_continue",
+    "recorded": true
+  },
+  "sample_matrix": [
+    {
+      "report_id": "periodic_07389934450c03465de361729f061a97",
+      "subject": {
+        "id": "default",
+        "name": "组合账户",
+        "type": "portfolio"
+      },
+      "period": {
+        "end": "2026-07-15",
+        "report_cutoff_at": "2026-07-15T15:00:00+08:00",
+        "start": "2026-07-15",
+        "type": "daily"
+      },
+      "operation_count": 10,
+      "performance_basis": "total_assets",
+      "period_change_cny": "14648.84",
+      "validation": {
+        "status": "accepted",
+        "errors": []
+      },
+      "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_daily_2026-07-15_2026-07-15.json",
+      "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_daily_2026-07-15_2026-07-15.md"
+    },
+    {
+      "report_id": "periodic_f86542248148c05f93aad799f5dcb3d4",
+      "subject": {
+        "id": "000813.SZ",
+        "name": "德展健康",
+        "type": "instrument"
+      },
+      "period": {
+        "end": "2026-07-15",
+        "report_cutoff_at": "2026-07-15T15:00:00+08:00",
+        "start": "2026-07-15",
+        "type": "daily"
+      },
+      "operation_count": 3,
+      "performance_basis": "instrument_close_price",
+      "period_change_cny": "0.08",
+      "validation": {
+        "status": "accepted",
+        "errors": []
+      },
+      "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_daily_2026-07-15_2026-07-15.json",
+      "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_daily_2026-07-15_2026-07-15.md"
+    },
+    {
+      "report_id": "periodic_166f2bb2d1c13343a6c63f4626ba5ad7",
+      "subject": {
+        "id": "default",
+        "name": "组合账户",
+        "type": "portfolio"
+      },
+      "period": {
+        "calendar_end": "2026-07-05",
+        "calendar_start": "2026-06-29",
+        "completeness": "partial_selected_window",
+        "covered_trading_dates": [
+          "2026-06-29",
+          "2026-06-30",
+          "2026-07-01",
+          "2026-07-02",
+          "2026-07-03"
+        ],
+        "end": "2026-07-03",
+        "report_cutoff_at": "2026-07-03T15:00:00+08:00",
+        "start": "2026-06-29",
+        "type": "weekly"
+      },
+      "operation_count": 17,
+      "performance_basis": "invested_market_value_ex_cash",
+      "period_change_cny": "18001.7",
+      "validation": {
+        "status": "accepted",
+        "errors": []
+      },
+      "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_weekly_2026-06-29_2026-07-03.json",
+      "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_weekly_2026-06-29_2026-07-03.md"
+    },
+    {
+      "report_id": "periodic_8cddad3e62933d01392d53865f4718d0",
+      "subject": {
+        "id": "000813.SZ",
+        "name": "德展健康",
+        "type": "instrument"
+      },
+      "period": {
+        "calendar_end": "2026-07-05",
+        "calendar_start": "2026-06-29",
+        "completeness": "partial_selected_window",
+        "covered_trading_dates": [
+          "2026-06-29",
+          "2026-06-30",
+          "2026-07-01",
+          "2026-07-02",
+          "2026-07-03"
+        ],
+        "end": "2026-07-03",
+        "report_cutoff_at": "2026-07-03T15:00:00+08:00",
+        "start": "2026-06-29",
+        "type": "weekly"
+      },
+      "operation_count": 2,
+      "performance_basis": "instrument_close_price",
+      "period_change_cny": "0.2",
+      "validation": {
+        "status": "accepted",
+        "errors": []
+      },
+      "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_weekly_2026-06-29_2026-07-03.json",
+      "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_weekly_2026-06-29_2026-07-03.md"
+    },
+    {
+      "report_id": "periodic_9a97f190ae85fdb1730a3de16b57ccb4",
+      "subject": {
+        "id": "default",
+        "name": "组合账户",
+        "type": "portfolio"
+      },
+      "period": {
+        "calendar_end": "2026-06-30",
+        "calendar_start": "2026-06-01",
+        "completeness": "complete_selected_window",
+        "covered_trading_dates": [
+          "2026-06-01",
+          "2026-06-02",
+          "2026-06-03",
+          "2026-06-04",
+          "2026-06-05",
+          "2026-06-08",
+          "2026-06-09",
+          "2026-06-10",
+          "2026-06-11",
+          "2026-06-12",
+          "2026-06-15",
+          "2026-06-16",
+          "2026-06-17",
+          "2026-06-18",
+          "2026-06-22",
+          "2026-06-23",
+          "2026-06-24",
+          "2026-06-25",
+          "2026-06-26",
+          "2026-06-29",
+          "2026-06-30"
+        ],
+        "end": "2026-06-30",
+        "report_cutoff_at": "2026-06-30T15:00:00+08:00",
+        "start": "2026-06-01",
+        "type": "monthly"
+      },
+      "operation_count": 34,
+      "performance_basis": "invested_market_value_ex_cash",
+      "period_change_cny": "101",
+      "validation": {
+        "status": "accepted",
+        "errors": []
+      },
+      "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_monthly_2026-06-01_2026-06-30.json",
+      "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\portfolio_monthly_2026-06-01_2026-06-30.md"
+    },
+    {
+      "report_id": "periodic_c3e4d1f2658deb858efca2a190d33988",
+      "subject": {
+        "id": "000813.SZ",
+        "name": "德展健康",
+        "type": "instrument"
+      },
+      "period": {
+        "calendar_end": "2026-06-30",
+        "calendar_start": "2026-06-01",
+        "completeness": "complete_selected_window",
+        "covered_trading_dates": [
+          "2026-06-01",
+          "2026-06-02",
+          "2026-06-03",
+          "2026-06-04",
+          "2026-06-05",
+          "2026-06-08",
+          "2026-06-09",
+          "2026-06-10",
+          "2026-06-11",
+          "2026-06-12",
+          "2026-06-15",
+          "2026-06-16",
+          "2026-06-17",
+          "2026-06-18",
+          "2026-06-22",
+          "2026-06-23",
+          "2026-06-24",
+          "2026-06-25",
+          "2026-06-26",
+          "2026-06-29",
+          "2026-06-30"
+        ],
+        "end": "2026-06-30",
+        "report_cutoff_at": "2026-06-30T15:00:00+08:00",
+        "start": "2026-06-01",
+        "type": "monthly"
+      },
+      "operation_count": 1,
+      "performance_basis": "instrument_close_price",
+      "period_change_cny": "-0.34",
+      "validation": {
+        "status": "accepted",
+        "errors": []
+      },
+      "json_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_monthly_2026-06-01_2026-06-30.json",
+      "markdown_path": "C:\\Projects\\03_Investment_System_periodic_review_v1\\reports\\investment_review\\periodic_v1\\final\\instrument_000813.SZ_monthly_2026-06-01_2026-06-30.md"
+    }
+  ],
+  "periodic_report_store_count": 619,
+  "automation": {
+    "enabled": true,
+    "last_failure": null,
+    "last_success": {
+      "broker_accessed": false,
+      "completed_at": "2026-07-28T09:14:11Z",
+      "daily": {
+        "latest_formal_trade_date": "2026-07-16",
+        "latest_stored_portfolio_daily_date": "2026-07-16",
+        "report_count": 0,
+        "status": "up_to_date"
+      },
+      "orders_executed": false,
+      "started_at": "2026-07-28T08:00:00Z",
+      "status": "succeeded",
+      "summaries": [
+        {
+          "period_type": "weekly",
+          "reason": "no stored daily reports match the selected period",
+          "report_count": 0,
+          "selected_window": {
+            "end": "2026-07-24",
+            "start": "2026-07-20"
+          },
+          "status": "not_available"
+        },
+        {
+          "broker_accessed": false,
+          "daily_source_count": 451,
+          "operation_count": 68,
+          "orders_executed": false,
+          "period_type": "monthly",
+          "receipt_status_counts": {
+            "skipped": 23
+          },
+          "report_count": 23,
+          "selected_window": {
+            "end": "2026-06-30",
+            "start": "2026-06-01"
+          },
+          "status": "pass",
+          "subject_counts": {
+            "instrument": 22,
+            "portfolio": 1
+          }
+        }
+      ],
+      "trigger": "p4_validation_final"
+    },
+    "latest": {
+      "broker_accessed": false,
+      "completed_at": "2026-07-28T09:14:11Z",
+      "daily": {
+        "latest_formal_trade_date": "2026-07-16",
+        "latest_stored_portfolio_daily_date": "2026-07-16",
+        "report_count": 0,
+        "status": "up_to_date"
+      },
+      "orders_executed": false,
+      "started_at": "2026-07-28T08:00:00Z",
+      "status": "succeeded",
+      "summaries": [
+        {
+          "period_type": "weekly",
+          "reason": "no stored daily reports match the selected period",
+          "report_count": 0,
+          "selected_window": {
+            "end": "2026-07-24",
+            "start": "2026-07-20"
+          },
+          "status": "not_available"
+        },
+        {
+          "broker_accessed": false,
+          "daily_source_count": 451,
+          "operation_count": 68,
+          "orders_executed": false,
+          "period_type": "monthly",
+          "receipt_status_counts": {
+            "skipped": 23
+          },
+          "report_count": 23,
+          "selected_window": {
+            "end": "2026-06-30",
+            "start": "2026-06-01"
+          },
+          "status": "pass",
+          "subject_counts": {
+            "instrument": 22,
+            "portfolio": 1
+          }
+        }
+      ],
+      "trigger": "p4_validation_final"
+    },
+    "os_scheduler_installed": false,
+    "state": "succeeded"
+  },
+  "validation_results": {
+    "V-101": {
+      "status": "pass",
+      "tests_passed": 110,
+      "duration_seconds": 126.17
+    },
+    "V-102": {
+      "status": "pass",
+      "frontend_tests_passed": 23,
+      "production_build": "pass"
+    },
+    "V-201": {
+      "status": "pass",
+      "p1_reports": 2,
+      "formal_db_unchanged": true
+    },
+    "V-301": {
+      "status": "pass",
+      "trading_days": 3,
+      "daily_reports": 58,
+      "operation_counts_by_day": [6, 10, 0],
+      "no_trade_day_proven": true,
+      "repeat_idempotent": true
+    },
+    "V-401": {
+      "status": "pass",
+      "real_sample_matrix_reports": 6,
+      "stored_weekly_reports": 22,
+      "stored_monthly_reports": 23,
+      "instrument_performance_basis_errors": 0
+    },
+    "V-402": {
+      "status": "pass",
+      "localhost_api_status": "available",
+      "listed_reports": 619,
+      "default_latest_end": "2026-07-16",
+      "subject_navigation": ["portfolio", "instrument"],
+      "period_navigation": ["daily", "weekly", "monthly"],
+      "six_real_details_readable": true,
+      "chinese_name_and_code_visible": true,
+      "four_layer_context_visible": true,
+      "system_inference_visible": true,
+      "recommendation_risk_invalidation_and_missing_visible": true,
+      "browser_console_error_count": 0
+    },
+    "V-501": {
+      "status": "pass",
+      "tests_passed": 71,
+      "duration_seconds": 90.38,
+      "process_local_only": true,
+      "os_scheduler_or_service_installed": false
+    },
+    "V-999": {
+      "status": "pending_final_git_checkpoint"
+    }
+  },
+  "coverage_audit": {
+    "derived_db_sha256": "1c6ba91b669f0701d0ece3b655605b81fb67be8a7c8f0b4c6311c09f67406550",
+    "report_count": 619,
+    "portfolio_daily": 27,
+    "instrument_daily": 547,
+    "portfolio_weekly": 1,
+    "instrument_weekly": 21,
+    "portfolio_monthly": 1,
+    "instrument_monthly": 22,
+    "literal_None_report_count": 0,
+    "instrument_code_as_name_report_count": 0,
+    "invalid_instrument_performance_basis_count": 0
+  },
+  "formal_portfolio_db": {
+    "mode": "ro+immutable+query_only",
+    "sha256_before": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "sha256_after": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "unchanged": true
+  },
+  "known_data_limitations": [
+    "2026-07-14 以前没有可靠现金快照；相关周/月报告保留总资产 MISSING，并明确改用不含现金的持仓市值变化口径。",
+    "批量历史日报默认使用正式库本地行情回退；基本面、基准或板块缺失时明确显示，不用未来信息补造。",
+    "没有显式用户风险预算，精确仓位建议保持为区间。"
+  ],
+  "orders_executed": false,
+  "broker_accessed": false,
+  "guaranteed_return_claims": false,
+  "production_released": false,
+  "os_scheduler_or_service_installed": false
+}

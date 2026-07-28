@@ -1,9 +1,9 @@
 """Lightweight portfolio and instrument periodic reports.
 
-The P1 implementation intentionally supports daily reports only.  It reads the
-formal portfolio database through an immutable, query-only connection, reuses
-the canonical accounting and Trade Episode projection, and stores derived
-reports only in the selected review sidecar.
+The implementation reads the formal portfolio database through an immutable,
+query-only connection, reuses the canonical accounting and Trade Episode
+projection, and stores derived reports only in the selected review sidecar.
+Daily reports are the source facts for natural weekly and monthly summaries.
 """
 
 from __future__ import annotations
@@ -13,10 +13,11 @@ import hashlib
 import json
 import sqlite3
 from contextlib import contextmanager
+from copy import deepcopy
 from datetime import date, datetime, time, timezone
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Any, Iterable, Iterator, Mapping, Sequence
+from typing import Any, Callable, Iterable, Iterator, Mapping, Sequence
 from zoneinfo import ZoneInfo
 
 from src.portfolio.accounting import build_position_states
@@ -32,7 +33,12 @@ SHANGHAI = ZoneInfo("Asia/Shanghai")
 ZERO = Decimal("0")
 
 _SUBJECT_TYPES = {"portfolio", "instrument"}
-_PERIOD_TYPES = {"daily"}
+_PERIOD_TYPES = {"daily", "weekly", "monthly"}
+_PERIOD_DEPTHS = {
+    "daily": "daily_delta_only",
+    "weekly": "weekly_synthesis",
+    "monthly": "monthly_synthesis",
+}
 _ACTIONS = {"buy", "sell", "hold", "add", "reduce", "exit"}
 _POSITION_EVENT_TYPES = {"BUY", "SELL"}
 _CASH_EVENT_TYPES = {"BUY", "SELL", "DIVIDEND", "CASH_FEE"}
@@ -84,6 +90,10 @@ def _decimal_text(value: Decimal | None, *, places: int | None = None) -> str | 
     if value == ZERO:
         return "0"
     return format(value.normalize(), "f")
+
+
+def _visible_text(value: object, *, fallback: str = "MISSING") -> str:
+    return fallback if value is None or value == "" else str(value)
 
 
 def _pct(numerator: Decimal | None, denominator: Decimal | None) -> Decimal | None:
@@ -551,6 +561,280 @@ def _previous_market_date(
     return date.fromisoformat(row[0]) if row is not None and row[0] else None
 
 
+def _local_decision_context(
+    connection: sqlite3.Connection,
+    *,
+    ts_code: str,
+    name: str,
+    industry_name: str,
+    report_date: date,
+) -> dict[str, Any]:
+    """Build a deterministic fallback from facts already in the formal DB."""
+
+    rows = [
+        dict(row)
+        for row in connection.execute(
+            """
+            WITH ranked AS (
+                SELECT trade_date, close, pre_close, pct_chg, source, fetched_at,
+                       observation_id,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY trade_date
+                           ORDER BY fetched_at DESC, observation_id DESC
+                       ) AS rank_in_day
+                FROM close_prices
+                WHERE ts_code = ? AND trade_date <= ?
+            )
+            SELECT trade_date, close, pre_close, pct_chg, source, fetched_at,
+                   observation_id
+            FROM ranked
+            WHERE rank_in_day = 1
+            ORDER BY trade_date DESC
+            LIMIT 25
+            """,
+            (ts_code, report_date.isoformat()),
+        )
+    ]
+    rows.reverse()
+    latest = rows[-1] if rows else None
+    closes = [_decimal(row.get("close")) for row in rows]
+    latest_close = closes[-1] if closes else None
+
+    def session_return(sessions: int) -> str | None:
+        if len(closes) <= sessions or latest_close is None:
+            return None
+        return _decimal_text(
+            _pct(
+                latest_close - (closes[-sessions - 1] or ZERO),
+                closes[-sessions - 1],
+            ),
+            places=2,
+        )
+
+    technical_metrics = {
+        "trade_date": latest.get("trade_date") if latest else None,
+        "close_cny": _decimal_text(latest_close, places=4),
+        "return_3_session_pct": session_return(3),
+        "return_5_session_pct": session_return(5),
+        "return_20_session_pct": session_return(20),
+        "volume_vs_prior_5d_avg": None,
+        "day_open_cny": None,
+        "day_high_cny": None,
+        "day_low_cny": None,
+    }
+    return_3 = technical_metrics["return_3_session_pct"] or "MISSING"
+    return_5 = technical_metrics["return_5_session_pct"] or "MISSING"
+    return_20 = technical_metrics["return_20_session_pct"] or "MISSING"
+    technical_summary = (
+        "截至报告日，正式行情中的 3/5/20 个交易日涨跌幅分别为 "
+        f"{return_3}%/{return_5}%/{return_20}%；"
+        "成交量与日内高低价不在该轻量回退数据中。"
+        if latest
+        else "正式组合库没有报告日及之前的可用收盘价，无法形成趋势判断。"
+    )
+    day_change = _decimal_text(
+        _decimal(latest.get("pct_chg")) if latest else None,
+        places=2,
+    )
+    visible_day_change = day_change or "MISSING"
+    fetched_at = max(
+        (str(row.get("fetched_at") or "") for row in rows),
+        default=_report_cutoff(report_date).astimezone(timezone.utc).isoformat(
+            timespec="seconds"
+        ).replace("+00:00", "Z"),
+    )
+    price_ref = (
+        "portfolio.sqlite3#close_prices:"
+        f"{ts_code}:{latest['trade_date']}:{latest['observation_id']}"
+        if latest
+        else "TODO_PRICE"
+    )
+    return {
+        "schema_version": "investment_review.periodic_context.v1",
+        "subject": {
+            "ts_code": ts_code,
+            "name": name,
+            "industry_name": industry_name or "MISSING",
+        },
+        "as_of": report_date.isoformat(),
+        "fetched_at": fetched_at,
+        "provider": "formal_portfolio_read_only_fallback",
+        "fundamental_and_valuation": {
+            "status": "missing",
+            "scope": "latest_public_snapshot_before_report_cutoff",
+            "summary": (
+                "正式组合库不保存财务与估值快照；本日报未用常识或未来披露"
+                "补造基本面结论，需在标的研究证据可用后补充。"
+            ),
+            "metrics": {},
+            "valuation": {},
+            "observations": [],
+            "source_refs": [],
+        },
+        "market_and_sector": {
+            "status": "partial" if latest else "missing",
+            "scope": "report_day_delta",
+            "summary": (
+                f"标的当日涨跌幅 {visible_day_change}%；正式组合库未保存同日基准和"
+                "板块指数，因此不做大盘/板块归因。"
+                if latest
+                else "缺少标的、基准和板块的报告日行情，无法归因。"
+            ),
+            "stock_change_pct": day_change,
+            "benchmarks": [],
+            "sector": None,
+            "observations": (
+                [
+                    {
+                        "type": "fact",
+                        "text": f"标的当日涨跌幅 {visible_day_change}%。",
+                        "timing": "end_of_day_retrospective",
+                        "source_ref": price_ref,
+                    }
+                ]
+                if latest
+                else []
+            ),
+            "source_refs": [price_ref] if latest else [],
+        },
+        "technical_and_trend": {
+            "status": "available" if latest else "missing",
+            "scope": "report_cutoff_technical_delta",
+            "summary": technical_summary,
+            "metrics": technical_metrics,
+            "observations": [],
+            "source_refs": [price_ref] if latest else [],
+        },
+        "intraday_bars": [],
+        "timing_policy": (
+            "local fallback contains report-cutoff or earlier facts only; "
+            "no intraday observation is inferred"
+        ),
+    }
+
+
+def _aggregate_portfolio_daily_context(
+    contexts: Mapping[str, Mapping[str, Any]],
+    *,
+    report_date: date,
+) -> dict[str, Any]:
+    """Summarize per-instrument contexts without pretending full research coverage."""
+
+    ordered = [
+        (code, contexts[code])
+        for code in sorted(contexts)
+        if isinstance(contexts.get(code), Mapping)
+    ]
+    names = {
+        code: str(context.get("subject", {}).get("name") or code)
+        for code, context in ordered
+    }
+
+    def layer_status(layer_name: str) -> tuple[str, int]:
+        statuses = [
+            str(context.get(layer_name, {}).get("status") or "missing")
+            for _, context in ordered
+        ]
+        available = sum(status in {"available", "partial"} for status in statuses)
+        if available == len(statuses) and statuses:
+            return "available", available
+        if available:
+            return "partial", available
+        return "missing", 0
+
+    fundamental_status, fundamental_covered = layer_status(
+        "fundamental_and_valuation"
+    )
+    market_status, market_covered = layer_status("market_and_sector")
+    technical_status, technical_covered = layer_status("technical_and_trend")
+    changes = [
+        _decimal(context.get("market_and_sector", {}).get("stock_change_pct"))
+        for _, context in ordered
+    ]
+    positive = sum(value is not None and value > ZERO for value in changes)
+    negative = sum(value is not None and value < ZERO for value in changes)
+    flat = sum(value == ZERO for value in changes if value is not None)
+    trend20 = [
+        _decimal(
+            context.get("technical_and_trend", {})
+            .get("metrics", {})
+            .get("return_20_session_pct")
+        )
+        for _, context in ordered
+    ]
+    trend_positive = sum(value is not None and value > ZERO for value in trend20)
+    trend_negative = sum(value is not None and value < ZERO for value in trend20)
+
+    def combined_refs(layer_name: str) -> list[str]:
+        return sorted(
+            {
+                str(ref)
+                for _, context in ordered
+                for ref in context.get(layer_name, {}).get("source_refs", [])
+                if ref
+            }
+        )
+
+    fetched_at = max(
+        (str(context.get("fetched_at") or "") for _, context in ordered),
+        default=_report_cutoff(report_date).astimezone(timezone.utc).isoformat(
+            timespec="seconds"
+        ).replace("+00:00", "Z"),
+    )
+    covered_names = [names[code] for code, _ in ordered]
+    return {
+        "schema_version": "investment_review.periodic_context.v1",
+        "subject": {
+            "type": "portfolio",
+            "ts_code": "",
+            "name": "组合账户",
+            "covered_instruments": covered_names,
+        },
+        "as_of": report_date.isoformat(),
+        "fetched_at": fetched_at,
+        "provider": "portfolio_context_aggregation",
+        "fundamental_and_valuation": {
+            "status": fundamental_status,
+            "scope": "daily_held_and_traded_instruments",
+            "summary": (
+                f"本日报覆盖 {len(ordered)} 个持有或当日交易标的，其中 "
+                f"{fundamental_covered} 个取得可核对的基本面/估值上下文；"
+                "详细事实保留在对应标的日报，组合层不冒充完整个股研究。"
+            ),
+            "observations": [],
+            "source_refs": combined_refs("fundamental_and_valuation"),
+        },
+        "market_and_sector": {
+            "status": market_status,
+            "scope": "daily_held_and_traded_instruments",
+            "summary": (
+                f"报告日可核对 {market_covered}/{len(ordered)} 个标的的市场上下文；"
+                f"其中上涨 {positive}、下跌 {negative}、持平 {flat}。"
+                "缺少基准或板块时不做强行归因。"
+            ),
+            "observations": [],
+            "source_refs": combined_refs("market_and_sector"),
+        },
+        "technical_and_trend": {
+            "status": technical_status,
+            "scope": "daily_held_and_traded_instruments",
+            "summary": (
+                f"报告日可核对 {technical_covered}/{len(ordered)} 个标的的趋势；"
+                f"20 个交易日趋势为正 {trend_positive}、为负 {trend_negative}，"
+                "其余数据不足。"
+            ),
+            "observations": [],
+            "source_refs": combined_refs("technical_and_trend"),
+        },
+        "instrument_contexts": {code: dict(context) for code, context in ordered},
+        "intraday_bars": [],
+        "timing_policy": (
+            "each operation may consume only its own instrument context available "
+            "no later than the operation; end-of-day aggregates are retrospective"
+        ),
+    }
+
+
 def _event_id(row: Mapping[str, Any]) -> str:
     material = f"portfolio-ledger:{row.get('account_id')}:{row.get('entry_id')}"
     return "evt_periodic_" + _sha256_text(material)[:32]
@@ -864,6 +1148,12 @@ def infer_motive_hypothesis(
                 else None,
                 previous_buy_price,
             )
+            size_multiple_text = _visible_text(
+                _decimal_text(size_multiple, places=2)
+            )
+            price_step_text = _visible_text(
+                _decimal_text(price_step, places=2)
+            )
             if (
                 size_multiple is not None
                 and size_multiple > Decimal("1")
@@ -872,23 +1162,23 @@ def infer_motive_hypothesis(
             ):
                 motive = (
                     "系统推断：在前一笔买入后，本笔加仓规模约为前笔的 "
-                    f"{_decimal_text(size_multiple, places=2)} 倍，成交价又提高 "
-                    f"{_decimal_text(price_step, places=2)}%；"
+                    f"{size_multiple_text} 倍，成交价又提高 "
+                    f"{price_step_text}%；"
                     "更像是在看到盘中强势后放大试仓。规模随价格上升而扩大，"
                     "执行上带有追高风险，但这不是用户已记录动机。"
                 )
             elif size_multiple is not None and size_multiple <= Decimal("1"):
                 motive = (
                     "系统推断：本笔延续同日买入，但规模缩小为前笔的 "
-                    f"{_decimal_text(size_multiple, places=2)} 倍、成交价变化 "
-                    f"{_decimal_text(price_step, places=2)}%；"
+                    f"{size_multiple_text} 倍、成交价变化 "
+                    f"{price_step_text}%；"
                     "更像控制加仓节奏或继续拆单，不能据此声称用户在放大判断。"
                 )
             else:
                 motive = (
                     "系统推断：本笔延续同日买入，规模约为前笔的 "
-                    f"{_decimal_text(size_multiple, places=2)} 倍、成交价变化 "
-                    f"{_decimal_text(price_step, places=2)}%；"
+                    f"{size_multiple_text} 倍、成交价变化 "
+                    f"{price_step_text}%；"
                     "更像分批补仓或执行既定数量，而非顺价追高。"
                 )
             alternative = (
@@ -915,7 +1205,8 @@ def infer_motive_hypothesis(
             motive = (
                 f"系统推断：{trend_phrase}，"
                 f"本笔仅增加操作前持仓的 "
-                f"{_decimal_text(position_change_pct, places=2)}%{bar_phrase}；"
+                f"{_visible_text(_decimal_text(position_change_pct, places=2))}%"
+                f"{bar_phrase}；"
                 "更像小幅顺势试仓，而不是一次性改变长期仓位。"
             )
             alternative = (
@@ -1088,10 +1379,11 @@ def _daily_operations(
         and isinstance(point_in_time_context.get("subject"), Mapping)
         else ""
     )
-    intraday_bars = (
-        list(point_in_time_context.get("intraday_bars", []))
+    instrument_contexts = (
+        point_in_time_context.get("instrument_contexts", {})
         if isinstance(point_in_time_context, Mapping)
-        else []
+        and isinstance(point_in_time_context.get("instrument_contexts"), Mapping)
+        else {}
     )
     earlier: list[dict[str, Any]] = []
     result: list[dict[str, Any]] = []
@@ -1102,6 +1394,21 @@ def _daily_operations(
         fee = _fee_provenance(row)
         occurred_at = _iso_utc(_event_time(row))
         code = str(row.get("ts_code") or "")
+        operation_context = (
+            instrument_contexts.get(code)
+            if isinstance(instrument_contexts.get(code), Mapping)
+            else (
+                point_in_time_context
+                if context_subject == code
+                and isinstance(point_in_time_context, Mapping)
+                else {}
+            )
+        )
+        intraday_bars = (
+            list(operation_context.get("intraday_bars", []))
+            if isinstance(operation_context, Mapping)
+            else []
+        )
         operation = {
             "operation_id": "operation_" + _sha256_text(event_id)[:24],
             "event_id": event_id,
@@ -1169,9 +1476,7 @@ def _daily_operations(
                 position_weight_before_pct=_decimal_text(
                     estimated_weight_before, places=2
                 ),
-                intraday_bars=(
-                    intraday_bars if context_subject == code else None
-                ),
+                intraday_bars=intraday_bars or None,
             )
         closing_row = _price_row(
             connection,
@@ -1353,7 +1658,11 @@ def _decision_context(
         if isinstance(source.get("technical_and_trend"), Mapping)
         else _missing_context_layer("技术与趋势")
     )
-    if subject_type == "portfolio" and source:
+    if (
+        subject_type == "portfolio"
+        and source
+        and str(source.get("subject", {}).get("ts_code") or "")
+    ):
         operated_name = str(source.get("subject", {}).get("name") or subject_id)
         for layer in (fundamental, market, technical):
             layer["scope"] = "daily_operated_instrument_delta"
@@ -1361,14 +1670,22 @@ def _decision_context(
                 f"日报只展开当日操作相关标的 {operated_name}，"
                 "不冒充全组合基本面覆盖。"
             )
+    elif subject_type == "portfolio" and source:
+        for layer in (fundamental, market, technical):
+            layer["portfolio_scope_note"] = (
+                "组合层汇总持有或当日交易标的；具体事实与缺口见对应标的日报。"
+            )
 
+    cash_weight_text = _visible_text(snapshot.get("cash_weight_pct"))
+    top_weight_text = _visible_text(snapshot.get("top_position_weight_pct"))
+    top3_weight_text = _visible_text(snapshot.get("top3_weight_pct"))
     position_observations = [
         {
             "type": "fact",
             "text": (
-                f"报告截止现金权重 {snapshot.get('cash_weight_pct')}%，"
-                f"最大单一标的权重 {snapshot.get('top_position_weight_pct')}%，"
-                f"前三大合计 {snapshot.get('top3_weight_pct')}%。"
+                f"报告截止现金权重 {cash_weight_text}%，"
+                f"最大单一标的权重 {top_weight_text}%，"
+                f"前三大合计 {top3_weight_text}%。"
             ),
             "source_ref": "portfolio.sqlite3#ledger_entries+cash_balance_snapshots+close_prices",
         }
@@ -1387,21 +1704,26 @@ def _decision_context(
                 "source_ref": ",".join(summary.get("source_refs", [])),
             }
         )
-    selected_weight = next(
+    selected_position = next(
         (
-            item.get("portfolio_weight_pct")
+            item
             for item in positions
             if item.get("ts_code") == subject_id
         ),
         None,
     )
+    selected_weight_text = (
+        _visible_text(selected_position.get("portfolio_weight_pct"))
+        if isinstance(selected_position, Mapping)
+        else "0"
+    )
     position_summary = (
-        f"标的期末组合权重 {selected_weight or '0'}%；"
+        f"标的期末组合权重 {selected_weight_text}%；"
         f"当日 {len(operations)} 笔操作已按仓位路径和净闭环复盘。"
         if subject_type == "instrument"
         else (
-            f"组合现金权重 {snapshot.get('cash_weight_pct')}%，"
-            f"最大单一标的 {snapshot.get('top_position_weight_pct')}%；"
+            f"组合现金权重 {cash_weight_text}%，"
+            f"最大单一标的 {top_weight_text}%；"
             "日报只展开当日操作带来的仓位与执行变化。"
         )
     )
@@ -1466,6 +1788,11 @@ def build_recommendation(
         if isinstance(context.get("position_and_execution"), Mapping)
         else {}
     )
+    snapshot_cash = (
+        snapshot.get("cash")
+        if isinstance(snapshot.get("cash"), Mapping)
+        else {}
+    )
     latest_price_date = max(
         (
             str(item.get("price_date") or "")
@@ -1481,7 +1808,7 @@ def build_recommendation(
         missing_inputs.append("MISSING_MARKET_AND_SECTOR_CONTEXT")
     if technical.get("status") != "available":
         missing_inputs.append("MISSING_TECHNICAL_AND_TREND_CONTEXT")
-    if snapshot.get("cash", {}).get("fee_pending"):
+    if snapshot_cash.get("fee_pending"):
         missing_inputs.append("UNKNOWN_TRADE_FEE_PROVENANCE")
     if subject_type == "portfolio":
         concentrated = top_weight is not None and top_weight > Decimal("20")
@@ -1536,7 +1863,7 @@ def build_recommendation(
             "日报只展开当日操作标的，未完成全组合逐标的基本面覆盖",
             "指数或板块同涨不代表组合内每只股票的风险同步下降",
         ]
-        if snapshot.get("cash", {}).get("fee_pending"):
+        if snapshot_cash.get("fee_pending"):
             risks.append("部分交易费用来源未知，现金比例仍有小幅误差风险")
         missing_inputs.append("MISSING_FULL_PORTFOLIO_FUNDAMENTAL_COVERAGE")
         confidence = "medium" if total_assets is not None else "low"
@@ -1646,7 +1973,7 @@ def build_recommendation(
             "大盘或板块共同上涨不能证明个股会持续跑赢",
             "技术趋势是概率性上下文，不能保证后续收益",
         ]
-        if snapshot.get("cash", {}).get("fee_pending"):
+        if snapshot_cash.get("fee_pending"):
             risks.append("部分交易费用来源未知，会影响执行净结果")
         confidence = (
             "medium"
@@ -1682,27 +2009,203 @@ def _report_headline(
     *,
     subject_type: str,
     subject_id: str,
+    subject_name: str | None = None,
     snapshot: Mapping[str, Any],
     performance: Mapping[str, Any],
     recommendation: Mapping[str, Any],
 ) -> str:
     if subject_type == "portfolio":
+        change_basis = (
+            "总资产"
+            if performance.get("asset_change_pct") is not None
+            else "不含现金的持仓市值"
+        )
+        change_pct = (
+            performance.get("asset_change_pct")
+            if performance.get("asset_change_pct") is not None
+            else performance.get("invested_market_value_change_pct")
+        )
+        change_pct = change_pct if change_pct is not None else "MISSING"
+        cash_weight = snapshot.get("cash_weight_pct")
+        cash_weight = cash_weight if cash_weight is not None else "MISSING"
         return (
-            f"组合当日资产变动 {performance.get('asset_change_pct')}%，"
-            f"现金权重 {snapshot.get('cash_weight_pct')}%；"
+            f"组合当日{change_basis}变动 {change_pct}%，"
+            f"现金权重 {cash_weight}%；"
             f"建议 {recommendation.get('action')}，优先降低集中度并保留现金缓冲。"
         )
     selected = next(
         (item for item in snapshot.get("positions", []) if item.get("ts_code") == subject_id),
         None,
     )
-    display_name = selected.get("name") if selected else subject_id
+    display_name = (
+        selected.get("name")
+        if selected
+        else (str(subject_name).strip() if str(subject_name or "").strip() else subject_id)
+    )
+    selected_weight = (
+        selected.get("portfolio_weight_pct") if selected else "0"
+    )
+    selected_weight = (
+        selected_weight if selected_weight is not None else "MISSING"
+    )
+    price_change_pct = performance.get("price_change_pct")
+    performance_text = (
+        f"收盘价变动 {price_change_pct}%"
+        if price_change_pct is not None
+        else "收盘价变动 MISSING"
+    )
     return (
         f"{display_name}（{subject_id}）期末权重 "
-        f"{selected.get('portfolio_weight_pct') if selected else '0'}%，"
+        f"{selected_weight}%，"
+        f"{performance_text}；"
         f"当日操作已按四层上下文与无 Decision 的 system_inference 复盘；"
         f"建议 {recommendation.get('action')}。"
     )
+
+
+def _selected_market_value(
+    positions: Sequence[Mapping[str, Any]],
+) -> Decimal | None:
+    if not positions:
+        return ZERO
+    values = [_decimal(item.get("market_value_cny")) for item in positions]
+    if any(value is None for value in values):
+        return None
+    return sum((value or ZERO for value in values), ZERO)
+
+
+def _selected_quantity(
+    positions: Sequence[Mapping[str, Any]],
+) -> Decimal:
+    return sum(
+        (
+            _decimal(item.get("quantity"), default=ZERO) or ZERO
+            for item in positions
+        ),
+        ZERO,
+    )
+
+
+def _instrument_performance(
+    *,
+    subject_id: str,
+    previous_date: date | None,
+    report_date: date,
+    opening_positions: Sequence[Mapping[str, Any]],
+    closing_positions: Sequence[Mapping[str, Any]],
+    opening_price: Mapping[str, Any] | None,
+    closing_price: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    start_close = (
+        _decimal(opening_price.get("close"))
+        if isinstance(opening_price, Mapping)
+        else None
+    )
+    end_close = (
+        _decimal(closing_price.get("close"))
+        if isinstance(closing_price, Mapping)
+        else None
+    )
+    price_change = (
+        end_close - start_close
+        if start_close is not None and end_close is not None
+        else None
+    )
+    opening_market_value = _selected_market_value(opening_positions)
+    closing_market_value = _selected_market_value(closing_positions)
+    market_value_change = (
+        closing_market_value - opening_market_value
+        if opening_market_value is not None and closing_market_value is not None
+        else None
+    )
+    opening_quantity = _selected_quantity(opening_positions)
+    closing_quantity = _selected_quantity(closing_positions)
+    if price_change is not None:
+        performance_basis = "instrument_close_price"
+        period_change = price_change
+        period_change_pct = _pct(price_change, start_close)
+    elif market_value_change is not None:
+        performance_basis = "instrument_position_market_value"
+        period_change = market_value_change
+        period_change_pct = _pct(market_value_change, opening_market_value)
+    else:
+        performance_basis = "MISSING"
+        period_change = None
+        period_change_pct = None
+    price_refs = []
+    for price in (opening_price, closing_price):
+        if isinstance(price, Mapping) and price.get("trade_date"):
+            price_refs.append(
+                "portfolio.sqlite3#close_prices:"
+                f"{subject_id}:{price['trade_date']}"
+            )
+    return {
+        "type": "fact",
+        "comparison_date": previous_date.isoformat() if previous_date else None,
+        "start_total_assets_cny": None,
+        "end_total_assets_cny": None,
+        "asset_change_cny": None,
+        "asset_change_pct": None,
+        "start_close_cny": _decimal_text(start_close, places=4),
+        "end_close_cny": _decimal_text(end_close, places=4),
+        "start_price_date": (
+            opening_price.get("trade_date")
+            if isinstance(opening_price, Mapping)
+            else None
+        ),
+        "end_price_date": (
+            closing_price.get("trade_date")
+            if isinstance(closing_price, Mapping)
+            else None
+        ),
+        "price_change_cny": _decimal_text(price_change, places=4),
+        "price_change_pct": _decimal_text(
+            _pct(price_change, start_close),
+            places=2,
+        ),
+        "start_quantity": _decimal_text(opening_quantity),
+        "end_quantity": _decimal_text(closing_quantity),
+        "quantity_change": _decimal_text(closing_quantity - opening_quantity),
+        "start_invested_market_value_cny": _decimal_text(
+            opening_market_value,
+            places=2,
+        ),
+        "end_invested_market_value_cny": _decimal_text(
+            closing_market_value,
+            places=2,
+        ),
+        "invested_market_value_change_cny": _decimal_text(
+            market_value_change,
+            places=2,
+        ),
+        "invested_market_value_change_pct": _decimal_text(
+            _pct(market_value_change, opening_market_value),
+            places=2,
+        ),
+        "performance_basis": performance_basis,
+        "period_change_cny": _decimal_text(period_change, places=4),
+        "period_change_pct": _decimal_text(period_change_pct, places=2),
+        "cash_change_cny": None,
+        "valuation_complete": (
+            end_close is not None
+            and (previous_date is None or start_close is not None)
+            and closing_market_value is not None
+        ),
+        "calculation_method": (
+            "标的收益以报告日与上一交易日收盘价变化计算，避免买卖数量变化"
+            "冒充投资收益；持仓市值与数量变化另列，用于解释加减仓或退出。"
+            "缺价时保持 MISSING，不以组合总资产变化替代标的表现。"
+        ),
+        "source_refs": sorted(
+            {
+                *price_refs,
+                (
+                    "portfolio.sqlite3#ledger_entries:"
+                    f"{subject_id}:through:{report_date.isoformat()}"
+                ),
+            }
+        ),
+    }
 
 
 def build_daily_report(
@@ -1727,6 +2230,8 @@ def build_daily_report(
     source_sha = sha256_file(source)
     market_cutoff = _report_cutoff(day)
 
+    opening_instrument_price: dict[str, Any] | None = None
+    closing_instrument_price: dict[str, Any] | None = None
     with _read_only_connection(source) as connection:
         previous_date = _previous_market_date(connection, report_date=day)
         end_snapshot = _portfolio_snapshot(
@@ -1752,6 +2257,21 @@ def build_daily_report(
             review_db=review_db,
             point_in_time_context=point_in_time_context,
         )
+        if subject_type == "instrument":
+            closing_instrument_price = _price_row(
+                connection,
+                ts_code=selected_subject,
+                through=day,
+            )
+            opening_instrument_price = (
+                _price_row(
+                    connection,
+                    ts_code=selected_subject,
+                    through=previous_date,
+                )
+                if previous_date is not None
+                else None
+            )
 
     if subject_type == "instrument":
         operations = [
@@ -1762,8 +2282,22 @@ def build_daily_report(
             for item in end_snapshot["positions"]
             if item.get("ts_code") == selected_subject
         ]
+        selected_opening_positions = [
+            item
+            for item in (
+                start_snapshot.get("positions", [])
+                if start_snapshot is not None
+                else []
+            )
+            if item.get("ts_code") == selected_subject
+        ]
     else:
         selected_positions = end_snapshot["positions"]
+        selected_opening_positions = (
+            start_snapshot.get("positions", [])
+            if start_snapshot is not None
+            else []
+        )
     episode_summaries = _daily_episode_summaries(operations)
 
     source_observed_through = max(
@@ -1807,16 +2341,30 @@ def build_daily_report(
         if end_assets is not None and start_assets is not None
         else None
     )
-    start_cash = (
-        _decimal(start_snapshot.get("cash", {}).get("amount_cny"))
-        if start_snapshot is not None and start_snapshot.get("cash")
+    start_market_value = (
+        _decimal(start_snapshot.get("market_value_cny"))
+        if start_snapshot is not None
         else None
     )
-    end_cash = (
-        _decimal(end_snapshot.get("cash", {}).get("amount_cny"))
-        if end_snapshot.get("cash")
+    end_market_value = _decimal(end_snapshot.get("market_value_cny"))
+    market_value_change = (
+        end_market_value - start_market_value
+        if end_market_value is not None and start_market_value is not None
         else None
     )
+    start_cash_payload = (
+        start_snapshot.get("cash")
+        if start_snapshot is not None
+        and isinstance(start_snapshot.get("cash"), Mapping)
+        else {}
+    )
+    end_cash_payload = (
+        end_snapshot.get("cash")
+        if isinstance(end_snapshot.get("cash"), Mapping)
+        else {}
+    )
+    start_cash = _decimal(start_cash_payload.get("amount_cny"))
+    end_cash = _decimal(end_cash_payload.get("amount_cny"))
     performance = {
         "type": "fact",
         "comparison_date": (
@@ -1828,6 +2376,43 @@ def build_daily_report(
         "asset_change_pct": _decimal_text(
             _pct(asset_change, start_assets), places=2
         ),
+        "start_invested_market_value_cny": _decimal_text(
+            start_market_value,
+            places=2,
+        ),
+        "end_invested_market_value_cny": _decimal_text(
+            end_market_value,
+            places=2,
+        ),
+        "invested_market_value_change_cny": _decimal_text(
+            market_value_change,
+            places=2,
+        ),
+        "invested_market_value_change_pct": _decimal_text(
+            _pct(market_value_change, start_market_value),
+            places=2,
+        ),
+        "performance_basis": (
+            "total_assets"
+            if asset_change is not None
+            else (
+                "invested_market_value_ex_cash"
+                if market_value_change is not None
+                else "MISSING"
+            )
+        ),
+        "period_change_cny": _decimal_text(
+            asset_change if asset_change is not None else market_value_change,
+            places=2,
+        ),
+        "period_change_pct": _decimal_text(
+            (
+                _pct(asset_change, start_assets)
+                if asset_change is not None
+                else _pct(market_value_change, start_market_value)
+            ),
+            places=2,
+        ),
         "cash_change_cny": _decimal_text(
             end_cash - start_cash
             if end_cash is not None and start_cash is not None
@@ -1838,7 +2423,8 @@ def build_daily_report(
         "calculation_method": (
             "期末总资产减上一交易日总资产；当日无外部资金流证据时作为资产变动。"
             "若历史现金快照仍带 fee_pending，则从最近可靠现金锚点按当前账本费用"
-            "只读重放，并保留被替代快照。"
+            "只读重放，并保留被替代快照。现金不可得时总资产保持 MISSING，"
+            "另报不含现金的持仓市值变化作为可核对的次级口径。"
         ),
         "source_refs": [
             "portfolio.sqlite3#ledger_entries",
@@ -1846,6 +2432,16 @@ def build_daily_report(
             "portfolio.sqlite3#cash_balance_snapshots",
         ],
     }
+    if subject_type == "instrument":
+        performance = _instrument_performance(
+            subject_id=selected_subject,
+            previous_date=previous_date,
+            report_date=day,
+            opening_positions=selected_opening_positions,
+            closing_positions=selected_positions,
+            opening_price=opening_instrument_price,
+            closing_price=closing_instrument_price,
+        )
     decision_context = _decision_context(
         subject_type=subject_type,
         subject_id=selected_subject,
@@ -1901,7 +2497,7 @@ def build_daily_report(
             else "MODERATE"
         ),
         "missing_prices": end_snapshot.get("missing_prices", []),
-        "cash_status": end_snapshot.get("cash", {}).get("status", "MISSING"),
+        "cash_status": end_cash_payload.get("status", "MISSING"),
     }
     identity = {
         "schema_version": REPORT_SCHEMA_VERSION,
@@ -1947,7 +2543,13 @@ def build_daily_report(
         "sections": {
             "performance_and_positions": {
                 "performance": performance,
+                "opening_cash": (
+                    start_snapshot.get("cash")
+                    if start_snapshot is not None
+                    else None
+                ),
                 "cash": end_snapshot.get("cash"),
+                "opening_positions": selected_opening_positions,
                 "positions": selected_positions,
                 "risk_change": risks,
             },
@@ -2031,6 +2633,7 @@ def build_daily_report(
     report["headline"] = _report_headline(
         subject_type=subject_type,
         subject_id=selected_subject,
+        subject_name=report["subject"]["name"],
         snapshot=end_snapshot,
         performance=performance,
         recommendation=recommendation,
@@ -2040,6 +2643,653 @@ def build_daily_report(
     if validation["status"] != "accepted":
         raise PeriodicReportError(
             "periodic report validation failed: "
+            + ", ".join(validation["errors"])
+        )
+    return report
+
+
+def _compound_percent(values: Iterable[object]) -> str | None:
+    factor = Decimal("1")
+    observed = False
+    for value in values:
+        selected = _decimal(value)
+        if selected is None:
+            continue
+        factor *= Decimal("1") + selected / Decimal("100")
+        observed = True
+    return (
+        _decimal_text((factor - Decimal("1")) * Decimal("100"), places=2)
+        if observed
+        else None
+    )
+
+
+def _position_changes(
+    opening: Sequence[Mapping[str, Any]],
+    closing: Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    before = {str(item.get("ts_code") or ""): item for item in opening}
+    after = {str(item.get("ts_code") or ""): item for item in closing}
+    result: list[dict[str, Any]] = []
+    for code in sorted(set(before) | set(after)):
+        start = before.get(code, {})
+        end = after.get(code, {})
+        start_quantity = _decimal(start.get("quantity"), default=ZERO) or ZERO
+        end_quantity = _decimal(end.get("quantity"), default=ZERO) or ZERO
+        change = end_quantity - start_quantity
+        if change == ZERO and start and end:
+            status = "held"
+        elif start_quantity == ZERO and end_quantity > ZERO:
+            status = "opened"
+        elif start_quantity > ZERO and end_quantity == ZERO:
+            status = "exited"
+        elif change > ZERO:
+            status = "added"
+        else:
+            status = "reduced"
+        result.append(
+            {
+                "ts_code": code,
+                "name": str(end.get("name") or start.get("name") or code),
+                "opening_quantity": _decimal_text(start_quantity),
+                "closing_quantity": _decimal_text(end_quantity),
+                "quantity_change": _decimal_text(change),
+                "opening_weight_pct": start.get("portfolio_weight_pct"),
+                "closing_weight_pct": end.get("portfolio_weight_pct"),
+                "status": status,
+                "source_refs": sorted(
+                    {
+                        str(ref)
+                        for item in (start, end)
+                        for ref in item.get("source_refs", [])
+                        if ref
+                    }
+                ),
+            }
+        )
+    return result
+
+
+def _aggregate_context_layer(
+    reports: Sequence[Mapping[str, Any]],
+    *,
+    layer_name: str,
+    period_type: str,
+) -> dict[str, Any]:
+    entries: list[tuple[str, Mapping[str, Any]]] = []
+    for report in reports:
+        layer = report.get("sections", {}).get("decision_context", {}).get(
+            layer_name
+        )
+        if isinstance(layer, Mapping):
+            entries.append((str(report["period"]["end"]), layer))
+    if not entries:
+        return _missing_context_layer(
+            {
+                "fundamental_and_valuation": "基本面与估值",
+                "market_and_sector": "大盘与板块",
+                "technical_and_trend": "技术与趋势",
+            }[layer_name]
+        )
+    latest = deepcopy(entries[-1][1])
+    statuses = [str(layer.get("status") or "missing") for _, layer in entries]
+    covered = sum(status in {"available", "partial"} for status in statuses)
+    latest["status"] = (
+        "available"
+        if covered == len(entries)
+        else ("partial" if covered else "missing")
+    )
+    latest["scope"] = f"natural_{period_type}_synthesis"
+    latest["covered_trade_dates"] = [day for day, _ in entries]
+    latest["source_refs"] = sorted(
+        {
+            str(ref)
+            for _, layer in entries
+            for ref in layer.get("source_refs", [])
+            if ref
+        }
+    )
+    period_label = "周" if period_type == "weekly" else "月"
+    if layer_name == "fundamental_and_valuation":
+        distinct_summaries = list(
+            dict.fromkeys(
+                str(layer.get("summary") or "")
+                for _, layer in entries
+                if layer.get("summary")
+            )
+        )
+        latest["summary"] = (
+            f"本{period_label}覆盖 {len(entries)} 个交易日，"
+            f"{covered} 日具备可核对的基本面/估值上下文；"
+            f"期末判断：{distinct_summaries[-1] if distinct_summaries else '数据缺失'}"
+        )
+        latest["context_change_count"] = max(len(distinct_summaries) - 1, 0)
+    elif layer_name == "market_and_sector":
+        stock_return = _compound_percent(
+            layer.get("stock_change_pct") for _, layer in entries
+        )
+        latest["period_stock_return_pct"] = stock_return
+        latest["summary"] = (
+            f"本{period_label}覆盖 {len(entries)} 个交易日；"
+            + (
+                f"标的区间复合涨跌幅 {stock_return}%。"
+                if stock_return is not None
+                else "组合层或行情缺口使区间标的收益无法统一计算。"
+            )
+            + " 大盘与板块仅用于事后归因，不反推操作动机。"
+        )
+    else:
+        first_metrics = entries[0][1].get("metrics", {})
+        last_metrics = entries[-1][1].get("metrics", {})
+        first_close = (
+            _decimal(first_metrics.get("close_cny"))
+            if isinstance(first_metrics, Mapping)
+            else None
+        )
+        last_close = (
+            _decimal(last_metrics.get("close_cny"))
+            if isinstance(last_metrics, Mapping)
+            else None
+        )
+        period_return = (
+            _pct(last_close - first_close, first_close)
+            if first_close is not None and last_close is not None
+            else None
+        )
+        latest["period_return_pct"] = _decimal_text(period_return, places=2)
+        visible_period_return = latest["period_return_pct"] or "MISSING"
+        latest["summary"] = (
+            f"本{period_label}趋势以期初/期末和日级序列综合："
+            f"区间收盘变动 {visible_period_return}%；"
+            f"期末状态：{entries[-1][1].get('summary')}"
+        )
+    return latest
+
+
+def build_aggregate_report(
+    *,
+    daily_reports: Sequence[Mapping[str, Any]],
+    period_type: str,
+    period_start: str | date,
+    period_end: str | date,
+) -> dict[str, Any]:
+    """Build one natural weekly/monthly synthesis from validated daily facts."""
+
+    if period_type not in {"weekly", "monthly"}:
+        raise PeriodicReportError("aggregate period_type must be weekly or monthly")
+    start = _parse_date(period_start)
+    end = _parse_date(period_end)
+    if start > end:
+        raise PeriodicReportError("period_start must not be after period_end")
+    selected = [
+        deepcopy(dict(report))
+        for report in daily_reports
+        if report.get("period", {}).get("type") == "daily"
+        and start.isoformat()
+        <= str(report.get("period", {}).get("end") or "")
+        <= end.isoformat()
+    ]
+    selected.sort(key=lambda report: str(report["period"]["end"]))
+    if not selected:
+        raise PeriodicReportError("aggregate report requires daily source reports")
+    subject_keys = {
+        (
+            str(report.get("subject", {}).get("type") or ""),
+            str(report.get("subject", {}).get("id") or ""),
+        )
+        for report in selected
+    }
+    if len(subject_keys) != 1:
+        raise PeriodicReportError("daily source reports must share one subject")
+    if any(validate_periodic_report(report)["status"] != "accepted" for report in selected):
+        raise PeriodicReportError("aggregate source contains an invalid daily report")
+    subject_type, subject_id = next(iter(subject_keys))
+    first = selected[0]
+    last = selected[-1]
+    first_performance = first["sections"]["performance_and_positions"][
+        "performance"
+    ]
+    last_performance = last["sections"]["performance_and_positions"][
+        "performance"
+    ]
+    start_assets = _decimal(first_performance.get("start_total_assets_cny"))
+    end_assets = _decimal(last_performance.get("end_total_assets_cny"))
+    asset_change = (
+        end_assets - start_assets
+        if start_assets is not None and end_assets is not None
+        else None
+    )
+    start_market_value = _decimal(
+        first_performance.get("start_invested_market_value_cny")
+    )
+    end_market_value = _decimal(
+        last_performance.get("end_invested_market_value_cny")
+    )
+    market_value_change = (
+        end_market_value - start_market_value
+        if start_market_value is not None and end_market_value is not None
+        else None
+    )
+    start_close = _decimal(first_performance.get("start_close_cny"))
+    end_close = _decimal(last_performance.get("end_close_cny"))
+    close_change = (
+        end_close - start_close
+        if start_close is not None and end_close is not None
+        else None
+    )
+    if subject_type == "instrument":
+        asset_change = None
+        start_assets = None
+        end_assets = None
+        primary_change = (
+            close_change if close_change is not None else market_value_change
+        )
+        primary_start = (
+            start_close if close_change is not None else start_market_value
+        )
+        performance_basis = (
+            "instrument_close_price"
+            if close_change is not None
+            else (
+                "instrument_position_market_value"
+                if market_value_change is not None
+                else "MISSING"
+            )
+        )
+    else:
+        start_close = None
+        end_close = None
+        close_change = None
+        primary_change = (
+            asset_change if asset_change is not None else market_value_change
+        )
+        primary_start = (
+            start_assets if asset_change is not None else start_market_value
+        )
+        performance_basis = (
+            "total_assets"
+            if asset_change is not None
+            else (
+                "invested_market_value_ex_cash"
+                if market_value_change is not None
+                else "MISSING"
+            )
+        )
+    opening_section = first["sections"]["performance_and_positions"]
+    closing_section = last["sections"]["performance_and_positions"]
+    opening_positions = list(
+        opening_section.get("opening_positions")
+        or opening_section.get("positions")
+        or []
+    )
+    closing_positions = list(closing_section.get("positions") or [])
+    changes = _position_changes(opening_positions, closing_positions)
+    operations_by_id: dict[str, dict[str, Any]] = {}
+    for report in selected:
+        for operation in report["sections"]["operations_and_motives"].get(
+            "operations", []
+        ):
+            operations_by_id[str(operation.get("operation_id") or "")] = deepcopy(
+                dict(operation)
+            )
+    operations = sorted(
+        operations_by_id.values(),
+        key=lambda operation: str(operation.get("occurred_at") or ""),
+    )
+    episode_summaries = _daily_episode_summaries(operations)
+    daily_changes = [
+        {
+            "trade_date": report["period"]["end"],
+            "asset_change_cny": report["sections"]["performance_and_positions"][
+                "performance"
+            ].get("asset_change_cny"),
+            "asset_change_pct": report["sections"]["performance_and_positions"][
+                "performance"
+            ].get("asset_change_pct"),
+            "period_change_cny": report["sections"][
+                "performance_and_positions"
+            ]["performance"].get("period_change_cny"),
+            "period_change_pct": report["sections"][
+                "performance_and_positions"
+            ]["performance"].get("period_change_pct"),
+            "performance_basis": report["sections"][
+                "performance_and_positions"
+            ]["performance"].get("performance_basis"),
+            "operation_count": report["sections"]["operations_and_motives"].get(
+                "operation_count", 0
+            ),
+            "source_report_id": report["report_id"],
+        }
+        for report in selected
+    ]
+    quantified = [
+        item
+        for item in daily_changes
+        if _decimal(item.get("period_change_cny")) is not None
+    ]
+    best_day = (
+        max(quantified, key=lambda item: _decimal(item["period_change_cny"]) or ZERO)
+        if quantified
+        else None
+    )
+    worst_day = (
+        min(quantified, key=lambda item: _decimal(item["period_change_cny"]) or ZERO)
+        if quantified
+        else None
+    )
+    period_label = "周" if period_type == "weekly" else "月"
+    position_summary = (
+        f"本{period_label}共有 {len(operations)} 笔操作；"
+        f"期末持仓 {len(closing_positions)} 个，"
+        f"新增/加仓 {sum(item['status'] in {'opened', 'added'} for item in changes)} 个，"
+        f"减仓/退出 {sum(item['status'] in {'reduced', 'exited'} for item in changes)} 个。"
+    )
+    decision_context = {
+        "framework": "four_layer_periodic_review_v1",
+        "report_depth": _PERIOD_DEPTHS[period_type],
+        "fundamental_and_valuation": _aggregate_context_layer(
+            selected,
+            layer_name="fundamental_and_valuation",
+            period_type=period_type,
+        ),
+        "market_and_sector": _aggregate_context_layer(
+            selected,
+            layer_name="market_and_sector",
+            period_type=period_type,
+        ),
+        "technical_and_trend": _aggregate_context_layer(
+            selected,
+            layer_name="technical_and_trend",
+            period_type=period_type,
+        ),
+        "position_and_execution": {
+            "status": "available",
+            "scope": f"natural_{period_type}_synthesis",
+            "summary": position_summary,
+            "observations": [
+                {
+                    "type": "fact",
+                    "text": (
+                        f"{item['name']}（{item['ts_code']}）"
+                        f"{item['opening_quantity']} → {item['closing_quantity']} 股，"
+                        f"状态 {item['status']}。"
+                    ),
+                    "source_ref": ",".join(item["source_refs"]),
+                }
+                for item in changes
+                if item["status"] != "held"
+            ],
+            "position_changes": changes,
+            "episode_summaries": episode_summaries,
+            "source_refs": sorted(
+                {
+                    ref
+                    for item in changes
+                    for ref in item.get("source_refs", [])
+                }
+            ),
+        },
+        "timing_policy": (
+            "操作动机沿用各日报在操作时点冻结的 system_inference；"
+            "本周期表现、归因和建议只使用期末 cutoff 之前的信息。"
+        ),
+    }
+    report_cutoff_at = _report_cutoff(end).isoformat(timespec="seconds")
+    recommendation = deepcopy(last["sections"]["recommendation"])
+    recommendation["time_horizon"] = (
+        "next_natural_week" if period_type == "weekly" else "next_natural_month"
+    )
+    recommendation["data_timestamp"] = report_cutoff_at
+    recommendation["report_cutoff_at"] = report_cutoff_at
+    change_unit = "元/股" if performance_basis == "instrument_close_price" else "元"
+    change_description = (
+        "收盘价"
+        if performance_basis == "instrument_close_price"
+        else "资产或持仓市值"
+    )
+    recommendation["rationale"] = [
+        {
+            "type": "fact",
+            "text": (
+                f"本{period_label}独立汇总 {len(selected)} 个交易日，"
+                f"按 {performance_basis} 口径的{change_description}变动 "
+                f"{_decimal_text(primary_change, places=4)} {change_unit}，"
+                f"共 {len(operations)} 笔操作。"
+            ),
+        },
+        *list(recommendation.get("rationale", [])),
+    ]
+    performance = {
+        "type": "fact",
+        "comparison_date": first_performance.get("comparison_date"),
+        "start_total_assets_cny": _decimal_text(start_assets, places=2),
+        "end_total_assets_cny": _decimal_text(end_assets, places=2),
+        "asset_change_cny": _decimal_text(asset_change, places=2),
+        "asset_change_pct": _decimal_text(_pct(asset_change, start_assets), places=2),
+        "start_close_cny": _decimal_text(start_close, places=4),
+        "end_close_cny": _decimal_text(end_close, places=4),
+        "start_price_date": first_performance.get("start_price_date"),
+        "end_price_date": last_performance.get("end_price_date"),
+        "price_change_cny": _decimal_text(close_change, places=4),
+        "price_change_pct": _decimal_text(
+            _pct(close_change, start_close),
+            places=2,
+        ),
+        "start_invested_market_value_cny": _decimal_text(
+            start_market_value,
+            places=2,
+        ),
+        "end_invested_market_value_cny": _decimal_text(
+            end_market_value,
+            places=2,
+        ),
+        "invested_market_value_change_cny": _decimal_text(
+            market_value_change,
+            places=2,
+        ),
+        "invested_market_value_change_pct": _decimal_text(
+            _pct(market_value_change, start_market_value),
+            places=2,
+        ),
+        "performance_basis": performance_basis,
+        "period_change_cny": _decimal_text(primary_change, places=2),
+        "period_change_pct": _decimal_text(
+            _pct(primary_change, primary_start),
+            places=2,
+        ),
+        "cash_change_cny": _decimal_text(
+            (
+                (_decimal(closing_section.get("cash", {}).get("amount_cny")) or ZERO)
+                - (
+                    _decimal(
+                        opening_section.get("opening_cash", {}).get("amount_cny")
+                    )
+                    or ZERO
+                )
+            )
+            if closing_section.get("cash")
+            and opening_section.get("opening_cash")
+            else None,
+            places=2,
+        ),
+        "valuation_complete": all(
+            bool(
+                report["sections"]["performance_and_positions"]["performance"].get(
+                    "valuation_complete"
+                )
+            )
+            for report in selected
+        ),
+        "covered_trading_days": [report["period"]["end"] for report in selected],
+        "calculation_method": (
+            (
+                "使用首个日级报告的期初收盘价与最后一个日级报告的期末"
+                "收盘价计算标的周期表现，持仓市值变化单独呈现，避免期间"
+                "买卖数量变化冒充收益；"
+                if performance_basis == "instrument_close_price"
+                else (
+                    "期初无可比收盘价或无持仓，周期收益率保持 MISSING；"
+                    "仅呈现标的持仓市值变化，并明确该变化包含买卖数量影响，"
+                    "不能当作投资收益；"
+                    if subject_type == "instrument"
+                    else (
+                        "使用首个日级报告的期初资产与最后一个日级报告的期末"
+                        "资产对账；现金快照缺失时保持总资产为 MISSING，并使用"
+                        "不含现金的持仓市值作为明确标注的次级变化口径；"
+                    )
+                )
+            )
+            + "操作序列按 operation_id 去重，日级事实不重新解释。"
+        ),
+        "source_refs": [f"periodic_report:{report['report_id']}" for report in selected],
+    }
+    risks = deepcopy(closing_section.get("risk_change", {}))
+    risks["period_start"] = start.isoformat()
+    risks["period_end"] = end.isoformat()
+    risks["position_changes"] = changes
+    judgments = (
+        [
+            {
+                "type": "inference",
+                "status": (
+                    "needs_improvement"
+                    if (_decimal(item.get("net_round_trip_pnl_cny")) or ZERO) < ZERO
+                    else "mixed"
+                ),
+                "text": item.get("assessment"),
+                "source_refs": item.get("source_refs", []),
+            }
+            for item in episode_summaries
+        ]
+        or [
+            {
+                "type": "inference",
+                "status": "no_trade",
+                "text": f"本{period_label}没有操作，不构造虚假动机或执行评价。",
+                "source_refs": [],
+            }
+        ]
+    )
+    daily_limits = sorted(
+        {
+            str(item)
+            for report in selected
+            for item in report["sections"]["risks_invalidation_and_missing"].get(
+                "data_limitations", []
+            )
+        }
+    )
+    identity = {
+        "schema_version": REPORT_SCHEMA_VERSION,
+        "subject_type": subject_type,
+        "subject_id": subject_id,
+        "period_type": period_type,
+        "period_start": start.isoformat(),
+        "period_end": end.isoformat(),
+    }
+    report_id = "periodic_" + _sha256_text(_canonical_json(identity))[:32]
+    generated_at = max(
+        (str(report.get("generated_at") or "") for report in selected),
+        default=None,
+    )
+    headline_performance_label = {
+        "total_assets": "总资产",
+        "invested_market_value_ex_cash": "持仓市值（不含现金）",
+        "instrument_close_price": "收盘价",
+        "instrument_position_market_value": "标的持仓市值",
+    }.get(performance_basis, "表现")
+    headline_change_pct = (
+        performance["period_change_pct"]
+        if performance["period_change_pct"] is not None
+        else "MISSING"
+    )
+    report = {
+        "schema_version": REPORT_SCHEMA_VERSION,
+        "report_id": report_id,
+        "status": "ready",
+        "subject": deepcopy(last["subject"]),
+        "period": {
+            "type": period_type,
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+            "report_cutoff_at": report_cutoff_at,
+            "covered_trading_dates": [report["period"]["end"] for report in selected],
+        },
+        "generated_at": generated_at,
+        "headline": (
+            f"{last['subject']['name']}本{period_label}"
+            f"{headline_performance_label}"
+            f"变动 {headline_change_pct}%，共 {len(operations)} 笔操作；"
+            f"下一周期建议 {recommendation.get('action')}。"
+        ),
+        "sections": {
+            "performance_and_positions": {
+                "performance": performance,
+                "opening_cash": opening_section.get("opening_cash"),
+                "cash": closing_section.get("cash"),
+                "opening_positions": opening_positions,
+                "positions": closing_positions,
+                "risk_change": risks,
+                "period_attribution": {
+                    "daily_changes": daily_changes,
+                    "best_day": best_day,
+                    "worst_day": worst_day,
+                    "operation_count": len(operations),
+                },
+            },
+            "decision_context": decision_context,
+            "operations_and_motives": {
+                "operation_count": len(operations),
+                "operations": operations,
+                "episode_summaries": episode_summaries,
+            },
+            "review_judgments": judgments,
+            "recommendation": recommendation,
+            "risks_invalidation_and_missing": {
+                "major_risks": recommendation.get("major_downside_risks", []),
+                "invalidation_conditions": recommendation.get(
+                    "invalidation_conditions", []
+                ),
+                "missing_inputs": recommendation.get("important_missing_inputs", []),
+                "data_limitations": daily_limits,
+            },
+        },
+        "source": {
+            "source_path": "derived from validated daily periodic reports",
+            "source_sha256": last.get("source", {}).get("source_sha256"),
+            "source_observed_through": max(
+                (
+                    str(report.get("source", {}).get("source_observed_through") or "")
+                    for report in selected
+                ),
+                default=None,
+            ),
+            "context_fetched_at": max(
+                (
+                    str(report.get("source", {}).get("context_fetched_at") or "")
+                    for report in selected
+                ),
+                default=None,
+            ),
+            "review_sidecar": "investment_review.sqlite3 (derived report state)",
+            "daily_report_ids": [report["report_id"] for report in selected],
+            "source_refs": [
+                f"investment_review.sqlite3#periodic_reports:{report['report_id']}"
+                for report in selected
+            ],
+        },
+        "safety": {
+            "orders_executed": False,
+            "broker_accessed": False,
+            "guaranteed_return_claims": False,
+            "recommendation_is_not_an_order": True,
+        },
+    }
+    report["content_id"] = "sha256:" + _sha256_text(_canonical_json(report))
+    validation = validate_periodic_report(report)
+    if validation["status"] != "accepted":
+        raise PeriodicReportError(
+            "aggregate periodic report validation failed: "
             + ", ".join(validation["errors"])
         )
     return report
@@ -2065,8 +3315,17 @@ def validate_periodic_report(report: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(decision_context, Mapping):
         errors.append("missing_decision_context")
     else:
-        if decision_context.get("report_depth") != "daily_delta_only":
-            errors.append("invalid_daily_context_depth")
+        period_type = (
+            str(period.get("type") or "")
+            if isinstance(period, Mapping)
+            else ""
+        )
+        expected_depth = _PERIOD_DEPTHS.get(period_type)
+        if (
+            expected_depth is not None
+            and decision_context.get("report_depth") != expected_depth
+        ):
+            errors.append(f"invalid_{period_type}_context_depth")
         for layer_name in (
             "fundamental_and_valuation",
             "market_and_sector",
@@ -2176,15 +3435,26 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
     subject = report["subject"]
     period = report["period"]
     sections = report["sections"]
-    performance = sections["performance_and_positions"]["performance"]
-    cash = sections["performance_and_positions"].get("cash") or {}
-    risk = sections["performance_and_positions"]["risk_change"]
+    performance_section = sections["performance_and_positions"]
+    performance = performance_section["performance"]
+    cash = performance_section.get("cash") or {}
+    risk = performance_section["risk_change"]
     context = sections["decision_context"]
     recommendation = sections["recommendation"]
     operations = sections["operations_and_motives"]["operations"]
     episode_summaries = sections["operations_and_motives"].get(
         "episode_summaries", []
     )
+    period_title = {
+        "daily": "日报",
+        "weekly": "周报",
+        "monthly": "月报",
+    }.get(str(period.get("type") or ""), "周期报告")
+    context_title = {
+        "daily": "日报增量",
+        "weekly": "自然周汇总",
+        "monthly": "自然月汇总",
+    }.get(str(period.get("type") or ""), "周期汇总")
     subject_label = (
         subject["name"]
         if subject["type"] == "portfolio"
@@ -2196,8 +3466,100 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
         "formal_exemption": "正式豁免",
         "unknown": "来源未知",
     }
+
+    def visible(value: object, fallback: str = "MISSING") -> object:
+        return fallback if value is None or value == "" else value
+
+    if subject["type"] == "instrument":
+        opening_quantity = _selected_quantity(
+            performance_section.get("opening_positions") or []
+        )
+        closing_quantity = _selected_quantity(
+            performance_section.get("positions") or []
+        )
+        instrument_change_unit = (
+            "元/股"
+            if performance.get("performance_basis") == "instrument_close_price"
+            else "元"
+        )
+        instrument_change_pct = (
+            performance.get("period_change_pct")
+            if performance.get("period_change_pct") is not None
+            else "MISSING"
+        )
+        price_line = (
+            f"- 标的收盘价：{visible(performance.get('start_close_cny'))} → "
+            f"{visible(performance.get('end_close_cny'))} 元/股，变动 "
+            f"{visible(performance.get('price_change_cny'))} 元/股"
+            f"（{visible(performance.get('price_change_pct'))}%）。"
+            if performance.get("performance_basis") == "instrument_close_price"
+            else (
+                "- 标的收盘价：期初可比价格 MISSING；不计算收益率，"
+                "以下持仓市值变化包含买卖数量影响。"
+            )
+        )
+        performance_lines = [
+            price_line,
+            (
+                f"- 持仓数量：{_decimal_text(opening_quantity)} → "
+                f"{_decimal_text(closing_quantity)} 股；持仓市值 "
+                f"{visible(performance.get('start_invested_market_value_cny'))} → "
+                f"{visible(performance.get('end_invested_market_value_cny'))} 元。"
+            ),
+            (
+                f"- 可核对变化口径："
+                f"`{performance.get('performance_basis', 'MISSING')}`；"
+                f"{visible(performance.get('period_change_cny'))} "
+                f"{instrument_change_unit}"
+                f"（{instrument_change_pct}%）。"
+            ),
+            (
+                f"- 组合上下文：现金 {visible(cash.get('amount_cny'))} 元，"
+                f"现金权重 {visible(risk.get('cash_weight_pct'))}%，"
+                f"最大单一标的 "
+                f"{visible(risk.get('top_position_weight_pct'))}%。"
+            ),
+            (
+                f"- 现金一致性：`{cash.get('consistency_status', 'unknown')}`；"
+                f"费用来源完整性 "
+                f"`{cash.get('fee_provenance_status', 'unknown')}`。"
+            ),
+            f"- 计算说明：{performance.get('calculation_method')}",
+        ]
+    else:
+        performance_lines = [
+            (
+                f"- 总资产：{visible(performance.get('start_total_assets_cny'))} → "
+                f"{visible(performance.get('end_total_assets_cny'))} 元，变动 "
+                f"{visible(performance.get('asset_change_cny'))} 元"
+                f"（{visible(performance.get('asset_change_pct'))}%）。"
+            ),
+            (
+                f"- 可核对变化口径："
+                f"`{performance.get('performance_basis', 'MISSING')}`；"
+                f"{visible(performance.get('period_change_cny'))} 元"
+                f"（{visible(performance.get('period_change_pct'))}%）。"
+            ),
+            (
+                f"- 现金：{visible(cash.get('amount_cny'))} 元，组合权重 "
+                f"{visible(risk.get('cash_weight_pct'))}%，状态 "
+                f"`{cash.get('status', 'MISSING')}`。"
+            ),
+            (
+                f"- 现金一致性：`{cash.get('consistency_status', 'unknown')}`；"
+                f"费用来源完整性 "
+                f"`{cash.get('fee_provenance_status', 'unknown')}`。"
+            ),
+            (
+                f"- 集中度：最大单一标的 "
+                f"{visible(risk.get('top_position_weight_pct'))}%，前三大合计 "
+                f"{visible(risk.get('top3_weight_pct'))}%，状态 "
+                f"`{risk.get('concentration_status')}`。"
+            ),
+            f"- 计算说明：{performance.get('calculation_method')}",
+        ]
     lines = [
-        f"# {subject_label} {period['end']} 日报",
+        f"# {subject_label} {period['end']} {period_title}",
         "",
         f"> {report['headline']}",
         "",
@@ -2213,33 +3575,33 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
         "",
         "## 2. 收益、持仓、现金和风险变化",
         "",
-        (
-            f"- 总资产：{performance.get('start_total_assets_cny')} → "
-            f"{performance.get('end_total_assets_cny')} 元，变动 "
-            f"{performance.get('asset_change_cny')} 元"
-            f"（{performance.get('asset_change_pct')}%）。"
-        ),
-        (
-            f"- 现金：{cash.get('amount_cny', 'MISSING')} 元，组合权重 "
-            f"{risk.get('cash_weight_pct')}%，状态 "
-            f"`{cash.get('status', 'MISSING')}`。"
-        ),
-        (
-            f"- 现金一致性：`{cash.get('consistency_status', 'unknown')}`；"
-            f"费用来源完整性 "
-            f"`{cash.get('fee_provenance_status', 'unknown')}`。"
-        ),
-        (
-            f"- 集中度：最大单一标的 "
-            f"{risk.get('top_position_weight_pct')}%，前三大合计 "
-            f"{risk.get('top3_weight_pct')}%，状态 "
-            f"`{risk.get('concentration_status')}`。"
-        ),
-        f"- 计算说明：{performance.get('calculation_method')}",
+        *performance_lines,
         "",
-        "## 3. 四层决策上下文（日报增量）",
+        f"## 3. 四层决策上下文（{context_title}）",
         "",
     ]
+    attribution = sections["performance_and_positions"].get("period_attribution")
+    if isinstance(attribution, Mapping):
+        best = attribution.get("best_day") or {}
+        worst = attribution.get("worst_day") or {}
+        attribution_unit = (
+            "元/股"
+            if performance.get("performance_basis") == "instrument_close_price"
+            else "元"
+        )
+        lines[-2:-2] = [
+            (
+                f"- 周期归因：覆盖 "
+                f"{len(attribution.get('daily_changes', []))} 个交易日、"
+                f"{attribution.get('operation_count', 0)} 笔操作；"
+                f"最佳日 {visible(best.get('trade_date'))} "
+                f"{visible(best.get('period_change_cny'))} {attribution_unit}，"
+                f"最弱日 {visible(worst.get('trade_date'))} "
+                f"{visible(worst.get('period_change_cny'))} "
+                f"{attribution_unit}。"
+            ),
+            "",
+        ]
     layer_labels = (
         ("fundamental_and_valuation", "基本面与估值"),
         ("market_and_sector", "大盘与板块"),
@@ -2252,7 +3614,8 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
             [
                 f"### 3.{len([line for line in lines if line.startswith('### 3.')]) + 1} {label}",
                 "",
-                f"- 状态：`{layer.get('status')}`；{layer.get('summary')}",
+                f"- 状态：`{visible(layer.get('status'))}`；"
+                f"{visible(layer.get('summary'))}",
             ]
         )
         if layer.get("portfolio_scope_note"):
@@ -2269,7 +3632,7 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
         ]
     )
     if not operations:
-        lines.append("- 当日无持仓变动操作；报告仍保留表现、风险与建议。")
+        lines.append("- 本期无持仓变动操作；报告仍保留表现、风险与建议。")
     for summary in episode_summaries:
         fee_basis = "、".join(
             fee_labels.get(str(item), str(item))
@@ -2277,27 +3640,29 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
         )
         lines.extend(
             [
-                f"### {summary.get('name')}（{summary.get('ts_code')}）当日执行摘要",
+                f"### {summary.get('name')}（{summary.get('ts_code')}）本期执行摘要",
                 "",
                 (
-                    f"- 仓位路径：{summary.get('opening_quantity')} → "
-                    f"{summary.get('peak_quantity')} → "
-                    f"{summary.get('closing_quantity')} 股；峰值较期初 "
-                    f"{summary.get('peak_increase_pct')}%。"
+                    f"- 仓位路径：{visible(summary.get('opening_quantity'))} → "
+                    f"{visible(summary.get('peak_quantity'))} → "
+                    f"{visible(summary.get('closing_quantity'))} 股；峰值较期初 "
+                    f"{visible(summary.get('peak_increase_pct'))}%。"
                 ),
             ]
         )
         if summary.get("round_trip_closed"):
             lines.append(
-                f"- 闭环结果：毛价差 {summary.get('gross_round_trip_pnl_cny')} 元；"
-                f"费用 {summary.get('fee_total_cny')} 元（{fee_basis}）；"
-                f"净结果 {summary.get('net_round_trip_pnl_cny')} 元。"
+                f"- 闭环结果：毛价差 "
+                f"{visible(summary.get('gross_round_trip_pnl_cny'))} 元；"
+                f"费用 {visible(summary.get('fee_total_cny'))} 元（{fee_basis}）；"
+                f"净结果 {visible(summary.get('net_round_trip_pnl_cny'))} 元。"
             )
         else:
             lines.append(
-                f"- 当日非闭环：买入 {summary.get('bought_quantity')} 股、"
-                f"卖出 {summary.get('sold_quantity')} 股；"
-                f"已知费用 {summary.get('fee_total_cny')} 元（{fee_basis}），"
+                f"- 当日非闭环：买入 {visible(summary.get('bought_quantity'))} 股、"
+                f"卖出 {visible(summary.get('sold_quantity'))} 股；"
+                f"已知费用 {visible(summary.get('fee_total_cny'))} 元"
+                f"（{fee_basis}），"
                 "不计算虚假的日内净收益。"
             )
         lines.extend([f"- 执行判断：{summary.get('assessment')}", ""])
@@ -2319,7 +3684,7 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
             [
                 "",
                 "- 逐笔费用、替代解释和时点证据保留在同名 JSON/API 详情中；"
-                "组合日报只呈现当日增量，避免重复铺陈。",
+                "组合报告只呈现当前周期必要增量，避免重复铺陈。",
                 "",
             ]
         )
@@ -2352,11 +3717,11 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
                     (
                         f"- 操作事实：{operation['quantity']} 股 × "
                         f"{operation['price_cny']} 元；持仓 "
-                        f"{operation.get('quantity_before')} → "
-                        f"{operation.get('quantity_after')}。"
+                        f"{visible(operation.get('quantity_before'))} → "
+                        f"{visible(operation.get('quantity_after'))}。"
                     ),
                     (
-                        f"- 费用：{operation.get('fee_cny')} 元；"
+                        f"- 费用：{visible(operation.get('fee_cny'))} 元；"
                         f"来源 `{fee_label}`{fee_rule}。"
                     ),
                     (
@@ -2373,7 +3738,7 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
                     ),
                     (
                         f"- 事后评价：{evaluation['narrative']} 毛价差 "
-                        f"{evaluation.get('gross_mark_to_close_cny')} 元。"
+                        f"{visible(evaluation.get('gross_mark_to_close_cny'))} 元。"
                     ),
                     "",
                 ]
@@ -2383,11 +3748,15 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
             "## 5. 哪些判断或执行合理，哪些需要改进",
             "",
             *[
-                f"- `{item['status']}`：{item['text']}"
+                f"- `{item['status']}`：{visible(item.get('text'))}"
                 for item in sections["review_judgments"]
             ],
             "",
-            "## 6. 个性化交易建议与建议仓位",
+            (
+                f"## 6. {subject_label}个性化交易建议与建议仓位"
+                if subject["type"] == "instrument"
+                else "## 6. 个性化交易建议与建议仓位"
+            ),
             "",
             f"- 动作：`{recommendation['action']}`",
             f"- 仓位：`{json.dumps(recommendation['target_position'], ensure_ascii=False)}`",
@@ -2413,7 +3782,8 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
             "<summary>最小来源与时间说明</summary>",
             "",
             f"- 正式数据库 SHA-256：`{report['source']['source_sha256']}`",
-            f"- 数据观察至：`{report['source']['source_observed_through']}`",
+            f"- 数据观察至："
+            f"`{visible(report['source']['source_observed_through'])}`",
             f"- 来源：{', '.join(report['source']['source_refs'])}",
             "- 动机推断只使用各操作时点以前的信息；当日收盘结果只进入事后评价。",
             "- 建议只使用报告 cutoff 及以前的账本与市场信息。",
@@ -2697,6 +4067,46 @@ class PeriodicReportStore:
             raise PeriodicReportError("stored periodic report failed validation")
         return report
 
+    def get_by_identity(
+        self,
+        *,
+        subject_type: str,
+        subject_id: str,
+        period_type: str,
+        period_start: str,
+        period_end: str,
+    ) -> dict[str, Any] | None:
+        identity_key = "|".join(
+            [
+                subject_type,
+                subject_id,
+                period_type,
+                period_start,
+                period_end,
+            ]
+        )
+        with self._connect() as connection:
+            if not self._table_exists(connection):
+                return None
+            row = connection.execute(
+                """
+                SELECT payload_json, payload_sha256
+                FROM periodic_reports
+                WHERE identity_key = ?
+                """,
+                (identity_key,),
+            ).fetchone()
+        if row is None:
+            return None
+        payload = str(row["payload_json"])
+        if _sha256_text(payload) != row["payload_sha256"]:
+            raise PeriodicReportError("periodic report payload hash mismatch")
+        report = json.loads(payload)
+        validation = validate_periodic_report(report)
+        if validation["status"] != "accepted":
+            raise PeriodicReportError("stored periodic report failed validation")
+        return report
+
     def count(self) -> int:
         with self._connect() as connection:
             if not self._table_exists(connection):
@@ -2707,10 +4117,752 @@ class PeriodicReportStore:
                 ]
             )
 
+    def set_meta(self, key: str, value: Mapping[str, Any] | str) -> None:
+        if not str(key).strip():
+            raise PeriodicReportError("periodic report meta key must not be blank")
+        payload = (
+            _canonical_json(dict(value))
+            if isinstance(value, Mapping)
+            else str(value)
+        )
+        with self._connect(write=True) as connection:
+            connection.execute(
+                """
+                INSERT INTO periodic_report_meta(key, value)
+                VALUES (?, ?)
+                ON CONFLICT(key) DO UPDATE SET value=excluded.value
+                """,
+                (str(key), payload),
+            )
+            connection.commit()
+
+    def get_meta(self, key: str) -> str | None:
+        with self._connect() as connection:
+            if not self._table_exists(connection):
+                return None
+            meta_exists = connection.execute(
+                """
+                SELECT 1 FROM sqlite_master
+                WHERE type='table' AND name='periodic_report_meta'
+                """
+            ).fetchone()
+            if meta_exists is None:
+                return None
+            row = connection.execute(
+                "SELECT value FROM periodic_report_meta WHERE key = ?",
+                (str(key),),
+            ).fetchone()
+        return str(row["value"]) if row is not None else None
+
+    def get_json_meta(self, key: str) -> dict[str, Any] | None:
+        payload = self.get_meta(key)
+        if payload is None:
+            return None
+        try:
+            value = json.loads(payload)
+        except json.JSONDecodeError as exc:
+            raise PeriodicReportError("periodic report meta JSON is invalid") from exc
+        if not isinstance(value, Mapping):
+            raise PeriodicReportError("periodic report meta JSON must be an object")
+        return dict(value)
+
 
 def _write_report(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8", newline="\n")
+
+
+PeriodicContextResolver = Callable[..., Mapping[str, Any]]
+
+
+def _trading_dates(
+    connection: sqlite3.Connection,
+    *,
+    start_date: date,
+    end_date: date,
+) -> list[date]:
+    if start_date > end_date:
+        raise PeriodicReportError("start_date must not be after end_date")
+    return [
+        date.fromisoformat(str(row[0]))
+        for row in connection.execute(
+            """
+            SELECT DISTINCT trade_date
+            FROM close_prices
+            WHERE trade_date BETWEEN ? AND ?
+            ORDER BY trade_date
+            """,
+            (start_date.isoformat(), end_date.isoformat()),
+        )
+    ]
+
+
+def build_daily_report_set(
+    *,
+    portfolio_db: str | Path,
+    review_db: str | Path | None,
+    report_date: str | date,
+    account_id: str = "default",
+    context_resolver: PeriodicContextResolver | None = None,
+) -> dict[str, Any]:
+    """Build the portfolio and every held-or-traded instrument daily report."""
+
+    source = Path(portfolio_db).expanduser().resolve(strict=True)
+    day = _parse_date(report_date)
+    contexts: dict[str, dict[str, Any]] = {}
+    context_errors: list[dict[str, str]] = []
+    with _read_only_connection(source) as connection:
+        snapshot = _portfolio_snapshot(
+            connection,
+            account_id=account_id,
+            as_of=day,
+        )
+        traded_codes = {
+            str(row[0])
+            for row in connection.execute(
+                """
+                SELECT DISTINCT ts_code
+                FROM ledger_entries
+                WHERE account_id = ? AND event_date = ?
+                  AND event_type IN ('BUY', 'SELL')
+                """,
+                (account_id, day.isoformat()),
+            )
+            if row[0]
+        }
+        held_codes = {
+            str(item.get("ts_code"))
+            for item in snapshot.get("positions", [])
+            if item.get("ts_code")
+        }
+        codes = sorted(held_codes | traded_codes)
+        metadata = {
+            str(row["ts_code"]): {
+                "name": str(row["name"] or row["ts_code"]),
+                "industry_name": str(row["industry_name"] or "MISSING"),
+            }
+            for row in connection.execute(
+                (
+                    "SELECT ts_code, name, industry_name FROM instruments "
+                    f"WHERE ts_code IN ({','.join('?' for _ in codes)})"
+                )
+                if codes
+                else "SELECT ts_code, name, industry_name FROM instruments WHERE 0",
+                tuple(codes),
+            )
+        }
+        for code in codes:
+            item = metadata.get(
+                code,
+                {"name": code, "industry_name": "MISSING"},
+            )
+            local = _local_decision_context(
+                connection,
+                ts_code=code,
+                name=item["name"],
+                industry_name=item["industry_name"],
+                report_date=day,
+            )
+            if context_resolver is None:
+                contexts[code] = local
+                continue
+            try:
+                resolved = context_resolver(
+                    ts_code=code,
+                    name=item["name"],
+                    industry_name=item["industry_name"],
+                    report_date=day,
+                )
+                if not isinstance(resolved, Mapping):
+                    raise PeriodicContextError(
+                        "periodic context resolver returned a non-mapping"
+                    )
+                contexts[code] = dict(resolved)
+            except (ImportError, OSError, PeriodicContextError, RuntimeError) as exc:
+                local["context_fallback"] = {
+                    "status": "used",
+                    "error_type": type(exc).__name__,
+                    "reason": str(exc),
+                }
+                contexts[code] = local
+                context_errors.append(
+                    {
+                        "ts_code": code,
+                        "error_type": type(exc).__name__,
+                        "reason": str(exc),
+                    }
+                )
+
+    portfolio_context = _aggregate_portfolio_daily_context(
+        contexts,
+        report_date=day,
+    )
+    reports = [
+        build_daily_report(
+            portfolio_db=source,
+            review_db=review_db,
+            report_date=day,
+            subject_type="portfolio",
+            account_id=account_id,
+            point_in_time_context=portfolio_context,
+        )
+    ]
+    reports.extend(
+        build_daily_report(
+            portfolio_db=source,
+            review_db=review_db,
+            report_date=day,
+            subject_type="instrument",
+            subject_id=code,
+            account_id=account_id,
+            point_in_time_context=contexts[code],
+        )
+        for code in codes
+    )
+    return {
+        "report_date": day.isoformat(),
+        "reports": reports,
+        "held_instruments": sorted(held_codes),
+        "traded_instruments": sorted(traded_codes),
+        "context_errors": context_errors,
+    }
+
+
+def generate_daily_range(
+    *,
+    portfolio_db: str | Path,
+    review_db: str | Path,
+    start_date: str | date,
+    end_date: str | date,
+    output_dir: str | Path | None = None,
+    account_id: str = "default",
+    context_resolver: PeriodicContextResolver | None = None,
+    preserve_existing: bool = False,
+) -> dict[str, Any]:
+    """Generate and store complete daily report sets for real trading dates."""
+
+    source = Path(portfolio_db).expanduser().resolve(strict=True)
+    sidecar = Path(review_db).expanduser().resolve(strict=True)
+    repository = Path.cwd().resolve()
+    output = (
+        Path(output_dir).expanduser().resolve(strict=False)
+        if output_dir is not None
+        else None
+    )
+    if source == sidecar:
+        raise PeriodicReportError("formal source and review sidecar must differ")
+    if not sidecar.is_relative_to(repository):
+        raise PeriodicReportError("review sidecar must remain in the execution worktree")
+    if output is not None and not output.is_relative_to(repository):
+        raise PeriodicReportError("daily artifacts must remain in the execution worktree")
+
+    selected_start = _parse_date(start_date)
+    selected_end = _parse_date(end_date)
+    source_before = sha256_file(source)
+    with _read_only_connection(source) as connection:
+        trading_days = _trading_dates(
+            connection,
+            start_date=selected_start,
+            end_date=selected_end,
+        )
+    if not trading_days:
+        raise PeriodicReportError("no formal trading dates exist in the selected range")
+
+    store = PeriodicReportStore(sidecar)
+    store.initialize()
+    receipts: list[dict[str, Any]] = []
+    coverage: list[dict[str, Any]] = []
+    report_ids: list[str] = []
+    context_errors: list[dict[str, str]] = []
+    for day in trading_days:
+        daily = build_daily_report_set(
+            portfolio_db=source,
+            review_db=sidecar,
+            report_date=day,
+            account_id=account_id,
+            context_resolver=context_resolver,
+        )
+        context_errors.extend(daily["context_errors"])
+        stored_reports: list[dict[str, Any]] = []
+        for candidate in daily["reports"]:
+            existing = store.get_by_identity(
+                subject_type=str(candidate["subject"]["type"]),
+                subject_id=str(candidate["subject"]["id"]),
+                period_type="daily",
+                period_start=day.isoformat(),
+                period_end=day.isoformat(),
+            )
+            if preserve_existing and existing is not None:
+                report = existing
+                receipt = {
+                    "status": "preserved",
+                    "report_id": report["report_id"],
+                    "payload_sha256": _sha256_text(_canonical_json(report)),
+                }
+            else:
+                report = candidate
+                receipt = store.save(report)
+            receipts.append(receipt)
+            stored_reports.append(report)
+            report_ids.append(str(report["report_id"]))
+            if output is not None:
+                subject = report["subject"]
+                stem = (
+                    f"portfolio_daily_{day.isoformat()}"
+                    if subject["type"] == "portfolio"
+                    else (
+                        f"instrument_daily_{subject['id']}_"
+                        f"{day.isoformat()}"
+                    )
+                )
+                _write_report(
+                    output / day.isoformat() / f"{stem}.json",
+                    json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+                )
+                _write_report(
+                    output / day.isoformat() / f"{stem}.md",
+                    render_periodic_report_markdown(report),
+                )
+        portfolio_report = next(
+            item
+            for item in stored_reports
+            if item["subject"]["type"] == "portfolio"
+        )
+        coverage.append(
+            {
+                "trade_date": day.isoformat(),
+                "portfolio_reports": 1,
+                "instrument_reports": sum(
+                    item["subject"]["type"] == "instrument"
+                    for item in stored_reports
+                ),
+                "held_instruments": daily["held_instruments"],
+                "traded_instruments": daily["traded_instruments"],
+                "operation_count": portfolio_report["sections"][
+                    "operations_and_motives"
+                ]["operation_count"],
+                "no_trade_day": (
+                    portfolio_report["sections"]["operations_and_motives"][
+                        "operation_count"
+                    ]
+                    == 0
+                ),
+            }
+        )
+
+    source_after = sha256_file(source)
+    if source_after != source_before:
+        raise PeriodicReportError(
+            "formal portfolio database changed during daily range generation"
+        )
+    result = {
+        "schema_version": "investment_review.daily_range.validation.v1",
+        "status": "pass",
+        "period": {
+            "start": trading_days[0].isoformat(),
+            "end": trading_days[-1].isoformat(),
+            "trading_day_count": len(trading_days),
+        },
+        "coverage": coverage,
+        "report_count": len(report_ids),
+        "report_ids": report_ids,
+        "store_receipts": receipts,
+        "idempotency_identity": (
+            "subject_type+subject_id+period_type+period_start+period_end"
+        ),
+        "context_errors": context_errors,
+        "formal_portfolio_db": {
+            "mode": "ro+immutable+query_only",
+            "sha256_before": source_before,
+            "sha256_after": source_after,
+            "unchanged": True,
+        },
+        "orders_executed": False,
+        "broker_accessed": False,
+        "guaranteed_return_claims": False,
+    }
+    if output is not None:
+        output.mkdir(parents=True, exist_ok=True)
+        _write_report(
+            output / "daily_range_validation.json",
+            json.dumps(result, ensure_ascii=False, indent=2) + "\n",
+        )
+    return result
+
+
+def _natural_period_key(day: date, period_type: str) -> tuple[int, int]:
+    if period_type == "weekly":
+        iso = day.isocalendar()
+        return int(iso.year), int(iso.week)
+    if period_type == "monthly":
+        return day.year, day.month
+    raise PeriodicReportError("natural period_type must be weekly or monthly")
+
+
+def _natural_calendar_bounds(day: date, period_type: str) -> tuple[date, date]:
+    if period_type == "weekly":
+        start = day.fromordinal(day.toordinal() - day.weekday())
+        return start, start.fromordinal(start.toordinal() + 6)
+    if period_type == "monthly":
+        start = day.replace(day=1)
+        if start.month == 12:
+            next_month = start.replace(year=start.year + 1, month=1)
+        else:
+            next_month = start.replace(month=start.month + 1)
+        return start, next_month.fromordinal(next_month.toordinal() - 1)
+    raise PeriodicReportError("natural period_type must be weekly or monthly")
+
+
+def generate_periodic_summaries(
+    *,
+    review_db: str | Path,
+    period_type: str,
+    start_date: str | date,
+    end_date: str | date,
+    output_dir: str | Path | None = None,
+    subject_type: str | None = None,
+    subject_id: str | None = None,
+) -> dict[str, Any]:
+    """Aggregate stored daily facts into natural weekly or monthly reports."""
+
+    if period_type not in {"weekly", "monthly"}:
+        raise PeriodicReportError("period_type must be weekly or monthly")
+    start = _parse_date(start_date)
+    end = _parse_date(end_date)
+    if start > end:
+        raise PeriodicReportError("start_date must not be after end_date")
+    sidecar = Path(review_db).expanduser().resolve(strict=True)
+    repository = Path.cwd().resolve()
+    output = (
+        Path(output_dir).expanduser().resolve(strict=False)
+        if output_dir is not None
+        else None
+    )
+    if not sidecar.is_relative_to(repository):
+        raise PeriodicReportError("review sidecar must remain in the execution worktree")
+    if output is not None and not output.is_relative_to(repository):
+        raise PeriodicReportError("periodic artifacts must remain in the worktree")
+    if subject_type is not None and subject_type not in _SUBJECT_TYPES:
+        raise PeriodicReportError("subject_type must be portfolio or instrument")
+    if subject_id is not None and not str(subject_id).strip():
+        raise PeriodicReportError("subject_id must not be blank")
+
+    store = PeriodicReportStore(sidecar)
+    summaries = store.list(period_type="daily", limit=10000)
+    source_reports = [
+        store.get(str(item["report_id"]))
+        for item in summaries
+        if start.isoformat()
+        <= str(item.get("period", {}).get("end") or "")
+        <= end.isoformat()
+        and (
+            subject_type is None
+            or item.get("subject", {}).get("type") == subject_type
+        )
+        and (
+            subject_id is None
+            or item.get("subject", {}).get("id") == subject_id
+        )
+    ]
+    groups: dict[
+        tuple[str, str, tuple[int, int]],
+        list[dict[str, Any]],
+    ] = {}
+    for report in source_reports:
+        report_day = _parse_date(str(report["period"]["end"]))
+        key = (
+            str(report["subject"]["type"]),
+            str(report["subject"]["id"]),
+            _natural_period_key(report_day, period_type),
+        )
+        groups.setdefault(key, []).append(report)
+    if not groups:
+        raise PeriodicReportError("no stored daily reports match the selected period")
+
+    receipts: list[dict[str, Any]] = []
+    generated: list[dict[str, Any]] = []
+    for _, daily in sorted(groups.items()):
+        daily.sort(key=lambda report: str(report["period"]["end"]))
+        actual_start = _parse_date(str(daily[0]["period"]["end"]))
+        actual_end = _parse_date(str(daily[-1]["period"]["end"]))
+        calendar_start, calendar_end = _natural_calendar_bounds(
+            actual_end,
+            period_type,
+        )
+        report = build_aggregate_report(
+            daily_reports=daily,
+            period_type=period_type,
+            period_start=actual_start,
+            period_end=actual_end,
+        )
+        report["period"]["calendar_start"] = calendar_start.isoformat()
+        report["period"]["calendar_end"] = calendar_end.isoformat()
+        report["period"]["completeness"] = (
+            "complete_selected_window"
+            if start <= calendar_start and end >= calendar_end
+            else "partial_selected_window"
+        )
+        report["content_id"] = "sha256:" + _sha256_text(
+            _canonical_json(
+                {
+                    key: value
+                    for key, value in report.items()
+                    if key != "content_id"
+                }
+            )
+        )
+        validation = validate_periodic_report(report)
+        if validation["status"] != "accepted":
+            raise PeriodicReportError(
+                "periodic summary validation failed: "
+                + ", ".join(validation["errors"])
+            )
+        receipts.append(store.save(report))
+        generated.append(report)
+        if output is not None:
+            subject = report["subject"]
+            stem = (
+                f"portfolio_{period_type}_{actual_start}_{actual_end}"
+                if subject["type"] == "portfolio"
+                else (
+                    f"instrument_{period_type}_{subject['id']}_"
+                    f"{actual_start}_{actual_end}"
+                )
+            )
+            _write_report(
+                output / f"{stem}.json",
+                json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+            )
+            _write_report(
+                output / f"{stem}.md",
+                render_periodic_report_markdown(report),
+            )
+    result = {
+        "schema_version": "investment_review.periodic_summary.validation.v1",
+        "status": "pass",
+        "period_type": period_type,
+        "selected_window": {
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+        },
+        "report_count": len(generated),
+        "reports": [
+            {
+                "report_id": report["report_id"],
+                "subject": report["subject"],
+                "period": report["period"],
+                "operation_count": report["sections"][
+                    "operations_and_motives"
+                ]["operation_count"],
+                "daily_source_count": len(
+                    report.get("source", {}).get("daily_report_ids", [])
+                ),
+                "validation": validate_periodic_report(report),
+            }
+            for report in generated
+        ],
+        "store_receipts": receipts,
+        "orders_executed": False,
+        "broker_accessed": False,
+        "guaranteed_return_claims": False,
+    }
+    if output is not None:
+        output.mkdir(parents=True, exist_ok=True)
+        _write_report(
+            output / f"{period_type}_validation.json",
+            json.dumps(result, ensure_ascii=False, indent=2) + "\n",
+        )
+    return result
+
+
+def export_final_sample_matrix(
+    *,
+    portfolio_db: str | Path,
+    review_db: str | Path,
+    output_dir: str | Path,
+    instrument: str,
+    daily_date: str | date,
+    weekly_start: str | date,
+    weekly_end: str | date,
+    monthly_start: str | date,
+    monthly_end: str | date,
+) -> dict[str, Any]:
+    """Export the six reader-facing report types and a compact final manifest."""
+
+    source = Path(portfolio_db).expanduser().resolve(strict=True)
+    sidecar = Path(review_db).expanduser().resolve(strict=True)
+    output = Path(output_dir).expanduser().resolve(strict=False)
+    repository = Path.cwd().resolve()
+    if source == sidecar:
+        raise PeriodicReportError("formal source and review sidecar must differ")
+    if not sidecar.is_relative_to(repository):
+        raise PeriodicReportError("review sidecar must remain in the worktree")
+    if not output.is_relative_to(repository):
+        raise PeriodicReportError("final artifacts must remain in the worktree")
+    source_before = sha256_file(source)
+    store = PeriodicReportStore(sidecar)
+    selectors = [
+        ("portfolio", "default", "daily", daily_date, daily_date),
+        ("instrument", instrument, "daily", daily_date, daily_date),
+        ("portfolio", "default", "weekly", weekly_start, weekly_end),
+        ("instrument", instrument, "weekly", weekly_start, weekly_end),
+        ("portfolio", "default", "monthly", monthly_start, monthly_end),
+        ("instrument", instrument, "monthly", monthly_start, monthly_end),
+    ]
+    reports: list[dict[str, Any]] = []
+    for subject_type, subject_id, period_type, start_value, end_value in selectors:
+        start = _parse_date(start_value).isoformat()
+        end = _parse_date(end_value).isoformat()
+        report = store.get_by_identity(
+            subject_type=subject_type,
+            subject_id=subject_id,
+            period_type=period_type,
+            period_start=start,
+            period_end=end,
+        )
+        if report is None:
+            raise PeriodicReportError(
+                "final sample is missing: "
+                f"{subject_type}/{subject_id}/{period_type}/{start}/{end}"
+            )
+        validation = validate_periodic_report(report)
+        if validation["status"] != "accepted":
+            raise PeriodicReportError(
+                f"final sample failed validation: {report['report_id']}"
+            )
+        reports.append(report)
+
+    output.mkdir(parents=True, exist_ok=True)
+    matrix: list[dict[str, Any]] = []
+    for report in reports:
+        subject = report["subject"]
+        period = report["period"]
+        subject_stem = (
+            "portfolio"
+            if subject["type"] == "portfolio"
+            else f"instrument_{subject['id']}"
+        )
+        stem = (
+            f"{subject_stem}_{period['type']}_"
+            f"{period['start']}_{period['end']}"
+        )
+        json_path = output / f"{stem}.json"
+        markdown_path = output / f"{stem}.md"
+        _write_report(
+            json_path,
+            json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        )
+        _write_report(markdown_path, render_periodic_report_markdown(report))
+        matrix.append(
+            {
+                "report_id": report["report_id"],
+                "subject": report["subject"],
+                "period": report["period"],
+                "operation_count": report["sections"][
+                    "operations_and_motives"
+                ]["operation_count"],
+                "performance_basis": report["sections"][
+                    "performance_and_positions"
+                ]["performance"].get("performance_basis"),
+                "period_change_cny": report["sections"][
+                    "performance_and_positions"
+                ]["performance"].get("period_change_cny"),
+                "validation": validate_periodic_report(report),
+                "json_path": str(json_path),
+                "markdown_path": str(markdown_path),
+            }
+        )
+    source_after = sha256_file(source)
+    if source_after != source_before:
+        raise PeriodicReportError(
+            "formal portfolio database changed during final export"
+        )
+    automation_status = store.get_json_meta("periodic_automation_status")
+    validation_summary = {
+        "schema_version": "investment_review.periodic_v1.final_validation.v1",
+        "status": "candidate",
+        "p1_sample_acceptance": {
+            "grant": "accept_p1_sample_and_continue",
+            "recorded": True,
+        },
+        "sample_matrix": matrix,
+        "periodic_report_store_count": store.count(),
+        "automation": automation_status
+        or {
+            "enabled": False,
+            "state": "not_run",
+            "os_scheduler_installed": False,
+        },
+        "formal_portfolio_db": {
+            "mode": "ro+immutable+query_only",
+            "sha256_before": source_before,
+            "sha256_after": source_after,
+            "unchanged": True,
+        },
+        "known_data_limitations": [
+            (
+                "2026-07-14 以前没有可靠现金快照；相关周/月报告保留总资产 "
+                "MISSING，并明确改用不含现金的持仓市值变化口径。"
+            ),
+            (
+                "批量历史日报默认使用正式库本地行情回退；基本面、基准或板块"
+                "缺失时明确显示，不用未来信息补造。"
+            ),
+            "没有显式用户风险预算，精确仓位建议保持为区间。",
+        ],
+        "orders_executed": False,
+        "broker_accessed": False,
+        "guaranteed_return_claims": False,
+        "production_released": False,
+        "os_scheduler_or_service_installed": False,
+    }
+    validation_path = output / "validation_summary.json"
+    _write_report(
+        validation_path,
+        json.dumps(validation_summary, ensure_ascii=False, indent=2) + "\n",
+    )
+    readout_lines = [
+        "# 周期投资复盘 V1 本地候选",
+        "",
+        "- P1 用户授权：`accept_p1_sample_and_continue`（已记录）",
+        f"- 六类真实报告：{len(matrix)} / 6",
+        f"- 派生报告库当前报告数：{store.count()}",
+        f"- 正式组合库 SHA-256：`{source_before}`（前后不变）",
+        "- 订单执行：`false`；券商访问：`false`；保证收益：`false`",
+        "- 生产发布：`false`；OS scheduler/service：未安装",
+        "",
+        "## 六类样本",
+        "",
+    ]
+    for item in matrix:
+        readout_lines.append(
+            f"- {item['subject']['name']} · {item['period']['type']} · "
+            f"{item['period']['start']} 至 {item['period']['end']} · "
+            f"`{item['report_id']}`"
+        )
+    readout_lines.extend(
+        [
+            "",
+            "## 已知限制",
+            "",
+            *[
+                f"- {item}"
+                for item in validation_summary["known_data_limitations"]
+            ],
+            "",
+        ]
+    )
+    readout_path = output / "FINAL_READOUT.md"
+    _write_report(readout_path, "\n".join(readout_lines))
+    return {
+        "status": "candidate",
+        "report_count": len(matrix),
+        "report_ids": [item["report_id"] for item in matrix],
+        "validation_path": str(validation_path),
+        "readout_path": str(readout_path),
+        "formal_db_unchanged": True,
+        "source_sha256": source_before,
+    }
 
 
 def generate_p1_daily_slice(
@@ -2885,6 +5037,58 @@ def _parser() -> argparse.ArgumentParser:
     generate.add_argument("--date", required=True)
     generate.add_argument("--instrument", required=True)
     generate.add_argument("--output-dir", required=True)
+    daily_range = subparsers.add_parser(
+        "generate-daily-range",
+        help="Generate portfolio and held-or-traded instrument reports for a date range",
+    )
+    daily_range.add_argument("--portfolio-db", required=True)
+    daily_range.add_argument("--review-db", required=True)
+    daily_range.add_argument("--start-date", required=True)
+    daily_range.add_argument("--end-date", required=True)
+    daily_range.add_argument("--output-dir", required=True)
+    daily_range.add_argument("--account", default="default")
+    daily_range.add_argument(
+        "--context-source",
+        choices=("local", "baostock"),
+        default="local",
+        help="Use deterministic formal-DB context or bounded BaoStock enrichment",
+    )
+    daily_range.add_argument(
+        "--preserve-existing",
+        action="store_true",
+        help="Keep an already stored semantic report instead of refreshing it",
+    )
+    summaries = subparsers.add_parser(
+        "generate-summaries",
+        help="Aggregate stored daily reports into natural weekly or monthly reports",
+    )
+    summaries.add_argument("--review-db", required=True)
+    summaries.add_argument(
+        "--period-type",
+        choices=("weekly", "monthly"),
+        required=True,
+    )
+    summaries.add_argument("--start-date", required=True)
+    summaries.add_argument("--end-date", required=True)
+    summaries.add_argument("--output-dir", required=True)
+    summaries.add_argument(
+        "--subject-type",
+        choices=("portfolio", "instrument"),
+    )
+    summaries.add_argument("--subject-id")
+    final_export = subparsers.add_parser(
+        "export-final",
+        help="Export the six real portfolio/instrument daily/weekly/monthly samples",
+    )
+    final_export.add_argument("--portfolio-db", required=True)
+    final_export.add_argument("--review-db", required=True)
+    final_export.add_argument("--output-dir", required=True)
+    final_export.add_argument("--instrument", required=True)
+    final_export.add_argument("--daily-date", required=True)
+    final_export.add_argument("--weekly-start", required=True)
+    final_export.add_argument("--weekly-end", required=True)
+    final_export.add_argument("--monthly-start", required=True)
+    final_export.add_argument("--monthly-end", required=True)
     return parser
 
 
@@ -2897,6 +5101,49 @@ def main(argv: Sequence[str] | None = None) -> int:
             report_date=args.date,
             instrument=args.instrument,
             output_dir=args.output_dir,
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "generate-daily-range":
+        result = generate_daily_range(
+            portfolio_db=args.portfolio_db,
+            review_db=args.review_db,
+            start_date=args.start_date,
+            end_date=args.end_date,
+            output_dir=args.output_dir,
+            account_id=args.account,
+            context_resolver=(
+                fetch_p1_decision_context
+                if args.context_source == "baostock"
+                else None
+            ),
+            preserve_existing=args.preserve_existing,
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "generate-summaries":
+        result = generate_periodic_summaries(
+            review_db=args.review_db,
+            period_type=args.period_type,
+            start_date=args.start_date,
+            end_date=args.end_date,
+            output_dir=args.output_dir,
+            subject_type=args.subject_type,
+            subject_id=args.subject_id,
+        )
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0
+    if args.command == "export-final":
+        result = export_final_sample_matrix(
+            portfolio_db=args.portfolio_db,
+            review_db=args.review_db,
+            output_dir=args.output_dir,
+            instrument=args.instrument,
+            daily_date=args.daily_date,
+            weekly_start=args.weekly_start,
+            weekly_end=args.weekly_end,
+            monthly_start=args.monthly_start,
+            monthly_end=args.monthly_end,
         )
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return 0

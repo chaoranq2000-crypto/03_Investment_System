@@ -14788,7 +14788,7 @@ function appendPairs(parent, entries) {
 function projectedTime(value) {
 	if (typeof value === "string" || typeof value === "number") return text(value);
 	const item = object(value);
-	return text(item.occurred_at ?? item.known_at ?? item.status_occurred_at ?? item.requested_at ?? item.status_event?.occurred_at ?? item.status_event?.known_at ?? item.run?.requested_at);
+	return text(item.occurred_at ?? item.known_at ?? item.status_occurred_at ?? item.requested_at ?? item.completed_at ?? item.started_at ?? item.generated_at ?? item.status_event?.occurred_at ?? item.status_event?.known_at ?? item.run?.requested_at);
 }
 function periodicOperationTime(value) {
 	const raw = projectedTime(value);
@@ -14951,6 +14951,13 @@ function periodicReportView(value) {
 		sections
 	};
 }
+function periodicSubjectLabel(value) {
+	const subject = object(value?.subject ?? value);
+	const id = text(subject.id, "");
+	const name = text(subject.name, id || "MISSING_INSTRUMENT_NAME");
+	if (subject.type !== "instrument" || !id || name.includes(id)) return name;
+	return `${name}（${id}）`;
+}
 function interpretationTargets(detail) {
 	const sections = object(detail.interpretation_sections);
 	const targets = [];
@@ -15028,7 +15035,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		periodicReports: [],
 		periodicTotalCount: 0,
 		periodicSubject: "all",
-		periodicPeriod: "daily",
+		periodicPeriod: "all",
 		reviews: [],
 		totalCount: 0,
 		health: null,
@@ -15081,7 +15088,12 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 	});
 	const periodicPeriodSelect = element("select", "investment-review-select");
 	periodicPeriodSelect.setAttribute("aria-label", "按周期筛选报告");
-	[["daily", "日报"]].forEach(([value, label]) => {
+	[
+		["all", "全部周期"],
+		["daily", "日报"],
+		["weekly", "周报"],
+		["monthly", "月报"]
+	].forEach(([value, label]) => {
 		const option = element("option", "", label);
 		option.value = value;
 		periodicPeriodSelect.appendChild(option);
@@ -15204,16 +15216,17 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		const fees = object(health.fees);
 		const reviews = object(health.reviews);
 		const periodicReports = object(health.periodic_reports);
+		const periodicAutomation = object(periodicReports.automation);
 		const automation = object(health.automation);
 		healthLine.replaceChildren();
-		healthLine.append(element("span", "", `source ${text(counts.source_seen ?? counts.source, "unknown")}`), element("span", "", `sidecar ${text(counts.sidecar_seen ?? counts.sidecar, "unknown")}`), element("span", "", `unsynced ${text(lag.unsynced ?? counts.unsynced, "unknown")}`), element("span", "", `fees actual ${text(fees.actual, "0")} / estimated ${text(fees.estimated, "0")} / unknown ${text(fees.unknown, "0")}`), element("span", "", `reviews ${text(reviews.count ?? reviews.review_count, state.reviews.length)}`), element("span", "", `periodic ${text(periodicReports.count, state.periodicReports.length)}`), element("span", "", `automation ${text(automation.state, "disabled")}`), element("span", "", `auto_completed ${projectedTime(automation.last_completed)}`), element("span", "", `auto_success ${projectedTime(automation.last_success)}`), element("span", "", `auto_failure ${projectedTime(automation.last_failure)}`), element("span", "", `last_success ${projectedTime(health.last_success)}`), element("span", "", `last_failure ${projectedTime(health.last_failure)}`), element("span", "", `boundary ${boundaryText(health.boundary)}`));
+		healthLine.append(element("span", "", `source ${text(counts.source_seen ?? counts.source, "unknown")}`), element("span", "", `sidecar ${text(counts.sidecar_seen ?? counts.sidecar, "unknown")}`), element("span", "", `unsynced ${text(lag.unsynced ?? counts.unsynced, "unknown")}`), element("span", "", `fees actual ${text(fees.actual, "0")} / estimated ${text(fees.estimated, "0")} / unknown ${text(fees.unknown, "0")}`), element("span", "", `reviews ${text(reviews.count ?? reviews.review_count, state.reviews.length)}`), element("span", "", `periodic ${text(periodicReports.count, state.periodicReports.length)}`), element("span", "", `periodic_auto ${text(periodicAutomation.state, "disabled")}`), element("span", "", `periodic_success ${projectedTime(periodicAutomation.last_success)}`), element("span", "", `periodic_failure ${projectedTime(periodicAutomation.last_failure)}`), element("span", "", `automation ${text(automation.state, "disabled")}`), element("span", "", `auto_completed ${projectedTime(automation.last_completed)}`), element("span", "", `auto_success ${projectedTime(automation.last_success)}`), element("span", "", `auto_failure ${projectedTime(automation.last_failure)}`), element("span", "", `last_success ${projectedTime(health.last_success)}`), element("span", "", `last_failure ${projectedTime(health.last_failure)}`), element("span", "", `boundary ${boundaryText(health.boundary)}`));
 	}
 	function renderPeriodicList() {
 		periodicList.replaceChildren();
-		const filtered = state.periodicReports.filter((report) => (state.periodicSubject === "all" || report.subject.type === state.periodicSubject) && report.period.type === state.periodicPeriod);
+		const filtered = state.periodicReports.filter((report) => (state.periodicSubject === "all" || report.subject.type === state.periodicSubject) && (state.periodicPeriod === "all" || report.period.type === state.periodicPeriod));
 		periodicListStatus.textContent = state.periodicTotalCount > state.periodicReports.length ? `${filtered.length} / 已载入 ${state.periodicReports.length} / 总计 ${state.periodicTotalCount} 份周期报告` : `${filtered.length} / ${state.periodicReports.length} 份周期报告`;
 		if (!filtered.length) {
-			periodicList.appendChild(element("li", "investment-review-empty", "当前筛选下没有周期报告；P1 只生成已验证的真实日报样板。"));
+			periodicList.appendChild(element("li", "investment-review-empty", "当前筛选下没有周期报告；缺失周期不会被隐藏。"));
 			return;
 		}
 		filtered.forEach((reportValue) => {
@@ -15222,7 +15235,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 			const button = actionButton("", "investment-review-list-button");
 			const top = element("div", "investment-review-list-top");
 			const identity = element("div");
-			identity.append(element("strong", "", report.subject.name), element("span", "investment-review-mono", `${report.period.type} · ${text(report.period.end)}`));
+			identity.append(element("strong", "", periodicSubjectLabel(report)), element("span", "investment-review-mono", `${report.period.type} · ${text(report.period.end)}`));
 			top.append(identity, statusBadge(report.status));
 			const recommendation = object(report.recommendation);
 			const target = object(recommendation.target_position);
@@ -15609,9 +15622,20 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		const episodeSummaries = values(operationsSection.episode_summaries);
 		const recommendation = object(sections.recommendation);
 		const limitations = object(sections.risks_invalidation_and_missing);
+		const periodLabel = {
+			daily: "日报",
+			weekly: "周报",
+			monthly: "月报"
+		}[report.period.type] || "周期报告";
+		const contextLabel = {
+			daily: "日报增量",
+			weekly: "自然周汇总",
+			monthly: "自然月汇总"
+		}[report.period.type] || "周期汇总";
+		const subjectLabel = periodicSubjectLabel(report);
 		drawerContent.replaceChildren();
 		const header = element("header", "investment-review-drawer-heading");
-		header.append(element("p", "section-kicker", "PERIODIC REVIEW"), element("h2", "", `${report.subject.name} · ${text(report.period.end)} 日报`), element("p", "investment-review-mono", report.report_id), statusBadge(report.status));
+		header.append(element("p", "section-kicker", "PERIODIC REVIEW"), element("h2", "", `${subjectLabel} · ${text(report.period.end)} ${periodLabel}`), element("p", "investment-review-mono", report.report_id), statusBadge(report.status));
 		header.querySelector("h2").id = "investmentReviewDrawerTitle";
 		drawerContent.append(header, element("p", "investment-review-gap-summary", report.headline));
 		const performanceBlock = sectionBlock("收益、持仓、现金和风险变化", "PERIOD FACTS");
@@ -15632,7 +15656,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		}));
 		performanceBlock.body.appendChild(positionDetails);
 		drawerContent.appendChild(performanceBlock.section);
-		const contextBlock = sectionBlock("四层决策上下文（日报增量）", "FUNDAMENTAL · MARKET · TREND · EXECUTION");
+		const contextBlock = sectionBlock(`四层决策上下文（${contextLabel}）`, "FUNDAMENTAL · MARKET · TREND · EXECUTION");
 		[
 			["fundamental_and_valuation", "基本面与估值"],
 			["market_and_sector", "大盘与板块"],
@@ -15699,7 +15723,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 			operationsBlock.body.appendChild(card);
 		});
 		drawerContent.appendChild(operationsBlock.section);
-		const recommendationBlock = sectionBlock("个性化交易建议与建议仓位", "RECOMMENDATION · NOT AN ORDER");
+		const recommendationBlock = sectionBlock(report.subject.type === "instrument" ? `${subjectLabel}个性化交易建议与建议仓位` : "个性化交易建议与建议仓位", "RECOMMENDATION · NOT AN ORDER");
 		recommendationBlock.body.append(element("span", "investment-review-mono", `confidence ${text(recommendation.confidence)}`), element("h3", "", `${text(recommendation.action).toUpperCase()} · ${text(object(recommendation.target_position).target_position_note)}`), element("p", "", `期限：${text(recommendation.time_horizon)}`));
 		values(recommendation.rationale).forEach((itemValue) => {
 			const item = object(itemValue);
@@ -15741,7 +15765,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 			renderPeriodicDetail(object(unwrap(payload).report));
 		} catch (error) {
 			if (version !== state.requestVersion) return;
-			drawerContent.replaceChildren(element("h2", "", report.subject.name), statusBadge("failed"), element("p", "investment-review-warning", `periodic-report: ${error.message || "failed"}`));
+			drawerContent.replaceChildren(element("h2", "", periodicSubjectLabel(report)), statusBadge("failed"), element("p", "investment-review-warning", `periodic-report: ${error.message || "failed"}`));
 		}
 	}
 	function renderDetail(review, responses) {
@@ -15835,7 +15859,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 	async function loadPeriodicReports() {
 		periodicListStatus.textContent = "正在读取周期报告";
 		try {
-			const data = unwrap(await request(`${REVIEW_API_ROOT}/periodic-reports?period_type=daily&limit=200`));
+			const data = unwrap(await request(`${REVIEW_API_ROOT}/periodic-reports?limit=1000`));
 			state.periodicReports = values(data.reports).map(periodicReportView);
 			state.periodicTotalCount = Number(data.total_count ?? state.periodicReports.length);
 			renderPeriodicList();

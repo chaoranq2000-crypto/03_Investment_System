@@ -1,0 +1,511 @@
+{
+  "schema_version": "investment_review.periodic_report.v1",
+  "report_id": "periodic_9e04539cfd32c23d045bbaa23d49af3f",
+  "status": "ready",
+  "subject": {
+    "type": "instrument",
+    "id": "600674.SH",
+    "name": "川投能源"
+  },
+  "period": {
+    "type": "daily",
+    "start": "2026-07-15",
+    "end": "2026-07-15",
+    "report_cutoff_at": "2026-07-15T15:00:00+08:00"
+  },
+  "generated_at": "2026-07-15T12:30:30+00:00",
+  "headline": "川投能源（600674.SH）期末权重 0%，收盘价变动 0%；当日操作已按四层上下文与无 Decision 的 system_inference 复盘；建议 hold。",
+  "sections": {
+    "performance_and_positions": {
+      "performance": {
+        "type": "fact",
+        "comparison_date": "2026-07-14",
+        "start_total_assets_cny": null,
+        "end_total_assets_cny": null,
+        "asset_change_cny": null,
+        "asset_change_pct": null,
+        "start_close_cny": "15.3",
+        "end_close_cny": "15.3",
+        "start_price_date": "2026-07-14",
+        "end_price_date": "2026-07-14",
+        "price_change_cny": "0",
+        "price_change_pct": "0",
+        "start_quantity": "300",
+        "end_quantity": "0",
+        "quantity_change": "-300",
+        "start_invested_market_value_cny": "4590",
+        "end_invested_market_value_cny": "0",
+        "invested_market_value_change_cny": "-4590",
+        "invested_market_value_change_pct": "-100",
+        "performance_basis": "instrument_close_price",
+        "period_change_cny": "0",
+        "period_change_pct": "0",
+        "cash_change_cny": null,
+        "valuation_complete": true,
+        "calculation_method": "标的收益以报告日与上一交易日收盘价变化计算，避免买卖数量变化冒充投资收益；持仓市值与数量变化另列，用于解释加减仓或退出。缺价时保持 MISSING，不以组合总资产变化替代标的表现。",
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:600674.SH:2026-07-14",
+          "portfolio.sqlite3#ledger_entries:600674.SH:through:2026-07-15"
+        ]
+      },
+      "opening_cash": {
+        "amount_cny": "11357",
+        "as_of_date": "2026-07-14",
+        "source": "user_provided",
+        "status": "fact",
+        "fee_pending": false,
+        "fee_provenance_status": "complete",
+        "consistency_status": "snapshot_direct",
+        "note": "用户提供的 2026-07-14 账户现金余额；本次交割单不含完整银证转账流水",
+        "recorded_at": "2026-07-14T17:42:53+00:00",
+        "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42"
+      },
+      "cash": {
+        "amount_cny": "2626.74",
+        "as_of_date": "2026-07-15",
+        "source": "derived_read_only_ledger_replay",
+        "status": "fact",
+        "fee_pending": false,
+        "fee_provenance_status": "complete",
+        "consistency_status": "replayed_from_anchor",
+        "cash_change_from_anchor_cny": "-8730.26",
+        "anchor": {
+          "amount_cny": "11357",
+          "as_of_date": "2026-07-14",
+          "source": "user_provided",
+          "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42"
+        },
+        "superseded_snapshot": {
+          "amount_cny": "2697",
+          "as_of_date": "2026-07-15",
+          "note": "statement_cash_replay; anchor_snapshot_id=7de3e9bc-4927-4632-aecc-5e1cdcd54f42; anchor_as_of=2026-07-14; ledger_entries=10; cash_change=-8660; fee_pending_entries=10; calculation_status=fee_pending; ledger_fingerprint=7bc48a25e4a662494cd2243b06892abdd35b612ad733f0bf220ab4074848b280",
+          "source_ref": "portfolio.sqlite3#cash_balance_snapshots:e694beb7-5be3-4474-9126-0e35fd804f00"
+        },
+        "replayed_ledger_entries": 10,
+        "unknown_fee_entries": 0,
+        "recorded_at": "2026-07-15T12:30:30+00:00",
+        "source_ref": "portfolio.sqlite3#cash_balance_snapshots:7de3e9bc-4927-4632-aecc-5e1cdcd54f42+ledger_entries:through:2026-07-15"
+      },
+      "opening_positions": [
+        {
+          "ts_code": "600674.SH",
+          "name": "川投能源",
+          "asset_type": "equity",
+          "industry_name": "水力发电",
+          "quantity": "300",
+          "average_cost_cny": "15.6268",
+          "remaining_cost_cny": "4688.05",
+          "close_cny": "15.3",
+          "price_date": "2026-07-14",
+          "price_source": "tushare.daily",
+          "market_value_cny": "4590",
+          "unrealized_pnl_cny": "-98.05",
+          "unrealized_return_pct": "-2.09",
+          "realized_pnl_to_date_cny": "0",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:600674.SH:through:2026-07-14",
+            "portfolio.sqlite3#close_prices:600674.SH:2026-07-14"
+          ],
+          "portfolio_weight_pct": "1"
+        }
+      ],
+      "positions": [],
+      "risk_change": {
+        "type": "fact_and_inference",
+        "cash_weight_pct": "0.56",
+        "top_position_weight_pct": "30.4",
+        "top3_weight_pct": "65.51",
+        "concentration_status": "HIGH",
+        "missing_prices": [],
+        "cash_status": "fact"
+      }
+    },
+    "decision_context": {
+      "framework": "four_layer_periodic_review_v1",
+      "report_depth": "daily_delta_only",
+      "fundamental_and_valuation": {
+        "status": "missing",
+        "scope": "latest_public_snapshot_before_report_cutoff",
+        "summary": "正式组合库不保存财务与估值快照；本日报未用常识或未来披露补造基本面结论，需在标的研究证据可用后补充。",
+        "metrics": {},
+        "valuation": {},
+        "observations": [],
+        "source_refs": []
+      },
+      "market_and_sector": {
+        "status": "partial",
+        "scope": "report_day_delta",
+        "summary": "标的当日涨跌幅 1.32%；正式组合库未保存同日基准和板块指数，因此不做大盘/板块归因。",
+        "stock_change_pct": "1.32",
+        "benchmarks": [],
+        "sector": null,
+        "observations": [
+          {
+            "type": "fact",
+            "text": "标的当日涨跌幅 1.32%。",
+            "timing": "end_of_day_retrospective",
+            "source_ref": "portfolio.sqlite3#close_prices:600674.SH:2026-07-14:8"
+          }
+        ],
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:600674.SH:2026-07-14:8"
+        ]
+      },
+      "technical_and_trend": {
+        "status": "available",
+        "scope": "report_cutoff_technical_delta",
+        "summary": "截至报告日，正式行情中的 3/5/20 个交易日涨跌幅分别为 4.22%/6.25%/-0.2%；成交量与日内高低价不在该轻量回退数据中。",
+        "metrics": {
+          "trade_date": "2026-07-14",
+          "close_cny": "15.3",
+          "return_3_session_pct": "4.22",
+          "return_5_session_pct": "6.25",
+          "return_20_session_pct": "-0.2",
+          "volume_vs_prior_5d_avg": null,
+          "day_open_cny": null,
+          "day_high_cny": null,
+          "day_low_cny": null
+        },
+        "observations": [],
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:600674.SH:2026-07-14:8"
+        ]
+      },
+      "position_and_execution": {
+        "status": "available",
+        "scope": "daily_operation_delta",
+        "summary": "标的期末组合权重 0%；当日 2 笔操作已按仓位路径和净闭环复盘。",
+        "observations": [
+          {
+            "type": "fact",
+            "text": "报告截止现金权重 0.56%，最大单一标的权重 30.4%，前三大合计 65.51%。",
+            "source_ref": "portfolio.sqlite3#ledger_entries+cash_balance_snapshots+close_prices"
+          },
+          {
+            "type": "retrospective_outcome",
+            "text": "川投能源（600674.SH）持仓 300 → 300 → 0；当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+            "source_ref": "portfolio.sqlite3#ledger_entries:969,portfolio.sqlite3#ledger_entries:970"
+          }
+        ],
+        "episode_summaries": [
+          {
+            "type": "retrospective_execution_summary",
+            "ts_code": "600674.SH",
+            "name": "川投能源",
+            "opening_quantity": "300",
+            "peak_quantity": "300",
+            "closing_quantity": "0",
+            "peak_increase_pct": "0",
+            "bought_quantity": "0",
+            "sold_quantity": "300",
+            "round_trip_closed": false,
+            "gross_round_trip_pnl_cny": null,
+            "fee_total_cny": "12.39",
+            "fee_statuses": [
+              "rule_backfilled"
+            ],
+            "net_round_trip_pnl_cny": null,
+            "assessment": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+            "source_refs": [
+              "portfolio.sqlite3#ledger_entries:969",
+              "portfolio.sqlite3#ledger_entries:970"
+            ]
+          }
+        ],
+        "source_refs": [
+          "portfolio.sqlite3#ledger_entries+cash_balance_snapshots+close_prices",
+          "portfolio.sqlite3#ledger_entries:969,portfolio.sqlite3#ledger_entries:970"
+        ]
+      },
+      "timing_policy": "动机仅使用操作时点已可见信息；收盘、板块相对表现和净闭环只进入事后复盘与报告截止建议。"
+    },
+    "operations_and_motives": {
+      "operation_count": 2,
+      "operations": [
+        {
+          "operation_id": "operation_fae882a6a36d56ee5fbd6f3d",
+          "event_id": "evt_periodic_ca369f7ca988362614efcb47ab9b3d0a",
+          "episode_id": "te_5a89b8ef4da6beff11bd2f556cee6326",
+          "episode_status": "closed",
+          "occurred_at": "2026-07-15T02:42:18Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "sell",
+          "side": "SELL",
+          "ts_code": "600674.SH",
+          "name": "川投能源",
+          "quantity": "100",
+          "price_cny": "15.61",
+          "gross_amount_cny": "1561",
+          "fee_cny": "5.8",
+          "fee_status": "rule_backfilled",
+          "fee_rule": "historical_fee_rule_v1",
+          "fee_is_known": true,
+          "quantity_before": "300",
+          "quantity_after": "200",
+          "operation_role": "reduce",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:969",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_fae882a6a36d56ee5fbd6f3d",
+            "input_cutoff_at": "2026-07-15T02:42:18Z",
+            "most_likely_motive": "系统推断：本笔更像在上涨中降低仓位风险或兑现一部分利润。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "reduce 100 股，成交价 15.61 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:969",
+                "observed_at": "2026-07-15T02:42:18Z"
+              },
+              {
+                "type": "fact",
+                "text": "本笔数量相当于操作前持仓的 33.33%",
+                "source_ref": "portfolio.sqlite3#ledger_entries:969",
+                "observed_at": "2026-07-15T02:42:18Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 15.3 元，成交价相对其变动 2.03%",
+                "source_ref": "portfolio.sqlite3#close_prices:600674.SH:2026-07-14:8",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是组合再平衡或现金需要，与价格判断无关。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_STRATEGY_OR_TARGET_POSITION",
+              "MISSING_INTRADAY_MARKET_CONTEXT"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "reasonable",
+            "gross_mark_to_close_cny": "31",
+            "fee_status": "rule_backfilled",
+            "narrative": "按当日收盘价回看，成交方向获得了正的毛价差。 费用为规则回填值，可用于净结果计算，但不冒充券商实收。"
+          }
+        },
+        {
+          "operation_id": "operation_95e41978f7365fa7bc5b138f",
+          "event_id": "evt_periodic_59cd4bb7af7f4dd07ddc60abdda131fe",
+          "episode_id": "te_5a89b8ef4da6beff11bd2f556cee6326",
+          "episode_status": "closed",
+          "occurred_at": "2026-07-15T02:42:18Z",
+          "source_imported_at": "2026-07-15T04:43:28+00:00",
+          "event_type": "sell",
+          "side": "SELL",
+          "ts_code": "600674.SH",
+          "name": "川投能源",
+          "quantity": "200",
+          "price_cny": "15.61",
+          "gross_amount_cny": "3122",
+          "fee_cny": "6.59",
+          "fee_status": "rule_backfilled",
+          "fee_rule": "historical_fee_rule_v1",
+          "fee_is_known": true,
+          "quantity_before": "200",
+          "quantity_after": "0",
+          "operation_role": "exit",
+          "decision_status": "not_recorded",
+          "recorded_decisions": [],
+          "source_ref": "portfolio.sqlite3#ledger_entries:970",
+          "motive": {
+            "label": "system_inference",
+            "operation_id": "operation_95e41978f7365fa7bc5b138f",
+            "input_cutoff_at": "2026-07-15T02:42:18Z",
+            "most_likely_motive": "系统推断：本笔更像在上涨中降低仓位风险或兑现一部分利润。",
+            "supporting_observations": [
+              {
+                "type": "fact",
+                "text": "exit 200 股，成交价 15.61 元",
+                "source_ref": "portfolio.sqlite3#ledger_entries:970",
+                "observed_at": "2026-07-15T02:42:18Z"
+              },
+              {
+                "type": "fact",
+                "text": "本笔数量相当于操作前持仓的 100%",
+                "source_ref": "portfolio.sqlite3#ledger_entries:970",
+                "observed_at": "2026-07-15T02:42:18Z"
+              },
+              {
+                "type": "fact",
+                "text": "操作前最近收盘价 15.3 元，成交价相对其变动 2.03%",
+                "source_ref": "portfolio.sqlite3#close_prices:600674.SH:2026-07-14:8",
+                "observed_at": "2026-07-14T15:00:00+08:00"
+              },
+              {
+                "type": "fact",
+                "text": "本次操作前同日已有 1 笔该标的操作",
+                "source_ref": "portfolio.sqlite3#ledger_entries:969",
+                "observed_at": "2026-07-15T02:42:18Z"
+              }
+            ],
+            "alternative_explanations": [
+              "也可能是组合再平衡或现金需要，与价格判断无关。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_STRATEGY_OR_TARGET_POSITION",
+              "MISSING_INTRADAY_MARKET_CONTEXT"
+            ],
+            "uses_later_information": false
+          },
+          "retrospective_evaluation": {
+            "type": "retrospective_outcome",
+            "judgment": "reasonable",
+            "gross_mark_to_close_cny": "62",
+            "fee_status": "rule_backfilled",
+            "narrative": "按当日收盘价回看，成交方向获得了正的毛价差。 费用为规则回填值，可用于净结果计算，但不冒充券商实收。"
+          }
+        }
+      ],
+      "episode_summaries": [
+        {
+          "type": "retrospective_execution_summary",
+          "ts_code": "600674.SH",
+          "name": "川投能源",
+          "opening_quantity": "300",
+          "peak_quantity": "300",
+          "closing_quantity": "0",
+          "peak_increase_pct": "0",
+          "bought_quantity": "0",
+          "sold_quantity": "300",
+          "round_trip_closed": false,
+          "gross_round_trip_pnl_cny": null,
+          "fee_total_cny": "12.39",
+          "fee_statuses": [
+            "rule_backfilled"
+          ],
+          "net_round_trip_pnl_cny": null,
+          "assessment": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:969",
+            "portfolio.sqlite3#ledger_entries:970"
+          ]
+        }
+      ]
+    },
+    "review_judgments": [
+      {
+        "type": "inference",
+        "status": "mixed",
+        "text": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+        "source_refs": [
+          "portfolio.sqlite3#ledger_entries:969",
+          "portfolio.sqlite3#ledger_entries:970"
+        ]
+      }
+    ],
+    "recommendation": {
+      "type": "analyst_view",
+      "action": "hold",
+      "target_position": {
+        "target_position_range_pct": [
+          "0",
+          "0"
+        ],
+        "target_position_note": "当前无持仓；数据不足时不新增仓位。"
+      },
+      "time_horizon": "下一交易周或下一次实质性信息更新前",
+      "confidence": "low",
+      "rationale": [
+        {
+          "type": "fact",
+          "text": "报告截止时组合权重约 0%。",
+          "source_ref": "portfolio.sqlite3#ledger_entries"
+        },
+        {
+          "type": "fact",
+          "text": "收盘价 MISSING 元，账面成本 MISSING 元。",
+          "source_ref": "portfolio.sqlite3#ledger_entries+close_prices"
+        },
+        {
+          "type": "inference",
+          "text": "正式组合库不保存财务与估值快照；本日报未用常识或未来披露补造基本面结论，需在标的研究证据可用后补充。",
+          "source_ref": "periodic_report:risk_guardrail"
+        },
+        {
+          "type": "inference",
+          "text": "标的当日涨跌幅 1.32%；正式组合库未保存同日基准和板块指数，因此不做大盘/板块归因。",
+          "source_ref": "portfolio.sqlite3#close_prices:600674.SH:2026-07-14:8"
+        },
+        {
+          "type": "inference",
+          "text": "截至报告日，正式行情中的 3/5/20 个交易日涨跌幅分别为 4.22%/6.25%/-0.2%；成交量与日内高低价不在该轻量回退数据中。",
+          "source_ref": "portfolio.sqlite3#close_prices:600674.SH:2026-07-14:8"
+        },
+        {
+          "type": "opinion",
+          "text": "标的期末组合权重 0%；当日 2 笔操作已按仓位路径和净闭环复盘。",
+          "source_ref": "periodic_report:position_and_execution"
+        }
+      ],
+      "major_downside_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "轻量日报不能替代公司长期价值深度研究",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "data_timestamp": "2026-07-15T15:00:00+08:00",
+      "report_cutoff_at": "2026-07-15T15:00:00+08:00",
+      "important_missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT"
+      ],
+      "orders_executed": false,
+      "guaranteed_return": false
+    },
+    "risks_invalidation_and_missing": {
+      "major_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "轻量日报不能替代公司长期价值深度研究",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET",
+        "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT"
+      ],
+      "data_limitations": [
+        "MISSING_DECISION"
+      ]
+    }
+  },
+  "source": {
+    "source_path": "portfolio.sqlite3 (formal, immutable/query-only)",
+    "source_sha256": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "source_observed_through": "2026-07-15T12:30:30+00:00",
+    "context_fetched_at": "2026-07-15T01:14:57+00:00",
+    "review_sidecar": "investment_review.sqlite3 (derived report state)",
+    "source_refs": [
+      "portfolio.sqlite3#ledger_entries",
+      "portfolio.sqlite3#close_prices",
+      "portfolio.sqlite3#cash_balance_snapshots",
+      "investment_review.sqlite3#decisions",
+      "baostock#bounded_periodic_context"
+    ]
+  },
+  "safety": {
+    "orders_executed": false,
+    "broker_accessed": false,
+    "guaranteed_return_claims": false,
+    "recommendation_is_not_an_order": true
+  },
+  "content_id": "sha256:80e7be76827dfc90af9471e54bb421c9ac5c3800c735bc514ba9b7304ceeb4eb"
+}

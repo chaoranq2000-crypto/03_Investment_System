@@ -257,6 +257,9 @@ export function projectedTime(value) {
       ?? item.known_at
       ?? item.status_occurred_at
       ?? item.requested_at
+      ?? item.completed_at
+      ?? item.started_at
+      ?? item.generated_at
       ?? item.status_event?.occurred_at
       ?? item.status_event?.known_at
       ?? item.run?.requested_at,
@@ -501,6 +504,14 @@ export function periodicReportHeadline(value) {
   return `${report.headline} 建议 ${action}；${text(target.target_position_note, "仓位精度受缺失数据限制。")}`;
 }
 
+export function periodicSubjectLabel(value) {
+  const subject = object(value?.subject ?? value);
+  const id = text(subject.id, "");
+  const name = text(subject.name, id || "MISSING_INSTRUMENT_NAME");
+  if (subject.type !== "instrument" || !id || name.includes(id)) return name;
+  return `${name}（${id}）`;
+}
+
 function interpretationTargets(detail) {
   const sections = object(detail.interpretation_sections);
   const targets = [];
@@ -592,7 +603,7 @@ export function mountInvestmentReview({
     periodicReports: [],
     periodicTotalCount: 0,
     periodicSubject: "all",
-    periodicPeriod: "daily",
+    periodicPeriod: "all",
     reviews: [],
     totalCount: 0,
     health: null,
@@ -654,7 +665,12 @@ export function mountInvestmentReview({
     });
   const periodicPeriodSelect = element("select", "investment-review-select");
   periodicPeriodSelect.setAttribute("aria-label", "按周期筛选报告");
-  [["daily", "日报"]].forEach(([value, label]) => {
+  [
+    ["all", "全部周期"],
+    ["daily", "日报"],
+    ["weekly", "周报"],
+    ["monthly", "月报"],
+  ].forEach(([value, label]) => {
     const option = element("option", "", label);
     option.value = value;
     periodicPeriodSelect.appendChild(option);
@@ -799,6 +815,7 @@ export function mountInvestmentReview({
     const fees = object(health.fees);
     const reviews = object(health.reviews);
     const periodicReports = object(health.periodic_reports);
+    const periodicAutomation = object(periodicReports.automation);
     const automation = object(health.automation);
     healthLine.replaceChildren();
     healthLine.append(
@@ -808,6 +825,9 @@ export function mountInvestmentReview({
       element("span", "", `fees actual ${text(fees.actual, "0")} / estimated ${text(fees.estimated, "0")} / unknown ${text(fees.unknown, "0")}`),
       element("span", "", `reviews ${text(reviews.count ?? reviews.review_count, state.reviews.length)}`),
       element("span", "", `periodic ${text(periodicReports.count, state.periodicReports.length)}`),
+      element("span", "", `periodic_auto ${text(periodicAutomation.state, "disabled")}`),
+      element("span", "", `periodic_success ${projectedTime(periodicAutomation.last_success)}`),
+      element("span", "", `periodic_failure ${projectedTime(periodicAutomation.last_failure)}`),
       element("span", "", `automation ${text(automation.state, "disabled")}`),
       element("span", "", `auto_completed ${projectedTime(automation.last_completed)}`),
       element("span", "", `auto_success ${projectedTime(automation.last_success)}`),
@@ -823,7 +843,10 @@ export function mountInvestmentReview({
     const filtered = state.periodicReports.filter((report) => (
       (state.periodicSubject === "all"
         || report.subject.type === state.periodicSubject)
-      && report.period.type === state.periodicPeriod
+      && (
+        state.periodicPeriod === "all"
+        || report.period.type === state.periodicPeriod
+      )
     ));
     periodicListStatus.textContent = (
       state.periodicTotalCount > state.periodicReports.length
@@ -835,7 +858,7 @@ export function mountInvestmentReview({
         element(
           "li",
           "investment-review-empty",
-          "当前筛选下没有周期报告；P1 只生成已验证的真实日报样板。",
+          "当前筛选下没有周期报告；缺失周期不会被隐藏。",
         ),
       );
       return;
@@ -847,7 +870,7 @@ export function mountInvestmentReview({
       const top = element("div", "investment-review-list-top");
       const identity = element("div");
       identity.append(
-        element("strong", "", report.subject.name),
+        element("strong", "", periodicSubjectLabel(report)),
         element(
           "span",
           "investment-review-mono",
@@ -1368,6 +1391,17 @@ export function mountInvestmentReview({
     const episodeSummaries = values(operationsSection.episode_summaries);
     const recommendation = object(sections.recommendation);
     const limitations = object(sections.risks_invalidation_and_missing);
+    const periodLabel = {
+      daily: "日报",
+      weekly: "周报",
+      monthly: "月报",
+    }[report.period.type] || "周期报告";
+    const contextLabel = {
+      daily: "日报增量",
+      weekly: "自然周汇总",
+      monthly: "自然月汇总",
+    }[report.period.type] || "周期汇总";
+    const subjectLabel = periodicSubjectLabel(report);
     drawerContent.replaceChildren();
     const header = element("header", "investment-review-drawer-heading");
     header.append(
@@ -1375,7 +1409,7 @@ export function mountInvestmentReview({
       element(
         "h2",
         "",
-        `${report.subject.name} · ${text(report.period.end)} 日报`,
+        `${subjectLabel} · ${text(report.period.end)} ${periodLabel}`,
       ),
       element("p", "investment-review-mono", report.report_id),
       statusBadge(report.status),
@@ -1419,7 +1453,7 @@ export function mountInvestmentReview({
     drawerContent.appendChild(performanceBlock.section);
 
     const contextBlock = sectionBlock(
-      "四层决策上下文（日报增量）",
+      `四层决策上下文（${contextLabel}）`,
       "FUNDAMENTAL · MARKET · TREND · EXECUTION",
     );
     [
@@ -1605,7 +1639,9 @@ export function mountInvestmentReview({
     drawerContent.appendChild(operationsBlock.section);
 
     const recommendationBlock = sectionBlock(
-      "个性化交易建议与建议仓位",
+      report.subject.type === "instrument"
+        ? `${subjectLabel}个性化交易建议与建议仓位`
+        : "个性化交易建议与建议仓位",
       "RECOMMENDATION · NOT AN ORDER",
     );
     recommendationBlock.body.append(
@@ -1676,7 +1712,7 @@ export function mountInvestmentReview({
     } catch (error) {
       if (version !== state.requestVersion) return;
       drawerContent.replaceChildren(
-        element("h2", "", report.subject.name),
+        element("h2", "", periodicSubjectLabel(report)),
         statusBadge("failed"),
         element(
           "p",
@@ -1804,7 +1840,7 @@ export function mountInvestmentReview({
     periodicListStatus.textContent = "正在读取周期报告";
     try {
       const payload = await request(
-        `${REVIEW_API_ROOT}/periodic-reports?period_type=daily&limit=200`,
+        `${REVIEW_API_ROOT}/periodic-reports?limit=1000`,
       );
       const data = unwrap(payload);
       state.periodicReports = values(data.reports).map(periodicReportView);

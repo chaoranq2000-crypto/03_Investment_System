@@ -865,6 +865,9 @@ class InvestmentReviewWebService:
         automation_status_provider: (
             Callable[[], Mapping[str, Any]] | None
         ) = None,
+        periodic_automation_status_provider: (
+            Callable[[], Mapping[str, Any]] | None
+        ) = None,
         read_only_acceptance: bool = False,
     ) -> None:
         self.read_only_acceptance = bool(read_only_acceptance)
@@ -974,6 +977,23 @@ class InvestmentReviewWebService:
             self.store.path,
             read_only=self.read_only_acceptance,
         )
+        self.periodic_automation_status_provider = (
+            periodic_automation_status_provider
+            if periodic_automation_status_provider is not None
+            else (
+                lambda: self.periodic_reports.get_json_meta(
+                    "periodic_automation_status"
+                )
+                or {
+                    "enabled": False,
+                    "state": "never_run",
+                    "latest": None,
+                    "last_success": None,
+                    "last_failure": None,
+                    "os_scheduler_installed": False,
+                }
+            )
+        )
         if self.read_only_acceptance and sync_service is not None:
             raise _error(
                 503,
@@ -1059,6 +1079,20 @@ class InvestmentReviewWebService:
                 "人工验收模式不允许启用复盘自动运行",
             )
         self.automation_status_provider = provider
+
+    def set_periodic_automation_status_provider(
+        self,
+        provider: Callable[[], Mapping[str, Any]] | None,
+    ) -> None:
+        """Attach process-local periodic report automation health."""
+
+        if self.read_only_acceptance:
+            raise _error(
+                403,
+                "review_acceptance_read_only",
+                "人工验收模式不允许启用周期报告自动运行",
+            )
+        self.periodic_automation_status_provider = provider
 
     def _require_writable(self) -> None:
         if self.read_only_acceptance:
@@ -1801,8 +1835,8 @@ class InvestmentReviewWebService:
             "running",
         }:
             raise _error(400, "invalid_status", "status 筛选值无效")
-        if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 200:
-            raise _error(400, "invalid_limit", "limit 必须在 1 到 200 之间")
+        if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 1000:
+            raise _error(400, "invalid_limit", "limit 必须在 1 到 1000 之间")
 
         cache_key = (scope, status, limit)
         if self.read_only_acceptance:
@@ -2010,16 +2044,20 @@ class InvestmentReviewWebService:
                 "invalid_subject_type",
                 "subject_type 必须是 portfolio 或 instrument",
             )
-        if period_type is not None and period_type != "daily":
+        if period_type is not None and period_type not in {
+            "daily",
+            "weekly",
+            "monthly",
+        }:
             raise _error(
                 400,
                 "invalid_period_type",
-                "P1 period_type 只支持 daily",
+                "period_type 必须是 daily、weekly 或 monthly",
             )
         if subject_id is not None and not str(subject_id).strip():
             raise _error(400, "invalid_subject_id", "subject_id 不能为空")
-        if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 200:
-            raise _error(400, "invalid_limit", "limit 必须在 1 到 200 之间")
+        if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 1000:
+            raise _error(400, "invalid_limit", "limit 必须在 1 到 1000 之间")
         try:
             reports = self.periodic_reports.list(
                 subject_type=subject_type,
@@ -2039,7 +2077,7 @@ class InvestmentReviewWebService:
             "data": {
                 "reports": reports,
                 "total_count": len(reports),
-                "supported_period_types": ["daily"],
+                "supported_period_types": ["daily", "weekly", "monthly"],
                 "supported_subject_types": ["portfolio", "instrument"],
             },
         }
@@ -2449,6 +2487,36 @@ class InvestmentReviewWebService:
         except PeriodicReportError:
             periodic_count = 0
         try:
+            raw_periodic_automation = (
+                self.periodic_automation_status_provider()
+                if self.periodic_automation_status_provider is not None
+                else None
+            )
+            periodic_automation = (
+                dict(raw_periodic_automation)
+                if isinstance(raw_periodic_automation, Mapping)
+                else {
+                    "enabled": False,
+                    "state": "never_run",
+                    "latest": None,
+                    "last_success": None,
+                    "last_failure": None,
+                    "os_scheduler_installed": False,
+                }
+            )
+        except Exception as exc:
+            periodic_automation = {
+                "enabled": True,
+                "state": "failed",
+                "latest": None,
+                "last_success": None,
+                "last_failure": {
+                    "status": "failed",
+                    "error_type": type(exc).__name__,
+                },
+                "os_scheduler_installed": False,
+            }
+        try:
             if self.automation_status_provider is not None:
                 raw_automation = self.automation_status_provider()
             else:
@@ -2519,6 +2587,21 @@ class InvestmentReviewWebService:
             health_gaps.append(
                 "REVIEW_AUTOMATION_" + automation_state.upper()
             )
+        periodic_automation_state = str(
+            periodic_automation.get("state") or "unknown"
+        )
+        if (
+            periodic_automation.get("enabled") is True
+            and periodic_automation_state in {"failed", "blocked", "partial"}
+        ):
+            health_gaps.append(
+                "PERIODIC_REPORT_AUTOMATION_"
+                + periodic_automation_state.upper()
+            )
+            if severity.get(periodic_automation_state, 1) > severity.get(
+                status, 1
+            ):
+                status = periodic_automation_state
         return _envelope(
             status=_current_status(status),
             data={
@@ -2531,8 +2614,9 @@ class InvestmentReviewWebService:
                 "reviews": review_health,
                 "periodic_reports": {
                     "count": periodic_count,
-                    "supported_period_types": ["daily"],
+                    "supported_period_types": ["daily", "weekly", "monthly"],
                     "supported_subject_types": ["portfolio", "instrument"],
+                    "automation": periodic_automation,
                 },
                 "automation": automation,
                 "boundary": dict(API_BOUNDARY),

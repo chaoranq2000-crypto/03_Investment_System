@@ -1,0 +1,735 @@
+{
+  "content_id": "sha256:8deb28edbe9ce293201c4444047a8196703392ebd0705482d43e46b3fd218635",
+  "generated_at": "2026-07-28T08:35:23Z",
+  "headline": "德展健康本周收盘价变动 6.69%，共 2 笔操作；下一周期建议 hold。",
+  "period": {
+    "calendar_end": "2026-07-05",
+    "calendar_start": "2026-06-29",
+    "completeness": "partial_selected_window",
+    "covered_trading_dates": [
+      "2026-06-29",
+      "2026-06-30",
+      "2026-07-01",
+      "2026-07-02",
+      "2026-07-03"
+    ],
+    "end": "2026-07-03",
+    "report_cutoff_at": "2026-07-03T15:00:00+08:00",
+    "start": "2026-06-29",
+    "type": "weekly"
+  },
+  "report_id": "periodic_8cddad3e62933d01392d53865f4718d0",
+  "safety": {
+    "broker_accessed": false,
+    "guaranteed_return_claims": false,
+    "orders_executed": false,
+    "recommendation_is_not_an_order": true
+  },
+  "schema_version": "investment_review.periodic_report.v1",
+  "sections": {
+    "decision_context": {
+      "framework": "four_layer_periodic_review_v1",
+      "fundamental_and_valuation": {
+        "context_change_count": 2,
+        "covered_trade_dates": [
+          "2026-06-29",
+          "2026-06-30",
+          "2026-07-01",
+          "2026-07-02",
+          "2026-07-03"
+        ],
+        "metrics": {
+          "eps_ttm_cny": "-0.170582",
+          "gross_margin_pct": "43.7015",
+          "net_margin_pct": "-48.7093",
+          "net_profit_cny": "-43167923.15",
+          "published_date": "2026-04-25",
+          "roe_avg_pct": "-0.7453",
+          "statement_date": "2026-03-31"
+        },
+        "observations": [
+          {
+            "available_at": "2026-04-25",
+            "source_ref": "baostock.query_profit_data:sz.000813:2026-03-31:published:2026-04-25",
+            "text": "截至 2026-03-31，ROE -0.7453%，净利率 -48.7093%，净利润 -43167923.15 元；相较 2025-03-31，亏损绝对额变化 47.45%。",
+            "type": "fact"
+          },
+          {
+            "available_at": "2026-07-03",
+            "source_ref": "baostock.query_history_k_data_plus:sz.000813:2026-07-03:daily_valuation",
+            "text": "2026-07-03 估值快照：PE(TTM) -18.7007、PB 1.453882、PS(TTM) 16.886719。",
+            "type": "fact"
+          }
+        ],
+        "scope": "natural_weekly_synthesis",
+        "source_refs": [
+          "baostock.query_history_k_data_plus:sz.000813:2026-06-30:daily_valuation",
+          "baostock.query_history_k_data_plus:sz.000813:2026-07-03:daily_valuation",
+          "baostock.query_profit_data:sz.000813:2026-03-31:published:2026-04-25"
+        ],
+        "status": "partial",
+        "summary": "本周覆盖 5 个交易日，2 日具备可核对的基本面/估值上下文；期末判断：最新可得财务快照净利润 -4316.79 万元，同比亏损扩大 47.45%；负 PE 不具备常规可比意义，PS(TTM) 16.886719 倍也不能单独证明便宜，短期上涨不能证明基本面反转。",
+        "valuation": {
+          "pb_mrq": "1.453882",
+          "pcf_ncf_ttm": "-6.148203",
+          "pe_ttm": "-18.7007",
+          "ps_ttm": "16.886719",
+          "trade_date": "2026-07-03"
+        }
+      },
+      "market_and_sector": {
+        "benchmarks": [
+          {
+            "change_pct": "0.64",
+            "code": "sz.399001",
+            "name": "深证成指"
+          },
+          {
+            "change_pct": "0.62",
+            "code": "sh.000300",
+            "name": "沪深300"
+          }
+        ],
+        "covered_trade_dates": [
+          "2026-06-29",
+          "2026-06-30",
+          "2026-07-01",
+          "2026-07-02",
+          "2026-07-03"
+        ],
+        "observations": [
+          {
+            "source_ref": "baostock.query_history_k_data_plus:sz.000813:2026-07-03:daily",
+            "text": "标的当日涨跌幅 1.27%。",
+            "timing": "end_of_day_retrospective",
+            "type": "fact"
+          },
+          {
+            "source_ref": "baostock.query_history_k_data_plus:sz.399001:2026-07-03:daily",
+            "text": "深证成指当日涨跌幅 0.64%。",
+            "timing": "end_of_day_retrospective",
+            "type": "fact"
+          },
+          {
+            "source_ref": "baostock.query_history_k_data_plus:sh.000300:2026-07-03:daily",
+            "text": "沪深300当日涨跌幅 0.62%。",
+            "timing": "end_of_day_retrospective",
+            "type": "fact"
+          },
+          {
+            "source_ref": "baostock.query_history_k_data_plus:sh.000933:2026-07-03:daily",
+            "text": "中证医药当日涨跌幅 2.04%，标的相对板块 -0.77 个百分点。",
+            "timing": "end_of_day_retrospective",
+            "type": "fact"
+          }
+        ],
+        "period_stock_return_pct": "6.69",
+        "scope": "natural_weekly_synthesis",
+        "sector": {
+          "change_pct": "2.04",
+          "code": "sh.000933",
+          "name": "中证医药",
+          "stock_relative_pct_points": "-0.77"
+        },
+        "source_refs": [
+          "baostock.query_history_k_data_plus:sh.000300:2026-06-30:daily",
+          "baostock.query_history_k_data_plus:sh.000300:2026-07-03:daily",
+          "baostock.query_history_k_data_plus:sh.000933:2026-06-30:daily",
+          "baostock.query_history_k_data_plus:sh.000933:2026-07-03:daily",
+          "baostock.query_history_k_data_plus:sz.000813:2026-06-30:daily",
+          "baostock.query_history_k_data_plus:sz.000813:2026-07-03:daily",
+          "baostock.query_history_k_data_plus:sz.399001:2026-06-30:daily",
+          "baostock.query_history_k_data_plus:sz.399001:2026-07-03:daily",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-06-29:306",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-07-01:308",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-07-02:309"
+        ],
+        "status": "available",
+        "stock_change_pct": "1.27",
+        "summary": "本周覆盖 5 个交易日；标的区间复合涨跌幅 6.69%。 大盘与板块仅用于事后归因，不反推操作动机。"
+      },
+      "position_and_execution": {
+        "episode_summaries": [
+          {
+            "assessment": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+            "bought_quantity": "8900",
+            "closing_quantity": "8900",
+            "fee_statuses": [
+              "rule_backfilled"
+            ],
+            "fee_total_cny": "39.51",
+            "gross_round_trip_pnl_cny": null,
+            "name": "德展健康",
+            "net_round_trip_pnl_cny": null,
+            "opening_quantity": "17200",
+            "peak_increase_pct": "0",
+            "peak_quantity": "17200",
+            "round_trip_closed": false,
+            "sold_quantity": "17200",
+            "source_refs": [
+              "portfolio.sqlite3#ledger_entries:915",
+              "portfolio.sqlite3#ledger_entries:921"
+            ],
+            "ts_code": "000813.SZ",
+            "type": "retrospective_execution_summary"
+          }
+        ],
+        "observations": [
+          {
+            "source_ref": "portfolio.sqlite3#close_prices:000813.SZ:2026-06-26,portfolio.sqlite3#close_prices:000813.SZ:2026-07-03,portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-06-26,portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03",
+            "text": "德展健康（000813.SZ）17200 → 8900 股，状态 reduced。",
+            "type": "fact"
+          }
+        ],
+        "position_changes": [
+          {
+            "closing_quantity": "8900",
+            "closing_weight_pct": null,
+            "name": "德展健康",
+            "opening_quantity": "17200",
+            "opening_weight_pct": null,
+            "quantity_change": "-8300",
+            "source_refs": [
+              "portfolio.sqlite3#close_prices:000813.SZ:2026-06-26",
+              "portfolio.sqlite3#close_prices:000813.SZ:2026-07-03",
+              "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-06-26",
+              "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03"
+            ],
+            "status": "reduced",
+            "ts_code": "000813.SZ"
+          }
+        ],
+        "scope": "natural_weekly_synthesis",
+        "source_refs": [
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-06-26",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-07-03",
+          "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-06-26",
+          "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03"
+        ],
+        "status": "available",
+        "summary": "本周共有 2 笔操作；期末持仓 1 个，新增/加仓 0 个，减仓/退出 1 个。"
+      },
+      "report_depth": "weekly_synthesis",
+      "technical_and_trend": {
+        "covered_trade_dates": [
+          "2026-06-29",
+          "2026-06-30",
+          "2026-07-01",
+          "2026-07-02",
+          "2026-07-03"
+        ],
+        "metrics": {
+          "close_cny": "3.19",
+          "day_high_cny": "3.25",
+          "day_low_cny": "3.11",
+          "day_open_cny": "3.16",
+          "return_20_session_pct": "3.24",
+          "return_3_session_pct": "5.28",
+          "return_5_session_pct": "6.69",
+          "trade_date": "2026-07-03",
+          "volume_vs_prior_5d_avg": "0.8"
+        },
+        "observations": [],
+        "period_return_pct": "2.24",
+        "scope": "natural_weekly_synthesis",
+        "source_refs": [
+          "baostock.query_history_k_data_plus:sz.000813:through:2026-06-30:daily",
+          "baostock.query_history_k_data_plus:sz.000813:through:2026-07-03:daily",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-06-29:306",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-07-01:308",
+          "portfolio.sqlite3#close_prices:000813.SZ:2026-07-02:309"
+        ],
+        "status": "available",
+        "summary": "本周趋势以期初/期末和日级序列综合：区间收盘变动 2.24%；期末状态：截至收盘，3/5/20 个交易日涨跌幅分别为 5.28%/6.69%/3.24%；这是概率性趋势描述，不是买卖保证。"
+      },
+      "timing_policy": "操作动机沿用各日报在操作时点冻结的 system_inference；本周期表现、归因和建议只使用期末 cutoff 之前的信息。"
+    },
+    "operations_and_motives": {
+      "episode_summaries": [
+        {
+          "assessment": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+          "bought_quantity": "8900",
+          "closing_quantity": "8900",
+          "fee_statuses": [
+            "rule_backfilled"
+          ],
+          "fee_total_cny": "39.51",
+          "gross_round_trip_pnl_cny": null,
+          "name": "德展健康",
+          "net_round_trip_pnl_cny": null,
+          "opening_quantity": "17200",
+          "peak_increase_pct": "0",
+          "peak_quantity": "17200",
+          "round_trip_closed": false,
+          "sold_quantity": "17200",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:915",
+            "portfolio.sqlite3#ledger_entries:921"
+          ],
+          "ts_code": "000813.SZ",
+          "type": "retrospective_execution_summary"
+        }
+      ],
+      "operation_count": 2,
+      "operations": [
+        {
+          "decision_status": "not_recorded",
+          "episode_id": "te_9e90b5c0a923d6e48dbb12766dd2d7da",
+          "episode_status": "closed",
+          "event_id": "evt_periodic_f940e204e8d42609b42f4d76e30c8b1b",
+          "event_type": "sell",
+          "fee_cny": "34.23",
+          "fee_is_known": true,
+          "fee_rule": "historical_fee_rule_v1",
+          "fee_status": "rule_backfilled",
+          "gross_amount_cny": "54696",
+          "motive": {
+            "alternative_explanations": [
+              "也可能是组合再平衡或现金需要，与价格判断无关。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_STRATEGY_OR_TARGET_POSITION",
+              "MISSING_INTRADAY_MARKET_CONTEXT"
+            ],
+            "input_cutoff_at": "2026-07-03T01:30:06Z",
+            "label": "system_inference",
+            "most_likely_motive": "系统推断：本笔更像在上涨中降低仓位风险或兑现一部分利润。",
+            "operation_id": "operation_945b667bf3974fb72fa5e00a",
+            "supporting_observations": [
+              {
+                "observed_at": "2026-07-03T01:30:06Z",
+                "source_ref": "portfolio.sqlite3#ledger_entries:915",
+                "text": "exit 17200 股，成交价 3.18 元",
+                "type": "fact"
+              },
+              {
+                "observed_at": "2026-07-03T01:30:06Z",
+                "source_ref": "portfolio.sqlite3#ledger_entries:915",
+                "text": "本笔数量相当于操作前持仓的 100%",
+                "type": "fact"
+              },
+              {
+                "observed_at": "2026-07-02T15:00:00+08:00",
+                "source_ref": "portfolio.sqlite3#close_prices:000813.SZ:2026-07-02:309",
+                "text": "操作前最近收盘价 3.15 元，成交价相对其变动 0.95%",
+                "type": "fact"
+              }
+            ],
+            "uses_later_information": false
+          },
+          "name": "德展健康",
+          "occurred_at": "2026-07-03T01:30:06Z",
+          "operation_id": "operation_945b667bf3974fb72fa5e00a",
+          "operation_role": "exit",
+          "price_cny": "3.18",
+          "quantity": "17200",
+          "quantity_after": "0",
+          "quantity_before": "17200",
+          "recorded_decisions": [],
+          "retrospective_evaluation": {
+            "fee_status": "rule_backfilled",
+            "gross_mark_to_close_cny": "-172",
+            "judgment": "needs_improvement",
+            "narrative": "按当日收盘价回看，成交方向产生了负的毛价差。 费用为规则回填值，可用于净结果计算，但不冒充券商实收。",
+            "type": "retrospective_outcome"
+          },
+          "side": "SELL",
+          "source_imported_at": "2026-07-14T17:42:14+00:00",
+          "source_ref": "portfolio.sqlite3#ledger_entries:915",
+          "ts_code": "000813.SZ"
+        },
+        {
+          "decision_status": "not_recorded",
+          "episode_id": "te_d423cfe1b64873938d5598be9ae39f4e",
+          "episode_status": "open",
+          "event_id": "evt_periodic_2d4f00d351a276094b265f305554f8aa",
+          "event_type": "buy",
+          "fee_cny": "5.28",
+          "fee_is_known": true,
+          "fee_rule": "historical_fee_rule_v1",
+          "fee_status": "rule_backfilled",
+          "gross_amount_cny": "28035",
+          "motive": {
+            "alternative_explanations": [
+              "也可能是长期仓位补回或被动再平衡；没有 Decision，不能确认其依据是短线趋势。"
+            ],
+            "confidence": "medium",
+            "important_missing_information": [
+              "MISSING_DECISION",
+              "MISSING_STRATEGY_OR_TARGET_POSITION"
+            ],
+            "input_cutoff_at": "2026-07-03T05:38:58Z",
+            "label": "system_inference",
+            "most_likely_motive": "系统推断：操作前近三次收盘累计上涨约 3.96%，本笔仅增加操作前持仓的 MISSING%；更像小幅顺势试仓，而不是一次性改变长期仓位。",
+            "operation_id": "operation_39a7c3d3c1952eb12cefcc83",
+            "supporting_observations": [
+              {
+                "observed_at": "2026-07-03T05:38:58Z",
+                "source_ref": "portfolio.sqlite3#ledger_entries:921",
+                "text": "open 8900 股，成交价 3.15 元",
+                "type": "fact"
+              },
+              {
+                "observed_at": "2026-07-02T15:00:00+08:00",
+                "source_ref": "portfolio.sqlite3#close_prices:000813.SZ:2026-07-02:309",
+                "text": "操作前最近收盘价 3.15 元，成交价相对其变动 0%",
+                "type": "fact"
+              },
+              {
+                "observed_at": "2026-07-03T05:38:58Z",
+                "source_ref": "portfolio.sqlite3#ledger_entries:915",
+                "text": "本次操作前同日已有 1 笔该标的操作",
+                "type": "fact"
+              },
+              {
+                "observed_at": "2026-07-03T05:35:00Z",
+                "source_ref": "baostock.query_history_k_data_plus:sz.000813:2026-07-03:5m:13:35",
+                "text": "操作前最近一根已完成 5 分钟 K 线截至 2026-07-03T13:35:00+08:00：高 3.17 元、收 3.15 元；成交价相对该高点 -0.63%",
+                "type": "fact"
+              }
+            ],
+            "uses_later_information": false
+          },
+          "name": "德展健康",
+          "occurred_at": "2026-07-03T05:38:58Z",
+          "operation_id": "operation_39a7c3d3c1952eb12cefcc83",
+          "operation_role": "open",
+          "price_cny": "3.15",
+          "quantity": "8900",
+          "quantity_after": "8900",
+          "quantity_before": "0",
+          "recorded_decisions": [],
+          "retrospective_evaluation": {
+            "fee_status": "rule_backfilled",
+            "gross_mark_to_close_cny": "356",
+            "judgment": "reasonable",
+            "narrative": "按当日收盘价回看，成交方向获得了正的毛价差。 费用为规则回填值，可用于净结果计算，但不冒充券商实收。",
+            "type": "retrospective_outcome"
+          },
+          "side": "BUY",
+          "source_imported_at": "2026-07-14T17:42:14+00:00",
+          "source_ref": "portfolio.sqlite3#ledger_entries:921",
+          "ts_code": "000813.SZ"
+        }
+      ]
+    },
+    "performance_and_positions": {
+      "cash": null,
+      "opening_cash": null,
+      "opening_positions": [
+        {
+          "asset_type": "equity",
+          "average_cost_cny": "5.906",
+          "close_cny": "2.99",
+          "industry_name": "医药生物",
+          "market_value_cny": "51428",
+          "name": "德展健康",
+          "portfolio_weight_pct": null,
+          "price_date": "2026-06-26",
+          "price_source": "tushare.daily",
+          "quantity": "17200",
+          "realized_pnl_to_date_cny": "0",
+          "remaining_cost_cny": "101583.79",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-06-26",
+            "portfolio.sqlite3#close_prices:000813.SZ:2026-06-26"
+          ],
+          "ts_code": "000813.SZ",
+          "unrealized_pnl_cny": "-50155.79",
+          "unrealized_return_pct": "-49.37"
+        }
+      ],
+      "performance": {
+        "asset_change_cny": null,
+        "asset_change_pct": null,
+        "calculation_method": "使用首个日级报告的期初收盘价与最后一个日级报告的期末收盘价计算标的周期表现，持仓市值变化单独呈现，避免期间买卖数量变化冒充收益；操作序列按 operation_id 去重，日级事实不重新解释。",
+        "cash_change_cny": null,
+        "comparison_date": "2026-06-26",
+        "covered_trading_days": [
+          "2026-06-29",
+          "2026-06-30",
+          "2026-07-01",
+          "2026-07-02",
+          "2026-07-03"
+        ],
+        "end_close_cny": "3.19",
+        "end_invested_market_value_cny": "28391",
+        "end_price_date": "2026-07-03",
+        "end_total_assets_cny": null,
+        "invested_market_value_change_cny": "-23037",
+        "invested_market_value_change_pct": "-44.79",
+        "performance_basis": "instrument_close_price",
+        "period_change_cny": "0.2",
+        "period_change_pct": "6.69",
+        "price_change_cny": "0.2",
+        "price_change_pct": "6.69",
+        "source_refs": [
+          "periodic_report:periodic_e175c041568ff7532178b0204aa57073",
+          "periodic_report:periodic_5198459011a3578900e420594db4db8c",
+          "periodic_report:periodic_7f93a88be1de3f719c647dd91890ee01",
+          "periodic_report:periodic_f37f40b8c64b834ec3903cc6fe1e99e3",
+          "periodic_report:periodic_93f612568adda4100919dbddde7ac8e1"
+        ],
+        "start_close_cny": "2.99",
+        "start_invested_market_value_cny": "51428",
+        "start_price_date": "2026-06-26",
+        "start_total_assets_cny": null,
+        "type": "fact",
+        "valuation_complete": true
+      },
+      "period_attribution": {
+        "best_day": {
+          "asset_change_cny": null,
+          "asset_change_pct": null,
+          "operation_count": 0,
+          "performance_basis": "instrument_close_price",
+          "period_change_cny": "0.13",
+          "period_change_pct": "4.35",
+          "source_report_id": "periodic_e175c041568ff7532178b0204aa57073",
+          "trade_date": "2026-06-29"
+        },
+        "daily_changes": [
+          {
+            "asset_change_cny": null,
+            "asset_change_pct": null,
+            "operation_count": 0,
+            "performance_basis": "instrument_close_price",
+            "period_change_cny": "0.13",
+            "period_change_pct": "4.35",
+            "source_report_id": "periodic_e175c041568ff7532178b0204aa57073",
+            "trade_date": "2026-06-29"
+          },
+          {
+            "asset_change_cny": null,
+            "asset_change_pct": null,
+            "operation_count": 0,
+            "performance_basis": "instrument_close_price",
+            "period_change_cny": "-0.09",
+            "period_change_pct": "-2.88",
+            "source_report_id": "periodic_5198459011a3578900e420594db4db8c",
+            "trade_date": "2026-06-30"
+          },
+          {
+            "asset_change_cny": null,
+            "asset_change_pct": null,
+            "operation_count": 0,
+            "performance_basis": "instrument_close_price",
+            "period_change_cny": "0.09",
+            "period_change_pct": "2.97",
+            "source_report_id": "periodic_7f93a88be1de3f719c647dd91890ee01",
+            "trade_date": "2026-07-01"
+          },
+          {
+            "asset_change_cny": null,
+            "asset_change_pct": null,
+            "operation_count": 0,
+            "performance_basis": "instrument_close_price",
+            "period_change_cny": "0.03",
+            "period_change_pct": "0.96",
+            "source_report_id": "periodic_f37f40b8c64b834ec3903cc6fe1e99e3",
+            "trade_date": "2026-07-02"
+          },
+          {
+            "asset_change_cny": null,
+            "asset_change_pct": null,
+            "operation_count": 2,
+            "performance_basis": "instrument_close_price",
+            "period_change_cny": "0.04",
+            "period_change_pct": "1.27",
+            "source_report_id": "periodic_93f612568adda4100919dbddde7ac8e1",
+            "trade_date": "2026-07-03"
+          }
+        ],
+        "operation_count": 2,
+        "worst_day": {
+          "asset_change_cny": null,
+          "asset_change_pct": null,
+          "operation_count": 0,
+          "performance_basis": "instrument_close_price",
+          "period_change_cny": "-0.09",
+          "period_change_pct": "-2.88",
+          "source_report_id": "periodic_5198459011a3578900e420594db4db8c",
+          "trade_date": "2026-06-30"
+        }
+      },
+      "positions": [
+        {
+          "asset_type": "equity",
+          "average_cost_cny": "8.4227",
+          "close_cny": "3.19",
+          "industry_name": "医药生物",
+          "market_value_cny": "28391",
+          "name": "德展健康",
+          "portfolio_weight_pct": null,
+          "price_date": "2026-07-03",
+          "price_source": "tushare.daily",
+          "quantity": "8900",
+          "realized_pnl_to_date_cny": "0",
+          "remaining_cost_cny": "74962.3",
+          "source_refs": [
+            "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03",
+            "portfolio.sqlite3#close_prices:000813.SZ:2026-07-03"
+          ],
+          "ts_code": "000813.SZ",
+          "unrealized_pnl_cny": "-46571.3",
+          "unrealized_return_pct": "-62.13"
+        }
+      ],
+      "risk_change": {
+        "cash_status": "MISSING",
+        "cash_weight_pct": null,
+        "concentration_status": "MODERATE",
+        "missing_prices": [],
+        "period_end": "2026-07-03",
+        "period_start": "2026-06-29",
+        "position_changes": [
+          {
+            "closing_quantity": "8900",
+            "closing_weight_pct": null,
+            "name": "德展健康",
+            "opening_quantity": "17200",
+            "opening_weight_pct": null,
+            "quantity_change": "-8300",
+            "source_refs": [
+              "portfolio.sqlite3#close_prices:000813.SZ:2026-06-26",
+              "portfolio.sqlite3#close_prices:000813.SZ:2026-07-03",
+              "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-06-26",
+              "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03"
+            ],
+            "status": "reduced",
+            "ts_code": "000813.SZ"
+          }
+        ],
+        "top3_weight_pct": "0",
+        "top_position_weight_pct": "0",
+        "type": "fact_and_inference"
+      }
+    },
+    "recommendation": {
+      "action": "hold",
+      "confidence": "low",
+      "data_timestamp": "2026-07-03T15:00:00+08:00",
+      "guaranteed_return": false,
+      "important_missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET"
+      ],
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "major_downside_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "最新可得财务快照仍显示经营风险，短期趋势转强不等于基本面反转",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "orders_executed": false,
+      "rationale": [
+        {
+          "text": "本周独立汇总 5 个交易日，按 instrument_close_price 口径的收盘价变动 0.2 元/股，共 2 笔操作。",
+          "type": "fact"
+        },
+        {
+          "source_ref": "portfolio.sqlite3#ledger_entries:000813.SZ:through:2026-07-03",
+          "text": "报告截止时组合权重约 MISSING%。",
+          "type": "fact"
+        },
+        {
+          "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
+          "text": "收盘价 3.19 元，账面成本 8.4227 元。",
+          "type": "fact"
+        },
+        {
+          "source_ref": "baostock.query_profit_data:sz.000813:2026-03-31:published:2026-04-25,baostock.query_history_k_data_plus:sz.000813:2026-07-03:daily_valuation",
+          "text": "最新可得财务快照净利润 -4316.79 万元，同比亏损扩大 47.45%；负 PE 不具备常规可比意义，PS(TTM) 16.886719 倍也不能单独证明便宜，短期上涨不能证明基本面反转。",
+          "type": "inference"
+        },
+        {
+          "source_ref": "baostock.query_history_k_data_plus:sz.000813:2026-07-03:daily,baostock.query_history_k_data_plus:sz.399001:2026-07-03:daily,baostock.query_history_k_data_plus:sh.000300:2026-07-03:daily,baostock.query_history_k_data_plus:sh.000933:2026-07-03:daily",
+          "text": "标的当日 1.27%，大盘为 深证成指 0.64%、沪深300 0.62%；中证医药 2.04%，标的相对板块 -0.77 个百分点。这些结果只解释交易环境，不直接证明用户当时的动机。",
+          "type": "inference"
+        },
+        {
+          "source_ref": "baostock.query_history_k_data_plus:sz.000813:through:2026-07-03:daily",
+          "text": "截至收盘，3/5/20 个交易日涨跌幅分别为 5.28%/6.69%/3.24%；这是概率性趋势描述，不是买卖保证。",
+          "type": "inference"
+        },
+        {
+          "source_ref": "periodic_report:position_and_execution",
+          "text": "标的期末组合权重 0%；当日 2 笔操作已按仓位路径和净闭环复盘。",
+          "type": "opinion"
+        }
+      ],
+      "report_cutoff_at": "2026-07-03T15:00:00+08:00",
+      "target_position": {
+        "target_position_note": "维持观察仓或空仓，不主动扩大到 5% 以上。",
+        "target_position_range_pct": [
+          "0",
+          "5"
+        ]
+      },
+      "time_horizon": "next_natural_week",
+      "type": "analyst_view"
+    },
+    "review_judgments": [
+      {
+        "source_refs": [
+          "portfolio.sqlite3#ledger_entries:915",
+          "portfolio.sqlite3#ledger_entries:921"
+        ],
+        "status": "mixed",
+        "text": "当日操作改变了期末仓位，应与目标仓位和风险预算共同复盘。",
+        "type": "inference"
+      }
+    ],
+    "risks_invalidation_and_missing": {
+      "data_limitations": [
+        "MISSING_DECISION"
+      ],
+      "invalidation_conditions": [
+        "用户提供可验证的目标仓位与止损/加仓计划",
+        "新的基本面或估值证据改变风险收益判断",
+        "正式账本持仓在报告截止后已发生变化"
+      ],
+      "major_risks": [
+        "减仓后价格继续上涨会产生机会成本",
+        "最新可得财务快照仍显示经营风险，短期趋势转强不等于基本面反转",
+        "大盘或板块共同上涨不能证明个股会持续跑赢",
+        "技术趋势是概率性上下文，不能保证后续收益"
+      ],
+      "missing_inputs": [
+        "MISSING_EXPLICIT_USER_RISK_BUDGET"
+      ]
+    }
+  },
+  "source": {
+    "context_fetched_at": "2026-07-28T08:35:23Z",
+    "daily_report_ids": [
+      "periodic_e175c041568ff7532178b0204aa57073",
+      "periodic_5198459011a3578900e420594db4db8c",
+      "periodic_7f93a88be1de3f719c647dd91890ee01",
+      "periodic_f37f40b8c64b834ec3903cc6fe1e99e3",
+      "periodic_93f612568adda4100919dbddde7ac8e1"
+    ],
+    "review_sidecar": "investment_review.sqlite3 (derived report state)",
+    "source_observed_through": "2026-07-15T01:15:00+00:00",
+    "source_path": "derived from validated daily periodic reports",
+    "source_refs": [
+      "investment_review.sqlite3#periodic_reports:periodic_e175c041568ff7532178b0204aa57073",
+      "investment_review.sqlite3#periodic_reports:periodic_5198459011a3578900e420594db4db8c",
+      "investment_review.sqlite3#periodic_reports:periodic_7f93a88be1de3f719c647dd91890ee01",
+      "investment_review.sqlite3#periodic_reports:periodic_f37f40b8c64b834ec3903cc6fe1e99e3",
+      "investment_review.sqlite3#periodic_reports:periodic_93f612568adda4100919dbddde7ac8e1"
+    ],
+    "source_sha256": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057"
+  },
+  "status": "ready",
+  "subject": {
+    "id": "000813.SZ",
+    "name": "德展健康",
+    "type": "instrument"
+  }
+}
