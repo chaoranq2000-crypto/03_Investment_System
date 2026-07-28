@@ -94,7 +94,8 @@ Do not claim guaranteed outcomes. Do not execute the recommendation.
 
 ## Minimal report contract
 
-Keep the main report concise:
+Keep the main report concise and reader-first. The items below are semantic
+requirements, not mandatory headings or a checklist that must be printed in order:
 
 1. 本期结论摘要；
 2. 收益、持仓、现金和风险变化；
@@ -103,9 +104,26 @@ Keep the main report concise:
 5. 个性化交易建议与建议仓位；
 6. 主要依据、风险、失效条件和数据缺失。
 
+Use fundamental/valuation, market/sector, technical/trend and
+position/execution context as an evidence pool. Include a dimension in the main
+text only when it changes the central judgment, explains an operation or outcome,
+affects the recommendation, or constitutes a material risk. Put remaining facts,
+operation details and source references in a collapsed appendix.
+
+Organize the main text around one central judgment, a small number of material
+findings, the causal link to the operation or portfolio state, and the next action.
+Do not repeat the same fact in multiple sections merely to satisfy the report
+contract.
+
 Hide technical IDs, hashes, receipts and replay details from the main report. Put
 only the minimum source and time references needed to understand the conclusion in a
 collapsed appendix or internal log.
+
+When a development-time reviewer is used to improve a real sample, treat it as a
+principle-based critical reader rather than a template enforcer. It should identify
+at most three material problems, state what should be preserved, not rewrite the
+report, and allow at most one revision round. Ordinary report generation must not
+depend on a new soft-review approval chain.
 
 ## Minimal workflow
 
