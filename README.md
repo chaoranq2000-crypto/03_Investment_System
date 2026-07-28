@@ -1,6 +1,6 @@
 # A-share Research OS / A股投研工作区
 
-> 这是一个证据驱动的 A 股投研工作区，不是自动交易系统，也不直接提供买入、卖出或持有建议。
+> 这是一个证据驱动的 A 股投研与个人复盘工作区，不是自动交易系统。研究工作流不直接提供买入、卖出或持有建议；独立的 `investment-review` 可以基于个人账本和报告截止时点信息提供个性化建议，但不会下单或保证收益。
 
 ## 项目定位
 
@@ -50,7 +50,7 @@ P1.6 不做：扩展新细分、P2 横向比较、批量扩大公司池、自动
 | `docs/architecture/WORKSPACE_STRUCTURE.md` | 目录结构、文件归位和命名规则。 |
 | `docs/architecture/RESEARCH_OBJECT_MODEL.md` | Segment、Company、Evidence、Claim、Metric 等对象模型。 |
 | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | 证据、引用、来源等级和新鲜度规则。 |
-| `docs/policies/QUALITY_GUARDRAILS.md` | 质量检查、反幻觉、反证和 no-advice 纪律。 |
+| `docs/policies/QUALITY_GUARDRAILS.md` | 质量检查、反幻觉、反证，以及研究产出与个人复盘建议的边界。 |
 | `docs/workflows/README.md` | workflow 文档入口。 |
 | `docs/workflows/RESEARCH_WORKFLOW.md` | 唯一全局 workflow kernel；定义 `workflow_type`、global stage、global gate、backflow decision。 |
 | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | `research-orchestrator` 运行时规范；消费全局接口，不重新定义全局接口。 |
@@ -96,7 +96,7 @@ $research-orchestrator 启动细分到个股闭环：AI服务器液冷。
 
 本项目可以输出研究框架、证据地图、风险清单、评分卡、观察清单、情景假设和 refresh log。
 
-本项目不输出直接买卖建议、仓位建议、保证收益判断或自动交易指令。
+研究工作流不输出直接买卖建议或仓位建议。独立的 `investment-review` 可以输出有依据的个性化交易动作与仓位建议，但必须标明数据时间、风险和失效条件，且不保证收益、不连接券商、不自动执行。
 
 ## 本地持仓记录
 
@@ -200,9 +200,10 @@ P2F-3 可在不改变事实层的前提下，显式消费一份已记录的模�
 ```
 
 该入口不会自行联网。所有 finding 必须引用 fact ID 并保留 assumptions、uncertainty、
-counterevidence 和 temporal perspective；心理诊断、交易建议、机械评分、结果倒推和
-事后最佳价会被拒绝。provider 不可用或响应非法时，输出仍是原 facts-only artifact，
-失败只记录在独立 attempt receipt 中。
+counterevidence 和 temporal perspective；心理诊断、机械评分、结果倒推和事后最佳价
+会被拒绝。解释层可以给出有事实引用的直接交易动作和目标仓位，但不得保证收益或暗示
+已经执行订单。provider 不可用或响应非法时，输出仍是原 facts-only artifact，失败只
+记录在独立 attempt receipt 中。
 
 P2F-4 通过闭合的人工作业请求追加接受、拒绝或事实链接纠正。每次动作都创建新
 revision，保留前一 `content_id`、actor、reason、reviewed time 和 target/result ID；

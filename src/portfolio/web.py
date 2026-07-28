@@ -287,7 +287,7 @@ class DashboardApplication:
                 "clearance_summary": clearance_summary,
                 "pnl_performance": pnl_performance,
                 "metadata": metadata,
-                "boundary": "记录与核算工具，不构成买入、卖出、持有或仓位建议。",
+                "boundary": "台账负责记录与核算；investment-review 可单独提供买卖与仓位建议，但不会自动下单。",
             }
         )
 

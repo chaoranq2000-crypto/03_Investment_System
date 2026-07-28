@@ -18,7 +18,7 @@
 ## Policies
 
 - `policies/EVIDENCE_AND_CITATION_POLICY.md` — 证据、引用、来源等级、新鲜度和冲突处理。
-- `policies/QUALITY_GUARDRAILS.md` — 质量门、反幻觉、反证和 no-advice 纪律。
+- `policies/QUALITY_GUARDRAILS.md` — 质量门、反幻觉、反证，以及研究产出与个人复盘建议的边界。
 
 ## Workflows
 

@@ -230,9 +230,6 @@ def test_f3_02_unknown_fact_ref_falls_back(context: dict[str, Any]) -> None:
     [
         ("The exit proves fear and loss aversion.", "POLICY_PSYCHOLOGY_DIAGNOSIS"),
         ("The execution was undisciplined.", "POLICY_PSYCHOLOGY_DIAGNOSIS"),
-        ("现在应该买入并继续持有。", "POLICY_DIRECT_ADVICE"),
-        ("Buy the security now.", "POLICY_DIRECT_ADVICE"),
-        ("Set the position size to 20%.", "POLICY_DIRECT_ADVICE"),
         ("The mechanical score is 85/100.", "POLICY_MECHANICAL_SCORE"),
         ("The profit proves this was a correct decision.", "POLICY_OUTCOME_QUALITY"),
     ],
@@ -245,6 +242,29 @@ def test_f3_03_f3_04_f3_05_policy_gate_rejects_unsafe_text(
     result = _build(context["facts"], payload)
     assert result.used_fallback is True
     assert expected_code in result.attempt["failure_codes"]
+
+
+@pytest.mark.parametrize(
+    "statement",
+    [
+        "现在应该买入并继续持有。",
+        "Buy the security now.",
+        "Set the position size to 20%.",
+    ],
+)
+def test_direct_recommendations_pass_policy_validation(
+    context: dict[str, Any], statement: str
+) -> None:
+    payload = _response_payload(context["facts"])
+    payload["interpretation_sections"]["main_tensions"][0]["statement"] = statement
+    result = _build(context["facts"], payload)
+    assert result.used_fallback is False
+    assert result.attempt["status"] == "succeeded"
+    assert result.artifact["governance"]["no_advice"] is False
+    assert (
+        result.artifact["interpretation_sections"]["main_tensions"][0]["statement"]
+        == statement
+    )
 
 
 def test_f3_07_tension_without_alternative_is_not_releasable(

@@ -93,7 +93,8 @@ def test_dashboard_payload_uses_real_store_values(tmp_path):
     assert three_months["status"] == "partial_history"
     assert three_months["series"][0] == {"date": "2026-07-10", "pnl": "0"}
     assert payload["metadata"]["baseline_date"] == "2026-07-10"
-    assert "不构成" in payload["boundary"]
+    assert "可单独提供买卖与仓位建议" in payload["boundary"]
+    assert "不会自动下单" in payload["boundary"]
 
 
 def test_dashboard_payload_includes_cash_in_total_assets_and_weights(tmp_path):

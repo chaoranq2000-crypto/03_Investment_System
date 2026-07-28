@@ -29,7 +29,7 @@
 	}
 })();
 //#endregion
-//#region node_modules/klinecharts/dist/index.esm.js
+//#region ../../../../03_Investment_System_portfolio/src/portfolio/frontend/node_modules/klinecharts/dist/index.esm.js
 /**
 * @license
 * KLineChart v10.0.0
@@ -15017,7 +15017,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 	heading.append(headingText, headingActions);
 	const content = element("div", "investment-review-content");
 	content.id = "investmentReviewContent";
-	const acceptanceBoundary = element("div", "investment-review-acceptance-boundary", "只读人工验收：本页不会写入复盘库，不提供买卖或仓位建议，也不推断未记录的投资动机。操作前公开可得不等于证明您实际阅读过。");
+	const acceptanceBoundary = element("div", "investment-review-acceptance-boundary", "只读报告：本页不会写入正式持仓账本或执行交易；可以展示标记为 system_inference 的动机推断，以及个性化买卖与仓位建议。公开可得不等于证明您在操作前实际阅读过。");
 	acceptanceBoundary.hidden = !readOnlyMode;
 	acceptanceBoundary.setAttribute("role", "note");
 	const healthLine = element("div", "investment-review-health-line", "复盘健康状态正在读取");
@@ -15322,7 +15322,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		if (decisions.length) block.body.appendChild(renderStructured(decisions));
 		else block.body.appendChild(element("p", "investment-review-warning", "decision unknown / unlinked"));
 		if (readOnlyMode) {
-			block.body.appendChild(element("p", "investment-review-boundary", "只读验收会话：补充决策与关联已停用；系统不会替您编造当时理由。"));
+			block.body.appendChild(element("p", "investment-review-boundary", "只读验收会话：补充决策与关联已停用；缺少记录时可以显示明确标记的系统推断，但不会冒充您的原始理由。"));
 			return block;
 		}
 		const form = element("form", "investment-review-form investment-review-decision-form");

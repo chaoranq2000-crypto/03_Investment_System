@@ -11,7 +11,9 @@ Operate `src/portfolio/` as a private accounting utility. Keep all user holdings
 
 - Do not call, edit, resume, or close `research-orchestrator`.
 - Do not write `reports/workflow_runs/`, evidence manifests, research claims, readiness gates, watchlists, or P2 artifacts.
-- Do not emit trading advice, target positions, or buy/sell/hold instructions.
+- Bookkeeping and market-data commands do not derive recommendations themselves.
+  They may display recommendations produced by the independent `investment-review`
+  layer, but must never execute them or write to a broker.
 - Do not commit `data/db/*.sqlite3`, holding CSVs, broker CSV/XLSX files, account identifiers, or screenshots.
 - Use this skill only for portfolio bookkeeping, price refreshes, and audit output.
 

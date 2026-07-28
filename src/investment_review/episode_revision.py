@@ -402,7 +402,7 @@ def apply_human_review(
         raise EpisodeRevisionError("review event chronology must be append-only")
     candidate["governance"] = {
         "facts_interpretation_separated": True,
-        "no_advice": True,
+        "no_advice": False,
         "no_mechanical_score": True,
         "generation_mode": "human_authored",
         "model_generation": None,

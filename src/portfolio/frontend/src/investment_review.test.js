@@ -41,9 +41,9 @@ describe("investment review read-only acceptance", () => {
     expect(mainSource.indexOf("if (isInvestmentReviewAcceptanceHealth(health))"))
       .toBeLessThan(mainSource.lastIndexOf("loadPortfolio();"));
     expect(mainSource).toContain('readOnly: true');
-    expect(source).toContain("只读人工验收");
-    expect(source).toContain("系统不会替您编造当时理由");
-    expect(source).toContain("不提供买卖或仓位建议");
+    expect(source).toContain("只读报告");
+    expect(source).toContain("不会冒充您的原始理由");
+    expect(source).toContain("个性化买卖与仓位建议");
   });
 });
 

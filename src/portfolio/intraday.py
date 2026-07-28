@@ -687,7 +687,7 @@ class IntradayService:
                     None,
                 ),
             },
-            "boundary": "仅展示行情与交割单事实，不构成交易建议。",
+            "boundary": "本视图展示行情与交割单事实；investment-review 可在独立报告区提供建议，但不会自动执行。",
         }
 
     def refresh(

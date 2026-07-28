@@ -165,7 +165,7 @@
           "const": true
         },
         "no_advice": {
-          "const": true
+          "type": "boolean"
         },
         "no_mechanical_score": {
           "const": true

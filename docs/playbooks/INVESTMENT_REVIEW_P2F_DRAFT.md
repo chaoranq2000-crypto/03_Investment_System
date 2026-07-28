@@ -160,9 +160,10 @@ scope、可行性、tradeoffs 与 `not_advice=true`。没有 typed history input
 - 参数；
 - canonical generated time。
 
-policy/temporal gate 拒绝心理诊断、直接买卖/持有/仓位建议、机械评分、用盈亏判定
-决策质量、把 outcome 写入 decision-time finding，以及使用事后最佳价或 episode 结束后
-信息的 counterfactual。
+policy/temporal gate 拒绝心理诊断、机械评分、用盈亏判定决策质量、把 outcome 写入
+decision-time finding，以及使用事后最佳价或 episode 结束后信息的 counterfactual。
+解释层可以提供有事实引用的直接买卖/持有/仓位建议，也可以在缺少 Decision 时给出
+明确标记的动机假设，但不得保证收益、暗示订单已执行或把系统推断冒充用户原话。
 
 provider 超时/不可用、非法 JSON、schema 或 policy 校验失败时，输出必须回退为字节完全
 不变的 facts-only artifact；失败原因只进入独立
@@ -177,7 +178,7 @@ provider 超时/不可用、非法 JSON、schema 或 policy 校验失败时，�
 schema validation
 temporal validation
 source-reference validation
-no-advice policy
+recommendation boundary policy
 no-score policy
 revision-chain validation
 ```

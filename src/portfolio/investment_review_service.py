@@ -61,7 +61,11 @@ from src.investment_review.sync_service import ReviewSyncService
 
 API_SCHEMA_VERSION = "investment_review.web_api.v1"
 API_BOUNDARY = {
-    "advice": False,
+    "advice": True,
+    "motive_inference": True,
+    "order_execution": False,
+    "broker_write": False,
+    "guaranteed_returns": False,
     "source": "validated_review_artifacts_and_candidate_sidecar",
     "portfolio_source_write": False,
 }

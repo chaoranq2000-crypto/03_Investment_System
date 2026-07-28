@@ -7,7 +7,10 @@ You are working inside **A-share Research OS / A股投研工作区**.
 Your job is to maintain an evidence-first A-share equity research workspace. You may help with workflow construction,
 evidence organization, report drafting, comparison frameworks, quality review, and refresh logs.
 
-This repository is **not** a trading system. Do not present outputs as direct buy / sell / hold instructions.
+This repository is an evidence-first research and personal investment decision-support
+system. It may provide personalized buy/sell/hold recommendations and position-sizing
+guidance. It must not execute orders, write to a broker, guarantee returns, or present
+uncertain conclusions as certain.
 
 ## Non-negotiable rules
 
@@ -20,7 +23,7 @@ This repository is **not** a trading system. Do not present outputs as direct bu
 7. Preserve uncertainty, risks, and counter-evidence.
 8. New evidence that changes old conclusions must produce a change log or refresh note.
 9. Do not overwrite files in `data/raw/`; add new versions, processed text, tables, manifests, or metadata instead.
-10. Do not output direct buy/sell/hold instructions, position sizing, guaranteed returns, or certainty claims.
+10. Do not output guaranteed returns or certainty claims.
 
 ## Documentation priority
 
@@ -67,20 +70,22 @@ Lower-level skills are repeatable research actions:
 | `company-universe` | Build an A-share company pool for one segment. |
 | `segment-company-mapping` | Maintain many-to-many exposure records. |
 | `stock-deep-dive` | Analyze one listed company and produce stock research artifacts. |
-| `quality-review` | Check evidence, claim types, metrics, exposure, stale data, and no-advice boundaries. |
+| `quality-review` | Check evidence, claim types, metrics, exposure, and stale data. |
 | `refresh-research` | Update existing research with new evidence and produce change logs. |
 | `compare-segments` | Compare multiple segments after readiness gates pass. |
 | `compare-stocks` | Compare multiple stocks after relevant stock packages are ready. |
 | `memo-writer` | Convert reviewed research into memos, watchlist notes, or thesis notes. |
-| `investment-review` | Maintain a separate, read-only personal trade-review data foundation and provenance chain. |
+| `investment-review` | Generate portfolio/instrument periodic reviews, infer trading motives when notes are absent, and provide evidence-grounded personalized recommendations. |
 
 Do not use a disabled, retired, or unlisted skill unless the repository configuration explicitly enables it.
 
 `investment-review` is explicitly enabled as an independent repo-local utility. It is not a canonical A-share
-research `workflow_type`, is not routed through `research-orchestrator`, and must not change research evidence,
-portfolio accounting, order execution, or P2 readiness. Its source portfolio SQLite must remain read-only; review
-data must be written to a separate sidecar database. Follow `.agents/skills/investment-review/SKILL.md` for its
-phase boundary.
+research `workflow_type` and is not routed through `research-orchestrator`. It may infer clearly labeled trading
+motives and provide personalized buy/sell/hold and position-sizing recommendations. It must not change research
+evidence, portfolio accounting, order execution, or P2 readiness. Its source portfolio SQLite must remain
+read-only; derived review data must be written to the existing sidecar database. Do not add new provenance,
+approval, replay, or revision layers unless required to prevent source mutation, time leakage, or materially
+incorrect reporting. Follow `.agents/skills/investment-review/SKILL.md` for its product boundary.
 
 ## Completion gates
 
@@ -92,8 +97,12 @@ Before marking work done, check:
 4. Segment-company exposure records include evidence, confidence, and missing-field labels.
 5. Risks, counter-evidence, and uncertainty are visible.
 6. Outputs follow workspace paths.
-7. Direct trading instructions are absent.
-8. Any remaining issue has an owner, severity, and next step.
+7. Any remaining issue has an owner, severity, and next step.
+
+For reader-facing `investment-review` V1 reports, lightweight references to the
+ledger, market data and analysis time are sufficient. Do not require research-workflow
+manifests, multi-stage human approval, byte-exact replay, or a new revision chain for
+each ordinary report.
 
 ## Language and style
 

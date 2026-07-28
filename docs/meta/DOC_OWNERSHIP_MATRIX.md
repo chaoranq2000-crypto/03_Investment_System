@@ -30,14 +30,14 @@
 
 | 文件 / 目录 | 主职责 | 不应包含 | 上位文件 |
 |---|---|---|---|
-| `AGENTS.md` | repo-level 规则、证据纪律、no-advice、安全边界、完成门槛 | 完整目录百科、完整 workflow 阶段表、长期计划全文 | system / project instructions |
+| `AGENTS.md` | repo-level 规则、证据纪律、研究 no-advice / 复盘建议例外、安全边界、完成门槛 | 完整目录百科、完整 workflow 阶段表、长期计划全文 | system / project instructions |
 | `README.md` | 给人看的快速入口、当前阶段摘要、核心链接 | 大段规则、完整路线图、长表格 | `AGENTS.md` |
 | `docs/index.md` | 文档导航 | 规则正文、计划正文、workflow 阶段表 | `AGENTS.md` |
 | `docs/project/PROJECT_CHARTER.md` | 项目使命、范围、非目标、阶段框架 | skill 细节、具体执行任务 | `AGENTS.md` |
 | `docs/architecture/WORKSPACE_STRUCTURE.md` | 文件放置、目录结构、命名规则 | workflow 阶段细节、报告表达标准 | `AGENTS.md` |
 | `docs/architecture/RESEARCH_OBJECT_MODEL.md` | Segment / Company / Evidence / Claim / Metric 等对象模型 | 具体报告模板、阶段计划 | `AGENTS.md` |
 | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | evidence / claim / citation / freshness / conflict rules | workflow 编排细节、样例报告语言风格 | `AGENTS.md` |
-| `docs/policies/QUALITY_GUARDRAILS.md` | 质量门原则、反幻觉、反证、no-advice | 具体工作流执行步骤、全局 gate id 表 | `AGENTS.md` |
+| `docs/policies/QUALITY_GUARDRAILS.md` | 质量门原则、反幻觉、反证、研究 no-advice 与复盘建议边界 | 具体工作流执行步骤、全局 gate id 表 | `AGENTS.md` |
 | `docs/workflows/RESEARCH_WORKFLOW.md` | 全局 workflow kernel | 阶段计划、执行日志、skill 局部实现细节 | `AGENTS.md` |
 | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | orchestrator 运行时状态、路由、handoff、门禁调度 | 新增全局 workflow_type、stage_id 或 gate_id | `RESEARCH_WORKFLOW.md` |
 | `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层 source adapter、manifest、candidate、data pack、局部 DL checks | 投研结论、报告写作风格、全局 gate id 定义 | `RESEARCH_WORKFLOW.md` |
@@ -53,7 +53,7 @@
 
 | 重复内容 | 保留主事实源 | 其他文件处理方式 |
 |---|---|---|
-| 项目使命和 no-advice | `AGENTS.md` + `PROJECT_CHARTER.md` | README 只摘要一句。 |
+| 项目使命、研究 no-advice 和复盘建议例外 | `AGENTS.md` + `PROJECT_CHARTER.md` | README 只摘要一句。 |
 | 目录结构 | `WORKSPACE_STRUCTURE.md` | AGENTS / README 只列关键路径。 |
 | 对象模型 | `RESEARCH_OBJECT_MODEL.md` | workflow docs 只引用对象名称和交接资产。 |
 | evidence / claim 规则 | `EVIDENCE_AND_CITATION_POLICY.md` | AGENTS 只保留纪律，quality docs 只检查。 |

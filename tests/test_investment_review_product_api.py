@@ -275,7 +275,7 @@ def test_v2_operation_checkpoint_projects_six_axes_and_paired_perspectives(
     user_receipt = fixture.runner.run(
         scope="single",
         as_of=AS_OF,
-        knowledge_cutoff="2026-07-28T00:00:00Z",
+        knowledge_cutoff="2026-07-30T00:00:00Z",
         perspective="user",
         dry_run=False,
         trigger="pytest-v2-api",
@@ -283,7 +283,7 @@ def test_v2_operation_checkpoint_projects_six_axes_and_paired_perspectives(
     system_receipt = fixture.runner.run(
         scope="single",
         as_of=AS_OF,
-        knowledge_cutoff="2026-07-28T00:00:00Z",
+        knowledge_cutoff="2026-07-30T00:00:00Z",
         perspective="system",
         dry_run=False,
         trigger="pytest-v2-api",
@@ -549,7 +549,11 @@ def test_read_models_are_curated_and_health_does_not_leak_paths(
     assert health["status"] == "healthy"
     assert health["data"]["counts"]["unsynced"] == 0
     assert health["data"]["fees"]["actual"] == 2
-    assert health["boundary"]["advice"] is False
+    assert health["boundary"]["advice"] is True
+    assert health["boundary"]["motive_inference"] is True
+    assert health["boundary"]["order_execution"] is False
+    assert health["boundary"]["broker_write"] is False
+    assert health["boundary"]["guaranteed_returns"] is False
 
     values = list(
         _all_strings(

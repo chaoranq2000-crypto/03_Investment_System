@@ -619,4 +619,6 @@ def test_cli_correct_render_diff_and_revision_list(
     output = capsys.readouterr().out
     assert '"effective_status": "superseded"' in output
     assert revised_path.exists()
-    assert "不是交易建议" in markdown_path.read_text(encoding="utf-8")
+    rendered = markdown_path.read_text(encoding="utf-8")
+    assert "可包含个性化建议" in rendered
+    assert "不执行订单" in rendered
