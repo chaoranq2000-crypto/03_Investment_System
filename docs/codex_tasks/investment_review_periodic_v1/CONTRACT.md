@@ -18,7 +18,7 @@ activated_at: "2026-07-28T03:22:55+00:00"
 
 - **Problem or opportunity:** 当前投资复盘产品已经具备真实账本同步、Trade Episode、事实复盘、操作检查点、行情上下文、API/UI 和进程内自动化基础，但产品对象仍是按 `single/weekly/monthly` 筛选的逐 episode 事实报告。用户无法直接看到组合与单个标的的自然日、自然周、自然月周期报告；缺少 Decision 时仍没有自动交易动机分析；建议边界虽然已经放开，但周期建议生成器尚未建设。
 - **Why this stage exists:** 用户已固定目标：以最少新增结构完成可直接阅读的周期复盘产品；无决策记录时自动推断动机；报告提供个性化买入、卖出、持有、加减仓、退出和仓位建议；不继续扩建 P2G/P2H、复杂画像或重型审计。
-- **Relevant current state:** 执行工作树为 `C:\Projects\03_Investment_System_periodic_review_v1`，分支为 `codex/investment-review-periodic-v1`，执行基线为 `7df75562eb7c7123ff066406f92fd6b844be994b`。P1–P4 已在提交 `ac045c0`、`054142b`、`4a70cc2` 中完成并通过验证：619 份派生报告、六类真实样本、API/UI、补跑和进程内自动化均已闭合，正式库 SHA-256 `6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057` 保持不变。用户随后指出报告虽数据完整，但仍像数据堆砌：四层事实、逐笔操作、判断和建议被逐项输出，缺少重要性取舍、因果综合和编辑层级。用户明确要求下一步改变分析与编辑逻辑而非继续扩充栏目，并同意先用专门子代理形成黄金样本；独立审稿代理只能作为原则型读者，不能用大量机械提示词重写全文。因此最早未证明的 outcome 是 P5 读者版黄金样本。
+- **Relevant current state:** 执行工作树为 `C:\Projects\03_Investment_System_periodic_review_v1`，分支为 `codex/investment-review-periodic-v1`，执行基线为 `7df75562eb7c7123ff066406f92fd6b844be994b`。P1–P7 曾完成工程验证，正式库 SHA-256 `6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057` 保持不变；用户也曾给出 P1 与 P5 样本继续授权。真实使用后，用户于 2026-07-31 明确指出“当前的报告仍然无法阅读”，否决当前 V2 的读者质量。检查确认问题不是栏目不足，而是主文仍由字段拼接形成：中心判断塞入过多事实并在下文重复，内部枚举和缺失码泄漏，周/月以计数代替综合，组合结论与操作选择缺乏编辑取舍，且存在建议语义冲突和可见截断。用户随后以“好的”同意先重新制作两份真实黄金样稿、暂不改通用生成器。旧 P5 接受记录只保留为历史事实，不再证明当前读者质量；最早未证明的 outcome 现为 P8 可读性重置样稿。
 - **Authoritative sources:** 根目录 `AGENTS.md`；`.agents/skills/investment-review/SKILL.md`；`docs/plans/INVESTMENT_REVIEW_IMPLEMENTATION_PLAN.md`；本合同与同目录 `START_HERE.md`；直接相关源代码与真实只读数据库。旧 `docs/playbooks/INVESTMENT_REVIEW_P2*.md` 仅是历史实现参考，冲突时不控制本 V1。
 - **Known gaps and external dependencies:** 现有事实、四层上下文和六类周期对象已经可用，但生成器与页面仍按固定栏目逐项展开，周/月报告也容易把日级内容拼接后重复输出。当前运行时没有真实模型客户端、模型凭据或获授权的外部模型 provider；本质量迭代先用 Codex 开发期子代理制作两份黄金样本，再以确定性 `analysis_brief`、重要性筛选和读者版渲染实现通用改造。是否接入产品运行时模型属于后续独立授权，不得在本合同当前授权下假定。
 - **Instruction precedence:** 当前适用的 `AGENTS.md` 高于本合同；`investment-review` skill 高于旧 playbook；本合同高于临时执行判断。无先前聊天、memory、其他任务包或未写入决定可以改变本合同。
@@ -41,6 +41,8 @@ This capsule is self-contained. No prior chat, memory, or unstated decision is a
 8. 每份读者版报告先形成一个中心判断，再选择真正改变判断或行动的少量发现，解释因果、操作得失和下一步行动；
 9. 默认主视图展示连贯读者版，完整事实、逐笔明细、缺失项和来源保留在折叠附录；
 10. 开发期审稿代理只指出最多三个实质问题并保护有效判断，不直接重写全文；普通生产报告不增加软性审稿链。
+11. 主文只使用自然中文表达，不暴露 `hold`、`reduce`、`system_inference`、`MISSING_*`、内部 horizon 或其他 schema 枚举；数字按读者理解需要取舍和格式化，不出现无意义精度或正文截断。
+12. 每份报告围绕一个真实投资问题组织，只保留会改变判断、行动或主要风险的证据；组合报告必须说明为何选择某些持仓或操作展开，周/月必须解释状态变化而非统计日数。
 
 ### Confirmed reader-facing review framework
 
@@ -70,6 +72,8 @@ This capsule is self-contained. No prior chat, memory, or unstated decision is a
 - 两份真实日报先形成读者版黄金样本并由用户确认；未确认前不修改六类生产报告的默认输出；
 - 样本确认后，组合/标的 × 日/周/月六类报告均生成中心判断驱动的读者版主文，原结构化内容保留为附录；
 - 历史 V1 报告仍可读取；新报告不依赖运行时模型也能生成确定性最低可用读者版。
+- 2026-07-31 的读者否决使既有 P5/P7 人工可读性结论失效；两份重新编辑的真实日报必须再次获得用户明确接受，且当前生产生成器在新样稿获接受前不得继续泛化或宣称读者质量完成。
+- P8 只证明新的写作基准，不预先决定后续采用确定性编辑器还是产品运行时写作代理；样稿接受后须按用户选择修订同一合同再进入通用实现。
 
 ### Truth boundaries
 
@@ -91,6 +95,7 @@ This capsule is self-contained. No prior chat, memory, or unstated decision is a
 - `tests/test_investment_review_*.py`、`tests/test_portfolio_web.py`、必要 fixtures 与新的周期报告专项测试；
 - `reports/investment_review/periodic_v1/**` 的真实样板、核对结果和最终验证摘要；
 - `reports/investment_review/periodic_v1/reader_quality_pilot/**` 的两份黄金样本、分析简报和一次原则型审稿结果；
+- `reports/investment_review/periodic_v1/reader_quality_rework/**` 的两份重新编辑黄金样稿、事实绑定、决策简报和一次原则型审稿结果；
 - 根 `AGENTS.md`、`.agents/skills/investment-review/SKILL.md`、当前实施计划以及本任务包的必要一致性更新；
 - 现有 review sidecar 中派生报告状态的幂等写入；正式 portfolio SQLite 只读；
 - 固定 conda Python、pytest、现有 Node/Vitest/Vite、SQLite 只读查询、localhost 浏览器/API、现有本地行情缓存和已配置只读行情提供方；
@@ -125,6 +130,7 @@ Routine in-scope local reads/writes, ordinary local commands/tests, package upda
 2. **发布门:** push、PR、merge、deploy 或生产运行必须由用户另行授权并在本合同/START 中记录精确目标。
 3. **系统调度门:** 可以实现并测试进程内/CLI 自动生成；安装 Windows 计划任务、服务或开机启动必须另行授权。
 4. **读者版样本门:** P5 工程样本完成后，用户必须明确确认 `reports/investment_review/periodic_v1/reader_quality_pilot/` 中的组合日报与标的日报具有更好的复盘与决策价值。授权 actor=`user`，target=`P5 reader-quality daily samples`，grant=`accept_reader_report_samples_and_continue`。未获得时将任务标记 `blocked`，不得进入 P6–P7。
+5. **读者质量重置门:** P8 工程样稿完成后，用户必须重新确认 `reports/investment_review/periodic_v1/reader_quality_rework/` 中的组合日报与德展健康日报已经可读，并选择后续通用实现路线。授权 actor=`user`，target=`P8 reader-quality rework samples`，grant=`accept_reader_rework_samples_and_continue`。旧的 P5 grant 不替代本门；未获得时任务标记 `blocked`，不得改造通用生成器。
 
 User authorization recorded in `START_HERE.md` may activate or revise this envelope. Consequential external, destructive, publication, deployment, credential, or high-cost actions require explicit authority.
 
@@ -147,6 +153,10 @@ User authorization recorded in `START_HERE.md` may activate or revise this envel
 | D-013 | fixed | 黄金样本使用分析、写作和原则型审稿三个开发期子代理；审稿最多提出三个实质问题、不得直接重写、只返修一轮 | 用户关于独立审稿机械化风险的确认 |
 | D-014 | fixed | 本轮不接产品运行时模型，不增加 provider、凭据、依赖或按报告计费调用；先验证黄金样本和确定性读者版路线 | 当前授权边界 + 用户未授予运行时模型权限 |
 | D-015 | blocking | 用户接受两份 P5 读者版样本后才允许进入 P6–P7 | 新的读者质量人工门 |
+| D-016 | fixed | 用户 2026-07-31 的真实使用反馈否决当前 V2 的读者质量；旧 P5/P7 通过记录仅作为历史工程证据 | 用户原文“当前的报告仍然无法阅读” |
+| D-017 | fixed | P8 先以冻结真实事实重写组合日报与德展健康日报，不修改通用生成器，不用新增栏目掩盖分析与编辑问题 | 用户同意的重置方案 |
+| D-018 | fixed | P8 使用开发期分析、专门写作和原则审稿角色；提示只给写作原则与事实边界，审稿最多三个实质问题且只返修一轮 | 用户对专门撰写代理与机械审稿风险的确认 |
+| D-019 | blocking | 两份 P8 样稿获用户接受并选择实现路线后，才能把新写作逻辑推广到六类生产报告 | 读者质量重置门 |
 
 ## Deliverables
 
@@ -162,6 +172,7 @@ User authorization recorded in `START_HERE.md` may activate or revise this envel
 | O-008 | `reports/investment_review/periodic_v1/reader_quality_pilot/` | 冻结事实输入、两份 `analysis_brief`、两份读者版样本、一次原则型审稿意见与样本验证摘要 | V-601 + 用户样本门 |
 | O-009 | `src/investment_review/periodic_narrative.py` 与 `src/investment_review/periodic_reports.py` | 重要性筛选、分析简报、读者版结构、V1/V2 验证与 Markdown 附录 | V-701/V-801 |
 | O-010 | `src/portfolio/frontend/src/investment_review.js` 与生成后的 `src/portfolio/web_assets/**` | 默认读者版主文、折叠事实附录和历史 V1 回退 | V-702/V-801 |
+| O-011 | `reports/investment_review/periodic_v1/reader_quality_rework/` | 两份冻结事实绑定、两份决策简报、两份自然中文黄金样稿和一次原则型审稿 | V-901 + 用户重置门 |
 
 ## Execution phases
 
@@ -214,6 +225,13 @@ User authorization recorded in `START_HERE.md` may activate or revise this envel
 - **Validation and evidence:** V-702、V-801；API/UI/browser、人读检查、六类报告、幂等补跑和正式数据库不变全部通过。
 - **Important boundaries or recovery notes:** 只更新派生 sidecar 和授权报告/UI 文件；不 push、merge、deploy、安装系统调度或执行建议。
 
+### P8 — 可读性重置与真实黄金样稿
+
+- **Outcome:** 基于既有 `2026-07-15` 组合日报和德展健康（000813.SZ）日报冻结 JSON，重新形成两份真正可读的黄金样稿。每份报告只回答一个核心投资问题，用少量事实完成判断、操作复盘和下一步行动；主文不暴露内部枚举、缺失码、审计话术或无意义精度。
+- **Deliverables:** O-011；本合同与 START 的重置记录；P8 本地 checkpoint。
+- **Validation and evidence:** V-901；所有主文数字与判断回指冻结 JSON；动机与事后结果时间分区不变；正式数据库 before/after SHA-256 不变；用户人工阅读确认。
+- **Important boundaries or recovery notes:** P8 不修改通用生成器、API/UI 或 sidecar。开发期分析角色先提炼决策问题，专门写作角色完成自然语言样稿，原则审稿只指出最多三个严重问题并只允许一轮返修。工程样稿完成后必须停止并请求 `accept_reader_rework_samples_and_continue`；不得把“好的”解释为样稿验收。
+
 ## Completion criteria
 
 | Criterion ID | Exact requirement | Required evidence | Validator or review method | Blocking class |
@@ -232,6 +250,9 @@ User authorization recorded in `START_HERE.md` may activate or revise this envel
 | C-ENG-012 | 四层上下文不再强制形成四个正文栏目；完整四层事实、逐笔记录和来源仍可从折叠附录访问 | Markdown/API/UI 证据 | V-701/V-702 | engineering |
 | C-ENG-013 | 周报/月报至少形成一个不能由单日日报原句替代的跨日综合判断，不拼接日级分析文本 | 周/月真实样本 + tests | V-701/V-801 | engineering |
 | C-ENG-014 | 原则型审稿代理只用于 P5 黄金样本，最多三个 `must_fix`、不得直接重写且只返修一轮 | P5 review artifact | V-601 | engineering |
+| C-ENG-015 | P8 两份主文分别围绕一个核心投资问题，结论、证据、操作评价和行动形成因果链，同一事实不在主文重复解释 | P8 样稿 + 决策简报 | V-901 + 人工阅读 | engineering |
+| C-ENG-016 | P8 主文不出现内部枚举、缺失码、审计元数据、无意义小数精度或截断文本；必要缺口用自然中文表述 | P8 样稿 | V-901 | engineering |
+| C-ENG-017 | 组合样稿说明所选持仓/操作为何重要；标的样稿把系统推断、替代解释和事后评价压缩为可理解的操作教训 | P8 样稿 + review artifact | V-901 | engineering |
 | C-COMPAT-001 | 历史 `investment_review.periodic_report.v1` 仍可通过 API/UI 读取；新生成器输出 V2 | V1 fixture + V2 report | V-701/V-702 | engineering |
 | C-DATA-001 | 正式 portfolio SQLite 始终只读且前后内容不变 | before/after 文件信息与 SHA-256 | V-201/V-999 | data_readiness |
 | C-DATA-002 | 已回填手续费不再报缺失，且实际记录、规则回填、正式豁免、未知不会互相冒充；现金口径冲突可见 | P1 数字核对 + tests | V-101/V-201 | data_readiness |
@@ -239,6 +260,7 @@ User authorization recorded in `START_HERE.md` may activate or revise this envel
 | C-SAFE-001 | 不保证收益、不自动下单、不使用券商凭据 | source scan + tests + UI check | V-999 | engineering |
 | C-HUMAN-001 | 用户明确接受 P1 真实样板后才进入 P2 | START authorization record | 用户明确答复 | human_approval |
 | C-HUMAN-002 | 用户明确接受 P5 两份读者版黄金样本后才进入 P6 | START authorization record | 用户明确答复 `accept_reader_report_samples_and_continue` | human_approval |
+| C-HUMAN-003 | 用户在 2026-07-31 否决旧读者版后，重新明确接受 P8 两份黄金样稿并选择后续实现路线 | START authorization record | 用户明确答复 `accept_reader_rework_samples_and_continue` | human_approval |
 | C-REL-001 | 形成验证通过的本地候选与本地 commits，未 push/merge/deploy | Git log/status + final readout | V-999 | release_readiness |
 
 All required criteria must pass. The executor cannot waive, weaken, or replace a criterion.
@@ -262,6 +284,7 @@ All required criteria must pass. The executor cannot waive, weaken, or replace a
 | V-701 | P6 | 运行新增 periodic narrative/renderer 专项 tests 与受影响的 V-101；执行 `git diff --check` | analysis brief、V2、fallback、V1 compatibility、时间/来源/安全全部通过 | START checkpoint |
 | V-702 | P7 | 运行前端 tests/build 和 localhost API/browser 检查读者主文、折叠附录、V1 回退 | UI 默认读者版且事实仍可核对 | final sample matrix |
 | V-801 | P7/final | 重跑 V-101/V-102/V-501 与新增 narrative tests；生成六类真实 V2 样本；检查周/月综合、sidecar 幂等和正式 DB SHA | 全部通过，local candidate ready | O-006 + final START |
+| V-901 | P8 | 核对两份冻结 JSON SHA；逐条核对主文数字、判断来源、操作时点与 cutoff；检查主文无内部枚举/缺失码/截断、无关键事实重复；运行一次最多三个 `must_fix` 的原则审稿；检查 `git diff --check` 与正式 DB SHA | 两份样稿事实可靠且具备新的可读性基准，正式 DB 不变 | O-011 + START checkpoint |
 
 ## Checkpoint and resume protocol
 
@@ -276,6 +299,8 @@ All required criteria must pass. The executor cannot waive, weaken, or replace a
 9. P1–P4 已完成，不因 P5–P7 质量迭代而重写既有完成证据；只重跑受影响验证。
 10. P5 先生成两份黄金样本并停止；用户授权 `accept_reader_report_samples_and_continue` 后才进入 P6。
 11. P6–P7 不接产品运行时模型；若完成需要 provider、凭据、依赖或按报告调用费用，停止并请求独立合同修订。
+12. 用户 2026-07-31 的否决使读者质量重新进入 P8；P1–P7 的工程证据保留，但不得用旧 P5 grant 证明 P8 已接受。
+13. P8 只制作两份真实黄金样稿并停止。用户明确给出 `accept_reader_rework_samples_and_continue` 及后续路线选择后，才能修订合同并推广到通用生成器。
 
 At meaningful milestones: update `START_HERE.md`, run proportionate validation, and create a Git checkpoint when useful. Multiple adjacent phases may share one checkpoint. On resume, start from the earliest useful outcome not yet proven.
 
@@ -285,6 +310,7 @@ At meaningful milestones: update `START_HERE.md`, run proportionate validation, 
 - 需要新增 provider、凭据、运行时依赖、lockfile、无界网络或明显成本；
 - P1 样板未获用户接受却准备进入 P2；
 - P5 读者版样板未获用户接受却准备进入 P6；
+- P8 重写样稿未获用户重新接受却准备修改通用生成器；
 - 真实数据不足以产生任何可核对 P1 样板，且现有只读 provider 不能在授权范围内补足；
 - 修改会覆盖意图不明的用户工作，或需要批量/递归删除；
 - 必须 push、merge、deploy、安装系统任务/服务而未获授权；
@@ -297,6 +323,6 @@ Stop only for conflicting authoritative instructions, user changes that would be
 
 仅授权 `codex/investment-review-periodic-v1` 上的本地 commits。禁止 push、PR、merge、tag、release、deploy、生产服务修改、OS scheduler/service 安装和订单执行。
 
-最终交付必须列出：工作树与分支、source baseline、setup/阶段 commits、修改路径、六类真实样本位置、P1 与 P5 用户接受记录、读者版/附录行为、全部 validators、正式 DB before/after、已知数据限制、自动化状态，以及 `orders_executed=false`、`guaranteed_return_claims=false`、`production_released=false`。
+最终交付必须列出：工作树与分支、source baseline、setup/阶段 commits、修改路径、六类真实样本位置、P1/P5 历史接受记录与 P8 新接受记录、读者版/附录行为、全部 validators、正式 DB before/after、已知数据限制、自动化状态，以及 `orders_executed=false`、`guaranteed_return_claims=false`、`production_released=false`。
 
 The normal unattended endpoint is a verified candidate artifact or branch for human review, not an automatic merge or deployment unless explicitly authorized above.

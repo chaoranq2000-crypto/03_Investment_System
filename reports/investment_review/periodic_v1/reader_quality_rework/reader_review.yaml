@@ -1,0 +1,33 @@
+schema_version: investment_review.reader_review.v1
+review_round: 1
+reviewer_role: principle_based_reader
+review_scope:
+  - portfolio_daily_reader_sample.md
+  - instrument_000813_daily_reader_sample.md
+  - portfolio_daily_decision_brief.md
+  - instrument_000813_daily_decision_brief.md
+verdict: engineering_pass_user_acceptance_pending
+core_problem: null
+must_fix: []
+keep:
+  - sample: portfolio
+    point: 组合稿围绕现金余量与集中度组织判断，并解释了为何选择瑞鹄模具和巨人网络。
+  - sample: instrument_000813
+    point: 标的稿把趋势、板块相对表现、基本面与仓位串成同一判断。
+  - sample: both
+    point: 两份报告均给出具体动作、机会成本和重新评估条件，且没有内部状态码泄漏。
+fact_review:
+  frozen_json_hashes_match_manifest: true
+  material_numbers_match_frozen_json: true
+  recommendation_calculations_consistent: true
+  later_information_used_to_infer_motive: false
+  closing_results_used_only_for_retrospective_review: true
+review_constraints:
+  rewrote_report: false
+  must_fix_count: 0
+  max_must_fix_allowed: 3
+  revision_rounds: 0
+  files_modified_by_reviewer: false
+  network_accessed: false
+  formal_portfolio_db_opened: false
+  broker_accessed: false

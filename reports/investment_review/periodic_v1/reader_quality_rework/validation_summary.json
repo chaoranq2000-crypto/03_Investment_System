@@ -1,0 +1,55 @@
+{
+  "schema_version": "investment_review.reader_quality_rework_validation.v1",
+  "phase": "P8",
+  "validated_at": "2026-07-31T23:47:44+08:00",
+  "status": "engineering_pass_user_acceptance_pending",
+  "contract_sha256": "5b77afd16c9bb270d3de7735e927a2359e844d54d795a433c02b58c7da573d5d",
+  "checks": {
+    "package_validation_before_samples": "pass_no_warnings",
+    "frozen_json_hashes_match_manifest": true,
+    "material_facts_trace_to_frozen_json": true,
+    "forbidden_reader_token_count": 0,
+    "portfolio_operations_using_later_information": 0,
+    "instrument_operations_using_later_information": 0,
+    "principle_review_verdict": "pass",
+    "principle_review_must_fix_count": 0,
+    "revision_rounds": 0,
+    "git_diff_check": "pass"
+  },
+  "recommendation_calculations": {
+    "portfolio_cash_after_reducing_ruihu_800_pct": 5.23,
+    "portfolio_ruihu_weight_after_reducing_800_pct": 25.73,
+    "instrument_weight_after_reducing_800_pct": 11.99
+  },
+  "samples": [
+    {
+      "path": "reports/investment_review/periodic_v1/reader_quality_rework/portfolio_daily_reader_sample.md",
+      "character_count": 755
+    },
+    {
+      "path": "reports/investment_review/periodic_v1/reader_quality_rework/instrument_000813_daily_reader_sample.md",
+      "character_count": 856
+    }
+  ],
+  "formal_portfolio_db": {
+    "sha256_before": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "sha256_after": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "unchanged": true
+  },
+  "scope": {
+    "general_generator_modified": false,
+    "api_or_ui_modified": false,
+    "review_sidecar_modified": false,
+    "network_accessed": false,
+    "runtime_model_provider_added": false,
+    "formal_portfolio_db_written": false,
+    "broker_accessed": false,
+    "orders_executed": false,
+    "guaranteed_return_claims": false,
+    "production_released": false
+  },
+  "human_acceptance": {
+    "status": "pending",
+    "required_grant": "accept_reader_rework_samples_and_continue"
+  }
+}
