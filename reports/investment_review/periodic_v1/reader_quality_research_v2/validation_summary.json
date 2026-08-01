@@ -1,0 +1,132 @@
+{
+  "schema_version": "investment_review.reader_quality_research_v2_validation.v1",
+  "phase": "P9",
+  "validated_at": "2026-08-02T00:42:51+08:00",
+  "status": "engineering_pass_user_acceptance_pending",
+  "contract_sha256": "789d3c1a8a7513f44176de9265d1138018f64253da6d5d5e0432e066e9854b4e",
+  "checks": {
+    "package_validation": "pass_no_warnings",
+    "method_source_links_present": true,
+    "method_access_limits_disclosed": true,
+    "xiaohongshu_coverage": "login_wall_observed_no_note_content_claimed",
+    "wechat_coverage": "public_index_snippets_only_article_redirect_timeout_disclosed",
+    "xueqiu_coverage": "public_page_and_search_index_content",
+    "mature_trading_journal_coverage": "public_full_text_multiple_sources",
+    "behavioral_finance_coverage": "public_open_access_article_and_abstract",
+    "frozen_json_hashes_match_manifest": true,
+    "material_facts_trace_to_frozen_json": true,
+    "network_facts_added_to_samples": false,
+    "forbidden_reader_token_count": 0,
+    "operations_using_later_information": 0,
+    "reader_samples_use_chinese_instrument_names": true,
+    "process_and_outcome_separated": true,
+    "reusable_correction_and_conditional_plan_present": true,
+    "repeated_data_wall_detected": false,
+    "git_diff_check": "pass"
+  },
+  "frozen_inputs": [
+    {
+      "path": "reports/investment_review/periodic_v1/final/portfolio_daily_2026-07-15_2026-07-15.json",
+      "expected_sha256": "145c5555b9cb3ecfd51fe563fe6861f5f6dc5ae621457ebb026b0c8f152c795d",
+      "actual_sha256": "145c5555b9cb3ecfd51fe563fe6861f5f6dc5ae621457ebb026b0c8f152c795d",
+      "unchanged": true
+    },
+    {
+      "path": "reports/investment_review/periodic_v1/final/instrument_000813.SZ_daily_2026-07-15_2026-07-15.json",
+      "expected_sha256": "cc033d93b10b8fd08240aff39b9fc58a0da993063a9a2f669a0e413be431a3f1",
+      "actual_sha256": "cc033d93b10b8fd08240aff39b9fc58a0da993063a9a2f669a0e413be431a3f1",
+      "unchanged": true
+    }
+  ],
+  "fact_trace": {
+    "portfolio_daily_reader_sample.md": [
+      {
+        "claim": "账面资产增加约1.46万元和3.20%",
+        "json_path": "$.sections.performance_and_positions.performance"
+      },
+      {
+        "claim": "沪电股份、川投能源退出，德展健康日内增量撤回，巨人网络增加200股，瑞鹄模具增加800股",
+        "json_path": "$.sections.operations_and_motives.operations"
+      },
+      {
+        "claim": "巨人网络26.24元成交并收于29.56元；瑞鹄模具27.77/27.77/27.60元成交并收于27.60元",
+        "json_path": "$.sections.operations_and_motives.operations + $.sections.performance_and_positions.positions"
+      },
+      {
+        "claim": "瑞鹄模具30.40%、巨人网络22.54%、现金2626.74元和0.56%",
+        "json_path": "$.sections.performance_and_positions.positions + $.sections.performance_and_positions.cash + $.sections.performance_and_positions.risk_change"
+      },
+      {
+        "claim": "减持瑞鹄模具800股后现金约5%",
+        "json_path": "derived only from cutoff close, quantity and total assets in $.sections.performance_and_positions"
+      }
+    ],
+    "instrument_000813_daily_reader_sample.md": [
+      {
+        "claim": "09:38买1700股@3.41、10:01买4100股@3.48、10:32卖5800股@3.46，持仓17200到23000再回17200",
+        "json_path": "$.sections.operations_and_motives.operations"
+      },
+      {
+        "claim": "第二笔价格高2.05%、数量为第一笔2.41倍",
+        "json_path": "$.sections.operations_and_motives.operations[1].motive"
+      },
+      {
+        "claim": "毛价差3元、规则回填费用25.43元、净结果-22.43元",
+        "json_path": "$.sections.operations_and_motives.episode_summaries[0]"
+      },
+      {
+        "claim": "标的2.37%、中证医药3.17%、相对-0.79个百分点、20日13.86%",
+        "json_path": "$.sections.decision_context.market_and_sector + $.sections.decision_context.technical_and_trend"
+      },
+      {
+        "claim": "一季度净亏损约4317万元、亏损绝对额同比扩大47.45%",
+        "json_path": "$.sections.decision_context.fundamental_and_valuation"
+      },
+      {
+        "claim": "减持约800股至16400股后权重约12%",
+        "json_path": "derived only from cutoff close, quantity and total assets in frozen JSON"
+      }
+    ]
+  },
+  "time_boundary": {
+    "motive_source": "operation_time_information_only",
+    "all_motive_uses_later_information_false": true,
+    "closing_price_sector_performance_and_net_result": "retrospective_evaluation_only",
+    "recommendation_cutoff": "2026-07-15T15:00:00+08:00"
+  },
+  "samples": [
+    {
+      "path": "reports/investment_review/periodic_v1/reader_quality_research_v2/portfolio_daily_reader_sample.md",
+      "character_count": 1075,
+      "sha256": "6e363b352d607c3a2111b7033bcc76c554b62cc6fbc841987e3b2647dec537e7"
+    },
+    {
+      "path": "reports/investment_review/periodic_v1/reader_quality_research_v2/instrument_000813_daily_reader_sample.md",
+      "character_count": 1219,
+      "sha256": "5671c3189305d4e1a44d67004b87233eb54b8e56da0f5a3097aafad0ea27f573"
+    }
+  ],
+  "formal_portfolio_db": {
+    "path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+    "sha256_before": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "sha256_after": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "unchanged": true
+  },
+  "scope": {
+    "general_generator_modified": false,
+    "api_or_ui_modified": false,
+    "review_sidecar_modified": false,
+    "runtime_model_provider_added": false,
+    "credentials_or_dependencies_added": false,
+    "external_content_written": false,
+    "formal_portfolio_db_written": false,
+    "broker_accessed": false,
+    "orders_executed": false,
+    "guaranteed_return_claims": false,
+    "production_released": false
+  },
+  "human_acceptance": {
+    "status": "pending",
+    "required_grant": "accept_researched_review_samples_and_continue"
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "schema_version": "investment_review.reader_quality_research_v2_input.v1",
+  "research_id": "reader_quality_research_v2_20260715",
+  "frozen_at": "2026-08-02",
+  "facts": [
+    {
+      "subject_type": "portfolio",
+      "period_type": "daily",
+      "period_start": "2026-07-15",
+      "period_end": "2026-07-15",
+      "path": "reports/investment_review/periodic_v1/final/portfolio_daily_2026-07-15_2026-07-15.json",
+      "sha256": "145c5555b9cb3ecfd51fe563fe6861f5f6dc5ae621457ebb026b0c8f152c795d"
+    },
+    {
+      "subject_type": "instrument",
+      "subject_id": "000813.SZ",
+      "subject_name": "德展健康",
+      "period_type": "daily",
+      "period_start": "2026-07-15",
+      "period_end": "2026-07-15",
+      "path": "reports/investment_review/periodic_v1/final/instrument_000813.SZ_daily_2026-07-15_2026-07-15.json",
+      "sha256": "cc033d93b10b8fd08240aff39b9fc58a0da993063a9a2f669a0e413be431a3f1"
+    }
+  ],
+  "method_sources": [
+    {
+      "platform": "xiaohongshu",
+      "url": "https://www.xiaohongshu.com/search_result/?keyword=%E8%82%A1%E7%A5%A8%E5%A4%8D%E7%9B%98",
+      "access": "login_wall_search_results_not_read",
+      "allowed_use": "access_limitation_only"
+    },
+    {
+      "platform": "wechat_public_index",
+      "url": "https://weixin.sogou.com/weixin?type=2&query=%E8%82%A1%E7%A5%A8%E5%A4%8D%E7%9B%98",
+      "access": "public_search_snippets_only_article_redirect_timed_out",
+      "allowed_use": "method_and_structure_only"
+    },
+    {
+      "platform": "xueqiu",
+      "url": "https://xueqiu.com/S/SH600103/hots?page=20",
+      "access": "public_page_content",
+      "allowed_use": "method_and_structure_only"
+    },
+    {
+      "platform": "taoguba",
+      "url": "https://www.tgb.cn/a/2pe4l7snW4c",
+      "access": "public_intro_full_text_login_limited",
+      "allowed_use": "method_and_cadence_only"
+    },
+    {
+      "platform": "professional_trading_journal",
+      "url": "https://www.smbtraining.com/blog/stock-trading",
+      "access": "public_full_text",
+      "allowed_use": "method_only"
+    },
+    {
+      "platform": "professional_trading_journal",
+      "url": "https://www.tradervue.com/blog/5-trading-best-practices-and-tips-by-professional-traders",
+      "access": "public_full_text",
+      "allowed_use": "method_only"
+    },
+    {
+      "platform": "systematic_trading_journal",
+      "url": "https://doc.turtlesignal.com/zh/practice/trading-journal/",
+      "access": "public_full_text",
+      "allowed_use": "method_only"
+    },
+    {
+      "platform": "behavioral_finance",
+      "url": "https://link.springer.com/article/10.1007/s11238-020-09773-1",
+      "access": "public_open_access_full_text",
+      "allowed_use": "process_outcome_separation_only"
+    }
+  ],
+  "formal_portfolio_db": {
+    "path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+    "access": "not_opened_for_p9_writing",
+    "sha256_before": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057"
+  },
+  "scope": {
+    "network_material_changes_historical_facts": false,
+    "general_generator_modified": false,
+    "api_or_ui_modified": false,
+    "review_sidecar_modified": false,
+    "runtime_model_provider_added": false,
+    "orders_executed": false
+  }
+}
