@@ -1,0 +1,268 @@
+{
+  "artifact_path": ".codex_tmp\\investment_review_periodic_v1\\strategy_drawdown_validation\\market_cache\\entries\\df0c64de66665c76b13c0b188aa49d00b5c9a82f2ec69bdeab4221aa93f9f462.json",
+  "artifact_sha256": "fcdf757a242dea30c345821eb6f91fd4190c950a8ce8462cd7cada557f0e7b96",
+  "coverage": {
+    "index_count": 4,
+    "index_ready_count": 4,
+    "instrument_count": 25,
+    "instrument_ready_count": 25,
+    "requested_end": "2026-07-17",
+    "requested_start": "2025-04-07"
+  },
+  "indices": [
+    {
+      "attempts": [
+        {
+          "endpoint": "query_history_k_data_plus",
+          "request": {
+            "adjustflag": "3",
+            "code": "sh.000300",
+            "end_date": "2026-07-17",
+            "fields": "date,code,open,high,low,close,preclose,volume,amount,pctChg",
+            "frequency": "d",
+            "start_date": "2025-04-07"
+          },
+          "response_hash_basis": "normalized_rows",
+          "response_sha256": "c630845b51672e6e12c1f56c402b707d165b0a0f45282fc71b4eb221b87c4ddd",
+          "source": "baostock",
+          "status": "success"
+        }
+      ],
+      "index": {
+        "name": "沪深300",
+        "ts_code": "000300.SH"
+      },
+      "selected_closes": {
+        "2026-01-29": "4753.8697",
+        "2026-06-08": "4713.6358",
+        "2026-06-23": "4919.386",
+        "2026-07-16": "4698.4344"
+      },
+      "status": "ready"
+    },
+    {
+      "attempts": [
+        {
+          "endpoint": "query_history_k_data_plus",
+          "request": {
+            "adjustflag": "3",
+            "code": "sh.000852",
+            "end_date": "2026-07-17",
+            "fields": "date,code,open,high,low,close,preclose,volume,amount,pctChg",
+            "frequency": "d",
+            "start_date": "2025-04-07"
+          },
+          "response_hash_basis": "normalized_rows",
+          "response_sha256": "71bcf0291d4feb9ebd5119fad4424dc7b48bf1655f18969f8bda8ee404560f5e",
+          "source": "baostock",
+          "status": "success"
+        }
+      ],
+      "index": {
+        "name": "中证1000",
+        "ts_code": "000852.SH"
+      },
+      "selected_closes": {
+        "2026-01-29": "8332.2067",
+        "2026-06-08": "8081.2614",
+        "2026-06-23": "8680.0387",
+        "2026-07-16": "7631.7622"
+      },
+      "status": "ready"
+    },
+    {
+      "attempts": [
+        {
+          "endpoint": "query_history_k_data_plus",
+          "request": {
+            "adjustflag": "3",
+            "code": "sh.000905",
+            "end_date": "2026-07-17",
+            "fields": "date,code,open,high,low,close,preclose,volume,amount,pctChg",
+            "frequency": "d",
+            "start_date": "2025-04-07"
+          },
+          "response_hash_basis": "normalized_rows",
+          "response_sha256": "703c4420354a6b10fbec1fc936ccb78798d7f51cf1426c5e445da0b3238ba4e4",
+          "source": "baostock",
+          "status": "success"
+        }
+      ],
+      "index": {
+        "name": "中证500",
+        "ts_code": "000905.SH"
+      },
+      "selected_closes": {
+        "2026-01-29": "8517.8429",
+        "2026-06-08": "7963.4529",
+        "2026-06-23": "8688.5923",
+        "2026-07-16": "7955.6635"
+      },
+      "status": "ready"
+    },
+    {
+      "attempts": [
+        {
+          "endpoint": "query_history_k_data_plus",
+          "request": {
+            "adjustflag": "3",
+            "code": "sz.399001",
+            "end_date": "2026-07-17",
+            "fields": "date,code,open,high,low,close,preclose,volume,amount,pctChg",
+            "frequency": "d",
+            "start_date": "2025-04-07"
+          },
+          "response_hash_basis": "normalized_rows",
+          "response_sha256": "d7a3949eff8c129d93a7ced95b8c2573245b63a95a7554ba0703b99f7fe1435b",
+          "source": "baostock",
+          "status": "success"
+        }
+      ],
+      "index": {
+        "name": "深证成指",
+        "ts_code": "399001.SZ"
+      },
+      "selected_closes": {
+        "2026-01-29": "14300.076",
+        "2026-06-08": "14821.1861",
+        "2026-06-23": "15854.1963",
+        "2026-07-16": "14488.6541"
+      },
+      "status": "ready"
+    }
+  ],
+  "instrument_gaps": [
+    {
+      "attempts": [
+        {
+          "endpoint": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+          "request": {
+            "param": "sz127113,day,2025-04-07,2026-07-17,531,"
+          },
+          "response_hash_basis": "raw_response_bytes",
+          "response_sha256": "74fe3efcb362c1fcecc073e10c91900604d8e651a8ac7a9fc8fa0174cacb0556",
+          "source": "tencent",
+          "status": "success"
+        }
+      ],
+      "first_market_date": "2026-03-30",
+      "instrument": {
+        "asset_type": "unknown",
+        "name": "长高转债",
+        "ts_code": "127113.SZ"
+      },
+      "selected_bars": [
+        {
+          "adjustment": "raw",
+          "amount": null,
+          "amount_unit": "provider_native",
+          "close": "146.5",
+          "high": "146.5",
+          "low": "130",
+          "open": "130",
+          "pct_chg": null,
+          "source": "tencent.ifzq.fqkline.day",
+          "trade_date": "2026-03-30",
+          "volume": "113559",
+          "volume_unit": "provider_native"
+        },
+        {
+          "adjustment": "raw",
+          "amount": null,
+          "amount_unit": "provider_native",
+          "close": "140.5",
+          "high": "148.892",
+          "low": "139.01",
+          "open": "145.5",
+          "pct_chg": null,
+          "source": "tencent.ifzq.fqkline.day",
+          "trade_date": "2026-03-31",
+          "volume": "784480",
+          "volume_unit": "provider_native"
+        }
+      ],
+      "status": "ready"
+    },
+    {
+      "attempts": [
+        {
+          "endpoint": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+          "request": {
+            "param": "sh551550,day,2025-04-07,2026-07-17,531,"
+          },
+          "response_hash_basis": "raw_response_bytes",
+          "response_sha256": "bac6cdbec803c01d09a2d25b52332f254056cac65bf92bcb9ceb78c08437e003",
+          "source": "tencent",
+          "status": "success"
+        }
+      ],
+      "first_market_date": "2025-07-17",
+      "instrument": {
+        "asset_type": "etf",
+        "name": "科创债ETF华夏",
+        "ts_code": "551550.SH"
+      },
+      "selected_bars": [
+        {
+          "adjustment": "raw",
+          "amount": null,
+          "amount_unit": "provider_native",
+          "close": "100.09",
+          "high": "100.167",
+          "low": "100.05",
+          "open": "100.14",
+          "pct_chg": null,
+          "source": "tencent.ifzq.fqkline.day",
+          "trade_date": "2025-07-21",
+          "volume": "1581097",
+          "volume_unit": "provider_native"
+        },
+        {
+          "adjustment": "raw",
+          "amount": null,
+          "amount_unit": "provider_native",
+          "close": "100.043",
+          "high": "100.09",
+          "low": "100.023",
+          "open": "100.09",
+          "pct_chg": null,
+          "source": "tencent.ifzq.fqkline.day",
+          "trade_date": "2025-07-22",
+          "volume": "1851234",
+          "volume_unit": "provider_native"
+        },
+        {
+          "adjustment": "raw",
+          "amount": null,
+          "amount_unit": "provider_native",
+          "close": "100.588",
+          "high": "100.598",
+          "low": "100.519",
+          "open": "100.569",
+          "pct_chg": null,
+          "source": "tencent.ifzq.fqkline.day",
+          "trade_date": "2026-03-30",
+          "volume": "305838",
+          "volume_unit": "provider_native"
+        },
+        {
+          "adjustment": "raw",
+          "amount": null,
+          "amount_unit": "provider_native",
+          "close": "100.554",
+          "high": "100.626",
+          "low": "100.554",
+          "open": "100.606",
+          "pct_chg": null,
+          "source": "tencent.ifzq.fqkline.day",
+          "trade_date": "2026-03-31",
+          "volume": "13040",
+          "volume_unit": "provider_native"
+        }
+      ],
+      "status": "ready"
+    }
+  ],
+  "payload_sha256": "54687b07d4c0d97fd3cab2ef7d32a341b4622d7e73d902c437d4d9a88df1b20d",
+  "status": "loaded"
+}

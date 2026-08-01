@@ -1,0 +1,3 @@
+﻿strategy,signal_date,signal_event,signal_exposure,applied_exposure_same_day,next_trading_day_execution_proxy,first_return_effect_date,drawdown_at_signal
+defense_30,2026-06-08,de_risk,0.75,1.0,2026-06-09,2026-06-10,0.2227381239279569
+defense_30,2026-06-23,re_risk,1.0,0.75,2026-06-24,2026-06-25,0.18007519052118204

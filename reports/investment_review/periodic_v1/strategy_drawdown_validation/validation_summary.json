@@ -1,0 +1,94 @@
+{
+  "schema_version": "investment_review.strategy_drawdown_validation.v1",
+  "phase": "P10",
+  "status": "engineering_pass_human_decision_pending",
+  "period": {
+    "start": "2025-04-07",
+    "end": "2026-07-16",
+    "epistemic_status": "conditional_due_to_cash_price_and_rebase_gaps"
+  },
+  "formal_portfolio_db": {
+    "path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio.sqlite3",
+    "access": "sqlite_uri_mode_ro_immutable_1_and_pragma_query_only_on",
+    "sha256_before": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "sha256_after": "6207d15cc61cffd963cc8154a1b9af2ddae56ae11efe9a26116f7792e6ffb057",
+    "unchanged": true,
+    "quick_check": "ok"
+  },
+  "validators": {
+    "targeted_pytest": "28 passed, 1 skipped",
+    "ruff_check": "pass",
+    "ruff_format_check": "pass",
+    "py_compile": "pass",
+    "real_pipeline": "pass",
+    "task_package_validator": "pass_after_P10_checkpoint",
+    "git_diff_check": "pass_before_local_commit",
+    "autonomous_stage_checkpoint": "blocked_after_P10_for_C-HUMAN-005"
+  },
+  "data_coverage": {
+    "formal_ledger_rows": 983,
+    "formal_close_price_rows": 7092,
+    "cash_snapshot_rows": 4,
+    "position_rebase_rows": 38,
+    "external_instruments_ready": "25/25",
+    "external_indices_ready": "4/4",
+    "external_cache_sha256": "fcdf757a242dea30c345821eb6f91fd4190c950a8ce8462cd7cada557f0e7b96"
+  },
+  "primary_results": {
+    "baseline": {
+      "final_nav": 477862.84,
+      "net_total_return": -0.0793997135,
+      "conditional_cagr": -0.0650394512,
+      "max_drawdown": 0.2227381239
+    },
+    "defense_30": {
+      "final_nav": 470933.64,
+      "net_total_return": -0.0927487831,
+      "conditional_cagr": -0.0760752594,
+      "max_drawdown": 0.2227381239,
+      "upside_participation": 0.9585502609,
+      "extra_cost": 266.53,
+      "trigger_count": 2
+    },
+    "elastic_35": {
+      "final_nav": 477862.84,
+      "net_total_return": -0.0793997135,
+      "conditional_cagr": -0.0650394512,
+      "max_drawdown": 0.2227381239,
+      "trigger_count": 0
+    }
+  },
+  "criteria": {
+    "C-ENG-021": "pass_with_explicit_conditional_baseline",
+    "C-ENG-022": "pass",
+    "C-DATA-003": "pass",
+    "C-TIME-002": "pass_strict_close_only_proxy",
+    "C-HUMAN-005": "pending_user_choice"
+  },
+  "conclusion": {
+    "supports_routine_35pct_drawdown_budget": false,
+    "supports_mechanical_20pct_derisk": false,
+    "proves_30pct_is_optimal": false,
+    "caps_drawdown_at_30_or_35pct": false,
+    "recommended_for_user_discussion": "30pct strategy-failure candidate, 35pct catastrophe line, 20pct conditional multi-signal defense"
+  },
+  "known_limits": [
+    "seven negative-cash dates in the anchored historical replay",
+    "constant cash shift is a sensitivity and not an account fact",
+    "twelve formal price gaps use an explicitly labelled cost proxy",
+    "159792.SZ has one unverified 6624-share rebase difference",
+    "portfolio overlay does not simulate instrument-level fills, limits, lots or suspensions",
+    "one account path cannot establish future 30-40pct annualized returns"
+  ],
+  "safety": {
+    "orders_executed": false,
+    "broker_accessed": false,
+    "guaranteed_return_claims": false,
+    "production_released": false,
+    "formal_database_written": false
+  },
+  "separate_pending_gate": {
+    "P9_researched_reader_samples_accepted": false,
+    "required_grant": "accept_researched_review_samples_and_continue"
+  }
+}

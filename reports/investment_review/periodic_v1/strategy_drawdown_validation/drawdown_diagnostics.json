@@ -1,0 +1,324 @@
+{
+  "attribution": [
+    {
+      "instrument_name": "德展健康",
+      "nav_contribution_cny": "-46963.50",
+      "ts_code": "000813.SZ"
+    },
+    {
+      "instrument_name": "瑞鹄模具",
+      "nav_contribution_cny": "-22830.23",
+      "ts_code": "002997.SZ"
+    },
+    {
+      "instrument_name": "兴发集团",
+      "nav_contribution_cny": "-22753.97",
+      "ts_code": "600141.SH"
+    },
+    {
+      "instrument_name": "港股通互联网ETF富国",
+      "nav_contribution_cny": "-9408.820",
+      "ts_code": "159792.SZ"
+    },
+    {
+      "instrument_name": "恒生医药ETF华夏",
+      "nav_contribution_cny": "-4529.830",
+      "ts_code": "159892.SZ"
+    },
+    {
+      "instrument_name": "中国中免",
+      "nav_contribution_cny": "-3485.00",
+      "ts_code": "601888.SH"
+    },
+    {
+      "instrument_name": "欧派家居",
+      "nav_contribution_cny": "-2704.00",
+      "ts_code": "603833.SH"
+    },
+    {
+      "instrument_name": "黄金ETF易方达",
+      "nav_contribution_cny": "-1919.370",
+      "ts_code": "159934.SZ"
+    },
+    {
+      "instrument_name": "恒生互联网ETF华夏",
+      "nav_contribution_cny": "-1782.000",
+      "ts_code": "513330.SH"
+    },
+    {
+      "instrument_name": "索菲亚",
+      "nav_contribution_cny": "-1719.00",
+      "ts_code": "002572.SZ"
+    },
+    {
+      "instrument_name": "中信证券",
+      "nav_contribution_cny": "-1633.16",
+      "ts_code": "600030.SH"
+    },
+    {
+      "instrument_name": "北新建材",
+      "nav_contribution_cny": "-1328.00",
+      "ts_code": "000786.SZ"
+    },
+    {
+      "instrument_name": "春秋航空",
+      "nav_contribution_cny": "-1215.00",
+      "ts_code": "601021.SH"
+    },
+    {
+      "instrument_name": "重庆啤酒",
+      "nav_contribution_cny": "-453.00",
+      "ts_code": "600132.SH"
+    },
+    {
+      "instrument_name": "顺丰控股",
+      "nav_contribution_cny": "-409.07",
+      "ts_code": "002352.SZ"
+    },
+    {
+      "instrument_name": "港股通科技ETF华夏",
+      "nav_contribution_cny": "-370.110",
+      "ts_code": "159101.SZ"
+    },
+    {
+      "instrument_name": "青岛啤酒",
+      "nav_contribution_cny": "-343.00",
+      "ts_code": "600600.SH"
+    },
+    {
+      "instrument_name": "海信家电",
+      "nav_contribution_cny": "-331.90",
+      "ts_code": "000921.SZ"
+    },
+    {
+      "instrument_name": "旅游ETF富国",
+      "nav_contribution_cny": "-307.130",
+      "ts_code": "159766.SZ"
+    },
+    {
+      "instrument_name": "芯片ETF",
+      "nav_contribution_cny": "-240.440",
+      "ts_code": "512760.SH"
+    },
+    {
+      "instrument_name": "广深铁路",
+      "nav_contribution_cny": "-184.71",
+      "ts_code": "601333.SH"
+    },
+    {
+      "instrument_name": "医疗器械ETF永赢",
+      "nav_contribution_cny": "-64.790",
+      "ts_code": "159883.SZ"
+    },
+    {
+      "instrument_name": "生物医药ETF天弘",
+      "nav_contribution_cny": "-19.300",
+      "ts_code": "159859.SZ"
+    },
+    {
+      "instrument_name": "立讯精密",
+      "nav_contribution_cny": "41.68",
+      "ts_code": "002475.SZ"
+    },
+    {
+      "instrument_name": "苏 泊 尔",
+      "nav_contribution_cny": "50.72",
+      "ts_code": "002032.SZ"
+    },
+    {
+      "instrument_name": "恒生消费ETF景顺",
+      "nav_contribution_cny": "59.540",
+      "ts_code": "513970.SH"
+    },
+    {
+      "instrument_name": "金风科技",
+      "nav_contribution_cny": "107.31",
+      "ts_code": "002202.SZ"
+    },
+    {
+      "instrument_name": "中国移动",
+      "nav_contribution_cny": "118.94",
+      "ts_code": "600941.SH"
+    },
+    {
+      "instrument_name": "三花智控",
+      "nav_contribution_cny": "193.79",
+      "ts_code": "002050.SZ"
+    },
+    {
+      "instrument_name": "海天味业",
+      "nav_contribution_cny": "196.45",
+      "ts_code": "603288.SH"
+    },
+    {
+      "instrument_name": "长江电力",
+      "nav_contribution_cny": "218.95",
+      "ts_code": "600900.SH"
+    },
+    {
+      "instrument_name": "中国核电",
+      "nav_contribution_cny": "222.00",
+      "ts_code": "601985.SH"
+    },
+    {
+      "instrument_name": "川投能源",
+      "nav_contribution_cny": "330.00",
+      "ts_code": "600674.SH"
+    },
+    {
+      "instrument_name": "XD中国国",
+      "nav_contribution_cny": "364.00",
+      "ts_code": "600007.SH"
+    },
+    {
+      "instrument_name": "牧原股份",
+      "nav_contribution_cny": "403.42",
+      "ts_code": "002714.SZ"
+    },
+    {
+      "instrument_name": "长高转债",
+      "nav_contribution_cny": "467.77",
+      "ts_code": "127113.SZ"
+    },
+    {
+      "instrument_name": "煤炭ETF国泰",
+      "nav_contribution_cny": "614.890",
+      "ts_code": "515220.SH"
+    },
+    {
+      "instrument_name": "比亚迪",
+      "nav_contribution_cny": "1518.80",
+      "ts_code": "002594.SZ"
+    }
+  ],
+  "attribution_total_cny": "-120087.070",
+  "concentration": {
+    "peak": {
+      "cash": "207215.77",
+      "cash_weight": "0.3843448912367260632796105695",
+      "nav": "539140.170",
+      "position_count": 31,
+      "positions_over_5pct": 2,
+      "top1_weight": "0.1222056965260073275563941006",
+      "top3_weight": "0.2248240935191306557624893727",
+      "top_positions": [
+        {
+          "instrument_name": "德展健康",
+          "market_value": "65886.00",
+          "ts_code": "000813.SZ",
+          "weight": "0.1222056965260073275563941006"
+        },
+        {
+          "instrument_name": "芯片ETF",
+          "market_value": "29621.700",
+          "ts_code": "512760.SH",
+          "weight": "0.05494248369584481156356796786"
+        },
+        {
+          "instrument_name": "中信证券",
+          "market_value": "25704.00",
+          "ts_code": "600030.SH",
+          "weight": "0.04767591329727851664252730417"
+        },
+        {
+          "instrument_name": "黄金ETF易方达",
+          "market_value": "23647.400",
+          "ts_code": "159934.SZ",
+          "weight": "0.04386132088803548064318783740"
+        },
+        {
+          "instrument_name": "恒生医药ETF华夏",
+          "market_value": "23575.200",
+          "ts_code": "159892.SZ",
+          "weight": "0.04372740395136945555364572445"
+        },
+        {
+          "instrument_name": "比亚迪",
+          "market_value": "18462.00",
+          "ts_code": "002594.SZ",
+          "weight": "0.03424341391590242663610096053"
+        },
+        {
+          "instrument_name": "港股通互联网ETF富国",
+          "market_value": "11893.800",
+          "ts_code": "159792.SZ",
+          "weight": "0.02206068228972810540160641341"
+        },
+        {
+          "instrument_name": "煤炭ETF国泰",
+          "market_value": "10499.700",
+          "ts_code": "515220.SH",
+          "weight": "0.01947489833673495336101555927"
+        }
+      ],
+      "trade_date": "2026-01-29"
+    },
+    "trough": {
+      "cash": "14599.50",
+      "cash_weight": "0.03483926022740316203364203725",
+      "nav": "419053.100",
+      "position_count": 20,
+      "positions_over_5pct": 4,
+      "top1_weight": "0.2471906304952761356496348553",
+      "top3_weight": "0.6625126982714123818675962545",
+      "top_positions": [
+        {
+          "instrument_name": "德展健康",
+          "market_value": "103586.00",
+          "ts_code": "000813.SZ",
+          "weight": "0.2471906304952761356496348553"
+        },
+        {
+          "instrument_name": "瑞鹄模具",
+          "market_value": "100440.0",
+          "ts_code": "002997.SZ",
+          "weight": "0.2396832286886793105694719834"
+        },
+        {
+          "instrument_name": "兴发集团",
+          "market_value": "73602.00",
+          "ts_code": "600141.SH",
+          "weight": "0.1756388390874569356484894158"
+        },
+        {
+          "instrument_name": "港股通互联网ETF富国",
+          "market_value": "27720.0",
+          "ts_code": "159792.SZ",
+          "weight": "0.06614913479938461259444208860"
+        },
+        {
+          "instrument_name": "中信证券",
+          "market_value": "20344.00",
+          "ts_code": "600030.SH",
+          "weight": "0.04854754683833623948850396286"
+        },
+        {
+          "instrument_name": "恒生医药ETF华夏",
+          "market_value": "11247.600",
+          "ts_code": "159892.SZ",
+          "weight": "0.02684051257465939280725998686"
+        },
+        {
+          "instrument_name": "顺丰控股",
+          "market_value": "6916.00",
+          "ts_code": "002352.SZ",
+          "weight": "0.01650387504590707001093656150"
+        },
+        {
+          "instrument_name": "青岛啤酒",
+          "market_value": "6014.00",
+          "ts_code": "600600.SH",
+          "weight": "0.01435140319926042785508566814"
+        }
+      ],
+      "trade_date": "2026-06-08"
+    }
+  },
+  "window": {
+    "max_drawdown": "0.2227381239279573621828252938",
+    "peak_date": "2026-01-29",
+    "peak_nav": "539140.170",
+    "trough_date": "2026-06-08",
+    "trough_nav": "419053.100"
+  }
+}

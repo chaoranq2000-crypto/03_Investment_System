@@ -1,0 +1,662 @@
+{
+  "account_id": "default",
+  "artifact_scope": "compact_audit_and_scenario_summary; full daily marks are reproducible from the read-only source database and pipeline",
+  "audit": {
+    "cash_snapshot_checks": [
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0.00",
+        "is_selected_anchor": true,
+        "note": "用户提供的 2026-07-14 账户现金余额；本次交割单不含完整银证转账流水",
+        "reconstructed_cash": "11357.00",
+        "recorded_amount": "11357",
+        "recorded_at": "2026-07-14T17:42:53+00:00",
+        "snapshot_id": "7de3e9bc-4927-4632-aecc-5e1cdcd54f42",
+        "source": "user_provided"
+      },
+      {
+        "as_of_date": "2026-07-15",
+        "difference": "-70.26",
+        "is_selected_anchor": false,
+        "note": "statement_cash_replay; anchor_snapshot_id=7de3e9bc-4927-4632-aecc-5e1cdcd54f42; anchor_as_of=2026-07-14; ledger_entries=10; cash_change=-8660; fee_pending_entries=10; calculation_status=fee_pending; ledger_fingerprint=7bc48a25e4a662494cd2243b06892abdd35b612ad733f0bf220ab4074848b280",
+        "reconstructed_cash": "2626.74",
+        "recorded_amount": "2697",
+        "recorded_at": "2026-07-15T12:30:30+00:00",
+        "snapshot_id": "e694beb7-5be3-4474-9126-0e35fd804f00",
+        "source": "statement_calculated"
+      }
+    ],
+    "final_holdings": [
+      {
+        "instrument_name": "北新建材",
+        "quantity": "200",
+        "ts_code": "000786.SZ"
+      },
+      {
+        "instrument_name": "德展健康",
+        "quantity": "17200",
+        "ts_code": "000813.SZ"
+      },
+      {
+        "instrument_name": "顺丰控股",
+        "quantity": "200",
+        "ts_code": "002352.SZ"
+      },
+      {
+        "instrument_name": "巨人网络",
+        "quantity": "3600",
+        "ts_code": "002558.SZ"
+      },
+      {
+        "instrument_name": "索菲亚",
+        "quantity": "300",
+        "ts_code": "002572.SZ"
+      },
+      {
+        "instrument_name": "瑞鹄模具",
+        "quantity": "5200",
+        "ts_code": "002997.SZ"
+      },
+      {
+        "instrument_name": "港股通互联网ETF富国",
+        "quantity": "98700",
+        "ts_code": "159792.SZ"
+      },
+      {
+        "instrument_name": "恒生医药ETF华夏",
+        "quantity": "41600",
+        "ts_code": "159892.SZ"
+      },
+      {
+        "instrument_name": "恒生互联网ETF华夏",
+        "quantity": "11000",
+        "ts_code": "513330.SH"
+      },
+      {
+        "instrument_name": "中信证券",
+        "quantity": "500",
+        "ts_code": "600030.SH"
+      },
+      {
+        "instrument_name": "重庆啤酒",
+        "quantity": "100",
+        "ts_code": "600132.SH"
+      },
+      {
+        "instrument_name": "青岛啤酒",
+        "quantity": "100",
+        "ts_code": "600600.SH"
+      },
+      {
+        "instrument_name": "春秋航空",
+        "quantity": "100",
+        "ts_code": "601021.SH"
+      },
+      {
+        "instrument_name": "广深铁路",
+        "quantity": "1600",
+        "ts_code": "601333.SH"
+      },
+      {
+        "instrument_name": "中国中免",
+        "quantity": "200",
+        "ts_code": "601888.SH"
+      },
+      {
+        "instrument_name": "中国核电",
+        "quantity": "600",
+        "ts_code": "601985.SH"
+      },
+      {
+        "instrument_name": "欧派家居",
+        "quantity": "100",
+        "ts_code": "603833.SH"
+      }
+    ],
+    "holdings_at_output_start": [
+      {
+        "instrument_name": "黄金ETF华安",
+        "quantity": "300",
+        "ts_code": "518880.SH"
+      }
+    ],
+    "holdings_before_output_start": [],
+    "inferred_cash_before_first_ledger_event": "519088.75",
+    "negative_holding_events": [],
+    "rebase_quantity_checks": [
+      {
+        "as_of_date": "2026-07-07",
+        "difference": "0",
+        "ledger_quantity": "8900",
+        "rebase_id": "9679776aed08486d9e0b935bbe56e97a",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/opening_2026-07-07_rebased_9ea8ce20.csv",
+        "status": "reviewed",
+        "target_quantity": "8900",
+        "ts_code": "000813.SZ"
+      },
+      {
+        "as_of_date": "2026-07-07",
+        "difference": "0",
+        "ledger_quantity": "2600",
+        "rebase_id": "ac5ace173cd14ce5adb40066942985a6",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/included_in_opening_verified.csv",
+        "status": "reviewed",
+        "target_quantity": "2600",
+        "ts_code": "002558.SZ"
+      },
+      {
+        "as_of_date": "2026-07-07",
+        "difference": "0",
+        "ledger_quantity": "3600",
+        "rebase_id": "030a3b8b773147d481caaf038bce20da",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/screenshot_summaries.csv",
+        "status": "reviewed",
+        "target_quantity": "3600",
+        "ts_code": "002997.SZ"
+      },
+      {
+        "as_of_date": "2026-07-07",
+        "difference": "0",
+        "ledger_quantity": "34100",
+        "rebase_id": "b8bf8589b33c47b4b5e25c3f2c1bee0d",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/opening_2026-07-07_rebased_9ea8ce20.csv",
+        "status": "reviewed",
+        "target_quantity": "34100",
+        "ts_code": "159892.SZ"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "200",
+        "rebase_id": "3f153cec6b374195ba13d95fbeba527c",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "200",
+        "ts_code": "000786.SZ"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "200",
+        "rebase_id": "bb75ece64b8d48c7b3b079a74d16878e",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/screenshot_summaries.csv",
+        "status": "reviewed",
+        "target_quantity": "200",
+        "ts_code": "002352.SZ"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "300",
+        "rebase_id": "b9c835162b264463b71cd3cb65bba026",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "300",
+        "ts_code": "002463.SZ"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "2600",
+        "rebase_id": "76465416365f497fb363c3726060dabc",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "2600",
+        "ts_code": "002558.SZ"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "300",
+        "rebase_id": "5a8bb411af17404eb23c4221e21ca4ad",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "300",
+        "ts_code": "002572.SZ"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "500",
+        "rebase_id": "ad27de96ae5e429e9a55cc24083ca7d7",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "500",
+        "ts_code": "600030.SH"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "100",
+        "rebase_id": "d8c14f1b03f34cb1a874387113061fb8",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "100",
+        "ts_code": "600132.SH"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "100",
+        "rebase_id": "5d68c6d78b924b24962c45aaccf0a486",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/screenshot_summaries.csv",
+        "status": "reviewed",
+        "target_quantity": "100",
+        "ts_code": "600600.SH"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "300",
+        "rebase_id": "250c7578657b47e890c20917abc9bee6",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "300",
+        "ts_code": "600674.SH"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "200",
+        "rebase_id": "5dca6e6c02d54d32b3daae89e4af9a01",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "200",
+        "ts_code": "600900.SH"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "100",
+        "rebase_id": "8f31f3e2f4ae4f3297d5dee58afacd03",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "100",
+        "ts_code": "601021.SH"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "1600",
+        "rebase_id": "b95606fda7834f79a86d00b21f127f80",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "1600",
+        "ts_code": "601333.SH"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "200",
+        "rebase_id": "7237165d7d28469ca752b73df5300729",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "200",
+        "ts_code": "601888.SH"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "600",
+        "rebase_id": "32dedd2297804fc59672fea937aa3dd4",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/screenshot_summaries.csv",
+        "status": "reviewed",
+        "target_quantity": "600",
+        "ts_code": "601985.SH"
+      },
+      {
+        "as_of_date": "2026-07-10",
+        "difference": "0",
+        "ledger_quantity": "100",
+        "rebase_id": "88b117b6c20146ae94baf11cb8159c0b",
+        "source_path": "C:\\Projects\\03_Investment_System\\data\\db\\portfolio_opening_2026-07-10.csv",
+        "status": "reviewed",
+        "target_quantity": "100",
+        "ts_code": "603833.SH"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "200",
+        "rebase_id": "b29df76ecb154d8e9c776ff6902a0f57",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "200",
+        "ts_code": "000786.SZ"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "17200",
+        "rebase_id": "f727e3f3b53a4df5931a45d16d677508",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "17200",
+        "ts_code": "000813.SZ"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "200",
+        "rebase_id": "d875afc01c77434eaad829c74371edea",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "200",
+        "ts_code": "002352.SZ"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "100",
+        "rebase_id": "f8c5e66399624bcb8f12624c8182c286",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "100",
+        "ts_code": "002463.SZ"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "3400",
+        "rebase_id": "e6c1a44c86044e54ad9dfdf3812e6086",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "3400",
+        "ts_code": "002558.SZ"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "3400",
+        "rebase_id": "b7738c2ccf7e4e96b534cefbbb9781f3",
+        "source_path": "data/db/cost_reconciliation_20260715/002558_current_20260715.png",
+        "status": "reviewed",
+        "target_quantity": "3400",
+        "ts_code": "002558.SZ"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "300",
+        "rebase_id": "cac10780a99444d691747940219e8cc3",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "300",
+        "ts_code": "002572.SZ"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "4400",
+        "rebase_id": "ccec223371174d9bba893adc9366fef7",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "4400",
+        "ts_code": "002997.SZ"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "-6624",
+        "ledger_quantity": "98700",
+        "rebase_id": "d12accc81b7b4487bb9d930338d0e2db",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "unverified",
+        "target_quantity": "105324",
+        "ts_code": "159792.SZ"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "41600",
+        "rebase_id": "297e5ff7a38b4bb3a0ef96bc23057f23",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "41600",
+        "ts_code": "159892.SZ"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "500",
+        "rebase_id": "c3bc1a8cfb414e6188989bf1361a415e",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "500",
+        "ts_code": "600030.SH"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "100",
+        "rebase_id": "6b2854fa82e14efb93ccfd304bdd1599",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "100",
+        "ts_code": "600132.SH"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "100",
+        "rebase_id": "d7dcf146eb734648a6f03c6e73bc2c12",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "100",
+        "ts_code": "600600.SH"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "300",
+        "rebase_id": "8e3147231ef04f12af780a784e87c496",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "300",
+        "ts_code": "600674.SH"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "100",
+        "rebase_id": "6a7f816065f345b5941490587722b423",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "100",
+        "ts_code": "601021.SH"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "1600",
+        "rebase_id": "52917ec79d814ed9b32fa9bee0b07f01",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "1600",
+        "ts_code": "601333.SH"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "200",
+        "rebase_id": "9f168009a9244631b50203f526064140",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "200",
+        "ts_code": "601888.SH"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "600",
+        "rebase_id": "f15b939f45c2438db239d1ca9931ee51",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "600",
+        "ts_code": "601985.SH"
+      },
+      {
+        "as_of_date": "2026-07-14",
+        "difference": "0",
+        "ledger_quantity": "100",
+        "rebase_id": "bcce5b2595eb44398f1b983949f324af",
+        "source_path": "data/db/statement_import_20260714_9ea8ce20/portfolio.shadow.sqlite3",
+        "status": "reviewed",
+        "target_quantity": "100",
+        "ts_code": "603833.SH"
+      }
+    ],
+    "source_access": "sqlite_uri_mode_ro_immutable_1_and_pragma_query_only_on",
+    "source_row_counts": {
+      "cash_balance_snapshots": 4,
+      "close_prices": 7092,
+      "ledger_entries": 983,
+      "position_cost_rebases": 38
+    }
+  },
+  "cash_anchor": {
+    "amount": "11357",
+    "as_of_date": "2026-07-14",
+    "source_ref": "portfolio.sqlite3#cash_balance_snapshots:2026-07-14_user_provided",
+    "timing": "end_of_day"
+  },
+  "scenarios": [
+    {
+      "assumptions": [
+        "cash anchor is correct at end of anchor date",
+        "ledger contains every cash-changing event after initial funding",
+        "latest available close at or before each date is a valid valuation mark"
+      ],
+      "cash_shift": "0",
+      "diagnostics": {
+        "incomplete_valuation_dates": [],
+        "minimum_cash": "-6736.29",
+        "negative_cash_dates": [
+          "2026-03-19",
+          "2026-03-20",
+          "2026-03-23",
+          "2026-03-24",
+          "2026-07-02",
+          "2026-07-03",
+          "2026-07-06"
+        ],
+        "nonpositive_nav_dates": []
+      },
+      "end_observation": {
+        "cash": "2626.74",
+        "equity_exposure": "0.9945031507367260446533151647",
+        "market_value": "475236.100",
+        "nav": "477862.840",
+        "trade_date": "2026-07-16"
+      },
+      "epistemic_status": "reconstruction_scenario_not_fact",
+      "fee_status_counts": {
+        "complete": 183,
+        "contains_non_actual": 128
+      },
+      "gap_counts": {
+        "fee_not_directly_observed": 710,
+        "market_price_missing_cost_proxy_used": 12
+      },
+      "name": "anchored_raw",
+      "period": {
+        "complete_nav_observation_count": 311,
+        "end": "2026-07-16",
+        "observation_count": 311,
+        "start": "2025-04-07"
+      },
+      "start_observation": {
+        "cash": "517014.34",
+        "equity_exposure": "0.003974551465769731776437827851",
+        "market_value": "2063.100",
+        "nav": "519077.440",
+        "trade_date": "2025-04-07"
+      }
+    },
+    {
+      "assumptions": [
+        "caller-specified constant cash correction applies unchanged to every date",
+        "the shift is a sensitivity input and is not evidence of an actual transfer"
+      ],
+      "cash_shift": "6736.29",
+      "diagnostics": {
+        "incomplete_valuation_dates": [],
+        "minimum_cash": "0.00",
+        "negative_cash_dates": [],
+        "nonpositive_nav_dates": []
+      },
+      "end_observation": {
+        "cash": "9363.03",
+        "equity_exposure": "0.9806788138476435151668555410",
+        "market_value": "475236.100",
+        "nav": "484599.130",
+        "trade_date": "2026-07-16"
+      },
+      "epistemic_status": "sensitivity_scenario_not_fact",
+      "fee_status_counts": {
+        "complete": 183,
+        "contains_non_actual": 128
+      },
+      "gap_counts": {
+        "fee_not_directly_observed": 710,
+        "market_price_missing_cost_proxy_used": 12
+      },
+      "name": "constant_cash_shift",
+      "period": {
+        "complete_nav_observation_count": 311,
+        "end": "2026-07-16",
+        "observation_count": 311,
+        "start": "2025-04-07"
+      },
+      "start_observation": {
+        "cash": "523750.63",
+        "equity_exposure": "0.003923632804339285701040937063",
+        "market_value": "2063.100",
+        "nav": "525813.730",
+        "trade_date": "2025-04-07"
+      }
+    },
+    {
+      "assumptions": [
+        "dates before 2026-07-14 are excluded from return statistics",
+        "holdings and cash at the trusted boundary still depend on earlier ledger replay"
+      ],
+      "cash_shift": "0",
+      "diagnostics": {
+        "incomplete_valuation_dates": [],
+        "minimum_cash": "2626.74",
+        "negative_cash_dates": [],
+        "nonpositive_nav_dates": []
+      },
+      "end_observation": {
+        "cash": "2626.74",
+        "equity_exposure": "0.9945031507367260446533151647",
+        "market_value": "475236.100",
+        "nav": "477862.840",
+        "trade_date": "2026-07-16"
+      },
+      "epistemic_status": "restricted_window_scenario_not_fact",
+      "fee_status_counts": {
+        "complete": 1,
+        "contains_non_actual": 2
+      },
+      "gap_counts": {
+        "fee_not_directly_observed": 12
+      },
+      "name": "trusted_window",
+      "period": {
+        "complete_nav_observation_count": 3,
+        "end": "2026-07-16",
+        "observation_count": 3,
+        "start": "2026-07-14"
+      },
+      "start_observation": {
+        "cash": "11357.00",
+        "equity_exposure": "0.9751698776531085205558519244",
+        "market_value": "446031.000",
+        "nav": "457388.000",
+        "trade_date": "2026-07-14"
+      }
+    }
+  ],
+  "schema_version": "investment_review.strategy_drawdown_pipeline.v1"
+}
