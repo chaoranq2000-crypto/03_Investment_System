@@ -132,6 +132,126 @@ export function normalizeBars(bars = []) {
   );
 }
 
+const LIVE_BAR_VALUE_FIELDS = ["open", "high", "low", "close", "volume", "turnover"];
+
+export function reconcileLiveIntradayBars(previousBars = [], incomingBars = []) {
+  const previous = normalizeBars(previousBars);
+  const incoming = normalizeBars(incomingBars);
+  const previousByTimestamp = new Map(previous.map((item) => [item.timestamp, item]));
+  const incomingRawByTimestamp = new Map(
+    incomingBars
+      .filter((item) => Number.isFinite(Number(item?.timestamp)))
+      .map((item) => [Number(item.timestamp), item]),
+  );
+  const mergedRawByTimestamp = new Map(
+    previousBars
+      .filter((item) => Number.isFinite(Number(item?.timestamp)))
+      .map((item) => [Number(item.timestamp), item]),
+  );
+  incomingRawByTimestamp.forEach((item, timestamp) => {
+    mergedRawByTimestamp.set(timestamp, item);
+  });
+  const previousLastTimestamp = previous.at(-1)?.timestamp ?? null;
+  const updates = incoming.filter((item) => {
+    const existing = previousByTimestamp.get(item.timestamp);
+    const changed = !existing || LIVE_BAR_VALUE_FIELDS.some(
+      (field) => existing[field] !== item[field],
+    );
+    return changed && (
+      previousLastTimestamp === null || item.timestamp >= previousLastTimestamp
+    );
+  });
+  return {
+    bars: [...mergedRawByTimestamp.values()].sort(
+      (left, right) => Number(left.timestamp) - Number(right.timestamp),
+    ),
+    updates,
+  };
+}
+
+export function liveRetryDelay(failureCount, baseIntervalMilliseconds = 30_000) {
+  const failures = Math.max(1, Math.trunc(Number(failureCount) || 1));
+  const base = Math.max(1, Number(baseIntervalMilliseconds) || 30_000);
+  return base * (2 ** Math.min(failures - 1, 2));
+}
+
+export function livePollDelay(live, failureCount = 0) {
+  const interval = Math.max(
+    1,
+    Number(live?.poll_interval_seconds || 30) * 1000,
+  );
+  const nextPollSeconds = Number(live?.next_poll_seconds);
+  if (live?.market_state === "closed") return null;
+  if (["pre_open", "lunch_break"].includes(live?.market_state)) {
+    return Number.isFinite(nextPollSeconds) && nextPollSeconds > 0
+      ? nextPollSeconds * 1000
+      : null;
+  }
+  if (Number(failureCount) > 0) return liveRetryDelay(failureCount, interval);
+  if (Number.isFinite(nextPollSeconds) && nextPollSeconds > 0) {
+    return nextPollSeconds * 1000;
+  }
+  if (["open_am", "open_pm"].includes(live?.market_state)) return interval;
+  return null;
+}
+
+function shanghaiDateTimeParts(value = new Date()) {
+  const current = value instanceof Date ? value : new Date(value);
+  if (!Number.isFinite(current.getTime())) return null;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(current);
+  return Object.fromEntries(parts.map((item) => [item.type, item.value]));
+}
+
+export function shanghaiDateString(value = new Date()) {
+  const values = shanghaiDateTimeParts(value);
+  if (!values) return null;
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+export function shanghaiLiveSchedule(value = new Date(), pollIntervalSeconds = 30) {
+  const parts = shanghaiDateTimeParts(value);
+  if (!parts) return { market_state: "closed", next_poll_seconds: null };
+  const weekday = new Date(Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+  )).getUTCDay();
+  if (weekday === 0 || weekday === 6) {
+    return { market_state: "closed", next_poll_seconds: null };
+  }
+  const secondOfDay = (
+    Number(parts.hour) * 3600 + Number(parts.minute) * 60 + Number(parts.second)
+  );
+  if (secondOfDay < 9 * 3600 + 30 * 60) {
+    return {
+      market_state: "pre_open",
+      next_poll_seconds: 9 * 3600 + 30 * 60 - secondOfDay,
+    };
+  }
+  if (secondOfDay < 11 * 3600 + 30 * 60) {
+    return { market_state: "open_am", next_poll_seconds: pollIntervalSeconds };
+  }
+  if (secondOfDay < 13 * 3600) {
+    return {
+      market_state: "lunch_break",
+      next_poll_seconds: 13 * 3600 - secondOfDay,
+    };
+  }
+  if (secondOfDay <= 15 * 3600) {
+    return { market_state: "open_pm", next_poll_seconds: pollIntervalSeconds };
+  }
+  return { market_state: "closed", next_poll_seconds: null };
+}
+
 export function rangeLabel(rangeKey) {
   return { "3m": "最近 3 个月", "1y": "最近 1 年", cycle: "本轮持仓" }[rangeKey] || rangeKey;
 }

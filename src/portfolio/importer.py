@@ -8,7 +8,7 @@ import re
 import unicodedata
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
 from typing import Any
 
@@ -92,6 +92,21 @@ OPENING_ALIASES: dict[str, tuple[str, ...]] = {
 }
 
 FEE_COMPONENTS = ("commission", "stamp_tax", "transfer_fee", "regulatory_fee", "other_fee")
+FEE_RULE_VERSION = "historical_fee_rule_v1"
+CONVERTIBLE_BOND_FEE_RULE_VERSION = "online_convertible_bond_fee_rule_v1"
+PRIMARY_BOND_SUBSCRIPTION_FEE_RULE_VERSION = (
+    "online_primary_bond_subscription_fee_exempt_v1"
+)
+FEE_MONEY_QUANTUM = Decimal("0.01")
+ETF_FEE_RATE = Decimal("0.0001")
+ETF_MINIMUM_FEE = Decimal("0.10")
+EQUITY_COMMISSION_RATE = Decimal("0.0001158")
+EQUITY_MINIMUM_COMMISSION = Decimal("5.00")
+EQUITY_TRANSFER_FEE_RATE = Decimal("0.00001")
+EQUITY_SELL_STAMP_TAX_RATE = Decimal("0.0005")
+CONVERTIBLE_BOND_CODE_PREFIXES = ("110", "111", "113", "118", "123", "127", "128")
+# SSE and SZSE both charge 0.004% bilaterally.
+CONVERTIBLE_BOND_EXCHANGE_FEE_RATE = Decimal("0.00004")
 
 
 def normalize_header(value: Any) -> str:
@@ -293,11 +308,69 @@ def infer_asset_type(ts_code: str, raw_type: str = "") -> str:
     if any(token in normalized_type for token in ("股票", "ashare", "equity")):
         return "equity"
     code = ts_code.split(".", 1)[0]
-    if code.startswith(("15", "16", "18", "50", "51", "52", "56", "58")):
+    if code.startswith(("15", "16", "18", "50", "51", "52", "55", "56", "58")):
         return "etf"
     if code.startswith(("110", "111", "113", "118", "123", "127", "128")):
         return "unknown"
     return "equity"
+
+
+def _round_fee(value: Decimal) -> Decimal:
+    return value.quantize(FEE_MONEY_QUANTUM, rounding=ROUND_HALF_UP)
+
+
+def _is_convertible_bond(ts_code: str | None) -> bool:
+    code = str(ts_code or "").split(".", 1)[0]
+    return code.startswith(CONVERTIBLE_BOND_CODE_PREFIXES)
+
+
+def _is_primary_bond_subscription(raw_event: str) -> bool:
+    return "新债入账" in normalize_header(raw_event)
+
+
+def formal_fee_rule_version(*, asset_type: str, ts_code: str | None = None) -> str:
+    if str(asset_type).strip().lower() in {"equity", "etf"}:
+        return FEE_RULE_VERSION
+    if _is_convertible_bond(ts_code):
+        return CONVERTIBLE_BOND_FEE_RULE_VERSION
+    raise ValueError(
+        f"证券 {ts_code or '<unknown>'} 没有可应用的正式手续费规则"
+    )
+
+
+def calculate_historical_trade_fee(
+    gross_amount: Decimal,
+    *,
+    asset_type: str,
+    event_type: str,
+    ts_code: str | None = None,
+) -> Decimal:
+    """Apply the user-confirmed formal fee rule for a supported security."""
+
+    normalized_asset_type = str(asset_type).strip().lower()
+    normalized_event_type = str(event_type).strip().upper()
+    if gross_amount <= ZERO:
+        raise ValueError("历史手续费规则要求成交金额为正")
+    if normalized_event_type not in {"BUY", "SELL"}:
+        raise ValueError(f"历史手续费规则不支持业务类型: {event_type}")
+    if normalized_asset_type == "etf":
+        return _round_fee(max(ETF_MINIMUM_FEE, gross_amount * ETF_FEE_RATE))
+    if normalized_asset_type == "equity":
+        commission = _round_fee(
+            max(EQUITY_MINIMUM_COMMISSION, gross_amount * EQUITY_COMMISSION_RATE)
+        )
+        transfer_fee = _round_fee(gross_amount * EQUITY_TRANSFER_FEE_RATE)
+        stamp_tax = (
+            _round_fee(gross_amount * EQUITY_SELL_STAMP_TAX_RATE)
+            if normalized_event_type == "SELL"
+            else ZERO
+        )
+        return commission + transfer_fee + stamp_tax
+    if _is_convertible_bond(ts_code):
+        return _round_fee(gross_amount * CONVERTIBLE_BOND_EXCHANGE_FEE_RATE)
+    raise ValueError(
+        f"证券 {ts_code or '<unknown>'} 没有可应用的正式手续费规则"
+    )
 
 
 def _classify_event(value: str) -> str | None:
@@ -383,6 +456,7 @@ def parse_statement(
             event_time = parse_time_value(_value(row, mapping, "event_time"))
             ts_code = normalize_ts_code(raw_code)
             name = _value(row, mapping, "name").strip() or ts_code
+            asset_type = infer_asset_type(ts_code)
             external_id = _value(row, mapping, "external_id").strip()
             note_parts = [f"broker={broker}", f"raw_event={raw_event}"]
 
@@ -415,13 +489,16 @@ def parse_statement(
                 total_fee = parse_decimal(_value(row, mapping, "total_fee"), field="手续费")
                 if total_fee is not None:
                     fees = abs(total_fee)
+                    note_parts.append("fee_source=broker_actual")
                 else:
                     components = [
                         parse_decimal(_value(row, mapping, key), field=key) for key in FEE_COMPONENTS
                     ]
                     explicit_components = [item for item in components if item is not None]
                     fees = sum((abs(item) for item in explicit_components), ZERO)
-                    if not explicit_components:
+                    if explicit_components:
+                        note_parts.append("fee_source=broker_actual")
+                    else:
                         net_amount = parse_decimal(
                             _value(row, mapping, "net_amount"), field="资金发生额"
                         )
@@ -434,8 +511,29 @@ def parse_statement(
                             if inferred >= ZERO:
                                 fees = inferred
                                 note_parts.append("fees_inferred_from_net_amount=true")
+                                note_parts.append("fee_source=broker_actual")
+                        elif _is_primary_bond_subscription(raw_event):
+                            fees = ZERO
+                            note_parts.append(
+                                "fee_rule="
+                                + PRIMARY_BOND_SUBSCRIPTION_FEE_RULE_VERSION
+                            )
+                            note_parts.append("fee_source=formal_exemption")
                         else:
-                            note_parts.append("fees_missing=true")
+                            fees = calculate_historical_trade_fee(
+                                gross,
+                                asset_type=asset_type,
+                                event_type=event_type,
+                                ts_code=ts_code,
+                            )
+                            note_parts.append(
+                                "fee_rule="
+                                + formal_fee_rule_version(
+                                    asset_type=asset_type,
+                                    ts_code=ts_code,
+                                )
+                            )
+                            note_parts.append("fee_source=rule_derived")
                 net_amount_for_audit = parse_decimal(
                     _value(row, mapping, "net_amount"), field="资金发生额"
                 )
@@ -484,7 +582,7 @@ def parse_statement(
             result.instruments[ts_code] = Instrument(
                 ts_code=ts_code,
                 name=name,
-                asset_type=infer_asset_type(ts_code),
+                asset_type=asset_type,
             )
         except ValueError as exc:
             result.issues.append(

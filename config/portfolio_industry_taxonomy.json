@@ -28,6 +28,13 @@
       "index_name": "恒生互联网科技业",
       "reviewed_at": "2026-07-15",
       "evidence_source": "tushare.etf_basic"
+    },
+    "588200.SH": {
+      "industry_name": "电子",
+      "index_code": "000685.SH",
+      "index_name": "上证科创芯片",
+      "reviewed_at": "2026-07-17",
+      "evidence_source": "tushare.etf_basic|sse.index_000685"
     }
   },
   "aliases": {

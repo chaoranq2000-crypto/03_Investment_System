@@ -493,6 +493,32 @@ def _reconcile(snapshot: _SourceSnapshot, sidecar: Path) -> dict[str, Any]:
     }
 
 
+def _fee_source_details(event: CanonicalTradeEvent) -> tuple[str, str | None]:
+    source_row = event.raw_payload.get("source_row")
+    note = str(source_row.get("note") or "") if isinstance(source_row, Mapping) else ""
+    fields: dict[str, str] = {}
+    for part in note.split(";"):
+        key, separator, value = part.strip().partition("=")
+        if separator and key.strip():
+            fields[key.strip().lower()] = value.strip()
+    fee_source = fields.get("fee_source", "").lower()
+    fee_rule = fields.get("fee_rule")
+    if fee_source in {"broker_actual", "rule_derived", "formal_exemption"}:
+        return fee_source, fee_rule
+    if fields.get("fees_inferred_from_net_amount", "").lower() == "true":
+        return "broker_actual", fee_rule
+    if "fee_backfilled_exact" in fields:
+        return "broker_actual", fee_rule
+    if fields.get("fee_backfilled_rule", "").lower() == "true":
+        return "rule_derived", fee_rule
+    if fee_rule:
+        return (
+            "formal_exemption" if "exempt" in fee_rule.lower() else "rule_derived",
+            fee_rule,
+        )
+    return "unknown", None
+
+
 def _fee_observations(
     snapshot: _SourceSnapshot,
 ) -> tuple[tuple[FeeObservation, ...], dict[str, CanonicalTradeEvent]]:
@@ -501,7 +527,8 @@ def _fee_observations(
     for event in snapshot.events:
         if event.side not in {"BUY", "SELL"}:
             continue
-        source_fee_actual = bool(event.fees is not None and event.fees > 0)
+        fee_source, fee_rule = _fee_source_details(event)
+        source_fee_actual = fee_source == "broker_actual"
         observations.append(
             FeeObservation.build(
                 event_id=event.event_id,
@@ -517,7 +544,9 @@ def _fee_observations(
                     "source_record_id": event.source_record_id,
                     "source_table": snapshot.table,
                     "source_field": "fees",
-                    "explicit_positive": source_fee_actual,
+                    "explicit_positive": bool(event.fees is not None and event.fees > 0),
+                    "fee_source": fee_source,
+                    "fee_rule": fee_rule,
                 },
             )
         )

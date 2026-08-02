@@ -345,13 +345,28 @@ def test_available_four_layer_context_flows_into_motive_and_recommendation(
 
 def test_fee_provenance_separates_actual_backfill_exemption_and_unknown() -> None:
     assert _fee_provenance(
-        {"fees": "6.2", "note": "broker_statement=true"}
+        {
+            "fees": "6.2",
+            "note": "broker_statement=true; fee_source=broker_actual",
+        }
     )["status"] == "reported_actual"
+    legacy_actual = _fee_provenance(
+        {
+            "fees": "6.2",
+            "note": "fee_backfilled_exact=historical_statement.csv:2",
+        }
+    )
+    assert legacy_actual["status"] == "reported_actual"
+    assert legacy_actual["fee_source"] == "broker_actual"
+    assert _fee_provenance(
+        {"fees": "6.2", "note": "broker_statement=true"}
+    )["status"] == "unknown"
     backfilled = _fee_provenance(
         {
             "fees": "5.06",
             "note": (
-                "fees_missing=true; fee_rule=historical_fee_rule_v1; "
+                "fees_missing=true; fee_source=rule_derived; "
+                "fee_rule=historical_fee_rule_v1; "
                 "fee_backfilled_rule=true"
             ),
         }
@@ -481,7 +496,7 @@ def test_missing_historical_cash_preserves_total_asset_gap_and_market_value_basi
     assert performance["performance_basis"] == "invested_market_value_ex_cash"
     assert performance["period_change_cny"] is not None
     assert performance["period_change_pct"] is not None
-    assert "现金权重 MISSING" in report["headline"]
+    assert "现金权重尚无法可靠计算" in report["headline"]
     assert "None" not in report["headline"]
     assert validate_periodic_report(report)["status"] == "accepted"
 

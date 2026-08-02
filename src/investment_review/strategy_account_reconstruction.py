@@ -366,14 +366,27 @@ def _fee_evidence(row: Mapping[str, Any]) -> str:
     if event_type not in {"BUY", "SELL"}:
         return "not_applicable"
     note = str(row.get("note") or "").lower()
-    if "fee_backfilled_rule=true" in note:
+    fields: dict[str, str] = {}
+    for part in note.split(";"):
+        key, separator, value = part.strip().partition("=")
+        if separator and key.strip():
+            fields[key.strip()] = value.strip()
+    fee_source = fields.get("fee_source", "")
+    fee_rule = fields.get("fee_rule", "")
+    if fee_source == "formal_exemption" or "exempt" in fee_rule:
+        return "formal_exemption"
+    if fee_source == "rule_derived" or "fee_backfilled_rule=true" in note:
         return "rule_backfilled"
+    if fee_rule:
+        return "rule_backfilled"
+    if (
+        fee_source == "broker_actual"
+        or "fees_inferred_from_net_amount=true" in note
+        or "fee_backfilled_exact=" in note
+    ):
+        return "recorded_actual"
     if any(marker in note for marker in ("fee_pending", "fees_missing=true")):
         return "unknown"
-    if _decimal(row.get("fees"), field="fees") > ZERO:
-        return "recorded_actual"
-    if "fee_rule=" in note and any(marker in note for marker in ("exempt", "no_fee", "zero_fee")):
-        return "formal_exemption"
     return "unknown"
 
 

@@ -22,7 +22,12 @@ from src.investment_review.periodic_runner import (
 )
 
 from .industries import IndustryFetchError, TushareIndustryProvider
-from .intraday import IntradayFetchError, IntradayService, build_intraday_provider
+from .intraday import (
+    IntradayFetchError,
+    IntradayService,
+    build_intraday_provider,
+    build_live_intraday_provider,
+)
 from .kline import (
     KlineFetchError,
     KlineNotFoundError,
@@ -47,10 +52,11 @@ from .investment_review_service import (
 
 
 WEB_ASSET_DIR = Path(__file__).with_name("web_assets")
-DASHBOARD_API_VERSION = 2
+DASHBOARD_API_VERSION = 3
 DASHBOARD_CAPABILITIES = (
     "daily-kline",
     "refresh-intraday",
+    "live-intraday-1m",
     "auto-performance-history",
 )
 STATIC_ASSETS = {
@@ -129,6 +135,7 @@ class DashboardApplication:
         account_id: str = "default",
         env_file: str | Path = ".env.local",
         realtime_provider: FallbackRealtimeProvider | None = None,
+        live_intraday_provider: Any | None = None,
         realtime_cache_seconds: int = 55,
         investment_review_service: InvestmentReviewWebService | None = None,
         investment_review_error: ReviewHTTPError | None = None,
@@ -152,6 +159,11 @@ class DashboardApplication:
             None
             if self.review_acceptance_read_only
             else (realtime_provider or FallbackRealtimeProvider())
+        )
+        self.live_intraday_provider = (
+            None
+            if self.review_acceptance_read_only
+            else (live_intraday_provider or build_live_intraday_provider())
         )
         self.realtime_cache_seconds = realtime_cache_seconds
         self.investment_review_service = investment_review_service
@@ -851,6 +863,29 @@ class DashboardApplication:
         finally:
             self.refresh_lock.release()
 
+    def live_intraday(
+        self,
+        ts_code: str,
+        *,
+        trade_date: date,
+        cycle_id: str | None = None,
+        as_of: date | None = None,
+    ) -> dict[str, Any]:
+        if not self.refresh_lock.acquire(blocking=False):
+            raise KlineRefreshBusyError("已有一个数据刷新任务正在运行")
+        try:
+            return _json_ready(
+                IntradayService(self.store, account_id=self.account_id).refresh_live(
+                    self.live_intraday_provider,
+                    ts_code,
+                    trade_date=trade_date,
+                    cycle_id=cycle_id,
+                    as_of=as_of,
+                )
+            )
+        finally:
+            self.refresh_lock.release()
+
 
 class DashboardHTTPServer(ThreadingHTTPServer):
     daemon_threads = True
@@ -1389,6 +1424,7 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
             "/api/refresh-industries": "refresh-industries",
             "/api/refresh-kline": "refresh-kline",
             "/api/refresh-intraday": "refresh-intraday",
+            "/api/live-intraday": "live-intraday",
         }
         expected_action = actions.get(parsed.path)
         if expected_action is None:
@@ -1430,7 +1466,7 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                     ),
                     as_of=_parse_iso_date(payload.get("as_of"), "as_of"),
                 )
-            else:
+            elif parsed.path == "/api/refresh-intraday":
                 ts_code = str(payload.get("ts_code", "")).strip()
                 if not ts_code:
                     raise ValueError("ts_code 不能为空")
@@ -1438,6 +1474,21 @@ class DashboardRequestHandler(BaseHTTPRequestHandler):
                 if trade_date is None:
                     raise ValueError("trade_date 不能为空")
                 result = self.server.dashboard_app.refresh_intraday(
+                    ts_code,
+                    trade_date=trade_date,
+                    cycle_id=(
+                        str(payload["cycle_id"]) if payload.get("cycle_id") else None
+                    ),
+                    as_of=_parse_iso_date(payload.get("as_of"), "as_of"),
+                )
+            else:
+                ts_code = str(payload.get("ts_code", "")).strip()
+                if not ts_code:
+                    raise ValueError("ts_code 不能为空")
+                trade_date = _parse_iso_date(payload.get("trade_date"), "trade_date")
+                if trade_date is None:
+                    raise ValueError("trade_date 不能为空")
+                result = self.server.dashboard_app.live_intraday(
                     ts_code,
                     trade_date=trade_date,
                     cycle_id=(

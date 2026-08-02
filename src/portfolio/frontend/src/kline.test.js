@@ -11,11 +11,16 @@ import {
   intradayFitBarSpace,
   intradayAverageSeries,
   latestLedgerTradeDate,
+  livePollDelay,
+  liveRetryDelay,
   normalizeBars,
   normalizeTechnicalIndicatorSelection,
   operationDomId,
   rangeLabel,
+  reconcileLiveIntradayBars,
   setTechnicalIndicatorVisibility,
+  shanghaiDateString,
+  shanghaiLiveSchedule,
   sensitiveText,
   technicalIndicatorChartHeight,
   technicalIndicatorPaneId,
@@ -95,6 +100,51 @@ describe("K 线前端映射", () => {
     expect(intradayFitBarSpace(900, 241, { min: 2, max: 14 })).toBeCloseTo(3.3469, 3);
     expect(intradayFitBarSpace(900, 48, { min: 2, max: 24 })).toBeCloseTo(15.7692, 3);
     expect(intradayFitBarSpace(0, 0, { min: 2, max: 14 })).toBe(2);
+  });
+
+  it("实时分时把同根修订交给图表更新，并按时间追加新分钟", () => {
+    const previous = [
+      { timestamp: 1, open: 10, high: 10, low: 10, close: 10, volume: 10, turnover: 100, bar_time: "09:31" },
+      { timestamp: 2, open: 10, high: 11, low: 10, close: 11, volume: 20, turnover: 210, bar_time: "09:32" },
+    ];
+    const incoming = [
+      previous[0],
+      { ...previous[1], high: 11.2, close: 11.1, volume: 25, turnover: 265 },
+      { timestamp: 3, open: 11.1, high: 11.3, low: 11, close: 11.2, volume: 8, turnover: 89.6, bar_time: "09:33" },
+    ];
+    const result = reconcileLiveIntradayBars(previous, incoming);
+    expect(result.bars).toHaveLength(3);
+    expect(result.bars[1].close).toBe(11.1);
+    expect(result.updates.map((item) => item.timestamp)).toEqual([2, 3]);
+    expect(reconcileLiveIntradayBars(result.bars, incoming).updates).toEqual([]);
+  });
+
+  it("实时轮询按 30/60/120 秒退避，并在午休和收盘暂停", () => {
+    expect(liveRetryDelay(1)).toBe(30_000);
+    expect(liveRetryDelay(2)).toBe(60_000);
+    expect(liveRetryDelay(3)).toBe(120_000);
+    expect(liveRetryDelay(8)).toBe(120_000);
+    expect(livePollDelay({ market_state: "open_am", poll_interval_seconds: 30 })).toBe(30_000);
+    expect(livePollDelay({ market_state: "lunch_break", next_poll_seconds: 3600 })).toBe(3_600_000);
+    expect(livePollDelay({ market_state: "closed", next_poll_seconds: null })).toBeNull();
+    expect(livePollDelay({ market_state: "open_pm" }, 2)).toBe(60_000);
+  });
+
+  it("用上海时区判断今日而不依赖浏览器本地时区", () => {
+    expect(shanghaiDateString("2026-07-17T16:30:00Z")).toBe("2026-07-18");
+    expect(shanghaiDateString("invalid")).toBeNull();
+    expect(shanghaiLiveSchedule("2026-07-14T02:00:00Z")).toEqual({
+      market_state: "open_am",
+      next_poll_seconds: 30,
+    });
+    expect(shanghaiLiveSchedule("2026-07-14T04:00:00Z")).toEqual({
+      market_state: "lunch_break",
+      next_poll_seconds: 3600,
+    });
+    expect(shanghaiLiveSchedule("2026-07-18T02:00:00Z")).toEqual({
+      market_state: "closed",
+      next_poll_seconds: null,
+    });
   });
 
   it("提供完整且不重复的 KLineChart v10 技术指标目录", () => {

@@ -145,7 +145,6 @@ ambiguous, or a write could affect protected data.
 ## Completion criteria
 
 The product is complete when:
-
 - all six portfolio/instrument daily/weekly/monthly report types are directly
   accessible;
 - reports are generated even when there was no trade or no Decision record;

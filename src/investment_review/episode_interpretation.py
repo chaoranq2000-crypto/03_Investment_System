@@ -29,7 +29,6 @@ from .artifact_io import (
 from .episode_review import (
     FACT_SECTION_NAMES,
     INTERPRETATION_SECTION_NAMES,
-    SCHEMA_VERSION as EPISODE_REVIEW_SCHEMA_VERSION,
     EpisodeReviewError,
     validate_episode_review,
 )

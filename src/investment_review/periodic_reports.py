@@ -287,12 +287,25 @@ def _fee_provenance(row: Mapping[str, Any]) -> dict[str, Any]:
     fields = _note_fields(note)
     fee_value = _decimal(row.get("fees"), default=ZERO) or ZERO
     fee_rule = fields.get("fee_rule")
-    if fields.get("fee_backfilled_rule", "").lower() == "true":
-        status = "rule_backfilled"
-    elif fee_rule in _FEE_EXEMPT_RULES:
+    fee_source = fields.get("fee_source", "").lower()
+    effective_fee_source = fee_source or "unknown"
+    if fee_source == "formal_exemption" or fee_rule in _FEE_EXEMPT_RULES:
         status = "formal_exemption"
-    elif fee_value > ZERO:
+        effective_fee_source = "formal_exemption"
+    elif (
+        fee_source == "rule_derived"
+        or fields.get("fee_backfilled_rule", "").lower() == "true"
+        or (fee_rule is not None and fee_rule not in _FEE_EXEMPT_RULES)
+    ):
+        status = "rule_backfilled"
+        effective_fee_source = "rule_derived"
+    elif (
+        fee_source == "broker_actual"
+        or fields.get("fees_inferred_from_net_amount", "").lower() == "true"
+        or "fee_backfilled_exact=" in note_lower
+    ):
         status = "reported_actual"
+        effective_fee_source = "broker_actual"
     elif any(
         marker in note_lower
         for marker in ("fee_pending", "fees_missing=true", "missing_source_column")
@@ -304,6 +317,7 @@ def _fee_provenance(row: Mapping[str, Any]) -> dict[str, Any]:
         "amount_cny": _decimal_text(fee_value, places=2),
         "status": status,
         "fee_rule": fee_rule,
+        "fee_source": effective_fee_source,
         "is_known": status != "unknown",
         "note_ref": (
             f"fee_rule={fee_rule}" if fee_rule else "ledger note has no fee rule"
@@ -1404,7 +1418,7 @@ def _operation_evaluation(
     if fee_status == "unknown":
         narrative += " 费用来源仍未知，不能把毛价差当作真实净收益。"
     elif fee_status == "rule_backfilled":
-        narrative += " 费用为规则回填值，可用于净结果计算，但不冒充券商实收。"
+        narrative += " 费用为规则计算或回填值，可用于净结果计算，但不冒充券商实收。"
     elif fee_status == "formal_exemption":
         narrative += " 该笔为正式规则确认的费用豁免。"
     elif fee_status == "reported_actual":
@@ -3556,7 +3570,7 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
     )
     fee_labels = {
         "reported_actual": "账本实收",
-        "rule_backfilled": "规则回填",
+        "rule_backfilled": "规则计算/回填",
         "formal_exemption": "正式豁免",
         "unknown": "来源未知",
     }

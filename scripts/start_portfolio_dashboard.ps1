@@ -53,8 +53,8 @@ $databasePath = Join-Path $runtimeRoot "data\db\portfolio.sqlite3"
 $envFilePath = Join-Path $runtimeRoot ".env.local"
 $dashboardUrl = "http://127.0.0.1:$Port/"
 $healthUrl = "${dashboardUrl}health"
-$requiredApiVersion = 2
-$requiredCapability = "refresh-intraday"
+$requiredApiVersion = 3
+$requiredCapability = "live-intraday-1m"
 
 function Test-PortfolioDashboard {
     try {

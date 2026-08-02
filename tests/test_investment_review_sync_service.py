@@ -44,6 +44,7 @@ CREATE TABLE ledger_entries (
     cash_amount TEXT NOT NULL DEFAULT '0',
     external_id TEXT NOT NULL DEFAULT '',
     dedupe_key TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
     created_at TEXT NOT NULL
 );
 """
@@ -66,6 +67,7 @@ def _default_rows() -> list[dict[str, str]]:
                 "cash_amount": "-1001",
                 "external_id": f"actual-{index}",
                 "dedupe_key": f"actual-{index}",
+                "note": "fee_source=broker_actual",
                 "created_at": "2026-07-14T00:00:00Z",
             }
         )
@@ -84,6 +86,7 @@ def _default_rows() -> list[dict[str, str]]:
                 "cash_amount": "-2000",
                 "external_id": "target",
                 "dedupe_key": "target",
+                "note": "",
                 "created_at": "2026-07-14T00:00:00Z",
             },
             {
@@ -99,6 +102,7 @@ def _default_rows() -> list[dict[str, str]]:
                 "cash_amount": "1000",
                 "external_id": "unknown-asset",
                 "dedupe_key": "unknown-asset",
+                "note": "",
                 "created_at": "2026-07-14T00:00:00Z",
             },
         ]
@@ -131,17 +135,20 @@ def _write_fixture(
         "INSERT INTO instruments(ts_code, asset_type) VALUES (?, ?)",
         [("000001.SZ", "equity"), ("000002.SZ", "unknown")],
     )
-    payload_rows = rows if rows is not None else _default_rows()
+    payload_rows = [
+        {**row, "note": str(row.get("note") or "")}
+        for row in (rows if rows is not None else _default_rows())
+    ]
     conn.executemany(
         """
         INSERT INTO ledger_entries(
             account_id, event_date, event_time, event_type, ts_code,
             quantity, price, gross_amount, fees, cash_amount, external_id,
-            dedupe_key, created_at
+            dedupe_key, note, created_at
         ) VALUES (
             :account_id, :event_date, :event_time, :event_type, :ts_code,
             :quantity, :price, :gross_amount, :fees, :cash_amount, :external_id,
-            :dedupe_key, :created_at
+            :dedupe_key, :note, :created_at
         )
         """,
         payload_rows,
@@ -537,6 +544,72 @@ def test_apply_is_exactly_reconciled_idempotent_and_persists_fee_states(
         "unknown": 1,
     }
     assert corrected_status["fee_details"]["correction_count"] == 1
+
+
+def test_rule_derived_positive_fee_is_not_an_actual_profile_sample(
+    tmp_path: Path,
+) -> None:
+    root = tmp_path / "repo"
+    rows = _default_rows()
+    rows[0]["note"] = (
+        "fee_source=rule_derived; fee_rule=historical_fee_rule_v1"
+    )
+    source, mapping_path, review_db = _write_fixture(root, rows=rows)
+    store = _initialize_product_sidecar(review_db)
+    service = ReviewSyncService(
+        source,
+        review_db=review_db,
+        mapping_path=mapping_path,
+        repo_root=root,
+    )
+    observations, events_by_id = sync_module._fee_observations(service._snapshot())
+    derived = next(
+        item
+        for item in observations
+        if events_by_id[item.event_id].source_record_id == "acct::actual-1"
+    )
+    assert derived.source_fees == 1
+    assert derived.source_fee_actual is False
+    assert derived.source_fee_provenance["fee_source"] == "rule_derived"
+
+    receipt = sync_review_events(
+        source,
+        review_db=review_db,
+        mapping_path=mapping_path,
+        repo_root=root,
+    )
+    assert receipt["fees"]["status_counts"] == {
+        "actual": 4,
+        "estimated": 0,
+        "unknown": 3,
+    }
+    assert receipt["fees"]["profiles_inserted"] == 0
+    assert {item["status"] for item in store.list_fee_projections()} == {
+        "actual",
+        "unknown",
+    }
+
+
+def test_exact_statement_fee_backfill_remains_an_actual_sample(tmp_path: Path) -> None:
+    root = tmp_path / "repo"
+    rows = _default_rows()
+    rows[0]["note"] = "fee_backfilled_exact=historical_statement.csv:2"
+    source, mapping_path, review_db = _write_fixture(root, rows=rows)
+    service = ReviewSyncService(
+        source,
+        review_db=review_db,
+        mapping_path=mapping_path,
+        repo_root=root,
+    )
+
+    observations, events_by_id = sync_module._fee_observations(service._snapshot())
+    actual = next(
+        item
+        for item in observations
+        if events_by_id[item.event_id].source_record_id == "acct::actual-1"
+    )
+    assert actual.source_fee_actual is True
+    assert actual.source_fee_provenance["fee_source"] == "broker_actual"
 
 
 def test_two_concurrent_syncs_converge_without_duplicate_fee_rows(tmp_path: Path) -> None:

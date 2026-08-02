@@ -18,7 +18,7 @@ from .industries import IndustryFetchError, TushareIndustryProvider
 from .importer import parse_date_value, parse_opening_snapshot, parse_statement
 from .intraday import IntradayFetchError, IntradayService, build_intraday_provider
 from .kline import KlineFetchError, KlineNotFoundError, KlineService, TushareKlineProvider
-from .models import ImportIssue, decimal_to_text
+from .models import IndustryClassification, ImportIssue, Instrument, decimal_to_text
 from .prices import PriceFetchError, TushareCloseProvider
 from .runtime import default_database_path, default_env_file_path
 from .store import PortfolioStore
@@ -143,6 +143,90 @@ def command_import_opening(args: argparse.Namespace, store: PortfolioStore) -> i
     return 0
 
 
+def _industry_classification_payload(item: IndustryClassification) -> dict[str, str]:
+    return {
+        "ts_code": item.ts_code,
+        "industry_name": item.industry_name,
+        "source": item.source,
+        "method": item.method,
+        "source_date": item.source_date,
+        "confidence": item.confidence,
+    }
+
+
+def _refresh_industry_targets(
+    store: PortfolioStore,
+    instruments: list[Instrument],
+    env_file: str,
+) -> dict[str, Any]:
+    provider = TushareIndustryProvider(get_tushare_pro(env_file))
+    classifications, missing = provider.fetch_many(instruments)
+    updated = store.set_industries(classifications)
+    return {
+        "fetched": len(classifications),
+        "updated": updated,
+        "missing": missing,
+        "classifications": [
+            _industry_classification_payload(item) for item in classifications
+        ],
+    }
+
+
+def _auto_refresh_new_open_industries(
+    store: PortfolioStore,
+    *,
+    account_id: str,
+    open_codes_before: set[str],
+    env_file: str,
+    enabled: bool,
+) -> dict[str, Any]:
+    open_instruments = store.instruments_for_open_positions(account_id)
+    new_open_instruments = sorted(
+        (item for item in open_instruments if item.ts_code not in open_codes_before),
+        key=lambda item: item.ts_code,
+    )
+    new_open_codes = [item.ts_code for item in new_open_instruments]
+    targets = [
+        item for item in new_open_instruments if item.asset_type in {"equity", "etf"}
+    ]
+    requested_codes = [item.ts_code for item in targets]
+    skipped_codes = [
+        item.ts_code
+        for item in new_open_instruments
+        if item.asset_type not in {"equity", "etf"}
+    ]
+    base = {
+        "new_open_codes": new_open_codes,
+        "requested_codes": requested_codes,
+        "skipped_codes": skipped_codes,
+    }
+    if not enabled:
+        return {
+            "status": "disabled",
+            "reason": "--no-auto-refresh-industries",
+            **base,
+        }
+    if not targets:
+        return {
+            "status": "not_needed",
+            "reason": "没有新增的股票或 ETF 持仓",
+            **base,
+        }
+    try:
+        result = _refresh_industry_targets(store, targets, env_file)
+    except Exception as exc:
+        return {
+            "status": "failed",
+            "error": f"{type(exc).__name__}: {exc}",
+            **base,
+        }
+    return {
+        "status": "partial" if result["missing"] else "updated",
+        **base,
+        **result,
+    }
+
+
 def command_import_statement(args: argparse.Namespace, store: PortfolioStore) -> int:
     parsed = parse_statement(
         args.input,
@@ -193,6 +277,11 @@ def command_import_statement(args: argparse.Namespace, store: PortfolioStore) ->
         print("预览通过；确认后在同一命令末尾添加 --apply。")
         return 0
 
+    open_codes_before = (
+        {item.ts_code for item in store.instruments_for_open_positions(args.account)}
+        if not args.included_in_opening and not args.historical_closed
+        else set()
+    )
     if args.included_in_opening:
         outcome = store.record_included_statement(
             account_id=args.account,
@@ -227,6 +316,14 @@ def command_import_statement(args: argparse.Namespace, store: PortfolioStore) ->
             skipped_rows=parsed.skipped_rows,
         )
     summary.update(outcome)
+    if not args.included_in_opening and not args.historical_closed:
+        summary["industry_refresh"] = _auto_refresh_new_open_industries(
+            store,
+            account_id=args.account,
+            open_codes_before=open_codes_before,
+            env_file=getattr(args, "env_file", str(default_env_file_path())),
+            enabled=getattr(args, "auto_refresh_industries", True),
+        )
     # The three apply methods commit internally.  Import lazily here so review
     # integration can only run after a successful portfolio commit and can
     # never interfere with preview or portfolio failure paths.
@@ -319,27 +416,10 @@ def command_refresh_industries(args: argparse.Namespace, store: PortfolioStore) 
     if not instruments:
         print("当前没有需要更新行业分类的持仓。")
         return 0
-    provider = TushareIndustryProvider(get_tushare_pro(args.env_file))
-    classifications, missing = provider.fetch_many(instruments)
-    updated = store.set_industries(classifications)
+    result = _refresh_industry_targets(store, instruments, args.env_file)
     print(
         json.dumps(
-            _raw({
-                "fetched": len(classifications),
-                "updated": updated,
-                "missing": missing,
-                "classifications": [
-                    {
-                        "ts_code": item.ts_code,
-                        "industry_name": item.industry_name,
-                        "source": item.source,
-                        "method": item.method,
-                        "source_date": item.source_date,
-                        "confidence": item.confidence,
-                    }
-                    for item in classifications
-                ],
-            }),
+            _raw(result),
             ensure_ascii=False,
             indent=2,
         )
@@ -809,6 +889,15 @@ def build_parser() -> argparse.ArgumentParser:
     statement_parser.add_argument("--input", required=True, help="CSV/XLSX 交割单")
     statement_parser.add_argument("--sheet", help="Excel sheet 名或从 0 开始的序号")
     statement_parser.add_argument("--broker", default="generic", help="券商/导出来源标签")
+    statement_parser.add_argument(
+        "--env-file", default=default_env_file, help="自动更新行业时使用的 Tushare 本地配置"
+    )
+    statement_parser.add_argument(
+        "--no-auto-refresh-industries",
+        dest="auto_refresh_industries",
+        action="store_false",
+        help="实际入账后不自动更新新增股票或 ETF 的行业",
+    )
     statement_mode = statement_parser.add_mutually_exclusive_group()
     statement_mode.add_argument(
         "--included-in-opening",

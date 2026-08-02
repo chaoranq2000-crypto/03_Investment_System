@@ -16,14 +16,21 @@ from src.portfolio.accounting import (
     build_position_states,
 )
 from src.portfolio.cli import build_parser, command_import_statement
-from src.portfolio.importer import parse_opening_snapshot, parse_statement
+from src.portfolio.importer import (
+    calculate_historical_trade_fee,
+    parse_opening_snapshot,
+    parse_statement,
+)
 from src.portfolio.industries import TushareIndustryProvider
 from src.portfolio.intraday import (
     FallbackIntradayProvider,
     IntradayFetchBatch,
     IntradayFetchError,
     IntradayService,
+    SinaMinuteKlineProvider,
     TushareIntradayProvider,
+    live_market_state,
+    parse_sina_minute_kline_response,
 )
 from src.portfolio.kline import KlineFetchError, KlineService, TushareKlineProvider
 from src.portfolio.models import (
@@ -1150,7 +1157,107 @@ def test_gbk_tsv_disguised_as_xls_and_excel_text_codes_are_supported(tmp_path):
     assert parsed.entries[0].ts_code == "159792.SZ"
     assert parsed.entries[0].external_id == "0104000075848146"
     assert parsed.entries[0].quantity == Decimal("14000")
-    assert "fees_missing=true" in parsed.entries[0].note
+    assert parsed.entries[0].fees == Decimal("1.00")
+    assert "fee_rule=historical_fee_rule_v1" in parsed.entries[0].note
+    assert "fee_source=rule_derived" in parsed.entries[0].note
+    assert "fees_missing" not in parsed.entries[0].note
+
+
+@pytest.mark.parametrize(
+    ("gross_amount", "asset_type", "event_type", "expected"),
+    [
+        ("9996", "etf", "BUY", "1.00"),
+        ("741.70", "etf", "SELL", "0.10"),
+        ("13910", "equity", "BUY", "5.14"),
+        ("60095", "equity", "BUY", "7.56"),
+        ("13655", "equity", "SELL", "11.97"),
+        ("1467.85", "unknown", "SELL", "0.06"),
+    ],
+)
+def test_historical_trade_fee_rule(
+    gross_amount, asset_type, event_type, expected
+):
+    assert calculate_historical_trade_fee(
+        Decimal(gross_amount),
+        asset_type=asset_type,
+        event_type=event_type,
+        ts_code="127115.SZ" if asset_type == "unknown" else None,
+    ) == Decimal(expected)
+
+
+def test_missing_statement_fee_uses_formal_historical_rule(tmp_path):
+    path = tmp_path / "missing-fee.csv"
+    path.write_text(
+        "成交日期,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额\n"
+        "2026-07-17,600030,中信证券,买入,13.91,1000,13910\n"
+        "2026-07-17,002463,沪电股份,卖出,13.655,1000,13655\n"
+        "2026-07-17,159792,港股通互联网ETF,买入,0.714,14000,9996\n",
+        encoding="utf-8",
+    )
+
+    parsed = parse_statement(path, account_id="default", broker="test")
+
+    assert not parsed.errors
+    assert [entry.fees for entry in parsed.entries] == [
+        Decimal("5.14"),
+        Decimal("11.97"),
+        Decimal("1.00"),
+    ]
+    assert all(
+        "fee_rule=historical_fee_rule_v1" in entry.note
+        for entry in parsed.entries
+    )
+    assert all("fee_source=rule_derived" in entry.note for entry in parsed.entries)
+    assert all("fees_missing" not in entry.note for entry in parsed.entries)
+
+
+def test_missing_convertible_bond_fee_uses_online_rule(tmp_path):
+    path = tmp_path / "bond-missing-fee.csv"
+    path.write_text(
+        "成交日期,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额\n"
+        "2026-07-17,127115,长高转债,卖出,146.785,10,1467.85\n",
+        encoding="utf-8",
+    )
+
+    parsed = parse_statement(path, account_id="default", broker="test")
+
+    assert not parsed.errors
+    assert parsed.entries[0].fees == Decimal("0.06")
+    assert (
+        "fee_rule=online_convertible_bond_fee_rule_v1"
+        in parsed.entries[0].note
+    )
+    assert "fee_source=rule_derived" in parsed.entries[0].note
+    assert "fees_missing" not in parsed.entries[0].note
+
+
+def test_primary_bond_subscription_remains_formal_zero_fee(tmp_path):
+    path = tmp_path / "bond-subscription.csv"
+    path.write_text(
+        "成交日期,证券代码,证券名称,业务名称,成交价格,成交数量,成交金额\n"
+        "2026-03-16,127113,长高转债,新债入账,100,10,1000\n",
+        encoding="utf-8",
+    )
+
+    parsed = parse_statement(path, account_id="default", broker="test")
+
+    assert not parsed.errors
+    assert parsed.entries[0].fees == Decimal("0")
+    assert (
+        "fee_rule=online_primary_bond_subscription_fee_exempt_v1"
+        in parsed.entries[0].note
+    )
+    assert "fee_source=formal_exemption" in parsed.entries[0].note
+
+
+def test_unclassified_security_without_online_rule_is_rejected():
+    with pytest.raises(ValueError, match="没有可应用的正式手续费规则"):
+        calculate_historical_trade_fee(
+            Decimal("1000"),
+            asset_type="unknown",
+            event_type="SELL",
+            ts_code="999999.SH",
+        )
 
 
 def test_broker_dividend_account_character_variant_is_supported(tmp_path):
@@ -1765,6 +1872,132 @@ def test_intraday_provider_uses_tushare_1m_and_falls_back_after_etf_permission()
     ]
 
 
+def _sina_minute_jsonp(records: list[dict[str, str]]) -> bytes:
+    return (
+        "/*<script>location.href='//sina.com';</script>*/\n=("
+        + json.dumps(records, ensure_ascii=False)
+        + ");"
+    ).encode("utf-8")
+
+
+class _SinaMinuteResponse:
+    def __init__(self, payload: bytes) -> None:
+        self.payload = payload
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_args):
+        return False
+
+    def read(self) -> bytes:
+        return self.payload
+
+
+def test_sina_minute_provider_covers_equity_and_etf_and_filters_trade_date():
+    requested_urls: list[str] = []
+    response = _sina_minute_jsonp(
+        [
+            {
+                "day": "2026-07-13 15:00:00",
+                "open": "9.9",
+                "high": "10",
+                "low": "9.8",
+                "close": "9.9",
+                "volume": "90",
+                "amount": "891",
+            },
+            {
+                "day": "2026-07-14 09:31:00",
+                "open": "10",
+                "high": "10.2",
+                "low": "9.9",
+                "close": "10.1",
+                "volume": "100",
+                "amount": "1010",
+            },
+        ]
+    )
+
+    def opener(request, *, timeout):
+        assert timeout == 3
+        requested_urls.append(request.full_url)
+        return _SinaMinuteResponse(response)
+
+    provider = SinaMinuteKlineProvider(timeout_seconds=3, opener=opener)
+    equity = provider.fetch(
+        Instrument("600000.SH", "浦发银行", "equity"),
+        trade_date=date(2026, 7, 14),
+    )
+    etf = provider.fetch(
+        Instrument("159892.SZ", "示例ETF", "etf"),
+        trade_date=date(2026, 7, 14),
+    )
+
+    assert equity.source == "sina.minute_kline"
+    assert equity.frequency_minutes == 1
+    assert len(equity.bars) == 1
+    assert equity.bars[0].bar_time.isoformat() == "2026-07-14T09:31:00+08:00"
+    assert etf.bars[0].ts_code == "159892.SZ"
+    assert "symbol=sh600000" in requested_urls[0]
+    assert "symbol=sz159892" in requested_urls[1]
+    assert all("scale=1" in url and "datalen=300" in url for url in requested_urls)
+
+
+def test_sina_minute_provider_rejects_bad_envelopes_dates_rows_and_network():
+    with pytest.raises(ValueError, match="JSONP"):
+        parse_sina_minute_kline_response("not jsonp")
+
+    instrument = Instrument("600000.SH", "浦发银行", "equity")
+
+    def provider_for(records):
+        return SinaMinuteKlineProvider(
+            opener=lambda *_args, **_kwargs: _SinaMinuteResponse(
+                _sina_minute_jsonp(records)
+            )
+        )
+
+    valid = {
+        "day": "2026-07-14 09:31:00",
+        "open": "10",
+        "high": "10.2",
+        "low": "9.9",
+        "close": "10.1",
+        "volume": "100",
+        "amount": "1010",
+    }
+    with pytest.raises(LookupError, match="分钟行情为空"):
+        provider_for([{**valid, "day": "2026-07-13 15:00:00"}]).fetch(
+            instrument, trade_date=date(2026, 7, 14)
+        )
+    with pytest.raises(ValueError, match="重复结束时间"):
+        provider_for([valid, valid]).fetch(
+            instrument, trade_date=date(2026, 7, 14)
+        )
+    with pytest.raises(ValueError, match="最高价关系无效"):
+        provider_for([{**valid, "high": "10.0", "close": "10.1"}]).fetch(
+            instrument, trade_date=date(2026, 7, 14)
+        )
+
+    def network_failure(*_args, **_kwargs):
+        raise OSError("offline")
+
+    with pytest.raises(ConnectionError, match="网络请求失败"):
+        SinaMinuteKlineProvider(opener=network_failure).fetch(
+            instrument, trade_date=date(2026, 7, 14)
+        )
+
+
+def test_live_market_state_uses_shanghai_sessions():
+    zone = ZoneInfo("Asia/Shanghai")
+    assert live_market_state(datetime(2026, 7, 14, 9, 0, tzinfo=zone)) == "pre_open"
+    assert live_market_state(datetime(2026, 7, 14, 10, 0, tzinfo=zone)) == "open_am"
+    assert live_market_state(datetime(2026, 7, 14, 12, 0, tzinfo=zone)) == "lunch_break"
+    assert live_market_state(datetime(2026, 7, 14, 14, 0, tzinfo=zone)) == "open_pm"
+    assert live_market_state(datetime(2026, 7, 14, 15, 1, tzinfo=zone)) == "closed"
+    assert live_market_state(datetime(2026, 7, 18, 10, 0, tzinfo=zone)) == "closed"
+
+
 def test_intraday_store_latest_observation_mapping_and_cache_retention(tmp_path):
     store = _build_intraday_store(tmp_path)
     zone = ZoneInfo("Asia/Shanghai")
@@ -1803,6 +2036,29 @@ def test_intraday_store_latest_observation_mapping_and_cache_retention(tmp_path)
         "new_refresh_batches": 0,
         "new_minute_observations": 0,
     }
+    unchanged_new_batch = [
+        _minute_bar(
+            bar_time=item.bar_time,
+            close=str(item.close),
+            batch_id="minute-identical",
+            dedupe_key=item.dedupe_key,
+            fetched_at="2026-07-14T08:01:00+00:00",
+        )
+        for item in first_batch
+    ]
+    assert store.add_minute_batch(
+        unchanged_new_batch,
+        trade_date=date(2026, 7, 14),
+        frequency_minutes=5,
+        source="baostock.history_k_data_plus",
+        refresh_batch_id="minute-identical",
+        provider_attempts=[{"provider": "baostock.5m", "status": "success"}],
+        fetched_at="2026-07-14T08:01:00+00:00",
+    ) == {"new_refresh_batches": 0, "new_minute_observations": 0}
+    with store.connect() as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM minute_refresh_batches"
+        ).fetchone()[0] == 1
 
     updated = _minute_bar(
         bar_time=datetime(2026, 7, 14, 9, 35, tzinfo=zone),
@@ -1811,15 +2067,22 @@ def test_intraday_store_latest_observation_mapping_and_cache_retention(tmp_path)
         dedupe_key="minute-0935-v2",
         fetched_at="2026-07-14T08:05:00+00:00",
     )
-    store.add_minute_batch(
-        [updated],
+    unchanged_0940 = _minute_bar(
+        bar_time=datetime(2026, 7, 14, 9, 40, tzinfo=zone),
+        close="11",
+        batch_id="minute-2",
+        dedupe_key="minute-0940-v1",
+        fetched_at="2026-07-14T08:05:00+00:00",
+    )
+    assert store.add_minute_batch(
+        [updated, unchanged_0940],
         trade_date=date(2026, 7, 14),
         frequency_minutes=5,
         source=updated.source,
         refresh_batch_id="minute-2",
         provider_attempts=[{"provider": "baostock.5m", "status": "success"}],
         fetched_at=updated.fetched_at,
-    )
+    ) == {"new_refresh_batches": 1, "new_minute_observations": 1}
     rows, metadata = store.latest_minute_bars("600000.SH", date(2026, 7, 14))
     assert [item["close_price"] for item in rows] == [Decimal("11.5"), Decimal("11")]
     assert metadata["refresh_batch_id"] == "minute-2"
@@ -1876,6 +2139,71 @@ def test_intraday_store_latest_observation_mapping_and_cache_retention(tmp_path)
     assert IntradayService(store).get_payload(
         "600000.SH", trade_date=date(2026, 7, 14), as_of=date(2026, 7, 14)
     )["bars"] == retained_bars
+
+
+def test_live_intraday_service_only_accepts_today_and_returns_poll_metadata(tmp_path):
+    store = _build_intraday_store(tmp_path)
+    zone = ZoneInfo("Asia/Shanghai")
+    fetched_at = "2026-07-14T02:00:00+00:00"
+    bar = MinuteBarObservation(
+        ts_code="600000.SH",
+        bar_time=datetime(2026, 7, 14, 9, 31, tzinfo=zone),
+        frequency_minutes=1,
+        open=Decimal("10"),
+        high=Decimal("10.2"),
+        low=Decimal("9.9"),
+        close=Decimal("10.1"),
+        volume_shares=Decimal("100"),
+        amount_cny=Decimal("1010"),
+        source="sina.minute_kline",
+        refresh_batch_id="live-1",
+        dedupe_key="live-0931-v1",
+        fetched_at=fetched_at,
+    )
+
+    class LiveProvider:
+        def fetch(self, instrument, *, trade_date):
+            assert instrument.asset_type == "equity"
+            assert trade_date == date(2026, 7, 14)
+            return IntradayFetchBatch(
+                bars=(bar,),
+                frequency_minutes=1,
+                source="sina.minute_kline",
+                refresh_batch_id="live-1",
+                fetched_at=fetched_at,
+                provider_attempts=(
+                    {"provider": "sina.minute_kline", "status": "success"},
+                ),
+            )
+
+    service = IntradayService(store)
+    payload = service.refresh_live(
+        LiveProvider(),
+        "600000.SH",
+        trade_date=date(2026, 7, 14),
+        as_of=date(2026, 7, 14),
+        now=datetime(2026, 7, 14, 10, 0, tzinfo=zone),
+    )
+    assert payload["period"]["span"] == 1
+    assert payload["refresh"]["new_minute_observations"] == 1
+    assert payload["live"] == {
+        "eligible": True,
+        "market_state": "open_am",
+        "poll_interval_seconds": 30,
+        "next_poll_seconds": 30,
+        "source": "sina.minute_kline",
+        "last_bar_time": "2026-07-14T09:31:00+08:00",
+        "updated_at": fetched_at,
+    }
+
+    with pytest.raises(ValueError, match="只允许请求当前日期"):
+        service.refresh_live(
+            LiveProvider(),
+            "600000.SH",
+            trade_date=date(2026, 7, 13),
+            as_of=date(2026, 7, 14),
+            now=datetime(2026, 7, 14, 10, 0, tzinfo=zone),
+        )
 
 
 def test_refresh_intraday_cli_contract():
@@ -1946,6 +2274,7 @@ def test_industry_provider_normalizes_equity_and_uses_reviewed_etf_mapping():
         def etf_basic(self, **kwargs):
             identities = {
                 "159892.SZ": ("HSBIO.HI", "恒生生物科技"),
+                "588200.SH": ("000685.SH", "上证科创芯片"),
             }
             index_code, index_name = identities.get(kwargs["ts_code"], ("", ""))
             return _Frame([{"index_code": index_code, "index_name": index_name}])
@@ -1955,6 +2284,7 @@ def test_industry_provider_normalizes_equity_and_uses_reviewed_etf_mapping():
             Instrument("600000.SH", "浦发银行", "equity"),
             Instrument("000001.SZ", "示例制药", "equity"),
             Instrument("159892.SZ", "恒生医药ETF华夏", "etf"),
+            Instrument("588200.SH", "科创芯片ETF嘉实", "etf"),
             Instrument("159999.SZ", "未复核ETF", "etf"),
         ]
     )
@@ -1967,6 +2297,8 @@ def test_industry_provider_normalizes_equity_and_uses_reviewed_etf_mapping():
     assert by_code["159892.SZ"].industry_name == "医药生物"
     assert by_code["159892.SZ"].confidence == "high"
     assert "verification=live_index_match" in by_code["159892.SZ"].source
+    assert by_code["588200.SH"].industry_name == "电子"
+    assert by_code["588200.SH"].confidence == "high"
     assert by_code["159999.SZ"].industry_name == "未分类（ETF需复核映射）"
     assert by_code["159999.SZ"].confidence == "unverified"
     assert missing == ["159999.SZ"]
@@ -1999,6 +2331,70 @@ def test_industry_provider_can_use_reviewed_mapping_when_etf_basic_is_unavailabl
     assert classifications[0].industry_name == "互联网"
     assert classifications[0].method == "reviewed_etf_override"
     assert "verification=reviewed_config" in classifications[0].source
+
+
+def test_statement_apply_auto_refreshes_industry_for_new_open_position(
+    tmp_path, monkeypatch, capsys
+):
+    statement_path = tmp_path / "new-position.csv"
+    statement_path.write_text(
+        "成交日期,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费\n"
+        "2026-07-17,600000,浦发银行,买入,10,100,1000,0\n",
+        encoding="utf-8",
+    )
+    store = PortfolioStore(tmp_path / "portfolio.sqlite3")
+    store.initialize()
+    monkeypatch.setattr("src.portfolio.cli.get_tushare_pro", lambda _path: _FakePro())
+    args = build_parser().parse_args(
+        ["import-statement", "--input", str(statement_path), "--apply"]
+    )
+
+    assert args.auto_refresh_industries is True
+    assert args.handler(args, store) == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["inserted_entries"] == 1
+    assert payload["industry_refresh"]["status"] == "updated"
+    assert payload["industry_refresh"]["new_open_codes"] == ["600000.SH"]
+    assert payload["industry_refresh"]["requested_codes"] == ["600000.SH"]
+    with store.connect() as connection:
+        row = connection.execute(
+            "SELECT industry_name, industry_source FROM instruments WHERE ts_code = ?",
+            ("600000.SH",),
+        ).fetchone()
+    assert dict(row) == {
+        "industry_name": "银行",
+        "industry_source": "tushare.stock_basic.industry",
+    }
+
+
+def test_statement_industry_refresh_failure_does_not_rollback_ledger(
+    tmp_path, monkeypatch, capsys
+):
+    statement_path = tmp_path / "new-position.csv"
+    statement_path.write_text(
+        "成交日期,证券代码,证券名称,买卖标志,成交价格,成交数量,成交金额,手续费\n"
+        "2026-07-17,600000,浦发银行,买入,10,100,1000,0\n",
+        encoding="utf-8",
+    )
+    store = PortfolioStore(tmp_path / "portfolio.sqlite3")
+    store.initialize()
+
+    def unavailable(_path):
+        raise RuntimeError("industry provider unavailable")
+
+    monkeypatch.setattr("src.portfolio.cli.get_tushare_pro", unavailable)
+    args = build_parser().parse_args(
+        ["import-statement", "--input", str(statement_path), "--apply"]
+    )
+
+    assert args.handler(args, store) == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert payload["inserted_entries"] == 1
+    assert payload["industry_refresh"]["status"] == "failed"
+    assert "industry provider unavailable" in payload["industry_refresh"]["error"]
+    assert len(store.ledger("default")) == 1
 
 
 def test_store_migrates_v1_database_and_persists_industry(tmp_path):

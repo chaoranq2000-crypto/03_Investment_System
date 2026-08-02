@@ -4,6 +4,8 @@ import hashlib
 import importlib
 import io
 import json
+import math
+import re
 import uuid
 from collections import defaultdict
 from contextlib import redirect_stdout
@@ -12,6 +14,8 @@ from datetime import date, datetime, time, timezone
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 from zoneinfo import ZoneInfo
 
 from src.utils.tushare_client import get_tushare_pro
@@ -36,6 +40,11 @@ from .store import PortfolioStore
 SHANGHAI_TZ = ZoneInfo("Asia/Shanghai")
 CHART_QUANTUM = Decimal("0.000001")
 SUPPORTED_INTRADAY_ASSET_TYPES = {"equity", "etf"}
+SINA_MINUTE_KLINE_URL = (
+    "https://quotes.sina.cn/cn/api/jsonp_v2.php/=/"
+    "CN_MarketDataService.getKLineData"
+)
+LIVE_POLL_INTERVAL_SECONDS = 30
 SOURCE_REASON_CODES = {
     "missing_credentials",
     "permission_denied",
@@ -285,6 +294,96 @@ def _baostock_code(ts_code: str) -> str:
     return f"{normalized_exchange}.{code}"
 
 
+def _sina_symbol(ts_code: str) -> str:
+    code, separator, exchange = ts_code.strip().upper().partition(".")
+    if not separator or not code.isdigit() or len(code) != 6:
+        raise ValueError("无法转换新浪证券代码")
+    normalized_exchange = exchange.lower()
+    if normalized_exchange not in {"sh", "sz", "bj"}:
+        raise ValueError("无法转换新浪证券代码")
+    return f"{normalized_exchange}{code}"
+
+
+def parse_sina_minute_kline_response(payload: str | bytes) -> list[dict[str, Any]]:
+    """Parse Sina's fixed JSONP envelope without executing callback text."""
+
+    text = payload.decode("utf-8", errors="strict") if isinstance(payload, bytes) else payload
+    match = re.search(r"=\s*\((?P<payload>\s*\[.*\]\s*)\)\s*;?\s*$", text, re.DOTALL)
+    if match is None:
+        raise ValueError("新浪分钟行情 JSONP 格式无效")
+    try:
+        decoded = json.loads(match.group("payload"))
+    except json.JSONDecodeError as exc:
+        raise ValueError("新浪分钟行情 JSON 无效") from exc
+    if not isinstance(decoded, list) or any(not isinstance(item, dict) for item in decoded):
+        raise ValueError("新浪分钟行情必须是对象数组")
+    return [dict(item) for item in decoded]
+
+
+class SinaMinuteKlineProvider:
+    name = "sina.minute_kline"
+
+    def __init__(
+        self,
+        *,
+        timeout_seconds: float = 10.0,
+        opener: Any | None = None,
+    ) -> None:
+        self.timeout_seconds = timeout_seconds
+        self.opener = opener or urlopen
+
+    def fetch(self, instrument: Instrument, *, trade_date: date) -> IntradayFetchBatch:
+        if instrument.asset_type not in SUPPORTED_INTRADAY_ASSET_TYPES:
+            raise ValueError("新浪分钟行情只支持股票和 ETF")
+        query = urlencode(
+            {
+                "symbol": _sina_symbol(instrument.ts_code),
+                "scale": "1",
+                "ma": "no",
+                "datalen": "300",
+            }
+        )
+        request = Request(
+            f"{SINA_MINUTE_KLINE_URL}?{query}",
+            headers={
+                "User-Agent": "Mozilla/5.0 portfolio-ledger",
+                "Referer": "https://finance.sina.com.cn/",
+                "Accept": "application/javascript, application/json, text/plain, */*",
+            },
+        )
+        try:
+            # The request target is the fixed HTTPS constant above; only query values vary.
+            with self.opener(request, timeout=self.timeout_seconds) as response:  # noqa: S310
+                raw_payload = response.read()
+        except (OSError, TimeoutError) as exc:
+            raise ConnectionError("新浪分钟行情网络请求失败") from exc
+
+        records: list[dict[str, Any]] = []
+        for raw in parse_sina_minute_kline_response(raw_payload):
+            end_time = _bar_time(raw.get("day"))
+            if end_time.date() != trade_date:
+                continue
+            records.append(
+                {
+                    "ts_code": instrument.ts_code,
+                    "trade_time": end_time,
+                    "open": raw.get("open"),
+                    "high": raw.get("high"),
+                    "low": raw.get("low"),
+                    "close": raw.get("close"),
+                    "volume": raw.get("volume"),
+                    "amount": raw.get("amount"),
+                }
+            )
+        return _build_batch(
+            instrument,
+            trade_date,
+            frequency_minutes=1,
+            source=self.name,
+            records=records,
+        )
+
+
 class BaostockIntradayProvider:
     def __init__(self, module: Any | None = None) -> None:
         self.module = module
@@ -363,6 +462,48 @@ def build_intraday_provider(
         attempts.append(_attempt("tushare.1m", "failed", _reason_code(exc)))
     providers.append(("baostock.5m", BaostockIntradayProvider()))
     return FallbackIntradayProvider(providers, initial_attempts=attempts)
+
+
+def build_live_intraday_provider() -> FallbackIntradayProvider:
+    return FallbackIntradayProvider(
+        [(SinaMinuteKlineProvider.name, SinaMinuteKlineProvider())]
+    )
+
+
+def _shanghai_datetime(value: datetime | None = None) -> datetime:
+    current = value or datetime.now(SHANGHAI_TZ)
+    if current.tzinfo is None:
+        return current.replace(tzinfo=SHANGHAI_TZ)
+    return current.astimezone(SHANGHAI_TZ)
+
+
+def live_market_state(value: datetime | None = None) -> str:
+    current = _shanghai_datetime(value)
+    if current.weekday() >= 5:
+        return "closed"
+    clock = current.timetz().replace(tzinfo=None)
+    if clock < time(9, 30):
+        return "pre_open"
+    if clock < time(11, 30):
+        return "open_am"
+    if clock < time(13, 0):
+        return "lunch_break"
+    if clock <= time(15, 0):
+        return "open_pm"
+    return "closed"
+
+
+def _live_next_poll_seconds(current: datetime, market_state: str) -> int | None:
+    if market_state in {"open_am", "open_pm"}:
+        return LIVE_POLL_INTERVAL_SECONDS
+    resume_time = {
+        "pre_open": time(9, 30),
+        "lunch_break": time(13, 0),
+    }.get(market_state)
+    if resume_time is None:
+        return None
+    resume_at = datetime.combine(current.date(), resume_time, tzinfo=SHANGHAI_TZ)
+    return max(1, math.ceil((resume_at - current).total_seconds()))
 
 
 class IntradayService:
@@ -732,5 +873,82 @@ class IntradayService:
             "trade_date": selected_date.isoformat(),
             "fetched_bars": len(batch.bars),
             **inserted,
+        }
+        return payload
+
+    def refresh_live(
+        self,
+        provider: Any,
+        ts_code: str,
+        *,
+        trade_date: date,
+        cycle_id: str | None = None,
+        as_of: date | None = None,
+        now: datetime | None = None,
+    ) -> dict[str, Any]:
+        current = _shanghai_datetime(now)
+        current_date = current.date()
+        if trade_date != current_date:
+            raise ValueError("实时分钟行情只允许请求当前日期")
+        target_as_of = as_of or current_date
+        instrument, cycle = self._context(
+            ts_code, cycle_id=cycle_id, as_of=target_as_of
+        )
+        selected_date = self._resolve_trade_date(cycle, trade_date, target_as_of)
+        if instrument.asset_type not in SUPPORTED_INTRADAY_ASSET_TYPES:
+            raise ValueError("实时分钟行情只支持股票和 ETF")
+
+        try:
+            batch = provider.fetch(instrument, trade_date=selected_date)
+        except IntradayFetchError as exc:
+            raise IntradayFetchError(
+                "新浪实时 1 分钟行情不可用", exc.provider_attempts
+            ) from exc
+        except LookupError as exc:
+            raise IntradayFetchError(
+                "新浪实时 1 分钟行情不可用",
+                [_attempt(SinaMinuteKlineProvider.name, "failed", "empty_response")],
+            ) from exc
+        except Exception as exc:
+            raise IntradayFetchError(
+                "新浪实时 1 分钟行情不可用",
+                [
+                    _attempt(
+                        SinaMinuteKlineProvider.name,
+                        "failed",
+                        _reason_code(exc),
+                    )
+                ],
+            ) from exc
+        inserted = self.store.add_minute_batch(
+            batch.bars,
+            trade_date=selected_date,
+            frequency_minutes=batch.frequency_minutes,
+            source=batch.source,
+            refresh_batch_id=batch.refresh_batch_id,
+            provider_attempts=list(batch.provider_attempts),
+            fetched_at=batch.fetched_at,
+        )
+        payload = self.get_payload(
+            instrument.ts_code,
+            trade_date=selected_date,
+            cycle_id=cycle.cycle_id,
+            as_of=target_as_of,
+        )
+        market_state = live_market_state(current)
+        payload["refresh"] = {
+            "refresh_batch_id": batch.refresh_batch_id,
+            "trade_date": selected_date.isoformat(),
+            "fetched_bars": len(batch.bars),
+            **inserted,
+        }
+        payload["live"] = {
+            "eligible": True,
+            "market_state": market_state,
+            "poll_interval_seconds": LIVE_POLL_INTERVAL_SECONDS,
+            "next_poll_seconds": _live_next_poll_seconds(current, market_state),
+            "source": batch.source,
+            "last_bar_time": payload["coverage"]["last_bar_time"],
+            "updated_at": batch.fetched_at,
         }
         return payload

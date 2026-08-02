@@ -159,9 +159,27 @@ def test_ledger_cash_delta_uses_contractual_signs(
 
 def test_anchor_backsolve_daily_nav_snapshots_and_rebase_audit(tmp_path: Path) -> None:
     path = _database(tmp_path / "portfolio.sqlite3")
-    _entry(path, "2025-01-02", "BUY", quantity="10", price="10", gross="100", fees="1")
+    _entry(
+        path,
+        "2025-01-02",
+        "BUY",
+        quantity="10",
+        price="10",
+        gross="100",
+        fees="1",
+        note="fee_backfilled_exact=historical_statement.csv:2",
+    )
     _entry(path, "2025-01-03", "DIVIDEND", cash="5")
-    _entry(path, "2025-01-04", "SELL", quantity="5", price="12", gross="60", fees="2")
+    _entry(
+        path,
+        "2025-01-04",
+        "SELL",
+        quantity="5",
+        price="12",
+        gross="60",
+        fees="2",
+        note="fee_source=broker_actual",
+    )
     _entry(path, "2025-01-04", "CASH_FEE", cash="2")
     for day, close in (("2025-01-02", "10"), ("2025-01-03", "11"), ("2025-01-04", "12")):
         _price(path, day, close)
@@ -214,7 +232,16 @@ def test_anchor_backsolve_daily_nav_snapshots_and_rebase_audit(tmp_path: Path) -
 
 def test_never_uses_a_future_close_and_marks_cost_proxy_as_non_market(tmp_path: Path) -> None:
     path = _database(tmp_path / "portfolio.sqlite3")
-    _entry(path, "2025-01-02", "BUY", quantity="10", price="10", gross="100", fees="1")
+    _entry(
+        path,
+        "2025-01-02",
+        "BUY",
+        quantity="10",
+        price="10",
+        gross="100",
+        fees="1",
+        note="fee_source=broker_actual",
+    )
     _price(path, "2025-01-03", "11")
 
     result = _result(path, anchor_date="2025-01-03", anchor_amount="899")

@@ -19,11 +19,15 @@ import {
   intradayFitBarSpace,
   intradayAverageSeries,
   latestLedgerTradeDate,
+  livePollDelay,
   normalizeBars,
   normalizeTechnicalIndicatorSelection,
   operationDomId,
   rangeLabel,
+  reconcileLiveIntradayBars,
   setTechnicalIndicatorVisibility,
+  shanghaiDateString,
+  shanghaiLiveSchedule,
   technicalIndicatorChartHeight,
   tradeDateOnOrBeforeAsOf,
 } from "./kline.js";
@@ -63,6 +67,13 @@ const state = {
   chartView: "daily",
   klinePayload: null,
   intradayPayload: null,
+  intradayLiveTimer: null,
+  intradayLiveGeneration: 0,
+  intradayLiveCallback: null,
+  intradayLiveChart: null,
+  intradayLiveAbortController: null,
+  intradayLiveFailures: 0,
+  intradayLiveInFlight: false,
   klineIndicators: readKlineIndicatorSelection(DAILY_INDICATOR_STORAGE_KEY),
   intradayIndicators: readKlineIndicatorSelection(INTRADAY_INDICATOR_STORAGE_KEY),
 };
@@ -456,7 +467,12 @@ function startRealtimeTimer() {
   window.clearInterval(state.liveTimer);
   state.liveTimer = window.setInterval(refreshRealtime, 60_000);
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && !state.asOf) refreshRealtime();
+    if (document.hidden) {
+      pauseIntradayLiveSubscription();
+      return;
+    }
+    if (!state.asOf) refreshRealtime();
+    resumeIntradayLiveSubscription();
   });
 }
 
@@ -1479,8 +1495,21 @@ function renderKlineStatus(payload = activeChartPayload()) {
   status.className = `kline-status is-${payload.status}`;
   if (state.chartView === "intraday") {
     const frequency = payload.period?.label || "分钟精度待刷新";
+    if (payload.live?.degraded) {
+      status.className = "kline-status is-error";
+      status.textContent = `实时 1 分钟更新暂不可用，保留最近缓存 · ${payload.live.error || "上游行情失败"}`;
+      return;
+    }
+    const liveState = {
+      open_am: "实时轮询中",
+      open_pm: "实时轮询中",
+      pre_open: "盘前暂停",
+      lunch_break: "午休暂停",
+      closed: "收盘后暂停",
+    }[payload.live?.market_state];
+    const liveText = payload.live ? ` · ${liveState || "实时状态待确认"}` : "";
     status.textContent = {
-      ready: `${payload.trade_date} · ${payload.coverage.bar_count} 根 ${frequency}行情 · 日内均价 · ${indicatorText}`,
+      ready: `${payload.trade_date} · ${payload.coverage.bar_count} 根 ${frequency}行情${liveText} · 日内均价 · ${indicatorText}`,
       missing: `${payload.trade_date} 本地尚无分钟行情缓存`,
       unsupported: `暂不支持 ${payload.instrument.asset_type} 资产的分钟行情`,
     }[payload.status] || payload.status;
@@ -1535,7 +1564,169 @@ function replaceKlineIndicatorSelection(names) {
   }
 }
 
+function intradayLiveEligible(payload = state.intradayPayload) {
+  return Boolean(
+    payload?.live?.eligible
+    && payload.trade_date === shanghaiDateString()
+    && !state.asOf
+    && state.drawerContext
+    && state.chartView === "intraday",
+  );
+}
+
+function clearIntradayLiveTimer() {
+  window.clearTimeout(state.intradayLiveTimer);
+  state.intradayLiveTimer = null;
+}
+
+function cancelIntradayLiveRequest() {
+  state.intradayLiveAbortController?.abort();
+  state.intradayLiveAbortController = null;
+  state.intradayLiveInFlight = false;
+}
+
+function stopIntradayLiveSubscription() {
+  clearIntradayLiveTimer();
+  cancelIntradayLiveRequest();
+  state.intradayLiveGeneration += 1;
+  state.intradayLiveCallback = null;
+  state.intradayLiveChart = null;
+  state.intradayLiveFailures = 0;
+}
+
+function pauseIntradayLiveSubscription() {
+  if (!state.intradayLiveCallback) return;
+  clearIntradayLiveTimer();
+  cancelIntradayLiveRequest();
+  state.intradayLiveGeneration += 1;
+}
+
+function currentIntradayLiveSchedule(payload = state.intradayPayload) {
+  const interval = Number(payload?.live?.poll_interval_seconds || 30);
+  return {
+    ...(payload?.live || {}),
+    ...shanghaiLiveSchedule(new Date(), interval),
+    poll_interval_seconds: interval,
+  };
+}
+
+function scheduleIntradayLivePoll() {
+  clearIntradayLiveTimer();
+  if (
+    document.hidden
+    || state.intradayLiveInFlight
+    || state.intradayLiveChart !== state.chart
+    || !state.intradayLiveCallback
+    || !intradayLiveEligible()
+  ) return;
+  const delay = livePollDelay(
+    currentIntradayLiveSchedule(),
+    state.intradayLiveFailures,
+  );
+  if (delay === null) return;
+  const generation = state.intradayLiveGeneration;
+  state.intradayLiveTimer = window.setTimeout(
+    () => pollIntradayLive(generation),
+    delay,
+  );
+}
+
+function renderIntradayLiveMetadata(payload = state.intradayPayload) {
+  if (!payload || state.chartView !== "intraday") return;
+  renderKlineStatus(payload);
+  renderIntradayCoverage(payload);
+}
+
+async function pollIntradayLive(generation) {
+  if (
+    generation !== state.intradayLiveGeneration
+    || document.hidden
+    || state.intradayLiveInFlight
+    || !intradayLiveEligible()
+  ) return;
+  const params = intradayRequestParams(state.intradayPayload.trade_date);
+  if (!params) return;
+  state.intradayLiveInFlight = true;
+  const controller = new AbortController();
+  state.intradayLiveAbortController = controller;
+  try {
+    const payload = await api("/api/live-intraday", {
+      method: "POST",
+      headers: { "X-Portfolio-Action": "live-intraday" },
+      body: JSON.stringify(params),
+      signal: controller.signal,
+    });
+    if (
+      generation !== state.intradayLiveGeneration
+      || state.intradayLiveChart !== state.chart
+      || !intradayLiveEligible(payload)
+    ) return;
+    const reconciled = reconcileLiveIntradayBars(
+      state.intradayPayload?.bars || [],
+      payload.bars || [],
+    );
+    payload.bars = reconciled.bars;
+    state.intradayPayload = payload;
+    state.intradayLiveFailures = 0;
+    if (!state.chart && payload.bars.length) {
+      renderIntradayPayload(payload);
+      return;
+    }
+    reconciled.updates.forEach((bar) => state.intradayLiveCallback?.(bar));
+    renderIntradayLiveMetadata(payload);
+  } catch (error) {
+    if (generation !== state.intradayLiveGeneration || error.name === "AbortError") return;
+    state.intradayLiveFailures += 1;
+    const schedule = currentIntradayLiveSchedule();
+    state.intradayPayload.live = {
+      ...(state.intradayPayload.live || {}),
+      ...schedule,
+      eligible: true,
+      degraded: true,
+      error: error.message,
+    };
+    renderIntradayLiveMetadata();
+  } finally {
+    if (generation !== state.intradayLiveGeneration) return;
+    state.intradayLiveInFlight = false;
+    state.intradayLiveAbortController = null;
+    scheduleIntradayLivePoll();
+  }
+}
+
+function startIntradayLiveSubscription(chart, callback) {
+  stopIntradayLiveSubscription();
+  if (!intradayLiveEligible()) return;
+  state.intradayLiveChart = chart;
+  state.intradayLiveCallback = callback;
+  scheduleIntradayLivePoll();
+}
+
+function startIntradayLiveBootstrapRetry() {
+  stopIntradayLiveSubscription();
+  if (!intradayLiveEligible() || state.chart) return;
+  state.intradayLiveChart = null;
+  state.intradayLiveCallback = () => {};
+  scheduleIntradayLivePoll();
+}
+
+function resumeIntradayLiveSubscription() {
+  if (
+    document.hidden
+    || !state.intradayLiveCallback
+    || state.intradayLiveChart !== state.chart
+    || !intradayLiveEligible()
+  ) return;
+  clearIntradayLiveTimer();
+  const generation = state.intradayLiveGeneration;
+  state.intradayLiveTimer = window.setTimeout(
+    () => pollIntradayLive(generation),
+    0,
+  );
+}
+
 function disposeKlineChart() {
+  stopIntradayLiveSubscription();
   state.chartResizeObserver?.disconnect();
   state.chartResizeObserver = null;
   const container = document.getElementById("klineChart");
@@ -1745,6 +1936,12 @@ function renderIntradayChart(payload) {
         chart.scrollToRealTime();
       });
     },
+    subscribeBar: ({ callback }) => {
+      startIntradayLiveSubscription(chart, callback);
+    },
+    unsubscribeBar: () => {
+      if (state.intradayLiveChart === chart) stopIntradayLiveSubscription();
+    },
   });
   chart.createIndicator({ name: "INTRADAY_AVG", paneId: "candle_pane" });
   selectedKlineIndicatorNames(payload).forEach((name) => {
@@ -1928,39 +2125,53 @@ function renderIntradayDateControls(payload) {
   ) ? payload.trade_date : "";
 }
 
+function renderIntradayCoverage(payload) {
+  const coverage = document.getElementById("klineCoverage");
+  if (!coverage) return;
+  const source = payload.live?.source || payload.source?.provider || "MISSING";
+  const dateScopeLabels = {
+    pre_open_context: "建仓前上下文",
+    post_close_context: "清仓后上下文",
+    cycle: "本轮周期",
+  };
+  const dateScope = dateScopeLabels[payload.date_scope] || "日期范围待确认";
+  const precision = payload.source?.frequency_minutes
+    ? `${payload.source.frequency_minutes} 分钟`
+    : "精度待刷新";
+  const fallbackLabels = {
+    missing_credentials: "缺少 Tushare 凭据",
+    permission_denied: "Tushare 权限不足",
+    empty_response: "上游返回为空",
+    invalid_response: "上游数据校验失败",
+    dependency_missing: "上游依赖缺失",
+    network_error: "上游网络失败",
+    upstream_error: "上游调用失败",
+  };
+  const fallback = payload.source?.fallback_reason
+    ? ` · 回退原因 ${fallbackLabels[payload.source.fallback_reason] || payload.source.fallback_reason}`
+    : "";
+  const liveState = {
+    open_am: "实时轮询中",
+    open_pm: "实时轮询中",
+    pre_open: "盘前暂停",
+    lunch_break: "午休暂停",
+    closed: "收盘后暂停",
+  }[payload.live?.market_state];
+  const live = payload.live
+    ? ` · ${payload.live.degraded ? "实时降级" : liveState || "实时状态待确认"}`
+    : "";
+  const fetchedAt = payload.live?.updated_at || payload.source?.fetched_at;
+  coverage.textContent = `${payload.trade_date} · ${dateScope} · ${source} · ${precision}${fallback}${live} · 已定位 ${payload.operation_mapping?.mapped_count || 0} 笔 / 未定位 ${payload.operation_mapping?.unlocated_count || 0} 笔 · 最新 ${payload.live?.last_bar_time?.slice(11, 19) || payload.coverage?.last_bar_time?.slice(11, 19) || "—"} · 更新 ${formatFetchTime(fetchedAt)}`;
+}
+
 function renderIntradayPayload(payload) {
   state.intradayPayload = payload;
   renderIntradayDateControls(payload);
   renderKlineIndicatorControls(payload);
   renderKlineStatus(payload);
-  const coverage = document.getElementById("klineCoverage");
   const chartContainer = document.getElementById("klineChart");
   const empty = document.getElementById("klineEmpty");
-  if (coverage) {
-    const source = payload.source?.provider || "MISSING";
-    const dateScopeLabels = {
-      pre_open_context: "建仓前上下文",
-      post_close_context: "清仓后上下文",
-      cycle: "本轮周期",
-    };
-    const dateScope = dateScopeLabels[payload.date_scope] || "日期范围待确认";
-    const precision = payload.source?.frequency_minutes
-      ? `${payload.source.frequency_minutes} 分钟`
-      : "精度待刷新";
-    const fallbackLabels = {
-      missing_credentials: "缺少 Tushare 凭据",
-      permission_denied: "Tushare 权限不足",
-      empty_response: "Tushare 返回为空",
-      invalid_response: "Tushare 数据校验失败",
-      dependency_missing: "上游依赖缺失",
-      network_error: "上游网络失败",
-      upstream_error: "上游调用失败",
-    };
-    const fallback = payload.source?.fallback_reason
-      ? ` · 回退原因 ${fallbackLabels[payload.source.fallback_reason] || payload.source.fallback_reason}`
-      : "";
-    coverage.textContent = `${payload.trade_date} · ${dateScope} · ${source} · ${precision}${fallback} · 已定位 ${payload.operation_mapping?.mapped_count || 0} 笔 / 未定位 ${payload.operation_mapping?.unlocated_count || 0} 笔 · 更新 ${formatFetchTime(payload.source?.fetched_at)}`;
-  }
+  renderIntradayCoverage(payload);
   renderOperationList(payload);
   if (payload.bars?.length) {
     chartContainer.hidden = false;
@@ -1990,6 +2201,9 @@ function intradayRequestParams(tradeDate = null) {
 
 async function loadIntraday(tradeDate = null, options = {}) {
   if (!state.drawerContext) return;
+  if (tradeDate && tradeDate !== state.intradayPayload?.trade_date) {
+    disposeKlineChart();
+  }
   const autoRefreshTradeDate = Boolean(options?.autoRefreshTradeDate);
   if (tradeDate) state.drawerContext.intradayDate = tradeDate;
   const params = intradayRequestParams(tradeDate);
@@ -2007,6 +2221,39 @@ async function loadIntraday(tradeDate = null, options = {}) {
     const payload = await api(`/api/intraday?${query.toString()}`);
     if (requestId !== state.drawerRequestId || state.chartView !== "intraday") return;
     state.drawerContext.intradayDate = payload.trade_date;
+    if (!state.asOf && payload.trade_date === shanghaiDateString()) {
+      state.intradayPayload = payload;
+      renderIntradayDateControls(payload);
+      if (status) {
+        status.className = "kline-status is-loading";
+        status.textContent = `正在取得 ${payload.trade_date} 完整实时 1 分钟行情`;
+      }
+      try {
+        const livePayload = await api("/api/live-intraday", {
+          method: "POST",
+          headers: { "X-Portfolio-Action": "live-intraday" },
+          body: JSON.stringify({ ...params, trade_date: payload.trade_date }),
+        });
+        if (requestId !== state.drawerRequestId || state.chartView !== "intraday") return;
+        renderIntradayPayload(livePayload);
+      } catch (error) {
+        if (requestId !== state.drawerRequestId || state.chartView !== "intraday") return;
+        const schedule = shanghaiLiveSchedule();
+        payload.live = {
+          eligible: true,
+          ...schedule,
+          poll_interval_seconds: 30,
+          source: "sina.minute_kline",
+          last_bar_time: payload.coverage?.last_bar_time || null,
+          updated_at: payload.source?.fetched_at || null,
+          degraded: true,
+          error: error.message,
+        };
+        renderIntradayPayload(payload);
+        if (!payload.bars?.length) startIntradayLiveBootstrapRetry();
+      }
+      return;
+    }
     if (
       autoRefreshTradeDate
       && (payload.available_trade_dates || []).some(
@@ -2045,12 +2292,18 @@ async function refreshIntraday(options = {}) {
   button.disabled = true;
   button.textContent = automatic ? "自动更新中" : "更新中";
   const requestId = ++state.drawerRequestId;
+  const isLiveRequest = !state.asOf && params.trade_date === shanghaiDateString();
   try {
-    const payload = await api("/api/refresh-intraday", {
+    const payload = await api(
+      isLiveRequest ? "/api/live-intraday" : "/api/refresh-intraday",
+      {
       method: "POST",
-      headers: { "X-Portfolio-Action": "refresh-intraday" },
+      headers: {
+        "X-Portfolio-Action": isLiveRequest ? "live-intraday" : "refresh-intraday",
+      },
       body: JSON.stringify(params),
-    });
+      },
+    );
     if (requestId !== state.drawerRequestId || state.chartView !== "intraday") return;
     state.drawerContext.intradayDate = payload.trade_date;
     renderIntradayPayload(payload);
@@ -2090,6 +2343,10 @@ function openIntradayForTradeDate(tradeDate) {
   }
   const coverage = document.getElementById("klineCoverage");
   if (coverage) coverage.textContent = `${tradeDate} · 正在请求分钟行情`;
+  if (!state.asOf && tradeDate === shanghaiDateString()) {
+    void loadIntraday(tradeDate);
+    return;
+  }
   void refreshIntraday({ tradeDate, automatic: true });
 }
 
@@ -2111,6 +2368,10 @@ function isLedgerTradeDate(tradeDate) {
 }
 
 function openIntradayForLatestTradeDate() {
+  if (!state.asOf && state.drawerContext?.kind === "position") {
+    openIntradayForTradeDate(shanghaiDateString());
+    return;
+  }
   const tradeDate = latestLedgerTradeDate(
     state.klinePayload?.operation_groups || [],
     state.asOf,
@@ -2674,11 +2935,13 @@ function bindEvents() {
   }));
 
   elements.asOfInput.addEventListener("change", async (event) => {
+    stopIntradayLiveSubscription();
     state.asOf = event.target.value || null;
     await loadPortfolio({ announce: true });
   });
 
   elements.latestButton.addEventListener("click", async () => {
+    stopIntradayLiveSubscription();
     state.asOf = null;
     elements.asOfInput.value = "";
     await loadPortfolio({ announce: true });

@@ -2,18 +2,23 @@ from __future__ import annotations
 
 import json
 import threading
-from datetime import date
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+from zoneinfo import ZoneInfo
 
 import pytest
 
 from src.portfolio.importer import parse_opening_snapshot, parse_statement
-from src.portfolio.intraday import IntradayFetchError
+from src.portfolio.intraday import IntradayFetchBatch, IntradayFetchError
 from src.portfolio.kline import KlineFetchError, KlineRefreshBusyError
-from src.portfolio.models import ClosePrice, IndustryClassification
+from src.portfolio.models import (
+    ClosePrice,
+    IndustryClassification,
+    MinuteBarObservation,
+)
 from src.portfolio.realtime import RealtimeFetchResult, RealtimeQuote
 from src.portfolio.store import PortfolioStore
 from src.portfolio.web import DashboardApplication, WEB_ASSET_DIR, create_dashboard_server
@@ -46,7 +51,7 @@ def test_dashboard_payload_uses_real_store_values(tmp_path):
     store.set_industries(
         [IndustryClassification("600000.SH", "银行", "tushare.stock_basic.industry")]
     )
-    payload = DashboardApplication(store).portfolio_payload()
+    payload = DashboardApplication(store).portfolio_payload(date(2026, 7, 15))
 
     assert payload["summary"]["market_value"] == "1200"
     assert payload["summary"]["cash_balance"] == "0"
@@ -415,10 +420,11 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
         with urlopen(f"{base}/health", timeout=5) as response:
             assert json.load(response) == {
                 "status": "ok",
-                "api_version": 2,
+                "api_version": 3,
                 "capabilities": [
                     "daily-kline",
                     "refresh-intraday",
+                    "live-intraday-1m",
                     "auto-performance-history",
                 ],
             }
@@ -477,6 +483,7 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
                 timeout=5,
             )
         assert missing_cycle.value.code == 404
+        missing_cycle.value.close()
 
         server.dashboard_app.realtime_portfolio_payload = lambda: {
             "metadata": {"market_data": {"mode": "intraday"}}
@@ -496,6 +503,7 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
                 timeout=5,
             )
         assert exc_info.value.code == 403
+        exc_info.value.close()
 
         with pytest.raises(HTTPError) as industry_exc:
             urlopen(
@@ -508,6 +516,7 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
                 timeout=5,
             )
         assert industry_exc.value.code == 403
+        industry_exc.value.close()
 
         with pytest.raises(HTTPError) as kline_exc:
             urlopen(
@@ -520,6 +529,7 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
                 timeout=5,
             )
         assert kline_exc.value.code == 403
+        kline_exc.value.close()
 
         with pytest.raises(HTTPError) as intraday_exc:
             urlopen(
@@ -534,6 +544,22 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
                 timeout=5,
             )
         assert intraday_exc.value.code == 403
+        intraday_exc.value.close()
+
+        with pytest.raises(HTTPError) as live_intraday_exc:
+            urlopen(
+                Request(
+                    f"{base}/api/live-intraday",
+                    data=json.dumps(
+                        {"ts_code": "600000.SH", "trade_date": "2026-07-10"}
+                    ).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                ),
+                timeout=5,
+            )
+        assert live_intraday_exc.value.code == 403
+        live_intraday_exc.value.close()
 
         server.dashboard_app.refresh_prices = lambda **_: {
             "fetched": 1,
@@ -643,6 +669,40 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
             assert payload["period"]["span"] == 5
             assert payload["refresh"]["fetched_bars"] == 48
 
+        server.dashboard_app.live_intraday = lambda *_args, **_kwargs: {
+            "status": "ready",
+            "period": {"span": 1},
+            "live": {
+                "market_state": "open_am",
+                "poll_interval_seconds": 30,
+                "source": "sina.minute_kline",
+                "last_bar_time": "2026-07-10T10:00:00+08:00",
+                "updated_at": "2026-07-10T02:00:00+00:00",
+            },
+        }
+        with urlopen(
+            Request(
+                f"{base}/api/live-intraday",
+                data=json.dumps(
+                    {
+                        "ts_code": "600000.SH",
+                        "trade_date": "2026-07-10",
+                        "as_of": "2026-07-10",
+                    }
+                ).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Portfolio-Action": "live-intraday",
+                },
+                method="POST",
+            ),
+            timeout=5,
+        ) as response:
+            payload = json.load(response)
+            assert payload["period"]["span"] == 1
+            assert payload["live"]["poll_interval_seconds"] == 30
+            assert payload["live"]["source"] == "sina.minute_kline"
+
         server.dashboard_app.refresh_intraday = lambda *_args, **_kwargs: (_ for _ in ()).throw(
             IntradayFetchError(
                 "分钟行情源均不可用",
@@ -673,6 +733,60 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
         assert intraday_provider_failure.value.code == 502
         error_payload = json.loads(intraday_provider_failure.value.read().decode("utf-8"))
         assert error_payload["provider_attempts"][0]["reason"] == "permission_denied"
+        intraday_provider_failure.value.close()
+
+        server.dashboard_app.live_intraday = lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            IntradayFetchError(
+                "实时分钟行情不可用",
+                [
+                    {
+                        "provider": "sina.minute_kline",
+                        "status": "failed",
+                        "reason": "network_error",
+                    }
+                ],
+            )
+        )
+        with pytest.raises(HTTPError) as live_provider_failure:
+            urlopen(
+                Request(
+                    f"{base}/api/live-intraday",
+                    data=json.dumps(
+                        {"ts_code": "600000.SH", "trade_date": "2026-07-10"}
+                    ).encode("utf-8"),
+                    headers={
+                        "Content-Type": "application/json",
+                        "X-Portfolio-Action": "live-intraday",
+                    },
+                    method="POST",
+                ),
+                timeout=5,
+            )
+        assert live_provider_failure.value.code == 502
+        live_error = json.loads(live_provider_failure.value.read().decode("utf-8"))
+        assert live_error["provider_attempts"][0]["provider"] == "sina.minute_kline"
+        live_provider_failure.value.close()
+
+        server.dashboard_app.live_intraday = lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            KlineRefreshBusyError("已有一个数据刷新任务正在运行")
+        )
+        with pytest.raises(HTTPError) as live_refresh_busy:
+            urlopen(
+                Request(
+                    f"{base}/api/live-intraday",
+                    data=json.dumps(
+                        {"ts_code": "600000.SH", "trade_date": "2026-07-10"}
+                    ).encode("utf-8"),
+                    headers={
+                        "Content-Type": "application/json",
+                        "X-Portfolio-Action": "live-intraday",
+                    },
+                    method="POST",
+                ),
+                timeout=5,
+            )
+        assert live_refresh_busy.value.code == 409
+        live_refresh_busy.value.close()
 
         def fail_kline(*_args, **_kwargs):
             raise KlineFetchError("provider unavailable")
@@ -692,6 +806,7 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
                 timeout=5,
             )
         assert provider_failure.value.code == 502
+        provider_failure.value.close()
 
         def busy_kline(*_args, **_kwargs):
             raise KlineRefreshBusyError("refresh busy")
@@ -711,6 +826,98 @@ def test_dashboard_http_endpoints_and_local_action_guard(tmp_path):
                 timeout=5,
             )
         assert refresh_conflict.value.code == 409
+        refresh_conflict.value.close()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=5)
+
+
+def test_live_intraday_http_accepts_only_current_shanghai_date(tmp_path):
+    store = _build_store(tmp_path)
+    zone = ZoneInfo("Asia/Shanghai")
+    current_date = datetime.now(zone).date()
+    fetched_at = "2026-07-18T02:00:00+00:00"
+    bar = MinuteBarObservation(
+        ts_code="600000.SH",
+        bar_time=datetime.combine(current_date, time(9, 31), tzinfo=zone),
+        frequency_minutes=1,
+        open=Decimal("10"),
+        high=Decimal("10.2"),
+        low=Decimal("9.9"),
+        close=Decimal("10.1"),
+        volume_shares=Decimal("100"),
+        amount_cny=Decimal("1010"),
+        source="sina.minute_kline",
+        refresh_batch_id="live-http-current",
+        dedupe_key=f"live-http-{current_date.isoformat()}",
+        fetched_at=fetched_at,
+    )
+
+    class LiveProvider:
+        def fetch(self, instrument, *, trade_date):
+            assert instrument.ts_code == "600000.SH"
+            assert trade_date == current_date
+            return IntradayFetchBatch(
+                bars=(bar,),
+                frequency_minutes=1,
+                source="sina.minute_kline",
+                refresh_batch_id="live-http-current",
+                fetched_at=fetched_at,
+                provider_attempts=(
+                    {"provider": "sina.minute_kline", "status": "success"},
+                ),
+            )
+
+    server = create_dashboard_server(store, port=0)
+    server.dashboard_app.live_intraday_provider = LiveProvider()
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    host, port = server.server_address[:2]
+    base = f"http://{host}:{port}"
+    try:
+        with urlopen(
+            Request(
+                f"{base}/api/live-intraday",
+                data=json.dumps(
+                    {
+                        "ts_code": "600000.SH",
+                        "trade_date": current_date.isoformat(),
+                    }
+                ).encode("utf-8"),
+                headers={
+                    "Content-Type": "application/json",
+                    "X-Portfolio-Action": "live-intraday",
+                },
+                method="POST",
+            ),
+            timeout=5,
+        ) as response:
+            payload = json.load(response)
+            assert payload["live"]["source"] == "sina.minute_kline"
+            assert payload["live"]["poll_interval_seconds"] == 30
+
+        with pytest.raises(HTTPError) as historical:
+            urlopen(
+                Request(
+                    f"{base}/api/live-intraday",
+                    data=json.dumps(
+                        {
+                            "ts_code": "600000.SH",
+                            "trade_date": (current_date - timedelta(days=1)).isoformat(),
+                        }
+                    ).encode("utf-8"),
+                    headers={
+                        "Content-Type": "application/json",
+                        "X-Portfolio-Action": "live-intraday",
+                    },
+                    method="POST",
+                ),
+                timeout=5,
+            )
+        assert historical.value.code == 400
+        assert "只允许请求当前日期" in historical.value.read().decode("utf-8")
+        historical.value.close()
     finally:
         server.shutdown()
         server.server_close()
@@ -781,9 +988,13 @@ def test_dashboard_assets_are_self_contained_and_have_required_controls():
     assert "/api/kline?" in javascript
     assert 'api("/api/refresh-kline"' in javascript
     assert "/api/intraday?" in javascript
-    assert 'api("/api/refresh-intraday"' in javascript
+    assert '"/api/refresh-intraday"' in javascript
+    assert 'api("/api/live-intraday"' in javascript
+    assert '"X-Portfolio-Action": "live-intraday"' in javascript
     assert 'name: "portfolioOperation"' in javascript
     assert "chart.setDataLoader" in javascript
+    assert "subscribeBar" in javascript
+    assert "unsubscribeBar" in javascript
     assert 'chart.subscribeAction("onCandleBarClick"' in javascript
     assert "openIntradayForTradeDate" in javascript
     assert "openIntradayForLatestTradeDate" in javascript
@@ -827,6 +1038,6 @@ def test_dashboard_assets_are_self_contained_and_have_required_controls():
     assert '"--app=$Url"' in launcher
     assert '"explorer.exe"' in launcher
     assert "无法打开页面" in launcher
-    assert '$requiredApiVersion = 2' in launcher
-    assert '$requiredCapability = "refresh-intraday"' in launcher
+    assert '$requiredApiVersion = 3' in launcher
+    assert '$requiredCapability = "live-intraday-1m"' in launcher
     assert "Stop-IncompatiblePortfolioDashboard" in launcher

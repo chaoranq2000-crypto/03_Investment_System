@@ -133,6 +133,15 @@ def test_acceptance_server_allows_only_review_reads_and_static_assets(
         assert status == 403
         assert blocked_portfolio["code"] == "review_acceptance_read_only"
 
+        status, blocked_live = _read_json(
+            base_url,
+            "/api/live-intraday",
+            method="POST",
+            body=b"{}",
+        )
+        assert status == 403
+        assert blocked_live["code"] == "review_acceptance_read_only"
+
         status, blocked_mutation = _read_json(
             base_url,
             "/api/investment-review/decision",

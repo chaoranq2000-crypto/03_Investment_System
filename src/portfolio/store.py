@@ -1775,6 +1775,20 @@ class PortfolioStore:
             ).fetchone()
             if exists is None:
                 raise ValueError(f"分钟行情包含未登记证券: {ts_code}")
+            placeholders = ", ".join("?" for _ in bar_list)
+            existing_dedupe_keys = {
+                row["dedupe_key"]
+                for row in connection.execute(
+                    f"SELECT dedupe_key FROM minute_bar_observations "
+                    f"WHERE dedupe_key IN ({placeholders})",
+                    tuple(item.dedupe_key for item in bar_list),
+                ).fetchall()
+            }
+            new_bars = [
+                item for item in bar_list if item.dedupe_key not in existing_dedupe_keys
+            ]
+            if not new_bars:
+                return {"new_refresh_batches": 0, "new_minute_observations": 0}
             batch_cursor = connection.execute(
                 """
                 INSERT OR IGNORE INTO minute_refresh_batches(
@@ -1793,7 +1807,7 @@ class PortfolioStore:
                 ),
             )
             inserted_bars = 0
-            for item in bar_list:
+            for item in new_bars:
                 cursor = connection.execute(
                     """
                     INSERT OR IGNORE INTO minute_bar_observations(
