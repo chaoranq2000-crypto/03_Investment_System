@@ -9,6 +9,9 @@ from pathlib import Path
 import pytest
 
 
+pytestmark = pytest.mark.legacy_compatibility
+
+
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_PATH = ROOT / "scripts" / "manage_r5_v1_historical_cleanup.py"
 
@@ -41,7 +44,10 @@ def test_frozen_contract_authority_and_a6_inventory_are_exact(tool) -> None:
         "status": "frozen",
         "source_baseline": tool.PACKAGE_SOURCE_BASELINE,
     }
-    assert tool.verify_root_agents(ROOT) == {
+    assert tool.verify_root_agents(
+        ROOT,
+        revision=tool.PACKAGE_SOURCE_BASELINE,
+    ) == {
         "path": "AGENTS.md",
         "blob_oid": tool.EXPECTED_AGENTS_BLOB_OID,
         "byte_count": tool.EXPECTED_AGENTS_BYTE_COUNT,

@@ -44,7 +44,6 @@ STOCK_PACK_VALIDATOR = (
     / "validate_r5_stock_research_pack.py"
 )
 CANONICAL_INDEX = ROOT / "config" / "r5_readout_canonical_index.yaml"
-
 WORKFLOW_ID = "wf_20260725_stock_first_002837_v1_policy_refresh"
 TARGET_RUN_REL = Path("reports") / "workflow_runs" / WORKFLOW_ID
 CANONICAL_RUN = ROOT / TARGET_RUN_REL
@@ -1090,20 +1089,22 @@ def test_protected_output_paths_are_rejected(tmp_path: Path) -> None:
     assert not dirty_main_guard.exists()
 
 
-def test_canonical_index_points_to_current_policy_refresh() -> None:
+def test_current_run_pointers_are_self_consistent() -> None:
     index = yaml.safe_load(CANONICAL_INDEX.read_text(encoding="utf-8"))
-    pointer = index["current_runs"]["stock_002837"]
-    assert pointer["workflow_id"] == WORKFLOW_ID
-    assert pointer["state_path"] == (
-        TARGET_RUN_REL / "workflow_state.yaml"
-    ).as_posix()
-    assert pointer["readout_path"] == (
-        TARGET_RUN_REL / "workflow_readout.md"
-    ).as_posix()
-    assert pointer["status"] == "accepted_with_todos"
-    historical_workflow_id = "wf_" + "20260703_stock_first_002837_invic"
-    assert historical_workflow_id not in yaml.safe_dump(
-        pointer,
-        allow_unicode=True,
-        sort_keys=True,
-    )
+    current_runs = index["current_runs"]
+    assert isinstance(current_runs, dict) and current_runs
+
+    for pointer_name, pointer in current_runs.items():
+        assert set(pointer) == {"workflow_id", "state_path", "readout_path"}, pointer_name
+        state_path = ROOT / pointer["state_path"]
+        readout_path = ROOT / pointer["readout_path"]
+        assert state_path.is_file(), pointer_name
+        assert readout_path.is_file(), pointer_name
+
+        state = yaml.safe_load(state_path.read_text(encoding="utf-8"))
+        assert state["workflow_id"] == pointer["workflow_id"], pointer_name
+        assert isinstance(state.get("status"), str) and state["status"], pointer_name
+
+        readout_text = readout_path.read_text(encoding="utf-8")
+        assert pointer["workflow_id"] in readout_text, pointer_name
+        assert state["status"] in readout_text, pointer_name

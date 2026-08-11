@@ -114,7 +114,7 @@ P2 之前，重点不是批量比较，而是把 `segment_to_stock_closed_loop`�
 | Metric | 结构化指标观察值 | `data/manifests/metrics_draft.csv`、`data/manifests/metrics_registry.csv` |
 | Exposure | 细分与公司的多对多暴露关系 | `data/processed/normalized/segment_company_exposure.csv` |
 | Report | 某一时点的可再生产物 | `reports/segments/`、`reports/stocks/` |
-| Scorecard | 结构化评分，服务于比较前的统一口径 | `reports/**/scorecard.yaml` |
+| Scorecard | 有证据边界的分析者评估；仅有 `config/scoring_frameworks.yaml` 定义的占位状态时保持未评分，不按 0 计入比较，不求总分也不自动生成研究优先级 | `config/scoring_frameworks.yaml`、`reports/**/scorecard.yaml` |
 | WatchItem | 观察对象、原因、证据、触发条件、复核日期 | `config/watchlist.yaml`、`reports/**/watchlist*` |
 | WorkflowRun | 某次工作流执行状态和交接记录 | `reports/workflow_runs/` |
 
@@ -161,38 +161,29 @@ canonical `workflow_type`、global `stage_id`、global `gate_id`
 Detailed workflow_state schema is owned by
 `.agents/skills/research-orchestrator/references/workflow_state_schema.md`.
 
-### 6.1 V1 四类完成事实
+### 6.1 Run 状态与跨层证据边界
 
-V1 必须同时报告四个互不替代的布尔事实。四者的语义只在本 kernel 定义；
-运行时、局部 profile、Bundle、Night mission 和 readout 只能消费并附证据，
-不得改变定义或用一个事实推导另一个事实。
+普通研究 run 只维护本次运行的 `workflow_state.status`、G0–G10、TODO、
+backflow 和适用时的 `sample_quality_ready`。自动报告质量由 canonical status
+与完整 G0–G10 结果派生，不再要求普通 run 另写
+`automated_report_quality_passed`。
 
-| fact | canonical meaning | evidence boundary |
-|---|---|---|
-| `system_v1_complete` | 工程接口、活动控制面、隔离真实重放、根因归并和工程验证均已闭环，且活动 V1 路径没有 open `engineering_defect`。 | 由版本化实现、测试、scope audit、历史不可变检查和可复跑工件证明。 |
-| `sample_quality_ready` | 当前研究样本已通过全部必要自动质量条件，且唯一最终报告通过真实 reviewer 的有效审核；这些是必要条件，不表示任何单项条件自动充分。 | 由当前样本的 research pack、自动质量结论、最终报告当前字节的机器 SHA-256 和真实 reviewer 决定共同证明；工程测试或中间产物状态不得自动提升。 |
-| `p2_ready` | canonical comparison-readiness 决定已经独立通过。 | 只能由 `comparison_readiness_gate` 按本文件第 13 节判定；工程完成或样例质量不能代替。 |
-| `release_ready` | 候选版本已按获批发布边界发布，且最终精确 HEAD 的必需 CI/验证成功。 | 由 remote SHA、exact-head CI 和发布凭证证明；本地测试或预发布提交不得代替。 |
+`sample_quality_ready` 表示当前样本除自动质量通过外，还具有当前最终报告的有效
+人工审核及其他适用样例条件。这些都是必要条件，不构成只靠 gate 和审核状态即可
+自动推导为 true 的充分条件，也不得反向覆盖 `workflow_state.status`。
 
-`system_v1_complete=true` 至少要求：
+`p2_ready` 只由 `comparison_readiness_gate` 按第 13 节形成；普通细分、个股、
+interlock 或 refresh run 不保存其全局副本。`system_v1_complete` 与
+`release_ready` 分别属于项目集成证据和发布证据，不是普通研究 run 的完成字段。
+项目级 `system_v1_complete=true` 只能由版本化实现、测试、scope audit、可复跑工件
+以及活动路径 open `engineering_defect` 为零支持；发行人未披露数据不能抬高或否定它。
 
-1. 本文件的 canonical interface 和 G0–G10 保持唯一 owner；
-2. 活动 run 只有一套当前状态、TODO、质量结论和 readout；
-3. 真实归档输入可以在隔离 run 中可追溯、可重复地完成自动化闭环；
-4. 影响活动 V1 路径的 open `engineering_defect` 为零；
-5. 合同要求的 targeted/full tests、文档漂移、scope 和历史不可变检查全部通过。
+旧 V1 readout 曾把 `system_v1_complete`、`sample_quality_ready`、`p2_ready` 和
+`release_ready` 并列称为“四个互不替代的布尔事实”。该表达只用于读取旧 run；
+`system_v1_complete=true` 不得自动把后三项改为 true，旧字段也不是新 run 的写入合同。
 
-以下事实不得抬高或否定 `system_v1_complete`：发行人未披露数据、最终报告审核
-`not_requested` / `pending`、`sample_quality_ready=false`、`p2_ready=false`，
-或尚未授权的发布。
-这些外部事实必须保留为显式缺口，但不得被工程自动化补造。反过来，
-`system_v1_complete=true` 也不得自动把后三项改为 true。
-
-历史 Night mission outcome `review_intake_ready` 与长期 Goal
-`r5_bundle17r_bf2_four_case_activation` 只作为原运行的只读追溯事实保留；原长期
-Goal 记录在历史快照中保持 open。它们不能写入 canonical `workflow_state.status`，
-不能参与当前 dispatch、当前 Goal 的关闭条件或 V1 完成判定，也不得形成最终报告审核
-之外的活动人工授权边界。
+历史 run 的任务描述、局部状态和授权记录只是原运行的只读追溯事实，不能参与
+当前 dispatch、canonical close 或活动人工授权。
 
 ### 6.2 活动 run 的单一当前控制面
 
@@ -206,7 +197,7 @@ workflow_readout.md
 ```
 
 `run_log.md` 和 `artifact_manifest.csv` 记录执行与追溯，但不得形成第二套当前状态或质量结论。
-Bundle、Night、旧 close readout、历史 quality report 和 generation snapshot 可以保留为只读证据，
+历史产物、旧 close readout、历史 quality report 和 generation snapshot 可以保留为只读证据，
 不得覆盖或支配上述当前资产。新一轮输出必须写入新的 run-scoped 路径，不能覆盖历史 run。
 
 ### 6.3 当前目标范围内的 issue 与 outcome
@@ -221,8 +212,8 @@ Bundle、Night、旧 close readout、历史 quality report 和 generation snapsh
 | `blocks_current_goal` | 是否阻断当前 run 明确要求的目标；必须由 disposition、impact scope 和实际依赖推导。 |
 
 `severity` 只描述风险和修复优先级，不能单独决定 `blocks_current_goal` 或
-canonical `workflow_state.status`。历史 `blocking_decision`、Bundle gate 或 R5
-local check 也不能覆盖当前目标依赖判断。
+canonical `workflow_state.status`。历史决定或局部检查结果也不能覆盖
+当前目标依赖判断。
 
 确定性状态推导如下：
 
@@ -265,47 +256,30 @@ generation lock 和中间 receipt 全部由机器验证，不是人工审批对�
 保留的 `reviewed` 只表示已通过适用的 provenance、schema、claim-type、metric、
 citation、hash 和 no-advice 机器检查；它不表示 reviewer 已逐项批准。
 
-每个新建或更新的活动 run 使用：
+活动人审只绑定一次最终报告的当前字节 SHA-256。其他 exact-hash、generation lock
+和中间 receipt 只服务于机器完整性与重放。rollback 只保护可变且非幂等的写入事务；
+remote receipt 只证明 publication 边界，不是普通研究或质量 gate 的放行条件。
 
-```yaml
-final_report_review_semantics_version: final_report_review_v1
-automated_report_quality_passed: false
-final_report_review_status: not_requested
-final_report_review:
-  report_path: null
-  report_sha256: null
-  reviewer: null
-  reviewed_at: null
-  decision: not_requested
-  notes: null
-  change_scope: null
-```
+`final_report_review_semantics_version`、`final_report_review_status`、
+`final_report_review.report_sha256` 和 `final_report_review.change_scope` 等标识符的
+结构、状态值、hash 绑定、状态迁移与 legacy 兼容只由
+`.agents/skills/research-orchestrator/references/workflow_state_schema.md` 和
+`schemas/r5_final_report_review.schema.json` 定义。新状态使用该 schema 与模板，
+不在本 kernel 复制字段表。旧状态保留的 `automated_report_quality_passed` 或
+`final_report_review.decision` 只是只读兼容字段，不是新 run 的必填项。
 
-字段级约束由
-`.agents/skills/research-orchestrator/references/workflow_state_schema.md`
-和 `schemas/r5_final_report_review.schema.json` 实现。canonical 行为是：
+自动报告质量必须从 canonical status 与完整 G0–G10 结果派生；局部 evaluator pass、
+最终人工决定或历史 accepted 记录都不能代替该全集。最终报告审核不改变自动 outcome；
+只有审核揭示活动质量缺陷时，才按第 6.3 节进入相应 fix loop。
 
-`automated_report_quality_passed=true` 只在活动状态列出 G0–G10 全部
-canonical gates，且每项均为 `pass` 或 `not_applicable` 时成立。
-局部 Bundle/R5 pass、最终人工决定或历史 accepted 记录都不能代替该全集。
-
-| `final_report_review_status` | record requirement | automatic workflow effect | sample-quality effect |
-|---|---|---|---|
-| `not_requested` | 路径、hash、reviewer、时间、备注和 `change_scope` 均为空；`decision` 必须同值。 | 不改变自动 outcome，也不阻止 `system_v1_complete`。 | 必须为 false。 |
-| `pending` | 绑定 `reports/stocks/<id>/` 或 `reports/segments/<id>/` 下的最终报告路径和机器计算 SHA-256；该路径必须与 `artifacts[]` 中唯一 required/current `artifact_type: final_report` 一致；reviewer、时间、备注、`change_scope` 为空；`decision` 必须同值。 | 不改变自动 outcome，也不阻止 `system_v1_complete`。 | 必须为 false。 |
-| `approved` | 绑定当前最终报告路径与当前字节 SHA-256；包含真实非机器 reviewer、ISO 时间、非空备注；`decision` 必须同值，`change_scope` 为空。 | 不得覆盖自动质量 failure。 | 只有全部必要自动质量条件也通过时才允许为 true；仍须满足其他样例质量条件。 |
-| `changes_requested` | 与 `approved` 使用相同身份、时间、路径、hash 和备注约束；`change_scope` 只能为 `automated_quality_defect` 或 `report_revision`。 | 前者把 workflow 路由为 `needs_fix`；后者只进入最终报告修订，不改变已推导的自动 outcome。 | 必须为 false。 |
-
-`final_report_review.decision` 必须等于顶层 status。最终报告字节变化后，
-机器重算 hash 必须使旧 `approved` / `changes_requested` 失效，不能把旧 reviewer
-决定迁移到新报告。若替换已提交的人审记录，新的有效人审事件必须使用严格更晚的
-`reviewed_at`；只更新 hash 不能迁移旧决定。机器不得生成 reviewer 身份、审核时间、批准或修改决定。
+最终报告字节变化后，机器重算 hash 必须使旧人工决定失效，不能把旧 reviewer
+决定迁移到新报告。机器不得生成 reviewer 身份、审核时间、批准或修改决定，
 人工审核也不能批准伪造数据、绕过自动质量失败或把 unsupported-used 变成可接受事实。
 
 只有最终报告的 SHA-256 绑定人工审核。evidence、claim、metric、pack、计算、
 generation lock、candidate 和 receipt 的 hash 继续用于机器完整性与重放，
-不得转化为并行人审、authority 或逐项 candidate decision。历史 Bundle/Night 的
-多份 exact-hash 人审和 reviewer-authority 记录保持只读兼容证据，退出活动 routing，
+不得转化为并行人审、authority 或逐项 candidate decision。历史局部人审、
+exact-hash 和 reviewer-authority 记录保持只读兼容证据，退出活动 routing，
 也不能满足当前最终报告审核。
 
 ## 7. Skill 角色分工
@@ -505,36 +479,16 @@ generation lock、candidate 和 receipt 的 hash 继续用于机器完整性与�
 
 任何 skill-local gate 不得使用新的全局 `G` 编号。
 
-### 11.1 显式 capability-local 检查与兼容别名
+### 11.1 显式 capability-local evaluator
 
-R5、Bundle、Night、data-layer、report-production 和 skill-local 检查必须使用明确的局部
-前缀或兼容别名，并映射到 G0–G10 中的一个或多个 owner gate。局部控制只在对应风险边界
-生效：活动人审只绑定一次最终报告的当前字节 SHA-256；其他 exact-hash、generation lock、
-candidate 和 receipt 只保护机器完整性与可重放性；rollback 只保护可变且非幂等的写入事务；
-remote receipt 只证明 publication 边界。普通读取、幂等生成和本地质量检查不得因此获得新的
-通用门禁。
-
-局部检查不得：
-
-1. 写入新的全局 `G` 编号；
-2. 作为 `workflow_state.quality_gates[].gate_id` 的 canonical 值；
-3. 重定义工程完成、样例质量、P2 或发布事实；
-4. 因历史 Bundle/Night 任务仍 open 而移动活动 V1 的工程终点。
-
-兼容层必须记录 `local_check_id`、`mapped_global_gate_ids`、owner、适用边界和失败回流目标。
-
-Bundle11R–16R 与 legacy R5 sample-quality local checks 已退出普通 orchestrator 的默认 routing。
-它们只能在调用方明确请求某个 capability 时作为局部 evaluator 运行，并且必须：
-
-1. 声明被检查的 `affected_capabilities`；
-2. 使用既有 local ID，并映射到 G0–G10；
-3. 只返回该 capability 的 pass、limitation 或 defect；
-4. 由第 6.3 节按当前目标依赖推导 canonical outcome；
-5. 不直接写 `workflow_state.status`，也不设置工程完成、样例质量或 P2 事实。
-
-普通 `stock_first_closed_loop`、报告生成、close 和 quality dispatch 不得默认调用这些
-Bundle pipeline。仍有通用价值的算法可以保留为显式 evaluator；专用 routing、配置和
-实现属于历史兼容资产，不是 canonical 前置条件。
+局部或 legacy evaluator 已退出普通 orchestrator 的默认 routing。只有 handoff
+明确点名待评估 capability、即调用方明确请求某个 capability 时，才读取对应的
+现有 reference 并执行。输出必须
+映射到 G0–G10 owner gate，声明 `affected_capabilities`，并返回可由第 6.3 节
+消费的 scoped issue。evaluator 不直接写 `workflow_state.status`，也不得写其他
+canonical state、新的全局 gate 或跨层
+完成事实；其局部 pass/fail、hash、receipt 和历史人审记录不得代替
+当前目标依赖判断。
 
 ## 12. 固化产物清单
 
@@ -594,15 +548,3 @@ config/segment_taxonomy.yaml 更新或新增 candidate 说明
 
 阶段性建设顺序属于 `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md`，
 不在本 kernel 中维护。
-
-## 14. Legacy Bundle / R5 evaluator boundary
-
-Bundle11R–16R and the legacy R5 sample-quality local-check set are capability evaluators, not a
-mandatory operating-research inner loop. A caller may explicitly request a
-business-line driver, operating-evidence, peer-eligibility, model-link or
-sample-benchmark check. The resulting issue rows must carry
-`impact_scope`、`active_disposition`、`affected_capabilities` and
-`blocks_current_goal`, and must use the existing local-to-G0–G10 mapping.
-
-No Bundle or R5 evaluator may become a default step between T0 and T10, require
-historical Bundle generations, or directly decide the canonical outcome.

@@ -134,10 +134,11 @@ Create or update `reports/workflow_runs/<workflow_id>/workflow_state.yaml`
 when the run requires persisted state. Use `workflow_state_schema.md`
 and the runtime rules in `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
-New or updated active runs must set `state_schema_version: r5_v1` and
-`final_report_review_semantics_version: final_report_review_v1`. The retained
-`references/orchestration_contract.md` path is a compatibility pointer, not a
-second runtime contract or a template for active state.
+Create new or updated active runs from the canonical workflow-state template
+and validate them with `workflow_state_schema.md`. Do not hand-copy a field
+contract into this skill. The retained `references/orchestration_contract.md`
+path is a compatibility pointer, not a second runtime contract or a template
+for active state.
 
 ### ORCH-4 Select next stage and target skill
 
@@ -165,20 +166,11 @@ receipt or per-item human decision.
 
 ### ORCH-7 Route fix loop if needed
 
-For each active issue, consume `impact_scope`、`active_disposition`、
-`affected_capabilities` and `blocks_current_goal`. Derive the canonical outcome
-from the current-goal truth table in `RESEARCH_WORKFLOW.md`; severity alone is
-never a workflow decision.
-
-- visible unknowns that are not used by the current output may remain
-  `accepted_with_todos`;
-- unsupported-used numbers, calculation errors, true double-counting, broken
-  citations, hidden TODOs and no-advice violations are `needs_fix`;
-- only identity/path/parse/source identity or required-input failures that
-  prevent any honest target output are `blocked`.
-
-Route `needs_fix` to the owner skill and keep non-blocking limitations in TODOs.
-Fix loop rules live in
+Consume issue rows validated against
+`.agents/skills/quality-review/references/issue_schema.md`. Derive the run
+outcome only from the current-goal semantics in `RESEARCH_WORKFLOW.md`; do not
+copy its field table or truth table into this skill. Route fixable work to the
+issue owner and keep non-blocking limitations visible. Fix-loop actions live in
 `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
 ### ORCH-8 Close with workflow_readout and final-report review state
@@ -187,39 +179,16 @@ For complete runs, write `workflow_readout.md` with final status, artifacts,
 quality results, backflow decision, TODOs, and P2 readiness only if relevant.
 Close rules live in `WORKFLOW_ORCHESTRATION_SPEC.md`.
 
-The only active human boundary is the final report. Record:
+The only active human boundary is the final report. At close:
 
-```text
-automated_report_quality_passed
-final_report_review_status
-final_report_review.report_path
-final_report_review.report_sha256
-final_report_review.reviewer
-final_report_review.reviewed_at
-final_report_review.decision
-final_report_review.notes
-final_report_review.change_scope
-```
-
-`not_requested` has empty binding and person fields. `pending` binds a
-repo-relative report path and machine-computed SHA-256, with no reviewer,
-timestamp, notes or `change_scope`. `approved|changes_requested` additionally
-require a real non-machine reviewer, ISO timestamp and non-empty notes;
-`decision` equals the top-level status. `change_scope` is
-`automated_quality_defect|report_revision` only for `changes_requested`.
-
-Recompute the report hash from current bytes. Any byte change invalidates the
-old decision. Never synthesize reviewer identity or migrate a historical
-approval. `not_requested|pending` does not block automatic workflow close or
-`system_v1_complete`, but `sample_quality_ready` remains false.
-`sample_quality_ready=true` is permitted only when all necessary automated
-quality conditions pass, the current final report has a valid `approved`
-review, and every other applicable sample-quality condition holds. These are
-necessary conditions, not an automatic sufficiency rule.
-
-For `changes_requested`, route to `needs_fix` only when
-`change_scope=automated_quality_defect`; `report_revision` returns only to
-final-report writing and preserves the automatically derived outcome.
+- Derive automatic report quality from canonical status and complete G0-G10.
+- Build and validate review state through `workflow_state_schema.md` and the
+  state validator; do not reproduce its fields or truth table here.
+- Recompute the current report hash before consuming a bound review.
+- Record only real external human-review facts; never synthesize identity,
+  migrate a historical approval, or let human review override machine quality.
+- Consume a validated change request to route the affected work; keep the
+  canonical outcome and sample-quality meaning owned by `RESEARCH_WORKFLOW.md`.
 
 ## Output style
 
@@ -248,13 +217,14 @@ Do not write long investment opinions from this skill.
 - Separate fact、estimate、inference、management_comment、analyst_view、opinion。
 - Record uncertainty、missing data and TODO。
 - Do not output buy/sell/hold advice.
-- Do not default-route Bundle11R–16R or `R5-G1`–`R5-G11`.
+- Do not load or route a local/legacy evaluator unless the handoff explicitly
+  names the capability.
 - Do not let a local evaluator, historical `blocking_decision`, or severity
   overwrite the canonical current-goal outcome.
 - Do not require human approval for evidence, claims, metrics, fields,
   candidates, generation locks, calculations or intermediate receipts.
-- Do not reuse Bundle/Night/Reader reviewer authority or exact-hash decisions
-  as the current final-report review.
+- Do not reuse historical local reviewer authority or exact-hash decisions as
+  the current final-report review.
 
 ## Minimal close checklist
 
@@ -271,25 +241,15 @@ This checklist is an operational close check, not a second global gate table.
 [ ] no issue has `blocks_current_goal=true` unless status is `needs_fix` or `blocked`
 [ ] visible unused unknowns and capability limitations remain explicit
 [ ] intermediate `reviewed` objects are machine-qualified, not human-approved
-[ ] final_report_review_status is valid; current report bytes match its hash when bound
-[ ] not_requested / pending does not alter automatic outcome; sample_quality_ready stays false
+[ ] final-report review state passes the canonical state validator when present
 [ ] workflow_readout.md states accepted / accepted_with_todos / needs_fix / blocked
 ```
 
-## Explicit legacy capability-evaluator routing
+## Conditional capability-local evaluator dispatch
 
-Bundle11R–16R and `R5-G1`–`R5-G11` are retired from ordinary orchestrator routing.
-Invoke a retained evaluator only when the handoff explicitly names a capability,
-such as business-line drivers, operating evidence, overlap reconciliation,
-peer eligibility or sample benchmarking.
-
-The evaluator output must keep its local ID, map to G0–G10, and return
-`impact_scope`、`active_disposition`、`affected_capabilities` and
-`blocks_current_goal`. Route only the affected capability. Never copy the
-evaluator's local pass/fail or highest severity directly into
-`workflow_state.status`.
-
-Historical Bundle14/15/16 per-case human reviews, independent receipts,
-reviewer-authored mappings and multiple exact-hash decisions are read-only
-compatibility evidence. They are not requested by this route and cannot
-satisfy the current final-report review.
+Only when the handoff explicitly names a capability, read its corresponding
+existing reference and invoke the retained evaluator. Require output conforming
+to `.agents/skills/quality-review/references/issue_schema.md`, then route only
+the affected capability to its normal owner. Never copy local pass/fail,
+severity, hash or historical authorization into `workflow_state.status` or the
+current final-report review. Otherwise do not load the evaluator reference.

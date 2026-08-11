@@ -123,7 +123,6 @@ def bind_review(
         "report_sha256": digest or report_sha256(report_path),
         "reviewer": reviewer,
         "reviewed_at": reviewed_at,
-        "decision": status,
         "notes": notes,
         "change_scope": change_scope,
     }
@@ -176,44 +175,31 @@ def test_final_report_review_schema_accepts_the_active_template() -> None:
     approve_review(approved)
     assert list(validator.iter_errors(approved)) == []
 
+    sample_ready = template_state()
+    sample_ready["status"] = "accepted"
+    sample_ready["sample_quality_ready"] = True
+    approve_review(sample_ready)
+    assert "automated_report_quality_passed" not in sample_ready
+    assert list(validator.iter_errors(sample_ready)) == []
 
-def test_not_requested_does_not_block_automatic_or_engineering_completion(
+
+def test_not_requested_does_not_block_derived_automatic_completion(
     tmp_path: Path,
 ) -> None:
     state = template_state()
-    state.update(
-        {
-            "status": "accepted",
-            "system_v1_complete": True,
-            "sample_quality_ready": False,
-        }
-    )
+    state["status"] = "accepted"
+    state["quality_gates"] = complete_machine_gates()
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 0, result.stderr
     assert "compatibility" not in result.stdout
-
-
-def test_engineering_completion_requires_completed_automatic_status(
-    tmp_path: Path,
-) -> None:
-    state = template_state()
-    state["system_v1_complete"] = True
-    result = run_validator(write_state(tmp_path, state))
-    assert result.returncode == 1
-    assert "requires a completed automatic workflow status" in result.stderr
 
 
 def test_pending_binds_current_report_without_blocking_completion(
     tmp_path: Path,
 ) -> None:
     state = template_state()
-    state.update(
-        {
-            "status": "accepted",
-            "system_v1_complete": True,
-            "sample_quality_ready": False,
-        }
-    )
+    state["status"] = "accepted"
+    state["quality_gates"] = complete_machine_gates()
     bind_review(state, "pending")
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 0, result.stderr
@@ -225,6 +211,13 @@ def test_record_decision_must_match_top_level_status(tmp_path: Path) -> None:
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 1
     assert "decision must equal final_report_review_status" in result.stderr
+
+
+def test_matching_legacy_record_decision_remains_compatible(tmp_path: Path) -> None:
+    state = template_state()
+    state["final_report_review"]["decision"] = "not_requested"
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
 
 
 def test_final_review_marker_requires_active_v1_state_schema(tmp_path: Path) -> None:
@@ -322,6 +315,17 @@ def test_new_report_hash_cannot_reuse_an_old_human_review_event(
 
     current["final_report_review"]["reviewed_at"] = "2026-07-25T14:31:00+08:00"
     current["final_report_review"]["notes"] = "Re-reviewed the second report bytes."
+    validator.validate_final_report_review_transition(current, previous)
+
+
+def test_removing_redundant_legacy_decision_is_not_a_new_review_event() -> None:
+    validator = load_validator()
+    previous = template_state()
+    approve_review(previous)
+    previous["final_report_review"]["decision"] = "approved"
+    current = copy.deepcopy(previous)
+    current["final_report_review"].pop("decision")
+
     validator.validate_final_report_review_transition(current, previous)
 
 
@@ -518,7 +522,7 @@ def test_approved_review_requires_reviewer_time_and_notes(
     assert message in result.stderr
 
 
-def test_automated_quality_true_requires_complete_machine_gate_evidence(
+def test_legacy_automated_quality_true_requires_complete_machine_gate_evidence(
     tmp_path: Path,
 ) -> None:
     state = template_state()
@@ -526,10 +530,10 @@ def test_automated_quality_true_requires_complete_machine_gate_evidence(
     state["quality_gates"] = [{"gate_id": "G0", "status": "pass"}]
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 1
-    assert "requires complete G0-G10 machine evidence" in result.stderr
+    assert "must equal the value derived" in result.stderr
 
 
-def test_automated_quality_true_requires_completed_automatic_status(
+def test_legacy_automated_quality_true_requires_completed_automatic_status(
     tmp_path: Path,
 ) -> None:
     state = template_state()
@@ -537,14 +541,13 @@ def test_automated_quality_true_requires_completed_automatic_status(
     state["quality_gates"] = complete_machine_gates()
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 1
-    assert "requires a completed automatic workflow status" in result.stderr
+    assert "must equal the value derived" in result.stderr
 
 
 def test_sample_quality_true_requires_automated_pass_and_current_approval(
     tmp_path: Path,
 ) -> None:
     state = template_state()
-    state["automated_report_quality_passed"] = True
     state["quality_gates"] = complete_machine_gates()
     state["sample_quality_ready"] = True
     state["status"] = "accepted"
@@ -560,30 +563,28 @@ def test_sample_quality_true_requires_automated_pass_and_current_approval(
     assert "final_report_review_status=approved" in result.stderr
 
     automatic_failure = copy.deepcopy(state)
-    automatic_failure["automated_report_quality_passed"] = False
+    automatic_failure["quality_gates"][0]["status"] = "fail"
     result = run_validator(write_state(tmp_path, automatic_failure))
     assert result.returncode == 1
-    assert "automated_report_quality_passed=true" in result.stderr
+    assert "requires derived automated report quality to pass" in result.stderr
 
 
 def test_sample_quality_true_requires_completed_automatic_status(
     tmp_path: Path,
 ) -> None:
     state = template_state()
-    state["automated_report_quality_passed"] = True
     state["quality_gates"] = complete_machine_gates()
     state["sample_quality_ready"] = True
     approve_review(state)
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 1
-    assert "requires a completed automatic workflow status" in result.stderr
+    assert "requires derived automated report quality to pass" in result.stderr
 
 
 def test_approved_and_automatic_pass_do_not_force_sample_quality_true(
     tmp_path: Path,
 ) -> None:
     state = template_state()
-    state["automated_report_quality_passed"] = True
     state["quality_gates"] = complete_machine_gates()
     state["sample_quality_ready"] = False
     state["status"] = "accepted"
@@ -599,7 +600,6 @@ def test_report_revision_request_does_not_change_machine_outcome(
     state.update(
         {
             "status": "accepted",
-            "automated_report_quality_passed": True,
             "quality_gates": complete_machine_gates(),
             "sample_quality_ready": False,
         }
@@ -637,7 +637,6 @@ def test_human_approval_cannot_override_automatic_quality_failure(
     tmp_path: Path,
 ) -> None:
     state = template_state()
-    state["automated_report_quality_passed"] = False
     state["sample_quality_ready"] = False
     approve_review(state)
     result = run_validator(write_state(tmp_path, state))
@@ -646,4 +645,4 @@ def test_human_approval_cannot_override_automatic_quality_failure(
     state["sample_quality_ready"] = True
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 1
-    assert "automated_report_quality_passed=true" in result.stderr
+    assert "requires derived automated report quality to pass" in result.stderr

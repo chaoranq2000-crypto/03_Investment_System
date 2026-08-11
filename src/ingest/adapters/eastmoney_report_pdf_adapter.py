@@ -12,6 +12,7 @@ from urllib.parse import urlencode
 import yaml
 from pypdf import PdfReader
 
+from src.ingest.adapters.adapter_runtime import resolve_compatible_run_id
 from src.ingest.adapters.public_http import request_public
 from src.ingest.evidence_io import (
     EVIDENCE_FIELDNAMES,
@@ -115,6 +116,19 @@ def _extract_pdf(pdf_path: Path, text_path: Path, page_map_path: Path) -> tuple[
     page_map_path.parent.mkdir(parents=True, exist_ok=True)
     page_map_path.write_text(yaml.safe_dump({"pages": page_rows}, sort_keys=False), encoding="utf-8")
     return len(reader.pages), any(item["text_length"] > 0 for item in page_rows)
+
+
+def _report_pdf_run_id(
+    repo_root: Path,
+    stock_code: str,
+    pdf_rows: Sequence[Mapping[str, Any]],
+) -> str:
+    run_suffix = f"{stock_code}_{short_hash(hash_json(pdf_rows), 8)}"
+    return resolve_compatible_run_id(
+        repo_root,
+        current_run_id=f"report_pdf_run_{run_suffix}",
+        legacy_run_id=f"r5_bundle8r_report_pdf_{run_suffix}",
+    )
 
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
@@ -247,7 +261,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         writer.writerows(pdf_rows)
     now = utc_now_iso()
     run_row = {
-        "run_id": f"r5_bundle8r_report_pdf_{stock_code}_{short_hash(hash_json(pdf_rows), 8)}",
+        "run_id": _report_pdf_run_id(repo_root, stock_code, pdf_rows),
         "ingest_mode": "url_file",
         "started_at": now,
         "finished_at": utc_now_iso(),
@@ -263,14 +277,15 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "issues": "" if pdf_rows else "no_public_pdf_archived",
         "notes": "analyst_view_only; PDF bytes and page map retained",
     }
-    _append_unique(
+    run_created = _append_unique(
         repo_root / "data/manifests/ingest_runs.csv",
         INGEST_RUN_FIELDNAMES,
         [run_row],
         "run_id",
     )
     log_path = repo_root / "data/processed/logs" / f"{run_row['run_id']}.json"
-    write_json(log_path, run_row)
+    if run_created or not log_path.is_file():
+        write_json(log_path, run_row)
     receipt = {
         "schema_version": 1,
         "decision": "pass" if pdf_rows else "needs_fix",

@@ -28,7 +28,9 @@ Codex Skills：标准化投研动作
 
 当前处于 **P1.6：workflow buildout / 进入 P2 前的工作流制度化**。
 
-P1.6 是项目总阶段标签；具体 R5 Bundle、当前 gate 与允许的产出级别，以 `reports/p1_6/R5_READOUT_CANONICAL_INDEX.md` 中最新 canonical close readout 为准，README 不作为运行时状态事实源。
+P1.6 是项目 buildout 标签，不是单次 workflow 的运行状态。跨 run 的当前选择以 [`config/r5_readout_canonical_index.yaml`](config/r5_readout_canonical_index.yaml) 的 `current_runs` 为唯一 pointer；从其中的 `state_path` 读取 run 状态，从 `readout_path` 打开对应的人类投影。README 不复制当前 workflow ID 或 status；[`R5_READOUT_CANONICAL_INDEX.md`](reports/p1_6/R5_READOUT_CANONICAL_INDEX.md) 只是历史 R5/Patch/Bundle 目录。
+
+Pointer 可能指向已做 hash 绑定的兼容 run，其 readout 会保留当时的字段；新 run 的写入结构以 `research-orchestrator` 的 workflow-state template/schema 为准，不反向改写旧 run。
 
 P1.6 的重点是：
 
@@ -55,6 +57,9 @@ P1.6 不做：扩展新细分、P2 横向比较、批量扩大公司池、自动
 | `docs/workflows/RESEARCH_WORKFLOW.md` | 唯一全局 workflow kernel；定义 `workflow_type`、global stage、global gate、backflow decision。 |
 | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | `research-orchestrator` 运行时规范；消费全局接口，不重新定义全局接口。 |
 | `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层 source adapter、manifest、candidate、data pack 边界。 |
+| `config/r5_readout_canonical_index.yaml` | `current_runs` 选择跨 run 的当前 state/readout；这是 current pointer 唯一 owner。 |
+| `reports/workflow_runs/<workflow_id>/` | 每个 run 的 state、readout 与审计产物；当前路径必须从 `current_runs` 解析，不在 README 手写。 |
+| `reports/p1_6/R5_READOUT_CANONICAL_INDEX.md` | 历史 R5/Patch/Bundle readout 目录；不是 current pointer。 |
 | `.agents/skills/stock-deep-dive/references/report_production_profile.md` | 个股报告生产 profile；属于 `stock-deep-dive` 执行细节。 |
 | `docs/meta/DOC_OWNERSHIP_MATRIX.md` | 文档职责边界和去重矩阵。 |
 
@@ -94,6 +99,6 @@ $research-orchestrator 启动细分到个股闭环：AI服务器液冷。
 
 ## 研究边界
 
-本项目可以输出研究框架、证据地图、风险清单、评分卡、观察清单、情景假设和 refresh log。
+Research 产品可以输出研究框架、证据地图、风险清单、评分卡、观察清单、情景假设和 refresh log。
 
-本项目不输出直接买卖建议、仓位建议、保证收益判断或自动交易指令。
+Research 产出不输出直接买卖建议、仓位建议、保证收益判断或自动交易指令。

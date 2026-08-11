@@ -1,11 +1,11 @@
 project:
   name: a-share-research-os
   name_cn: A股投研工作区
-  stage: P1.5
+  stage: P1.6
   previous_stage:
     P0: conditional_pass
     P1: conditional_pass_with_medium_todos
-  current_focus: pre_p2_hardening
+  current_focus: workflow_buildout_pre_p2
   report_date: 2026-07-13
   as_of_date: 2026-07-13
   generated_at: 2026-07-13

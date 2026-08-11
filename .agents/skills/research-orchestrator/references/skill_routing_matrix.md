@@ -53,4 +53,7 @@ are owned by docs/workflows/RESEARCH_WORKFLOW.md.
 4. 没有 `segment_exposure.yaml` 或 no-backflow reason，不得关闭 stock-first workflow。
 5. 个股深度完成后，必须给出 backflow decision。
 6. 进入 P2 前，必须先执行 `comparison_readiness_gate`。
-7. high severity quality issue 未关闭，不得 accepted。
+7. `severity` 只表示风险和修复优先级。只有 `blocks_current_goal=true`
+   的活动缺陷，或导致任何诚实目标产物都无法生成的不可替代输入失败，
+   才阻止当前目标关闭；可见且未被当前产物使用的缺口可保留为
+   `accepted_with_todos`。

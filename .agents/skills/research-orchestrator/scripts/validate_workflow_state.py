@@ -98,19 +98,22 @@ CURRENT_ASSET_NAMES = (
     "workflow_readout.md",
 )
 REPO_ROOT = Path(__file__).resolve().parents[4]
-FINAL_REPORT_REVIEW_FIELDS = {
+FINAL_REPORT_REVIEW_REQUIRED_FIELDS = {
     "report_path",
     "report_sha256",
     "reviewer",
     "reviewed_at",
-    "decision",
     "notes",
     "change_scope",
 }
-FINAL_REVIEW_TRUTH_FIELDS = (
+FINAL_REPORT_REVIEW_OPTIONAL_FIELDS = {"decision"}
+FINAL_REPORT_REVIEW_FIELDS = (
+    FINAL_REPORT_REVIEW_REQUIRED_FIELDS | FINAL_REPORT_REVIEW_OPTIONAL_FIELDS
+)
+FINAL_REVIEW_REQUIRED_BOOLEAN_FIELDS = ("sample_quality_ready",)
+LEGACY_OPTIONAL_BOOLEAN_FIELDS = (
     "automated_report_quality_passed",
     "system_v1_complete",
-    "sample_quality_ready",
     "p2_ready",
     "release_ready",
 )
@@ -364,10 +367,16 @@ def validate_final_report_review_transition(
     baseline_review = baseline.get("final_report_review")
     if not isinstance(current_review, dict) or not isinstance(baseline_review, dict):
         return
+    current_comparable = {
+        key: value for key, value in current_review.items() if key != "decision"
+    }
+    baseline_comparable = {
+        key: value for key, value in baseline_review.items() if key != "decision"
+    }
     if (
         previous_status in human_statuses
         and current_status == previous_status
-        and current_review == baseline_review
+        and current_comparable == baseline_comparable
     ):
         return
 
@@ -555,6 +564,22 @@ def _validate_final_report_binding(
         )
 
 
+def _derive_automated_report_quality_passed(data: dict[str, Any]) -> bool:
+    """Derive automatic report quality from canonical outcome and G0-G10."""
+
+    if data.get("status") not in {"accepted", "accepted_with_todos"}:
+        return False
+    gates = {
+        item.get("gate_id"): item.get("status")
+        for item in data.get("quality_gates", [])
+        if isinstance(item, dict) and item.get("gate_id") in VALID_GATE_IDS
+    }
+    return set(gates) == VALID_GATE_IDS and all(
+        gate_status in {"pass", "not_applicable"}
+        for gate_status in gates.values()
+    )
+
+
 def validate_final_report_review(
     data: dict[str, Any],
     *,
@@ -564,7 +589,7 @@ def validate_final_report_review(
 
     _reject_parallel_human_review_fields(data)
 
-    for field in FINAL_REVIEW_TRUTH_FIELDS:
+    for field in FINAL_REVIEW_REQUIRED_BOOLEAN_FIELDS:
         if field not in data:
             fail(f"{field} is required for final_report_review_v1")
         if not isinstance(data[field], bool):
@@ -577,45 +602,16 @@ def validate_final_report_review(
     review = data.get("final_report_review")
     if not isinstance(review, dict):
         fail("final_report_review must be a mapping")
-    missing = sorted(FINAL_REPORT_REVIEW_FIELDS - set(review))
+    missing = sorted(FINAL_REPORT_REVIEW_REQUIRED_FIELDS - set(review))
     extra = sorted(set(review) - FINAL_REPORT_REVIEW_FIELDS)
     if missing:
         fail("final_report_review missing fields: " + ", ".join(missing))
     if extra:
         fail("final_report_review has unsupported fields: " + ", ".join(extra))
-    if review["decision"] != status:
+    if "decision" in review and review["decision"] != status:
         fail("final_report_review.decision must equal final_report_review_status")
 
-    automated_pass = data["automated_report_quality_passed"]
-    if automated_pass:
-        gates = {
-            item.get("gate_id"): item.get("status")
-            for item in data.get("quality_gates", [])
-            if isinstance(item, dict)
-        }
-        missing_gates = sorted(VALID_GATE_IDS - set(gates))
-        non_passing_gates = sorted(
-            gate_id
-            for gate_id, gate_status in gates.items()
-            if gate_id in VALID_GATE_IDS
-            and gate_status not in {"pass", "not_applicable"}
-        )
-        if missing_gates or non_passing_gates:
-            details = []
-            if missing_gates:
-                details.append("missing=" + ",".join(missing_gates))
-            if non_passing_gates:
-                details.append("not_passed=" + ",".join(non_passing_gates))
-            fail(
-                "automated_report_quality_passed=true requires complete G0-G10 "
-                "machine evidence with pass/not_applicable statuses; "
-                + "; ".join(details)
-            )
-        if data["status"] not in {"accepted", "accepted_with_todos"}:
-            fail(
-                "automated_report_quality_passed=true requires a completed "
-                "automatic workflow status"
-            )
+    automated_pass = _derive_automated_report_quality_passed(data)
 
     if status == "not_requested":
         for field in (
@@ -673,8 +669,8 @@ def validate_final_report_review(
     if data["sample_quality_ready"]:
         if not automated_pass:
             fail(
-                "sample_quality_ready=true requires "
-                "automated_report_quality_passed=true"
+                "sample_quality_ready=true requires derived automated report "
+                "quality to pass"
             )
         if status != "approved":
             fail(
@@ -686,16 +682,6 @@ def validate_final_report_review(
                 "sample_quality_ready=true requires a completed automatic "
                 "workflow status"
             )
-
-    if (
-        data["system_v1_complete"]
-        and data["status"] not in {"accepted", "accepted_with_todos"}
-    ):
-        fail(
-            "system_v1_complete=true requires a completed automatic "
-            "workflow status"
-        )
-
 
 def _validate_scoped_issue(item: dict[str, Any], label: str) -> str:
     """Validate one current-goal issue and return its row-level outcome."""
@@ -821,6 +807,27 @@ def validate_v1_controls(data: dict[str, Any], *, goal_scoped: bool) -> None:
                     "mapped_global_gate_ids"
                 )
 
+    for field in (
+        *FINAL_REVIEW_REQUIRED_BOOLEAN_FIELDS,
+        *LEGACY_OPTIONAL_BOOLEAN_FIELDS,
+    ):
+        if field in data and not isinstance(data[field], bool):
+            fail(f"{field} must be a boolean when present")
+
+    if "automated_report_quality_passed" in data:
+        derived_automated_pass = _derive_automated_report_quality_passed(data)
+        if data["automated_report_quality_passed"] != derived_automated_pass:
+            fail(
+                "legacy automated_report_quality_passed must equal the value "
+                "derived from workflow status and complete G0-G10 evidence"
+            )
+
+    if (
+        data.get("p2_ready") is True
+        and data.get("workflow_type") != "comparison_readiness_gate"
+    ):
+        fail("p2_ready=true requires workflow_type=comparison_readiness_gate")
+
     for index, item in enumerate(data.get("open_todos", [])):
         if not isinstance(item, dict):
             fail(f"open_todos[{index}] must be a mapping")
@@ -903,23 +910,16 @@ def main(argv: list[str]) -> int:
     )
     if review_semantics_version is None:
         marker_controlled_fields = [
-            "automated_report_quality_passed",
             "final_report_review_status",
             "final_report_review",
         ]
         if goal_scoped:
-            marker_controlled_fields.extend(FINAL_REVIEW_TRUTH_FIELDS)
+            marker_controlled_fields.extend(FINAL_REVIEW_REQUIRED_BOOLEAN_FIELDS)
         else:
-            legacy_truth_claims = sorted(
-                field
-                for field in FINAL_REVIEW_TRUTH_FIELDS
-                if field in data and data[field] is not False
-            )
-            if legacy_truth_claims:
+            if data.get("sample_quality_ready") is True:
                 fail(
-                    "legacy final-report truth claims require "
-                    "final_report_review_semantics_version=final_report_review_v1: "
-                    + ", ".join(legacy_truth_claims)
+                    "legacy sample_quality_ready=true requires "
+                    "final_report_review_semantics_version=final_report_review_v1"
                 )
         partial_review_fields = sorted(
             field

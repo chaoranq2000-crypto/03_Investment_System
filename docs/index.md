@@ -28,6 +28,12 @@
 - `workflows/DATA_LAYER_WORKFLOW.md` — 数据层发现、拉取、归档、候选化和交接。
 - `workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` — 兼容性指针；实际 profile 已迁移到 `.agents/skills/stock-deep-dive/references/report_production_profile.md`。
 
+## Current run navigation
+
+- [`current_runs`](../config/r5_readout_canonical_index.yaml) — 跨 run 的当前 state/readout pointer 唯一 owner。
+- `reports/workflow_runs/<workflow_id>/` — 从 pointer 的 `state_path` 读取 run 状态，从 `readout_path` 打开人类投影；本索引不复制当前 workflow ID 或 status。
+- [Historical R5/Patch/Bundle readout directory](../reports/p1_6/R5_READOUT_CANONICAL_INDEX.md) — 历史目录，不负责选择 current run。
+
 ## Reporting
 
 - `reporting/STOCK_REPORT_TARGET_STANDARD.md` — 样例级个股报告目标标准。
@@ -54,6 +60,14 @@
 - `meta/DOC_OWNERSHIP_MATRIX.md` — 文档职责边界和去重矩阵。
 - `meta/TOP_LEVEL_DOCS_INDEX.md` — 兼容性指针；不再作为主索引维护。
 - `meta/GENERATED_FILE_MANIFEST.txt` — 生成文件清单。
+
+## Diagnostics and plans
+
+- `logs/2026-08-10_system_complexity_diagnostic.md` — 规则递归、规模膨胀与判断机械化的时间点整合诊断。
+- `plans/p1_6_system_complexity_remediation_plan.md` — 允许修改核心事实源与活动代码的有限分阶段修正计划。
+- `logs/2026-08-10_system_complexity_remediation_execution_log.md` — Phase 0–7 的已执行内容、验证、工程停止点与保留的人工决定。
+
+以上文档用于诊断和实施导航，不是当前规则或 workflow 事实源；永久规则仍以 `AGENTS.md`、对应 workflow/policy owner 和活动 skill 契约为准。
 
 ## Historical material
 

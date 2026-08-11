@@ -45,11 +45,7 @@ PROTECTED_V1_REPLAY_STATE_PATH = (
 )
 FINAL_REVIEW_STATE_FIELDS = {
     "final_report_review_semantics_version",
-    "automated_report_quality_passed",
-    "system_v1_complete",
     "sample_quality_ready",
-    "p2_ready",
-    "release_ready",
     "final_report_review_status",
     "final_report_review",
 }
@@ -175,6 +171,16 @@ def test_versioned_template_and_singleton_names_are_canonical() -> None:
     assert result.returncode == 0, result.stderr
     assert "legacy compatibility" not in result.stdout
 
+    state = template_state()
+    for retired_default in (
+        "automated_report_quality_passed",
+        "system_v1_complete",
+        "p2_ready",
+        "release_ready",
+    ):
+        assert retired_default not in state
+    assert "decision" not in state["final_report_review"]
+
 
 def test_versioned_state_accepts_only_mapped_canonical_gates(tmp_path: Path) -> None:
     state = template_state()
@@ -249,27 +255,67 @@ def test_protected_v1_replay_state_remains_read_only_compatible() -> None:
     assert after == before
 
 
-@pytest.mark.parametrize(
-    "truth_field",
-    [
-        "automated_report_quality_passed",
-        "system_v1_complete",
-        "sample_quality_ready",
-        "p2_ready",
-        "release_ready",
-    ],
-)
-def test_protected_v1_replay_cannot_claim_truth_without_final_review_marker(
+def test_protected_v1_replay_cannot_claim_sample_quality_without_final_review_marker(
     tmp_path: Path,
-    truth_field: str,
 ) -> None:
     state = yaml.safe_load(
         PROTECTED_V1_REPLAY_STATE_PATH.read_text(encoding="utf-8")
     )
-    state[truth_field] = True
+    state["sample_quality_ready"] = True
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 1
-    assert "legacy final-report truth claims require" in result.stderr
+    assert "legacy sample_quality_ready=true requires" in result.stderr
+
+
+def test_legacy_project_truth_booleans_remain_optional_and_decoupled(
+    tmp_path: Path,
+) -> None:
+    state = template_state()
+    state["system_v1_complete"] = True
+    state["release_ready"] = True
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+
+
+def test_p2_ready_true_is_scoped_to_comparison_readiness_runs(tmp_path: Path) -> None:
+    state = template_state()
+    state["p2_ready"] = True
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert (
+        "p2_ready=true requires workflow_type=comparison_readiness_gate"
+        in result.stderr
+    )
+
+    state["workflow_type"] = "comparison_readiness_gate"
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+
+
+def test_legacy_automated_quality_boolean_must_equal_derived_value(
+    tmp_path: Path,
+) -> None:
+    state = template_state()
+    state["automated_report_quality_passed"] = False
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+
+    state["automated_report_quality_passed"] = True
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert "must equal the value derived" in result.stderr
+
+    state["status"] = "accepted"
+    state["quality_gates"] = [
+        {"gate_id": f"G{index}", "status": "pass"} for index in range(11)
+    ]
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 0, result.stderr
+
+    state["automated_report_quality_passed"] = False
+    result = run_validator(write_state(tmp_path, state))
+    assert result.returncode == 1
+    assert "must equal the value derived" in result.stderr
 
 
 def test_unknown_state_schema_version_fails(tmp_path: Path) -> None:
@@ -320,22 +366,10 @@ def test_partial_final_report_review_schema_cannot_bypass_marker(
     assert "final-report review fields require" in result.stderr
 
 
-@pytest.mark.parametrize(
-    "truth_field",
-    [
-        "system_v1_complete",
-        "sample_quality_ready",
-        "p2_ready",
-        "release_ready",
-    ],
-)
-def test_final_review_truth_fields_cannot_bypass_marker(
-    tmp_path: Path,
-    truth_field: str,
-) -> None:
+def test_sample_quality_cannot_bypass_final_review_marker(tmp_path: Path) -> None:
     state = template_state()
     strip_final_review_semantics(state)
-    state[truth_field] = True
+    state["sample_quality_ready"] = True
     result = run_validator(write_state(tmp_path, state))
     assert result.returncode == 1
     assert "final-report review fields require" in result.stderr

@@ -12,6 +12,9 @@ import pytest
 import yaml
 
 
+pytestmark = pytest.mark.legacy_compatibility
+
+
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "run_r5_v1_replay_002837.py"
 VALIDATOR = (

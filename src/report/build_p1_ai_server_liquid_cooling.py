@@ -800,6 +800,7 @@ def build_config() -> None:
                 - 年报/半年报披露分产品收入
                 - 数据中心液冷重大合同公告
                 - 投资者关系活动记录更新客户验证进展
+                - 连续两期未找到液冷收入、订单或客户验证披露时触发补证与重评，不等同命题失效
               risks:
                 - 收入暴露低于市场叙事
                 - 液冷产品价格竞争
@@ -825,6 +826,7 @@ def build_config() -> None:
               triggers:
                 - 液冷板收入或订单披露
                 - 子公司创源智热业务进展披露
+                - 连续两期未找到液冷收入、订单或客户验证披露时触发补证与重评，不等同命题失效
               risks:
                 - 仅有产品或技术储备，未形成显著业绩贡献
               confidence: medium
@@ -1192,14 +1194,18 @@ def build_segment_reports() -> None:
 
         ## 11. 评分卡
 
-        | Dimension | Score 0-5 | Rationale | evidence_ids | confidence |
+        | Dimension | Score / status | Rationale | evidence_ids | confidence |
         |---|---:|---|---|---|
         | market_space | 4 | AI算力基础设施扩张提供需求背景 | policy_miit_compute_infra_20231008_9f2a30 | medium |
         | growth_visibility | 3 | 技术路径明确，但渗透率数据待补 | industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91 | medium |
+        | industry_chain_position | 4 | 设备、部件和系统集成链条明确 | industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91 | medium |
+        | profit_pool_quality | 3 | 可能有设备和系统集成利润池，但公司级毛利和订单口径缺失 | annual_report_002837_invic_2025_0f8fcf; annual_report_301018_shenling_2024_122331 | low |
         | a_share_purity | 3 | 有若干A股产品暴露，但收入占比缺失 | annual_report_002837_invic_2025_0f8fcf; annual_report_301018_shenling_2024_122331 | medium |
-        | evidence_quality | 3 | 官方披露充足，财务字段不完整 | evidence_manifest | medium |
+        | evidence_quality | 3 | 官方披露和准官方行业报告可用，结构化财务快照已补；液冷收入、订单和客户侧证据仍待补 | market_data_tushare_stock_basic_20260701_a6d9f2 | medium |
+        | catalyst_visibility | UNSCORED | 缺少明确时间表和订单金额 | TODO | low |
+        | risk_pressure | UNSCORED | 风冷效率、替代路径、价格竞争和收入纯度均需补证 | TODO | low |
 
-        说明：评分只表示研究优先级和证据质量，不是交易信号。
+        说明：数字分数是有证据边界的分析者判断；UNSCORED 不按 0 计算。不求总分，研究优先级不是交易信号。
 
         ## 12. 后续跟踪清单
 
@@ -1225,24 +1231,28 @@ def build_segment_reports() -> None:
           scores:
             market_space:
               score: 4
+              score_type: analyst_judgment
               rationale: AI算力基础设施扩张提供需求背景，但不是液冷订单证据。
               evidence_ids:
                 - policy_miit_compute_infra_20231008_9f2a30
               confidence: medium
             growth_visibility:
               score: 3
+              score_type: analyst_judgment
               rationale: 冷板式液冷技术路径清楚，渗透率和客户采购节奏待补。
               evidence_ids:
                 - industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91
               confidence: medium
             industry_chain_position:
               score: 4
+              score_type: analyst_judgment
               rationale: 设备、部件和系统集成链条明确。
               evidence_ids:
                 - industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91
               confidence: medium
             profit_pool_quality:
               score: 3
+              score_type: analyst_judgment
               rationale: 可能有设备和系统集成利润池，但公司级毛利和订单口径缺失。
               evidence_ids:
                 - annual_report_002837_invic_2025_0f8fcf
@@ -1250,6 +1260,7 @@ def build_segment_reports() -> None:
               confidence: low
             a_share_purity:
               score: 3
+              score_type: analyst_judgment
               rationale: A股候选较多，但收入纯度未核验。
               evidence_ids:
                 - annual_report_002837_invic_2025_0f8fcf
@@ -1258,11 +1269,28 @@ def build_segment_reports() -> None:
               confidence: medium
             evidence_quality:
               score: 3
+              score_type: analyst_judgment
               rationale: 官方披露和准官方行业报告可用，Tushare stock_basic已补；财务深字段仍待抓取。
               evidence_ids:
                 - market_data_tushare_stock_basic_20260701_a6d9f2
               confidence: medium
+            catalyst_visibility:
+              score: null
+              score_type: unscored
+              rationale: 年报、半年报、液冷订单和客户验证是后续观察点，但本轮缺少明确时间表和订单金额。
+              evidence_ids:
+                - TODO
+              confidence: low
+            risk_pressure:
+              score: null
+              score_type: unscored
+              rationale: 风冷效率提升、风液混合替代、价格竞争和公司收入纯度不足均需持续跟踪。
+              evidence_ids:
+                - TODO
+              confidence: low
           final_priority: watch_medium_high
+          final_priority_type: research_priority
+          priority_basis: analyst_judgment_not_score_aggregation
           key_reasons:
             - reason: 细分边界清楚，产品链条可定义。
               evidence_id: industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91
@@ -1367,6 +1395,8 @@ def stock_report(
     claim_ids: list[str],
     profile: str,
     risk_note: str,
+    financial_score: str,
+    technology_score: str,
     priority: str,
 ) -> None:
     base = f"reports/stocks/{folder}"
@@ -1509,35 +1539,74 @@ def stock_report(
           scores:
             segment_exposure_quality:
               score: {exposure_score}
+              score_type: analyst_judgment
               rationale: 暴露类型为{exposure_type}，仍需收入占比和客户订单核验。
               evidence_ids:
                 - {evidence_id}
               confidence: medium
             revenue_visibility:
-              score: 1
+              score: null
+              score_type: unscored
               rationale: 液冷收入占比暂缺。
               evidence_ids:
                 - TODO
               confidence: low
             financial_quality:
-              score: 1
-              rationale: Tushare stock_basic已导入，结构化财务字段未完成。
+              score: {financial_score}
+              score_type: analyst_judgment
+              rationale: Tushare结构化财务快照已导入，但属于公司整体指标，不能直接归因于AI服务器液冷业务。
               evidence_ids:
-                - market_data_tushare_stock_basic_20260701_a6d9f2
+                - market_data_tushare_income_selected_stocks_20260701_f1c8b2
+                - market_data_tushare_fina_indicator_selected_stocks_20260701_c3e4a9
+              confidence: medium
+            margin_quality:
+              score: 2
+              score_type: analyst_judgment
+              rationale: 公司整体毛利率可追踪，但液冷业务毛利率暂缺。
+              evidence_ids:
+                - market_data_tushare_fina_indicator_selected_stocks_20260701_c3e4a9
+              confidence: low
+            customer_quality:
+              score: null
+              score_type: unscored
+              rationale: 客户侧订单、认证和批量交付证据仍待补。
+              evidence_ids:
+                - TODO
+              confidence: low
+            technology_or_product_edge:
+              score: {technology_score}
+              score_type: analyst_judgment
+              rationale: 公司披露液冷相关产品或技术线索，但优势强度仍需订单、客户或技术参数证据。
+              evidence_ids:
+                - {evidence_id}
+              confidence: medium
+            governance_quality:
+              score: null
+              score_type: unscored
+              rationale: P1.5未做治理深挖，仅保留为后续个股深度核验项。
+              evidence_ids:
+                - TODO
+              confidence: low
+            valuation_scenario_risk:
+              score: null
+              score_type: unscored
+              rationale: 估值场景只用于研究假设管理，液冷收入和利润缺口尚不支持数字评估。
+              evidence_ids:
+                - TODO
               confidence: low
             evidence_quality:
               score: 3
+              score_type: analyst_judgment
               rationale: 有官方披露证据，但字段抽取未完成。
               evidence_ids:
                 - {evidence_id}
               confidence: medium
           final_priority: {priority}
+          final_priority_type: research_priority
+          priority_basis: analyst_judgment_not_score_aggregation
           key_reasons:
             - reason: 进入P1个股样本用于验证暴露映射。
               evidence_id: {evidence_id}
-          kill_switches:
-            - condition: 连续两期无液冷收入、订单或客户验证披露。
-              evidence_needed: 年报/半年报/公告/投关记录
         """,
     )
     write_text(
@@ -1604,6 +1673,8 @@ def build_stock_reports() -> None:
         ],
         profile="英维克披露数据中心热管理和液冷相关产品/解决方案，属于较清晰的产品暴露样本。",
         risk_note="液冷收入占比和利润贡献尚未在本轮证据中直接披露。",
+        financial_score="3",
+        technology_score="3",
         priority="deep_watch",
     )
     stock_report(
@@ -1620,6 +1691,8 @@ def build_stock_reports() -> None:
         ],
         profile="科创新源披露液冷板和数据中心液冷需求相关内容，但更适合作为技术/概念暴露降权样本。",
         risk_note="产品线索可能未转化为显著收入或利润贡献。",
+        financial_score="2",
+        technology_score="2",
         priority="validation_watch",
     )
 
@@ -1923,7 +1996,7 @@ def build_p1_reports() -> None:
 
 
 def build_decision_log() -> None:
-    write_text(
+    write_raw_text_once(
         "decisions/watchlist_changes.md",
         f"""
         # Watchlist Changes

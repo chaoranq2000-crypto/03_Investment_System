@@ -31,38 +31,20 @@
 | 过期证据 | 可能过期的证据标记 `stale` |
 | 多对多映射 | 个股与细分关系使用 exposure 记录 |
 | 更新记录 | 新证据导致变化时输出 change log |
-| 投资边界 | 不给出直接买卖建议 |
+| Research 投资边界 | Research 产出不给出直接买卖建议 |
 
 ---
 
 ## 3. 当前目标范围与 outcome
 
-质量 issue 必须把风险描述与工作流决定分开。活动 issue 至少记录：
+质量 issue 必须把风险描述与工作流决定分开；severity 只描述风险大小和处理
+优先级，不能单独决定 run status。字段级 issue contract 由
+`.agents/skills/quality-review/references/issue_schema.md` 定义，canonical outcome
+只由 `docs/workflows/RESEARCH_WORKFLOW.md` 第 6.3 节定义。本政策不复制字段 enum、
+truth table 或状态推导。
 
-```text
-severity
-impact_scope: workflow | report | section | claim | method | none
-active_disposition: active_defect | unknown | method_unavailable |
-                    report_limitation | historical_backlog |
-                    policy_retired | not_required_for_active_v1
-affected_capabilities
-blocks_current_goal
-```
-
-`severity` 只描述风险大小和处理优先级。它不能单独决定
-`blocks_current_goal`，也不能仅因 `high` 就把整个 workflow 置为
-`needs_fix` 或 `blocked`。
-
-具体 outcome truth table 的唯一 owner 是
-`docs/workflows/RESEARCH_WORKFLOW.md`。本政策执行以下边界：
-
-- visible 且未被当前产物使用的 unknown 可以保留为
-  `accepted_with_todos`；
-- unsupported-used number、错误计算、真实 double-count、引用断裂、
-  hidden TODO 和 no-advice 违规必须为 `needs_fix`；
-- identity、path、parse、source identity 或不可替代必要输入失败，导致
-  任何诚实目标产物都无法生成时，才使用 `blocked`；
-- 自动质量通过且没有活动限制或 TODO 时，才使用 `accepted`。
+质量审查应返回有证据的 finding、受影响能力、修复 owner 与下一步；编排器再消费
+上述 owners 形成 run 状态。
 
 ### 3.1 缺失信息降级阶梯
 
@@ -85,24 +67,15 @@ machine-qualified，不表示人工批准，也不要求 reviewer authority、�
 
 唯一活动人工边界是最终报告质量审核：
 
-```text
-final_report_review_status:
-  not_requested | pending | approved | changes_requested
-```
+机器负责计算并校验最终报告当前字节的 SHA-256；真实 reviewer 负责报告质量判断。
+报告字节变化必须使旧决定失效。人工审核不能批准伪造数据、替代证据检查或绕过
+自动质量失败，机器也不得合成 reviewer、时间或决定。
 
-`pending` 绑定 repo-relative 最终报告路径和机器计算的当前字节 SHA-256。
-`approved|changes_requested` 还要求真实非机器 reviewer、ISO 时间和非空备注；
-review record 的 `decision` 必须等于顶层 status。`change_scope` 只在
-`changes_requested` 中取 `automated_quality_defect|report_revision`。
-
-报告字节变化立即使旧决定失效。`not_requested|pending` 不阻止自动 workflow
-或 `system_v1_complete`，但 `sample_quality_ready=false`。只有全部必要自动
-质量条件通过、最终报告 `approved` 且 hash 仍匹配，并满足其他适用条件时，
-`sample_quality_ready` 才允许为 true；这些是必要条件，不是自动充分条件。
-
-人工审核不能批准伪造数据或绕过自动质量失败。`changes_requested` 揭示自动质量
-缺陷时路由 `needs_fix`；若 `change_scope=report_revision`，只修订最终报告，
-不改写已推导的自动 outcome。
+最终报告审核结构、状态迁移和 legacy 字段兼容见
+`.agents/skills/research-orchestrator/references/workflow_state_schema.md` 与
+`schemas/r5_final_report_review.schema.json`；本政策不复制字段级规则。
+`sample_quality_ready` 的业务含义和自动 outcome 边界以
+`docs/workflows/RESEARCH_WORKFLOW.md` 为准。
 
 除最终报告 SHA-256 外，其他 hash 只用于机器完整性和重放。历史 Bundle/Night
 的人审、authority、独立 receipt 和 candidate decision 只读，不进入活动 routing。
@@ -304,9 +277,9 @@ watchlist 是否变化？
 
 ---
 
-## 11. 不构成投资建议
+## 11. Research 产出不构成投资建议
 
-所有产出都应默认包含研究边界：
+所有 Research 工作流产出都应默认包含研究边界：
 
 > 本内容用于研究流程与证据管理，不构成任何买入、卖出、持有或其他交易建议。
 

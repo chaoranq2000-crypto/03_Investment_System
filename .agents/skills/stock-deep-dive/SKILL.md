@@ -128,80 +128,21 @@ The pack should include:
 - `risk_counter_evidence`
 - `source_gap_requests`
 
-For R5-MVP work, produce `R5_stock_research_pack.yaml` using
-`references/r5_stock_research_pack_contract.md`. The pack is the R5 fact
-source and must preserve all `TODO_*`, `MISSING_DISCLOSURE`, forecast,
-valuation, market, and business-breakdown gaps.
-
-Bundle 3 core subpack contracts live in:
-
-- `references/r5_financial_history_pack_contract.md`
-- `references/r5_business_breakdown_pack_contract.md`
-- `references/r5_forecast_model_pack_contract.md`
-- `references/r5_valuation_pack_contract.md`
-
 Rules:
 
 - Estimates, assumptions and analyst views must be explicitly labeled.
 - Management comments must not be promoted to facts unless supported by official disclosure or accepted claim review.
 - Business line revenue, gross margin, customer, product, capacity and order fields may be `MISSING`; never invent them.
 
-### SDD-R5-0 R5 mode entry
+### Conditional R5 report capability
 
-Use the R5 path only when the run explicitly asks for an R5 research pack or sample-quality preparation. R5 supplements the R4 `stock_analysis_pack.yaml` path; it does not redefine the global workflow kernel.
-
-### SDD-R5-1 R4 to R5 mapping
-
-Map machine-qualified `stock_analysis_pack.yaml` fields into
-`R5_stock_research_pack.yaml` according to
-`references/r5_stock_research_pack_contract.md`. If a source R4 field is
-absent or has not passed machine validation, keep the R5 field present with
-`missing_reason`, `source_gap_register`, or a visible TODO.
-
-### SDD-R5-2 Twelve subpack build
-
-Build the 12 R5 subpacks: company identity, evidence snapshot, financial history, business breakdown, segment exposure, industry context, peer comparison, forecast model, valuation, technical market, sentiment/event, and risk/counterevidence. Every material field must retain `fact`, `estimate`, `assumption`, `inference`, `analyst_view`, `management_comment`, `opinion`, or `unknown` typing.
-
-### SDD-R5-3 Source-gap and downgrade handling
-
-Allowed R5 states are `R5_sample_quality_ready`, `R5_research_draft`, `R5_source_gapped_draft`, and `blocked`. Missing business, forecast, valuation, market, technical, sentiment, or event inputs must downgrade the state rather than being filled from memory or prose.
-
-`R5_sample_quality_ready` additionally requires a valid current final-report
-`approved` review and every applicable sample-quality condition. Automatic
-subpack readiness and final approval are necessary conditions, not an
-automatic sufficiency rule.
-
-These are report-capability labels, not canonical workflow outcomes. Apply the
-degradation ladder before choosing a label:
-
-```text
-direct issuer disclosure
-→ audited aggregate
-→ bounded estimate / scenario with explicit assumptions
-→ unknown or omit the dependent conclusion
-```
-
-Visible unused unknowns and unavailable non-required methods may coexist with
-canonical `accepted_with_todos`. Unsupported-used values, calculation errors,
-true double-counting, broken citations, hidden TODOs or no-advice violations
-are `needs_fix`. Use canonical `blocked` only when identity/path/parse/source
-identity or an irreplaceable required input failure prevents any honest target
-output.
-
-### SDD-R5-4 Upstream and sub-skill boundary
-
-Do not acquire evidence, call live APIs, calculate real forecast values, or
-calculate real valuation outputs inside `stock-deep-dive`. Evidence comes
-from `evidence-ingest`; valuation context comes from `company-valuation` or
-machine-qualified valuation assets.
-
-### SDD-R5-5 Quality-review handoff
-
-Before any R5 report composition, hand off the pack, `source_gap_register`,
-open questions, no-advice scan status, and downgrade reason to
-`quality-review`. Composer/writer layers may translate only machine-qualified
-pack content and must not create new facts. This is automated qualification,
-not a human approval step.
+Use the R5 path only when the handoff explicitly requests an R5 research pack,
+R5 report, or legacy sample-quality capability. Then read
+`references/r5_stock_research_pack_contract.md`,
+`references/r5_report_contract.md`, and only the R5 subpack references needed
+by that request. Preserve visible gaps and send the resulting pack to
+`quality-review` before composition. Ordinary stock runs do not load or require
+R5 packs, Bundle generations, Reader artifacts, or legacy report states.
 
 ### SDD-2.5 Valuation subagent handoff
 
@@ -258,7 +199,9 @@ Use:
 - `assets/stock_deep_dive_report_template.md`
 - `references/report_style_guide.md`
 - `references/report_production_profile.md`
-- `references/legacy_stock_skill_rules.md`
+
+Read `references/legacy_stock_skill_rules.md` only when an explicit legacy
+split-workflow compatibility handoff requires it.
 
 Produce an R4 / stock deep dive draft from `stock_analysis_pack.yaml`.
 
@@ -321,6 +264,15 @@ Exposure rules:
   disclosed or machine-qualified by `quality-review` from an official source.
 - Customer, order, capacity, or project clues must remain clue-level unless
   the source and machine-validation status allow a stronger claim.
+- A scorecard dimension supported only by placeholder states defined in
+  `config/scoring_frameworks.yaml` uses `score: null` and
+  `score_type: unscored`; a numeric score is an evidence-bounded
+  `analyst_judgment`, never a substitute value for missing disclosure.
+- Missing disclosure may open an evidence refresh and reassessment task; it
+  does not automatically lower a score, weaken a thesis or invalidate a thesis.
+  If it changes confidence, score or thesis strength, state the relevant time
+  expectation, disclosure boundary and evidence coverage. Never present absence
+  of disclosure as evidence that the business does not exist.
 
 ### SDD-5 Quality-review handoff
 
@@ -355,7 +307,7 @@ accepted-with-todos, but sample quality remains false.
 
 ## Must-read references
 
-Read these references before executing a stock run:
+Read these current references before executing an ordinary stock run:
 
 - `references/data_layer_pack_consumption.md`
 - `references/publishable_stock_report_gate.md`
@@ -365,10 +317,18 @@ Read these references before executing a stock run:
 - `references/market_sentiment_event_contract.md`
 - `references/report_style_guide.md`
 - `references/report_production_profile.md`
-- `references/r5_stock_research_pack_contract.md`
-- `references/r5_report_contract.md`
 - `references/valuation_subagent_handoff.md`
-- `references/legacy_stock_skill_rules.md`
+
+Read these only when the handoff explicitly requests the corresponding
+capability:
+
+- R5 pack or report: `references/r5_stock_research_pack_contract.md`,
+  `references/r5_report_contract.md`, and the required R5 subpack contracts.
+- Legacy operating-evidence or sample-quality evaluation:
+  `references/operating_evidence_profile.md` and the relevant retained R5
+  evaluator reference.
+- Legacy split-workflow compatibility:
+  `references/legacy_stock_skill_rules.md`.
 
 If a reference is missing, record a TODO rather than inventing its content.
 
@@ -429,21 +389,8 @@ Before closing a run, confirm:
 
 ## Explicit legacy capability evaluators
 
-Bundle11R–16R and `R5-G1`–`R5-G11` are retired from this skill's default route. Invoke
-a retained evaluator only when the handoff explicitly names a capability such
-as business-line archetype assignment, operating-evidence qualification,
-overlap reconciliation, model linking, peer eligibility or sample benchmarking.
-
-When explicitly invoked, every thesis-critical assumption still carries source,
-unit, period, scenario, confidence, overlap treatment and financial-statement
-mapping. A broad proxy must be labelled and bounded. The evaluator result must
-retain its local ID, map to G0–G10, declare `affected_capabilities`, and return
-the scoped issue fields used by `quality-review`.
-
-No local Bundle/R5 pass or failure may directly change the canonical outcome.
-If the explicit evaluator is not requested, ordinary stock research proceeds
-through SDD-0–SDD-5 and the canonical G0–G10 owners.
-
-Any historical Bundle per-case human review, reviewer-authored mapping,
-independent receipt or generation-lock approval remains read-only and is not
-part of this skill's active route.
+If the handoff explicitly requests a retained Bundle/R5 capability evaluator,
+read only the corresponding reference and return its capability-local result
+to `quality-review`. Otherwise proceed through SDD-0–SDD-5 without loading the
+legacy evaluator. Historical reviewer, receipt, generation-lock and local
+pass/fail records remain read-only and cannot decide the canonical outcome.

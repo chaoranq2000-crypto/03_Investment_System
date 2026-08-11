@@ -58,13 +58,15 @@ description: Use when comparing multiple listed companies within or across segme
 - 不同会计口径、业务口径或估值口径必须说明。
 - narrative exposure 不能直接提高比较结论。
 - 缺失数据不得用猜测填充。
-- 评分不是交易信号。
+- 消费 scorecard 时，仅有 `config/scoring_frameworks.yaml` 定义的占位状态的维度保留 `score: null` / `unscored`，不当作 0 参与比较。
+- scorecard 的数字分数必须有非占位证据并标注为分析者判断；不自动求总分或映射研究优先级。
+- 评分用于结构化研究比较；最终研究优先级仍是定性判断，不是交易信号。
 
 ## Quality checklist
 
 - [ ] 公司标识和 linked_segments 正确。
 - [ ] exposure 数据有 evidence_id 或 TODO。
 - [ ] 指标口径、单位、周期一致。
-- [ ] 评分有证据支撑。
+- [ ] 数字评分有非占位证据支撑；未评分维度保留缺口。
 - [ ] 风险和反证已列出。
 - [ ] 未输出买卖建议。

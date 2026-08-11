@@ -10,3 +10,7 @@ line-length = 100
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-m 'not legacy_compatibility'"
+markers = [
+  "legacy_compatibility: frozen historical governance and replay compatibility checks excluded from the default suite",
+]
