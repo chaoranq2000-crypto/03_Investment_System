@@ -14959,6 +14959,7 @@ function periodicReportView(value) {
 			appendix: object(readerReport.appendix)
 		},
 		recommendation,
+		historical_snapshot: object(report.historical_snapshot),
 		performance,
 		operation_count: Number(report.operation_count ?? operations.operation_count ?? 0),
 		sections
@@ -15003,11 +15004,7 @@ function periodicReportHeadline(value) {
 		if (base.includes(display.label) && base.includes(display.detail)) return base;
 		return `${base} ${display.label}；${display.detail}。`;
 	}
-	if (display.mode === "historical_snapshot") {
-		const base = text(report.reader_report.central_judgment || report.headline, "周期报告缺少结论摘要");
-		if (base.includes(display.label)) return base;
-		return `${base} ${display.label}；${display.detail}。`;
-	}
+	if (display.mode === "historical_snapshot") return `${display.label}。原报告摘要仅作为历史内容保留，请在详情中查看。`;
 	if (report.reader_report.central_judgment) return report.reader_report.central_judgment;
 	return `${report.headline} ${display.label}；${display.detail}`;
 }
@@ -15701,10 +15698,20 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		header.append(element("p", "section-kicker", "PERIODIC REVIEW"), element("h2", "", `${subjectLabel} · ${text(report.period.end)} ${periodLabel}`), element("p", "investment-review-mono", report.report_id), statusBadge(report.status));
 		header.querySelector("h2").id = "investmentReviewDrawerTitle";
 		drawerContent.append(header, element("p", "investment-review-gap-summary", periodicReportHeadline(report)));
+		if (recommendationDisplay.mode === "historical_snapshot") {
+			drawerContent.appendChild(element("p", "investment-review-warning", "以下内容为历史报告原文，可能包含旧动作或仓位区间；它不是当前有效建议，也不会触发订单。"));
+			const snapshot = object(report.historical_snapshot);
+			const originalJudgment = text(snapshot.original_central_judgment || snapshot.original_headline, "");
+			if (originalJudgment) {
+				const original = element("details", "investment-review-structured-details");
+				original.append(element("summary", "", "查看原报告摘要（历史）"), element("p", "", originalJudgment));
+				drawerContent.appendChild(original);
+			}
+		}
 		if (isReaderReport) {
 			readerSections.forEach((sectionValue) => {
 				const readerSection = object(sectionValue);
-				const block = sectionBlock(text(readerSection.title, "综合分析"), "READER ANALYSIS");
+				const block = sectionBlock(text(readerSection.title, "综合分析"), recommendationDisplay.mode === "historical_snapshot" ? "HISTORICAL REPORT CONTENT" : "READER ANALYSIS");
 				values(readerSection.paragraphs).forEach((paragraph, index) => {
 					block.body.appendChild(element("p", index === 0 ? "investment-review-list-conclusion" : "", text(paragraph)));
 				});

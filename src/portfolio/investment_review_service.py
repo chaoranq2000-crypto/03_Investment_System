@@ -97,6 +97,7 @@ def _periodic_report_api_projection(
     """Label legacy actions without rewriting the stored historical report."""
 
     projected = deepcopy(dict(report))
+    historical_snapshot = False
     sections = projected.get("sections")
     recommendation = (
         sections.get("recommendation")
@@ -107,6 +108,7 @@ def _periodic_report_api_projection(
         selected = dict(recommendation)
         if selected.get("mode") not in {"observation_only", "advice"}:
             selected["mode"] = "historical_snapshot"
+            historical_snapshot = True
         if isinstance(sections, Mapping):
             projected["sections"] = dict(sections)
             projected["sections"]["recommendation"] = selected
@@ -123,8 +125,30 @@ def _periodic_report_api_projection(
                 "advice",
             }:
                 selected_action["mode"] = "historical_snapshot"
+                historical_snapshot = True
             projected["reader_report"] = dict(reader_report)
             projected["reader_report"]["action_plan"] = selected_action
+    if historical_snapshot:
+        reader_projection = projected.get("reader_report")
+        original_reader_judgment = (
+            reader_projection.get("central_judgment")
+            if isinstance(reader_projection, Mapping)
+            else None
+        )
+        projected["historical_snapshot"] = {
+            "label": "历史建议快照，非当前有效建议",
+            "original_headline": projected.get("headline"),
+            "original_central_judgment": original_reader_judgment,
+            "stored_report_unchanged": True,
+        }
+        safe_headline = (
+            "历史建议快照，非当前有效建议。"
+            "原报告摘要仅作为历史内容保留，请在详情中查看。"
+        )
+        projected["headline"] = safe_headline
+        if isinstance(reader_projection, Mapping):
+            projected["reader_report"] = dict(reader_projection)
+            projected["reader_report"]["central_judgment"] = safe_headline
     return projected
 
 _RUN_ID = re.compile(r"^reviewrun_[0-9a-f]{32}$")

@@ -2149,7 +2149,8 @@ def test_v2_marker_upgrade_fails_closed_when_rw_handle_is_substituted(
         review_store_module.sqlite3, "connect", substituted_connect
     )
     with pytest.raises(
-        ReviewStoreError, match="SQLite main path drifted at after_rw_open"
+        ReviewStoreError,
+        match=r"Reviewability SQLite main (?:path|handle) drifted at after_rw_open",
     ):
         store.upgrade_reviewability_candidate_v2()
     assert substituted is True

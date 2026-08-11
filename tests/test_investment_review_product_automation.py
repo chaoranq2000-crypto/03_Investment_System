@@ -1008,8 +1008,9 @@ def test_default_market_adapter_receives_clock_and_custom_factory_is_explicit(
     plan = coordinator._prepare_plan(trigger="default_adapter")
 
     assert captured["clock"]() == frozen_now
-    assert str(captured["cache_root"]).endswith(
-        "investment_review_product_completion_v3\\market_cache"
+    assert Path(captured["cache_root"]).parts[-2:] == (
+        "investment_review_product_completion_v3",
+        "market_cache",
     )
     assert plan.market_input_sha256 is not None
     with pytest.raises(ValueError, match="requires explicit"):

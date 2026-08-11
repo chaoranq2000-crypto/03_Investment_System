@@ -141,7 +141,7 @@ def _periodic_api_report() -> dict[str, Any]:
             "report_cutoff_at": "2026-07-15T15:00:00+08:00",
         },
         "generated_at": "2026-07-15T12:00:00Z",
-        "headline": "组合日报 API 样本。",
+        "headline": "组合日报：因此现有 hold 建议不变。",
         "sections": {
             "performance_and_positions": {
                 "performance": {"asset_change_pct": "1"},
@@ -265,6 +265,17 @@ def test_periodic_report_api_lists_and_reads_from_the_selected_sidecar(
     assert listing["data"]["reports"][0]["recommendation"]["mode"] == (
         "historical_snapshot"
     )
+    projected_report = listing["data"]["reports"][0]
+    assert projected_report["headline"].startswith(
+        "历史建议快照，非当前有效建议。"
+    )
+    assert "现有 hold 建议不变" not in projected_report["headline"]
+    assert projected_report["historical_snapshot"] == {
+        "label": "历史建议快照，非当前有效建议",
+        "original_headline": "组合日报：因此现有 hold 建议不变。",
+        "original_central_judgment": None,
+        "stored_report_unchanged": True,
+    }
     with pytest.raises(InvestmentReviewServiceError) as captured:
         product_api.service.list_periodic_reports(limit=1001)
     assert captured.value.code == "invalid_limit"
@@ -276,6 +287,7 @@ def test_periodic_report_api_lists_and_reads_from_the_selected_sidecar(
     assert detail["data"]["report"]["sections"]["recommendation"]["mode"] == (
         "historical_snapshot"
     )
+    assert "现有 hold 建议不变" not in detail["data"]["report"]["headline"]
     assert store.get(report["report_id"]) == report
     health = product_api.service.get_health()
     assert health["data"]["periodic_reports"]["count"] == 2

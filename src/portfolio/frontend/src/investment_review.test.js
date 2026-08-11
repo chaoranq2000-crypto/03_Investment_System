@@ -42,7 +42,7 @@ describe("periodic investment reports", () => {
     },
     reader_report: {
       schema_version: "investment_review.reader_report.v1",
-      central_judgment: "短期趋势转强，但执行和基本面约束仍在。",
+      central_judgment: "因此现有 reduce 建议不变。",
       narrative_sections: [{
         key: "judgment_basis",
         title: "趋势、基本面与仓位约束",
@@ -137,11 +137,12 @@ describe("periodic investment reports", () => {
       targetPositionNote: "把单标的权重降至 8%–12%。",
       label: "历史建议快照，非当前有效建议",
     });
-    expect(view.reader_report.central_judgment).toContain("执行和基本面");
+    expect(view.reader_report.central_judgment).toContain("reduce 建议");
     expect(periodicSubjectLabel(view)).toBe("德展健康（000813.SZ）");
-    expect(periodicReportHeadline(report)).toContain(
-      "历史建议快照，非当前有效建议",
+    expect(periodicReportHeadline(report)).toBe(
+      "历史建议快照，非当前有效建议。原报告摘要仅作为历史内容保留，请在详情中查看。",
     );
+    expect(periodicReportHeadline(report)).not.toContain("reduce 建议");
     expect(projectedTime(view.period.report_cutoff_at)).toBe(
       "2026-07-15T15:00:00+08:00",
     );
@@ -183,7 +184,7 @@ describe("periodic investment reports", () => {
       label: "用户策略触发 · 建议 reduce",
     });
     expect(periodicReportHeadline(adviceReport)).toBe(
-      "短期趋势转强，但执行和基本面约束仍在。",
+      "因此现有 reduce 建议不变。",
     );
   });
 
@@ -240,6 +241,8 @@ describe("periodic investment reports", () => {
       source.indexOf("OPERATION EVIDENCE"),
     );
     expect(source).toContain("MOTIVE · SYSTEM INFERENCE");
+    expect(source).toContain("以下内容为历史报告原文");
+    expect(source).toContain("查看原报告摘要（历史）");
     expect(source).toContain("weekly: \"自然周汇总\"");
     expect(source).toContain("monthly: \"自然月汇总\"");
     expect(source).toContain("[\"weekly\", \"周报\"]");

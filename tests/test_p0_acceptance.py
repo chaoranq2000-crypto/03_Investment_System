@@ -154,11 +154,19 @@ def collect_errors() -> list[str]:
         "Evidence is the source of truth",
         "Do not overwrite files in `data/raw/`",
         "Segment-company exposure is many-to-many",
-        "personalized buy/sell/hold recommendations",
-        "must not execute orders",
     ]:
         if marker not in agents:
             errors.append(f"AGENTS.md missing principle: {marker}")
+
+    normalized_agents = " ".join(agents.replace("**", "").split())
+    for marker in [
+        "Research organizes evidence and produces research judgments. It never provides direct buy/sell/hold actions or position targets.",
+        "Portfolio records and reconciles accounting facts. It does not infer motives or provide investment advice.",
+        "Investment Review derives retrospective reviews from those facts. It may provide personalized actions only when the user explicitly asks for advice in the current review and supplies user-confirmed strategy and risk inputs relevant to that advice.",
+        "No product may execute orders",
+    ]:
+        if marker not in normalized_agents:
+            errors.append(f"AGENTS.md missing product boundary: {marker}")
 
     quality = read_text(".agents/skills/quality-review/SKILL.md")
     for marker in [
