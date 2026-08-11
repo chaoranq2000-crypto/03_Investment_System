@@ -3618,6 +3618,9 @@ VALUES(
         self._ensure_product_completion_initialized()
         with self.connection() as conn:
             with conn:
+                # Lock before the idempotence reads so concurrent deterministic
+                # plans converge to INSERTED/SKIPPED instead of racing inserts.
+                conn.execute("BEGIN IMMEDIATE")
                 profile_results = [
                     self._save_fee_profile_conn(conn, profile) for profile in profiles
                 ]
