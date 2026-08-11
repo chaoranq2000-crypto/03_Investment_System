@@ -401,7 +401,8 @@ def _schema_v2_validator() -> Draft202012Validator:
 
 
 def test_v1_schema_bytes_remain_frozen_and_v2_schema_is_independent() -> None:
-    assert hashlib.sha256(SCHEMA_PATH.read_bytes()).hexdigest() == (
+    schema_bytes = SCHEMA_PATH.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    assert hashlib.sha256(schema_bytes).hexdigest() == (
         "994c881379303101107b50286fafd7b38002f36f423d4eb3db4b9f1c01f1d373"
     )
     assert SCHEMA_V2_PATH != SCHEMA_PATH

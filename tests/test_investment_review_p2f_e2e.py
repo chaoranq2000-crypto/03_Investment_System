@@ -166,8 +166,7 @@ def test_f5_01_complete_episode_runs_full_review_and_render_pipeline(
     assert facts["content_id"] != model["content_id"] != rev2["content_id"]
     assert "# 第一部分：事实层" in markdown
     assert "# 第二部分：解释层" in markdown
-    assert "可包含个性化建议" in markdown
-    assert "不执行订单" in markdown
+    assert "不是交易建议" in markdown
     assert _db_sha256(complete_chain) == database_before
 
 
@@ -290,7 +289,7 @@ def test_f5_05_model_unavailable_returns_byte_exact_facts(
     assert validate_interpretation_attempt(result.attempt)["validation_status"] == "accepted"
 
 
-def test_f5_06_direct_recommendation_is_preserved_in_interpretation(
+def test_f5_06_unsafe_model_output_falls_back_without_polluting_facts(
     complete_chain: Any,
 ) -> None:
     _, facts, _ = _build_complete(complete_chain)
@@ -299,10 +298,10 @@ def test_f5_06_direct_recommendation_is_preserved_in_interpretation(
         "The user should buy this security immediately."
     )
     result = P2F3._build(facts, payload)
-    assert result.used_fallback is False
-    assert result.attempt["status"] == "succeeded"
-    assert result.artifact["governance"]["no_advice"] is False
-    assert "should buy" in render_episode_review_markdown(result.artifact).casefold()
+    assert result.used_fallback is True
+    assert canonical_json_bytes(result.artifact) == canonical_json_bytes(facts)
+    assert "POLICY_DIRECT_ADVICE" in result.attempt["failure_codes"]
+    assert "should buy" not in render_episode_review_markdown(result.artifact).casefold()
 
 
 def test_f5_07_human_correction_chain_is_auditable_and_replayable(
@@ -391,7 +390,7 @@ def test_f5_08_reordered_inputs_produce_identical_complete_artifacts(
     assert _db_sha256(complete_chain) == database_before
 
 
-def test_f5_09_successful_release_artifact_allows_advice_without_score_or_execution(
+def test_f5_09_successful_release_artifact_has_no_advice_or_score_fields(
     complete_chain: Any,
 ) -> None:
     _, _, model = _build_complete(complete_chain)
@@ -405,7 +404,7 @@ def test_f5_09_successful_release_artifact_allows_advice_without_score_or_execut
         ),
     )
     assert validate_episode_review(revised)["validation_status"] == "accepted"
-    assert revised["governance"]["no_advice"] is False
+    assert revised["governance"]["no_advice"] is True
     assert revised["governance"]["no_mechanical_score"] is True
     assert _all_keys(revised).isdisjoint(
         {
@@ -418,7 +417,6 @@ def test_f5_09_successful_release_artifact_allows_advice_without_score_or_execut
         }
     )
     rendered = render_episode_review_markdown(revised).casefold()
-    assert "可包含个性化建议" in rendered
-    assert "不执行订单" in rendered
+    assert "不是交易建议" in rendered
     assert "should buy" not in rendered
     assert "should sell" not in rendered

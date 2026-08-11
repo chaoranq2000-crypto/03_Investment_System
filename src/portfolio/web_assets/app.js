@@ -14964,6 +14964,53 @@ function periodicReportView(value) {
 		sections
 	};
 }
+function periodicRecommendationDisplay(value) {
+	const report = object(value);
+	const sections = object(report.sections);
+	const recommendation = object(report.recommendation || sections.recommendation);
+	const readerAction = object(object(report.reader_report).action_plan);
+	const action = readerAction.action ?? recommendation.action;
+	const normalizedAction = typeof action === "string" ? action.trim() : "";
+	const target = object(recommendation.target_position);
+	const targetPositionNote = text(readerAction.target_position_note ?? target.target_position_note, "仓位精度受缺失数据限制。");
+	if (readerAction.mode === "observation_only" || recommendation.mode === "observation_only" || !normalizedAction) return {
+		observationOnly: true,
+		mode: "observation_only",
+		action: null,
+		targetPositionNote: null,
+		label: "仅事实与风险观察",
+		detail: "未生成交易动作或目标仓位",
+		summary: "仅事实与风险观察 · 未生成交易动作或目标仓位"
+	};
+	const legacySnapshot = (readerAction.mode ?? recommendation.mode) !== "advice";
+	const label = legacySnapshot ? "历史建议快照，非当前有效建议" : `用户策略触发 · 建议 ${normalizedAction}`;
+	const detail = legacySnapshot ? `${normalizedAction.toUpperCase()} · ${targetPositionNote}` : targetPositionNote;
+	return {
+		observationOnly: false,
+		mode: legacySnapshot ? "historical_snapshot" : "advice",
+		action: normalizedAction,
+		targetPositionNote,
+		label,
+		detail,
+		summary: `${label} · ${detail}`
+	};
+}
+function periodicReportHeadline(value) {
+	const report = periodicReportView(value);
+	const display = periodicRecommendationDisplay(report);
+	if (display.observationOnly) {
+		const base = text(report.reader_report.central_judgment || report.headline, "周期报告缺少结论摘要");
+		if (base.includes(display.label) && base.includes(display.detail)) return base;
+		return `${base} ${display.label}；${display.detail}。`;
+	}
+	if (display.mode === "historical_snapshot") {
+		const base = text(report.reader_report.central_judgment || report.headline, "周期报告缺少结论摘要");
+		if (base.includes(display.label)) return base;
+		return `${base} ${display.label}；${display.detail}。`;
+	}
+	if (report.reader_report.central_judgment) return report.reader_report.central_judgment;
+	return `${report.headline} ${display.label}；${display.detail}`;
+}
 function periodicSubjectLabel(value) {
 	const subject = object(value?.subject ?? value);
 	const id = text(subject.id, "");
@@ -15079,7 +15126,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 	heading.append(headingText, headingActions);
 	const content = element("div", "investment-review-content");
 	content.id = "investmentReviewContent";
-	const acceptanceBoundary = element("div", "investment-review-acceptance-boundary", "只读报告：本页不会写入正式持仓账本或执行交易；可以展示标记为 system_inference 的动机推断，以及个性化买卖与仓位建议。公开可得不等于证明您在操作前实际阅读过。");
+	const acceptanceBoundary = element("div", "investment-review-acceptance-boundary", "只读报告：本页不会写入正式持仓账本或执行交易；普通周期报告仅展示事实与风险观察，只有显式 advice 模式才展示个性化交易动作和仓位目标。可以展示标记为 system_inference 的动机推断；公开可得不等于证明您在操作前实际阅读过。");
 	acceptanceBoundary.hidden = !readOnlyMode;
 	acceptanceBoundary.setAttribute("role", "note");
 	const healthLine = element("div", "investment-review-health-line", "复盘健康状态正在读取");
@@ -15250,9 +15297,8 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 			const identity = element("div");
 			identity.append(element("strong", "", periodicSubjectLabel(report)), element("span", "investment-review-mono", `${report.period.type} · ${text(report.period.end)}`));
 			top.append(identity, statusBadge(report.status));
-			const recommendation = object(report.recommendation);
-			const target = object(recommendation.target_position);
-			button.append(top, element("p", "investment-review-list-meta", `${report.subject.type} · operations ${report.operation_count} · cutoff ${projectedTime(report.period.report_cutoff_at)}`), element("p", "investment-review-list-conclusion", report.headline), element("p", "investment-review-list-gaps", `建议 ${text(recommendation.action)} · ${text(target.target_position_note, "仓位精度受缺失数据限制")}`));
+			const recommendationDisplay = periodicRecommendationDisplay(report);
+			button.append(top, element("p", "investment-review-list-meta", `${report.subject.type} · operations ${report.operation_count} · cutoff ${projectedTime(report.period.report_cutoff_at)}`), element("p", "investment-review-list-conclusion", periodicReportHeadline(report)), element("p", "investment-review-list-gaps", recommendationDisplay.summary));
 			button.disabled = !report.report_id;
 			button.addEventListener("click", () => void openPeriodicReport(report));
 			row.appendChild(button);
@@ -15633,10 +15679,11 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		const operationsSection = object(sections.operations_and_motives);
 		const operations = values(operationsSection.operations);
 		const episodeSummaries = values(operationsSection.episode_summaries);
-		const recommendation = object(sections.recommendation);
+		const recommendation = object(report.recommendation || sections.recommendation);
 		const limitations = object(sections.risks_invalidation_and_missing);
 		const readerReport = object(report.reader_report);
 		const readerSections = values(readerReport.narrative_sections);
+		const recommendationDisplay = periodicRecommendationDisplay(report);
 		const isReaderReport = report.schema_version === "investment_review.periodic_report.v2" && Boolean(readerReport.central_judgment) && readerSections.length > 0;
 		const periodLabel = {
 			daily: "日报",
@@ -15653,7 +15700,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		const header = element("header", "investment-review-drawer-heading");
 		header.append(element("p", "section-kicker", "PERIODIC REVIEW"), element("h2", "", `${subjectLabel} · ${text(report.period.end)} ${periodLabel}`), element("p", "investment-review-mono", report.report_id), statusBadge(report.status));
 		header.querySelector("h2").id = "investmentReviewDrawerTitle";
-		drawerContent.append(header, element("p", "investment-review-gap-summary", report.headline));
+		drawerContent.append(header, element("p", "investment-review-gap-summary", periodicReportHeadline(report)));
 		if (isReaderReport) {
 			readerSections.forEach((sectionValue) => {
 				const readerSection = object(sectionValue);
@@ -15664,8 +15711,16 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 				drawerContent.appendChild(block.section);
 			});
 			const readerAction = object(readerReport.action_plan);
-			const actionBlock = sectionBlock(report.subject.type === "instrument" ? `${subjectLabel}下一步行动` : "下一步行动", "RECOMMENDATION · NOT AN ORDER");
-			actionBlock.body.append(element("span", "investment-review-mono", `confidence ${text(readerAction.confidence)}`), element("h3", "", `${text(readerAction.action).toUpperCase()} · ${text(readerAction.target_position_note, "仓位精度受缺失数据限制")}`), element("p", "", `期限：${text(readerAction.time_horizon)}`), element("p", "investment-review-list-gaps", "这是分析建议，不是订单；系统不会连接券商或自动执行交易。"));
+			const actionBlock = sectionBlock(recommendationDisplay.observationOnly ? "事实与风险观察" : recommendationDisplay.mode === "historical_snapshot" ? "历史建议快照" : report.subject.type === "instrument" ? `${subjectLabel}下一步行动` : "下一步行动", recommendationDisplay.observationOnly ? "OBSERVATION ONLY" : recommendationDisplay.mode === "historical_snapshot" ? "LEGACY ADVICE SNAPSHOT" : "RECOMMENDATION · NOT AN ORDER");
+			if (recommendationDisplay.observationOnly) {
+				actionBlock.body.append(element("h3", "", recommendationDisplay.label), element("p", "", recommendationDisplay.detail), element("p", "investment-review-list-gaps", text(readerAction.text, "需要用户明确请求 advice 模式并提供风险策略后，才会生成个性化交易动作和仓位目标。")));
+				const questions = values(readerAction.questions_to_resolve);
+				if (questions.length) {
+					const questionDetails = element("details", "investment-review-structured-details");
+					questionDetails.append(element("summary", "", "查看待确认问题"), renderStructured(questions));
+					actionBlock.body.appendChild(questionDetails);
+				}
+			} else actionBlock.body.append(element("p", "investment-review-list-gaps", recommendationDisplay.label), element("span", "investment-review-mono", `confidence ${text(readerAction.confidence)}`), element("h3", "", `${recommendationDisplay.action.toUpperCase()} · ${recommendationDisplay.targetPositionNote}`), element("p", "", `期限：${text(readerAction.time_horizon)}`), element("p", "investment-review-list-gaps", recommendationDisplay.mode === "historical_snapshot" ? "该内容仅为历史快照，不是当前有效建议；系统不会连接券商或自动执行交易。" : "这是分析建议，不是订单；系统不会连接券商或自动执行交易。"));
 			drawerContent.appendChild(actionBlock.section);
 			const riskBlock = sectionBlock("风险、失效条件与数据缺口", "RISK · INVALIDATION · MISSING");
 			values(readerReport.major_risks).forEach((item) => {
@@ -15687,15 +15742,16 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 			return;
 		}
 		const performanceBlock = sectionBlock("收益、持仓、现金和风险变化", "PERIOD FACTS");
-		appendPairs(performanceBlock.body, [
+		const riskPairs = [
 			["期初总资产", performance.start_total_assets_cny],
 			["期末总资产", performance.end_total_assets_cny],
 			["资产变动", `${text(performance.asset_change_cny)} / ${text(performance.asset_change_pct)}%`],
 			["现金权重", `${text(risk.cash_weight_pct)}%`],
 			["最大单一标的", `${text(risk.top_position_weight_pct)}%`],
-			["前三大合计", `${text(risk.top3_weight_pct)}%`],
-			["集中度", risk.concentration_status]
-		]);
+			["前三大合计", `${text(risk.top3_weight_pct)}%`]
+		];
+		if (risk.concentration_status !== null && risk.concentration_status !== void 0 && risk.concentration_status !== "") riskPairs.push(["集中度", risk.concentration_status]);
+		appendPairs(performanceBlock.body, riskPairs);
 		const positionDetails = element("details", "investment-review-structured-details");
 		positionDetails.append(element("summary", "", "查看持仓与现金事实"), renderStructured({
 			cash: facts.cash,
@@ -15729,7 +15785,7 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 		});
 		drawerContent.appendChild(contextBlock.section);
 		const operationsBlock = sectionBlock("操作与交易动机复盘", "MOTIVE · SYSTEM INFERENCE");
-		if (!operations.length) operationsBlock.body.appendChild(element("p", "investment-review-empty-copy", "本期没有持仓变动操作；表现、风险与建议仍正常生成。"));
+		if (!operations.length) operationsBlock.body.appendChild(element("p", "investment-review-empty-copy", recommendationDisplay.observationOnly ? "本期没有持仓变动操作；表现与风险观察仍正常生成。" : "本期没有持仓变动操作；表现、风险与建议仍正常生成。"));
 		const feeLabels = {
 			reported_actual: "账本实收",
 			rule_backfilled: "规则回填",
@@ -15771,8 +15827,9 @@ function mountInvestmentReview({ request, notify = () => {}, readOnly = false } 
 			operationsBlock.body.appendChild(card);
 		});
 		drawerContent.appendChild(operationsBlock.section);
-		const recommendationBlock = sectionBlock(report.subject.type === "instrument" ? `${subjectLabel}个性化交易建议与建议仓位` : "个性化交易建议与建议仓位", "RECOMMENDATION · NOT AN ORDER");
-		recommendationBlock.body.append(element("span", "investment-review-mono", `confidence ${text(recommendation.confidence)}`), element("h3", "", `${text(recommendation.action).toUpperCase()} · ${text(object(recommendation.target_position).target_position_note)}`), element("p", "", `期限：${text(recommendation.time_horizon)}`));
+		const recommendationBlock = sectionBlock(recommendationDisplay.observationOnly ? "事实与风险观察" : recommendationDisplay.mode === "historical_snapshot" ? "历史建议快照" : report.subject.type === "instrument" ? `${subjectLabel}个性化交易建议与建议仓位` : "个性化交易建议与建议仓位", recommendationDisplay.observationOnly ? "OBSERVATION ONLY" : recommendationDisplay.mode === "historical_snapshot" ? "LEGACY ADVICE SNAPSHOT" : "RECOMMENDATION · NOT AN ORDER");
+		if (recommendationDisplay.observationOnly) recommendationBlock.body.append(element("h3", "", recommendationDisplay.label), element("p", "", recommendationDisplay.detail), element("p", "investment-review-list-gaps", "需要用户明确请求 advice 模式并提供风险策略后，才会生成个性化交易动作和仓位目标。"));
+		else recommendationBlock.body.append(element("p", "investment-review-list-gaps", recommendationDisplay.label), element("span", "investment-review-mono", `confidence ${text(recommendation.confidence)}`), element("h3", "", `${recommendationDisplay.action.toUpperCase()} · ${recommendationDisplay.targetPositionNote}`), element("p", "", `期限：${text(recommendation.time_horizon)}`));
 		values(recommendation.rationale).forEach((itemValue) => {
 			const item = object(itemValue);
 			recommendationBlock.body.appendChild(element("p", "", `${text(item.type)}：${text(item.text)}`));

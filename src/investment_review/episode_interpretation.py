@@ -69,6 +69,21 @@ _PSYCHOLOGY_PATTERNS = tuple(
         ),
     )
 )
+_ADVICE_PATTERNS = tuple(
+    re.compile(pattern, re.IGNORECASE)
+    for pattern in (
+        r"\b(?:should|must|recommend(?:ed|ation)?(?:\s+to)?)\s+(?:buy|sell|hold|add|reduce|close)",
+        r"\brecommend(?:ed|s|ing)?\s+(?:buying|selling|holding|adding|reducing|closing)\b",
+        r"(?:^|\n|[.!?]\s+)(?:buy|sell|hold|add|reduce|close)\b",
+        r"\b(?:allocate|put)\s+\d+(?:\.\d+)?%\s+(?:of\s+)?(?:the\s+)?portfolio\b",
+        r"\bposition\s+size\b.{0,12}\d+(?:\.\d+)?%",
+        r"(?:建议|应该|应当|必须|立即|现在).{0,8}(?:买入|卖出|持有|加仓|减仓|清仓)",
+        r"(?:下次)?应.{0,4}(?:买入|卖出|持有|加仓|减仓|清仓)",
+        r"(?:^|\n|[。！？]\s*)(?:买入|卖出|持有|加仓|减仓|清仓).{0,12}(?:。|！|？|$)",
+        r"仓位.{0,6}\d+(?:\.\d+)?%",
+        r"(?:最优处理|建议|应该|应当|必须|立即|现在).{0,10}(?:退出|止损)",
+    )
+)
 _SCORE_PATTERNS = tuple(
     re.compile(pattern, re.IGNORECASE)
     for pattern in (
@@ -284,14 +299,14 @@ def build_interpretation_prompt(facts_artifact: Mapping[str, Any]) -> str:
             "decision_time findings may use only known_at_decision or not_applicable facts.",
             "Counterfactuals may use only information available within their "
             "declared temporal_scope.",
-            "Do not diagnose psychology, score decisions, or use hindsight-best prices.",
+            "Do not diagnose psychology, score decisions, issue trading advice, "
+            "or use hindsight-best prices.",
             "When an explicit Decision is absent, infer plausible trading motive "
             "hypotheses only from information available at the operation time. "
             "Label them as system_inference, include alternatives, and never present "
             "them as the user's recorded statement.",
-            "Recommendations may include direct buy/sell/hold actions and exact "
-            "target position percentages when supported by cited facts. Do not "
-            "claim guaranteed returns or imply order execution.",
+            "Keep motive hypotheses and retrospective observations descriptive; "
+            "do not recommend buy/sell/hold actions or target positions.",
             "history_links must be an empty array because no typed history input is supplied.",
             "FACTS_JSON:",
             prompt_input,
@@ -421,12 +436,14 @@ def _strings(value: object) -> list[str]:
 
 
 def interpretation_policy_codes(value: object) -> set[str]:
-    """Return the shared no-diagnosis/score/hindsight policy codes."""
+    """Return the shared no-diagnosis/advice/score/hindsight policy codes."""
 
     material = "\n".join(_strings(value))
     codes: set[str] = set()
     if any(pattern.search(material) for pattern in _PSYCHOLOGY_PATTERNS):
         codes.add("POLICY_PSYCHOLOGY_DIAGNOSIS")
+    if any(pattern.search(material) for pattern in _ADVICE_PATTERNS):
+        codes.add("POLICY_DIRECT_ADVICE")
     if any(pattern.search(material) for pattern in _SCORE_PATTERNS):
         codes.add("POLICY_MECHANICAL_SCORE")
     if any(pattern.search(material) for pattern in _NUMERIC_CONFIDENCE_PATTERNS):
@@ -883,7 +900,7 @@ def build_model_assisted_episode_review(
         candidate["interpretation_sections"] = normalized
         candidate_governance = deepcopy(dict(governance))
         candidate_governance["generation_mode"] = "model_assisted"
-        candidate_governance["no_advice"] = False
+        candidate_governance["no_advice"] = True
         candidate_governance["model_generation"] = {
             "model_id": model_id,
             "prompt_template_id": PROMPT_TEMPLATE_ID,

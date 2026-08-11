@@ -2454,25 +2454,16 @@ def _validate_episode_review_impl(artifact: Mapping[str, Any]) -> dict[str, Any]
                     "initial facts-only artifact cannot contain human review events",
                 )
             )
-        if governance.get("no_advice") is not True:
-            findings.append(
-                _finding(
-                    "blocker",
-                    "FACTS_ONLY_ADVICE_BOUNDARY_INVALID",
-                    "facts-only review must remain advice-free",
-                )
-            )
-    if (
-        governance.get("facts_interpretation_separated") is not True
-        or governance.get("no_mechanical_score") is not True
-        or not isinstance(governance.get("no_advice"), bool)
+    if not all(
+        governance.get(key) is True
+        for key in (
+            "facts_interpretation_separated",
+            "no_advice",
+            "no_mechanical_score",
+        )
     ):
         findings.append(
-            _finding(
-                "blocker",
-                "GOVERNANCE_INVALID",
-                "review governance flags must be explicit and valid",
-            )
+            _finding("blocker", "GOVERNANCE_INVALID", "review safety flags must be true")
         )
     sections = artifact.get("fact_sections")
     if not isinstance(sections, Mapping):
@@ -2913,11 +2904,6 @@ def render_episode_review_markdown(artifact: Mapping[str, Any]) -> str:
     }
     governance = artifact["governance"]
     revision = artifact["revision"]
-    advice_boundary = (
-        "> 事实与解释严格分区；本文不是交易建议，不提供机械评分或心理归因。"
-        if governance["no_advice"]
-        else "> 事实与解释严格分区；解释可包含个性化建议，但不保证收益、不执行订单，也不提供机械评分或心理诊断。"
-    )
     lines = [
         "# 单笔交易复盘",
         "",
@@ -2934,7 +2920,7 @@ def render_episode_review_markdown(artifact: Mapping[str, Any]) -> str:
         ),
         f"- generation_mode: {_markdown_code(governance['generation_mode'])}",
         "",
-        advice_boundary,
+        "> 事实与解释严格分区；本文不是交易建议，不提供机械评分或心理归因。",
         "",
         "## 修订与生成来源",
     ]

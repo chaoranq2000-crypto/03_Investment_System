@@ -3,10 +3,11 @@ name: investment-review
 description: >-
   Personal investment review workflow for importing trade records, reconstructing
   trade episodes, generating portfolio and instrument daily/weekly/monthly reports,
-  inferring trading motives when decision notes are absent, and producing
-  evidence-grounded personalized recommendations including direct buy/sell/hold and
-  position-sizing guidance. Use for personal trade review and periodic reporting.
-  Never route to order execution or guaranteed-return claims.
+  inferring trading motives when decision notes are absent, and, only when explicitly
+  requested with user-confirmed strategy and risk inputs, producing evidence-grounded
+  personalized recommendations. Use for personal trade review and periodic reporting.
+  Never route to order execution or guaranteed-return claims. When advice inputs are
+  absent, produce observations rather than trading actions or position targets.
 ---
 
 # Investment Review
@@ -20,7 +21,9 @@ directly read:
 - instrument daily, weekly and monthly reviews;
 - operation reviews embedded as one section of each periodic report;
 - inferred trading motives when no decision record exists;
-- personalized buy/sell/hold and position-sizing recommendations.
+- personalized actions and position guidance when the user has explicitly requested
+  advice and supplied the required personal strategy and risk context;
+- observation-only review when that context is absent.
 
 Do not let a missing Decision block report generation.
 
@@ -38,6 +41,10 @@ Do not let a missing Decision block report generation.
   or present uncertain conclusions as certain.
 - Do not add a new canonical P2 stage, behavior profile, complex risk model,
   provenance layer, approval workflow or revision system solely for this product.
+
+This skill consumes Portfolio accounting facts but does not alter them. Research
+artifacts remain no-advice inputs; importing them into Investment Review does not turn
+their research conclusions into trading instructions.
 
 Treat existing P2A-P2H artifacts, replay checks and playbooks as optional internal or
 historical implementation references. Reuse what is already useful, but do not make
@@ -70,11 +77,25 @@ best-effort low-confidence hypothesis and alternatives. Never present the inferr
 motive as a recorded user statement. Use later price and outcome data only in the
 retrospective review section.
 
-## Produce personalized recommendations
+## Advice boundary
 
-Use the latest information available at the report cutoff to provide a direct,
-evidence-grounded recommendation when requested or when the periodic report includes
-the recommendation section.
+An ordinary request to generate or refresh a periodic report produces an
+observation-only review. Provide personalized trading actions only when the user, in
+the current request or an explicitly advice-capable review, asks for advice and has
+confirmed the strategy and risk inputs needed to interpret it. These inputs must at
+least establish the user's time horizon and risk budget; preserve any relevant
+liquidity, concentration or other portfolio constraints the user supplies. Never
+substitute system defaults, historical experimental thresholds or inferred preferences
+for user confirmation.
+
+An observation-only review may describe accounting facts, changes in exposure,
+retrospective outcomes, labeled motive hypotheses, risks, scenarios and questions for
+the user. It must not recommend `buy`, `sell`, `hold`, `add`, `reduce` or `exit`, and
+must not state an exact target position or position range.
+
+When the user has explicitly requested advice and the necessary user-confirmed inputs
+are present, use only information available at the report cutoff to provide a direct,
+evidence-grounded recommendation.
 
 A recommendation may include:
 
@@ -87,8 +108,8 @@ A recommendation may include:
 - data timestamp and important missing inputs.
 
 Keep the recommendation separate from facts and motive inference. If data quality is
-too weak to support an exact position size, provide a lower-confidence action
-recommendation and state which missing input prevents precise sizing.
+too weak to support the requested action or position size, return to observation-only
+analysis for the unsupported part and state which evidence or user input is missing.
 
 Do not claim guaranteed outcomes. Do not execute the recommendation.
 
@@ -101,7 +122,7 @@ requirements, not mandatory headings or a checklist that must be printed in orde
 2. 收益、持仓、现金和风险变化；
 3. 操作与交易动机复盘；
 4. 哪些判断或执行合理，哪些需要改进；
-5. 个性化交易建议与建议仓位；
+5. 观察、风险、场景与待确认问题；仅在满足 advice boundary 时给出个性化交易建议与建议仓位；
 6. 主要依据、风险、失效条件和数据缺失。
 
 Use fundamental/valuation, market/sector, technical/trend and
@@ -111,7 +132,8 @@ affects the recommendation, or constitutes a material risk. Put remaining facts,
 operation details and source references in a collapsed appendix.
 
 Organize the main text around one central judgment, a small number of material
-findings, the causal link to the operation or portfolio state, and the next action.
+findings, and the causal link to the operation or portfolio state. Include a next
+action only when the advice boundary is satisfied.
 Do not repeat the same fact in multiple sections merely to satisfy the report
 contract.
 
@@ -131,8 +153,8 @@ depend on a new soft-review approval chain.
 2. Select one natural trading day, week or month and one portfolio/instrument subject.
 3. Calculate period facts and reconstruct the relevant Trade Episodes.
 4. Infer missing motives and produce retrospective operation reviews.
-5. Generate personalized recommendations from information available at the report
-   cutoff.
+5. Generate observation-only analysis from information available at the report
+   cutoff; add personalized recommendations only when the advice boundary is satisfied.
 6. Render and save one readable report.
 7. After one real daily sample is accepted, reuse the same pipeline for all six report
    types and enable scheduled generation.
@@ -149,7 +171,9 @@ The product is complete when:
   accessible;
 - reports are generated even when there was no trade or no Decision record;
 - every relevant operation has a recorded motive or a labeled motive hypothesis;
-- every report contains useful review judgments and a personalized recommendation;
+- every report contains useful review judgments; personalized actions or position
+  targets appear only when the user explicitly requested advice and supplied the
+  required inputs;
 - repeated runs do not duplicate reports or change source accounting data;
 - failures and important missing data are visible without exposing a large audit
   interface to the user.

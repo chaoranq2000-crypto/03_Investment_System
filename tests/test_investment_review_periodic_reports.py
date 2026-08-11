@@ -303,12 +303,13 @@ def test_real_contract_shape_builds_portfolio_and_no_decision_instrument_daily(
     assert "样本一号（000001.SZ）" in markdown
     assert "当日收盘价上涨 1.85%" in markdown
     assert "结构化事实与来源" in markdown
-    assert "## 下一步行动" in markdown
+    assert "## 后续需要确认" in markdown
+    assert "未生成交易动作或目标仓位" in markdown
     assert "四层决策上下文" not in markdown
-    assert "报告不会连接券商或自动执行交易" in markdown
+    assert "`hold`" not in markdown
 
 
-def test_available_four_layer_context_flows_into_motive_and_recommendation(
+def test_available_four_layer_context_flows_into_motive_and_observation(
     tmp_path: Path,
 ) -> None:
     source = _formal_portfolio_db(tmp_path)
@@ -334,13 +335,50 @@ def test_available_four_layer_context_flows_into_motive_and_recommendation(
             "position_and_execution",
         )
     )
-    assert recommendation["confidence"] == "medium"
+    assert recommendation["mode"] == "observation_only"
+    assert recommendation["confidence"] == "not_applicable"
+    assert recommendation["action"] is None
+    assert recommendation["target_position"] is None
     assert "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT" not in (
         recommendation["important_missing_inputs"]
     )
     assert "MISSING_INTRADAY_MARKET_CONTEXT" not in operations[0]["motive"][
         "important_missing_information"
     ]
+
+
+def test_explicit_user_policy_can_enable_one_advice_report(tmp_path: Path) -> None:
+    source = _formal_portfolio_db(tmp_path)
+    sidecar = _empty_sidecar(tmp_path)
+    report = build_daily_report(
+        portfolio_db=source,
+        review_db=sidecar,
+        report_date="2026-07-15",
+        subject_type="instrument",
+        subject_id="000001.SZ",
+        point_in_time_context=_point_in_time_context(),
+        review_mode="advice",
+        risk_policy={
+            "time_horizon": "未来十二个月",
+            "risk_budget": "最大可承受本金损失 10%",
+            "target_position_range_pct": ["7", "9"],
+        },
+    )
+
+    recommendation = report["sections"]["recommendation"]
+    assert recommendation["mode"] == "advice"
+    assert recommendation["decision_basis"] == "user_policy_trigger"
+    assert recommendation["user_risk_budget"] == "最大可承受本金损失 10%"
+    assert recommendation["action"] == "reduce"
+    assert recommendation["target_position"]["target_position_range_pct"] == [
+        "7",
+        "9",
+    ]
+    assert report["reader_report"]["action_plan"]["mode"] == "advice"
+    markdown = render_periodic_report_markdown(report)
+    assert "## 下一步行动" in markdown
+    assert "`user_policy_trigger`" in markdown
+    assert "最大可承受本金损失 10%" in markdown
 
 
 def test_fee_provenance_separates_actual_backfill_exemption_and_unknown() -> None:
@@ -465,10 +503,10 @@ def test_daily_report_still_exists_without_trades(tmp_path: Path) -> None:
 
     operations = report["sections"]["operations_and_motives"]
     assert operations["operation_count"] == 0
-    assert report["sections"]["recommendation"]["action"] in {
-        "hold",
-        "reduce",
-    }
+    recommendation = report["sections"]["recommendation"]
+    assert recommendation["mode"] == "observation_only"
+    assert recommendation["action"] is None
+    assert recommendation["target_position"] is None
     assert validate_periodic_report(report)["status"] == "accepted"
 
 

@@ -214,24 +214,22 @@ def _risk_finding(report: Mapping[str, Any]) -> dict[str, Any] | None:
         material: list[str] = []
         if cash_weight is None:
             material.append("现金权重尚无法可靠计算")
-        elif cash_weight < Decimal("5"):
-            material.append(f"现金权重仅 {cash_weight}%")
         else:
             material.append(f"现金权重 {cash_weight}%")
-        if top_weight is not None and top_weight > Decimal("20"):
+        if top_weight is not None:
             material.append(f"最大单一标的 {top_weight}%")
-        if top3_weight is not None and top3_weight > Decimal("50"):
+        if top3_weight is not None:
             material.append(f"前三大合计 {top3_weight}%")
         if not material:
             return None
         return _finding(
             kind="portfolio_risk",
-            claim_type="fact_and_inference",
+            claim_type="fact",
             importance=95,
             text=(
-                f"{period_label}风险判断的关键约束包括："
+                f"{period_label}期末组合结构："
                 + "、".join(material)
-                + "；收益变化不能替代对现金与集中度的检查。"
+                + "。是否需要调整取决于用户确认的风险预算与策略输入。"
             ),
             source_refs=_refs(
                 report,
@@ -492,8 +490,37 @@ def _cross_period_finding(
 def _action_plan(report: Mapping[str, Any]) -> dict[str, Any]:
     sections = _mapping(report.get("sections"))
     recommendation = _mapping(sections.get("recommendation"))
+    if recommendation.get("mode") == "observation_only":
+        return {
+            "type": "observation",
+            "mode": "observation_only",
+            "action": None,
+            "target_position": None,
+            "target_position_note": None,
+            "time_horizon": None,
+            "confidence": "not_applicable",
+            "text": (
+                "当前仅形成事实与风险观察；在用户明确请求 advice 模式并提供"
+                "风险策略前，不生成交易动作或目标仓位。"
+            ),
+            "questions_to_resolve": list(
+                _sequence(recommendation.get("questions_to_resolve"))
+            ),
+            "source_refs": _refs(
+                report,
+                "sections.recommendation",
+                recommendation,
+            ),
+            "orders_executed": False,
+            "guaranteed_return": False,
+        }
     target = _mapping(recommendation.get("target_position"))
-    action = str(recommendation.get("action") or "hold")
+    action = str(recommendation.get("action") or "")
+    mode = (
+        "advice"
+        if recommendation.get("mode") == "advice"
+        else "historical_snapshot"
+    )
     source_target_note = str(
         target.get("target_position_note")
         or "仓位精度受当前缺失数据限制。"
@@ -512,6 +539,9 @@ def _action_plan(report: Mapping[str, Any]) -> dict[str, Any]:
     horizon = str(recommendation.get("time_horizon") or "下一次实质性信息更新前")
     return {
         "type": "analyst_view",
+        "mode": mode,
+        "decision_basis": recommendation.get("decision_basis"),
+        "user_risk_budget": recommendation.get("user_risk_budget"),
         "action": action,
         "target_position": dict(target),
         "target_position_note": target_note,
@@ -542,7 +572,9 @@ def _central_judgment(
 ) -> dict[str, Any]:
     subject = _mapping(report.get("subject"))
     subject_name = str(subject.get("name") or subject.get("id") or "报告对象")
-    action = str(action_plan.get("action") or "hold")
+    observation_only = action_plan.get("mode") == "observation_only"
+    historical_snapshot = action_plan.get("mode") == "historical_snapshot"
+    action = str(action_plan.get("action") or "")
     target_note = str(action_plan.get("target_position_note") or "")
     performance_text = str(performance.get("text") or "").rstrip("。； ")
     constraints: list[str] = []
@@ -571,7 +603,23 @@ def _central_judgment(
     central = f"{subject_name}{performance_text}"
     if constraints:
         central += f"；{connector}{'；'.join(dict.fromkeys(constraints))}"
-    central += f"。因此现有 {action} 建议不变：{target_note}"
+    if observation_only:
+        central += (
+            "。当前仅形成事实与风险观察；在用户明确请求 advice 模式并提供"
+            "风险策略前，不生成交易动作或目标仓位。"
+        )
+    elif historical_snapshot:
+        central += (
+            f"。历史建议快照记录为 {action}：{target_note}"
+            "该内容只用于复盘，不是当前有效建议。"
+        )
+    else:
+        basis = (
+            "用户策略触发的"
+            if action_plan.get("decision_basis") == "user_policy_trigger"
+            else "现有"
+        )
+        central += f"。因此{basis} {action} 建议为：{target_note}"
     refs = set(_sequence(performance.get("source_refs")))
     if risk is not None:
         refs.update(_sequence(risk.get("source_refs")))
@@ -579,7 +627,11 @@ def _central_judgment(
         refs.update(_sequence(contexts[0].get("source_refs")))
     refs.update(_sequence(action_plan.get("source_refs")))
     return {
-        "type": "inference_and_analyst_view",
+        "type": (
+            "inference"
+            if observation_only or historical_snapshot
+            else "inference_and_analyst_view"
+        ),
         "text": " ".join(central.split()),
         "source_refs": sorted(str(item) for item in refs if item),
     }
@@ -863,7 +915,12 @@ def validate_periodic_narrative(report: Mapping[str, Any]) -> list[str]:
         if not _sequence(item.get("source_refs")):
             errors.append("material_finding_missing_source_refs")
     action = _mapping(brief.get("action_plan"))
-    if not str(action.get("action") or "").strip():
+    if action.get("mode") == "observation_only":
+        if action.get("action") is not None:
+            errors.append("observation_only_analysis_brief_has_action")
+        if action.get("target_position") is not None:
+            errors.append("observation_only_analysis_brief_has_target_position")
+    elif not str(action.get("action") or "").strip():
         errors.append("analysis_brief_missing_action")
     if action.get("orders_executed") is not False:
         errors.append("analysis_brief_orders_executed_not_false")
@@ -945,21 +1002,58 @@ def render_reader_report_markdown(report: Mapping[str, Any]) -> str:
         lines.extend([f"## {selected.get('title')}", ""])
         for paragraph in _sequence(selected.get("paragraphs")):
             lines.extend([str(paragraph), ""])
-    lines.extend(
-        [
-            "## 下一步行动",
-            "",
-            f"- **动作：** `{action.get('action')}`",
-            f"- **仓位：** {action.get('target_position_note')}",
-            f"- **期限：** {action.get('time_horizon')}",
-            f"- **置信度：** `{action.get('confidence')}`",
-            "",
-            "这是一项分析建议，不是订单；报告不会连接券商或自动执行交易。",
-            "",
-            "## 风险、失效条件与数据缺口",
-            "",
-        ]
-    )
+    action_mode = action.get("mode")
+    if action_mode == "observation_only":
+        lines.extend(
+            [
+                "## 后续需要确认",
+                "",
+                "- **当前模式：** `observation_only`",
+                "- 未生成交易动作或目标仓位。",
+                *[
+                    f"- 待确认：{item}"
+                    for item in _sequence(action.get("questions_to_resolve"))
+                ],
+                "",
+                "## 风险、失效条件与数据缺口",
+                "",
+            ]
+        )
+    elif action_mode == "historical_snapshot" or (
+        action_mode is None and action.get("action")
+    ):
+        lines.extend(
+            [
+                "## 历史建议快照",
+                "",
+                f"- **历史动作：** `{action.get('action')}`",
+                f"- **历史仓位：** {action.get('target_position_note')}",
+                f"- **原记录期限：** {action.get('time_horizon')}",
+                "",
+                "该内容只用于复盘，不是当前有效建议，也不会触发订单。",
+                "",
+                "## 风险、失效条件与数据缺口",
+                "",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "## 下一步行动",
+                "",
+                f"- **动作：** `{action.get('action')}`",
+                f"- **仓位：** {action.get('target_position_note')}",
+                f"- **期限：** {action.get('time_horizon')}",
+                f"- **触发依据：** `{action.get('decision_basis')}`",
+                f"- **用户风险预算：** {action.get('user_risk_budget')}",
+                f"- **置信度：** `{action.get('confidence')}`",
+                "",
+                "这是一项分析建议，不是订单；报告不会连接券商或自动执行交易。",
+                "",
+                "## 风险、失效条件与数据缺口",
+                "",
+            ]
+        )
     for item in _sequence(reader.get("major_risks")):
         lines.append(f"- 主要风险：{item}")
     for item in _sequence(reader.get("invalidation_conditions")):

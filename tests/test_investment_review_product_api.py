@@ -5,7 +5,7 @@ import socket
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from dataclasses import dataclass, replace
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterator, Mapping
 
@@ -262,6 +262,9 @@ def test_periodic_report_api_lists_and_reads_from_the_selected_sidecar(
         weekly_report["report_id"]
     )
     assert full_listing["data"]["total_count"] == 2
+    assert listing["data"]["reports"][0]["recommendation"]["mode"] == (
+        "historical_snapshot"
+    )
     with pytest.raises(InvestmentReviewServiceError) as captured:
         product_api.service.list_periodic_reports(limit=1001)
     assert captured.value.code == "invalid_limit"
@@ -270,7 +273,10 @@ def test_periodic_report_api_lists_and_reads_from_the_selected_sidecar(
         "weekly",
         "monthly",
     ]
-    assert detail["data"]["report"] == report
+    assert detail["data"]["report"]["sections"]["recommendation"]["mode"] == (
+        "historical_snapshot"
+    )
+    assert store.get(report["report_id"]) == report
     health = product_api.service.get_health()
     assert health["data"]["periodic_reports"]["count"] == 2
     assert health["data"]["periodic_reports"]["supported_period_types"] == [
@@ -429,6 +435,15 @@ def test_v2_operation_checkpoint_projects_six_axes_and_paired_perspectives(
         automatic_market_context=True,
     )
     fixture.store.upgrade_reviewability_candidate_v2()
+    latest_first_ingest = max(
+        datetime.fromisoformat(
+            str(item["first_ingest"]["observed_at"]).replace("Z", "+00:00")
+        )
+        for item in fixture.store.list_event_observation_evidence()
+    )
+    knowledge_cutoff = (
+        latest_first_ingest + timedelta(seconds=1)
+    ).isoformat().replace("+00:00", "Z")
     fixture.runner.checkpoint_market_resolver = MarketContextAdapter(
         cache_root=fixture.runner.market_cache_root,
         provider_gateway=None,
@@ -438,7 +453,7 @@ def test_v2_operation_checkpoint_projects_six_axes_and_paired_perspectives(
     user_receipt = fixture.runner.run(
         scope="single",
         as_of=AS_OF,
-        knowledge_cutoff="2026-07-30T00:00:00Z",
+        knowledge_cutoff=knowledge_cutoff,
         perspective="user",
         dry_run=False,
         trigger="pytest-v2-api",
@@ -446,7 +461,7 @@ def test_v2_operation_checkpoint_projects_six_axes_and_paired_perspectives(
     system_receipt = fixture.runner.run(
         scope="single",
         as_of=AS_OF,
-        knowledge_cutoff="2026-07-30T00:00:00Z",
+        knowledge_cutoff=knowledge_cutoff,
         perspective="system",
         dry_run=False,
         trigger="pytest-v2-api",
