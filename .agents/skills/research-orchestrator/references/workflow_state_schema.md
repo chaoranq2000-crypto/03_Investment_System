@@ -107,25 +107,28 @@ Marked active states also require:
 
 ```yaml
 final_report_review_semantics_version: final_report_review_v1
-automated_report_quality_passed: false
-system_v1_complete: false
 sample_quality_ready: false
-p2_ready: false
-release_ready: false
 final_report_review:
   report_path: null
   report_sha256: null
   reviewer: null
   reviewed_at: null
-  decision: not_requested
   notes: null
   change_scope: null
 ```
 
+Ordinary runs do not write `automated_report_quality_passed`,
+`system_v1_complete`, `p2_ready`, or `release_ready`. Automated report quality is
+derived from canonical `status` plus the complete G0-G10 gate set. Project
+completion and release readiness belong to their project-level evidence owners.
+`p2_ready` is written only by a `comparison_readiness_gate` run. Older states may
+retain these boolean fields as read-only compatibility data.
+
 The structural schema is `schemas/r5_final_report_review.schema.json`. Runtime validation
 adds repository and byte-integrity checks:
 
-- `final_report_review.decision` always equals `final_report_review_status`.
+- New review records omit the redundant `final_report_review.decision`. If an older
+  record retains it, it must equal `final_report_review_status`.
 - `not_requested` keeps the report binding, reviewer, time, notes and `change_scope`
   null.
 - `pending` binds one existing final-report path under the canonical
@@ -141,21 +144,23 @@ adds repository and byte-integrity checks:
   report hash binds human review. Evidence, claim, metric, candidate and generation-lock
   hashes remain machine-integrity controls.
 - If a committed `approved|changes_requested` record changes its report path, hash,
-  decision, reviewer, notes or `change_scope`, the replacement must be a new human review
-  event with a strictly later `reviewed_at`. Updating only the stored hash cannot migrate
+  top-level status, reviewer, notes or `change_scope`, the replacement must be a new
+  human review event with a strictly later `reviewed_at`. Updating only the stored hash cannot migrate
   the old decision to new bytes. Resetting to `not_requested|pending` explicitly
   invalidates the prior human decision; any later return to a human decision must also be
   later than the most recent committed human-review event.
-- `automated_report_quality_passed: true` requires all canonical G0–G10 entries to be
-  present and each to be `pass` or `not_applicable`, plus a completed automatic
-  workflow status: `accepted` or `accepted_with_todos`.
-- `sample_quality_ready: true` is allowed only when automated report quality passed and
-  the current-byte final report is `approved`. Approval does not force sample quality to
-  true because other sample-level conditions may remain.
-- `system_v1_complete: true` and `sample_quality_ready: true` also require a completed
-  automatic workflow status: `accepted` or `accepted_with_todos`.
-- `not_requested` and `pending` do not change `status` or
-  `system_v1_complete`. They keep `sample_quality_ready: false`.
+- Automated report quality is true exactly when all canonical G0-G10 entries are
+  present and each is `pass` or `not_applicable`, and canonical `status` is
+  `accepted` or `accepted_with_todos`. If an older state retains
+  `automated_report_quality_passed`, its value must equal that derivation.
+- `sample_quality_ready: true` is allowed only when derived automated report quality
+  passed and the current-byte final report is `approved`. Approval does not force sample
+  quality to true because other sample-level conditions may remain.
+- `p2_ready: true`, when present, requires
+  `workflow_type: comparison_readiness_gate`. A legacy false value remains compatible
+  in other workflow types.
+- `not_requested` and `pending` do not change `status`. They keep
+  `sample_quality_ready: false`.
 - `changes_requested` with `automated_quality_defect` requires canonical
   `status: needs_fix` and the normal scoped issue/fix-loop evidence.
   `change_scope: report_revision` does not itself change the machine-derived workflow

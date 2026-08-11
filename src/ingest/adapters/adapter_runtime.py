@@ -71,6 +71,26 @@ class FetchResult:
 LiveFetcher = Callable[[argparse.Namespace], FetchResult]
 
 
+def resolve_compatible_run_id(
+    repo_root: Path,
+    *,
+    current_run_id: str,
+    legacy_run_id: str,
+) -> str:
+    """Prefer the neutral ID unless the matching legacy run already exists."""
+
+    ingest_runs_path = repo_root / "data" / "manifests" / "ingest_runs.csv"
+    existing_run_ids = {
+        str(row.get("run_id", ""))
+        for row in read_csv_dicts(ingest_runs_path)
+    }
+    if current_run_id in existing_run_ids:
+        return current_run_id
+    if legacy_run_id in existing_run_ids:
+        return legacy_run_id
+    return current_run_id
+
+
 def standard_parser(description: str, default_endpoint_hint: str) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--repo-root", default=".")
@@ -444,7 +464,15 @@ def execute_standard_adapter(
         claim_rows,
         "claim_candidate_id",
     )
-    run_id = f"r5_bundle8r_{safe_slug(spec.adapter_id)}_{safe_slug(endpoint_hint)}_{short_hash(body_hash, 8)}"
+    run_suffix = (
+        f"{safe_slug(spec.adapter_id)}_{safe_slug(endpoint_hint)}_"
+        f"{short_hash(body_hash, 8)}"
+    )
+    run_id = resolve_compatible_run_id(
+        repo_root,
+        current_run_id=f"adapter_run_{run_suffix}",
+        legacy_run_id=f"r5_bundle8r_{run_suffix}",
+    )
     run_row = {
         "run_id": run_id,
         "ingest_mode": manifest_row["ingest_mode"],
@@ -462,14 +490,15 @@ def execute_standard_adapter(
         "issues": ";".join(f"missing_field:{item}" for item in missing_fields),
         "notes": f"claim_boundary={contract.claim_boundary}; transport={fetched.transport}",
     }
-    _append_unique(
+    run_created = _append_unique(
         repo_root / "data" / "manifests" / "ingest_runs.csv",
         INGEST_RUN_FIELDNAMES,
         [run_row],
         "run_id",
     )
     log_path = repo_root / "data" / "processed" / "logs" / f"{ev_id}__ingest_log.json"
-    write_json(log_path, run_row)
+    if run_created or not log_path.is_file():
+        write_json(log_path, run_row)
     receipt = {
         "schema_version": 1,
         "decision": "pass" if schema_verified else "needs_fix",

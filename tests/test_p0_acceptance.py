@@ -154,7 +154,8 @@ def collect_errors() -> list[str]:
         "Evidence is the source of truth",
         "Do not overwrite files in `data/raw/`",
         "Segment-company exposure is many-to-many",
-        "Do not output direct buy/sell/hold instructions",
+        "Research and Portfolio outputs contain no direct",
+        "Investment Review must not invent a risk budget",
     ]:
         if marker not in agents:
             errors.append(f"AGENTS.md missing principle: {marker}")

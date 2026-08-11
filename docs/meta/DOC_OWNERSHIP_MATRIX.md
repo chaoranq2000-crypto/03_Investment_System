@@ -20,19 +20,22 @@
 | global `stage_id` | `docs/workflows/RESEARCH_WORKFLOW.md` | 下层 skill 可定义 `SDD-*`、`DL-*`、`QR-*`、`RP-*` 局部步骤。 |
 | global `gate_id` G0-G10 | `docs/workflows/RESEARCH_WORKFLOW.md` | 其他文件只能引用 gate id，不得定义完整全局 gate 表。 |
 | `backflow_decision` enum | `docs/workflows/RESEARCH_WORKFLOW.md` | `stock-deep-dive` 和 mapping 只能消费或输出该 enum。 |
-| V1 completion truth semantics | `docs/workflows/RESEARCH_WORKFLOW.md` | `system_v1_complete`、`sample_quality_ready`、`p2_ready`、`release_ready` 只能分别引用和附证据，不得互相替代。 |
+| ordinary run outcome and sample-quality meaning | `docs/workflows/RESEARCH_WORKFLOW.md` | 普通 run 只保存本轮 status/G0-G10/TODO/backflow 与适用的 sample-quality；不得复制项目完成、P2 或发布结论。 |
+| project integration and release evidence | 对应 convergence / exact-head CI / release artifact | `system_v1_complete` 与 `release_ready` 不写入普通研究 run；历史字段只读兼容。 |
+| P2 readiness | `docs/workflows/RESEARCH_WORKFLOW.md` 的 comparison-readiness 章节 | 只有 `comparison_readiness_gate` 可以形成 `p2_ready`；普通 run 不保存全局副本。 |
 | canonical workflow outcomes | `docs/workflows/RESEARCH_WORKFLOW.md` | `accepted`、`accepted_with_todos`、`needs_fix`、`blocked` 的当前目标范围 truth table 只能引用，不得按 severity 重定义。 |
 | issue scope / disposition semantics | `docs/workflows/RESEARCH_WORKFLOW.md` | `impact_scope`、`active_disposition`、`affected_capabilities`、`blocks_current_goal` 由 schema/quality skill 实现，但语义不得漂移。 |
 | missing-data degradation ladder | `docs/workflows/RESEARCH_WORKFLOW.md` | 其他文档可解释本地降级，不得把局部缺口提升为新的全局 blocker。 |
-| final-report human-review semantics | `docs/workflows/RESEARCH_WORKFLOW.md` | 唯一活动人工边界、`sample_quality_ready` 必要条件和 hash 边界只能引用；字段级约束由 workflow-state / final-review schema 实现。 |
+| final-report review fields and transitions | `research-orchestrator/references/workflow_state_schema.md` + `schemas/r5_final_report_review.schema.json` | workflow/policy/skills 只说明本地动作与人工边界，不复制字段表、状态真值表或 legacy 兼容规则。 |
 | intermediate machine-qualification semantics | `docs/workflows/RESEARCH_WORKFLOW.md` + `quality-review` | evidence、claim、metric、candidate、计算、generation lock 和 receipt 的 `reviewed` 只表示机器验证，不得改成并行人工 approval。 |
 | workflow state fields | `research-orchestrator/references/workflow_state_schema.md` | 必须使用 canonical `workflow_type`。 |
 | active-run current asset ownership | `docs/workflows/RESEARCH_WORKFLOW.md` + `WORKFLOW_ORCHESTRATION_SPEC.md` | 每个活动 run 只保留一份当前 state、TODO、quality 和 readout；历史产物只读。 |
+| cross-run current pointer | `config/r5_readout_canonical_index.yaml.current_runs` | README 和文档索引只链接 pointer，不复制当前 workflow ID/status；历史 R5 readout 目录不得选择 current run。 |
 | handoff packet format | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | skill 可补充本 skill 的 handoff 要求。 |
 | source rank / citation principle | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | evidence-ingest references 承担字段级执行契约。 |
-| quality issue schema | `.agents/skills/quality-review/SKILL.md` 或其 references | 不得创造全局 gate id。 |
+| quality issue schema | `.agents/skills/quality-review/references/issue_schema.md` | skill 与 policy 只消费该字段合同；不得创造全局 gate id。 |
 | stock report production profile | `.agents/skills/stock-deep-dive/references/report_production_profile.md` | 不得作为平级 workflow。 |
-| local check to global gate mapping | `docs/workflows/RESEARCH_WORKFLOW.md` | 局部检查保留局部 ID，并映射到 G0–G10；不得产生第二套 global gate。 |
+| local check to global gate mapping | 对应 capability-local evaluator reference | `RESEARCH_WORKFLOW.md` 只持有通用映射原则与 canonical G0–G10；各 reference 持有本 capability 的 local ID 和映射，不得产生第二套 global gate。 |
 | legacy Bundle/R5 capability evaluator routing | `docs/workflows/RESEARCH_WORKFLOW.md` + `WORKFLOW_ORCHESTRATION_SPEC.md` | Bundle11R–16R、`R5-G1`–`R5-G11` 只能显式调用并影响 `affected_capabilities`；不得成为默认 routing 或直接写 canonical outcome。 |
 
 ## 职责矩阵

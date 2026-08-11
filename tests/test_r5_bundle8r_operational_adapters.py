@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -20,7 +21,18 @@ from src.ingest.adapters import (
     ths_consensus_adapter,
 )
 from src.ingest.adapters.adapter_runtime import execute_standard_adapter
-from src.ingest.adapters.eastmoney_report_pdf_adapter import _extract_pdf
+from src.ingest.adapters.eastmoney_report_pdf_adapter import (
+    _extract_pdf,
+    _report_pdf_run_id,
+)
+from src.ingest.evidence_io import (
+    INGEST_RUN_FIELDNAMES,
+    hash_json,
+    read_csv_dicts,
+    safe_slug,
+    short_hash,
+    write_csv_rows,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -89,6 +101,8 @@ def test_adapter_fixture_writes_raw_manifest_schema_and_boundary(
     assert result["checks"]["manifest_write_verified"] is True
     assert result["checks"]["schema_fingerprint_verified"] is True
     assert result["checks"]["claim_boundary_verified"] is True
+    assert result["run_id"].startswith("adapter_run_")
+    assert not result["run_id"].startswith("r5_bundle8r_")
     assert receipt.is_file()
 
 
@@ -122,3 +136,72 @@ def test_cross_exchange_market_fixture_passes_contract(tmp_path: Path) -> None:
     assert code == 0, result
     assert result["decision"] == "pass"
     assert result["checks"]["schema_fingerprint_verified"] is True
+
+
+def test_adapter_run_id_reuses_matching_legacy_ledger_row(tmp_path: Path) -> None:
+    fixture_path = FIXTURES / "tencent_quote.json"
+    payload_hash = hash_json(json.loads(fixture_path.read_text(encoding="utf-8")))
+    endpoint = "quote_and_valuation"
+    run_suffix = (
+        f"{safe_slug(tencent_quote_adapter.SPEC.adapter_id)}_{safe_slug(endpoint)}_"
+        f"{short_hash(payload_hash, 8)}"
+    )
+    legacy_run_id = f"r5_bundle8r_{run_suffix}"
+    write_csv_rows(
+        tmp_path / "data/manifests/ingest_runs.csv",
+        INGEST_RUN_FIELDNAMES,
+        [{"run_id": legacy_run_id}],
+    )
+
+    code, result = execute_standard_adapter(
+        [
+            "--repo-root", str(tmp_path), "--stock-code", "002837",
+            "--company-id", "cn_002837_invic", "--as-of-date", "2026-07-01",
+            "--endpoint-hint", endpoint, "--mode", "fixture",
+            "--fixture-json", str(fixture_path),
+            "--receipt-output", str(tmp_path / "legacy_adapter.yaml"),
+        ],
+        spec=tencent_quote_adapter.SPEC,
+        live_fetcher=tencent_quote_adapter.fetch_live,
+        description="legacy run id compatibility",
+    )
+
+    assert code == 0, result
+    assert result["run_id"] == legacy_run_id
+    rows = read_csv_dicts(tmp_path / "data/manifests/ingest_runs.csv")
+    assert [row["run_id"] for row in rows] == [legacy_run_id]
+
+    log_path = tmp_path / result["ingest_log_path"]
+    preserved_log = '{"historical": true}\n'
+    log_path.write_text(preserved_log, encoding="utf-8")
+    code, repeated_result = execute_standard_adapter(
+        [
+            "--repo-root", str(tmp_path), "--stock-code", "002837",
+            "--company-id", "cn_002837_invic", "--as-of-date", "2026-07-01",
+            "--endpoint-hint", endpoint, "--mode", "fixture",
+            "--fixture-json", str(fixture_path),
+            "--receipt-output", str(tmp_path / "legacy_adapter_repeat.yaml"),
+        ],
+        spec=tencent_quote_adapter.SPEC,
+        live_fetcher=tencent_quote_adapter.fetch_live,
+        description="legacy run id compatibility repeat",
+    )
+    assert code == 0, repeated_result
+    assert repeated_result["run_id"] == legacy_run_id
+    assert log_path.read_text(encoding="utf-8") == preserved_log
+
+
+def test_report_pdf_run_id_is_neutral_and_legacy_compatible(tmp_path: Path) -> None:
+    pdf_rows = [{"info_code": "fixture", "file_hash": "abc123"}]
+    neutral_run_id = _report_pdf_run_id(tmp_path, "002837", pdf_rows)
+    assert neutral_run_id.startswith("report_pdf_run_002837_")
+
+    legacy_run_id = neutral_run_id.replace(
+        "report_pdf_run_", "r5_bundle8r_report_pdf_", 1
+    )
+    write_csv_rows(
+        tmp_path / "data/manifests/ingest_runs.csv",
+        INGEST_RUN_FIELDNAMES,
+        [{"run_id": legacy_run_id}],
+    )
+    assert _report_pdf_run_id(tmp_path, "002837", pdf_rows) == legacy_run_id

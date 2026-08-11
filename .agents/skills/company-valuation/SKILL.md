@@ -379,12 +379,10 @@ Before closing, confirm:
 - valuation_quality_handoff.yaml exists
 ```
 
-<!-- BEGIN R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
-## Bundle 12R valuation-method eligibility
+## Explicit legacy Bundle12R valuation-method eligibility
 
-Before using peer multiples, DCF or SOTP for a Bundle 12R workflow, read
-`references/bundle12r_valuation_eligibility.md` and consume
-`R5_bundle12r_valuation_eligibility.yaml`. Method eligibility is independent and
-non-compensating; reverse/scenario valuation remains the fallback when a method
-is not eligible.
-<!-- END R5_BUNDLE12R_OPERATING_EVIDENCE_PROFILE -->
+Only when the handoff explicitly requests the legacy Bundle12R valuation
+capability, read `references/bundle12r_valuation_eligibility.md` and consume its
+eligibility artifact. Ordinary peer-multiple, DCF, SOTP, reverse-valuation and
+scenario work follows the current `references/method_selection.md` contract and
+does not require Bundle12R artifacts or generation locks.

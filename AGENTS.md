@@ -7,7 +7,19 @@ You are working inside **A-share Research OS / A股投研工作区**.
 Your job is to maintain an evidence-first A-share equity research workspace. You may help with workflow construction,
 evidence organization, report drafting, comparison frameworks, quality review, and refresh logs.
 
-This repository is **not** a trading system. Do not present outputs as direct buy / sell / hold instructions.
+This repository contains three related products with separate output boundaries:
+
+- **Research** organizes evidence and produces research judgments. It never provides
+  direct buy/sell/hold actions or position targets.
+- **Portfolio** records and reconciles accounting facts. It does not infer motives or
+  provide investment advice.
+- **Investment Review** consumes reviewed research and read-only portfolio facts. It may
+  provide personalized actions only when the user explicitly requests advice for the
+  current review and supplies the relevant strategy and risk inputs. Otherwise it remains
+  observation-only.
+
+No product may execute orders, write to a broker, guarantee returns, or present uncertain
+conclusions as certain.
 
 ## Non-negotiable rules
 
@@ -20,36 +32,21 @@ This repository is **not** a trading system. Do not present outputs as direct bu
 7. Preserve uncertainty, risks, and counter-evidence.
 8. New evidence that changes old conclusions must produce a change log or refresh note.
 9. Do not overwrite files in `data/raw/`; add new versions, processed text, tables, manifests, or metadata instead.
-10. Do not output direct buy/sell/hold instructions, position sizing, guaranteed returns, or certainty claims.
+10. Keep product boundaries explicit. Research and Portfolio outputs contain no direct
+    trading actions or position targets. Investment Review must not invent a risk budget,
+    time horizon, or portfolio constraint in order to produce advice.
 
 ## File deletion safety
 
-Codex may automatically delete files only when every condition below is satisfied:
-
-1. The current user has explicitly authorized Codex deletion, and the current frozen task contract permits Codex—not only the user—to perform the active deletion wave.
-2. Every target is listed as one concrete repo-relative file path in a committed, validated exact manifest. The manifest must bind the wave, source snapshot, blob identity, byte count, content hash, restore command, file count, and ordinal UTF-8 NUL path-vector hash. Wildcards, directory families, inferred descendants, and dynamically discovered extras are not targets.
-3. Before deletion, Codex must verify the recorded clean `wave_parent_commit`, an otherwise clean worktree, the complete target set and path-vector hash, recoverability, and that every resolved target stays inside the dedicated worktree and is a tracked non-directory file. Any mismatch is a hard stop.
-4. Codex must delete targets one at a time. Each deletion operation may act on only one already-resolved literal file path, for example `Remove-Item -LiteralPath "C:\\exact\\file.txt"`. A deterministic iterator over the fully materialized and validated manifest is allowed only if it invokes one literal-path file deletion per manifest row and stops immediately on any error or drift.
-5. After the wave, Codex must verify the complete raw NUL-delimited Git status and name-status vectors against the exact manifest before staging. The vectors may contain only the expected deletion records for that wave; any extra modification, deletion, rename, untracked path, or type change is a hard stop.
-
-Codex may remove now-empty directories only when every condition below is also satisfied:
-
-1. The current user has explicitly authorized directory removal, and the current frozen task contract permits Codex to remove the active wave's exact empty-directory manifest.
-2. Every directory is listed as one concrete repo-relative path in a committed, validated manifest that binds the wave, root, directory count, deepest-first ordinal order, and UTF-8 NUL path-vector hash. Dynamically discovered directories, inferred parents, wildcards, and directory families are not targets.
-3. All file targets for the wave have already been deleted, the complete raw NUL-delimited Git status and name-status vectors have been verified against the exact file manifest, and every directory target resolves inside the dedicated worktree but is not the repository or worktree root.
-4. Immediately before each removal, Codex must verify that the resolved target is a real directory, that neither it nor any path component below the dedicated-worktree root is a reparse point, that a full enumeration including hidden, system, and ignored entries proves it empty, and that it is the next deepest-first manifest row. The directory-state vector must show the already processed ordinal prefix absent and the current row plus remaining suffix present. Each operation may act on only that one already-resolved literal directory path and must be non-recursive. Any non-empty directory, reparse point, missing/out-of-order row, containment failure, or status-vector drift is a hard stop.
-5. After every directory removal and before staging, Codex must reverify that the directory-state vector shows the processed ordinal prefix absent and the remaining suffix present, and that the complete raw Git status and name-status vectors still equal the exact file-deletion manifest.
-
-The following remain prohibited without exception:
-
-- recursive deletion, including `Remove-Item -Recurse`, `rm -rf`, `rmdir /s`, `rd /s`, and `del /s`;
-- wildcard, glob, regex, prefix, directory-family, or search-result deletion;
-- deleting any directory outside the exact authorized empty-directory protocol above; deleting repository/worktree roots, non-empty directories, unresolved paths, symlinks/reparse points, or paths outside the dedicated worktree;
-- passing a collection of paths to one deletion operation;
-- using `git clean`, reset/checkout-based removal, or any command that can delete paths beyond the current validated manifest;
-- touching the user's main worktree as part of a dedicated-worktree deletion wave.
-
-If the current frozen contract is stricter than this section—for example, it requires user-manual deletion—Codex must obey that contract until a frozen amendment explicitly changes the actor while preserving the exact manifest, wave order, validation, recovery, and status-vector gates.
+- Do not delete files or directories without explicit user authorization.
+- Never use recursive, wildcard, search-result, or bulk deletion, including
+  `Remove-Item -Recurse`, `rm -rf`, `rmdir /s`, `rd /s`, `del /s`, or `git clean`.
+- If one file is explicitly authorized, resolve and verify that exact path inside the
+  intended worktree, then delete only that one literal path in one operation.
+- Do not remove directories automatically. If the requested scope contains multiple
+  files or any directory, stop and ask the user to perform the deletion manually.
+- Do not use reset or checkout as a substitute for deletion, and do not touch a dirty
+  user worktree when a dedicated worktree can be used.
 
 ## Documentation priority
 

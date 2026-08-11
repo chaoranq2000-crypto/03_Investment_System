@@ -1,6 +1,10 @@
-# R5 Readout Canonical Index
+# Historical R5/Patch/Bundle Readout Directory
 
-status: `canonical_index_defined`
+historical_compatibility_status: `canonical_index_defined`
+
+> 本文件只保留历史 R5/Patch/Bundle readout 分类。表中 `canonical_status` 表示当时 strict-smoke 证据关系，不表示当前项目或当前 run。当前 run 以 [`config/r5_readout_canonical_index.yaml`](../../config/r5_readout_canonical_index.yaml) 的 `current_runs` 为唯一 pointer。
+
+> 已经 governance cleanup 移出工作树的历史路径，通过 [`historical_baseline_manifest.yaml`](r5_v1_governance_cleanup/historical_baseline_manifest.yaml) 和 Git history 查阅；路径不存在不会改变本表的历史分类性质。
 
 Historical readouts are not rewritten. Legacy entries are retained as history and cannot be used as strict smoke evidence.
 

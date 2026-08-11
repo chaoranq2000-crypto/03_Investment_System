@@ -16,11 +16,7 @@ next_stage: T1
 active_skill: research-orchestrator
 required_next_skill: null
 
-automated_report_quality_passed: false
-system_v1_complete: false
 sample_quality_ready: false
-p2_ready: false
-release_ready: false
 
 final_report_review_status: not_requested
 final_report_review:
@@ -28,7 +24,6 @@ final_report_review:
   report_sha256: null
   reviewer: null
   reviewed_at: null
-  decision: not_requested
   notes: null
   change_scope: null
 

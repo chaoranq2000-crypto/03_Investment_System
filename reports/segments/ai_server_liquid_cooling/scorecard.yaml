@@ -5,24 +5,28 @@ segment_scorecard:
   scores:
     market_space:
       score: 4
+      score_type: analyst_judgment
       rationale: AI算力基础设施扩张提供需求背景，但不是液冷订单证据。
       evidence_ids:
         - policy_miit_compute_infra_20231008_9f2a30
       confidence: medium
     growth_visibility:
       score: 3
+      score_type: analyst_judgment
       rationale: 冷板式液冷技术路径清楚，渗透率和客户采购节奏待补。
       evidence_ids:
         - industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91
       confidence: medium
     industry_chain_position:
       score: 4
+      score_type: analyst_judgment
       rationale: 设备、部件和系统集成链条明确。
       evidence_ids:
         - industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91
       confidence: medium
     profit_pool_quality:
       score: 3
+      score_type: analyst_judgment
       rationale: 可能有设备和系统集成利润池，但公司级毛利和订单口径缺失。
       evidence_ids:
         - annual_report_002837_invic_2025_0f8fcf
@@ -30,6 +34,7 @@ segment_scorecard:
       confidence: low
     a_share_purity:
       score: 3
+      score_type: analyst_judgment
       rationale: A股候选较多，但收入纯度未核验。
       evidence_ids:
         - annual_report_002837_invic_2025_0f8fcf
@@ -38,23 +43,28 @@ segment_scorecard:
       confidence: medium
     evidence_quality:
       score: 3
+      score_type: analyst_judgment
       rationale: 官方披露和准官方行业报告可用，Tushare stock_basic已补；财务深字段仍待抓取。
       evidence_ids:
         - market_data_tushare_stock_basic_20260701_a6d9f2
       confidence: medium
     catalyst_visibility:
-      score: 2
+      score: null
+      score_type: unscored
       rationale: 年报、半年报、液冷订单和客户验证是后续催化观察点，但本轮缺少明确时间表和订单金额。
       evidence_ids:
         - TODO
       confidence: low
     risk_pressure:
-      score: 3
+      score: null
+      score_type: unscored
       rationale: 风冷效率提升、风液混合替代、价格竞争和公司收入纯度不足均需持续跟踪。
       evidence_ids:
         - TODO
       confidence: low
   final_priority: watch_medium_high
+  final_priority_type: research_priority
+  priority_basis: analyst_judgment_not_score_aggregation
   key_reasons:
     - reason: 细分边界清楚，产品链条可定义。
       evidence_id: industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91

@@ -95,18 +95,6 @@ def test_registry_write_boundary_starts_at_card_5_5_only() -> None:
     assert "canonical_registries" in cards[first_write_card]["declared_write_scopes"]
 
 
-def test_readme_uses_canonical_index_as_status_pointer() -> None:
-    text = README_PATH.read_text(encoding="utf-8")
-
-    expected = (
-        "P1.6 是项目总阶段标签；具体 R5 Bundle、当前 gate 与允许的产出级别，以 "
-        "`reports/p1_6/R5_READOUT_CANONICAL_INDEX.md` 中最新 canonical close readout "
-        "为准，README 不作为运行时状态事实源。"
-    )
-    assert expected in text
-    assert "当前处于 R5 Bundle 5" not in text
-
-
 def test_ci_keeps_compile_and_full_pytest_semantics() -> None:
     ci_text = CI_PATH.read_text(encoding="utf-8")
     baseline_text = BASELINE_READOUT.read_text(encoding="utf-8")

@@ -84,7 +84,9 @@
 |---|---|---|---|---|
 | 历史事实 | 2025公司整体收入、利润、毛利率已有结构化快照 | metric_company_cn_300731_cotran_total_revenue_20251231_d79602; metric_company_cn_300731_cotran_gross_margin_20251231_8793dd | fact | medium |
 | 关键假设 | 液冷业务若能披露收入占比，才可量化业绩弹性 | TODO | inference | low |
-| 敏感性 | 若客户验证或订单披露不足，exposure_score应维持或下调 | annual_report_300731_cotran_2025_122523 | inference | medium |
+| 补证复核 | 若客户验证或订单仍未披露，保留缺口并触发证据刷新；如调整exposure_score或置信度，需说明时间预期、披露范围和依据，不得把未披露写成业务不存在 | TODO | unknown | low |
+
+> 2026-08-10 语义修正：本行只更新缺失披露的解释；原始证据快照、report_date 和其他报告结论未改变。
 
 ## 8. 估值场景
 

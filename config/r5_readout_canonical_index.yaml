@@ -5,7 +5,6 @@ current_runs:
     workflow_id: wf_20260725_stock_first_002837_v1_policy_refresh
     state_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml
     readout_path: reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_readout.md
-    status: accepted_with_todos
 policy_migrations:
   blocker_root_policy:
     path: reports/p1_6/r5_v1_governance_cleanup/root_policy_migration.yaml

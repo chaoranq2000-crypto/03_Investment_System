@@ -6,13 +6,10 @@
   "required": [
     "state_schema_version",
     "decision_semantics_version",
+    "workflow_type",
     "status",
     "final_report_review_semantics_version",
-    "automated_report_quality_passed",
-    "system_v1_complete",
     "sample_quality_ready",
-    "p2_ready",
-    "release_ready",
     "final_report_review_status",
     "final_report_review"
   ],
@@ -22,6 +19,15 @@
     },
     "decision_semantics_version": {
       "const": "current_goal_v1"
+    },
+    "workflow_type": {
+      "enum": [
+        "segment_to_stock_closed_loop",
+        "stock_first_closed_loop",
+        "segment_stock_interlock",
+        "refresh_existing_research",
+        "comparison_readiness_gate"
+      ]
     },
     "status": {
       "enum": [
@@ -177,9 +183,6 @@
       },
       "then": {
         "properties": {
-          "automated_report_quality_passed": {
-            "const": true
-          },
           "final_report_review_status": {
             "const": "approved"
           },
@@ -195,21 +198,18 @@
     {
       "if": {
         "properties": {
-          "system_v1_complete": {
+          "p2_ready": {
             "const": true
           }
         },
         "required": [
-          "system_v1_complete"
+          "p2_ready"
         ]
       },
       "then": {
         "properties": {
-          "status": {
-            "enum": [
-              "accepted",
-              "accepted_with_todos"
-            ]
+          "workflow_type": {
+            "const": "comparison_readiness_gate"
           }
         }
       }
@@ -240,7 +240,6 @@
         "report_sha256",
         "reviewer",
         "reviewed_at",
-        "decision",
         "notes",
         "change_scope"
       ],

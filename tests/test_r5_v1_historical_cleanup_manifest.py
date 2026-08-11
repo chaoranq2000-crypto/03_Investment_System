@@ -10,6 +10,9 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 import pytest
 
 
+pytestmark = pytest.mark.legacy_compatibility
+
+
 ROOT = Path(__file__).resolve().parents[1]
 TOOL_PATH = ROOT / "scripts" / "manage_r5_v1_historical_cleanup.py"
 
@@ -340,7 +343,26 @@ def test_file_vector_accepts_only_an_exact_ordinal_prefix(tool) -> None:
         tool.validate_deletion_prefix_vectors(b"", b"", b"M\0a.txt\0", expected)
 
 
-def test_v8_actor_generation_and_tampering_fail_closed(tool) -> None:
+def test_v8_actor_generation_and_tampering_fail_closed(tool, monkeypatch) -> None:
+    verify_root_agents = tool.verify_root_agents
+    frozen_transition = tool.load_committed_yaml(
+        ROOT,
+        tool.DECOUPLING_CHECKPOINT,
+        tool.DECOUPLING_RECEIPT_REL,
+    )["transition_validation"]
+    monkeypatch.setattr(
+        tool,
+        "verify_root_agents",
+        lambda repo_root, *, revision=None: verify_root_agents(
+            repo_root,
+            revision=revision or tool.PACKAGE_SOURCE_BASELINE,
+        ),
+    )
+    monkeypatch.setattr(
+        tool,
+        "validate_transition_contract",
+        lambda repo_root, authority: copy.deepcopy(frozen_transition),
+    )
     _, cleanup, receipt = tool.build_documents(ROOT)
     tool.validate_fixed_cleanup_aggregates(cleanup)
     tool.validate_actor_bindings(cleanup)

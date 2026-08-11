@@ -55,14 +55,15 @@ description: Use when comparing multiple segments with consistent dimensions, ev
 ## Guardrails
 
 - 不同口径必须先标准化或标注不可比。
-- 没有证据的评分必须写 TODO。
-- 评分只代表研究优先级，不是交易信号。
+- 消费 scorecard 时，仅有 `config/scoring_frameworks.yaml` 定义的占位状态的维度保留 `score: null` / `unscored`，不当作 0 参与比较。
+- scorecard 的数字分数必须有非占位证据并标注为分析者判断；不自动求总分或映射研究优先级。
+- 评分用于结构化研究比较；最终研究优先级仍是定性判断，不是交易信号。
 - 冲突证据必须保留。
 
 ## Quality checklist
 
 - [ ] 所有 segment_id 稳定且定义清楚。
 - [ ] 比较维度统一。
-- [ ] 每个评分有 evidence_id / claim_id 或 TODO。
+- [ ] 数字评分有非占位 evidence_id / claim_id；未评分维度保留缺口。
 - [ ] 关键不确定性和反证已列出。
 - [ ] 研究队列不包含交易指令。

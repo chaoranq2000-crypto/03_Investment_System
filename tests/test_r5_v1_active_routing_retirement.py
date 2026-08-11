@@ -56,22 +56,23 @@ def test_active_roots_have_zero_candidate_worktree_routes() -> None:
     assert "没有合格候选时，记录 `extended_wave_count=0`" in contract
 
 
-def test_transition_tests_and_retained_ci_are_equal_strength() -> None:
-    tool = load_tool()
-    authority = tool.parse_authority(ROOT)
-    transition = tool.validate_transition_contract(ROOT, authority)
+def test_standard_ci_and_manual_legacy_suite_have_separate_owners() -> None:
+    ci = read(".github/workflows/ci.yml")
+    legacy_ci = read(".github/workflows/legacy_compatibility.yml")
+    pytest_config = read("pyproject.toml")
 
-    assert transition["path_count"] == 3
-    assert set(transition["paths"]) == tool.EXPECTED_A7
-    assert all(
-        row["source_commit"] == tool.DECOUPLING_CHECKPOINT
-        for row in transition["tests"]
-    )
-    assert all(
-        row["equal_strength_retirement_assertions"] is True
-        for row in transition["tests"]
-    )
-    assert all(transition["ci"].values())
+    assert "tests/test_r5_v1_active_routing_retirement.py" in ci
+    assert "tests/test_r5_v1_historical_baseline_manifest.py" not in ci
+    assert "tests/test_r5_v1_historical_cleanup_manifest.py" not in ci
+    assert "workflow_dispatch" in legacy_ci
+    assert "-m legacy_compatibility" in legacy_ci
+    for historical_test in (
+        "tests/test_r5_v1_historical_baseline_manifest.py",
+        "tests/test_r5_v1_historical_cleanup_manifest.py",
+        "tests/test_r5_v1_replay_002837.py",
+    ):
+        assert historical_test in legacy_ci
+    assert "not legacy_compatibility" in pytest_config
 
 
 def test_retained_builders_require_explicit_workflow_roots() -> None:

@@ -107,18 +107,20 @@
 
 ## 11. 评分卡
 
-| Dimension | Score 0-5 | Rationale | evidence_ids | confidence |
+| Dimension | Score / status | Rationale | evidence_ids | confidence |
 |---|---:|---|---|---|
 | market_space | 4 | AI算力基础设施扩张提供需求背景 | policy_miit_compute_infra_20231008_9f2a30 | medium |
 | growth_visibility | 3 | 技术路径明确，但渗透率数据待补 | industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91 | medium |
 | industry_chain_position | 4 | 设备、部件和系统集成链条明确 | industry_report_caict_cold_plate_liquid_cooling_20240523_4d8c91 | medium |
 | profit_pool_quality | 3 | 可能有设备和系统集成利润池，但公司级毛利和订单口径缺失 | annual_report_002837_invic_2025_0f8fcf; annual_report_301018_shenling_2024_122331 | low |
 | a_share_purity | 3 | 有若干A股产品暴露，但收入占比缺失 | annual_report_002837_invic_2025_0f8fcf; annual_report_301018_shenling_2024_122331 | medium |
-| evidence_quality | 3 | 官方披露和准官方行业报告可用，结构化财务快照已补；液冷收入、订单和客户侧证据仍待补 | evidence_manifest | medium |
-| catalyst_visibility | 2 | 年报、半年报、液冷订单和客户验证是后续催化观察点，但本轮缺少明确时间表和订单金额 | TODO | low |
-| risk_pressure | 3 | 风冷效率提升、风液混合替代、价格竞争和公司收入纯度不足均需持续跟踪 | TODO | low |
+| evidence_quality | 3 | 官方披露和准官方行业报告可用，结构化财务快照已补；液冷收入、订单和客户侧证据仍待补 | market_data_tushare_stock_basic_20260701_a6d9f2 | medium |
+| catalyst_visibility | UNSCORED | 年报、半年报、液冷订单和客户验证是后续催化观察点，但本轮缺少明确时间表和订单金额 | TODO | low |
+| risk_pressure | UNSCORED | 风冷效率提升、风液混合替代、价格竞争和公司收入纯度不足均需持续跟踪 | TODO | low |
 
-说明：评分只表示研究优先级和证据质量，不是交易信号。
+说明：数字分数是有证据边界的分析者判断；UNSCORED 不按 0 计算。不求总分，研究优先级是定性判断，不是交易信号。
+
+> 2026-08-10 评分语义修正：本节展示与当前 scorecard 契约对齐；原始证据快照、report_date 和其他报告结论未改变。
 
 ## 12. 后续跟踪清单
 

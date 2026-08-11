@@ -1,0 +1,29 @@
+name: Legacy Compatibility (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  legacy-compatibility:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          channels: conda-forge
+          activate-environment: investment-system-ci
+          python-version: "3.11"
+      - name: Install compatibility test dependencies
+        run: conda install -y pytest pyyaml pandas pypdf jsonschema
+      - name: Run frozen historical compatibility suite
+        run: >-
+          python -m pytest -q -m legacy_compatibility
+          tests/test_r5_v1_historical_baseline_manifest.py
+          tests/test_r5_v1_historical_cleanup_manifest.py
+          tests/test_r5_v1_replay_002837.py

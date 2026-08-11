@@ -2,16 +2,30 @@ score_scale:
   min: 0
   max: 5
   interpretation:
-    0: no_evidence_or_not_applicable
+    0: evidence_supported_very_weak
     1: weak
     2: early_or_uncertain
     3: moderate
     4: strong
     5: very_strong_with_high_quality_evidence
 
+score_semantics:
+  unscored_value: null
+  placeholder_evidence_prefixes:
+    - TODO
+    - MISSING
+    - LOW_CONFIDENCE
+    - UNVERIFIED
+    - NOT_APPLICABLE
+  numeric_score_type: analyst_judgment
+  unscored_score_type: unscored
+  aggregate_scores: false
+  priority_type: research_priority
+  priority_basis: analyst_judgment_not_score_aggregation
+
 frameworks:
   segment_scorecard:
-    description: 细分方向研究评分框架，用于比较研究优先级，不是交易信号。
+    description: 细分方向研究评分框架；数字是有证据边界的分析者判断，未评分维度保持 null，不求总分且不是交易信号。
     dimensions:
       - market_space
       - growth_visibility
@@ -23,15 +37,19 @@ frameworks:
       - risk_pressure
     required_fields:
       - segment_id
-      - score_date
-      - dimension
+      - report_date
+      - scores
+      - final_priority
+      - final_priority_type
+      - priority_basis
+    score_entry_required_fields:
       - score
+      - score_type
       - rationale
       - evidence_ids
       - confidence
-      - reviewer
   stock_scorecard:
-    description: 个股研究评分框架，用于结构化比较，不输出买卖建议。
+    description: 个股研究评分框架；数字是有证据边界的分析者判断，未评分维度保持 null，不求总分且不输出买卖建议。
     dimensions:
       - segment_exposure_quality
       - revenue_visibility
@@ -46,12 +64,16 @@ frameworks:
       - company_id
       - stock_code
       - score_date
-      - dimension
+      - scores
+      - final_priority
+      - final_priority_type
+      - priority_basis
+    score_entry_required_fields:
       - score
+      - score_type
       - rationale
       - evidence_ids
       - confidence
-      - reviewer
   comparison_matrix:
     description: 细分或个股横向比较矩阵，要求统一口径和证据来源。
     required_fields:
@@ -66,7 +88,11 @@ frameworks:
 
 guardrails:
   - score_is_not_trading_signal: true
-  - scoring_requires_evidence_or_todo: true
+  - numeric_score_requires_non_placeholder_evidence: true
+  - placeholder_only_dimension_is_unscored: true
+  - unscored_dimension_is_not_zero: true
+  - score_aggregation_is_disabled: true
+  - final_priority_is_qualitative_research_priority: true
   - high_score_requires_primary_or_high_quality_evidence: true
   - narrative_only_exposure_cannot_receive_high_score: true
   - changed_scores_require_refresh_log: true

@@ -10,6 +10,8 @@ from typing import Any
 
 import yaml
 
+from src.report import build_p1_ai_server_liquid_cooling as p1_builder
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SEGMENT_ID = "ai_server_liquid_cooling"
@@ -64,6 +66,61 @@ def split_ids(value: str) -> list[str]:
     return [item.strip() for item in value.split(";") if item.strip()]
 
 
+def is_placeholder_evidence_id(evidence_id: str, prefixes: tuple[str, ...]) -> bool:
+    return any(
+        evidence_id == prefix
+        or evidence_id.startswith(f"{prefix}_")
+        or evidence_id.startswith(f"{prefix}:")
+        for prefix in prefixes
+    )
+
+
+def assert_missing_disclosure_is_not_a_kill_switch(card: dict[str, Any]) -> None:
+    kill_switch_text = yaml.safe_dump(card.get("kill_switches", []), allow_unicode=True)
+    for legacy_condition in [
+        "连续两期无液冷收入、订单或客户验证披露",
+        "连续两期未找到液冷收入、订单或客户验证披露",
+    ]:
+        assert legacy_condition not in kill_switch_text
+
+
+def assert_scorecard_semantics(
+    card: dict[str, Any],
+    framework: dict[str, Any],
+    evidence_ids: set[str],
+    placeholder_prefixes: tuple[str, ...],
+    score_min: int,
+    score_max: int,
+) -> None:
+    assert set(card["scores"]) == set(framework["dimensions"])
+    assert set(framework["required_fields"]) <= set(card)
+    assert "total_score" not in card
+    assert card["final_priority_type"] == "research_priority"
+    assert card["priority_basis"] == "analyst_judgment_not_score_aggregation"
+
+    entry_required = set(framework["score_entry_required_fields"])
+    for dimension, payload in card["scores"].items():
+        assert entry_required <= set(payload), f"{dimension} missing score entry fields"
+        ids = payload["evidence_ids"]
+        assert ids, f"{dimension} missing evidence_ids"
+        assert all(
+            is_placeholder_evidence_id(evidence_id, placeholder_prefixes)
+            or evidence_id in evidence_ids
+            for evidence_id in ids
+        )
+        has_real_evidence = any(
+            not is_placeholder_evidence_id(evidence_id, placeholder_prefixes)
+            for evidence_id in ids
+        )
+        if payload["score"] is not None:
+            assert has_real_evidence
+            assert isinstance(payload["score"], int) and not isinstance(payload["score"], bool)
+            assert score_min <= payload["score"] <= score_max
+            assert payload["score_type"] == "analyst_judgment"
+        else:
+            assert payload["score_type"] == "unscored"
+
+
 def test_configs_parse_and_existing_acceptance_tests_compile() -> None:
     for path in [ROOT / "pyproject.toml", ROOT / ".codex/config.toml"]:
         tomllib.loads(path.read_text(encoding="utf-8"))
@@ -94,10 +151,10 @@ def test_stage_metadata_is_consistent() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     p2_checklist = (ROOT / "reports/p1/p2_entry_checklist.md").read_text(encoding="utf-8")
 
-    assert config["project"]["stage"] == "P1.5"
+    assert config["project"]["stage"] == "P1.6"
     assert config["project"]["previous_stage"]["P0"] == "conditional_pass"
     assert config["project"]["previous_stage"]["P1"] == "conditional_pass_with_medium_todos"
-    assert config["project"]["current_focus"] == "pre_p2_hardening"
+    assert config["project"]["current_focus"] == "workflow_buildout_pre_p2"
     assert "A-share Research OS" in readme
     assert "docs/workflows/RESEARCH_WORKFLOW.md" in readme
     assert "READY_FOR_LIMITED_P2" in p2_checklist
@@ -276,31 +333,146 @@ def test_exposure_scoring_rules_are_complete() -> None:
 
 
 def test_scorecards_match_scoring_framework_dimensions() -> None:
-    frameworks = load_yaml("config/scoring_frameworks.yaml")["frameworks"]
+    scoring_config = load_yaml("config/scoring_frameworks.yaml")
+    frameworks = scoring_config["frameworks"]
     evidence_ids = {row["evidence_id"] for row in read_csv("data/manifests/evidence_manifest.csv")}
+    placeholder_prefixes = tuple(scoring_config["score_semantics"]["placeholder_evidence_prefixes"])
+    score_min = scoring_config["score_scale"]["min"]
+    score_max = scoring_config["score_scale"]["max"]
+    for existing_missing_label in [
+        "TODO_SOURCE_REQUIRED",
+        "MISSING_DISCLOSURE",
+        "LOW_CONFIDENCE",
+        "UNVERIFIED",
+    ]:
+        assert is_placeholder_evidence_id(existing_missing_label, placeholder_prefixes)
 
-    segment_framework = set(frameworks["segment_scorecard"]["dimensions"])
-    segment_scores = load_yaml("reports/segments/ai_server_liquid_cooling/scorecard.yaml")[
+    segment_card = load_yaml("reports/segments/ai_server_liquid_cooling/scorecard.yaml")[
         "segment_scorecard"
-    ]["scores"]
-    assert set(segment_scores) == segment_framework
+    ]
+    assert_scorecard_semantics(
+        segment_card,
+        frameworks["segment_scorecard"],
+        evidence_ids,
+        placeholder_prefixes,
+        score_min,
+        score_max,
+    )
+    unscored_with_real_evidence = {
+        **segment_card,
+        "scores": {
+            **segment_card["scores"],
+            "market_space": {
+                **segment_card["scores"]["market_space"],
+                "score": None,
+                "score_type": "unscored",
+            },
+        },
+    }
+    assert_scorecard_semantics(
+        unscored_with_real_evidence,
+        frameworks["segment_scorecard"],
+        evidence_ids,
+        placeholder_prefixes,
+        score_min,
+        score_max,
+    )
 
-    stock_framework = set(frameworks["stock_scorecard"]["dimensions"])
     for path in [
         "reports/stocks/002837_invic/stock_scorecard.yaml",
         "reports/stocks/300731_cotran/stock_scorecard.yaml",
     ]:
-        stock_scores = load_yaml(path)["stock_scorecard"]["scores"]
-        assert set(stock_scores) == stock_framework
-        for dimension, payload in stock_scores.items():
-            ids = payload["evidence_ids"]
-            assert ids, f"{path} {dimension} missing evidence_ids"
-            assert all(evidence_id == "TODO" or evidence_id in evidence_ids for evidence_id in ids)
+        stock_card = load_yaml(path)["stock_scorecard"]
+        assert_missing_disclosure_is_not_a_kill_switch(stock_card)
+        assert_scorecard_semantics(
+            stock_card,
+            frameworks["stock_scorecard"],
+            evidence_ids,
+            placeholder_prefixes,
+            score_min,
+            score_max,
+        )
 
-    for dimension, payload in segment_scores.items():
-        ids = payload["evidence_ids"]
-        assert ids, f"segment score {dimension} missing evidence_ids"
-        assert all(evidence_id == "TODO" or evidence_id in evidence_ids for evidence_id in ids)
+
+def test_missing_disclosure_is_a_refresh_trigger_not_invalidation() -> None:
+    watchlist = load_yaml("config/watchlist.yaml")["watchlist"]
+    companies = {company["company_id"]: company for company in watchlist["companies"]}
+    for company_id in ["cn_002837_invic", "cn_300731_cotran"]:
+        company = companies[company_id]
+        trigger_text = "\n".join(company["triggers"])
+        assert "补证与重评" in trigger_text
+        assert "不等同命题失效" in trigger_text
+
+    for path in STOCK_REPORTS:
+        report_text = path.read_text(encoding="utf-8")
+        assert "exposure_score应维持或下调" not in report_text
+        assert "不得把未披露写成业务不存在" in report_text
+
+
+def test_p1_builder_preserves_scorecard_and_refresh_semantics(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.setattr(p1_builder, "ROOT", tmp_path)
+    p1_builder.build_config()
+    p1_builder.build_segment_reports()
+    p1_builder.build_stock_reports()
+
+    scoring_config = load_yaml("config/scoring_frameworks.yaml")
+    frameworks = scoring_config["frameworks"]
+    evidence_ids = {row["evidence_id"] for row in read_csv("data/manifests/evidence_manifest.csv")}
+    placeholder_prefixes = tuple(scoring_config["score_semantics"]["placeholder_evidence_prefixes"])
+    score_min = scoring_config["score_scale"]["min"]
+    score_max = scoring_config["score_scale"]["max"]
+    generated_segment = yaml.safe_load(
+        (tmp_path / "reports/segments/ai_server_liquid_cooling/scorecard.yaml").read_text(
+            encoding="utf-8"
+        )
+    )["segment_scorecard"]
+    assert_scorecard_semantics(
+        generated_segment,
+        frameworks["segment_scorecard"],
+        evidence_ids,
+        placeholder_prefixes,
+        score_min,
+        score_max,
+    )
+    generated_segment_report = (
+        tmp_path / "reports/segments/ai_server_liquid_cooling/2026-07-01_segment_report.md"
+    ).read_text(encoding="utf-8")
+    assert "| catalyst_visibility | UNSCORED |" in generated_segment_report
+    assert "| risk_pressure | UNSCORED |" in generated_segment_report
+
+    for folder in ["002837_invic", "300731_cotran"]:
+        generated_stock = yaml.safe_load(
+            (tmp_path / f"reports/stocks/{folder}/stock_scorecard.yaml").read_text(
+                encoding="utf-8"
+            )
+        )["stock_scorecard"]
+        assert_scorecard_semantics(
+            generated_stock,
+            frameworks["stock_scorecard"],
+            evidence_ids,
+            placeholder_prefixes,
+            score_min,
+            score_max,
+        )
+        assert_missing_disclosure_is_not_a_kill_switch(generated_stock)
+
+    generated_watchlist = yaml.safe_load(
+        (tmp_path / "config/watchlist.yaml").read_text(encoding="utf-8")
+    )["watchlist"]
+    generated_companies = {
+        company["company_id"]: company for company in generated_watchlist["companies"]
+    }
+    for company_id in ["cn_002837_invic", "cn_300731_cotran"]:
+        company = generated_companies[company_id]
+        trigger_text = "\n".join(company["triggers"])
+        assert "补证与重评" in trigger_text
+        assert "不等同命题失效" in trigger_text
+
+    decision_log = tmp_path / "decisions/watchlist_changes.md"
+    decision_log.parent.mkdir(parents=True, exist_ok=True)
+    decision_log.write_text("existing append-only change\n", encoding="utf-8")
+    p1_builder.build_decision_log()
+    assert decision_log.read_text(encoding="utf-8") == "existing append-only change\n"
 
 
 def test_quality_issues_have_gate_fields() -> None:
@@ -337,6 +509,10 @@ def test_reports_have_required_sections_and_evidence_markers() -> None:
         "dimensions"
     ]:
         assert f"| {dimension} |" in segment_text
+    assert "| catalyst_visibility | UNSCORED |" in segment_text
+    assert "| risk_pressure | UNSCORED |" in segment_text
+    assert "| evidence_manifest |" not in segment_text
+    assert "market_data_tushare_stock_basic_20260701_a6d9f2" in segment_text
 
     stock_sections = [
         "## 0. Metadata",

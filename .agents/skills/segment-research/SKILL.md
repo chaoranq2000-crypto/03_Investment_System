@@ -63,6 +63,8 @@ description: Use when researching one A-share segment or industry-chain node, in
 - Material claim 必须有 `evidence_id`、`claim_id`、`metric_id` 或显式 TODO。
 - segment-company exposure 是多对多，不得强行单归属。
 - 管理层表述和券商预测不能写成事实。
+- Scorecard 仅有 `config/scoring_frameworks.yaml` 定义的占位状态时使用 `score: null` 与 `score_type: unscored`；`0` 只用于有证据支持的极弱评估。
+- 数字分数标记 `score_type: analyst_judgment`；不求总分，研究优先级不得伪装成评分聚合结果。
 - 报告是 snapshot，后续更新必须产出 refresh log。
 
 ## Quality checklist
@@ -73,5 +75,6 @@ description: Use when researching one A-share segment or industry-chain node, in
 - [ ] exposure_type、exposure_score、confidence 已标注。
 - [ ] 事实、估计、推断、观点已分离。
 - [ ] 风险和反证已列出。
+- [ ] 未评分维度保持 null，数字分数有非占位证据。
 - [ ] 评分不是交易信号。
 - [ ] 未输出买卖建议。
