@@ -767,9 +767,9 @@ def test_newly_opened_instrument_keeps_unavailable_return_explicit(
 
     assert performance["performance_basis"] == "instrument_position_market_value"
     assert performance["period_change_pct"] is None
-    assert "收益率保持 MISSING" in aggregate["headline"]
+    assert "暂时无法计算本期收益率" in aggregate["headline"]
     assert "缺少可比期初价格" in markdown
-    assert "收益率保持 MISSING" in markdown
+    assert "暂时无法计算本期收益率" in markdown
     assert "None" not in markdown
 
 

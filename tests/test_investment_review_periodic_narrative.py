@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import sqlite3
 from copy import deepcopy
 from pathlib import Path
@@ -64,6 +65,31 @@ def test_v2_daily_report_has_reader_first_narrative_and_complete_appendix(
     ]["action"]
     assert reader["action_plan"]["mode"] == "observation_only"
     assert reader["action_plan"]["target_position"] is None
+    assert reader["action_plan"]["questions_to_resolve"] == [
+        "如需进一步形成行动方案，需要先明确投资期限、可承受损失和仓位边界。"
+    ]
+    assert len(reader["major_risks"]) <= 1
+    assert len(reader["invalidation_conditions"]) <= 1
+    assert len(reader["missing_inputs"]) <= 1
+    reader_visible_fields = [
+        reader["central_judgment"],
+        *(
+            paragraph
+            for section in reader["narrative_sections"]
+            for paragraph in section["paragraphs"]
+        ),
+        *reader["major_risks"],
+        *reader["invalidation_conditions"],
+        *reader["missing_inputs"],
+        *reader["action_plan"]["questions_to_resolve"],
+    ]
+    forbidden_reader_terms = re.compile(
+        r"\b(?:MISSING|UNKNOWN)(?:_[A-Z0-9]+)*\b"
+        r"|\bsystem_inference\b|\bobservation_only\b|\bDecision\b"
+        r"|\b(?:buy|sell|hold|add|reduce|exit)\b"
+    )
+    assert not any(forbidden_reader_terms.search(text) for text in reader_visible_fields)
+    assert "，但" not in reader["central_judgment"]
     assert reader["orders_executed"] is False
     assert reader["guaranteed_return"] is False
     assert validate_periodic_report(report) == {
@@ -72,6 +98,7 @@ def test_v2_daily_report_has_reader_first_narrative_and_complete_appendix(
     }
 
     markdown = render_periodic_report_markdown(report)
+    reader_markdown = markdown.split("<details>", 1)[0]
     assert markdown.count("**中心判断：**") == 1
     assert "<details>" in markdown
     assert "<summary>结构化事实与来源</summary>" in markdown
@@ -81,6 +108,17 @@ def test_v2_daily_report_has_reader_first_narrative_and_complete_appendix(
     assert "未生成交易动作或目标仓位" in markdown
     assert "`hold`" not in markdown
     assert "8%–12%" not in markdown
+    assert "system_inference" not in reader_markdown
+    assert "observation_only" not in reader_markdown
+    assert "MISSING" not in reader_markdown
+    assert "UNKNOWN" not in reader_markdown
+    assert "Decision" not in reader_markdown
+    assert "系统按操作时点信息推测" in reader_markdown
+    assert reader_markdown.count("未生成交易动作或目标仓位") == 1
+    assert "是否明确请求进入 advice 模式" not in reader_markdown
+    assert "用户确认的投资期限和风险预算是什么" not in reader_markdown
+    assert "用户的现金区间与单一标的仓位边界是什么" not in reader_markdown
+    assert "如需进一步形成行动方案，需要先明确投资期限、可承受损失和仓位边界" in reader_markdown
 
 
 def test_v2_no_trade_and_missing_cash_degrade_without_inventing_facts(
@@ -139,7 +177,6 @@ def test_portfolio_structure_is_described_without_hidden_risk_thresholds() -> No
     assert finding["type"] == "fact"
     assert finding["text"] == (
         "当日期末组合结构：现金权重 8%、最大单一标的 18%、前三大合计 45%。"
-        "是否需要调整取决于用户确认的风险预算与策略输入。"
     )
     assert "fixture:portfolio_structure" in finding["source_refs"]
 
