@@ -1855,6 +1855,34 @@ def _decision_context(
     }
 
 
+def _user_policy_range(
+    value: object,
+) -> list[str] | None:
+    if (
+        not isinstance(value, Sequence)
+        or isinstance(value, (str, bytes))
+        or len(value) != 2
+    ):
+        return None
+    try:
+        lower = _decimal(value[0])
+        upper = _decimal(value[1])
+    except PeriodicReportError:
+        return None
+    if (
+        lower is None
+        or upper is None
+        or lower < ZERO
+        or upper > Decimal("100")
+        or lower > upper
+    ):
+        return None
+    return [
+        _decimal_text(lower) or "0",
+        _decimal_text(upper) or "0",
+    ]
+
+
 def build_recommendation(
     *,
     subject_type: str,
@@ -1862,6 +1890,8 @@ def build_recommendation(
     snapshot: Mapping[str, Any],
     report_cutoff_at: str,
     decision_context: Mapping[str, Any] | None = None,
+    review_mode: str | None = None,
+    risk_policy: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     positions = list(snapshot.get("positions", []))
     total_assets = _decimal(snapshot.get("total_assets_cny"))
@@ -1883,11 +1913,6 @@ def build_recommendation(
         if isinstance(context.get("technical_and_trend"), Mapping)
         else {}
     )
-    execution = (
-        context.get("position_and_execution")
-        if isinstance(context.get("position_and_execution"), Mapping)
-        else {}
-    )
     snapshot_cash = (
         snapshot.get("cash")
         if isinstance(snapshot.get("cash"), Mapping)
@@ -1901,7 +1926,17 @@ def build_recommendation(
         ),
         default=None,
     )
-    missing_inputs = ["MISSING_EXPLICIT_USER_RISK_BUDGET"]
+    selected_mode = str(review_mode or "").strip().lower()
+    policy = risk_policy if isinstance(risk_policy, Mapping) else {}
+    policy_time_horizon = str(policy.get("time_horizon") or "").strip()
+    policy_risk_budget = str(policy.get("risk_budget") or "").strip()
+    missing_inputs: list[str] = []
+    if selected_mode != "advice":
+        missing_inputs.append("MISSING_EXPLICIT_USER_REVIEW_MODE")
+    if not policy_time_horizon:
+        missing_inputs.append("MISSING_EXPLICIT_USER_TIME_HORIZON")
+    if not policy_risk_budget:
+        missing_inputs.append("MISSING_EXPLICIT_USER_RISK_BUDGET")
     if fundamental.get("status") not in {"available", "partial"}:
         missing_inputs.append("MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT")
     if market.get("status") not in {"available", "partial"}:
@@ -1910,17 +1945,18 @@ def build_recommendation(
         missing_inputs.append("MISSING_TECHNICAL_AND_TREND_CONTEXT")
     if snapshot_cash.get("fee_pending"):
         missing_inputs.append("UNKNOWN_TRADE_FEE_PROVENANCE")
+
     if subject_type == "portfolio":
-        concentrated = top_weight is not None and top_weight > Decimal("20")
-        cash_thin = cash_weight is not None and cash_weight < Decimal("5")
-        action = "reduce" if concentrated or cash_thin else "hold"
-        target = {
-            "target_cash_range_pct": ["5", "10"],
-            "single_instrument_cap_range_pct": ["15", "20"],
-            "target_position_note": (
-                "把超过 20% 的单一标的降至 15%–20%，并将现金提高至 5%–10%。"
-            ),
-        }
+        cash_range = _user_policy_range(policy.get("target_cash_range_pct"))
+        cap_range = _user_policy_range(
+            policy.get("single_instrument_cap_range_pct")
+        )
+        has_explicit_policy = (
+            bool(policy_time_horizon)
+            and bool(policy_risk_budget)
+            and cash_range is not None
+            and cap_range is not None
+        )
         rationale = [
             {
                 "type": "fact",
@@ -1937,9 +1973,12 @@ def build_recommendation(
                 "source_ref": "portfolio.sqlite3#ledger_entries+close_prices",
             },
             {
-                "type": "opinion",
-                "text": "在缺少完整风险预算时，先降低集中度比继续放大方向暴露更稳妥。",
-                "source_ref": "periodic_report:risk_guardrail",
+                "type": "inference",
+                "text": (
+                    "现金与集中度的风险含义取决于用户明确的资金用途、"
+                    "可承受损失和单一标的暴露边界；当前账本本身不能给出这些边界。"
+                ),
+                "source_ref": "periodic_report:missing_user_risk_policy",
             },
         ]
         if market.get("summary"):
@@ -1954,49 +1993,36 @@ def build_recommendation(
                 }
             )
         invalidation = [
-            "用户已有可验证且不同的风险预算或资金安排",
+            "用户补充或修改明确的风险策略",
             "正式账本现金或持仓在报告截止后发生变化",
-            "新增全组合基本面证据支持当前集中度且风险预算允许",
+            "新增全组合基本面证据改变现有风险观察",
         ]
         risks = [
-            "减仓后标的继续上涨会产生机会成本",
+            "现金比例与集中度只能描述当前暴露，不能单独决定交易动作",
             "日报只展开当日操作标的，未完成全组合逐标的基本面覆盖",
             "指数或板块同涨不代表组合内每只股票的风险同步下降",
         ]
         if snapshot_cash.get("fee_pending"):
             risks.append("部分交易费用来源未知，现金比例仍有小幅误差风险")
         missing_inputs.append("MISSING_FULL_PORTFOLIO_FUNDAMENTAL_COVERAGE")
-        confidence = "medium" if total_assets is not None else "low"
     else:
         selected = next(
             (item for item in positions if item.get("ts_code") == subject_id),
             None,
         )
         weight = _decimal(selected.get("portfolio_weight_pct")) if selected else ZERO
-        if selected is None:
-            action = "hold"
-            target_range = ["0", "0"]
-            target_note = "当前无持仓；数据不足时不新增仓位。"
-        elif weight is not None and weight > Decimal("20"):
-            action = "reduce"
-            target_range = ["12", "18"]
-            target_note = "把单标的权重降至 12%–18%。"
-        elif weight is not None and weight > Decimal("12"):
-            action = "reduce"
-            target_range = ["8", "12"]
-            target_note = "把单标的权重降至 8%–12%。"
-        elif weight is not None and weight >= Decimal("5"):
-            action = "hold"
-            target_range = ["5", "12"]
-            target_note = "维持 5%–12%，不在证据不足时继续加仓。"
-        else:
-            action = "hold"
-            target_range = ["0", "5"]
-            target_note = "维持观察仓或空仓，不主动扩大到 5% 以上。"
-        target = {
-            "target_position_range_pct": target_range,
-            "target_position_note": target_note,
-        }
+        instrument_ranges = policy.get("instrument_target_position_ranges_pct")
+        raw_target_range = (
+            instrument_ranges.get(subject_id)
+            if isinstance(instrument_ranges, Mapping)
+            else policy.get("target_position_range_pct")
+        )
+        instrument_range = _user_policy_range(raw_target_range)
+        has_explicit_policy = (
+            bool(policy_time_horizon)
+            and bool(policy_risk_budget)
+            and instrument_range is not None
+        )
         rationale = [
             {
                 "type": "fact",
@@ -2023,10 +2049,10 @@ def build_recommendation(
                 "text": (
                     str(fundamental.get("summary"))
                     if fundamental.get("summary")
-                    else "基本面与估值增量不足，不能仅因短期价格反弹扩大集中仓位。"
+                    else "基本面与估值增量不足，现有价格和成本事实不能替代长期判断。"
                 ),
                 "source_ref": ",".join(fundamental.get("source_refs", []))
-                or "periodic_report:risk_guardrail",
+                or "periodic_report:fundamental_context_boundary",
             },
             {
                 "type": "inference",
@@ -2048,23 +2074,14 @@ def build_recommendation(
                 "source_ref": ",".join(technical.get("source_refs", []))
                 or "periodic_report:trend_boundary",
             },
-            {
-                "type": "opinion",
-                "text": (
-                    str(execution.get("summary"))
-                    if execution.get("summary")
-                    else "在缺少明确风险预算时，不应继续扩大单一标的集中度。"
-                ),
-                "source_ref": "periodic_report:position_and_execution",
-            },
         ]
         invalidation = [
-            "用户提供可验证的目标仓位与止损/加仓计划",
+            "用户补充或修改明确的风险策略",
             "新的基本面或估值证据改变风险收益判断",
             "正式账本持仓在报告截止后已发生变化",
         ]
         risks = [
-            "减仓后价格继续上涨会产生机会成本",
+            "当前仓位、成本与价格只能描述暴露，不能单独决定交易动作",
             (
                 "最新可得财务快照仍显示经营风险，短期趋势转强不等于基本面反转"
                 if fundamental.get("observations")
@@ -2075,6 +2092,77 @@ def build_recommendation(
         ]
         if snapshot_cash.get("fee_pending"):
             risks.append("部分交易费用来源未知，会影响执行净结果")
+
+    if not has_explicit_policy:
+        missing_inputs.append("MISSING_EXPLICIT_USER_RISK_POLICY")
+
+    advice_enabled = selected_mode == "advice" and has_explicit_policy
+    if not advice_enabled:
+        return {
+            "type": "observation",
+            "mode": "observation_only",
+            "decision_basis": None,
+            "user_risk_budget": None,
+            "action": None,
+            "target_position": None,
+            "time_horizon": None,
+            "confidence": "not_applicable",
+            "rationale": rationale,
+            "major_downside_risks": risks,
+            "invalidation_conditions": invalidation,
+            "questions_to_resolve": [
+                "是否明确请求进入 advice 模式？",
+                "用户确认的投资期限和风险预算是什么？",
+                "用户的现金区间与单一标的仓位边界是什么？",
+            ],
+            "data_timestamp": (
+                f"{latest_price_date}T15:00:00+08:00"
+                if latest_price_date
+                else report_cutoff_at
+            ),
+            "report_cutoff_at": report_cutoff_at,
+            "important_missing_inputs": sorted(set(missing_inputs)),
+            "orders_executed": False,
+            "guaranteed_return": False,
+        }
+
+    if subject_type == "portfolio":
+        assert cash_range is not None and cap_range is not None
+        cash_lower = _decimal(cash_range[0]) or ZERO
+        cap_upper = _decimal(cap_range[1]) or ZERO
+        action = (
+            "reduce"
+            if (top_weight is not None and top_weight > cap_upper)
+            or (cash_weight is not None and cash_weight < cash_lower)
+            else "hold"
+        )
+        target = {
+            "target_cash_range_pct": cash_range,
+            "single_instrument_cap_range_pct": cap_range,
+            "target_position_note": (
+                f"按用户策略将现金保持在 {cash_range[0]}%–{cash_range[1]}%，"
+                f"并将单一标的保持在 {cap_range[0]}%–{cap_range[1]}%。"
+            ),
+        }
+        confidence = "medium" if total_assets is not None else "low"
+    else:
+        assert instrument_range is not None
+        range_lower = _decimal(instrument_range[0]) or ZERO
+        range_upper = _decimal(instrument_range[1]) or ZERO
+        current_weight = weight or ZERO
+        if current_weight > range_upper:
+            action = "reduce"
+        elif current_weight < range_lower:
+            action = "buy" if selected is None or current_weight == ZERO else "add"
+        else:
+            action = "hold"
+        target = {
+            "target_position_range_pct": instrument_range,
+            "target_position_note": (
+                f"按用户策略将该标的保持在 "
+                f"{instrument_range[0]}%–{instrument_range[1]}%。"
+            ),
+        }
         confidence = (
             "medium"
             if all(
@@ -2086,9 +2174,12 @@ def build_recommendation(
         )
     return {
         "type": "analyst_view",
+        "mode": "advice",
+        "decision_basis": "user_policy_trigger",
+        "user_risk_budget": policy_risk_budget,
         "action": action,
         "target_position": target,
-        "time_horizon": "下一交易周或下一次实质性信息更新前",
+        "time_horizon": policy_time_horizon,
         "confidence": confidence,
         "rationale": rationale,
         "major_downside_risks": risks,
@@ -2114,6 +2205,7 @@ def _report_headline(
     performance: Mapping[str, Any],
     recommendation: Mapping[str, Any],
 ) -> str:
+    observation_only = recommendation.get("mode") == "observation_only"
     if subject_type == "portfolio":
         change_basis = (
             "总资产"
@@ -2128,11 +2220,13 @@ def _report_headline(
         change_pct = change_pct if change_pct is not None else "MISSING"
         cash_weight = snapshot.get("cash_weight_pct")
         cash_weight = cash_weight if cash_weight is not None else "MISSING"
-        return (
+        summary = (
             f"组合当日{change_basis}变动 {change_pct}%，"
-            f"现金权重 {cash_weight}%；"
-            f"建议 {recommendation.get('action')}，优先降低集中度并保留现金缓冲。"
+            f"现金权重 {cash_weight}%。"
         )
+        if observation_only:
+            return summary + "当前未取得显式用户风险策略，仅陈述暴露与风险观察。"
+        return summary + f"建议 {recommendation.get('action')}。"
     selected = next(
         (item for item in snapshot.get("positions", []) if item.get("ts_code") == subject_id),
         None,
@@ -2154,13 +2248,15 @@ def _report_headline(
         if price_change_pct is not None
         else "收盘价变动 MISSING"
     )
-    return (
+    summary = (
         f"{display_name}（{subject_id}）期末权重 "
         f"{selected_weight}%，"
         f"{performance_text}；"
-        f"当日操作已按四层上下文与无 Decision 的 system_inference 复盘；"
-        f"建议 {recommendation.get('action')}。"
+        f"当日操作已按四层上下文与无 Decision 的 system_inference 复盘。"
     )
+    if observation_only:
+        return summary + "当前未取得显式用户风险策略，仅陈述事实与风险观察。"
+    return summary + f"建议 {recommendation.get('action')}。"
 
 
 def _selected_market_value(
@@ -2317,6 +2413,8 @@ def build_daily_report(
     subject_id: str | None = None,
     account_id: str = "default",
     point_in_time_context: Mapping[str, Any] | None = None,
+    review_mode: str | None = None,
+    risk_policy: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build one deterministic P1 daily report from immutable source data."""
 
@@ -2557,6 +2655,8 @@ def build_daily_report(
         snapshot=end_snapshot,
         report_cutoff_at=report_cutoff_at,
         decision_context=decision_context,
+        review_mode=review_mode,
+        risk_policy=risk_policy,
     )
     judgments = (
         [
@@ -2590,12 +2690,7 @@ def build_daily_report(
             "top_position_weight_pct"
         ),
         "top3_weight_pct": end_snapshot.get("top3_weight_pct"),
-        "concentration_status": (
-            "HIGH"
-            if (_decimal(end_snapshot.get("top_position_weight_pct")) or ZERO)
-            > Decimal("20")
-            else "MODERATE"
-        ),
+        "concentration_status": None,
         "missing_prices": end_snapshot.get("missing_prices", []),
         "cash_status": end_cash_payload.get("status", "MISSING"),
     }
@@ -3321,7 +3416,11 @@ def build_aggregate_report(
             f"{last['subject']['name']}本{period_label}"
             f"{headline_performance_label}"
             f"变动 {headline_change_pct}%，共 {len(operations)} 笔操作；"
-            f"下一周期建议 {recommendation.get('action')}。"
+            + (
+                "当前仅陈述事实与风险观察。"
+                if recommendation.get("mode") == "observation_only"
+                else f"下一周期建议 {recommendation.get('action')}。"
+            )
         ),
         "sections": {
             "performance_and_positions": {
@@ -3444,10 +3543,17 @@ def validate_periodic_report(report: Mapping[str, Any]) -> dict[str, Any]:
     if not isinstance(recommendation, Mapping):
         errors.append("missing_recommendation")
     else:
-        if recommendation.get("action") not in _ACTIONS:
-            errors.append("invalid_recommendation_action")
-        if not recommendation.get("target_position"):
-            errors.append("missing_target_position")
+        recommendation_mode = recommendation.get("mode")
+        if recommendation_mode == "observation_only":
+            if recommendation.get("action") is not None:
+                errors.append("observation_only_has_action")
+            if recommendation.get("target_position") is not None:
+                errors.append("observation_only_has_target_position")
+        else:
+            if recommendation.get("action") not in _ACTIONS:
+                errors.append("invalid_recommendation_action")
+            if not recommendation.get("target_position"):
+                errors.append("missing_target_position")
         if not recommendation.get("major_downside_risks"):
             errors.append("missing_recommendation_risks")
         if not recommendation.get("invalidation_conditions"):
@@ -3549,6 +3655,11 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
     risk = performance_section["risk_change"]
     context = sections["decision_context"]
     recommendation = sections["recommendation"]
+    observation_only = recommendation.get("mode") == "observation_only"
+    historical_snapshot = recommendation.get("mode") not in {
+        "observation_only",
+        "advice",
+    }
     operations = sections["operations_and_motives"]["operations"]
     episode_summaries = sections["operations_and_motives"].get(
         "episode_summaries", []
@@ -3659,12 +3770,39 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
                 f"`{cash.get('fee_provenance_status', 'unknown')}`。"
             ),
             (
-                f"- 集中度：最大单一标的 "
+                f"- 集中度事实：最大单一标的 "
                 f"{visible(risk.get('top_position_weight_pct'))}%，前三大合计 "
-                f"{visible(risk.get('top3_weight_pct'))}%，状态 "
-                f"`{risk.get('concentration_status')}`。"
+                f"{visible(risk.get('top3_weight_pct'))}%。"
             ),
             f"- 计算说明：{performance.get('calculation_method')}",
+        ]
+    if observation_only:
+        recommendation_summary_lines = [
+            "- 当前模式：`observation_only`；未取得显式用户风险策略。",
+            "- 本报告只陈述事实、风险观察与待确认问题，不给出交易动作或目标仓位。",
+        ]
+    elif historical_snapshot:
+        recommendation_summary_lines = [
+            (
+                f"- 历史建议快照：`{recommendation['action']}`；"
+                f"{recommendation['target_position'].get('target_position_note')}"
+            ),
+            "- 该内容只用于复盘，不是当前有效建议。",
+        ]
+    else:
+        recommendation_summary_lines = [
+            (
+                f"- 直接建议：`{recommendation['action']}`；"
+                f"{recommendation['target_position'].get('target_position_note')}"
+            ),
+            (
+                f"- 建议置信度：`{recommendation['confidence']}`；"
+                "本报告不会执行订单。"
+            ),
+            (
+                "- 触发依据：`user_policy_trigger`；用户风险预算："
+                f"{recommendation.get('user_risk_budget')}。"
+            ),
         ]
     lines = [
         f"# {subject_label} {period['end']} {period_title}",
@@ -3675,11 +3813,7 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
         "",
         f"- 报告对象：{subject_label}；类型 `{subject['type']}`",
         f"- 报告截止：`{period['report_cutoff_at']}`",
-        (
-            f"- 直接建议：`{recommendation['action']}`；"
-            f"{recommendation['target_position'].get('target_position_note')}"
-        ),
-        f"- 建议置信度：`{recommendation['confidence']}`；本报告不会执行订单。",
+        *recommendation_summary_lines,
         "",
         "## 2. 收益、持仓、现金和风险变化",
         "",
@@ -3733,6 +3867,55 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
                 f"- {observation.get('type', 'unknown')}：{observation.get('text')}"
             )
         lines.append("")
+    if observation_only:
+        recommendation_section_title = "## 6. 事实与风险观察"
+    elif historical_snapshot:
+        recommendation_section_title = "## 6. 历史建议快照（非当前有效建议）"
+    else:
+        recommendation_section_title = (
+            f"## 6. {subject_label}个性化交易建议与建议仓位"
+            if subject["type"] == "instrument"
+            else "## 6. 个性化交易建议与建议仓位"
+        )
+    if observation_only:
+        recommendation_detail_lines = [
+            "- 未生成交易动作。",
+            "- 未生成目标仓位或仓位区间。",
+            *[
+                f"- 观察依据（{item['type']}）：{item['text']}"
+                for item in recommendation["rationale"]
+            ],
+        ]
+    elif historical_snapshot:
+        recommendation_detail_lines = [
+            f"- 历史动作：`{recommendation['action']}`",
+            (
+                "- 历史仓位：`"
+                + json.dumps(
+                    recommendation["target_position"], ensure_ascii=False
+                )
+                + "`"
+            ),
+            "- 该内容只用于复盘，不是当前有效建议。",
+        ]
+    else:
+        recommendation_detail_lines = [
+            f"- 动作：`{recommendation['action']}`",
+            (
+                "- 仓位：`"
+                + json.dumps(
+                    recommendation["target_position"], ensure_ascii=False
+                )
+                + "`"
+            ),
+            f"- 期限：{recommendation['time_horizon']}",
+            "- 触发依据：`user_policy_trigger`。",
+            f"- 用户风险预算：{recommendation.get('user_risk_budget')}",
+            *[
+                f"- 依据（{item['type']}）：{item['text']}"
+                for item in recommendation["rationale"]
+            ],
+        ]
     lines.extend(
         [
             "## 4. 操作与交易动机复盘",
@@ -3740,7 +3923,7 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
         ]
     )
     if not operations:
-        lines.append("- 本期无持仓变动操作；报告仍保留表现、风险与建议。")
+        lines.append("- 本期无持仓变动操作；报告仍保留表现、风险与观察。")
     for summary in episode_summaries:
         fee_basis = "、".join(
             fee_labels.get(str(item), str(item))
@@ -3860,19 +4043,9 @@ def render_periodic_report_markdown(report: Mapping[str, Any]) -> str:
                 for item in sections["review_judgments"]
             ],
             "",
-            (
-                f"## 6. {subject_label}个性化交易建议与建议仓位"
-                if subject["type"] == "instrument"
-                else "## 6. 个性化交易建议与建议仓位"
-            ),
+            recommendation_section_title,
             "",
-            f"- 动作：`{recommendation['action']}`",
-            f"- 仓位：`{json.dumps(recommendation['target_position'], ensure_ascii=False)}`",
-            f"- 期限：{recommendation['time_horizon']}",
-            *[
-                f"- 依据（{item['type']}）：{item['text']}"
-                for item in recommendation["rationale"]
-            ],
+            *recommendation_detail_lines,
             "",
             "## 7. 主要依据、风险、失效条件和数据缺失",
             "",

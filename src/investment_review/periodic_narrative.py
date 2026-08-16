@@ -8,6 +8,7 @@ report without a runtime model or a second approval workflow.
 from __future__ import annotations
 
 import json
+import re
 from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping, Sequence
 
@@ -31,6 +32,40 @@ _BASIS_LABELS = {
     "instrument_close_price": "收盘价",
     "instrument_position_market_value": "标的持仓市值",
 }
+_ACTION_LABELS = {
+    "buy": "买入",
+    "sell": "卖出",
+    "hold": "维持现有持仓",
+    "add": "增加持仓",
+    "reduce": "降低持仓",
+    "exit": "退出持仓",
+}
+_MISSING_INPUT_LABELS = {
+    "MISSING_DECISION": "本期操作缺少对应的原始决策说明",
+    "MISSING_FULL_PORTFOLIO_FUNDAMENTAL_COVERAGE": (
+        "尚未完成组合全部持仓的基本面覆盖"
+    ),
+    "MISSING_FUNDAMENTAL_AND_VALUATION_CONTEXT": (
+        "缺少可核对的基本面与估值材料"
+    ),
+    "MISSING_INTRADAY_MARKET_CONTEXT": "缺少操作时点的市场环境资料",
+    "MISSING_MARKET_AND_SECTOR_CONTEXT": "缺少可核对的市场与板块资料",
+    "MISSING_TECHNICAL_AND_TREND_CONTEXT": "缺少可核对的价格趋势资料",
+    "MISSING_STRATEGY_OR_TARGET_POSITION": "尚未确认投资策略与目标仓位",
+    "UNKNOWN_TRADE_FEE_PROVENANCE": "部分交易费用的来源仍待核实",
+}
+_OBSERVATION_INPUT_CODES = {
+    "MISSING_EXPLICIT_USER_REVIEW_MODE",
+    "MISSING_EXPLICIT_USER_RISK_BUDGET",
+    "MISSING_EXPLICIT_USER_RISK_POLICY",
+    "MISSING_EXPLICIT_USER_TIME_HORIZON",
+}
+_INTERNAL_MISSING_CODE = re.compile(r"\b(?:MISSING|UNKNOWN)(?:_[A-Z0-9]+)*\b")
+_READER_FORBIDDEN_TERM = re.compile(
+    r"\b(?:MISSING|UNKNOWN)(?:_[A-Z0-9]+)*\b"
+    r"|\bsystem_inference\b|\bobservation_only\b|\bDecision\b"
+    r"|\b(?:buy|sell|hold|add|reduce|exit)\b"
+)
 _APPENDIX_KEYS = (
     "performance_and_positions",
     "decision_context",
@@ -65,6 +100,117 @@ def _visible(value: object, fallback: str = "MISSING") -> str:
     if value is None or value == "":
         return fallback
     return str(value)
+
+
+def _reader_value(value: object, fallback: str = "暂缺可靠数据") -> str:
+    """Render a missing value for a reader without leaking storage sentinels."""
+
+    if value is None or value == "":
+        return fallback
+    return str(value)
+
+
+def _action_label(value: object) -> str:
+    action = str(value or "").strip()
+    return _ACTION_LABELS.get(action, action or "继续观察")
+
+
+def _missing_input_label(value: object) -> str:
+    code = str(value or "").strip()
+    if code in _MISSING_INPUT_LABELS:
+        return _MISSING_INPUT_LABELS[code]
+    if code.startswith("MISSING_") or code.startswith("UNKNOWN_"):
+        return "仍有一项基础资料尚未核实"
+    return code
+
+
+def _reader_text(value: object) -> str:
+    """Translate storage vocabulary only when it enters reader-visible prose."""
+
+    text = " ".join(str(value or "").split())
+    text = re.sub(r"(\d+日)\s*=\s*MISSING\s*%", r"\1数据暂缺", text)
+    text = text.replace("system_inference", "系统推测")
+    text = text.replace("observation_only", "事实复盘")
+    text = text.replace("advice 模式", "行动建议")
+    text = text.replace("Decision", "原始决策说明")
+
+    def replace_missing(match: re.Match[str]) -> str:
+        code = match.group(0)
+        if code == "MISSING":
+            return "数据暂缺"
+        if code == "UNKNOWN":
+            return "来源待核实"
+        return _missing_input_label(code)
+
+    text = _INTERNAL_MISSING_CODE.sub(replace_missing, text)
+    for action, label in _ACTION_LABELS.items():
+        text = re.sub(rf"`?\b{action}\b`?", label, text)
+    return text
+
+
+def _reader_action_plan(value: object) -> dict[str, Any]:
+    plan = dict(_mapping(value))
+    for key in (
+        "text",
+        "target_position_note",
+        "time_horizon",
+        "user_risk_budget",
+    ):
+        if plan.get(key) is not None:
+            plan[key] = _reader_text(plan.get(key))
+    if plan.get("action"):
+        plan["action_label"] = _action_label(plan.get("action"))
+    if plan.get("mode") == "observation_only":
+        plan["questions_to_resolve"] = [
+            "如需进一步形成行动方案，需要先明确投资期限、可承受损失和仓位边界。"
+        ]
+    else:
+        plan["questions_to_resolve"] = [
+            _reader_text(item)
+            for item in _sequence(plan.get("questions_to_resolve"))
+            if str(item).strip()
+        ]
+    return plan
+
+
+def _reader_risk_summary(
+    value: object,
+    *,
+    action_mode: object,
+) -> dict[str, list[str]]:
+    risks = _mapping(value)
+    observation_only = action_mode == "observation_only"
+    major_risks = [
+        _reader_text(item)
+        for item in _sequence(risks.get("major_risks"))
+        if str(item).strip()
+        and not (
+            observation_only and "不能单独决定交易动作" in str(item)
+        )
+    ][:1]
+    invalidation_conditions = [
+        _reader_text(item)
+        for item in _sequence(risks.get("invalidation_conditions"))
+        if str(item).strip()
+        and not (observation_only and "风险策略" in str(item))
+    ][:1]
+    missing_codes = [
+        str(item)
+        for item in _sequence(risks.get("missing_inputs"))
+        if str(item).strip()
+        and not (
+            observation_only
+            and str(item) in _OBSERVATION_INPUT_CODES | {"MISSING_DECISION"}
+        )
+    ]
+    missing_labels = list(
+        dict.fromkeys(_reader_text(_missing_input_label(item)) for item in missing_codes)
+    )
+    return {
+        "major_risks": major_risks,
+        "invalidation_conditions": invalidation_conditions,
+        "missing_inputs": ["；".join(missing_labels)] if missing_labels else [],
+    }
 
 
 def _shorten(value: object, *, limit: int = 96) -> str:
@@ -169,7 +315,7 @@ def _performance_finding(report: Mapping[str, Any]) -> dict[str, Any]:
     if change_pct is None:
         if subject.get("type") == "instrument":
             text = (
-                f"{period_label}缺少可比期初价格，标的收益率保持 MISSING"
+                f"{period_label}缺少可比期初价格，暂时无法计算本期收益率"
                 f"{coverage_text}；持仓市值变化包含买卖数量影响，不能替代收益。"
             )
         else:
@@ -214,24 +360,22 @@ def _risk_finding(report: Mapping[str, Any]) -> dict[str, Any] | None:
         material: list[str] = []
         if cash_weight is None:
             material.append("现金权重尚无法可靠计算")
-        elif cash_weight < Decimal("5"):
-            material.append(f"现金权重仅 {cash_weight}%")
         else:
             material.append(f"现金权重 {cash_weight}%")
-        if top_weight is not None and top_weight > Decimal("20"):
+        if top_weight is not None:
             material.append(f"最大单一标的 {top_weight}%")
-        if top3_weight is not None and top3_weight > Decimal("50"):
+        if top3_weight is not None:
             material.append(f"前三大合计 {top3_weight}%")
         if not material:
             return None
         return _finding(
             kind="portfolio_risk",
-            claim_type="fact_and_inference",
+            claim_type="fact",
             importance=95,
             text=(
-                f"{period_label}风险判断的关键约束包括："
+                f"{period_label}期末组合结构："
                 + "、".join(material)
-                + "；收益变化不能替代对现金与集中度的检查。"
+                + "。"
             ),
             source_refs=_refs(
                 report,
@@ -253,14 +397,14 @@ def _risk_finding(report: Mapping[str, Any]) -> dict[str, Any] | None:
             kind="position_risk",
             claim_type="fact",
             importance=90,
-            text=f"{period_label}期末已无该标的持仓；后续建议应按退出后的暴露重新评估。",
+            text=f"{period_label}期末已无该标的持仓，当前暴露已经归零。",
             source_refs=_refs(
                 report,
                 "sections.performance_and_positions.positions",
                 facts,
             ),
         )
-    weight = _visible(selected.get("portfolio_weight_pct"))
+    weight = _reader_value(selected.get("portfolio_weight_pct"))
     unrealized = selected.get("unrealized_return_pct")
     cost = selected.get("average_cost_cny")
     close = selected.get("close_cny")
@@ -270,11 +414,11 @@ def _risk_finding(report: Mapping[str, Any]) -> dict[str, Any] | None:
         importance=90,
         text=(
             f"{period_label}期末仓位权重 {weight}%，收盘价 "
-            f"{_visible(close)} 元、账面成本 {_visible(cost)} 元"
+            f"{_reader_value(close)} 元、账面成本 {_reader_value(cost)} 元"
             + (
-                f"，未实现收益率 {_visible(unrealized)}%。"
+                f"，未实现收益率 {_reader_value(unrealized)}%。"
                 if unrealized is not None
-                else "，未实现收益率 MISSING。"
+                else "，暂时无法可靠计算未实现收益率。"
             )
         ),
         source_refs=_refs(
@@ -392,9 +536,9 @@ def _operation_finding(report: Mapping[str, Any]) -> dict[str, Any]:
     text = f"{period_label}共有 {count} 笔操作。"
     if inferred:
         text += (
-            f"其中 {len(inferred)} 笔缺少 Decision，以下仅为 "
-            f"system_inference：{'；'.join(motives[:2]) or '动机信息有限'}。"
-            "替代解释与时点证据保留在附录。"
+            f"其中 {len(inferred)} 笔没有原始决策说明；系统按操作时点信息推测："
+            f"{'；'.join(motives[:2]) or '现有信息不足以形成明确解释'}。"
+            "这不是用户原话，替代解释和时点证据见附录。"
         )
     if summaries:
         primary = next(
@@ -492,8 +636,36 @@ def _cross_period_finding(
 def _action_plan(report: Mapping[str, Any]) -> dict[str, Any]:
     sections = _mapping(report.get("sections"))
     recommendation = _mapping(sections.get("recommendation"))
+    if recommendation.get("mode") == "observation_only":
+        return {
+            "type": "observation",
+            "mode": "observation_only",
+            "action": None,
+            "target_position": None,
+            "target_position_note": None,
+            "time_horizon": None,
+            "confidence": "not_applicable",
+            "text": (
+                "本期先核对事实、操作结果和仍需确认的问题，不给出交易动作或目标仓位。"
+            ),
+            "questions_to_resolve": list(
+                _sequence(recommendation.get("questions_to_resolve"))
+            ),
+            "source_refs": _refs(
+                report,
+                "sections.recommendation",
+                recommendation,
+            ),
+            "orders_executed": False,
+            "guaranteed_return": False,
+        }
     target = _mapping(recommendation.get("target_position"))
-    action = str(recommendation.get("action") or "hold")
+    action = str(recommendation.get("action") or "")
+    mode = (
+        "advice"
+        if recommendation.get("mode") == "advice"
+        else "historical_snapshot"
+    )
     source_target_note = str(
         target.get("target_position_note")
         or "仓位精度受当前缺失数据限制。"
@@ -512,13 +684,16 @@ def _action_plan(report: Mapping[str, Any]) -> dict[str, Any]:
     horizon = str(recommendation.get("time_horizon") or "下一次实质性信息更新前")
     return {
         "type": "analyst_view",
+        "mode": mode,
+        "decision_basis": recommendation.get("decision_basis"),
+        "user_risk_budget": recommendation.get("user_risk_budget"),
         "action": action,
         "target_position": dict(target),
         "target_position_note": target_note,
         "time_horizon": horizon,
         "confidence": confidence,
         "text": (
-            f"维持 {confidence} 置信度的 {action} 建议："
+            f"当前判断为{_action_label(action)}："
             f"{target_note}期限为 {horizon}。"
         ),
         "source_refs": _refs(
@@ -542,10 +717,13 @@ def _central_judgment(
 ) -> dict[str, Any]:
     subject = _mapping(report.get("subject"))
     subject_name = str(subject.get("name") or subject.get("id") or "报告对象")
-    action = str(action_plan.get("action") or "hold")
+    observation_only = action_plan.get("mode") == "observation_only"
+    historical_snapshot = action_plan.get("mode") == "historical_snapshot"
+    action = str(action_plan.get("action") or "")
     target_note = str(action_plan.get("target_position_note") or "")
     performance_text = str(performance.get("text") or "").rstrip("。； ")
-    constraints: list[str] = []
+    focus = ""
+    focus_refs: set[str] = set()
     fundamental = next(
         (
             item
@@ -554,33 +732,62 @@ def _central_judgment(
         ),
         None,
     )
-    if fundamental is not None:
-        constraints.append(_fundamental_constraint_summary(fundamental.get("text")))
-    if risk is not None:
-        constraints.append(_shorten(risk.get("text"), limit=82).rstrip("。； "))
+    risk_text = str(risk.get("text") or "") if risk is not None else ""
+    if risk is not None and any(
+        token in risk_text
+        for token in ("现金权重尚无法可靠计算", "期末已无该标的持仓")
+    ):
+        focus = _shorten(risk_text, limit=88).rstrip("。； ")
+        focus_refs.update(_sequence(risk.get("source_refs")))
+    if fundamental is not None and not focus:
+        fundamental_focus = _fundamental_constraint_summary(fundamental.get("text"))
+        if any(
+            token in fundamental_focus
+            for token in ("亏损", "风险", "不能证明", "下滑", "恶化", "高估")
+        ):
+            focus = fundamental_focus
+            focus_refs.update(_sequence(fundamental.get("source_refs")))
     operation_text = str(operation.get("text") or "")
-    if (
+    if not focus and "日内新增仓位已全部撤回" in operation_text:
+        focus = "日内新增仓位最终全部撤回，本期更值得复盘的是这组往返操作"
+        focus_refs.update(_sequence(operation.get("source_refs")))
+    elif not focus and (
         "没有持仓变动操作" not in operation_text
         and any(
             token in operation_text
             for token in ("净结果", "需要改进", "未覆盖", "拖累", "亏损")
         )
     ):
-        constraints.append("本期操作暴露出需要改进的执行问题")
-    connector = "但" if "上涨" in performance_text else "同时"
+        focus = "本期更值得关注的是操作中暴露出的执行问题"
+        focus_refs.update(_sequence(operation.get("source_refs")))
+    if not focus and risk is not None:
+        focus = _shorten(risk.get("text"), limit=88).rstrip("。； ")
+        focus_refs.update(_sequence(risk.get("source_refs")))
     central = f"{subject_name}{performance_text}"
-    if constraints:
-        central += f"；{connector}{'；'.join(dict.fromkeys(constraints))}"
-    central += f"。因此现有 {action} 建议不变：{target_note}"
+    if focus:
+        central += f"；{focus}"
+    if historical_snapshot:
+        central += (
+            f"。当时的记录建议{_action_label(action)}：{target_note}"
+            "这只是历史快照，不代表当前建议。"
+        )
+    elif not observation_only:
+        central += f"。结合用户已经确认的策略，当前建议{_action_label(action)}：{target_note}"
     refs = set(_sequence(performance.get("source_refs")))
     if risk is not None:
         refs.update(_sequence(risk.get("source_refs")))
     elif contexts:
         refs.update(_sequence(contexts[0].get("source_refs")))
-    refs.update(_sequence(action_plan.get("source_refs")))
+    refs.update(focus_refs)
+    if not observation_only:
+        refs.update(_sequence(action_plan.get("source_refs")))
     return {
-        "type": "inference_and_analyst_view",
-        "text": " ".join(central.split()),
+        "type": (
+            "inference"
+            if observation_only or historical_snapshot
+            else "inference_and_analyst_view"
+        ),
+        "text": _reader_text(central),
         "source_refs": sorted(str(item) for item in refs if item),
     }
 
@@ -706,12 +913,19 @@ def build_reader_report(
     findings = [
         _mapping(item) for item in _sequence(brief.get("material_findings"))
     ]
+    central_text = str(_mapping(brief.get("central_judgment")).get("text") or "")
+
+    def is_already_central(item: Mapping[str, Any]) -> bool:
+        text = str(item.get("text") or "").strip("。； ")
+        return bool(text and text in central_text)
+
     cross = [item for item in findings if item.get("kind") == "cross_period_synthesis"]
     operations = [item for item in findings if item.get("kind") == "operation_review"]
     main = [
         item
         for item in findings
         if item.get("kind") not in {"cross_period_synthesis", "operation_review"}
+        and not is_already_central(item)
     ]
     subject = _mapping(report.get("subject"))
     narrative_sections: list[dict[str, Any]] = []
@@ -734,7 +948,7 @@ def build_reader_report(
                 paragraph = str(performance_item.get("text") or "")
                 if market_item is not None:
                     paragraph += " " + str(market_item.get("text") or "")
-                paragraphs.append(paragraph)
+                paragraphs.append(_reader_text(paragraph))
             fundamental_item = by_kind.get("fundamental_constraint")
             risk_item = by_kind.get("position_risk")
             constraint_parts = [
@@ -743,7 +957,7 @@ def build_reader_report(
                 if item is not None
             ]
             if constraint_parts:
-                paragraphs.append(" ".join(constraint_parts))
+                paragraphs.append(_reader_text(" ".join(constraint_parts)))
             used_kinds = {
                 "period_performance",
                 "market_trend_context",
@@ -751,33 +965,34 @@ def build_reader_report(
                 "position_risk",
             }
             paragraphs.extend(
-                str(item.get("text") or "")
+                _reader_text(item.get("text"))
                 for item in main
                 if item.get("kind") not in used_kinds
             )
         else:
-            paragraphs = [str(item.get("text") or "") for item in main]
-        narrative_sections.append(
-            {
-                "key": "judgment_basis",
-                "title": title,
-                "paragraphs": paragraphs,
-                "source_refs": sorted(
-                    {
-                        str(ref)
-                        for item in main
-                        for ref in _sequence(item.get("source_refs"))
-                        if ref
-                    }
-                ),
-            }
-        )
+            paragraphs = [_reader_text(item.get("text")) for item in main]
+        if paragraphs:
+            narrative_sections.append(
+                {
+                    "key": "judgment_basis",
+                    "title": title,
+                    "paragraphs": paragraphs,
+                    "source_refs": sorted(
+                        {
+                            str(ref)
+                            for item in main
+                            for ref in _sequence(item.get("source_refs"))
+                            if ref
+                        }
+                    ),
+                }
+            )
     if cross:
         narrative_sections.append(
             {
                 "key": "cross_period_synthesis",
                 "title": "跨期变化",
-                "paragraphs": [str(item.get("text") or "") for item in cross],
+                "paragraphs": [_reader_text(item.get("text")) for item in cross],
                 "source_refs": sorted(
                     {
                         str(ref)
@@ -793,7 +1008,9 @@ def build_reader_report(
             {
                 "key": "operation_review",
                 "title": "操作复盘",
-                "paragraphs": [str(item.get("text") or "") for item in operations],
+                "paragraphs": [
+                    _reader_text(item.get("text")) for item in operations
+                ],
                 "source_refs": sorted(
                     {
                         str(ref)
@@ -806,22 +1023,24 @@ def build_reader_report(
         )
 
     risks = _mapping(brief.get("risks_and_invalidation"))
-    action_plan = dict(_mapping(brief.get("action_plan")))
+    action_plan = _reader_action_plan(brief.get("action_plan"))
+    reader_risks = _reader_risk_summary(
+        risks,
+        action_mode=action_plan.get("mode"),
+    )
     return {
         "schema_version": READER_REPORT_SCHEMA_VERSION,
-        "central_judgment": str(
-            _mapping(brief.get("central_judgment")).get("text") or ""
+        "central_judgment": _reader_text(
+            _mapping(brief.get("central_judgment")).get("text")
         ),
         "central_judgment_source_refs": list(
             _mapping(brief.get("central_judgment")).get("source_refs") or []
         ),
         "narrative_sections": narrative_sections,
         "action_plan": action_plan,
-        "major_risks": list(risks.get("major_risks") or []),
-        "invalidation_conditions": list(
-            risks.get("invalidation_conditions") or []
-        ),
-        "missing_inputs": list(risks.get("missing_inputs") or []),
+        "major_risks": reader_risks["major_risks"],
+        "invalidation_conditions": reader_risks["invalidation_conditions"],
+        "missing_inputs": reader_risks["missing_inputs"],
         "appendix": {
             "collapsed_by_default": True,
             "section_keys": list(_APPENDIX_KEYS),
@@ -863,7 +1082,12 @@ def validate_periodic_narrative(report: Mapping[str, Any]) -> list[str]:
         if not _sequence(item.get("source_refs")):
             errors.append("material_finding_missing_source_refs")
     action = _mapping(brief.get("action_plan"))
-    if not str(action.get("action") or "").strip():
+    if action.get("mode") == "observation_only":
+        if action.get("action") is not None:
+            errors.append("observation_only_analysis_brief_has_action")
+        if action.get("target_position") is not None:
+            errors.append("observation_only_analysis_brief_has_target_position")
+    elif not str(action.get("action") or "").strip():
         errors.append("analysis_brief_missing_action")
     if action.get("orders_executed") is not False:
         errors.append("analysis_brief_orders_executed_not_false")
@@ -904,6 +1128,21 @@ def validate_periodic_narrative(report: Mapping[str, Any]) -> list[str]:
             paragraph_texts.add(paragraph)
         if not _sequence(section.get("source_refs")):
             errors.append("reader_section_missing_source_refs")
+    reader_visible_texts = [
+        str(reader.get("central_judgment") or ""),
+        *paragraph_texts,
+        *(str(item) for item in _sequence(reader.get("major_risks"))),
+        *(str(item) for item in _sequence(reader.get("invalidation_conditions"))),
+        *(str(item) for item in _sequence(reader.get("missing_inputs"))),
+        *(
+            str(item)
+            for item in _sequence(
+                _mapping(reader.get("action_plan")).get("questions_to_resolve")
+            )
+        ),
+    ]
+    if any(_READER_FORBIDDEN_TERM.search(text) for text in reader_visible_texts):
+        errors.append("reader_internal_vocabulary_visible")
     appendix = _mapping(reader.get("appendix"))
     if not set(_APPENDIX_KEYS).issubset(
         {str(item) for item in _sequence(appendix.get("section_keys"))}
@@ -935,7 +1174,7 @@ def render_reader_report_markdown(report: Mapping[str, Any]) -> str:
     lines = [
         f"# {subject_label} {period.get('end')} {_PERIOD_TITLES.get(period_type, '周期报告')}",
         "",
-        f"> **中心判断：** {reader.get('central_judgment')}",
+        f"> **中心判断：** {_reader_text(reader.get('central_judgment'))}",
         "",
         f"**报告截止：** {period.get('report_cutoff_at')}",
         "",
@@ -944,28 +1183,65 @@ def render_reader_report_markdown(report: Mapping[str, Any]) -> str:
         selected = _mapping(section)
         lines.extend([f"## {selected.get('title')}", ""])
         for paragraph in _sequence(selected.get("paragraphs")):
-            lines.extend([str(paragraph), ""])
-    lines.extend(
-        [
-            "## 下一步行动",
-            "",
-            f"- **动作：** `{action.get('action')}`",
-            f"- **仓位：** {action.get('target_position_note')}",
-            f"- **期限：** {action.get('time_horizon')}",
-            f"- **置信度：** `{action.get('confidence')}`",
-            "",
-            "这是一项分析建议，不是订单；报告不会连接券商或自动执行交易。",
-            "",
-            "## 风险、失效条件与数据缺口",
-            "",
+            lines.extend([_reader_text(paragraph), ""])
+    action_mode = action.get("mode")
+    if action_mode == "observation_only":
+        questions = [
+            _reader_text(item)
+            for item in _sequence(action.get("questions_to_resolve"))
+            if str(item).strip()
         ]
-    )
-    for item in _sequence(reader.get("major_risks")):
-        lines.append(f"- 主要风险：{item}")
-    for item in _sequence(reader.get("invalidation_conditions")):
-        lines.append(f"- 失效条件：{item}")
-    missing = [str(item) for item in _sequence(reader.get("missing_inputs"))]
-    lines.append(f"- 缺失输入：{', '.join(missing) if missing else '无明确缺失项'}")
+        lines.extend(
+            [
+                "## 后续需要确认",
+                "",
+                "本期先核对已发生的变化，未生成交易动作或目标仓位。"
+                + (
+                    questions[0]
+                    if questions
+                    else "如需进一步形成行动方案，需要先明确投资期限、可承受损失和仓位边界。"
+                ),
+            ]
+        )
+    elif action_mode == "historical_snapshot" or (
+        action_mode is None and action.get("action")
+    ):
+        lines.extend(
+            [
+                "## 历史建议快照",
+                "",
+                f"- **当时的判断：** {_action_label(action.get('action'))}",
+                f"- **历史仓位：** {_reader_text(action.get('target_position_note'))}",
+                f"- **原记录期限：** {_reader_text(action.get('time_horizon'))}",
+                "",
+                "该内容只用于复盘，不是当前有效建议。",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "## 下一步行动",
+                "",
+                f"- **建议：** {_action_label(action.get('action'))}",
+                f"- **仓位：** {_reader_text(action.get('target_position_note'))}",
+                f"- **期限：** {_reader_text(action.get('time_horizon'))}",
+                f"- **用户风险预算：** {_reader_text(action.get('user_risk_budget'))}",
+                "",
+                "这项建议仅供决策参考，不会自动执行。",
+            ]
+        )
+    reader_risks = _reader_risk_summary(reader, action_mode=action_mode)
+    risks = reader_risks["major_risks"]
+    invalidation = reader_risks["invalidation_conditions"]
+    missing = reader_risks["missing_inputs"]
+    if risks or invalidation or missing:
+        lines.extend(["", "## 需要继续关注", ""])
+        for item in risks:
+            lines.append(f"- 风险：{item}")
+        for item in invalidation:
+            lines.append(f"- 出现以下变化时应重新判断：{item}")
+        if missing:
+            lines.append(f"- 尚待核实：{missing[0]}")
     appendix_payload = {
         "analysis_brief": report.get("analysis_brief"),
         "sections": report.get("sections"),
@@ -980,6 +1256,11 @@ def render_reader_report_markdown(report: Mapping[str, Any]) -> str:
             "",
             f"- 报告 ID：`{report.get('report_id')}`",
             f"- 报告 schema：`{report.get('schema_version')}`",
+            *(
+                [f"- 内部建议依据：`{action.get('decision_basis')}`"]
+                if action.get("decision_basis")
+                else []
+            ),
             "- 完整四层事实、逐笔操作、缺失项和来源如下；默认折叠。",
             "",
             "```json",

@@ -7,7 +7,7 @@ import sqlite3
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -412,7 +412,15 @@ def test_v2_automation_binds_perspective_anchor_and_carries_system_limitation(
         automatic_market_context=True,
     )
     fixture.store.upgrade_reviewability_candidate_v2()
-    audit_now = datetime(2026, 8, 1, 8, 1, tzinfo=timezone.utc)
+    latest_first_ingest = max(
+        datetime.fromisoformat(
+            str(item["first_ingest"]["observed_at"]).replace("Z", "+00:00")
+        )
+        for item in fixture.store.list_event_observation_evidence()
+    )
+    # The coordinator floors its clock to a 15-minute checkpoint slot. Keep the
+    # selected slot strictly after the controlled temporary-sidecar observation.
+    audit_now = latest_first_ingest + timedelta(seconds=901)
     adapter = market_adapter_module.MarketContextAdapter(
         cache_root=(
             fixture.root
@@ -1000,8 +1008,9 @@ def test_default_market_adapter_receives_clock_and_custom_factory_is_explicit(
     plan = coordinator._prepare_plan(trigger="default_adapter")
 
     assert captured["clock"]() == frozen_now
-    assert str(captured["cache_root"]).endswith(
-        "investment_review_product_completion_v3\\market_cache"
+    assert Path(captured["cache_root"]).parts[-2:] == (
+        "investment_review_product_completion_v3",
+        "market_cache",
     )
     assert plan.market_input_sha256 is not None
     with pytest.raises(ValueError, match="requires explicit"):

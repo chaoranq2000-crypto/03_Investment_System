@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import sqlite3
 from copy import deepcopy
 from pathlib import Path
@@ -7,6 +8,8 @@ from pathlib import Path
 from src.investment_review.periodic_narrative import (
     ANALYSIS_BRIEF_SCHEMA_VERSION,
     READER_REPORT_SCHEMA_VERSION,
+    _risk_finding,
+    render_reader_report_markdown,
 )
 from src.investment_review.periodic_reports import (
     LEGACY_REPORT_SCHEMA_VERSION,
@@ -60,6 +63,33 @@ def test_v2_daily_report_has_reader_first_narrative_and_complete_appendix(
     assert reader["action_plan"]["action"] == report["sections"][
         "recommendation"
     ]["action"]
+    assert reader["action_plan"]["mode"] == "observation_only"
+    assert reader["action_plan"]["target_position"] is None
+    assert reader["action_plan"]["questions_to_resolve"] == [
+        "如需进一步形成行动方案，需要先明确投资期限、可承受损失和仓位边界。"
+    ]
+    assert len(reader["major_risks"]) <= 1
+    assert len(reader["invalidation_conditions"]) <= 1
+    assert len(reader["missing_inputs"]) <= 1
+    reader_visible_fields = [
+        reader["central_judgment"],
+        *(
+            paragraph
+            for section in reader["narrative_sections"]
+            for paragraph in section["paragraphs"]
+        ),
+        *reader["major_risks"],
+        *reader["invalidation_conditions"],
+        *reader["missing_inputs"],
+        *reader["action_plan"]["questions_to_resolve"],
+    ]
+    forbidden_reader_terms = re.compile(
+        r"\b(?:MISSING|UNKNOWN)(?:_[A-Z0-9]+)*\b"
+        r"|\bsystem_inference\b|\bobservation_only\b|\bDecision\b"
+        r"|\b(?:buy|sell|hold|add|reduce|exit)\b"
+    )
+    assert not any(forbidden_reader_terms.search(text) for text in reader_visible_fields)
+    assert "，但" not in reader["central_judgment"]
     assert reader["orders_executed"] is False
     assert reader["guaranteed_return"] is False
     assert validate_periodic_report(report) == {
@@ -68,13 +98,27 @@ def test_v2_daily_report_has_reader_first_narrative_and_complete_appendix(
     }
 
     markdown = render_periodic_report_markdown(report)
+    reader_markdown = markdown.split("<details>", 1)[0]
     assert markdown.count("**中心判断：**") == 1
     assert "<details>" in markdown
     assert "<summary>结构化事实与来源</summary>" in markdown
     assert '"operations_and_motives"' in markdown
     assert '"decision_context"' in markdown
     assert "四层决策上下文" not in markdown
-    assert "不是订单" in markdown
+    assert "未生成交易动作或目标仓位" in markdown
+    assert "`hold`" not in markdown
+    assert "8%–12%" not in markdown
+    assert "system_inference" not in reader_markdown
+    assert "observation_only" not in reader_markdown
+    assert "MISSING" not in reader_markdown
+    assert "UNKNOWN" not in reader_markdown
+    assert "Decision" not in reader_markdown
+    assert "系统按操作时点信息推测" in reader_markdown
+    assert reader_markdown.count("未生成交易动作或目标仓位") == 1
+    assert "是否明确请求进入 advice 模式" not in reader_markdown
+    assert "用户确认的投资期限和风险预算是什么" not in reader_markdown
+    assert "用户的现金区间与单一标的仓位边界是什么" not in reader_markdown
+    assert "如需进一步形成行动方案，需要先明确投资期限、可承受损失和仓位边界" in reader_markdown
 
 
 def test_v2_no_trade_and_missing_cash_degrade_without_inventing_facts(
@@ -107,6 +151,58 @@ def test_v2_no_trade_and_missing_cash_degrade_without_inventing_facts(
     ] is None
     assert report["sections"]["performance_and_positions"]["cash"] is None
     assert validate_periodic_report(report)["status"] == "accepted"
+
+
+def test_portfolio_structure_is_described_without_hidden_risk_thresholds() -> None:
+    finding = _risk_finding(
+        {
+            "report_id": "fixture-neutral-structure",
+            "subject": {"type": "portfolio"},
+            "period": {"type": "daily"},
+            "sections": {
+                "performance_and_positions": {
+                    "risk_change": {
+                        "cash_weight_pct": "8",
+                        "top_position_weight_pct": "18",
+                        "top3_weight_pct": "45",
+                        "source_refs": ["fixture:portfolio_structure"],
+                    },
+                    "positions": [],
+                }
+            },
+        }
+    )
+
+    assert finding is not None
+    assert finding["type"] == "fact"
+    assert finding["text"] == (
+        "当日期末组合结构：现金权重 8%、最大单一标的 18%、前三大合计 45%。"
+    )
+    assert "fixture:portfolio_structure" in finding["source_refs"]
+
+
+def test_legacy_reader_action_is_labeled_as_historical_snapshot() -> None:
+    markdown = render_reader_report_markdown(
+        {
+            "subject": {"type": "instrument", "id": "000001.SZ", "name": "样本"},
+            "period": {"type": "daily", "end": "2026-07-15"},
+            "reader_report": {
+                "central_judgment": "历史报告。",
+                "narrative_sections": [],
+                "action_plan": {
+                    "action": "reduce",
+                    "target_position_note": "历史区间 8%–12%。",
+                    "time_horizon": "下一交易周",
+                },
+                "major_risks": [],
+                "invalidation_conditions": [],
+                "missing_inputs": [],
+            },
+        }
+    )
+
+    assert "## 历史建议快照" in markdown
+    assert "只用于复盘，不是当前有效建议" in markdown
 
 
 def test_weekly_reader_report_contains_cross_day_synthesis_not_daily_copy(
@@ -179,6 +275,19 @@ def test_v1_reports_remain_valid_readable_and_storable(
     legacy_markdown = render_periodic_report_markdown(legacy)
     assert "## 1. 本期结论摘要" in legacy_markdown
     assert "四层决策上下文" in legacy_markdown
+
+    historical_advice = deepcopy(legacy)
+    historical_recommendation = historical_advice["sections"]["recommendation"]
+    historical_recommendation.pop("mode", None)
+    historical_recommendation.pop("decision_basis", None)
+    historical_recommendation["action"] = "reduce"
+    historical_recommendation["target_position"] = {
+        "target_position_range_pct": ["8", "12"],
+        "target_position_note": "历史区间 8%–12%。",
+    }
+    historical_markdown = render_periodic_report_markdown(historical_advice)
+    assert "历史建议快照（非当前有效建议）" in historical_markdown
+    assert "该内容只用于复盘，不是当前有效建议" in historical_markdown
 
     store = PeriodicReportStore(sidecar)
     store.initialize()

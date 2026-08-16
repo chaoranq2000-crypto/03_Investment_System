@@ -7,9 +7,18 @@ You are working inside **A-share Research OS / A股投研工作区**.
 Your job is to maintain an evidence-first A-share equity research workspace. You may help with workflow construction,
 evidence organization, report drafting, comparison frameworks, quality review, and refresh logs.
 
-This repository is an evidence-first research and personal investment decision-support
-system. It may provide personalized buy/sell/hold recommendations and position-sizing
-guidance. It must not execute orders, write to a broker, guarantee returns, or present
+This repository contains three related products with separate output boundaries:
+
+- **Research** organizes evidence and produces research judgments. It never provides
+  direct buy/sell/hold actions or position targets.
+- **Portfolio** records and reconciles accounting facts. It does not infer motives or
+  provide investment advice.
+- **Investment Review** derives retrospective reviews from those facts. It may provide
+  personalized actions only when the user explicitly asks for advice in the current
+  review and supplies user-confirmed strategy and risk inputs relevant to that advice.
+  Otherwise it remains observation-only.
+
+No product may execute orders, write to a broker, guarantee returns, or present
 uncertain conclusions as certain.
 
 ## Non-negotiable rules
@@ -23,7 +32,9 @@ uncertain conclusions as certain.
 7. Preserve uncertainty, risks, and counter-evidence.
 8. New evidence that changes old conclusions must produce a change log or refresh note.
 9. Do not overwrite files in `data/raw/`; add new versions, processed text, tables, manifests, or metadata instead.
-10. Do not output guaranteed returns or certainty claims.
+10. Keep product boundaries explicit. Research and Portfolio outputs contain no direct
+    trading actions or position targets. Investment Review must not invent a risk budget,
+    time horizon, or portfolio constraint in order to produce advice.
 
 ## Documentation priority
 
@@ -75,17 +86,21 @@ Lower-level skills are repeatable research actions:
 | `compare-segments` | Compare multiple segments after readiness gates pass. |
 | `compare-stocks` | Compare multiple stocks after relevant stock packages are ready. |
 | `memo-writer` | Convert reviewed research into memos, watchlist notes, or thesis notes. |
-| `investment-review` | Generate portfolio/instrument periodic reviews, infer trading motives when notes are absent, and provide evidence-grounded personalized recommendations. |
+| `investment-review` | Generate portfolio/instrument periodic reviews, infer trading motives when notes are absent, and conditionally provide evidence-grounded personalized recommendations within its product boundary. |
 
 Do not use a disabled, retired, or unlisted skill unless the repository configuration explicitly enables it.
 
 `investment-review` is explicitly enabled as an independent repo-local utility. It is not a canonical A-share
 research `workflow_type` and is not routed through `research-orchestrator`. It may infer clearly labeled trading
-motives and provide personalized buy/sell/hold and position-sizing recommendations. It must not change research
-evidence, portfolio accounting, order execution, or P2 readiness. Its source portfolio SQLite must remain
-read-only; derived review data must be written to the existing sidecar database. Do not add new provenance,
-approval, replay, or revision layers unless required to prevent source mutation, time leakage, or materially
-incorrect reporting. Follow `.agents/skills/investment-review/SKILL.md` for its product boundary.
+motives. Personalized buy/sell/hold/add/reduce/exit actions or position targets are allowed only for a review in
+which the user explicitly requested advice and supplied user-confirmed strategy and risk inputs. A request to
+generate an ordinary periodic report is not by itself authorization to advise. If the required inputs are absent,
+the output is limited to facts, retrospective observations, risks, scenarios and questions; it must not use those
+action labels as recommendations or provide a target position/range. Investment Review must not change research
+evidence, portfolio accounting, order execution, or P2 readiness. Its source portfolio SQLite must remain read-only; derived review
+data must be written to the existing sidecar database. Do not add new provenance, approval, replay, or revision
+layers unless required to prevent source mutation, time leakage, or materially incorrect reporting. Follow
+`.agents/skills/investment-review/SKILL.md` for its product boundary.
 
 ## Completion gates
 
@@ -102,7 +117,7 @@ Before marking work done, check:
 For reader-facing `investment-review` V1 reports, lightweight references to the
 ledger, market data and analysis time are sufficient. Do not require research-workflow
 manifests, multi-stage human approval, byte-exact replay, or a new revision chain for
-each ordinary report.
+each ordinary report. This simplification does not relax the advice boundary above.
 
 ## Language and style
 

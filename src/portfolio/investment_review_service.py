@@ -15,6 +15,7 @@ import stat
 import threading
 from collections import Counter
 from collections.abc import Callable
+from copy import deepcopy
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -67,6 +68,12 @@ from src.investment_review.sync_service import ReviewSyncService
 API_SCHEMA_VERSION = "investment_review.web_api.v1"
 API_BOUNDARY = {
     "advice": True,
+    "advice_requires": [
+        "explicit_user_request",
+        "confirmed_time_horizon",
+        "confirmed_risk_budget",
+        "confirmed_position_constraints",
+    ],
     "motive_inference": True,
     "order_execution": False,
     "broker_write": False,
@@ -82,6 +89,67 @@ OPERATION_REVIEW_AXES = (
     "lifecycle",
     "outcome",
 )
+
+
+def _periodic_report_api_projection(
+    report: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Label legacy actions without rewriting the stored historical report."""
+
+    projected = deepcopy(dict(report))
+    historical_snapshot = False
+    sections = projected.get("sections")
+    recommendation = (
+        sections.get("recommendation")
+        if isinstance(sections, Mapping)
+        else projected.get("recommendation")
+    )
+    if isinstance(recommendation, Mapping):
+        selected = dict(recommendation)
+        if selected.get("mode") not in {"observation_only", "advice"}:
+            selected["mode"] = "historical_snapshot"
+            historical_snapshot = True
+        if isinstance(sections, Mapping):
+            projected["sections"] = dict(sections)
+            projected["sections"]["recommendation"] = selected
+        else:
+            projected["recommendation"] = selected
+
+    reader_report = projected.get("reader_report")
+    if isinstance(reader_report, Mapping):
+        action_plan = reader_report.get("action_plan")
+        if isinstance(action_plan, Mapping):
+            selected_action = dict(action_plan)
+            if selected_action.get("mode") not in {
+                "observation_only",
+                "advice",
+            }:
+                selected_action["mode"] = "historical_snapshot"
+                historical_snapshot = True
+            projected["reader_report"] = dict(reader_report)
+            projected["reader_report"]["action_plan"] = selected_action
+    if historical_snapshot:
+        reader_projection = projected.get("reader_report")
+        original_reader_judgment = (
+            reader_projection.get("central_judgment")
+            if isinstance(reader_projection, Mapping)
+            else None
+        )
+        projected["historical_snapshot"] = {
+            "label": "历史建议快照，非当前有效建议",
+            "original_headline": projected.get("headline"),
+            "original_central_judgment": original_reader_judgment,
+            "stored_report_unchanged": True,
+        }
+        safe_headline = (
+            "历史建议快照，非当前有效建议。"
+            "原报告摘要仅作为历史内容保留，请在详情中查看。"
+        )
+        projected["headline"] = safe_headline
+        if isinstance(reader_projection, Mapping):
+            projected["reader_report"] = dict(reader_projection)
+            projected["reader_report"]["central_judgment"] = safe_headline
+    return projected
 
 _RUN_ID = re.compile(r"^reviewrun_[0-9a-f]{32}$")
 _REVIEW_ID = re.compile(r"^review:[0-9a-f]{32}$")
@@ -2071,6 +2139,7 @@ class InvestmentReviewWebService:
                 "periodic_report_store_unavailable",
                 "周期报告存储不可用",
             ) from exc
+        reports = [_periodic_report_api_projection(report) for report in reports]
         return {
             "schema_version": REPORT_API_SCHEMA_VERSION,
             "status": "ready",
@@ -2105,7 +2174,7 @@ class InvestmentReviewWebService:
         return {
             "schema_version": REPORT_API_SCHEMA_VERSION,
             "status": "ready",
-            "data": {"report": report},
+            "data": {"report": _periodic_report_api_projection(report)},
         }
 
     def get_review_detail(

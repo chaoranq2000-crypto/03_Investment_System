@@ -5,7 +5,10 @@ import {
   isInvestmentReviewAcceptanceHealth,
   operationReviewHeadline,
   operationReviewView,
+  periodicActionLabel,
   periodicOperationTime,
+  periodicReaderText,
+  periodicRecommendationDisplay,
   periodicReportHeadline,
   periodicReportView,
   periodicSubjectLabel,
@@ -41,7 +44,7 @@ describe("periodic investment reports", () => {
     },
     reader_report: {
       schema_version: "investment_review.reader_report.v1",
-      central_judgment: "短期趋势转强，但执行和基本面约束仍在。",
+      central_judgment: "因此现有 reduce 建议不变。",
       narrative_sections: [{
         key: "judgment_basis",
         title: "趋势、基本面与仓位约束",
@@ -122,17 +125,27 @@ describe("periodic investment reports", () => {
     },
   };
 
-  it("normalizes the reader-facing daily report and direct position advice", () => {
+  it("keeps a mode-less historical action as a labeled legacy snapshot", () => {
     const view = periodicReportView(report);
+    const display = periodicRecommendationDisplay(report);
     expect(view.subject.type).toBe("instrument");
     expect(view.period.type).toBe("daily");
     expect(view.operation_count).toBe(3);
     expect(view.recommendation.action).toBe("reduce");
-    expect(view.reader_report.central_judgment).toContain("执行和基本面");
+    expect(display).toMatchObject({
+      observationOnly: false,
+      mode: "historical_snapshot",
+      action: "reduce",
+      actionLabel: "降低持仓",
+      targetPositionNote: "把单标的权重降至 8%–12%。",
+      label: "历史建议快照，非当前有效建议",
+    });
+    expect(view.reader_report.central_judgment).toContain("reduce 建议");
     expect(periodicSubjectLabel(view)).toBe("德展健康（000813.SZ）");
     expect(periodicReportHeadline(report)).toBe(
-      "短期趋势转强，但执行和基本面约束仍在。",
+      "历史建议快照，非当前有效建议。原报告摘要仅作为历史内容保留，请在详情中查看。",
     );
+    expect(periodicReportHeadline(report)).not.toContain("reduce 建议");
     expect(projectedTime(view.period.report_cutoff_at)).toBe(
       "2026-07-15T15:00:00+08:00",
     );
@@ -147,13 +160,109 @@ describe("periodic investment reports", () => {
     );
   });
 
+  it("keeps an explicitly advice-capable report distinct from legacy", () => {
+    const adviceReport = {
+      ...report,
+      reader_report: {
+        ...report.reader_report,
+        action_plan: {
+          ...report.reader_report.action_plan,
+          mode: "advice",
+          action_label: "缩减仓位",
+        },
+      },
+      sections: {
+        ...report.sections,
+        recommendation: {
+          ...report.sections.recommendation,
+          mode: "advice",
+          decision_basis: "user_policy_trigger",
+        },
+      },
+    };
+    const display = periodicRecommendationDisplay(adviceReport);
+    expect(display).toMatchObject({
+      observationOnly: false,
+      mode: "advice",
+      action: "reduce",
+      actionLabel: "缩减仓位",
+      label: "用户策略触发 · 建议缩减仓位",
+    });
+    expect(periodicReportHeadline(adviceReport)).toBe(
+      "因此现有降低持仓建议不变。",
+    );
+  });
+
+  it("renders missing-policy reports as observations without inventing an action", () => {
+    const observationReport = {
+      ...report,
+      headline: "当前未取得显式用户风险策略，仅陈述事实与风险观察。",
+      reader_report: {
+        ...report.reader_report,
+        central_judgment: "短期趋势转强，但风险策略尚未确认。",
+        action_plan: {
+          type: "observation",
+          mode: "observation_only",
+          action: null,
+          target_position: null,
+          target_position_note: null,
+          time_horizon: null,
+          confidence: "not_applicable",
+          text: "当前仅形成事实与风险观察。",
+        },
+      },
+      sections: {
+        ...report.sections,
+        recommendation: {
+          type: "observation",
+          mode: "observation_only",
+          action: null,
+          target_position: null,
+          time_horizon: null,
+          confidence: "not_applicable",
+        },
+      },
+    };
+    const display = periodicRecommendationDisplay(observationReport);
+    expect(display).toEqual({
+      observationOnly: true,
+      mode: "observation_only",
+      action: null,
+      actionLabel: null,
+      targetPositionNote: null,
+      label: "仅事实与风险观察",
+      detail: "未生成交易动作或目标仓位",
+      summary: "仅事实与风险观察 · 未生成交易动作或目标仓位",
+    });
+    const headline = periodicReportHeadline(observationReport);
+    expect(headline).toContain("仅事实与风险观察");
+    expect(headline).toContain("未生成交易动作或目标仓位");
+    expect(headline).not.toMatch(/建议\s+(hold|unknown|none)/i);
+  });
+
+  it("naturalizes reader-only action, motive, and missing-input labels", () => {
+    expect(periodicActionLabel("buy")).toBe("买入");
+    expect(periodicActionLabel("sell")).toBe("卖出");
+    expect(periodicActionLabel("hold")).toBe("继续持有");
+    expect(periodicActionLabel("add")).toBe("增加持仓");
+    expect(periodicActionLabel("reduce")).toBe("降低持仓");
+    expect(periodicActionLabel("exit")).toBe("退出持仓");
+    expect(periodicActionLabel("reduce", "缩减仓位")).toBe("缩减仓位");
+    expect(periodicReaderText(
+      "system_inference；MISSING_EXPLICIT_USER_RISK_BUDGET；advice 模式",
+    )).toBe("系统推测；尚未明确可承受损失；进一步讨论行动");
+    expect(periodicReaderText("recorded Decision")).toBe("已记录的原始决策说明");
+  });
+
   it("loads the periodic list and detail before operation-level evidence", () => {
     expect(source).toContain("/periodic-reports?limit=1000");
     expect(source).toContain("/periodic-report?");
     expect(source.indexOf("PERIODIC REPORTS")).toBeLessThan(
       source.indexOf("OPERATION EVIDENCE"),
     );
-    expect(source).toContain("MOTIVE · SYSTEM INFERENCE");
+    expect(source).toContain("操作与动机");
+    expect(source).toContain("以下内容为历史报告原文");
+    expect(source).toContain("查看原报告摘要（历史）");
     expect(source).toContain("weekly: \"自然周汇总\"");
     expect(source).toContain("monthly: \"自然月汇总\"");
     expect(source).toContain("[\"weekly\", \"周报\"]");
@@ -161,8 +270,24 @@ describe("periodic investment reports", () => {
     expect(source).toContain("FUNDAMENTAL · MARKET · TREND · EXECUTION");
     expect(source).toContain("operation.name, operation.ts_code");
     expect(source).toContain("rule_backfilled");
-    expect(source).toContain("RECOMMENDATION · NOT AN ORDER");
-    expect(source).toContain("READER ANALYSIS");
+    expect(source).toContain("分析建议 · 非订单");
+    expect(source).toContain("本期未生成交易动作");
+    expect(source).toContain("仅事实与风险观察");
+    expect(source).toContain("未生成交易动作或目标仓位");
+    expect(source).toContain("历史建议快照，非当前有效建议");
+    expect(source).toContain("历史内容 · 仅供回看");
+    expect(source).not.toContain("建议 ${text(recommendation.action)}");
+    expect(source).not.toContain("${text(recommendation.action).toUpperCase()}");
+    expect(source).toContain('riskPairs.push(["集中度", risk.concentration_status])');
+    expect(source).toContain("本期分析");
+    expect(source).toContain("风险与未决信息");
+    expect(source).toContain("判断把握：");
+    expect(source).not.toContain("OBSERVATION ONLY");
+    expect(source).not.toContain("LEGACY ADVICE SNAPSHOT");
+    expect(source).not.toContain("RECOMMENDATION · NOT AN ORDER");
+    expect(source).not.toContain("RISK · INVALIDATION · MISSING");
+    expect(source).not.toContain("advice 模式");
+    expect(source).not.toContain("`confidence ${");
     expect(source).toContain("查看完整结构化事实、逐笔操作与来源");
     expect(source).toContain("investment_review.periodic_report.v2");
   });
@@ -195,7 +320,7 @@ describe("investment review read-only acceptance", () => {
     expect(mainSource).toContain('readOnly: true');
     expect(source).toContain("只读报告");
     expect(source).toContain("不会冒充您的原始理由");
-    expect(source).toContain("个性化买卖与仓位建议");
+    expect(source).toContain("只有您明确要求行动建议并提供投资期限与风险边界时");
   });
 });
 
