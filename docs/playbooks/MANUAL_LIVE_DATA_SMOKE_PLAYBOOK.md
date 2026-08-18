@@ -137,8 +137,11 @@ conda run -p .\.conda\investment-system python -m src.ingest.adapters.tushare_ad
   --company-id cn_002837_invic `
   --mode live `
   --allow-network `
-  --as-of-date 2026-07-01 `
-  --publish-date 2026-07-01 `
+  --start-date 20260810 `
+  --end-date 20260818 `
+  --as-of-date 2026-08-18 `
+  --publish-date 2026-08-18 `
+  --fields ts_code,trade_date,close,pe_ttm,pb,total_mv `
   --raw-dir data/raw/live_smoke/manual_live_smoke_20260703_002837/tushare_daily_basic/raw `
   --normalized-dir data/raw/live_smoke/manual_live_smoke_20260703_002837/tushare_daily_basic/normalized `
   --manifest-path data/raw/live_smoke/manual_live_smoke_20260703_002837/tushare_daily_basic/evidence_manifest.csv `

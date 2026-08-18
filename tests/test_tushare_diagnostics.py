@@ -39,7 +39,7 @@ def test_probe_profiles_are_bounded_and_separate_product_needs():
     optional = {item["api_name"] for item in portfolio if not item["required"]}
     assert optional == {"cb_daily", "stk_mins", "etf_mins"}
     by_name = {item["api_name"]: item for item in portfolio}
-    assert by_name["cb_daily"]["params"]["trade_date"] == "20260819"
+    assert by_name["cb_daily"]["params"]["trade_date"] == "20260818"
     for api_name in ("stk_mins", "etf_mins"):
         params = by_name[api_name]["params"]
         assert params["start_date"].split(" ", 1)[0] == params["end_date"].split(" ", 1)[0]

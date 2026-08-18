@@ -45,7 +45,9 @@ def probe_definitions(
     end = today or date.today()
     start = end - timedelta(days=14)
     financial_start = end - timedelta(days=800)
-    probe_day = end
+    # Optional end-of-day and minute datasets should use a completed session;
+    # the current trading day can legitimately be empty before publication.
+    probe_day = end - timedelta(days=1)
     while probe_day.weekday() >= 5:
         probe_day -= timedelta(days=1)
     date_range = {
