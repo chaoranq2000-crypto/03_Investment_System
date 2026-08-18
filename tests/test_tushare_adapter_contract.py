@@ -6,12 +6,9 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
-
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src" / "ingest"))
-
-from adapters.tushare_adapter import main as tushare_main  # noqa: E402
-from structured_api_pull import build_api_params_hash  # noqa: E402
+from src.ingest.adapters import tushare_adapter
+from src.ingest.adapters.tushare_adapter import main as tushare_main
+from src.ingest.structured_api_pull import build_api_params_hash
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -44,6 +41,13 @@ def test_tushare_no_token_dry_run_returns_blocked(tmp_path: Path, monkeypatch) -
 
 def test_tushare_live_mode_requires_explicit_network_flag(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setenv("TUSHARE_TOKEN", "x" * 56)
+    monkeypatch.setattr(
+        tushare_adapter,
+        "_fetch_tushare_live_rows",
+        lambda _args: (_ for _ in ()).throw(
+            AssertionError("network path must not run without --allow-network")
+        ),
+    )
     readout = tmp_path / "tushare_live_blocked.json"
     tushare_main(
         [
@@ -112,9 +116,16 @@ def test_tushare_live_mode_routes_mock_response_through_structured_ingest(
             captured["http_url"] = getattr(self, "_DataApi__http_url", "")
             return FakeFrame()
 
+    def pro_api(value: str, *, timeout: int) -> FakePro:
+        captured["token"] = value
+        captured["timeout"] = timeout
+        return FakePro()
+
     fake_tushare = SimpleNamespace(
-        set_token=lambda value: captured.setdefault("token", value),
-        pro_api=lambda: FakePro(),
+        set_token=lambda _value: (_ for _ in ()).throw(
+            AssertionError("set_token must not be called")
+        ),
+        pro_api=pro_api,
     )
     monkeypatch.setitem(sys.modules, "tushare", fake_tushare)
     monkeypatch.setenv("TUSHARE_TOKEN", token)
@@ -146,6 +157,7 @@ def test_tushare_live_mode_routes_mock_response_through_structured_ingest(
     )
 
     assert captured["token"] == token
+    assert captured["timeout"] == 45
     assert captured["params"]["ts_code"] == "002837.SZ"  # type: ignore[index]
     assert captured["http_url"] == "https://tushare-proxy.example.test"
     payload = json.loads(readout.read_text(encoding="utf-8"))
@@ -272,12 +284,20 @@ def test_tushare_disclosure_date_uses_report_period_without_date_metrics(
             captured["params"] = params
             return FakeFrame()
 
+    def pro_api(value: str, *, timeout: int) -> FakePro:
+        captured["token"] = value
+        captured["timeout"] = timeout
+        return FakePro()
+
     fake_tushare = SimpleNamespace(
-        set_token=lambda value: captured.setdefault("token", value),
-        pro_api=lambda: FakePro(),
+        set_token=lambda _value: (_ for _ in ()).throw(
+            AssertionError("set_token must not be called")
+        ),
+        pro_api=pro_api,
     )
     monkeypatch.setitem(sys.modules, "tushare", fake_tushare)
     monkeypatch.setenv("TUSHARE_TOKEN", "event-calendar-token")
+    monkeypatch.setenv("TUSHARE_HTTP_URL", "https://current.example.test")
 
     tushare_main(
         [
@@ -308,3 +328,141 @@ def test_tushare_disclosure_date_uses_report_period_without_date_metrics(
     assert not metrics_path.exists()
     manifest = read_csv(tmp_path / "data/manifests/evidence_manifest.csv")
     assert manifest[0]["candidate_status"] == "not_generated"
+
+
+def test_tushare_live_mode_loads_canonical_config_from_repo_env_file(
+    tmp_path: Path, monkeypatch
+) -> None:
+    token = "file-only-fake-token"
+    endpoint = "https://file-config.example.test"
+    (tmp_path / ".env.local").write_text(
+        f"TUSHARE_TOKEN={token}\nTUSHARE_HTTP_URL={endpoint}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("TUSHARE_TOKEN", raising=False)
+    monkeypatch.delenv("TUSHARE_HTTP_URL", raising=False)
+    monkeypatch.delenv("TUSHARE_API_URL", raising=False)
+    captured: dict[str, object] = {}
+
+    class FakeFrame:
+        def to_dict(self, orient: str) -> list[dict[str, str]]:
+            assert orient == "records"
+            return [{"ts_code": "002837.SZ", "end_date": "20251231", "revenue": "10"}]
+
+    class FakePro:
+        def income(self, **_params: str) -> FakeFrame:
+            captured["endpoint"] = getattr(self, "_DataApi__http_url", "")
+            return FakeFrame()
+
+    def pro_api(value: str, *, timeout: int) -> FakePro:
+        captured.update(token=value, timeout=timeout)
+        return FakePro()
+
+    monkeypatch.setitem(sys.modules, "tushare", SimpleNamespace(pro_api=pro_api))
+    readout = tmp_path / "readout.json"
+
+    tushare_main(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--api-name",
+            "income",
+            "--stock-code",
+            "002837",
+            "--mode",
+            "live",
+            "--allow-network",
+            "--as-of-date",
+            "2026-08-19",
+            "--readout-output",
+            str(readout),
+        ]
+    )
+
+    assert captured == {"token": token, "timeout": 45, "endpoint": endpoint}
+    assert token not in readout.read_text(encoding="utf-8")
+
+
+def test_tushare_live_mode_rejects_legacy_endpoint_alias_without_sdk_call(
+    tmp_path: Path, monkeypatch
+) -> None:
+    token = "legacy-alias-fake-token"
+    (tmp_path / ".env.local").write_text(
+        f"TUSHARE_TOKEN={token}\n"
+        "TUSHARE_API_URL=https://legacy.example.test\n",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("TUSHARE_TOKEN", raising=False)
+    monkeypatch.delenv("TUSHARE_HTTP_URL", raising=False)
+    monkeypatch.delenv("TUSHARE_API_URL", raising=False)
+    monkeypatch.setattr(
+        "src.utils.tushare_client._load_tushare",
+        lambda: (_ for _ in ()).throw(
+            AssertionError("SDK must not load when canonical endpoint is missing")
+        ),
+    )
+    readout = tmp_path / "blocked.json"
+
+    tushare_main(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--api-name",
+            "income",
+            "--stock-code",
+            "002837",
+            "--mode",
+            "live",
+            "--allow-network",
+            "--readout-output",
+            str(readout),
+        ]
+    )
+
+    text = readout.read_text(encoding="utf-8")
+    payload = json.loads(text)
+    assert payload["result"] == "BLOCKED"
+    assert "TUSHARE_HTTP_URL is missing" in payload["permission_note"]
+    assert token not in text
+
+
+def test_tushare_live_mode_redacts_provider_error_before_readout(
+    tmp_path: Path, monkeypatch
+) -> None:
+    token = "provider-error-fake-token"
+    monkeypatch.setenv("TUSHARE_TOKEN", token)
+    monkeypatch.setenv("TUSHARE_HTTP_URL", "https://current.example.test")
+
+    class FailingPro:
+        def income(self, **_params: str):
+            raise RuntimeError(
+                f"token={token} Authorization: Bearer secondary-secret"
+            )
+
+    monkeypatch.setitem(
+        sys.modules,
+        "tushare",
+        SimpleNamespace(pro_api=lambda _token, timeout: FailingPro()),
+    )
+    readout = tmp_path / "provider_error.json"
+
+    tushare_main(
+        [
+            "--repo-root",
+            str(tmp_path),
+            "--api-name",
+            "income",
+            "--stock-code",
+            "002837",
+            "--mode",
+            "live",
+            "--allow-network",
+            "--readout-output",
+            str(readout),
+        ]
+    )
+
+    text = readout.read_text(encoding="utf-8")
+    assert token not in text
+    assert "secondary-secret" not in text
+    assert "<REDACTED>" in text

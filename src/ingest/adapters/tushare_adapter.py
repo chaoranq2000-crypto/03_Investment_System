@@ -8,12 +8,13 @@ from pathlib import Path
 from typing import Any, Mapping
 from typing import Sequence
 
-try:
-    from src.ingest.structured_api_pull import main as structured_main
-    from src.ingest.structured_api_pull import output_path, write_readout
-except ModuleNotFoundError:  # compatibility with legacy direct-path test imports
-    from structured_api_pull import main as structured_main
-    from structured_api_pull import output_path, write_readout
+from src.ingest.structured_api_pull import main as structured_main
+from src.ingest.structured_api_pull import output_path, write_readout
+from src.utils.tushare_client import (
+    get_tushare_pro,
+    load_env_file,
+    sanitize_provider_error,
+)
 
 
 SUPPORTED_APIS = {
@@ -167,19 +168,14 @@ def _live_params(args: argparse.Namespace) -> dict[str, str]:
 
 
 def _fetch_tushare_live_rows(args: argparse.Namespace) -> list[dict[str, str]]:
-    import tushare as ts  # type: ignore[import-not-found]
-
-    ts.set_token(os.environ[args.token_env])
-    pro = ts.pro_api()
-    api_url = (
-        os.environ.get("TUSHARE_HTTP_URL")
-        or os.environ.get("TUSHARE_API_URL")
-        or ""
-    ).strip()
-    if api_url:
-        pro._DataApi__http_url = api_url
+    pro = get_tushare_pro(
+        Path(args.repo_root) / ".env.local",
+        token_env=args.token_env,
+    )
     params = _live_params(args)
     if args.api_name == "pro_bar":
+        import tushare as ts  # type: ignore[import-not-found]
+
         result = ts.pro_bar(api=pro, **params)
     else:
         result = getattr(pro, args.api_name)(**params)
@@ -249,7 +245,13 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(json.dumps(payload, ensure_ascii=False, sort_keys=True))
         return 0
 
-    if not os.environ.get(args.token_env):
+    local_env = load_env_file(Path(args.repo_root) / ".env.local")
+    token_value = (
+        os.environ[args.token_env]
+        if args.token_env in os.environ
+        else local_env.get(args.token_env, "")
+    ).strip()
+    if not token_value:
         payload = blocked_payload(args, f"missing {args.token_env}")
         if args.readout_output:
             write_readout(output_path(Path(args.repo_root).resolve(), args.readout_output, Path("readout.json")), payload)
@@ -259,7 +261,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         rows = _fetch_tushare_live_rows(args)
     except Exception as exc:
-        payload = blocked_payload(args, f"live Tushare call failed before artifact write: {type(exc).__name__}: {exc}")
+        safe_error = sanitize_provider_error(exc, secrets=(token_value,))
+        payload = blocked_payload(
+            args,
+            "live Tushare call failed before artifact write: "
+            f"{type(exc).__name__}: {safe_error}",
+        )
         if args.readout_output:
             write_readout(output_path(Path(args.repo_root).resolve(), args.readout_output, Path("readout.json")), payload)
         print(json.dumps(payload, ensure_ascii=False, sort_keys=True))
