@@ -35,8 +35,8 @@ def main() -> None:
         {
             "token_present": summary["token_present"],
             "token_length": summary["token_length"],
-            "token_alnum": summary["token_alnum"],
-            "api_url": summary["api_url"],
+            "token_format_valid": summary["token_format_valid"],
+            "endpoint": summary["endpoint"],
         }
     )
 

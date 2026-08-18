@@ -79,7 +79,7 @@ def main() -> None:
         {
             "token_present": summary["token_present"],
             "token_length": summary["token_length"],
-            "api_url": summary["api_url"],
+            "endpoint": summary["endpoint"],
         }
     )
     pro = get_tushare_pro(ROOT / ".env.local")
