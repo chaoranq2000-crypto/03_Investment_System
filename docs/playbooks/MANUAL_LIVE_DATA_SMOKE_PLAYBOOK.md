@@ -93,6 +93,16 @@ conda run -p .\.conda\investment-system python -m src.utils.tushare_diagnostics 
   --allow-network
 ```
 
+The separately guarded pytest smoke also requires an explicit process-local switch. Set
+it only for an authorized manual run, then remove it from the shell afterward:
+
+```powershell
+$env:ENABLE_LIVE_DATA_TESTS="1"
+conda run -p .\.conda\investment-system python -m pytest -q -p no:cacheprovider `
+  tests\test_live_adapter_smoke.py
+Remove-Item Env:ENABLE_LIVE_DATA_TESTS
+```
+
 Profiles report row counts, schema and sanitized errors only. `research` adds
 `daily_basic` and `income`; `portfolio` checks the required price/adjustment path and
 labels convertible-bond/minute endpoints optional. Investment Review has no direct

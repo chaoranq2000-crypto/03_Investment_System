@@ -3,16 +3,12 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
-import sys
 from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src" / "ingest"))
-
-from adapters.baostock_adapter import main as baostock_main  # noqa: E402
-from adapters.tushare_adapter import main as tushare_main  # noqa: E402
+from src.ingest.adapters.baostock_adapter import main as baostock_main
+from src.ingest.adapters.tushare_adapter import main as tushare_main
 
 pytestmark = pytest.mark.skipif(
     os.environ.get("ENABLE_LIVE_DATA_TESTS") != "1",
@@ -23,6 +19,8 @@ pytestmark = pytest.mark.skipif(
 def test_tushare_live_smoke_manual(tmp_path: Path) -> None:
     if not os.environ.get("TUSHARE_TOKEN"):
         pytest.skip("TUSHARE_TOKEN is required for manual Tushare live smoke")
+    if not os.environ.get("TUSHARE_HTTP_URL"):
+        pytest.skip("TUSHARE_HTTP_URL is required for manual Tushare live smoke")
     readout = tmp_path / "tushare_live_smoke.json"
     tushare_main(
         [
