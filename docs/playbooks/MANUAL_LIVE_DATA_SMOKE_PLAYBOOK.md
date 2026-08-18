@@ -1,12 +1,12 @@
 # Manual Live Data Smoke Playbook
 
-> Purpose: verify Tushare / Baostock adapter execution paths manually. This playbook does not connect live results to reports.
+> Purpose: verify the shared Tushare client and Tushare / Baostock adapter paths manually. This is the only active live-data smoke playbook and does not connect results to reports or databases.
 
 ## 1. Preconditions
 
 | item | requirement |
 |---|---|
-| stage | P1.6 only |
+| stage | shared infrastructure and P1.6 adapters |
 | execution | manual only |
 | CI | do not enable live network tests |
 | output | temporary, isolated, reviewed before any commit |
@@ -14,12 +14,20 @@
 
 ## 2. Environment Variables
 
-Required for Tushare:
+Keep the following keys in the Git-ignored `.env.local`; do not paste real values into a
+command or this playbook:
 
-```powershell
-$env:TUSHARE_TOKEN="<local token value>"
-$env:ENABLE_LIVE_DATA_TESTS="1"
+```dotenv
+TUSHARE_TOKEN=
+TUSHARE_HTTP_URL=
+TUSHARE_DISABLE_PROXY=false
 ```
+
+`TUSHARE_HTTP_URL` is the only endpoint setting. The client rejects the retired
+`TUSHARE_API_URL` alias, non-HTTPS endpoints, credentials in URLs, and malformed proxy
+settings. Token length is provider-defined; the client validates unsafe characters but
+does not assume the old 56-character format. It passes the token to one client instance
+and never calls `ts.set_token()`.
 
 Optional for diagnostics:
 
@@ -40,8 +48,57 @@ Token rules:
 - Keep token values in the environment or `.env.local` only.
 - Do not write token values into readouts, logs, manifests or command history notes.
 - Adapter readouts may include `token_env: TUSHARE_TOKEN`; they must not include the token value.
+- Default diagnostics are configuration-only. Run a real probe only after the user gives
+  task-specific authorization, then add `--allow-network` explicitly.
+- Use fake tokens for automated tests. Neither the client nor adapter tests open a network
+  connection.
+- Do not set `NO_PROXY=*`. When direct endpoint access is required, set
+  `TUSHARE_DISABLE_PROXY=true`; the client adds only the configured endpoint host to
+  `NO_PROXY` for the duration of each call and restores the prior environment.
 
-## 3. Temporary Output Directory
+Visibility boundary:
+
+- An ordinary HTTPS forward proxy can see the destination host/IP, connection timing and
+  traffic volume. It normally cannot read the token or request body unless it performs
+  trusted TLS interception.
+- The configured endpoint receives the token, API name, stock codes, date filters and the
+  returned dataset. A third-party compatible endpoint therefore sees the full Tushare
+  request even when the network proxy is bypassed.
+
+## 3. Configuration And Fake-Token Checks
+
+Configuration-only diagnostics do not import the SDK or make network calls:
+
+```powershell
+conda run -p .\.conda\investment-system python -m src.utils.tushare_diagnostics `
+  --env-file .\.env.local `
+  --profile research
+```
+
+Run the offline security and adapter tests with fake tokens:
+
+```powershell
+conda run -p .\.conda\investment-system python -m pytest -q -p no:cacheprovider `
+  tests\test_tushare_client.py `
+  tests\test_tushare_adapter_contract.py `
+  tests\test_tushare_diagnostics.py
+```
+
+Only after explicit authorization, add the network flag for a bounded, read-only probe:
+
+```powershell
+conda run -p .\.conda\investment-system python -m src.utils.tushare_diagnostics `
+  --env-file .\.env.local `
+  --profile core `
+  --allow-network
+```
+
+Profiles report row counts, schema and sanitized errors only. `research` adds
+`daily_basic` and `income`; `portfolio` checks the required price/adjustment path and
+labels convertible-bond/minute endpoints optional. Investment Review has no direct
+Tushare dependency in `main`.
+
+## 4. Temporary Output Directory
 
 Use a run-scoped directory that is ignored or treated as local-only until reviewed:
 
@@ -60,10 +117,10 @@ git status --short
 
 If `git check-ignore` does not ignore the directory, stop and add an explicit local-only plan before running live smoke.
 
-## 4. Tushare daily_basic Smoke
+## 5. Tushare daily_basic Smoke
 
 ```powershell
-conda run -p .\.conda\investment-system python src\ingest\adapters\tushare_adapter.py `
+conda run -p .\.conda\investment-system python -m src.ingest.adapters.tushare_adapter `
   --repo-root . `
   --api-name daily_basic `
   --stock-code 002837 `
@@ -80,12 +137,12 @@ conda run -p .\.conda\investment-system python src\ingest\adapters\tushare_adapt
   --readout-output data/raw/live_smoke/manual_live_smoke_20260703_002837/tushare_daily_basic/readout.json
 ```
 
-## 5. Tushare Financial Statement Smoke
+## 6. Tushare Financial Statement Smoke
 
 Run each endpoint separately so failures stay isolated:
 
 ```powershell
-conda run -p .\.conda\investment-system python src\ingest\adapters\tushare_adapter.py `
+conda run -p .\.conda\investment-system python -m src.ingest.adapters.tushare_adapter `
   --repo-root . `
   --api-name income `
   --stock-code 002837 `
@@ -106,7 +163,7 @@ conda run -p .\.conda\investment-system python src\ingest\adapters\tushare_adapt
 
 Repeat with `--api-name balancesheet`, `--api-name cashflow`, and `--api-name fina_indicator`, changing `--fields` to the reviewed field list for each endpoint.
 
-## 6. Baostock K-line Smoke
+## 7. Baostock K-line Smoke
 
 ```powershell
 conda run -p .\.conda\investment-system python src\ingest\adapters\baostock_adapter.py `
@@ -128,7 +185,7 @@ conda run -p .\.conda\investment-system python src\ingest\adapters\baostock_adap
   --readout-output data/raw/live_smoke/manual_live_smoke_20260703_002837/baostock_kline/readout.json
 ```
 
-## 7. Baostock Financial Smoke
+## 8. Baostock Financial Smoke
 
 Run one endpoint at a time:
 
@@ -152,7 +209,7 @@ conda run -p .\.conda\investment-system python src\ingest\adapters\baostock_adap
 
 Repeat with `query_balance_data`, `query_cash_flow_data`, and `query_dupont_data` only if the prior endpoint finishes and writes a clean readout.
 
-## 8. Output Review
+## 9. Output Review
 
 For each endpoint, inspect:
 
@@ -172,17 +229,18 @@ Check:
 - metric candidates are metric-only.
 - no report artifact changed.
 
-## 9. Git Safety Check
+## 10. Git Safety Check
 
 ```powershell
 git status --short
 git diff --check
 git grep -n "token_value"
+git grep -n "TUSHARE_API_URL" -- .env.example src\ingest src\utils scripts
 ```
 
 Do not commit live raw responses unless they are reviewed, desensitized if needed, and explicitly approved.
 
-## 10. Cleanup Or Isolation
+## 11. Cleanup Or Isolation
 
 Preferred default: keep the temporary directory ignored and local-only until the user reviews it.
 
@@ -194,18 +252,19 @@ Remove-Item "C:\Projects\03_Investment_System\data\raw\live_smoke\manual_live_sm
 
 Do not use recursive deletion. If many files or directories need cleanup, stop and ask the user to delete them manually.
 
-## 11. Failure Handling
+## 12. Failure Handling
 
 | failure | action |
 |---|---|
 | missing token | stop Tushare smoke and keep blocked readout only |
 | package missing | stop that adapter and keep blocked readout only |
+| canonical endpoint missing / invalid | stop; update private `TUSHARE_HTTP_URL`; do not add a fallback |
 | permission / rate limit | stop that endpoint and record issue |
 | empty response | record partial/blocked readout; do not invent rows |
 | token appears in output | stop immediately; do not commit; ask for manual cleanup |
 | report file changed | stop and inspect diff before any further command |
 
-## 12. Outputs Not To Commit By Default
+## 13. Outputs Not To Commit By Default
 
 - live raw response CSV / JSON
 - endpoint readout containing environment-specific details
