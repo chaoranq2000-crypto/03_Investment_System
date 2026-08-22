@@ -23,6 +23,7 @@
 | workflow state fields | `research-orchestrator/references/workflow_state_schema.md` | 必须使用 canonical `workflow_type`。 |
 | handoff packet format | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | skill 可补充本 skill 的 handoff 要求。 |
 | source rank / citation principle | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | evidence-ingest references 承担字段级执行契约。 |
+| 个人高风险权益账户定性原则 | `docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` | AGENTS / Investment Review skill 只能引用；不得转写为机器阈值。`C-HUMAN-005` 仍为 `pending` / `null`。 |
 | quality issue schema | `.agents/skills/quality-review/SKILL.md` 或其 references | 不得创造全局 gate id。 |
 | stock report production profile | `.agents/skills/stock-deep-dive/references/report_production_profile.md` | 不得作为平级 workflow。 |
 
@@ -38,6 +39,7 @@
 | `docs/architecture/RESEARCH_OBJECT_MODEL.md` | Segment / Company / Evidence / Claim / Metric 等对象模型 | 具体报告模板、阶段计划 | `AGENTS.md` |
 | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | evidence / claim / citation / freshness / conflict rules | workflow 编排细节、样例报告语言风格 | `AGENTS.md` |
 | `docs/policies/QUALITY_GUARDRAILS.md` | 质量门原则、反幻觉、反证、研究 no-advice 与复盘建议边界 | 具体工作流执行步骤、全局 gate id 表 | `AGENTS.md` |
+| `docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` | 已确认的十项人类可读定性原则 | 机器 schema、固定参数、自动动作或 P10 建议阈值 | `AGENTS.md` |
 | `docs/workflows/RESEARCH_WORKFLOW.md` | 全局 workflow kernel | 阶段计划、执行日志、skill 局部实现细节 | `AGENTS.md` |
 | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | orchestrator 运行时状态、路由、handoff、门禁调度 | 新增全局 workflow_type、stage_id 或 gate_id | `RESEARCH_WORKFLOW.md` |
 | `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层 source adapter、manifest、candidate、data pack、局部 DL checks | 投研结论、报告写作风格、全局 gate id 定义 | `RESEARCH_WORKFLOW.md` |
