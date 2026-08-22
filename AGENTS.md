@@ -21,6 +21,20 @@ This repository contains three related products with separate output boundaries:
 No product may execute orders, write to a broker, guarantee returns, or present
 uncertain conclusions as certain.
 
+## Confirmed personal strategy policy
+
+`docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` is the confirmed
+human-readable policy for the user's high-risk equity account. Apply its ten
+qualitative principles as hard boundaries with contextual judgment. It is not
+machine-executable configuration and does not, by itself, authorize advice or satisfy
+the user-confirmed inputs required for the current review.
+
+`C-HUMAN-005` remains `pending`; no runtime profile value is configured, so its
+effective machine value is `null`. Historical P10 material marked
+`proposed_not_active` is evidence for later user discussion, not an active threshold.
+Do not infer a 30%, 35%, or other drawdown rule from return aspirations, and do not
+turn the charter into an automated sizing, compliance, de-risking, or order rule.
+
 ## Non-negotiable rules
 
 1. Evidence is the source of truth.

@@ -19,6 +19,7 @@
 
 - `policies/EVIDENCE_AND_CITATION_POLICY.md` — 证据、引用、来源等级、新鲜度和冲突处理。
 - `policies/QUALITY_GUARDRAILS.md` — 质量门、反幻觉、反证，以及研究产出与个人复盘建议的边界。
+- `policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` — 已确认的个人高风险权益账户定性章程；不是机器参数或当次建议授权。
 
 ## Workflows
 

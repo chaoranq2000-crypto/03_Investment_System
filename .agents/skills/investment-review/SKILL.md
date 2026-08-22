@@ -88,6 +88,14 @@ liquidity, concentration or other portfolio constraints the user supplies. Never
 substitute system defaults, historical experimental thresholds or inferred preferences
 for user confirmation.
 
+The confirmed qualitative policy is
+`docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md`. Use its ten principles
+as human-readable context, not as machine-executable parameters. A charter reference
+does not satisfy the current review's required explicit time horizon, risk budget or
+portfolio constraints. `C-HUMAN-005` remains `pending`; no runtime profile value is
+configured, so its effective machine value is `null`. Historical P10 material marked
+`proposed_not_active` must not supply a 30%, 35% or other automatic drawdown threshold.
+
 An observation-only review may describe accounting facts, changes in exposure,
 retrospective outcomes, labeled motive hypotheses, risks, scenarios and questions for
 the user. It must not recommend `buy`, `sell`, `hold`, `add`, `reduce` or `exit`, and
