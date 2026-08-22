@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/contracts/P2H_STAGE2_OBSERVATION_PROTOCOL.schema.json",
+  "title": "P2H Stage 2 Slice A Observation Protocol",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "protocol_id",
+    "canonical_hash",
+    "created_at",
+    "effective_at",
+    "knowledge_at",
+    "candidate_binding",
+    "question",
+    "required_fact_specs",
+    "observation_window",
+    "applicability_conditions",
+    "disconfirming_conditions",
+    "stop_conditions",
+    "expiry_at",
+    "missing_evidence_policy",
+    "privacy_scope",
+    "provenance",
+    "state_semantics"
+  ],
+  "properties": {
+    "schema_version": {"const": "p2h.observation_protocol.v1"},
+    "artifact_type": {"const": "observation_protocol"},
+    "protocol_id": {"$ref": "#/$defs/protocol_id"},
+    "canonical_hash": {"$ref": "#/$defs/sha256"},
+    "created_at": {"$ref": "#/$defs/timestamp"},
+    "effective_at": {"$ref": "#/$defs/timestamp"},
+    "knowledge_at": {"$ref": "#/$defs/timestamp"},
+    "candidate_binding": {"$ref": "#/$defs/candidate_binding"},
+    "question": {"type": "string", "minLength": 1},
+    "required_fact_specs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/fact_spec"}
+    },
+    "observation_window": {"$ref": "#/$defs/observation_window"},
+    "applicability_conditions": {"$ref": "#/$defs/nonempty_text_list"},
+    "disconfirming_conditions": {"$ref": "#/$defs/nonempty_text_list"},
+    "stop_conditions": {"$ref": "#/$defs/nonempty_text_list"},
+    "expiry_at": {"$ref": "#/$defs/timestamp"},
+    "missing_evidence_policy": {"$ref": "#/$defs/missing_evidence_policy"},
+    "privacy_scope": {"$ref": "#/$defs/privacy_scope"},
+    "provenance": {"$ref": "#/$defs/provenance"},
+    "state_semantics": {
+      "const": "Lifecycle state only; completed or expired does not prove or disprove the hypothesis, diagnose a person, score behavior, update a profile, or provide trading advice."
+    }
+  },
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "protocol_id": {"type": "string", "pattern": "^protocol:[0-9a-f]{32}$"},
+    "candidate_id": {"type": "string", "pattern": "^candidate:[0-9a-f]{32}$"},
+    "review_event_id": {"type": "string", "pattern": "^review_event:[0-9a-f]{32}$"},
+    "nonempty_text_list": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "artifact_type",
+        "content_id",
+        "source_locators"
+      ],
+      "properties": {
+        "schema_version": {"type": "string", "minLength": 1},
+        "artifact_type": {"type": "string", "minLength": 1},
+        "content_id": {"$ref": "#/$defs/sha256"},
+        "source_locators": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "stage1_review_event_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "review_event_id",
+        "canonical_hash",
+        "event_type",
+        "effective_at",
+        "knowledge_at",
+        "reviewed_at"
+      ],
+      "properties": {
+        "review_event_id": {"$ref": "#/$defs/review_event_id"},
+        "canonical_hash": {"$ref": "#/$defs/sha256"},
+        "event_type": {"type": "string", "minLength": 1},
+        "effective_at": {"$ref": "#/$defs/timestamp"},
+        "knowledge_at": {"$ref": "#/$defs/timestamp"},
+        "reviewed_at": {"$ref": "#/$defs/timestamp"}
+      }
+    },
+    "accepted_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "artifact_type",
+        "candidate_id",
+        "status",
+        "as_of",
+        "knowledge_cutoff",
+        "applied_event_ids",
+        "last_event_id",
+        "state_semantics",
+        "projection_hash"
+      ],
+      "properties": {
+        "schema_version": {"const": "p2h.behavior_hypothesis_projection.v1"},
+        "artifact_type": {"const": "behavior_hypothesis_projection"},
+        "candidate_id": {"$ref": "#/$defs/candidate_id"},
+        "status": {"const": "accepted_for_observation"},
+        "as_of": {"$ref": "#/$defs/timestamp"},
+        "knowledge_cutoff": {"$ref": "#/$defs/timestamp"},
+        "applied_event_ids": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/review_event_id"}
+        },
+        "last_event_id": {"$ref": "#/$defs/review_event_id"},
+        "state_semantics": {"type": "string", "minLength": 1},
+        "projection_hash": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "candidate_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_id",
+        "candidate_canonical_hash",
+        "candidate_source_refs",
+        "review_event_refs",
+        "review_event_set_hash",
+        "accepted_projection",
+        "source_replay_status"
+      ],
+      "properties": {
+        "candidate_id": {"$ref": "#/$defs/candidate_id"},
+        "candidate_canonical_hash": {"$ref": "#/$defs/sha256"},
+        "candidate_source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/source_ref"}
+        },
+        "review_event_refs": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/stage1_review_event_ref"}
+        },
+        "review_event_set_hash": {"$ref": "#/$defs/sha256"},
+        "accepted_projection": {"$ref": "#/$defs/accepted_projection"},
+        "source_replay_status": {"const": "verified"}
+      }
+    },
+    "fact_spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fact_key", "description", "acceptable_source_types"],
+      "properties": {
+        "fact_key": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{1,63}$"
+        },
+        "description": {"type": "string", "minLength": 1},
+        "acceptable_source_types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "observation_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["starts_at", "ends_at", "review_checkpoints"],
+      "properties": {
+        "starts_at": {"$ref": "#/$defs/timestamp"},
+        "ends_at": {"$ref": "#/$defs/timestamp"},
+        "review_checkpoints": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/timestamp"}
+        }
+      }
+    },
+    "missing_evidence_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["on_missing", "on_partial", "on_ambiguous", "allow_inference"],
+      "properties": {
+        "on_missing": {"const": "preserve_missing"},
+        "on_partial": {"const": "preserve_partial"},
+        "on_ambiguous": {"const": "preserve_ambiguous"},
+        "allow_inference": {"const": false}
+      }
+    },
+    "privacy_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "data_classification",
+        "allowed_source_kinds",
+        "prohibited_data_kinds",
+        "contains_direct_identifiers"
+      ],
+      "properties": {
+        "data_classification": {"enum": ["synthetic", "private_review_sidecar"]},
+        "allowed_source_kinds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "prohibited_data_kinds": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "contains_direct_identifiers": {"const": false}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["submitter_kind", "human_confirmed", "source_locator", "tool_version"],
+      "properties": {
+        "submitter_kind": {"enum": ["human", "agent_assisted"]},
+        "human_confirmed": {"const": true},
+        "source_locator": {"type": "string", "minLength": 1},
+        "tool_version": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

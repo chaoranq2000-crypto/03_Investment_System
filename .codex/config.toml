@@ -54,3 +54,15 @@ enabled = true
 [[skills.config]]
 path = ".agents/skills/research-orchestrator"
 enabled = true
+
+# Standalone private-accounting utility. It is not routed through the Research
+# workflow kernel or any Research quality gate.
+[[skills.config]]
+path = ".agents/skills/portfolio-tracker"
+enabled = true
+
+# Standalone personal-review utility. Advice remains gated by explicit current
+# user inputs; ordinary runs are observation-only.
+[[skills.config]]
+path = ".agents/skills/investment-review"
+enabled = true

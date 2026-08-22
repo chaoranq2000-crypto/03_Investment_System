@@ -1,0 +1,55 @@
+{
+  "created_at": "2026-07-20T12:00:00Z",
+  "effective_at": "2026-07-20T11:00:00Z",
+  "knowledge_at": "2026-07-20T12:00:00Z",
+  "subject_scope": {
+    "kind": "cohort",
+    "refs": [
+      "synthetic-cohort-001"
+    ]
+  },
+  "pattern_family": "outcome_conditioning",
+  "hypothesis_statement": "The observed association may persist in comparable synthetic episodes.",
+  "supporting_evidence": [
+    {
+      "artifact_type": "p2h.synthetic_source.v1",
+      "artifact_id": "evaluation:11111111111111111111111111111111",
+      "canonical_hash": "sha256:40088780b90475875439e722e4fa1e55fddc98720e1e7f142a77917a8808cfcf",
+      "source_locator": "tests/fixtures/investment_review_p2h_stage1/synthetic_observation_source.json",
+      "effective_at": "2026-07-20T10:00:00Z",
+      "knowledge_at": "2026-07-20T11:30:00Z"
+    }
+  ],
+  "counterevidence": [
+    {
+      "artifact_type": "p2h.synthetic_source.v1",
+      "artifact_id": "evaluation:22222222222222222222222222222222",
+      "canonical_hash": "sha256:40088780b90475875439e722e4fa1e55fddc98720e1e7f142a77917a8808cfcf",
+      "source_locator": "tests/fixtures/investment_review_p2h_stage1/synthetic_observation_source.json",
+      "effective_at": "2026-07-20T10:00:00Z",
+      "knowledge_at": "2026-07-20T11:30:00Z"
+    }
+  ],
+  "source_gaps": [],
+  "alternative_explanations": [
+    "Opportunity quality may have changed independently."
+  ],
+  "applicability_conditions": [
+    "Only the frozen synthetic cohort and stated cutoff are covered."
+  ],
+  "disconfirming_observations": [
+    "Comparable episodes show no relationship after opportunity quality is held constant."
+  ],
+  "observation_plan": {
+    "question": "Does the association persist in future comparable synthetic episodes?",
+    "required_facts": [
+      "reviewed synthetic decision intent",
+      "synthetic pre-event portfolio context"
+    ]
+  },
+  "provenance": {
+    "submitter_kind": "human_reviewed_sidecar",
+    "source_locator": "tests/fixtures/investment_review_p2h_stage1/candidate_draft.json",
+    "tool_version": "p2h.behavior_hypothesis_candidate.builder.v1"
+  }
+}

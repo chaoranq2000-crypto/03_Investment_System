@@ -1,0 +1,68 @@
+{
+  "created_at": "2026-07-20T15:00:00Z",
+  "effective_at": "2026-07-20T15:00:00Z",
+  "knowledge_at": "2026-07-20T15:00:00Z",
+  "accepted_projection_as_of": "2026-07-20T14:00:00Z",
+  "accepted_projection_knowledge_cutoff": "2026-07-20T14:00:00Z",
+  "question": "Does the association persist in future comparable synthetic episodes?",
+  "required_fact_specs": [
+    {
+      "fact_key": "decision_intent",
+      "description": "The reviewed synthetic decision intent known at each checkpoint.",
+      "acceptable_source_types": [
+        "decision_record",
+        "review_note"
+      ]
+    },
+    {
+      "fact_key": "episode_context",
+      "description": "The synthetic pre-event context for each comparable episode.",
+      "acceptable_source_types": [
+        "episode_fact"
+      ]
+    }
+  ],
+  "observation_window": {
+    "starts_at": "2026-07-21T00:00:00Z",
+    "ends_at": "2026-08-20T00:00:00Z",
+    "review_checkpoints": [
+      "2026-07-31T00:00:00Z",
+      "2026-08-10T00:00:00Z"
+    ]
+  },
+  "applicability_conditions": [
+    "Only the frozen synthetic cohort and stated cutoff are covered."
+  ],
+  "disconfirming_conditions": [
+    "Comparable synthetic episodes show no association under the stated conditions."
+  ],
+  "stop_conditions": [
+    "Exact source lineage becomes unavailable."
+  ],
+  "expiry_at": "2026-08-21T00:00:00Z",
+  "missing_evidence_policy": {
+    "on_missing": "preserve_missing",
+    "on_partial": "preserve_partial",
+    "on_ambiguous": "preserve_ambiguous",
+    "allow_inference": false
+  },
+  "privacy_scope": {
+    "data_classification": "synthetic",
+    "allowed_source_kinds": [
+      "synthetic_stage1_artifact"
+    ],
+    "prohibited_data_kinds": [
+      "broker_export",
+      "credentials",
+      "order_execution",
+      "portfolio_sqlite"
+    ],
+    "contains_direct_identifiers": false
+  },
+  "provenance": {
+    "submitter_kind": "agent_assisted",
+    "human_confirmed": true,
+    "source_locator": "tests/fixtures/investment_review_p2h_stage2/protocol_draft.json",
+    "tool_version": "p2h.observation_protocol.builder.v1"
+  }
+}

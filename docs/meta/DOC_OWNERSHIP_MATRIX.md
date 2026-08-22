@@ -33,6 +33,10 @@
 | cross-run current pointer | `config/r5_readout_canonical_index.yaml.current_runs` | README 和文档索引只链接 pointer，不复制当前 workflow ID/status；历史 R5 readout 目录不得选择 current run。 |
 | handoff packet format | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | skill 可补充本 skill 的 handoff 要求。 |
 | source rank / citation principle | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | evidence-ingest references 承担字段级执行契约。 |
+| 个人高风险权益账户定性原则 | `docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` | AGENTS / Investment Review skill 只能引用；不得转写为机器阈值。`C-HUMAN-005` 仍为 `pending` / `null`。 |
+| Portfolio 操作与账务边界 | `.agents/skills/portfolio-tracker/SKILL.md` | playbook 只给操作提示；不得把账务事实写成研究结论或交易建议。 |
+| Investment Review advice gate | `AGENTS.md` + `.agents/skills/investment-review/SKILL.md` | 普通复盘保持 `observation_only`；期限、风险预算与仓位约束必须来自当次显式用户输入。 |
+| Review source mapping provenance | 本地 Git-ignored generated / reviewed mapping + 本次真实人工复核 | 不提交正式库路径、schema receipt 或历史 hash；缺失时能力 unavailable，不得回退到旧报告。 |
 | quality issue schema | `.agents/skills/quality-review/references/issue_schema.md` | skill 与 policy 只消费该字段合同；不得创造全局 gate id。 |
 | stock report production profile | `.agents/skills/stock-deep-dive/references/report_production_profile.md` | 不得作为平级 workflow。 |
 | local check to global gate mapping | 对应 capability-local evaluator reference | `RESEARCH_WORKFLOW.md` 只持有通用映射原则与 canonical G0–G10；各 reference 持有本 capability 的 local ID 和映射，不得产生第二套 global gate。 |
@@ -42,14 +46,16 @@
 
 | 文件 / 目录 | 主职责 | 不应包含 | 上位文件 |
 |---|---|---|---|
-| `AGENTS.md` | repo-level 规则、证据纪律、no-advice、安全边界、完成门槛 | 完整目录百科、完整 workflow 阶段表、长期计划全文 | system / project instructions |
+| `AGENTS.md` | repo-level 规则、证据纪律、三产品边界、安全边界、完成门槛 | 完整目录百科、完整 workflow 阶段表、长期计划全文 | system / project instructions |
 | `README.md` | 给人看的快速入口、当前阶段摘要、核心链接 | 大段规则、完整路线图、长表格 | `AGENTS.md` |
 | `docs/index.md` | 文档导航 | 规则正文、计划正文、workflow 阶段表 | `AGENTS.md` |
 | `docs/project/PROJECT_CHARTER.md` | 项目使命、范围、非目标、阶段框架 | skill 细节、具体执行任务 | `AGENTS.md` |
 | `docs/architecture/WORKSPACE_STRUCTURE.md` | 文件放置、目录结构、命名规则 | workflow 阶段细节、报告表达标准 | `AGENTS.md` |
 | `docs/architecture/RESEARCH_OBJECT_MODEL.md` | Segment / Company / Evidence / Claim / Metric 等对象模型 | 具体报告模板、阶段计划 | `AGENTS.md` |
 | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | evidence / claim / citation / freshness / conflict rules | workflow 编排细节、样例报告语言风格 | `AGENTS.md` |
-| `docs/policies/QUALITY_GUARDRAILS.md` | 质量门原则、反幻觉、反证、no-advice | 具体工作流执行步骤、全局 gate id 表 | `AGENTS.md` |
+| `docs/policies/QUALITY_GUARDRAILS.md` | 质量门原则、反幻觉、反证、Research no-advice 与 Review 建议边界 | 具体工作流执行步骤、全局 gate id 表 | `AGENTS.md` |
+| `docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` | 已确认的十项人类可读定性原则 | 机器 schema、固定参数、自动动作或 P10 建议阈值 | `AGENTS.md` |
+| `docs/contracts/INVESTMENT_REVIEW_*.schema.json`、`P2*.schema.json` | Investment Review 数据合同 | 阶段完成结论、建议授权、Research gate | `AGENTS.md` + `investment-review` skill |
 | `docs/workflows/RESEARCH_WORKFLOW.md` | 全局 workflow kernel | 阶段计划、执行日志、skill 局部实现细节 | `AGENTS.md` |
 | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | orchestrator 运行时状态、路由、handoff、门禁调度 | 新增全局 workflow_type、stage_id 或 gate_id | `RESEARCH_WORKFLOW.md` |
 | `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层 source adapter、manifest、candidate、data pack、局部 DL checks | 投研结论、报告写作风格、全局 gate id 定义 | `RESEARCH_WORKFLOW.md` |
@@ -62,6 +68,7 @@
 | `docs/codex_tasks/` | 给 Codex 的一次性任务说明 | 永久规则、当前事实源 | plans / workflow docs |
 | `docs/logs/` | 执行记录、readout、历史 closeout | 新规则定义 | current docs |
 | `.agents/skills/<skill>/SKILL.md` | 单个 skill 的触发、输入、输出、边界、guardrails | 项目总路线图、其它 skill 的完整契约、全局接口定义 | workflow docs |
+| `docs/meta/PORTFOLIO_REVIEW_INTEGRATION_DEPENDENCY_ALLOWLIST.md` | 选择性集成与后续文档清理的依赖/保留/排除边界 | 产品运行规则、历史完成状态 | `AGENTS.md` + 本矩阵 |
 
 ## 重复内容处理规则
 
@@ -76,6 +83,9 @@
 | 数据下载 / source adapter | `DATA_LAYER_WORKFLOW.md` + evidence-ingest references | stock-deep-dive 不直接定义下载器。 |
 | 个股报告 production profile | `stock-deep-dive/references/report_production_profile.md` | workflow docs 只指针，不复制阶段表。 |
 | 最终报告人工审核 | `RESEARCH_WORKFLOW.md` + workflow-state / final-review schema | R5、Reader、Bundle、Night 和 skill docs 只引用，不得要求中间人审或迁移历史 reviewer。 |
+| Portfolio 账务规则 | `portfolio-tracker/SKILL.md` + `PORTFOLIO_TRACKER.md` | Research 文档不复制账务公式或私有数据库操作。 |
+| Review 建议权限 | `AGENTS.md` + `investment-review/SKILL.md` | 章程、playbook、报告和 schema 不得自行授权 advice。 |
+| C-HUMAN-005 | `pending` / `null` 人工边界 | 不从回报目标、P10、历史报告或测试样本推导数值。 |
 | 阶段计划 | `docs/plans/` | README 只写当前阶段一句话。 |
 
 ## 个股 skill 合并状态

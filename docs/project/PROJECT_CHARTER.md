@@ -19,11 +19,14 @@ A-share Research OS 是一个证据驱动的 A 股投研工作区。它的目标
 - 维护投研流程：细分研究、公司池、个股深度、横向比较、刷新维护、质量审查。
 - 维护研究产物：报告、评分卡、对比矩阵、证据地图、观察清单、备忘录、复盘。
 - 维护不确定性：缺失数据、低置信度、反证、风险、过期结论必须显性化。
+- 通过独立 Portfolio utility 维护本地账务事实，通过独立 Investment Review
+  对这些事实做复盘；二者不改变 Research workflow 的事实源和门禁。
 
 ### 2.2 系统不负责
 
-- 不生成直接买入、卖出、持有建议。
-- 不承诺自动交易。
+- Research 与 Portfolio 不生成直接买入、卖出、持有或仓位建议；Investment Review
+  仅在 `AGENTS.md` 规定的当次显式输入齐备时处理个性化建议。
+- 不连接券商，不执行订单，不保证收益。
 - 不在 P0 实现复杂数据库。
 - 不在 P0 做全市场扫描。
 - 不在 P0 做自动估值模型。
@@ -152,6 +155,8 @@ decisions/postmortems/
 | 比较体系 | 细分比较、个股比较、优先级排序 | P2 |
 | 更新体系 | 新证据、旧结论、评分变化、报告刷新 | P3 |
 | 质量体系 | 证据检查、口径检查、反证检查、复盘 | P0-P3 |
+| Portfolio utility | 私有持仓、现金、成本、行情和盈亏事实 | 独立产品，不属于 P0-P3 Research stages |
+| Investment Review utility | 只读消费 Portfolio、写 sidecar、默认 observation-only | 独立产品，不属于 Research workflow_type |
 
 ---
 

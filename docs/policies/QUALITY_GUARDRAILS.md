@@ -31,7 +31,7 @@
 | 过期证据 | 可能过期的证据标记 `stale` |
 | 多对多映射 | 个股与细分关系使用 exposure 记录 |
 | 更新记录 | 新证据导致变化时输出 change log |
-| Research 投资边界 | Research 产出不给出直接买卖建议 |
+| 投资边界 | Research 永久无直接交易建议；Portfolio 只陈述事实；Investment Review 只有在显式当前输入齐备时才可给建议 |
 
 ---
 
@@ -277,7 +277,7 @@ watchlist 是否变化？
 
 ---
 
-## 11. Research 产出不构成投资建议
+## 11. Research、Portfolio 与 Investment Review 的边界
 
 所有 Research 工作流产出都应默认包含研究边界：
 
@@ -297,3 +297,22 @@ watchlist 是否变化？
 - 明确交易价位指令
 - 保证收益判断
 - 无风险表述
+
+Portfolio 只负责账务记录、对账、持仓、现金、成本、收益和行情等可验证事实。
+它不推断交易动机，不生成个性化交易动作或目标仓位，也不把 Portfolio 行业标签
+回写为 Research exposure。
+
+独立的 `investment-review` 可以解释 Portfolio 事实、生成明确标注的动机假设并复盘
+操作，但普通周期报告必须保持 `observation_only`。只有当用户在当前请求中明确要求
+advice，并提供当前投资期限、风险预算及与本次建议有关的仓位或组合约束时，Review
+才可以生成个性化动作或建议仓位。系统默认、历史实验参数、推断出的偏好、收益目标和
+人类可读章程都不能替代这些输入。
+
+缺少任何必需输入或证据不足时，Review 的 `action` 和 `target_position` 必须为空；
+可以说明事实、变化、风险、场景和待确认问题，但不能以 `buy`、`sell`、`hold`、
+`add`、`reduce`、`exit` 的形式给出建议。允许给建议时，也必须把事实、动机推断和
+建议分开，标明数据截止时间、依据、风险、失效条件与重要缺失。
+
+`docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` 只提供人类判断边界。
+`C-HUMAN-005` 保持 `pending` / `null`；不得从 P10、30%、35% 或任何回报目标生成
+自动回撤、仓位或减风险规则。任何产品都不得连接券商、执行订单或保证收益。

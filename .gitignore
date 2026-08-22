@@ -15,6 +15,9 @@ __pycache__/
 .venv/
 venv/
 
+# Node
+node_modules/
+
 # Jupyter
 .ipynb_checkpoints/
 
@@ -33,11 +36,25 @@ docs/references/project_learning/
 *.parquet.tmp
 data/db/*.duckdb
 data/db/*.duckdb.wal
+data/db/*.sqlite3
+data/db/*.sqlite3-*
+data/db/*.csv
+data/db/*.xlsx
+data/db/*.xls
+data/db/broker_statements_*/
+data/db/cost_reconciliation_*/
 data/processed/embeddings/*
 !data/processed/embeddings/.gitkeep
 data/db/vector.index
 reports/workflow_runs/**/.tmp_mineru_output/
+reports/investment_review/
 *_patch.zip
+
+# Local Investment Review mappings are generated from a private read-only
+# source and must not be committed.
+config/investment_review.local.json
+config/investment_review.portfolio.generated.json
+config/investment_review.portfolio.reviewed.json
 
 # Secrets / tokens
 secrets/

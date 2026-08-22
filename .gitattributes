@@ -5,6 +5,10 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.toml text eol=lf
+src/portfolio/frontend/index.html text eol=lf
+src/portfolio/web_assets/index.html text eol=lf
+src/portfolio/web_assets/app.css text eol=lf
+src/portfolio/web_assets/app.js text eol=lf
 
 # Bundle 13R evidence files carry SHA256-bound source bytes or are derived
 # receipts for those sources. Keep their checkout representation stable.

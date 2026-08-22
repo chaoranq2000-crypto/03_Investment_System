@@ -1,0 +1,557 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/p2g.behavior_hypothesis_ledger.v1.schema.json",
+  "title": "Deterministic behavior hypothesis ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "content_id",
+    "ledger_id",
+    "source_revisions",
+    "entries",
+    "active_fingerprint_ids",
+    "audit_fingerprint_ids",
+    "counts",
+    "release_readiness",
+    "source_verification",
+    "canonicalization"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "p2g.behavior_hypothesis_ledger.v1"
+    },
+    "artifact_type": {
+      "const": "behavior_hypothesis_ledger"
+    },
+    "content_id": {
+      "$ref": "#/$defs/contentId"
+    },
+    "ledger_id": {
+      "type": "string",
+      "pattern": "^behavior-hypothesis-ledger:[0-9a-f]{32}$"
+    },
+    "source_revisions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/sourceRevision"
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/ledgerEntry"
+      }
+    },
+    "active_fingerprint_ids": {
+      "$ref": "#/$defs/fingerprintIdSet"
+    },
+    "audit_fingerprint_ids": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/fingerprintIdSet"
+        },
+        {
+          "minItems": 1
+        }
+      ]
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_chain_count",
+        "source_revision_count",
+        "fingerprint_count",
+        "occurrence_count",
+        "active_fingerprint_count",
+        "proposed_occurrence_count",
+        "accepted_occurrence_count",
+        "rejected_occurrence_count",
+        "superseded_occurrence_count"
+      ],
+      "properties": {
+        "source_chain_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "source_revision_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "fingerprint_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "occurrence_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "active_fingerprint_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "proposed_occurrence_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "accepted_occurrence_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "rejected_occurrence_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        },
+        "superseded_occurrence_count": {
+          "$ref": "#/$defs/nonNegativeInteger"
+        }
+      }
+    },
+    "release_readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "blocker_codes"
+      ],
+      "properties": {
+        "status": {
+          "const": "ready"
+        },
+        "blocker_codes": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "source_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "validation_mode",
+        "verified_revision_content_ids",
+        "verified_observation_content_ids"
+      ],
+      "properties": {
+        "status": {
+          "const": "verified"
+        },
+        "validation_mode": {
+          "const": "p2g4_revision_chain_source_replay"
+        },
+        "verified_revision_content_ids": {
+          "$ref": "#/$defs/contentIdSet"
+        },
+        "verified_observation_content_ids": {
+          "$ref": "#/$defs/contentIdSet"
+        }
+      }
+    },
+    "canonicalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "builder_version",
+        "canonical_json",
+        "content_hash",
+        "sort_version",
+        "fingerprint_version"
+      ],
+      "properties": {
+        "builder_version": {
+          "const": "p2g.behavior_hypothesis_ledger.builder.v1"
+        },
+        "canonical_json": {
+          "const": "utf8_nfc_sorted_keys_compact_no_float"
+        },
+        "content_hash": {
+          "const": "sha256"
+        },
+        "sort_version": {
+          "const": "p2g.behavior_hypothesis_ledger_sort.v1"
+        },
+        "fingerprint_version": {
+          "const": "p2g.behavior_hypothesis_fingerprint.v1"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nonNegativeInteger": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "contentId": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "contentIdSet": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/contentId"
+      }
+    },
+    "hypothesisId": {
+      "type": "string",
+      "pattern": "^hypothesis:[0-9a-f]{32}$"
+    },
+    "evaluationId": {
+      "type": "string",
+      "pattern": "^evaluation:[0-9a-f]{32}$"
+    },
+    "fingerprintId": {
+      "type": "string",
+      "pattern": "^hypothesis-fingerprint:[0-9a-f]{32}$"
+    },
+    "fingerprintIdSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/fingerprintId"
+      }
+    },
+    "stringSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "nonEmptyStringSet": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/stringSet"
+        },
+        {
+          "minItems": 1
+        }
+      ]
+    },
+    "revisionLineageItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision_no",
+        "content_id",
+        "parent_content_id",
+        "request_id"
+      ],
+      "properties": {
+        "revision_no": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "parent_content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "request_id": {
+          "type": "string",
+          "pattern": "^review-request:[0-9a-f]{32}$"
+        }
+      }
+    },
+    "sourceRevision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision_chain_id",
+        "head_content_id",
+        "head_revision_no",
+        "root_hypothesis_set_content_id",
+        "source_observation_content_id",
+        "source_observation_set_id",
+        "revision_lineage"
+      ],
+      "properties": {
+        "revision_chain_id": {
+          "type": "string",
+          "pattern": "^hypothesis-revision-chain:[0-9a-f]{32}$"
+        },
+        "head_content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "head_revision_no": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "root_hypothesis_set_content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "source_observation_content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "source_observation_set_id": {
+          "type": "string",
+          "pattern": "^observation-set:[0-9a-f]{32}$"
+        },
+        "revision_lineage": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/revisionLineageItem"
+          }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "episode_ids",
+        "start_at",
+        "end_at",
+        "market_contexts"
+      ],
+      "properties": {
+        "episode_ids": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "start_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "end_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "market_contexts": {
+          "$ref": "#/$defs/stringSet"
+        }
+      }
+    },
+    "hypothesisPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "scope",
+        "evaluation_refs",
+        "supporting_reasons",
+        "counterevidence_evaluation_refs",
+        "counterevidence_search",
+        "alternative_explanations",
+        "assumptions",
+        "uncertainty_notes",
+        "falsification_conditions",
+        "next_observations_needed",
+        "temporal_perspective",
+        "warning_codes",
+        "guardrail_flags"
+      ],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "evaluation_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/evaluationId"
+          }
+        },
+        "supporting_reasons": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "counterevidence_evaluation_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/evaluationId"
+          }
+        },
+        "counterevidence_search": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "alternative_explanations": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "assumptions": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "uncertainty_notes": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "falsification_conditions": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "next_observations_needed": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "temporal_perspective": {
+          "const": "retrospective"
+        },
+        "warning_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "const": "insufficient_repeat_evidence"
+          }
+        },
+        "guardrail_flags": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "reviewHistoryItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "review_event_id",
+        "request_id",
+        "actor",
+        "reviewed_at",
+        "action",
+        "reason",
+        "target_hypothesis_id",
+        "result_hypothesis_id"
+      ],
+      "properties": {
+        "review_event_id": {
+          "type": "string",
+          "pattern": "^hypothesis-review-event:[0-9a-f]{32}$"
+        },
+        "request_id": {
+          "type": "string",
+          "pattern": "^review-request:[0-9a-f]{32}$"
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "action": {
+          "enum": [
+            "accept",
+            "reject",
+            "correct"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_hypothesis_id": {
+          "$ref": "#/$defs/hypothesisId"
+        },
+        "result_hypothesis_id": {
+          "$ref": "#/$defs/hypothesisId"
+        }
+      }
+    },
+    "occurrence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "occurrence_id",
+        "revision_chain_id",
+        "head_content_id",
+        "hypothesis_id",
+        "lineage_root_hypothesis_id",
+        "supersedes_hypothesis_id",
+        "status",
+        "source_hypothesis_set_content_id",
+        "source_observation_content_id",
+        "review_history"
+      ],
+      "properties": {
+        "occurrence_id": {
+          "type": "string",
+          "pattern": "^hypothesis-occurrence:[0-9a-f]{32}$"
+        },
+        "revision_chain_id": {
+          "type": "string",
+          "pattern": "^hypothesis-revision-chain:[0-9a-f]{32}$"
+        },
+        "head_content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "hypothesis_id": {
+          "$ref": "#/$defs/hypothesisId"
+        },
+        "lineage_root_hypothesis_id": {
+          "$ref": "#/$defs/hypothesisId"
+        },
+        "supersedes_hypothesis_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/hypothesisId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "accepted",
+            "rejected",
+            "superseded"
+          ]
+        },
+        "source_hypothesis_set_content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "source_observation_content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "review_history": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/reviewHistoryItem"
+          }
+        }
+      }
+    },
+    "ledgerEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fingerprint_id",
+        "hypothesis",
+        "occurrences"
+      ],
+      "properties": {
+        "fingerprint_id": {
+          "$ref": "#/$defs/fingerprintId"
+        },
+        "hypothesis": {
+          "$ref": "#/$defs/hypothesisPayload"
+        },
+        "occurrences": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/occurrence"
+          }
+        }
+      }
+    }
+  }
+}

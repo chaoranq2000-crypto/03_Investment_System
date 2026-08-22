@@ -1,0 +1,577 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/contracts/p2g.behavior_hypothesis_revision.v1.schema.json",
+  "title": "P2G-4 immutable behavior hypothesis revision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "content_id",
+    "revision_chain_id",
+    "revision",
+    "source_hypothesis_set",
+    "source_observation_set",
+    "evaluation_inventory",
+    "model_provenance",
+    "hypotheses",
+    "review_events",
+    "warnings",
+    "release_readiness",
+    "source_verification",
+    "canonicalization"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "p2g.behavior_hypothesis_revision.v1"
+    },
+    "artifact_type": {
+      "const": "behavior_hypothesis_revision"
+    },
+    "content_id": {
+      "$ref": "#/$defs/contentId"
+    },
+    "revision_chain_id": {
+      "type": "string",
+      "pattern": "^hypothesis-revision-chain:[0-9a-f]{32}$"
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revision_no",
+        "parent_content_id",
+        "root_hypothesis_set_content_id",
+        "request_id"
+      ],
+      "properties": {
+        "revision_no": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "parent_content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "root_hypothesis_set_content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "request_id": {
+          "$ref": "#/$defs/requestId"
+        }
+      }
+    },
+    "source_hypothesis_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "hypothesis_set_id",
+        "content_id"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "p2g.behavior_hypothesis_set.v1"
+        },
+        "hypothesis_set_id": {
+          "type": "string",
+          "pattern": "^hypothesis-set:[0-9a-f]{32}$"
+        },
+        "content_id": {
+          "$ref": "#/$defs/contentId"
+        }
+      }
+    },
+    "source_observation_set": {
+      "$ref": "#/$defs/sourceObservationSet"
+    },
+    "evaluation_inventory": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/evaluationInventoryItem"
+      }
+    },
+    "model_provenance": {
+      "$ref": "#/$defs/modelProvenance"
+    },
+    "hypotheses": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/revisionHypothesis"
+      }
+    },
+    "review_events": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/reviewEvent"
+      }
+    },
+    "warnings": {
+      "$ref": "#/$defs/stringSet"
+    },
+    "release_readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "blocker_codes"
+      ],
+      "properties": {
+        "status": {
+          "const": "ready"
+        },
+        "blocker_codes": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "source_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "validation_mode",
+        "verified_content_id"
+      ],
+      "properties": {
+        "status": {
+          "const": "verified"
+        },
+        "validation_mode": {
+          "const": "p2g3_source_replay"
+        },
+        "verified_content_id": {
+          "$ref": "#/$defs/contentId"
+        }
+      }
+    },
+    "canonicalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "builder_version",
+        "canonical_json",
+        "content_hash",
+        "sort_version"
+      ],
+      "properties": {
+        "builder_version": {
+          "const": "p2g.behavior_hypothesis_revision.builder.v1"
+        },
+        "canonical_json": {
+          "const": "utf8_nfc_sorted_keys_compact_no_float"
+        },
+        "content_hash": {
+          "const": "sha256"
+        },
+        "sort_version": {
+          "const": "p2g.behavior_hypothesis_revision_sort.v1"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "contentId": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "requestId": {
+      "type": "string",
+      "pattern": "^review-request:[0-9a-f]{32}$"
+    },
+    "hypothesisId": {
+      "type": "string",
+      "pattern": "^hypothesis:[0-9a-f]{32}$"
+    },
+    "evaluationId": {
+      "type": "string",
+      "pattern": "^evaluation:[0-9a-f]{32}$"
+    },
+    "stringSet": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "nonEmptyStringSet": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/stringSet"
+        },
+        {
+          "minItems": 1
+        }
+      ]
+    },
+    "sourceTemporalScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "effective_from",
+        "effective_to",
+        "knowledge_cutoff"
+      ],
+      "properties": {
+        "effective_from": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "effective_to": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "effective_anchor": {
+          "enum": [
+            "episode_opened_at",
+            "episode_closed_at"
+          ]
+        },
+        "knowledge_cutoff": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "filters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "account_ids",
+            "instrument_ids"
+          ],
+          "properties": {
+            "account_ids": {
+              "$ref": "#/$defs/stringSet"
+            },
+            "instrument_ids": {
+              "$ref": "#/$defs/stringSet"
+            }
+          }
+        }
+      }
+    },
+    "sourceObservationSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "observation_set_id",
+        "content_id",
+        "release_readiness",
+        "source_verification",
+        "temporal_scope"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "p2g.behavior_observation_set.v1"
+        },
+        "observation_set_id": {
+          "type": "string",
+          "pattern": "^observation-set:[0-9a-f]{32}$"
+        },
+        "content_id": {
+          "$ref": "#/$defs/contentId"
+        },
+        "release_readiness": {
+          "const": "ready"
+        },
+        "source_verification": {
+          "const": "verified"
+        },
+        "temporal_scope": {
+          "$ref": "#/$defs/sourceTemporalScope"
+        }
+      }
+    },
+    "evaluationInventoryItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evaluation_id",
+        "evaluation_sha256",
+        "detector_id",
+        "detector_version",
+        "status",
+        "reason_codes",
+        "episode_ids",
+        "review_ids"
+      ],
+      "properties": {
+        "evaluation_id": {
+          "$ref": "#/$defs/evaluationId"
+        },
+        "evaluation_sha256": {
+          "$ref": "#/$defs/contentId"
+        },
+        "detector_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detector_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "not_observed",
+            "insufficient_evidence",
+            "not_comparable",
+            "not_applicable"
+          ]
+        },
+        "reason_codes": {
+          "$ref": "#/$defs/stringSet"
+        },
+        "episode_ids": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "review_ids": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        }
+      }
+    },
+    "modelProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_id",
+        "generated_at",
+        "response_sha256"
+      ],
+      "properties": {
+        "model_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "response_sha256": {
+          "$ref": "#/$defs/contentId"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "episode_ids",
+        "start_at",
+        "end_at",
+        "market_contexts"
+      ],
+      "properties": {
+        "episode_ids": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "start_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "end_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "market_contexts": {
+          "$ref": "#/$defs/stringSet"
+        }
+      }
+    },
+    "revisionHypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hypothesis_id",
+        "lineage_root_hypothesis_id",
+        "supersedes_hypothesis_id",
+        "status",
+        "statement",
+        "scope",
+        "evaluation_refs",
+        "supporting_reasons",
+        "counterevidence_evaluation_refs",
+        "counterevidence_search",
+        "alternative_explanations",
+        "assumptions",
+        "uncertainty_notes",
+        "falsification_conditions",
+        "next_observations_needed",
+        "temporal_perspective",
+        "warning_codes",
+        "guardrail_flags"
+      ],
+      "properties": {
+        "hypothesis_id": {
+          "$ref": "#/$defs/hypothesisId"
+        },
+        "lineage_root_hypothesis_id": {
+          "$ref": "#/$defs/hypothesisId"
+        },
+        "supersedes_hypothesis_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/hypothesisId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "proposed",
+            "accepted",
+            "rejected",
+            "superseded"
+          ]
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "evaluation_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/evaluationId"
+          }
+        },
+        "supporting_reasons": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "counterevidence_evaluation_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/evaluationId"
+          }
+        },
+        "counterevidence_search": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "alternative_explanations": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "assumptions": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "uncertainty_notes": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "falsification_conditions": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "next_observations_needed": {
+          "$ref": "#/$defs/nonEmptyStringSet"
+        },
+        "temporal_perspective": {
+          "const": "retrospective"
+        },
+        "warning_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "const": "insufficient_repeat_evidence"
+          }
+        },
+        "guardrail_flags": {
+          "type": "array",
+          "maxItems": 0
+        }
+      }
+    },
+    "reviewEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "review_event_id",
+        "request_id",
+        "actor",
+        "reviewed_at",
+        "action",
+        "reason",
+        "target_hypothesis_id",
+        "result_hypothesis_id",
+        "target_status_before",
+        "target_status_after",
+        "result_status"
+      ],
+      "properties": {
+        "review_event_id": {
+          "type": "string",
+          "pattern": "^hypothesis-review-event:[0-9a-f]{32}$"
+        },
+        "request_id": {
+          "$ref": "#/$defs/requestId"
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "action": {
+          "enum": [
+            "accept",
+            "reject",
+            "correct"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_hypothesis_id": {
+          "$ref": "#/$defs/hypothesisId"
+        },
+        "result_hypothesis_id": {
+          "$ref": "#/$defs/hypothesisId"
+        },
+        "target_status_before": {
+          "enum": [
+            "proposed",
+            "accepted",
+            "rejected"
+          ]
+        },
+        "target_status_after": {
+          "enum": [
+            "accepted",
+            "rejected",
+            "superseded"
+          ]
+        },
+        "result_status": {
+          "enum": [
+            "proposed",
+            "accepted",
+            "rejected"
+          ]
+        }
+      }
+    }
+  }
+}
