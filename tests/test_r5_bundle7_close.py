@@ -112,15 +112,25 @@ def test_canonical_indexes_supersede_bundle6_and_activate_bundle7_close() -> Non
     index_yaml = yaml.safe_load(
         (ROOT / "config/r5_readout_canonical_index.yaml").read_text(encoding="utf-8")
     )
-    entries = {row["path"]: row for row in index_yaml["readouts"]}
+    retention = yaml.safe_load(
+        (
+            ROOT
+            / "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml"
+        ).read_text(encoding="utf-8")
+    )
+    entries = {
+        item["path"]: item
+        for group in retention["candidate_groups"]
+        for item in group["items"]
+    }
 
     assert f"| `{BUNDLE6_CLOSE}` | `superseded` | `false` |" in index_md
     assert f"| `{BUNDLE7_CLOSE}` | `canonical` | `true` |" in index_md
-    assert entries[BUNDLE6_CLOSE]["canonical_status"] == "superseded"
-    assert entries[BUNDLE6_CLOSE]["blocking_for_strict_smoke"] is False
-    assert entries[BUNDLE6_CLOSE]["replacement_or_supplement_path"] == BUNDLE7_CLOSE
-    assert entries[BUNDLE7_CLOSE]["canonical_status"] == "canonical"
-    assert entries[BUNDLE7_CLOSE]["blocking_for_strict_smoke"] is True
+    assert "readouts" not in index_yaml
+    assert entries[BUNDLE6_CLOSE]["historical_relation"] == "superseded"
+    assert entries[BUNDLE6_CLOSE]["replacement_path"] == BUNDLE7_CLOSE
+    assert entries[BUNDLE7_CLOSE]["historical_relation"] == "historical_canonical"
+    assert entries[BUNDLE7_CLOSE]["replacement_path"] is None
 
 
 def test_close_readout_contains_auditable_execution_and_hard_boundaries() -> None:

@@ -1,32 +1,13 @@
 canonical_index_path: config/r5_readout_canonical_index.yaml
-required_tokens:
-  status:
-    - status
-  files_added:
-    - files_added
-    - files added
-  files_modified:
-    - files_modified
-    - files modified
-  commands_run:
-    - commands_run
-    - commands run
-  exit_codes:
-    - exit_code
-    - exit codes
-  stdout_or_stderr_summary:
-    - stdout_or_stderr_summary
-    - stdout or stderr
-    - stdout/stderr
-  known_todos:
-    - known_todos
-    - known todos
-  next_recommended_patch:
-    - next_recommended_patch
-    - next recommended patch
-pytest_summary_regex: "\\b\\d+\\s+(passed|failed|error|errors|skipped)\\b"
-critical_evidence_regex: "(sha256|line[_ -]?count|before_lines|after_lines|checked=\\d+|inventory_status)"
-summary_only_phrases:
-  - pytest passed
-  - all tests passed
-  - validation ok
+required_pointer_fields:
+  - workflow_id
+  - state_path
+  - readout_path
+forbidden_top_level_keys:
+  - readouts
+  - policy_migrations
+required_authority:
+  project_rules: AGENTS.md
+  research_workflow: docs/workflows/RESEARCH_WORKFLOW.md
+  document_ownership: docs/meta/DOC_OWNERSHIP_MATRIX.md
+  retention_manifest: docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml

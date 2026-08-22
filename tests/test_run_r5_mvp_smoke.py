@@ -68,15 +68,35 @@ def test_write_json_creates_report(tmp_path: Path):
     assert '"status": "pass"' in path.read_text(encoding="utf-8")
 
 
-def test_default_steps_adds_strict_to_advisory_gates():
+def test_default_steps_use_only_current_control_plane_inputs():
     runner = load_runner()
     steps = runner.default_steps(sys.executable, strict=True)
-    inventory = next(step for step in steps if step["name"] == "r5_patch_inventory_check")
-    truthfulness = next(step for step in steps if step["name"] == "r5_readout_truthfulness_gate")
+    truthfulness = next(
+        step for step in steps if step["name"] == "current_pointer_truthfulness"
+    )
+    source_route = next(
+        step for step in steps if step["name"] == "source_route_quality"
+    )
 
-    assert "--strict" in inventory["command"]
     assert "--strict" in truthfulness["command"]
-    assert "--json" in truthfulness["command"]
+    assert source_route["artifact_outputs"] == [
+        "reports/quality/source_route_quality_report.yaml"
+    ]
+    serialized = "\n".join(" ".join(step["command"]) for step in steps)
+    assert "config/r5_readout_canonical_index.yaml" not in serialized
+    assert "r5_patch_1_12_expected_artifacts" not in serialized
+    assert "reports/p1_6/R5_PATCH_" not in serialized
+    assert "historical_cleanup" not in serialized
+    assert {step["name"] for step in steps} == {
+        "r5_artifact_format_guard",
+        "doc_drift",
+        "current_pointer_truthfulness",
+        "current_workflow_state",
+        "source_route_quality",
+        "active_routing_retirement",
+        "research_pack_contracts",
+        "current_research_fixture_smoke",
+    }
 
 
 def test_emit_report_writes_stderr(capsys):

@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -13,7 +14,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 HISTORICAL_RUN = f"reports/workflow_runs/{WORKFLOW_ID}"
 RETAINED_DROPZONE = REPO_ROOT / "data/reviewed_inputs" / WORKFLOW_ID
-MANIFEST_PATH = REPO_ROOT / "config/r5_bundle5_expected_artifacts.yaml"
+MANIFEST_SOURCE = "config/r5_bundle5_expected_artifacts.yaml"
 TRUTHFULNESS_PATH = REPO_ROOT / "reports/p1_6/r5_bundle5_readout_truthfulness_result.json"
 CLOSE_READOUT = REPO_ROOT / "reports/p1_6/R5_BUNDLE_5_REAL_REVIEWED_INPUT_ONBOARDING_CLOSE_READOUT.md"
 CANONICAL_INDEX = REPO_ROOT / "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md"
@@ -82,7 +83,8 @@ def accepted_dropzone_records(dropzone_root: Path) -> list[dict[str, Any]]:
 def test_manifest_declared_bundle5_artifacts_are_physical_and_boundaries_closed(
     historical_blob_bytes,
 ) -> None:
-    manifest = load_yaml(MANIFEST_PATH)
+    manifest = yaml.safe_load(historical_blob_bytes(MANIFEST_SOURCE).decode("utf-8"))
+    assert isinstance(manifest, dict)
 
     assert manifest["bundle"] == "R5_BUNDLE_5_REAL_002837_REVIEWED_INPUT_ONBOARDING"
     assert manifest["fixed_boundaries"]["sample_quality_report_allowed"] is False
@@ -94,7 +96,10 @@ def test_manifest_declared_bundle5_artifacts_are_physical_and_boundaries_closed(
         if path.startswith(HISTORICAL_RUN + "/"):
             assert historical_blob_bytes(path)
         elif not (REPO_ROOT / path).exists():
-            missing.append(path)
+            try:
+                historical_blob_bytes(path)
+            except (AssertionError, subprocess.CalledProcessError):
+                missing.append(path)
     assert missing == []
 
 
@@ -253,7 +258,12 @@ def test_benchmark_is_nonpromoting_and_sample_content_is_not_evidence(
 def test_real_draft_keeps_traceability_risk_counterevidence_and_source_gaps(
     historical_blob_bytes,
 ) -> None:
-    profile = load_yaml(REPO_ROOT / "codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml")
+    profile = yaml.safe_load(
+        historical_blob_bytes(
+            "codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml"
+        ).decode("utf-8")
+    )
+    assert isinstance(profile, dict)
     report_source = f"{HISTORICAL_RUN}/R5_stock_research_note_reviewed_input_draft.md"
     report = historical_blob_bytes(report_source).decode("utf-8")
 

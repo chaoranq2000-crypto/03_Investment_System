@@ -49,8 +49,7 @@ def _blocker(blocker_id: str, reason: str, detail: str = "") -> dict[str, str]:
     return {"id": blocker_id, "severity": "high", "reason": reason, "detail": detail}
 
 
-def collect_inputs(repo_root: Path, rules: dict[str, Any]) -> dict[str, Any]:
-    paths = rules["default_paths"]
+def collect_inputs(repo_root: Path, paths: dict[str, str]) -> dict[str, Any]:
     smoke = load_json(repo_root / paths["strict_smoke_result"])
     pack = load_yaml(repo_root / paths["source_gapped_pack"])
     dry_run = load_yaml(repo_root / paths["reviewed_input_dry_run_result"])
@@ -142,13 +141,25 @@ def evaluate_gate(inputs: dict[str, Any], rules: dict[str, Any]) -> dict[str, An
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Evaluate the R5 reviewed-input pilot gate.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
-    parser.add_argument("--rules", type=Path, default=Path("config/r5_reviewed_input_pilot_gate_rules.yaml"))
+    parser.add_argument("--rules", type=Path, required=True)
+    parser.add_argument("--strict-smoke-result", required=True)
+    parser.add_argument("--source-gapped-pack", required=True)
+    parser.add_argument("--reviewed-input-dry-run-result", required=True)
+    parser.add_argument("--quality-scorecard-v2", required=True)
+    parser.add_argument("--promotion-rules", required=True)
     parser.add_argument("--json", type=Path, required=True)
     args = parser.parse_args(argv)
 
     repo_root = args.repo_root.resolve()
     rules = load_yaml(args.rules)
-    result = evaluate_gate(collect_inputs(repo_root, rules), rules)
+    paths = {
+        "strict_smoke_result": args.strict_smoke_result,
+        "source_gapped_pack": args.source_gapped_pack,
+        "reviewed_input_dry_run_result": args.reviewed_input_dry_run_result,
+        "quality_scorecard_v2": args.quality_scorecard_v2,
+        "promotion_rules": args.promotion_rules,
+    }
+    result = evaluate_gate(collect_inputs(repo_root, paths), rules)
     args.json.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(

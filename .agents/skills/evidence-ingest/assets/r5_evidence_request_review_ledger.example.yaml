@@ -1,12 +1,12 @@
 schema_version: r5_evidence_request_review_ledger_v0.1
 artifact_type: R5_evidence_request_review_ledger
-workflow_id: wf_20260703_stock_first_002837_invic
-source_queue_path: reports/workflow_runs/wf_20260703_stock_first_002837_invic/R5_evidence_request_queue.yaml
+workflow_id: wf_example_stock_first_000000
+source_queue_path: reports/workflow_runs/wf_example_stock_first_000000/R5_evidence_request_queue.yaml
 review_status: pending
 no_live_api: true
 items:
-  - request_id: r5_market_snapshot_r5_002837_gap_market_001
-    source_gap_id: R5_002837_GAP_MARKET_001
+  - request_id: r5_market_snapshot_r5_000000_gap_market_001
+    source_gap_id: R5_000000_GAP_MARKET_001
     pack_section: valuation_pack
     review_decision: pending
     evidence_id: null

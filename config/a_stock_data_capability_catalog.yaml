@@ -38,7 +38,7 @@ capabilities:
     primary_adapter_status: live_empty_needs_fix
     approved_alternatives: [tushare_adapter, baostock_adapter]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: mootdx_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -88,7 +88,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [tushare_adapter]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: tencent_quote_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -137,7 +137,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: []
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: eastmoney_report_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -164,7 +164,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: []
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: eastmoney_report_pdf_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -191,7 +191,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: []
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: eastmoney_industry_report_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -218,7 +218,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [eastmoney_report_adapter]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: ths_consensus_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -378,7 +378,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [tushare_adapter]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: eastmoney_capital_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -493,7 +493,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [tushare_adapter]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: eastmoney_capital_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -520,7 +520,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [tushare_adapter]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: eastmoney_capital_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -680,7 +680,7 @@ capabilities:
     primary_adapter_status: transport_failure_needs_fix
     approved_alternatives: [tushare_adapter, tencent_quote_adapter]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: eastmoney_basic_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -707,7 +707,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [tushare_adapter, baostock_adapter]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: sina_financial_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -734,7 +734,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [exchange_fallback_adapter]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: official_disclosure_pull
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -876,7 +876,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [official_disclosure_pull]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: cninfo_irm_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable
@@ -992,7 +992,7 @@ capabilities:
     resolution_type: direct_operational
     approved_alternatives: [official_disclosure_pull]
     proof_paths:
-    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+        - reports/quality/source_route_quality_report.yaml
   target_adapter: exchange_fallback_adapter
   operational_definition:
   - adapter_importable_or_cli_resolvable

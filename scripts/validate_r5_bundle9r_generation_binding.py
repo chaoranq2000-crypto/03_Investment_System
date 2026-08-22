@@ -23,7 +23,7 @@ from src.research.r5_bundle9r_contracts import (  # noqa: E402
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate Bundle 9R evidence-generation binding and reject stale downstream inputs.")
-    parser.add_argument("--binding", default="config/r5_bundle9r_generation_binding.yaml")
+    parser.add_argument("--binding", required=True)
     parser.add_argument("--current-lock", required=True)
     parser.add_argument("--downstream-artifact", action="append", default=[])
     parser.add_argument("--repo-root", default=".")

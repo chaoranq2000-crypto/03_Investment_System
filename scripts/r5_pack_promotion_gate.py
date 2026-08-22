@@ -95,17 +95,14 @@ def evaluate_promotion(pack: dict[str, Any], dry_run: dict[str, Any], rules: dic
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Evaluate R5 pack promotion.")
-    parser.add_argument("--rules", type=Path, default=Path("config/r5_pack_promotion_rules.yaml"))
-    parser.add_argument("--pack", type=Path)
-    parser.add_argument("--dry-run", type=Path)
+    parser.add_argument("--rules", type=Path, required=True)
+    parser.add_argument("--pack", type=Path, required=True)
+    parser.add_argument("--dry-run", type=Path, required=True)
     parser.add_argument("--json", type=Path)
     args = parser.parse_args(argv)
 
     rules = load_yaml(args.rules)
-    paths = rules.get("default_paths", {})
-    pack_path = args.pack or Path(paths["source_gapped_pack"])
-    dry_run_path = args.dry_run or Path(paths["reviewed_input_dry_run"])
-    result = evaluate_promotion(load_yaml(pack_path), load_yaml(dry_run_path), rules)
+    result = evaluate_promotion(load_yaml(args.pack), load_yaml(args.dry_run), rules)
     payload = json.dumps(result, ensure_ascii=False, indent=2)
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)

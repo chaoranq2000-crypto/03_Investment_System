@@ -243,7 +243,7 @@ def test_final_review_marker_requires_active_v1_state_schema(tmp_path: Path) -> 
         "reports/final_report.md ",
         "reports/final?.md",
         ".git/config",
-        "docs/codex_tasks/v1_governance_integration_cleanup_v2/CONTRACT.md",
+        "docs/codex_tasks/retired_governance_contract.md",
         "reports/workflow_runs/example/final_report.md",
         "reports/stocks/000001_test/final_report.yaml",
     ],

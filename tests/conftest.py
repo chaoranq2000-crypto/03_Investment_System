@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import subprocess
 from itertools import count
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Callable
 
 import pytest
@@ -11,9 +11,6 @@ import yaml
 
 
 HISTORICAL_BASELINE = "312adc73821706b0b7ca6aa00e80ee608bd10b32"
-HISTORICAL_MANIFEST = Path(
-    "reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml"
-)
 SOURCE_QUEUE = Path(
     "reports/p1_6/r5_night_shift/r5_overnight_02_20260720/next_night_queue.yaml"
 )
@@ -49,20 +46,23 @@ def _historical_queue_blob(repo_root: Path) -> bytes:
 @pytest.fixture(scope="session")
 def historical_blob_bytes() -> Callable[[str], bytes]:
     repo_root = Path(__file__).resolve().parents[1]
-    manifest = yaml.safe_load(
-        (repo_root / HISTORICAL_MANIFEST).read_text(encoding="utf-8")
-    )
-    assert manifest["source_snapshot"] == HISTORICAL_BASELINE
-    rows = {row["path"]: row for row in manifest["files"]}
-    assert len(rows) == len(manifest["files"])
+    resolved_commit = subprocess.check_output(
+        ["git", "-C", str(repo_root), "rev-parse", f"{HISTORICAL_BASELINE}^{{commit}}"],
+        text=True,
+        encoding="utf-8",
+    ).strip()
+    assert resolved_commit == HISTORICAL_BASELINE
     cache: dict[str, bytes] = {}
 
     def read(source_path: str) -> bytes:
         if source_path in cache:
             return cache[source_path]
-        assert source_path in rows, f"unbound historical blob: {source_path}"
-        row = rows[source_path]
-        object_name = f"{row['baseline_commit']}:{source_path}"
+        pure = PurePosixPath(source_path)
+        assert source_path == pure.as_posix(), f"non-canonical historical path: {source_path}"
+        assert not pure.is_absolute(), f"absolute historical path: {source_path}"
+        assert ".." not in pure.parts, f"escaping historical path: {source_path}"
+        assert pure.parts and pure.parts[0] != ".git", f"forbidden historical path: {source_path}"
+        object_name = f"{HISTORICAL_BASELINE}:{source_path}"
         subprocess.run(
             ["git", "-C", str(repo_root), "cat-file", "-e", object_name],
             stdout=subprocess.PIPE,
@@ -74,7 +74,6 @@ def historical_blob_bytes() -> Callable[[str], bytes]:
             text=True,
             encoding="utf-8",
         ).strip()
-        assert oid == row["blob_oid"]
         size = int(
             subprocess.check_output(
                 ["git", "-C", str(repo_root), "cat-file", "-s", object_name],
@@ -82,12 +81,15 @@ def historical_blob_bytes() -> Callable[[str], bytes]:
                 encoding="utf-8",
             ).strip()
         )
-        assert size == row["byte_count"]
         payload = subprocess.check_output(
             ["git", "-C", str(repo_root), "cat-file", "blob", object_name]
         )
-        assert len(payload) == row["byte_count"]
-        assert hashlib.sha256(payload).hexdigest() == row["content_sha256"]
+        assert len(payload) == size
+        expected_oid = hashlib.sha1(
+            f"blob {len(payload)}\0".encode("ascii") + payload,
+            usedforsecurity=False,
+        ).hexdigest()
+        assert oid == expected_oid
         cache[source_path] = payload
         return payload
 

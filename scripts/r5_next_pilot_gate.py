@@ -138,27 +138,30 @@ def evaluate_gate(
     }
 
 
-def _load_registries(repo_root: Path, rules: dict[str, Any]) -> dict[str, Any]:
-    paths = rules.get("default_paths") or {}
-    loaded: dict[str, Any] = {}
-    for key in ["market_peer_input_registry", "forecast_assumption_registry", "evidence_request_review_ledger"]:
-        path_text = paths.get(key)
-        if not path_text:
-            continue
-        path = repo_root / path_text
-        loaded[key] = load_yaml(path) if path.exists() else {"review_status": "missing"}
-    return loaded
+def _load_registries(paths: dict[str, Path]) -> dict[str, Any]:
+    return {
+        key: load_yaml(path) if path.exists() else {"review_status": "missing"}
+        for key, path in paths.items()
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Evaluate R5 next pilot gate from readiness and reviewed-input registries.")
     parser.add_argument("--readiness", required=True, type=Path)
-    parser.add_argument("--rules", default=Path("config/r5_next_pilot_gate_rules.yaml"), type=Path)
+    parser.add_argument("--rules", required=True, type=Path)
+    parser.add_argument("--market-peer-input-registry", required=True, type=Path)
+    parser.add_argument("--forecast-assumption-registry", required=True, type=Path)
+    parser.add_argument("--evidence-request-review-ledger", required=True, type=Path)
     parser.add_argument("--json", required=True, type=Path)
     args = parser.parse_args(argv)
 
     rules = load_yaml(args.rules)
-    result = evaluate_gate(load_json(args.readiness), rules, _load_registries(Path(".").resolve(), rules))
+    registry_paths = {
+        "market_peer_input_registry": args.market_peer_input_registry,
+        "forecast_assumption_registry": args.forecast_assumption_registry,
+        "evidence_request_review_ledger": args.evidence_request_review_ledger,
+    }
+    result = evaluate_gate(load_json(args.readiness), rules, _load_registries(registry_paths))
     args.json.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(

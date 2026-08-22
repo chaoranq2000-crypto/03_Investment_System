@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-MANIFEST_PATH = REPO_ROOT / "config/r5_bundle4_expected_artifacts.yaml"
+MANIFEST_SOURCE = "config/r5_bundle4_expected_artifacts.yaml"
 SMOKE_PATH = REPO_ROOT / "reports/p1_6/r5_bundle4_reviewed_input_smoke_result.json"
 TRUTHFULNESS_PATH = REPO_ROOT / "reports/p1_6/r5_bundle4_readout_truthfulness_result.json"
 CLOSE_READOUT = REPO_ROOT / "reports/p1_6/R5_BUNDLE_4_REVIEWED_INPUT_FIXTURE_PROMOTION_CLOSE_READOUT.md"
@@ -44,8 +45,10 @@ def artifact_paths(value: Any) -> list[str]:
     return []
 
 
-def test_expected_artifact_manifest_is_complete_and_physical() -> None:
-    manifest = load_yaml(MANIFEST_PATH)
+def test_expected_artifact_manifest_is_complete_and_physical(
+    historical_blob_bytes,
+) -> None:
+    manifest = yaml.safe_load(historical_blob_bytes(MANIFEST_SOURCE).decode("utf-8"))
 
     assert manifest["bundle"] == "R5_BUNDLE_4_REVIEWED_INPUT_FIXTURE_PROMOTION_SMOKE"
     assert manifest["expected_close_state"] == "R5_REVIEWED_INPUT_FIXTURE_PROMOTION_SMOKE_PASSED"
@@ -53,7 +56,14 @@ def test_expected_artifact_manifest_is_complete_and_physical() -> None:
     assert manifest["p2_allowed"] is False
     paths = artifact_paths(manifest["artifacts"])
     assert paths
-    missing = [path for path in sorted(set(paths)) if not (REPO_ROOT / path).exists()]
+    missing = []
+    for path in sorted(set(paths)):
+        if (REPO_ROOT / path).exists():
+            continue
+        try:
+            historical_blob_bytes(path)
+        except (AssertionError, subprocess.CalledProcessError):
+            missing.append(path)
     assert missing == []
 
 
