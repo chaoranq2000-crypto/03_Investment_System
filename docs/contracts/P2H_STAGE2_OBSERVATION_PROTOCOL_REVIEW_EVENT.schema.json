@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/contracts/P2H_STAGE2_OBSERVATION_PROTOCOL_REVIEW_EVENT.schema.json",
+  "title": "P2H Stage 2 Slice A Observation Protocol Human Review Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_type",
+    "protocol_review_event_id",
+    "canonical_hash",
+    "protocol_id",
+    "event_type",
+    "reviewed_at",
+    "effective_at",
+    "knowledge_at",
+    "reviewer_ref",
+    "rationale",
+    "evidence_cutoff",
+    "supersedes_event_id",
+    "superseded_by_protocol_id",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {"const": "p2h.observation_protocol_review_event.v1"},
+    "artifact_type": {"const": "observation_protocol_review_event"},
+    "protocol_review_event_id": {"$ref": "#/$defs/protocol_review_event_id"},
+    "canonical_hash": {"$ref": "#/$defs/sha256"},
+    "protocol_id": {"$ref": "#/$defs/protocol_id"},
+    "event_type": {
+      "enum": [
+        "submitted",
+        "approved_for_observation",
+        "activated",
+        "paused",
+        "completed",
+        "abandoned",
+        "superseded",
+        "note_added"
+      ]
+    },
+    "reviewed_at": {"$ref": "#/$defs/timestamp"},
+    "effective_at": {"$ref": "#/$defs/timestamp"},
+    "knowledge_at": {"$ref": "#/$defs/timestamp"},
+    "reviewer_ref": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._:-]{2,127}$"
+    },
+    "rationale": {"type": "string", "minLength": 1},
+    "evidence_cutoff": {"$ref": "#/$defs/timestamp"},
+    "supersedes_event_id": {
+      "oneOf": [
+        {"$ref": "#/$defs/protocol_review_event_id"},
+        {"type": "null"}
+      ]
+    },
+    "superseded_by_protocol_id": {
+      "oneOf": [
+        {"$ref": "#/$defs/protocol_id"},
+        {"type": "null"}
+      ]
+    },
+    "provenance": {"$ref": "#/$defs/provenance"}
+  },
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+    },
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "protocol_id": {"type": "string", "pattern": "^protocol:[0-9a-f]{32}$"},
+    "protocol_review_event_id": {
+      "type": "string",
+      "pattern": "^protocol_review_event:[0-9a-f]{32}$"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["submitter_kind", "source_locator", "tool_version"],
+      "properties": {
+        "submitter_kind": {"const": "human"},
+        "source_locator": {"type": "string", "minLength": 1},
+        "tool_version": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

@@ -18,7 +18,8 @@
 ## Policies
 
 - `policies/EVIDENCE_AND_CITATION_POLICY.md` — 证据、引用、来源等级、新鲜度和冲突处理。
-- `policies/QUALITY_GUARDRAILS.md` — 质量门、反幻觉、反证和 no-advice 纪律。
+- `policies/QUALITY_GUARDRAILS.md` — 质量门、反幻觉、反证和三产品投资边界。
+- `policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` — 已确认的个人高风险权益账户定性章程；不是机器参数或当次建议授权。
 
 ## Workflows
 
@@ -43,6 +44,10 @@
 ## Playbooks
 
 - `playbooks/OPERATING_PLAYBOOK.md` — 日常命令索引和轻量操作指南；不是工作流事实源。
+- `playbooks/PORTFOLIO_TRACKER.md` — 本地私有持仓、交割单、成本、行情与看板操作手册。
+- `playbooks/INVESTMENT_REVIEW_P2G_3.md`、`INVESTMENT_REVIEW_P2G_4.md`、
+  `INVESTMENT_REVIEW_BEHAVIOR_HYPOTHESIS_LEDGER.md` — Review 行为假设合同测试依赖；
+  不属于 Research workflow，也不授权交易建议。
 - `playbooks/stock_report_case_study_shengyi_tech.md` — 个股报告案例研究。
 - `playbooks/stock_report_samples/README.md` — 样例报告目录说明。
 
@@ -54,12 +59,16 @@
 - `.agents/skills/stock-deep-dive/references/report_production_profile.md` — 个股报告生产 profile。
 - `.agents/skills/evidence-ingest/references/` — manifest、source、adapter、字段级契约。
 - `.agents/skills/quality-review/` — issue schema 和质量审查执行契约。
+- `.agents/skills/portfolio-tracker/` — Portfolio 私有账务工具边界。
+- `.agents/skills/investment-review/` — Investment Review、`observation_only` 和 advice 输入门禁。
 
 ## Meta
 
 - `meta/DOC_OWNERSHIP_MATRIX.md` — 文档职责边界和去重矩阵。
 - `meta/TOP_LEVEL_DOCS_INDEX.md` — 兼容性指针；不再作为主索引维护。
 - `meta/GENERATED_FILE_MANIFEST.txt` — 生成文件清单。
+- `meta/PORTFOLIO_REVIEW_INTEGRATION_DEPENDENCY_ALLOWLIST.md` — Portfolio / Review
+  选择性集成、文档依赖保留与历史材料排除清单。
 
 ## Diagnostics and plans
 

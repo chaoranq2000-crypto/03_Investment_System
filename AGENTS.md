@@ -21,6 +21,20 @@ This repository contains three related products with separate output boundaries:
 No product may execute orders, write to a broker, guarantee returns, or present uncertain
 conclusions as certain.
 
+## Confirmed personal strategy policy
+
+`docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` is the confirmed
+human-readable policy for the user's high-risk equity account. Apply its ten
+qualitative principles as hard boundaries with contextual judgment. It is not
+machine-executable configuration and does not, by itself, authorize advice or satisfy
+the user-confirmed inputs required for the current review.
+
+`C-HUMAN-005` remains `pending`; no runtime profile value is configured, so its
+effective machine value is `null`. Historical P10 material marked
+`proposed_not_active` is evidence for later user discussion, not an active threshold.
+Do not infer a 30%, 35%, or other drawdown rule from return aspirations, and do not
+turn the charter into an automated sizing, compliance, de-risking, or order rule.
+
 ## Non-negotiable rules
 
 1. Evidence is the source of truth.
@@ -77,6 +91,7 @@ Use the existing workspace structure. Do not create ad hoc top-level folders.
 | Segment reports | `reports/segments/<segment_id>/` |
 | Stock reports | `reports/stocks/<stock_code>_<company_slug>/` |
 | Workflow run state and handoffs | `reports/workflow_runs/<workflow_id>/` |
+| Local Investment Review outputs | `reports/investment_review/<run_id>/` (generated and Git-ignored) |
 | Thesis, watchlist, and postmortems | `decisions/` |
 
 ## Workflow routing
@@ -100,6 +115,26 @@ Lower-level skills are repeatable research actions:
 
 Do not use a disabled, retired, or unlisted skill unless the repository configuration explicitly enables it.
 
+## Independent product utilities
+
+`portfolio-tracker` is the independent private-accounting utility. It may record and
+reconcile portfolio, cash, cost, price and profit/loss facts, but it does not infer
+motives or produce trading actions. Its private files remain Git-ignored.
+
+`investment-review` is an independent personal-review utility, not a canonical
+Research `workflow_type` and not part of `research-orchestrator` routing. It consumes
+the formal Portfolio SQLite source read-only and writes derived state only to the
+separate local sidecar. Missing or unreviewed local mapping configuration must make
+the Review capability unavailable; it must never trigger source mutation or an
+implicit database copy.
+
+An ordinary review is `observation_only`. Personalized actions or position targets are
+permitted only when the user explicitly requests advice for the current review and
+supplies a current time horizon, risk budget and the relevant position or portfolio
+constraints. The charter, historical thresholds, inferred preferences and a return
+target do not satisfy these inputs. Review output never authorizes broker access or
+order execution.
+
 ## Completion gates
 
 Before marking work done, check:
@@ -110,7 +145,8 @@ Before marking work done, check:
 4. Segment-company exposure records include evidence, confidence, and missing-field labels.
 5. Risks, counter-evidence, and uncertainty are visible.
 6. Outputs follow workspace paths.
-7. Direct trading instructions are absent.
+7. Research and Portfolio outputs contain no direct trading instructions; any
+   Investment Review advice satisfies its explicit current-input gate.
 8. Any remaining issue has an owner, severity, and next step.
 
 ## Language and style

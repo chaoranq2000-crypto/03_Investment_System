@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Evidence-first A-share equity research workspace"
 requires-python = ">=3.11"
 readme = "README.md"
+dependencies = ["jsonschema>=4.18,<5"]
 
 [tool.ruff]
 line-length = 100
