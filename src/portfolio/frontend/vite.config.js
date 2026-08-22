@@ -4,7 +4,13 @@ export default defineConfig({
   plugins: [
     {
       name: "normalize-index-line-endings",
-      transformIndexHtml: (html) => html.replace(/\r\n?/g, "\n"),
+      transformIndexHtml: {
+        order: "post",
+        handler: (html) =>
+          html
+            .replace(/\r\n?/g, "\n")
+            .replace(/\n[ \t]*\n(?=<\/body>)/g, "\n"),
+      },
     },
   ],
   base: "/",
