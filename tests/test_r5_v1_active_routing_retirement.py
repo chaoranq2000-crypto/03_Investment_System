@@ -498,8 +498,29 @@ def test_retired_routes_do_not_reenter_current_text_defaults() -> None:
         for target, sources in observed.items()
         if any(declared_surfaces.get(source) != target for source in sources)
     }
+    physical_declared = {
+        source for source in declared_surfaces if (ROOT / source).is_file()
+    }
+    approved_missing = set(declared_surfaces) - physical_declared
+    ready = {
+        item["path"]
+        for group in manifest["candidate_groups"]
+        if group["status"] == "READY_FOR_MANUAL_DELETE"
+        for item in group["items"]
+    }
     assert unexpected == {}
-    assert observed.get("old_002837_workflow", set()) == set(declared_surfaces)
+    if approved_missing:
+        assert manifest["deletion_control"]["execution_state"] in {
+            "quarantine_move_in_progress",
+            "user_quarantined_pending_manual_delete",
+            "user_deleted_pending_commit",
+            "completed",
+        }
+        assert approved_missing <= set(
+            manifest["deletion_control"]["approval"]["approved_exact_paths"]
+        )
+        assert approved_missing <= ready
+    assert observed.get("old_002837_workflow", set()) == physical_declared
 
 
 def test_legacy_gate_clis_require_explicit_rules_and_inputs() -> None:

@@ -29,11 +29,16 @@ def test_manifest_is_a_decision_record_not_a_deletion_executor() -> None:
     control = manifest["deletion_control"]
 
     assert control["codex_delete_authorized"] is False
+    assert control["codex_quarantine_move_authorized"] is True
     assert control["directories_authorized"] is False
-    assert control["execution_actor"] == "user_manual_exact_file_only"
+    assert control["execution_actor"] == (
+        "codex_exact_path_quarantine_then_user_manual_directory_delete"
+    )
     assert control["git_history_is_recovery_basis"] is True
     assert set(control["state_contract"]) == {
         "not_started",
+        "quarantine_move_in_progress",
+        "user_quarantined_pending_manual_delete",
         "user_deleted_pending_commit",
         "completed",
     }
@@ -126,12 +131,29 @@ def test_user_decision_keeps_the_2026_07_23_replay_out_of_ready() -> None:
 def test_modified_file_allowlist_is_exact_and_contains_only_authorized_paths() -> None:
     manifest = load_manifest()
     allowlist = manifest["audit"]["modified_file_allowlist"]
+    retirement = manifest["audit"]["retirement_execution"]
+    approved = manifest["deletion_control"]["approval"]["approved_exact_paths"]
 
     assert allowlist == sorted(set(allowlist))
     assert "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml" in allowlist
     assert not any(path.startswith("data/") for path in allowlist)
     assert not any(path.startswith("src/portfolio/") for path in allowlist)
     assert not any(path.startswith("src/investment_review/") for path in allowlist)
+    assert retirement["dependency_decoupling_commit"] == (
+        "bbb95318156820bd5c1d8a49d4a20a7df8758754"
+    )
+    assert retirement["control_paths"] == [
+        "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml",
+        "tests/test_r5_v1_active_routing_retirement.py",
+        "tests/test_r5_v1_historical_cleanup_manifest.py",
+    ]
+    assert retirement["approved_paths_source"] == (
+        "deletion_control.approval.approved_exact_paths"
+    )
+    assert retirement["expected_worktree_change_count"] == (
+        len(retirement["control_paths"]) + len(approved)
+    )
+    assert retirement["quarantine_root"] == manifest["deletion_control"]["quarantine"]["path"]
 
 
 def test_declared_inbound_references_are_exact_and_auditable() -> None:
@@ -318,6 +340,61 @@ def test_deletion_state_matches_exact_worktree_absence_and_approval() -> None:
     missing = {path for path in ready if not (ROOT / path).is_file()}
     approved_ids = set(control["approval"]["approved_closure_ids"])
     approved_paths = set(control["approval"]["approved_exact_paths"])
+    quarantine_config = control["quarantine"]
+    quarantine_relative = PurePosixPath(quarantine_config["path"])
+    assert quarantine_relative.parts[:1] == (".codex_tmp",)
+    assert ".." not in quarantine_relative.parts
+    quarantine_root = ROOT.joinpath(*quarantine_relative.parts)
+    assert ROOT.resolve() in quarantine_root.resolve().parents
+    assert quarantine_config["layout"] == "preserved_repo_relative_paths"
+    assert quarantine_config["tracked"] is False
+    assert quarantine_config["gitignored"] is True
+    assert quarantine_config["content_validation"] == "original_path_git_filtered_blob_oid"
+    ignore_check = subprocess.run(
+        ["git", "-C", str(ROOT), "check-ignore", "-q", str(quarantine_root / "probe")],
+        check=False,
+    )
+    assert ignore_check.returncode == 0
+    assert not quarantine_root.is_symlink()
+
+    checkout_receipts = {
+        row["path"]: row for row in quarantine_config["crlf_checkout_receipts"]
+    }
+    assert len(checkout_receipts) == 5
+    assert set(checkout_receipts) <= set(ready)
+
+    def assert_quarantine_payload(relative: str, payload_path: Path) -> None:
+        assert payload_path.is_file()
+        assert not payload_path.is_symlink()
+        payload = payload_path.read_bytes()
+        receipt = checkout_receipts.get(relative)
+        expected_size = receipt["checkout_byte_count"] if receipt else ready[relative]["byte_count"]
+        expected_sha = receipt["checkout_sha256"] if receipt else ready[relative]["content_sha256"]
+        assert len(payload) == expected_size, relative
+        assert hashlib.sha256(payload).hexdigest() == expected_sha, relative
+        filtered_oid = subprocess.check_output(
+            [
+                "git",
+                "-C",
+                str(ROOT),
+                "hash-object",
+                f"--path={relative}",
+                "--",
+                str(payload_path),
+            ],
+            text=True,
+        ).strip()
+        assert filtered_oid == ready[relative]["blob_oid"], relative
+
+    quarantine_files: set[str] = set()
+    if quarantine_root.is_dir():
+        descendants = list(quarantine_root.rglob("*"))
+        assert not any(path.is_symlink() for path in descendants)
+        quarantine_files = {
+            path.relative_to(quarantine_root).as_posix()
+            for path in descendants
+            if path.is_file()
+        }
     baseline = manifest["audit"]["baseline_commit"]
     diff_rows = [
         line.split("\t", 1)
@@ -352,22 +429,50 @@ def test_deletion_state_matches_exact_worktree_absence_and_approval() -> None:
 
     assert approved_ids <= set(closures)
     expected = set().union(*(closures[closure_id] for closure_id in approved_ids))
-    assert missing == expected
-    assert deleted_from_baseline == expected
+    assert deleted_from_baseline == missing
     assert changed_from_baseline <= declared_allowlist | expected
     assert added_from_baseline <= declared_additions
     if control["execution_state"] == "not_started":
+        assert missing == set()
         assert approved_ids == set()
         assert approved_paths == set()
+        assert quarantine_files == set()
         assert untracked <= declared_additions
+    elif control["execution_state"] == "quarantine_move_in_progress":
+        assert approved_ids == set(closures)
+        assert approved_paths == expected == set(ready)
+        assert quarantine_files == missing
+        assert untracked == set()
+        assert staged == set()
+        for relative in expected:
+            source = ROOT / relative
+            quarantined = quarantine_root.joinpath(*PurePosixPath(relative).parts)
+            assert source.is_file() != quarantined.is_file(), relative
+            assert_quarantine_payload(relative, quarantined if quarantined.is_file() else source)
+    elif control["execution_state"] == "user_quarantined_pending_manual_delete":
+        assert approved_ids == set(closures)
+        assert approved_paths == expected == set(ready)
+        assert missing == expected
+        assert quarantine_files == expected
+        assert untracked == set()
+        assert staged == set()
+        for relative in expected:
+            quarantined = quarantine_root.joinpath(*PurePosixPath(relative).parts)
+            assert_quarantine_payload(relative, quarantined)
     elif control["execution_state"] == "user_deleted_pending_commit":
         assert approved_ids
         assert approved_paths == expected
+        assert missing == expected
+        assert not quarantine_root.exists()
+        assert quarantine_files == set()
         assert untracked == set()
         assert staged == set()
     elif control["execution_state"] == "completed":
         assert approved_ids
         assert approved_paths == expected
+        assert missing == expected
+        assert not quarantine_root.exists()
+        assert quarantine_files == set()
         assert untracked == set()
         assert staged == set()
         for path in expected:

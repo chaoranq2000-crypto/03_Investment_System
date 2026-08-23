@@ -54,6 +54,15 @@ audit:
   - tests/test_r5_v1_historical_cleanup_manifest.py
   - tests/test_r5_v1_root_policy_migration.py
   - tests/test_run_r5_mvp_smoke.py
+  retirement_execution:
+    dependency_decoupling_commit: bbb95318156820bd5c1d8a49d4a20a7df8758754
+    control_paths:
+    - docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml
+    - tests/test_r5_v1_active_routing_retirement.py
+    - tests/test_r5_v1_historical_cleanup_manifest.py
+    approved_paths_source: deletion_control.approval.approved_exact_paths
+    expected_worktree_change_count: 72
+    quarantine_root: .codex_tmp/docs_reports_retirement_bbb9531_20260823
 authority:
   project_rules: AGENTS.md
   research_workflow: docs/workflows/RESEARCH_WORKFLOW.md
@@ -67,17 +76,140 @@ status_definitions:
   USER_DECISION: Evidence or policy value is not safely decidable by automation.
 deletion_control:
   codex_delete_authorized: false
+  codex_quarantine_move_authorized: true
   directories_authorized: false
-  execution_actor: user_manual_exact_file_only
-  execution_state: not_started
+  execution_actor: codex_exact_path_quarantine_then_user_manual_directory_delete
+  execution_state: completed
   git_history_is_recovery_basis: true
+  authorization:
+    authorized_at: '2026-08-23'
+    scope: all_ready_closures
+    instruction: retire_all_and_place_files_in_one_folder_for_user_bulk_delete
   approval:
-    approved_closure_ids: []
-    approved_exact_paths: []
+    approved_closure_ids:
+    - ready_closure_001
+    - ready_closure_002
+    - ready_closure_003
+    - ready_closure_004
+    - ready_closure_005
+    - ready_closure_006
+    - ready_closure_007
+    - ready_closure_008
+    - ready_closure_009
+    - ready_closure_010
+    - ready_closure_011
+    - ready_closure_012
+    - ready_closure_013
+    - ready_closure_014
+    - ready_closure_015
+    - ready_closure_016
+    - ready_closure_017
+    - ready_closure_018
+    approved_exact_paths:
+    - config/r5_bundle10r_expected_artifacts.yaml
+    - config/r5_bundle10r_generation_binding.yaml
+    - config/r5_bundle8r_expected_artifacts.yaml
+    - config/r5_bundle9r_expected_artifacts.yaml
+    - config/r5_bundle9r_generation_binding.yaml
+    - docs/codex_tasks/v1_governance_integration_cleanup/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v10/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v10/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v11/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v11/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v2/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v3/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v3/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v4/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v4/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v5/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v5/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v6/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v6/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v7/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v7/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v8/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v9/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v9/START_HERE.md
+    - docs/plans/DATA_LAYER_ACCEPTANCE_CHECKLIST.md
+    - docs/plans/DATA_LAYER_CODEX_EXECUTION_PLAN.md
+    - docs/plans/DATA_LAYER_DEV_TASK_BREAKDOWN.md
+    - docs/plans/DATA_LAYER_NEXT_TASKS_MASTER_PLAN.md
+    - docs/plans/DATA_LAYER_R4_READINESS_NEXT_TASKS.md
+    - reports/p1_6/OLD_STOCK_SKILL_CLEANUP_READOUT.md
+    - reports/p1_6/R5_BUNDLE16R_CLOSE_READOUT_TEMPLATE.md
+    - reports/p1_6/R5_BUNDLE_1_STRUCTURAL_GATE_HARDENING_READOUT.md
+    - reports/p1_6/R5_BUNDLE_7_0_QUALITY_REBASE_PLAN.md
+    - reports/p1_6/R5_BUNDLE_8_0_RESEARCH_DEPTH_PLAN.md
+    - reports/p1_6/R5_NEXT_STAGE_FINAL_ACCEPTANCE_READOUT.md
+    - reports/p1_6/R5_NEXT_STAGE_PATCH_0A_1_2_SUMMARY_READOUT.md
+    - reports/p1_6/R5_NEXT_STAGE_PATCH_3_4_5_SUMMARY_READOUT.md
+    - reports/p1_6/R5_NEXT_STAGE_PATCH_6_7_8_SUMMARY_READOUT.md
+    - reports/p1_6/R5_NEXT_STAGE_PATCH_9_10_11_SUMMARY_READOUT.md
+    - reports/p1_6/R5_NEXT_STAGE_STATUS_AND_PLAN.md
+    - reports/p1_6/R5_NEXT_STAGE_STATUS_AND_TASKS_READOUT.md
+    - reports/p1_6/STOCK_DEEP_DIVE_SKILL_MERGE_READOUT.md
+    - reports/p1_6/WORKFLOW_DOC_DEDUP_READOUT.md
+    - reports/p1_6/company_valuation_subagent_integration_readout.md
+    - reports/p1_6/r5_v1_governance_cleanup/governance_cleanup_readout.md
+    - reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/historical_cleanup_manifest.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/root_policy_migration.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/active_routing_audit.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/clean_checkout_smoke.txt
+    - reports/p1_6/r5_v1_governance_cleanup/validation/doc_drift.txt
+    - reports/p1_6/r5_v1_governance_cleanup/validation/final_report_review_audit.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/full_pytest.txt
+    - reports/p1_6/r5_v1_governance_cleanup/validation/governance_targeted.txt
+    - reports/p1_6/r5_v1_governance_cleanup/validation/historical_decoupling.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/manual_deletion_wave_bundle.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/manual_deletion_wave_night.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/manual_deletion_wave_old002837.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/preflight.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/refresh_002837.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/scope_audit.yaml
+    - reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml
+    - reports/quality/R5_source_route_operational_quality.yaml
+    - schemas/r5_v1_root_policy_migration.schema.json
+    - scripts/manage_r5_v1_historical_cleanup.py
+    - scripts/validate_r5_v1_root_policy_migration.py
+  quarantine:
+    path: .codex_tmp/docs_reports_retirement_bbb9531_20260823
+    status: deleted_by_user
+    user_delete_confirmed_at: '2026-08-23'
+    file_count: 69
+    baseline_git_blob_bytes: 4713738
+    checkout_physical_bytes: 4714099
+    layout: preserved_repo_relative_paths
+    tracked: false
+    gitignored: true
+    content_validation: original_path_git_filtered_blob_oid
+    physical_receipt_policy: candidate content SHA/bytes except explicit CRLF checkout receipts
+    deletion_actor: user_manual_directory_delete
+    crlf_checkout_receipts:
+    - path: reports/p1_6/r5_v1_governance_cleanup/validation/clean_checkout_smoke.txt
+      checkout_byte_count: 1613
+      checkout_sha256: 5361428175863cc9d01f8431e14cb3b512f7125cec4c83aaee420178ed397d75
+    - path: reports/p1_6/r5_v1_governance_cleanup/validation/doc_drift.txt
+      checkout_byte_count: 240
+      checkout_sha256: 2e0e8b743e8a13912de88c0df6ac5b5cbc5d9dc6839f2491188d081e4146ac62
+    - path: reports/p1_6/r5_v1_governance_cleanup/validation/full_pytest.txt
+      checkout_byte_count: 2000
+      checkout_sha256: f37ef2e50e29dd589b3a2a22023795b155d58ead6eda7dcd5f1f156e3f928edf
+    - path: reports/p1_6/r5_v1_governance_cleanup/validation/governance_targeted.txt
+      checkout_byte_count: 1279
+      checkout_sha256: dd74b5e81fa073c99931fd93bfb3c5f9ea473f949a1f403d11ee60f82ab7e1cc
+    - path: schemas/r5_v1_root_policy_migration.schema.json
+      checkout_byte_count: 6029
+      checkout_sha256: ef71f3df7571376f82140d7695556d8c936e9a9b32951441e1eb10f187da800f
   state_contract:
     not_started: All READY paths remain present and match baseline Git blobs.
-    user_deleted_pending_commit: Missing paths must equal complete approved closures; no rename, staging, or extra deletion is allowed.
-    completed: Deleted paths are absent from current HEAD and remain recoverable from the audited baseline.
+    quarantine_move_in_progress: Every approved path exists at exactly one of its source or quarantine locations, matches its physical receipt and original-path Git-filtered blob, and may be resumed or rolled back without loss.
+    user_quarantined_pending_manual_delete: All approved source paths are absent; the ignored quarantine contains exactly the approved relative paths with matching physical receipts and Git-filtered blobs; no path is staged.
+    user_deleted_pending_commit: All approved source paths and the quarantine directory are absent; missing paths equal complete approved closures and no path is staged.
+    completed: Approved paths and the quarantine directory are absent from current HEAD/worktree and remain recoverable from the audited baseline.
 protected_invariants:
 - id: C-HUMAN-005
   status: pending
@@ -4211,8 +4343,9 @@ summary:
     file_count: 21
     byte_count: 206594
   notes:
-  - No file or directory has been deleted, moved, or renamed.
-  - READY means dependency closure only; the user must manually delete exact files and return for revalidation.
+  - All 18 closures and 69 exact READY paths are approved for retirement.
+  - The user deleted the Git-ignored quarantine; all approved source paths remain absent.
+  - Approved paths are absent from current HEAD; the audited baseline remains the recovery basis.
   - The 2026-07-23 replay remains USER_DECISION and is excluded from READY.
   READY_DOCS_REPORTS_ONLY:
     file_count: 61
