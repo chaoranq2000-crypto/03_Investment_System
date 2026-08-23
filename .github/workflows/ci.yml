@@ -41,7 +41,7 @@ jobs:
       - name: Compile Python files
         run: python -m py_compile $(git ls-files '*.py')
       - name: Validate source routes and operational adapters
-        run: python scripts/run_source_route_quality_gate.py --import-check --output reports/quality/ci_source_route_quality_report.yaml
+        run: python scripts/run_source_route_quality_gate.py --import-check --output .codex_tmp/ci_source_route_quality_report.yaml
       - name: Validate active routing retirement
         run: python -m pytest -q tests/test_r5_v1_active_routing_retirement.py
       - name: Run pytest

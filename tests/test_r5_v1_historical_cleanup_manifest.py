@@ -143,6 +143,7 @@ def test_modified_file_allowlist_is_exact_and_contains_only_authorized_paths() -
         "bbb95318156820bd5c1d8a49d4a20a7df8758754"
     )
     assert retirement["control_paths"] == [
+        ".github/workflows/ci.yml",
         "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml",
         "tests/test_r5_v1_active_routing_retirement.py",
         "tests/test_r5_v1_historical_cleanup_manifest.py",
@@ -154,6 +155,13 @@ def test_modified_file_allowlist_is_exact_and_contains_only_authorized_paths() -
         len(retirement["control_paths"]) + len(approved)
     )
     assert retirement["quarantine_root"] == manifest["deletion_control"]["quarantine"]["path"]
+
+
+def test_ci_quality_report_is_written_only_to_the_ignored_temp_root() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+
+    assert "--output .codex_tmp/ci_source_route_quality_report.yaml" in workflow
+    assert "reports/quality/ci_source_route_quality_report.yaml" not in workflow
 
 
 def test_declared_inbound_references_are_exact_and_auditable() -> None:

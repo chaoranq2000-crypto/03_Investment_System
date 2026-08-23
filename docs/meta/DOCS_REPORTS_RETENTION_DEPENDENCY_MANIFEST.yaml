@@ -14,6 +14,7 @@ audit:
   modified_file_allowlist:
   - .agents/skills/evidence-ingest/assets/r5_evidence_request_review_ledger.example.yaml
   - .agents/skills/stock-deep-dive/assets/r5_valuation_input_registry.example.yaml
+  - .github/workflows/ci.yml
   - .github/workflows/legacy_compatibility.yml
   - README.md
   - config/a_stock_data_capability_catalog.yaml
@@ -57,11 +58,12 @@ audit:
   retirement_execution:
     dependency_decoupling_commit: bbb95318156820bd5c1d8a49d4a20a7df8758754
     control_paths:
+    - .github/workflows/ci.yml
     - docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml
     - tests/test_r5_v1_active_routing_retirement.py
     - tests/test_r5_v1_historical_cleanup_manifest.py
     approved_paths_source: deletion_control.approval.approved_exact_paths
-    expected_worktree_change_count: 72
+    expected_worktree_change_count: 73
     quarantine_root: .codex_tmp/docs_reports_retirement_bbb9531_20260823
 authority:
   project_rules: AGENTS.md
