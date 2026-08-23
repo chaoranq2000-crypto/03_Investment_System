@@ -29,6 +29,49 @@ PACK_VALIDATOR = load_module("r5_bundle5_card56_pack_validator_test", PACK_VALID
 SCORECARD_VALIDATOR = load_module("r5_bundle5_card56_scorecard_validator_test", SCORECARD_VALIDATOR_PATH)
 PROMOTION_GATE = load_module("r5_bundle5_card56_promotion_gate_test", PROMOTION_GATE_PATH)
 
+PILOT_RULES = {
+    "required_for_reviewed_input_pilot": [
+        "reviewed_market_inputs_available",
+        "reviewed_peer_inputs_available",
+        "reviewed_forecast_assumptions_available",
+        "reviewed_valuation_inputs_available",
+    ],
+    "critical_todo_tokens": [
+        "TODO_MARKET_DATA",
+        "TODO_PEER_DATA",
+        "TODO_MODEL_INPUT",
+    ],
+    "fixed_boundaries": {
+        "max_allowed_report_level": "reviewed_input_research_draft",
+        "sample_quality_report_allowed": False,
+        "p2_allowed": False,
+    },
+    "next_candidate_tasks": [],
+    "max_next_candidate_tasks": 3,
+}
+PROMOTION_RULES = {
+    "required_for_reviewed_input_research_draft": [
+        "reviewed_market_inputs_available",
+        "reviewed_peer_inputs_available",
+        "reviewed_forecast_assumptions_available",
+        "reviewed_valuation_inputs_available",
+    ],
+    "required_for_sample_quality_candidate": [
+        "reviewed_market_inputs_available",
+        "reviewed_peer_inputs_available",
+        "reviewed_forecast_assumptions_available",
+        "reviewed_valuation_inputs_available",
+        "reviewed_business_disclosure_available",
+    ],
+    "blocking_todo_tokens": [
+        "TODO_MARKET_DATA",
+        "TODO_PEER_DATA",
+        "TODO_MODEL_INPUT",
+        "MISSING_DISCLOSURE",
+        "TODO_SOURCE_REQUIRED",
+    ],
+}
+
 
 def load_yaml(path: Path):
     return yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -55,7 +98,7 @@ def test_real_pilot_gate_is_open_but_capped_at_reviewed_input(
 
 
 def test_bundle5_fixed_boundary_cannot_be_opened_by_empty_sample_blockers() -> None:
-    rules = load_yaml(REPO_ROOT / "config/r5_bundle5_pilot_gate_rules.yaml")
+    rules = PILOT_RULES
     inputs = {
         "strict_smoke_result": {"status": "pass", "failed": 0},
         "reviewed_input_dry_run_result": {
@@ -157,7 +200,7 @@ def test_policy_enum_does_not_reactivate_resolved_todos(
         historical_blob_bytes,
         "R5_reviewed_input_dry_run_result.yaml",
     )
-    rules = load_yaml(REPO_ROOT / "config/r5_pack_promotion_rules.yaml")
+    rules = PROMOTION_RULES
 
     pack_issues = PACK_VALIDATOR.validate_pack_issues(pack)
     assert not [issue for issue in pack_issues if issue["issue_id"] == "R5P-GAP-002"]

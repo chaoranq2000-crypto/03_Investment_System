@@ -33,7 +33,6 @@
 
 - [`current_runs`](../config/r5_readout_canonical_index.yaml) — 跨 run 的当前 state/readout pointer 唯一 owner。
 - `reports/workflow_runs/<workflow_id>/` — 从 pointer 的 `state_path` 读取 run 状态，从 `readout_path` 打开人类投影；本索引不复制当前 workflow ID 或 status。
-- [Historical R5/Patch/Bundle readout directory](../reports/p1_6/R5_READOUT_CANONICAL_INDEX.md) — 历史目录，不负责选择 current run。
 
 ## Reporting
 
@@ -69,14 +68,8 @@
 - `meta/GENERATED_FILE_MANIFEST.txt` — 生成文件清单。
 - `meta/PORTFOLIO_REVIEW_INTEGRATION_DEPENDENCY_ALLOWLIST.md` — Portfolio / Review
   选择性集成、文档依赖保留与历史材料排除清单。
-
-## Diagnostics and plans
-
-- `logs/2026-08-10_system_complexity_diagnostic.md` — 规则递归、规模膨胀与判断机械化的时间点整合诊断。
-- `plans/p1_6_system_complexity_remediation_plan.md` — 允许修改核心事实源与活动代码的有限分阶段修正计划。
-- `logs/2026-08-10_system_complexity_remediation_execution_log.md` — Phase 0–7 的已执行内容、验证、工程停止点与保留的人工决定。
-
-以上文档用于诊断和实施导航，不是当前规则或 workflow 事实源；永久规则仍以 `AGENTS.md`、对应 workflow/policy owner 和活动 skill 契约为准。
+- `meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml` — docs/reports 的 canonical
+  保留、依赖、Git 恢复与手工删除候选清单。
 
 ## Historical material
 
@@ -89,3 +82,5 @@ docs/codex_tasks/
 ```
 
 需要查历史时再进入这些目录；日常执行不应把其中内容作为上位规则。
+旧 R5/Patch/Bundle readout、治理包和清理收据只按 retention manifest 与 Git history
+追溯，不作为日常导航入口，也不得被解释为 current/checkpoint。

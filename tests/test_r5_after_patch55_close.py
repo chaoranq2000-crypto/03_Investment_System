@@ -7,7 +7,7 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DECISION_PATH = REPO_ROOT / "reports/p1_6/r5_after_patch55_decision.json"
-EXPECTED_PATH = REPO_ROOT / "config/r5_patch_49_55_expected_artifacts.yaml"
+EXPECTED_SOURCE = "config/r5_patch_49_55_expected_artifacts.yaml"
 HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 NOTE_SOURCE = f"{HISTORICAL_RUN}/R5_stock_research_note_reviewed_input_draft.md"
 
@@ -36,7 +36,7 @@ def test_after_patch55_decision_keeps_source_gapped_state():
 
 
 def test_patch49_55_expected_artifacts_exist(historical_blob_bytes):
-    expected = load_yaml(EXPECTED_PATH)
+    expected = yaml.safe_load(historical_blob_bytes(EXPECTED_SOURCE).decode("utf-8"))
     missing = []
     for item in expected["required_artifacts"]:
         path = item["path"]

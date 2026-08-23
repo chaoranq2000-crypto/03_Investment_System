@@ -576,7 +576,7 @@ def build_outputs(
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build R5 Bundle 5.3 market and peer onboarding outputs.")
-    parser.add_argument("--repo-root", type=Path, default=Path("."))
+    parser.add_argument("--repo-root", type=Path, required=True)
     parser.add_argument("--env-file", type=Path, default=Path(".env.local"))
     parser.add_argument("--fixture-json", type=Path)
     parser.add_argument("--allow-network", action="store_true")

@@ -7,7 +7,7 @@ import io
 import json
 import subprocess
 from decimal import Decimal, InvalidOperation
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Callable, Mapping, Sequence
 
 import yaml
@@ -15,9 +15,6 @@ import yaml
 
 HISTORICAL_SOURCE_SNAPSHOT = "312adc73821706b0b7ca6aa00e80ee608bd10b32"
 HISTORICAL_WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
-HISTORICAL_MANIFEST = Path(
-    "reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml"
-)
 PEER_FIELD_MAP = {
     "total_revenue": ("income", "total_revenue"),
     "net_profit_attributable": ("income", "n_income_attr_p"),
@@ -44,18 +41,25 @@ def _read_csv(path: Path) -> list[dict[str, str]]:
 
 
 def _historical_blob_reader(repo_root: Path) -> Callable[[str], bytes]:
-    manifest = _load_yaml(repo_root / HISTORICAL_MANIFEST)
-    if manifest.get("source_snapshot") != HISTORICAL_SOURCE_SNAPSHOT:
-        raise ValueError("historical baseline manifest source snapshot drift")
-    rows = {str(row["path"]): row for row in manifest.get("files", [])}
-    if len(rows) != len(manifest.get("files", [])):
-        raise ValueError("historical baseline manifest contains duplicate paths")
+    resolved_commit = subprocess.check_output(
+        ["git", "-C", str(repo_root), "rev-parse", f"{HISTORICAL_SOURCE_SNAPSHOT}^{{commit}}"],
+        text=True,
+        encoding="utf-8",
+    ).strip()
+    if resolved_commit != HISTORICAL_SOURCE_SNAPSHOT:
+        raise ValueError("historical source snapshot drift")
 
     def read(source_path: str) -> bytes:
-        row = rows.get(source_path)
-        if row is None:
-            raise ValueError(f"historical blob is not manifest-bound: {source_path}")
-        object_name = f"{row['baseline_commit']}:{source_path}"
+        pure = PurePosixPath(source_path)
+        if (
+            source_path != pure.as_posix()
+            or pure.is_absolute()
+            or ".." in pure.parts
+            or not pure.parts
+            or pure.parts[0] == ".git"
+        ):
+            raise ValueError(f"unsafe historical blob path: {source_path}")
+        object_name = f"{HISTORICAL_SOURCE_SNAPSHOT}:{source_path}"
         exists = subprocess.run(
             ["git", "-C", str(repo_root), "cat-file", "-e", object_name],
             stdout=subprocess.PIPE,
@@ -79,12 +83,14 @@ def _historical_blob_reader(repo_root: Path) -> Callable[[str], bytes]:
         payload = subprocess.check_output(
             ["git", "-C", str(repo_root), "cat-file", "blob", object_name]
         )
-        if oid != row["blob_oid"]:
-            raise ValueError(f"historical blob OID drift: {source_path}")
-        if size != row["byte_count"] or len(payload) != row["byte_count"]:
+        if size != len(payload):
             raise ValueError(f"historical blob byte-count drift: {source_path}")
-        if hashlib.sha256(payload).hexdigest() != row["content_sha256"]:
-            raise ValueError(f"historical blob SHA-256 drift: {source_path}")
+        expected_oid = hashlib.sha1(
+            f"blob {len(payload)}\0".encode("ascii") + payload,
+            usedforsecurity=False,
+        ).hexdigest()
+        if oid != expected_oid:
+            raise ValueError(f"historical blob OID drift: {source_path}")
         return payload
 
     return read

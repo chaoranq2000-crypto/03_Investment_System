@@ -1,629 +1,767 @@
 from __future__ import annotations
 
-import ast
-import copy
-import importlib.util
-import inspect
+import hashlib
+import posixpath
+import re
 import subprocess
-from pathlib import Path, PurePosixPath, PureWindowsPath
+from pathlib import Path, PurePosixPath
+from typing import Any
 
-import pytest
-
-
-pytestmark = pytest.mark.legacy_compatibility
+import yaml
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TOOL_PATH = ROOT / "scripts" / "manage_r5_v1_historical_cleanup.py"
+MANIFEST_PATH = ROOT / "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml"
 
 
-def load_tool():
-    spec = importlib.util.spec_from_file_location(
-        "manage_r5_v1_historical_cleanup_cleanup_tests", TOOL_PATH
+def load_manifest() -> dict[str, Any]:
+    data = yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
+    assert isinstance(data, dict)
+    return data
+
+
+def groups_by_status(manifest: dict[str, Any], status: str) -> list[dict[str, Any]]:
+    return [group for group in manifest["candidate_groups"] if group["status"] == status]
+
+
+def test_manifest_is_a_decision_record_not_a_deletion_executor() -> None:
+    manifest = load_manifest()
+    control = manifest["deletion_control"]
+
+    assert control["codex_delete_authorized"] is False
+    assert control["codex_quarantine_move_authorized"] is True
+    assert control["directories_authorized"] is False
+    assert control["execution_actor"] == (
+        "codex_exact_path_quarantine_then_user_manual_directory_delete"
     )
-    assert spec and spec.loader
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-@pytest.fixture(scope="module")
-def tool():
-    return load_tool()
-
-
-@pytest.fixture(scope="module")
-def documents(tool):
-    return (
-        tool.load_yaml(ROOT / tool.BASELINE_MANIFEST_REL),
-        tool.load_yaml(ROOT / tool.CLEANUP_MANIFEST_REL),
-    )
-
-
-def test_cleanup_manifest_is_exact_three_wave_partition(tool, documents) -> None:
-    baseline, cleanup = documents
-    rows = cleanup["files"]
-    paths = [row["path"] for row in rows]
-    waves = cleanup["waves"]
-    baseline_by_path = {row["path"]: row for row in baseline["files"]}
-
-    assert cleanup["schema_version"] == "r5_v1_historical_cleanup_manifest_v1"
-    assert cleanup["deletion_actor"] == "wave_specific"
-    assert cleanup["codex_delete_authorized"] is False
-    assert cleanup["authorization_scope"] == "wave_specific_only"
-    assert cleanup["wave_order"] == ["night", "bundle", "old002837"]
-    assert [row["wave"] for row in waves] == cleanup["wave_order"]
-    assert [row["order"] for row in waves] == [1, 2, 3]
-    assert {
-        wave["wave"]: {
-            "deletion_actor": wave["deletion_actor"],
-            "codex_delete_authorized": wave["codex_delete_authorized"],
-        }
-        for wave in waves
-    } == tool.WAVE_ACTORS
-    assert paths == sorted(paths)
-    assert len(paths) == len(set(paths))
-    assert cleanup["aggregate"] == tool._aggregate(rows)
-    directories = cleanup["old002837_empty_directory_cleanup"]
-    assert directories == tool.build_old002837_directory_manifest(ROOT)
-    assert directories["aggregate"] == {
-        "directory_count": 29,
-        "path_vector_encoding": "deepest_first_utf8_nul",
-        "path_vector_byte_count": 2208,
-        "path_vector_sha256": (
-            "1e987f07ab4aa9b7c54a7444b053949b5c5d377655903d9715d8948e42446cd3"
-        ),
-        "absolute_path_vector_byte_count": 3803,
-        "absolute_path_vector_sha256": (
-            "31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75"
-        ),
+    assert control["git_history_is_recovery_basis"] is True
+    assert set(control["state_contract"]) == {
+        "not_started",
+        "quarantine_move_in_progress",
+        "user_quarantined_pending_manual_delete",
+        "user_deleted_pending_commit",
+        "completed",
     }
-    assert directories["paths"] == list(tool.OLD002837_DIRECTORIES)
-    assert set(directories["paths"]).isdisjoint(paths)
-
-    flattened = [
-        path
-        for wave in waves
-        for path in wave["paths"]
-    ]
-    assert flattened == [
-        row["path"]
-        for wave in cleanup["wave_order"]
-        for row in rows
-        if row["wave"] == wave
-    ]
-    assert len(flattened) == len(set(flattened)) == len(paths)
-    assert set(flattened) == set(paths)
-    for wave in waves:
-        wave_rows = [row for row in rows if row["wave"] == wave["wave"]]
-        assert wave["paths"] == [row["path"] for row in wave_rows]
-        assert wave["aggregate"] == tool._aggregate(wave_rows)
-        assert [row["wave_ordinal"] for row in wave_rows] == list(
-            range(1, len(wave_rows) + 1)
-        )
-    for row in rows:
-        baseline_row = baseline_by_path[row["path"]]
-        assert {
-            "deletion_actor": row["deletion_actor"],
-            "codex_delete_authorized": row["codex_delete_authorized"],
-        } == tool.WAVE_ACTORS[row["wave"]]
-        for key in (
-            "baseline_commit",
-            "blob_oid",
-            "byte_count",
-            "content_sha256",
-            "restore_command",
-        ):
-            assert row[key] == baseline_row[key]
-
-
-def test_fixed_absolute_directory_receipt_is_path_flavour_independent(
-    tool, monkeypatch
-) -> None:
-    dedicated_root_text = str(tool.DEDICATED_WORKTREE_ROOT)
-    monkeypatch.setattr(
-        tool,
-        "DEDICATED_WORKTREE_ROOT",
-        PurePosixPath(dedicated_root_text),
-    )
-
-    directories = tool.build_old002837_directory_manifest(ROOT)
-    expected_paths = [
-        str(
-            PureWindowsPath(dedicated_root_text).joinpath(
-                *PurePosixPath(path).parts
-            )
-        )
-        for path in tool.OLD002837_DIRECTORIES
-    ]
-
-    assert directories["dedicated_worktree_root"] == dedicated_root_text
-    assert directories["absolute_paths"] == expected_paths
-    assert directories["aggregate"]["absolute_path_vector_byte_count"] == 3803
-    assert directories["aggregate"]["absolute_path_vector_sha256"] == (
-        "31669a8f873c2510709a7f9828b27dad4eab9fe49a159071d40345693e770b75"
-    )
-
-
-def test_actual_paths_are_eligible_and_disjoint_from_every_retained_set(
-    tool, documents
-) -> None:
-    _, cleanup = documents
-    authority = tool.parse_authority(ROOT)
-    a6 = tool.expand_a6(ROOT)
-    actual = {row["path"] for row in cleanup["files"]}
-    retained = (
-        authority["a1"]
-        | authority["a2"]
-        | authority["a4"]
-        | authority["a5"]
-        | a6
-    )
-    assert actual.isdisjoint(retained)
-    assert actual & authority["a7"] == authority["a7"] == tool.EXPECTED_A7
-    assert all(
-        row["wave"] == "night"
-        for row in cleanup["files"]
-        if row["path"] in authority["a7"]
-    )
-    assert actual.issuperset(authority["a3"])
-    assert all(not tool.is_protected(path, a6) for path in actual)
-    assert actual.isdisjoint(tool.RETAINED_EVALUATOR_DEPENDENCIES)
-    assert all(
-        tool.classify_wave(path, authority["a3"]) == row["wave"]
-        for row in cleanup["files"]
-        for path in [row["path"]]
-    )
-
-
-def test_actual_manifest_has_no_wildcard_absolute_or_escaping_path(
-    tool, documents
-) -> None:
-    _, cleanup = documents
-    for row in cleanup["files"]:
-        path = row["path"]
-        posix = Path(path)
-        assert not posix.is_absolute()
-        assert ".." not in posix.parts
-        assert not any(token in path for token in ("*", "?", "[", "]", "{", "}"))
-        assert "\\" not in path
-        assert row["active_reference_count"] >= 0
-        assert row["reference_scan_scope"] == "tracked_active_roots"
-        assert row["deletion_preconditions"] == [
-            "active_reference_count_equals_zero",
-            "baseline_blob_and_full_restore_verified",
-            "current_wave_armed_in_start_here",
-            "codex_unlinks_only_this_exact_literal_regular_file",
-        ]
-
-
-@pytest.mark.parametrize(
-    ("payload", "expected"),
-    [
-        (
-            b" D alpha.txt\0 D dir/beta.yaml\0",
-            [
-                {"status": " D", "path": "alpha.txt"},
-                {"status": " D", "path": "dir/beta.yaml"},
-            ],
-        ),
-        (
-            b"?? untracked.txt\0",
-            [{"status": "??", "path": "untracked.txt"}],
-        ),
-        (
-            b"R  new.txt\0old.txt\0",
-            [{"status": "R ", "path": "new.txt", "source_path": "old.txt"}],
-        ),
-    ],
-)
-def test_porcelain_v1_z_parser_is_nul_safe(tool, payload, expected) -> None:
-    assert tool.parse_porcelain_v1_z(payload) == expected
-
-
-@pytest.mark.parametrize(
-    ("payload", "expected"),
-    [
-        (
-            b"D\0alpha.txt\0D\0dir/beta.yaml\0",
-            [
-                {"status": "D", "path": "alpha.txt"},
-                {"status": "D", "path": "dir/beta.yaml"},
-            ],
-        ),
-        (
-            b"R100\0old.txt\0new.txt\0",
-            [
-                {
-                    "status": "R100",
-                    "path": "old.txt",
-                    "destination_path": "new.txt",
-                }
-            ],
-        ),
-    ],
-)
-def test_name_status_z_parser_is_nul_safe(tool, payload, expected) -> None:
-    assert tool.parse_name_status_z(payload) == expected
-
-
-def test_vector_parsers_and_document_validation_fail_closed(tool, documents) -> None:
-    baseline, cleanup = documents
-    with pytest.raises(tool.CleanupValidationError):
-        tool.parse_porcelain_v1_z(b" D missing-nul")
-    with pytest.raises(tool.CleanupValidationError):
-        tool.parse_name_status_z(b"D\0")
-
-    duplicate = copy.deepcopy(cleanup)
-    duplicate["files"].append(copy.deepcopy(duplicate["files"][0]))
-    with pytest.raises(tool.CleanupValidationError):
-        tool.validate_documents(ROOT, baseline, duplicate)
-
-
-def test_cli_rejects_completed_night_and_has_no_stage_or_commit_surface(tool) -> None:
-    parser = tool.build_parser()
-    help_text = parser.format_help().lower()
-    assert "stage" not in parser._subparsers._group_actions[0].choices
-    assert "commit" not in parser._subparsers._group_actions[0].choices
-    assert set(parser._subparsers._group_actions[0].choices) == {
-        "build",
-        "validate",
-        "verify-restore",
-        "verify-wave",
+    assert control["execution_state"] in control["state_contract"]
+    assert set(control["approval"]) == {
+        "approved_closure_ids",
+        "approved_exact_paths",
+    }
+    assert isinstance(control["approval"]["approved_closure_ids"], list)
+    assert isinstance(control["approval"]["approved_exact_paths"], list)
+    rendered = MANIFEST_PATH.read_text(encoding="utf-8").lower()
+    for forbidden in (
+        "remove-item",
+        "rm -rf",
+        "git clean",
         "delete-wave",
-    }
-    assert "historical-cleanup control plane" in help_text
-    delete_parser = parser._subparsers._group_actions[0].choices["delete-wave"]
-    wave_action = next(
-        action for action in delete_parser._actions if action.dest == "wave"
-    )
-    assert tuple(wave_action.choices) == ("bundle", "old002837")
-    with pytest.raises(SystemExit):
-        parser.parse_args(
-            ["delete-wave", "--wave", "night", "--wave-parent", "deadbeef"]
-        )
-
-    tree = ast.parse(inspect.getsource(tool))
-    forbidden_git_verbs = {"add", "commit", "clean", "reset", "checkout"}
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.Call):
-            continue
-        if not isinstance(node.func, ast.Name) or node.func.id != "_git":
-            continue
-        literal_args = {
-            arg.value
-            for arg in node.args
-            if isinstance(arg, ast.Constant) and isinstance(arg.value, str)
-        }
-        assert literal_args.isdisjoint(forbidden_git_verbs)
+        "unlink(",
+        "rmdir(",
+    ):
+        assert forbidden not in rendered
 
 
-def _status_payload(paths: list[str]) -> bytes:
-    return b"".join(b" D " + path.encode("utf-8") + b"\0" for path in paths)
+def test_every_candidate_group_has_dependency_and_replacement_evidence() -> None:
+    manifest = load_manifest()
+
+    for group in manifest["candidate_groups"]:
+        assert group["status"] in manifest["status_definitions"]
+        assert group["replacement_authority"]
+        assert "inbound_reference_policy" in group
+        assert group["items"]
+        for item in group["items"]:
+            assert set(item) >= {
+                "path",
+                "inbound_references",
+                "replacement_authority",
+                "recovery_basis",
+            }
+            assert item["replacement_authority"]
+            assert isinstance(item["inbound_references"], list)
 
 
-def _diff_payload(paths: list[str]) -> bytes:
-    return b"".join(b"D\0" + path.encode("utf-8") + b"\0" for path in paths)
-
-
-def test_file_vector_accepts_only_an_exact_ordinal_prefix(tool) -> None:
-    expected = ["a.txt", "b.txt", "c.txt"]
-    assert tool.validate_deletion_prefix_vectors(b"", b"", b"", expected)[
-        "prefix_count"
-    ] == 0
-    prefix = tool.validate_deletion_prefix_vectors(
-        _status_payload(expected[:2]),
-        _diff_payload(expected[:2]),
-        b"",
-        expected,
-    )
-    assert prefix["prefix_count"] == 2
-    assert prefix["complete"] is False
-    complete = tool.validate_deletion_prefix_vectors(
-        _status_payload(expected),
-        _diff_payload(expected),
-        b"",
-        expected,
-        require_complete=True,
-    )
-    assert complete["complete"] is True
-
-    with pytest.raises(tool.CleanupValidationError, match="ordinal manifest prefix"):
-        tool.validate_deletion_prefix_vectors(
-            _status_payload(["a.txt", "c.txt"]),
-            _diff_payload(["a.txt", "c.txt"]),
-            b"",
-            expected,
-        )
-    with pytest.raises(tool.CleanupValidationError, match="non-worktree-deletion"):
-        tool.validate_deletion_prefix_vectors(
-            b"?? unexpected.txt\0", b"", b"", expected
-        )
-    with pytest.raises(tool.CleanupValidationError, match="staged"):
-        tool.validate_deletion_prefix_vectors(b"", b"", b"M\0a.txt\0", expected)
-
-
-def test_v8_actor_generation_and_tampering_fail_closed(tool, monkeypatch) -> None:
-    verify_root_agents = tool.verify_root_agents
-    frozen_transition = tool.load_committed_yaml(
-        ROOT,
-        tool.DECOUPLING_CHECKPOINT,
-        tool.DECOUPLING_RECEIPT_REL,
-    )["transition_validation"]
-    monkeypatch.setattr(
-        tool,
-        "verify_root_agents",
-        lambda repo_root, *, revision=None: verify_root_agents(
-            repo_root,
-            revision=revision or tool.PACKAGE_SOURCE_BASELINE,
-        ),
-    )
-    monkeypatch.setattr(
-        tool,
-        "validate_transition_contract",
-        lambda repo_root, authority: copy.deepcopy(frozen_transition),
-    )
-    _, cleanup, receipt = tool.build_documents(ROOT)
-    tool.validate_fixed_cleanup_aggregates(cleanup)
-    tool.validate_actor_bindings(cleanup)
-    assert receipt["deletion_control"]["root_agents"]["blob_oid"] == (
-        tool.EXPECTED_AGENTS_BLOB_OID
-    )
-    assert receipt["deletion_control"]["wave_actors"] == tool.WAVE_ACTORS
-    assert receipt["guards"]["codex_delete_command_exists"] is True
-    assert all(
-        actor == {
-            "deletion_actor": "codex_exact_manifest_one_file_at_a_time",
-            "codex_delete_authorized": True,
-        }
-        for actor in tool.WAVE_ACTORS.values()
-    )
-    assert receipt["deletion_control"]["file_delete_surface"][
-        "completed_night_rejected"
-    ] is True
-    assert receipt["deletion_control"]["old002837_directory_surface"][
-        "requires_complete_501_file_deletion_vector"
-    ] is True
-
-    tampered_wave = copy.deepcopy(cleanup)
-    tampered_wave["waves"][0]["codex_delete_authorized"] = False
-    with pytest.raises(tool.CleanupValidationError, match="actor/authorization"):
-        tool.validate_actor_bindings(tampered_wave)
-
-    tampered_row = copy.deepcopy(cleanup)
-    first_bundle = next(
-        row for row in tampered_row["files"] if row["wave"] == "bundle"
-    )
-    first_bundle["codex_delete_authorized"] = False
-    with pytest.raises(tool.CleanupValidationError, match="actor/authorization"):
-        tool.validate_actor_bindings(tampered_row)
-
-
-def test_bundle_arm_requires_exact_v8_checkpoint_subject_and_section_scoped_start(
-    tool, documents, tmp_path: Path
-) -> None:
-    repo = tmp_path / "arm_repo"
-    repo.mkdir()
-    subprocess.run(["git", "init", "-q", str(repo)], check=True)
-    subprocess.run(
-        ["git", "-C", str(repo), "config", "user.name", "Codex Test"],
-        check=True,
-    )
-    subprocess.run(
-        ["git", "-C", str(repo), "config", "user.email", "codex@example.invalid"],
-        check=True,
-    )
-    _, cleanup = documents
-    expected = next(
-        list(wave["paths"]) for wave in cleanup["waves"] if wave["wave"] == "bundle"
-    )
-    start = repo / tool.START_HERE_REL
-    start.parent.mkdir(parents=True)
-    lines = [
-        "---",
-        'task_id: "v1_governance_integration_cleanup_v8"',
-        f'contract_sha256: "{tool.EXPECTED_CONTRACT_SHA256}"',
-        f'source_baseline: "{tool.PACKAGE_SOURCE_BASELINE}"',
-        'state: "running"',
-        "---",
-        tool.ARM_SECTION_HEADINGS["bundle"],
-        "- Wave: `bundle`",
-        tool.ARM_STATE_MARKER,
-        "- Contract deletion actor: `codex_exact_manifest_one_file_at_a_time`",
-        "- Contract Codex deletion authorization: `true`",
-        "- Expected deletion count: 205",
-        tool.EXPECTED_WAVE_AGGREGATES["bundle"]["path_vector_sha256"],
-        "#### Bundle exact absolute per-file manifest",
+def test_ready_paths_are_literal_files_and_never_directories() -> None:
+    manifest = load_manifest()
+    ready = [
+        item
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
     ]
-    lines.extend(
-        f"- `{repo.joinpath(*Path(path).parts)}`" for path in expected
-    )
-    start.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    subprocess.run(["git", "-C", str(repo), "add", "--", start.as_posix()], check=True)
-    subprocess.run(
-        [
-            "git",
-            "-C",
-            str(repo),
-            "commit",
-            "-q",
-            "-m",
-            "chore(v1): bind bundle deletion to codex exact-file actor",
-        ],
-        check=True,
-    )
-    migration = subprocess.run(
-        ["git", "-C", str(repo), "rev-parse", "HEAD"],
-        check=True,
-        stdout=subprocess.PIPE,
-        text=True,
-    ).stdout.strip()
-    with pytest.raises(tool.CleanupValidationError, match="exact v8 arm checkpoint"):
-        tool.validate_wave_arm_identity(repo, migration, "bundle", expected)
 
-    subprocess.run(
-        [
-            "git",
-            "-C",
-            str(repo),
-            "commit",
-            "--allow-empty",
-            "-q",
-            "-m",
-            tool.ARM_COMMIT_SUBJECTS["bundle"],
-        ],
-        check=True,
-    )
-    arm = subprocess.run(
-        ["git", "-C", str(repo), "rev-parse", "HEAD"],
-        check=True,
-        stdout=subprocess.PIPE,
-        text=True,
-    ).stdout.strip()
-    identity = tool.validate_wave_arm_identity(repo, arm, "bundle", expected)
-    assert identity["commit_subject"] == tool.ARM_COMMIT_SUBJECTS["bundle"]
-    assert identity["path_count"] == 205
-    with pytest.raises(tool.CleanupValidationError, match="completed or unauthorized"):
-        tool.validate_wave_arm_identity(repo, arm, "night", expected)
+    for item in ready:
+        pure = PurePosixPath(item["path"])
+        assert pure.suffix
+        assert item["path"] == pure.as_posix()
+        assert not pure.is_absolute()
+        assert ".." not in pure.parts
+        assert item["recovery_basis"]["kind"] == "git_blob"
 
 
-def test_literal_file_guard_and_single_unlink_use_a_real_temp_git_index(
-    tool, tmp_path: Path
-) -> None:
-    repo = tmp_path / "literal_repo"
-    repo.mkdir()
-    subprocess.run(["git", "init", "-q", str(repo)], check=True)
-    regular = repo / "regular.txt"
-    regular.write_text("temporary", encoding="utf-8")
-    subprocess.run(["git", "-C", str(repo), "add", "--", "regular.txt"], check=True)
-    subprocess.run(
-        ["git", "-C", str(repo), "config", "user.name", "Codex Test"],
-        check=True,
+def test_user_decision_keeps_the_2026_07_23_replay_out_of_ready() -> None:
+    manifest = load_manifest()
+    replay_prefix = (
+        "reports/workflow_runs/"
+        "wf_20260723_stock_first_002837_v1_replay/"
     )
-    subprocess.run(
-        ["git", "-C", str(repo), "config", "user.email", "codex@example.invalid"],
-        check=True,
-    )
-    subprocess.run(
-        ["git", "-C", str(repo), "commit", "-q", "-m", "fixture"],
-        check=True,
-    )
-    blob_oid = subprocess.run(
-        ["git", "-C", str(repo), "rev-parse", "HEAD:regular.txt"],
-        check=True,
-        stdout=subprocess.PIPE,
-        text=True,
-    ).stdout.strip()
+    ready = {
+        item["path"]
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
+    }
+    user_decision = {
+        item["path"]
+        for group in groups_by_status(manifest, "USER_DECISION")
+        for item in group["items"]
+    }
+    tracked_replay = {
+        path.replace("\\", "/")
+        for path in subprocess.check_output(
+            ["git", "-C", str(ROOT), "ls-files", f"{replay_prefix}*"],
+            text=True,
+            encoding="utf-8",
+        ).splitlines()
+        if path
+    }
 
-    target = tool.validate_literal_tracked_file(
-        repo, "regular.txt", expected_blob_oid=blob_oid
+    assert tracked_replay
+    assert tracked_replay <= user_decision
+    assert tracked_replay.isdisjoint(ready)
+
+
+def test_modified_file_allowlist_is_exact_and_contains_only_authorized_paths() -> None:
+    manifest = load_manifest()
+    allowlist = manifest["audit"]["modified_file_allowlist"]
+    retirement = manifest["audit"]["retirement_execution"]
+    approved = manifest["deletion_control"]["approval"]["approved_exact_paths"]
+
+    assert allowlist == sorted(set(allowlist))
+    assert "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml" in allowlist
+    assert not any(path.startswith("data/") for path in allowlist)
+    assert not any(path.startswith("src/portfolio/") for path in allowlist)
+    assert not any(path.startswith("src/investment_review/") for path in allowlist)
+    assert retirement["dependency_decoupling_commit"] == (
+        "bbb95318156820bd5c1d8a49d4a20a7df8758754"
     )
-    assert target == regular.resolve()
-    with pytest.raises(tool.CleanupValidationError, match="index blob OID"):
-        tool.validate_literal_tracked_file(
-            repo, "regular.txt", expected_blob_oid="0" * 40
+    assert retirement["control_paths"] == [
+        ".github/workflows/ci.yml",
+        "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml",
+        "tests/test_r5_v1_active_routing_retirement.py",
+        "tests/test_r5_v1_historical_cleanup_manifest.py",
+    ]
+    assert retirement["approved_paths_source"] == (
+        "deletion_control.approval.approved_exact_paths"
+    )
+    assert retirement["expected_worktree_change_count"] == (
+        len(retirement["control_paths"]) + len(approved)
+    )
+    assert retirement["quarantine_root"] == manifest["deletion_control"]["quarantine"]["path"]
+
+
+def test_ci_quality_report_is_written_only_to_the_ignored_temp_root() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+
+    assert "--output .codex_tmp/ci_source_route_quality_report.yaml" in workflow
+    assert "reports/quality/ci_source_route_quality_report.yaml" not in workflow
+
+
+def test_declared_inbound_references_are_exact_and_auditable() -> None:
+    manifest = load_manifest()
+    baseline = manifest["audit"]["baseline_commit"]
+    candidate_paths = {
+        item["path"]
+        for group in manifest["candidate_groups"]
+        for item in group["items"]
+    }
+
+    def historical_text(relative: str) -> str:
+        return subprocess.check_output(
+            ["git", "-C", str(ROOT), "show", f"{baseline}:{relative}"],
+        ).decode("utf-8", errors="replace")
+
+    def mentions(source_path: str, source_text: str, target: str) -> bool:
+        if target in source_text.replace("\\", "/"):
+            return True
+        if not source_path.endswith(".md"):
+            return False
+        source_dir = posixpath.dirname(source_path)
+        for raw_link in re.findall(r"\]\(([^)]+)\)", source_text):
+            link = raw_link.split("#", 1)[0]
+            if not link or "://" in link:
+                continue
+            resolved = posixpath.normpath(posixpath.join(source_dir, link))
+            if resolved == target:
+                return True
+        return False
+
+    for group in manifest["candidate_groups"]:
+        for item in group["items"]:
+            target = item["path"]
+            for reference in item["inbound_references"]:
+                source = ROOT / reference["source_path"]
+                relation = reference["relation"]
+                if source.is_file():
+                    source_text = source.read_text(encoding="utf-8", errors="replace")
+                else:
+                    assert (
+                        reference["source_path"] in candidate_paths
+                        or relation in {"closure_internal", "self_reference", "git_history_only"}
+                    ), reference
+                    source_text = historical_text(reference["source_path"])
+                assert mentions(reference["source_path"], source_text, target), reference
+                assert reference["relation"] in {
+                    "closure_internal",
+                    "current_worktree_physical",
+                    "git_history_only",
+                    "historical_cross_reference",
+                    "historical_metadata_only",
+                    "negative_assertion_only",
+                    "retained_evidence_reference",
+                    "retirement_assertion_only",
+                    "self_reference",
+                }
+
+
+def test_internal_relations_and_actual_full_path_references_are_closed() -> None:
+    manifest = load_manifest()
+    candidates = {
+        item["path"]: item
+        for group in manifest["candidate_groups"]
+        for item in group["items"]
+    }
+    ready = {
+        item["path"]
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
+    }
+    candidate_status = {
+        item["path"]: group["status"]
+        for group in manifest["candidate_groups"]
+        for item in group["items"]
+    }
+    declared = {
+        target: {reference["source_path"] for reference in item["inbound_references"]}
+        for target, item in candidates.items()
+    }
+
+    for target, item in candidates.items():
+        for reference in item["inbound_references"]:
+            if reference["relation"] == "closure_internal":
+                source = reference["source_path"]
+                assert source in candidates, (target, reference)
+                assert candidate_status[source] == candidate_status[target], (
+                    target,
+                    reference,
+                )
+                if target in ready:
+                    assert source in ready, (target, reference)
+            if reference["relation"] == "self_reference":
+                assert reference["source_path"] == target, (target, reference)
+
+    tracked = subprocess.check_output(
+        ["git", "-C", str(ROOT), "ls-files", "-z"],
+    ).decode("utf-8").split("\0")
+    actual: dict[str, set[str]] = {target: set() for target in candidates}
+    for source_path in tracked:
+        if not source_path or source_path == MANIFEST_PATH.relative_to(ROOT).as_posix():
+            continue
+        source = ROOT / source_path
+        if not source.is_file():
+            continue
+        try:
+            source_text = source.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        normalized_source_text = source_text.replace("\\", "/")
+        for target in candidates:
+            if target in normalized_source_text:
+                actual[target].add(source_path)
+
+    undeclared = {
+        target: sorted(sources - declared[target])
+        for target, sources in actual.items()
+        if sources - declared[target]
+    }
+    assert undeclared == {}
+
+
+def test_every_candidate_has_exact_dual_hash_git_recovery() -> None:
+    manifest = load_manifest()
+    baseline = manifest["audit"]["baseline_commit"]
+
+    for group in manifest["candidate_groups"]:
+        for item in group["items"]:
+            relative = item["path"]
+            payload = subprocess.check_output(
+                ["git", "-C", str(ROOT), "show", f"{baseline}:{relative}"],
+            )
+            oid = subprocess.check_output(
+                ["git", "-C", str(ROOT), "rev-parse", f"{baseline}:{relative}"],
+                text=True,
+                encoding="utf-8",
+            ).strip()
+            assert item["recovery_basis"] == {
+                "kind": "git_blob",
+                "commit": baseline,
+            }
+            assert item["blob_oid"] == oid
+            assert item["byte_count"] == len(payload)
+            assert item["content_sha256"] == hashlib.sha256(payload).hexdigest()
+
+
+def test_manual_delete_closures_are_complete_and_atomic() -> None:
+    manifest = load_manifest()
+    ready = {
+        item["path"]: item
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
+    }
+    grouped: dict[str, set[str]] = {}
+    for relative, item in ready.items():
+        grouped.setdefault(item["closure_id"], set()).add(relative)
+
+    declared = {row["closure_id"]: row for row in manifest["manual_delete_closures"]}
+    assert set(grouped) == set(declared)
+    assert all(row["all_or_none"] is True for row in declared.values())
+    for closure_id, paths in grouped.items():
+        row = declared[closure_id]
+        assert row["file_count"] == len(paths)
+        assert row["byte_count"] == sum(ready[path]["byte_count"] for path in paths)
+        assert row["first_path"] == min(paths)
+
+
+def test_deletion_state_matches_exact_worktree_absence_and_approval() -> None:
+    manifest = load_manifest()
+    control = manifest["deletion_control"]
+    ready = {
+        item["path"]: item
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
+    }
+    closures = {
+        row["closure_id"]: {
+            path
+            for path, item in ready.items()
+            if item["closure_id"] == row["closure_id"]
+        }
+        for row in manifest["manual_delete_closures"]
+    }
+    missing = {path for path in ready if not (ROOT / path).is_file()}
+    approved_ids = set(control["approval"]["approved_closure_ids"])
+    approved_paths = set(control["approval"]["approved_exact_paths"])
+    quarantine_config = control["quarantine"]
+    quarantine_relative = PurePosixPath(quarantine_config["path"])
+    assert quarantine_relative.parts[:1] == (".codex_tmp",)
+    assert ".." not in quarantine_relative.parts
+    quarantine_root = ROOT.joinpath(*quarantine_relative.parts)
+    assert ROOT.resolve() in quarantine_root.resolve().parents
+    assert quarantine_config["layout"] == "preserved_repo_relative_paths"
+    assert quarantine_config["tracked"] is False
+    assert quarantine_config["gitignored"] is True
+    assert quarantine_config["content_validation"] == "original_path_git_filtered_blob_oid"
+    ignore_check = subprocess.run(
+        ["git", "-C", str(ROOT), "check-ignore", "-q", str(quarantine_root / "probe")],
+        check=False,
+    )
+    assert ignore_check.returncode == 0
+    assert not quarantine_root.is_symlink()
+
+    checkout_receipts = {
+        row["path"]: row for row in quarantine_config["crlf_checkout_receipts"]
+    }
+    assert len(checkout_receipts) == 5
+    assert set(checkout_receipts) <= set(ready)
+
+    def assert_quarantine_payload(relative: str, payload_path: Path) -> None:
+        assert payload_path.is_file()
+        assert not payload_path.is_symlink()
+        payload = payload_path.read_bytes()
+        receipt = checkout_receipts.get(relative)
+        expected_size = receipt["checkout_byte_count"] if receipt else ready[relative]["byte_count"]
+        expected_sha = receipt["checkout_sha256"] if receipt else ready[relative]["content_sha256"]
+        assert len(payload) == expected_size, relative
+        assert hashlib.sha256(payload).hexdigest() == expected_sha, relative
+        filtered_oid = subprocess.check_output(
+            [
+                "git",
+                "-C",
+                str(ROOT),
+                "hash-object",
+                f"--path={relative}",
+                "--",
+                str(payload_path),
+            ],
+            text=True,
+        ).strip()
+        assert filtered_oid == ready[relative]["blob_oid"], relative
+
+    quarantine_files: set[str] = set()
+    if quarantine_root.is_dir():
+        descendants = list(quarantine_root.rglob("*"))
+        assert not any(path.is_symlink() for path in descendants)
+        quarantine_files = {
+            path.relative_to(quarantine_root).as_posix()
+            for path in descendants
+            if path.is_file()
+        }
+    baseline = manifest["audit"]["baseline_commit"]
+    diff_rows = [
+        line.split("\t", 1)
+        for line in subprocess.check_output(
+            ["git", "-C", str(ROOT), "diff", "--no-renames", "--name-status", baseline, "--"],
+            text=True,
+        ).splitlines()
+    ]
+    changed_from_baseline = {path for _, path in diff_rows}
+    deleted_from_baseline = {path for status, path in diff_rows if status == "D"}
+    added_from_baseline = {path for status, path in diff_rows if status == "A"}
+    baseline_files = set(
+        subprocess.check_output(
+            ["git", "-C", str(ROOT), "ls-tree", "-r", "--name-only", baseline],
+            text=True,
+        ).splitlines()
+    )
+    declared_allowlist = set(manifest["audit"]["modified_file_allowlist"])
+    declared_additions = declared_allowlist - baseline_files
+    untracked = set(
+        subprocess.check_output(
+            ["git", "-C", str(ROOT), "ls-files", "--others", "--exclude-standard"],
+            text=True,
+        ).splitlines()
+    )
+    staged = set(
+        subprocess.check_output(
+            ["git", "-C", str(ROOT), "diff", "--cached", "--name-only"],
+            text=True,
+        ).splitlines()
+    )
+
+    assert approved_ids <= set(closures)
+    expected = set().union(*(closures[closure_id] for closure_id in approved_ids))
+    assert deleted_from_baseline == missing
+    assert changed_from_baseline <= declared_allowlist | expected
+    assert added_from_baseline <= declared_additions
+    if control["execution_state"] == "not_started":
+        assert missing == set()
+        assert approved_ids == set()
+        assert approved_paths == set()
+        assert quarantine_files == set()
+        assert untracked <= declared_additions
+    elif control["execution_state"] == "quarantine_move_in_progress":
+        assert approved_ids == set(closures)
+        assert approved_paths == expected == set(ready)
+        assert quarantine_files == missing
+        assert untracked == set()
+        assert staged == set()
+        for relative in expected:
+            source = ROOT / relative
+            quarantined = quarantine_root.joinpath(*PurePosixPath(relative).parts)
+            assert source.is_file() != quarantined.is_file(), relative
+            assert_quarantine_payload(relative, quarantined if quarantined.is_file() else source)
+    elif control["execution_state"] == "user_quarantined_pending_manual_delete":
+        assert approved_ids == set(closures)
+        assert approved_paths == expected == set(ready)
+        assert missing == expected
+        assert quarantine_files == expected
+        assert untracked == set()
+        assert staged == set()
+        for relative in expected:
+            quarantined = quarantine_root.joinpath(*PurePosixPath(relative).parts)
+            assert_quarantine_payload(relative, quarantined)
+    elif control["execution_state"] == "user_deleted_pending_commit":
+        assert approved_ids
+        assert approved_paths == expected
+        assert missing == expected
+        assert not quarantine_root.exists()
+        assert quarantine_files == set()
+        assert untracked == set()
+        assert staged == set()
+    elif control["execution_state"] == "completed":
+        assert approved_ids
+        assert approved_paths == expected
+        assert missing == expected
+        assert not quarantine_root.exists()
+        assert quarantine_files == set()
+        assert untracked == set()
+        assert staged == set()
+        for path in expected:
+            current_head = subprocess.run(
+                ["git", "-C", str(ROOT), "cat-file", "-e", f"HEAD:{path}"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+            assert current_head.returncode != 0, path
+    else:
+        raise AssertionError(f"unknown deletion state: {control['execution_state']}")
+
+
+def test_baseline_docs_and_reports_have_one_effective_classification() -> None:
+    manifest = load_manifest()
+    resolution = manifest["classification_resolution"]
+    summary = resolution["effective_summary"]
+
+    assert resolution["scope"]["expected_file_count"] == 522
+    assert resolution["scope"]["expected_git_blob_bytes"] == 7_152_475
+    assert sum(row["file_count"] for row in summary.values()) == 522
+    assert sum(row["git_blob_bytes"] for row in summary.values()) == 7_152_475
+    assert set(summary) == set(manifest["status_definitions"])
+    assert resolution["conflict_policy"] == {
+        "duplicate_exact_status": "error",
+        "equal_specificity_prefix_status": "error",
+        "unmatched_baseline_path": "error",
+        "ready_selector_type": "exact_file_only",
+        "effective_sets_disjoint": True,
+    }
+
+
+def test_legacy_route_surfaces_are_hash_bound_and_never_current_defaults() -> None:
+    manifest = load_manifest()
+    baseline = manifest["audit"]["baseline_commit"]
+    surfaces = manifest["legacy_route_surfaces"]
+    candidate_status = {
+        item["path"]: group["status"]
+        for group in manifest["candidate_groups"]
+        for item in group["items"]
+    }
+
+    assert len(surfaces) == 10
+    assert len({row["path"] for row in surfaces}) == len(surfaces)
+    for row in surfaces:
+        payload = subprocess.check_output(
+            ["git", "-C", str(ROOT), "show", f"{baseline}:{row['path']}"],
         )
-    with pytest.raises(tool.CleanupValidationError, match="escaping"):
-        tool.validate_literal_tracked_file(repo, "../outside.txt")
-    directory = repo / "directory"
-    directory.mkdir()
-    with pytest.raises(tool.CleanupValidationError, match="non-regular"):
-        tool.validate_literal_tracked_file(repo, "directory")
-
-    class ReparseStat:
-        st_file_attributes = 0x400
-
-    assert tool._is_reparse_stat(ReparseStat()) is True
-    regular.write_text("index drift", encoding="utf-8")
-    subprocess.run(["git", "-C", str(repo), "add", "--", "regular.txt"], check=True)
-    with pytest.raises(tool.CleanupValidationError, match="index blob OID"):
-        tool.validate_literal_tracked_file(
-            repo, "regular.txt", expected_blob_oid=blob_oid
+        assert row["route_policy"] == (
+            "explicit input or historical fixture only; never a current default"
         )
-    tool._unlink_one_literal(target)
-    assert not regular.exists()
+        assert row["recovery_basis"] == {"kind": "git_blob", "commit": baseline}
+        assert row["byte_count"] == len(payload)
+        assert row["content_sha256"] == hashlib.sha256(payload).hexdigest()
+        if row["status_source"] == "candidate_groups":
+            assert row["status"] == candidate_status[row["path"]]
+        else:
+            assert row["status"] == "LEGACY_BOUND"
+        for reference in row["inbound_references"]:
+            source = ROOT / reference["source_path"]
+            if source.is_file():
+                source_text = source.read_text(encoding="utf-8", errors="replace")
+            else:
+                assert reference["source_path"] in candidate_status, reference
+                source_text = subprocess.check_output(
+                    [
+                        "git",
+                        "-C",
+                        str(ROOT),
+                        "show",
+                        f"{baseline}:{reference['source_path']}",
+                    ],
+                ).decode("utf-8", errors="replace")
+            assert row["path"] in source_text, reference
 
 
-def test_directory_surface_is_deepest_first_prefix_only_and_git_invisible(
-    tool, tmp_path: Path
-) -> None:
-    repo = tmp_path / "directory_repo"
-    repo.mkdir()
-    subprocess.run(["git", "init", "-q", str(repo)], check=True)
-    subprocess.run(
-        ["git", "-C", str(repo), "config", "user.name", "Codex Test"],
-        check=True,
-    )
-    subprocess.run(
-        ["git", "-C", str(repo), "config", "user.email", "codex@example.invalid"],
-        check=True,
-    )
-    subprocess.run(
-        ["git", "-C", str(repo), "commit", "--allow-empty", "-q", "-m", "root"],
-        check=True,
-    )
-    parent = subprocess.run(
-        ["git", "-C", str(repo), "rev-parse", "HEAD"],
-        check=True,
-        stdout=subprocess.PIPE,
-        text=True,
-    ).stdout.strip()
-    paths = ["run/a", "run/b", "run"]
-    for path in paths[:2]:
-        repo.joinpath(*Path(path).parts).mkdir(parents=True, exist_ok=True)
+def test_explicit_legacy_writers_are_kept_and_git_recoverable() -> None:
+    manifest = load_manifest()
+    baseline = manifest["audit"]["baseline_commit"]
+    writers = manifest["legacy_route_writers"]
+    candidate_paths = {
+        item["path"]
+        for group in manifest["candidate_groups"]
+        for item in group["items"]
+    }
 
-    frozen_vectors = tool.capture_deletion_vectors(repo, parent)
-    state = tool.validate_directory_prefix_state(repo, paths, processed_count=0)
-    assert state["current_path"] == "run/a"
-    for index, path in enumerate(paths, start=1):
-        target = repo.joinpath(*Path(path).parts)
-        tool._rmdir_one_literal(target)
-        assert tool.capture_deletion_vectors(repo, parent) == frozen_vectors
-        state = tool.validate_directory_prefix_state(
-            repo, paths, processed_count=index
+    assert len(writers) == 5
+    assert len({row["path"] for row in writers}) == len(writers)
+    for row in writers:
+        payload = subprocess.check_output(
+            ["git", "-C", str(ROOT), "show", f"{baseline}:{row['path']}"],
         )
-    assert state["complete"] is True
-    assert not (repo / "run").exists()
+        assert row["status"] == "KEEP_ACTIVE"
+        assert row["route_id"] == "old_002837_workflow"
+        assert row["write_targets"]
+        assert row["recovery_basis"] == {"kind": "git_blob", "commit": baseline}
+        assert row["byte_count"] == len(payload)
+        assert row["content_sha256"] == hashlib.sha256(payload).hexdigest()
+        for reference in row["inbound_references"]:
+            source = ROOT / reference["source_path"]
+            if source.is_file():
+                source_text = source.read_text(encoding="utf-8", errors="replace")
+            else:
+                assert reference["source_path"] in candidate_paths, reference
+                source_text = subprocess.check_output(
+                    [
+                        "git",
+                        "-C",
+                        str(ROOT),
+                        "show",
+                        f"{baseline}:{reference['source_path']}",
+                    ],
+                ).decode("utf-8", errors="replace")
+            assert row["path"] in source_text, reference
 
 
-def test_directory_surface_rejects_extra_nonempty_gap_and_worktree_root(
-    tool, tmp_path: Path
-) -> None:
-    extra_repo = tmp_path / "extra_repo"
-    (extra_repo / "run" / "a").mkdir(parents=True)
-    (extra_repo / "run" / "extra").mkdir()
-    with pytest.raises(tool.CleanupValidationError, match="enumeration"):
-        tool.validate_directory_prefix_state(extra_repo, ["run/a", "run"])
+def test_human_policy_and_formal_database_invariants_remain_untouched() -> None:
+    manifest = load_manifest()
+    invariants = {row["id"]: row for row in manifest["protected_invariants"]}
 
-    file_repo = tmp_path / "file_repo"
-    (file_repo / "run" / "a").mkdir(parents=True)
-    (file_repo / "run" / "unexpected.txt").write_text(
-        "unexpected", encoding="utf-8"
+    human = invariants["C-HUMAN-005"]
+    assert human["status"] == "pending"
+    assert human["effective_machine_value"] is None
+    assert human["mutation_authorized"] is False
+    assert human["authority"] == [
+        "AGENTS.md",
+        "docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md",
+    ]
+    database = invariants["formal_portfolio_database"]
+    assert database["access"] == "read_only"
+    assert database["copy_delete_rebuild_authorized"] is False
+    assert database["tracked_or_manifested_content"] is False
+
+
+def test_ready_expected_configs_are_only_the_closed_three_file_set() -> None:
+    manifest = load_manifest()
+    ready = {
+        item["path"]
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
+        if item["path"].startswith("config/")
+        and item["path"].endswith("expected_artifacts.yaml")
+    }
+    bound = {
+        item["path"]
+        for group in groups_by_status(manifest, "LEGACY_BOUND")
+        for item in group["items"]
+        if item["path"].startswith("config/")
+    }
+
+    assert ready == {
+        "config/r5_bundle8r_expected_artifacts.yaml",
+        "config/r5_bundle9r_expected_artifacts.yaml",
+        "config/r5_bundle10r_expected_artifacts.yaml",
+    }
+    assert bound >= {
+        "config/r5_bundle3_expected_artifacts.yaml",
+        "config/r5_bundle4_expected_artifacts.yaml",
+        "config/r5_bundle5_expected_artifacts.yaml",
+        "config/r5_patch_1_12_expected_artifacts.yaml",
+        "config/r5_patch_49_55_expected_artifacts.yaml",
+    }
+
+
+def test_legacy_generation_bindings_are_ready_only_after_default_cli_retirement() -> None:
+    manifest = load_manifest()
+    ready = {
+        item["path"]
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
+    }
+
+    assert {
+        "config/r5_bundle10r_generation_binding.yaml",
+        "config/r5_bundle9r_generation_binding.yaml",
+    } <= ready
+    assert all(
+        row["route_policy"]
+        == "explicit input or historical fixture only; never a current default"
+        for row in manifest["legacy_route_surfaces"]
     )
-    with pytest.raises(tool.CleanupValidationError, match="non-directory entry"):
-        tool.validate_directory_prefix_state(file_repo, ["run/a", "run"])
-    with pytest.raises(tool.CleanupValidationError, match="non-empty"):
-        tool._rmdir_one_literal(file_repo / "run")
-
-    gap_repo = tmp_path / "gap_repo"
-    (gap_repo / "run" / "a").mkdir(parents=True)
-    (gap_repo / "run" / "b").mkdir()
-    (gap_repo / "run" / "b").rmdir()
-    with pytest.raises(tool.CleanupValidationError, match="prefix/remaining-suffix"):
-        tool.validate_directory_prefix_state(
-            gap_repo, ["run/a", "run/b", "run"]
-        )
-
-    root_repo = tmp_path / "root_repo"
-    root_repo.mkdir()
-    with pytest.raises(tool.CleanupValidationError, match="worktree root"):
-        tool.validate_directory_prefix_state(root_repo, ["."])
 
 
-def test_baseline_recovery_metadata_tampering_fails_closed(tool, documents) -> None:
-    baseline, _ = documents
-    row = copy.deepcopy(baseline["files"][0])
-    tool._validate_baseline_row(ROOT, row)
-    row["content_sha256"] = "0" * 64
-    with pytest.raises(tool.CleanupValidationError, match="content SHA-256"):
-        tool._validate_baseline_row(ROOT, row)
+def test_stale_current_markers_are_quarantined_not_rewritten() -> None:
+    manifest = load_manifest()
+    status_by_path = {
+        item["path"]: group["status"]
+        for group in manifest["candidate_groups"]
+        for item in group["items"]
+    }
+    stale_markers = (
+        "state: \"running",
+        "Current checkpoint",
+        "current checkpoint",
+        "latest working",
+        "Current workflow",
+    )
+    scoped_roots = (
+        ROOT / "docs/codex_tasks",
+        ROOT / "docs/plans",
+        ROOT / "reports/p1_6",
+    )
+    stale_paths: set[str] = set()
+    for scoped_root in scoped_roots:
+        for path in scoped_root.rglob("*"):
+            if path.is_file() and path.suffix.lower() in {".md", ".yaml", ".yml"}:
+                text = path.read_text(encoding="utf-8", errors="replace")
+                if any(marker in text for marker in stale_markers):
+                    stale_paths.add(path.relative_to(ROOT).as_posix())
+
+    assert stale_paths
+    assert stale_paths <= set(status_by_path)
+    assert all(
+        status_by_path[path] in {
+            "LEGACY_BOUND",
+            "READY_FOR_MANUAL_DELETE",
+            "USER_DECISION",
+        }
+        for path in stale_paths
+    )
+
+
+def test_protected_review_contracts_and_research_runs_remain_out_of_ready() -> None:
+    manifest = load_manifest()
+    ready = {
+        item["path"]
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
+    }
+    protected_exact = {
+        row["path"]
+        for row in manifest["protected_paths"]
+        if "path" in row
+    }
+    review_contracts = {
+        path.replace("\\", "/")
+        for path in subprocess.check_output(
+            ["git", "-C", str(ROOT), "ls-files", "docs/contracts/**"],
+            text=True,
+            encoding="utf-8",
+        ).splitlines()
+        if path
+    }
+
+    assert len(review_contracts) == 20
+    assert review_contracts <= protected_exact
+    assert review_contracts.isdisjoint(ready)
+    for prefix in (
+        "reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/",
+        "reports/workflow_runs/wf_20260703_data_layer_002837_invic/",
+        "reports/workflow_runs/wf_20260715_stock_first_301217_tongguan_copper_foil/",
+        "reports/workflow_runs/wf_20260715_stock_first_600673_hec_tech/",
+        "reports/workflow_runs/wf_20260715_stock_first_600988_chifeng_gold/",
+        "reports/workflow_runs/wf_20260715_stock_first_603259_wuxi_apptec/",
+    ):
+        assert not any(path.startswith(prefix) for path in ready)
+
+
+def test_retired_governance_control_plane_has_explicit_exception_for_p5_evidence() -> None:
+    manifest = load_manifest()
+    ready = {
+        item["path"]
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
+    }
+    bound = {
+        item["path"]
+        for group in groups_by_status(manifest, "LEGACY_BOUND")
+        for item in group["items"]
+    }
+
+    for path in (
+        "reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml",
+        "reports/p1_6/r5_v1_governance_cleanup/historical_cleanup_manifest.yaml",
+        "docs/codex_tasks/v1_governance_integration_cleanup_v8/CONTRACT.md",
+        "docs/codex_tasks/v1_governance_integration_cleanup_v11/CONTRACT.md",
+        "scripts/manage_r5_v1_historical_cleanup.py",
+    ):
+        assert path in ready
+    assert (
+        "docs/codex_tasks/v1_governance_integration_cleanup_v2/CONTRACT.md"
+        in bound
+    )

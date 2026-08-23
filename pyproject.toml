@@ -13,5 +13,5 @@ line-length = 100
 testpaths = ["tests"]
 addopts = "-m 'not legacy_compatibility'"
 markers = [
-  "legacy_compatibility: frozen historical governance and replay compatibility checks excluded from the default suite",
+  "legacy_compatibility: explicit historical replay checks excluded from the default suite",
 ]

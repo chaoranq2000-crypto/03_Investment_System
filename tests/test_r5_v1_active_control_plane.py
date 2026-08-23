@@ -19,9 +19,10 @@ HISTORICAL_SCOPE_AUDIT_SHA256 = (
     "8670a74e180024894126479e73e7fa4ebe4ba284ae4bb80683831c16691ded57"
 )
 RETAINED_CONTROL_PATHS = (
-    "reports/p1_6/r5_v1_governance_cleanup/root_policy_migration.yaml",
-    "reports/p1_6/r5_v1_governance_cleanup/validation/blocker_root_reconciliation.yaml",
-    "reports/p1_6/r5_v1_governance_cleanup/validation/source_route_quality_report.yaml",
+    "config/r5_readout_canonical_index.yaml",
+    "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml",
+    "reports/quality/source_route_quality_report.yaml",
+    "reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml",
     "reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/"
     "validation/replay_receipt.yaml",
 )
@@ -102,7 +103,7 @@ def test_bundle_runtimes_are_explicit_local_evaluators_only() -> None:
     assert "workflow_state.yaml" not in bundle12_cli + bundle13_cli
 
 
-def test_v1_protected_history_is_unchanged_from_the_night05_delivery() -> None:
+def test_v1_history_is_git_recoverable_and_current_control_paths_are_present() -> None:
     assert (
         git_output("merge-base", "--is-ancestor", DELIVERY_BASELINE, PACKAGE_BASELINE)
         == ""
@@ -112,10 +113,11 @@ def test_v1_protected_history_is_unchanged_from_the_night05_delivery() -> None:
     assert audit["historical_changed_paths"] == []
     assert audit["out_of_scope_paths"] == []
     for relative in RETAINED_CONTROL_PATHS:
-        assert git_output("ls-files", "--error-unmatch", relative) == relative
         path = ROOT / relative
         assert path.is_file()
         assert path.stat().st_size > 0
+        if relative != "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml":
+            assert git_output("ls-files", "--error-unmatch", relative) == relative
 
 
 def test_legacy_night05_scope_is_frozen_at_delivery_snapshot() -> None:

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Run the R5 MVP smoke checks through one wrapper command."""
+"""Run the active Research control-plane smoke checks through one wrapper.
+
+The filename is retained for compatibility; legacy Patch/Bundle manifests are
+not inputs to the default command.
+"""
 from __future__ import annotations
 
 import argparse
@@ -14,26 +18,11 @@ from typing import Any
 
 
 def default_steps(python: str, strict: bool) -> list[dict[str, Any]]:
-    inventory_command = [
-        python,
-        "scripts/r5_patch_inventory_check.py",
-        "--config",
-        "config/r5_patch_1_12_expected_artifacts.yaml",
-        "--out",
-        "reports/p1_6/r5_patch_1_12_inventory_status.yaml",
-    ]
-    truthfulness_command = [
-        python,
-        "scripts/check_r5_readout_truthfulness.py",
-        "--rules",
-        "config/r5_readout_truthfulness_rules.yaml",
-        "--glob",
-        "reports/p1_6/R5_PATCH_*_READOUT.md",
-    ]
-    if strict:
-        inventory_command.append("--strict")
-        truthfulness_command.append("--strict")
-
+    del strict  # Current control-plane checks are always blocking.
+    current_state = (
+        "reports/workflow_runs/"
+        "wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml"
+    )
     return [
         {
             "name": "r5_artifact_format_guard",
@@ -41,20 +30,63 @@ def default_steps(python: str, strict: bool) -> list[dict[str, Any]]:
                 python,
                 "scripts/check_r5_artifact_format.py",
                 "--strict",
-                "--json",
-                "reports/p1_6/r5_format_guard.json",
             ],
-            "artifact_outputs": ["reports/p1_6/r5_format_guard.json"],
-            "trust_boundary_note": "format guard runs first and checks gate-of-gates including smoke wrapper itself",
+            "artifact_outputs": [],
+            "trust_boundary_note": "current artifact format and gate-of-gates checks remain blocking",
         },
         {
-            "name": "r5_patch_inventory_check",
-            "command": inventory_command,
-            "artifact_outputs": ["reports/p1_6/r5_patch_1_12_inventory_status.yaml"],
-            "trust_boundary_note": "inventory is blocking in strict mode",
+            "name": "doc_drift",
+            "command": [python, "scripts/check_doc_drift.py"],
+            "artifact_outputs": [],
+            "trust_boundary_note": "canonical documentation owners and retention manifest must agree",
         },
         {
-            "name": "r5_pack_validators",
+            "name": "current_pointer_truthfulness",
+            "command": [
+                python,
+                "scripts/check_r5_readout_truthfulness.py",
+                "--rules",
+                "config/r5_readout_truthfulness_rules.yaml",
+                "--strict",
+            ],
+            "artifact_outputs": [],
+            "trust_boundary_note": "only current_runs may select an active state/readout",
+        },
+        {
+            "name": "current_workflow_state",
+            "command": [
+                python,
+                ".agents/skills/research-orchestrator/scripts/validate_workflow_state.py",
+                current_state,
+            ],
+            "artifact_outputs": [],
+            "trust_boundary_note": "canonical workflow-state validator remains authoritative",
+        },
+        {
+            "name": "source_route_quality",
+            "command": [
+                python,
+                "scripts/run_source_route_quality_gate.py",
+                "--import-check",
+            ],
+            "artifact_outputs": ["reports/quality/source_route_quality_report.yaml"],
+            "trust_boundary_note": "operational adapter proof is read from reports/quality",
+        },
+        {
+            "name": "active_routing_retirement",
+            "command": [
+                python,
+                "-m",
+                "pytest",
+                "-q",
+                "tests/test_r5_v1_active_routing_retirement.py",
+                "--tb=short",
+            ],
+            "artifact_outputs": [],
+            "trust_boundary_note": "retired governance paths cannot re-enter active routing",
+        },
+        {
+            "name": "research_pack_contracts",
             "command": [
                 python,
                 "-m",
@@ -68,10 +100,10 @@ def default_steps(python: str, strict: bool) -> list[dict[str, Any]]:
                 "--tb=short",
             ],
             "artifact_outputs": [],
-            "trust_boundary_note": "pytest exit_code is treated as authoritative",
+            "trust_boundary_note": "current research pack validators retain fail-closed semantics",
         },
         {
-            "name": "r5_composer_fixture_smoke",
+            "name": "current_research_fixture_smoke",
             "command": [
                 python,
                 "-m",
@@ -79,36 +111,13 @@ def default_steps(python: str, strict: bool) -> list[dict[str, Any]]:
                 "-q",
                 "tests/test_compose_r5_report_from_pack.py",
                 "tests/test_r5_mvp_fixture_smoke.py",
-                "--tb=short",
-            ],
-            "artifact_outputs": [],
-            "trust_boundary_note": "pytest exit_code is treated as authoritative",
-        },
-        {
-            "name": "r5_quality_fixture_smoke",
-            "command": [
-                python,
-                "-m",
-                "pytest",
-                "-q",
                 "tests/test_r5_stock_led_smoke_dry_run.py",
                 "--tb=short",
             ],
             "artifact_outputs": [],
-            "trust_boundary_note": "pytest exit_code is treated as authoritative",
-        },
-        {
-            "name": "r5_readout_truthfulness_gate",
-            "command": [
-                *truthfulness_command,
-                "--json",
-                "reports/p1_6/r5_readout_truthfulness_result.json",
-            ],
-            "artifact_outputs": ["reports/p1_6/r5_readout_truthfulness_result.json"],
-            "trust_boundary_note": "canonical readouts are blocking; legacy readouts are archived as noncanonical",
+            "trust_boundary_note": "composer and stock-led fixtures remain part of the current smoke contract",
         },
     ]
-
 
 def _tail(text: str, limit: int = 20) -> str:
     return "\n".join(text.splitlines()[-limit:])
@@ -167,7 +176,7 @@ def write_json(path: Path, report: dict[str, Any]) -> None:
 
 
 def emit_report(report: dict[str, Any]) -> None:
-    print(f"r5_mvp_smoke_status={report['status']} checked={report['checked']} failed={report['failed']}")
+    print(f"research_control_smoke_status={report['status']} checked={report['checked']} failed={report['failed']}")
     for result in report["results"]:
         print(f"[{result['name']}] exit_code={result['exit_code']} duration={result['duration_seconds']}s")
         if result["summary"]:
@@ -177,7 +186,7 @@ def emit_report(report: dict[str, Any]) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run the R5 MVP smoke suite.")
+    parser = argparse.ArgumentParser(description="Run the active Research control-plane smoke suite.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
     parser.add_argument("--python", default=sys.executable)
     parser.add_argument("--strict", action="store_true", help="Run advisory gates in blocking mode.")

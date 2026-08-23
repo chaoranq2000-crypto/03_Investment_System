@@ -555,7 +555,7 @@ def build_outputs(repo_root: Path, reviewed_at: str) -> dict[str, Any]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build R5 Bundle 5.4 forecast and valuation onboarding outputs.")
-    parser.add_argument("--repo-root", type=Path, default=Path("."))
+    parser.add_argument("--repo-root", type=Path, required=True)
     parser.add_argument("--reviewed-at", required=True)
     args = parser.parse_args(argv)
     result = build_outputs(args.repo_root.resolve(), args.reviewed_at)

@@ -31,6 +31,7 @@
 | workflow state fields | `research-orchestrator/references/workflow_state_schema.md` | 必须使用 canonical `workflow_type`。 |
 | active-run current asset ownership | `docs/workflows/RESEARCH_WORKFLOW.md` + `WORKFLOW_ORCHESTRATION_SPEC.md` | 每个活动 run 只保留一份当前 state、TODO、quality 和 readout；历史产物只读。 |
 | cross-run current pointer | `config/r5_readout_canonical_index.yaml.current_runs` | README 和文档索引只链接 pointer，不复制当前 workflow ID/status；历史 R5 readout 目录不得选择 current run。 |
+| docs/reports retention and legacy dependency status | `docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml` | 只记录保留边界、入站依赖、替代权威、Git 恢复依据和手工删除候选；不得成为研究结论或删除执行器。 |
 | handoff packet format | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | skill 可补充本 skill 的 handoff 要求。 |
 | source rank / citation principle | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | evidence-ingest references 承担字段级执行契约。 |
 | 个人高风险权益账户定性原则 | `docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` | AGENTS / Investment Review skill 只能引用；不得转写为机器阈值。`C-HUMAN-005` 仍为 `pending` / `null`。 |
@@ -69,6 +70,7 @@
 | `docs/logs/` | 执行记录、readout、历史 closeout | 新规则定义 | current docs |
 | `.agents/skills/<skill>/SKILL.md` | 单个 skill 的触发、输入、输出、边界、guardrails | 项目总路线图、其它 skill 的完整契约、全局接口定义 | workflow docs |
 | `docs/meta/PORTFOLIO_REVIEW_INTEGRATION_DEPENDENCY_ALLOWLIST.md` | 选择性集成与后续文档清理的依赖/保留/排除边界 | 产品运行规则、历史完成状态 | `AGENTS.md` + 本矩阵 |
+| `docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml` | docs/reports 保留状态、legacy 依赖闭包、恢复依据与手工删除候选 | 当前研究状态、删除命令、批量删除授权 | `AGENTS.md` + 本矩阵 |
 
 ## 重复内容处理规则
 

@@ -200,6 +200,10 @@ workflow_readout.md
 历史产物、旧 close readout、历史 quality report 和 generation snapshot 可以保留为只读证据，
 不得覆盖或支配上述当前资产。新一轮输出必须写入新的 run-scoped 路径，不能覆盖历史 run。
 
+跨 run 的当前选择只消费 `config/r5_readout_canonical_index.yaml.current_runs`。
+旧 R5/Patch/Bundle readout index、治理 checkpoint、START_HERE 和固定 hash 合同均为历史 provenance，
+不得参与 current run 选择、dispatch、P2 判断或活动人审授权。
+
 ### 6.3 当前目标范围内的 issue 与 outcome
 
 活动 issue 必须把风险描述和工作流决定分开。每条 issue 至少记录：

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 from pathlib import Path
 
 
@@ -56,17 +57,13 @@ def test_bundle10_completion_and_external_review_lifecycle_passes(
             payload = payload.replace(b"\n", b"\r\n")
         target.write_bytes(payload)
 
-    manifest = load_module().load_yaml(
-        ROOT / "reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml"
-    )
-    historical_paths = {row["path"] for row in manifest["files"]}
-
     def source_path_exists(source_path: str) -> bool:
         if (ROOT / source_path).exists():
             return True
-        if source_path not in historical_paths:
+        try:
+            historical_blob_bytes(source_path)
+        except (AssertionError, subprocess.CalledProcessError):
             return False
-        historical_blob_bytes(source_path)
         return True
 
     result = load_module().validate_bundle10(

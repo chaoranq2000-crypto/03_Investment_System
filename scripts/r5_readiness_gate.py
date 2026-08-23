@@ -11,7 +11,6 @@ from typing import Any
 import yaml
 
 
-DEFAULT_RULES = Path("config/r5_readiness_gate_rules.yaml")
 FORBIDDEN = re.compile(r"买入|卖出|持有|仓位|目标价|保证收益|buy rating|sell rating|hold rating|position sizing", re.IGNORECASE)
 
 
@@ -38,8 +37,7 @@ def _text(repo_root: Path, rel_path: str) -> str:
     return path.read_text(encoding="utf-8", errors="replace") if path.exists() else ""
 
 
-def collect_inputs(repo_root: Path, rules: dict[str, Any]) -> dict[str, Any]:
-    paths = rules["default_paths"]
+def collect_inputs(repo_root: Path, paths: dict[str, str]) -> dict[str, Any]:
     inputs: dict[str, Any] = {"paths": paths}
 
     smoke_path = repo_root / paths["smoke_result"]
@@ -157,13 +155,29 @@ def decide_readiness(inputs: dict[str, Any]) -> dict[str, Any]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Evaluate R5 readiness gates.")
     parser.add_argument("--repo-root", type=Path, default=Path("."))
-    parser.add_argument("--rules", type=Path, default=DEFAULT_RULES)
+    parser.add_argument("--rules", type=Path, required=True)
+    parser.add_argument("--smoke-result", required=True)
+    parser.add_argument("--inventory-status", required=True)
+    parser.add_argument("--format-guard", required=True)
+    parser.add_argument("--source-gapped-pack", required=True)
+    parser.add_argument("--source-gap-report", required=True)
+    parser.add_argument("--evidence-plan", required=True)
+    parser.add_argument("--valuation-handoff-example", required=True)
     parser.add_argument("--json", type=Path, required=True)
     args = parser.parse_args(argv)
 
     repo_root = args.repo_root.resolve()
     rules = load_yaml(args.rules)
-    inputs = collect_inputs(repo_root, rules)
+    paths = {
+        "smoke_result": args.smoke_result,
+        "inventory_status": args.inventory_status,
+        "format_guard": args.format_guard,
+        "source_gapped_pack": args.source_gapped_pack,
+        "source_gap_report": args.source_gap_report,
+        "evidence_plan": args.evidence_plan,
+        "valuation_handoff_example": args.valuation_handoff_example,
+    }
+    inputs = collect_inputs(repo_root, paths)
     result = decide_readiness(inputs)
     result["input_summary"] = {
         "smoke_status": inputs["smoke_result"].get("status"),

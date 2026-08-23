@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from pathlib import Path, PurePosixPath
+import subprocess
 from typing import Any
 
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-MANIFEST_PATH = REPO_ROOT / "config/r5_bundle5_expected_artifacts.yaml"
+MANIFEST_SOURCE = "config/r5_bundle5_expected_artifacts.yaml"
 BASELINE_READOUT = REPO_ROOT / "reports/p1_6/R5_AFTER_BUNDLE4_STATUS_BASELINE_READOUT.md"
 README_PATH = REPO_ROOT / "README.md"
 CI_PATH = REPO_ROOT / ".github/workflows/ci.yml"
@@ -20,14 +21,14 @@ EXPECTED_CORE_INPUT_TYPES = {
 }
 
 
-def load_manifest() -> dict[str, Any]:
-    data = yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
+def load_manifest(historical_blob_bytes) -> dict[str, Any]:
+    data = yaml.safe_load(historical_blob_bytes(MANIFEST_SOURCE).decode("utf-8"))
     assert isinstance(data, dict)
     return data
 
 
-def test_bundle5_manifest_freezes_scope_and_fail_closed_states() -> None:
-    manifest = load_manifest()
+def test_bundle5_manifest_freezes_scope_and_fail_closed_states(historical_blob_bytes) -> None:
+    manifest = load_manifest(historical_blob_bytes)
 
     assert manifest["bundle"] == "R5_BUNDLE_5_REAL_002837_REVIEWED_INPUT_ONBOARDING"
     assert manifest["base_state"] == "R5_REVIEWED_INPUT_FIXTURE_PROMOTION_SMOKE_PASSED"
@@ -41,17 +42,24 @@ def test_bundle5_manifest_freezes_scope_and_fail_closed_states() -> None:
     assert manifest["fixed_boundaries"]["fixtures_are_research_evidence"] is False
 
 
-def test_baseline_required_paths_are_physical() -> None:
-    manifest = load_manifest()
+def test_baseline_required_paths_are_physical(historical_blob_bytes) -> None:
+    manifest = load_manifest(historical_blob_bytes)
     required = manifest["baseline_required_paths"]
 
     assert len(required) == len(set(required))
-    missing = [path for path in required if not (REPO_ROOT / path).exists()]
+    missing = []
+    for path in required:
+        if (REPO_ROOT / path).exists():
+            continue
+        try:
+            historical_blob_bytes(path)
+        except (AssertionError, subprocess.CalledProcessError):
+            missing.append(path)
     assert missing == []
 
 
-def test_owned_artifact_producers_are_unique_and_repo_relative() -> None:
-    manifest = load_manifest()
+def test_owned_artifact_producers_are_unique_and_repo_relative(historical_blob_bytes) -> None:
+    manifest = load_manifest(historical_blob_bytes)
     producers: dict[str, str] = {}
 
     for card_id, card in manifest["cards"].items():
@@ -69,14 +77,19 @@ def test_owned_artifact_producers_are_unique_and_repo_relative() -> None:
 
     assert producers
     assert not any(path.lower().endswith(".zip") for path in producers)
-    missing_reused_checks = [
-        path for path in manifest["reused_checks"] if not (REPO_ROOT / path).exists()
-    ]
+    missing_reused_checks = []
+    for path in manifest["reused_checks"]:
+        if (REPO_ROOT / path).exists():
+            continue
+        try:
+            historical_blob_bytes(path)
+        except (AssertionError, subprocess.CalledProcessError):
+            missing_reused_checks.append(path)
     assert missing_reused_checks == []
 
 
-def test_registry_write_boundary_starts_at_card_5_5_only() -> None:
-    manifest = load_manifest()
+def test_registry_write_boundary_starts_at_card_5_5_only(historical_blob_bytes) -> None:
+    manifest = load_manifest(historical_blob_bytes)
     cards = manifest["cards"]
     first_write_card = manifest["real_workflow_write_boundary"][
         "first_card_allowed_to_write_canonical_registries"

@@ -1,24 +1,32 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_PATH = REPO_ROOT / "config/r5_bundle3_expected_artifacts.yaml"
+EXPECTED_SOURCE = "config/r5_bundle3_expected_artifacts.yaml"
 PREFLIGHT_PATH = REPO_ROOT / "reports/p1_6/r5_core_asset_preflight_result.json"
 CLOSE_READOUT = REPO_ROOT / "reports/p1_6/R5_BUNDLE_3_CORE_RESEARCH_ASSET_SUBPACKS_CLOSE_READOUT.md"
 
 
-def test_bundle3_expected_artifacts_exist():
-    expected = yaml.safe_load(EXPECTED_PATH.read_text(encoding="utf-8"))
+def test_bundle3_expected_artifacts_exist(historical_blob_bytes):
+    expected = yaml.safe_load(historical_blob_bytes(EXPECTED_SOURCE).decode("utf-8"))
     paths: list[str] = []
     for group in expected["artifacts"].values():
         for value in group.values():
             if isinstance(value, str):
                 paths.append(value)
-    missing = [path for path in paths if not (REPO_ROOT / path).exists()]
+    missing = []
+    for path in paths:
+        if (REPO_ROOT / path).exists():
+            continue
+        try:
+            historical_blob_bytes(path)
+        except (AssertionError, subprocess.CalledProcessError):
+            missing.append(path)
 
     assert not missing
 
