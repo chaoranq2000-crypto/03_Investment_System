@@ -512,6 +512,7 @@ def build_outputs(
     rows: list[dict[str, Any]],
     reviewed_at: str,
     retrieved_at: str,
+    readout_path: Path,
 ) -> dict[str, Any]:
     datetime.fromisoformat(reviewed_at.replace("Z", "+00:00"))
     payload = raw_payload(rows)
@@ -564,7 +565,7 @@ def build_outputs(
         "p2_allowed": False,
     }
     _write_yaml(run_dir / "R5_bundle5_market_peer_acquisition_log.yaml", acquisition)
-    write_readout(repo_root / "reports/p1_6/R5_BUNDLE_5_3_MARKET_PEER_INPUT_READOUT.md", evidence_id, reviewed_at, selection)
+    write_readout(readout_path, evidence_id, reviewed_at, selection)
     return {
         "evidence_id": evidence_id,
         "raw_path": raw_rel,
@@ -581,6 +582,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--fixture-json", type=Path)
     parser.add_argument("--allow-network", action="store_true")
     parser.add_argument("--reviewed-at", required=True)
+    parser.add_argument("--readout-output", type=Path, required=True)
     args = parser.parse_args(argv)
     repo_root = args.repo_root.resolve()
     if args.fixture_json:
@@ -591,7 +593,18 @@ def main(argv: list[str] | None = None) -> int:
     else:
         raise SystemExit("provide --fixture-json or explicit --allow-network")
     retrieved_at = utc_now_iso()
-    result = build_outputs(repo_root, rows=rows, reviewed_at=args.reviewed_at, retrieved_at=retrieved_at)
+    readout_path = (
+        args.readout_output
+        if args.readout_output.is_absolute()
+        else repo_root / args.readout_output
+    )
+    result = build_outputs(
+        repo_root,
+        rows=rows,
+        reviewed_at=args.reviewed_at,
+        retrieved_at=retrieved_at,
+        readout_path=readout_path,
+    )
     print(
         "r5_bundle5_card_5_3 status=accepted "
         f"evidence_id={result['evidence_id']} market={result['market_records']} peers={result['peer_records']} "

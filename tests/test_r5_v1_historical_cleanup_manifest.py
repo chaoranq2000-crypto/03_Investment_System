@@ -97,7 +97,7 @@ def test_ready_paths_are_literal_files_and_never_directories() -> None:
         assert item["recovery_basis"]["kind"] == "git_blob"
 
 
-def test_user_decision_keeps_the_2026_07_23_replay_out_of_ready() -> None:
+def test_phase2_replay_is_an_exact_ready_closure_with_equivalent_evidence() -> None:
     manifest = load_manifest()
     replay_prefix = (
         "reports/workflow_runs/"
@@ -108,11 +108,7 @@ def test_user_decision_keeps_the_2026_07_23_replay_out_of_ready() -> None:
         for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
         for item in group["items"]
     }
-    user_decision = {
-        item["path"]
-        for group in groups_by_status(manifest, "USER_DECISION")
-        for item in group["items"]
-    }
+    phase2 = manifest["phase2_retirement"]
     tracked_replay = {
         path.replace("\\", "/")
         for path in subprocess.check_output(
@@ -124,8 +120,98 @@ def test_user_decision_keeps_the_2026_07_23_replay_out_of_ready() -> None:
     }
 
     assert tracked_replay
-    assert tracked_replay <= user_decision
-    assert tracked_replay.isdisjoint(ready)
+    assert tracked_replay <= ready
+    assert tracked_replay == set(
+        phase2["closures"]["phase2_closure_004_replay_20260723"]["exact_paths"]
+    )
+    assert phase2["evidence_equivalence"]["replay_metric_candidates"] == {
+        "candidate_count": 136,
+        "exact_row_match_count": 136,
+        "replacement_path": "data/manifests/metrics_draft.csv",
+        "promoted_count": 0,
+    }
+    assert phase2["evidence_equivalence"]["replay_issue_lineage"][
+        "mapped_issue_count"
+    ] == 4
+
+
+def test_phase2_inventory_is_exact_disjoint_present_and_unapproved() -> None:
+    manifest = load_manifest()
+    phase2 = manifest["phase2_retirement"]
+    closures = phase2["closures"]
+    expected = {
+        "phase2_closure_001_docs_codex_tasks": (17, 303_117),
+        "phase2_closure_002_docs_plans": (17, 234_521),
+        "phase2_closure_003_reports_p1_6": (148, 493_977),
+        "phase2_closure_004_replay_20260723": (16, 132_529),
+        "phase2_closure_005_top_codex_tasks": (207, 418_965),
+        "phase2_closure_006_migrated_rules": (2, 3_470),
+    }
+
+    assert phase2["status"] == "awaiting_user_approval"
+    assert set(closures) == set(expected)
+    path_sets = {key: set(row["exact_paths"]) for key, row in closures.items()}
+    all_paths = set().union(*path_sets.values())
+    assert sum(len(paths) for paths in path_sets.values()) == len(all_paths) == 407
+    assert sum(row["git_blob_bytes"] for row in closures.values()) == 1_586_579
+    for closure_id, (file_count, byte_count) in expected.items():
+        row = closures[closure_id]
+        assert row["all_or_none"] is True
+        assert row["file_count"] == file_count == len(path_sets[closure_id])
+        assert row["git_blob_bytes"] == byte_count
+
+    ready = {
+        item["path"]
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
+    }
+    assert all_paths <= ready
+    assert all((ROOT / relative).is_file() for relative in all_paths)
+    changed = set(
+        subprocess.check_output(
+            ["git", "-C", str(ROOT), "diff", "--name-only"],
+            text=True,
+        ).splitlines()
+    )
+    assert changed <= set(phase2["modified_file_allowlist"])
+    assert changed.isdisjoint(all_paths)
+
+    gate = phase2["approval_gate"]
+    assert gate["required_selection"] == "all_six_phase2_closures_all_or_none"
+    assert gate["user_approved"] is False
+    assert gate["approved_closure_ids"] == []
+    assert gate["approved_exact_paths"] == []
+    assert gate["codex_quarantine_move_authorized"] is False
+    assert gate["codex_delete_authorized"] is False
+    assert gate["execution_state"] == "not_started"
+
+
+def test_phase2_decision_buckets_are_exact_and_exhaustive() -> None:
+    phase2 = load_manifest()["phase2_retirement"]
+    buckets = phase2["decision_buckets"]
+    expected = {
+        "DIRECT_RETIRE": (241, 513_650),
+        "MIGRATE_THEN_RETIRE": (151, 784_888),
+        "EVIDENCE_EQUIVALENCE_THEN_RETIRE": (15, 288_041),
+    }
+    path_sets = {
+        key: set(row["exact_paths"])
+        for key, row in buckets.items()
+    }
+    closure_paths = {
+        path
+        for row in phase2["closures"].values()
+        for path in row["exact_paths"]
+    }
+
+    assert set(buckets) == set(expected)
+    assert sum(len(paths) for paths in path_sets.values()) == 407
+    assert set().union(*path_sets.values()) == closure_paths
+    for bucket, (file_count, byte_count) in expected.items():
+        row = buckets[bucket]
+        assert row["replacement_complete"] is True
+        assert len(path_sets[bucket]) == row["file_count"] == file_count
+        assert row["git_blob_bytes"] == byte_count
 
 
 def test_modified_file_allowlist_is_exact_and_contains_only_authorized_paths() -> None:
@@ -167,19 +253,24 @@ def test_ci_quality_report_is_written_only_to_the_ignored_temp_root() -> None:
 def test_declared_inbound_references_are_exact_and_auditable() -> None:
     manifest = load_manifest()
     baseline = manifest["audit"]["baseline_commit"]
-    candidate_paths = {
-        item["path"]
+    candidate_recovery = {
+        item["path"]: item["recovery_basis"]["commit"]
         for group in manifest["candidate_groups"]
         for item in group["items"]
     }
+    candidate_paths = set(candidate_recovery)
 
     def historical_text(relative: str) -> str:
+        recovery_commit = candidate_recovery.get(relative, baseline)
         return subprocess.check_output(
-            ["git", "-C", str(ROOT), "show", f"{baseline}:{relative}"],
+            ["git", "-C", str(ROOT), "show", f"{recovery_commit}:{relative}"],
         ).decode("utf-8", errors="replace")
 
     def mentions(source_path: str, source_text: str, target: str) -> bool:
         if target in source_text.replace("\\", "/"):
+            return True
+        adjacent_literal_text = re.sub(r"([\"'])\s*\1", "", source_text)
+        if target in adjacent_literal_text.replace("\\", "/"):
             return True
         if not source_path.endswith(".md"):
             return False
@@ -207,7 +298,17 @@ def test_declared_inbound_references_are_exact_and_auditable() -> None:
                         or relation in {"closure_internal", "self_reference", "git_history_only"}
                     ), reference
                     source_text = historical_text(reference["source_path"])
-                assert mentions(reference["source_path"], source_text, target), reference
+                if not mentions(reference["source_path"], source_text, target):
+                    via = reference.get("via_source_path")
+                    assert relation == "git_history_only" and isinstance(via, str), reference
+                    assert mentions(reference["source_path"], source_text, via), reference
+                    via_path = ROOT / via
+                    via_text = (
+                        via_path.read_text(encoding="utf-8", errors="replace")
+                        if via_path.is_file()
+                        else historical_text(via)
+                    )
+                    assert mentions(via, via_text, target), reference
                 assert reference["relation"] in {
                     "closure_internal",
                     "current_worktree_physical",
@@ -286,11 +387,11 @@ def test_internal_relations_and_actual_full_path_references_are_closed() -> None
 
 def test_every_candidate_has_exact_dual_hash_git_recovery() -> None:
     manifest = load_manifest()
-    baseline = manifest["audit"]["baseline_commit"]
 
     for group in manifest["candidate_groups"]:
         for item in group["items"]:
             relative = item["path"]
+            baseline = item["recovery_basis"]["commit"]
             payload = subprocess.check_output(
                 ["git", "-C", str(ROOT), "show", f"{baseline}:{relative}"],
             )
@@ -299,10 +400,7 @@ def test_every_candidate_has_exact_dual_hash_git_recovery() -> None:
                 text=True,
                 encoding="utf-8",
             ).strip()
-            assert item["recovery_basis"] == {
-                "kind": "git_blob",
-                "commit": baseline,
-            }
+            assert item["recovery_basis"] == {"kind": "git_blob", "commit": baseline}
             assert item["blob_oid"] == oid
             assert item["byte_count"] == len(payload)
             assert item["content_sha256"] == hashlib.sha256(payload).hexdigest()
@@ -316,8 +414,15 @@ def test_manual_delete_closures_are_complete_and_atomic() -> None:
         for item in group["items"]
     }
     grouped: dict[str, set[str]] = {}
+    group_closure = {
+        item["path"]: item.get("closure_id", group.get("closure_id"))
+        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+        for item in group["items"]
+    }
     for relative, item in ready.items():
-        grouped.setdefault(item["closure_id"], set()).add(relative)
+        closure_id = group_closure[relative]
+        assert closure_id
+        grouped.setdefault(closure_id, set()).add(relative)
 
     declared = {row["closure_id"]: row for row in manifest["manual_delete_closures"]}
     assert set(grouped) == set(declared)
@@ -340,8 +445,10 @@ def test_deletion_state_matches_exact_worktree_absence_and_approval() -> None:
     closures = {
         row["closure_id"]: {
             path
-            for path, item in ready.items()
-            if item["closure_id"] == row["closure_id"]
+            for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
+            for item in group["items"]
+            for path in [item["path"]]
+            if item.get("closure_id", group.get("closure_id")) == row["closure_id"]
         }
         for row in manifest["manual_delete_closures"]
     }
@@ -421,6 +528,9 @@ def test_deletion_state_matches_exact_worktree_absence_and_approval() -> None:
         ).splitlines()
     )
     declared_allowlist = set(manifest["audit"]["modified_file_allowlist"])
+    declared_allowlist.update(
+        manifest.get("phase2_retirement", {}).get("modified_file_allowlist", [])
+    )
     declared_additions = declared_allowlist - baseline_files
     untracked = set(
         subprocess.check_output(
@@ -740,19 +850,13 @@ def test_protected_review_contracts_and_research_runs_remain_out_of_ready() -> N
         assert not any(path.startswith(prefix) for path in ready)
 
 
-def test_retired_governance_control_plane_has_explicit_exception_for_p5_evidence() -> None:
+def test_phase2_closes_the_last_governance_contract_with_git_recovery() -> None:
     manifest = load_manifest()
     ready = {
         item["path"]
         for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
         for item in group["items"]
     }
-    bound = {
-        item["path"]
-        for group in groups_by_status(manifest, "LEGACY_BOUND")
-        for item in group["items"]
-    }
-
     for path in (
         "reports/p1_6/r5_v1_governance_cleanup/historical_baseline_manifest.yaml",
         "reports/p1_6/r5_v1_governance_cleanup/historical_cleanup_manifest.yaml",
@@ -763,5 +867,12 @@ def test_retired_governance_control_plane_has_explicit_exception_for_p5_evidence
         assert path in ready
     assert (
         "docs/codex_tasks/v1_governance_integration_cleanup_v2/CONTRACT.md"
-        in bound
+        in ready
     )
+    proof = manifest["phase2_retirement"]["evidence_equivalence"][
+        "p5_contract_receipt"
+    ]
+    assert proof["retained_receipt"] == (
+        "reports/p1_6/r5_v1_governance_cleanup/validation/p5_authority_conflict.yaml"
+    )
+    assert proof["recovery_commit"] == manifest["phase2_retirement"]["baseline_commit"]

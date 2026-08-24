@@ -455,11 +455,13 @@ def write_stage_readouts(
     repo_root: Path,
     stock_run: Path,
     gate: dict[str, object],
+    gate_readout_path: Path,
+    draft_readout_path: Path,
 ) -> None:
     stock_ref = stock_run.relative_to(repo_root).as_posix()
-    r4_gate = repo_root / "reports/p1_6/R4_PUBLISHABLE_STOCK_REPORT_GATE_READOUT.md"
-    r4_draft = repo_root / "reports/p1_6/R4_STOCK_REPORT_DRAFT_V0_1_READOUT.md"
-    r4_gate.write_text(
+    gate_readout_path.parent.mkdir(parents=True, exist_ok=True)
+    draft_readout_path.parent.mkdir(parents=True, exist_ok=True)
+    gate_readout_path.write_text(
         "\n".join(
             [
                 "# R4_PUBLISHABLE_STOCK_REPORT_GATE_READOUT",
@@ -482,7 +484,7 @@ def write_stage_readouts(
         + "\n",
         encoding="utf-8",
     )
-    r4_draft.write_text(
+    draft_readout_path.write_text(
         "\n".join(
             [
                 "# R4_STOCK_REPORT_DRAFT_V0_1_READOUT",
@@ -514,6 +516,8 @@ def build_r4_outputs(
     repo_root: Path,
     data_layer_run: Path,
     stock_run: Path,
+    gate_readout_path: Path,
+    draft_readout_path: Path,
 ) -> dict[str, object]:
     repo_root = repo_root.resolve()
     data_layer_run = (
@@ -521,6 +525,16 @@ def build_r4_outputs(
     ).resolve()
     stock_run = (
         stock_run if stock_run.is_absolute() else repo_root / stock_run
+    ).resolve()
+    gate_readout_path = (
+        gate_readout_path
+        if gate_readout_path.is_absolute()
+        else repo_root / gate_readout_path
+    ).resolve()
+    draft_readout_path = (
+        draft_readout_path
+        if draft_readout_path.is_absolute()
+        else repo_root / draft_readout_path
     ).resolve()
     write_source_gap_report(data_layer_run=data_layer_run, stock_run=stock_run)
     first_gate = evaluate_r4_gate(data_layer_run=data_layer_run, stock_run=stock_run)
@@ -532,7 +546,13 @@ def build_r4_outputs(
     final_gate = evaluate_r4_gate(data_layer_run=data_layer_run, stock_run=stock_run)
     write_quality_gate_report(stock_run=stock_run, gate=final_gate)
     _update_artifact_manifest(stock_run)
-    write_stage_readouts(repo_root=repo_root, stock_run=stock_run, gate=final_gate)
+    write_stage_readouts(
+        repo_root=repo_root,
+        stock_run=stock_run,
+        gate=final_gate,
+        gate_readout_path=gate_readout_path,
+        draft_readout_path=draft_readout_path,
+    )
     return final_gate
 
 
@@ -541,11 +561,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--repo-root", default=".")
     parser.add_argument("--data-layer-run", type=Path, required=True)
     parser.add_argument("--stock-run", type=Path, required=True)
+    parser.add_argument("--gate-readout-output", type=Path, required=True)
+    parser.add_argument("--draft-readout-output", type=Path, required=True)
     args = parser.parse_args(argv)
     gate = build_r4_outputs(
         repo_root=Path(args.repo_root).resolve(),
         data_layer_run=args.data_layer_run,
         stock_run=args.stock_run,
+        gate_readout_path=args.gate_readout_output,
+        draft_readout_path=args.draft_readout_output,
     )
     print(gate)
     return 1 if gate["status"] == "blocked" else 0

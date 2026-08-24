@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import inspect
 import sys
 from pathlib import Path
 
@@ -29,6 +30,14 @@ VALUATION_VALIDATOR = load_module(
     "r5_bundle5_valuation_pack_validator_test",
     SKILL_SCRIPTS / "validate_r5_valuation_pack.py",
 )
+
+
+def test_readout_output_is_explicit_and_has_no_legacy_default() -> None:
+    parameter = inspect.signature(BUILDER.build_outputs).parameters["readout_path"]
+    assert parameter.default is inspect.Parameter.empty
+    source = SCRIPT_PATH.read_text(encoding="utf-8")
+    assert 'parser.add_argument("--readout-output", type=Path, required=True)' in source
+    assert "reports/p1_6/" not in source
 
 
 def test_model_values_are_reproducible_from_disclosed_base_inputs() -> None:

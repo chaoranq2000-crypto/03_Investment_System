@@ -265,8 +265,7 @@ def _update_artifact_manifest(stock_run: Path) -> None:
         writer.writerows(rows)
 
 
-def write_stage_readout(repo_root: Path, rows: list[dict[str, str]]) -> None:
-    path = repo_root / "reports/p1_6/BUSINESS_SEGMENT_DISCLOSURE_EXTRACTION_MVP_READOUT.md"
+def write_stage_readout(path: Path, rows: list[dict[str, str]]) -> None:
     missing = sum(1 for row in rows if row["review_status"] == "missing_disclosure")
     product = sum(1 for row in rows if row["review_status"] == "product_line_clue")
     reviewed = sum(1 for row in rows if row["review_status"] == "reviewed_official")
@@ -290,6 +289,7 @@ def write_stage_readout(repo_root: Path, rows: list[dict[str, str]]) -> None:
         "- Liquid-cooling profit_pct remains MISSING_DISCLOSURE.",
         "- No Tushare/Baostock row was used for business exposure.",
     ]
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -297,6 +297,7 @@ def build_business_segment_pack(
     *,
     repo_root: Path,
     workflow_run: Path,
+    stage_readout_path: Path,
 ) -> list[dict[str, str]]:
     stock_run = workflow_run if workflow_run.is_absolute() else repo_root / workflow_run
     rows = build_business_segment_rows()
@@ -305,7 +306,7 @@ def build_business_segment_pack(
     _update_remaining_gaps(stock_run)
     _update_segment_exposure(stock_run)
     _update_artifact_manifest(stock_run)
-    write_stage_readout(repo_root, rows)
+    write_stage_readout(stage_readout_path, rows)
     return rows
 
 
@@ -313,12 +314,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build business segment metric pack for R4 readiness.")
     parser.add_argument("--repo-root", default=".")
     parser.add_argument("--workflow-run", required=True)
+    parser.add_argument("--stage-readout-output", type=Path, required=True)
     args = parser.parse_args(argv)
     repo_root = Path(args.repo_root).resolve()
     workflow_run = Path(args.workflow_run)
     rows = build_business_segment_pack(
         repo_root=repo_root,
         workflow_run=workflow_run,
+        stage_readout_path=(
+            args.stage_readout_output
+            if args.stage_readout_output.is_absolute()
+            else repo_root / args.stage_readout_output
+        ),
     )
     output = workflow_run / "business_segment_metric_pack.csv"
     print({"rows": len(rows), "output": output.as_posix()})

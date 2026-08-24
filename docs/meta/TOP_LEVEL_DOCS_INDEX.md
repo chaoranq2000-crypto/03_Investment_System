@@ -20,7 +20,8 @@ docs/meta/DOC_OWNERSHIP_MATRIX.md
 docs/workflows/RESEARCH_WORKFLOW.md
 ```
 
-历史计划、日志和 Codex 任务保留在以下目录，但不作为当前事实源：
+历史计划、日志和 Codex 任务中的受保护剩余项位于以下目录，但不作为当前事实
+源；退役项由 canonical retention manifest 与 Git history 提供精确恢复：
 
 ```text
 docs/plans/

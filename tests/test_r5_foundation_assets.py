@@ -42,7 +42,10 @@ NO_ADVICE_SCAN_FILES = [
     REPO_ROOT / "templates/r5_stock_research_note.md",
     REPO_ROOT / ".agents/skills/stock-deep-dive/assets/r5_stock_research_pack.example.yaml",
     REPO_ROOT / ".agents/skills/quality-review/assets/r5_quality_issues.example.csv",
-    REPO_ROOT / "reports/p1_6/R5_BUNDLE_2_RECOVERY_EXECUTABLE_GATES_READOUT.md",
+]
+
+HISTORICAL_NO_ADVICE_SCAN_SOURCES = [
+    "reports/p1_6/R5_BUNDLE_2_RECOVERY_EXECUTABLE_GATES_READOUT.md",
 ]
 
 QUALITY_ISSUE_FIELDS = {
@@ -118,10 +121,14 @@ def test_r5_rubric_has_bundle_2_gate_coverage():
     assert thresholds["source_gap_must_be_visible"] is True
 
 
-def test_no_direct_trading_phrases_in_r5_templates_examples_or_readout():
+def test_no_direct_trading_phrases_in_r5_templates_examples_or_readout(
+    historical_blob_bytes,
+):
     for path in NO_ADVICE_SCAN_FILES:
-        if not path.exists():
-            continue
         text = path.read_text(encoding="utf-8")
         for phrase in FORBIDDEN_ACTION_PHRASES:
             assert phrase not in text, f"{phrase} found in {path}"
+    for source in HISTORICAL_NO_ADVICE_SCAN_SOURCES:
+        text = historical_blob_bytes(source).decode("utf-8")
+        for phrase in FORBIDDEN_ACTION_PHRASES:
+            assert phrase not in text, f"{phrase} found in {source}"

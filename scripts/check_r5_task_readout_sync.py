@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check R5 task cards against readout artifacts for Patch 43-48."""
+"""Check an explicitly supplied legacy task/readout compatibility contract."""
 from __future__ import annotations
 
 import argparse
@@ -19,53 +19,49 @@ class PatchExpectation:
     blocking_for_next: bool
     notes: str = ""
     companion_paths: tuple[str, ...] = ()
+    close_readout_relation: str = "standard_patch_readout_path"
 
 
-PATCH_EXPECTATIONS: tuple[PatchExpectation, ...] = (
-    PatchExpectation(
-        patch_id="R5_PATCH_43",
-        task_card_path="codex_tasks/r5_after_patch36/R5_PATCH_43_VALUATION_INPUT_REGISTRY_AND_INTERLOCK.md",
-        readout_path="reports/p1_6/R5_PATCH_43_VALUATION_INPUT_REGISTRY_AND_INTERLOCK_READOUT.md",
-        blocking_for_next=True,
-        notes="valuation registry/interlock readout with command evidence",
-    ),
-    PatchExpectation(
-        patch_id="R5_PATCH_44",
-        task_card_path="codex_tasks/r5_after_patch36/R5_PATCH_44_002837_REVIEWED_INPUT_DRY_RUN.md",
-        readout_path="reports/p1_6/R5_PATCH_44_002837_REVIEWED_INPUT_DRY_RUN_READOUT.md",
-        blocking_for_next=True,
-        notes="002837 reviewed-input dry run readout with command evidence",
-    ),
-    PatchExpectation(
-        patch_id="R5_PATCH_45",
-        task_card_path="codex_tasks/r5_after_patch36/R5_PATCH_45_R5_PACK_PROMOTION_GATE.md",
-        readout_path="reports/p1_6/R5_PATCH_45_R5_PACK_PROMOTION_GATE_READOUT.md",
-        blocking_for_next=True,
-        notes="pack promotion gate readout with command evidence",
-    ),
-    PatchExpectation(
-        patch_id="R5_PATCH_46",
-        task_card_path="codex_tasks/r5_after_patch36/R5_PATCH_46_QUALITY_GATE_SCORECARD_V2.md",
-        readout_path="reports/p1_6/R5_PATCH_46_QUALITY_GATE_SCORECARD_V2_READOUT.md",
-        blocking_for_next=True,
-        notes="quality scorecard v2 readout with command evidence",
-    ),
-    PatchExpectation(
-        patch_id="R5_PATCH_47",
-        task_card_path="codex_tasks/r5_after_patch36/R5_PATCH_47_COMPOSER_RESEARCH_DRAFT_PLUS_MODE.md",
-        readout_path="reports/p1_6/R5_PATCH_47_COMPOSER_RESEARCH_DRAFT_PLUS_MODE_READOUT.md",
-        blocking_for_next=True,
-        notes="composer draft-plus readout with command evidence",
-    ),
-    PatchExpectation(
-        patch_id="R5_PATCH_48",
-        task_card_path="codex_tasks/r5_after_patch36/R5_PATCH_48_PILOT_READINESS_DECISION.md",
-        readout_path="reports/p1_6/R5_AFTER_PATCH36_REVIEWED_INPUT_CLOSE_READOUT.md",
-        blocking_for_next=True,
-        notes="Patch 48 is represented by the after-Patch36 close readout, not a patch-numbered readout",
-        companion_paths=("reports/p1_6/r5_reviewed_input_pilot_gate_result.json",),
-    ),
-)
+def load_expectations(path: Path) -> tuple[PatchExpectation, ...]:
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    rows = data.get("expectations") if isinstance(data, dict) else data
+    if not isinstance(rows, list) or not rows:
+        raise ValueError("expectations input must contain a non-empty expectations list")
+
+    expectations: list[PatchExpectation] = []
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            raise ValueError(f"expectations[{index}] must be a mapping")
+        required = {
+            "patch_id",
+            "task_card_path",
+            "readout_path",
+            "blocking_for_next",
+        }
+        missing = sorted(required - set(row))
+        if missing:
+            raise ValueError(
+                f"expectations[{index}] missing required fields: {', '.join(missing)}"
+            )
+        if not isinstance(row["blocking_for_next"], bool):
+            raise ValueError(
+                f"expectations[{index}].blocking_for_next must be boolean"
+            )
+        expectations.append(
+            PatchExpectation(
+                patch_id=str(row["patch_id"]),
+                task_card_path=str(row["task_card_path"]),
+                readout_path=str(row["readout_path"]),
+                blocking_for_next=row["blocking_for_next"],
+                notes=str(row.get("notes") or ""),
+                companion_paths=tuple(str(value) for value in row.get("companion_paths") or ()),
+                close_readout_relation=str(
+                    row.get("close_readout_relation")
+                    or "standard_patch_readout_path"
+                ),
+            )
+        )
+    return tuple(expectations)
 
 
 def _read_text(path: Path) -> str:
@@ -118,13 +114,6 @@ def evaluate_row(root: Path, expectation: PatchExpectation, canonical_index_text
     else:
         status = "task_card_and_readout_missing"
 
-    readout_name = Path(expectation.readout_path).name
-    close_readout_relation = (
-        "close_readout_exists_under_non_patch_filename"
-        if expectation.patch_id == "R5_PATCH_48" and readout_exists and not readout_name.startswith("R5_PATCH_48")
-        else "standard_patch_readout_path"
-    )
-
     row = {
         **asdict(expectation),
         "task_card_exists": task_exists,
@@ -132,7 +121,7 @@ def evaluate_row(root: Path, expectation: PatchExpectation, canonical_index_text
         "readout_status": _status_line(readout_text) if readout_exists else "missing",
         "command_evidence": command_evidence,
         "status": status,
-        "close_readout_relation": close_readout_relation,
+        "close_readout_relation": expectation.close_readout_relation,
         "canonical_status": _canonical_status(expectation.readout_path, canonical_index_text),
         "companion_artifacts": companion_status,
     }
@@ -140,9 +129,13 @@ def evaluate_row(root: Path, expectation: PatchExpectation, canonical_index_text
     return row
 
 
-def build_matrix(root: Path) -> dict[str, Any]:
-    canonical_index_text = _read_text(root / "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md")
-    rows = [evaluate_row(root, item, canonical_index_text) for item in PATCH_EXPECTATIONS]
+def build_matrix(
+    root: Path,
+    expectations: tuple[PatchExpectation, ...],
+    canonical_index_path: Path | None = None,
+) -> dict[str, Any]:
+    canonical_index_text = _read_text(canonical_index_path) if canonical_index_path else ""
+    rows = [evaluate_row(root, item, canonical_index_text) for item in expectations]
     blocking_missing = [
         row["patch_id"]
         for row in rows
@@ -152,6 +145,7 @@ def build_matrix(root: Path) -> dict[str, Any]:
         "artifact_type": "r5_after_patch48_status_matrix",
         "schema_version": "r5_after_patch48_status_matrix_v0.1",
         "generated_from": "scripts/check_r5_task_readout_sync.py",
+        "expectation_source": "explicit_input",
         "status": "pass" if not blocking_missing else "fail",
         "blocking_missing": blocking_missing,
         "rows": rows,
@@ -167,12 +161,42 @@ def write_payload(path: Path, payload: dict[str, Any]) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Check R5 Patch 43-48 task/readout sync.")
+    parser = argparse.ArgumentParser(
+        description="Check an explicit legacy task/readout compatibility contract."
+    )
     parser.add_argument("--repo-root", type=Path, default=Path("."))
+    parser.add_argument(
+        "--expectations",
+        type=Path,
+        required=True,
+        help="Explicit YAML/JSON expectation contract; no legacy table is implied.",
+    )
+    parser.add_argument(
+        "--canonical-index",
+        type=Path,
+        help="Optional explicit historical index used only for compatibility labels.",
+    )
     parser.add_argument("--json", type=Path, help="Output path; YAML is written when the suffix is .yaml/.yml.")
     args = parser.parse_args(argv)
 
-    payload = build_matrix(args.repo_root.resolve())
+    root = args.repo_root.resolve()
+    expectations_path = (
+        args.expectations.resolve()
+        if args.expectations.is_absolute()
+        else (root / args.expectations).resolve()
+    )
+    canonical_index_path = None
+    if args.canonical_index:
+        canonical_index_path = (
+            args.canonical_index.resolve()
+            if args.canonical_index.is_absolute()
+            else (root / args.canonical_index).resolve()
+        )
+    payload = build_matrix(
+        root,
+        load_expectations(expectations_path),
+        canonical_index_path,
+    )
     if args.json:
         write_payload(args.json, payload)
     print(

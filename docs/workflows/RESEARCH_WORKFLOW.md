@@ -550,5 +550,6 @@ config/segment_taxonomy.yaml 更新或新增 candidate 说明
 8. quality-review 没有 `blocks_current_goal=true` 的活动缺陷；severity 只描述风险，
    可见且未被使用的 unknown / limitation 不得仅因 high 而阻断 readiness 判断。
 
-阶段性建设顺序属于 `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md`，
-不在本 kernel 中维护。
+阶段性建设顺序不是当前 workflow 事实。历史建设计划仅通过 retention
+manifest 与 Git history 追溯；当前执行只使用本 kernel、orchestrator contract
+和 current-run pointer。

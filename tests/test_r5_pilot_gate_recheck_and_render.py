@@ -20,6 +20,10 @@ def load_renderer():
 
 def _render_inputs(historical_blob_file) -> dict[str, Path]:
     return {
+        "gate_path": historical_blob_file(
+            "reports/p1_6/r5_reviewed_input_pilot_gate_result.json",
+            "render/gate.json",
+        ),
         "pack_path": historical_blob_file(
             f"{HISTORICAL_RUN}/R5_stock_research_pack_source_gapped.yaml",
             "render/pack.yaml",
@@ -33,6 +37,12 @@ def _render_inputs(historical_blob_file) -> dict[str, Path]:
             "render/promotion.yaml",
         ),
     }
+
+
+def test_gate_input_is_explicit_and_has_no_legacy_default() -> None:
+    source = SCRIPT.read_text(encoding="utf-8")
+    assert 'parser.add_argument("--gate", type=Path, required=True' in source
+    assert "reports/p1_6/" not in source
 
 
 def test_blocked_gate_renders_source_gapped_draft(tmp_path: Path, historical_blob_file):

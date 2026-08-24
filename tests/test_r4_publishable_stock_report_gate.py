@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SOURCE_PATH = ROOT / "src/qa/r4_publishable_stock_report_gate.py"
 sys.path.insert(0, str(ROOT / "src" / "qa"))
 
 from check_no_unsupported_advice import find_unsupported_advice  # noqa: E402
@@ -35,6 +36,13 @@ def _minimal_stock_run(historical_blob_file) -> Path:
     ]
     assert len({path.parent for path in files}) == 1
     return files[0].parent
+
+
+def test_stage_readout_outputs_are_explicit_and_not_repo_level_defaults() -> None:
+    source = SOURCE_PATH.read_text(encoding="utf-8")
+    assert 'parser.add_argument("--gate-readout-output", type=Path, required=True)' in source
+    assert 'parser.add_argument("--draft-readout-output", type=Path, required=True)' in source
+    assert "reports/p1_6/" not in source
 
 
 def test_r4_publishable_gate_documents_bridge_only_boundary() -> None:

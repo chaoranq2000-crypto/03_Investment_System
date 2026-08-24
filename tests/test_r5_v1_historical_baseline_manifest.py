@@ -51,7 +51,6 @@ def test_manifest_has_one_authority_chain_and_explicit_status_vocabulary() -> No
 
 def test_ready_paths_are_exact_unique_and_git_recoverable() -> None:
     manifest = load_manifest()
-    baseline = manifest["audit"]["baseline_commit"]
     items = ready_items(manifest)
     paths = [item["path"] for item in items]
 
@@ -67,7 +66,10 @@ def test_ready_paths_are_exact_unique_and_git_recoverable() -> None:
         assert not pure.is_absolute()
         assert ".." not in pure.parts
         assert not any(token in path for token in ("*", "?", "[", "]", "{", "}"))
-        object_name = f"{baseline}:{path}"
+        recovery = item["recovery_basis"]
+        assert recovery["kind"] == "git_blob"
+        recovery_commit = recovery["commit"]
+        object_name = f"{recovery_commit}:{path}"
         oid = subprocess.check_output(
             ["git", "-C", str(ROOT), "rev-parse", object_name],
             text=True,
@@ -89,9 +91,9 @@ def test_ready_paths_are_exact_unique_and_git_recoverable() -> None:
         ).hexdigest()
         assert oid == item["blob_oid"] == calculated_oid
         assert size == item["byte_count"] == len(payload)
-        assert item["recovery_basis"] == {
+        assert recovery == {
             "kind": "git_blob",
-            "commit": baseline,
+            "commit": recovery_commit,
         }
 
 
@@ -103,7 +105,7 @@ def test_ready_aggregate_is_derived_from_exact_items() -> None:
         "byte_count": sum(item["byte_count"] for item in items),
     }
 
-    assert manifest["summary"]["READY_FOR_MANUAL_DELETE"] == expected
+    assert manifest["summary"]["READY_FOR_MANUAL_DELETE_ALL_PHASES"] == expected
     for group in manifest["candidate_groups"]:
         if group["status"] != "READY_FOR_MANUAL_DELETE":
             continue

@@ -34,6 +34,7 @@
 | docs/reports retention and legacy dependency status | `docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml` | 只记录保留边界、入站依赖、替代权威、Git 恢复依据和手工删除候选；不得成为研究结论或删除执行器。 |
 | handoff packet format | `docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md` | skill 可补充本 skill 的 handoff 要求。 |
 | source rank / citation principle | `docs/policies/EVIDENCE_AND_CITATION_POLICY.md` | evidence-ingest references 承担字段级执行契约。 |
+| operating-evidence qualification | `evidence-ingest/references/operating_evidence_acquisition_contract.md` + `company-valuation` method selection | missing/conflicting 不可补偿；业务线边界、重叠和期间单位满足后才可支持完整方法。旧 Bundle 固定阈值不作为当前默认。 |
 | 个人高风险权益账户定性原则 | `docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md` | AGENTS / Investment Review skill 只能引用；不得转写为机器阈值。`C-HUMAN-005` 仍为 `pending` / `null`。 |
 | Portfolio 操作与账务边界 | `.agents/skills/portfolio-tracker/SKILL.md` | playbook 只给操作提示；不得把账务事实写成研究结论或交易建议。 |
 | Investment Review advice gate | `AGENTS.md` + `.agents/skills/investment-review/SKILL.md` | 普通复盘保持 `observation_only`；期限、风险预算与仓位约束必须来自当次显式用户输入。 |

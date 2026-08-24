@@ -107,8 +107,12 @@ def test_current_quality_report_supersedes_old_sample_quality_surface(
     assert "R5_bundle7_quality_gate_report.md" in historical
 
 
-def test_canonical_indexes_supersede_bundle6_and_activate_bundle7_close() -> None:
-    index_md = (ROOT / "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md").read_text(encoding="utf-8")
+def test_canonical_indexes_supersede_bundle6_and_activate_bundle7_close(
+    historical_blob_bytes,
+) -> None:
+    index_md = historical_blob_bytes(
+        "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md"
+    ).decode("utf-8")
     index_yaml = yaml.safe_load(
         (ROOT / "config/r5_readout_canonical_index.yaml").read_text(encoding="utf-8")
     )
@@ -119,18 +123,27 @@ def test_canonical_indexes_supersede_bundle6_and_activate_bundle7_close() -> Non
         ).read_text(encoding="utf-8")
     )
     entries = {
-        item["path"]: item
+        item["path"]: (group["status"], item)
         for group in retention["candidate_groups"]
         for item in group["items"]
     }
+    bundle6_status, bundle6_entry = entries[BUNDLE6_CLOSE]
+    bundle7_status, bundle7_entry = entries[BUNDLE7_CLOSE]
 
     assert f"| `{BUNDLE6_CLOSE}` | `superseded` | `false` |" in index_md
     assert f"| `{BUNDLE7_CLOSE}` | `canonical` | `true` |" in index_md
     assert "readouts" not in index_yaml
-    assert entries[BUNDLE6_CLOSE]["historical_relation"] == "superseded"
-    assert entries[BUNDLE6_CLOSE]["replacement_path"] == BUNDLE7_CLOSE
-    assert entries[BUNDLE7_CLOSE]["historical_relation"] == "historical_canonical"
-    assert entries[BUNDLE7_CLOSE]["replacement_path"] is None
+    assert bundle6_status == "READY_FOR_MANUAL_DELETE"
+    assert bundle6_entry["closure_id"] == "phase2_closure_003_reports_p1_6"
+    assert "config/r5_readout_canonical_index.yaml.current_runs" in bundle6_entry[
+        "replacement_authority"
+    ]
+    assert all(
+        reference["relation"] != "current_worktree_physical"
+        for reference in bundle6_entry["inbound_references"]
+    )
+    assert bundle7_status == "KEEP_EVIDENCE"
+    assert "git_history" in bundle7_entry["replacement_authority"]
 
 
 def test_close_readout_contains_auditable_execution_and_hard_boundaries() -> None:

@@ -70,8 +70,7 @@ docs/plans/
 ├── plan_template.md
 ├── p0_acceptance_checklist.md
 ├── p0_execution_plan.md
-├── p1_execution_plan.md
-└── p1_1_revision_plan.md
+└── R4_DISCLOSURE_BACKFLOW_NEXT_TASKS.md
 ```
 
 ### 3.2 日志目录 `docs/logs/`

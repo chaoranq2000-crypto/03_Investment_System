@@ -6,9 +6,17 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SOURCE_PATH = ROOT / "src/ingest/official_financial_reconciliation.py"
 sys.path.insert(0, str(ROOT / "src" / "ingest"))
 
 from official_financial_reconciliation import FIELDNAMES, build_reconciliation_rows  # noqa: E402
+
+
+def test_stage_readout_route_is_explicit_and_old_stock_run_is_absent() -> None:
+    source = SOURCE_PATH.read_text(encoding="utf-8")
+    assert 'parser.add_argument("--stage-readout-output", type=Path, required=True)' in source
+    assert "reports/p1_6/" not in source
+    assert "wf_20260703_stock_first_002837_invic" not in source
 
 
 DATA_LAYER_RUN = ROOT / "reports/workflow_runs/wf_20260703_data_layer_002837_invic"

@@ -23,6 +23,9 @@ Allowed `input_type` values:
 Evidence-ingest may help archive and describe local reviewed inputs, but it must
 not call live APIs for this dropzone and must not treat templates as evidence.
 
+This is a local reviewed-input path, not the only possible Research evidence
+intake path and not a parallel workflow.
+
 ## Accepted Rows
 
 Rows with `review_status: accepted` or `review_status: accepted_degraded` must
@@ -48,10 +51,22 @@ Accepted rows must not contain TODO markers, `MISSING_DISCLOSURE`,
 `LOW_CONFIDENCE_CLUE_ONLY`, `evidence_id: null`, or
 `source_evidence_id: null`.
 
+`review_status` is one of `pending`, `accepted`, `rejected` or
+`accepted_degraded`. `accepted_degraded` is allowed only with explicit
+limitations and `sample_quality_allowed: false`; it may support limited draft
+context but cannot independently unblock sample quality or P2.
+
+Templates are empty contract examples. They are not evidence and cannot be
+copied into an accepted registry row without reviewed metadata and evidence
+anchors.
+
 ## Pending And Rejected Rows
 
 `pending` and `rejected` rows may preserve TODO markers. They are useful for
 auditability but must not unblock gates or registry promotion.
+
+If the dropzone contains no accepted reviewed inputs, downstream output remains
+source-gapped and no gate is promoted.
 
 ## Validation Command
 

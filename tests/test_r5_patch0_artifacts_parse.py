@@ -13,16 +13,17 @@ YAML_FILES = [
 ]
 
 MULTILINE_FILES = [
+    REPO_ROOT / "AGENTS.md",
+    REPO_ROOT / "docs/workflows/RESEARCH_WORKFLOW.md",
     REPO_ROOT / "docs/workflows/R5_SAMPLE_QUALITY_STOCK_REPORT_SPEC.md",
     REPO_ROOT / "docs/workflows/R5_MVP_RESTRUCTURE_PLAN.md",
     REPO_ROOT / "templates/r5_stock_research_pack.yaml",
     REPO_ROOT / "templates/r5_stock_research_note.md",
     REPO_ROOT / "benchmarks/r5_report_quality_rubric.yaml",
-    REPO_ROOT / "reports/p1_6/R5_MVP_PATCH_0_PLAN.md",
-    REPO_ROOT / "codex_tasks/R5_PATCH_0_TASK_CARD.md",
 ]
 
 SPEC_PATH = REPO_ROOT / "docs/workflows/R5_SAMPLE_QUALITY_STOCK_REPORT_SPEC.md"
+PLAN_PATH = REPO_ROOT / "docs/workflows/R5_MVP_RESTRUCTURE_PLAN.md"
 NOTE_TEMPLATE_PATH = REPO_ROOT / "templates/r5_stock_research_note.md"
 
 
@@ -32,10 +33,21 @@ def test_r5_yaml_artifacts_parse():
         assert data is not None, path
 
 
-def test_r5_patch0_artifacts_are_not_single_line_blobs():
+def test_current_r5_foundation_artifacts_are_not_single_line_blobs():
     for path in MULTILINE_FILES:
         lines = path.read_text(encoding="utf-8").splitlines()
         assert len(lines) >= 8, path
+
+
+def test_r5_mvp_plan_is_historical_context_not_an_active_patch_router():
+    text = PLAN_PATH.read_text(encoding="utf-8")
+
+    assert "Legacy compatibility note" in text
+    assert "docs/workflows/RESEARCH_WORKFLOW.md" in text
+    assert "docs/meta/DOC_OWNERSHIP_MATRIX.md" in text
+    assert "codex_tasks/R5_PATCH_0_TASK_CARD.md" not in text
+    assert "reports/p1_6/R5_MVP_PATCH_0_PLAN.md" not in text
+    assert "这不是当前任务指令" in text
 
 
 def test_r5_note_template_has_enough_report_sections():

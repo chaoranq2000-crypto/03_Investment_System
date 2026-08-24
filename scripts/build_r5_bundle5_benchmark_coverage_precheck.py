@@ -298,7 +298,7 @@ status: pass_precheck_only
 - `scripts/build_r5_bundle5_benchmark_coverage_precheck.py`
 - `reports/workflow_runs/{workflow_id}/R5_bundle5_benchmark_coverage_precheck.yaml`
 - `tests/test_r5_bundle5_benchmark_coverage_precheck.py`
-- `reports/p1_6/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_READOUT.md`
+- readout path supplied explicitly through `--readout-output`
 
 ## files_modified
 
@@ -306,7 +306,7 @@ status: pass_precheck_only
 
 ## commands_run
 
-- `.\\.conda\\investment-system\\python.exe scripts\\build_r5_bundle5_benchmark_coverage_precheck.py --repo-root . --workflow-id <id> --profile <path> --report <path> --pack <path> --quality <path> --output <path> ...`
+- `.\\.conda\\investment-system\\python.exe scripts\\build_r5_bundle5_benchmark_coverage_precheck.py --repo-root . --workflow-id <id> --profile <path> --report <path> --pack <path> --quality <path> --output <path> --readout-output <path> ...`
 
 ## exit_code
 
