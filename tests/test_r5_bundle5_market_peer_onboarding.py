@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import inspect
 import json
 import sys
 from pathlib import Path
@@ -19,6 +20,14 @@ def load_builder():
 
 
 BUILDER = load_builder()
+
+
+def test_readout_output_is_explicit_and_has_no_legacy_default() -> None:
+    parameter = inspect.signature(BUILDER.build_outputs).parameters["readout_path"]
+    assert parameter.default is inspect.Parameter.empty
+    source = SCRIPT_PATH.read_text(encoding="utf-8")
+    assert 'parser.add_argument("--readout-output", type=Path, required=True)' in source
+    assert "reports/p1_6/" not in source
 
 
 def fixture_rows() -> list[dict]:

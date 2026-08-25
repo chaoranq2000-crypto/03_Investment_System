@@ -31,12 +31,92 @@ SOURCE_RUN = (
     / "workflow_runs"
     / "wf_20260703_stock_first_002837_invic"
 )
-CANONICAL_REPLAY = (
-    ROOT
-    / "reports"
-    / "workflow_runs"
-    / "wf_20260723_stock_first_002837_v1_replay"
+HISTORICAL_REPLAY_BASELINE = "f60f220ae252262a537c612ce193fc779901984b"
+HISTORICAL_REPLAY_PREFIX = (
+    "reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay"
 )
+HISTORICAL_REPLAY_BLOBS = {
+    "artifact_manifest.csv": (
+        "58c93d464f93b365714747cbb564e7b9263553c3",
+        4247,
+        "bc256a3be21bbe0f9c8623ce7cf9571f59f7e4f414a506ed65481022367f1052",
+    ),
+    "inputs/claim_snapshot.csv": (
+        "94b3d4668256b98039e35d6128aa41fb6bf56a46",
+        151,
+        "971ee42de92fcd0e68bf9d5232f40792aa327284c369ae6a79d3413fae4a3015",
+    ),
+    "inputs/input_provenance.csv": (
+        "b4a375269d3ac8bbc4bbf75e277b69a69ca0a5de",
+        10831,
+        "eec9e4ede0483390ccb1419ac4ef9a84c1a772a9cb6edc8ceb3fc30e987757db",
+    ),
+    "inputs/metric_candidates.csv": (
+        "b7db88fc934c13dd4f51ee343ee09275ccdb621f",
+        83200,
+        "146d32f45474527ad9abd2d3d473ca9e115f000458f1b825a26ccd3928f91cdf",
+    ),
+    "open_todos.csv": (
+        "02af505e25268e22b7bd80aaab7a9ddd06b6c93d",
+        1883,
+        "a049c1211cfa669f8dd857c2207768e5cda1f3c5ff7b8a5e3dec4ef3b5ac7706",
+    ),
+    "quality_gate_report.md": (
+        "c55f14588c286833af3f8b199fd1498bbb9d2f32",
+        2803,
+        "287e8018f9ad14331dfdddf68f1c2e5e75472ca57baafa1b9861dc6b23e18b08",
+    ),
+    "research/backflow_decision.yaml": (
+        "9fa2b2fa077eabdfc488bd26ac4f61d0da9a5b59",
+        1452,
+        "f60e629eef8377c116d470455f378f5d1ab0defd11f263931570ad4ebd9f6da4",
+    ),
+    "research/segment_exposure.yaml": (
+        "aaabe2608df80a997e7478a3af1e9cf427ad1b70",
+        837,
+        "cf4067f63af8f7ab492f0693bda40b54e476f4515a9023ab45c93c67d89a4831",
+    ),
+    "research/stock_report_draft.md": (
+        "4a6d0500476be50df4034fe9865d021475f384f1",
+        1439,
+        "019530a51b0f0a03f0f461ff6dabe35a5b17ae41d06f50db1c9757f612d49cf1",
+    ),
+    "research/stock_research_pack.yaml": (
+        "b5c02f452e51f9c7e1a28fa3888e17492b083833",
+        4154,
+        "0f803e31f2d935d7741da8eb11311a0666684e35b3381cdf60c5f47ac819e562",
+    ),
+    "run_log.md": (
+        "4504e73d641c11b4f66b7ede1be62420e78c086a",
+        1287,
+        "f31b714c7584493bf8e07f0763c75f0b746eb36195c9b77025444fb26388e770",
+    ),
+    "validation/artifact_hashes.csv": (
+        "d7fdc17dfe25db8735382643bbc553e9041297c6",
+        2755,
+        "e23f8e66846dcbc9606b1044272860894c912db8a900b8c124cdfaab19fdfef3",
+    ),
+    "validation/idempotence_report.yaml": (
+        "88e2481cbb83fa2b8e34edc8902671f64a5937fe",
+        4253,
+        "7c906ff170addcc39a0de1d7574f6eb637026469f5ad0f597f6e30d6bfd88271",
+    ),
+    "validation/replay_receipt.yaml": (
+        "be8d84762e1787d180c0d1b3289b4ed6ff6f1f45",
+        1391,
+        "a395c2e0a9f2c55342221249a47f4ae2291844dfa5cd59a417284ad01d59c925",
+    ),
+    "workflow_readout.md": (
+        "2e26e373ed0091cd366071d2f1522e36022ba961",
+        1585,
+        "3a1b7d8df42138041a9d36a4972e2f8811c33bcdc4677ae4d43083709297c4d8",
+    ),
+    "workflow_state.yaml": (
+        "18b27d1d27f9f401850b15510954a68c3a1f1323",
+        10261,
+        "23331ce5c47d3a5185e7a098de9af94a5a49f0e461289a9dcdc686066b1972a6",
+    ),
+}
 
 SIX_PIECES = {
     "workflow_state.yaml",
@@ -93,6 +173,43 @@ def tree_hashes(root: Path) -> dict[str, str]:
     }
 
 
+def historical_replay_blob(relative_path: str) -> bytes:
+    expected_oid, expected_bytes, expected_sha256 = HISTORICAL_REPLAY_BLOBS[
+        relative_path
+    ]
+    repository_path = f"{HISTORICAL_REPLAY_PREFIX}/{relative_path}"
+    spec = f"{HISTORICAL_REPLAY_BASELINE}:{repository_path}"
+    observed_oid = subprocess.check_output(
+        ["git", "rev-parse", "--verify", spec],
+        cwd=ROOT,
+        text=True,
+        encoding="utf-8",
+    ).strip()
+    assert observed_oid == expected_oid
+    assert (
+        subprocess.check_output(
+            ["git", "cat-file", "-t", spec],
+            cwd=ROOT,
+            text=True,
+            encoding="utf-8",
+        ).strip()
+        == "blob"
+    )
+    observed_bytes = int(
+        subprocess.check_output(
+            ["git", "cat-file", "-s", spec],
+            cwd=ROOT,
+            text=True,
+            encoding="utf-8",
+        ).strip()
+    )
+    assert observed_bytes == expected_bytes
+    payload = subprocess.check_output(["git", "cat-file", "blob", spec], cwd=ROOT)
+    assert len(payload) == expected_bytes
+    assert hashlib.sha256(payload).hexdigest() == expected_sha256
+    return payload
+
+
 @pytest.fixture(scope="module")
 def built_replay(tmp_path_factory: pytest.TempPathFactory):
     runner = load_runner()
@@ -105,6 +222,72 @@ def built_replay(tmp_path_factory: pytest.TempPathFactory):
         historical_fixture_root=fixture_root,
     )
     return runner, output, result
+
+
+def test_replay_cli_rejects_repository_historical_output(tmp_path: Path) -> None:
+    runner = load_runner()
+    old_target = ROOT / runner.TARGET_RUN_REL
+    with pytest.raises(
+        runner.ReplayContractError,
+        match="must not recreate the retired repository path",
+    ):
+        runner.validate_output_run(ROOT, old_target)
+    with pytest.raises(
+        runner.ReplayContractError,
+        match="repository output must be an explicit child of .codex_tmp",
+    ):
+        runner.validate_output_run(
+            ROOT,
+            ROOT / "reports" / "workflow_runs" / "another_historical_replay",
+        )
+    with pytest.raises(
+        runner.ReplayContractError,
+        match="repository output must be an explicit child of .codex_tmp",
+    ):
+        runner.validate_output_run(ROOT, ROOT / ".codex_tmp")
+    with pytest.raises(
+        runner.ReplayContractError,
+        match="must be an explicit child of the system temporary directory",
+    ):
+        runner.validate_output_run(
+            ROOT,
+            Path(ROOT.anchor) / "codex_replay_forbidden_output",
+        )
+
+    allowed_system_temp = runner.validate_output_run(
+        ROOT,
+        tmp_path / "explicit_replay_output",
+    )
+    assert allowed_system_temp == (tmp_path / "explicit_replay_output").resolve()
+    allowed_repo_temp = runner.validate_output_run(
+        ROOT,
+        ROOT / ".codex_tmp" / "explicit_replay_output",
+    )
+    assert allowed_repo_temp == (
+        ROOT / ".codex_tmp" / "explicit_replay_output"
+    ).resolve()
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-B",
+            str(SCRIPT),
+            "--repo-root",
+            str(ROOT),
+            "--source-run",
+            str(SOURCE_RUN),
+            "--output-run",
+            str(old_target),
+        ],
+        cwd=ROOT,
+        text=True,
+        encoding="utf-8",
+        capture_output=True,
+        check=False,
+        env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+    )
+    assert completed.returncode == 2
+    assert "must not recreate the retired repository path" in completed.stderr
 
 
 def test_replay_has_canonical_six_piece_control_plane(built_replay) -> None:
@@ -378,7 +561,50 @@ def test_replay_is_byte_idempotent_and_source_isolated(
         runner.resolve_contract_paths(ROOT, SOURCE_RUN, SOURCE_RUN)
 
 
-def test_checked_in_replay_matches_materializer(built_replay) -> None:
-    _, output, _ = built_replay
-    assert CANONICAL_REPLAY.is_dir()
-    assert tree_hashes(CANONICAL_REPLAY) == tree_hashes(output)
+def test_historical_replay_tree_is_git_recoverable(built_replay) -> None:
+    runner, output, _ = built_replay
+    assert runner.HISTORICAL_BASELINE == HISTORICAL_REPLAY_BASELINE
+    generated_hashes = tree_hashes(output)
+    expected_hashes = {
+        relative_path: receipt[2]
+        for relative_path, receipt in HISTORICAL_REPLAY_BLOBS.items()
+    }
+    assert generated_hashes == expected_hashes
+    assert len(HISTORICAL_REPLAY_BLOBS) == 16
+    assert sum(row[1] for row in HISTORICAL_REPLAY_BLOBS.values()) == 132529
+
+    payloads = {
+        relative_path: historical_replay_blob(relative_path)
+        for relative_path in HISTORICAL_REPLAY_BLOBS
+    }
+    manifest_rows = list(
+        csv.DictReader(
+            payloads["artifact_manifest.csv"]
+            .decode("utf-8-sig")
+            .splitlines()
+        )
+    )
+    prefix = HISTORICAL_REPLAY_PREFIX + "/"
+    assert {
+        row["path"].removeprefix(prefix) for row in manifest_rows
+    } == set(HISTORICAL_REPLAY_BLOBS)
+    for row in manifest_rows:
+        relative_path = row["path"].removeprefix(prefix)
+        assert row["path"].startswith(prefix)
+        if relative_path == "artifact_manifest.csv":
+            assert "recursive self-hash intentionally omitted" in row["notes"]
+        else:
+            expected_sha256 = HISTORICAL_REPLAY_BLOBS[relative_path][2]
+            assert row["notes"].rsplit("sha256=", 1)[-1] == expected_sha256
+
+    hash_rows = list(
+        csv.DictReader(
+            payloads["validation/artifact_hashes.csv"]
+            .decode("utf-8-sig")
+            .splitlines()
+        )
+    )
+    for row in hash_rows:
+        relative_path = row["path"].removeprefix(prefix)
+        assert row["path"].startswith(prefix)
+        assert row["sha256"] == HISTORICAL_REPLAY_BLOBS[relative_path][2]

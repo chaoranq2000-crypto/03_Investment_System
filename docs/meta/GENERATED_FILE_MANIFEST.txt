@@ -55,8 +55,6 @@ docs/logs/p0/2026-07-01_p0_smoke_test.md
 docs/logs/p0/2026-07-01_p0_closeout.md
 docs/plans/p0_acceptance_checklist.md
 docs/plans/p0_execution_plan.md
-docs/plans/p1_execution_plan.md
-docs/plans/p1_1_revision_plan.md
 docs/logs/2026-07-01_plan_completion_log.md
 docs/plans/plan_template.md
 docs/playbooks/OPERATING_PLAYBOOK.md

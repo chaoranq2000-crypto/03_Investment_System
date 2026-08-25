@@ -178,6 +178,7 @@ def check_retention_manifest(errors: list[str]) -> None:
         fail(errors, path, "directory deletion must remain unauthorized")
 
     ready_items: list[dict[str, object]] = []
+    ready_closure_by_path: dict[str, str] = {}
     candidate_status: dict[str, str] = {}
     seen: set[str] = set()
     for group in manifest.get("candidate_groups", []):
@@ -208,6 +209,11 @@ def check_retention_manifest(errors: list[str]) -> None:
             if not re.fullmatch(r"[0-9a-f]{64}", str(item.get("content_sha256", ""))):
                 fail(errors, path, f"candidate lacks SHA-256: {value}")
             if group.get("status") == "READY_FOR_MANUAL_DELETE":
+                closure_id = item.get("closure_id", group.get("closure_id"))
+                if not isinstance(closure_id, str) or not closure_id:
+                    fail(errors, path, f"READY candidate lacks closure id: {value}")
+                else:
+                    ready_closure_by_path[value] = closure_id
                 ready_items.append(item)
 
     ready_paths = {str(item["path"]) for item in ready_items}
@@ -232,7 +238,10 @@ def check_retention_manifest(errors: list[str]) -> None:
         "file_count": len(ready_items),
         "byte_count": sum(int(item.get("byte_count", -1)) for item in ready_items),
     }
-    if manifest.get("summary", {}).get("READY_FOR_MANUAL_DELETE") != expected_summary:
+    if (
+        manifest.get("summary", {}).get("READY_FOR_MANUAL_DELETE_ALL_PHASES")
+        != expected_summary
+    ):
         fail(errors, path, "READY aggregate does not match exact item list")
 
     resolution = manifest.get("classification_resolution", {})
@@ -353,47 +362,124 @@ def check_retention_manifest(errors: list[str]) -> None:
         fail(errors, path, "effective classification does not cover every baseline file")
 
     ready_by_path = {str(item["path"]): item for item in ready_items}
-    adjacency = {relative: set() for relative in ready_by_path}
     for target, item in ready_by_path.items():
         for reference in item.get("inbound_references", []):
             source = reference.get("source_path")
-            if (
-                reference.get("relation") in {"closure_internal", "self_reference"}
-                and source in ready_by_path
-                and source != target
-            ):
-                adjacency[target].add(source)
-                adjacency[source].add(target)
-    components: list[list[str]] = []
-    unseen = set(adjacency)
-    while unseen:
-        stack = [min(unseen)]
-        component: set[str] = set()
-        while stack:
-            node = stack.pop()
-            if node in component:
-                continue
-            component.add(node)
-            stack.extend(adjacency[node] - component)
-        unseen -= component
-        components.append(sorted(component))
-    components.sort(key=lambda rows: (-len(rows), rows[0]))
-    expected_closures = []
-    for index, rows in enumerate(components, 1):
-        closure_id = f"ready_closure_{index:03d}"
-        if any(ready_by_path[relative].get("closure_id") != closure_id for relative in rows):
-            fail(errors, path, f"READY closure id drifted: {closure_id}")
-        expected_closures.append(
-            {
-                "closure_id": closure_id,
-                "all_or_none": True,
-                "file_count": len(rows),
-                "byte_count": sum(int(ready_by_path[relative]["byte_count"]) for relative in rows),
-                "first_path": rows[0],
-            }
-        )
-    if manifest.get("manual_delete_closures") != expected_closures:
-        fail(errors, path, "manual delete closure aggregate drifted")
+            relation = reference.get("relation")
+            if relation == "self_reference" and source != target:
+                fail(errors, path, f"invalid self reference: {target}")
+            if relation == "closure_internal":
+                if source not in ready_by_path:
+                    fail(errors, path, f"closure-internal source is not READY: {source}")
+                elif ready_closure_by_path.get(source) != ready_closure_by_path.get(target):
+                    fail(errors, path, f"closure-internal edge crosses closures: {source} -> {target}")
+
+    grouped: dict[str, list[str]] = {}
+    for relative, closure_id in ready_closure_by_path.items():
+        grouped.setdefault(closure_id, []).append(relative)
+    declared_rows = manifest.get("manual_delete_closures", [])
+    if not isinstance(declared_rows, list):
+        fail(errors, path, "manual delete closures must be a list")
+        declared_rows = []
+    declared: dict[str, dict[str, object]] = {}
+    for row in declared_rows:
+        if not isinstance(row, dict) or not isinstance(row.get("closure_id"), str):
+            fail(errors, path, "manual delete closure must have a string id")
+            continue
+        closure_id = str(row["closure_id"])
+        if closure_id in declared:
+            fail(errors, path, f"duplicate manual delete closure: {closure_id}")
+            continue
+        declared[closure_id] = row
+    if set(declared) != set(grouped):
+        fail(errors, path, "manual delete closure id set drifted")
+    for closure_id, rows in grouped.items():
+        rows.sort()
+        declared_row = declared.get(closure_id, {})
+        expected = {
+            "all_or_none": True,
+            "file_count": len(rows),
+            "byte_count": sum(int(ready_by_path[relative]["byte_count"]) for relative in rows),
+            "first_path": rows[0],
+        }
+        if any(declared_row.get(key) != value for key, value in expected.items()):
+            fail(errors, path, f"manual delete closure aggregate drifted: {closure_id}")
+
+    phase2 = manifest.get("phase2_retirement", {})
+    allowed_phase2_statuses = {
+        "awaiting_user_approval",
+        "quarantine_move_in_progress",
+        "user_quarantined_pending_manual_delete",
+        "user_deleted_pending_commit",
+        "completed",
+    }
+    if not isinstance(phase2, dict) or phase2.get("status") not in allowed_phase2_statuses:
+        fail(errors, path, "Phase 2 status is invalid")
+        return
+    gate = phase2.get("approval_gate", {})
+    phase2_closures = phase2.get("closures", {})
+    if not isinstance(phase2_closures, dict):
+        fail(errors, path, "Phase 2 closures must be a mapping")
+        return
+    phase2_paths: set[str] = set()
+    for closure_id, row in phase2_closures.items():
+        exact_paths = row.get("exact_paths", []) if isinstance(row, dict) else []
+        if not isinstance(exact_paths, list) or len(exact_paths) != len(set(exact_paths)):
+            fail(errors, path, f"Phase 2 closure path list is invalid: {closure_id}")
+            continue
+        expected_paths = {
+            relative
+            for relative, candidate_closure in ready_closure_by_path.items()
+            if candidate_closure == closure_id
+        }
+        if set(exact_paths) != expected_paths:
+            fail(errors, path, f"Phase 2 exact path closure drifted: {closure_id}")
+        if phase2_paths.intersection(exact_paths):
+            fail(errors, path, f"Phase 2 closures overlap: {closure_id}")
+        phase2_paths.update(exact_paths)
+    scope_total = phase2.get("scope", {}).get("total", {})
+    if len(phase2_paths) != scope_total.get("file_count"):
+        fail(errors, path, "Phase 2 scope file count drifted")
+    if sum(int(ready_by_path[relative]["byte_count"]) for relative in phase2_paths) != scope_total.get(
+        "git_blob_bytes"
+    ):
+        fail(errors, path, "Phase 2 scope byte count drifted")
+
+    execution_state = gate.get("execution_state")
+    if gate.get("required_selection") != "all_six_phase2_closures_all_or_none":
+        fail(errors, path, "Phase 2 approval selection rule drifted")
+    if execution_state == "not_started":
+        if phase2.get("status") != "awaiting_user_approval":
+            fail(errors, path, "unapproved Phase 2 status drifted")
+        if gate.get("user_approved") is not False:
+            fail(errors, path, "unapproved Phase 2 approval must be false")
+        if gate.get("approved_closure_ids") != [] or gate.get("approved_exact_paths") != []:
+            fail(errors, path, "unapproved Phase 2 approval lists must be empty")
+        if gate.get("codex_quarantine_move_authorized") is not False:
+            fail(errors, path, "unapproved Phase 2 quarantine move must be false")
+    elif execution_state in {
+        "quarantine_move_in_progress",
+        "user_quarantined_pending_manual_delete",
+        "user_deleted_pending_commit",
+        "completed",
+    }:
+        if phase2.get("status") != execution_state:
+            fail(errors, path, "approved Phase 2 status must match execution state")
+        if gate.get("user_approved") is not True:
+            fail(errors, path, "approved Phase 2 approval must be true")
+        if gate.get("approved_closure_ids") != list(phase2_closures):
+            fail(errors, path, "approved Phase 2 closure IDs drifted")
+        approved_paths = gate.get("approved_exact_paths")
+        if not isinstance(approved_paths, list) or len(approved_paths) != len(set(approved_paths)):
+            fail(errors, path, "approved Phase 2 exact path list is invalid")
+        elif set(approved_paths) != phase2_paths:
+            fail(errors, path, "approved Phase 2 exact paths drifted")
+        if gate.get("codex_quarantine_move_authorized") is not True:
+            fail(errors, path, "approved Phase 2 quarantine move must be true")
+    else:
+        fail(errors, path, "Phase 2 execution state is invalid")
+    if gate.get("codex_delete_authorized") is not False:
+        fail(errors, path, "Codex delete authorization must remain false")
 
 
 def main() -> int:

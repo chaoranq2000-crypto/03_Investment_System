@@ -8,8 +8,10 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SOURCE = "config/r5_bundle3_expected_artifacts.yaml"
-PREFLIGHT_PATH = REPO_ROOT / "reports/p1_6/r5_core_asset_preflight_result.json"
-CLOSE_READOUT = REPO_ROOT / "reports/p1_6/R5_BUNDLE_3_CORE_RESEARCH_ASSET_SUBPACKS_CLOSE_READOUT.md"
+PREFLIGHT_SOURCE = "reports/p1_6/r5_core_asset_preflight_result.json"
+CLOSE_READOUT_SOURCE = (
+    "reports/p1_6/R5_BUNDLE_3_CORE_RESEARCH_ASSET_SUBPACKS_CLOSE_READOUT.md"
+)
 
 
 def test_bundle3_expected_artifacts_exist(historical_blob_bytes):
@@ -21,8 +23,6 @@ def test_bundle3_expected_artifacts_exist(historical_blob_bytes):
                 paths.append(value)
     missing = []
     for path in paths:
-        if (REPO_ROOT / path).exists():
-            continue
         try:
             historical_blob_bytes(path)
         except (AssertionError, subprocess.CalledProcessError):
@@ -31,8 +31,8 @@ def test_bundle3_expected_artifacts_exist(historical_blob_bytes):
     assert not missing
 
 
-def test_bundle3_preflight_fails_closed_with_todos():
-    result = json.loads(PREFLIGHT_PATH.read_text(encoding="utf-8"))
+def test_bundle3_preflight_fails_closed_with_todos(historical_blob_bytes):
+    result = json.loads(historical_blob_bytes(PREFLIGHT_SOURCE).decode("utf-8"))
 
     assert result["core_asset_state"] == "R5_CORE_ASSET_SCHEMAS_EXECUTABLE_WITH_TODOS"
     assert result["financial_history_status"] == "accepted_with_todos"
@@ -44,8 +44,8 @@ def test_bundle3_preflight_fails_closed_with_todos():
     assert result["blockers"] == []
 
 
-def test_bundle3_close_readout_freezes_next_decision():
-    text = CLOSE_READOUT.read_text(encoding="utf-8")
+def test_bundle3_close_readout_freezes_next_decision(historical_blob_bytes):
+    text = historical_blob_bytes(CLOSE_READOUT_SOURCE).decode("utf-8")
 
     assert "current_r5_state: `R5_CORE_ASSET_SCHEMAS_EXECUTABLE_WITH_TODOS`" in text
     assert "sample_quality_report_allowed: `false`" in text

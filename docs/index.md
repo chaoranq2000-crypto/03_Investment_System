@@ -73,7 +73,8 @@
 
 ## Historical material
 
-以下目录保留为历史和任务记录，不作为当前事实源：
+以下目录中的剩余受保护文件只作为历史和任务记录，不作为当前事实源；已退役
+文件从 retention manifest 指定的 Git commit 恢复：
 
 ```text
 docs/plans/
@@ -81,6 +82,7 @@ docs/logs/
 docs/codex_tasks/
 ```
 
-需要查历史时再进入这些目录；日常执行不应把其中内容作为上位规则。
+需要查历史时先读 retention manifest，再按精确路径进入剩余文件或 Git history；
+日常执行不应把其中内容作为上位规则。
 旧 R5/Patch/Bundle readout、治理包和清理收据只按 retention manifest 与 Git history
 追溯，不作为日常导航入口，也不得被解释为 current/checkpoint。

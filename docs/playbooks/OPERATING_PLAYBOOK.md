@@ -10,8 +10,8 @@
 | 查文档总目录 | `docs/index.md` |
 | 查永久工作流定义 | `docs/workflows/RESEARCH_WORKFLOW.md` |
 | 查 workflow run、handoff 和编排 runtime | `.agents/skills/research-orchestrator/references/orchestration_contract.md` |
-| 查当前 P1.6 建设计划 | `docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md` |
-| 查 P1.6 已完成基础设施记录 | `docs/logs/2026-07-02_p1_6_workflow_foundation_log.md` |
+| 查当前 Research 阶段与门禁 | `docs/workflows/RESEARCH_WORKFLOW.md` |
+| 查历史 P1.6 建设依据 | retention manifest 与 Git history；基础设施记录见 `docs/logs/2026-07-02_p1_6_workflow_foundation_log.md` |
 
 ## 2. 常见任务入口
 

@@ -77,6 +77,12 @@ Read these for stock-led evidence download tasks:
 - `references/official_disclosure_download.md`
 - `references/structured_api_pull_runner.md`
 
+Read these when the handoff explicitly includes reviewed local inputs or
+company operating-driver qualification:
+
+- `references/r5_reviewed_input_dropzone_contract.md`
+- `references/operating_evidence_acquisition_contract.md`
+
 Read adapter notes only when relevant:
 
 - `references/adapter_notes/cninfo_sse_szse.md`
@@ -222,11 +228,14 @@ blocking_issues:
 next_todos:
 ```
 
-## Explicit legacy Bundle12R operating-evidence capability
+## Operating-evidence qualification and legacy compatibility
 
-Only when the handoff explicitly requests the legacy Bundle12R
-operating-evidence capability, read
-`references/operating_evidence_acquisition_contract.md` and follow that
-contract. Ordinary operating-driver requests stay on the normal
-Evidence/Claim/Metric path and do not load Bundle-specific routing, artifact,
-generation-lock or review requirements.
+For company operating-driver qualification, use
+`references/operating_evidence_acquisition_contract.md` as the current
+evidence-layer rule. It does not activate a Bundle workflow or change the
+normal Evidence/Claim/Metric path.
+
+Only when a handoff explicitly requests the legacy Bundle12R capability may
+the runner additionally load Bundle-specific routing, artifacts,
+generation-locks or historical review requirements. Those legacy controls are
+never default Research routing and do not establish a current human decision.

@@ -11,7 +11,6 @@ import yaml
 
 
 DATA_LAYER_RUN = Path("reports/workflow_runs/wf_20260703_data_layer_002837_invic")
-STOCK_RUN = Path("reports/workflow_runs/wf_20260703_stock_first_002837_invic")
 OFFICIAL_EVIDENCE_ID = "ev_annual_report_002837_20260421_ce7f64"
 
 FIELDNAMES = [
@@ -399,8 +398,7 @@ def _update_artifact_manifest(data_layer_run: Path) -> None:
         writer.writerows(rows)
 
 
-def write_stage_readout(repo_root: Path, rows: list[dict[str, str]]) -> None:
-    path = repo_root / "reports/p1_6/OFFICIAL_DISCLOSURE_RECONCILIATION_MVP_READOUT.md"
+def write_stage_readout(path: Path, rows: list[dict[str, str]]) -> None:
     mismatch = sum(1 for row in rows if row["reconciliation_status"] == "mismatch")
     official_missing = sum(1 for row in rows if row["reconciliation_status"] == "official_missing")
     structured_missing = sum(1 for row in rows if row["reconciliation_status"] == "structured_missing")
@@ -424,10 +422,15 @@ def write_stage_readout(repo_root: Path, rows: list[dict[str, str]]) -> None:
         "- No structured metric was promoted to reported fact.",
         "- No business exposure was inferred from company-level financial metrics.",
     ]
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def build_official_reconciliation(*, repo_root: Path) -> list[dict[str, str]]:
+def build_official_reconciliation(
+    *,
+    repo_root: Path,
+    stage_readout_path: Path,
+) -> list[dict[str, str]]:
     data_layer_run = repo_root / DATA_LAYER_RUN
     rows = build_reconciliation_rows(data_layer_run / "financial_metric_pack.csv")
     output_path = data_layer_run / "official_financial_reconciliation.csv"
@@ -438,15 +441,25 @@ def build_official_reconciliation(*, repo_root: Path) -> list[dict[str, str]]:
     _rewrite_open_todos(data_layer_run)
     _update_workflow_state(data_layer_run)
     _update_artifact_manifest(data_layer_run)
-    write_stage_readout(repo_root, rows)
+    write_stage_readout(stage_readout_path, rows)
     return rows
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build official financial reconciliation for the R4 data-layer run.")
     parser.add_argument("--repo-root", default=".")
+    parser.add_argument("--stage-readout-output", type=Path, required=True)
     args = parser.parse_args(argv)
-    rows = build_official_reconciliation(repo_root=Path(args.repo_root).resolve())
+    repo_root = Path(args.repo_root).resolve()
+    stage_readout_path = (
+        args.stage_readout_output
+        if args.stage_readout_output.is_absolute()
+        else repo_root / args.stage_readout_output
+    )
+    rows = build_official_reconciliation(
+        repo_root=repo_root,
+        stage_readout_path=stage_readout_path,
+    )
     print({"rows": len(rows), "output": OUTPUT_POSIX})
     return 0
 

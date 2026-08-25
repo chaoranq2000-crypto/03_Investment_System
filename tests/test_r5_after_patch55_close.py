@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DECISION_PATH = REPO_ROOT / "reports/p1_6/r5_after_patch55_decision.json"
+DECISION_SOURCE = "reports/p1_6/r5_after_patch55_decision.json"
 EXPECTED_SOURCE = "config/r5_patch_49_55_expected_artifacts.yaml"
 HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 NOTE_SOURCE = f"{HISTORICAL_RUN}/R5_stock_research_note_reviewed_input_draft.md"
@@ -20,8 +21,8 @@ def load_yaml(path: Path):
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
-def test_after_patch55_decision_keeps_source_gapped_state():
-    decision = load_json(DECISION_PATH)
+def test_after_patch55_decision_keeps_source_gapped_state(historical_blob_bytes):
+    decision = json.loads(historical_blob_bytes(DECISION_SOURCE).decode("utf-8"))
 
     assert decision["current_r5_state"] == "R5_REVIEWED_INPUT_PILOT_BLOCKED_SOURCE_GAPPED"
     assert decision["reviewed_input_pilot_allowed"] is False
@@ -40,9 +41,9 @@ def test_patch49_55_expected_artifacts_exist(historical_blob_bytes):
     missing = []
     for item in expected["required_artifacts"]:
         path = item["path"]
-        if path.startswith(HISTORICAL_RUN + "/"):
+        try:
             assert historical_blob_bytes(path)
-        elif not (REPO_ROOT / path).exists():
+        except (AssertionError, subprocess.CalledProcessError):
             missing.append(path)
 
     assert not missing

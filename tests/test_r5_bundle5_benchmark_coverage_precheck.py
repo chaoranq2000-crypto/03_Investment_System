@@ -9,7 +9,8 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts/build_r5_bundle5_benchmark_coverage_precheck.py"
-PROFILE_PATH = REPO_ROOT / "codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml"
+RUBRIC_PATH = REPO_ROOT / "benchmarks/r5_report_quality_rubric.yaml"
+SAMPLE_POLICY_PATH = REPO_ROOT / "docs/workflows/R5_SAMPLE_QUALITY_STOCK_REPORT_SPEC.md"
 
 
 def load_module():
@@ -28,9 +29,60 @@ def load_yaml(path: Path):
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
+def build_current_profile(path: Path) -> dict:
+    rubric = load_yaml(RUBRIC_PATH)
+    policy_text = SAMPLE_POLICY_PATH.read_text(encoding="utf-8")
+    coverage_dimensions = list(rubric["required_sections"])
+    assert len(coverage_dimensions) == 10
+    for marker in (
+        "R5 只学习其“研究结构和信息密度”",
+        "直接交易指令",
+        "个人化仓位安排",
+        "保证收益表达",
+    ):
+        assert marker in policy_text
+
+    profile = {
+        "schema_version": "current_r5_sample_benchmark_fixture_v1",
+        "profile_id": "current_r5_sample_benchmark_policy_fixture",
+        "source_origin": "current_repository_authority",
+        "source_files": [],
+        "use_as_research_evidence": False,
+        "use_as_workflow_fact_source": False,
+        "use_as_gate_definition": False,
+        "allowed_uses": ["section_coverage_reference", "information_density_reference"],
+        "prohibited_uses": [
+            "importing_factual_claims",
+            "importing_forecasts_or_prices",
+            "importing_investment_ratings",
+            "importing_position_sizing",
+            "importing_trade_timing",
+        ],
+        "coverage_dimensions": coverage_dimensions,
+        "forbidden_output_patterns": [
+            "直接交易指令",
+            "个人化仓位安排",
+            "保证收益",
+            "买入",
+            "卖出",
+            "仓位",
+        ],
+        "quality_flags_fixed": {
+            "sample_quality_report_allowed": False,
+            "p2_allowed": False,
+        },
+    }
+    path.write_text(
+        yaml.safe_dump(profile, allow_unicode=True, sort_keys=False),
+        encoding="utf-8",
+    )
+    return profile
+
+
 @pytest.fixture
 def precheck_fixture(tmp_path: Path) -> dict:
-    profile = load_yaml(PROFILE_PATH)
+    profile_path = tmp_path / "sample_report_benchmark_profile.yaml"
+    profile = build_current_profile(profile_path)
     report_path = tmp_path / "research_draft.md"
     pack_path = tmp_path / "research_pack.yaml"
     quality_path = tmp_path / "quality_gate.yaml"
@@ -73,7 +125,7 @@ def precheck_fixture(tmp_path: Path) -> dict:
         REPO_ROOT,
         workflow_id="wf_fixture_benchmark",
         stock_code="300001",
-        profile_path=PROFILE_PATH,
+        profile_path=profile_path,
         report_path=report_path,
         pack_path=pack_path,
         quality_path=quality_path,
@@ -85,6 +137,7 @@ def precheck_fixture(tmp_path: Path) -> dict:
         "profile": profile,
         "result": result,
         "report_path": report_path,
+        "profile_path": profile_path,
     }
 
 
@@ -176,8 +229,12 @@ def test_not_applicable_cannot_hide_a_known_gap() -> None:
 def test_sample_material_is_not_registered_as_evidence(
     precheck_fixture: dict,
 ) -> None:
+    profile = precheck_fixture["profile"]
     result = precheck_fixture["result"]
 
+    assert profile["use_as_research_evidence"] is False
+    assert profile["use_as_workflow_fact_source"] is False
+    assert profile["use_as_gate_definition"] is False
     assert result["sample_evidence_registered_count"] == 0
     assert result["sample_registration_scan"]["matches"] == []
     assert result["sample_registration_scan"]["checked"] > 0

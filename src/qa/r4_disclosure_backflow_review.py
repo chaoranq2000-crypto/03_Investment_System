@@ -21,7 +21,7 @@ OFFICIAL_EVIDENCE_ID = "ev_annual_report_002837_20260421_ce7f64"
 
 STOCK_RUN = Path("__workflow_run_required__")
 DATA_LAYER_RUN = Path(f"reports/workflow_runs/{DATA_LAYER_ID}")
-P1_6 = Path("reports/p1_6")
+SUMMARY_ROOT = STOCK_RUN / "stage_summaries"
 SEGMENT_UNIVERSE = Path("reports/segments/ai_server_liquid_cooling/company_universe.csv")
 GLOBAL_EXPOSURE = Path("data/processed/normalized/segment_company_exposure.csv")
 
@@ -39,12 +39,14 @@ R4_OPEN_QUESTIONS_V02 = STOCK_RUN / "R4_open_questions_v0_2.md"
 
 def configure_workflow_run(workflow_run: Path) -> None:
     global STOCK_RUN
+    global SUMMARY_ROOT
     global OFFICIAL_DECISION_CSV, OFFICIAL_DECISION_MD
     global LIQUID_REVIEW_CSV, LIQUID_REVIEW_MD
     global BACKFLOW_REVIEW_MD, BACKFLOW_REVIEW_YAML
     global R4_V02, R4_GATE_V02, R4_SOURCE_GAP_V02, R4_OPEN_QUESTIONS_V02
 
     STOCK_RUN = workflow_run
+    SUMMARY_ROOT = STOCK_RUN / "stage_summaries"
     OFFICIAL_DECISION_CSV = STOCK_RUN / "official_reconciliation_review_decision.csv"
     OFFICIAL_DECISION_MD = STOCK_RUN / "official_reconciliation_review_decision.md"
     LIQUID_REVIEW_CSV = STOCK_RUN / "liquid_cooling_exposure_evidence_review.csv"
@@ -330,7 +332,13 @@ def _update_workflow_state(stock_run: Path) -> None:
         ("exposure_backflow_review", str(BACKFLOW_REVIEW_YAML), "segment-company-mapping", "R4_Phase_4", "current"),
         ("R4_stock_deep_dive_v0_2", str(R4_V02), "stock-deep-dive", "R4_Phase_5", "publishable_ready_with_disclosure_todos"),
         ("R4_quality_gate_report_v0_2", str(R4_GATE_V02), "quality-review", "R4_Phase_5", "current"),
-        ("P2_readiness_check_after_R4_v0_2", "reports/p1_6/P2_READINESS_CHECK_AFTER_R4_V0_2.md", "research-orchestrator", "R4_Phase_7", "current"),
+        (
+            "P2_readiness_check_after_R4_v0_2",
+            (SUMMARY_ROOT / "P2_READINESS_CHECK_AFTER_R4_V0_2.md").as_posix(),
+            "research-orchestrator",
+            "R4_Phase_7",
+            "current",
+        ),
     ]:
         if artifact_type not in existing:
             state.setdefault("artifacts", []).append(
@@ -466,7 +474,7 @@ def build_official_reconciliation_review(repo_root: Path) -> list[dict[str, str]
         "\n".join(lines) + "\n",
         encoding="utf-8",
     )
-    readout = repo_root / P1_6 / "OFFICIAL_RECONCILIATION_REVIEW_DECISION_READOUT.md"
+    readout = repo_root / SUMMARY_ROOT / "OFFICIAL_RECONCILIATION_REVIEW_DECISION_READOUT.md"
     readout.write_text(
         "\n".join(
             [
@@ -607,7 +615,7 @@ def build_liquid_cooling_review(repo_root: Path) -> list[dict[str, str]]:
         "\n".join(lines) + "\n",
         encoding="utf-8",
     )
-    readout = repo_root / P1_6 / "LIQUID_COOLING_EXPOSURE_EVIDENCE_REVIEW_READOUT.md"
+    readout = repo_root / SUMMARY_ROOT / "LIQUID_COOLING_EXPOSURE_EVIDENCE_REVIEW_READOUT.md"
     readout.write_text(
         "\n".join(
             [
@@ -728,7 +736,7 @@ def build_backflow_review(repo_root: Path) -> dict[str, Any]:
         "- Segment-led replay is prepared, but no P2 comparison is started.",
     ]
     (stock_run / "exposure_backflow_review.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    readout = repo_root / P1_6 / "SEGMENT_STOCK_BACKFLOW_REVIEW_READOUT.md"
+    readout = repo_root / SUMMARY_ROOT / "SEGMENT_STOCK_BACKFLOW_REVIEW_READOUT.md"
     readout.write_text(
         "\n".join(
             [
@@ -976,7 +984,7 @@ def build_r4_v02(repo_root: Path) -> None:
         hits = find_unsupported_advice(path.read_text(encoding="utf-8"))
         if hits:
             raise ValueError(f"{path} contains restricted no-advice patterns: {hits}")
-    readout = repo_root / P1_6 / "R4_STOCK_REPORT_DRAFT_V0_2_READOUT.md"
+    readout = repo_root / SUMMARY_ROOT / "R4_STOCK_REPORT_DRAFT_V0_2_READOUT.md"
     readout.write_text(
         "\n".join(
             [
@@ -1006,7 +1014,7 @@ def build_r4_v02(repo_root: Path) -> None:
 
 
 def write_phase0_and_format_readouts(repo_root: Path) -> None:
-    plan = repo_root / "docs/plans/R4_DISCLOSURE_BACKFLOW_NEXT_TASKS.md"
+    plan = repo_root / SUMMARY_ROOT / "r4_disclosure_backflow_plan.md"
     plan.write_text(
         "\n".join(
             [
@@ -1037,7 +1045,7 @@ def write_phase0_and_format_readouts(repo_root: Path) -> None:
         + "\n",
         encoding="utf-8",
     )
-    (repo_root / P1_6 / "R4_DISCLOSURE_BACKFLOW_NEXT_TASKS_PLAN_READOUT.md").write_text(
+    (repo_root / SUMMARY_ROOT / "R4_DISCLOSURE_BACKFLOW_NEXT_TASKS_PLAN_READOUT.md").write_text(
         "\n".join(
             [
                 "# R4_DISCLOSURE_BACKFLOW_NEXT_TASKS_PLAN_READOUT",
@@ -1062,7 +1070,7 @@ def write_phase0_and_format_readouts(repo_root: Path) -> None:
         + "\n",
         encoding="utf-8",
     )
-    (repo_root / P1_6 / "R4_ARTIFACT_FORMATTING_CLEANUP_READOUT.md").write_text(
+    (repo_root / SUMMARY_ROOT / "R4_ARTIFACT_FORMATTING_CLEANUP_READOUT.md").write_text(
         "\n".join(
             [
                 "# R4_ARTIFACT_FORMATTING_CLEANUP_READOUT",
@@ -1121,7 +1129,7 @@ def write_segment_led_replay_preparation(repo_root: Path) -> None:
         + "\n",
         encoding="utf-8",
     )
-    (repo_root / P1_6 / "SEGMENT_LED_REPLAY_PREPARATION_READOUT.md").write_text(
+    (repo_root / SUMMARY_ROOT / "SEGMENT_LED_REPLAY_PREPARATION_READOUT.md").write_text(
         "\n".join(
             [
                 "# SEGMENT_LED_REPLAY_PREPARATION_READOUT",
@@ -1146,7 +1154,7 @@ def write_segment_led_replay_preparation(repo_root: Path) -> None:
 
 
 def write_p2_readiness_check(repo_root: Path) -> None:
-    p2_path = repo_root / P1_6 / "P2_READINESS_CHECK_AFTER_R4_V0_2.md"
+    p2_path = repo_root / SUMMARY_ROOT / "P2_READINESS_CHECK_AFTER_R4_V0_2.md"
     p2_path.write_text(
         "\n".join(
             [
@@ -1191,7 +1199,7 @@ def write_p2_readiness_check(repo_root: Path) -> None:
 
 
 def write_master_readout(repo_root: Path) -> None:
-    path = repo_root / P1_6 / "R4_DISCLOSURE_BACKFLOW_MASTER_READOUT.md"
+    path = repo_root / SUMMARY_ROOT / "R4_DISCLOSURE_BACKFLOW_MASTER_READOUT.md"
     path.write_text(
         "\n".join(
             [
@@ -1346,6 +1354,7 @@ def finalize_artifact_manifest(repo_root: Path) -> None:
 
 def run_all(repo_root: Path, workflow_run: Path) -> None:
     configure_workflow_run(workflow_run)
+    (repo_root / SUMMARY_ROOT).mkdir(parents=True, exist_ok=True)
     write_phase0_and_format_readouts(repo_root)
     _write_handoff(repo_root / STOCK_RUN)
     build_official_reconciliation_review(repo_root)

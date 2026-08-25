@@ -8,7 +8,9 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_SOURCE = "config/r5_bundle5_expected_artifacts.yaml"
-BASELINE_READOUT = REPO_ROOT / "reports/p1_6/R5_AFTER_BUNDLE4_STATUS_BASELINE_READOUT.md"
+BASELINE_READOUT_SOURCE = (
+    "reports/p1_6/R5_AFTER_BUNDLE4_STATUS_BASELINE_READOUT.md"
+)
 README_PATH = REPO_ROOT / "README.md"
 CI_PATH = REPO_ROOT / ".github/workflows/ci.yml"
 
@@ -42,15 +44,13 @@ def test_bundle5_manifest_freezes_scope_and_fail_closed_states(historical_blob_b
     assert manifest["fixed_boundaries"]["fixtures_are_research_evidence"] is False
 
 
-def test_baseline_required_paths_are_physical(historical_blob_bytes) -> None:
+def test_baseline_required_paths_are_git_recoverable(historical_blob_bytes) -> None:
     manifest = load_manifest(historical_blob_bytes)
     required = manifest["baseline_required_paths"]
 
     assert len(required) == len(set(required))
     missing = []
     for path in required:
-        if (REPO_ROOT / path).exists():
-            continue
         try:
             historical_blob_bytes(path)
         except (AssertionError, subprocess.CalledProcessError):
@@ -108,9 +108,9 @@ def test_registry_write_boundary_starts_at_card_5_5_only(historical_blob_bytes) 
     assert "canonical_registries" in cards[first_write_card]["declared_write_scopes"]
 
 
-def test_ci_keeps_compile_and_full_pytest_semantics() -> None:
+def test_ci_keeps_compile_and_full_pytest_semantics(historical_blob_bytes) -> None:
     ci_text = CI_PATH.read_text(encoding="utf-8")
-    baseline_text = BASELINE_READOUT.read_text(encoding="utf-8")
+    baseline_text = historical_blob_bytes(BASELINE_READOUT_SOURCE).decode("utf-8")
 
     assert "python -m py_compile $(git ls-files '*.py')" in ci_text
     assert "python -m pytest -q" in ci_text

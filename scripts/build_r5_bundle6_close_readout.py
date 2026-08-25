@@ -11,18 +11,37 @@ def sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def resolve_input(root: Path, path: Path) -> Path:
+    return path.resolve() if path.is_absolute() else (root / path).resolve()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", default=str(Path(__file__).resolve().parents[1]))
     parser.add_argument("--run-root", type=Path, required=True)
+    parser.add_argument(
+        "--expected-artifacts",
+        type=Path,
+        required=True,
+        help="Explicit Bundle 6 expected-artifact contract or fixture.",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        required=True,
+        help="Explicit close-readout output path.",
+    )
     parser.add_argument("--full-pytest-summary", required=True)
     parser.add_argument("--focused-pytest-summary", default="32 passed in 0.51s")
     args = parser.parse_args()
     root = Path(args.repo_root).resolve()
-    run = args.run_root if args.run_root.is_absolute() else root / args.run_root
-    run = run.resolve()
+    run = resolve_input(root, args.run_root)
     run_rel = run.relative_to(root)
-    expected = yaml.safe_load((root / "codex_tasks/r5_after_bundle5/R5_BUNDLE6_EXPECTED_ARTIFACTS.yaml").read_text(encoding="utf-8"))
+    expected_path = resolve_input(root, args.expected_artifacts)
+    output = resolve_input(root, args.output)
+    expected = yaml.safe_load(expected_path.read_text(encoding="utf-8"))
+    if not isinstance(expected, dict) or not isinstance(expected.get("required_artifacts"), list):
+        raise SystemExit("expected-artifacts must contain a required_artifacts list")
     score = yaml.safe_load((run / "R5_stock_research_report_reader_v2_quality_scorecard.yaml").read_text(encoding="utf-8"))
     review = yaml.safe_load((run / "R5_stock_research_report_reader_v2_human_review.yaml").read_text(encoding="utf-8"))
     comparison = yaml.safe_load((run / "R5_bundle6_before_after_comparison.yaml").read_text(encoding="utf-8"))
@@ -158,7 +177,7 @@ def main() -> int:
         "",
         "No sample-quality or P2 promotion is implied by this close readout.",
     ]
-    output = root / "reports/p1_6/R5_BUNDLE_6_READER_REPORT_QUALITY_REMEDIATION_CLOSE_READOUT.md"
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(f"bundle6_close state=R5_002837_READER_FACING_REPORT_V2_CANDIDATE_READY inventory={len(inventory)} human_review=pending sample_quality=false p2=false")
     return 0

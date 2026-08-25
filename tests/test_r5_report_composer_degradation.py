@@ -114,11 +114,15 @@ def test_gate_composer_pending_inputs_stay_research_draft(
         historical_blob_file,
         "R5_evidence_request_review_ledger.yaml",
     )
+    gate_path = historical_blob_file(
+        "reports/p1_6/r5_after_patch40_pilot_gate_result.json",
+        "composer/r5_after_patch40_pilot_gate_result.json",
+    )
 
     result = composer.compose_with_gate(
         pack_path=pack_path,
         output_path=output,
-        gate_path=REPO_ROOT / "reports/p1_6/r5_after_patch40_pilot_gate_result.json",
+        gate_path=gate_path,
         market_peer_registry_path=market_peer_registry,
         forecast_registry_path=forecast_registry,
         evidence_ledger_path=evidence_ledger,

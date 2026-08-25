@@ -539,7 +539,12 @@ Cards 5.2-5.4 now have accepted reviewed inputs. Proceed to Card 5.5 only after 
     path.write_text(text, encoding="utf-8")
 
 
-def build_outputs(repo_root: Path, reviewed_at: str) -> dict[str, Any]:
+def build_outputs(
+    repo_root: Path,
+    reviewed_at: str,
+    *,
+    readout_path: Path,
+) -> dict[str, Any]:
     datetime.fromisoformat(reviewed_at.replace("Z", "+00:00"))
     forecast_records = build_forecast_records(reviewed_at)
     valuation_record = build_valuation_record(reviewed_at, forecast_records)
@@ -549,7 +554,7 @@ def build_outputs(repo_root: Path, reviewed_at: str) -> dict[str, Any]:
     run_dir = repo_root / "reports/workflow_runs" / WORKFLOW_ID
     _write_yaml(run_dir / "R5_bundle5_forecast_model_candidate.yaml", build_forecast_pack(forecast_records))
     _write_yaml(run_dir / "R5_bundle5_valuation_pack_candidate.yaml", build_valuation_pack(forecast_records))
-    write_readout(repo_root / "reports/p1_6/R5_BUNDLE_5_4_FORECAST_VALUATION_INPUT_READOUT.md", reviewed_at, model_values())
+    write_readout(readout_path, reviewed_at, model_values())
     return {"forecast_records": len(forecast_records), "valuation_records": 1}
 
 
@@ -557,8 +562,19 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Build R5 Bundle 5.4 forecast and valuation onboarding outputs.")
     parser.add_argument("--repo-root", type=Path, required=True)
     parser.add_argument("--reviewed-at", required=True)
+    parser.add_argument("--readout-output", type=Path, required=True)
     args = parser.parse_args(argv)
-    result = build_outputs(args.repo_root.resolve(), args.reviewed_at)
+    repo_root = args.repo_root.resolve()
+    readout_path = (
+        args.readout_output
+        if args.readout_output.is_absolute()
+        else repo_root / args.readout_output
+    )
+    result = build_outputs(
+        repo_root,
+        args.reviewed_at,
+        readout_path=readout_path,
+    )
     print(
         "r5_bundle5_card_5_4 status=accepted "
         f"forecast={result['forecast_records']} valuation={result['valuation_records']} "

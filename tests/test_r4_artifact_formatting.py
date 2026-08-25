@@ -47,7 +47,10 @@ def test_new_r4_review_artifacts_use_posix_paths(historical_blob_file) -> None:
         _historical_file(historical_blob_file, "liquid_cooling_exposure_evidence_review.md"),
         _historical_file(historical_blob_file, "exposure_backflow_review.md"),
         _historical_file(historical_blob_file, "R4_stock_deep_dive_v0_2.md"),
-        ROOT / "reports/p1_6/R4_DISCLOSURE_BACKFLOW_MASTER_READOUT.md",
+        historical_blob_file(
+            "reports/p1_6/R4_DISCLOSURE_BACKFLOW_MASTER_READOUT.md",
+            "r4_formatting/R4_DISCLOSURE_BACKFLOW_MASTER_READOUT.md",
+        ),
     ]:
         text = path.read_text(encoding="utf-8")
         assert "reports\\workflow_runs" not in text

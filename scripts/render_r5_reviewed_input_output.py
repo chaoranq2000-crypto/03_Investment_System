@@ -61,15 +61,14 @@ def render_output(
     workflow_id: str,
     result_path: Path,
     output_path: Path,
+    gate_path: Path,
     pack_path: Path | None = None,
-    gate_path: Path | None = None,
     staging_path: Path | None = None,
     promotion_path: Path | None = None,
     scorecard_path: Path | None = None,
 ) -> dict[str, Any]:
     run_dir = repo_root / "reports/workflow_runs" / workflow_id
     pack_path = pack_path or run_dir / "R5_stock_research_pack_source_gapped.yaml"
-    gate_path = gate_path or repo_root / "reports/p1_6/r5_reviewed_input_pilot_gate_result.json"
     staging_path = staging_path or run_dir / "R5_reviewed_input_staging_result.yaml"
     promotion_path = promotion_path or run_dir / "R5_reviewed_input_registry_promotion_result.yaml"
     scorecard_path = scorecard_path or repo_root / ".agents/skills/quality-review/assets/r5_quality_scorecard.example.yaml"
@@ -149,22 +148,32 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--json", type=Path, required=True)
     parser.add_argument("--pack", type=Path, help="Explicit research-pack path.")
-    parser.add_argument("--gate", type=Path, help="Explicit pilot-gate result path.")
+    parser.add_argument("--gate", type=Path, required=True, help="Explicit pilot-gate result path.")
     parser.add_argument("--staging", type=Path, help="Explicit reviewed-input staging path.")
     parser.add_argument("--promotion", type=Path, help="Explicit registry-promotion result path.")
     parser.add_argument("--scorecard", type=Path, help="Explicit quality-scorecard path.")
     args = parser.parse_args(argv)
 
+    repo_root = args.repo_root.resolve()
+
+    def resolved(value: Path) -> Path:
+        if value.is_absolute():
+            return value
+        return repo_root / value
+
+    def resolved_optional(value: Path | None) -> Path | None:
+        return None if value is None else resolved(value)
+
     result = render_output(
-        repo_root=args.repo_root.resolve(),
+        repo_root=repo_root,
         workflow_id=args.workflow_id,
-        result_path=args.json,
-        output_path=args.output,
-        pack_path=args.pack,
-        gate_path=args.gate,
-        staging_path=args.staging,
-        promotion_path=args.promotion,
-        scorecard_path=args.scorecard,
+        result_path=resolved(args.json),
+        output_path=resolved(args.output),
+        pack_path=resolved_optional(args.pack),
+        gate_path=resolved(args.gate),
+        staging_path=resolved_optional(args.staging),
+        promotion_path=resolved_optional(args.promotion),
+        scorecard_path=resolved_optional(args.scorecard),
     )
     print(
         "r5_reviewed_input_render_type={rendered} sample_quality_allowed={sample} p2_allowed={p2} source_gap_count={gaps} forbidden_language_check={forbidden}".format(

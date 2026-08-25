@@ -23,8 +23,8 @@
 `docs/plans/` 下的计划文件统一使用英文小写 `snake_case`；计划完成情况放在与 `docs/plans/` 平行的 `docs/logs/`：
 
 - 通用模板：`plan_template.md`
-- 阶段计划：`p0_execution_plan.md`、`p1_execution_plan.md`
-- 阶段修正计划：`p1_1_revision_plan.md`
+- 阶段计划：`p0_execution_plan.md` 或 `<stage_id>_execution_plan.md`
+- 阶段修正计划：`<stage_id>_revision_plan.md`
 - 验收清单：`p0_acceptance_checklist.md`
 - 完成情况日志：`docs/logs/YYYY-MM-DD_plan_completion_log.md`
 - 阶段记录：`docs/logs/<stage_id>/YYYY-MM-DD_<stage_id>_<record_type>.md`

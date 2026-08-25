@@ -15,9 +15,11 @@ WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
 HISTORICAL_RUN = f"reports/workflow_runs/{WORKFLOW_ID}"
 RETAINED_DROPZONE = REPO_ROOT / "data/reviewed_inputs" / WORKFLOW_ID
 MANIFEST_SOURCE = "config/r5_bundle5_expected_artifacts.yaml"
-TRUTHFULNESS_PATH = REPO_ROOT / "reports/p1_6/r5_bundle5_readout_truthfulness_result.json"
-CLOSE_READOUT = REPO_ROOT / "reports/p1_6/R5_BUNDLE_5_REAL_REVIEWED_INPUT_ONBOARDING_CLOSE_READOUT.md"
-CANONICAL_INDEX = REPO_ROOT / "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md"
+TRUTHFULNESS_SOURCE = "reports/p1_6/r5_bundle5_readout_truthfulness_result.json"
+CLOSE_READOUT_SOURCE = (
+    "reports/p1_6/R5_BUNDLE_5_REAL_REVIEWED_INPUT_ONBOARDING_CLOSE_READOUT.md"
+)
+CANONICAL_INDEX_SOURCE = "reports/p1_6/R5_READOUT_CANONICAL_INDEX.md"
 PRECHECK_SCRIPT = REPO_ROOT / "scripts/build_r5_bundle5_benchmark_coverage_precheck.py"
 
 
@@ -93,13 +95,10 @@ def test_manifest_declared_bundle5_artifacts_are_physical_and_boundaries_closed(
     assert paths
     missing = []
     for path in paths:
-        if path.startswith(HISTORICAL_RUN + "/"):
-            assert historical_blob_bytes(path)
-        elif not (REPO_ROOT / path).exists():
-            try:
-                historical_blob_bytes(path)
-            except (AssertionError, subprocess.CalledProcessError):
-                missing.append(path)
+        try:
+            historical_blob_bytes(path)
+        except (AssertionError, subprocess.CalledProcessError):
+            missing.append(path)
     assert missing == []
 
 
@@ -285,9 +284,13 @@ def test_real_draft_keeps_traceability_risk_counterevidence_and_source_gaps(
         assert token not in report
 
 
-def test_bundle5_truthfulness_and_canonical_index_are_complete() -> None:
-    truthfulness = load_json(TRUTHFULNESS_PATH)
-    index_text = CANONICAL_INDEX.read_text(encoding="utf-8")
+def test_bundle5_truthfulness_and_canonical_index_are_complete(
+    historical_blob_bytes,
+) -> None:
+    truthfulness = json.loads(
+        historical_blob_bytes(TRUTHFULNESS_SOURCE).decode("utf-8")
+    )
+    index_text = historical_blob_bytes(CANONICAL_INDEX_SOURCE).decode("utf-8")
 
     assert truthfulness["truthfulness_status"] == "pass"
     assert truthfulness["checked"] == 8
@@ -307,8 +310,10 @@ def test_bundle5_truthfulness_and_canonical_index_are_complete() -> None:
     assert all(name in index_text for name in expected_readouts)
 
 
-def test_close_readout_preserves_target_mapping_and_hard_boundaries() -> None:
-    text = CLOSE_READOUT.read_text(encoding="utf-8")
+def test_close_readout_preserves_target_mapping_and_hard_boundaries(
+    historical_blob_bytes,
+) -> None:
+    text = historical_blob_bytes(CLOSE_READOUT_SOURCE).decode("utf-8")
 
     assert "R5_REVIEWED_INPUT_PILOT_ALLOWED" in text
     assert "R5_REAL_002837_REVIEWED_INPUT_RESEARCH_DRAFT_READY" in text

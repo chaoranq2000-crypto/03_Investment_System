@@ -1,6 +1,13 @@
 # R5 MVP Restructure Plan — 样例质量个股报告重构总计划
 
-> 本文件是 R5-MVP 的阶段性总计划。它不替代现有 P1.6 工作流计划；它是在 P1.6 的 workflow / skill / gate 基础上，新增“样例质量个股深度报告”的最小闭环。
+> 本文件记录 R5-MVP 的阶段性设计；它当时建立在 P1.6 的 workflow / skill / gate
+> 架构基础上，用于描述“样例质量个股深度报告”的最小闭环。
+>
+> **Legacy compatibility note（2026-08-24）：** 本文件保留 R5-MVP 的设计沿革，
+> 不再充当当前 checkpoint、任务队列或运行状态入口。当前全局 workflow 与状态语义以
+> `AGENTS.md`、`docs/workflows/RESEARCH_WORKFLOW.md`、
+> `docs/meta/DOC_OWNERSHIP_MATRIX.md` 和活动 skill contract 为准；下文 Phase / Patch
+> 编号只描述历史实施顺序，不授权恢复或重新执行旧任务包。
 
 ## 1. 背景
 
@@ -87,9 +94,9 @@ R5_open_questions.md = 下一轮研究问题清单
 
 ### Phase 0：R5-MVP 目标说明与模板骨架
 
-本补丁所属阶段。只新增文档、模板、rubric 和 Codex 任务卡，不写运行代码，不生成个股报告。
+历史 Phase 0 只新增文档、模板和 rubric，不写运行代码，不生成个股报告。
 
-交付物：
+其仍由当前树保留的设计产物为：
 
 ```text
 docs/workflows/R5_MVP_RESTRUCTURE_PLAN.md
@@ -97,8 +104,6 @@ docs/workflows/R5_SAMPLE_QUALITY_STOCK_REPORT_SPEC.md
 templates/r5_stock_research_pack.yaml
 templates/r5_stock_research_note.md
 benchmarks/r5_report_quality_rubric.yaml
-reports/p1_6/R5_MVP_PATCH_0_PLAN.md
-codex_tasks/R5_PATCH_0_TASK_CARD.md
 ```
 
 ### Phase 1：stock-deep-dive B5-lite 契约补强
@@ -180,12 +185,13 @@ blocked：
   - 报告试图隐藏 TODO 或创造无证据结论。
 ```
 
-## 9. 当前补丁完成后，下一步建议
+## 9. 历史后继说明
 
-完成 Patch 0 后，下一张 Codex 任务卡应为：
+Phase 0 当时把以下工作列为后继步骤：
 
 ```text
 Patch 1：stock-deep-dive B5-lite R5 research pack contract
 ```
 
-Patch 1 只允许新增 / 修改 `stock-deep-dive` 的 references、assets 和 SKILL 指令，不写 forecast / valuation 计算逻辑。
+这不是当前任务指令。任何后续研究或维护工作均应由当前 Research workflow 和活动
+skill contract 重新路由，不得从这里恢复旧 Patch 队列。

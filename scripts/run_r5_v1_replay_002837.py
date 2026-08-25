@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Build the isolated, offline 002837 V1 replay run.
+"""Reproduce the isolated, offline 002837 V1 historical replay.
 
 The source workflow is read-only.  This runner recomputes the archived Bundle 13R
-result through pure functions, verifies real evidence hashes, and writes only the
-contract-authorized target workflow directory.
+result through pure functions and verifies real evidence hashes.  Repository writes
+are limited to an explicit ``.codex_tmp`` child; other outputs must be under the
+system temporary directory.  The retired checked-in replay directory is never a
+write target.
 """
 
 from __future__ import annotations
@@ -42,6 +44,8 @@ TARGET_RUN_REL = Path("reports/workflow_runs") / TARGET_WORKFLOW_ID
 HISTORICAL_BASELINE = "f60f220ae252262a537c612ce193fc779901984b"
 AS_OF_DATE = "2026-07-23"
 
+# Frozen historical provenance rendered into the byte-identical replay receipt.
+# It is never executed; validate_output_run() rejects its retired output target.
 EXACT_REPLAY_COMMAND = (
     r"C:\Projects\03_Investment_System\.conda\investment-system\python.exe -B "
     r"scripts\run_r5_v1_replay_002837.py --repo-root . "
@@ -364,6 +368,50 @@ def _lexical_absolute(path: Path, repo_root: Path) -> str:
     return os.path.normcase(os.path.normpath(os.path.abspath(os.fspath(candidate))))
 
 
+def _is_strict_descendant(candidate: Path, parent: Path) -> bool:
+    candidate_text = os.path.normcase(os.path.normpath(os.fspath(candidate)))
+    parent_text = os.path.normcase(os.path.normpath(os.fspath(parent)))
+    if candidate_text == parent_text:
+        return False
+    try:
+        return os.path.commonpath([candidate_text, parent_text]) == parent_text
+    except ValueError:
+        return False
+
+
+def validate_output_run(repo_root: Path, output_run: Path) -> Path:
+    """Return an approved explicit output directory for historical replay checks."""
+
+    root = repo_root.resolve()
+    candidate = output_run if output_run.is_absolute() else root / output_run
+    actual = candidate.resolve()
+    retired_run = (root / TARGET_RUN_REL).resolve()
+    repo_temp = (root / ".codex_tmp").resolve()
+    system_temp = Path(tempfile.gettempdir()).resolve()
+
+    if actual == retired_run or _is_strict_descendant(actual, retired_run):
+        raise ReplayContractError(
+            "output run must not recreate the retired repository path "
+            f"{TARGET_RUN_REL.as_posix()}: {actual}"
+        )
+
+    if actual == root or _is_strict_descendant(actual, root):
+        if _is_strict_descendant(actual, repo_temp):
+            return actual
+        raise ReplayContractError(
+            "repository output must be an explicit child of .codex_tmp: "
+            f"{actual}"
+        )
+
+    if _is_strict_descendant(actual, system_temp):
+        return actual
+
+    raise ReplayContractError(
+        "output run must be an explicit child of the system temporary directory "
+        f"or {repo_temp}: {actual}"
+    )
+
+
 def validate_source_run_identifier(repo_root: Path, source_run: Path) -> None:
     expected = _lexical_absolute(repo_root / SOURCE_RUN_REL, repo_root)
     actual = _lexical_absolute(source_run, repo_root)
@@ -472,12 +520,7 @@ def resolve_contract_paths(
     root = repo_root.resolve()
     validate_source_run_identifier(root, source_run)
     expected_source = root / SOURCE_RUN_REL
-    expected_output = (root / TARGET_RUN_REL).resolve()
-    actual_output = output_run.resolve()
-    if actual_output != expected_output:
-        raise ReplayContractError(
-            f"output run must be {TARGET_RUN_REL.as_posix()}, found {actual_output}"
-        )
+    actual_output = validate_output_run(root, output_run)
     if _lexical_absolute(source_run, root) == _lexical_absolute(output_run, root):
         raise ReplayContractError("source and output runs must be different")
     return root, expected_source, actual_output
@@ -1177,6 +1220,7 @@ def capture_compare_hashes(output_run: Path) -> dict[str, str]:
 
 
 def materialize_once(repo_root: Path, source_run: Path, output_run: Path) -> dict[str, Any]:
+    output_run = validate_output_run(repo_root, output_run)
     anchor_rows = verify_expected_sources(repo_root)
     evidence_rows, evidence_provenance = select_real_evidence(repo_root)
     provenance = anchor_rows + evidence_provenance
@@ -1335,14 +1379,15 @@ def materialize_replay(
     *,
     historical_fixture_root: Path | None = None,
 ) -> dict[str, Any]:
-    """Materialize a replay into an already-authorized directory.
+    """Materialize a replay into an approved temporary directory.
 
-    Tests use this pure target parameter with a temporary directory.  The CLI
-    always enters through :func:`execute_replay`, which enforces the one frozen
-    repository target before calling this helper.
+    Tests use a system-temporary target.  A caller may alternatively use an
+    explicit child of the repository's Git-ignored ``.codex_tmp`` directory.
+    The retired checked-in run path is rejected here as well as by the CLI.
     """
     root = repo_root.resolve()
     validate_source_run_identifier(root, source_run)
+    output_run = validate_output_run(root, output_run)
     if historical_fixture_root is None:
         historical_fixture_root = Path(
             tempfile.mkdtemp(prefix="r5_v1_replay_historical_source_")

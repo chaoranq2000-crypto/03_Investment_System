@@ -36,13 +36,25 @@ LEGACY_STATE_REL = (
 LEGACY_STATE_BLOB_OID = "3a9d29405e3f0b5342cf1a2469f1e25c025e50ac"
 LEGACY_STATE_BYTES = 81447
 LEGACY_STATE_SHA256 = "aabe24082ff80facc55ba5eb51530199e9c2ba9d92d3b43c36e9189d0cdfed10"
-PROTECTED_V1_REPLAY_STATE_PATH = (
-    ROOT
-    / "reports"
-    / "workflow_runs"
-    / "wf_20260723_stock_first_002837_v1_replay"
-    / "workflow_state.yaml"
+V1_REPLAY_STATE_REL = (
+    "reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/"
+    "workflow_state.yaml"
 )
+V1_REPLAY_STATE_BLOB_OID = "18b27d1d27f9f401850b15510954a68c3a1f1323"
+V1_REPLAY_STATE_BYTES = 10261
+V1_REPLAY_STATE_SHA256 = "23331ce5c47d3a5185e7a098de9af94a5a49f0e461289a9dcdc686066b1972a6"
+FIXED_HISTORICAL_STATE_BLOBS = {
+    LEGACY_STATE_REL: (
+        LEGACY_STATE_BLOB_OID,
+        LEGACY_STATE_BYTES,
+        LEGACY_STATE_SHA256,
+    ),
+    V1_REPLAY_STATE_REL: (
+        V1_REPLAY_STATE_BLOB_OID,
+        V1_REPLAY_STATE_BYTES,
+        V1_REPLAY_STATE_SHA256,
+    ),
+}
 FINAL_REVIEW_STATE_FIELDS = {
     "final_report_review_semantics_version",
     "sample_quality_ready",
@@ -72,7 +84,9 @@ def run_validator(path: Path) -> subprocess.CompletedProcess[str]:
 
 def git_blob_bytes(revision: str, relative_path: str) -> bytes:
     assert revision == HISTORICAL_BASELINE
-    assert relative_path == LEGACY_STATE_REL
+    expected_oid, expected_bytes, expected_sha256 = FIXED_HISTORICAL_STATE_BLOBS[
+        relative_path
+    ]
     spec = f"{revision}:{relative_path}"
     observed_oid = subprocess.check_output(
         ["git", "rev-parse", "--verify", spec],
@@ -80,7 +94,7 @@ def git_blob_bytes(revision: str, relative_path: str) -> bytes:
         text=True,
         encoding="utf-8",
     ).strip()
-    assert observed_oid == LEGACY_STATE_BLOB_OID
+    assert observed_oid == expected_oid
     object_type = subprocess.check_output(
         ["git", "cat-file", "-t", spec],
         cwd=ROOT,
@@ -96,13 +110,13 @@ def git_blob_bytes(revision: str, relative_path: str) -> bytes:
             encoding="utf-8",
         ).strip()
     )
-    assert observed_bytes == LEGACY_STATE_BYTES
+    assert observed_bytes == expected_bytes
     payload = subprocess.check_output(
         ["git", "cat-file", "blob", spec],
         cwd=ROOT,
     )
-    assert len(payload) == LEGACY_STATE_BYTES
-    assert hashlib.sha256(payload).hexdigest() == LEGACY_STATE_SHA256
+    assert len(payload) == expected_bytes
+    assert hashlib.sha256(payload).hexdigest() == expected_sha256
     return payload
 
 
@@ -111,6 +125,15 @@ def legacy_state_fixture(tmp_path: Path) -> Path:
     payload = git_blob_bytes(HISTORICAL_BASELINE, LEGACY_STATE_REL)
     assert hashlib.sha256(payload).hexdigest() == LEGACY_STATE_SHA256
     path = tmp_path / "legacy_workflow_state.yaml"
+    path.write_bytes(payload)
+    return path
+
+
+@pytest.fixture
+def v1_replay_state_fixture(tmp_path: Path) -> Path:
+    payload = git_blob_bytes(HISTORICAL_BASELINE, V1_REPLAY_STATE_REL)
+    assert hashlib.sha256(payload).hexdigest() == V1_REPLAY_STATE_SHA256
+    path = tmp_path / "v1_replay_workflow_state.yaml"
     path.write_bytes(payload)
     return path
 
@@ -246,20 +269,23 @@ def test_protected_legacy_state_remains_read_only_compatible(
     assert after == before == LEGACY_STATE_SHA256
 
 
-def test_protected_v1_replay_state_remains_read_only_compatible() -> None:
-    before = hashlib.sha256(PROTECTED_V1_REPLAY_STATE_PATH.read_bytes()).hexdigest()
-    result = run_validator(PROTECTED_V1_REPLAY_STATE_PATH)
-    after = hashlib.sha256(PROTECTED_V1_REPLAY_STATE_PATH.read_bytes()).hexdigest()
+def test_protected_v1_replay_state_remains_read_only_compatible(
+    v1_replay_state_fixture: Path,
+) -> None:
+    before = hashlib.sha256(v1_replay_state_fixture.read_bytes()).hexdigest()
+    result = run_validator(v1_replay_state_fixture)
+    after = hashlib.sha256(v1_replay_state_fixture.read_bytes()).hexdigest()
     assert result.returncode == 0, result.stderr
     assert "legacy r5_v1 compatibility; read-only" in result.stdout
-    assert after == before
+    assert after == before == V1_REPLAY_STATE_SHA256
 
 
 def test_protected_v1_replay_cannot_claim_sample_quality_without_final_review_marker(
     tmp_path: Path,
+    v1_replay_state_fixture: Path,
 ) -> None:
     state = yaml.safe_load(
-        PROTECTED_V1_REPLAY_STATE_PATH.read_text(encoding="utf-8")
+        v1_replay_state_fixture.read_text(encoding="utf-8")
     )
     state["sample_quality_ready"] = True
     result = run_validator(write_state(tmp_path, state))

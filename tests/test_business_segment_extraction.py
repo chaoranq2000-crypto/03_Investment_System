@@ -6,6 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SOURCE_PATH = ROOT / "src/ingest/business_segment_extraction.py"
 sys.path.insert(0, str(ROOT / "src" / "ingest"))
 
 from business_segment_extraction import FIELDNAMES, build_business_segment_rows  # noqa: E402
@@ -16,6 +17,12 @@ HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 
 def _historical_path(name: str) -> str:
     return f"{HISTORICAL_RUN}/{name}"
+
+
+def test_stage_readout_route_is_explicit_and_not_a_repo_level_default() -> None:
+    source = SOURCE_PATH.read_text(encoding="utf-8")
+    assert 'parser.add_argument("--stage-readout-output", type=Path, required=True)' in source
+    assert "reports/p1_6/" not in source
 
 
 def test_business_segment_metric_pack_schema_is_stable(historical_blob_file) -> None:
