@@ -109,14 +109,15 @@ def test_phase2_replay_is_an_exact_ready_closure_with_equivalent_evidence() -> N
         for item in group["items"]
     }
     phase2 = manifest["phase2_retirement"]
+    baseline = phase2["baseline_commit"]
     tracked_replay = {
         path.replace("\\", "/")
         for path in subprocess.check_output(
-            ["git", "-C", str(ROOT), "ls-files", f"{replay_prefix}*"],
+            ["git", "-C", str(ROOT), "ls-tree", "-r", "--name-only", baseline],
             text=True,
             encoding="utf-8",
         ).splitlines()
-        if path
+        if path.startswith(replay_prefix)
     }
 
     assert tracked_replay
