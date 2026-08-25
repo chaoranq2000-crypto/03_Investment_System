@@ -406,16 +406,17 @@ def check_retention_manifest(errors: list[str]) -> None:
             fail(errors, path, f"manual delete closure aggregate drifted: {closure_id}")
 
     phase2 = manifest.get("phase2_retirement", {})
-    if not isinstance(phase2, dict) or phase2.get("status") != "awaiting_user_approval":
-        fail(errors, path, "Phase 2 must remain at the user approval gate")
+    allowed_phase2_statuses = {
+        "awaiting_user_approval",
+        "quarantine_move_in_progress",
+        "user_quarantined_pending_manual_delete",
+        "user_deleted_pending_commit",
+        "completed",
+    }
+    if not isinstance(phase2, dict) or phase2.get("status") not in allowed_phase2_statuses:
+        fail(errors, path, "Phase 2 status is invalid")
         return
     gate = phase2.get("approval_gate", {})
-    if gate.get("user_approved") is not False:
-        fail(errors, path, "Phase 2 approval must remain false")
-    if gate.get("approved_closure_ids") != [] or gate.get("approved_exact_paths") != []:
-        fail(errors, path, "Phase 2 approval lists must remain empty")
-    if gate.get("codex_quarantine_move_authorized") is not False:
-        fail(errors, path, "Phase 2 quarantine move must remain unauthorized")
     phase2_closures = phase2.get("closures", {})
     if not isinstance(phase2_closures, dict):
         fail(errors, path, "Phase 2 closures must be a mapping")
@@ -443,6 +444,42 @@ def check_retention_manifest(errors: list[str]) -> None:
         "git_blob_bytes"
     ):
         fail(errors, path, "Phase 2 scope byte count drifted")
+
+    execution_state = gate.get("execution_state")
+    if gate.get("required_selection") != "all_six_phase2_closures_all_or_none":
+        fail(errors, path, "Phase 2 approval selection rule drifted")
+    if execution_state == "not_started":
+        if phase2.get("status") != "awaiting_user_approval":
+            fail(errors, path, "unapproved Phase 2 status drifted")
+        if gate.get("user_approved") is not False:
+            fail(errors, path, "unapproved Phase 2 approval must be false")
+        if gate.get("approved_closure_ids") != [] or gate.get("approved_exact_paths") != []:
+            fail(errors, path, "unapproved Phase 2 approval lists must be empty")
+        if gate.get("codex_quarantine_move_authorized") is not False:
+            fail(errors, path, "unapproved Phase 2 quarantine move must be false")
+    elif execution_state in {
+        "quarantine_move_in_progress",
+        "user_quarantined_pending_manual_delete",
+        "user_deleted_pending_commit",
+        "completed",
+    }:
+        if phase2.get("status") != execution_state:
+            fail(errors, path, "approved Phase 2 status must match execution state")
+        if gate.get("user_approved") is not True:
+            fail(errors, path, "approved Phase 2 approval must be true")
+        if gate.get("approved_closure_ids") != list(phase2_closures):
+            fail(errors, path, "approved Phase 2 closure IDs drifted")
+        approved_paths = gate.get("approved_exact_paths")
+        if not isinstance(approved_paths, list) or len(approved_paths) != len(set(approved_paths)):
+            fail(errors, path, "approved Phase 2 exact path list is invalid")
+        elif set(approved_paths) != phase2_paths:
+            fail(errors, path, "approved Phase 2 exact paths drifted")
+        if gate.get("codex_quarantine_move_authorized") is not True:
+            fail(errors, path, "approved Phase 2 quarantine move must be true")
+    else:
+        fail(errors, path, "Phase 2 execution state is invalid")
+    if gate.get("codex_delete_authorized") is not False:
+        fail(errors, path, "Codex delete authorization must remain false")
 
 
 def main() -> int:

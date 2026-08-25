@@ -215,7 +215,6 @@ root_causes:
   - reports/p1_6/r5_night_shift/r5_overnight_05_20260723/execution/recompute_summary.json
   - reports/p1_6/r5_night_shift/r5_overnight_05_20260723/progress/blocker_ledger.json
   active_v1_evidence_paths: &id001
-  - reports/p1_6/r5_v1_convergence/convergence_readout.md
   - tests/test_r5_v1_active_control_plane.py
   - tests/test_r5_v1_replay_002837.py
   resolution_evidence_paths: []

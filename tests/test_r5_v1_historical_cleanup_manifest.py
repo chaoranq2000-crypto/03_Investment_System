@@ -135,7 +135,7 @@ def test_phase2_replay_is_an_exact_ready_closure_with_equivalent_evidence() -> N
     ] == 4
 
 
-def test_phase2_inventory_is_exact_disjoint_present_and_unapproved() -> None:
+def test_phase2_inventory_and_quarantine_state_are_exact() -> None:
     manifest = load_manifest()
     phase2 = manifest["phase2_retirement"]
     closures = phase2["closures"]
@@ -148,7 +148,6 @@ def test_phase2_inventory_is_exact_disjoint_present_and_unapproved() -> None:
         "phase2_closure_006_migrated_rules": (2, 3_470),
     }
 
-    assert phase2["status"] == "awaiting_user_approval"
     assert set(closures) == set(expected)
     path_sets = {key: set(row["exact_paths"]) for key, row in closures.items()}
     all_paths = set().union(*path_sets.values())
@@ -166,24 +165,89 @@ def test_phase2_inventory_is_exact_disjoint_present_and_unapproved() -> None:
         for item in group["items"]
     }
     assert all_paths <= ready
-    assert all((ROOT / relative).is_file() for relative in all_paths)
+    candidate_oids = {
+        item["path"]: item["blob_oid"]
+        for group in manifest["candidate_groups"]
+        for item in group["items"]
+    }
     changed = set(
         subprocess.check_output(
             ["git", "-C", str(ROOT), "diff", "--name-only"],
             text=True,
         ).splitlines()
     )
-    assert changed <= set(phase2["modified_file_allowlist"])
-    assert changed.isdisjoint(all_paths)
-
     gate = phase2["approval_gate"]
     assert gate["required_selection"] == "all_six_phase2_closures_all_or_none"
-    assert gate["user_approved"] is False
-    assert gate["approved_closure_ids"] == []
-    assert gate["approved_exact_paths"] == []
-    assert gate["codex_quarantine_move_authorized"] is False
     assert gate["codex_delete_authorized"] is False
-    assert gate["execution_state"] == "not_started"
+    quarantine_relative = PurePosixPath(gate["quarantine_root_after_approval"])
+    assert quarantine_relative.parts[:1] == (".codex_tmp",)
+    assert ".." not in quarantine_relative.parts
+    quarantine_root = ROOT.joinpath(*quarantine_relative.parts)
+    assert ROOT.resolve() in quarantine_root.resolve().parents
+    assert not quarantine_root.is_symlink()
+    ignore_check = subprocess.run(
+        ["git", "-C", str(ROOT), "check-ignore", "-q", str(quarantine_root / "probe")],
+        check=False,
+    )
+    assert ignore_check.returncode == 0
+    quarantine_descendants = list(quarantine_root.rglob("*")) if quarantine_root.is_dir() else []
+    assert not any(path.is_symlink() for path in quarantine_descendants)
+    quarantine_files = {
+        path.relative_to(quarantine_root).as_posix()
+        for path in quarantine_descendants
+        if path.is_file()
+    }
+    source_files = {relative for relative in all_paths if (ROOT / relative).is_file()}
+    assert source_files.isdisjoint(quarantine_files)
+
+    execution_state = gate["execution_state"]
+    if execution_state == "not_started":
+        assert phase2["status"] == "awaiting_user_approval"
+        assert gate["user_approved"] is False
+        assert gate["approved_closure_ids"] == []
+        assert gate["approved_exact_paths"] == []
+        assert gate["codex_quarantine_move_authorized"] is False
+        assert source_files == all_paths
+        assert quarantine_files == set()
+        assert changed <= set(phase2["modified_file_allowlist"])
+        assert changed.isdisjoint(all_paths)
+    else:
+        assert execution_state in {
+            "quarantine_move_in_progress",
+            "user_quarantined_pending_manual_delete",
+            "user_deleted_pending_commit",
+            "completed",
+        }
+        assert phase2["status"] == execution_state
+        assert gate["user_approved"] is True
+        assert gate["approved_closure_ids"] == list(closures)
+        assert len(gate["approved_exact_paths"]) == len(set(gate["approved_exact_paths"]))
+        assert set(gate["approved_exact_paths"]) == all_paths
+        assert gate["codex_quarantine_move_authorized"] is True
+        assert changed <= set(phase2["modified_file_allowlist"]) | all_paths
+        if execution_state == "quarantine_move_in_progress":
+            assert source_files | quarantine_files == all_paths
+        elif execution_state == "user_quarantined_pending_manual_delete":
+            assert source_files == set()
+            assert quarantine_files == all_paths
+        else:
+            assert source_files == set()
+            assert quarantine_files == set()
+
+    for relative in quarantine_files:
+        filtered_oid = subprocess.check_output(
+            [
+                "git",
+                "-C",
+                str(ROOT),
+                "hash-object",
+                f"--path={relative}",
+                "--",
+                str(quarantine_root.joinpath(*PurePosixPath(relative).parts)),
+            ],
+            text=True,
+        ).strip()
+        assert filtered_oid == candidate_oids[relative], relative
 
 
 def test_phase2_decision_buckets_are_exact_and_exhaustive() -> None:
@@ -455,6 +519,23 @@ def test_deletion_state_matches_exact_worktree_absence_and_approval() -> None:
     missing = {path for path in ready if not (ROOT / path).is_file()}
     approved_ids = set(control["approval"]["approved_closure_ids"])
     approved_paths = set(control["approval"]["approved_exact_paths"])
+    phase2_gate = manifest.get("phase2_retirement", {}).get("approval_gate", {})
+    phase2_approved = set(phase2_gate.get("approved_exact_paths", []))
+    phase2_state = phase2_gate.get("execution_state", "not_started")
+    if phase2_state == "quarantine_move_in_progress":
+        phase2_expected_missing = {
+            relative for relative in phase2_approved if not (ROOT / relative).is_file()
+        }
+        assert phase2_expected_missing <= phase2_approved
+    elif phase2_state in {
+        "user_quarantined_pending_manual_delete",
+        "user_deleted_pending_commit",
+        "completed",
+    }:
+        phase2_expected_missing = phase2_approved
+    else:
+        assert phase2_state == "not_started"
+        phase2_expected_missing = set()
     quarantine_config = control["quarantine"]
     quarantine_relative = PurePosixPath(quarantine_config["path"])
     assert quarantine_relative.parts[:1] == (".codex_tmp",)
@@ -548,7 +629,7 @@ def test_deletion_state_matches_exact_worktree_absence_and_approval() -> None:
     assert approved_ids <= set(closures)
     expected = set().union(*(closures[closure_id] for closure_id in approved_ids))
     assert deleted_from_baseline == missing
-    assert changed_from_baseline <= declared_allowlist | expected
+    assert changed_from_baseline <= declared_allowlist | expected | phase2_approved
     assert added_from_baseline <= declared_additions
     if control["execution_state"] == "not_started":
         assert missing == set()
@@ -588,7 +669,7 @@ def test_deletion_state_matches_exact_worktree_absence_and_approval() -> None:
     elif control["execution_state"] == "completed":
         assert approved_ids
         assert approved_paths == expected
-        assert missing == expected
+        assert missing == expected | phase2_expected_missing
         assert not quarantine_root.exists()
         assert quarantine_files == set()
         assert untracked == set()
@@ -782,6 +863,11 @@ def test_stale_current_markers_are_quarantined_not_rewritten() -> None:
         for group in manifest["candidate_groups"]
         for item in group["items"]
     }
+    recovery_by_path = {
+        item["path"]: item["recovery_basis"]["commit"]
+        for group in manifest["candidate_groups"]
+        for item in group["items"]
+    }
     stale_markers = (
         "state: \"running",
         "Current checkpoint",
@@ -789,18 +875,40 @@ def test_stale_current_markers_are_quarantined_not_rewritten() -> None:
         "latest working",
         "Current workflow",
     )
-    scoped_roots = (
-        ROOT / "docs/codex_tasks",
-        ROOT / "docs/plans",
-        ROOT / "reports/p1_6",
-    )
+    scoped_prefixes = ("docs/codex_tasks/", "docs/plans/", "reports/p1_6/")
+    phase2_gate = manifest["phase2_retirement"]["approval_gate"]
+    approved_paths = set(phase2_gate["approved_exact_paths"])
+    quarantine_relative = PurePosixPath(phase2_gate["quarantine_root_after_approval"])
+    quarantine_root = ROOT.joinpath(*quarantine_relative.parts)
     stale_paths: set[str] = set()
-    for scoped_root in scoped_roots:
-        for path in scoped_root.rglob("*"):
-            if path.is_file() and path.suffix.lower() in {".md", ".yaml", ".yml"}:
-                text = path.read_text(encoding="utf-8", errors="replace")
-                if any(marker in text for marker in stale_markers):
-                    stale_paths.add(path.relative_to(ROOT).as_posix())
+    for relative in approved_paths:
+        if not relative.startswith(scoped_prefixes):
+            continue
+        pure = PurePosixPath(relative)
+        if pure.suffix.lower() not in {".md", ".yaml", ".yml"}:
+            continue
+        source = ROOT.joinpath(*pure.parts)
+        quarantined = quarantine_root.joinpath(*pure.parts)
+        locations = [path for path in (source, quarantined) if path.is_file()]
+        if locations:
+            assert len(locations) == 1, relative
+            text = locations[0].read_text(encoding="utf-8", errors="replace")
+        else:
+            assert phase2_gate["execution_state"] in {
+                "user_deleted_pending_commit",
+                "completed",
+            }
+            text = subprocess.check_output(
+                [
+                    "git",
+                    "-C",
+                    str(ROOT),
+                    "show",
+                    f"{recovery_by_path[relative]}:{relative}",
+                ],
+            ).decode("utf-8", errors="replace")
+        if any(marker in text for marker in stale_markers):
+            stale_paths.add(relative)
 
     assert stale_paths
     assert stale_paths <= set(status_by_path)

@@ -8084,8 +8084,6 @@ candidate_groups:
       relation: historical_cross_reference
     - source_path: docs/codex_tasks/r5_v1_convergence/START_HERE.md
       relation: historical_cross_reference
-    - source_path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
-      relation: retained_evidence_reference
     replacement_authority:
     - config/r5_readout_canonical_index.yaml.current_runs
     - reports/workflow_runs/wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml
@@ -12397,7 +12395,7 @@ summary:
   PHASE1_COMPLETED:
     file_count: 69
     byte_count: 4713738
-  PHASE2_READY_PENDING_USER_APPROVAL:
+  PHASE2_COMPLETED:
     file_count: 407
     byte_count: 1586579
   READY_FOR_MANUAL_DELETE_ALL_PHASES:
@@ -12411,8 +12409,8 @@ summary:
     byte_count: 0
   notes:
   - 'Phase 1 remains completed: 69 approved paths were deleted by the user and are recoverable from Git.'
-  - Phase 2 dependency decoupling is complete, but its 407 exact paths remain present and unapproved for quarantine or deletion.
-  - The six Phase 2 closures are one all-or-none approval set; no target has been moved, renamed, edited, or deleted.
+  - Phase 2 dependency decoupling and retirement are complete; all 407 exact paths and the approved Git-ignored quarantine were deleted manually by the user and remain recoverable from Git.
+  - The six Phase 2 closures were approved and handled as one all-or-none set; Codex deletion remained unauthorized throughout execution.
   - The root static Patch12 archive and five external expected-artifact compatibility manifests remain outside the Phase 2 deletion scope.
 manual_delete_closures:
 - closure_id: ready_closure_001
@@ -13242,7 +13240,7 @@ legacy_route_writers:
   content_sha256: 1673aec245d874f7580547bb69e4b8041d2870e2913cafc71239bb5753aa4a03
 phase2_retirement:
   phase: 2
-  status: awaiting_user_approval
+  status: completed
   audited_at: '2026-08-24'
   baseline_commit: 9569f3fe95707504aa7a25a789a841267214c401
   branch: codex/docs-reports-governance-cleanup-phase2-20260824
@@ -13267,9 +13265,9 @@ phase2_retirement:
       .yaml: 21
     last_change_at_min: '2026-07-01T23:43:53+08:00'
     last_change_at_max: '2026-08-23T00:48:35+08:00'
-    target_worktree_matches_head_count: 407
+    target_worktree_matches_head_count: 0
     target_worktree_modified_count: 0
-    target_worktree_missing_count: 0
+    target_worktree_missing_count: 407
     protected_overlap_count: 0
   modified_file_allowlist:
   - .agents/skills/evidence-ingest/SKILL.md
@@ -13285,6 +13283,7 @@ phase2_retirement:
   - docs/playbooks/OPERATING_PLAYBOOK.md
   - docs/workflows/R5_MVP_RESTRUCTURE_PLAN.md
   - docs/workflows/RESEARCH_WORKFLOW.md
+  - reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
   - scripts/build_r5_bundle5_benchmark_coverage_precheck.py
   - scripts/build_r5_bundle5_forecast_valuation_onboarding.py
   - scripts/build_r5_bundle5_market_peer_onboarding.py
@@ -13323,14 +13322,432 @@ phase2_retirement:
   - tests/test_r5_v1_workflow_state_validator.py
   approval_gate:
     required_selection: all_six_phase2_closures_all_or_none
-    user_approved: false
-    approved_closure_ids: []
-    approved_exact_paths: []
-    codex_quarantine_move_authorized: false
+    user_approved: true
+    approved_at: '2026-08-25'
+    approval_source: explicit_user_message
+    approved_closure_ids:
+    - phase2_closure_001_docs_codex_tasks
+    - phase2_closure_002_docs_plans
+    - phase2_closure_003_reports_p1_6
+    - phase2_closure_004_replay_20260723
+    - phase2_closure_005_top_codex_tasks
+    - phase2_closure_006_migrated_rules
+    approved_exact_paths:
+    - docs/codex_tasks/R5_BUNDLE_17R_BF2_EX1_VERIFIED_RESULT_MATERIALIZATION.md
+    - docs/codex_tasks/R5_BUNDLE_17R_BF2_EXECUTION_RECEIPTS.md
+    - docs/codex_tasks/TASK_01_MINERU_PDF_PIPELINE.md
+    - docs/codex_tasks/TASK_02_STRUCTURED_MARKET_DATA_PIPELINE.md
+    - docs/codex_tasks/TASK_03_CLAIM_METRIC_PROMOTION.md
+    - docs/codex_tasks/TASK_04_STOCK_ANALYSIS_PACK.md
+    - docs/codex_tasks/TASK_05_REPORT_WRITER_AND_TEMPLATE.md
+    - docs/codex_tasks/TASK_06_QUALITY_REVIEW_AND_BACKFLOW.md
+    - docs/codex_tasks/TASK_07_002837_REGRESSION_RUN.md
+    - docs/codex_tasks/TASK_DOCS_WORKFLOW_DEDUP_REFACTOR.md
+    - docs/codex_tasks/TASK_DOCS_WORKFLOW_DEDUP_REFACTOR_READOUT.md
+    - docs/codex_tasks/TASK_DOC_DRIFT_CHECK_SCRIPT.md
+    - docs/codex_tasks/r5_v1_convergence/CONTRACT.md
+    - docs/codex_tasks/r5_v1_convergence/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v12/CONTRACT.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v12/START_HERE.md
+    - docs/codex_tasks/v1_governance_integration_cleanup_v2/CONTRACT.md
+    - docs/plans/CODEX_VALUATION_INPUT_ENRICHMENT_PLAN.md
+    - docs/plans/DOCS_AND_AGENTS_CLEANUP_PLAN.md
+    - docs/plans/P1_6_COMPANY_VALUATION_SUBAGENT_INTEGRATION_PLAN.md
+    - docs/plans/P1_6_PHASE_B1_ONLY_CODEX_PLAN.md
+    - docs/plans/P1_6_R4_TO_P2_CODEX_NEXT_PLAN_20260703.md
+    - docs/plans/P1_6_WORKFLOW_BUILDOUT_PLAN.md
+    - docs/plans/R5_BUNDLE15R_REVIEWED_EVIDENCE_QUALIFICATION_PLAN.md
+    - docs/plans/R5_BUNDLE17R_ACTIVATION_PLAN.md
+    - docs/plans/R5_BUNDLE17R_TARGETED_BACKFLOW_PLAN.md
+    - docs/plans/R5_BUNDLE_10R_READER_REBUILD_PLAN.md
+    - docs/plans/R5_BUNDLE_13R_EVIDENCE_BACKFLOW_EXECUTION_PLAN.md
+    - docs/plans/R5_BUNDLE_14R_CROSS_INDUSTRY_GOLDEN_REGRESSION_PLAN.md
+    - docs/plans/R5_BUNDLE_9R_FORECAST_VALUATION_REBUILD_PLAN.md
+    - docs/plans/STOCK_REPORT_QUALITY_UPGRADE_PLAN.md
+    - docs/plans/p1_1_revision_plan.md
+    - docs/plans/p1_6_system_complexity_remediation_plan.md
+    - docs/plans/p1_execution_plan.md
+    - reports/p1_6/B1_EVIDENCE_INGEST_DEBUG_READOUT.md
+    - reports/p1_6/B1_EVIDENCE_INGEST_DEBUG_READOUT_TEMPLATE.md
+    - reports/p1_6/B1_EVIDENCE_INGEST_OPERATOR_GUIDE.md
+    - reports/p1_6/BUSINESS_SEGMENT_DISCLOSURE_EXTRACTION_MVP_READOUT.md
+    - reports/p1_6/COMPANY_VALUATION_SUBAGENT_HARDENING_READOUT.md
+    - reports/p1_6/DATA_LAYER_ACCEPTANCE_CHECKLIST_UPDATE_READOUT.md
+    - reports/p1_6/DATA_LAYER_CHECKLIST_RECONCILIATION_AFTER_MASTER_READOUT.md
+    - reports/p1_6/DATA_LAYER_DL1_5B_PHYSICAL_FORMATTING_READOUT.md
+    - reports/p1_6/DATA_LAYER_DL1_5_ARTIFACT_FORMATTING_READOUT.md
+    - reports/p1_6/DATA_LAYER_DL1_QUALITY_STATE_READOUT.md
+    - reports/p1_6/DATA_LAYER_DL2_TECHNICAL_MARKET_SEMANTICS_READOUT.md
+    - reports/p1_6/DATA_LAYER_DL3_PEER_AND_RECONCILIATION_READOUT.md
+    - reports/p1_6/DATA_LAYER_DL4_ADAPTER_HARDENING_READOUT.md
+    - reports/p1_6/DATA_LAYER_DL5_STOCK_REPORT_BRIDGE_READOUT.md
+    - reports/p1_6/DATA_LAYER_DL7_INTEGRATED_DEBUG_READOUT.md
+    - reports/p1_6/DATA_LAYER_EXECUTION_SANITY_READOUT.md
+    - reports/p1_6/DATA_LAYER_NEXT_TASKS_MASTER_READOUT.md
+    - reports/p1_6/DOCS_AGENTS_CLEANUP_READOUT.md
+    - reports/p1_6/LIQUID_COOLING_EXPOSURE_EVIDENCE_REVIEW_READOUT.md
+    - reports/p1_6/MANUAL_LIVE_DATA_SMOKE_PLAYBOOK_READOUT.md
+    - reports/p1_6/OFFICIAL_DISCLOSURE_RECONCILIATION_MVP_READOUT.md
+    - reports/p1_6/OFFICIAL_RECONCILIATION_REVIEW_DECISION_READOUT.md
+    - reports/p1_6/OLD_STOCK_SKILL_DELETE_DECISION.md
+    - reports/p1_6/P2_READINESS_CHECK_AFTER_R4_V0_2.md
+    - reports/p1_6/P2_READINESS_PRECHECK_AFTER_DATA_LAYER.md
+    - reports/p1_6/R4_ARTIFACT_FORMATTING_CLEANUP_READOUT.md
+    - reports/p1_6/R4_DISCLOSURE_BACKFLOW_MASTER_READOUT.md
+    - reports/p1_6/R4_DISCLOSURE_BACKFLOW_NEXT_TASKS_PLAN_READOUT.md
+    - reports/p1_6/R4_PUBLISHABLE_STOCK_REPORT_GATE_READOUT.md
+    - reports/p1_6/R4_READINESS_NEXT_TASKS_MASTER_READOUT.md
+    - reports/p1_6/R4_STOCK_REPORT_DRAFT_V0_1_READOUT.md
+    - reports/p1_6/R4_STOCK_REPORT_DRAFT_V0_2_READOUT.md
+    - reports/p1_6/R5_AFTER_BUNDLE2_STATUS_BASELINE_READOUT.md
+    - reports/p1_6/R5_AFTER_BUNDLE3_COMPLETION_REVIEW.md
+    - reports/p1_6/R5_AFTER_BUNDLE3_STATUS_BASELINE_READOUT.md
+    - reports/p1_6/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
+    - reports/p1_6/R5_AFTER_BUNDLE4_STATUS_BASELINE_READOUT.md
+    - reports/p1_6/R5_AFTER_PATCH24_SUPPLEMENT_CLOSE_READOUT.md
+    - reports/p1_6/R5_AFTER_PATCH36_REVIEWED_INPUT_CLOSE_READOUT.md
+    - reports/p1_6/R5_AFTER_PATCH42_CLOSE_READOUT.md
+    - reports/p1_6/R5_AFTER_PATCH48_STATUS_INDEX_READOUT.md
+    - reports/p1_6/R5_AFTER_PATCH55_REVIEWED_INPUT_ACTIVATION_CLOSE_READOUT.md
+    - reports/p1_6/R5_BUNDLE_2_RECOVERY_EXECUTABLE_GATES_READOUT.md
+    - reports/p1_6/R5_BUNDLE_3_1_FINANCIAL_HISTORY_SUBPACK_READOUT.md
+    - reports/p1_6/R5_BUNDLE_3_2_BUSINESS_BREAKDOWN_SUBPACK_READOUT.md
+    - reports/p1_6/R5_BUNDLE_3_3_FORECAST_MODEL_SUBPACK_READOUT.md
+    - reports/p1_6/R5_BUNDLE_3_4_VALUATION_SUBPACK_READOUT.md
+    - reports/p1_6/R5_BUNDLE_3_5_CORE_ASSET_PREFLIGHT_GATE_READOUT.md
+    - reports/p1_6/R5_BUNDLE_3_CORE_RESEARCH_ASSET_SUBPACKS_CLOSE_READOUT.md
+    - reports/p1_6/R5_BUNDLE_4_1_ACCEPTED_FIXTURE_SET_READOUT.md
+    - reports/p1_6/R5_BUNDLE_4_2_DROPZONE_VALIDATION_READOUT.md
+    - reports/p1_6/R5_BUNDLE_4_3_REGISTRY_PROMOTION_READOUT.md
+    - reports/p1_6/R5_BUNDLE_4_4_POST_PROMOTION_DRY_RUN_READOUT.md
+    - reports/p1_6/R5_BUNDLE_4_5_END_TO_END_FIXTURE_SMOKE_READOUT.md
+    - reports/p1_6/R5_BUNDLE_4_REVIEWED_INPUT_FIXTURE_PROMOTION_CLOSE_READOUT.md
+    - reports/p1_6/R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_READOUT.md
+    - reports/p1_6/R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_FINANCIAL_READOUT.md
+    - reports/p1_6/R5_BUNDLE_5_3_MARKET_PEER_INPUT_READOUT.md
+    - reports/p1_6/R5_BUNDLE_5_4_FORECAST_VALUATION_INPUT_READOUT.md
+    - reports/p1_6/R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_READOUT.md
+    - reports/p1_6/R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_QUALITY_READOUT.md
+    - reports/p1_6/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_READOUT.md
+    - reports/p1_6/R5_BUNDLE_5_REAL_REVIEWED_INPUT_ONBOARDING_CLOSE_READOUT.md
+    - reports/p1_6/R5_BUNDLE_6_0_STATUS_READER_QUALITY_BASELINE_READOUT.md
+    - reports/p1_6/R5_BUNDLE_6_READER_REPORT_QUALITY_REMEDIATION_CLOSE_READOUT.md
+    - reports/p1_6/R5_MVP_PATCH_0_PLAN.md
+    - reports/p1_6/R5_MVP_PATCH_1_PLAN.md
+    - reports/p1_6/R5_MVP_SMOKE_READOUT_AFTER_PATCH_8.md
+    - reports/p1_6/R5_PATCH_0A_REPAIR_READOUT.md
+    - reports/p1_6/R5_PATCH_10_CLOSE_READOUT_TEMPLATE_READOUT.md
+    - reports/p1_6/R5_PATCH_11_SAMPLE_BENCHMARK_POLICY_READOUT.md
+    - reports/p1_6/R5_PATCH_12_COMPANY_VALUATION_VALIDATOR_READOUT.md
+    - reports/p1_6/R5_PATCH_13_FORMAT_SYNTAX_RECOVERY_READOUT.md
+    - reports/p1_6/R5_PATCH_14_FORMAT_GUARD_READOUT.md
+    - reports/p1_6/R5_PATCH_15_INVENTORY_RECONCILIATION_READOUT.md
+    - reports/p1_6/R5_PATCH_16_VALIDATOR_SEMANTIC_HARDENING_READOUT.md
+    - reports/p1_6/R5_PATCH_17_COMPOSER_REPAIR_READOUT.md
+    - reports/p1_6/R5_PATCH_18_REPRODUCIBLE_FIXTURE_SMOKE_READOUT.md
+    - reports/p1_6/R5_PATCH_19_READOUT_TRUTHFULNESS_GATE_READOUT.md
+    - reports/p1_6/R5_PATCH_1_PACK_VALIDATOR_READOUT.md
+    - reports/p1_6/R5_PATCH_1_STOCK_DEEP_DIVE_R5_PACK_CONTRACT_READOUT.md
+    - reports/p1_6/R5_PATCH_20_SINGLE_SMOKE_COMMAND_READOUT.md
+    - reports/p1_6/R5_PATCH_21_SOURCE_GAPPED_002837_PACK_READOUT.md
+    - reports/p1_6/R5_PATCH_22_EVIDENCE_PLAN_BRIDGE_READOUT.md
+    - reports/p1_6/R5_PATCH_23_VALUATION_HANDOFF_INTERLOCK_READOUT.md
+    - reports/p1_6/R5_PATCH_24_READINESS_GATE_READOUT.md
+    - reports/p1_6/R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR_READOUT.md
+    - reports/p1_6/R5_PATCH_2_SEGMENT_MAPPING_READOUT.md
+    - reports/p1_6/R5_PATCH_37_MARKET_PEER_INPUT_REGISTRY_READOUT.md
+    - reports/p1_6/R5_PATCH_37_REVIEWED_EVIDENCE_INTAKE_READOUT.md
+    - reports/p1_6/R5_PATCH_38_FORECAST_ASSUMPTION_REGISTRY_READOUT.md
+    - reports/p1_6/R5_PATCH_38_MARKET_SNAPSHOT_REVIEWED_INPUTS_READOUT.md
+    - reports/p1_6/R5_PATCH_39_EVIDENCE_REQUEST_REVIEW_LEDGER_READOUT.md
+    - reports/p1_6/R5_PATCH_39_PEER_SNAPSHOT_REVIEWED_INPUTS_READOUT.md
+    - reports/p1_6/R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN_READOUT.md
+    - reports/p1_6/R5_PATCH_3_QUALITY_REVIEW_READOUT.md
+    - reports/p1_6/R5_PATCH_40_OFFICIAL_DISCLOSURE_BUSINESS_GAP_INTAKE_READOUT.md
+    - reports/p1_6/R5_PATCH_40_REAL_SAMPLE_PILOT_GATE_RECHECK_READOUT.md
+    - reports/p1_6/R5_PATCH_41_COMPOSER_DEGRADATION_READOUT.md
+    - reports/p1_6/R5_PATCH_41_FORECAST_ASSUMPTION_REGISTRY_READOUT.md
+    - reports/p1_6/R5_PATCH_42_FORECAST_MODEL_FROM_REVIEWED_ASSUMPTIONS_READOUT.md
+    - reports/p1_6/R5_PATCH_43_VALUATION_INPUT_REGISTRY_AND_INTERLOCK_READOUT.md
+    - reports/p1_6/R5_PATCH_44_002837_REVIEWED_INPUT_DRY_RUN_READOUT.md
+    - reports/p1_6/R5_PATCH_45_R5_PACK_PROMOTION_GATE_READOUT.md
+    - reports/p1_6/R5_PATCH_46_QUALITY_GATE_SCORECARD_V2_READOUT.md
+    - reports/p1_6/R5_PATCH_47_COMPOSER_RESEARCH_DRAFT_PLUS_MODE_READOUT.md
+    - reports/p1_6/R5_PATCH_4_FORECAST_VALUATION_READOUT.md
+    - reports/p1_6/R5_PATCH_50_REVIEWED_INPUT_DROPZONE_CONTRACT_READOUT.md
+    - reports/p1_6/R5_PATCH_51_REVIEWED_INPUT_DROPZONE_VALIDATORS_READOUT.md
+    - reports/p1_6/R5_PATCH_52_002837_REVIEWED_INPUT_STAGING_DRY_RUN_READOUT.md
+    - reports/p1_6/R5_PATCH_53_REGISTRY_PROMOTION_FROM_ACCEPTED_STAGING_READOUT.md
+    - reports/p1_6/R5_PATCH_54_PILOT_GATE_RECHECK_AND_DRAFT_PLUS_RENDER_READOUT.md
+    - reports/p1_6/R5_PATCH_5_TECH_SENTIMENT_CATALYST_READOUT.md
+    - reports/p1_6/R5_PATCH_6_COMPOSER_READOUT.md
+    - reports/p1_6/R5_PATCH_7_BENCHMARK_READOUT.md
+    - reports/p1_6/R5_PATCH_8_STOCK_LED_SMOKE_READOUT.md
+    - reports/p1_6/R5_PATCH_9_EVIDENCE_PLAN_READOUT.md
+    - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
+    - reports/p1_6/SEGMENT_LED_REPLAY_PREPARATION_READOUT.md
+    - reports/p1_6/SEGMENT_STOCK_BACKFLOW_REVIEW_READOUT.md
+    - reports/p1_6/STOCK_LED_EVIDENCE_DOWNLOAD_MVP_READOUT.md
+    - reports/p1_6/VALUATION_INPUT_ENRICHMENT_INVENTORY.md
+    - reports/p1_6/VALUATION_INPUT_ENRICHMENT_READOUT.md
+    - reports/p1_6/r5_after_patch24_close_gate_result.json
+    - reports/p1_6/r5_after_patch40_pilot_gate_result.json
+    - reports/p1_6/r5_after_patch42_close_gate_result.json
+    - reports/p1_6/r5_after_patch48_status_matrix.yaml
+    - reports/p1_6/r5_after_patch55_decision.json
+    - reports/p1_6/r5_bundle3_readout_truthfulness_result.json
+    - reports/p1_6/r5_bundle4_readout_truthfulness_result.json
+    - reports/p1_6/r5_bundle4_reviewed_input_smoke_result.json
+    - reports/p1_6/r5_bundle5_readout_truthfulness_result.json
+    - reports/p1_6/r5_core_asset_preflight_result.json
+    - reports/p1_6/r5_format_guard.json
+    - reports/p1_6/r5_mvp_smoke_result.json
+    - reports/p1_6/r5_patch_1_12_inventory_status.yaml
+    - reports/p1_6/r5_readiness_gate_result.json
+    - reports/p1_6/r5_readout_truthfulness_result.json
+    - reports/p1_6/r5_reviewed_input_dropzone_valid_pending.json
+    - reports/p1_6/r5_reviewed_input_pilot_gate_result.json
+    - reports/p1_6/r5_v1_convergence/convergence_readout.md
+    - reports/p1_6/r5_v1_convergence/validation/final_source_route_quality_report.yaml
+    - reports/p1_6/r5_v1_convergence/validation/final_validation_summary.yaml
+    - reports/p1_6/r5_v1_convergence/validation/p2_source_route_quality_report.yaml
+    - reports/p1_6/r5_v1_convergence/validation/p3_source_route_quality_report.yaml
+    - reports/p1_6/r5_v1_convergence/validation/p4_replay_validation.yaml
+    - reports/p1_6/r5_v1_convergence/validation/p5_blocker_root_cause_validation.yaml
+    - reports/p1_6/r5_v1_convergence/validation/p5_source_route_quality_report.yaml
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/artifact_manifest.csv
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/inputs/claim_snapshot.csv
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/inputs/input_provenance.csv
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/inputs/metric_candidates.csv
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/open_todos.csv
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/quality_gate_report.md
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/backflow_decision.yaml
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/segment_exposure.yaml
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/stock_report_draft.md
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/research/stock_research_pack.yaml
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/run_log.md
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/validation/artifact_hashes.csv
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/validation/idempotence_report.yaml
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/validation/replay_receipt.yaml
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/workflow_readout.md
+    - reports/workflow_runs/wf_20260723_stock_first_002837_v1_replay/workflow_state.yaml
+    - codex_tasks/R5_PATCH_0_TASK_CARD.md
+    - codex_tasks/R5_PATCH_10_R5_QUALITY_GATE.md
+    - codex_tasks/R5_PATCH_11_REPORT_PLANNER_COMPOSER_SKELETON.md
+    - codex_tasks/R5_PATCH_12_SAMPLE_BENCHMARK_REGRESSION.md
+    - codex_tasks/R5_PATCH_13_R5_DRY_RUN_FIXTURE_HARNESS.md
+    - codex_tasks/R5_PATCH_14_ORCHESTRATOR_INTERLOCK_DOC_INDEX.md
+    - codex_tasks/R5_PATCH_1_STOCK_DEEP_DIVE_R5_PACK_CONTRACT.md
+    - codex_tasks/R5_PATCH_1_TASK_CARD.md
+    - codex_tasks/R5_PATCH_2_R5_PACK_SCHEMA_VALIDATOR.md
+    - codex_tasks/R5_PATCH_3_EVIDENCE_INGEST_R5_SNAPSHOT_PLAN.md
+    - codex_tasks/R5_PATCH_4_FINANCIAL_BUSINESS_PACK_CONTRACTS.md
+    - codex_tasks/R5_PATCH_5_FORECAST_MODEL_CONTRACT_AND_VALIDATOR.md
+    - codex_tasks/R5_PATCH_6_VALUATION_PACK_CONTRACT_AND_HANDOFF.md
+    - codex_tasks/R5_PATCH_7_TECHNICAL_MARKET_PACK_CONTRACT.md
+    - codex_tasks/R5_PATCH_8_SENTIMENT_EVENT_PACK_CONTRACT.md
+    - codex_tasks/R5_PATCH_9_RISK_COUNTEREVIDENCE_SOURCE_GAP_PACK.md
+    - codex_tasks/r5_after_bundle2/APPLY_ORDER.md
+    - codex_tasks/r5_after_bundle2/R5_AFTER_BUNDLE2_COMPLETION_REVIEW.md
+    - codex_tasks/r5_after_bundle2/R5_BUNDLE_3_0_STATUS_BASELINE_AND_EXPECTED_ARTIFACTS.md
+    - codex_tasks/r5_after_bundle2/R5_BUNDLE_3_1_FINANCIAL_HISTORY_SUBPACK_CONTRACT.md
+    - codex_tasks/r5_after_bundle2/R5_BUNDLE_3_2_BUSINESS_BREAKDOWN_SUBPACK_CONTRACT.md
+    - codex_tasks/r5_after_bundle2/R5_BUNDLE_3_3_FORECAST_MODEL_SUBPACK_CONTRACT.md
+    - codex_tasks/r5_after_bundle2/R5_BUNDLE_3_4_VALUATION_SUBPACK_CONTRACT.md
+    - codex_tasks/r5_after_bundle2/R5_BUNDLE_3_5_CORE_ASSET_PREFLIGHT_GATE.md
+    - codex_tasks/r5_after_bundle2/R5_BUNDLE_3_6_CLOSE_READOUT_AND_NEXT_DECISION.md
+    - codex_tasks/r5_after_bundle2/README.md
+    - codex_tasks/r5_after_bundle3/APPLY_ORDER.md
+    - codex_tasks/r5_after_bundle3/R5_AFTER_BUNDLE3_COMPLETION_REVIEW.md
+    - codex_tasks/r5_after_bundle3/R5_BUNDLE_4_0_STATUS_BASELINE_AND_EXPECTED_ARTIFACTS.md
+    - codex_tasks/r5_after_bundle3/R5_BUNDLE_4_1_ACCEPTED_REVIEWED_INPUT_FIXTURE_SET.md
+    - codex_tasks/r5_after_bundle3/R5_BUNDLE_4_2_DROPZONE_VALIDATION_AND_FIXTURE_BOUNDARY.md
+    - codex_tasks/r5_after_bundle3/R5_BUNDLE_4_3_REGISTRY_PROMOTION_WRITE_AND_IDEMPOTENCY.md
+    - codex_tasks/r5_after_bundle3/R5_BUNDLE_4_4_POST_PROMOTION_DRY_RUN_FROM_REGISTRIES.md
+    - codex_tasks/r5_after_bundle3/R5_BUNDLE_4_5_END_TO_END_FIXTURE_SMOKE_GATE.md
+    - codex_tasks/r5_after_bundle3/R5_BUNDLE_4_6_CLOSE_READOUT_AND_REAL_INPUT_NEXT_DECISION.md
+    - codex_tasks/r5_after_bundle3/README.md
+    - codex_tasks/r5_after_bundle4/APPLY_ORDER.md
+    - codex_tasks/r5_after_bundle4/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
+    - codex_tasks/r5_after_bundle4/R5_BUNDLE5_TASK_PACKAGE_MANIFEST.yaml
+    - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_0_STATUS_TRUTH_SYNC_AND_EXPECTED_ARTIFACTS.md
+    - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_AND_PROVENANCE_MATRIX.md
+    - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_AND_FINANCIAL_HISTORY_ONBOARDING.md
+    - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_3_MARKET_AND_PEER_INPUT_ONBOARDING.md
+    - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_4_FORECAST_AND_VALUATION_INPUT_ONBOARDING.md
+    - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_AND_CORE_ASSET_REBUILD.md
+    - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_AND_QUALITY_GATE.md
+    - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_NO_ADVICE.md
+    - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_8_CLOSE_READOUT_AND_NEXT_DECISION.md
+    - codex_tasks/r5_after_bundle4/README.md
+    - codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml
+    - codex_tasks/r5_after_bundle5/APPLY_ORDER.md
+    - codex_tasks/r5_after_bundle5/R5_AFTER_BUNDLE5_COMPLETION_REVIEW.md
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE6_EXPECTED_ARTIFACTS.yaml
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE6_READER_QUALITY_RUBRIC.yaml
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE6_TASK_PACKAGE_MANIFEST.yaml
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE_6_0_STATUS_AND_READER_QUALITY_BASELINE.md
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE_6_1_READER_FACING_REPORT_CONTRACT.md
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE_6_2_SECTION_PAYLOAD_AND_METRIC_NORMALIZATION.md
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE_6_3_NARRATIVE_COMPOSER_AND_TRACEABILITY_SPLIT.md
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE_6_4_RESEARCH_COVERAGE_REMEDIATION.md
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE_6_5_FORECAST_AND_VALUATION_REMEDIATION.md
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE_6_6_READER_QUALITY_GATE_AND_NEGATIVE_TESTS.md
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE_6_7_002837_V2_RENDER_AND_HUMAN_REVIEW.md
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE_6_8_CLOSE_READOUT_AND_NEXT_DECISION.md
+    - codex_tasks/r5_after_bundle5/R5_BUNDLE_6_CLOSE_READOUT_TEMPLATE.md
+    - codex_tasks/r5_after_bundle5/README.md
+    - codex_tasks/r5_after_bundle5/TARGET_READER_FACING_REPORT_SURFACE.md
+    - codex_tasks/r5_after_bundle7/R5_BUNDLE_8_1_EVIDENCE_COVERAGE.md
+    - codex_tasks/r5_after_bundle7/R5_BUNDLE_8_2_INDUSTRY_PEER_INPUTS.md
+    - codex_tasks/r5_after_bundle7/R5_BUNDLE_8_3_ANALYSIS_ENGINE.md
+    - codex_tasks/r5_after_bundle7/R5_BUNDLE_8_4_INTEGRATION_GATE.md
+    - codex_tasks/r5_after_patch12/APPLY_ORDER.md
+    - codex_tasks/r5_after_patch12/R5_PATCH1_12_COMPLETION_REVIEW.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_13_FORMAT_SYNTAX_RECOVERY.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_14_R5_FORMAT_GUARD_AND_SMOKE_COMMAND.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_15_PATCH_1_12_INVENTORY_RECONCILIATION.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_16_R5_VALIDATOR_SEMANTIC_HARDENING.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_17_R5_COMPOSER_REPAIR.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_18_REPRODUCIBLE_FIXTURE_SMOKE.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_19_READOUT_TRUTHFULNESS_GATE.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_20_R5_SINGLE_SMOKE_COMMAND.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_21_SOURCE_GAPPED_002837_R5_PACK.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_22_R5_EVIDENCE_PLAN_BRIDGE.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_23_VALUATION_HANDOFF_INTERLOCK.md
+    - codex_tasks/r5_after_patch12/R5_PATCH_24_R5_READINESS_GATE.md
+    - codex_tasks/r5_after_patch12/README.md
+    - codex_tasks/r5_after_patch24/APPLY_ORDER.md
+    - codex_tasks/r5_after_patch24/R5_AFTER_PATCH24_COMPLETION_REVIEW.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_25_RAW_FORMAT_RECOVERY_AND_REBASE.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_26_EXECUTABLE_GUARD_OF_GUARDS.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_27_INVENTORY_V2_RECONCILIATION.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_28_TRUTHFULNESS_CANONICAL_READOUTS.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_29_SMOKE_RESULT_TRUST_BOUNDARY.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_30_READINESS_GATE_REBASE_ON_REAL_SMOKE.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_31_SOURCE_GAPPED_002837_PACK_NORMALIZATION.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_32_EVIDENCE_REQUEST_QUEUE_FROM_R5_GAPS.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_33_MARKET_PEER_INPUT_STUBS_AND_VALIDATORS.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_34_FORECAST_VALUATION_INPUT_INTERLOCK.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_35_REPORT_COMPOSER_DEGRADATION_TESTS.md
+    - codex_tasks/r5_after_patch24/R5_PATCH_36_R5_CONTRACTS_CLOSE_READOUT_AND_NEXT_PILOT_GATE.md
+    - codex_tasks/r5_after_patch24/README.md
+    - codex_tasks/r5_after_patch36/APPLY_ORDER.md
+    - codex_tasks/r5_after_patch36/R5_AFTER_PATCH36_COMPLETION_REVIEW.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_37_REVIEWED_EVIDENCE_INTAKE_PROTOCOL.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_37_REVIEWED_MARKET_PEER_INPUT_REGISTRY.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_38_FORECAST_ASSUMPTION_REGISTRY.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_38_MARKET_SNAPSHOT_REVIEWED_INPUTS.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_39_EVIDENCE_REQUEST_QUEUE_REVIEW_LEDGER.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_39_PEER_SNAPSHOT_REVIEWED_INPUTS.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_40_OFFICIAL_DISCLOSURE_BUSINESS_GAP_INTAKE.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_40_REAL_SAMPLE_PILOT_GATE_RECHECK.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_41_COMPOSER_DEGRADATION_WITH_REVIEWED_INPUTS.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_41_FORECAST_ASSUMPTION_REGISTRY.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_42_CLOSE_READOUT_AND_STATUS_FREEZE.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_42_FORECAST_MODEL_FROM_REVIEWED_ASSUMPTIONS.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_43_VALUATION_INPUT_REGISTRY_AND_INTERLOCK.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_44_002837_REVIEWED_INPUT_DRY_RUN.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_45_R5_PACK_PROMOTION_GATE.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_46_QUALITY_GATE_SCORECARD_V2.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_47_COMPOSER_RESEARCH_DRAFT_PLUS_MODE.md
+    - codex_tasks/r5_after_patch36/R5_PATCH_48_PILOT_READINESS_DECISION.md
+    - codex_tasks/r5_after_patch36/README.md
+    - codex_tasks/r5_after_patch48/APPLY_ORDER.md
+    - codex_tasks/r5_after_patch48/R5_AFTER_PATCH48_COMPLETION_REVIEW.md
+    - codex_tasks/r5_after_patch48/R5_PATCH_49_STATUS_INDEX_AND_TASK_HYGIENE.md
+    - codex_tasks/r5_after_patch48/R5_PATCH_50_REVIEWED_INPUT_DROPZONE_CONTRACT.md
+    - codex_tasks/r5_after_patch48/R5_PATCH_51_REVIEWED_INPUT_DROPZONE_VALIDATORS.md
+    - codex_tasks/r5_after_patch48/R5_PATCH_52_002837_REVIEWED_INPUT_STAGING_DRY_RUN.md
+    - codex_tasks/r5_after_patch48/R5_PATCH_53_REGISTRY_PROMOTION_FROM_ACCEPTED_STAGING.md
+    - codex_tasks/r5_after_patch48/R5_PATCH_54_PILOT_GATE_RECHECK_AND_DRAFT_PLUS_RENDER.md
+    - codex_tasks/r5_after_patch48/R5_PATCH_55_CLOSE_READOUT_AND_NEXT_DECISION.md
+    - codex_tasks/r5_after_patch48/README.md
+    - codex_tasks/r5_bundle10r/APPLY_ORDER.md
+    - codex_tasks/r5_bundle10r/R5_BUNDLE_10R_0_BASELINE_AND_MODEL_BINDING.md
+    - codex_tasks/r5_bundle10r/R5_BUNDLE_10R_1_READER_INPUT_AND_CLAIM_CONTRACT.md
+    - codex_tasks/r5_bundle10r/R5_BUNDLE_10R_2_DYNAMIC_ANALYSIS_PAYLOAD.md
+    - codex_tasks/r5_bundle10r/R5_BUNDLE_10R_3_GENERIC_WRITER_AND_TRACEABILITY.md
+    - codex_tasks/r5_bundle10r/R5_BUNDLE_10R_4_MARKET_EVENT_CONTEXT.md
+    - codex_tasks/r5_bundle10r/R5_BUNDLE_10R_5_NON_COMPENSATING_QUALITY_GATE.md
+    - codex_tasks/r5_bundle10r/R5_BUNDLE_10R_6_REGRESSION_AND_NEGATIVE_TESTS.md
+    - codex_tasks/r5_bundle10r/R5_BUNDLE_10R_7_HUMAN_REVIEW_AND_STATE_SYNC.md
+    - codex_tasks/r5_bundle10r/R5_BUNDLE_10R_8_CLOSE_AND_READER_GENERATION_LOCK.md
+    - codex_tasks/r5_bundle11r_runtime/APPLY_ORDER.md
+    - codex_tasks/r5_bundle11r_runtime/README.md
+    - codex_tasks/r5_bundle13r/APPLY_ORDER.md
+    - codex_tasks/r5_bundle13r/R5_BUNDLE_13R_0_BASELINE_AND_HASH_BINDING.md
+    - codex_tasks/r5_bundle13r/R5_BUNDLE_13R_1_QUEUE_AND_T1_EVIDENCE.md
+    - codex_tasks/r5_bundle13r/R5_BUNDLE_13R_2_T2_OVERLAP_AND_EXPOSURE.md
+    - codex_tasks/r5_bundle13r/R5_BUNDLE_13R_3_PROMOTION_AND_12R_RERUN.md
+    - codex_tasks/r5_bundle13r/R5_BUNDLE_13R_4_VALUATION_ELIGIBILITY.md
+    - codex_tasks/r5_bundle13r/R5_BUNDLE_13R_5_STATE_SYNC_AND_LOCK.md
+    - codex_tasks/r5_bundle13r/R5_BUNDLE_13R_6_CLOSE_READOUT.md
+    - codex_tasks/r5_bundle14r/00_BASELINE_AND_SCOPE.md
+    - codex_tasks/r5_bundle14r/01_CONTRACT_AND_HARNESS.md
+    - codex_tasks/r5_bundle14r/02_OFFICIAL_EVIDENCE_PACKS.md
+    - codex_tasks/r5_bundle14r/03_DRIVER_FINANCIAL_MODELS.md
+    - codex_tasks/r5_bundle14r/04_VALUATION_READER.md
+    - codex_tasks/r5_bundle14r/05_SEMANTIC_ADVERSARIAL_GATE.md
+    - codex_tasks/r5_bundle14r/06_EXACT_HASH_HUMAN_REVIEW.md
+    - codex_tasks/r5_bundle14r/07_CLOSE_OR_BACKFLOW.md
+    - codex_tasks/r5_bundle14r/README.md
+    - codex_tasks/r5_bundle15r/00_BASELINE_AND_SCOPE.md
+    - codex_tasks/r5_bundle15r/01_INSTALL_AND_SEED.md
+    - codex_tasks/r5_bundle15r/02_BUILD_REVIEWED_EVIDENCE_PACKS.md
+    - codex_tasks/r5_bundle15r/03_COMPILE_AND_QUALIFY.md
+    - codex_tasks/r5_bundle15r/04_RUN_BUNDLE14R_SELECTIVELY.md
+    - codex_tasks/r5_bundle15r/05_EXACT_HASH_REVIEW_AND_CLOSE.md
+    - codex_tasks/r5_bundle15r/README.md
+    - codex_tasks/r5_bundle16r/00_BASELINE_AND_SCOPE.md
+    - codex_tasks/r5_bundle16r/01_INVENTORY_AND_MAPPING_QUEUE.md
+    - codex_tasks/r5_bundle16r/02_REVIEW_AND_MATERIALIZE.md
+    - codex_tasks/r5_bundle16r/03_RUN_15R_AND_SELECTIVE_14R.md
+    - codex_tasks/r5_bundle16r/04_CLOSE_OR_BACKFLOW.md
+    - codex_tasks/r5_bundle16r/R5_BUNDLE16R_ACCEPTANCE_MATRIX.yaml
+    - codex_tasks/r5_bundle16r/R5_BUNDLE16R_TASK_CARD.md
+    - codex_tasks/r5_bundle8r/R5_BUNDLE_8R_0_BASELINE_AND_FORWARD_STATE.md
+    - codex_tasks/r5_bundle8r/R5_BUNDLE_8R_1_FULL_CAPABILITY_ACCOUNTING.md
+    - codex_tasks/r5_bundle8r/R5_BUNDLE_8R_2_ADAPTER_CONTRACT_AND_GATE.md
+    - codex_tasks/r5_bundle8r/R5_BUNDLE_8R_3_MARKET_AND_FUNDAMENTAL_ADAPTERS.md
+    - codex_tasks/r5_bundle8r/R5_BUNDLE_8R_4_RESEARCH_IR_AND_PDF_ADAPTERS.md
+    - codex_tasks/r5_bundle8r/R5_BUNDLE_8R_5_CAPITAL_EVENT_NEWS_AND_FALLBACKS.md
+    - codex_tasks/r5_bundle8r/R5_BUNDLE_8R_6_002837_LIVE_EVIDENCE_PILOT.md
+    - codex_tasks/r5_bundle8r/R5_BUNDLE_8R_7_RESEARCH_INPUT_REQUALIFICATION_CLOSE.md
+    - codex_tasks/r5_bundle9r/APPLY_ORDER.md
+    - codex_tasks/r5_bundle9r/R5_BUNDLE_9R_0_BASELINE_AND_GENERATION_BINDING.md
+    - codex_tasks/r5_bundle9r/R5_BUNDLE_9R_1_INPUT_REVIEW_AND_PROMOTION.md
+    - codex_tasks/r5_bundle9r/R5_BUNDLE_9R_2_SEGMENT_DRIVER_MODEL.md
+    - codex_tasks/r5_bundle9r/R5_BUNDLE_9R_3_FINANCIAL_STATEMENT_BRIDGE.md
+    - codex_tasks/r5_bundle9r/R5_BUNDLE_9R_4_SCENARIOS_AND_SENSITIVITY.md
+    - codex_tasks/r5_bundle9r/R5_BUNDLE_9R_5_PEER_CONSENSUS_RECONCILIATION.md
+    - codex_tasks/r5_bundle9r/R5_BUNDLE_9R_6_REVERSE_AND_SCENARIO_VALUATION.md
+    - codex_tasks/r5_bundle9r/R5_BUNDLE_9R_7_QUALITY_GATE_AND_NEGATIVE_TESTS.md
+    - codex_tasks/r5_bundle9r/R5_BUNDLE_9R_8_CLOSE_AND_MODEL_GENERATION_LOCK.md
+    - codex_tasks/r5_next_stage/APPLY_ORDER.md
+    - codex_tasks/r5_next_stage/R5_PATCH_0A_REPAIR_FORMAT_AND_VALIDATION.md
+    - codex_tasks/r5_next_stage/R5_PATCH_10_R5_CLOSE_READOUT_AND_TASK_QUEUE.md
+    - codex_tasks/r5_next_stage/R5_PATCH_11_SAMPLE_REPORTS_BENCHMARK_PLACEHOLDER.md
+    - codex_tasks/r5_next_stage/R5_PATCH_12_COMPANY_VALUATION_MINI_VALIDATOR.md
+    - codex_tasks/r5_next_stage/R5_PATCH_1_R5_PACK_VALIDATOR_AND_EXAMPLE.md
+    - codex_tasks/r5_next_stage/R5_PATCH_2_SEGMENT_MAPPING_VALIDATOR_AND_EXAMPLES.md
+    - codex_tasks/r5_next_stage/R5_PATCH_3_QUALITY_REVIEW_R5_ISSUE_VALIDATOR.md
+    - codex_tasks/r5_next_stage/R5_PATCH_4_FORECAST_AND_VALUATION_SCHEMA_VALIDATORS.md
+    - codex_tasks/r5_next_stage/R5_PATCH_5_TECHNICAL_SENTIMENT_CATALYST_PACKS.md
+    - codex_tasks/r5_next_stage/R5_PATCH_6_R5_COMPOSER_SKELETON.md
+    - codex_tasks/r5_next_stage/R5_PATCH_7_R5_BENCHMARK_REGRESSION.md
+    - codex_tasks/r5_next_stage/R5_PATCH_8_R5_STOCK_LED_SMOKE_DRY_RUN.md
+    - codex_tasks/r5_next_stage/R5_PATCH_9_EVIDENCE_INGEST_R5_STOCK_EVIDENCE_PLAN.md
+    - docs/policies/OPERATING_EVIDENCE_QUALIFICATION_POLICY.md
+    - docs/workflows/R5_REVIEWED_INPUT_DROPZONE_SPEC.md
+    codex_quarantine_move_authorized: true
     codex_delete_authorized: false
-    execution_state: not_started
-    quarantine_root_after_approval: .codex_tmp/docs_reports_retirement_phase2_<commit>_20260824
-    note: No Phase 2 target may move, rename, or be deleted before a new explicit user approval.
+    execution_state: completed
+    quarantined_at: '2026-08-25'
+    user_deleted_at: '2026-08-25'
+    completed_at: '2026-08-25'
+    quarantine_root_after_approval: .codex_tmp/docs_reports_retirement_phase2_a267b81_20260825
+    note: The user manually deleted the exact quarantine after content validation; Codex deletion remained unauthorized and the completed retirement state is captured by Git.
   reader_writer_closure:
     default_runtime_reader_count: 0
     default_runtime_writer_count: 0
@@ -13704,10 +14121,6 @@ phase2_retirement:
         relations:
         - retained_evidence_reference
         target_count: 2
-      - source_path: reports/p1_6/r5_v1_convergence/blocker_root_cause_map.yaml
-        relations:
-        - retained_evidence_reference
-        target_count: 1
       - source_path: tests/test_r4_artifact_formatting.py
         relations:
         - git_history_only
