@@ -1,6 +1,6 @@
 # Research 运行依赖瘦身记录
 
-状态：两轮瘦身改造及验证完成。第一轮 5 份旧配置和 4 个旧工作树目录已由用户删除；第二轮 17 份 Bundle 5 文件已完成退役并集中待删，见专项记录。共享 R5 能力继续保留。
+状态：两轮瘦身改造、验证及目标文件的用户手动删除完成。第一轮 5 份旧配置和 4 个旧工作树目录、第二轮 17 份 Bundle 5 文件均已核验缺失，见专项记录。共享 R5 能力继续保留。
 
 ## 范围与基线
 
@@ -91,7 +91,7 @@ git -C 'C:/Projects/03_Investment_System' worktree prune --verbose
 - 优先核查 Bundle 5 的披露、市场同业、预测估值三类旧 onboarding 生成器：静态引用显示其专用测试仍直接加载当前物理脚本，retirement guard 也声明了旧路由的显式调用。这一组需要连同专用测试、模板和配置核对后退役，不能仅移动脚本。
 - `.agents/skills/stock-deep-dive/SKILL.md` 将 R5 研究包列为显式请求才启用的能力，普通个股流程不加载 Bundle generation 或旧报告状态。后续应区分只服务旧生成器的资产和仍被保留能力共用的资产。
 
-进展：本轮 Bundle 5 依赖组已完成退役，详见 [第二轮专项记录](2026-09-06_legacy_bundle5_retirement.md)。7 个脚本、1 份规则、9 个专用测试文件已集中待删，真实输入来源检查独立保留；默认全套 2248 passed、历史兼容 88 passed，当前 17 个研究产物逐字节一致。共享校验器和正式研究证据继续保留。物理删除待办为 `bundle5_manual_delete`；owner=user；severity=low。
+进展：本轮 Bundle 5 依赖组已完成退役，详见 [第二轮专项记录](2026-09-06_legacy_bundle5_retirement.md)。7 个脚本、1 份规则、9 个专用测试文件已由用户删除并核验，真实输入来源检查独立保留；默认全套 2248 passed、历史兼容 88 passed，当前 17 个研究产物逐字节一致。共享校验器和正式研究证据继续保留。`bundle5_manual_delete` 已完成；Git 恢复依据继续保留。
 
 ## 其他剩余事项
 
