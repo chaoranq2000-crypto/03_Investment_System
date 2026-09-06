@@ -1,6 +1,6 @@
 # Bundle 6–10 旧工具链退役与收尾
 
-状态：本组代码退役、依赖解耦、恢复验证和全套回归完成；56 份旧文件已集中，等待用户手动物理删除。本轮开始于 2026-09-07（Asia/Shanghai）。
+状态：本组代码退役、依赖解耦、恢复验证、全套回归及用户手动物理删除均已完成。本轮开始于 2026-09-07（Asia/Shanghai）。
 
 ## 范围与依据
 
@@ -112,9 +112,17 @@ tests/test_r5_bundle9_valuation.py
 tests/test_r5_bundle9r_forward_state.py
 ```
 
-## 手动清理与发布
+## 用户删除核验（2026-09-07）
 
-本轮待删文件夹：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_legacy_bundle6_10_20260907/`。该路径的文件搬运不等于已释放磁盘；实际批量文件与目录删除由用户执行。依据 `AGENTS.md` 第 60–61 行：“Do not remove directories automatically. If the requested scope contains multiple files or any directory, stop and ask the user to perform the deletion manually.”
+用户反馈“已删除”后，现场核验本组 56 份旧文件的原路径和待删副本均不存在，前两轮移入的 4 份辅助记录也已删除。待删目录仅剩本轮 `README.md` 和 `cleanup_manifest.json` 两份辅助记录，可保留或手动删除。
+
+本组 56 条记录已转入 `completed_manual_deletions`，保留恢复提交、blob、字节数、SHA-256 及引用证据，并登记 `deletion_actor=user`。当前 `manual_delete_candidates` 为空，完成索引共 78 条；其他 manifest 字段保持不变。
+
+删除后的完成索引与保护检查：Doc drift 通过，相关回归 32 passed（14.31 秒）；全部 78 条完成记录的 Git 恢复内容校验通过。此前完整回归结果仍作为代码版本的验证依据；本次只调整清单与删除记录，没有改动运行代码或证据。
+
+## 其他手动清理与发布
+
+原待删文件夹：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_legacy_bundle6_10_20260907/`。本组旧文件已由用户物理删除；目录中剩余两份辅助记录，其他工作树与 Git 登记尚待用户手动收尾。依据 `AGENTS.md` 第 60–61 行：“Do not remove directories automatically. If the requested scope contains multiple files or any directory, stop and ask the user to perform the deletion manually.”
 
 旧只读工作树 `C:/Users/Q/.codex/worktrees/c02d/03_Investment_System` 已复核为 Git 干净、无忽略文件，1,927 个文件共 98,404,478 bytes（约 93.85 MiB）。本轮未观察到命令行指向该路径的其他进程；这不证明旧任务以后不会再使用它。用户确认不再需要旧工作树时，可手动执行：
 
@@ -129,7 +137,6 @@ git -C C:/Projects/03_Investment_System worktree prune --verbose
 
 | 剩余事项 | owner | severity | 下一步 |
 |---|---|---|---|
-| 本轮待删文件夹物理删除 | user | low | 验证完成后手动删除整个文件夹，再核验清理状态 |
 | 旧 c02d 工作树及四处失效登记 | user | low | 不再使用时执行上述手动清理 |
 | 瘦身分支发布 | user | medium | 确认发布范围后再推送或合入主线 |
 | 5 条既有 Tushare CSV 哈希差异 | codex | medium | 独立核对源版本及登记依据，不在清理中重写原证据 |
