@@ -795,17 +795,6 @@ allowed_retired_references:
   - reports/p1_6/r5_after_patch55_decision.json
   - reports/p1_6/r5_bundle4_readout_truthfulness_result.json
   - reports/p1_6/r5_bundle4_reviewed_input_smoke_result.json
-- source_path: tests/test_r5_bundle6_close.py
-  relation: git_history_only
-  targets:
-  - codex_tasks/r5_after_bundle5/R5_BUNDLE6_EXPECTED_ARTIFACTS.yaml
-  - reports/p1_6/R5_BUNDLE_6_0_STATUS_READER_QUALITY_BASELINE_READOUT.md
-  - reports/p1_6/R5_BUNDLE_6_READER_REPORT_QUALITY_REMEDIATION_CLOSE_READOUT.md
-- source_path: tests/test_r5_bundle7_close.py
-  relation: git_history_only
-  targets:
-  - reports/p1_6/R5_BUNDLE_6_READER_REPORT_QUALITY_REMEDIATION_CLOSE_READOUT.md
-  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
 - source_path: tests/test_r5_foundation_assets.py
   relation: git_history_only
   targets:
@@ -864,29 +853,17 @@ retired_route_tokens:
   allowed_readers:
   - source_path: scripts/run_r5_v1_replay_002837.py
     relation: immutable_git_snapshot_replay
-  - source_path: scripts/validate_r5_bundle8b_close.py
-    relation: immutable_git_snapshot_validation
   - source_path: src/ingest/business_segment_extraction.py
     relation: explicit_workflow_run_writer
   - source_path: src/qa/r4_disclosure_backflow_review.py
     relation: explicit_workflow_run_writer
   - source_path: tests/test_r5_002837_reviewed_input_staging.py
     relation: immutable_git_fixture_or_temp_only
-  - source_path: tests/test_r5_bundle10_close.py
-    relation: immutable_git_fixture_or_temp_only
-  - source_path: tests/test_r5_bundle10_human_review_finalize.py
-    relation: immutable_git_fixture_or_temp_only
-  - source_path: tests/test_r5_bundle10_human_review_handoff.py
-    relation: immutable_git_fixture_or_temp_only
-  - source_path: tests/test_r5_bundle10_human_review_submission.py
-    relation: immutable_git_fixture_or_temp_only
   - source_path: tests/test_r5_bundle10r_v5_human_review.py
     relation: immutable_git_fixture_or_temp_only
   - source_path: tests/test_r5_bundle13r_evidence_backflow.py
     relation: immutable_git_fixture_or_temp_only
   - source_path: tests/test_r5_bundle4_post_promotion_dry_run.py
-    relation: immutable_git_fixture_or_temp_only
-  - source_path: tests/test_r5_bundle9_close.py
     relation: immutable_git_fixture_or_temp_only
   - source_path: tests/test_r5_forecast_valuation_interlock.py
     relation: immutable_git_fixture_or_temp_only
@@ -937,8 +914,575 @@ legacy_route_surfaces:
 - path: config/r5_readiness_gate_rules.yaml
 - path: config/r5_reviewed_input_pilot_gate_rules.yaml
 manual_delete_candidates:
-- path: config/r5_bundle3_expected_artifacts.yaml
+- path: r5_after_patch12_patch_package.zip
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 3839fdd385f94e6074575f3a9350720cee78418a
+  git_blob_bytes: 35382
+  content_sha256: d90ddf7846eb978b30209236d2b06de5ea0331d0e091843df3fd9a2833dffc69
   status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+  - source_path: reports/p1_6/R5_BUNDLE16R_REAL_COMPANY_REGRESSION_CLOSE_READOUT.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle10_human_review_handoff.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 0667ed120729827a97d652d85320f7211a6c75b6
+  git_blob_bytes: 12706
+  content_sha256: 99c4fafe4b41b8be0d43150cf94cc664f4e28b68d2ab99d5a7b844291a5f20a7
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle10_reader_pack.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: b3de99e71d1ae3192c92023ae754fc85b6ba5a36
+  git_blob_bytes: 53035
+  content_sha256: e906f65271d13cdccc1d2a5fecbd6abd2c1b03fcf3c3f69011194aa8cf86144a
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle10r_human_review_handoff.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: a61260c58c446f126992a098b4f0aaa28eb993ca
+  git_blob_bytes: 2641
+  content_sha256: 9a6f005f9a0cfc5ad8a77d1ccf3bcafa126c295f9cc4a3decc4eb4fb3b79e180
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle10r_reader_generation_lock.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 957fd4e18f68e50f7f9b6184ceef0f67fc2a2d7b
+  git_blob_bytes: 1824
+  content_sha256: 815cff834e8bac0449439e61de380aa5f1b406b27698e655668f45e0a4d5b396
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle10r_reader_pack.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 598cbb61e90da14af7141bbebe99e8012ce4bf85
+  git_blob_bytes: 2806
+  content_sha256: 655c8ebf17c06fa38ba4f3786be68129daa1977d8a3aa29113dfba63bd94058b
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle6_close_readout.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: a8f44840a50aefd64bbf593d53b8472bfd9a9d43
+  git_blob_bytes: 9043
+  content_sha256: 9b8191fbde3f0755f8a749ad0225d18a9ccab76f5363119b141a38050860784e
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle6_human_review_handoff.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: d6f016ce8191fa03294e443f31a2ad2ac03ef60d
+  git_blob_bytes: 3761
+  content_sha256: 86f785b227a8bbf15601d711bbfc4be1fa505a2eccacba72d9ce01b34fe9d79c
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle6_reader_baseline.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 4009266b96687bf0a2a6e785b3ce81187401eeed
+  git_blob_bytes: 12212
+  content_sha256: 0d91bd0cfa37327d4341ed41afcaf75ec7846400682f86c80a8e702c23e2f6ed
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle6_research_remediation.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 89de2bf21a78754525930d9f202a2e4f53522ae9
+  git_blob_bytes: 13403
+  content_sha256: 31c1ef4b7c3bbc056f0c2d795249fe58e75b84ef0a519c87e360c794dc5de894
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle8_research_depth_plan.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: c7145ab7a5740f28c642da790f0133cd464384ad
+  git_blob_bytes: 14389
+  content_sha256: 01372fe5c3bb80511d44f27b166dc29fb3846ef12399dc00bb19c3d4ee3c33d7
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle8r_pilot_artifacts.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 58991270b845dc5381bdfb3122b4ce8918a287f6
+  git_blob_bytes: 27174
+  content_sha256: 68a5a76d2de2ae074a0cf103cdb2d0c810aff06997750a2d8d6b507ce575fff0
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle9_forecast.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: e1c41e030c99b8310cb5a34dc4a6bca47303c581
+  git_blob_bytes: 35103
+  content_sha256: 12bb6b8b13ce1471889fa30a1ca49dc027e80150d61a686ed6adc430ef842199
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle9_valuation.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 1c70d44777b82bee1804789fe5cc864269ba2ed0
+  git_blob_bytes: 65785
+  content_sha256: 4e34590431657ad306d9071c614c2c69fe38f6170047b82189208925ec8f74ee
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle9r_forecast_valuation.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: c16c14b928328b723b608b7e5d27bbe9b90ab80f
+  git_blob_bytes: 41329
+  content_sha256: efbc6150fdb471259d8cd296186b30c79dfdc8c5a8b82f3bd4647260db5233c5
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle9r_model_generation_lock.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 061c24c8b24c056f905b95984787ccc33440477c
+  git_blob_bytes: 2346
+  content_sha256: a119b51ac9e6d2122ca4809de15835b77fb9a742c0854ad0bbc5b0b4675ad2ad
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/check_r5_bundle10r_model_freshness.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 9eae24e29050562828603cb3679e07c6de329601
+  git_blob_bytes: 1487
+  content_sha256: bf2cad35c9e62ecdea6e92814471e66a0691954a2def946136d377ba45f1e066
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/close_r5_bundle8b.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 8bc88c821e8f0dac6814629eea4cd7b0bb537b80
+  git_blob_bytes: 20664
+  content_sha256: af02c0e54bba63bb953a78cfd49f91b397d0fbe8a7be5b438b854aa94ccf73bc
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/close_r5_bundle9.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 2d8962d620d035a7d106089778428cb29416816f
+  git_blob_bytes: 21295
+  content_sha256: 6d7f2a7bb666cbc07d3193c678eafb6d4c4fafa3448598eabe3081876c3f6203
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/finalize_r5_bundle10_after_human_review.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: c59b5635c9a451402ffe3a984fd0e0afff55ffa7
+  git_blob_bytes: 17957
+  content_sha256: cae2ecda12ca33f724b8cce37c831f0554e6107b86af5011e8081260f223b20e
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/run_r5_bundle10r_reader_quality_gate.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: cf4e7766c8cccd3d6336562ddc2013a90441ab54
+  git_blob_bytes: 1466
+  content_sha256: 58ee3a5d0a2feaa23a67cfd09d661c1e622e8a1a1ff778b8c2a4493d36ad4b54
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-08-10_system_complexity_remediation_execution_log.md
+    relation: historical_cross_reference
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/run_r5_bundle8_research_depth_gate.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: a566a817f268d11a92fa649df9f8bc4612ad67ea
+  git_blob_bytes: 6396
+  content_sha256: e798c19d719a759c8ec036a16528b36b61b2f3d7f42330fedfb476bf0e3f7f8d
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/run_r5_bundle9r_model_quality_gate.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 4f04d0324448117f3bc4f2e759e71f3a1f6de1c7
+  git_blob_bytes: 2238
+  content_sha256: e45f8e93f9fce5e31b4dc37b6dc95ced86a2d0d9a5670d0a05f08228687c8672
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/start_r5_bundle10r_reader_rebuild.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: c16f27e3f843a45b32b86087ddb21d5ff8932873
+  git_blob_bytes: 2592
+  content_sha256: ec7644a2ce6b966a4db10bf9ed2959c26e6869e81cbe7a0f0b17422185cd8b02
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/start_r5_bundle8r_forward_requalification.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 9bb5e19b938068dc47688ddef6361d410a993f24
+  git_blob_bytes: 4153
+  content_sha256: b6b99fe5d326ddd7ba9357506141178c8b7f4f3526670c510e191953651a237a
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/start_r5_bundle9r_forecast_valuation_rebuild.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: ca4a68618117460d87ac2e66473653742eceae0d
+  git_blob_bytes: 4193
+  content_sha256: e6424ceccfafcfcb3b5804d8d2b5186a351cd2436c9b996b20efcc1c18331d18
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/sync_r5_bundle10_external_review_pending.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: d1efb05ce7f030b1cd35da8071db65c3992a3363
+  git_blob_bytes: 24331
+  content_sha256: a84a5ad07df0c4fb9bc5233ca0eeaea96cc1626908fb0ad353fb09892ca5882a
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/validate_r5_bundle10_close.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: b8be4df4228902d678d2667a4b6966f9376408ac
+  git_blob_bytes: 23023
+  content_sha256: eb2c215d8d5d60ffeaba5ce03a409f543884f84a8224f756511af3f49dcf4ee6
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/validate_r5_bundle10_human_review_submission.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: a332ceae1246a068deceb0290d6403501e66dca0
+  git_blob_bytes: 10849
+  content_sha256: 4b92d12f4bea01c250504e2957457d994489dc01be67c1d202261d007fd0b262
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/validate_r5_bundle10r_close.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 2678cb8cb557c1e840d94cff2ebfc4845d34b61c
+  git_blob_bytes: 1702
+  content_sha256: 38539c3c2d449aae6cda1e9b7ad3b90cec340df8214919aaef8c2aad72198320
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/validate_r5_bundle10r_generation_binding.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: a89fa6294fb870bfce44f1650b077dac395ffc44
+  git_blob_bytes: 1132
+  content_sha256: 68fc9d79bdeb15ce9cdea0cffea378de555b0cec1431829204cc4930be8bd21d
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/validate_r5_bundle8b_close.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: acf6a6e9b5163c8005eaae9c1fcc51f2735b60b8
+  git_blob_bytes: 13099
+  content_sha256: f847165d3d5b20e9fa5a40c9cbbed7569add645b74824a5e5e483e32bc4b621d
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/validate_r5_bundle9_close.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: ce87c98588733146f2ee95008f7fbdd5ffc08d85
+  git_blob_bytes: 11384
+  content_sha256: 2ae7390e94bda16046c4ff55c05afcdac1611b2da94a5f7ce4b40146714c597d
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: scripts/validate_r5_bundle9r_generation_binding.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: d4e17e2f500c5a7f4aabca892d47b063734d25ab
+  git_blob_bytes: 2651
+  content_sha256: 7dda61eeee085fcc0748578b734877c949c7944bb0a875ec28b058094cf9a575
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: templates/r5_bundle8r_research_request.example.yaml
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: d279205dfa67d889af572bc4450261145b771718
+  git_blob_bytes: 1700
+  content_sha256: 00faec2ccf3828f06db04c8da05914a4b88c3f622c4d2a41bd94a59520a01467
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_bundle8r_forward_requalification.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 62ba8621a9cc1f1c942041298edd4342a1db86ed
+  git_blob_bytes: 1053
+  content_sha256: a5e305452799218452c2e5114989b438f1a73465e165dad51fc7eeda85e65d43
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle10_close.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 6b487ae5a25978e71f939e282855c2b4ae96dcd5
+  git_blob_bytes: 4342
+  content_sha256: ab0f60df16ca314efc6310280bded446f62d6849c5dcce841bcdebc7da7bbde4
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle10_human_review_finalize.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 09e8268fd6223687d7ef4bc169c4f6109b481528
+  git_blob_bytes: 8227
+  content_sha256: 0f14f9719f47fd5795b15bee5eabb2be7bc9475e19b6712a68514113923530e2
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle10_human_review_handoff.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 059e8f79fe2914a8aaf166c430ba55afca2287bb
+  git_blob_bytes: 5110
+  content_sha256: 42fdb0497772379130073bace74e0180f57c4086a74d0461ac65e07f0aca0afc
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle10_human_review_submission.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 960c59a4d76bc0d643c5f07c51ebd6b39ef66a59
+  git_blob_bytes: 2958
+  content_sha256: b37e9c957d4c125d3c9b25c55f38159bf508527fff0e057d7d1da4e29c93d094
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle10_state_sync.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 73b19befb028cce85b615442ead0520b6d442677
+  git_blob_bytes: 6352
+  content_sha256: e1858460436219e10fd03ecfdc21fc508af8eabf021a602be4ec58105cf8e921
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle10r_forward_state.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: bd92b962eb2c8ecbfe441cdb5a453e4915243c9e
+  git_blob_bytes: 864
+  content_sha256: 162592c2e10170eec1edbd6b486d76d39bc337294362ac9a6cebe6e654c90563
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle10r_model_freshness.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: a58a97075d9aef4f08c4a7ec274900367fe3beae
+  git_blob_bytes: 418
+  content_sha256: 22112a148b33a97b13590ebc87f5808cfc54a5e7ac30439baf92b6682a5b49d8
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle10r_v5_artifacts.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 9577ede093aa7a14a1deb58c2e22a07ab332ef83
+  git_blob_bytes: 5586
+  content_sha256: f69439bd892d93eeb3f90ab4c798f7cae0c1c215a7b6c6949383bfc3e61e8d1f
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle6_close.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 817f1add6d45f91758d6d542ef1fadb8e1847aac
+  git_blob_bytes: 6649
+  content_sha256: 63af288df5238744e5f5585f38c1bfdb80ed948b7e19c8607f6203235d153f02
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle6_human_review_handoff.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 433af33d0b4f1906a442afbdaa17987080d4f21d
+  git_blob_bytes: 1512
+  content_sha256: 0b7f0e61b9a0d5abffdbb18b1e4efded9cacf4dc0655497eb13b40389a8e4ee8
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle6_reader_baseline.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: a7e4187c59d0fe632b3ee58c4988dcb17a40aabb
+  git_blob_bytes: 3404
+  content_sha256: a5f43cbb42b0898fdd14a25f4619c865f7ecef359b1b0ade75a275d3932ae005
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle6_research_remediation.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: f858b76b2c5bab4cc9f478e3c2c4740487c2cda1
+  git_blob_bytes: 2080
+  content_sha256: 766e0df697104d40943f50fa32846cd3e69ca83eae0e30362288525737bde73d
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle7_close.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 24d69e1687885e3ca774ee4843950659e4ffac13
+  git_blob_bytes: 7447
+  content_sha256: 8ed8d0fbb28a94474f885c0e398d4af0c9f59aa85232c63b3b44a7c37c161012
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+  - source_path: reports/p1_6/R5_BUNDLE_7_QUALITY_REBASE_AND_BACKFLOW_CLOSE_READOUT.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle8_plan.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 19081a0e31d664a2ef9e6a6f95e36c741f2b6927
+  git_blob_bytes: 3148
+  content_sha256: 0cc038b588a698c8708a9ef5603018b1dce8fc56f9d50f628e35cd8dc1446990
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle8b_close.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: e8b594338300ce68c2d06bc361491afe6e67ccae
+  git_blob_bytes: 682
+  content_sha256: e729515185e4f8ebdfce5177699f34b03e55b6e9deb1589a9663148583e770d4
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle8b_local_close.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 443685e04775bb9775eccfc8558a0f7d05291c06
+  git_blob_bytes: 3099
+  content_sha256: e56872fda23c8bfc1542fd0f57f7acc55a85cb864bda54c9b460f88b92e3c5a9
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle9_close.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 19c96ad10fbf98bb71bbf90b7a01f9ad2d170199
+  git_blob_bytes: 5038
+  content_sha256: 98f42c75e99ae1229730e3db826dc37b34f3210e68f885f8a20055ac3c28c2f1
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle9_forecast.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: 8bcfe6cf5439d7067bb6322f8d77e28b19098cb5
+  git_blob_bytes: 3470
+  content_sha256: 4528243d8a232a773ad72f7ac4f478730ae95e804a560b358e57b216ec656a6e
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle9_valuation.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: ed4d6fa2dd07fdb7b501537af7e3c3770d49bbc5
+  git_blob_bytes: 3183
+  content_sha256: 0b38baf0a139876c301197c4de13fb7f73a365a2a029059eaa69e5b59b118454
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle9r_forward_state.py
+  recovery_commit: 4121360c4583a95a9d889ee4604bf0893f92a294
+  blob_oid: fdadb6aef089ca10b03d505ba091952b636b8736
+  git_blob_bytes: 1714
+  content_sha256: e86d695cc2a4c008aefce86076e3d0893618c9dc45c06b3d95c7dc84e97a8d9e
+  status: READY_FOR_MANUAL_DELETE
+  reason: 历史阶段工具、专用测试或固定样例退役；现行共享能力与证据保留。
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
+    relation: historical_cross_reference
+completed_manual_deletions:
+- path: config/r5_bundle3_expected_artifacts.yaml
+  status: DELETED_BY_USER
   reason: Only historical Git-fixture consumers remain; no current physical reader or writer.
   recovery_commit: 457c7ee0ed3db7565320709f0b8b2cdeedf05aff
   blob_oid: e468601af3be9a5a43a31d2ad09216727d74bfdc
@@ -951,8 +1495,11 @@ manual_delete_candidates:
     relation: retirement_assertion_only
   - source_path: docs/logs/2026-09-06_research_runtime_slimming.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: config/r5_bundle4_expected_artifacts.yaml
-  status: READY_FOR_MANUAL_DELETE
+  status: DELETED_BY_USER
   reason: Only historical Git-fixture consumers remain; no current physical reader or writer.
   recovery_commit: 457c7ee0ed3db7565320709f0b8b2cdeedf05aff
   blob_oid: e1e8c2a9c41a738dd9f1c822d651621b70c465a8
@@ -967,8 +1514,11 @@ manual_delete_candidates:
     relation: retirement_assertion_only
   - source_path: docs/logs/2026-09-06_research_runtime_slimming.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: config/r5_bundle5_expected_artifacts.yaml
-  status: READY_FOR_MANUAL_DELETE
+  status: DELETED_BY_USER
   reason: Only historical Git-fixture consumers remain; no current physical reader or writer.
   recovery_commit: 457c7ee0ed3db7565320709f0b8b2cdeedf05aff
   blob_oid: eae75644a648bb21cfd498d547bd3a65e43469af
@@ -981,8 +1531,11 @@ manual_delete_candidates:
     relation: retirement_assertion_only
   - source_path: docs/logs/2026-09-06_research_runtime_slimming.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: config/r5_patch_1_12_expected_artifacts.yaml
-  status: READY_FOR_MANUAL_DELETE
+  status: DELETED_BY_USER
   reason: Only historical Git-fixture consumers remain; no current physical reader or writer.
   recovery_commit: 457c7ee0ed3db7565320709f0b8b2cdeedf05aff
   blob_oid: 5e5f424e4b9a59f28a69d118afbf0b38320e6471
@@ -995,8 +1548,11 @@ manual_delete_candidates:
     relation: retirement_assertion_only
   - source_path: docs/logs/2026-09-06_research_runtime_slimming.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: config/r5_patch_49_55_expected_artifacts.yaml
-  status: READY_FOR_MANUAL_DELETE
+  status: DELETED_BY_USER
   reason: Only historical Git-fixture consumers remain; no current physical reader or writer.
   recovery_commit: 457c7ee0ed3db7565320709f0b8b2cdeedf05aff
   blob_oid: 858f1944082a340c883358eda64a2791f8159a0d
@@ -1009,9 +1565,13 @@ manual_delete_candidates:
     relation: retirement_assertion_only
   - source_path: docs/logs/2026-09-06_research_runtime_slimming.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: config/r5_bundle5_pilot_gate_rules.yaml
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: cc9794210948bfc6ba3c148d0dd31253a067396d
   git_blob_bytes: 1180
@@ -1019,9 +1579,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: scripts/build_r5_bundle5_benchmark_coverage_precheck.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 51e3622c09c0faabb95c42dc515e62cd1b534b8f
   git_blob_bytes: 16070
@@ -1029,9 +1593,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: scripts/build_r5_bundle5_forecast_valuation_onboarding.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 0d89b58bab058b6e003f590cef5f4ebafb64e133
   git_blob_bytes: 29919
@@ -1039,9 +1607,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: scripts/build_r5_bundle5_market_peer_onboarding.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 35288cc387ad81152d371fde68dbd062bb7b4e2d
   git_blob_bytes: 25516
@@ -1049,9 +1621,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: scripts/build_r5_bundle5_official_disclosure_onboarding.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 1a73d33b59b9f769bb0d00229872cbb22195cf8f
   git_blob_bytes: 26302
@@ -1059,9 +1635,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: scripts/build_r5_bundle5_real_input_inventory.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 63def19f0e1537c1e5223763df30180cd6446f67
   git_blob_bytes: 20579
@@ -1069,9 +1649,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: scripts/run_r5_bundle5_real_registry_promotion.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 3333ba125c100c64b08214c1ef70b8428499d025
   git_blob_bytes: 15567
@@ -1079,9 +1663,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: scripts/run_r5_bundle5_research_draft_quality_gate.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 545b757adedead8646fd989baefba35c22713e8e
   git_blob_bytes: 51169
@@ -1089,9 +1677,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: tests/test_r5_bundle5_benchmark_coverage_precheck.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 3757b42fb8b08cc12a10ddf7396bc76a550f2df2
   git_blob_bytes: 9471
@@ -1099,9 +1691,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: tests/test_r5_bundle5_close.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 9a4e3f93777255b8a05ebeec2ae95e4f9662efb5
   git_blob_bytes: 12790
@@ -1109,9 +1705,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: tests/test_r5_bundle5_forecast_valuation_onboarding.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 18ef76ea4fb0c5593181ef3c8d546acfc1762f02
   git_blob_bytes: 5592
@@ -1119,9 +1719,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: tests/test_r5_bundle5_market_peer_onboarding.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: a80c6d2e3165cb105868154a471626929e779fe3
   git_blob_bytes: 5909
@@ -1129,9 +1733,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: tests/test_r5_bundle5_official_disclosure_onboarding.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: b633230ba7f97c438d3d341c900a46259be6e8e5
   git_blob_bytes: 4317
@@ -1139,9 +1747,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: tests/test_r5_bundle5_real_input_inventory.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 196626861c1ab3981ea11a7d0d66a76991071a3e
   git_blob_bytes: 14756
@@ -1149,9 +1761,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: tests/test_r5_bundle5_real_pilot_gate.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 2b26594a607d97bcc033b2f9bef5f681d6ba5eb7
   git_blob_bytes: 9721
@@ -1159,9 +1775,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: tests/test_r5_bundle5_real_registry_promotion.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: 20b6724e8a531b84e71cc7ca28f5bff87f8b85b4
   git_blob_bytes: 7167
@@ -1169,9 +1789,13 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md
 - path: tests/test_r5_bundle5_status_baseline.py
-  status: READY_FOR_MANUAL_DELETE
-  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  status: DELETED_BY_USER
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are
+    independent.
   recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
   blob_oid: e3c7e3734e83bd676b7743c7d89098c6f1c1b8c2
   git_blob_bytes: 4922
@@ -1179,3 +1803,6 @@ manual_delete_candidates:
   inbound_references:
   - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
+  deletion_actor: user
+  deletion_verified_on: '2026-09-07'
+  deletion_record: docs/logs/2026-09-07_legacy_bundle6_10_retirement.md

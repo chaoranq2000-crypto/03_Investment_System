@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -24,6 +25,16 @@ def validate(data):
 @pytest.fixture
 def manifest():
     return yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
+
+
+@pytest.fixture
+def candidate_manifest(manifest):
+    # Negative candidate cases must keep working when the real pending queue empties.
+    if not manifest["manual_delete_candidates"]:
+        candidate = manifest["completed_manual_deletions"].pop()
+        candidate["status"] = "READY_FOR_MANUAL_DELETE"
+        manifest["manual_delete_candidates"] = [candidate]
+    return manifest
 
 
 def test_current_retention_contract_and_recovery_identity_pass(manifest):
@@ -51,15 +62,15 @@ def test_current_products_evidence_and_pointer_selected_runs_remain_protected(ma
 
 
 @pytest.mark.parametrize("value", ["../outside.yaml", "C:/outside.yaml", "config/*.yaml"])
-def test_retention_rejects_nonliteral_or_escaping_candidates(manifest, value):
-    manifest["manual_delete_candidates"][0]["path"] = value
-    assert any("unsafe or non-literal" in error for error in validate(manifest))
+def test_retention_rejects_nonliteral_or_escaping_candidates(candidate_manifest, value):
+    candidate_manifest["manual_delete_candidates"][0]["path"] = value
+    assert any("unsafe or non-literal" in error for error in validate(candidate_manifest))
 
 
-def test_retention_rejects_protected_deletion_and_reused_approval(manifest):
-    manifest["manual_delete_candidates"][0]["path"] = "AGENTS.md"
-    manifest["deletion_control"]["prior_approvals_apply_to_new_candidates"] = True
-    errors = validate(manifest)
+def test_retention_rejects_protected_deletion_and_reused_approval(candidate_manifest):
+    candidate_manifest["manual_delete_candidates"][0]["path"] = "AGENTS.md"
+    candidate_manifest["deletion_control"]["prior_approvals_apply_to_new_candidates"] = True
+    errors = validate(candidate_manifest)
     assert any("conflicts with retired/protected" in error for error in errors)
     assert any("old approvals cannot be reused" in error for error in errors)
 
@@ -77,9 +88,54 @@ def test_retention_rejects_restored_paths_and_physical_readers(manifest):
     assert any("current physical dependency" in error for error in errors)
 
 
-def test_retention_rejects_candidate_with_live_dependency(manifest):
-    manifest["manual_delete_candidates"][0]["inbound_references"][0]["relation"] = "current_worktree_physical"
-    assert any("candidate still has a current physical dependency" in error for error in validate(manifest))
+def test_retention_rejects_candidate_with_live_dependency(candidate_manifest):
+    candidate_manifest["manual_delete_candidates"][0]["inbound_references"][0]["relation"] = "current_worktree_physical"
+    assert any("candidate still has a current physical dependency" in error for error in validate(candidate_manifest))
+
+
+def test_completed_index_preserves_verified_recovery_records(manifest):
+    previous = yaml.safe_load(subprocess.check_output([
+        "git", "-C", str(ROOT), "show",
+        "4121360c4583a95a9d889ee4604bf0893f92a294:docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml",
+    ]))
+    completed = {row["path"]: row for row in manifest["completed_manual_deletions"]}
+    fields = ("path", "recovery_commit", "blob_oid", "git_blob_bytes", "content_sha256")
+    for old in previous["manual_delete_candidates"]:
+        current = completed[old["path"]]
+        assert current["status"] == "DELETED_BY_USER"
+        assert {key: current[key] for key in fields} == {key: old[key] for key in fields}
+    assert not set(completed) & {row["path"] for row in manifest["manual_delete_candidates"]}
+
+
+def test_completed_deletions_reject_reappearance_and_missing_user_evidence(manifest):
+    row = manifest["completed_manual_deletions"][0]
+    row["path"] = "pyproject.toml"
+    row["deletion_actor"] = "codex"
+    errors = validate(manifest)
+    assert any("completed deletion has reappeared" in error for error in errors)
+    assert any("requires verified user evidence" in error for error in errors)
+
+
+@pytest.mark.parametrize("index", ["manual_delete_candidates", "completed_manual_deletions"])
+def test_retention_rejects_corrupted_recovery_in_either_index(candidate_manifest, index):
+    candidate_manifest[index][0]["content_sha256"] = "0" * 64
+    assert any("candidate recovery integrity mismatch" in error for error in validate(candidate_manifest))
+
+
+def test_completed_index_cannot_be_omitted(manifest):
+    manifest.pop("completed_manual_deletions")
+    assert any("manual deletion indexes must be lists" in error for error in validate(manifest))
+
+
+def test_empty_pending_queue_is_valid_after_all_records_are_completed(manifest):
+    for row in manifest["manual_delete_candidates"]:
+        row.update(
+            status="DELETED_BY_USER", deletion_actor="user", deletion_verified_on="2026-09-07",
+            deletion_record="docs/logs/2026-09-07_legacy_bundle6_10_retirement.md",
+        )
+    manifest["completed_manual_deletions"].extend(manifest["manual_delete_candidates"])
+    manifest["manual_delete_candidates"] = []
+    assert validate(manifest) == []
 
 
 def test_retention_rejects_policy_and_ledger_boundary_changes(manifest):
@@ -111,7 +167,7 @@ def test_v2_preserves_all_published_retirements_and_protected_evidence(manifest)
     current_routes = {row["id"]: row for row in manifest["retired_route_tokens"]}
     assert current_routes.keys() == old_routes.keys()
     registered_retirements = retired | {
-        row["path"] for row in manifest["manual_delete_candidates"]
+        row["path"] for row in manifest["manual_delete_candidates"] + manifest["completed_manual_deletions"]
     }
     for route_id, current in current_routes.items():
         original = old_routes[route_id]

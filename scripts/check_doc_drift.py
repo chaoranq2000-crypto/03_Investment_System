@@ -8,6 +8,7 @@ inspect historical plans/logs/tasks.
 from __future__ import annotations
 
 import hashlib
+import io
 import re
 import subprocess
 import sys
@@ -194,7 +195,7 @@ def check_retention_manifest(
         if (
             value != normalized or pure.is_absolute() or PureWindowsPath(value).drive
             or any(part in {".", ".."} for part in pure.parts)
-            or any(token in value for token in ("*", "?", "[", "]", "{", "}"))
+            or any(token in value for token in ("*", "?", "[", "]", "{", "}", "\r", "\n"))
             or not (REPO_ROOT / pure).resolve().is_relative_to(REPO_ROOT.resolve())
         ):
             fail(errors, path, f"unsafe or non-literal path: {value}")
@@ -270,20 +271,39 @@ def check_retention_manifest(
         except (OSError, subprocess.CalledProcessError):
             fail(errors, path, "historical snapshot is not recoverable from Git")
 
+    pending = manifest.get("manual_delete_candidates")
+    completed = manifest.get("completed_manual_deletions")
+    if not all(isinstance(rows, list) and all(isinstance(row, dict) for row in rows)
+               for rows in (pending, completed)):
+        fail(errors, path, "manual deletion indexes must be lists of mappings")
+        return
     seen_candidates = set()
-    for row in manifest.get("manual_delete_candidates", []):
+    recovery_rows = []
+    for row, is_completed in [(row, False) for row in pending] + [(row, True) for row in completed]:
         value = literal(row.get("path"))
         if not value:
             continue
         if value in seen_candidates or value in retired_set or is_protected(value):
             fail(errors, path, f"candidate conflicts with retired/protected paths: {value}")
         seen_candidates.add(value)
-        if row.get("status") != "READY_FOR_MANUAL_DELETE" or not row.get("reason"):
+        expected_status = "DELETED_BY_USER" if is_completed else "READY_FOR_MANUAL_DELETE"
+        if row.get("status") != expected_status or not row.get("reason"):
             fail(errors, path, f"candidate requires a scoped readiness reason: {value}")
-        if not re.fullmatch(r"[0-9a-f]{40}", str(row.get("recovery_commit", ""))):
+        recovery_commit = str(row.get("recovery_commit", ""))
+        if not re.fullmatch(r"[0-9a-f]{40}", recovery_commit):
             fail(errors, path, f"candidate requires a fixed Git recovery commit: {value}")
+        else:
+            recovery_rows.append(row)
         if not re.fullmatch(r"[0-9a-f]{40}", str(row.get("blob_oid", ""))) or not re.fullmatch(r"[0-9a-f]{64}", str(row.get("content_sha256", ""))):
             fail(errors, path, f"candidate recovery hashes are missing: {value}")
+        if is_completed:
+            record = literal(row.get("deletion_record"))
+            if (row.get("deletion_actor") != "user"
+                or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(row.get("deletion_verified_on", "")))
+                or not record or not (REPO_ROOT / record).is_file()):
+                fail(errors, path, f"completed deletion requires verified user evidence: {value}")
+            if (REPO_ROOT / value).exists():
+                fail(errors, path, f"completed deletion has reappeared: {value}")
         references = row.get("inbound_references", [])
         if not references:
             fail(errors, path, f"candidate dependency evidence is missing: {value}")
@@ -301,6 +321,32 @@ def check_retention_manifest(
             oid = git_output("hash-object", f"--path={value}", "--", value).strip()
             if oid != row.get("blob_oid"):
                 fail(errors, path, f"candidate changed since dependency audit: {value}")
+
+    # One immutable Git batch verifies both indexes without a process per file.
+    if recovery_rows:
+        specs = [f"{row['recovery_commit']}:{row['path']}" for row in recovery_rows]
+        try:
+            result = subprocess.run(
+                ["git", "cat-file", "--batch"], cwd=REPO_ROOT,
+                input=("\n".join(specs) + "\n").encode("utf-8"),
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True,
+            )
+            stream = io.BytesIO(result.stdout)
+            for row in recovery_rows:
+                header = stream.readline().rstrip(b"\n").split()
+                if len(header) != 3 or header[1] != b"blob":
+                    fail(errors, path, f"candidate is not recoverable from Git: {row['path']}")
+                    continue
+                payload = stream.read(int(header[2]))
+                if stream.read(1) != b"\n":
+                    raise ValueError("malformed Git blob batch")
+                oid = hashlib.sha1(f"blob {len(payload)}\0".encode() + payload, usedforsecurity=False).hexdigest()
+                if (oid != row.get("blob_oid") or oid != header[0].decode("ascii")
+                    or len(payload) != row.get("git_blob_bytes")
+                    or hashlib.sha256(payload).hexdigest() != row.get("content_sha256")):
+                    fail(errors, path, f"candidate recovery integrity mismatch: {row['path']}")
+        except (OSError, ValueError, subprocess.CalledProcessError):
+            fail(errors, path, "candidate Git recovery verification failed")
 
 
 

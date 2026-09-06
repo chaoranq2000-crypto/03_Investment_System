@@ -63,8 +63,8 @@ tests/test_r5_bundle5_status_baseline.py
 
 待删文件夹：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_legacy_bundle5_20260906/`。
 
-2026-09-07 用户反馈已删除；现场核验 17 个原路径与待删副本均不存在，`scripts/`、`tests/`、`config/` 子目录已移除。该文件夹目前只剩说明和清单两份辅助记录，可保留或手动删除。另一份最新恢复与删除收据保存在上述本轮日志目录中。
+2026-09-07 用户反馈已删除；现场核验 17 个原路径与待删副本均不存在，`scripts/`、`tests/`、`config/` 子目录已移除。当时剩余的说明和清单两份辅助记录已在第三轮集中到新待删目录；旧目录目前为空，可手动删除。另一份最新恢复与删除收据保存在上述本轮日志目录中。
 
-精确路径、Git blob、SHA-256 和恢复提交另见 canonical manifest 的 `manual_delete_candidates`。`AGENTS.md` 第 60–61 行要求多个文件或目录的删除由用户手动执行；本轮只移动文件，不自动删除目录。
+精确路径、Git blob、SHA-256 和恢复提交另见 canonical manifest 的 `completed_manual_deletions`。`AGENTS.md` 第 60–61 行要求多个文件或目录的删除由用户手动执行；本轮只移动文件，不自动删除目录。
 
-完成项：`bundle5_manual_delete`；actor=user；17 份文件的物理删除已核验，Git 恢复 blob 仍全部可用。canonical manifest 的候选条目继续保留就绪依据和恢复哈希，最新本地删除状态见收据。发布仍待决定，未推送或合并。
+完成项：`bundle5_manual_delete`；actor=user；17 份文件的物理删除已核验，Git 恢复 blob 仍全部可用。canonical manifest 的完成索引保留删除核验依据和恢复哈希；后续索引整理见 [6–10 收尾记录](2026-09-07_legacy_bundle6_10_retirement.md)。发布仍待决定，未推送或合并。

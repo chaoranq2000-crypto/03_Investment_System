@@ -42,7 +42,7 @@
 
 按用户“将其它需要清理的零散文件放入一个文件夹”的要求，以下 5 份配置先从当前工作树逐个移入同一待删文件夹，保留原 `config/` 结构，移动前后的长度和 SHA-256 全部一致，合计 34,765 bytes。用户随后反馈已删除；2026-09-06 现场核对原路径和待删副本均不存在，五文件清理完成。
 
-待删文件夹：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_research_runtime_20260906/`。该文件夹目前只剩 `README.md` 与 `cleanup_manifest.json` 两份辅助文件，用户可一并手动删除。原配置内容已不存在。
+待删文件夹：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_research_runtime_20260906/`。当时剩余的 `README.md` 与 `cleanup_manifest.json` 已在第三轮集中到新待删目录；旧目录目前为空，可手动删除。原配置内容已不存在。
 
 以下路径为移动前的原始相对路径；此次未移动旧主目录或其他工作树中的同名文件。
 
@@ -54,13 +54,13 @@ config/r5_patch_1_12_expected_artifacts.yaml
 config/r5_patch_49_55_expected_artifacts.yaml
 ```
 
-精确路径、原 blob、SHA-256 和恢复提交仍保留在 canonical manifest 的 `manual_delete_candidates`；恢复提交为 `457c7ee0ed3db7565320709f0b8b2cdeedf05aff`。本地移动收据另外保存在 `.codex_tmp/runtime_slimming_20260906/quarantine_receipt.json`，删除待删文件夹不会删除这份收据。
+精确路径、原 blob、SHA-256 和恢复提交仍保留在 canonical manifest 的 `completed_manual_deletions`；恢复提交为 `457c7ee0ed3db7565320709f0b8b2cdeedf05aff`。本地移动收据另外保存在 `.codex_tmp/runtime_slimming_20260906/quarantine_receipt.json`，删除待删文件夹不会删除这份收据。
 
 同步移除 canonical manifest 中以这 5 份配置为来源的 5 条现存引用记录（共 64 条历史引用关系），保留全部退役登记、保护规则、待删候选和恢复信息。首次移动后检查发现这些来源已经缺失，修正的是清单内容，未放宽验证器。
 
 移动后验证：Research smoke 的 8 个步骤全部通过；治理清单与相关历史配置回归 59 passed（143.71 秒）；5 个原路径缺失、待删内容哈希、Git 恢复字节与精确变更范围全部通过。当前清单为 59,229 Git LF bytes。本次只记录 5 个原路径移出和清单、日志两项更新；未修改验证器、测试或产品代码。
 
-完成项：`manual_candidate_delete`；actor=user；五份旧配置的物理删除已核验。canonical manifest 的候选条目继续保存就绪依据与恢复哈希，最新本地删除状态记录在上述移动收据中；它们不代表待删副本仍存在。
+完成项：`manual_candidate_delete`；actor=user；五份旧配置的物理删除已核验。canonical manifest 的完成索引继续保存用户删除核验依据与恢复哈希，原始移动收据仍保留。
 
 ## 已完成工作树的本地清理
 
@@ -99,3 +99,7 @@ git -C 'C:/Projects/03_Investment_System' worktree prune --verbose
 - 其他旧生成器、模板、readout 和样例仍按实际依赖保留；本轮没有把 R5 命名当作可删除证据。
 - 根目录历史 ZIP 继续保留，不纳入这批五文件清单。
 - 本轮没有执行目录删除、Git GC、历史重写或跨工作树私有配置迁移。
+
+## 2026-09-07 系列退役与收尾
+
+Bundle 6–10 的 56 个旧文件已集中移出；默认全套 2232 passed、历史兼容 59 passed，17 个当前研究产物逐字节一致，详见 [第三轮专项记录](2026-09-07_legacy_bundle6_10_retirement.md)。前两轮已由用户删除的 22 条记录转入完成索引，恢复依据与防重现检查继续有效；两处旧待删文件夹的 4 份辅助记录合并到第三轮待删目录。现行共享组件、证据与人审边界保留。

@@ -64,7 +64,7 @@ def ready_items() -> dict[str, dict[str, Any]]:
             items[target]["inbound_references"].append({
                 "source_path": row["source_path"], "relation": row["relation"],
             })
-    for candidate in manifest["manual_delete_candidates"]:
+    for candidate in manifest["manual_delete_candidates"] + manifest["completed_manual_deletions"]:
         items[candidate["path"]] = candidate
     return items
 
@@ -371,8 +371,9 @@ def test_dynamic_python_routes_are_declared_or_absent() -> None:
     assert unexpected == {}
 
 
-def test_manual_candidates_have_no_physical_python_consumer() -> None:
-    for candidate in load_manifest()["manual_delete_candidates"]:
+def test_registered_retirements_have_no_physical_python_consumer() -> None:
+    manifest = load_manifest()
+    for candidate in manifest["manual_delete_candidates"] + manifest["completed_manual_deletions"]:
         for reference in candidate["inbound_references"]:
             source = reference["source_path"]
             if not source.endswith(".py") or reference["relation"] != "git_history_only":
@@ -382,6 +383,31 @@ def test_manual_candidates_have_no_physical_python_consumer() -> None:
             assert not _python_dynamic_references(
                 source, text, {candidate["path"]: candidate["path"]}
             ), (candidate["path"], source)
+
+
+def test_retired_python_modules_have_no_live_imports() -> None:
+    modules = {
+        module: path
+        for path in ready_items() if path.endswith(".py")
+        for module in (path[:-3].replace("/", "."), Path(path).stem)
+    }
+    unexpected = []
+    for source in iter_active_text_files():
+        if source.suffix != ".py":
+            continue
+        tree = ast.parse(source.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            imported = []
+            if isinstance(node, ast.Import):
+                imported = [alias.name for alias in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                imported = [node.module or ""] + [
+                    f"{node.module}.{alias.name}" for alias in node.names
+                ]
+            for name in imported:
+                if name in modules:
+                    unexpected.append((source.relative_to(ROOT).as_posix(), modules[name]))
+    assert unexpected == []
 
 
 def test_retired_route_tokens_have_no_active_default_or_physical_reader() -> None:
@@ -519,7 +545,7 @@ def test_retired_routes_do_not_reenter_current_text_defaults() -> None:
     }
     approved_missing = set(declared_surfaces) - physical_declared
     ready = set(manifest["retired_paths"]) | {
-        row["path"] for row in manifest["manual_delete_candidates"]
+        row["path"] for row in manifest["manual_delete_candidates"] + manifest["completed_manual_deletions"]
     }
     assert unexpected == {}
     if approved_missing:
@@ -530,9 +556,6 @@ def test_retired_routes_do_not_reenter_current_text_defaults() -> None:
 
 def test_legacy_gate_clis_require_explicit_rules_and_inputs() -> None:
     expectations = {
-        "scripts/validate_r5_bundle9r_generation_binding.py": (
-            "--binding",
-        ),
         "scripts/r5_next_pilot_gate.py": (
             "--rules",
             "--readiness",
@@ -651,8 +674,6 @@ def test_operational_source_route_proof_uses_current_quality_location() -> None:
 
 def test_retained_builders_require_explicit_workflow_roots() -> None:
     explicit_cli_paths = (
-        "scripts/build_r5_bundle10_reader_pack.py",
-        "scripts/build_r5_bundle9_forecast.py",
         "scripts/build_r5_reader_section_payloads.py",
         "src/ingest/business_segment_extraction.py",
         "src/qa/r4_disclosure_backflow_review.py",
@@ -661,8 +682,6 @@ def test_retained_builders_require_explicit_workflow_roots() -> None:
         source = read(path)
         assert 'add_argument("--workflow-run", required=True)' in source, path
 
-    valuation = read("scripts/build_r5_bundle9_valuation.py")
-    assert 'f"reports/workflow_runs/{run_dir.name}/valuation"' in valuation
     backflow = read("src/research/r5_bundle13r_evidence_backflow.py")
     assert '(output_root.parent / "bundle12r_rerun_after_13r").as_posix()' in backflow
 

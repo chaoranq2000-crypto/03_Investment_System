@@ -13,6 +13,25 @@ ROOT = Path(__file__).resolve().parents[1]
 REVIEWED_ROOT = ROOT / "data/reviewed_inputs"
 
 
+def test_retained_evidence_manifest_has_unique_ids_and_physical_files() -> None:
+    with (ROOT / "data/manifests/evidence_manifest.csv").open(
+        encoding="utf-8-sig", newline=""
+    ) as handle:
+        rows = list(csv.DictReader(handle))
+    assert rows
+    ids = [row["evidence_id"] for row in rows]
+    assert all(ids) and len(ids) == len(set(ids))
+    for row in rows:
+        assert row["raw_file_path"], row["evidence_id"]
+        for field in ("raw_file_path", "processed_text_path", "processed_table_path", "page_map_path"):
+            value = row.get(field)
+            if not value:
+                continue
+            target = (ROOT / value).resolve()
+            assert target.is_relative_to(ROOT / "data"), (row["evidence_id"], field)
+            assert target.is_file(), (row["evidence_id"], field, value)
+
+
 def test_committed_accepted_inputs_have_reviewed_physical_evidence() -> None:
     tracked = subprocess.check_output(
         ["git", "-C", str(ROOT), "ls-files", "-z", "--", "data/reviewed_inputs"],
