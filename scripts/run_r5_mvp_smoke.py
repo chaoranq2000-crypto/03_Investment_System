@@ -13,16 +13,46 @@ import platform
 import subprocess
 import sys
 import time
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
+import yaml
 
-def default_steps(python: str, strict: bool) -> list[dict[str, Any]]:
+
+def current_state_paths(repo_root: Path) -> list[str]:
+    index_path = repo_root / "config/r5_readout_canonical_index.yaml"
+    index = yaml.safe_load(index_path.read_text(encoding="utf-8"))
+    runs = index.get("current_runs") if isinstance(index, dict) else None
+    if not isinstance(runs, dict) or not runs:
+        raise ValueError("current_runs must be a non-empty mapping")
+    paths = []
+    for pointer in runs.values():
+        if not isinstance(pointer, dict):
+            raise ValueError("current run pointer must be a mapping")
+        value = pointer.get("state_path")
+        workflow_id = pointer.get("workflow_id")
+        if not isinstance(value, str) or not isinstance(workflow_id, str):
+            raise ValueError("current run pointer requires workflow_id and state_path")
+        path = PurePosixPath(value)
+        expected = f"reports/workflow_runs/{workflow_id}/workflow_state.yaml"
+        if (
+            value != expected
+            or value != path.as_posix()
+            or ".." in path.parts
+            or PureWindowsPath(value).is_absolute()
+            or not (repo_root / path).resolve().is_relative_to(repo_root.resolve())
+        ):
+            raise ValueError(f"unsafe current workflow state path: {value}")
+        paths.append(value)
+    return sorted(set(paths))
+
+
+def default_steps(
+    python: str, strict: bool, repo_root: Path | None = None
+) -> list[dict[str, Any]]:
     del strict  # Current control-plane checks are always blocking.
-    current_state = (
-        "reports/workflow_runs/"
-        "wf_20260725_stock_first_002837_v1_policy_refresh/workflow_state.yaml"
-    )
+    root = repo_root if repo_root is not None else Path(__file__).resolve().parents[1]
+    states = current_state_paths(root)
     return [
         {
             "name": "r5_artifact_format_guard",
@@ -52,25 +82,30 @@ def default_steps(python: str, strict: bool) -> list[dict[str, Any]]:
             "artifact_outputs": [],
             "trust_boundary_note": "only current_runs may select an active state/readout",
         },
-        {
-            "name": "current_workflow_state",
-            "command": [
-                python,
-                ".agents/skills/research-orchestrator/scripts/validate_workflow_state.py",
-                current_state,
-            ],
-            "artifact_outputs": [],
-            "trust_boundary_note": "canonical workflow-state validator remains authoritative",
-        },
+        *[
+            {
+                "name": "current_workflow_state" if len(states) == 1 else f"current_workflow_state_{number}",
+                "command": [
+                    python,
+                    ".agents/skills/research-orchestrator/scripts/validate_workflow_state.py",
+                    state,
+                ],
+                "artifact_outputs": [],
+                "trust_boundary_note": "state is selected only by current_runs and checked by its canonical validator",
+            }
+            for number, state in enumerate(states, 1)
+        ],
         {
             "name": "source_route_quality",
             "command": [
                 python,
                 "scripts/run_source_route_quality_gate.py",
                 "--import-check",
+                "--output",
+                ".codex_tmp/research_smoke_source_route_quality_report.yaml",
             ],
-            "artifact_outputs": ["reports/quality/source_route_quality_report.yaml"],
-            "trust_boundary_note": "operational adapter proof is read from reports/quality",
+            "artifact_outputs": [".codex_tmp/research_smoke_source_route_quality_report.yaml"],
+            "trust_boundary_note": "diagnostics write an isolated proof without replacing the tracked quality snapshot",
         },
         {
             "name": "active_routing_retirement",
@@ -194,7 +229,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     repo_root = args.repo_root.resolve()
-    report = run_steps(default_steps(args.python, args.strict), repo_root)
+    report = run_steps(default_steps(args.python, args.strict, repo_root), repo_root)
     if args.json:
         write_json(args.json, report)
     emit_report(report)

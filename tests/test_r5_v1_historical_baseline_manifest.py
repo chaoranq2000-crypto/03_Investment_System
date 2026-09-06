@@ -7,15 +7,19 @@ from typing import Any
 
 import yaml
 
+from conftest import GOVERNANCE_BASELINE, GOVERNANCE_MANIFEST, governance_paths, governance_snapshot, governance_text
+import pytest
+
+# Published historical results; current algorithms are covered in the default suite.
+pytestmark = pytest.mark.legacy_compatibility
+
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml"
 
 
 def load_manifest() -> dict[str, Any]:
-    data = yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
-    assert isinstance(data, dict)
-    return data
+    return governance_snapshot()
 
 
 def ready_items(manifest: dict[str, Any]) -> list[dict[str, Any]]:

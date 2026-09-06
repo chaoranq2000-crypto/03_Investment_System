@@ -2,12 +2,51 @@ from __future__ import annotations
 
 import hashlib
 import subprocess
+from functools import lru_cache
 from itertools import count
 from pathlib import Path, PurePosixPath
 from typing import Any, Callable
 
 import pytest
 import yaml
+
+
+GOVERNANCE_BASELINE = "457c7ee0ed3db7565320709f0b8b2cdeedf05aff"
+GOVERNANCE_MANIFEST = "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml"
+
+
+@lru_cache(maxsize=1)
+def governance_paths() -> frozenset[str]:
+    root = Path(__file__).resolve().parents[1]
+    output = subprocess.check_output(
+        ["git", "-C", str(root), "ls-tree", "-r", "--name-only", "-z", GOVERNANCE_BASELINE]
+    )
+    return frozenset(path.decode("utf-8") for path in output.split(b"\0") if path)
+
+
+@lru_cache(maxsize=None)
+def governance_blob(source_path: str) -> bytes:
+    """Read a published governance receipt; never select a current workflow."""
+    pure = PurePosixPath(source_path)
+    assert source_path == pure.as_posix() and not pure.is_absolute()
+    assert ".." not in pure.parts and pure.parts[0] != ".git"
+    root = Path(__file__).resolve().parents[1]
+    spec = f"{GOVERNANCE_BASELINE}:{source_path}"
+    payload = subprocess.check_output(["git", "-C", str(root), "cat-file", "blob", spec])
+    oid = subprocess.check_output(["git", "-C", str(root), "rev-parse", spec], text=True).strip()
+    assert hashlib.sha1(f"blob {len(payload)}\0".encode() + payload, usedforsecurity=False).hexdigest() == oid
+    return payload
+
+
+def governance_text(source_path: str) -> str:
+    return governance_blob(source_path).decode("utf-8")
+
+
+@lru_cache(maxsize=1)
+def governance_snapshot() -> dict[str, Any]:
+    data = yaml.safe_load(governance_text(GOVERNANCE_MANIFEST))
+    assert data["schema_version"] == "docs_reports_retention_dependency_manifest_v1"
+    return data
 
 
 HISTORICAL_BASELINE = "312adc73821706b0b7ca6aa00e80ee608bd10b32"

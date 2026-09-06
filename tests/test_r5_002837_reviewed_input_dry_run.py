@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import yaml
+import pytest
 
 DRY_RUN_SOURCE = (
     "reports/workflow_runs/wf_20260703_stock_first_002837_invic/"
@@ -86,6 +87,7 @@ def test_unreviewed_fixture_inputs_do_not_exceed_source_gapped_level(tmp_path):
     assert has_reviewed_valuation_inputs(inputs["valuation"]) is False
 
 
+@pytest.mark.legacy_compatibility
 def test_dry_run_result_reflects_promoted_physical_registries(
     historical_blob_bytes,
 ):

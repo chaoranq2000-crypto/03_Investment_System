@@ -4,6 +4,7 @@ import io
 from pathlib import Path
 
 import yaml
+import pytest
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -106,6 +107,7 @@ def test_bundle9_canonical_state_is_closed_but_reader_remains_fail_closed(
     assert scorecard["decision"] == "rejected"
 
 
+@pytest.mark.legacy_compatibility
 def test_bundle9_close_artifacts_are_registered_once(historical_blob_bytes) -> None:
     paths = [
         row["path"]

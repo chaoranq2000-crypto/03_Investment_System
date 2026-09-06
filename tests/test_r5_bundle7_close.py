@@ -6,6 +6,12 @@ from pathlib import Path
 
 import yaml
 
+from conftest import governance_snapshot, governance_text
+import pytest
+
+# Published historical results; current algorithms are covered in the default suite.
+pytestmark = pytest.mark.legacy_compatibility
+
 
 ROOT = Path(__file__).resolve().parents[1]
 HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
@@ -116,12 +122,7 @@ def test_canonical_indexes_supersede_bundle6_and_activate_bundle7_close(
     index_yaml = yaml.safe_load(
         (ROOT / "config/r5_readout_canonical_index.yaml").read_text(encoding="utf-8")
     )
-    retention = yaml.safe_load(
-        (
-            ROOT
-            / "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml"
-        ).read_text(encoding="utf-8")
-    )
+    retention = governance_snapshot()
     entries = {
         item["path"]: (group["status"], item)
         for group in retention["candidate_groups"]
@@ -147,7 +148,7 @@ def test_canonical_indexes_supersede_bundle6_and_activate_bundle7_close(
 
 
 def test_close_readout_contains_auditable_execution_and_hard_boundaries() -> None:
-    text = CLOSE.read_text(encoding="utf-8")
+    text = governance_text(BUNDLE7_CLOSE)
     for token in (
         "files_added",
         "files_modified",
@@ -169,7 +170,7 @@ def test_close_readout_contains_auditable_execution_and_hard_boundaries() -> Non
 
 
 def test_close_readout_records_rollback_ci_and_merge_evidence() -> None:
-    text = CLOSE.read_text(encoding="utf-8")
+    text = governance_text(BUNDLE7_CLOSE)
     assert "tracked_worktree_clean=true" in text
     assert "29196388267" in text and "29196389723" in text
     assert "https://github.com/chaoranq2000-crypto/03_Investment_System/pull/1" in text

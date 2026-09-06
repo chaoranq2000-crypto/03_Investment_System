@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / "scripts/run_r5_mvp_smoke.py"
@@ -80,8 +81,9 @@ def test_default_steps_use_only_current_control_plane_inputs():
 
     assert "--strict" in truthfulness["command"]
     assert source_route["artifact_outputs"] == [
-        "reports/quality/source_route_quality_report.yaml"
+        ".codex_tmp/research_smoke_source_route_quality_report.yaml"
     ]
+    assert "--output" in source_route["command"]
     serialized = "\n".join(" ".join(step["command"]) for step in steps)
     assert "config/r5_readout_canonical_index.yaml" not in serialized
     assert "r5_patch_1_12_expected_artifacts" not in serialized
@@ -97,6 +99,41 @@ def test_default_steps_use_only_current_control_plane_inputs():
         "research_pack_contracts",
         "current_research_fixture_smoke",
     }
+
+
+def test_smoke_follows_replaced_and_multiple_current_pointers(tmp_path: Path):
+    runner = load_runner()
+    index = tmp_path / "config/r5_readout_canonical_index.yaml"
+    index.parent.mkdir()
+    states = [
+        "reports/workflow_runs/wf_fixture_a/workflow_state.yaml",
+        "reports/workflow_runs/wf_fixture_b/workflow_state.yaml",
+    ]
+    index.write_text(
+        yaml.safe_dump({"current_runs": {
+            f"fixture_{number}": {"workflow_id": f"wf_fixture_{name}", "state_path": state}
+            for number, (name, state) in enumerate(zip(("a", "b"), states))
+        }}),
+        encoding="utf-8",
+    )
+    steps = runner.default_steps(sys.executable, True, tmp_path)
+    selected = [step["command"][-1] for step in steps if step["name"].startswith("current_workflow_state")]
+    assert selected == states
+    assert all("20260725" not in state for state in selected)
+
+
+@pytest.mark.parametrize("runs", [
+    {},
+    {"fixture": {"workflow_id": "../../escape", "state_path": "reports/workflow_runs/../../escape/workflow_state.yaml"}},
+    {"fixture": {"workflow_id": "wf_a", "state_path": "C:/outside/workflow_state.yaml"}},
+])
+def test_smoke_rejects_missing_or_escaping_current_state(tmp_path: Path, runs):
+    runner = load_runner()
+    index = tmp_path / "config/r5_readout_canonical_index.yaml"
+    index.parent.mkdir()
+    index.write_text(yaml.safe_dump({"current_runs": runs}), encoding="utf-8")
+    with pytest.raises(ValueError):
+        runner.default_steps(sys.executable, True, tmp_path)
 
 
 def test_emit_report_writes_stderr(capsys):

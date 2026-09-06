@@ -39,6 +39,7 @@ def artifact_exists(path: str, historical_blob_bytes) -> bool:
         return False
 
 
+@pytest.mark.legacy_compatibility
 def test_all_declared_bundle6_artifacts_exist(historical_blob_bytes):
     expected = yaml.safe_load(
         historical_blob_bytes(HISTORICAL_EXPECTED_ARTIFACTS).decode("utf-8")
@@ -51,6 +52,7 @@ def test_all_declared_bundle6_artifacts_exist(historical_blob_bytes):
     assert missing == []
 
 
+@pytest.mark.legacy_compatibility
 def test_reader_report_citations_resolve_once_and_sources_exist(historical_blob_bytes):
     report = historical_blob_bytes(
         f"{HISTORICAL_RUN}/R5_stock_research_report_reader_v2.md"
@@ -68,6 +70,7 @@ def test_reader_report_citations_resolve_once_and_sources_exist(historical_blob_
     )
 
 
+@pytest.mark.legacy_compatibility
 def test_close_state_keeps_human_review_and_promotion_boundaries(historical_blob_bytes):
     close = historical_blob_bytes(HISTORICAL_CLOSE_READOUT).decode("utf-8")
     score = historical_yaml(

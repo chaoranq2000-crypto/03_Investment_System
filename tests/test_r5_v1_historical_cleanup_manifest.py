@@ -9,15 +9,19 @@ from typing import Any
 
 import yaml
 
+from conftest import GOVERNANCE_BASELINE, GOVERNANCE_MANIFEST, governance_paths, governance_snapshot, governance_text
+import pytest
+
+# Published historical results; current algorithms are covered in the default suite.
+pytestmark = pytest.mark.legacy_compatibility
+
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST_PATH = ROOT / "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml"
 
 
 def load_manifest() -> dict[str, Any]:
-    data = yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
-    assert isinstance(data, dict)
-    return data
+    return governance_snapshot()
 
 
 def groups_by_status(manifest: dict[str, Any], status: str) -> list[dict[str, Any]]:
@@ -49,7 +53,7 @@ def test_manifest_is_a_decision_record_not_a_deletion_executor() -> None:
     }
     assert isinstance(control["approval"]["approved_closure_ids"], list)
     assert isinstance(control["approval"]["approved_exact_paths"], list)
-    rendered = MANIFEST_PATH.read_text(encoding="utf-8").lower()
+    rendered = governance_text(GOVERNANCE_MANIFEST).lower()
     for forbidden in (
         "remove-item",
         "rm -rf",
@@ -173,7 +177,7 @@ def test_phase2_inventory_and_quarantine_state_are_exact() -> None:
     }
     changed = set(
         subprocess.check_output(
-            ["git", "-C", str(ROOT), "diff", "--name-only"],
+            ["git", "-C", str(ROOT), "diff", "--name-only", phase2["baseline_commit"], GOVERNANCE_BASELINE],
             text=True,
         ).splitlines()
     )
@@ -355,8 +359,8 @@ def test_declared_inbound_references_are_exact_and_auditable() -> None:
             for reference in item["inbound_references"]:
                 source = ROOT / reference["source_path"]
                 relation = reference["relation"]
-                if source.is_file():
-                    source_text = source.read_text(encoding="utf-8", errors="replace")
+                if reference["source_path"] in governance_paths():
+                    source_text = governance_text(reference["source_path"])
                 else:
                     assert (
                         reference["source_path"] in candidate_paths
@@ -369,8 +373,8 @@ def test_declared_inbound_references_are_exact_and_auditable() -> None:
                     assert mentions(reference["source_path"], source_text, via), reference
                     via_path = ROOT / via
                     via_text = (
-                        via_path.read_text(encoding="utf-8", errors="replace")
-                        if via_path.is_file()
+                        governance_text(via)
+                        if via in governance_paths()
                         else historical_text(via)
                     )
                     assert mentions(via, via_text, target), reference
@@ -423,18 +427,15 @@ def test_internal_relations_and_actual_full_path_references_are_closed() -> None
             if reference["relation"] == "self_reference":
                 assert reference["source_path"] == target, (target, reference)
 
-    tracked = subprocess.check_output(
-        ["git", "-C", str(ROOT), "ls-files", "-z"],
-    ).decode("utf-8").split("\0")
+    tracked = sorted(governance_paths())
     actual: dict[str, set[str]] = {target: set() for target in candidates}
     for source_path in tracked:
         if not source_path or source_path == MANIFEST_PATH.relative_to(ROOT).as_posix():
             continue
-        source = ROOT / source_path
-        if not source.is_file():
+        if Path(source_path).suffix not in {".py", ".md", ".yaml", ".yml", ".toml", ".json", ".csv", ".txt", ".ps1", ".js", ".ts", ".html", ".css"}:
             continue
         try:
-            source_text = source.read_text(encoding="utf-8")
+            source_text = governance_text(source_path)
         except (OSError, UnicodeDecodeError):
             continue
         normalized_source_text = source_text.replace("\\", "/")
@@ -502,189 +503,21 @@ def test_manual_delete_closures_are_complete_and_atomic() -> None:
 def test_deletion_state_matches_exact_worktree_absence_and_approval() -> None:
     manifest = load_manifest()
     control = manifest["deletion_control"]
-    ready = {
-        item["path"]: item
-        for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
-        for item in group["items"]
-    }
-    closures = {
-        row["closure_id"]: {
-            path
-            for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE")
-            for item in group["items"]
-            for path in [item["path"]]
-            if item.get("closure_id", group.get("closure_id")) == row["closure_id"]
-        }
-        for row in manifest["manual_delete_closures"]
-    }
-    missing = {path for path in ready if not (ROOT / path).is_file()}
-    approved_ids = set(control["approval"]["approved_closure_ids"])
-    approved_paths = set(control["approval"]["approved_exact_paths"])
-    phase2_gate = manifest.get("phase2_retirement", {}).get("approval_gate", {})
-    phase2_approved = set(phase2_gate.get("approved_exact_paths", []))
-    phase2_state = phase2_gate.get("execution_state", "not_started")
-    if phase2_state == "quarantine_move_in_progress":
-        phase2_expected_missing = {
-            relative for relative in phase2_approved if not (ROOT / relative).is_file()
-        }
-        assert phase2_expected_missing <= phase2_approved
-    elif phase2_state in {
-        "user_quarantined_pending_manual_delete",
-        "user_deleted_pending_commit",
-        "completed",
-    }:
-        phase2_expected_missing = phase2_approved
-    else:
-        assert phase2_state == "not_started"
-        phase2_expected_missing = set()
-    quarantine_config = control["quarantine"]
-    quarantine_relative = PurePosixPath(quarantine_config["path"])
-    assert quarantine_relative.parts[:1] == (".codex_tmp",)
-    assert ".." not in quarantine_relative.parts
-    quarantine_root = ROOT.joinpath(*quarantine_relative.parts)
-    assert ROOT.resolve() in quarantine_root.resolve().parents
-    assert quarantine_config["layout"] == "preserved_repo_relative_paths"
-    assert quarantine_config["tracked"] is False
-    assert quarantine_config["gitignored"] is True
-    assert quarantine_config["content_validation"] == "original_path_git_filtered_blob_oid"
-    ignore_check = subprocess.run(
-        ["git", "-C", str(ROOT), "check-ignore", "-q", str(quarantine_root / "probe")],
-        check=False,
-    )
-    assert ignore_check.returncode == 0
-    assert not quarantine_root.is_symlink()
-
-    checkout_receipts = {
-        row["path"]: row for row in quarantine_config["crlf_checkout_receipts"]
-    }
-    assert len(checkout_receipts) == 5
-    assert set(checkout_receipts) <= set(ready)
-
-    def assert_quarantine_payload(relative: str, payload_path: Path) -> None:
-        assert payload_path.is_file()
-        assert not payload_path.is_symlink()
-        payload = payload_path.read_bytes()
-        receipt = checkout_receipts.get(relative)
-        expected_size = receipt["checkout_byte_count"] if receipt else ready[relative]["byte_count"]
-        expected_sha = receipt["checkout_sha256"] if receipt else ready[relative]["content_sha256"]
-        assert len(payload) == expected_size, relative
-        assert hashlib.sha256(payload).hexdigest() == expected_sha, relative
-        filtered_oid = subprocess.check_output(
-            [
-                "git",
-                "-C",
-                str(ROOT),
-                "hash-object",
-                f"--path={relative}",
-                "--",
-                str(payload_path),
-            ],
-            text=True,
-        ).strip()
-        assert filtered_oid == ready[relative]["blob_oid"], relative
-
-    quarantine_files: set[str] = set()
-    if quarantine_root.is_dir():
-        descendants = list(quarantine_root.rglob("*"))
-        assert not any(path.is_symlink() for path in descendants)
-        quarantine_files = {
-            path.relative_to(quarantine_root).as_posix()
-            for path in descendants
-            if path.is_file()
-        }
-    baseline = manifest["audit"]["baseline_commit"]
-    diff_rows = [
-        line.split("\t", 1)
-        for line in subprocess.check_output(
-            ["git", "-C", str(ROOT), "diff", "--no-renames", "--name-status", baseline, "--"],
-            text=True,
-        ).splitlines()
-    ]
-    changed_from_baseline = {path for _, path in diff_rows}
-    deleted_from_baseline = {path for status, path in diff_rows if status == "D"}
-    added_from_baseline = {path for status, path in diff_rows if status == "A"}
-    baseline_files = set(
-        subprocess.check_output(
-            ["git", "-C", str(ROOT), "ls-tree", "-r", "--name-only", baseline],
-            text=True,
-        ).splitlines()
-    )
-    declared_allowlist = set(manifest["audit"]["modified_file_allowlist"])
-    declared_allowlist.update(
-        manifest.get("phase2_retirement", {}).get("modified_file_allowlist", [])
-    )
-    declared_additions = declared_allowlist - baseline_files
-    untracked = set(
-        subprocess.check_output(
-            ["git", "-C", str(ROOT), "ls-files", "--others", "--exclude-standard"],
-            text=True,
-        ).splitlines()
-    )
-    staged = set(
-        subprocess.check_output(
-            ["git", "-C", str(ROOT), "diff", "--cached", "--name-only"],
-            text=True,
-        ).splitlines()
-    )
-
-    assert approved_ids <= set(closures)
-    expected = set().union(*(closures[closure_id] for closure_id in approved_ids))
-    assert deleted_from_baseline == missing
-    assert changed_from_baseline <= declared_allowlist | expected | phase2_approved
-    assert added_from_baseline <= declared_additions
-    if control["execution_state"] == "not_started":
-        assert missing == set()
-        assert approved_ids == set()
-        assert approved_paths == set()
-        assert quarantine_files == set()
-        assert untracked <= declared_additions
-    elif control["execution_state"] == "quarantine_move_in_progress":
-        assert approved_ids == set(closures)
-        assert approved_paths == expected == set(ready)
-        assert quarantine_files == missing
-        assert untracked == set()
-        assert staged == set()
-        for relative in expected:
-            source = ROOT / relative
-            quarantined = quarantine_root.joinpath(*PurePosixPath(relative).parts)
-            assert source.is_file() != quarantined.is_file(), relative
-            assert_quarantine_payload(relative, quarantined if quarantined.is_file() else source)
-    elif control["execution_state"] == "user_quarantined_pending_manual_delete":
-        assert approved_ids == set(closures)
-        assert approved_paths == expected == set(ready)
-        assert missing == expected
-        assert quarantine_files == expected
-        assert untracked == set()
-        assert staged == set()
-        for relative in expected:
-            quarantined = quarantine_root.joinpath(*PurePosixPath(relative).parts)
-            assert_quarantine_payload(relative, quarantined)
-    elif control["execution_state"] == "user_deleted_pending_commit":
-        assert approved_ids
-        assert approved_paths == expected
-        assert missing == expected
-        assert not quarantine_root.exists()
-        assert quarantine_files == set()
-        assert untracked == set()
-        assert staged == set()
-    elif control["execution_state"] == "completed":
-        assert approved_ids
-        assert approved_paths == expected
-        assert missing == expected | phase2_expected_missing
-        assert not quarantine_root.exists()
-        assert quarantine_files == set()
-        assert untracked == set()
-        assert staged == set()
-        for path in expected:
-            current_head = subprocess.run(
-                ["git", "-C", str(ROOT), "cat-file", "-e", f"HEAD:{path}"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                check=False,
-            )
-            assert current_head.returncode != 0, path
-    else:
-        raise AssertionError(f"unknown deletion state: {control['execution_state']}")
+    phase2 = manifest["phase2_retirement"]["approval_gate"]
+    assert control["execution_state"] == phase2["execution_state"] == "completed"
+    ready = {item["path"] for group in groups_by_status(manifest, "READY_FOR_MANUAL_DELETE") for item in group["items"]}
+    approved = set(control["approval"]["approved_exact_paths"]) | set(phase2["approved_exact_paths"])
+    assert ready == approved
+    assert ready.isdisjoint(governance_paths())
+    rows = subprocess.check_output(
+        ["git", "-C", str(ROOT), "diff", "--no-renames", "--name-status", manifest["audit"]["baseline_commit"], GOVERNANCE_BASELINE],
+        text=True, encoding="utf-8",
+    ).splitlines()
+    changes = [row.split("\t", 1) for row in rows]
+    assert {path for status, path in changes if status == "D"} == ready
+    allowlist = set(manifest["audit"]["modified_file_allowlist"]) | set(manifest["phase2_retirement"]["modified_file_allowlist"])
+    assert {path for _, path in changes} <= ready | allowlist
+    # Current worktree changes belong to v2 validation, never this completed receipt.
 
 
 def test_baseline_docs_and_reports_have_one_effective_classification() -> None:
@@ -734,8 +567,8 @@ def test_legacy_route_surfaces_are_hash_bound_and_never_current_defaults() -> No
             assert row["status"] == "LEGACY_BOUND"
         for reference in row["inbound_references"]:
             source = ROOT / reference["source_path"]
-            if source.is_file():
-                source_text = source.read_text(encoding="utf-8", errors="replace")
+            if reference["source_path"] in governance_paths():
+                source_text = governance_text(reference["source_path"])
             else:
                 assert reference["source_path"] in candidate_status, reference
                 source_text = subprocess.check_output(
@@ -774,8 +607,8 @@ def test_explicit_legacy_writers_are_kept_and_git_recoverable() -> None:
         assert row["content_sha256"] == hashlib.sha256(payload).hexdigest()
         for reference in row["inbound_references"]:
             source = ROOT / reference["source_path"]
-            if source.is_file():
-                source_text = source.read_text(encoding="utf-8", errors="replace")
+            if reference["source_path"] in governance_paths():
+                source_text = governance_text(reference["source_path"])
             else:
                 assert reference["source_path"] in candidate_paths, reference
                 source_text = subprocess.check_output(

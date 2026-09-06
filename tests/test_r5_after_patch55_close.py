@@ -5,6 +5,10 @@ import subprocess
 from pathlib import Path
 
 import yaml
+import pytest
+
+# Published historical results; current algorithms are covered in the default suite.
+pytestmark = pytest.mark.legacy_compatibility
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DECISION_SOURCE = "reports/p1_6/r5_after_patch55_decision.json"

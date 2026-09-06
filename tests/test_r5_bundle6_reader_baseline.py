@@ -4,6 +4,7 @@ import hashlib
 from pathlib import Path
 
 import yaml
+import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
@@ -22,6 +23,7 @@ def canonical_text_sha256(payload: bytes) -> str:
     return hashlib.sha256(normalized).hexdigest()
 
 
+@pytest.mark.legacy_compatibility
 def test_bundle6_baseline_freezes_current_bundle5_artifacts(historical_blob_bytes) -> None:
     baseline = historical_yaml(
         historical_blob_bytes, "R5_bundle6_reader_surface_baseline.yaml"
@@ -48,6 +50,7 @@ def test_canonical_text_hash_is_line_ending_independent(tmp_path: Path) -> None:
     assert canonical_text_sha256(crlf.read_bytes()) == expected
 
 
+@pytest.mark.legacy_compatibility
 def test_reader_surface_inventory_records_known_failures(historical_blob_bytes) -> None:
     baseline = historical_yaml(
         historical_blob_bytes, "R5_bundle6_reader_surface_baseline.yaml"
@@ -65,6 +68,7 @@ def test_reader_surface_inventory_records_known_failures(historical_blob_bytes) 
     assert surface["over_precise_numeric_count"] > 0
 
 
+@pytest.mark.legacy_compatibility
 def test_coverage_and_fixed_boundaries_are_preserved(historical_blob_bytes) -> None:
     baseline = historical_yaml(
         historical_blob_bytes, "R5_bundle6_reader_surface_baseline.yaml"

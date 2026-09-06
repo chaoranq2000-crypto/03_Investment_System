@@ -2,6 +2,10 @@ from __future__ import annotations
 
 import csv
 from pathlib import Path
+import pytest
+
+# Published historical results; current algorithms are covered in the default suite.
+pytestmark = pytest.mark.legacy_compatibility
 
 ROOT = Path(__file__).resolve().parents[1]
 HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"

@@ -58,12 +58,15 @@ def load_manifest() -> dict[str, Any]:
 
 def ready_items() -> dict[str, dict[str, Any]]:
     manifest = load_manifest()
-    return {
-        item["path"]: item
-        for group in manifest["candidate_groups"]
-        if group["status"] == "READY_FOR_MANUAL_DELETE"
-        for item in group["items"]
-    }
+    items = {path: {"path": path, "inbound_references": []} for path in manifest["retired_paths"]}
+    for row in manifest["allowed_retired_references"]:
+        for target in row["targets"]:
+            items[target]["inbound_references"].append({
+                "source_path": row["source_path"], "relation": row["relation"],
+            })
+    for candidate in manifest["manual_delete_candidates"]:
+        items[candidate["path"]] = candidate
+    return items
 
 
 def iter_active_text_files() -> list[Path]:
@@ -368,6 +371,19 @@ def test_dynamic_python_routes_are_declared_or_absent() -> None:
     assert unexpected == {}
 
 
+def test_manual_candidates_have_no_physical_python_consumer() -> None:
+    for candidate in load_manifest()["manual_delete_candidates"]:
+        for reference in candidate["inbound_references"]:
+            source = reference["source_path"]
+            if not source.endswith(".py") or reference["relation"] != "git_history_only":
+                continue
+            text = read(source)
+            assert "historical_blob_bytes" in text or "historical_blob_file" in text
+            assert not _python_dynamic_references(
+                source, text, {candidate["path"]: candidate["path"]}
+            ), (candidate["path"], source)
+
+
 def test_retired_route_tokens_have_no_active_default_or_physical_reader() -> None:
     manifest = load_manifest()
     tokens = {
@@ -502,23 +518,12 @@ def test_retired_routes_do_not_reenter_current_text_defaults() -> None:
         source for source in declared_surfaces if (ROOT / source).is_file()
     }
     approved_missing = set(declared_surfaces) - physical_declared
-    ready = {
-        item["path"]
-        for group in manifest["candidate_groups"]
-        if group["status"] == "READY_FOR_MANUAL_DELETE"
-        for item in group["items"]
+    ready = set(manifest["retired_paths"]) | {
+        row["path"] for row in manifest["manual_delete_candidates"]
     }
     assert unexpected == {}
     if approved_missing:
-        assert manifest["deletion_control"]["execution_state"] in {
-            "quarantine_move_in_progress",
-            "user_quarantined_pending_manual_delete",
-            "user_deleted_pending_commit",
-            "completed",
-        }
-        assert approved_missing <= set(
-            manifest["deletion_control"]["approval"]["approved_exact_paths"]
-        )
+        assert manifest["deletion_control"]["prior_approvals_apply_to_new_candidates"] is False
         assert approved_missing <= ready
     assert observed.get("old_002837_workflow", set()) == physical_declared
 
@@ -628,7 +633,12 @@ def test_ci_and_manual_workflow_do_not_invoke_retired_cleanup_tool() -> None:
     assert "manage_r5_v1_historical_cleanup.py" not in combined
     assert "v1_governance_integration_cleanup_v8/CONTRACT.md" not in combined
     assert "v1_governance_integration_cleanup_v11/CONTRACT.md" not in combined
-    assert "tests/test_r5_v1_replay_002837.py" in manual
+    workflow = yaml.safe_load(manual)
+    command = workflow["jobs"]["provenance-and-replay"]["steps"][-1]["run"].strip()
+    assert command == "python -m pytest -q -m legacy_compatibility"
+    assert "pytestmark = pytest.mark.legacy_compatibility" in read(
+        "tests/test_r5_v1_replay_002837.py"
+    )
     assert "workflow_dispatch" in manual
 
 

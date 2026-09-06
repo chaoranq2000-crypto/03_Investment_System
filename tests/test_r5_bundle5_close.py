@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW_ID = "wf_20260703_stock_first_002837_invic"
@@ -82,6 +83,7 @@ def accepted_dropzone_records(dropzone_root: Path) -> list[dict[str, Any]]:
     return records
 
 
+@pytest.mark.legacy_compatibility
 def test_manifest_declared_bundle5_artifacts_are_physical_and_boundaries_closed(
     historical_blob_bytes,
 ) -> None:
@@ -200,6 +202,7 @@ def test_registry_promotion_is_backup_protected_and_idempotent(
     assert set(idempotency["second_actions"].values()) == {"unchanged"}
 
 
+@pytest.mark.legacy_compatibility
 def test_core_pack_pilot_render_and_quality_gates_agree(
     historical_blob_bytes,
 ) -> None:
@@ -235,6 +238,7 @@ def test_core_pack_pilot_render_and_quality_gates_agree(
         assert artifact["p2_allowed"] is False
 
 
+@pytest.mark.legacy_compatibility
 def test_benchmark_is_nonpromoting_and_sample_content_is_not_evidence(
     historical_blob_bytes,
 ) -> None:
@@ -284,6 +288,7 @@ def test_real_draft_keeps_traceability_risk_counterevidence_and_source_gaps(
         assert token not in report
 
 
+@pytest.mark.legacy_compatibility
 def test_bundle5_truthfulness_and_canonical_index_are_complete(
     historical_blob_bytes,
 ) -> None:
@@ -310,6 +315,7 @@ def test_bundle5_truthfulness_and_canonical_index_are_complete(
     assert all(name in index_text for name in expected_readouts)
 
 
+@pytest.mark.legacy_compatibility
 def test_close_readout_preserves_target_mapping_and_hard_boundaries(
     historical_blob_bytes,
 ) -> None:
