@@ -1,6 +1,6 @@
 # Research 运行依赖瘦身记录
 
-状态：工程改造及全部验证完成；5 份旧配置已逐个移入待删文件夹并校验内容；4 个旧工作树目录已由用户删除，残留 Git 登记待清理。
+状态：第一轮工程瘦身及验证完成；5 份旧配置和 4 个旧工作树目录均已由用户删除。待删文件夹只余说明和清单，残留 Git 登记待清理；其余旧 R5 工具链尚未整体退役。
 
 ## 范围与基线
 
@@ -38,11 +38,11 @@
 
 测试耗时是同机、同一 Conda 环境的单次前后测量，缓存和机器负载会影响绝对耗时。
 
-## 已集中到待删文件夹的 5 份旧配置
+## 已由用户删除的 5 份旧配置
 
-按用户本次“将其它需要清理的零散文件放入一个文件夹”的要求，以下 5 份配置已从当前工作树逐个移入同一待删文件夹，保留原 `config/` 结构。移动前后的长度和 SHA-256 全部一致，合计 34,765 bytes。原路径均已不存在，待删文件夹中的原文件仍在，尚未计入释放空间。
+按用户“将其它需要清理的零散文件放入一个文件夹”的要求，以下 5 份配置先从当前工作树逐个移入同一待删文件夹，保留原 `config/` 结构，移动前后的长度和 SHA-256 全部一致，合计 34,765 bytes。用户随后反馈已删除；2026-09-06 现场核对原路径和待删副本均不存在，五文件清理完成。
 
-待删文件夹：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_research_runtime_20260906/`。用户可直接手动删除整个文件夹；内含 5 份旧配置，以及本次新建的说明和清单。
+待删文件夹：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_research_runtime_20260906/`。该文件夹目前只剩 `README.md` 与 `cleanup_manifest.json` 两份辅助文件，用户可一并手动删除。原配置内容已不存在。
 
 以下路径为移动前的原始相对路径；此次未移动旧主目录或其他工作树中的同名文件。
 
@@ -60,7 +60,7 @@ config/r5_patch_49_55_expected_artifacts.yaml
 
 移动后验证：Research smoke 的 8 个步骤全部通过；治理清单与相关历史配置回归 59 passed（143.71 秒）；5 个原路径缺失、待删内容哈希、Git 恢复字节与精确变更范围全部通过。当前清单为 59,229 Git LF bytes。本次只记录 5 个原路径移出和清单、日志两项更新；未修改验证器、测试或产品代码。
 
-待办：`manual_candidate_delete`；owner=user；severity=low；下一步为手动删除上述待删文件夹，之后核对物理删除结果并登记完成状态。
+完成项：`manual_candidate_delete`；actor=user；五份旧配置的物理删除已核验。canonical manifest 的候选条目继续保存就绪依据与恢复哈希，最新本地删除状态记录在上述移动收据中；它们不代表待删副本仍存在。
 
 ## 已完成工作树的本地清理
 
@@ -82,6 +82,16 @@ git -C 'C:/Projects/03_Investment_System' worktree prune --verbose
 ```
 
 待办：`completed_worktree_registration_cleanup`；owner=user；severity=low；实际目录已删除，下一步仅清理上述失效登记。项目 `AGENTS.md` 禁止自动删除目录，因此 Codex 没有执行实际 prune。当前主目录、Portfolio/Review 长期工作树和本轮工作树不在清理范围。
+
+## 后续旧 R5 依赖退役
+
+第一轮完成的是默认测试负担收缩、治理清单压缩和五份无当前消费者配置的移出。其余旧工具仍须继续核查，测试引用本身不是永久保留理由。
+
+- 当前共用契约继续保留：`docs/workflows/RESEARCH_WORKFLOW.md` 仍以 `schemas/r5_final_report_review.schema.json` 定义新运行的人审结构；当前 Research smoke 仍调用研究包、预测与估值校验器。文件名中的 R5 不代表功能已失效。
+- 优先核查 Bundle 5 的披露、市场同业、预测估值三类旧 onboarding 生成器：静态引用显示其专用测试仍直接加载当前物理脚本，retirement guard 也声明了旧路由的显式调用。这一组需要连同专用测试、模板和配置核对后退役，不能仅移动脚本。
+- `.agents/skills/stock-deep-dive/SKILL.md` 将 R5 研究包列为显式请求才启用的能力，普通个股流程不加载 Bundle generation 或旧报告状态。后续应区分只服务旧生成器的资产和仍被保留能力共用的资产。
+
+待办：`remaining_legacy_r5_dependency_retirement`；owner=codex；severity=medium；下一步为建立上述生成器的精确依赖组，将仍有价值的算法检查归入现行组件，保留共用校验器与原始研究证据，再形成下一批待删清单并验证当前研究结果不变。本次复核未移动或退役新的 R5 组件。
 
 ## 其他剩余事项
 
