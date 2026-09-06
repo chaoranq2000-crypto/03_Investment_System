@@ -179,7 +179,7 @@ status: accepted_baseline_only
 ## commands_run
 
 - `.\\.conda\\investment-system\\python.exe scripts\\check_r5_readout_truthfulness.py --rules config\\r5_readout_truthfulness_rules.yaml --glob 'reports/p1_6/R5_BUNDLE_5*READOUT.md' --strict`
-- `.\\.conda\\investment-system\\python.exe -m pytest -q tests\\test_r5_bundle5_close.py --tb=short -p no:cacheprovider`
+- Historical Bundle 5 close verification is recoverable from Git commit `bd57ff31ed57c141f306b8b95d3d102dd23040f7`; it is not a current-worktree command.
 - `.\\.conda\\investment-system\\python.exe -m pytest -q --tb=short -p no:cacheprovider`
 - `.\\.conda\\investment-system\\python.exe scripts\\build_r5_bundle6_reader_baseline.py --repo-root . --run-root "{run_display}" --truthfulness-result "{truthfulness_display}" --baseline-output "{baseline_display}" --readout-output "{readout_display}" --full-pytest-summary "510 passed, 2 skipped in 20.98s" --bundle5-close-summary "9 passed in 0.17s"`
 

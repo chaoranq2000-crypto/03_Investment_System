@@ -107,4 +107,18 @@ def test_v2_preserves_all_published_retirements_and_protected_evidence(manifest)
     assert set(manifest["retired_paths"]) == retired
     assert manifest["protected_paths"] == old["protected_paths"]
     assert manifest["protected_invariants"] == old["protected_invariants"]
-    assert manifest["retired_route_tokens"] == old["retired_route_tokens"]
+    old_routes = {row["id"]: row for row in old["retired_route_tokens"]}
+    current_routes = {row["id"]: row for row in manifest["retired_route_tokens"]}
+    assert current_routes.keys() == old_routes.keys()
+    registered_retirements = retired | {
+        row["path"] for row in manifest["manual_delete_candidates"]
+    }
+    for route_id, current in current_routes.items():
+        original = old_routes[route_id]
+        assert {key: value for key, value in current.items() if key != "allowed_readers"} == {
+            key: value for key, value in original.items() if key != "allowed_readers"
+        }
+        before = {(row["source_path"], row["relation"]) for row in original["allowed_readers"]}
+        after = {(row["source_path"], row["relation"]) for row in current["allowed_readers"]}
+        assert after <= before, "retirement cannot introduce a new legacy reader"
+        assert {path for path, _ in before - after} <= registered_retirements

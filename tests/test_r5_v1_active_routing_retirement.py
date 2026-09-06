@@ -530,14 +530,6 @@ def test_retired_routes_do_not_reenter_current_text_defaults() -> None:
 
 def test_legacy_gate_clis_require_explicit_rules_and_inputs() -> None:
     expectations = {
-        "scripts/build_r5_bundle5_forecast_valuation_onboarding.py": (
-            "--repo-root",
-            "--reviewed-at",
-        ),
-        "scripts/build_r5_bundle5_market_peer_onboarding.py": (
-            "--repo-root",
-            "--reviewed-at",
-        ),
         "scripts/validate_r5_bundle9r_generation_binding.py": (
             "--binding",
         ),

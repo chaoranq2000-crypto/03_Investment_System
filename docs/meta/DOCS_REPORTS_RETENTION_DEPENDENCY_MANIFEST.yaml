@@ -676,10 +676,6 @@ retired_paths:
 - scripts/manage_r5_v1_historical_cleanup.py
 - scripts/validate_r5_v1_root_policy_migration.py
 allowed_retired_references:
-- source_path: config/r5_bundle5_pilot_gate_rules.yaml
-  relation: historical_metadata_only
-  targets:
-  - reports/p1_6/r5_mvp_smoke_result.json
 - source_path: config/r5_readiness_gate_rules.yaml
   relation: historical_metadata_only
   targets:
@@ -799,55 +795,6 @@ allowed_retired_references:
   - reports/p1_6/r5_after_patch55_decision.json
   - reports/p1_6/r5_bundle4_readout_truthfulness_result.json
   - reports/p1_6/r5_bundle4_reviewed_input_smoke_result.json
-- source_path: tests/test_r5_bundle5_close.py
-  relation: git_history_only
-  targets:
-  - codex_tasks/r5_after_bundle4/APPLY_ORDER.md
-  - codex_tasks/r5_after_bundle4/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE5_TASK_PACKAGE_MANIFEST.yaml
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_0_STATUS_TRUTH_SYNC_AND_EXPECTED_ARTIFACTS.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_AND_PROVENANCE_MATRIX.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_AND_FINANCIAL_HISTORY_ONBOARDING.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_3_MARKET_AND_PEER_INPUT_ONBOARDING.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_4_FORECAST_AND_VALUATION_INPUT_ONBOARDING.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_AND_CORE_ASSET_REBUILD.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_AND_QUALITY_GATE.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_NO_ADVICE.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_8_CLOSE_READOUT_AND_NEXT_DECISION.md
-  - codex_tasks/r5_after_bundle4/README.md
-  - codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml
-  - reports/p1_6/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
-  - reports/p1_6/R5_AFTER_BUNDLE4_STATUS_BASELINE_READOUT.md
-  - reports/p1_6/R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_READOUT.md
-  - reports/p1_6/R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_FINANCIAL_READOUT.md
-  - reports/p1_6/R5_BUNDLE_5_3_MARKET_PEER_INPUT_READOUT.md
-  - reports/p1_6/R5_BUNDLE_5_4_FORECAST_VALUATION_INPUT_READOUT.md
-  - reports/p1_6/R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_READOUT.md
-  - reports/p1_6/R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_QUALITY_READOUT.md
-  - reports/p1_6/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_READOUT.md
-  - reports/p1_6/R5_BUNDLE_5_REAL_REVIEWED_INPUT_ONBOARDING_CLOSE_READOUT.md
-  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
-  - reports/p1_6/r5_bundle5_readout_truthfulness_result.json
-- source_path: tests/test_r5_bundle5_status_baseline.py
-  relation: git_history_only
-  targets:
-  - codex_tasks/r5_after_bundle4/APPLY_ORDER.md
-  - codex_tasks/r5_after_bundle4/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE5_TASK_PACKAGE_MANIFEST.yaml
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_0_STATUS_TRUTH_SYNC_AND_EXPECTED_ARTIFACTS.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_1_REAL_INPUT_INVENTORY_AND_PROVENANCE_MATRIX.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_2_OFFICIAL_DISCLOSURE_AND_FINANCIAL_HISTORY_ONBOARDING.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_3_MARKET_AND_PEER_INPUT_ONBOARDING.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_4_FORECAST_AND_VALUATION_INPUT_ONBOARDING.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_5_REAL_REGISTRY_PROMOTION_AND_CORE_ASSET_REBUILD.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_6_RESEARCH_DRAFT_RENDER_AND_QUALITY_GATE.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_7_BENCHMARK_COVERAGE_PRECHECK_NO_ADVICE.md
-  - codex_tasks/r5_after_bundle4/R5_BUNDLE_5_8_CLOSE_READOUT_AND_NEXT_DECISION.md
-  - codex_tasks/r5_after_bundle4/README.md
-  - codex_tasks/r5_after_bundle4/SAMPLE_REPORT_BENCHMARK_PROFILE.yaml
-  - reports/p1_6/R5_AFTER_BUNDLE4_COMPLETION_REVIEW.md
-  - reports/p1_6/R5_AFTER_BUNDLE4_STATUS_BASELINE_READOUT.md
-  - reports/p1_6/R5_READOUT_CANONICAL_INDEX.md
 - source_path: tests/test_r5_bundle6_close.py
   relation: git_history_only
   targets:
@@ -915,12 +862,6 @@ retired_route_tokens:
   - reports/workflow_runs/wf_20260703_stock_first_002837_invic/
   policy: no default route; explicit legacy writers or immutable Git fixtures only
   allowed_readers:
-  - source_path: scripts/build_r5_bundle5_forecast_valuation_onboarding.py
-    relation: explicit_legacy_writer
-  - source_path: scripts/build_r5_bundle5_market_peer_onboarding.py
-    relation: explicit_legacy_writer
-  - source_path: scripts/build_r5_bundle5_official_disclosure_onboarding.py
-    relation: explicit_scoped_legacy_writer
   - source_path: scripts/run_r5_v1_replay_002837.py
     relation: immutable_git_snapshot_replay
   - source_path: scripts/validate_r5_bundle8b_close.py
@@ -944,10 +885,6 @@ retired_route_tokens:
   - source_path: tests/test_r5_bundle13r_evidence_backflow.py
     relation: immutable_git_fixture_or_temp_only
   - source_path: tests/test_r5_bundle4_post_promotion_dry_run.py
-    relation: immutable_git_fixture_or_temp_only
-  - source_path: tests/test_r5_bundle5_real_input_inventory.py
-    relation: immutable_git_fixture_or_temp_only
-  - source_path: tests/test_r5_bundle5_real_registry_promotion.py
     relation: immutable_git_fixture_or_temp_only
   - source_path: tests/test_r5_bundle9_close.py
     relation: immutable_git_fixture_or_temp_only
@@ -1040,10 +977,6 @@ manual_delete_candidates:
   inbound_references:
   - source_path: config/r5_bundle5_expected_artifacts.yaml
     relation: self_reference
-  - source_path: tests/test_r5_bundle5_close.py
-    relation: git_history_only
-  - source_path: tests/test_r5_bundle5_status_baseline.py
-    relation: git_history_only
   - source_path: tests/test_r5_v1_historical_cleanup_manifest.py
     relation: retirement_assertion_only
   - source_path: docs/logs/2026-09-06_research_runtime_slimming.md
@@ -1075,4 +1008,174 @@ manual_delete_candidates:
   - source_path: tests/test_r5_v1_historical_cleanup_manifest.py
     relation: retirement_assertion_only
   - source_path: docs/logs/2026-09-06_research_runtime_slimming.md
+    relation: historical_cross_reference
+- path: config/r5_bundle5_pilot_gate_rules.yaml
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: cc9794210948bfc6ba3c148d0dd31253a067396d
+  git_blob_bytes: 1180
+  content_sha256: 95e42012af31c0eb912b19deda34d79316a691a594291d4fec3d21d3e3ba9815
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle5_benchmark_coverage_precheck.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 51e3622c09c0faabb95c42dc515e62cd1b534b8f
+  git_blob_bytes: 16070
+  content_sha256: 7b25df7b29445f14da4a85695efcee35189754a979d432432be10228f81aa48b
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle5_forecast_valuation_onboarding.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 0d89b58bab058b6e003f590cef5f4ebafb64e133
+  git_blob_bytes: 29919
+  content_sha256: ac774be54a79b6d2b2cc553a3052ca257050c4c7c7576496748c9e18afb375e8
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle5_market_peer_onboarding.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 35288cc387ad81152d371fde68dbd062bb7b4e2d
+  git_blob_bytes: 25516
+  content_sha256: 9c10aaec59b0c9df6feedb2c213f1769d0df1df54dbf00fb90852d025a21882c
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle5_official_disclosure_onboarding.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 1a73d33b59b9f769bb0d00229872cbb22195cf8f
+  git_blob_bytes: 26302
+  content_sha256: 738f1f397aeb37c7cf154cea8c60e92c8293497aaa457162ad230a0e34dd645d
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: scripts/build_r5_bundle5_real_input_inventory.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 63def19f0e1537c1e5223763df30180cd6446f67
+  git_blob_bytes: 20579
+  content_sha256: 7d3deea2901fae83b46f33fc8aa67cb130331d96a4bd2ca8294e5545513fa643
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: scripts/run_r5_bundle5_real_registry_promotion.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 3333ba125c100c64b08214c1ef70b8428499d025
+  git_blob_bytes: 15567
+  content_sha256: 6c1144534b40557276ba550b6d630299d417dadcfa8d43bce56bdc71701f6be0
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: scripts/run_r5_bundle5_research_draft_quality_gate.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 545b757adedead8646fd989baefba35c22713e8e
+  git_blob_bytes: 51169
+  content_sha256: 7e9dcb3bd9fcba9ad292e124b957f66df3fc84d3cbb3e98a836d7cee8a32ee26
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle5_benchmark_coverage_precheck.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 3757b42fb8b08cc12a10ddf7396bc76a550f2df2
+  git_blob_bytes: 9471
+  content_sha256: 7e61a94a0cc529f15b4837e01d8e9be8cb4932d44968eedbf57d6601f67618fa
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle5_close.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 9a4e3f93777255b8a05ebeec2ae95e4f9662efb5
+  git_blob_bytes: 12790
+  content_sha256: a1bb8c1e18fe31df3e2ef8ad6750cccdc444fa62330d5db91b73757107763bf1
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle5_forecast_valuation_onboarding.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 18ef76ea4fb0c5593181ef3c8d546acfc1762f02
+  git_blob_bytes: 5592
+  content_sha256: 57799189eecc88902239a8ebae3f99c906bfd18ccd8449a819acf847dd748d40
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle5_market_peer_onboarding.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: a80c6d2e3165cb105868154a471626929e779fe3
+  git_blob_bytes: 5909
+  content_sha256: cf23d2a7baad64c262facb0e444fe90091910156190fa020014776cd1ed2117d
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle5_official_disclosure_onboarding.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: b633230ba7f97c438d3d341c900a46259be6e8e5
+  git_blob_bytes: 4317
+  content_sha256: 8c3ba7bf0442d87baa81401470afa42e33a63cda5cfa9b905e388c173b28fefe
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle5_real_input_inventory.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 196626861c1ab3981ea11a7d0d66a76991071a3e
+  git_blob_bytes: 14756
+  content_sha256: 3952743bbb408910de0afdb3fd99798f8f34b0ee178cd573b8e63e87671c877f
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle5_real_pilot_gate.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 2b26594a607d97bcc033b2f9bef5f681d6ba5eb7
+  git_blob_bytes: 9721
+  content_sha256: c63665a02b1495d8bf1c34d6feea6295ba9a87a201e979bcd295a9348debfeca
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle5_real_registry_promotion.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: 20b6724e8a531b84e71cc7ca28f5bff87f8b85b4
+  git_blob_bytes: 7167
+  content_sha256: 80120529a36db03885416b9a8edcf86166b0f02c037370da2fed43e73d174da5
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle5_status_baseline.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Dedicated Bundle 5 generator, rule or test retired as one dependency group; retained evidence checks are independent.
+  recovery_commit: bd57ff31ed57c141f306b8b95d3d102dd23040f7
+  blob_oid: e3c7e3734e83bd676b7743c7d89098c6f1c1b8c2
+  git_blob_bytes: 4922
+  content_sha256: a78b274b310e9d8c5d998a52c8e1a670a4f11a60f83a88ae522ec0eeaf1b2c54
+  inbound_references:
+  - source_path: docs/logs/2026-09-06_legacy_bundle5_retirement.md
     relation: historical_cross_reference
