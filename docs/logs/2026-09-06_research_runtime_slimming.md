@@ -1,6 +1,6 @@
 # Research 运行依赖瘦身记录
 
-状态：工程改造及全部验证完成；文件和工作树的物理删除待用户执行。
+状态：工程改造及全部验证完成；5 份旧配置已逐个移入待删文件夹并校验内容；4 个旧工作树目录已由用户删除，残留 Git 登记待清理。
 
 ## 范围与基线
 
@@ -19,9 +19,9 @@
 4. 两轮历史清理的完整 v1 收据固定在上述基线提交；历史检查从 Git 读取并校验，不再把过去的修改范围当作当前工作区限制。
 5. Research smoke 从 current-run pointer 读取所有当前 state，临时源路由证明写入 `.codex_tmp/`，不覆盖 tracked 质量快照。
 
-按 Git LF 字节计算，治理清单从 749,985 bytes 缩减至 64,091 bytes，下降 91.45%。原来被隔离的 89 项检查在基线中合计耗时约 170.19 秒。
+首次工程提交 `0ce7806` 中，按 Git LF 字节计算，治理清单从 749,985 bytes 缩减至 64,091 bytes，下降 91.45%。原来被隔离的 89 项检查在基线中合计耗时约 170.19 秒。
 
-## 验证证据
+## 工程改造验证证据（移动旧配置前）
 
 详细命令输出、JUnit XML、调用/文件读写轨迹位于本工作树的 `.codex_tmp/runtime_slimming_20260906/`，不提交生成日志。
 
@@ -38,11 +38,13 @@
 
 测试耗时是同机、同一 Conda 环境的单次前后测量，缓存和机器负载会影响绝对耗时。
 
-## 待用户手动删除的 5 个文件
+## 已集中到待删文件夹的 5 份旧配置
 
-以下文件只剩历史 Git fixture 或历史文字引用，没有当前 Python 物理消费者。精确路径、原 blob、SHA-256 和恢复提交保留在 canonical manifest 的 `manual_delete_candidates`，共 34,765 Git bytes。当前尚未删除，不能计入已释放空间。
+按用户本次“将其它需要清理的零散文件放入一个文件夹”的要求，以下 5 份配置已从当前工作树逐个移入同一待删文件夹，保留原 `config/` 结构。移动前后的长度和 SHA-256 全部一致，合计 34,765 bytes。原路径均已不存在，待删文件夹中的原文件仍在，尚未计入释放空间。
 
-路径均相对于本轮工作树，不能在旧的主目录或其他工作树中执行这批清理。
+待删文件夹：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_research_runtime_20260906/`。用户可直接手动删除整个文件夹；内含 5 份旧配置，以及本次新建的说明和清单。
+
+以下路径为移动前的原始相对路径；此次未移动旧主目录或其他工作树中的同名文件。
 
 ```text
 config/r5_bundle3_expected_artifacts.yaml
@@ -52,7 +54,13 @@ config/r5_patch_1_12_expected_artifacts.yaml
 config/r5_patch_49_55_expected_artifacts.yaml
 ```
 
-待办：`manual_candidate_delete`；owner=user；severity=low；下一步为手动删除后由 Codex 复核文件缺失、引用和测试，并登记完成状态。
+精确路径、原 blob、SHA-256 和恢复提交仍保留在 canonical manifest 的 `manual_delete_candidates`；恢复提交为 `457c7ee0ed3db7565320709f0b8b2cdeedf05aff`。本地移动收据另外保存在 `.codex_tmp/runtime_slimming_20260906/quarantine_receipt.json`，删除待删文件夹不会删除这份收据。
+
+同步移除 canonical manifest 中以这 5 份配置为来源的 5 条现存引用记录（共 64 条历史引用关系），保留全部退役登记、保护规则、待删候选和恢复信息。首次移动后检查发现这些来源已经缺失，修正的是清单内容，未放宽验证器。
+
+移动后验证：Research smoke 的 8 个步骤全部通过；治理清单与相关历史配置回归 59 passed（143.71 秒）；5 个原路径缺失、待删内容哈希、Git 恢复字节与精确变更范围全部通过。当前清单为 59,229 Git LF bytes。本次只记录 5 个原路径移出和清单、日志两项更新；未修改验证器、测试或产品代码。
+
+待办：`manual_candidate_delete`；owner=user；severity=low；下一步为手动删除上述待删文件夹，之后核对物理删除结果并登记完成状态。
 
 ## 已完成工作树的本地清理
 
@@ -65,18 +73,15 @@ config/r5_patch_49_55_expected_artifacts.yaml
 | `C:/Users/Q/.codex/worktrees/bc43/03_Investment_System` | 119,289,275 bytes |
 | `C:/Users/Q/.codex/worktrees/df8c/03_Investment_System` | 104,098,313 bytes |
 
-合计约 425.63 MiB，实际释放量受文件系统分配影响。未跟踪的临时测试产物不由 Git 恢复；如需保留它们，应先自行保留。
+以上为删除前文件逻辑大小，合计约 425.63 MiB，不能直接等同于实际磁盘释放量。2026-09-06 用户反馈已删除；本次现场核对四个目录均已不存在，长期工作树和本轮工作树仍在。
 
-用户可在确认目录后逐个手动运行以下命令；它们保留 Git 分支。本任务未执行这些目录删除命令。
+Git 中仍有这四个已失效的 worktree 登记。只读预演 `git worktree prune --dry-run --verbose` 确认待清理的仅为这四条；分支仍保留。用户可手动执行以下命令清理登记元数据：
 
 ```powershell
-git worktree remove 'C:/Users/Q/.codex/worktrees/5646/03_Investment_System'
-git worktree remove 'C:/Users/Q/.codex/worktrees/8632/03_Investment_System'
-git worktree remove 'C:/Users/Q/.codex/worktrees/bc43/03_Investment_System'
-git worktree remove 'C:/Users/Q/.codex/worktrees/df8c/03_Investment_System'
+git -C 'C:/Projects/03_Investment_System' worktree prune --verbose
 ```
 
-待办：`completed_worktree_cleanup`；owner=user；severity=low；下一步为手动移除后核对 worktree 注册信息和实际磁盘占用。当前主目录、Portfolio/Review 长期工作树和本轮工作树不在此范围。
+待办：`completed_worktree_registration_cleanup`；owner=user；severity=low；实际目录已删除，下一步仅清理上述失效登记。项目 `AGENTS.md` 禁止自动删除目录，因此 Codex 没有执行实际 prune。当前主目录、Portfolio/Review 长期工作树和本轮工作树不在清理范围。
 
 ## 其他剩余事项
 
