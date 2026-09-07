@@ -164,6 +164,124 @@ def _token_hits(values: Iterable[str], tokens: Mapping[str, str]) -> set[str]:
     return {target for token, target in tokens.items() if token in rendered}
 
 
+def _actual_git_commands(node: ast.AST, forwarders: Iterable[str] = ()) -> set[str]:
+    commands = set()
+    for call in ast.walk(node):
+        if not isinstance(call, ast.Call) or not call.args:
+            continue
+        if isinstance(call.func, ast.Name) and call.func.id in forwarders:
+            commands.update(x.value for x in call.args if isinstance(x, ast.Constant))
+            continue
+        if ast.unparse(call.func) not in {"subprocess.check_output", "subprocess.run"}:
+            continue
+        argument = call.args[0]
+        if isinstance(argument, (ast.List, ast.Tuple)) and argument.elts:
+            if isinstance(argument.elts[0], ast.Constant) and argument.elts[0].value == "git":
+                commands.update(x.value for x in argument.elts if isinstance(x, ast.Constant))
+    return commands
+
+
+def _verified_history_delegate(source: str, helper: str) -> bool:
+    """Recognize only the explicit blocker-map reader contract and its real helper."""
+    tree, helper_tree = ast.parse(source), ast.parse(helper)
+    imports = [node for node in tree.body if isinstance(node, ast.ImportFrom)
+               and node.module == "conftest"
+               and any(alias.name == "GIT_HISTORY" and alias.asname is None for alias in node.names)]
+    if len(imports) != 1 or any(isinstance(node, ast.Name) and node.id == "GIT_HISTORY"
+                              and isinstance(node.ctx, ast.Store) for node in ast.walk(tree)):
+        return False
+    constants = {node.targets[0].id: node.value for node in tree.body
+                 if isinstance(node, ast.Assign) and len(node.targets) == 1
+                 and isinstance(node.targets[0], ast.Name)}
+    baseline = constants.get("HISTORICAL_BASELINE")
+    if not isinstance(baseline, ast.Constant) or not re.fullmatch(r"[0-9a-f]{40}", str(baseline.value)):
+        return False
+    try:
+        triplets = ast.literal_eval(constants.get("EXPECTED_BASELINE_BLOB_TRIPLETS"))
+    except (ValueError, TypeError):
+        return False
+    if not isinstance(triplets, dict) or not triplets or any(
+        not isinstance(row, tuple) or len(row) != 3
+        or not re.fullmatch(r"[0-9a-f]{40}", str(row[0]))
+        or not isinstance(row[1], int) or row[1] < 0
+        or not re.fullmatch(r"[0-9a-f]{64}", str(row[2])) for row in triplets.values()
+    ):
+        return False
+    wrappers = [node for node in tree.body if isinstance(node, ast.FunctionDef)
+                and node.name == "git_blob_bytes"]
+    classes = [node for node in helper_tree.body if isinstance(node, ast.ClassDef)
+               and node.name == "HistoricalGit"]
+    if len(wrappers) != 1 or len(classes) != 1:
+        return False
+    wrapper = wrappers[0]
+    required = ast.parse('''
+assert revision == HISTORICAL_BASELINE
+expected_oid, expected_bytes, expected_sha256 = EXPECTED_BASELINE_BLOB_TRIPLETS[relative_path]
+blob = GIT_HISTORY.blob(revision, relative_path)
+observed_oid = blob.oid
+assert observed_oid == expected_oid, relative_path
+object_type = blob.object_type
+assert object_type == "blob", relative_path
+observed_bytes = blob.byte_count
+assert observed_bytes == expected_bytes, relative_path
+payload = blob.payload
+assert len(payload) == expected_bytes, relative_path
+assert hashlib.sha256(payload).hexdigest() == expected_sha256, relative_path
+return payload
+''').body
+    observed = [ast.dump(node) for node in wrapper.body]
+    if not all(ast.dump(node) in observed for node in required):
+        return False
+    if sum(isinstance(node, ast.Return) for node in ast.walk(wrapper)) != 1 or not isinstance(wrapper.body[-1], ast.Return):
+        return False
+    permitted_calls = {"GIT_HISTORY.blob", "prefetch_baseline_blobs", "len",
+                       "hashlib.sha256", "hashlib.sha256(payload).hexdigest"}
+    if any(not isinstance(node, (ast.Assign, ast.Assert, ast.Expr, ast.Return)) for node in wrapper.body):
+        return False
+    if any(ast.unparse(node.func) not in permitted_calls for node in ast.walk(wrapper)
+           if isinstance(node, ast.Call)):
+        return False
+    # Do not allow later assignments to replace a checked value before it is returned.
+    assignments = [ast.dump(target) for node in wrapper.body if isinstance(node, ast.Assign)
+                   for target in node.targets]
+    if len(assignments) != len(set(assignments)):
+        return False
+    methods = {node.name: node for node in classes[0].body if isinstance(node, ast.FunctionDef)}
+    if not {"_commit", "_path", "blobs", "blob"} <= methods.keys():
+        return False
+    if any(isinstance(node, ast.Call) and (
+               isinstance(node.func, ast.Name) and node.func.id == "open"
+               or isinstance(node.func, ast.Attribute)
+               and node.func.attr in {"open", "read_bytes", "read_text", "write_bytes", "write_text"})
+           for node in ast.walk(classes[0])):
+        return False
+    if "rev-parse" not in _actual_git_commands(methods["_commit"]) or not {
+        "cat-file", "--batch"
+    } <= _actual_git_commands(methods["blobs"]):
+        return False
+    helper_checks = {
+        "_commit": ["re.fullmatch(r'[0-9a-f]{40}', commit)", "resolved == commit"],
+        "blobs": ["len(header) == 3 and header[1] == b'blob'",
+                  "len(payload) == size and stream.read(1) == b'\\n'",
+                  "oid == header[0].decode('ascii')"],
+    }
+    for name, checks in helper_checks.items():
+        assertions = {ast.dump(node.test) for node in ast.walk(methods[name]) if isinstance(node, ast.Assert)}
+        if not all(ast.dump(ast.parse(check, mode="eval").body) in assertions for check in checks):
+            return False
+    helper_calls = {ast.unparse(node.func) for node in ast.walk(methods["blobs"])
+                    if isinstance(node, ast.Call)}
+    if not {"self._commit", "self._path", "hashlib.sha1", "hashlib.sha256"} <= helper_calls:
+        return False
+    binding = ast.parse("GIT_HISTORY = HistoricalGit(Path(__file__).resolve().parents[1])").body[0]
+    forwarding = ast.parse("return self.blobs(commit, [source_path])[source_path]").body[0]
+    return (any(ast.dump(node) == ast.dump(binding) for node in helper_tree.body)
+            and sum(isinstance(node, ast.Name) and node.id == "GIT_HISTORY"
+                    and isinstance(node.ctx, ast.Store) for node in ast.walk(helper_tree)) == 1
+            and len(methods["blob"].body) == 1
+            and ast.dump(methods["blob"].body[0]) == ast.dump(forwarding))
+
+
 def _python_dynamic_references(
     source_path: str,
     text: str,
@@ -225,13 +343,23 @@ def _python_dynamic_references(
         for node in ast.walk(tree)
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
     }
+    git_forwarders = {
+        name for name, function in function_nodes.items()
+        if function.args.vararg and len(function.body) == 1
+        and isinstance(function.body[0], ast.Return)
+        and "git" in _actual_git_commands(function)
+        and any(isinstance(node, ast.Starred) and isinstance(node.value, ast.Name)
+                and node.value.id == function.args.vararg.arg for node in ast.walk(function))
+    }
     immutable_git_readers = {
         name
         for name, function in function_nodes.items()
-        if "cat-file" in (ast.get_source_segment(text, function) or "")
-        and "rev-parse" in (ast.get_source_segment(text, function) or "")
-        and "assert" in (ast.get_source_segment(text, function) or "")
+        if {"cat-file", "rev-parse"} <= _actual_git_commands(function, git_forwarders)
+        and any(isinstance(node, ast.Assert) for node in ast.walk(function))
     }
+    delegated_reader = source_path == "tests/test_r5_v1_blocker_root_cause_map.py"
+    if delegated_reader and _verified_history_delegate(text, read("tests/conftest.py")):
+        immutable_git_readers.add("git_blob_bytes")
 
     def enclosing_function(node: ast.AST) -> str | None:
         current = parents.get(node)
@@ -279,7 +407,7 @@ def _python_dynamic_references(
             continue
         if name == "add_argument" and any(keyword.arg == "default" for keyword in node.keywords):
             hits.update(matched)
-        elif name in physical:
+        elif name in physical or (delegated_reader and name == "git_blob_bytes"):
             hits.update(matched)
         elif indirect.search(name) and not explicit_paths:
             hits.update(matched)
@@ -459,14 +587,14 @@ def test_declared_retired_route_readers_are_git_or_temp_bound() -> None:
                 "immutable_git_snapshot_validation",
                 "immutable_git_fixture_source",
             }:
-                assert "cat-file" in source, reader
-                assert "rev-parse" in source, reader
-                assert "sha256" in source or "hashlib.sha1" in source, reader
-                assert (
-                    "assert" in source
-                    or "raise ReplayContractError" in source
-                    or "raise ValueError" in source
-                ), reader
+                if reader["source_path"] == "tests/test_r5_v1_blocker_root_cause_map.py":
+                    assert _verified_history_delegate(source, read("tests/conftest.py")), reader
+                else:
+                    tree = ast.parse(source)
+                    assert {"cat-file", "rev-parse"} <= _actual_git_commands(tree), reader
+                    assert any(isinstance(node, ast.Call) and ast.unparse(node.func)
+                               in {"hashlib.sha256", "hashlib.sha1"} for node in ast.walk(tree)), reader
+                    assert any(isinstance(node, (ast.Assert, ast.Raise)) for node in ast.walk(tree)), reader
             elif relation == "immutable_git_fixture_or_temp_only":
                 assert (
                     "historical_blob_bytes" in source
@@ -554,60 +682,6 @@ def test_retired_routes_do_not_reenter_current_text_defaults() -> None:
     assert observed.get("old_002837_workflow", set()) == physical_declared
 
 
-def test_legacy_gate_clis_require_explicit_rules_and_inputs() -> None:
-    expectations = {
-        "scripts/r5_next_pilot_gate.py": (
-            "--rules",
-            "--readiness",
-            "--market-peer-input-registry",
-            "--forecast-assumption-registry",
-            "--evidence-request-review-ledger",
-        ),
-        "scripts/r5_pack_promotion_gate.py": (
-            "--rules",
-            "--pack",
-            "--dry-run",
-        ),
-        "scripts/r5_readiness_gate.py": (
-            "--rules",
-            "--smoke-result",
-            "--inventory-status",
-            "--format-guard",
-            "--source-gapped-pack",
-            "--source-gap-report",
-            "--evidence-plan",
-            "--valuation-handoff-example",
-        ),
-        "scripts/r5_reviewed_input_pilot_gate.py": (
-            "--rules",
-            "--strict-smoke-result",
-            "--source-gapped-pack",
-            "--reviewed-input-dry-run-result",
-            "--quality-scorecard-v2",
-            "--promotion-rules",
-        ),
-    }
-    forbidden_defaults = {
-        "config/r5_bundle9r_generation_binding.yaml",
-        "config/r5_next_pilot_gate_rules.yaml",
-        "config/r5_pack_promotion_rules.yaml",
-        "config/r5_readiness_gate_rules.yaml",
-        "config/r5_reviewed_input_pilot_gate_rules.yaml",
-    }
-
-    for source_path, flags in expectations.items():
-        source = read(source_path)
-        for flag in flags:
-            argument = re.search(
-                rf"add_argument\(\s*['\"]{re.escape(flag)}['\"](?P<body>.*?)\)",
-                source,
-                re.DOTALL,
-            )
-            assert argument is not None, (source_path, flag)
-            assert "required=True" in argument.group("body"), (source_path, flag)
-        assert forbidden_defaults.isdisjoint(set(re.findall(r"config/r5_[a-z0-9_]+\.yaml", source)))
-
-
 def test_dynamic_scanner_distinguishes_tmp_git_and_active_routes() -> None:
     candidate = "reports/workflow_runs/example_retired_run/input.yaml"
     tokens = {candidate: candidate}
@@ -624,6 +698,60 @@ def test_dynamic_scanner_distinguishes_tmp_git_and_active_routes() -> None:
     assert _python_dynamic_references("indirect.py", indirect, tokens) == {candidate}
     assert _python_dynamic_references("writer.py", active_write, tokens) == {candidate}
     assert _python_dynamic_references("git_fixture.py", git_reader, tokens) == set()
+
+
+def test_history_delegate_rejects_spoofed_or_weakened_wrapper_contracts() -> None:
+    source = read("tests/test_r5_v1_blocker_root_cause_map.py")
+    helper = read("tests/conftest.py")
+    assert _verified_history_delegate(source, helper)
+    changes = (
+        ("from conftest import GIT_HISTORY", "from elsewhere import GIT_HISTORY"),
+        ("GIT_HISTORY.blob(revision, relative_path)", "other.blob(revision, relative_path)"),
+        ('HISTORICAL_BASELINE = "a96c1b717bf15905d72fd142efd946fa01bce666"',
+         'HISTORICAL_BASELINE = "HEAD"'),
+        ("assert observed_oid == expected_oid, relative_path", "assert observed_oid"),
+        ("assert object_type == \"blob\", relative_path", "assert object_type"),
+        ("assert len(payload) == expected_bytes, relative_path", "assert payload"),
+        ("assert hashlib.sha256(payload).hexdigest() == expected_sha256, relative_path", "assert payload"),
+        ("return payload", "return (ROOT / relative_path).read_bytes()"),
+    )
+    for old, new in changes:
+        assert old in source
+        assert not _verified_history_delegate(source.replace(old, new, 1), helper), old
+    assert not _verified_history_delegate(source + "\nGIT_HISTORY = object()\n", helper)
+
+
+def test_history_delegate_requires_helper_commands_and_integrity_checks() -> None:
+    source = read("tests/test_r5_v1_blocker_root_cause_map.py")
+    helper = read("tests/conftest.py")
+    changes = (
+        ('"rev-parse"', '"not-rev-parse"'),
+        ('"cat-file"', '"not-cat-file"'),
+        ('assert oid == header[0].decode("ascii")', 'assert oid'),
+        ('assert len(payload) == size and stream.read(1) == b"\\n"', 'assert payload'),
+        ("hashlib.sha1(", "hashlib.md5("),
+        ("self._commit(commit)", "self.other(commit)"),
+        ("paths = list(dict.fromkeys(source_paths))",
+         "paths = list(dict.fromkeys(source_paths))\n        self.root.read_bytes()"),
+        ("payload = stream.read(size)",
+         "payload = open(self.root / path, 'rb').read()"),
+    )
+    for old, new in changes:
+        assert old in helper
+        assert not _verified_history_delegate(source, helper.replace(old, new, 1)), old
+    assert not _verified_history_delegate(source, helper + "\nGIT_HISTORY = object()\n")
+
+
+def test_dynamic_scanner_checks_delegate_and_ignores_comment_only_git_evidence() -> None:
+    candidate = "reports/workflow_runs/example_retired_run/input.yaml"
+    tokens = {candidate: candidate}
+    path = "tests/test_r5_v1_blocker_root_cause_map.py"
+    source = read(path) + f"\ngit_blob_bytes(HISTORICAL_BASELINE, {candidate!r})\n"
+    assert _python_dynamic_references(path, source, tokens) == set()
+    spoofed = source.replace("from conftest import GIT_HISTORY", "from elsewhere import GIT_HISTORY")
+    assert _python_dynamic_references(path, spoofed, tokens) == {candidate}
+    comment_only = f'''\nfrom pathlib import Path\ndef historical_blob():\n    """cat-file rev-parse assert"""\n    return Path({candidate!r}).read_bytes()\nhistorical_blob()\n'''
+    assert _python_dynamic_references("spoofed_reader.py", comment_only, tokens) == {candidate}
 
 
 def test_current_pointer_has_no_legacy_selection_surface() -> None:
@@ -693,7 +821,7 @@ def test_retained_bundle_evaluators_are_explicit_and_noncanonical() -> None:
     sources = "\n".join(
         read(path)
         for path in (
-            "src/research/r5_bundle11r_runtime.py",
+            "scripts/run_r5_bundle11r_runtime.py",
             "src/research/r5_bundle12r_operating_evidence.py",
             "src/research/r5_bundle13r_evidence_backflow.py",
         )
@@ -712,12 +840,23 @@ def test_retained_bundle_evaluators_are_explicit_and_noncanonical() -> None:
 
 def test_standard_ci_keeps_full_history_and_drops_retired_routes() -> None:
     ci = read(".github/workflows/ci.yml")
-    runtime = read(".github/workflows/r5_bundle11r_runtime.yml")
+    workflow = yaml.safe_load(ci)
+    commands = [step.get("run", "").strip() for step in workflow["jobs"]["tests"]["steps"]]
 
     assert "fetch-depth: 0" in ci
     assert "tests/test_r5_night_shift_" not in ci
     assert "reports/p1_6/r5_night_shift/" not in ci
     assert "reports/p1_6/r5_bundle17r" not in ci
-    assert "test_r5_bundle11r_runtime_integration.py" not in runtime
-    assert "scripts/audit_r5_bundle11r_target.py" not in runtime
-    assert "scripts/integrate_r5_bundle11r_workflow.py" not in runtime
+    assert "python -m pytest -q" in commands
+    assert "python -m py_compile $(git ls-files '*.py')" in commands
+    for path in (
+        "tests/test_r5_bundle11r_runtime_contracts.py",
+        "tests/test_r5_bundle11r_runtime_engine.py",
+        "tests/test_r5_bundle11r_runtime_semantic.py",
+    ):
+        source = read(path)
+        assert "def test_" in source
+        assert "legacy_compatibility" not in source
+    assert "test_runtime_cli_matches_engine_output_and_exit_code" in read(
+        "tests/test_r5_bundle11r_runtime_engine.py"
+    )

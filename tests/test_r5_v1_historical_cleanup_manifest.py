@@ -9,7 +9,10 @@ from typing import Any
 
 import yaml
 
-from conftest import GOVERNANCE_BASELINE, GOVERNANCE_MANIFEST, governance_paths, governance_snapshot, governance_text
+from conftest import (
+    GIT_HISTORY, GOVERNANCE_BASELINE, GOVERNANCE_MANIFEST, governance_paths,
+    governance_snapshot, governance_text, governance_text_index, prefetch_governance_recovery,
+)
 import pytest
 
 # Published historical results; current algorithms are covered in the default suite.
@@ -21,6 +24,7 @@ MANIFEST_PATH = ROOT / "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yam
 
 
 def load_manifest() -> dict[str, Any]:
+    prefetch_governance_recovery()
     return governance_snapshot()
 
 
@@ -331,9 +335,7 @@ def test_declared_inbound_references_are_exact_and_auditable() -> None:
 
     def historical_text(relative: str) -> str:
         recovery_commit = candidate_recovery.get(relative, baseline)
-        return subprocess.check_output(
-            ["git", "-C", str(ROOT), "show", f"{recovery_commit}:{relative}"],
-        ).decode("utf-8", errors="replace")
+        return GIT_HISTORY.text(recovery_commit, relative, errors="replace")
 
     def mentions(source_path: str, source_text: str, target: str) -> bool:
         if target in source_text.replace("\\", "/"):
@@ -427,17 +429,8 @@ def test_internal_relations_and_actual_full_path_references_are_closed() -> None
             if reference["relation"] == "self_reference":
                 assert reference["source_path"] == target, (target, reference)
 
-    tracked = sorted(governance_paths())
     actual: dict[str, set[str]] = {target: set() for target in candidates}
-    for source_path in tracked:
-        if not source_path or source_path == MANIFEST_PATH.relative_to(ROOT).as_posix():
-            continue
-        if Path(source_path).suffix not in {".py", ".md", ".yaml", ".yml", ".toml", ".json", ".csv", ".txt", ".ps1", ".js", ".ts", ".html", ".css"}:
-            continue
-        try:
-            source_text = governance_text(source_path)
-        except (OSError, UnicodeDecodeError):
-            continue
+    for source_path, source_text in governance_text_index().items():
         normalized_source_text = source_text.replace("\\", "/")
         for target in candidates:
             if target in normalized_source_text:
@@ -458,14 +451,8 @@ def test_every_candidate_has_exact_dual_hash_git_recovery() -> None:
         for item in group["items"]:
             relative = item["path"]
             baseline = item["recovery_basis"]["commit"]
-            payload = subprocess.check_output(
-                ["git", "-C", str(ROOT), "show", f"{baseline}:{relative}"],
-            )
-            oid = subprocess.check_output(
-                ["git", "-C", str(ROOT), "rev-parse", f"{baseline}:{relative}"],
-                text=True,
-                encoding="utf-8",
-            ).strip()
+            blob = GIT_HISTORY.blob(baseline, relative)
+            oid, payload = blob.oid, blob.payload
             assert item["recovery_basis"] == {"kind": "git_blob", "commit": baseline}
             assert item["blob_oid"] == oid
             assert item["byte_count"] == len(payload)
@@ -552,9 +539,7 @@ def test_legacy_route_surfaces_are_hash_bound_and_never_current_defaults() -> No
     assert len(surfaces) == 10
     assert len({row["path"] for row in surfaces}) == len(surfaces)
     for row in surfaces:
-        payload = subprocess.check_output(
-            ["git", "-C", str(ROOT), "show", f"{baseline}:{row['path']}"],
-        )
+        payload = GIT_HISTORY.blob(baseline, row["path"]).payload
         assert row["route_policy"] == (
             "explicit input or historical fixture only; never a current default"
         )
@@ -571,15 +556,7 @@ def test_legacy_route_surfaces_are_hash_bound_and_never_current_defaults() -> No
                 source_text = governance_text(reference["source_path"])
             else:
                 assert reference["source_path"] in candidate_status, reference
-                source_text = subprocess.check_output(
-                    [
-                        "git",
-                        "-C",
-                        str(ROOT),
-                        "show",
-                        f"{baseline}:{reference['source_path']}",
-                    ],
-                ).decode("utf-8", errors="replace")
+                source_text = GIT_HISTORY.text(baseline, reference["source_path"], errors="replace")
             assert row["path"] in source_text, reference
 
 
@@ -596,9 +573,7 @@ def test_explicit_legacy_writers_are_kept_and_git_recoverable() -> None:
     assert len(writers) == 5
     assert len({row["path"] for row in writers}) == len(writers)
     for row in writers:
-        payload = subprocess.check_output(
-            ["git", "-C", str(ROOT), "show", f"{baseline}:{row['path']}"],
-        )
+        payload = GIT_HISTORY.blob(baseline, row["path"]).payload
         assert row["status"] == "KEEP_ACTIVE"
         assert row["route_id"] == "old_002837_workflow"
         assert row["write_targets"]
@@ -611,15 +586,7 @@ def test_explicit_legacy_writers_are_kept_and_git_recoverable() -> None:
                 source_text = governance_text(reference["source_path"])
             else:
                 assert reference["source_path"] in candidate_paths, reference
-                source_text = subprocess.check_output(
-                    [
-                        "git",
-                        "-C",
-                        str(ROOT),
-                        "show",
-                        f"{baseline}:{reference['source_path']}",
-                    ],
-                ).decode("utf-8", errors="replace")
+                source_text = GIT_HISTORY.text(baseline, reference["source_path"], errors="replace")
             assert row["path"] in source_text, reference
 
 
@@ -732,15 +699,7 @@ def test_stale_current_markers_are_quarantined_not_rewritten() -> None:
                 "user_deleted_pending_commit",
                 "completed",
             }
-            text = subprocess.check_output(
-                [
-                    "git",
-                    "-C",
-                    str(ROOT),
-                    "show",
-                    f"{recovery_by_path[relative]}:{relative}",
-                ],
-            ).decode("utf-8", errors="replace")
+            text = GIT_HISTORY.text(recovery_by_path[relative], relative, errors="replace")
         if any(marker in text for marker in stale_markers):
             stale_paths.add(relative)
 

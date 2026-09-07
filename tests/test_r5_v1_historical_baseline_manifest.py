@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import hashlib
-import subprocess
 from pathlib import Path, PurePosixPath
 from typing import Any
 
 import yaml
 
-from conftest import GOVERNANCE_BASELINE, GOVERNANCE_MANIFEST, governance_paths, governance_snapshot, governance_text
+from conftest import GIT_HISTORY, governance_snapshot, prefetch_governance_recovery
 import pytest
 
 # Published historical results; current algorithms are covered in the default suite.
@@ -19,6 +18,7 @@ MANIFEST_PATH = ROOT / "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yam
 
 
 def load_manifest() -> dict[str, Any]:
+    prefetch_governance_recovery()
     return governance_snapshot()
 
 
@@ -73,22 +73,9 @@ def test_ready_paths_are_exact_unique_and_git_recoverable() -> None:
         recovery = item["recovery_basis"]
         assert recovery["kind"] == "git_blob"
         recovery_commit = recovery["commit"]
-        object_name = f"{recovery_commit}:{path}"
-        oid = subprocess.check_output(
-            ["git", "-C", str(ROOT), "rev-parse", object_name],
-            text=True,
-            encoding="utf-8",
-        ).strip()
-        size = int(
-            subprocess.check_output(
-                ["git", "-C", str(ROOT), "cat-file", "-s", object_name],
-                text=True,
-                encoding="utf-8",
-            ).strip()
-        )
-        payload = subprocess.check_output(
-            ["git", "-C", str(ROOT), "cat-file", "blob", object_name]
-        )
+        blob = GIT_HISTORY.blob(recovery_commit, path)
+        oid, payload = blob.oid, blob.payload
+        size = blob.byte_count
         calculated_oid = hashlib.sha1(
             f"blob {len(payload)}\0".encode("ascii") + payload,
             usedforsecurity=False,

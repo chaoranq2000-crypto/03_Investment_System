@@ -4,13 +4,15 @@ import copy
 import hashlib
 import json
 import re
-import subprocess
 from collections import Counter, defaultdict, deque
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 import pytest
 import yaml
+
+from conftest import GIT_HISTORY
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -310,39 +312,25 @@ def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+@lru_cache(maxsize=1)
+def prefetch_baseline_blobs() -> None:
+    GIT_HISTORY.blobs(HISTORICAL_BASELINE, EXPECTED_BASELINE_BLOB_TRIPLETS)
+
+
 def git_blob_bytes(revision: str, relative_path: str) -> bytes:
     assert revision == HISTORICAL_BASELINE
     expected_oid, expected_bytes, expected_sha256 = (
         EXPECTED_BASELINE_BLOB_TRIPLETS[relative_path]
     )
-    spec = f"{revision}:{relative_path}"
-    observed_oid = subprocess.check_output(
-        ["git", "rev-parse", "--verify", spec],
-        cwd=ROOT,
-        text=True,
-        encoding="utf-8",
-    ).strip()
+    prefetch_baseline_blobs()
+    blob = GIT_HISTORY.blob(revision, relative_path)
+    observed_oid = blob.oid
     assert observed_oid == expected_oid, relative_path
-    object_type = subprocess.check_output(
-        ["git", "cat-file", "-t", spec],
-        cwd=ROOT,
-        text=True,
-        encoding="utf-8",
-    ).strip()
+    object_type = blob.object_type
     assert object_type == "blob", relative_path
-    observed_bytes = int(
-        subprocess.check_output(
-            ["git", "cat-file", "-s", spec],
-            cwd=ROOT,
-            text=True,
-            encoding="utf-8",
-        ).strip()
-    )
+    observed_bytes = blob.byte_count
     assert observed_bytes == expected_bytes, relative_path
-    payload = subprocess.check_output(
-        ["git", "cat-file", "blob", spec],
-        cwd=ROOT,
-    )
+    payload = blob.payload
     assert len(payload) == expected_bytes, relative_path
     assert hashlib.sha256(payload).hexdigest() == expected_sha256, relative_path
     return payload

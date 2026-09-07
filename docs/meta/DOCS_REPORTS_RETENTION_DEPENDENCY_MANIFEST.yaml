@@ -676,16 +676,6 @@ retired_paths:
 - scripts/manage_r5_v1_historical_cleanup.py
 - scripts/validate_r5_v1_root_policy_migration.py
 allowed_retired_references:
-- source_path: config/r5_readiness_gate_rules.yaml
-  relation: historical_metadata_only
-  targets:
-  - reports/p1_6/r5_format_guard.json
-  - reports/p1_6/r5_mvp_smoke_result.json
-  - reports/p1_6/r5_patch_1_12_inventory_status.yaml
-- source_path: config/r5_reviewed_input_pilot_gate_rules.yaml
-  relation: historical_metadata_only
-  targets:
-  - reports/p1_6/r5_mvp_smoke_result.json
 - source_path: docs/logs/2026-07-01_plan_completion_log.md
   relation: retained_evidence_reference
   targets:
@@ -804,18 +794,10 @@ allowed_retired_references:
   targets:
   - codex_tasks/R5_PATCH_0_TASK_CARD.md
   - reports/p1_6/R5_MVP_PATCH_0_PLAN.md
-- source_path: tests/test_r5_pilot_gate_recheck_and_render.py
-  relation: git_history_only
-  targets:
-  - reports/p1_6/r5_reviewed_input_pilot_gate_result.json
 - source_path: tests/test_r5_report_composer_degradation.py
   relation: git_history_only
   targets:
   - reports/p1_6/r5_after_patch40_pilot_gate_result.json
-- source_path: tests/test_r5_v1_active_routing_retirement.py
-  relation: negative_assertion_only
-  targets:
-  - config/r5_bundle9r_generation_binding.yaml
 - source_path: tests/test_r5_v1_historical_cleanup_manifest.py
   relation: git_history_only
   targets:
@@ -913,7 +895,263 @@ legacy_route_surfaces:
 - path: config/r5_patch_49_55_expected_artifacts.yaml
 - path: config/r5_readiness_gate_rules.yaml
 - path: config/r5_reviewed_input_pilot_gate_rules.yaml
-manual_delete_candidates: []
+manual_delete_candidates:
+- path: .github/workflows/r5_bundle11r_runtime.yml
+  status: READY_FOR_MANUAL_DELETE
+  reason: Bundle 11 CLI and contract retained; aggregator and CLI regression consolidated;
+    default CI covers retained tests.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: d438a94d609d122e8be872c5c5236a3542b52adb
+  git_blob_bytes: 1321
+  content_sha256: b38b0ce56e1a9b921c4f782f3be0736e5b4f68772d068e066ef507285a7932d6
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: config/r5_next_pilot_gate_rules.yaml
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: aef4abecfb5ad649347d5b3ac2981f8962542545
+  git_blob_bytes: 796
+  content_sha256: b320b0ddc448d379cd895f5d4c504bdeaa8fbeeb498c02406f7d377a5a455282
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: config/r5_pack_promotion_rules.yaml
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 26dde3b211e5c8485e50e31a8ab8e328d521a4c8
+  git_blob_bytes: 1001
+  content_sha256: e7b571ef4daafb7eaef9cbab9ab196846d1e7592225ca676bbbfea8083fd294e
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: config/r5_readiness_gate_rules.yaml
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: d813bd011594cacc266d3230074523cffc2e5fc1
+  git_blob_bytes: 1064
+  content_sha256: 1220a81688e9144c3e81bacc151d9de3f73a6af4436fc6be9617c400ae980444
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: config/r5_reviewed_input_pilot_gate_rules.yaml
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 0aaf20cec1750fd2ed0b8afe472e835b609fc696
+  git_blob_bytes: 1061
+  content_sha256: 3444a93a3cf65f94591e446d753a721bb5bb81594d8f658965bec7c17cea5454
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: scripts/check_r5_task_readout_sync.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 5aaebaf6b67f62609517ea3ded741a38cb3eea32
+  git_blob_bytes: 7779
+  content_sha256: bb864c65d59ae3e831e03efd62120a19545a164662e8112818d791969860a9d5
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: scripts/r5_next_pilot_gate.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 4e573f9a94ebc7edc1b3f14638b4a261c11ba859
+  git_blob_bytes: 7412
+  content_sha256: 0ec5b451ce8474bf1d62e3101396feb7d02a88e983c543271b93589467f16fd8
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: scripts/r5_pack_promotion_gate.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 358151ebfd84da971a1fd9a1d8469d0519f8663c
+  git_blob_bytes: 5540
+  content_sha256: 8f0c21be7cea382eccbfe49b2dc2ced1ce8f5c5c8d261f4d0ad2f2751d22e975
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: scripts/r5_patch_inventory_check.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 7a294b64401a60a12b7da49d804a054711c5f8cd
+  git_blob_bytes: 8969
+  content_sha256: 9e4ccff1723b6a3a7092ed221e1c83b2323e1b9b67de23c4a85efc50fcf2e77d
+  inbound_references:
+  - source_path: reports/p1_6/R5_PATCH_25_RAW_FORMAT_RECOVERY_READOUT.md
+    relation: historical_cross_reference
+  - source_path: reports/p1_6/R5_PATCH_27_INVENTORY_V2_READOUT.md
+    relation: historical_cross_reference
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: scripts/r5_readiness_gate.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 320d5e1f3f2d704bf755ea2f7b442512a16deeb2
+  git_blob_bytes: 8740
+  content_sha256: cec4d32e2fd1b939630fdda460b363d7dd77b8789e9db2a4b6654675c93adada
+  inbound_references:
+  - source_path: reports/p1_6/R5_PATCH_25_RAW_FORMAT_RECOVERY_READOUT.md
+    relation: historical_cross_reference
+  - source_path: reports/p1_6/R5_PATCH_30_READINESS_REBASE_READOUT.md
+    relation: historical_cross_reference
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: scripts/r5_reviewed_input_pilot_gate.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 3f593eec6da165bfdcd935a2016617ca1370ff34
+  git_blob_bytes: 7895
+  content_sha256: c264be3bd0aca2f0352a5117beae8fa157e045e7453f3bbf60e248f52a58c5e5
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: scripts/render_r5_reviewed_input_output.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 4a17257563c2761983aea94bbe1f81db473d2a44
+  git_blob_bytes: 8283
+  content_sha256: e9ca641fc238093690b943e35d408efed355bbfa94dcc3bcf03a44ba523c97d1
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: src/research/r5_bundle11r_runtime.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Bundle 11 CLI and contract retained; aggregator and CLI regression consolidated;
+    default CI covers retained tests.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 0a81ee894a227022c99788ff171df6ce4a9357be
+  git_blob_bytes: 4341
+  content_sha256: bd490ae4a3ab8fd901e81b1cc9f3ec61edee62df5623ecee650c4ea7f422c149
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle11r_runtime_cli.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Bundle 11 CLI and contract retained; aggregator and CLI regression consolidated;
+    default CI covers retained tests.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: aaf8b4ba9c43d6516436cb238b99ca06f996c93e
+  git_blob_bytes: 977
+  content_sha256: 00d3bda7ea5e3cd50b4d5c86761cddf5b01a92e6beb018bbf65f98eb0dab7ce1
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: tests/test_r5_next_pilot_gate.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 85cc39a6a2918f75801ee439498268b06eed642f
+  git_blob_bytes: 1491
+  content_sha256: e73c0e2774880638604dc34cd7788e8b7c15f6e95718619fd2bebbefc6e2b41f
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: tests/test_r5_next_pilot_gate_after_registries.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: a18eb1092eada7c2270a4b31f12e1f262d7edad3
+  git_blob_bytes: 2562
+  content_sha256: fd8e4a2ea85fb067da41b228f698e3538a686c22b31f6a1b584918eda447c43d
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: tests/test_r5_pack_promotion_gate.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 7b54fb03e07aced42779bb51e91ff54af26ea291
+  git_blob_bytes: 3714
+  content_sha256: a7a406721e246fd96c659d83b06d7512f690d93077842a2e7012d0b893df2d69
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: tests/test_r5_patch_inventory_check.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: c3a487f799fa962ad99278cd33f33056228cf5af
+  git_blob_bytes: 4668
+  content_sha256: 6cb3ef41807abf3796fa2a93c9573a395f165b442cdcf94d5879cfcc56957de2
+  inbound_references:
+  - source_path: reports/p1_6/R5_PATCH_27_INVENTORY_V2_READOUT.md
+    relation: historical_cross_reference
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: tests/test_r5_pilot_gate_recheck_and_render.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: d6cae0f376edcd8839ecee70aee990a69ac59b6c
+  git_blob_bytes: 3103
+  content_sha256: a4637dcc102a98a2baf8c4f23f1a2671e177c84fa1ce7094f7cd9a80d9b97d1a
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: tests/test_r5_readiness_gate.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 07f7088360293c672eb54aa713c456e071eb55af
+  git_blob_bytes: 2627
+  content_sha256: d32f58d0b9feb5c066ad388b1d8e37238927455be1ec89bf7bd185eafa23da83
+  inbound_references:
+  - source_path: reports/p1_6/R5_PATCH_25_RAW_FORMAT_RECOVERY_READOUT.md
+    relation: historical_cross_reference
+  - source_path: reports/p1_6/R5_PATCH_30_READINESS_REBASE_READOUT.md
+    relation: historical_cross_reference
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: tests/test_r5_reviewed_input_pilot_gate.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: eb2588027ccc672d13842e9d7d4800918a97dece
+  git_blob_bytes: 3448
+  content_sha256: 0b81d58d144e22aac3d5feac80bc55fdadf4cbd919d0030c1bfa178e93072d96
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
+- path: tests/test_r5_task_readout_sync.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Retired historical pilot/patch endpoint with dedicated fixtures; no current
+    physical reader or writer remains.
+  recovery_commit: 66f5884b3eeef779b69dde8c3b28524fd66ec31e
+  blob_oid: 6b4eaa3809f4de53bf25224f29fb13519cc22c06
+  git_blob_bytes: 4599
+  content_sha256: c548fc2071b654842e7ded2058b9de0ad94b89c4f62dba75797dd92d90ec95ab
+  inbound_references:
+  - source_path: docs/logs/2026-09-07_legacy_pilot_history_slimming.md
+    relation: historical_cross_reference
 completed_manual_deletions:
 - path: config/r5_bundle3_expected_artifacts.yaml
   status: DELETED_BY_USER
