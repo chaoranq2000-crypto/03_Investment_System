@@ -1,6 +1,6 @@
 # 旧试点工具退役与历史审计提速
 
-状态：代码退役、依赖解耦、文件隔离、恢复验证及全套回归均已完成；实际批量删除待用户执行。
+状态：代码退役、依赖解耦、文件隔离、恢复验证、全套回归及用户手动物理删除均已完成。
 
 ## 范围与恢复依据
 
@@ -8,7 +8,7 @@
 
 共移出 22 个旧文件，原始内容与 Git 内容均为 91,391 bytes（约 89.25 KiB）。19 个属于旧试点、readiness、promotion、补丁清单及固定 readout 工具，另 3 个为 Bundle 11 聚合包装、独立 CLI 测试及重复 CI。每项保留固定提交、Git blob、字节数、SHA-256 和现存引用依据。本轮新增一份通用历史读取测试和本记录，受管理文件净减少 20 个。
 
-当前指针、研究运行、原始证据、已审核输入、共享研究门、Portfolio、Investment Review、人审契约及正式账本不在修改范围内。保留 476 条既有退役路径和 78 条用户已删除的完整恢复记录；本轮 22 条进入 `manual_delete_candidates`，不记作物理删除完成。
+当前指针、研究运行、原始证据、已审核输入、共享研究门、Portfolio、Investment Review、人审契约及正式账本不在修改范围内。保留 476 条既有退役路径和 78 条用户已删除的完整恢复记录；本轮 22 条最初进入 `manual_delete_candidates`，用户删除并核验后转入已完成记录。当前待删队列为空，完成索引共 100 条。
 
 ## 实现边界
 
@@ -70,15 +70,22 @@ tests/test_r5_reviewed_input_pilot_gate.py
 tests/test_r5_task_readout_sync.py
 ```
 
-## 手动删除与剩余事项
+## 用户删除核验（2026-09-07）
 
-待删目录：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_legacy_pilot_history_20260907/`。该目录集中保存 22 个文件及说明／收据，外部证据目录保留另一份收据。没有执行删除命令。
+用户反馈“已删除”后，现场逐项核验本轮 22 个原路径和 22 个隔离副本均不存在。独立核验也确认全部 22 条仍可从固定提交 `66f5884b3eeef779b69dde8c3b28524fd66ec31e` 恢复，Git blob 类型、OID、长度及 SHA-256 全部一致，共 91,391 bytes。
 
-依据 `AGENTS.md` 的文件删除规则：“Do not remove directories automatically. If the requested scope contains multiple files or any directory, stop and ask the user to perform the deletion manually.” 用户手动删除后应核对原路径与隔离副本缺失，再将 22 条索引转入已完成记录。
+本轮 22 条记录已转入 `completed_manual_deletions`，登记 `deletion_actor=user`、核验日期和本记录路径。原有 78 条完成记录及清单其他字段逐项不变；`manual_delete_candidates` 为 0，完成索引为 100。删除证据另存 `.codex_tmp/legacy_pilot_history_slimming_20260907/user_deletion_verification.json`，原移动收据作为历史证据保留。
+
+本次仅更新清单与删除记录，没有改动运行代码、测试代码或业务数据；此前完整回归结果仍适用于代码版本。收尾验证：Doc drift 通过，清单、路由及历史保护回归 34 passed（19.78 秒）；100 条完成记录的 Git 恢复完整性检查通过。
+
+## 剩余事项
+
+原待删目录：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_legacy_pilot_history_20260907/`。22 个旧文件已由用户物理删除；目录中仅剩 `README.md` 和 `cleanup_manifest.json` 两份辅助记录，可保留或由用户手动删除。外部证据目录另有收据副本。Codex 没有执行删除命令。
+
+本轮遵循 `AGENTS.md` 的文件删除规则：“Do not remove directories automatically. If the requested scope contains multiple files or any directory, stop and ask the user to perform the deletion manually.” 上述删除及索引更新已完成核验。
 
 本轮仅保存本地提交，未推送或合并。恢复提交包含前序本地提交；后续发布需保留其可达性，不应只复制最终文件或丢弃恢复历史。
 
 | 剩余事项 | owner | severity | 下一步 |
 |---|---|---|---|
-| 本轮 22 个旧文件的物理删除 | user | low | 手动删除上述待删目录，之后核验完成索引 |
 | 瘦身分支发布 | user | medium | 确认发布范围后推送或合入主线，并保留恢复提交 |
