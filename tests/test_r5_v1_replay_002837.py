@@ -594,3 +594,50 @@ def test_historical_replay_tree_is_git_recoverable(built_replay) -> None:
         relative_path = row["path"].removeprefix(prefix)
         assert row["path"].startswith(prefix)
         assert row["sha256"] == HISTORICAL_REPLAY_BLOBS[relative_path][2]
+
+
+def test_replay_manifest_anchor_and_selection_never_read_live_manifest(monkeypatch) -> None:
+    runner = load_runner()
+    live_manifest = (ROOT / runner.HISTORICAL_MANIFEST_REL).resolve()
+    original_open = Path.open
+
+    def reject_live_manifest(path: Path, *args, **kwargs):
+        assert path.resolve() != live_manifest, "historical replay read the live manifest"
+        return original_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", reject_live_manifest)
+    anchors = runner.verify_expected_sources(ROOT)
+    selected, _ = runner.select_real_evidence(ROOT)
+    manifest_anchor = next(
+        row for row in anchors if row["source_path"] == runner.HISTORICAL_MANIFEST_REL
+    )
+    assert manifest_anchor["observed_sha256"] == runner.EXPECTED_SOURCE_HASHES[
+        runner.HISTORICAL_MANIFEST_REL
+    ]
+    assert tuple(row["evidence_id"] for row in selected) == runner.SELECTED_EVIDENCE_IDS
+
+
+@pytest.mark.parametrize(
+    ("fault", "error"),
+    [("oid", "OID mismatch"), ("size", "byte-count mismatch"), ("payload", "content mismatch")],
+)
+def test_frozen_manifest_rejects_invalid_git_objects(monkeypatch, fault: str, error: str) -> None:
+    runner = load_runner()
+    spec = f"{runner.HISTORICAL_BASELINE}:{runner.HISTORICAL_MANIFEST_REL}"
+    original_run = runner.subprocess.run
+
+    def tampered_git(args, *positional, **kwargs):
+        result = original_run(args, *positional, **kwargs)
+        if args[-1] == spec and result.returncode == 0:
+            if fault == "oid" and args[1:3] == ["rev-parse", "--verify"]:
+                result.stdout = "0" * 40 + "\n"
+            elif fault == "size" and args[1:3] == ["cat-file", "-s"]:
+                result.stdout = str(int(result.stdout.strip()) + 1) + "\n"
+            elif fault == "payload" and args[1:3] == ["cat-file", "blob"]:
+                payload = result.stdout
+                result.stdout = bytes([payload[0] ^ 1]) + payload[1:]
+        return result
+
+    monkeypatch.setattr(runner.subprocess, "run", tampered_git)
+    with pytest.raises(runner.ReplayContractError, match=error):
+        runner.read_git_blob(ROOT, runner.HISTORICAL_BASELINE, runner.HISTORICAL_MANIFEST_REL)
