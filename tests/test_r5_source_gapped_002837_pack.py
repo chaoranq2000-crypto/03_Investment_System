@@ -1,6 +1,10 @@
 from __future__ import annotations
 
 import yaml
+import pytest
+
+# Published historical results; current algorithms are covered in the default suite.
+pytestmark = pytest.mark.legacy_compatibility
 
 HISTORICAL_RUN = "reports/workflow_runs/wf_20260703_stock_first_002837_invic"
 PACK_SOURCE = f"{HISTORICAL_RUN}/R5_stock_research_pack_source_gapped.yaml"

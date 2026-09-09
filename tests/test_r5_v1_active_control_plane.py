@@ -79,7 +79,7 @@ def test_bundle_runtimes_are_explicit_local_evaluators_only() -> None:
     bundle_sources = "\n".join(
         read(path)
         for path in (
-            "src/research/r5_bundle11r_runtime.py",
+            "scripts/run_r5_bundle11r_runtime.py",
             "src/research/r5_bundle12r_operating_evidence.py",
             "src/research/r5_bundle13r_evidence_backflow.py",
         )
@@ -89,7 +89,9 @@ def test_bundle_runtimes_are_explicit_local_evaluators_only() -> None:
     assert "调用方明确请求某个 capability" in kernel
     assert "不直接写 `workflow_state.status`" in kernel
     assert "post-10R research-depth stage" not in skill
-    assert "src.research.r5_bundle11r_runtime" in bundle11_cli
+    assert "def run_runtime(" in bundle11_cli
+    assert "result = run_runtime(" in bundle11_cli
+    assert "from src.quality.semantic_research_gate import run_semantic_gate" in bundle11_cli
     assert 'parser.add_argument("--segment-plan", required=True)' in bundle11_cli
     assert 'parser.add_argument("--output", required=True)' in bundle11_cli
     assert 'parser.add_argument("--input", required=True' in bundle12_cli

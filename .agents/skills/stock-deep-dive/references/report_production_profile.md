@@ -346,7 +346,10 @@ Severity 只描述风险，不单独决定 outcome。缺失数据按 direct disc
 audited aggregate → bounded estimate/scenario → unknown/omit 降级，并只关闭
 实际依赖它的 section、claim、calculation 或 method。
 
-R5-G1–R5-G11 and Bundle11R–16R are explicit capability-local evaluators only.
+R5-G1–R5-G11 and the retained Bundle11R–13R implementations are explicit
+capability-local evaluators only. Bundle14R–16R implementations are retired;
+their contracts and results remain historical compatibility evidence, not callable
+report-production prerequisites.
 When explicitly invoked, their local IDs map to G0–G10 and may update only
 `affected_capabilities`; their local result cannot overwrite the canonical status.
 

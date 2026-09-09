@@ -7,6 +7,9 @@ from typing import Any
 
 import yaml
 
+from conftest import governance_snapshot
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "config/r5_readout_canonical_index.yaml"
@@ -169,8 +172,9 @@ def test_current_state_rejects_fake_historical_resolution(tmp_path: Path) -> Non
     assert "workflow status accepted_with_todos is inconsistent" in completed.stderr
 
 
+@pytest.mark.legacy_compatibility
 def test_retired_root_policy_artifacts_are_git_recoverable_not_current_authority() -> None:
-    manifest = load_yaml(MANIFEST)
+    manifest = governance_snapshot()
     ready = {
         item["path"]: item
         for group in manifest["candidate_groups"]

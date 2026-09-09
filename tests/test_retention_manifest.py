@@ -1,0 +1,180 @@
+from __future__ import annotations
+
+import importlib.util
+import subprocess
+from pathlib import Path
+
+import pytest
+import yaml
+
+
+ROOT = Path(__file__).resolve().parents[1]
+MANIFEST_PATH = ROOT / "docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml"
+
+
+def validate(data):
+    spec = importlib.util.spec_from_file_location("retention_doc_check", ROOT / "scripts/check_doc_drift.py")
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    errors = []
+    module.check_retention_manifest(errors, manifest=data)
+    return errors
+
+
+@pytest.fixture
+def manifest():
+    return yaml.safe_load(MANIFEST_PATH.read_text(encoding="utf-8"))
+
+
+@pytest.fixture
+def candidate_manifest(manifest):
+    # Negative candidate cases must keep working when the real pending queue empties.
+    if not manifest["manual_delete_candidates"]:
+        candidate = manifest["completed_manual_deletions"].pop()
+        candidate["status"] = "READY_FOR_MANUAL_DELETE"
+        manifest["manual_delete_candidates"] = [candidate]
+    return manifest
+
+
+def test_current_retention_contract_and_recovery_identity_pass(manifest):
+    assert validate(manifest) == []
+    assert len(manifest["retired_paths"]) == 476
+    assert "candidate_groups" not in manifest
+    assert "phase2_retirement" not in manifest
+
+
+def test_current_products_evidence_and_pointer_selected_runs_remain_protected(manifest):
+    exact = {row["path"] for row in manifest["protected_paths"] if "path" in row}
+    prefixes = {row["path_prefix"] for row in manifest["protected_paths"] if "path_prefix" in row}
+    assert {
+        "AGENTS.md", "README.md", "docs/index.md",
+        "docs/workflows/RESEARCH_WORKFLOW.md", "docs/workflows/WORKFLOW_ORCHESTRATION_SPEC.md",
+        "config/r5_readout_canonical_index.yaml",
+        "docs/policies/PERSONAL_HIGH_RISK_EQUITY_STRATEGY_CHARTER.md",
+    } <= exact
+    assert {path.relative_to(ROOT).as_posix() for path in (ROOT / "docs/contracts").glob("*.json")} <= exact
+    assert {"data/raw/", "data/manifests/", "reports/segments/", "reports/stocks/"} <= prefixes
+    pointer = yaml.safe_load((ROOT / "config/r5_readout_canonical_index.yaml").read_text(encoding="utf-8"))
+    for run in pointer["current_runs"].values():
+        state = run["state_path"]
+        assert state in exact or any(state.startswith(prefix) for prefix in prefixes)
+
+
+@pytest.mark.parametrize("value", ["../outside.yaml", "C:/outside.yaml", "config/*.yaml"])
+def test_retention_rejects_nonliteral_or_escaping_candidates(candidate_manifest, value):
+    candidate_manifest["manual_delete_candidates"][0]["path"] = value
+    assert any("unsafe or non-literal" in error for error in validate(candidate_manifest))
+
+
+def test_retention_rejects_protected_deletion_and_reused_approval(candidate_manifest):
+    candidate_manifest["manual_delete_candidates"][0]["path"] = "AGENTS.md"
+    candidate_manifest["deletion_control"]["prior_approvals_apply_to_new_candidates"] = True
+    errors = validate(candidate_manifest)
+    assert any("conflicts with retired/protected" in error for error in errors)
+    assert any("old approvals cannot be reused" in error for error in errors)
+
+
+def test_retention_rejects_corrupted_recovery_snapshot(manifest):
+    manifest["history"]["snapshot"]["content_sha256"] = "0" * 64
+    assert any("integrity mismatch" in error for error in validate(manifest))
+
+
+def test_retention_rejects_restored_paths_and_physical_readers(manifest):
+    manifest["retired_paths"].append("pyproject.toml")
+    manifest["allowed_retired_references"][0]["relation"] = "current_worktree_physical"
+    errors = validate(manifest)
+    assert any("has reappeared" in error for error in errors)
+    assert any("current physical dependency" in error for error in errors)
+
+
+def test_retention_rejects_candidate_with_live_dependency(candidate_manifest):
+    candidate_manifest["manual_delete_candidates"][0]["inbound_references"][0]["relation"] = "current_worktree_physical"
+    assert any("candidate still has a current physical dependency" in error for error in validate(candidate_manifest))
+
+
+def test_completed_index_preserves_verified_recovery_records(manifest):
+    previous = yaml.safe_load(subprocess.check_output([
+        "git", "-C", str(ROOT), "show",
+        "4121360c4583a95a9d889ee4604bf0893f92a294:docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml",
+    ]))
+    completed = {row["path"]: row for row in manifest["completed_manual_deletions"]}
+    fields = ("path", "recovery_commit", "blob_oid", "git_blob_bytes", "content_sha256")
+    for old in previous["manual_delete_candidates"]:
+        current = completed[old["path"]]
+        assert current["status"] == "DELETED_BY_USER"
+        assert {key: current[key] for key in fields} == {key: old[key] for key in fields}
+    assert not set(completed) & {row["path"] for row in manifest["manual_delete_candidates"]}
+
+
+def test_completed_deletions_reject_reappearance_and_missing_user_evidence(manifest):
+    row = manifest["completed_manual_deletions"][0]
+    row["path"] = "pyproject.toml"
+    row["deletion_actor"] = "codex"
+    errors = validate(manifest)
+    assert any("completed deletion has reappeared" in error for error in errors)
+    assert any("requires verified user evidence" in error for error in errors)
+
+
+@pytest.mark.parametrize("index", ["manual_delete_candidates", "completed_manual_deletions"])
+def test_retention_rejects_corrupted_recovery_in_either_index(candidate_manifest, index):
+    candidate_manifest[index][0]["content_sha256"] = "0" * 64
+    assert any("candidate recovery integrity mismatch" in error for error in validate(candidate_manifest))
+
+
+def test_completed_index_cannot_be_omitted(manifest):
+    manifest.pop("completed_manual_deletions")
+    assert any("manual deletion indexes must be lists" in error for error in validate(manifest))
+
+
+def test_empty_pending_queue_is_valid_after_all_records_are_completed(manifest):
+    for row in manifest["manual_delete_candidates"]:
+        row.update(
+            status="DELETED_BY_USER", deletion_actor="user", deletion_verified_on="2026-09-07",
+            deletion_record="docs/logs/2026-09-07_legacy_bundle6_10_retirement.md",
+        )
+    manifest["completed_manual_deletions"].extend(manifest["manual_delete_candidates"])
+    manifest["manual_delete_candidates"] = []
+    assert validate(manifest) == []
+
+
+def test_retention_rejects_policy_and_ledger_boundary_changes(manifest):
+    for row in manifest["protected_invariants"]:
+        if row["id"] == "C-HUMAN-005":
+            row["effective_machine_value"] = 0.3
+        if row["id"] == "formal_portfolio_database":
+            row["access"] = "read_write"
+    errors = validate(manifest)
+    assert any("C-HUMAN-005" in error for error in errors)
+    assert any("database protection" in error for error in errors)
+
+
+@pytest.mark.legacy_compatibility
+def test_v2_preserves_all_published_retirements_and_protected_evidence(manifest):
+    from conftest import governance_snapshot
+
+    old = governance_snapshot()
+    retired = {
+        row["path"]
+        for group in old["candidate_groups"]
+        if group["status"] == "READY_FOR_MANUAL_DELETE"
+        for row in group["items"]
+    }
+    assert set(manifest["retired_paths"]) == retired
+    assert manifest["protected_paths"] == old["protected_paths"]
+    assert manifest["protected_invariants"] == old["protected_invariants"]
+    old_routes = {row["id"]: row for row in old["retired_route_tokens"]}
+    current_routes = {row["id"]: row for row in manifest["retired_route_tokens"]}
+    assert current_routes.keys() == old_routes.keys()
+    registered_retirements = retired | {
+        row["path"] for row in manifest["manual_delete_candidates"] + manifest["completed_manual_deletions"]
+    }
+    for route_id, current in current_routes.items():
+        original = old_routes[route_id]
+        assert {key: value for key, value in current.items() if key != "allowed_readers"} == {
+            key: value for key, value in original.items() if key != "allowed_readers"
+        }
+        before = {(row["source_path"], row["relation"]) for row in original["allowed_readers"]}
+        after = {(row["source_path"], row["relation"]) for row in current["allowed_readers"]}
+        assert after <= before, "retirement cannot introduce a new legacy reader"
+        assert {path for path, _ in before - after} <= registered_retirements

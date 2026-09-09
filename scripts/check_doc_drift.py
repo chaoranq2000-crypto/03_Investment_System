@@ -7,10 +7,12 @@ inspect historical plans/logs/tasks.
 
 from __future__ import annotations
 
+import hashlib
+import io
 import re
 import subprocess
 import sys
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 
 import yaml
 
@@ -49,13 +51,6 @@ CANONICAL_WORKFLOW_TYPES = {
     "comparison_readiness_gate",
 }
 CANONICAL_GATES = {f"G{i}" for i in range(11)}
-RETENTION_STATUSES = {
-    "KEEP_ACTIVE",
-    "KEEP_EVIDENCE",
-    "LEGACY_BOUND",
-    "READY_FOR_MANUAL_DELETE",
-    "USER_DECISION",
-}
 
 
 def git_output(*args: str, input_text: str | None = None) -> str:
@@ -153,333 +148,206 @@ def check_active_files(errors: list[str]) -> None:
                 fail(errors, path, "SKILL.md mentions workflow_type without anti-redefinition guardrail")
 
 
-def check_retention_manifest(errors: list[str]) -> None:
+def check_retention_manifest(
+    errors: list[str], *, manifest: dict | None = None
+) -> None:
+    """Validate current protection and retirement boundaries, not old execution receipts."""
     path = REPO_ROOT / RETENTION_MANIFEST
-    if not path.is_file():
-        errors.append(f"{RETENTION_MANIFEST}: missing canonical retention manifest")
-        return
-    try:
-        manifest = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except yaml.YAMLError as exc:
-        fail(errors, path, f"invalid YAML: {exc}")
-        return
+    if manifest is None:
+        if not path.is_file():
+            fail(errors, path, "missing canonical retention manifest")
+            return
+        try:
+            manifest = yaml.safe_load(path.read_text(encoding="utf-8"))
+        except yaml.YAMLError as exc:
+            fail(errors, path, f"invalid YAML: {exc}")
+            return
     if not isinstance(manifest, dict):
         fail(errors, path, "manifest must be a mapping")
         return
-    if manifest.get("schema_version") != "docs_reports_retention_dependency_manifest_v1":
+    if manifest.get("schema_version") != "docs_reports_retention_dependency_manifest_v2":
         fail(errors, path, "unexpected schema_version")
-    if set(manifest.get("status_definitions", {})) != RETENTION_STATUSES:
-        fail(errors, path, "status vocabulary must be exact")
-
+    if manifest.get("status") != "active":
+        fail(errors, path, "current retention manifest must be active")
+    expected_authority = {
+        "project_rules": "AGENTS.md",
+        "research_workflow": "docs/workflows/RESEARCH_WORKFLOW.md",
+        "document_ownership": "docs/meta/DOC_OWNERSHIP_MATRIX.md",
+        "current_run_pointer": "config/r5_readout_canonical_index.yaml.current_runs",
+    }
+    if manifest.get("authority") != expected_authority:
+        fail(errors, path, "current authority chain drifted")
     control = manifest.get("deletion_control", {})
-    if control.get("codex_delete_authorized") is not False:
-        fail(errors, path, "Codex deletion must remain unauthorized")
-    if control.get("directories_authorized") is not False:
-        fail(errors, path, "directory deletion must remain unauthorized")
-
-    ready_items: list[dict[str, object]] = []
-    ready_closure_by_path: dict[str, str] = {}
-    candidate_status: dict[str, str] = {}
-    seen: set[str] = set()
-    for group in manifest.get("candidate_groups", []):
-        if not isinstance(group, dict) or group.get("status") not in RETENTION_STATUSES:
-            fail(errors, path, "candidate group has invalid status")
-            continue
-        for item in group.get("items", []):
-            if not isinstance(item, dict) or not isinstance(item.get("path"), str):
-                fail(errors, path, "candidate item must have a string path")
-                continue
-            value = item["path"]
-            pure = PurePosixPath(value)
-            if value != pure.as_posix() or pure.is_absolute() or ".." in pure.parts:
-                fail(errors, path, f"unsafe candidate path: {value}")
-            if any(token in value for token in ("*", "?", "[", "]", "{", "}")):
-                fail(errors, path, f"candidate path is not literal: {value}")
-            if value in seen:
-                fail(errors, path, f"duplicate candidate path: {value}")
-            seen.add(value)
-            candidate_status[value] = str(group.get("status"))
-            recovery = item.get("recovery_basis", {})
-            if not isinstance(recovery, dict) or recovery.get("kind") != "git_blob":
-                fail(errors, path, f"candidate lacks Git recovery basis: {value}")
-            if not isinstance(item.get("blob_oid"), str):
-                fail(errors, path, f"candidate lacks blob OID: {value}")
-            if not isinstance(item.get("byte_count"), int):
-                fail(errors, path, f"candidate lacks byte count: {value}")
-            if not re.fullmatch(r"[0-9a-f]{64}", str(item.get("content_sha256", ""))):
-                fail(errors, path, f"candidate lacks SHA-256: {value}")
-            if group.get("status") == "READY_FOR_MANUAL_DELETE":
-                closure_id = item.get("closure_id", group.get("closure_id"))
-                if not isinstance(closure_id, str) or not closure_id:
-                    fail(errors, path, f"READY candidate lacks closure id: {value}")
-                else:
-                    ready_closure_by_path[value] = closure_id
-                ready_items.append(item)
-
-    ready_paths = {str(item["path"]) for item in ready_items}
-    for protected in manifest.get("protected_paths", []):
-        if not isinstance(protected, dict):
-            fail(errors, path, "protected path entry must be a mapping")
-            continue
-        exact = protected.get("path")
-        if isinstance(exact, str) and exact in ready_paths:
-            fail(errors, path, f"protected path is marked READY: {exact}")
-        prefix = protected.get("path_prefix")
-        if isinstance(prefix, str):
-            normalized = prefix.rstrip("/") + "/"
-            conflict = next(
-                (candidate for candidate in ready_paths if candidate.startswith(normalized)),
-                None,
-            )
-            if conflict:
-                fail(errors, path, f"protected prefix contains READY path: {conflict}")
-
-    expected_summary = {
-        "file_count": len(ready_items),
-        "byte_count": sum(int(item.get("byte_count", -1)) for item in ready_items),
-    }
-    if (
-        manifest.get("summary", {}).get("READY_FOR_MANUAL_DELETE_ALL_PHASES")
-        != expected_summary
-    ):
-        fail(errors, path, "READY aggregate does not match exact item list")
-
-    resolution = manifest.get("classification_resolution", {})
-    scope = resolution.get("scope", {}) if isinstance(resolution, dict) else {}
-    baseline = scope.get("baseline_commit")
-    if baseline != manifest.get("audit", {}).get("baseline_commit"):
-        fail(errors, path, "classification baseline must equal audit baseline")
-        return
-
-    protected_exact: dict[str, str] = {}
-    protected_prefixes: list[tuple[str, str]] = []
-    for entry in manifest.get("protected_paths", []):
-        if not isinstance(entry, dict) or entry.get("status") not in RETENTION_STATUSES:
-            continue
-        if isinstance(entry.get("path"), str):
-            exact = entry["path"]
-            previous = protected_exact.setdefault(exact, entry["status"])
-            if previous != entry["status"]:
-                fail(errors, path, f"conflicting protected exact status: {exact}")
-        elif isinstance(entry.get("path_prefix"), str):
-            protected_prefixes.append((entry["path_prefix"], entry["status"]))
-
-    defaults: list[tuple[str, str]] = []
-    rule_ids: set[str] = set()
-    for rule in manifest.get("classification_defaults", []):
-        if not isinstance(rule, dict):
-            fail(errors, path, "classification default must be a mapping")
-            continue
-        rule_id = rule.get("rule_id")
-        prefix = rule.get("path_prefix")
-        status = rule.get("status")
-        if not isinstance(rule_id, str) or rule_id in rule_ids:
-            fail(errors, path, f"invalid or duplicate classification rule id: {rule_id}")
-            continue
-        rule_ids.add(rule_id)
-        if not isinstance(prefix, str) or not prefix.endswith("/"):
-            fail(errors, path, f"classification rule must use a directory prefix: {rule_id}")
-            continue
-        if any(token in prefix for token in ("*", "?", "[", "]", "{", "}")):
-            fail(errors, path, f"classification prefix must be literal: {prefix}")
-        if status not in RETENTION_STATUSES:
-            fail(errors, path, f"classification rule has invalid status: {rule_id}")
-            continue
-        defaults.append((prefix, status))
-
-    def longest_prefix_status(
-        relative: str,
-        rules: list[tuple[str, str]],
-        label: str,
-    ) -> str | None:
-        matches = [(len(prefix), status) for prefix, status in rules if relative.startswith(prefix)]
-        if not matches:
-            return None
-        longest = max(length for length, _ in matches)
-        statuses = {status for length, status in matches if length == longest}
-        if len(statuses) != 1:
-            fail(errors, path, f"equal-specificity {label} conflict: {relative}")
-            return None
-        return statuses.pop()
-
-    def effective_status(relative: str) -> str | None:
-        if relative in candidate_status:
-            return candidate_status[relative]
-        if relative in protected_exact:
-            return protected_exact[relative]
-        protected = longest_prefix_status(relative, protected_prefixes, "protected prefix")
-        if protected is not None:
-            return protected
-        return longest_prefix_status(relative, defaults, "classification prefix")
-
-    try:
-        inventory_rows = [
-            line for line in git_output("ls-tree", "-r", "--name-only", str(baseline), "--", "docs", "reports").splitlines()
-            if line
-        ]
-        size_rows = git_output(
-            "cat-file",
-            "--batch-check=%(objectsize)",
-            input_text="".join(f"{baseline}:{relative}\n" for relative in inventory_rows),
-        ).splitlines()
-    except (OSError, subprocess.CalledProcessError) as exc:
-        fail(errors, path, f"cannot read classification baseline: {exc}")
-        return
-    if len(inventory_rows) != len(size_rows):
-        fail(errors, path, "baseline path/size vectors have different lengths")
-        return
-
-    effective: dict[str, tuple[str, int]] = {}
-    for relative, size_text in zip(inventory_rows, size_rows, strict=True):
-        status = effective_status(relative)
-        if status is None:
-            fail(errors, path, f"unclassified baseline path: {relative}")
-            continue
-        effective[relative] = (status, int(size_text))
-
-    expected_count = int(scope.get("expected_file_count", -1))
-    expected_bytes = int(scope.get("expected_git_blob_bytes", -1))
-    if len(inventory_rows) != expected_count:
-        fail(errors, path, "baseline inventory file count drifted")
-    if sum(int(size) for size in size_rows) != expected_bytes:
-        fail(errors, path, "baseline inventory byte count drifted")
-    manifest_self = scope.get("manifest_self", {})
-    if manifest_self.get("path") != RETENTION_MANIFEST.as_posix():
-        fail(errors, path, "manifest self exception is missing")
-    if protected_exact.get(RETENTION_MANIFEST.as_posix()) != "KEEP_ACTIVE":
-        fail(errors, path, "manifest self must be explicitly KEEP_ACTIVE")
-
-    calculated: dict[str, dict[str, int]] = {}
-    for status in RETENTION_STATUSES:
-        rows = [size for value, size in effective.values() if value == status]
-        calculated[status] = {
-            "file_count": len(rows),
-            "git_blob_bytes": sum(rows),
-        }
-    if resolution.get("effective_summary") != calculated:
-        fail(errors, path, "effective docs/reports classification summary drifted")
-    if sum(row["file_count"] for row in calculated.values()) != expected_count:
-        fail(errors, path, "effective classification does not cover every baseline file")
-
-    ready_by_path = {str(item["path"]): item for item in ready_items}
-    for target, item in ready_by_path.items():
-        for reference in item.get("inbound_references", []):
-            source = reference.get("source_path")
-            relation = reference.get("relation")
-            if relation == "self_reference" and source != target:
-                fail(errors, path, f"invalid self reference: {target}")
-            if relation == "closure_internal":
-                if source not in ready_by_path:
-                    fail(errors, path, f"closure-internal source is not READY: {source}")
-                elif ready_closure_by_path.get(source) != ready_closure_by_path.get(target):
-                    fail(errors, path, f"closure-internal edge crosses closures: {source} -> {target}")
-
-    grouped: dict[str, list[str]] = {}
-    for relative, closure_id in ready_closure_by_path.items():
-        grouped.setdefault(closure_id, []).append(relative)
-    declared_rows = manifest.get("manual_delete_closures", [])
-    if not isinstance(declared_rows, list):
-        fail(errors, path, "manual delete closures must be a list")
-        declared_rows = []
-    declared: dict[str, dict[str, object]] = {}
-    for row in declared_rows:
-        if not isinstance(row, dict) or not isinstance(row.get("closure_id"), str):
-            fail(errors, path, "manual delete closure must have a string id")
-            continue
-        closure_id = str(row["closure_id"])
-        if closure_id in declared:
-            fail(errors, path, f"duplicate manual delete closure: {closure_id}")
-            continue
-        declared[closure_id] = row
-    if set(declared) != set(grouped):
-        fail(errors, path, "manual delete closure id set drifted")
-    for closure_id, rows in grouped.items():
-        rows.sort()
-        declared_row = declared.get(closure_id, {})
-        expected = {
-            "all_or_none": True,
-            "file_count": len(rows),
-            "byte_count": sum(int(ready_by_path[relative]["byte_count"]) for relative in rows),
-            "first_path": rows[0],
-        }
-        if any(declared_row.get(key) != value for key, value in expected.items()):
-            fail(errors, path, f"manual delete closure aggregate drifted: {closure_id}")
-
-    phase2 = manifest.get("phase2_retirement", {})
-    allowed_phase2_statuses = {
-        "awaiting_user_approval",
-        "quarantine_move_in_progress",
-        "user_quarantined_pending_manual_delete",
-        "user_deleted_pending_commit",
-        "completed",
-    }
-    if not isinstance(phase2, dict) or phase2.get("status") not in allowed_phase2_statuses:
-        fail(errors, path, "Phase 2 status is invalid")
-        return
-    gate = phase2.get("approval_gate", {})
-    phase2_closures = phase2.get("closures", {})
-    if not isinstance(phase2_closures, dict):
-        fail(errors, path, "Phase 2 closures must be a mapping")
-        return
-    phase2_paths: set[str] = set()
-    for closure_id, row in phase2_closures.items():
-        exact_paths = row.get("exact_paths", []) if isinstance(row, dict) else []
-        if not isinstance(exact_paths, list) or len(exact_paths) != len(set(exact_paths)):
-            fail(errors, path, f"Phase 2 closure path list is invalid: {closure_id}")
-            continue
-        expected_paths = {
-            relative
-            for relative, candidate_closure in ready_closure_by_path.items()
-            if candidate_closure == closure_id
-        }
-        if set(exact_paths) != expected_paths:
-            fail(errors, path, f"Phase 2 exact path closure drifted: {closure_id}")
-        if phase2_paths.intersection(exact_paths):
-            fail(errors, path, f"Phase 2 closures overlap: {closure_id}")
-        phase2_paths.update(exact_paths)
-    scope_total = phase2.get("scope", {}).get("total", {})
-    if len(phase2_paths) != scope_total.get("file_count"):
-        fail(errors, path, "Phase 2 scope file count drifted")
-    if sum(int(ready_by_path[relative]["byte_count"]) for relative in phase2_paths) != scope_total.get(
-        "git_blob_bytes"
-    ):
-        fail(errors, path, "Phase 2 scope byte count drifted")
-
-    execution_state = gate.get("execution_state")
-    if gate.get("required_selection") != "all_six_phase2_closures_all_or_none":
-        fail(errors, path, "Phase 2 approval selection rule drifted")
-    if execution_state == "not_started":
-        if phase2.get("status") != "awaiting_user_approval":
-            fail(errors, path, "unapproved Phase 2 status drifted")
-        if gate.get("user_approved") is not False:
-            fail(errors, path, "unapproved Phase 2 approval must be false")
-        if gate.get("approved_closure_ids") != [] or gate.get("approved_exact_paths") != []:
-            fail(errors, path, "unapproved Phase 2 approval lists must be empty")
-        if gate.get("codex_quarantine_move_authorized") is not False:
-            fail(errors, path, "unapproved Phase 2 quarantine move must be false")
-    elif execution_state in {
-        "quarantine_move_in_progress",
-        "user_quarantined_pending_manual_delete",
-        "user_deleted_pending_commit",
-        "completed",
+    if control != {
+        "codex_delete_authorized": False,
+        "directories_authorized": False,
+        "execution_actor": "user_manual_delete",
+        "prior_approvals_apply_to_new_candidates": False,
     }:
-        if phase2.get("status") != execution_state:
-            fail(errors, path, "approved Phase 2 status must match execution state")
-        if gate.get("user_approved") is not True:
-            fail(errors, path, "approved Phase 2 approval must be true")
-        if gate.get("approved_closure_ids") != list(phase2_closures):
-            fail(errors, path, "approved Phase 2 closure IDs drifted")
-        approved_paths = gate.get("approved_exact_paths")
-        if not isinstance(approved_paths, list) or len(approved_paths) != len(set(approved_paths)):
-            fail(errors, path, "approved Phase 2 exact path list is invalid")
-        elif set(approved_paths) != phase2_paths:
-            fail(errors, path, "approved Phase 2 exact paths drifted")
-        if gate.get("codex_quarantine_move_authorized") is not True:
-            fail(errors, path, "approved Phase 2 quarantine move must be true")
+        fail(errors, path, "deletion requires the current manual boundary; old approvals cannot be reused")
+
+    def literal(value, *, prefix=False):
+        if not isinstance(value, str) or not value:
+            fail(errors, path, "path must be a non-empty string")
+            return None
+        pure = PurePosixPath(value)
+        normalized = pure.as_posix() + ("/" if prefix else "")
+        if (
+            value != normalized or pure.is_absolute() or PureWindowsPath(value).drive
+            or any(part in {".", ".."} for part in pure.parts)
+            or any(token in value for token in ("*", "?", "[", "]", "{", "}", "\r", "\n"))
+            or not (REPO_ROOT / pure).resolve().is_relative_to(REPO_ROOT.resolve())
+        ):
+            fail(errors, path, f"unsafe or non-literal path: {value}")
+            return None
+        return value
+
+    protected_exact, protected_prefixes = set(), set()
+    for row in manifest.get("protected_paths", []):
+        if not isinstance(row, dict) or row.get("status") not in {"KEEP_ACTIVE", "KEEP_EVIDENCE"}:
+            fail(errors, path, "invalid protected path entry")
+            continue
+        prefix = "path_prefix" in row
+        value = literal(row.get("path_prefix" if prefix else "path"), prefix=prefix)
+        if value:
+            (protected_prefixes if prefix else protected_exact).add(value)
+    if RETENTION_MANIFEST.as_posix() not in protected_exact:
+        fail(errors, path, "canonical manifest must protect itself")
+
+    def is_protected(value):
+        return value in protected_exact or any(value.startswith(p) for p in protected_prefixes)
+
+    retired = manifest.get("retired_paths", [])
+    if not isinstance(retired, list) or not retired or not all(isinstance(x, str) for x in retired):
+        fail(errors, path, "retired_paths must be a non-empty string list")
+        return
+    if len(retired) != len(set(retired)):
+        fail(errors, path, "duplicate retired path")
+    for value in retired:
+        if literal(value) is None:
+            continue
+        if is_protected(value):
+            fail(errors, path, f"protected path is retired: {value}")
+        if (REPO_ROOT / value).exists():
+            fail(errors, path, f"retired path has reappeared: {value}")
+    retired_set = set(retired)
+    for row in manifest.get("allowed_retired_references", []):
+        source = literal(row.get("source_path"))
+        if not source or not (REPO_ROOT / source).is_file():
+            fail(errors, path, "declared current reference source is missing")
+        if row.get("relation") not in {
+            "git_history_only", "historical_cross_reference", "historical_metadata_only",
+            "negative_assertion_only", "retained_evidence_reference", "retirement_assertion_only",
+        }:
+            fail(errors, path, "retired reference cannot be a current physical dependency")
+        targets = row.get("targets", [])
+        if not targets or not set(targets) <= retired_set or len(targets) != len(set(targets)):
+            fail(errors, path, "retired reference targets must be unique registered paths")
+
+    invariants = {row.get("id"): row for row in manifest.get("protected_invariants", [])}
+    human = invariants.get("C-HUMAN-005", {})
+    database = invariants.get("formal_portfolio_database", {})
+    if human.get("status") != "pending" or human.get("effective_machine_value") is not None or human.get("mutation_authorized") is not False:
+        fail(errors, path, "C-HUMAN-005 invariant drifted")
+    if database.get("access") != "read_only" or database.get("copy_delete_rebuild_authorized") is not False or database.get("tracked_or_manifested_content") is not False:
+        fail(errors, path, "formal database protection drifted")
+
+    history = manifest.get("history", {})
+    snapshot = history.get("snapshot", {})
+    if history.get("storage") != "git_history" or history.get("current_selection_allowed") is not False:
+        fail(errors, path, "history cannot select current runs")
+    commit = snapshot.get("commit", "")
+    if not re.fullmatch(r"[0-9a-f]{40}", commit) or snapshot.get("path") != RETENTION_MANIFEST.as_posix():
+        fail(errors, path, "invalid historical snapshot identity")
     else:
-        fail(errors, path, "Phase 2 execution state is invalid")
-    if gate.get("codex_delete_authorized") is not False:
-        fail(errors, path, "Codex delete authorization must remain false")
+        try:
+            payload = subprocess.check_output(
+                ["git", "show", f"{commit}:{RETENTION_MANIFEST.as_posix()}"], cwd=REPO_ROOT
+            )
+            oid = hashlib.sha1(f"blob {len(payload)}\0".encode() + payload, usedforsecurity=False).hexdigest()
+            if (oid != snapshot.get("blob_oid") or len(payload) != snapshot.get("git_blob_bytes")
+                or hashlib.sha256(payload).hexdigest() != snapshot.get("content_sha256")):
+                fail(errors, path, "historical snapshot integrity mismatch")
+        except (OSError, subprocess.CalledProcessError):
+            fail(errors, path, "historical snapshot is not recoverable from Git")
+
+    pending = manifest.get("manual_delete_candidates")
+    completed = manifest.get("completed_manual_deletions")
+    if not all(isinstance(rows, list) and all(isinstance(row, dict) for row in rows)
+               for rows in (pending, completed)):
+        fail(errors, path, "manual deletion indexes must be lists of mappings")
+        return
+    seen_candidates = set()
+    recovery_rows = []
+    for row, is_completed in [(row, False) for row in pending] + [(row, True) for row in completed]:
+        value = literal(row.get("path"))
+        if not value:
+            continue
+        if value in seen_candidates or value in retired_set or is_protected(value):
+            fail(errors, path, f"candidate conflicts with retired/protected paths: {value}")
+        seen_candidates.add(value)
+        expected_status = "DELETED_BY_USER" if is_completed else "READY_FOR_MANUAL_DELETE"
+        if row.get("status") != expected_status or not row.get("reason"):
+            fail(errors, path, f"candidate requires a scoped readiness reason: {value}")
+        recovery_commit = str(row.get("recovery_commit", ""))
+        if not re.fullmatch(r"[0-9a-f]{40}", recovery_commit):
+            fail(errors, path, f"candidate requires a fixed Git recovery commit: {value}")
+        else:
+            recovery_rows.append(row)
+        if not re.fullmatch(r"[0-9a-f]{40}", str(row.get("blob_oid", ""))) or not re.fullmatch(r"[0-9a-f]{64}", str(row.get("content_sha256", ""))):
+            fail(errors, path, f"candidate recovery hashes are missing: {value}")
+        if is_completed:
+            record = literal(row.get("deletion_record"))
+            if (row.get("deletion_actor") != "user"
+                or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(row.get("deletion_verified_on", "")))
+                or not record or not (REPO_ROOT / record).is_file()):
+                fail(errors, path, f"completed deletion requires verified user evidence: {value}")
+            if (REPO_ROOT / value).exists():
+                fail(errors, path, f"completed deletion has reappeared: {value}")
+        references = row.get("inbound_references", [])
+        if not references:
+            fail(errors, path, f"candidate dependency evidence is missing: {value}")
+        for reference in references:
+            source = literal(reference.get("source_path"))
+            relation = reference.get("relation")
+            if relation == "self_reference":
+                if source != value:
+                    fail(errors, path, "candidate self-reference points elsewhere")
+            elif relation not in {"git_history_only", "historical_cross_reference", "retirement_assertion_only"}:
+                fail(errors, path, "candidate still has a current physical dependency")
+            elif source and not (REPO_ROOT / source).is_file():
+                fail(errors, path, f"candidate reference source is missing: {source}")
+        if (REPO_ROOT / value).is_file():
+            oid = git_output("hash-object", f"--path={value}", "--", value).strip()
+            if oid != row.get("blob_oid"):
+                fail(errors, path, f"candidate changed since dependency audit: {value}")
+
+    # One immutable Git batch verifies both indexes without a process per file.
+    if recovery_rows:
+        specs = [f"{row['recovery_commit']}:{row['path']}" for row in recovery_rows]
+        try:
+            result = subprocess.run(
+                ["git", "cat-file", "--batch"], cwd=REPO_ROOT,
+                input=("\n".join(specs) + "\n").encode("utf-8"),
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True,
+            )
+            stream = io.BytesIO(result.stdout)
+            for row in recovery_rows:
+                header = stream.readline().rstrip(b"\n").split()
+                if len(header) != 3 or header[1] != b"blob":
+                    fail(errors, path, f"candidate is not recoverable from Git: {row['path']}")
+                    continue
+                payload = stream.read(int(header[2]))
+                if stream.read(1) != b"\n":
+                    raise ValueError("malformed Git blob batch")
+                oid = hashlib.sha1(f"blob {len(payload)}\0".encode() + payload, usedforsecurity=False).hexdigest()
+                if (oid != row.get("blob_oid") or oid != header[0].decode("ascii")
+                    or len(payload) != row.get("git_blob_bytes")
+                    or hashlib.sha256(payload).hexdigest() != row.get("content_sha256")):
+                    fail(errors, path, f"candidate recovery integrity mismatch: {row['path']}")
+        except (OSError, ValueError, subprocess.CalledProcessError):
+            fail(errors, path, "candidate Git recovery verification failed")
+
 
 
 def main() -> int:

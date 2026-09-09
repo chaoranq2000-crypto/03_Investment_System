@@ -42,7 +42,7 @@
 | quality issue schema | `.agents/skills/quality-review/references/issue_schema.md` | skill 与 policy 只消费该字段合同；不得创造全局 gate id。 |
 | stock report production profile | `.agents/skills/stock-deep-dive/references/report_production_profile.md` | 不得作为平级 workflow。 |
 | local check to global gate mapping | 对应 capability-local evaluator reference | `RESEARCH_WORKFLOW.md` 只持有通用映射原则与 canonical G0–G10；各 reference 持有本 capability 的 local ID 和映射，不得产生第二套 global gate。 |
-| legacy Bundle/R5 capability evaluator routing | `docs/workflows/RESEARCH_WORKFLOW.md` + `WORKFLOW_ORCHESTRATION_SPEC.md` | Bundle11R–16R、`R5-G1`–`R5-G11` 只能显式调用并影响 `affected_capabilities`；不得成为默认 routing 或直接写 canonical outcome。 |
+| legacy Bundle/R5 capability evaluator routing | `docs/workflows/RESEARCH_WORKFLOW.md` + `WORKFLOW_ORCHESTRATION_SPEC.md` | 仍有实现的 Bundle11R–13R、`R5-G1`–`R5-G11` 局部 evaluator 只能显式调用并影响 `affected_capabilities`；Bundle14R–16R 实现已退役，其合同与结果只作历史兼容证据；不得成为默认 routing 或直接写 canonical outcome。 |
 
 ## 职责矩阵
 
@@ -63,7 +63,7 @@
 | `docs/workflows/DATA_LAYER_WORKFLOW.md` | 数据层 source adapter、manifest、candidate、data pack、局部 DL checks | 投研结论、报告写作风格、全局 gate id 定义 | `RESEARCH_WORKFLOW.md` |
 | `docs/workflows/STOCK_REPORT_PRODUCTION_WORKFLOW.md` | 兼容性指针 | active profile、workflow_type 定义 | `RESEARCH_WORKFLOW.md` |
 | `docs/workflows/R5_SAMPLE_QUALITY_STOCK_REPORT_SPEC.md` | 显式 R5 report-capability profile、局部降级和 legacy evaluator 说明 | canonical outcome 重定义、默认 Bundle/R5 routing | `RESEARCH_WORKFLOW.md` |
-| `docs/workflows/R5_REAL_COMPANY_REGRESSION_CONTRACT.md` | 显式调用的 automated legacy four-case capability evaluator；历史 per-case 人审只读 | 活动 reviewer authority、release gate、canonical status owner、普通 T0–T10 前置条件 | `RESEARCH_WORKFLOW.md` |
+| `docs/workflows/R5_REAL_COMPANY_REGRESSION_CONTRACT.md` | 已退役 Bundle16R 四公司回归的历史契约、字段释义与兼容证据；历史 per-case 人审只读 | 当前可调用 evaluator、活动 reviewer authority、release gate、canonical status owner、普通 T0–T10 前置条件 | `RESEARCH_WORKFLOW.md` |
 | `docs/reporting/` | 个股报告质量标准、证据到叙事契约、表达指南 | 编排路由、run 状态、source adapter 规则 | `stock-deep-dive` profile |
 | `docs/playbooks/` | 日常操作提示和命令入口 | 永久事实定义、阶段验收标准 | workflow docs |
 | `docs/plans/` | 建设计划和验收清单 | 当前事实源定义 | project / workflow docs |

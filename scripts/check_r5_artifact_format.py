@@ -72,10 +72,8 @@ R5_PYTHON_RULES = [
 
 R5_GATE_OF_GATES_RULES = [
     ArtifactRule("scripts/check_r5_artifact_format.py", "python", min_lines=8, requires_cli_help=True),
-    ArtifactRule("scripts/r5_patch_inventory_check.py", "python", min_lines=8, requires_cli_help=True),
     ArtifactRule("scripts/check_r5_readout_truthfulness.py", "python", min_lines=8, requires_cli_help=True),
     ArtifactRule("scripts/run_r5_mvp_smoke.py", "python", min_lines=8, requires_cli_help=True),
-    ArtifactRule("scripts/r5_readiness_gate.py", "python", min_lines=8, requires_cli_help=True),
 ]
 
 R5_TEST_RULES = [

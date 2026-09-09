@@ -11,6 +11,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from conftest import GIT_HISTORY
+
 
 pytestmark = pytest.mark.legacy_compatibility
 
@@ -178,33 +180,13 @@ def historical_replay_blob(relative_path: str) -> bytes:
         relative_path
     ]
     repository_path = f"{HISTORICAL_REPLAY_PREFIX}/{relative_path}"
-    spec = f"{HISTORICAL_REPLAY_BASELINE}:{repository_path}"
-    observed_oid = subprocess.check_output(
-        ["git", "rev-parse", "--verify", spec],
-        cwd=ROOT,
-        text=True,
-        encoding="utf-8",
-    ).strip()
+    blob = GIT_HISTORY.blob(HISTORICAL_REPLAY_BASELINE, repository_path)
+    observed_oid = blob.oid
     assert observed_oid == expected_oid
-    assert (
-        subprocess.check_output(
-            ["git", "cat-file", "-t", spec],
-            cwd=ROOT,
-            text=True,
-            encoding="utf-8",
-        ).strip()
-        == "blob"
-    )
-    observed_bytes = int(
-        subprocess.check_output(
-            ["git", "cat-file", "-s", spec],
-            cwd=ROOT,
-            text=True,
-            encoding="utf-8",
-        ).strip()
-    )
+    assert blob.object_type == "blob"
+    observed_bytes = blob.byte_count
     assert observed_bytes == expected_bytes
-    payload = subprocess.check_output(["git", "cat-file", "blob", spec], cwd=ROOT)
+    payload = blob.payload
     assert len(payload) == expected_bytes
     assert hashlib.sha256(payload).hexdigest() == expected_sha256
     return payload
@@ -573,6 +555,10 @@ def test_historical_replay_tree_is_git_recoverable(built_replay) -> None:
     assert len(HISTORICAL_REPLAY_BLOBS) == 16
     assert sum(row[1] for row in HISTORICAL_REPLAY_BLOBS.values()) == 132529
 
+    GIT_HISTORY.blobs(
+        HISTORICAL_REPLAY_BASELINE,
+        (f"{HISTORICAL_REPLAY_PREFIX}/{relative}" for relative in HISTORICAL_REPLAY_BLOBS),
+    )
     payloads = {
         relative_path: historical_replay_blob(relative_path)
         for relative_path in HISTORICAL_REPLAY_BLOBS

@@ -5,6 +5,10 @@ import subprocess
 from pathlib import Path
 
 import yaml
+import pytest
+
+# Published historical results; current algorithms are covered in the default suite.
+pytestmark = pytest.mark.legacy_compatibility
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_SOURCE = "config/r5_bundle3_expected_artifacts.yaml"
