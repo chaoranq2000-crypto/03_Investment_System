@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import io
 import json
 import os
 import subprocess
@@ -42,6 +43,7 @@ TARGET_WORKFLOW_ID = "wf_20260723_stock_first_002837_v1_replay"
 SOURCE_RUN_REL = Path("reports/workflow_runs") / SOURCE_WORKFLOW_ID
 TARGET_RUN_REL = Path("reports/workflow_runs") / TARGET_WORKFLOW_ID
 HISTORICAL_BASELINE = "f60f220ae252262a537c612ce193fc779901984b"
+HISTORICAL_MANIFEST_REL = "data/manifests/evidence_manifest.csv"
 AS_OF_DATE = "2026-07-23"
 
 # Frozen historical provenance rendered into the byte-identical replay receipt.
@@ -126,6 +128,12 @@ EXPECTED_HISTORICAL_SOURCE_BLOBS = {
         "c64b320fcbb07b4f5637d9c2ef7f1510112b6136",
         43773,
         "a41ba3eecdea561ee3ed58df173628058a832b695f88bacbb996d258d0521d78",
+    ),
+    # Keep this last so the historical anchor order and receipt bytes stay fixed.
+    HISTORICAL_MANIFEST_REL: (
+        "8746bf3c66ebab3b3ad01f09458d03410d1a0597",
+        112378,
+        "34568fb9f31dc84c16e4b086b751a81ef8770591086c59a901ea7107510175ae",
     ),
 }
 
@@ -276,7 +284,10 @@ class ReplayContractError(RuntimeError):
 
 
 def is_historical_source_path(relative_path: str) -> bool:
-    return relative_path.startswith(SOURCE_RUN_REL.as_posix() + "/")
+    return (
+        relative_path == HISTORICAL_MANIFEST_REL
+        or relative_path.startswith(SOURCE_RUN_REL.as_posix() + "/")
+    )
 
 
 def read_git_blob(repo_root: Path, revision: str, relative_path: str) -> bytes:
@@ -572,8 +583,10 @@ def verify_expected_sources(repo_root: Path) -> list[dict[str, str]]:
 
 
 def select_real_evidence(repo_root: Path) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
-    manifest_path = repo_root / "data/manifests/evidence_manifest.csv"
-    _, manifest_rows = read_csv(manifest_path)
+    manifest_payload = read_git_blob(repo_root, HISTORICAL_BASELINE, HISTORICAL_MANIFEST_REL)
+    manifest_rows = list(
+        csv.DictReader(io.StringIO(manifest_payload.decode("utf-8-sig"), newline=""))
+    )
     by_id = {row.get("evidence_id", ""): row for row in manifest_rows}
     selected: list[dict[str, str]] = []
     provenance: list[dict[str, str]] = []
