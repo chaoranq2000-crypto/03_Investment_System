@@ -1,6 +1,6 @@
 # 测试夹具收尾与 Bundle 4 外壳合并
 
-状态：实现、依赖解耦、文件隔离、恢复验证及全套回归均已完成；实际文件删除待用户执行。
+状态：实现、依赖解耦、文件隔离、恢复验证、全套回归及用户手动物理删除均已完成。
 
 ## 范围与恢复依据
 
@@ -13,7 +13,7 @@ scripts/run_r5_bundle4_reviewed_input_smoke.py
 tests/test_r5_bundle4_reviewed_input_smoke.py
 ```
 
-每项在 canonical retention manifest 保留固定恢复提交、Git blob、字节数、SHA-256 与当前引用依据。原有 476 条退役路径、100 条用户已删除记录、保护范围、历史快照和不变量保持不变。本轮 2 条仅进入 `manual_delete_candidates`，尚未标记物理删除完成。
+每项在 canonical retention manifest 保留固定恢复提交、Git blob、字节数、SHA-256 与当前引用依据。原有 476 条退役路径、100 条用户已删除记录、保护范围、历史快照和不变量保持不变。本轮 2 条最初进入 `manual_delete_candidates`，用户删除并核验后转入已完成记录。当前待删为 0，完成索引共 102 条。
 
 ## 实现与覆盖边界
 
@@ -49,15 +49,22 @@ Bundle 4 保留 promoter、registry IO、dry-run builder 及原 fixture 文件�
 
 当前研究数据、原始证据、已审核输入、正式 Portfolio 数据库、Investment Review、当前运行与指针不在本轮修改范围内。没有删除目录、变更工作树登记、推送或合并。
 
-## 手动删除与剩余事项
+## 用户删除核验（2026-09-09）
 
-待删目录：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_test_fixture_bundle4_20260909/`。该目录保存两份旧文件及 README／恢复收据；证据目录另有收据副本。
+用户反馈“已删除”后，逐项核验两份原文件及两份隔离副本均不存在。独立核验确认它们仍可从固定提交 `412e1d985454f374e9e0127523b33b44ff89675a` 恢复；两份 Git blob 的类型、OID、长度和 SHA-256 全部一致，共 21,665 bytes。
 
-`AGENTS.md` 第 60–61 行要求："Do not remove directories automatically. If the requested scope contains multiple files or any directory, stop and ask the user to perform the deletion manually." 因此文件仅移入隔离目录，用户删除后再核验并更新完成记录。
+本轮 2 条记录已转入 `completed_manual_deletions`，登记 `deletion_actor=user`、核验日期和本记录路径。原有 100 条完成记录及清单其他字段逐项不变。证据保存在 `.codex_tmp/test_fixture_bundle4_slimming_20260909/user_deletion_verification.json`；原移动收据继续作为历史证据保留。
+
+本次只调整清单与删除记录，没有修改运行代码、测试代码或业务数据。此前完整回归仍作为代码版本的验证依据。收尾验证：Doc drift 通过，清单、路由及历史保护回归 34 passed（15.39 秒），102 条完成记录的 Git 恢复完整性检查通过。
+
+## 剩余事项
+
+原待删目录：`C:/Users/Q/.codex/worktrees/slim20260906/03_Investment_System/.codex_tmp/manual_delete_test_fixture_bundle4_20260909/`。两份旧文件已由用户删除，目录中仅剩 `README.md` 与 `cleanup_manifest.json` 两份辅助记录，可保留或由用户手动删除；证据目录另有收据副本。
+
+本轮遵循 `AGENTS.md` 第 60–61 行要求："Do not remove directories automatically. If the requested scope contains multiple files or any directory, stop and ask the user to perform the deletion manually." 用户删除及完成索引更新均已核验；Codex 未执行文件或目录删除。
 
 本轮只保存本地提交。后续发布须保留前序提交及恢复对象的可达性。
 
 | 剩余事项 | owner | severity | 下一步 |
 |---|---|---|---|
-| 本轮 2 个旧文件的物理删除 | user | low | 手动删除本轮待删目录后核验 |
 | 瘦身分支发布 | user | medium | 确认发布范围后推送或合入主线，并保留恢复提交 |
