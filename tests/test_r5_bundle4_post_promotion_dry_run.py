@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+import csv
 import hashlib
 import importlib.util
+import json
+import socket
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
 
 import pytest
+import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BUILDER_SCRIPT = REPO_ROOT / "scripts/build_r5_reviewed_input_dry_run_from_registries.py"
@@ -115,6 +120,27 @@ def target_hashes(run_dir: Path, names: tuple[str, ...]) -> dict[str, str | None
     return {name: sha256_path(run_dir / name) for name in names}
 
 
+def current_artifact_hashes() -> dict[str, str]:
+    pointer_path = REPO_ROOT / "config/r5_readout_canonical_index.yaml"
+    pointer = yaml.safe_load(pointer_path.read_text(encoding="utf-8"))
+    assert pointer["status"] == "active" and pointer["current_runs"]
+    paths = {pointer_path}
+    for current in pointer["current_runs"].values():
+        state_path = REPO_ROOT / current["state_path"]
+        manifest_path = state_path.parent / "artifact_manifest.csv"
+        paths.update((state_path, REPO_ROOT / current["readout_path"], manifest_path))
+        with manifest_path.open(encoding="utf-8", newline="") as handle:
+            rows = list(csv.DictReader(handle))
+        assert rows
+        paths.update(REPO_ROOT / row["path"] for row in rows)
+    hashes = {}
+    for path in paths:
+        assert path.resolve().is_relative_to(REPO_ROOT.resolve())
+        assert path.is_file(), f"missing current artifact: {path}"
+        hashes[path.relative_to(REPO_ROOT).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
+    return hashes
+
+
 @pytest.mark.parametrize("create_empty_dir", [False, True], ids=["missing", "empty"])
 def test_missing_or_empty_registries_keep_every_flag_false(
     builder,
@@ -180,6 +206,98 @@ def test_all_complete_sets_five_flags_but_fixture_caps_sample_quality_and_p2(
     assert result["allowed_report_level"] == "reviewed_input_research_draft"
     assert result["sample_quality_report_allowed"] is False
     assert result["p2_allowed"] is False
+
+
+def test_mixed_status_derives_only_market_readiness_from_promoted_registries(
+    builder, promoter, tmp_path: Path,
+) -> None:
+    run_dir, promotion_path, promotion = promote_fixture(promoter, tmp_path, "mixed_status")
+    result = build(builder, run_dir, promotion_path)
+
+    assert {flag: result[flag] for flag in REVIEWED_FLAGS} == {
+        "reviewed_market_inputs_available": True,
+        "reviewed_peer_inputs_available": False,
+        "reviewed_forecast_assumptions_available": False,
+        "reviewed_valuation_inputs_available": False,
+        "reviewed_business_disclosure_available": False,
+    }
+    assert result["remaining_todos"] == [token for token in CRITICAL_TODOS if token != "TODO_MARKET_DATA"]
+    assert result["allowed_report_level"] == "source_gapped_research_draft"
+    assert promotion["accepted_count"] == promotion["accepted_degraded_count"] == 1
+    assert promotion["accepted_input_ids"] == ["fixture_mixed_market_accepted"]
+    assert promotion["accepted_degraded_input_ids"] == ["fixture_mixed_peer_degraded"]
+
+
+@pytest.mark.parametrize(
+    ("scenario", "repeat"),
+    [
+        (None, False),
+        ("accepted_core_complete", False),
+        ("accepted_all_complete", False),
+        ("mixed_status", False),
+        ("invalid_cross_stock", False),
+        ("accepted_core_complete", True),
+    ],
+    ids=["empty", "core", "complete", "mixed", "invalid", "idempotent"],
+)
+def test_fixture_pipeline_is_offline_relocatable_and_preserves_current_artifacts(
+    builder, promoter, tmp_path: Path, monkeypatch, scenario: str | None, repeat: bool,
+) -> None:
+    def reject_network(*_args, **_kwargs):
+        raise AssertionError("reviewed-input fixture pipeline must not access the network")
+
+    monkeypatch.setattr(socket, "create_connection", reject_network)
+    monkeypatch.setattr(socket.socket, "connect", reject_network)
+    status_command = ["git", "status", "--porcelain=v1", "-z", "-uall"]
+    before_status = subprocess.check_output(status_command, cwd=REPO_ROOT)
+    before_current = current_artifact_hashes()
+    outputs = []
+    registry_bytes = []
+    for root_name in ("first", "second"):
+        case_root = tmp_path / root_name
+        if scenario in (None, "invalid_cross_stock"):
+            case_root.mkdir()
+            dropzone = FIXTURE_ROOT / scenario if scenario else case_root / "empty_dropzone"
+            if scenario is None:
+                dropzone.mkdir()
+            run_dir = case_root / "run"
+            promotion_path = case_root / "promotion_result.yaml"
+            promotion = promoter.promote_reviewed_inputs(
+                repo_root=REPO_ROOT, workflow_id=FIXTURE_WORKFLOW, stock_code=FIXTURE_STOCK,
+                dropzone_root=dropzone, output_run_dir=run_dir, fixture_mode=True, dry_run=False,
+            )
+            promotion_path.write_bytes(promoter.registry_io.dump_yaml_bytes(promotion))
+            assert promotion["promotion_status"] == (
+                "blocked_invalid_dropzone" if scenario else "no_accepted_inputs"
+            )
+            assert promotion["registries_changed"] is False
+            assert all(not (run_dir / name).exists() for name in REGISTRY_FILES.values())
+        else:
+            run_dir, promotion_path, promotion = promote_fixture(promoter, case_root, scenario)
+            if repeat:
+                run_dir, promotion_path, promotion = promote_fixture(promoter, case_root, scenario)
+                assert promotion["registries_changed"] is False
+        result = build(builder, run_dir, promotion_path)
+        for actual in (promotion, result):
+            assert actual["fixture_mode"] is True
+            assert actual["sample_quality_report_allowed"] is False
+            assert actual["p2_allowed"] is False
+        if scenario in (None, "invalid_cross_stock"):
+            assert all(result[flag] is False for flag in REVIEWED_FLAGS)
+            assert result["remaining_todos"] == list(CRITICAL_TODOS)
+            assert result["allowed_report_level"] == "source_gapped_research_draft"
+        serialized = json.dumps((promotion, result), sort_keys=True)
+        for prefix in (str(case_root.resolve()), case_root.resolve().as_posix()):
+            serialized = serialized.replace(json.dumps(prefix)[1:-1], "<case_root>")
+        outputs.append(serialized)
+        registry_bytes.append({
+            name: (run_dir / name).read_bytes() if (run_dir / name).is_file() else None
+            for name in REGISTRY_FILES.values()
+        })
+    assert outputs[0] == outputs[1]
+    assert registry_bytes[0] == registry_bytes[1]
+    assert current_artifact_hashes() == before_current
+    assert subprocess.check_output(status_command, cwd=REPO_ROOT) == before_status
 
 
 def test_valuation_flag_requires_evidence_anchored_valuation_input_refs(

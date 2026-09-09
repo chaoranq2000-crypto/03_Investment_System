@@ -1,25 +1,30 @@
-# R5 Real-Company Golden Regression Contract
+# R5 Real-Company Golden Regression — Historical Contract
 
 ## 1. Purpose
 
-Bundle 16R is a retained legacy capability evaluator for four real companies
-with materially different economic models. It is not a release gate, is not
-part of ordinary T0–T10 routing, and does not replace
-`RESEARCH_WORKFLOW.md`. It may be invoked only when the caller explicitly asks
-for this four-case regression capability and supplies the required local inputs.
-Its active invocation is automated only. Historical per-case human-review,
-reviewer-authority and exact-hash records remain read-only compatibility
-evidence and do not participate in active routing.
+Bundle 16R was a four-company regression evaluator for materially different
+economic models. Its implementation, case-pack builder, case registry and
+dedicated tests were retired in Git commit
+`274d47ec299a42946bc3b83f7908257e80f0f99b` on 2026-07-27
+(`chore(v1): remove retired bundle workflow history`). This document remains
+as a historical contract for interpreting retained artifacts and fixed Git
+generations; it does not describe an installed or callable four-case evaluator.
 
-The contract answers one question:
+The sections below preserve the retired evaluator's case definitions, artifact
+fields and local quality requirements. They do not set current report standards,
+release gates or T0–T10 routing. Current workflow and review decisions remain
+owned by `RESEARCH_WORKFLOW.md` and its workflow-state schema. Historical
+per-case human-review, reviewer-authority and exact-hash records remain read-only
+compatibility evidence.
+
+The historical contract addressed one question:
 
 > Can one issuer-neutral research runtime produce decision-useful, traceable and economically grounded research across four different business-model families without promoting sample prose into evidence?
 
-An engineering pass is not a sample-quality pass. P2 is never authorized by
-this contract, and a Bundle16R-local result never writes canonical
-`workflow_state.status`.
+A historical engineering pass is not a current sample-quality pass. This
+contract authorizes neither P2 nor a write to canonical `workflow_state.status`.
 
-## 2. Golden regression cases
+## 2. Historical golden regression cases
 
 | Case | Primary model family | Required operating bridge |
 |---|---|---|
@@ -28,12 +33,16 @@ this contract, and a Bundle16R-local result never writes canonical
 | 603259 药明康德 | backlog and project-funnel services | backlog + project stage + conversion/recognition + capacity/mix → revenue, margin and risk scenarios |
 | 600673 东阳光 | multi-business + project + acquisition | quota/price, manufacturing capacity, project acceptance, IDC utilization and deal consolidation → segment model and valuation eligibility |
 
-The four sample reports supplied outside the repository are narrative-density references only. They may be used to define research dimensions, adversarial tests and expected analytical emphasis. They must not be cited as facts, copied into evidence packs or used to seed numeric model inputs.
+The four sample reports supplied outside the repository served only as
+narrative-density references for research dimensions, adversarial tests and
+expected analytical emphasis. Their historical role does not make them evidence:
+they must not be cited as facts, copied into evidence packs or used to seed
+numeric model inputs.
 
-## 3. Required machine artifacts per case
+## 3. Historical machine artifacts per case
 
-Each active automated case result must bind the following roles to physical,
-repository-relative files and SHA-256 hashes:
+The machine-artifact contract bound the following roles to physical,
+repository-relative files and SHA-256 hashes within the historical generation:
 
 1. `workflow_state`
 2. `evidence_pack`
@@ -44,21 +53,22 @@ repository-relative files and SHA-256 hashes:
 7. `quality_readout`
 8. `generation_lock`
 
-A missing file, path escape, duplicate role or hash mismatch is a hard failure
-for the explicitly requested Bundle16R capability. It becomes canonical
-`blocked` only if an identity/path/parse/source failure prevents any honest
-current-goal output; otherwise it limits the affected capability and is routed
-through the canonical truth table.
+A missing file, path escape, duplicate role or hash mismatch failed the local
+Bundle16R artifact check. Historical paths and hashes must be assessed against
+their recorded generation, including fixed Git recovery for retired files;
+absence from the current worktree is not a new current-run failure by itself.
+Any present issue is classified under the current workflow's scoped truth table.
 
-The hashes on all eight roles, including `generation_lock`, are machine
-integrity and reproducibility checks. A historical ninth `human_review` role
-may be read only by an explicit compatibility reader; it is never required by
-an active case, never supplies current reviewer authority and never controls
-the canonical automatic outcome or `sample_quality_ready`.
+The hashes on all eight roles, including `generation_lock`, recorded machine
+integrity and reproducibility. Some historical generations also bound a ninth
+`human_review` role. It may be read only as compatibility evidence, never as
+current reviewer authority or as a source of the canonical automatic outcome
+or `sample_quality_ready`.
 
-## 4. Case-result manifest
+## 4. Historical case-result manifest
 
-Each `<case_id>.json` in the case-results directory must use:
+The retired case-result schema used the following `<case_id>.json` structure.
+This example preserves its fields and does not request a new case generation:
 
 ```json
 {
@@ -107,11 +117,14 @@ Each `<case_id>.json` in the case-results directory must use:
 }
 ```
 
-The metrics must be computed by upstream packs or a documented adapter. They must not be manually typed solely to satisfy the gate.
+The historical contract required metrics computed by upstream packs or a
+documented adapter; values entered solely to satisfy the gate were not valid.
 
-## 5. Operating-model quality floor
+## 5. Historical operating-model quality floor
 
-A case cannot pass by filling sections with generic prose. The minimum release floor is:
+The retired evaluator did not accept generic prose as a substitute for a model.
+Its local quality floor was the following; these fixed thresholds are retained
+to interpret old results, not to redefine current report or release requirements:
 
 - at least 80% of material segments bound to an explicit economic-driver contract;
 - at least 80% of revenue explained by driver output;
@@ -125,33 +138,41 @@ A case cannot pass by filling sections with generic prose. The minimum release f
 - at least 2 future event-to-model links;
 - zero unresolved critical research questions.
 
-A critical question may be explicitly unresolved during research. The
-evaluator must preserve it as `unknown` or `method_unavailable` rather than
-pass with a generic proxy. If the current case actually uses that missing input,
-the affected case result is `needs_fix`; if it remains visible and unused, the
-canonical workflow may be `accepted_with_todos`. Severity alone does not decide
-either result.
+The historical contract required unresolved critical questions to remain
+visible as `unknown` or `method_unavailable`, without passing them through a
+generic proxy. Current treatment remains governed by `RESEARCH_WORKFLOW.md`:
+using the missing input requires `needs_fix`; visible unused unknowns may allow
+`accepted_with_todos`. Severity alone does not decide the current outcome.
 
-## 6. Peer and valuation behavior
+## 6. Historical peer and valuation behavior
 
-Peer multiples are permitted only when:
+The retired evaluator permitted peer multiples only when:
 
 - at least three peers pass operating-definition qualification;
 - forecast periods are aligned;
 - product/service boundaries and accounting definitions are compatible; and
 - the report does not rank low-confidence peers.
 
-When these conditions are not met, the case must disable peer-multiple conclusions and use an allowed fallback such as reverse valuation, scenario valuation or an asset-value range. DCF and SOTP remain subject to their own upstream eligibility rules.
+When these conditions were not met, the case had to disable peer-multiple
+conclusions and use an eligible fallback such as reverse valuation, scenario
+valuation or an asset-value range. DCF and SOTP were subject to their upstream
+eligibility rules. Current method eligibility continues to belong to the
+applicable research and valuation contracts.
 
-## 7. Anti-hardcoding rule
+## 7. Historical anti-hardcoding rule
 
-The same runtime must serve all four companies. Issuer names, tickers and case-specific product labels may appear in:
+The historical harness required the same runtime to serve all four companies.
+Issuer names, tickers and case-specific product labels were allowed in:
 
 - the Bundle 16R case registry;
 - case manifests and generated artifacts;
 - benchmark metadata and test fixtures.
 
-They may not appear in the generic runtime implementation under `src/research`, the orchestrator, stock-deep-dive, quality-review or general scripts. The Bundle 16R evaluator scans these paths and fails when registered issuer-specific tokens are found outside explicit allow paths.
+They were not allowed in the generic runtime implementation under
+`src/research`, the orchestrator, stock-deep-dive, quality-review or general
+scripts. The retired evaluator scanned those paths and failed when registered
+issuer-specific tokens appeared outside explicit allow paths. This records
+historical test coverage; this contract does not install a current scan.
 
 ## 8. Historical exact-hash review records
 
@@ -161,9 +182,10 @@ the legacy evaluator required at that historical generation; they are
 read-only and must not be copied, refreshed, promoted or used to approve a
 current report.
 
-Active V1 has no per-case or generation-lock human approval. It machine-checks
-the case artifacts and their hashes, then applies the canonical scoped issue
-rules. The only active human boundary is the one final report named in
+Active V1 has no per-case or generation-lock human approval. Current artifact
+verification and scoped issue decisions follow `RESEARCH_WORKFLOW.md`, without
+requiring the retired four-case evaluator. The only active human boundary is
+the one final report named in
 `final_report_review.report_path`, whose current bytes are bound by
 `final_report_review.report_sha256`. That review uses
 `final_report_review_status: not_requested|pending|approved|changes_requested`
@@ -173,18 +195,19 @@ Automated jobs must never synthesize reviewer identity, review time,
 approval or change requests. A historical Bundle reviewer or accepted decision
 cannot satisfy the current final-report review.
 
-## 9. Legacy evaluator semantics
+## 9. Historical result semantics and current authority
 
-| Local or historical state | Meaning |
+| Historical state | Meaning |
 |---|---|
 | `engineering_pass=false` | one or more physical, truthfulness, model, semantic or hardcoding gates failed |
-| `engineering_pass=true` | the explicitly requested automated harness and four cases passed their local machine checks; this does not set canonical status |
+| `engineering_pass=true` | the recorded harness and four cases passed their local machine checks in that generation; this does not set current canonical status |
 | historical `sample_quality_allowed` | read-only compatibility fact about the old four-review policy; ignored by active routing and never imported into `sample_quality_ready` |
 | historical `p2_allowed` | read-only compatibility field; a separate canonical decision is always required |
 
-Bundle 16R must not edit canonical state to claim sample-quality or P2 merely
-because the evaluator is installed. Each local finding must be converted to an
-active issue with:
+The retired evaluator supplies no current state transition. Historical findings
+do not automatically become active issues. When a current request independently
+reevaluates a finding from those records, it uses the current workflow's existing
+issue fields:
 
 ```text
 impact_scope
@@ -195,23 +218,30 @@ local_check_id
 mapped_global_gate_ids
 ```
 
-Bundle16R checks map only to the existing G0–G10 owners for the capability they
-inspect. They do not create a new global gate. Unsupported-used numbers,
+Historical Bundle16R check IDs preserve mappings to existing G0–G10 owners;
+they do not create a current capability or a new global gate. Under the current
+workflow, unsupported-used numbers,
 calculation errors, true double-counting, hidden TODOs and no-advice failures
 are `needs_fix`; visible unused unknowns may remain
 `accepted_with_todos`; only failures that prevent any honest target output are
 `blocked`.
 
-An active run may set `sample_quality_ready=true` only outside this legacy
-evaluator, after all necessary automatic quality conditions pass and the
+An active run may set `sample_quality_ready=true` only under its current
+workflow contract, after all necessary automatic quality conditions pass and the
 current final report has a valid `approved` review with matching bytes, plus
 all other applicable sample-quality conditions. Those are necessary, not
 automatically sufficient, conditions.
 
-## 10. Determinism and generated files
+## 10. Historical determinism and generated files
 
-The evaluator emits deterministic JSON and Markdown readouts. Generated
-outputs belong under a run-specific or `bundle16r/generated/` directory and
-are not committed unless a later close task explicitly promotes a
-machine-qualified artifact. ZIP files, caches, backups and local evidence
-downloads are excluded from commits.
+The retired evaluator emitted deterministic JSON and Markdown readouts into
+run-specific or `bundle16r/generated/` directories. Its publication convention
+required an explicit close task to promote a machine-qualified artifact and
+excluded ZIP files, caches, backups and local evidence downloads from those
+generated-output commits.
+
+Existing tracked artifacts retain their evidence status under
+`docs/meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml`. Historical generation
+and publication conventions do not authorize regenerating, changing or deleting
+those records, and this contract provides no current execution or publication
+entry point.

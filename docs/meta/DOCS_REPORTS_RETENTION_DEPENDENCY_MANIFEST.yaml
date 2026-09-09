@@ -895,7 +895,29 @@ legacy_route_surfaces:
 - path: config/r5_patch_49_55_expected_artifacts.yaml
 - path: config/r5_readiness_gate_rules.yaml
 - path: config/r5_reviewed_input_pilot_gate_rules.yaml
-manual_delete_candidates: []
+manual_delete_candidates:
+- path: scripts/run_r5_bundle4_reviewed_input_smoke.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Fixture-only smoke shell retired after its meaningful end-to-end checks
+    were merged into retained promoter/dry-run tests; no current physical caller remains.
+  recovery_commit: 412e1d985454f374e9e0127523b33b44ff89675a
+  blob_oid: ef78bec3069b5de061e74d84b7b936aaf4b9a8dc
+  git_blob_bytes: 11687
+  content_sha256: f152ff02af84ac9e3d8e4f8a27003a53fd5f751224fa4557afef843885de9cb4
+  inbound_references:
+  - source_path: docs/logs/2026-09-09_test_fixture_bundle4_slimming.md
+    relation: historical_cross_reference
+- path: tests/test_r5_bundle4_reviewed_input_smoke.py
+  status: READY_FOR_MANUAL_DELETE
+  reason: Fixture-only smoke shell retired after its meaningful end-to-end checks
+    were merged into retained promoter/dry-run tests; no current physical caller remains.
+  recovery_commit: 412e1d985454f374e9e0127523b33b44ff89675a
+  blob_oid: ab21bbcd79d44c3c18d7936bb54b81ee2d6903fe
+  git_blob_bytes: 9978
+  content_sha256: 0a39c6fd3302ea17d43ad45ebb455e9686049cbb2d2abe4303012d99a3bfb3f9
+  inbound_references:
+  - source_path: docs/logs/2026-09-09_test_fixture_bundle4_slimming.md
+    relation: historical_cross_reference
 completed_manual_deletions:
 - path: config/r5_bundle3_expected_artifacts.yaml
   status: DELETED_BY_USER

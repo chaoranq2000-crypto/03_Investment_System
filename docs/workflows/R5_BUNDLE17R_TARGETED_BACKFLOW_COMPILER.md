@@ -1,8 +1,17 @@
-# R5 Bundle 17R-BF1 — Targeted Backflow Compiler
+# R5 Bundle 17R-BF1 — Historical Targeted Backflow Compiler
 
 ## Purpose
 
-Bundle 17R activation has a truthful blocked outcome:
+This document preserves the historical Bundle 17R-BF1 contract and its frozen
+activation baseline. Git commit `274d47ec299a42946bc3b83f7908257e80f0f99b` retired
+the compiler implementation and the Bundle 14R–17R execution chain. The original
+fields, routes and acceptance conditions below support historical interpretation
+and recovery under the [canonical retention manifest](../meta/DOCS_REPORTS_RETENTION_DEPENDENCY_MANIFEST.yaml).
+They are not a current work queue or an executable rerun plan. Current run
+selection and workflow decisions remain owned by `RESEARCH_WORKFLOW.md` and
+`config/r5_readout_canonical_index.yaml.current_runs`.
+
+The recorded Bundle 17R activation outcome was:
 
 ```text
 needs_targeted_backflow
@@ -12,7 +21,11 @@ sample_quality_allowed = false
 p2_allowed = false
 ```
 
-The next step is not Bundle 18R human review and not another Reader rebuild. This bundle compiles the exact physical Bundle 17R blocker queue into a deterministic, dependency-ordered set of work orders.
+The `0/4` and `63` values above are frozen historical results, not current-run
+status. The planned next step for that failure branch was to compile the exact
+physical blocker queue into deterministic, dependency-ordered work orders;
+Bundle 18R human review and a further Reader rebuild were not that step. The
+diagram records the former chain, including its now-retired rerun stage:
 
 ```text
 Bundle 17R receipt + generation lock
@@ -27,24 +40,29 @@ reviewed evidence / mappings / operating models / forecasts / valuation / Reader
 16R → 15R → 14R → 17R
 ```
 
-## Why this remains under Bundle 17R
+## Why the historical package was named Bundle 17R-BF1
 
-The Bundle 17R success branch reserves Bundle 18R for exact-hash human review. The current activation decision is the failure branch `R5_bundle17r_targeted_backflow`; therefore the corrective package is named `17R-BF1` and keeps Bundle 18R reserved.
+The original Bundle 17R success branch reserved Bundle 18R for exact-hash human
+review. The recorded activation took the failure branch
+`R5_bundle17r_targeted_backflow`; the corrective package was therefore named
+`17R-BF1`. These labels do not select a current stage or create reviewer authority.
 
-## Inputs
+## Historical inputs
 
-A manifest binds four physical artifacts from the committed Bundle 17R run:
+A manifest bound four physical artifacts from the committed Bundle 17R run:
 
 - activation receipt;
 - activation generation lock;
 - backflow queue;
 - case matrix.
 
-The policy owns the expected values. A manifest can choose physical paths and hashes but cannot change `0/4`, `63`, the expected decision, or the release boundaries.
+The historical policy owned the expected values. A manifest could choose
+physical paths and hashes but could not change `0/4`, `63`, the expected decision
+or the release boundaries.
 
-## Validation gates
+## Historical validation gates
 
-The compiler fails closed when:
+The retired compiler failed closed when:
 
 - a bound file is absent, outside an allowed root, forbidden, or hash-mismatched;
 - receipt and generation-lock generation IDs differ;
@@ -56,11 +74,12 @@ The compiler fails closed when:
 - a case-specific blocker references a case absent from the matrix;
 - a dependency is unknown or cyclic.
 
-## Routing and clustering
+## Historical routing and clustering
 
-Every source row remains in the issue ledger with a stable issue ID, including duplicate rows. Clustering reduces execution noise but never reduces blocker accounting.
+Every source row remained in the issue ledger with a stable issue ID, including
+duplicate rows. Clustering reduced execution noise without reducing blocker accounting.
 
-Routes are policy-owned:
+The historical policy owned these routes:
 
 1. physical binding and generation integrity;
 2. official evidence acquisition and review;
@@ -73,9 +92,12 @@ Routes are policy-owned:
 9. exact-hash human-review handoff;
 10. manual orchestrator triage for anything not safely classified.
 
-A terminal work order reruns Bundle 16R, 15R, 14R, and 17R only after all preceding work orders are physically evidenced.
+The former terminal work order required rerunning Bundle 16R, 15R, 14R and 17R
+only after all preceding work orders were physically evidenced. That execution
+chain is retired; this requirement is retained to explain the historical close
+boundary, not to request or enable a current rerun.
 
-## Outputs
+## Historical outputs
 
 ```text
 R5_bundle17r_backflow_compilation.json
@@ -90,7 +112,7 @@ R5_bundle17r_backflow_close_readout.md
 R5_bundle17r_backflow_generation_lock.json
 ```
 
-## State semantics
+## Historical state semantics
 
 | Decision | Meaning |
 |---|---|
@@ -100,9 +122,10 @@ R5_bundle17r_backflow_generation_lock.json
 
 None of these states authorizes sample quality, human acceptance, canonical workflow-state mutation, or P2.
 
-## Close boundary
+## Historical close boundary
 
-17R-BF1 engineering close means the compiler and plans are installed and deterministic. Research close requires:
+In the original contract, 17R-BF1 engineering close meant that the compiler and
+plans were installed and deterministic. Its research-close requirements were:
 
 ```text
 all work-order acceptance artifacts physically present
@@ -112,4 +135,7 @@ all work-order acceptance artifacts physically present
 + Bundle 17R activation = 4/4 and blockers = 0
 ```
 
-Only then may the workflow route to Bundle 18R exact-hash human review. Bundle 18R still cannot grant P2 automatically.
+Only after those conditions did the historical plan permit a Bundle 18R
+exact-hash human-review handoff. This does not restore the retired chain or
+dispatch a current workflow. Historical human-review records cannot replace
+current final-report review, and P2 remains a separate canonical decision.
